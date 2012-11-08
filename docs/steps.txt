@@ -1,10 +1,32 @@
-Here it is:
 
+################
+# Install needed packages
+#
 # Install gsl on Ubuntu:
 sudo aptitude install libgsl0-dev libgsl0ldbl
 
 # Install gnuplot on Ubuntu:
 sudo aptitude install gnuplot
+
+
+################
+# Get koral from unfuddle after koral git setup there.
+#
+
+git clone git@harm.unfuddle.com:harm/koral.git
+cd koral
+# I already added Olek's files with my doc revisions to git:
+# cp -a ~/koral.orig/* .
+# git commit -a -m "initial add with emails from Olek in docs and mods to steps.txt"
+# You can make any file changes and then commit changes to local repo
+git commit -a -m "comment here"
+# push commit to unfuddle
+git push origin master
+
+
+################
+# Make and Run Koral
+#
 
 # Setting OPENMP:
 export OMP_NUMTHREADS=8
@@ -22,11 +44,15 @@ make clean ; make
 # or ./mk
 
 # Running
-mkdir run ; rm -rf run/* ; cd run ; cp -a ../ko ../PROBLEMS ../gifs ../dumps . ; ./ko
+mkdir run ; rm -rf run/* ; cd run ; cp -a ../ko ../PROBLEMS . ; mkdir gifs dumps ; ./ko
 
 
-# looking at results:
+################
+# Look at results:
+#
+
 # gifs/*.gif - if only gnuplot worked it produced gifs
-# dumps/out0001.dat - ascii dump files, the column order is given near the end of fileop.c
+# ascii dump files, the column order is given near the end of fileop.c
+# dumps/out0001.dat
 
 
