@@ -1,0 +1,44 @@
+Here is the KORAL code. I hope you find it useful and keep confident
+for a moment.
+
+It has not been optimized for a while, so you will find for sure a
+number of "imperfect" pieces of code. However, I have recently cleaned
+it up, added a number of comments and I hope it is readable.
+
+It consists of a number of source files in the main folder which
+contain problem-independent routines and subfolders (PROBLEMS/XXX)
+containing problem-dependent files. They are #included into the main
+source files, so whenever you modify any of the problem-specific
+files, you need to run something like: "make clean; make" and then
+"./ko" which is the executable.
+
+Below is a nut-shell description of all the important files. Inside
+them you will find a number of comments. I hope they are easy to read.
+
+* main folder *
+problem.h - choice of the problem
+ko.c - high level calls, nothing interesting
+finite.c - finite differencing, reconstruction, Lax-Friedrichs, grid etc.
+physics.c - wave speed calculation, formulae for fluxes, source terms
+problem.c - calls for problem-related routines
+rad.c - radiation-related routines
+relele.c - some relativistic stuff
+frames.c - frame boosts etc.
+metric.c - metric components
+misc.c - mainly memory allocations
+fileop.c - file operations (the code writes ascii dump files plus
+calls gnuplot to produce gifs on the go)
+u2p.c - conserved to primitives converter
+p2u.c - primitives to conserved converter
+zsolve_quartic.c - solver for quartic equations
+ko.h - definitions, nothing interesting
+
+* problem folder *
+init.c - initial state
+bc.c - boundary conditions
+dump.c - calculation of non-standard output
+kappa.c - absorption opacities
+kappaes.c - scattering opacities
+out2gif_1d.c - gnuplot macro in 1d
+out2gif_2d.c - gnuplot macro in 2d
+anasol.c - unused

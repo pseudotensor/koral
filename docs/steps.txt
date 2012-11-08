@@ -1,0 +1,32 @@
+Here it is:
+
+# Install gsl on Ubuntu:
+sudo aptitude install libgsl0-dev libgsl0ldbl
+
+# Install gnuplot on Ubuntu:
+sudo aptitude install gnuplot
+
+# Setting OPENMP:
+export OMP_NUMTHREADS=8
+
+# Editing:
+# problem.h - to choose problem, e.g., #define PROBLEM 6 for RADTUBE)
+# PROBLEMS/RADTUBE/define.h - problem parameters
+# PROBLEMS/RADTUBE/init.h - initial state
+# PROBLEMS/RADTUBE/bc.c - boundary conditions
+# PROBLEMS/RADTUBE/kappa.c, kappaes.c - opacities
+
+# Compiling:
+# make clean required when any of the files inside PROBLEMS has changed
+make clean ; make
+# or ./mk
+
+# Running
+mkdir run ; rm -rf run/* ; cd run ; cp -a ../ko ../PROBLEMS ../gifs ../dumps . ; ./ko
+
+
+# looking at results:
+# gifs/*.gif - if only gnuplot worked it produced gifs
+# dumps/out0001.dat - ascii dump files, the column order is given near the end of fileop.c
+
+
