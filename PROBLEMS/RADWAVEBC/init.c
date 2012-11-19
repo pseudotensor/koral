@@ -13,26 +13,26 @@ set_initial_profile()
 */
 
 ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE,vx;  
-	      ldouble xx,yy,zz;
-	      ldouble uu[NV];
+ldouble xx,yy,zz;
+ldouble uu[NV];
 
-	      xx=get_x(ix,0);
-	      yy=get_x(iy,1);
-	      zz=get_x(iz,2);
-	      ldouble gg[4][5],eup[4][4],elo[4][4];
-	      pick_g(ix,iy,iz,gg);
-	      calc_LNRFes(gg,eup,elo);
+xx=get_x(ix,0);
+yy=get_x(iy,1);
+zz=get_x(iz,2);
+ldouble gg[4][5],eup[4][4],elo[4][4];
+pick_g(ix,iy,iz,gg);
+calc_LNRFes(gg,eup,elo);
 
-	      ldouble pp[NV],T;
+ldouble pp[NV],T;
 
 /************************/
 
 ldouble t=0.;
-rho=RHO+exp(-OMIM*t)*(DRRE*cos(OMRE*t-KK*xx) + DRIM*sin(OMRE*t-KK*xx));
-uint=UINT+exp(-OMIM*t)*((DPRE*cos(OMRE*t-KK*xx) + DPIM*sin(OMRE*t-KK*xx)/GAMMAM1))*UINT;
-vx=0.+exp(-OMIM*t)*(DVRE*cos(OMRE*t-KK*xx) + DVIM*sin(OMRE*t-KK*xx))/CC;
-E=(ERAD+exp(-OMIM*t)*(DERE*cos(OMRE*t-KK*xx) + DEIM*sin(OMRE*t-KK*xx)))*4.*SIGMA_RAD*TEMP*TEMP*TEMP*TEMP;
-Fx=(0.+exp(-OMIM*t)*(DFRE*cos(OMRE*t-KK*xx) + DFIM*sin(OMRE*t-KK*xx)))*4.*SIGMA_RAD*TEMP*TEMP*TEMP*TEMP;
+rho=RHO;
+uint=UINT;
+vx=0.;
+E=ERAD*4.*SIGMA_RAD*TEMP*TEMP*TEMP*TEMP;
+Fx=0.;
 
 
       Fz=Fy=0.;

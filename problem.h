@@ -16,12 +16,12 @@
 //11 RADSHADOW - radiative shadow
 //12 RADATM - atmosphere enlighted
 //13 DONUTOSC - 2d Polish donut oscillating
-//14 RADWAVE - 1d linear rad wave
-//15 RADWAVEJIANG - 1d linear rad wave like in Jiang+12
+//14 RADWAVEBC - 1d linear rad wave imposed on boundary
+//15 RADWAVE - 1d linear rad wave with periodic BC
 //16 RADPULSE3D - radiative blob spreading around
 //17 RADDBLSHADOW - radiative shadow with two beams inclined
 
-#define PROBLEM 1
+#define PROBLEM 15
 
 #if(PROBLEM==1)
 
@@ -207,6 +207,20 @@
 
 #if(PROBLEM==14)
 
+#define PR_DEFINE "PROBLEMS/RADWAVEBC/define.h"
+#define PR_BC "PROBLEMS/RADWAVEBC/bc.c"
+#define PR_INIT "PROBLEMS/RADWAVEBC/init.c"
+#define PR_KAPPA "PROBLEMS/RADWAVEBC/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADWAVEBC/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADWAVEBC/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADWAVEBC/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADWAVEBC/dump.c"
+#define PR_ANASOL "PROBLEMS/RADWAVEBC/anasol.c"
+
+#endif
+
+#if(PROBLEM==15)
+
 #define PR_DEFINE "PROBLEMS/RADWAVE/define.h"
 #define PR_BC "PROBLEMS/RADWAVE/bc.c"
 #define PR_INIT "PROBLEMS/RADWAVE/init.c"
@@ -216,20 +230,6 @@
 #define PR_OUT2GIF_1D "PROBLEMS/RADWAVE/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADWAVE/dump.c"
 #define PR_ANASOL "PROBLEMS/RADWAVE/anasol.c"
-
-#endif
-
-#if(PROBLEM==15)
-
-#define PR_DEFINE "PROBLEMS/RADWAVEJIANG/define.h"
-#define PR_BC "PROBLEMS/RADWAVEJIANG/bc.c"
-#define PR_INIT "PROBLEMS/RADWAVEJIANG/init.c"
-#define PR_KAPPA "PROBLEMS/RADWAVEJIANG/kappa.c"
-#define PR_KAPPAES "PROBLEMS/RADWAVEJIANG/kappaes.c"
-#define PR_OUT2GIF_2D "PROBLEMS/RADWAVEJIANG/out2gif_2d.c"
-#define PR_OUT2GIF_1D "PROBLEMS/RADWAVEJIANG/out2gif_1d.c"
-#define PR_DUMP "PROBLEMS/RADWAVEJIANG/dump.c"
-#define PR_ANASOL "PROBLEMS/RADWAVEJIANG/anasol.c"
 
 #endif
 
