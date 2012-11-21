@@ -60,6 +60,7 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble eup[][4], ldouble elo[][4])
   //************************************
  
   ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vph*vph*gphph + vth*vth*gthth);
+
   if(ut2<0.)
     {
       my_err("ut2.lt.0 in p2u\n"); ut2=0.;

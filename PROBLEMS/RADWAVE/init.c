@@ -28,25 +28,54 @@ ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE,vx;
 /************************/
 
 ldouble t=0.;
-rho=RHO+exp(-OMIM*t)*(DRRE*cos(OMRE*t-KK*xx) + DRIM*sin(OMRE*t-KK*xx));
-uint=UINT+exp(-OMIM*t)*((DPRE*cos(OMRE*t-KK*xx) + DPIM*sin(OMRE*t-KK*xx)/GAMMAM1))*UINT;
-vx=0.+exp(-OMIM*t)*(DVRE*cos(OMRE*t-KK*xx) + DVIM*sin(OMRE*t-KK*xx))/CC;
-E=(ERAD+exp(-OMIM*t)*(DERE*cos(OMRE*t-KK*xx) + DEIM*sin(OMRE*t-KK*xx)))*4.*SIGMA_RAD*TEMP*TEMP*TEMP*TEMP;
-Fx=(0.+exp(-OMIM*t)*(DFRE*cos(OMRE*t-KK*xx) + DFIM*sin(OMRE*t-KK*xx)))*4.*SIGMA_RAD*TEMP*TEMP*TEMP*TEMP;
 
+//hydro density wave
+#if (NWAVE==1)
+rho=RHO*(1.+AAA*cos(KK*xx));
+uint=UINT;
+vx=VX;
+#endif
 
-      Fz=Fy=0.;
-      pp[0]=rho;
-      pp[1]=uint;
+//radiative hydro density wave
+#if (NWAVE==3)
+rho=RHO*(1.+AAA*cos(KK*xx));
+uint=UINT;
+vx=VX;
+E=ERAD;
+Fx=Fz=Fy=0.;
+#endif
+
+//hydro sound wave
+#if (NWAVE==2)
+rho=RHO*(1.+AAA*cos(KK*xx));
+uint=UINT*(1.+GAMMA*AAA*cos(KK*xx));
+ldouble cs=1./CC;
+vx=AAA*cos(KK*xx)*cs;
+E=ERAD;
+Fx=Fz=Fy=0.;
+#endif
+
+//radiative sound wave
+#if (NWAVE==4)
+rho=RHO*(1.+GASFACTOR*AAA*cos(KK*xx));
+uint=UINT*(1.+GASFACTOR*GAMMA*AAA*cos(KK*xx));
+ldouble cs=1./CC;
+vx=GASFACTOR*AAA*cos(KK*xx)*cs;
+E=ERAD*(1.+ERADFACTOR*AAA*cos(KK*xx));
+Fx=Fz=Fy=0.;
+#endif
+
+pp[0]=rho;
+pp[1]=uint;
 pp[2]=vx;
-      pp[3]=0.;
-      pp[4]=0.;
-      pp[5]=calc_Sfromu(rho,uint);
+pp[3]=0.;
+pp[4]=0.;
+pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
-      pp[6]=E;
-      pp[7]=Fx;
-      pp[8]=Fy;
-      pp[9]=Fz; 
+pp[6]=E;
+pp[7]=Fx;
+pp[8]=Fy;
+pp[9]=Fz; 
 #endif
 
 //print_Nvector(pp,NV); getchar();

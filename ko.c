@@ -98,6 +98,7 @@ solve_all_problems_5(ldouble tstart)
 #endif
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1,imp_time2,tstepden;
+
       
 #ifndef RADIATION //pure hydro
       if(NZ>1)
@@ -126,8 +127,10 @@ solve_all_problems_5(ldouble tstart)
 #endif
       
       //reseting wavespeeds
-      max_ws[0]=max_ws[1]=max_ws[2]=-1.;
-       
+      max_ws[0]=-1.;
+      max_ws[1]=-1.;
+      max_ws[2]=-1.;
+
       //iteration counter
       i1++;
 
@@ -225,6 +228,7 @@ solve_all_problems_5(ldouble tstart)
       //performance
       ldouble znps=NX*NY*NZ/(end_time-start_time);
 
+  
       //output to a file
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT)
 	{

@@ -293,8 +293,10 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   //#pragma omp critical
   if(my_max(aaazhd,aaazrad)>max_ws[2]) max_ws[2]=my_max(aaazhd,aaazrad);
 #else
+ 
   //#pragma omp critical
-  if(aaaxhd>max_ws[0]) max_ws[0]=aaaxhd;
+  if(aaaxhd>max_ws[0]) 
+    max_ws[0]=aaaxhd;    
   //#pragma omp critical
   if(aaayhd>max_ws[1]) max_ws[1]=aaayhd;
   //#pragma omp critical
@@ -313,7 +315,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   int ix,iy,iz,iv,ii;
 
   //global
-  max_ws[0]=max_ws[1]=max_ws[2]=1.;
+  max_ws[0]=max_ws[1]=max_ws[2]=-1.;
 
   //local
   ldouble max_lws[3];
@@ -802,6 +804,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       al=my_max(ap1[0],am1[0]); 
 #endif
 
+#ifdef FLUXDISSIPATIONOFF
+      al=0.;
+#endif
+
       //Lax-Friedrich
       fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - al * (fd_uRl[i] - fd_uLl[i]));
   
@@ -853,6 +859,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	  al=my_max(ap1[0],am1[0]); 
 #endif
       
+#ifdef FLUXDISSIPATIONOFF
+      al=0.;
+#endif
+
 	  fd_fstarl[i] = .5*(get_ub(flRy,i,ix,iy,iz,1) + get_ub(flLy,i,ix,iy,iz,1) - al * (fd_uRl[i] - fd_uLl[i]));
       
 	  set_uby(flby,i,ix,iy,iz,fd_fstarl[i]);
@@ -902,6 +912,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	    }
 #else
 	  al=my_max(ap1[0],am1[0]); 
+#endif
+
+#ifdef FLUXDISSIPATIONOFF
+      al=0.;
 #endif
 
 	  fd_fstarl[i] = .5*(get_ub(flRz,i,ix,iy,iz,2) + get_ub(flLz,i,ix,iy,iz,2) - al * (fd_uRl[i] - fd_uLl[i]));
