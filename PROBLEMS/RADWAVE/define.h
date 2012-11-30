@@ -43,23 +43,24 @@
 #if (NWAVE==5) //sound wave with radiation set up according to Jiang+12
 //#define FLUXDISSIPATIONOFF
 
-#define NUMERO 11
+#define NUMERO 41
 
 #if (NUMERO==41)
 #define PP 100.
 #define CC 1.e2
 #undef KAPPA
 #define KAPPA 10.
-#define DRRE 1.e-3
+#define RHOFAC 0.01
+#define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
-#define DVRE 4.06372e-6
-#define DVIM 6.90937e-6
-#define DURE 9.88671e-4
-#define DUIM 6.97077e-6
-#define DERE -4.52724e-5
-#define DEIM 2.78566e-5
-#define DFRE -5.83678e-6
-#define DFIM -9.48194e-6
+#define DVRE (4.06372e-6*RHOFAC)
+#define DVIM (6.90937e-6*RHOFAC)
+#define DURE (9.88671e-4*RHOFAC)
+#define DUIM (6.97077e-6*RHOFAC)
+#define DERE (-4.52724e-5*RHOFAC)
+#define DEIM (2.78566e-5*RHOFAC)
+#define DFRE (-5.83678e-6*RHOFAC)
+#define DFIM (-9.48194e-6*RHOFAC)
 #define OMRE 0.0255331
 #define OMIM 0.0434128
 #define DTOUT1 1.e-0
