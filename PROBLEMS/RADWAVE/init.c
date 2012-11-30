@@ -9,25 +9,47 @@ set_initial_profile()
       for(iy=0;iy<NY;iy++)
 	{
 	  for(ix=0;ix<NX;ix++)
-	    {
+	  {
 */
 
 ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE,vx;  
-	      ldouble xx,yy,zz;
-	      ldouble uu[NV];
+ldouble xx,yy,zz;
+ldouble uu[NV];
 
-	      xx=get_x(ix,0);
-	      yy=get_x(iy,1);
-	      zz=get_x(iz,2);
-	      ldouble gg[4][5],eup[4][4],elo[4][4];
-	      pick_g(ix,iy,iz,gg);
-	      calc_LNRFes(gg,eup,elo);
+xx=get_x(ix,0);
+yy=get_x(iy,1);
+zz=get_x(iz,2);
+ldouble gg[4][5],eup[4][4],elo[4][4];
+pick_g(ix,iy,iz,gg);
+calc_LNRFes(gg,eup,elo);
 
-	      ldouble pp[NV],T;
+ldouble pp[NV],T;
 
 /************************/
 
 ldouble t=0.;
+
+//Jiang+12 waves
+#if (NWAVE==5)
+
+//printf("RHO = %Le\nUINT = %Le\nT = %Le\nERAD = %Le\nSIGMA = %Le\n",(ldouble)RHO,(ldouble)UINT,(ldouble)TEMP,(ldouble)ERAD,(ldouble)SIGMA_RAD);getchar();
+
+
+rho=RHO*(1+DRRE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DRIM/DRRE*sin(OMRE*t-KK*xx)));
+//ldouble DURE=DPRE/(GAMMA-1.); ldouble DUIM=DPIM/(GAMMA-1.);
+uint=UINT*(1.+DURE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DUIM/DURE*sin(OMRE*t-KK*xx))) ;
+ldouble cs=1/CC;
+vx=0.+DVRE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DVIM/DVRE*sin(OMRE*t-KK*xx)) ; //DVRE absolute!
+E=ERAD*(1+DERE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DEIM/DERE*sin(OMRE*t-KK*xx)));
+Fx=0.+ERAD*DFRE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DFIM/DFRE*sin(OMRE*t-KK*xx));
+Fz=Fy=0.;
+
+//rho=RHO;
+//uint=UINT;
+//E=ERAD;
+//vx=0;
+//Fx=0.;
+#endif
 
 //hydro density wave
 #if (NWAVE==1)
@@ -76,6 +98,9 @@ pp[6]=E;
 pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
+
+//perturbations given in the lab frame, need to be transformed to the fluid frame
+//prad_zamo2ff(pp,pp,gg,eup);
 #endif
 
 //print_Nvector(pp,NV); getchar();

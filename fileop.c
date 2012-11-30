@@ -241,9 +241,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //**********************************************************************
 
 						  fprintf(fout1,"%.4Le %.4Le %.4Le "
-							  "%.10Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le "
 							  "%.7Le %.7Le %.7Le %.7Le %.7Le %.7Le %.7Le %.7Le %.7Le "
-							  "%.4Le %.4Le %.4Le %.4Le %.4Le %.4Le\n",
+							  "%.7Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le "
+							  "%.10Le %.10Le %.10Le %.10Le %.10Le %.10Le\n",
 							  xx,     //1
 							  yy,     //2
 							  zz,     //3		      

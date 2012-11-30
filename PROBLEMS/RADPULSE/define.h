@@ -23,7 +23,7 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 2.
 #define DTOUT1 1.e3
-#define ALLSTEPSOUTPUT 0
+#define ALLSTEPSOUTPUT 1
 #define GAMMA (ldouble)(5./3.)
 #define MINX -50.
 #define MAXX 50.
@@ -44,6 +44,7 @@
 
 #define KAPPA 0.
 #define KAPPAES 1.e3
+//#define EDDINGTON_APR
 
 //#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT

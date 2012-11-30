@@ -119,7 +119,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     }
 
   ldouble EPS = 1.e-6;
-  ldouble CONV = 1.e-6;
+  ldouble CONV = 1.e-10;
 
   int verbose=0;
   int iter=0;

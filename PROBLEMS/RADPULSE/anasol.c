@@ -1,7 +1,7 @@
 //int
 //analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,ldouble *vv)
 //{
-
+/*
 	      ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
 	      ldouble xx,yy,zz;
 	   
@@ -64,5 +64,5 @@ double result, error;
      
 vv[3]=(ldouble)(result/sqrt(4.*Pi*k*(double)t));
 if(ix==NX/2) printf("%Le %Le %e %Le\n",t,1./3./chi,k,vv[3]);
-
+*/
  
