@@ -22,7 +22,7 @@ finite.c - finite differencing, reconstruction, Lax-Friedrichs, grid etc.
 physics.c - wave speed calculation, formulae for fluxes, source terms
 problem.c - calls for problem-related routines
 rad.c - radiation-related routines
-relele.c - some relativistic stuff
+relele.c - some relativistic stuff (cons quant and Tmunu in here)
 frames.c - frame boosts etc.
 metric.c - metric components
 misc.c - mainly memory allocations
@@ -42,3 +42,41 @@ kappaes.c - scattering opacities
 out2gif_1d.c - gnuplot macro in 1d
 out2gif_2d.c - gnuplot macro in 2d
 anasol.c - unused
+
+
+
+***********************************
+solve_implicit_lab:
+
+    pick_T: memory management routine -- storage memory mapping function -- prior to transforming T(stress-energy tensor) from one frame to another.
+
+    pick_g: reads-out covariant metric g_{\mu\nu}
+
+    pick_G: reads-out contravariant metric g^{\mu\nu}
+
+f_implicit_lab:
+
+1) work on conserved quantities
+2) u2p: convert all conserved to primitives
+   u2p_hot: hydro inversion (replace with HARM)
+   u2p_rad: radiation inversion (1 func)
+   u2p_rad_num: for when Eddington approximation used
+   u2p_cold: hydro cold inversion (replace with HARM)
+
+3) boost2_ff2zamo: converts ff 2 zamo for radiation
+boost22_ff2zamo:22 = boosts contravariant tensors
+                2 = boosts contravariant 4-vector
+              
+indices_2221 = 22 = both upper   21 = upper-lower  for going from 22 to 21
+       _21  = 2 to 1 for 4-vector
+
+trans2_lab2zamo: trans2 = upper 4-vector - lab2zamo
+trans22_zamo2lab: trans22 = upper-upper tensor - zamo2lab
+
+calc_Rij : primtives -> Radtensor using M1 closure
+
+calc_Gi: primitives -> calc_kappa -> calculate 4-force in fluid frame
+
+
+***********************************
+
