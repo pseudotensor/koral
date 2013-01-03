@@ -54,7 +54,7 @@ calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
 //**********************************************************************
 
 //TODO: clean arguments
-int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4], ldouble tup[][4], ldouble tlo[][4],ldouble *f)
+int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][5], ldouble GG[][5], ldouble tup[][4], ldouble tlo[][4],ldouble *f)
 {
   ldouble Rij[4][4];
   ldouble ppp[NV];
@@ -71,25 +71,20 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
   uu[4] = uu0[4] - (uu[9]-uu0[9]);
 
   //calculating primitives  
-  u2p(uu,pp2,gg,GG,eup,elo);
+  u2p(uu,pp2,gg,GG,tup,tlo);
 
   //new four-force
   ldouble Gi[4];
   calc_Gi(pp2,Gi);
-  //print_4vector(Gi);
 
   //OLD - limited by Bardeen's tensor
-  boost2_ff2zamo(Gi,Gi,pp2,gg,eup);
-  trans2_zamo2lab(Gi,Gi,elo);
-  //print_4vector(Gi);
+  //boost2_ff2zamo(Gi,Gi,pp2,gg,eup);
+  //trans2_zamo2lab(Gi,Gi,elo);
 
   //NEW
-  //calc_Gi(pp2,Gi);
-  //trans2_on2cc(Gi,Gi,tlo);
-  //boost2_ff2lab(Gi,Gi,pp2,gg);
-  //print_4vector(Gi);
-  //getchar();
-
+  trans2_on2cc(Gi,Gi,tlo);
+  boost2_ff2lab(Gi,Gi,pp2,gg);
+  
   indices_21(Gi,Gi,gg);
  
   f[0] = uu[6] - uu0[6] + dt * Gi[0];
@@ -118,10 +113,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   ldouble f1[4],f2[4],f3[4],x[4];
   ldouble gg[4][5];
   ldouble GG[4][5];
-  ldouble eup[4][4],elo[4][4];
   ldouble tup[4][4],tlo[4][4];
-  pick_T(emuup,ix,iy,iz,eup);
-  pick_T(emulo,ix,iy,iz,elo);
   pick_T(tmuup,ix,iy,iz,tup);
   pick_T(tmulo,ix,iy,iz,tlo);
   pick_g(ix,iy,iz,gg);
@@ -150,7 +142,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       //values at zero state
-      f_implicit_lab(uu0,uu,pp,dt,gg,GG,eup,elo,tup,tlo,f1);
+      f_implicit_lab(uu0,uu,pp,dt,gg,GG,tup,tlo,f1);
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -162,7 +154,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      else del=EPS*uup[j+6];
 	      uu[j+6]=uup[j+6]-del;
 
-	      f_implicit_lab(uu0,uu,pp,dt,gg,GG,eup,elo,tup,tlo,f2);
+	      f_implicit_lab(uu0,uu,pp,dt,gg,GG,tup,tlo,f2);
      
 	      J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
 

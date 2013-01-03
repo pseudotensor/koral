@@ -587,9 +587,9 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      ldouble fd_der[NV],t_der[NV],val,ms_der[NV],ss_der[NV],rho,uint,pp[NV],uu[NV],uuold[NV],duu[NV];
 	      
 	      ldouble gg[4][5];
-	      ldouble eup[4][4],elo[4][4];
-	      pick_T(emuup,ix,iy,iz,eup);
-	      pick_T(emulo,ix,iy,iz,elo);
+	      ldouble tup[4][4],tlo[4][4];
+	      pick_T(tmuup,ix,iy,iz,tup);
+	      pick_T(tmulo,ix,iy,iz,tlo);
 	      pick_g(ix,iy,iz,gg);
 	      ldouble gdet=gg[3][4];
 	      	      
@@ -681,8 +681,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  calc_primitives(ix,iy,iz);
 		  //semi-implicit in the fluid frame - only approximate!
 		  solve_implicit_ff(ix,iy,iz,dt,del4);
-		  boost2_ff2zamo(del4,del4,pp,gg,eup);
-		  trans2_zamo2lab(del4,del4,elo);
+		  //		  boost2_ff2zamo(del4,del4,pp,gg,eup);
+		  //		  trans2_zamo2lab(del4,del4,elo);
+		  trans2_on2cc(del4,del4,tlo);
+		  boost2_ff2lab(del4,del4,pp,gg);
 		  indices_21(del4,del4,gg);
 		}		
 #endif
@@ -692,8 +694,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      calc_primitives(ix,iy,iz);
 	      //applied explicitly
 	      solve_explicit_ff(ix,iy,iz,dt,del4);
-	      boost2_ff2zamo(del4,del4,pp,gg,eup);
-	      trans2_zamo2lab(del4,del4,elo);
+	      //	      boost2_ff2zamo(del4,del4,pp,gg,eup);
+	      //	      trans2_zamo2lab(del4,del4,elo);
+	      trans2_on2cc(del4,del4,tlo);
+	      boost2_ff2lab(del4,del4,pp,gg);
 	      indices_21(del4,del4,gg);
 #endif
 
@@ -702,8 +706,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      calc_primitives(ix,iy,iz);
 	      //semi-implicit in the fluid frame - only approximate!
 	      solve_implicit_ff(ix,iy,iz,dt,del4);
-	      boost2_ff2zamo(del4,del4,pp,gg,eup);
-	      trans2_zamo2lab(del4,del4,elo);
+	      //	      boost2_ff2zamo(del4,del4,pp,gg,eup);
+	      //	      trans2_zamo2lab(del4,del4,elo);
+	      trans2_on2cc(del4,del4,tlo);
+	      boost2_ff2lab(del4,del4,pp,gg);
 	      indices_21(del4,del4,gg);
 #endif
 

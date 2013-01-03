@@ -8,7 +8,7 @@
 //**********************************************************************
 //primitive to conserved converter
 int
-p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble eup[][4], ldouble elo[][4])
+p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble tup[][4], ldouble tlo[][4])
 {
   ldouble gtt=g[0][0];
   ldouble gtph=g[0][3];
@@ -40,10 +40,15 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble eup[][4], ldouble elo[][4])
   ldouble Rij[4][4];
 
   calc_Rij(p,Rij);
-  boost22_ff2zamo(Rij,Rij,p,g,eup);
-  trans22_zamo2lab(Rij,Rij,g,elo);  
-  indices_2221(Rij,Rij,g);
 
+  //boost22_ff2zamo(Rij,Rij,p,g,eup);
+  //trans22_zamo2lab(Rij,Rij,g,elo);  
+
+  trans22_on2cc(Rij,Rij,g,tlo);
+  boost22_ff2lab(Rij,Rij,p,g);
+
+  indices_2221(Rij,Rij,g);
+  
   u[6]=Rij[0][0]; //R^t_t
   u[7]=Rij[0][1]; //R^t_i
   u[8]=Rij[0][2];

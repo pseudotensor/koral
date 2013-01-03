@@ -1,3 +1,4 @@
+#define U2P_NUMTEMP
 #define U2PPREC 1.e-6
 #define U2PRADPREC 1.e-7
 #define RADFORCEPREC 1.e-5
@@ -39,11 +40,10 @@
 #define NWAVE 5
 //#define RADOUTPUTINZAMO
 
-
 #if (NWAVE==5) //sound wave with radiation set up according to Jiang+12
 //#define FLUXDISSIPATIONOFF
 
-#define NUMERO 41
+#define NUMERO 11
 
 #if (NUMERO==41)
 #define PP 100.

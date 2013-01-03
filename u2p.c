@@ -9,7 +9,7 @@
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4])
+u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4], ldouble tlo[][4])
 {
   int verbose=0;
 
@@ -32,10 +32,11 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]
   //************************************
   //hot hydro - conserving energy
   ret=0;
-  if(NY==1 && NZ==1 && 0) 
+#ifdef U2P_NUMTEMP
     u2pret=u2p_hot_gsl(uu,pp,gg);  //temporary 3D solver - not perfect - does not work for RADATM!
-  else
+#else
     u2pret=u2p_hot(uu,pp,gg);  //TODO: to be replaced - catastrophic cancelation!
+#endif
   //************************************
 
   if(u2pret<0) 
@@ -93,10 +94,10 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]
   
 #ifdef EDDINGTON_APR
   //numerical solver for primitives closing Rij in the fluid frame 
-  if(u2p_rad_num(uu,pp,gg,eup,elo)<0) ret-=100;
+  if(u2p_rad_num(uu,pp,gg,tup,tlo)<0) ret-=100;
 #else
   //covariant formulation, closing Rij in the lab frame
-  u2p_rad(uu,pp,gg,GG,eup,elo);
+  u2p_rad(uu,pp,gg,GG,tup,tlo);
 #endif
   
 #endif
@@ -111,7 +112,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]
 //**********************************************************************
 //**********************************************************************
 int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4])
+u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4], ldouble tlo[][4])
 {
   int verbose=0;
   ldouble Rij[4][4];
@@ -154,8 +155,11 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
       Rij[i][j]=4./3.*Erf*urf[i]*urf[j]+1./3.*Erf*GG[i][j];
 
   //boosting to ff
-  trans22_lab2zamo(Rij,Rij,gg,eup);
-  boost22_zamo2ff(Rij,Rij,pp,gg,eup);
+  //trans22_lab2zamo(Rij,Rij,gg,eup);
+  //boost22_zamo2ff(Rij,Rij,pp,gg,eup);
+
+  boost22_lab2ff(Rij,Rij,pp,gg);
+  trans22_cc2on(Rij,Rij,gg,tup);
 
   //reading primitives
   pp[6]=Rij[0][0];
@@ -172,14 +176,18 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
 //numerical conserved to primitives solver for radiation
 //used e.g. for not-frame-invariant  Eddington apr. 
 //solves in 4dimensions using frame boosts etc.
-int f_u2prad_num(ldouble *uu,ldouble *pp, ldouble gg[][5], ldouble eup[][4], ldouble elo[][4],ldouble *f)
+int f_u2prad_num(ldouble *uu,ldouble *pp, ldouble gg[][5], ldouble tup[][4], ldouble tlo[][4],ldouble *f)
 {
   ldouble Rij[4][4];
   ldouble ppp[NV];
 
   calc_Rij(pp,Rij);
-  boost22_ff2zamo(Rij,Rij,pp,gg,eup);
-  trans22_zamo2lab(Rij,Rij,gg,elo);
+  //boost22_ff2zamo(Rij,Rij,pp,gg,eup);
+  //trans22_zamo2lab(Rij,Rij,gg,elo);
+
+  trans22_on2cc(Rij,Rij,gg,tlo);
+  boost22_ff2lab(Rij,Rij,pp,gg);
+
   indices_2221(Rij,Rij,gg);
 
   ldouble gdet=gg[3][4];
@@ -202,7 +210,7 @@ print_state_u2prad_num (int iter, ldouble *x, ldouble *f)
 }
 
 int
-u2p_rad_num(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble eup[][4], ldouble elo[][4])
+u2p_rad_num(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble tup[][4], ldouble tlo[][4])
 {
   ldouble pp0[NV],pporg[NV];
   ldouble J[4][4],iJ[4][4];
@@ -229,7 +237,7 @@ u2p_rad_num(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble eup[][4], ldouble
 	}
 
       //valueas at zero state
-      f_u2prad_num(uu,pp,gg,eup,elo,f1);
+      f_u2prad_num(uu,pp,gg,tup,tlo,f1);
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -238,7 +246,7 @@ u2p_rad_num(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble eup[][4], ldouble
 	    {
 	      pp[j+6]=pp[j+6]+EPS*pp[6];
 	    
-	      f_u2prad_num(uu,pp,gg,eup,elo,f2);
+	      f_u2prad_num(uu,pp,gg,tup,tlo,f2);
      
 	      J[i][j]=(f2[i] - f1[i])/(EPS*pp[6]);
 

@@ -439,13 +439,15 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 #ifdef RADIATION
   /***************************************************/
 
-  ldouble eup[4][4],elo[4][4];
-  pick_T(emuup,ix,iy,iz,eup);
-  pick_T(emulo,ix,iy,iz,elo);
+  ldouble tup[4][4],tlo[4][4];
+  pick_T(tmuup,ix,iy,iz,tup);
+  pick_T(tmulo,ix,iy,iz,tlo);
   ldouble Rij[4][4];
   calc_Rij(pp,Rij);
-  boost22_ff2zamo(Rij,Rij,pp,gg,eup);
-  trans22_zamo2lab(Rij,Rij,gg,elo);
+  //boost22_ff2zamo(Rij,Rij,p,g,eup);
+  //trans22_zamo2lab(Rij,Rij,g,elo);  
+  trans22_on2cc(Rij,Rij,gg,tlo);
+  boost22_ff2lab(Rij,Rij,pp,gg);
   indices_2221(Rij,Rij,gg);
 
   //terms with Christoffels
@@ -560,13 +562,15 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       }
  
 #ifdef RADIATION
-  ldouble eup[4][4],elo[4][4];
-  pick_T(emuup,ix,iy,iz,eup);
-  pick_T(emulo,ix,iy,iz,elo);
+  ldouble tup[4][4],tlo[4][4];
+  pick_T(tmuup,ix,iy,iz,tup);
+  pick_T(tmulo,ix,iy,iz,tlo);
   ldouble Rij[4][4];
   calc_Rij(pp,Rij);
-  boost22_ff2zamo(Rij,Rij,pp,gg,eup);
-  trans22_zamo2lab(Rij,Rij,gg,elo);
+  //boost22_ff2zamo(Rij,Rij,p,g,eup);
+  //trans22_zamo2lab(Rij,Rij,g,elo);  
+  trans22_on2cc(Rij,Rij,gg,tlo);
+  boost22_ff2lab(Rij,Rij,pp,gg);
   indices_2221(Rij,Rij,gg);
 
   //to move gdet in/out derivative:
