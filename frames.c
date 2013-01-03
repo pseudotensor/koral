@@ -162,6 +162,210 @@ int prad_zamo2ff(ldouble *ppzamo, ldouble *ppff, ldouble gg[][5], ldouble eup[][
   return 0;
 }
 
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//A^i Lorentz boost from lab to fluid frame
+int
+boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5])
+{ 
+  int i,j,k,l;
+  ldouble At[4]   ;
+
+  int verbose=0;
+
+  if(verbose>0) print_4vector(A1);
+
+  //calculating the four-velocity of fluid in lab frame
+  ldouble ucon[4],ucov[4],vpr[3];
+
+  ldouble vr=pp[2];
+  ldouble vth=pp[3];
+  ldouble vph=pp[4];
+
+  ldouble gtt=gg[0][0];
+  ldouble gtph=gg[0][3];
+  ldouble grr=gg[1][1];
+  ldouble gthth=gg[2][2];
+  ldouble gphph=gg[3][3];
+  ldouble gtr=gg[1][2];
+  ldouble grph=gg[1][3];
+
+  ldouble ut2=-1./(gtt + 2.*vph*gtph + 2.*vr*gtr + 2.*vr*vph*grph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
+  if(ut2<0.) 
+    {
+      ut2=0.;
+     }
+  ldouble ut=sqrtl(ut2);
+
+  ucon[0]=ut;
+  ucon[1]=vr*ut;
+  ucon[2]=vth*ut;
+  ucon[3]=vph*ut;
+  indices_21(ucon,ucov,gg);  
+
+  if(verbose>0) print_4vector(ucon);
+
+  //four velocity of the lab frame
+  ldouble wcon[4],wcov[4];
+  wcon[0]=1./sqrtl(-gtt);
+  wcon[1]=wcon[2]=wcon[3]=0.;
+  indices_21(wcon,wcov,gg);
+
+  if(verbose>0) print_4vector(wcon);
+
+  //Lorentz transformation matrix
+  ldouble L[4][4];
+
+  //temporary Om matrix
+  ldouble Om[4][4];
+
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Om[i][j]=ucon[i]*wcov[j]-wcon[i]*ucov[j];
+  
+  //Lorentz factor = -w^mu u_mu
+  ldouble gam=-dot(wcon,ucov);
+
+  ldouble Omsum;
+  //Lorentz matrix components
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Omsum=0.;
+	for(k=0;k<4;k++)
+	  Omsum+=Om[i][k]*Om[k][j];
+	
+	L[i][j]=kron(i,j)+1./(1.+gam)*Omsum+Om[i][j];
+      }
+
+  //copying
+  for(i=0;i<4;i++)
+    {
+      At[i]=A1[i];
+    }
+  
+  if(verbose>0) print_tensor(L);
+
+  //boosting
+  for(i=0;i<4;i++)
+    {
+      A2[i]=0.;
+      for(k=0;k<4;k++)
+	{
+	  A2[i]+=L[i][k]*At[k];
+	}
+    }
+
+  if(verbose>0) print_4vector(A2);
+
+  if(verbose>0) getchar();
+
+  return 0; 
+}
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//A^i Lorentz boost from fluid to lab frame
+int
+boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5])
+{ 
+  int i,j,k,l;
+  ldouble At[4]   ;
+
+  int verbose=0;
+
+  if(verbose>0) print_4vector(A1);
+
+  //calculating the four-velocity of fluid in lab frame
+  ldouble wcon[4],wcov[4],vpr[3];
+
+  ldouble vr=pp[2];
+  ldouble vth=pp[3];
+  ldouble vph=pp[4];
+
+  ldouble gtt=gg[0][0];
+  ldouble gtph=gg[0][3];
+  ldouble grr=gg[1][1];
+  ldouble gthth=gg[2][2];
+  ldouble gphph=gg[3][3];
+  ldouble gtr=gg[1][2];
+  ldouble grph=gg[1][3];
+
+  ldouble ut2=-1./(gtt + 2.*vph*gtph + 2.*vr*gtr + 2.*vr*vph*grph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
+  if(ut2<0.) 
+    {
+      ut2=0.;
+     }
+  ldouble ut=sqrtl(ut2);
+
+  wcon[0]=ut;
+  wcon[1]=vr*ut;
+  wcon[2]=vth*ut;
+  wcon[3]=vph*ut;
+  indices_21(wcon,wcov,gg);  
+
+  if(verbose>0) print_4vector(wcon);
+
+  //four velocity of the lab frame
+  ldouble ucon[4],ucov[4];
+  ucon[0]=1./sqrtl(-gtt);
+  ucon[1]=ucon[2]=ucon[3]=0.;
+  indices_21(ucon,ucov,gg);
+
+  if(verbose>0) print_4vector(ucon);
+
+  //Lorentz transformation matrix
+  ldouble L[4][4];
+
+  //temporary Om matrix
+  ldouble Om[4][4];
+
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Om[i][j]=ucon[i]*wcov[j]-wcon[i]*ucov[j];
+  
+  //Lorentz factor = -w^mu u_mu
+  ldouble gam=-dot(wcon,ucov);
+
+  ldouble Omsum;
+  //Lorentz matrix components
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Omsum=0.;
+	for(k=0;k<4;k++)
+	  Omsum+=Om[i][k]*Om[k][j];
+	
+	L[i][j]=kron(i,j)+1./(1.+gam)*Omsum+Om[i][j];
+      }
+
+  //copying
+  for(i=0;i<4;i++)
+    {
+      At[i]=A1[i];
+    }
+  
+  if(verbose>0) print_tensor(L);
+
+  //boosting
+  for(i=0;i<4;i++)
+    {
+      A2[i]=0.;
+      for(k=0;k<4;k++)
+	{
+	  A2[i]+=L[i][k]*At[k];
+	}
+    }
+
+  if(verbose>0) print_4vector(A2);
+
+  if(verbose>0) getchar();
+
+  return 0;
+}
+
 
 /*****************************************************************/
 /*****************************************************************/
@@ -819,6 +1023,20 @@ indices_12(ldouble A1[4],ldouble A2[4],ldouble GG[][5])
 /*****************************************************************/
 int
 print_tensor(ldouble T[][4])
+{
+  int i;
+  printf("============\n");
+  for(i=0;i<4;i++)
+    printf("%10.3Le %10.3Le %10.3Le %10.3Le\n",T[i][0],T[i][1],T[i][2],T[i][3]);
+  printf("============\n");
+  return 0;  
+}
+
+/*****************************************************************/
+/* prints metric to screen *****************************************/
+/*****************************************************************/
+int
+print_metric(ldouble T[][5])
 {
   int i;
   printf("============\n");

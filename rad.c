@@ -75,8 +75,15 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
   //new four-force
   ldouble Gi[4];
   calc_Gi(pp2,Gi);
-  boost2_ff2zamo(Gi,Gi,pp2,gg,eup);
-  trans2_zamo2lab(Gi,Gi,elo);
+
+  //OLD - limited by Bardeen's tensor
+  //boost2_ff2zamo(Gi,Gi,pp2,gg,eup);
+  //trans2_zamo2lab(Gi,Gi,elo);
+
+  //NEW
+  boost2_ff2lab(Gi,Gi,pp2,gg);
+  //mising ortonormalizacion - so far only Minkowski
+
   indices_21(Gi,Gi,gg);
  
   f[0] = uu[6] - uu0[6] + dt * Gi[0];
