@@ -74,6 +74,7 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*u_step1,*u_step2,*u_step3
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,
   *pbLx,*pbRx,*pbLy,*pbRy,*pbLz,*pbRz,*sbLx,*sbRx,*sbLy,*sbRy,*sbLz,*sbRz,*ubLx,*ubRx,*ubLy,*ubRy,*ubLz,*ubRz,
   *flbx,*flby,*flbz,*flLx,*flRx,*flLy,*flRy,*flLz,*flRz,*gKr,*gKrbx,*gKrby,*gKrbz,*G,*emuup,*emulo,*emuupbx,*emulobx,*emuupby,*emuloby,*emuupbz,*emulobz;
+ldouble *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz;
 int *cellflag,**loop_1,**loop_2,Nloop_1,Nloop_2;
 //ldouble ****u;
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
@@ -254,6 +255,7 @@ int pr_tophat_inside(ldouble x,ldouble y,ldouble z);
 int my_finger(ldouble);
 
 //metric.c
+int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4]);
 int calc_LNRFes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4]);
 int calc_g(ldouble*,ldouble[][5]);
 int calc_G(ldouble*,ldouble[][5]);
@@ -321,6 +323,10 @@ int trans22_lab2zamo(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble eup
 int trans22_zamo2lab(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble elo[][4]);
 int trans2_lab2zamo(ldouble *u1,ldouble *u2,ldouble e[][4]);
 int trans2_zamo2lab(ldouble *u1,ldouble *u2,ldouble e[][4]);
+int trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tup[][4]);
+int trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tlo[][4]);
+int trans2_cc2on(ldouble *u1,ldouble *u2,ldouble t[][4]);
+int trans2_on2cc(ldouble *u1,ldouble *u2,ldouble t[][4]);
 int indices_2221(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5]);
 int indices_21(ldouble A1[4],ldouble A2[4],ldouble gg[][5]);
 int

@@ -4,7 +4,7 @@
 
 #define TMAX 1.e10
 #define GAMMA 1.4
-//#define RADIATION
+#define RADIATION
 #define SCHWARZSCHILD
 #define RK3STEPPING
 //#define SPHERICAL
@@ -35,7 +35,7 @@
 
 #define TAMB 1.e6
 
-#define FRATIO 0.
+#define FRATIO 1.
 
 #define FLUXLEFT FRATIO/KAPPAES/MINX/MINX
 #define FERATIO .99

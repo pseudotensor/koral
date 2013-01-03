@@ -86,6 +86,63 @@ calc_dlgdet(ldouble *xx, int idim)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//calculates orthonormal tetrad
+//so far limited to grt.neq.0
+int
+calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4])
+{
+  ldouble gtt,grr,grt,ghh,gpp;
+  ldouble blob1,blob1sq;
+  
+  gtt=g[0][0];
+  grr=g[1][1];
+  grt=g[0][1];
+  ghh=g[2][2]; //gthth
+  gpp=g[3][3]; //gphph
+
+  //calculating transformation lab -> ortonormal
+
+  //algorithm from HARM's tetrad.c from Mathematica
+  blob1=grr - sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt;
+  blob1sq=blob1*blob1;
+  tmulo[0][0]= (sqrt(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt)/
+		  pow((4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt)))*blob1sq,0.25));
+  tmulo[0][1] =  (2.0*grt)/(sqrt(4.0*((grt)*(grt)) + (grr - gtt)*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt))*
+			      sqrt(fabs(grr - sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt)));
+  tmulo[0][2] = 0.0;
+  tmulo[0][3] = 0.0;
+  tmulo[1][0] = (2.0*grt)/sqrt((4.0*((grt)*(grt)) + (grr - gtt)*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt))*
+				 (grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt));
+  tmulo[1][1] = sqrt((grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt)/
+		       (sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt)))*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt)));
+  tmulo[1][2] = 0.0;
+  tmulo[1][3] = 0.0;
+  tmulo[2][0] = 0.0;
+  tmulo[2][1] = 0.0;
+  tmulo[2][2] = 1.0/fabs(sqrt(ghh));
+  tmulo[2][3] = 0.0;
+  tmulo[3][0] = 0.0;
+  tmulo[3][1] = 0.0;
+  tmulo[3][2] = 0.0;
+  tmulo[3][3] = 1.0/fabs(sqrt(gpp));
+  /*
+  eigenvalues[0]=0.5*(grr - 1.*sqrt(4.*pow(grt,2) + pow(grr - 1.*gtt,2)) + gtt);
+  eigenvalues[1]=0.5*(grr + sqrt(4.*pow(grt,2) + pow(grr - 1.*gtt,2)) + gtt);
+  eigenvalues[2]=ghh;
+  eigenvalues[3]=gpp;
+  */
+
+  //ortonormal -> lab
+
+  inverse_44matrix(tmulo,tmuup);
+
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //calculates base vectors and 1-forms of LNRF to transform lab <--> LNRF
 int
 calc_LNRFes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4])

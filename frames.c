@@ -311,7 +311,7 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble L[][4])
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
-//A^i Lorentz boost from lab to fluid frame
+//T^ij Lorentz boost from lab to fluid frame
 int
 boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
 { 
@@ -363,7 +363,7 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
-//A^i Lorentz boost from lab to fluid frame
+//T^ij Lorentz boost from lab to fluid frame
 int
 boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
 { 
@@ -1057,6 +1057,128 @@ trans2_zamo2lab(ldouble *u1,ldouble *u2,ldouble elo[][4])
       for(j=0;j<4;j++)
 	{
 	  u2[i]+=ut[j]*elo[i][j];
+	}
+    }
+
+  return 0;
+}
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//T^ij transfromation ortonormal to code coordinates
+int
+trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tlo[][4])
+{
+  int i,j,k,l;
+  ldouble Tt[4][4];
+
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Tt[i][j]=T1[i][j];
+	}
+    }
+
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  T2[i][j]=0.;
+	  for(k=0;k<4;k++)
+	    {
+	      for(l=0;l<4;l++)
+		{
+		  T2[i][j]+=tlo[i][k]*tlo[j][l]*Tt[k][l];
+		}
+	    }
+	}
+    }
+
+  return 0;
+}
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//T^ij transfromation code coords -> ortonormal
+int
+trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tup[][4])
+{
+  int i,j,k,l;
+  ldouble Tt[4][4];
+
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Tt[i][j]=T1[i][j];
+	}
+    }
+
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  T2[i][j]=0.;
+	  for(k=0;k<4;k++)
+	    {
+	      for(l=0;l<4;l++)
+		{
+		  T2[i][j]+=tup[k][i]*tup[l][j]*Tt[k][l];
+		}
+	    }
+	}
+    }
+
+  return 0;
+}
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//u^i transfromation cc -> on
+int
+trans2_cc2on(ldouble *u1,ldouble *u2,ldouble tup[][4])
+{
+  int i,j,k;
+  ldouble ut[4];
+
+  for(i=0;i<4;i++)
+    ut[i]=u1[i];
+
+  for(i=0;i<4;i++)
+    {
+      u2[i]=0.;
+      for(j=0;j<4;j++)
+	{
+	  u2[i]+=ut[j]*tup[j][i];
+	}
+    }
+
+  return 0;
+}
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//u^i transfromation on -> cc
+int
+trans2_on2cc(ldouble *u1,ldouble *u2,ldouble tlo[][4])
+{
+  int i,j,k;
+  ldouble ut[4];
+
+  for(i=0;i<4;i++)
+    ut[i]=u1[i];
+
+  for(i=0;i<4;i++)
+    {
+      u2[i]=0.;
+      for(j=0;j<4;j++)
+	{
+	  u2[i]+=ut[j]*tlo[i][j];
 	}
     }
 

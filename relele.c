@@ -319,6 +319,7 @@ calc_metric()
   ldouble gloc[4][5];
   ldouble Kr[4][4][4];
   ldouble eup[4][4],elo[4][4];
+  ldouble tup[4][4],tlo[4][4];
 
   printf("Precalculating metrics... ");
   
@@ -342,11 +343,15 @@ calc_metric()
 	      set_g(g,3,4,ix,iy,iz,calc_gdet(xx));
 
 	      calc_LNRFes(gloc,eup,elo);
+	      calc_tetrades(gloc,tup,tlo);
+
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
 		    set_T(emuup,i,j,ix,iy,iz,eup[i][j]);
 		    set_T(emulo,i,j,ix,iy,iz,elo[i][j]);
+		    set_T(tmuup,i,j,ix,iy,iz,tup[i][j]);
+		    set_T(tmulo,i,j,ix,iy,iz,tlo[i][j]);
 		  }	      
 
 	      calc_G(xx,gloc);
@@ -375,11 +380,15 @@ calc_metric()
 		      set_gb(gbx,i,j,ix,iy,iz,gloc[i][j],0);
 
 		  calc_LNRFes(gloc,eup,elo);
+		  calc_tetrades(gloc,tup,tlo);
+
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      {
 			set_Tb(emuupbx,i,j,ix,iy,iz,eup[i][j],0);
 			set_Tb(emulobx,i,j,ix,iy,iz,elo[i][j],0);
+			set_Tb(tmuupbx,i,j,ix,iy,iz,tup[i][j],0);
+			set_Tb(tmulobx,i,j,ix,iy,iz,tlo[i][j],0);
 		      }	      
 
 
@@ -409,11 +418,15 @@ calc_metric()
 		  set_gb(gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
 
 	      calc_LNRFes(gloc,eup,elo);
+	      calc_tetrades(gloc,tup,tlo);
+
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
 		    set_Tb(emuupbx,i,j,ix+1,iy,iz,eup[i][j],0);
 		    set_Tb(emulobx,i,j,ix+1,iy,iz,elo[i][j],0);
+		    set_Tb(tmuupbx,i,j,ix+1,iy,iz,tup[i][j],0);
+		    set_Tb(tmulobx,i,j,ix+1,iy,iz,tlo[i][j],0);
 		  }	      
 
 	      calc_G(xx,gloc);
@@ -444,11 +457,15 @@ calc_metric()
 		      set_gb(gby,i,j,ix,iy,iz,gloc[i][j],1);
 
 		  calc_LNRFes(gloc,eup,elo);
+		  calc_tetrades(gloc,tup,tlo);
+
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      {
 			set_Tb(emuupby,i,j,ix,iy,iz,eup[i][j],1);
 			set_Tb(emuloby,i,j,ix,iy,iz,elo[i][j],1);
+			set_Tb(tmuupby,i,j,ix,iy,iz,tup[i][j],1);
+			set_Tb(tmuloby,i,j,ix,iy,iz,tlo[i][j],1);
 		      }	      
 
 		  calc_G(xx,gloc);
@@ -476,11 +493,13 @@ calc_metric()
 		  set_gb(gby,i,j,ix,iy+1,iz,gloc[i][j],1);
 
 	      calc_LNRFes(gloc,eup,elo);
+	      calc_tetrades(gloc,tup,tlo);
+
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
-		    set_Tb(emuupby,i,j,ix,iy+1,iz,eup[i][j],1);
-		    set_Tb(emuloby,i,j,ix,iy+1,iz,elo[i][j],1);
+		    set_Tb(tmuupby,i,j,ix,iy+1,iz,tup[i][j],1);
+		    set_Tb(tmuloby,i,j,ix,iy+1,iz,tlo[i][j],1);
 		  }	      
 
 	      calc_G(xx,gloc);
@@ -510,11 +529,15 @@ calc_metric()
 		      set_gb(gbz,i,j,ix,iy,iz,gloc[i][j],2);
 
 		  calc_LNRFes(gloc,eup,elo);
+		  calc_tetrades(gloc,tup,tlo);
+
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      {
 			set_Tb(emuupbz,i,j,ix,iy,iz,eup[i][j],2);
 			set_Tb(emulobz,i,j,ix,iy,iz,elo[i][j],2);
+			set_Tb(tmuupbz,i,j,ix,iy,iz,tup[i][j],2);
+			set_Tb(tmulobz,i,j,ix,iy,iz,tlo[i][j],2);
 		      }	      
 
 		  calc_G(xx,gloc);
@@ -542,11 +565,15 @@ calc_metric()
 		  set_gb(gbz,i,j,ix,iy,iz+1,gloc[i][j],2);	  
 
 	      calc_LNRFes(gloc,eup,elo);
+	      calc_tetrades(gloc,tup,tlo);
+
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
 		    set_Tb(emuupbz,i,j,ix,iy,iz+1,eup[i][j],2);
 		    set_Tb(emulobz,i,j,ix,iy,iz+1,elo[i][j],2);
+		    set_Tb(tmuupbz,i,j,ix,iy,iz+1,tup[i][j],2);
+		    set_Tb(tmulobz,i,j,ix,iy,iz+1,tlo[i][j],2);
 		  }	      
 
 	      calc_G(xx,gloc);

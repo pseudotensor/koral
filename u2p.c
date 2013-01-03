@@ -32,8 +32,8 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]
   //************************************
   //hot hydro - conserving energy
   ret=0;
-  if(NY==1 && NZ==1) 
-    u2pret=u2p_hot_gsl(uu,pp,gg);  //temporary 3D solver
+  if(NY==1 && NZ==1 && 0) 
+    u2pret=u2p_hot_gsl(uu,pp,gg);  //temporary 3D solver - not perfect - does not work for RADATM!
   else
     u2pret=u2p_hot(uu,pp,gg);  //TODO: to be replaced - catastrophic cancelation!
   //************************************
