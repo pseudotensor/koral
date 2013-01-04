@@ -81,10 +81,13 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
   //boost2_ff2zamo(Gi,Gi,pp2,gg,eup);
   //trans2_zamo2lab(Gi,Gi,elo);
 
-  //NEW
-  trans2_on2cc(Gi,Gi,tlo);
-  boost2_ff2lab(Gi,Gi,pp2,gg);
-  
+  //NEW - now old
+  //trans2_on2cc(Gi,Gi,tlo);
+  //boost2_ff2lab(Gi,Gi,pp2,gg);
+
+  //covariant calculation
+  calc_Gi(uu,pp2,gg,GG,Gi);
+ 
   indices_21(Gi,Gi,gg);
  
   f[0] = uu[6] - uu0[6] + dt * Gi[0];
@@ -497,13 +500,46 @@ ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z)
 //****** and calculates contravariant four-force ***********************
 //**********************************************************************
 int
-calc_Gi(ldouble *pp, ldouble R[][4],double Gi[4])
+calc_Gi(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
 {
+  int i,j,k;
+
+  //radiative stress tensor in the lab frame
+  ldouble Rij[4][4];
+  calc_Rij(uu,gg,GG,Rij);
+
+  //the four-velocity of fluid in lab frame
+  ldouble ucon[4],ucov[4],vpr[3];
+
+  ldouble vr=pp[2];
+  ldouble vth=pp[3];
+  ldouble vph=pp[4];
+
+  ldouble gtt=gg[0][0];
+  ldouble gtph=gg[0][3];
+  ldouble grr=gg[1][1];
+  ldouble gthth=gg[2][2];
+  ldouble gphph=gg[3][3];
+  ldouble gtr=gg[1][2];
+  ldouble grph=gg[1][3];
+
+  ldouble ut2=-1./(gtt + 2.*vph*gtph + 2.*vr*gtr + 2.*vr*vph*grph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
+  if(ut2<0.) 
+    {
+      ut2=0.;
+    }
+  ldouble ut=sqrtl(ut2);
+
+  ucon[0]=ut;
+  ucon[1]=vr*ut;
+  ucon[2]=vth*ut;
+  ucon[3]=vph*ut;
+  indices_21(ucon,ucov,gg);  
+
+  //gas properties
   ldouble rho=pp[0];
   ldouble u=pp[1];
-  ldouble E=pp[6];
-  ldouble F[3]={pp[7],pp[8],pp[9]};
-
+ 
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble T = p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
@@ -512,10 +548,21 @@ calc_Gi(ldouble *pp, ldouble R[][4],double Gi[4])
   ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);
   ldouble chi=kappa+kappaes;
 
-  Gi[0]=kappa*(E-4.*Pi*B);
-  Gi[1]=chi*F[0];
-  Gi[2]=chi*F[1];
-  Gi[3]=chi*F[2];
+  //contravariant four-force in the lab frame
+  //R^ab u_a u_b
+  ldouble Ruu=0.;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Ruu+=Rij[i][j]*ucov[i]*ucov[j];
+
+  ldouble Ru;
+  for(i=0;i<4;i++)
+    {
+      Ru=0.;
+      for(j=0;j<4;j++)
+	Ru+=Rij[i][j]*ucov[j];
+      Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
+    }
 
   return 0;
 }
