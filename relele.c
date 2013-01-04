@@ -345,6 +345,7 @@ calc_metric()
 	      calc_LNRFes(gloc,eup,elo);
 	      calc_tetrades(gloc,tup,tlo);
 	      
+	      /*
 	      printf("Bardeen eup elo\n");
 	      print_tensor(eup);
 	      print_tensor(elo);
@@ -354,6 +355,7 @@ calc_metric()
 	      print_tensor(tlo);
 
 	      getchar();
+	      */
 
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)

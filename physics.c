@@ -443,7 +443,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   pick_T(tmuup,ix,iy,iz,tup);
   pick_T(tmulo,ix,iy,iz,tlo);
   ldouble Rij[4][4];
-  calc_Rij(pp,Rij);
+  calc_Rij_ff(pp,Rij);
   //boost22_ff2zamo(Rij,Rij,p,g,eup);
   //trans22_zamo2lab(Rij,Rij,g,elo);  
   trans22_on2cc(Rij,Rij,gg,tlo);
@@ -566,7 +566,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   pick_T(tmuup,ix,iy,iz,tup);
   pick_T(tmulo,ix,iy,iz,tlo);
   ldouble Rij[4][4];
-  calc_Rij(pp,Rij);
+  calc_Rij_ff(pp,Rij);
   //boost22_ff2zamo(Rij,Rij,p,g,eup);
   //trans22_zamo2lab(Rij,Rij,g,elo);  
   trans22_on2cc(Rij,Rij,gg,tlo);

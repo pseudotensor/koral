@@ -12,7 +12,7 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble eup[][4])
   ldouble Rij[4][4];
   int i,j;
 
-  calc_Rij(pp1,Rij);
+  calc_Rij_ff(pp1,Rij);
   boost22_ff2zamo(Rij,Rij,pp1,gg,eup);
 
   for(i=0;i<NVHD;i++)
@@ -33,7 +33,7 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble eup[][4])
 int f_prad_zamo2ff(ldouble *ppff, ldouble *ppzamo, ldouble gg[][5], ldouble eup[][4],ldouble *f)
 {
   ldouble Rij[4][4];
-  calc_Rij(ppff,Rij);
+  calc_Rij_ff(ppff,Rij);
   boost22_ff2zamo(Rij,Rij,ppff,gg,eup);
 
   f[0]=-Rij[0][0]+ppzamo[6];

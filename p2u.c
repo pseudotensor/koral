@@ -39,7 +39,7 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble tup[][4], ldouble tlo[][4])
   ldouble F[3]={p[7],p[8],p[9]};
   ldouble Rij[4][4];
 
-  calc_Rij(p,Rij);
+  calc_Rij_ff(p,Rij);
 
   //boost22_ff2zamo(Rij,Rij,p,g,eup);
   //trans22_zamo2lab(Rij,Rij,g,elo);  

@@ -44,8 +44,8 @@
 
 //#define GASRADOFF
 
-#define MINX 1e1
-#define MAXX 1.4e1
+#define MINX 1e6
+#define MAXX 1.4e6
 
 #define KAPPA 0.
 #define KAPPAES kappaCGS2GU(0.4)

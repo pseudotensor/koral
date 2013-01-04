@@ -75,7 +75,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
 
   //new four-force
   ldouble Gi[4];
-  calc_Gi(pp2,Gi);
+  calc_Gi_ff(pp2,Gi);
 
   //OLD - limited by Bardeen's tensor
   //boost2_ff2zamo(Gi,Gi,pp2,gg,eup);
@@ -237,7 +237,7 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     }
 
   ldouble Gi[4];
-  calc_Gi(pp,Gi);
+  calc_Gi_ff(pp,Gi);
   
   //implicit flux:
   ldouble rho=pp[0];
@@ -293,7 +293,7 @@ solve_explicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     }
 
   ldouble Gi[4];
-  calc_Gi(pp,Gi);
+  calc_Gi_ff(pp,Gi);
   
   deltas[0]=-Gi[0]*dt;
   deltas[1]=-Gi[1]*dt;
@@ -493,11 +493,11 @@ ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z)
 }
 
 //**********************************************************************
-//******* takes primitives and calculates radiation four   *************
-//******* force G^\mu in the fluid frame *******************************
+//****** takes radiative stress tensor and gas primitives **************
+//****** and calculates contravariant four-force ***********************
 //**********************************************************************
 int
-calc_Gi(ldouble *pp, ldouble Gi[4])
+calc_Gi(ldouble *pp, ldouble R[][4],double Gi[4])
 {
   ldouble rho=pp[0];
   ldouble u=pp[1];
@@ -520,13 +520,88 @@ calc_Gi(ldouble *pp, ldouble Gi[4])
   return 0;
 }
 
+//**********************************************************************
+//******* takes primitives and calculates radiation four   *************
+//******* force G^\mu in the fluid frame *******************************
+//**********************************************************************
+int
+calc_Gi_ff(ldouble *pp, ldouble Gi[4])
+{
+  ldouble rho=pp[0];
+  ldouble u=pp[1];
+  ldouble E=pp[6];
+  ldouble F[3]={pp[7],pp[8],pp[9]};
+
+  ldouble p= (GAMMA-1.)*(ldouble)u;
+  ldouble T = p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+  ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);
+  ldouble chi=kappa+kappaes;
+
+  Gi[0]=kappa*(E-4.*Pi*B);
+  Gi[1]=chi*F[0];
+  Gi[2]=chi*F[1];
+  Gi[3]=chi*F[2];
+
+  return 0;
+}
+
+//**********************************************************************
+//******* takes conserved and closes Rij in arbitrary frame ************
+//**********************************************************************
+int
+calc_Rij(ldouble *uu, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
+{
+  int verbose=0;
+ 
+  //R^0mu
+  ldouble A[4]={uu[6],uu[7],uu[8],uu[9]};
+  //indices up
+  indices_12(A,A,GG);
+
+  //covariant formulation
+  
+  //g_munu R^0mu R^0nu
+  ldouble gRR=gg[0][0]*A[0]*A[0]+gg[0][1]*A[0]*A[1]+gg[0][2]*A[0]*A[2]+gg[0][3]*A[0]*A[3]+
+    gg[1][0]*A[1]*A[0]+gg[1][1]*A[1]*A[1]+gg[1][2]*A[1]*A[2]+gg[1][3]*A[1]*A[3]+
+    gg[2][0]*A[2]*A[0]+gg[2][1]*A[2]*A[1]+gg[2][2]*A[2]*A[2]+gg[2][3]*A[2]*A[3]+
+    gg[3][0]*A[3]*A[0]+gg[3][1]*A[3]*A[1]+gg[3][2]*A[3]*A[2]+gg[3][3]*A[3]*A[3];
+ 
+  //the quadratic equation for u^t of the radiation rest frame (urf[0])
+  ldouble a,b,c;
+  a=16.*gRR;
+  b=8.*(gRR*GG[0][0]+A[0]*A[0]);
+  c=gRR*GG[0][0]*GG[0][0]-A[0]*A[0]*GG[0][0];
+  ldouble delta=b*b-4.*a*c;
+  ldouble urf[4],Erf;
+  urf[0]=sqrtl((-b-sqrtl(delta))/2./a);
+  if(isnan(urf[0])) urf[0]=1.;
+
+  //radiative energy density in the radiation rest frame
+  Erf=3.*A[0]/(4.*urf[0]*urf[0]+GG[0][0]);
+
+  //four-velocity of the rest frame
+  urf[1]=3./(4.*Erf*urf[0])*(A[1]-1./3.*Erf*GG[0][1]);
+  urf[2]=3./(4.*Erf*urf[0])*(A[2]-1./3.*Erf*GG[0][2]);
+  urf[3]=3./(4.*Erf*urf[0])*(A[3]-1./3.*Erf*GG[0][3]);
+
+  //lab frame:
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=4./3.*Erf*urf[i]*urf[j]+1./3.*Erf*GG[i][j];
+
+  return 0;
+}
 
 //**********************************************************************
 //******* takes E and F^i from primitives and calculates radiation stress ****
-//******* tensor R^ij using M1 closure scheme *****************************
+//******* tensor R^ij in fluid frame using M1 closure scheme *****************
 //**********************************************************************
 int
-calc_Rij(ldouble *pp, ldouble Rij[][4])
+calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
 {
   ldouble E=pp[6];
   ldouble F[3]={pp[7],pp[8],pp[9]};
