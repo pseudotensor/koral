@@ -376,9 +376,10 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(i=0;i<NV;i++)
     pp[i]=get_u(p,i,ix,iy,iz);  
 
-  ldouble gg[4][5],ggxl[4][5],ggxr[4][5];
+  ldouble gg[4][5],GG[4][5],ggxl[4][5],ggxr[4][5];
 
   pick_g(ix,iy,iz,gg);
+  pick_G(ix,iy,iz,GG);
   ldouble gdet=gg[3][4];
   pick_gb(ix,iy,iz,0,ggxl);
   pick_gb(ix+1,iy,iz,0,ggxr);
@@ -439,15 +440,8 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 #ifdef RADIATION
   /***************************************************/
 
-  ldouble tup[4][4],tlo[4][4];
-  pick_T(tmuup,ix,iy,iz,tup);
-  pick_T(tmulo,ix,iy,iz,tlo);
   ldouble Rij[4][4];
-  calc_Rij_ff(pp,Rij);
-  //boost22_ff2zamo(Rij,Rij,p,g,eup);
-  //trans22_zamo2lab(Rij,Rij,g,elo);  
-  trans22_on2cc(Rij,Rij,gg,tlo);
-  boost22_ff2lab(Rij,Rij,pp,gg);
+  calc_Rij(pp,gg,GG,Rij);
   indices_2221(Rij,Rij,gg);
 
   //terms with Christoffels
@@ -521,8 +515,9 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     ff[iv]=0.;
 
   //picking up metric from a cell face  
-  ldouble gg[4][5];
+  ldouble gg[4][5],GG[4][5];
   pick_gb(ix,iy,iz,idim,gg);
+  pick_Gb(ix,iy,iz,idim,GG);
   ldouble gdet=gg[3][4];
   
   //calculating Tmunu
@@ -562,15 +557,8 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       }
  
 #ifdef RADIATION
-  ldouble tup[4][4],tlo[4][4];
-  pick_T(tmuup,ix,iy,iz,tup);
-  pick_T(tmulo,ix,iy,iz,tlo);
   ldouble Rij[4][4];
-  calc_Rij_ff(pp,Rij);
-  //boost22_ff2zamo(Rij,Rij,p,g,eup);
-  //trans22_zamo2lab(Rij,Rij,g,elo);  
-  trans22_on2cc(Rij,Rij,gg,tlo);
-  boost22_ff2lab(Rij,Rij,pp,gg);
+  calc_Rij(pp,gg,GG,Rij);
   indices_2221(Rij,Rij,gg);
 
   //to move gdet in/out derivative:

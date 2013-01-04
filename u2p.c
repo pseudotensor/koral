@@ -9,7 +9,7 @@
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4], ldouble tlo[][4])
+u2p(ldouble *uu, ldouble *pp, ldouble gg[][5])
 {
   int verbose=0;
 
@@ -91,195 +91,16 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4]
   //************************************
 
 #ifdef RADIATION
-  
-#ifdef EDDINGTON_APR
-  //numerical solver for primitives closing Rij in the fluid frame 
-  if(u2p_rad_num(uu,pp,gg,tup,tlo)<0) ret-=100;
-#else
-  //covariant formulation, closing Rij in the lab frame
-  u2p_rad(uu,pp,gg,GG,tup,tlo);
-#endif
-  
+  //primitives = R^t_mu
+  pp[6]=uu[6];
+  pp[7]=uu[7];
+  pp[8]=uu[8];
+  pp[9]=uu[9];
 #endif
   
   return ret;
 }
 
-//**********************************************************************
-//**********************************************************************
-//basic conserved to primitives solver for radiation
-//uses M1 closure in arbitrary frame/metric
-//**********************************************************************
-//**********************************************************************
-int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4], ldouble tlo[][4])
-{
-  int verbose=0;
-  ldouble Rij[4][4];
-
-  calc_Rij(uu,gg,GG,Rij);
-
-  //boosting to ff
-  //trans22_lab2zamo(Rij,Rij,gg,eup);
-  //boost22_zamo2ff(Rij,Rij,pp,gg,eup);
-
-  boost22_lab2ff(Rij,Rij,pp,gg);
-  trans22_cc2on(Rij,Rij,gg,tup);
-
-  //reading primitives
-  pp[6]=Rij[0][0];
-  pp[7]=Rij[0][1];
-  pp[8]=Rij[0][2];
-  pp[9]=Rij[0][3];
-
-  return 0;
-}
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//numerical conserved to primitives solver for radiation
-//used e.g. for not-frame-invariant  Eddington apr. 
-//solves in 4dimensions using frame boosts etc.
-int f_u2prad_num(ldouble *uu,ldouble *pp, ldouble gg[][5], ldouble tup[][4], ldouble tlo[][4],ldouble *f)
-{
-  ldouble Rij[4][4];
-  ldouble ppp[NV];
-
-  calc_Rij_ff(pp,Rij);
-  //boost22_ff2zamo(Rij,Rij,pp,gg,eup);
-  //trans22_zamo2lab(Rij,Rij,gg,elo);
-
-  trans22_on2cc(Rij,Rij,gg,tlo);
-  boost22_ff2lab(Rij,Rij,pp,gg);
-
-  indices_2221(Rij,Rij,gg);
-
-  ldouble gdet=gg[3][4];
-
-  f[0]=-Rij[0][0]+uu[6];
-  f[1]=-Rij[0][1]+uu[7];
-  f[2]=-Rij[0][2]+uu[8];
-  f[3]=-Rij[0][3]+uu[9];
-
-  return 0;
-} 
-
-int
-print_state_u2prad_num (int iter, ldouble *x, ldouble *f)
-{
-  printf ("iter = %3d x = % .3Le % .3Le % .3Le % .3Le "
-	  "f(x) = % .3Le % .3Le % .3Le % .3Le\n",
-	  iter,
-	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
-}
-
-int
-u2p_rad_num(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble tup[][4], ldouble tlo[][4])
-{
-  ldouble pp0[NV],pporg[NV];
-  ldouble J[4][4],iJ[4][4];
-  ldouble x[4],f1[4],f2[4],f3[4];
-  int i,j,k,iter=0;
-
-  ldouble EPS = 1.e-6;
-  ldouble CONV = U2PRADPREC;
-
-  int verbose=0;
-
-  for(i=6;i<NV;i++)
-    {
-      pporg[i]=pp[i];
-    }
-  
-  if(verbose!=0)   print_Nvector(uu,NV);
-  do
-    {
-      iter++;
-      for(i=6;i<NV;i++)
-	{
-	  pp0[i]=pp[i];
-	}
-
-      //valueas at zero state
-      f_u2prad_num(uu,pp,gg,tup,tlo,f1);
- 
-      //calculating approximate Jacobian
-      for(i=0;i<4;i++)
-	{
-	  for(j=0;j<4;j++)
-	    {
-	      pp[j+6]=pp[j+6]+EPS*pp[6];
-	    
-	      f_u2prad_num(uu,pp,gg,tup,tlo,f2);
-     
-	      J[i][j]=(f2[i] - f1[i])/(EPS*pp[6]);
-
-	      pp[j+6]=pp0[j+6];
-	    }
-	}
-
-      //inversion
-      inverse_44matrix(J,iJ);
-
-      //updating x
-      for(i=0;i<4;i++)
-	{
-	  x[i]=pp0[i+6];
-	}
-
-      for(i=0;i<4;i++)
-	{
-	  for(j=0;j<4;j++)
-	    {
-	      x[i]-=iJ[i][j]*f1[j];
-	    }
-	}
-      if(verbose>0)    print_state_u2prad_num (iter,x,f1); 
-
-      for(i=0;i<4;i++)
-	{
-	  pp[i+6]=x[i];
-	}
-  
-      //test convergence
-      for(i=0;i<4;i++)
-	{
-	  f3[i]=(pp[i+6]-pp0[i+6]);
-	  f3[i]=fabs(f3[i]/pp0[6]);
-	}
-
-      if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
-	break;
-
-      if(iter>50)
-	{
-	  printf("iter exceeded in u2prad_num()\n");
-	  
-	  for(i=6;i<NV;i++)
-	    {
-	      pp[i]=pporg[i];
-	    }
-	  
-	  return -1;
-
-	  break;
-	}
-     
-    }
-  while(1);
-  
-  if(pp[6]<EFLOOR) 
-    {
-      printf("enegative u2prad()\n");
-      pp[6]=EFLOOR;
-    }
-  
-  if(verbose!=0)   {print_Nvector(pp,NV);}
-  if(verbose>0)   printf("----\n");
-
-  return 0;
-}
 
 //**********************************************************************
 //**********************************************************************

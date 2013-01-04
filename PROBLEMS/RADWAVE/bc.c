@@ -29,7 +29,7 @@ if(ix>NX-1) iix=NX-1;
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
     }
 
-p2u(pp,uu,gg,eup,elo);
+p2u(pp,uu,gg);
 
   
   return 0;

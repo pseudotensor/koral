@@ -4,11 +4,14 @@
 ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
 
-  gdet_bc=get_g(g,3,4,ix,iy,iz);  
-  ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
+  gdet_bc=get_g(g,3,4,ix,iy,iz); 
+  ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4],tup[4][4],tlo[4][4];
   pick_g(ix,iy,iz,gg);
   pick_T(emuup,ix,iy,iz,eup);
   pick_T(emulo,ix,iy,iz,elo);
+  pick_G(ix,iy,iz,GG);
+  pick_T(tmuup,ix,iy,iz,tup);
+  pick_T(tmulo,ix,iy,iz,tlo);
   ldouble xx=get_x(ix,0);
 
 //printf("aa\n");
@@ -45,8 +48,9 @@ int iix,iiy,iiz,iv;
       pp[9]=Fz;
 
       prad_zamo2ff(pp,pp,gg,eup);
+      prad_ff2lab(pp,pp,gg,GG,tlo);
 
-      p2u(pp,uu,gg,eup,elo);
+      p2u(pp,uu,gg);
       return 0.;
     }
   else if(iz<0 )
@@ -85,7 +89,7 @@ int iix,iiy,iiz,iv;
       pp[7]=0.;
       pp[9]=0.;
 
-      p2u(pp,uu,gg,eup,elo);
+      p2u(pp,uu,gg);
 
 
       return 0;
@@ -103,7 +107,7 @@ int iix,iiy,iiz,iv;
 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      p2u(pp,uu,gg,eup,elo);
+      p2u(pp,uu,gg);
       return 0;
     }
   else if(ix<0 && 1) //copy
@@ -123,7 +127,7 @@ int iix,iiy,iiz,iv;
        //      E=calc_LTE_EfromT(TAMB);
       //pp[6]=E;
 
-      p2u(pp,uu,gg,eup,elo);
+      p2u(pp,uu,gg);
       return 0;
     }
 #ifdef FLATBACKGROUND
@@ -142,7 +146,7 @@ int iix,iiy,iiz,iv;
       //       rho=RHOAMB;
        //      E=calc_LTE_EfromT(TAMB);
       //pp[6]=E;
-      p2u(pp,uu,gg,eup,elo);
+      p2u(pp,uu,gg);
       return 0;
     }
 #endif
@@ -180,7 +184,8 @@ int iix,iiy,iiz,iv;
       pp[9]=get_u(p,9,iix,iiy,iiz);
       */
      prad_zamo2ff(pp,pp,gg,eup);
-  p2u(pp,uu,gg,eup,elo);
+prad_ff2lab(pp,pp,gg,GG,tlo);
+  p2u(pp,uu,gg);
       return 0;
     }
  
@@ -201,6 +206,6 @@ int iix,iiy,iiz,iv;
       
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
     }
-  p2u(pp,uu,gg,eup,elo);
+  p2u(pp,uu,gg);
 return 0;
   

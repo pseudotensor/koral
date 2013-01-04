@@ -692,16 +692,13 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 #ifdef EXPLICIT_RAD_SOURCE
 	      //new primitives before the source operator
 	      calc_primitives(ix,iy,iz);
-	      //applied explicitly
+	      //applied explicitly directly in lab frame
 	      solve_explicit_ff(ix,iy,iz,dt,del4);
-	      //	      boost2_ff2zamo(del4,del4,pp,gg,eup);
-	      //	      trans2_zamo2lab(del4,del4,elo);
-	      trans2_on2cc(del4,del4,tlo);
-	      boost2_ff2lab(del4,del4,pp,gg);
 	      indices_21(del4,del4,gg);
 #endif
 
 #ifdef IMPLICIT_FF_RAD_SOURCE
+	      my_err("OUTDATED\n");
 	      //new primitives before the source operator
 	      calc_primitives(ix,iy,iz);
 	      //semi-implicit in the fluid frame - only approximate!
@@ -780,11 +777,9 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
   //converting interpolated primitives to conserved
   pick_gb(ix,iy,iz,0,gg);
-  pick_Tb(emuupbx,ix,iy,iz,0,eup);
-  pick_Tb(emulobx,ix,iy,iz,0,elo);
    
-  p2u(fd_uLl,fd_uLl,gg,eup,elo);
-  p2u(fd_uRl,fd_uRl,gg,eup,elo);
+  p2u(fd_uLl,fd_uLl,gg);
+  p2u(fd_uRl,fd_uRl,gg);
 
   //save calculated conserved basing on primitives on faces
   for(i=0;i<NV;i++)
@@ -838,11 +833,9 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	}
 
       pick_gb(ix,iy,iz,1,gg);
-      pick_Tb(emuupby,ix,iy,iz,1,eup);
-      pick_Tb(emuloby,ix,iy,iz,1,elo);
-	    
-      p2u(fd_uLl,fd_uLl,gg,eup,elo);
-      p2u(fd_uRl,fd_uRl,gg,eup,elo);
+ 	    
+      p2u(fd_uLl,fd_uLl,gg);
+      p2u(fd_uRl,fd_uRl,gg);
 
       for(i=0;i<NV;i++)
 	{
@@ -893,11 +886,9 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	}
 
       pick_gb(ix,iy,iz,2,gg);
-      pick_Tb(emuupbz,ix,iy,iz,2,eup);
-      pick_Tb(emulobz,ix,iy,iz,2,elo);
 
-      p2u(fd_uLl,fd_uLl,gg,eup,elo);
-      p2u(fd_uRl,fd_uRl,gg,eup,elo);
+      p2u(fd_uLl,fd_uLl,gg);
+      p2u(fd_uRl,fd_uRl,gg);
 
       for(i=0;i<NV;i++)
 	{
@@ -1522,16 +1513,14 @@ int set_bc(ldouble t)
       ldouble r_src=get_x(ix,0);
       ldouble gg[4][5],eup[4][4],elo[4][4];
       pick_g(ix,iy,iz,gg);
-      pick_T(emuup,ix,iy,iz,eup);
-      pick_T(emulo,ix,iy,iz,elo);
-    
+     
       for(iv=0;iv<NV;iv++)
 	{
 	  pval[iv]=get_u(p,iv,iix,iiy,iiz);
 	  set_u(p,iv,ix,iy,iz,pval[iv]);
 	}
 
-      p2u(pval,uval,gg,eup,elo);
+      p2u(pval,uval,gg);
 
       for(iv=0;iv<NV;iv++)
 	{

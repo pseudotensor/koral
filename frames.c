@@ -4,9 +4,57 @@
 #include "ko.h"
 
 /*****************************************************************/
+/********** radiative primitives on fluid frame -> lab **************/
 /*****************************************************************/
+int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble tlo[][4])
+{
+  ldouble Rij[4][4];
+  int i,j;
+
+  calc_Rij_ff(pp1,Rij);
+
+  trans22_on2cc(Rij,Rij,gg,tlo);
+  boost22_ff2lab(Rij,Rij,pp1,gg);
+  indices_2221(Rij,Rij,gg);
+
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+
+  pp2[6]=Rij[0][0];
+  pp2[7]=Rij[0][1];
+  pp2[8]=Rij[0][2];
+  pp2[9]=Rij[0][3];
+
+  return 0;
+} 
+
+//*****************************************************************/
+/********** radiative primitives lab -> on fluid frame **************/
 /*****************************************************************/
-//radiative primitives fluid frame -> ZAMO
+int prad_lab2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4])
+{
+  ldouble Rij[4][4];
+  int i,j;  
+
+  calc_Rij(pp1,gg,GG,Rij);
+
+  boost22_lab2ff(Rij,Rij,pp1,gg);
+  trans22_cc2on(Rij,Rij,gg,tup);
+
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+
+  pp2[6]=Rij[0][0];
+  pp2[7]=Rij[0][1];
+  pp2[8]=Rij[0][2];
+  pp2[9]=Rij[0][3];
+
+  return 0;
+} 
+
+/*****************************************************************/
+/********** radiative primitives fluid frame -> ZAMO**************/
+/*****************************************************************/
 int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble eup[][4])
 {
   ldouble Rij[4][4];
@@ -27,9 +75,8 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble eup[][4])
 } 
 
 /*****************************************************************/
+/********** radiative primitives ZAMO -> fluid frame **************/
 /*****************************************************************/
-/*****************************************************************/
-//radiative primitives ZAMO -> fluid frame - numerical solver
 int f_prad_zamo2ff(ldouble *ppff, ldouble *ppzamo, ldouble gg[][5], ldouble eup[][4],ldouble *f)
 {
   ldouble Rij[4][4];
@@ -1203,6 +1250,39 @@ indices_2221(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5])
 	  for(k=0;k<4;k++)
 	    {
 	      Tt[i][j]+=T1[i][k]*gg[k][j];
+	    }	  
+	}
+    }
+
+   for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  T2[i][j]=Tt[i][j];
+	}
+    }
+
+  return 0;
+}
+
+//*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+// T^i_j -> T^ij
+int
+indices_2122(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5])
+{
+  int i,j,k;
+  ldouble Tt[4][4];
+
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Tt[i][j]=0.;
+	  for(k=0;k<4;k++)
+	    {
+	      Tt[i][j]+=T1[i][k]*GG[k][j];
 	    }	  
 	}
     }

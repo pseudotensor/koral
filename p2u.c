@@ -8,7 +8,7 @@
 //**********************************************************************
 //primitive to conserved converter
 int
-p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble tup[][4], ldouble tlo[][4])
+p2u(ldouble *p, ldouble *u, ldouble g[][5])
 {
   ldouble gtt=g[0][0];
   ldouble gtph=g[0][3];
@@ -34,25 +34,11 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble tup[][4], ldouble tlo[][4])
   //************************************
 
 #ifdef RADIATION
-
-  ldouble E=p[6];
-  ldouble F[3]={p[7],p[8],p[9]};
-  ldouble Rij[4][4];
-
-  calc_Rij_ff(p,Rij);
-
-  //boost22_ff2zamo(Rij,Rij,p,g,eup);
-  //trans22_zamo2lab(Rij,Rij,g,elo);  
-
-  trans22_on2cc(Rij,Rij,g,tlo);
-  boost22_ff2lab(Rij,Rij,p,g);
-
-  indices_2221(Rij,Rij,g);
   
-  u[6]=Rij[0][0]; //R^t_t
-  u[7]=Rij[0][1]; //R^t_i
-  u[8]=Rij[0][2];
-  u[9]=Rij[0][3];
+  u[6]=p[6]; //R^t_t
+  u[7]=p[7]; //R^t_i
+  u[8]=p[8];
+  u[9]=p[9];
  
 #endif
 

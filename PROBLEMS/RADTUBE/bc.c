@@ -10,10 +10,11 @@ ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 //gdet_src=get_g(g,3,4,iix,iiy,iiz);
-ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
+ldouble gg[4][5],GG[4][5],ggsrc[4][5],tup[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
-pick_T(emuup,ix,iy,iz,eup);
-pick_T(emulo,ix,iy,iz,elo);
+pick_g(ix,iy,iz,gg);
+pick_T(tmuup,ix,iy,iz,tup);
+pick_T(tmulo,ix,iy,iz,tlo);
 ldouble xx=get_x(ix,0);
 
 /**********************/
@@ -42,8 +43,10 @@ if(ix<0 &&  1)
     pp[7]=Fx;
     pp[8]=Fy;
     pp[9]=Fz; 
+    prad_ff2lab(pp,pp,gg,GG,tlo);
+
 #endif
-    p2u(pp,uu,gg,eup,elo);
+    p2u(pp,uu,gg);
     return 0.;
   }
 
@@ -68,9 +71,10 @@ if(ix>=NX && 1)
     pp[6]=E;
     pp[7]=Fx;
     pp[8]=Fy;
-    pp[9]=Fz; 
+    pp[9]=Fz;
+    prad_ff2lab(pp,pp,gg,GG,tlo); 
 #endif
-    p2u(pp,uu,gg,eup,elo);
+    p2u(pp,uu,gg);
     return 0.;
   }
 
@@ -90,7 +94,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //converting to conserved
-p2u(pp,uu,gg,eup,elo);
+p2u(pp,uu,gg);
   
 return 0;
   

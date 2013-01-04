@@ -54,7 +54,7 @@ calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
 //**********************************************************************
 
 //TODO: clean arguments
-int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][5], ldouble GG[][5], ldouble tup[][4], ldouble tlo[][4],ldouble *f)
+int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][5], ldouble GG[][5],ldouble *f)
 {
   ldouble Rij[4][4];
   ldouble ppp[NV];
@@ -71,22 +71,12 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
   uu[4] = uu0[4] - (uu[9]-uu0[9]);
 
   //calculating primitives  
-  u2p(uu,pp2,gg,GG,tup,tlo);
+  u2p(uu,pp2,gg);
 
-  //new four-force
+  //radiative four-force
   ldouble Gi[4];
-  calc_Gi_ff(pp2,Gi);
-
-  //OLD - limited by Bardeen's tensor
-  //boost2_ff2zamo(Gi,Gi,pp2,gg,eup);
-  //trans2_zamo2lab(Gi,Gi,elo);
-
-  //NEW - now old
-  //trans2_on2cc(Gi,Gi,tlo);
-  //boost2_ff2lab(Gi,Gi,pp2,gg);
-
   //covariant calculation
-  calc_Gi(uu,pp2,gg,GG,Gi);
+  calc_Gi(pp2,gg,GG,Gi);
  
   indices_21(Gi,Gi,gg);
  
@@ -130,7 +120,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     }
 
   ldouble EPS = 1.e-6;
-  ldouble CONV = 1.e-10;
+  ldouble CONV = 1.e-6 ;
 
   int verbose=0;
   int iter=0;
@@ -145,7 +135,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       //values at zero state
-      f_implicit_lab(uu0,uu,pp,dt,gg,GG,tup,tlo,f1);
+      f_implicit_lab(uu0,uu,pp,dt,gg,GG,f1);
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -157,7 +147,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      else del=EPS*uup[j+6];
 	      uu[j+6]=uup[j+6]-del;
 
-	      f_implicit_lab(uu0,uu,pp,dt,gg,GG,tup,tlo,f2);
+	      f_implicit_lab(uu0,uu,pp,dt,gg,GG,f2);
      
 	      J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
 
@@ -228,17 +218,22 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 {
   int i1,i2,i3,iv;
   ldouble pp[NV];
-  ldouble eup[4][4],elo[4][4];
-  pick_T(emuup,ix,iy,iz,eup);
-  pick_T(emulo,ix,iy,iz,elo);
+  ldouble tup[4][4],tlo[4][4];
+  pick_T(tmuup,ix,iy,iz,tup);
+  pick_T(tmulo,ix,iy,iz,tlo);
   ldouble gg[4][5];
   pick_g(ix,iy,iz,gg);
+  ldouble GG[4][5];
+  pick_G(ix,iy,iz,GG);
 
   for(iv=0;iv<NV;iv++)
     {
       pp[iv]=get_u(p,iv,ix,iy,iz);      
     }
 
+  //transforming radiative primitives to ortonormal fluid frame
+  prad_lab2ff(pp,pp,gg,GG,tup);
+  
   ldouble Gi[4];
   calc_Gi_ff(pp,Gi);
   
@@ -288,6 +283,8 @@ solve_explicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   pick_T(emulo,ix,iy,iz,elo);
   ldouble gg[4][5];
   pick_g(ix,iy,iz,gg);
+  ldouble GG[4][5];
+  pick_G(ix,iy,iz,GG);
   ldouble gdet=gg[3][4];
 
   for(iv=0;iv<NV;iv++)
@@ -296,13 +293,12 @@ solve_explicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     }
 
   ldouble Gi[4];
-  calc_Gi_ff(pp,Gi);
+  calc_Gi(pp,gg,GG,Gi);
   
   deltas[0]=-Gi[0]*dt;
   deltas[1]=-Gi[1]*dt;
   deltas[2]=-Gi[2]*dt;
   deltas[3]=-Gi[3]*dt;
-
 
   return 0;
 
@@ -500,13 +496,13 @@ ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z)
 //****** and calculates contravariant four-force ***********************
 //**********************************************************************
 int
-calc_Gi(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
+calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
 {
   int i,j,k;
 
   //radiative stress tensor in the lab frame
   ldouble Rij[4][4];
-  calc_Rij(uu,gg,GG,Rij);
+  calc_Rij(pp,gg,GG,Rij);
 
   //the four-velocity of fluid in lab frame
   ldouble ucon[4],ucov[4],vpr[3];
@@ -568,8 +564,8 @@ calc_Gi(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4
 }
 
 //**********************************************************************
-//******* takes primitives and calculates radiation four   *************
-//******* force G^\mu in the fluid frame *******************************
+//******* takes fluid frame E,F^i in place of radiative primitives   ***
+//******* and calculates force G^\mu in the fluid frame ****************
 //**********************************************************************
 int
 calc_Gi_ff(ldouble *pp, ldouble Gi[4])
@@ -595,16 +591,16 @@ calc_Gi_ff(ldouble *pp, ldouble Gi[4])
   return 0;
 }
 
-//**********************************************************************
-//******* takes conserved and closes Rij in arbitrary frame ************
-//**********************************************************************
+//***********************************************************************************
+//******* takes primitives (=conserved) and closes Rij in arbitrary frame ************
+//***********************************************************************************
 int
-calc_Rij(ldouble *uu, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
+calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 {
   int verbose=0;
  
-  //R^0mu
-  ldouble A[4]={uu[6],uu[7],uu[8],uu[9]};
+  //R^0_mu
+  ldouble A[4]={pp[6],pp[7],pp[8],pp[9]};
   //indices up
   indices_12(A,A,GG);
 
@@ -644,8 +640,10 @@ calc_Rij(ldouble *uu, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 }
 
 //**********************************************************************
-//******* takes E and F^i from primitives and calculates radiation stress ****
-//******* tensor R^ij in fluid frame using M1 closure scheme *****************
+//******* takes E and F^i from primitives (which are assumed to replace ***
+//******* the original primitives R^t_mu in pp) ************************
+//******* and calculates radiation stress ******************************
+//******* tensor R^ij in fluid frame using M1 closure scheme ***********
 //**********************************************************************
 int
 calc_Rij_ff(ldouble *pp, ldouble Rij[][4])

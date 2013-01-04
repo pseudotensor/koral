@@ -293,21 +293,14 @@ ldouble r_photon_BL(ldouble a);
 int update_entropy(int ix,int iy,int iz,int u2pflag);
 
 //u2p.c
-int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4]);
+int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5]);
 int u2p_hot(ldouble*,ldouble*,ldouble[][5]);
 int u2p_entropy(ldouble*,ldouble*,ldouble[][5]);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5]);
-int
-u2p_rad_num(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble eup[][4], ldouble elo[][4]);
-int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4]);
-
-int
-dump_u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble eup[][4], ldouble elo[][4]);
 
 
 //p2u.c
-int p2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
+int p2u(ldouble *p, ldouble *u,ldouble[][5]);
 int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
 
 //frames.c
@@ -339,7 +332,7 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble eup[][4]);
 int prad_ff2zamo(ldouble *pp1, ldouble *pp, ldouble gg[][5], ldouble eup[][4]);
 
 //rad.c
-int calc_Rij(ldouble *uu, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4]);
+int calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
 int solve_explicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas);
 int solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas);
@@ -356,4 +349,5 @@ int solve_radforce(int ix,int iy,int iz,ldouble dt);
 int calc_tautot(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tautot);
 int calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tauabs);
 int calc_Gi_ff(ldouble *pp, ldouble Gi[4]);
+int calc_Gi(ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble Gi[4]);
 

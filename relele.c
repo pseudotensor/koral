@@ -15,15 +15,13 @@ calc_conserved(int ix,int iy,int iz)
   ldouble gg[4][5],tlo[4][4],tup[4][4];
   
   pick_g(ix,iy,iz,gg);
-  pick_T(tmuup,ix,iy,iz,tup);
-  pick_T(tmulo,ix,iy,iz,tlo);
 
   for(iv=0;iv<NV;iv++)
     {
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
-  p2u(pp,uu,gg,tup,tlo);
+  p2u(pp,uu,gg);
 
   for(iv=0;iv<NV;iv++)
     {
@@ -43,12 +41,9 @@ calc_primitives(int ix,int iy,int iz)
 {
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
-  ldouble gg[4][5], GG[4][5],tlo[4][4],tup[4][4];
+  ldouble gg[4][5], tlo[4][4],tup[4][4];
 
   pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
-  pick_T(tmuup,ix,iy,iz,tup);
-  pick_T(tmulo,ix,iy,iz,tlo);
 
   for(iv=0;iv<NV;iv++)
     {
@@ -57,7 +52,7 @@ calc_primitives(int ix,int iy,int iz)
     }
 
   //converting to primitives
-  u2pret=u2p(uu,pp,gg,GG,tup,tlo);
+  u2pret=u2p(uu,pp,gg);
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
   set_cflag(0,ix,iy,iz,u2pret); 

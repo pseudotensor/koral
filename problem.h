@@ -8,7 +8,7 @@
 //3 DONUT - 2d Polish donut
 //4 GEODESICINFALL - geodesic infall with blobs or not
 //5 EDDINFALL - infall with flux from inside
-//6 RADTUBE- radiative shock tubes as in Farris et al 09
+//6 RADTUBE- radiative shock tubes as in Farris et al 09 - assumes Edd.approximation which is currently not handled
 //7 BONDI - like in Fragile's paper
 //8 HDTUBE - relativistic shock tube
 //9 HDTUBE2D - in 2d
@@ -21,7 +21,7 @@
 //16 RADPULSE3D - radiative blob spreading around
 //17 RADDBLSHADOW - radiative shadow with two beams inclined
 
-#define PROBLEM 12
+#define PROBLEM 1
 
 #if(PROBLEM==1)
 

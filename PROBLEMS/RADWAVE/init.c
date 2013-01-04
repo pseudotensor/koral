@@ -19,9 +19,11 @@ ldouble uu[NV];
 xx=get_x(ix,0);
 yy=get_x(iy,1);
 zz=get_x(iz,2);
-ldouble gg[4][5],eup[4][4],elo[4][4];
+ldouble gg[4][5],GG[4][5],tup[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
-calc_LNRFes(gg,eup,elo);
+pick_G(ix,iy,iz,GG);
+calc_tetrades(gg,tup,tlo);
+
 
 ldouble pp[NV],T;
 
@@ -99,12 +101,11 @@ pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
 
-//perturbations given in the lab frame, need to be transformed to the fluid frame
-//prad_zamo2ff(pp,pp,gg,eup);
+prad_ff2lab(pp,pp,gg,GG,tlo);
 #endif
 
 //print_Nvector(pp,NV); getchar();
-p2u(pp,uu,gg,eup,elo);	 
+p2u(pp,uu,gg);	 
 
 
 /***********************************************/
