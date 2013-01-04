@@ -91,50 +91,154 @@ calc_dlgdet(ldouble *xx, int idim)
 int
 calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4])
 {
-  ldouble gtt,grr,grt,ghh,gpp;
   ldouble blob1,blob1sq;
   
-  gtt=g[0][0];
-  grr=g[1][1];
-  grt=g[0][1];
-  ghh=g[2][2]; //gthth
-  gpp=g[3][3]; //gphph
+  int method=2;
+  int verbose=0;
 
-  //calculating transformation lab -> ortonormal
+  //numerical search for eigenvectors
+  if(method==1)
+    {
 
-  //algorithm from HARM's tetrad.c from Mathematica
-  blob1=grr - sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt;
-  blob1sq=blob1*blob1;
-  tmulo[0][0]= (sqrt(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt)/
-		  pow((4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt)))*blob1sq,0.25));
-  tmulo[0][1] =  (2.0*grt)/(sqrt(4.0*((grt)*(grt)) + (grr - gtt)*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt))*
-			      sqrt(fabs(grr - sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt)));
-  tmulo[0][2] = 0.0;
-  tmulo[0][3] = 0.0;
-  tmulo[1][0] = (2.0*grt)/sqrt((4.0*((grt)*(grt)) + (grr - gtt)*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt))*
-				 (grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt));
-  tmulo[1][1] = sqrt((grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt)/
-		       (sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt)))*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt)));
-  tmulo[1][2] = 0.0;
-  tmulo[1][3] = 0.0;
-  tmulo[2][0] = 0.0;
-  tmulo[2][1] = 0.0;
-  tmulo[2][2] = 1.0/fabs(sqrt(ghh));
-  tmulo[2][3] = 0.0;
-  tmulo[3][0] = 0.0;
-  tmulo[3][1] = 0.0;
-  tmulo[3][2] = 0.0;
-  tmulo[3][3] = 1.0/fabs(sqrt(gpp));
-  /*
-  eigenvalues[0]=0.5*(grr - 1.*sqrt(4.*pow(grt,2) + pow(grr - 1.*gtt,2)) + gtt);
-  eigenvalues[1]=0.5*(grr + sqrt(4.*pow(grt,2) + pow(grr - 1.*gtt,2)) + gtt);
-  eigenvalues[2]=ghh;
-  eigenvalues[3]=gpp;
-  */
+      double metric[]={g[0][0],g[0][1],g[0][2],g[0][3],
+		       g[1][0],g[1][1],g[1][2],g[1][3],
+		       g[2][0],g[2][1],g[2][2],g[2][3],
+		       g[3][0],g[3][1],g[3][2],g[3][3]};		       
 
-  //ortonormal -> lab
+      gsl_matrix_view m = gsl_matrix_view_array (metric, 4, 4);     
+      gsl_vector *eval = gsl_vector_alloc (4);
+      gsl_matrix *evec = gsl_matrix_alloc (4, 4);     
+      gsl_eigen_symmv_workspace * w = gsl_eigen_symmv_alloc (4);       
+      gsl_eigen_symmv (&m.matrix, eval, evec, w);     
+      gsl_eigen_symmv_free (w);
+       
+      int i,j;
+     
+      for (i = 0; i < 4; i++)
+	{
+	  double eval_i 
+	    = gsl_vector_get (eval, i);
+	  gsl_vector_view evec_i 
+	    = gsl_matrix_column (evec, i);
+     
+	  if(verbose) 
+	    {
+	      printf ("eigenvalue = %g\n", eval_i);
+	      printf ("eigenvector = \n");
+	      gsl_vector_fprintf (stdout, &evec_i.vector, "%g");
+	    }
 
-  inverse_44matrix(tmulo,tmuup);
+	  for(j=0;j<4;j++) tmulo[j][i]=gsl_matrix_get(evec,i,j)/sqrt(fabs(eval_i));
+
+	}          
+
+
+      //sorting to get maximal values on the diagonal
+      int neworder[4];
+      ldouble max;
+      for(i=0;i<4;i++)
+	{
+	  max=-1.;
+	  for(j=0;j<4;j++)
+	    if(fabs(tmulo[i][j])>max)
+	      {
+		neworder[i]=j;
+		max=fabs(tmulo[i][j]);
+	      }
+	}
+      
+      if(verbose)
+	{
+	  print_tensor(tmulo);
+	  printf("no: %d %d %d %d\n",neworder[0],neworder[1],neworder[2],neworder[3]);
+	}
+      
+      ldouble temp[4][4];
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  temp[neworder[i]][j]=tmulo[i][j];
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  tmulo[i][j]=temp[i][j];
+      //changing orientation to positive
+      for(i=0;i<4;i++) 
+	if(tmulo[i][i]<0.) 
+	  for(j=0;j<4;j++) tmulo[i][j]*=-1.;
+
+      if(verbose) print_tensor(tmulo);
+
+      //ortonormal -> lab
+      for(i=0;i<4;i++)
+	{     
+	  for(j=0;j<4;j++)
+	    tmuup[i][j]=tmulo[i][j];
+	}
+
+      //make them covariant
+      for(i=0;i<4;i++)
+	{	  
+	  indices_21(tmuup[i],tmuup[i],g);
+	  if(tmuup[i][i]<0.) 
+	  for(j=0;j<4;j++) tmuup[i][j]*=-1.;
+	}
+
+      if(verbose) print_tensor(tmuup);
+
+      gsl_vector_free (eval);
+      gsl_matrix_free (evec);
+    }
+
+  //algorithm from HARM's tetrad.c from Mathematica assuming only grt non-zero
+  if(method==2)
+    {
+      ldouble gtt,grr,grt,ghh,gpp;
+      int i,j;
+
+      gtt=g[0][0];
+      grr=g[1][1];
+      grt=g[0][1];
+      ghh=g[2][2]; //gthth
+      gpp=g[3][3]; //gphph
+
+      //lab -> ortonormal
+      blob1=grr - sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt;
+      blob1sq=blob1*blob1;
+      tmulo[0][0]= (sqrt(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt)/
+		    pow((4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt)))*blob1sq,0.25));
+      tmulo[0][1] =  (2.0*grt)/(sqrt(4.0*((grt)*(grt)) + (grr - gtt)*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt))*
+				sqrt(fabs(grr - sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt)));
+      tmulo[0][2] = 0.0;
+      tmulo[0][3] = 0.0;
+      tmulo[1][0] = (2.0*grt)/sqrt((4.0*((grt)*(grt)) + (grr - gtt)*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt))*
+				   (grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt));
+      tmulo[1][1] = sqrt((grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) - gtt)/
+			 (sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt)))*(grr + sqrt(4.0*((grt)*(grt)) + ((grr - gtt)*(grr - gtt))) + gtt)));
+      tmulo[1][2] = 0.0;
+      tmulo[1][3] = 0.0;
+      tmulo[2][0] = 0.0;
+      tmulo[2][1] = 0.0;
+      tmulo[2][2] = 1.0/fabs(sqrt(ghh));
+      tmulo[2][3] = 0.0;
+      tmulo[3][0] = 0.0;
+      tmulo[3][1] = 0.0;
+      tmulo[3][2] = 0.0;
+      tmulo[3][3] = 1.0/fabs(sqrt(gpp));
+
+      //ortonormal -> lab
+      for(i=0;i<4;i++)
+	{     
+	  for(j=0;j<4;j++)
+	    tmuup[i][j]=tmulo[i][j];
+	}
+
+      //make them covariant
+      for(i=0;i<4;i++)
+	{	  
+	  indices_21(tmuup[i],tmuup[i],g);
+	  if(tmuup[i][i]<0.) 
+	  for(j=0;j<4;j++) tmuup[i][j]*=-1.;
+	}
+    }
 
   return 0;
 }
