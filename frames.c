@@ -37,7 +37,6 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   int i,j;  
 
   calc_Rij(pp1,gg,GG,Rij);
-
   boost22_lab2ff(Rij,Rij,pp1,gg);
   trans22_cc2on(Rij,Rij,gg,tup);
 
@@ -1051,7 +1050,7 @@ trans22_lab2zamo(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble eup[][4
 	    {
 	      for(l=0;l<4;l++)
 		{
-		  T2[i][j]+=eup[k][i]*eup[l][j]*Tt[k][l];
+		  T2[i][j]+=eup[i][k]*eup[j][l]*Tt[k][l];
 		}
 	    }
 	}
@@ -1173,7 +1172,7 @@ trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tup[][4])
 	    {
 	      for(l=0;l<4;l++)
 		{
-		  T2[i][j]+=tup[k][i]*tup[l][j]*Tt[k][l];
+		  T2[i][j]+=tup[i][k]*tup[j][l]*Tt[k][l];
 		}
 	    }
 	}

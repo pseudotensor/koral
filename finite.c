@@ -698,7 +698,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 #endif
 
 #ifdef IMPLICIT_FF_RAD_SOURCE
-	      my_err("OUTDATED\n");
 	      //new primitives before the source operator
 	      calc_primitives(ix,iy,iz);
 	      //semi-implicit in the fluid frame - only approximate!

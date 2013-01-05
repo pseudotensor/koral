@@ -178,7 +178,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  xxx[3]=zz;
 
 						  pick_g(ix,iy,iz,gg);
-						  pick_g(ix,iy,iz,GG);
+						  pick_G(ix,iy,iz,GG);
 						  ldouble gdet=gg[3][4];
 
 						  dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
@@ -210,13 +210,10 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  pick_T(emuup,ix,iy,iz,eup);
 						  pick_T(emulo,ix,iy,iz,elo);	    
 
-						  //to fluid frame - default
 						  prad_lab2ff(pp,pp,gg,GG,tup);
-						  
 #ifdef RADOUTPUTINZAMO
 						  prad_ff2zamo(pp,pp,gg,eup); //to print out radiation primitives in ZAMO
 #endif
-
 						  E=pp[6];
 						  Fx=pp[7];
 						  Fy=pp[8];

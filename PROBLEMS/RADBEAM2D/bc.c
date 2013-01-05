@@ -47,6 +47,7 @@ int iix,iiy,iiz,iv;
       pp[8]=Fy;
       pp[9]=Fz;
 
+  
       prad_zamo2ff(pp,pp,gg,eup);
       prad_ff2lab(pp,pp,gg,GG,tlo);
 

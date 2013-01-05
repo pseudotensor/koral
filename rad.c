@@ -601,7 +601,8 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
  
   //R^0_mu
   ldouble A[4]={pp[6],pp[7],pp[8],pp[9]};
-  //indices up
+
+   //indices up
   indices_12(A,A,GG);
 
   //covariant formulation

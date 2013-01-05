@@ -79,17 +79,9 @@ E=calc_LTE_Efromurho(uint,rho);
 	      pp[8]=Fy;
 	      pp[9]=Fz;
 
-if(iz==NZ/2)
-  {
-    printf("r: %Lf\n",xx);
-print_Nvector(pp,NV);
-//prad_zamo2ff(pp,pp,gg,eup);
+prad_zamo2ff(pp,pp,gg,eup);
 prad_ff2lab(pp,pp,gg,GG,tlo);
-print_Nvector(pp,NV);
-prad_lab2ff(pp,pp,gg,GG,tup);
-print_Nvector(pp,NV);
-getchar();
-  }
+
 
 	      p2u(pp,uu,gg);
 
