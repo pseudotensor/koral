@@ -133,7 +133,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 #ifdef YZXDUMP
   for(iy=0;iy<NY;iy++)
     {
-      for(iz=-0*NG;iz<NZ+0*NG;iz++)
+      for(iz=-gcl*NG;iz<NZ+gcr*NG;iz++)
 	{
 	  for(ix=-gcl*NG;ix<NX+gcr*NG;ix++)
 	    {

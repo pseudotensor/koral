@@ -14,8 +14,6 @@ int iix,iiy,iiz,iv;
   pick_T(tmulo,ix,iy,iz,tlo);
   ldouble xx=get_x(ix,0);
 
-//printf("aa\n");
-
   //radius
   if(iz<0 && xx>BEAML && xx<BEAMR && IFBEAM) //hot boundary
     {
@@ -128,19 +126,23 @@ int iix,iiy,iiz,iv;
        //      E=calc_LTE_EfromT(TAMB);
       //pp[6]=E;
 
+
       p2u(pp,uu,gg);
+
+
       return 0;
     }
 #ifdef FLATBACKGROUND
    else if(ix>NX-1 || ix<0) //copy
     {
+
       ldouble gdet=get_g(g,3,4,ix,iy,iz);  
 
       iix=NX-1;
       iiy=iy;
       iiz=iz;
       for(iv=0;iv<NV;iv++)
-	{ 
+ 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
       ldouble Fx,Fy,Fz,rho,E,uint,vx;

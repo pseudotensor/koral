@@ -881,3 +881,117 @@ int max_eigen_lr_radx(ldouble nx,ldouble ny,ldouble nz,int idim,ldouble *al, ldo
   return 0;
 }
 
+/************************************************************************/
+/******* calculates wavespeeds in the lab frame using known *************/
+/******* R^i_j calculated basing on R^t_j from pp[] ***********************/
+/************************************************************************/
+int
+calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
+{
+  int verbose=0;
+
+  //if(pp[9]!=0.) verbose=1;
+
+  ldouble pp1[NV],pp2[NV];
+  ldouble dRdE[4][4],dRdF1[4][4],dRdF2[4][4],dRdF3[4][4],R1[4][4],R2[4][4],J[4][4];
+
+  //estimating Jacobian
+  ldouble EPS=1.e-8;
+  int i,j,k;
+  for(i=0;i<NV;i++)
+    pp1[i]=pp[i];
+  //dE
+  pp1[6]=pp[6]*(1.+EPS);
+  calc_Rij(pp1,gg,GG,R1);indices_2221(R1,R1,gg);
+  pp1[6]=pp[6]*(1.-EPS);
+  calc_Rij(pp1,gg,GG,R2);indices_2221(R2,R2,gg);
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dRdE[i][j]=(R2[i][j]-R1[i][j])/(2.*EPS*pp[6]);
+  pp1[6]=pp[6];
+  //dF1
+  pp1[7]=pp[7]+pp[6]*EPS;
+  calc_Rij(pp1,gg,GG,R1);indices_2221(R1,R1,gg);
+  pp1[7]=pp[7]-pp[6]*EPS;
+  calc_Rij(pp1,gg,GG,R2);indices_2221(R2,R2,gg);
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dRdF1[i][j]=(R2[i][j]-R1[i][j])/(2.*EPS*pp[6]);
+  pp1[7]=pp[7];
+ //dF2
+  pp1[8]=pp[8]+pp[6]*EPS;
+  calc_Rij(pp1,gg,GG,R1);indices_2221(R1,R1,gg);
+  pp1[8]=pp[8]-pp[6]*EPS;
+  calc_Rij(pp1,gg,GG,R2);indices_2221(R2,R2,gg);
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dRdF2[i][j]=(R2[i][j]-R1[i][j])/(2.*EPS*pp[6]);
+  pp1[8]=pp[8];
+  //dF3
+  pp1[9]=pp[9]+pp[6]*EPS;
+  calc_Rij(pp1,gg,GG,R1);indices_2221(R1,R1,gg);
+  pp1[9]=pp[9]-pp[6]*EPS;
+  calc_Rij(pp1,gg,GG,R2);indices_2221(R2,R2,gg);
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dRdF3[i][j]=(R2[i][j]-R1[i][j])/(2.*EPS*pp[6]);
+  pp1[9]=pp[9];
+
+  /*********** xyz ***********/
+  int dim;
+  for(dim=1;dim<=3;dim++)
+    {
+      for(i=0;i<4;i++)
+	{
+	  J[i][0]=dRdE[dim][i];
+	  J[i][1]=dRdF1[dim][i];
+	  J[i][2]=dRdF2[dim][i];
+	  J[i][3]=dRdF3[dim][i];
+	}
+  
+      double array[]={J[0][0],J[0][1],J[0][2],J[0][3],
+		      J[1][0],J[1][1],J[1][2],J[1][3],
+		      J[2][0],J[2][1],J[2][2],J[2][3],
+		      J[3][0],J[3][1],J[3][2],J[3][3]};
+      gsl_matrix_view m = gsl_matrix_view_array (array, 4, 4);     
+      gsl_vector_complex *eval = gsl_vector_complex_alloc (4);
+      gsl_eigen_nonsymm_workspace * w = gsl_eigen_nonsymm_alloc (4);       
+      gsl_eigen_nonsymm (&m.matrix, eval, w);     
+      gsl_eigen_nonsymm_free (w);
+       
+      ldouble eigval[4];
+      gsl_complex temp;
+      for (i = 0; i < 4; i++)
+	{
+	  temp=gsl_vector_complex_get (eval, i);
+	  eigval[i]=GSL_REAL(temp);
+	}
+
+      ldouble axl,axr;
+      axr=0.;
+      for(i=0;i<4;i++)
+	if(eigval[i]>axr) axr=eigval[i];
+      axl=0.;
+      for(i=0;i<4;i++)
+	if(eigval[i]<axl) axl=eigval[i];
+
+      gsl_vector_complex_free (eval);
+
+      aval[(dim-1)*2+0]=axl;
+      aval[(dim-1)*2+1]=axr;
+
+      if(verbose)
+	{
+	  printf("dim: %d\n",dim);
+	  print_Nvector(pp,NV);
+	  calc_Rij(pp,gg,GG,R1);
+	  for(i=0;i<4;i++) for(j=0;j<4;j++) R1[i][j]/=-pp[6];
+	  print_tensor(R1);
+	  print_tensor(J);
+	  print_Nvector(eigval,4);
+	  getchar();
+	}
+    }
+
+  return 0;
+}

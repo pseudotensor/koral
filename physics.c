@@ -7,6 +7,292 @@
 //calculates left and right wave speeds at cell center
 //*************************************************
 int
+calc_wavespeeds_lr_new(int ix, int iy, int iz,ldouble *aaa)
+{
+  //coordinates
+  ldouble xx[4];
+  xx[0]=0.;
+  xx[1]=get_x(ix,0);
+  xx[2]=get_x(iy,1);
+  xx[3]=get_x(iz,2);
+
+  //metric
+  ldouble gg[4][5];
+  pick_g(ix,iy,iz,gg);
+  ldouble GG[4][5];
+  pick_G(ix,iy,iz,GG);
+  ldouble g00=get_g(g,0,0,ix,iy,iz);
+  ldouble g03=get_g(g,0,3,ix,iy,iz);
+  ldouble g30=g03;
+  ldouble g11=get_g(g,1,1,ix,iy,iz);
+  ldouble g22=get_g(g,2,2,ix,iy,iz);  
+  ldouble g33=get_g(g,3,3,ix,iy,iz);
+
+  //inversed metric
+  ldouble G00=get_g(G,0,0,ix,iy,iz);
+  ldouble G03=get_g(G,0,3,ix,iy,iz);
+  ldouble G11=get_g(G,1,1,ix,iy,iz);
+  ldouble G22=get_g(G,2,2,ix,iy,iz);  
+  ldouble G33=get_g(G,3,3,ix,iy,iz);
+  ldouble G30=G03;
+
+  //extent of the cell
+  //TODO
+  ldouble dx[3];
+  dx[0]=get_size_x(ix,0)*sqrt(g11);
+  dx[1]=get_size_x(iy,1)*sqrt(g22);
+  dx[2]=get_size_x(iz,2)*sqrt(g33);   
+
+  ldouble pp[NV],uuu[NV];
+  int iv;
+  
+  ldouble axhdl,axhdr,ayhdl,ayhdr,azhdl,azhdr;
+  ldouble axl,axr,ayl,ayr,azl,azr;
+  axl=axr=ayl=ayr=azl=azr=1.;
+  
+  ldouble ucon[4],ucov[4],cst1,cst2,cst3,cst4;
+
+  //picking up primitives 
+  for(iv=0;iv<NV;iv++)
+    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+  //**********************************************************************
+  //***** hydro: speed of sound ******************************************
+  //**********************************************************************
+	      
+  ldouble rho=pp[0];
+  ldouble uu=pp[1];
+  ldouble vr=pp[2];
+  ldouble vth=pp[3];
+  ldouble vph=pp[4];
+
+  ldouble pre=(GAMMA-1.)*uu;
+  ldouble cs2=GAMMA*pre/(rho+uu+pre);
+
+  if(cs2<0.) cs2=0.;
+
+  //**********************************************************************
+  //***** other stuff ****************************************************
+  //**********************************************************************
+  ldouble ut2=-1./(g00 + 2.*vph*g03 + vr*vr*g11 + vth*vth*g22 + vph*vph*g33 );
+  if(ut2<0.) my_err("ut2.lt.0 in wavespeeds\n");
+  
+  ldouble ut=sqrtl(ut2);  
+  ldouble ur=vr*ut;
+  ldouble uth=vth*ut;
+  ldouble uph=vph*ut;
+
+  ucon[0]=ut;
+  ucon[1]=ur;
+  ucon[2]=uth;
+  ucon[3]=uph;
+  
+  ucov[0]=g00*ucon[0]+g03*ucon[3];
+  ucov[1]=g11*ucon[1];
+  ucov[2]=g22*ucon[2];
+  ucov[3]=g33*ucon[3]+g03*ucon[0];
+
+
+  //**********************************************************************
+  //algorithm from HARM to transform the fluid frame wavespeed into lab frame
+  //**********************************************************************
+
+  ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
+
+  //**********************************************************************
+  //**********************************************************************
+  //x
+  Acov[0]=0.;
+  Acov[1]=1.;
+  Acov[2]=0.;
+  Acov[3]=0.;
+  Acon[0]=G00*Acov[0]+G03*Acov[3];
+  Acon[1]=G11*Acov[1];
+  Acon[2]=G22*Acov[2];
+  Acon[3]=G33*Acov[3]+G03*Acov[0];
+  
+  Bcov[0]=1.;
+  Bcov[1]=0.;
+  Bcov[2]=0.;
+  Bcov[3]=0.;
+  Bcon[0]=G00*Bcov[0]+G03*Bcov[3];
+  Bcon[1]=G11*Bcov[1];
+  Bcon[2]=G22*Bcov[2];
+  Bcon[3]=G33*Bcov[3]+G03*Bcov[0];
+
+
+  Asq = dot(Acon,Acov);
+  Bsq = dot(Bcon,Bcov);
+  Au = dot(Acov, ucon);
+  Bu = dot(Bcov, ucon);
+  AB = dot(Acon, Bcov);
+  Au2 = Au * Au;
+  Bu2 = Bu * Bu;
+  AuBu = Au * Bu;
+
+  //hydro
+  wspeed2=cs2;
+  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
+  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
+  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
+
+  if(discr<0.) {printf("x discr in wavespeeds lt 0\n"); discr=0.;}
+  discr = sqrtl(discr);
+  cst1 = -(-B + discr) / (2. * A);
+  cst2 = -(-B - discr) / (2. * A);  
+  if(cst2>cst1)
+    {
+      axhdl=cst1;  axhdr=cst2;
+    }
+  else
+    {
+      axhdr=cst1;  axhdl=cst2;
+    }
+
+  //**********************************************************************
+  //**********************************************************************
+  //y
+  Acov[0]=0.;
+  Acov[1]=0.;
+  Acov[2]=1.;
+  Acov[3]=0.;
+  Acon[0]=G00*Acov[0]+G03*Acov[3];
+  Acon[1]=G11*Acov[1];
+  Acon[2]=G22*Acov[2];
+  Acon[3]=G33*Acov[3]+G03*Acov[0];
+  
+  Asq = dot(Acon,Acov);
+  Bsq = dot(Bcon,Bcov);
+  Au = dot(Acov, ucon);
+  Bu = dot(Bcov, ucon);
+  AB = dot(Acon, Bcov);
+  Au2 = Au * Au;
+  Bu2 = Bu * Bu;
+  AuBu = Au * Bu;
+
+  //hydro
+  wspeed2=cs2;
+  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
+  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
+  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
+  if(discr<0.) {printf("x discr in wavespeeds lt 0\n"); discr=0.;}
+  discr = sqrtl(discr);
+  cst1 = -(-B + discr) / (2. * A);
+  cst2 = -(-B - discr) / (2. * A);  
+  if(cst2>cst1)
+    {
+      ayhdl=cst1;  ayhdr=cst2;
+    }
+  else
+    {
+      ayhdr=cst1;  ayhdl=cst2;
+    }
+ 
+       
+  //**********************************************************************
+  //**********************************************************************
+  //z
+  Acov[0]=0.;
+  Acov[1]=0.;
+  Acov[2]=0.;
+  Acov[3]=1.;
+  Acon[0]=G00*Acov[0]+G03*Acov[3];
+  Acon[1]=G11*Acov[1];
+  Acon[2]=G22*Acov[2];
+  Acon[3]=G33*Acov[3]+G03*Acov[0];
+  
+  Asq = dot(Acon,Acov);
+  Bsq = dot(Bcon,Bcov);
+  Au = dot(Acov, ucon);
+  Bu = dot(Bcov, ucon);
+  AB = dot(Acon, Bcov);
+  Au2 = Au * Au;
+  Bu2 = Bu * Bu;
+  AuBu = Au * Bu;
+
+  //hydro
+  wspeed2=cs2;
+  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
+  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
+  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
+  if(discr<0.) {printf("y discr in wavespeeds lt 0\n"); discr=0.;}
+  discr = sqrtl(discr);
+  cst1 = -(-B + discr) / (2. * A);
+  cst2 = -(-B - discr) / (2. * A);  
+  if(cst2>cst1)
+    {
+      azhdl=cst1;  azhdr=cst2;
+    }
+  else
+    {
+      azhdr=cst1;  azhdl=cst2;
+    }
+
+#ifdef RADIATION
+  //**********************************************************************
+  //***** radiation: characteristic wave speed ***************************
+  //**********************************************************************
+
+  ldouble aval[6];
+  calc_rad_Jac_eval(pp,gg,GG,aval);
+  axl=aval[0];
+  axr=aval[1];
+  ayl=aval[2];
+  ayr=aval[3];
+  azl=aval[4];
+  azr=aval[5];
+  /*
+    TODO: limit wavespeeds
+    ldouble tautot[3];
+    calc_tautot(pp,xx,dx,tautot);
+
+    axr=my_min(axr, 4./3./tautot[0]);
+    axl=my_max(axl, -4./3./tautot[0]);
+    ayr=my_min(ayr, 4./3./tautot[1]);
+    ayl=my_max(ayl, -4./3./tautot[1]);
+    azr=my_min(azr, 4./3./tautot[2]);
+    azl=my_max(azl, -4./3./tautot[2]);
+  */
+#endif
+
+  //**********************************************************************
+  //**********************************************************************
+    
+  //zeroing 'co-going' velocities
+  if(axhdl>0.) axhdl=0.;
+  if(axhdr<0.) axhdr=0.;
+  if(ayhdl>0.) ayhdl=0.;
+  if(ayhdr<0.) ayhdr=0.;
+  if(azhdl>0.) azhdl=0.;
+  if(azhdr<0.) azhdr=0.;
+  if(axl>0.) axl=0.;
+  if(axr<0.) axr=0.;
+  if(ayl>0.) ayl=0.;
+  if(ayr<0.) ayr=0.;
+  if(azl>0.) azl=0.;
+  if(azr<0.) azr=0.;
+
+  //saving and passing up
+  aaa[0]=axhdl;
+  aaa[1]=axhdr;
+  aaa[2]=ayhdl;
+  aaa[3]=ayhdr;
+  aaa[4]=azhdl;
+  aaa[5]=azhdr;
+  aaa[6]=axl;
+  aaa[7]=axr;
+  aaa[8]=ayl;
+  aaa[9]=ayr;
+  aaa[10]=azl;
+  aaa[11]=azr;
+
+  return 0;
+}
+
+//*************************************************
+//calculates left and right wave speeds at cell center
+//*************************************************
+int
 calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 {
   //coordinates
@@ -71,6 +357,8 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   //**********************************************************************
   //***** radiation: characteristic wave speed ***************************
   //**********************************************************************
+
+  //TODO: update to new primitives
 
   ldouble tautot[3];
   calc_tautot(pp,xx,dx,tautot);

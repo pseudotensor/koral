@@ -211,6 +211,7 @@ struct rad_parameters
 ldouble max_eigen_Jac(ldouble *,ldouble*,int,void*);
 int calc_wavespeeds(int,int,int,ldouble*,ldouble*,ldouble*,ldouble*,ldouble*,ldouble*);
 int calc_wavespeeds_lr(int,int,int,ldouble*);
+int calc_wavespeeds_lr_new(int,int,int,ldouble*);
 int calc_wavespeeds_lr_faces( int,int,int,int, ldouble*,ldouble*);
 int max_eigen_lr_Jac(ldouble *,ldouble*,int,void*,ldouble*,ldouble*);
 int calc_Jac_num(ldouble *xx,ldouble *ujac, int idim,void *parameters,ldouble *fd_jac);
@@ -350,4 +351,6 @@ int calc_tautot(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tautot);
 int calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tauabs);
 int calc_Gi_ff(ldouble *pp, ldouble Gi[4]);
 int calc_Gi(ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble Gi[4]);
+int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval);
+
 

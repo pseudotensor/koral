@@ -350,6 +350,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
   //projects primitives onto ghost cells
   set_bc(t);
+
+
 	      
   //calculates and saves wavespeeds
 #pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (guided)
@@ -359,6 +361,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
       
+      calc_wavespeeds_lr_new(ix,iy,iz,aaa);	      
+     
       calc_wavespeeds_lr(ix,iy,iz,aaa);	      
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
@@ -664,7 +668,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  pp[iv]=get_u(p,iv,ix,iy,iz);      
 		}
 
-
 #ifdef RADIATION 
 	      //updating u - radiative four force
 	      ldouble del4[4],delapl[NV];
@@ -719,7 +722,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      delapl[7]=del4[1];
 	      delapl[8]=del4[2];
 	      delapl[9]=del4[3];
-	      
+
+
+
+
 
 	      for(iv=0;iv<NV;iv++)
 		{
@@ -732,6 +738,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
 		} 	      
 #endif
+
+
 	    }	      
 	}
     }
@@ -808,6 +816,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       al=0.;
 #endif
 
+#ifdef FLUXDISSIPATIONFULL
+      al=1.;
+#endif
+
       //Lax-Friedrich
       fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - al * (fd_uRl[i] - fd_uLl[i]));
   
@@ -859,6 +871,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       
 #ifdef FLUXDISSIPATIONOFF
       al=0.;
+#endif
+
+#ifdef FLUXDISSIPATIONFULL
+      al=1.;
 #endif
 
 	  fd_fstarl[i] = .5*(get_ub(flRy,i,ix,iy,iz,1) + get_ub(flLy,i,ix,iy,iz,1) - al * (fd_uRl[i] - fd_uLl[i]));
@@ -914,10 +930,15 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       al=0.;
 #endif
 
+#ifdef FLUXDISSIPATIONFULL
+      al=1.;
+#endif
+
 	  fd_fstarl[i] = .5*(get_ub(flRz,i,ix,iy,iz,2) + get_ub(flLz,i,ix,iy,iz,2) - al * (fd_uRl[i] - fd_uLl[i]));
 	        
 	  set_ubz(flbz,i,ix,iy,iz,fd_fstarl[i]);
  	}
+
     }
   else for(i=0;i<NV;i++) set_ubz(flbz,i,ix,iy,iz,0.);
 	
@@ -1518,8 +1539,11 @@ int set_bc(ldouble t)
 	  pval[iv]=get_u(p,iv,iix,iiy,iiz);
 	  set_u(p,iv,ix,iy,iz,pval[iv]);
 	}
+ 
 
       p2u(pval,uval,gg);
+
+
 
       for(iv=0;iv<NV;iv++)
 	{

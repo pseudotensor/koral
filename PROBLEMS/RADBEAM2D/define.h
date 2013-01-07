@@ -1,13 +1,14 @@
 #define TMAX 1.e10
+#define FLUXDISSIPATIONFULL
 #define RADIATION
 #define MINKOWSKI
 //#define CYLINDRICAL
-#define SPHERICAL
+//#define SPHERICAL
 //#define SCHWARZSCHILD
-#define NX 30
+#define NX 20
 #define NY 1
-#define NZ 60
-#define TSTEPLIM .5//kind of courant limiter
+#define NZ 20
+#define TSTEPLIM .15//kind of courant limiter
 #define INT_ORDER 1
 #define RK3STEPPING
 
@@ -49,12 +50,12 @@
 #define MINY .99*Pi/2.
 #define MAXY 1.01*Pi/2.
 #define MINZ 0.
-#define MAXZ Pi/2.//8.*Pi/4.
+#define MAXZ Pi/6.//8.*Pi/4.
 #define RHOFLOOR 1.e-50
 #define UFLOOR 1.e-65
 #define EFLOOR 1.e-40
 #define TAMB 1e7
-#define TLEFT 1e10
+#define TLEFT 2e7
 #define NLEFT 0.99999
 #define RHOAMB 1.e0
 #define KAPPA 0.
@@ -65,7 +66,7 @@
 #define YZXDUMP
 #define RADOUTPUTINZAMO
 #define PRINTGC_LEFT
-//#define PRINTGC_RIGHT
+#define PRINTGC_RIGHT
 //#define BLOB
 #define BLOBW .1
 #define BLOBP 100000.
