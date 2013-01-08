@@ -5,9 +5,9 @@
 //#define CYLINDRICAL
 //#define SPHERICAL
 //#define SCHWARZSCHILD
-#define NX 20
+#define NX 40
 #define NY 1
-#define NZ 20
+#define NZ 40
 #define TSTEPLIM .15//kind of courant limiter
 #define INT_ORDER 1
 #define RK3STEPPING
@@ -43,7 +43,13 @@
 #define MAXX 20.5
 #define BEAML 15.5
 #define BEAMR 16.5
-#define DTOUT1 1e0 //dt for basic output
+#define DTOUT1 1. //dt for basic output
+#elif (BEAMNO==4)
+#define MINX 30
+#define MAXX 50
+#define BEAML 37
+#define BEAMR 43
+#define DTOUT1 .25 //dt for basic output
 #endif
 
 #define PLOTFULLPHI
@@ -55,7 +61,7 @@
 #define UFLOOR 1.e-65
 #define EFLOOR 1.e-40
 #define TAMB 1e7
-#define TLEFT 2e7
+#define TLEFT 1e8
 #define NLEFT 0.99999
 #define RHOAMB 1.e0
 #define KAPPA 0.
@@ -78,4 +84,4 @@
 #define PAR_D 1.
 #define PAR_E 1e-4
 
-#define LOGXGRID
+//#define LOGXGRID

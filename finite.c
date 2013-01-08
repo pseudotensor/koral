@@ -361,8 +361,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
       
-      calc_wavespeeds_lr_new(ix,iy,iz,aaa);	      
-     
       calc_wavespeeds_lr(ix,iy,iz,aaa);	      
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }

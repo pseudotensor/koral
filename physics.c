@@ -7,7 +7,7 @@
 //calculates left and right wave speeds at cell center
 //*************************************************
 int
-calc_wavespeeds_lr_new(int ix, int iy, int iz,ldouble *aaa)
+calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 {
   //coordinates
   ldouble xx[4];
@@ -291,9 +291,10 @@ calc_wavespeeds_lr_new(int ix, int iy, int iz,ldouble *aaa)
 
 //*************************************************
 //calculates left and right wave speeds at cell center
+//in the fluid frame using fluid-frame primitives
 //*************************************************
 int
-calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
+calc_wavespeeds_lr_old(int ix, int iy, int iz,ldouble *aaa)
 {
   //coordinates
   ldouble xx[4];

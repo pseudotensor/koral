@@ -890,7 +890,7 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
 {
   int verbose=0;
 
-  //if(pp[9]!=0.) verbose=1;
+  //  if(pp[9]!=0.) verbose=1;
 
   ldouble pp1[NV],pp2[NV];
   ldouble dRdE[4][4],dRdF1[4][4],dRdF2[4][4],dRdF3[4][4],R1[4][4],R2[4][4],J[4][4];
@@ -939,6 +939,8 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
 
   /*********** xyz ***********/
   int dim;
+  gsl_vector_complex *eval = gsl_vector_complex_alloc (4);
+  gsl_eigen_nonsymm_workspace * w = gsl_eigen_nonsymm_alloc (4);       
   for(dim=1;dim<=3;dim++)
     {
       for(i=0;i<4;i++)
@@ -953,11 +955,9 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
 		      J[1][0],J[1][1],J[1][2],J[1][3],
 		      J[2][0],J[2][1],J[2][2],J[2][3],
 		      J[3][0],J[3][1],J[3][2],J[3][3]};
+      
       gsl_matrix_view m = gsl_matrix_view_array (array, 4, 4);     
-      gsl_vector_complex *eval = gsl_vector_complex_alloc (4);
-      gsl_eigen_nonsymm_workspace * w = gsl_eigen_nonsymm_alloc (4);       
       gsl_eigen_nonsymm (&m.matrix, eval, w);     
-      gsl_eigen_nonsymm_free (w);
        
       ldouble eigval[4];
       gsl_complex temp;
@@ -975,7 +975,9 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
       for(i=0;i<4;i++)
 	if(eigval[i]<axl) axl=eigval[i];
 
-      gsl_vector_complex_free (eval);
+      //ortonormalizing
+      axl*=sqrtl(gg[dim][dim]);
+      axr*=sqrtl(gg[dim][dim]);
 
       aval[(dim-1)*2+0]=axl;
       aval[(dim-1)*2+1]=axr;
@@ -989,9 +991,16 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
 	  print_tensor(R1);
 	  print_tensor(J);
 	  print_Nvector(eigval,4);
+	  printf("al ar: %Lf %Lf\n",axl,axr);
 	  getchar();
 	}
     }
 
-  return 0;
+   gsl_eigen_nonsymm_free (w);
+   gsl_vector_complex_free (eval);
+
+ 
+   
+ 
+   return 0;
 }
