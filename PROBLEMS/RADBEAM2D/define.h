@@ -3,8 +3,8 @@
 #define RADIATION
 //#define MINKOWSKI
 //#define CYLINDRICAL
-//#define SPHERICAL
-#define SCHWARZSCHILD
+#define SPHERICAL
+//#define SCHWARZSCHILD
 #define NX 20
 #define NY 1
 #define NZ 20
@@ -19,7 +19,7 @@
 #define GAMMA (1.4)
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
-#define BEAMNO 1
+#define BEAMNO 3
 #define IFBEAM 1
 //#define GASRADOFF
 //#define RADSOURCEOFF

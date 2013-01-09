@@ -667,7 +667,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
   //whether primitives corrected for caps, floors etc.
   *corrected=0;
 
-  int verbose=0;
+  int verbose=0,i;
   ldouble Rij[4][4];
 
   //R^0mu
@@ -690,37 +690,67 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
   c=gRR*GG[0][0]*GG[0][0]-Av[0]*Av[0]*GG[0][0];
   ldouble delta=b*b-4.*a*c;
   ldouble urfcon[4],urfcov[4],Erf;
-  urfcon[0]=sqrtl((-b-sqrtl(delta))/2./a);
-  if(isnan(urfcon[0])) 
+ 
+  ldouble gamma2=  (-b-sqrtl(delta))/2./a;
+
+  ldouble gammamax=1000.;
+ 
+  if(gamma2<0 || gamma2>gammamax*gammamax) 
     {
       //      printf("top cap in u2p\n");
       *corrected=1;
+
+      urfcon[0]=gammamax;
+      
+      //proper direction for the radiation rest frame, will be normalized later
+      
+      Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+
+      ldouble Arad[4];
+
+      for(i=1;i<4;i++)
+	{
+	  Arad[i]=(Av[i]-1./3.*Erf*GG[0][i])/(4./3.*Erf*gammamax);
+	  //	  Arad[i]=Av[i]/Av[0];
+	}
       
       //TODO: gtph
-      ldouble utaim=10.;
-      ldouble Afac = sqrtl((-1.-utaim*utaim*gg[0][0])/(Av[1]*Av[1]*gg[1][1]+Av[2]*Av[2]*gg[2][2]+Av[3]*Av[3]*gg[3][3]));
+      ldouble Afac = sqrtl((-1.-gammamax*gammamax*gg[0][0])/(Arad[1]*Arad[1]*gg[1][1]+Arad[2]*Arad[2]*gg[2][2]+Arad[3]*Arad[3]*gg[3][3]));
       
-      urfcon[0]=utaim;
-      urfcon[1]=Afac*Av[1];
-      urfcon[2]=Afac*Av[2];
-      urfcon[3]=Afac*Av[3];
+      urfcon[0]=gammamax;
+      urfcon[1]=Afac*Arad[1];
+      urfcon[2]=Afac*Arad[2];
+      urfcon[3]=Afac*Arad[3];
+
+      indices_21(urfcon,urfcov,gg);
+
+      //      print_4vector(urfcon);
+      //      printf("uu: %Le\n",dot(urfcon,urfcov));getchar();
     }
-  else if(urfcon[0]<1.)
+  else if(gamma2<1.)
     {
-      //      printf("low cap in u2p\n");
+      printf("low cap in u2p\n");
       *corrected=1;
 
       urfcon[0]=1.;
+
+      //radiative energy density in the radiation rest frame
+      Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+
       urfcon[1]=urfcon[2]=urfcon[3]=0.;
     }
-
-  //radiative energy density in the radiation rest frame
-  Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+  else
+    {
+      urfcon[0]=sqrtl(gamma2);
+    
+      //radiative energy density in the radiation rest frame
+      Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
       
-  //four-velocity of the rest frame urf^i
-  urfcon[1]=3./(4.*Erf*urfcon[0])*(Av[1]-1./3.*Erf*GG[0][1]);
-  urfcon[2]=3./(4.*Erf*urfcon[0])*(Av[2]-1./3.*Erf*GG[0][2]);
-  urfcon[3]=3./(4.*Erf*urfcon[0])*(Av[3]-1./3.*Erf*GG[0][3]);
+      //four-velocity of the rest frame urf^i
+      urfcon[1]=3./(4.*Erf*urfcon[0])*(Av[1]-1./3.*Erf*GG[0][1]);
+      urfcon[2]=3./(4.*Erf*urfcon[0])*(Av[2]-1./3.*Erf*GG[0][2]);
+      urfcon[3]=3./(4.*Erf*urfcon[0])*(Av[3]-1./3.*Erf*GG[0][3]);
+    }
   
   //new primitives
   pp[6]=Erf;
