@@ -25,6 +25,10 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   pp2[8]=Rij[0][2];
   pp2[9]=Rij[0][3];
 
+  //to E,urf
+  int corrected;
+  u2p_rad(pp2,pp2,gg,GG,NULL,NULL,&corrected);
+
   return 0;
 } 
 
@@ -43,6 +47,7 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   for(i=0;i<NVHD;i++)
     pp2[i]=pp1[i];
 
+  //E,F^i
   pp2[6]=Rij[0][0];
   pp2[7]=Rij[0][1];
   pp2[8]=Rij[0][2];
@@ -54,7 +59,7 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
 /*****************************************************************/
 /********** radiative primitives fluid frame -> ZAMO**************/
 /*****************************************************************/
-int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble eup[][4])
+int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4])
 {
   ldouble Rij[4][4];
   int i,j;
@@ -69,6 +74,10 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble eup[][4])
   pp2[7]=Rij[0][1];
   pp2[8]=Rij[0][2];
   pp2[9]=Rij[0][3];
+
+  //to E,urf
+  int corrected;
+  u2p_rad(pp2,pp2,gg,GG,NULL,NULL,&corrected);
 
   return 0;
 } 

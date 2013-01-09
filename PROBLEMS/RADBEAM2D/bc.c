@@ -45,11 +45,16 @@ int iix,iiy,iiz,iv;
       pp[8]=Fy;
       pp[9]=Fz;
 
-  
       prad_zamo2ff(pp,pp,gg,eup);
       prad_ff2lab(pp,pp,gg,GG,tlo);
 
-      p2u(pp,uu,gg);
+      //if(Fz>0.) print_Nvector(pp,NV);
+
+      p2u(pp,uu,gg,GG);
+
+      //if(Fz>0.) print_Nvector(uu,NV);
+      //if(Fz>0.) getchar();
+
       return 0.;
     }
   else if(iz<0 )
@@ -88,7 +93,7 @@ int iix,iiy,iiz,iv;
       pp[7]=0.;
       pp[9]=0.;
 
-      p2u(pp,uu,gg);
+      p2u(pp,uu,gg,GG);
 
 
       return 0;
@@ -106,7 +111,7 @@ int iix,iiy,iiz,iv;
 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      p2u(pp,uu,gg);
+      p2u(pp,uu,gg,GG);
       return 0;
     }
   else if(ix<0 && 1) //copy
@@ -127,7 +132,7 @@ int iix,iiy,iiz,iv;
       //pp[6]=E;
 
 
-      p2u(pp,uu,gg);
+      p2u(pp,uu,gg,GG);
 
 
       return 0;
@@ -149,7 +154,7 @@ int iix,iiy,iiz,iv;
       //       rho=RHOAMB;
        //      E=calc_LTE_EfromT(TAMB);
       //pp[6]=E;
-      p2u(pp,uu,gg);
+      p2u(pp,uu,gg,GG);
       return 0;
     }
 #endif
@@ -188,7 +193,7 @@ int iix,iiy,iiz,iv;
       */
      prad_zamo2ff(pp,pp,gg,eup);
 prad_ff2lab(pp,pp,gg,GG,tlo);
-  p2u(pp,uu,gg);
+ p2u(pp,uu,gg,GG);
       return 0;
     }
  
@@ -209,6 +214,6 @@ prad_ff2lab(pp,pp,gg,GG,tlo);
       
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
     }
-  p2u(pp,uu,gg);
+p2u(pp,uu,gg,GG);
 return 0;
   

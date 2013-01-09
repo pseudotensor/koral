@@ -12,16 +12,18 @@ calc_conserved(int ix,int iy,int iz)
 {
   int iv;
   ldouble uu[NV],pp[NV];
-  ldouble gg[4][5],tlo[4][4],tup[4][4];
+  ldouble gg[4][5],GG[4][5],tlo[4][4],tup[4][4];
   
   pick_g(ix,iy,iz,gg);
+  pick_G(ix,iy,iz,GG);
 
   for(iv=0;iv<NV;iv++)
     {
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
-  p2u(pp,uu,gg);
+  p2u(pp,uu,gg,GG);
+
 
   for(iv=0;iv<NV;iv++)
     {
@@ -41,9 +43,10 @@ calc_primitives(int ix,int iy,int iz)
 {
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
-  ldouble gg[4][5], tlo[4][4],tup[4][4];
+  ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];
 
   pick_g(ix,iy,iz,gg);
+  pick_G(ix,iy,iz,GG);
 
   for(iv=0;iv<NV;iv++)
     {
@@ -52,7 +55,19 @@ calc_primitives(int ix,int iy,int iz)
     }
 
   //converting to primitives
-  u2pret=u2p(uu,pp,gg);
+  int corrected;
+  u2pret=u2p(uu,pp,gg,GG,&corrected);
+
+  //update conserved to follow corrections on primitives
+  if(corrected!=0)
+    {
+      //      printf("correcting conserved\n");
+      p2u(pp,uu,gg,GG);
+      for(iv=0;iv<NV;iv++)
+	{
+	  set_u(u,iv,ix,iy,iz,uu[iv]);
+	}
+    }
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
   set_cflag(0,ix,iy,iz,u2pret); 

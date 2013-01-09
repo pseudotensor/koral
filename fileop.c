@@ -75,7 +75,6 @@ fread_restartfile(ldouble *t)
 	      //calculating primitives
 	      ldouble gg[4][5];
 	      pick_g(ix,iy,iz,gg);    
-	      //u2p(uu,pp,gg);
 
 	      //saving primitives
 	      for(iv=0;iv<NV;iv++)    
@@ -212,7 +211,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 
 						  prad_lab2ff(pp,pp,gg,GG,tup);
 #ifdef RADOUTPUTINZAMO
-						  prad_ff2zamo(pp,pp,gg,eup); //to print out radiation primitives in ZAMO
+						  prad_ff2zamo(pp,pp,gg,GG,eup); //to print out radiation primitives in ZAMO
 #endif
 						  E=pp[6];
 						  Fx=pp[7];

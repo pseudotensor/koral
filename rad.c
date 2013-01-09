@@ -71,7 +71,8 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
   uu[4] = uu0[4] - (uu[9]-uu0[9]);
 
   //calculating primitives  
-  u2p(uu,pp2,gg);
+  int corr;
+  u2p(uu,pp2,gg,GG,&corr);
 
   //radiative four-force
   ldouble Gi[4];
@@ -598,52 +599,18 @@ int
 calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 {
   int verbose=0;
- 
-  //R^0_mu
-  ldouble A[4]={pp[6],pp[7],pp[8],pp[9]};
-
-   //indices up
-  indices_12(A,A,GG);
 
   //covariant formulation
-  
-  //g_munu R^0mu R^0nu
-  ldouble gRR=gg[0][0]*A[0]*A[0]+gg[0][1]*A[0]*A[1]+gg[0][2]*A[0]*A[2]+gg[0][3]*A[0]*A[3]+
-    gg[1][0]*A[1]*A[0]+gg[1][1]*A[1]*A[1]+gg[1][2]*A[1]*A[2]+gg[1][3]*A[1]*A[3]+
-    gg[2][0]*A[2]*A[0]+gg[2][1]*A[2]*A[1]+gg[2][2]*A[2]*A[2]+gg[2][3]*A[2]*A[3]+
-    gg[3][0]*A[3]*A[0]+gg[3][1]*A[3]*A[1]+gg[3][2]*A[3]*A[2]+gg[3][3]*A[3]*A[3];
- 
-  //the quadratic equation for u^t of the radiation rest frame (urf[0])
-  ldouble a,b,c;
-  a=16.*gRR;
-  b=8.*(gRR*GG[0][0]+A[0]*A[0]);
-  c=gRR*GG[0][0]*GG[0][0]-A[0]*A[0]*GG[0][0];
-  ldouble delta=b*b-4.*a*c;
-  ldouble urfcon[4],Erf;
-  urfcon[0]=sqrtl((-b-sqrtl(delta))/2./a);
-  if(isnan(urfcon[0])) 
-    {
-      //      printf("err\n");
-      //      print_4vector(Av);
-      
-      //TODO: gtph
-      ldouble utaim=10.;
-      ldouble Afac = sqrtl((-1.-utaim*utaim*gg[0][0])/(A[1]*A[1]*gg[1][1]+A[2]*A[2]*gg[2][2]+A[3]*A[3]*gg[3][3]));
-      
-      urfcon[0]=utaim;
-      urfcon[1]=Afac*A[1];
-      urfcon[2]=Afac*A[2];
-      urfcon[3]=Afac*A[3];
-    }
-
   //radiative energy density in the radiation rest frame
-  Erf=3.*A[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
-
-  //four-velocity of the rest frame
-  urfcon[1]=3./(4.*Erf*urfcon[0])*(A[1]-1./3.*Erf*GG[0][1]);
-  urfcon[2]=3./(4.*Erf*urfcon[0])*(A[2]-1./3.*Erf*GG[0][2]);
-  urfcon[3]=3./(4.*Erf*urfcon[0])*(A[3]-1./3.*Erf*GG[0][3]);
-
+  ldouble Erf=pp[6];
+  //four-velocity of the rest frame urf^i
+  ldouble urfcon[4];
+  urfcon[1]=pp[7];
+  urfcon[2]=pp[8];
+  urfcon[3]=pp[9];
+  //TODO: gtph
+  urfcon[0] = sqrtl((-1-urfcon[1]*urfcon[1]*gg[1][1]-urfcon[2]*urfcon[2]*gg[2][2]-urfcon[3]*urfcon[3]*gg[3][3])/gg[0][0]);
+ 
   //lab frame:
   int i,j;
   for(i=0;i<4;i++)
@@ -655,7 +622,7 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 
 //**********************************************************************
 //******* takes E and F^i from primitives (which are assumed to replace ***
-//******* the original primitives R^t_mu in pp) ************************
+//******* the original primitives E,urf in pp) ************************
 //******* and calculates radiation stress ******************************
 //******* tensor R^ij in fluid frame using M1 closure scheme ***********
 //**********************************************************************
@@ -1042,63 +1009,19 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
   ldouble G22=GG[2][2];
   ldouble G33=GG[3][3];
   ldouble G30=G03;
-
-  //R^0_mu
-  ldouble Av[4]={pp[6],pp[7],pp[8],pp[9]};
-
-  //indices up
-  indices_12(Av,Av,GG);
-
-  //covariant formulation
   
-  //g_munu R^0mu R^0nu
-  ldouble gRR=gg[0][0]*Av[0]*Av[0]+gg[0][1]*Av[0]*Av[1]+gg[0][2]*Av[0]*Av[2]+gg[0][3]*Av[0]*Av[3]+
-    gg[1][0]*Av[1]*Av[0]+gg[1][1]*Av[1]*Av[1]+gg[1][2]*Av[1]*Av[2]+gg[1][3]*Av[1]*Av[3]+
-    gg[2][0]*Av[2]*Av[0]+gg[2][1]*Av[2]*Av[1]+gg[2][2]*Av[2]*Av[2]+gg[2][3]*Av[2]*Av[3]+
-    gg[3][0]*Av[3]*Av[0]+gg[3][1]*Av[3]*Av[1]+gg[3][2]*Av[3]*Av[2]+gg[3][3]*Av[3]*Av[3];
- 
-  //the quadratic equation for u^t of the radiation rest frame (urf[0])
-  ldouble a,b,c;
-  a=16.*gRR;
-  b=8.*(gRR*GG[0][0]+Av[0]*Av[0]);
-  c=gRR*GG[0][0]*GG[0][0]-Av[0]*Av[0]*GG[0][0];
-  ldouble delta=b*b-4.*a*c;
-  ldouble urfcon[4],urfcov[4],Erf;
-  urfcon[0]=sqrtl((-b-sqrtl(delta))/2./a);
-  if(isnan(urfcon[0])) 
-    {
-      //      printf("err\n");
-      //      print_4vector(Av);
-      
-      //TODO: gtph
-      ldouble utaim=10.;
-      ldouble Afac = sqrtl((-1.-utaim*utaim*g00)/(Av[1]*Av[1]*g11+Av[2]*Av[2]*g22+Av[3]*Av[3]*g33));
-      
-      urfcon[0]=utaim;
-      urfcon[1]=Afac*Av[1];
-      urfcon[2]=Afac*Av[2];
-      urfcon[3]=Afac*Av[3];
+  //radiative energy density in the radiation rest frame
+  ldouble Erf=pp[6];
+  //four-velocity of the rest frame urf^i
+  ldouble urfcon[4];
+  urfcon[1]=pp[7];
+  urfcon[2]=pp[8];
+  urfcon[3]=pp[9];
+  //TODO: gtph
+  urfcon[0] = sqrtl((-1-urfcon[1]*urfcon[1]*gg[1][1]-urfcon[2]*urfcon[2]*gg[2][2]-urfcon[3]*urfcon[3]*gg[3][3])/gg[0][0]);
 
-      indices_21(urfcon,urfcov,gg);
-
-      //      print_4vector(urfcon);
-      //      print_4vector(urfcov);
-      
-      //      printf("dot: %Le\n",dot(urfcon,urfcov)); getchar();
-
-    }
-  else
-    {
-      //radiative energy density in the radiation rest frame
-      Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
-      
-      //four-velocity of the rest frame urf^i
-      urfcon[1]=3./(4.*Erf*urfcon[0])*(Av[1]-1./3.*Erf*GG[0][1]);
-      urfcon[2]=3./(4.*Erf*urfcon[0])*(Av[2]-1./3.*Erf*GG[0][2]);
-      urfcon[3]=3./(4.*Erf*urfcon[0])*(Av[3]-1./3.*Erf*GG[0][3]);
-
-      indices_21(urfcon,urfcov,gg);
-    }
+  if(isnan(urfcon[0]))
+    my_err("nan in wavespeeds\n");
 
 
   //square of radiative wavespeed in radiative rest frame
@@ -1158,7 +1081,6 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
 	{
 	  printf("new:\ndim: %d\n",dim);
 	  print_4vector(urfcon);
-	  print_4vector(urfcov);
 	  printf("al ar: %Lf %Lf\n",my_min(cst1,cst2),my_max(cst1,cst2));
 	  getchar();
 	}

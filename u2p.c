@@ -9,9 +9,12 @@
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp, ldouble gg[][5])
+u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 {
+  *corrected=0;
   int verbose=0;
+  int hdcorr=0;
+  int radcorr=0;
 
   int u2pret,ret;
   ldouble ppbak[NV];
@@ -91,13 +94,12 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5])
   //************************************
 
 #ifdef RADIATION
-  //primitives = R^t_mu
-  pp[6]=uu[6];
-  pp[7]=uu[7];
-  pp[8]=uu[8];
-  pp[9]=uu[9];
+  int radcor;
+  u2p_rad(uu,pp,gg,GG,NULL,NULL,&radcorr);
 #endif
   
+  if(radcorr>0 || hdcorr>0) *corrected=1;
+
   return ret;
 }
 
@@ -660,57 +662,71 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5])
 //**********************************************************************
 //**********************************************************************
 int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4])
+u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4], int *corrected)
 {
+  //whether primitives corrected for caps, floors etc.
+  *corrected=0;
+
   int verbose=0;
   ldouble Rij[4][4];
 
   //R^0mu
-  ldouble A[4]={uu[6],uu[7],uu[8],uu[9]};
+  ldouble Av[4]={uu[6],uu[7],uu[8],uu[9]};
   //indices up
-  indices_12(A,A,GG);
+  indices_12(Av,Av,GG);
 
   //covariant formulation
   
   //g_munu R^0mu R^0nu
-  ldouble gRR=gg[0][0]*A[0]*A[0]+gg[0][1]*A[0]*A[1]+gg[0][2]*A[0]*A[2]+gg[0][3]*A[0]*A[3]+
-    gg[1][0]*A[1]*A[0]+gg[1][1]*A[1]*A[1]+gg[1][2]*A[1]*A[2]+gg[1][3]*A[1]*A[3]+
-    gg[2][0]*A[2]*A[0]+gg[2][1]*A[2]*A[1]+gg[2][2]*A[2]*A[2]+gg[2][3]*A[2]*A[3]+
-    gg[3][0]*A[3]*A[0]+gg[3][1]*A[3]*A[1]+gg[3][2]*A[3]*A[2]+gg[3][3]*A[3]*A[3];
+  ldouble gRR=gg[0][0]*Av[0]*Av[0]+gg[0][1]*Av[0]*Av[1]+gg[0][2]*Av[0]*Av[2]+gg[0][3]*Av[0]*Av[3]+
+    gg[1][0]*Av[1]*Av[0]+gg[1][1]*Av[1]*Av[1]+gg[1][2]*Av[1]*Av[2]+gg[1][3]*Av[1]*Av[3]+
+    gg[2][0]*Av[2]*Av[0]+gg[2][1]*Av[2]*Av[1]+gg[2][2]*Av[2]*Av[2]+gg[2][3]*Av[2]*Av[3]+
+    gg[3][0]*Av[3]*Av[0]+gg[3][1]*Av[3]*Av[1]+gg[3][2]*Av[3]*Av[2]+gg[3][3]*Av[3]*Av[3];
  
   //the quadratic equation for u^t of the radiation rest frame (urf[0])
   ldouble a,b,c;
   a=16.*gRR;
-  b=8.*(gRR*GG[0][0]+A[0]*A[0]);
-  c=gRR*GG[0][0]*GG[0][0]-A[0]*A[0]*GG[0][0];
+  b=8.*(gRR*GG[0][0]+Av[0]*Av[0]);
+  c=gRR*GG[0][0]*GG[0][0]-Av[0]*Av[0]*GG[0][0];
   ldouble delta=b*b-4.*a*c;
-  ldouble urf[4],Erf;
-  urf[0]=sqrtl((-b-sqrtl(delta))/2./a);
-  if(isnan(urf[0])) urf[0]=1.;
+  ldouble urfcon[4],urfcov[4],Erf;
+  urfcon[0]=sqrtl((-b-sqrtl(delta))/2./a);
+  if(isnan(urfcon[0])) 
+    {
+      //      printf("top cap in u2p\n");
+      *corrected=1;
+      
+      //TODO: gtph
+      ldouble utaim=10.;
+      ldouble Afac = sqrtl((-1.-utaim*utaim*gg[0][0])/(Av[1]*Av[1]*gg[1][1]+Av[2]*Av[2]*gg[2][2]+Av[3]*Av[3]*gg[3][3]));
+      
+      urfcon[0]=utaim;
+      urfcon[1]=Afac*Av[1];
+      urfcon[2]=Afac*Av[2];
+      urfcon[3]=Afac*Av[3];
+    }
+  else if(urfcon[0]<1.)
+    {
+      //      printf("low cap in u2p\n");
+      *corrected=1;
+
+      urfcon[0]=1.;
+      urfcon[1]=urfcon[2]=urfcon[3]=0.;
+    }
 
   //radiative energy density in the radiation rest frame
-  Erf=3.*A[0]/(4.*urf[0]*urf[0]+GG[0][0]);
-
-  //four-velocity of the rest frame
-  urf[1]=3./(4.*Erf*urf[0])*(A[1]-1./3.*Erf*GG[0][1]);
-  urf[2]=3./(4.*Erf*urf[0])*(A[2]-1./3.*Erf*GG[0][2]);
-  urf[3]=3./(4.*Erf*urf[0])*(A[3]-1./3.*Erf*GG[0][3]);
-
-  //lab frame:
-  int i,j;
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]=4./3.*Erf*urf[i]*urf[j]+1./3.*Erf*GG[i][j];
-
-  //boosting to ff
-  trans22_lab2zamo(Rij,Rij,gg,eup);
-  boost22_zamo2ff(Rij,Rij,pp,gg,eup);
-
-  //reading primitives
-  pp[6]=Rij[0][0];
-  pp[7]=Rij[0][1];
-  pp[8]=Rij[0][2];
-  pp[9]=Rij[0][3];
+  Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+      
+  //four-velocity of the rest frame urf^i
+  urfcon[1]=3./(4.*Erf*urfcon[0])*(Av[1]-1./3.*Erf*GG[0][1]);
+  urfcon[2]=3./(4.*Erf*urfcon[0])*(Av[2]-1./3.*Erf*GG[0][2]);
+  urfcon[3]=3./(4.*Erf*urfcon[0])*(Av[3]-1./3.*Erf*GG[0][3]);
+  
+  //new primitives
+  pp[6]=Erf;
+  pp[7]=urfcon[1];
+  pp[8]=urfcon[2];
+  pp[9]=urfcon[3];
 
   return 0;
 }

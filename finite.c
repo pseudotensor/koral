@@ -354,8 +354,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
   //projects primitives onto ghost cells
   set_bc(t);
-
-
 	      
   //calculates and saves wavespeeds
 #pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (guided)
@@ -686,7 +684,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      ldouble del4[4],delapl[NV];
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
-	      //implicit in lab frame in four dimensions
+	      //implicit in lab frame in four dimensionsp2u
 	      //primitives left intact to give good initial guess for u2p
 
 	      if(solve_implicit_lab(ix,iy,iz,dt,del4)<0) 
@@ -772,7 +770,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   ldouble a0[2],am1[2],ap1[2],al,ar,amax,cmin,cmax,csLl[2],csLr[2],csRl[2],csRr[2];
   ldouble fd_u0[NV],fd_up1[NV],fd_up2[NV],fd_um1[NV],fd_um2[NV],fd_r0[NV],fd_rm1[NV],fd_rp1[NV];
   ldouble fd_uLr[NV],fd_uLl[NV],fd_uRl[NV],fd_uRr[NV],fd_fstarl[NV],fd_fstarr[NV],fd_dul[3*NV],fd_dur[3*NV],fd_pdiffl[NV],fd_pdiffr[NV];
-  ldouble gdet,gg[4][5],eup[4][4],elo[4][4];
+  ldouble gdet,gg[4][5],GG[4][5],eup[4][4],elo[4][4];
 
   x0[0]=get_x(ix,0);
   x0[1]=get_x(iy,1);
@@ -797,9 +795,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
   //converting interpolated primitives to conserved
   pick_gb(ix,iy,iz,0,gg);
+  pick_Gb(ix,iy,iz,0,GG);
    
-  p2u(fd_uLl,fd_uLl,gg);
-  p2u(fd_uRl,fd_uRl,gg);
+  p2u(fd_uLl,fd_uLl,gg,GG);
+  p2u(fd_uRl,fd_uRl,gg,GG);
 
   //save calculated conserved basing on primitives on faces
   for(i=0;i<NV;i++)
@@ -857,9 +856,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	}
 
       pick_gb(ix,iy,iz,1,gg);
+      pick_Gb(ix,iy,iz,1,GG);
  	    
-      p2u(fd_uLl,fd_uLl,gg);
-      p2u(fd_uRl,fd_uRl,gg);
+      p2u(fd_uLl,fd_uLl,gg,GG);
+      p2u(fd_uRl,fd_uRl,gg,GG);
 
       for(i=0;i<NV;i++)
 	{
@@ -914,9 +914,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	}
 
       pick_gb(ix,iy,iz,2,gg);
+      pick_Gb(ix,iy,iz,2,GG);
 
-      p2u(fd_uLl,fd_uLl,gg);
-      p2u(fd_uRl,fd_uRl,gg);
+      p2u(fd_uLl,fd_uLl,gg,GG);
+      p2u(fd_uRl,fd_uRl,gg,GG);
 
       for(i=0;i<NV;i++)
 	{
@@ -1545,8 +1546,9 @@ int set_bc(ldouble t)
       ldouble gdet_src=get_g(g,3,4,iix,iiy,iiz);  
       ldouble r_gc=get_x(ix,0);
       ldouble r_src=get_x(ix,0);
-      ldouble gg[4][5],eup[4][4],elo[4][4];
+      ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
       pick_g(ix,iy,iz,gg);
+      pick_G(ix,iy,iz,GG);
      
       for(iv=0;iv<NV;iv++)
 	{
@@ -1555,7 +1557,7 @@ int set_bc(ldouble t)
 	}
  
 
-      p2u(pval,uval,gg);
+      p2u(pval,uval,gg,GG);
 
 
 

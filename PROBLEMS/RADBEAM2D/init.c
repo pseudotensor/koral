@@ -82,8 +82,8 @@ E=calc_LTE_Efromurho(uint,rho);
 prad_zamo2ff(pp,pp,gg,eup);
 prad_ff2lab(pp,pp,gg,GG,tlo);
 
+p2u(pp,uu,gg,GG);
 
-	      p2u(pp,uu,gg);
 
 /**************************/
 
