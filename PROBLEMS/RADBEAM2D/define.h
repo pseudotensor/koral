@@ -1,14 +1,14 @@
 #define TMAX 1.e10
-#define FLUXDISSIPATIONFULL
+//#define FLUXDISSIPATIONFULL
 #define RADIATION
-#define MINKOWSKI
+//#define MINKOWSKI
 //#define CYLINDRICAL
-//#define SPHERICAL
+#define SPHERICAL
 //#define SCHWARZSCHILD
-#define NX 40
+#define NX 20
 #define NY 1
-#define NZ 40
-#define TSTEPLIM .15//kind of courant limiter
+#define NZ 20
+#define TSTEPLIM .25//kind of courant limiter
 #define INT_ORDER 1
 #define RK3STEPPING
 

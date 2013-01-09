@@ -264,6 +264,10 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   aaayrad=my_max(fabs(aaa[8]),fabs(aaa[9]));
   aaazrad=my_max(fabs(aaa[10]),fabs(aaa[11]));
 
+  //  if(ix==5 && iz==-2) {printf("%d %d %Le\n",ix,iz,aaazrad);getchar();}
+  //  if(ix==5 && iz==-1) {printf("%d %d %Le\n",ix,iz,aaazrad);getchar();}
+  //  if(ix==5 && iz==0) {printf("%d %d %Le\n",ix,iz,aaazrad);getchar();}
+
   set_u_scalar(ahdx,ix,iy,iz,aaaxhd);
   set_u_scalar(ahdy,ix,iy,iz,aaayhd);
   set_u_scalar(ahdz,ix,iy,iz,aaazhd);
@@ -361,7 +365,18 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
       
-      calc_wavespeeds_lr(ix,iy,iz,aaa);	      
+      calc_wavespeeds_lr(ix,iy,iz,aaa);	
+	 
+      if(ix==5 && iz==-1 && 0)
+	{
+	  printf("ixyz: %d %d %d\n",ix,iy,iz);
+	  calc_wavespeeds_lr(ix,iy,iz,aaa);	
+	  printf("wavespeeds lab: %Le %Le %Le %Le %Le %Le\n",aaa[6],aaa[7],aaa[8],aaa[9],aaa[10],aaa[11]);
+	  //	  calc_wavespeeds_lr_old(ix,iy,iz,aaa);	
+	  //	  printf("wavespeeds ff: %Le %Le %Le %Le %Le %Le\n",aaa[6],aaa[7],aaa[8],aaa[9],aaa[10],aaa[11]);
+	  getchar();
+	}
+   
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
 
@@ -919,6 +934,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	  else
 	    {
 	      al=my_max(ap1[1],am1[1]); 
+	      //	      	      if(ix==5 && iz==0) printf("ult: %Le vs %Le\n",al,1./x0[0]);
 	    }
 #else
 	  al=my_max(ap1[0],am1[0]); 
@@ -929,7 +945,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 #endif
 
 #ifdef FLUXDISSIPATIONFULL
-      al=1.;
+      al=1./x0[0];
 #endif
 
 	  fd_fstarl[i] = .5*(get_ub(flRz,i,ix,iy,iz,2) + get_ub(flLz,i,ix,iy,iz,2) - al * (fd_uRl[i] - fd_uLl[i]));

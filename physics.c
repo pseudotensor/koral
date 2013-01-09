@@ -234,7 +234,11 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   //**********************************************************************
 
   ldouble aval[6];
-  calc_rad_Jac_eval(pp,gg,GG,aval);
+  int verbose=0;
+  //  if(ix==5 && iz==-1) verbose=1;
+  //  calc_rad_Jac_eval(pp,gg,GG,aval,verbose);
+  calc_rad_wavespeeds(pp,gg,GG,aval,verbose);
+
   axl=aval[0];
   axr=aval[1];
   ayl=aval[2];
@@ -335,9 +339,23 @@ calc_wavespeeds_lr_old(int ix, int iy, int iz,ldouble *aaa)
   
   ldouble ucon[4],ucov[4],cst1,cst2,cst3,cst4;
 
-  //picking up primitives 
+  //picking up primitives - now conserved 
   for(iv=0;iv<NV;iv++)
     pp[iv]=get_u(p,iv,ix,iy,iz);
+
+  //converting radiative primitives to the fluid frame
+  //debug
+  ldouble gg[4][5],GG[4][5],tup[4][4];
+  pick_g(ix,iy,iz,gg);
+  pick_G(ix,iy,iz,GG);
+  pick_T(tmuup,ix,iy,iz,tup);
+    
+
+  //  printf("plab: \n");
+  //  print_Nvector(pp,NV);
+  prad_lab2ff(pp,pp,gg,GG,tup);
+  //  printf("pff: \n");
+  //  if(ix==5 && iz==-1) {print_Nvector(pp,NV); getchar();}
 
   //**********************************************************************
   //***** hydro: speed of sound ******************************************
@@ -359,15 +377,13 @@ calc_wavespeeds_lr_old(int ix, int iy, int iz,ldouble *aaa)
   //***** radiation: characteristic wave speed ***************************
   //**********************************************************************
 
-  //TODO: update to new primitives
-
   ldouble tautot[3];
   calc_tautot(pp,xx,dx,tautot);
 
-  ldouble E=get_u(p,6,ix,iy,iz);
-  ldouble nx=get_u(p,7,ix,iy,iz)/E ;
-  ldouble ny=get_u(p,8,ix,iy,iz)/E;
-  ldouble nz=get_u(p,9,ix,iy,iz)/E;
+  ldouble E=pp[6];
+  ldouble nx=pp[7]/pp[6];
+  ldouble ny=pp[8]/pp[6];
+  ldouble nz=pp[9]/pp[6];
   ldouble nl=sqrtl(nx*nx+ny*ny+nz*nz);
 
   //solving for radiation wave speeds
@@ -807,6 +823,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ldouble gg[4][5],GG[4][5];
   pick_gb(ix,iy,iz,idim,gg);
   pick_Gb(ix,iy,iz,idim,GG);
+  
   ldouble gdet=gg[3][4];
   
   //calculating Tmunu
@@ -848,6 +865,43 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 #ifdef RADIATION
   ldouble Rij[4][4];
   calc_Rij(pp,gg,GG,Rij);
+  ldouble eup[4][4],elo[4][4],tup[4][4];
+  if(idim==0)
+    {
+      pick_Tb(tmuupbx,ix,iy,iz,idim,tup);
+      pick_Tb(emuupbx,ix,iy,iz,idim,eup);
+      pick_Tb(emulobx,ix,iy,iz,idim,elo);
+    }
+  if(idim==1)
+    {
+      pick_Tb(tmuupby,ix,iy,iz,idim,tup);
+      pick_Tb(emuupby,ix,iy,iz,idim,eup);
+      pick_Tb(emuloby,ix,iy,iz,idim,elo);
+    }
+  if(idim==2)
+    {
+      pick_Tb(tmuupbz,ix,iy,iz,idim,tup);
+      pick_Tb(emuupbz,ix,iy,iz,idim,eup);
+      pick_Tb(emulobz,ix,iy,iz,idim,elo);
+    }
+ 
+  /*
+  //testing with fluid frame Rij
+  //transforming radiative primitives to ortonormal fluid frame
+  int verbose=0;
+  if(pp[9]>0.) verbose=1;
+  if(verbose==1) {print_tensor(Rij);}
+    if(verbose==1) print_Nvector(pp,NV);
+
+  //prad_lab2ff(pp,pp,gg,GG,tup);
+  u2p_rad(pp,pp,gg,GG,eup,elo);
+   if(verbose==1)  print_Nvector(pp,NV);
+
+  calc_Rij_ff(pp,Rij);
+  boost22_ff2zamo(Rij,Rij,pp,gg,eup);
+  trans22_zamo2lab(Rij,Rij,gg,elo);
+  if(verbose==1) {print_tensor(Rij); getchar();}
+  */
   indices_2221(Rij,Rij,gg);
 
   //to move gdet in/out derivative:

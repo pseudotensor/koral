@@ -619,23 +619,36 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   b=8.*(gRR*GG[0][0]+A[0]*A[0]);
   c=gRR*GG[0][0]*GG[0][0]-A[0]*A[0]*GG[0][0];
   ldouble delta=b*b-4.*a*c;
-  ldouble urf[4],Erf;
-  urf[0]=sqrtl((-b-sqrtl(delta))/2./a);
-  if(isnan(urf[0])) urf[0]=1.;
+  ldouble urfcon[4],Erf;
+  urfcon[0]=sqrtl((-b-sqrtl(delta))/2./a);
+  if(isnan(urfcon[0])) 
+    {
+      //      printf("err\n");
+      //      print_4vector(Av);
+      
+      //TODO: gtph
+      ldouble utaim=10.;
+      ldouble Afac = sqrtl((-1.-utaim*utaim*gg[0][0])/(A[1]*A[1]*gg[1][1]+A[2]*A[2]*gg[2][2]+A[3]*A[3]*gg[3][3]));
+      
+      urfcon[0]=utaim;
+      urfcon[1]=Afac*A[1];
+      urfcon[2]=Afac*A[2];
+      urfcon[3]=Afac*A[3];
+    }
 
   //radiative energy density in the radiation rest frame
-  Erf=3.*A[0]/(4.*urf[0]*urf[0]+GG[0][0]);
+  Erf=3.*A[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
 
   //four-velocity of the rest frame
-  urf[1]=3./(4.*Erf*urf[0])*(A[1]-1./3.*Erf*GG[0][1]);
-  urf[2]=3./(4.*Erf*urf[0])*(A[2]-1./3.*Erf*GG[0][2]);
-  urf[3]=3./(4.*Erf*urf[0])*(A[3]-1./3.*Erf*GG[0][3]);
+  urfcon[1]=3./(4.*Erf*urfcon[0])*(A[1]-1./3.*Erf*GG[0][1]);
+  urfcon[2]=3./(4.*Erf*urfcon[0])*(A[2]-1./3.*Erf*GG[0][2]);
+  urfcon[3]=3./(4.*Erf*urfcon[0])*(A[3]-1./3.*Erf*GG[0][3]);
 
   //lab frame:
   int i,j;
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      Rij[i][j]=4./3.*Erf*urf[i]*urf[j]+1./3.*Erf*GG[i][j];
+      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
 
   return 0;
 }
@@ -886,9 +899,9 @@ int max_eigen_lr_radx(ldouble nx,ldouble ny,ldouble nz,int idim,ldouble *al, ldo
 /******* R^i_j calculated basing on R^t_j from pp[] ***********************/
 /************************************************************************/
 int
-calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
+calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose)
 {
-  int verbose=0;
+  //int verbose=0;
 
   //  if(pp[9]!=0.) verbose=1;
 
@@ -975,9 +988,9 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
       for(i=0;i<4;i++)
 	if(eigval[i]<axl) axl=eigval[i];
 
-      //ortonormalizing
-      axl*=sqrtl(gg[dim][dim]);
-      axr*=sqrtl(gg[dim][dim]);
+      //ortonormalizing - wrong, not needed
+      //axl*=sqrtl(gg[dim][dim]);
+      //axr*=sqrtl(gg[dim][dim]);
 
       aval[(dim-1)*2+0]=axl;
       aval[(dim-1)*2+1]=axr;
@@ -985,11 +998,11 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
       if(verbose)
 	{
 	  printf("dim: %d\n",dim);
-	  print_Nvector(pp,NV);
-	  calc_Rij(pp,gg,GG,R1);
-	  for(i=0;i<4;i++) for(j=0;j<4;j++) R1[i][j]/=-pp[6];
-	  print_tensor(R1);
-	  print_tensor(J);
+	  //	  print_Nvector(pp,NV);
+	  //	  calc_Rij(pp,gg,GG,R1);
+	  //	  for(i=0;i<4;i++) for(j=0;j<4;j++) R1[i][j]/=-pp[6];
+	  //	  print_tensor(R1);
+	  //	  print_tensor(J);
 	  print_Nvector(eigval,4);
 	  printf("al ar: %Lf %Lf\n",axl,axr);
 	  getchar();
@@ -1004,3 +1017,153 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
  
    return 0;
 }
+/************************************************************************/
+/******* calculates wavespeeds in the lab frame takin 1/@3 un ************/
+/******* radiative rest frame and boosting it to lab frame *****************/
+/******* using the HARM algorithm **************************************/
+/************************************************************************/
+
+int
+calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose)
+{
+  
+  //metric
+  ldouble g00=gg[0][0];
+  ldouble g03=gg[0][3];
+  ldouble g30=g03;
+  ldouble g11=gg[1][1];
+  ldouble g22=gg[2][2];
+  ldouble g33=gg[3][3];
+
+  //inversed metric
+  ldouble G00=GG[0][0];
+  ldouble G03=GG[0][3];
+  ldouble G11=GG[1][1];
+  ldouble G22=GG[2][2];
+  ldouble G33=GG[3][3];
+  ldouble G30=G03;
+
+  //R^0_mu
+  ldouble Av[4]={pp[6],pp[7],pp[8],pp[9]};
+
+  //indices up
+  indices_12(Av,Av,GG);
+
+  //covariant formulation
+  
+  //g_munu R^0mu R^0nu
+  ldouble gRR=gg[0][0]*Av[0]*Av[0]+gg[0][1]*Av[0]*Av[1]+gg[0][2]*Av[0]*Av[2]+gg[0][3]*Av[0]*Av[3]+
+    gg[1][0]*Av[1]*Av[0]+gg[1][1]*Av[1]*Av[1]+gg[1][2]*Av[1]*Av[2]+gg[1][3]*Av[1]*Av[3]+
+    gg[2][0]*Av[2]*Av[0]+gg[2][1]*Av[2]*Av[1]+gg[2][2]*Av[2]*Av[2]+gg[2][3]*Av[2]*Av[3]+
+    gg[3][0]*Av[3]*Av[0]+gg[3][1]*Av[3]*Av[1]+gg[3][2]*Av[3]*Av[2]+gg[3][3]*Av[3]*Av[3];
+ 
+  //the quadratic equation for u^t of the radiation rest frame (urf[0])
+  ldouble a,b,c;
+  a=16.*gRR;
+  b=8.*(gRR*GG[0][0]+Av[0]*Av[0]);
+  c=gRR*GG[0][0]*GG[0][0]-Av[0]*Av[0]*GG[0][0];
+  ldouble delta=b*b-4.*a*c;
+  ldouble urfcon[4],urfcov[4],Erf;
+  urfcon[0]=sqrtl((-b-sqrtl(delta))/2./a);
+  if(isnan(urfcon[0])) 
+    {
+      //      printf("err\n");
+      //      print_4vector(Av);
+      
+      //TODO: gtph
+      ldouble utaim=10.;
+      ldouble Afac = sqrtl((-1.-utaim*utaim*g00)/(Av[1]*Av[1]*g11+Av[2]*Av[2]*g22+Av[3]*Av[3]*g33));
+      
+      urfcon[0]=utaim;
+      urfcon[1]=Afac*Av[1];
+      urfcon[2]=Afac*Av[2];
+      urfcon[3]=Afac*Av[3];
+
+      indices_21(urfcon,urfcov,gg);
+
+      //      print_4vector(urfcon);
+      //      print_4vector(urfcov);
+      
+      //      printf("dot: %Le\n",dot(urfcon,urfcov)); getchar();
+
+    }
+  else
+    {
+      //radiative energy density in the radiation rest frame
+      Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+      
+      //four-velocity of the rest frame urf^i
+      urfcon[1]=3./(4.*Erf*urfcon[0])*(Av[1]-1./3.*Erf*GG[0][1]);
+      urfcon[2]=3./(4.*Erf*urfcon[0])*(Av[2]-1./3.*Erf*GG[0][2]);
+      urfcon[3]=3./(4.*Erf*urfcon[0])*(Av[3]-1./3.*Erf*GG[0][3]);
+
+      indices_21(urfcon,urfcov,gg);
+    }
+
+
+  //square of radiative wavespeed in radiative rest frame
+  ldouble rv2 = 1./3.;
+
+  //**********************************************************************
+  //algorithm from HARM to transform the fluid frame wavespeed into lab frame
+  //**********************************************************************
+
+  ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
+  ldouble axl,axr,ayl,ayr,azl,azr;
+  axl=axr=ayl=ayr=azl=azr=1.;
+   
+  //**********************************************************************
+  //**********************************************************************
+  int dim;
+  for(dim=0;dim<3;dim++)
+    {
+      Acov[0]=0.;
+      Acov[1]=0.;
+      Acov[2]=0.;
+      Acov[3]=0.;
+      Acov[dim+1]=1.;
+      indices_12(Acov,Acon,GG);
+  
+      Bcov[0]=1.;
+      Bcov[1]=0.;
+      Bcov[2]=0.;
+      Bcov[3]=0.;
+      indices_12(Bcov,Bcon,GG);
+
+      Asq = dot(Acon,Acov);
+      Bsq = dot(Bcon,Bcov);
+      Au = dot(Acov, urfcon);
+      Bu = dot(Bcov, urfcon);
+      AB = dot(Acon, Bcov);
+      Au2 = Au * Au;
+      Bu2 = Bu * Bu;
+      AuBu = Au * Bu;
+
+      wspeed2=rv2;
+      B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
+      A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
+      discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
+      if(discr<0.) {printf("x1discr in ravespeeds lt 0\n"); discr=0.;}
+      discr = sqrtl(discr);
+      ldouble cst1 = -(-B + discr) / (2. * A);
+      ldouble cst2 = -(-B - discr) / (2. * A);  
+
+      axl = my_min(cst1,cst2);
+      axr = my_max(cst1,cst2);
+
+      aval[dim*2+0]=axl;
+      aval[dim*2+1]=axr;
+ 
+      if(verbose || axl>1. || axr>1.)
+	{
+	  printf("new:\ndim: %d\n",dim);
+	  print_4vector(urfcon);
+	  print_4vector(urfcov);
+	  printf("al ar: %Lf %Lf\n",my_min(cst1,cst2),my_max(cst1,cst2));
+	  getchar();
+	}
+    }
+
+  return 0;
+}
+

@@ -505,6 +505,8 @@ calc_metric()
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
+		    set_Tb(emuupby,i,j,ix,iy+1,iz,eup[i][j],1);
+		    set_Tb(emuloby,i,j,ix,iy+1,iz,elo[i][j],1);
 		    set_Tb(tmuupby,i,j,ix,iy+1,iz,tup[i][j],1);
 		    set_Tb(tmuloby,i,j,ix,iy+1,iz,tlo[i][j],1);
 		  }	      

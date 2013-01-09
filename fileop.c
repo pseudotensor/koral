@@ -236,6 +236,11 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
 
                                                   #include PR_DUMP
+
+						  //debug
+						  v1=get_u_scalar(aradx,ix,iy,iz);
+						  v2=get_u_scalar(arady,ix,iy,iz);
+						  v3=get_u_scalar(aradz,ix,iy,iz);
 						  /******************/
 
 
