@@ -90,9 +90,6 @@ int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
   urf[2]=p[8];
   urf[3]=p[9];
 
-  //TODO: gtph
-  //  urf[0] = sqrtl((-1-urf[1]*urf[1]*g[1][1]-urf[2]*urf[2]*g[2][2]-urf[3]*urf[3]*g[3][3])/g[0][0]);
-
   //converting to lab four-velocity
   ldouble qsq=0.;
   for(i=1;i<4;i++)

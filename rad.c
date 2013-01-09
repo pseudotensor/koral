@@ -621,9 +621,6 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   for(i=1;i<4;i++)
     urfcon[i]=urfcon[i]+urfcon[0]*GG[0][i]/GG[0][0];
 
-  //TODO: gtph
-  //  urfcon[0] = sqrtl((-1-urfcon[1]*urfcon[1]*gg[1][1]-urfcon[2]*urfcon[2]*gg[2][2]-urfcon[3]*urfcon[3]*gg[3][3])/gg[0][0]);
- 
   //lab frame:
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -1041,9 +1038,6 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
   urfcon[0]=sqrtl(gamma2/alpha2);
   for(i=1;i<4;i++)
     urfcon[i]=urfcon[i]+urfcon[0]*GG[0][i]/GG[0][0];
-
-  //TODO: gtph
-  //  urfcon[0] = sqrtl((-1-urfcon[1]*urfcon[1]*gg[1][1]-urfcon[2]*urfcon[2]*gg[2][2]-urfcon[3]*urfcon[3]*gg[3][3])/gg[0][0]);
 
   if(isnan(urfcon[0]))
     my_err("nan in wavespeeds\n");
