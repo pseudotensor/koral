@@ -693,6 +693,18 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
  
   ldouble gamma2=  (-b-sqrtl(delta))/2./a;
 
+  /*
+  //formula for Erf firs
+  a=-3.*GG[0][0];
+  b=6.*Av[0];
+  c=9.*gRR;
+  delta=b*b-4.*a*c;
+  Erf= (-b-sqrtl(delta))/2./a;
+  printf("Erf1: %Le\n",Erf);
+  Erf= (-b+sqrtl(delta))/2./a;
+  printf("Erf2: %Le\n",Erf);
+  */
+
   ldouble gammamax=1000.;
  
   if(gamma2<0 || gamma2>gammamax*gammamax) 
@@ -722,10 +734,9 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
       urfcon[2]=Afac*Arad[2];
       urfcon[3]=Afac*Arad[3];
 
-      indices_21(urfcon,urfcov,gg);
-
-      //      print_4vector(urfcon);
-      //      printf("uu: %Le\n",dot(urfcon,urfcov));getchar();
+      //converting to relative four velocity
+      for(i=0;i<4;i++)
+	urfcon[i]=urfcon[i]-urfcon[0]*GG[0][i]/GG[0][0];
     }
   else if(gamma2<1.)
     {
@@ -733,11 +744,14 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
       *corrected=1;
 
       urfcon[0]=1.;
+      urfcon[1]=urfcon[2]=urfcon[3]=0.;
 
       //radiative energy density in the radiation rest frame
       Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
 
-      urfcon[1]=urfcon[2]=urfcon[3]=0.;
+      //converting to relative four velocity
+      for(i=0;i<4;i++)
+	urfcon[i]=urfcon[i]-urfcon[0]*GG[0][i]/GG[0][0];
     }
   else
     {
@@ -750,7 +764,20 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
       urfcon[1]=3./(4.*Erf*urfcon[0])*(Av[1]-1./3.*Erf*GG[0][1]);
       urfcon[2]=3./(4.*Erf*urfcon[0])*(Av[2]-1./3.*Erf*GG[0][2]);
       urfcon[3]=3./(4.*Erf*urfcon[0])*(Av[3]-1./3.*Erf*GG[0][3]);
+
+      //relative four-velocity
+      ldouble alpha=sqrtl(-1./GG[0][0]);
+      ldouble gamma=urfcon[0]*alpha;
+      for(i=1;i<4;i++)
+	{	  
+	  urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha+GG[0][i]/alpha;
+	  urfcon[i]*=gamma;
+	}
+      urfcon[0]=0.;
     }
+
+  //  printf("Erfold: %Le\n",Erf); getchar();
+
   
   //new primitives
   pp[6]=Erf;

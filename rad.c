@@ -599,20 +599,32 @@ int
 calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 {
   int verbose=0;
+  int i,j;
 
   //covariant formulation
   //radiative energy density in the radiation rest frame
   ldouble Erf=pp[6];
-  //four-velocity of the rest frame urf^i
+  //relative velocity
   ldouble urfcon[4];
   urfcon[1]=pp[7];
   urfcon[2]=pp[8];
   urfcon[3]=pp[9];
+
+  //converting to lab four-velocity
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=urfcon[i]*urfcon[j]*gg[i][j];
+  ldouble gamma2=1.+qsq;
+  ldouble alpha2=-1./GG[0][0];
+  urfcon[0]=sqrtl(gamma2/alpha2);
+  for(i=1;i<4;i++)
+    urfcon[i]=urfcon[i]+urfcon[0]*GG[0][i]/GG[0][0];
+
   //TODO: gtph
-  urfcon[0] = sqrtl((-1-urfcon[1]*urfcon[1]*gg[1][1]-urfcon[2]*urfcon[2]*gg[2][2]-urfcon[3]*urfcon[3]*gg[3][3])/gg[0][0]);
+  //  urfcon[0] = sqrtl((-1-urfcon[1]*urfcon[1]*gg[1][1]-urfcon[2]*urfcon[2]*gg[2][2]-urfcon[3]*urfcon[3]*gg[3][3])/gg[0][0]);
  
   //lab frame:
-  int i,j;
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
@@ -993,6 +1005,7 @@ calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int 
 int
 calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose)
 {
+  int i,j;
   
   //metric
   ldouble g00=gg[0][0];
@@ -1012,13 +1025,25 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
   
   //radiative energy density in the radiation rest frame
   ldouble Erf=pp[6];
-  //four-velocity of the rest frame urf^i
+  //relative four-velocity
   ldouble urfcon[4];
   urfcon[1]=pp[7];
   urfcon[2]=pp[8];
   urfcon[3]=pp[9];
+
+  //converting to lab four-velocity
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=urfcon[i]*urfcon[j]*gg[i][j];
+  ldouble gamma2=1.+qsq;
+  ldouble alpha2=-1./GG[0][0];
+  urfcon[0]=sqrtl(gamma2/alpha2);
+  for(i=1;i<4;i++)
+    urfcon[i]=urfcon[i]+urfcon[0]*GG[0][i]/GG[0][0];
+
   //TODO: gtph
-  urfcon[0] = sqrtl((-1-urfcon[1]*urfcon[1]*gg[1][1]-urfcon[2]*urfcon[2]*gg[2][2]-urfcon[3]*urfcon[3]*gg[3][3])/gg[0][0]);
+  //  urfcon[0] = sqrtl((-1-urfcon[1]*urfcon[1]*gg[1][1]-urfcon[2]*urfcon[2]*gg[2][2]-urfcon[3]*urfcon[3]*gg[3][3])/gg[0][0]);
 
   if(isnan(urfcon[0]))
     my_err("nan in wavespeeds\n");

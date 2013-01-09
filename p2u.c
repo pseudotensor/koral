@@ -80,14 +80,29 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 
 int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
 {
+  int i,j;
   ldouble Erf=p[6];
+
+  //relative four-velocity
   ldouble urf[4];
+  urf[0]=0.;
   urf[1]=p[7];
   urf[2]=p[8];
   urf[3]=p[9];
 
   //TODO: gtph
-  urf[0] = sqrtl((-1-urf[1]*urf[1]*g[1][1]-urf[2]*urf[2]*g[2][2]-urf[3]*urf[3]*g[3][3])/g[0][0]);
+  //  urf[0] = sqrtl((-1-urf[1]*urf[1]*g[1][1]-urf[2]*urf[2]*g[2][2]-urf[3]*urf[3]*g[3][3])/g[0][0]);
+
+  //converting to lab four-velocity
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=urf[i]*urf[j]*g[i][j];
+  ldouble gamma2=1.+qsq;
+  ldouble alpha2=-1./G[0][0];
+  urf[0]=sqrtl(gamma2/alpha2);
+  for(i=1;i<4;i++)
+    urf[i]=urf[i]+urf[0]*G[0][i]/G[0][0];
   
   ldouble Rtop[4];
   Rtop[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*G[0][0]; //R^t_t

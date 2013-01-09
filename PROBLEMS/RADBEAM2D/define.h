@@ -3,8 +3,8 @@
 #define RADIATION
 //#define MINKOWSKI
 //#define CYLINDRICAL
-#define SPHERICAL
-//#define SCHWARZSCHILD
+//#define SPHERICAL
+#define SCHWARZSCHILD
 #define NX 20
 #define NY 1
 #define NZ 20
@@ -56,19 +56,19 @@
 #define MINY .99*Pi/2.
 #define MAXY 1.01*Pi/2.
 #define MINZ 0.
-#define MAXZ Pi/2.//8.*Pi/4.
+#define MAXZ Pi/6.//8.*Pi/4.
 #define RHOFLOOR 1.e-50
 #define UFLOOR 1.e-65
 #define EFLOOR 1.e-40
 #define TAMB 1e7
 #define TLEFT 1e8
-#define NLEFT 0.9999
+#define NLEFT 0.999
 #define RHOAMB 1.e0
 #define KAPPA 0.
 #define SPECIFIC_BC
-//#define COPY_XBC
-//#define COPY_YBC
-//#define COPY_ZBC
+#define COPY_XBC
+#define COPY_YBC
+#define COPY_ZBC
 #define YZXDUMP
 //#define RADOUTPUTINZAMO
 #define PRINTGC_LEFT
