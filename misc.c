@@ -523,3 +523,26 @@ getch()
 }
 
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//returns location of the horizone in BL
+ldouble
+r_horizon_BL(ldouble a)
+{
+  return 1.+sqrtl(1-a*a);
+}
+
+//returns location of the co-rotating marginally bound orbit in BL
+ldouble
+r_mbound_BL(ldouble a)
+{
+  return 2.*(1.-a/2.+sqrtl(1.-a));
+}
+
+//returns location of the photon orbit in BL
+ldouble
+r_photon_BL(ldouble a)
+{
+  return 2.*(1.-cosl(2./3.*acosl(-a)));
+}

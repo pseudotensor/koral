@@ -4,7 +4,7 @@
 #include "ko.h"
 
 /*****************************************************************/
-/********** radiative primitives on fluid frame -> lab **************/
+/****** radiative ff primitives (E,F^i) -> primitives in lab frame  *******/
 /*****************************************************************/
 int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble tlo[][4])
 {
@@ -13,27 +13,28 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
 
   calc_Rij_ff(pp1,Rij);
 
-  trans22_on2cc(Rij,Rij,gg,tlo);
-  boost22_ff2lab(Rij,Rij,pp1,gg);
+  trans22_on2cc(Rij,Rij,tlo);
+  boost22_ff2lab(Rij,Rij,pp1,gg,GG);
   indices_2221(Rij,Rij,gg);
 
   for(i=0;i<NVHD;i++)
     pp2[i]=pp1[i];
 
+  //temporarily store conserved in pp2[]
   pp2[6]=Rij[0][0];
   pp2[7]=Rij[0][1];
   pp2[8]=Rij[0][2];
   pp2[9]=Rij[0][3];
 
-  //to E,urf
+  //convert to real primitives
   int corrected;
-  u2p_rad(pp2,pp2,gg,GG,NULL,NULL,&corrected);
+  u2p_rad(pp2,pp2,gg,GG,&corrected);
 
   return 0;
 } 
 
 //*****************************************************************/
-/********** radiative primitives lab -> on fluid frame **************/
+/********** radiative primitives lab -> (E,F^i) in fluid frame *********/
 /*****************************************************************/
 int prad_lab2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4])
 {
@@ -41,8 +42,8 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   int i,j;  
 
   calc_Rij(pp1,gg,GG,Rij);
-  boost22_lab2ff(Rij,Rij,pp1,gg);
-  trans22_cc2on(Rij,Rij,gg,tup);
+  boost22_lab2ff(Rij,Rij,pp1,gg,GG);
+  trans22_cc2on(Rij,Rij,tup);
 
   for(i=0;i<NVHD;i++)
     pp2[i]=pp1[i];
@@ -56,9 +57,9 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   return 0;
 } 
 
-/*****************************************************************/
-/********** radiative primitives fluid frame -> ZAMO**************/
-/*****************************************************************/
+/***********************************************************************/
+/******radiative primitives (E,F^i) fluid frame -> (E,F^i) in ZAMO *********/
+/***********************************************************************/
 int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4])
 {
   ldouble Rij[4][4];
@@ -70,20 +71,17 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   for(i=0;i<NVHD;i++)
     pp2[i]=pp1[i];
 
+  //(E,F^i)_ZAMO
   pp2[6]=Rij[0][0];
   pp2[7]=Rij[0][1];
   pp2[8]=Rij[0][2];
   pp2[9]=Rij[0][3];
 
-  //to E,urf
-  int corrected;
-  u2p_rad(pp2,pp2,gg,GG,NULL,NULL,&corrected);
-
   return 0;
 } 
 
 /*****************************************************************/
-/********** radiative primitives ZAMO -> fluid frame **************/
+/********** (E,F^i) ZAMO -> (E,F^i) fluid frame ********************/
 /*****************************************************************/
 int f_prad_zamo2ff(ldouble *ppff, ldouble *ppzamo, ldouble gg[][5], ldouble eup[][4],ldouble *f)
 {
@@ -222,49 +220,29 @@ int prad_zamo2ff(ldouble *ppzamo, ldouble *ppff, ldouble gg[][5], ldouble eup[][
 /*****************************************************************/
 //calculates Lorenz matrix for lab -> ff
 int
-calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble L[][4])
+calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
 {
   int i,j,k;
   int verbose=0;
 
   //calculating the four-velocity of fluid in lab frame
   ldouble ucon[4],ucov[4],vpr[3];
-
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
-
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-  ldouble gtr=gg[1][2];
-  ldouble grph=gg[1][3];
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + 2.*vr*gtr + 2.*vr*vph*grph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
-  if(ut2<0.) 
-    {
-      ut2=0.;
-     }
-  ldouble ut=sqrtl(ut2);
-
-  ucon[0]=ut;
-  ucon[1]=vr*ut;
-  ucon[2]=vth*ut;
-  ucon[3]=vph*ut;
+  ucon[1]=pp[2];
+  ucon[2]=pp[3];
+  ucon[3]=pp[4];
+  conv_vels(ucon,ucon,VEL3,VEL4,gg,GG);
+  //covariant four-velocity
   indices_21(ucon,ucov,gg);  
 
   if(verbose>0) print_4vector(ucon);
 
   //four velocity of the lab frame
   ldouble wcon[4],wcov[4];
-  wcon[0]=1./sqrtl(-gtt);
+  wcon[0]=1./sqrtl(-gg[0][0]);
   wcon[1]=wcon[2]=wcon[3]=0.;
   indices_21(wcon,wcov,gg);
 
   if(verbose>0) print_4vector(wcon);
-
 
   //temporary Om matrix
   ldouble Om[4][4];
@@ -295,49 +273,29 @@ calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble L[][4])
 /*****************************************************************/
 //calculates Lorenz matrix for ff -> lab
 int
-calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble L[][4])
+calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
 {
   int i,j,k;
   int verbose=0;
 
   //calculating the four-velocity of fluid in lab frame
-  ldouble wcon[4],wcov[4],vpr[3];
-
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
-
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-  ldouble gtr=gg[1][2];
-  ldouble grph=gg[1][3];
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + 2.*vr*gtr + 2.*vr*vph*grph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
-  if(ut2<0.) 
-    {
-      ut2=0.;
-     }
-  ldouble ut=sqrtl(ut2);
-
-  wcon[0]=ut;
-  wcon[1]=vr*ut;
-  wcon[2]=vth*ut;
-  wcon[3]=vph*ut;
+  ldouble wcon[4],wcov[4];
+  wcon[1]=pp[2];
+  wcon[2]=pp[3];
+  wcon[3]=pp[4];
+  conv_vels(wcon,wcon,VEL3,VEL4,gg,GG);
+  //covariant four-velocity
   indices_21(wcon,wcov,gg);  
-
+ 
   if(verbose>0) print_4vector(wcon);
 
   //four velocity of the lab frame
   ldouble ucon[4],ucov[4];
-  ucon[0]=1./sqrtl(-gtt);
+  ucon[0]=1./sqrtl(-gg[0][0]);
   ucon[1]=ucon[2]=ucon[3]=0.;
   indices_21(ucon,ucov,gg);
 
   if(verbose>0) print_4vector(ucon);
-
 
   //temporary Om matrix
   ldouble Om[4][4];
@@ -368,7 +326,7 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble L[][4])
 /*****************************************************************/
 //T^ij Lorentz boost from lab to fluid frame
 int
-boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
+boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5])
 { 
   int i,j,k,l;
   ldouble Tt[4][4];
@@ -379,7 +337,7 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
 
   //Lorentz transformation matrix
   ldouble L[4][4];
-  calc_Lorentz_lab2ff(pp,gg,L);
+  calc_Lorentz_lab2ff(pp,gg,GG,L);
 
   //copying
   for(i=0;i<4;i++)
@@ -420,7 +378,7 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
 /*****************************************************************/
 //T^ij Lorentz boost from lab to fluid frame
 int
-boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
+boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5])
 { 
   int i,j,k,l;
   ldouble Tt[4][4];
@@ -431,7 +389,7 @@ boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
 
   //Lorentz transformation matrix
   ldouble L[4][4];
-  calc_Lorentz_ff2lab(pp,gg,L);
+  calc_Lorentz_ff2lab(pp,gg,GG,L);
 
   //copying
   for(i=0;i<4;i++)
@@ -473,7 +431,7 @@ boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5])
 /*****************************************************************/
 //A^i Lorentz boost from lab to fluid frame
 int
-boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5])
+boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG[][5])
 { 
   int i,j,k,l;
   ldouble At[4]   ;
@@ -484,7 +442,7 @@ boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5])
 
   //Lorentz transformation matrix
   ldouble L[4][4];
-  calc_Lorentz_lab2ff(pp,gg,L);
+  calc_Lorentz_lab2ff(pp,gg,GG,L);
 
   //copying
   for(i=0;i<4;i++)
@@ -516,7 +474,7 @@ boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5])
 /*****************************************************************/
 //A^i Lorentz boost from fluid to lab frame
 int
-boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5])
+boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG[][5])
 { 
   int i,j,k,l;
   ldouble At[4]   ;
@@ -527,7 +485,7 @@ boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5])
 
   //Lorentz transformation matrix
   ldouble L[4][4];
-  calc_Lorentz_ff2lab(pp,gg,L);
+  calc_Lorentz_ff2lab(pp,gg,GG,L);
 
   //copying
   for(i=0;i<4;i++)
@@ -1001,7 +959,7 @@ boost22_ff2zamo(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldou
 /*****************************************************************/
 //T^ij transfromation ZAMO -> lab
 int
-trans22_zamo2lab(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble elo[][4])
+trans22_zamo2lab(ldouble T1[][4],ldouble T2[][4],ldouble elo[][4])
 {
   int i,j,k,l;
   ldouble Tt[4][4];
@@ -1037,7 +995,7 @@ trans22_zamo2lab(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble elo[][4
 /*****************************************************************/
 //T^ij transfromation lab -> ZAMO
 int
-trans22_lab2zamo(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble eup[][4])
+trans22_lab2zamo(ldouble T1[][4],ldouble T2[][4],ldouble eup[][4])
 {
   int i,j,k,l;
   ldouble Tt[4][4];
@@ -1123,7 +1081,7 @@ trans2_zamo2lab(ldouble *u1,ldouble *u2,ldouble elo[][4])
 /*****************************************************************/
 //T^ij transfromation ortonormal to code coordinates
 int
-trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tlo[][4])
+trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble tlo[][4])
 {
   int i,j,k,l;
   ldouble Tt[4][4];
@@ -1159,7 +1117,7 @@ trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tlo[][4])
 /*****************************************************************/
 //T^ij transfromation code coords -> ortonormal
 int
-trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tup[][4])
+trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble tup[][4])
 {
   int i,j,k,l;
   ldouble Tt[4][4];

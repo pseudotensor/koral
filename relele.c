@@ -6,6 +6,76 @@
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//converts velocities u1->u2
+int
+conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
+{
+  int i,j;
+  ldouble ut[4];
+
+  /*************** VEL3 -> VEL4 ***************/
+  if(which1==VEL3 && which2==VEL4)
+    {
+      ldouble a,b,c,delta;
+      c=1.; b=0.;
+      for(i=1;i<4;i++)
+	{
+	  c+=u1[i]*u1[i]*gg[i][i];
+	  b+=2.*u1[i]*gg[0][i];
+	}
+      a=gg[0][0];
+      delta=b*b-4.*a*c;
+      ut[0] = (-b+sqrtl(delta))/2./a;
+      if(ut[0]<1.) ut[0] = (-b-sqrtl(delta))/2./a;
+      if(ut[0]<1. || isnan(ut[0]))
+	{
+	  printf("ut.nan in conv_vels(%d,%d)\n",which1,which2); getchar();
+	}
+      ut[1]=u1[1]*ut[0];
+      ut[2]=u1[2]*ut[0];
+      ut[3]=u1[3]*ut[0];
+    }
+
+  /*************** VEL4 -> VELR ***************/
+  else if (which1==VEL4 && which2==VELR)
+    {
+      for(i=0;i<4;i++)
+	ut[i]=u1[i]-u1[0]*GG[0][i]/GG[0][0];
+    }
+
+  /*************** VELR -> VEL4 ***************/
+  else if (which1==VELR && which2==VEL4)
+    {
+      ldouble qsq=0.;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=u1[i]*u1[j]*gg[i][j];
+      ldouble gamma2=1.+qsq;
+      ldouble alpha2=-1./GG[0][0];
+      ut[0]=sqrtl(gamma2/alpha2);
+      for(i=1;i<4;i++)
+	ut[i]=u1[i]+ut[0]*GG[0][i]/GG[0][0];
+    }
+
+  /*************** not supported  ***************/
+  else
+    {
+      my_err("velocity conversion not supported.\n");
+      return -1;
+    }
+
+  u2[0]=ut[0];
+  u2[1]=ut[1];
+  u2[2]=ut[2];
+  u2[3]=ut[3];
+  
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //calculates conserved in given cell using global array p[]
 int
 calc_conserved(int ix,int iy,int iz)
@@ -71,20 +141,6 @@ calc_primitives(int ix,int iy,int iz)
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
   set_cflag(0,ix,iy,iz,u2pret); 
-
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
-
-  ldouble ut2=-1./(gg[0][0] + 2.*vph*gg[0][3] + vr*vr*gg[1][1] + vth*vth*gg[2][2] + vph*vph*gg[3][3] );
-  
-  //checking on floors & ceilings
-  int updateu=0;
- 
-  if(ut2<0.)
-    {
-      my_err("ut2.lt.0 in calc_primitives!\n"); ut2=0.;
-    }
   
   for(iv=0;iv<NV;iv++)    
     set_u(p,iv,ix,iy,iz,pp[iv]);	      
@@ -92,9 +148,9 @@ calc_primitives(int ix,int iy,int iz)
   return 0;
 }
 
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //picks a tensor from cell face arr at ix,iy,iz
 int
 pick_Tb(ldouble* arr,int ix,int iy,int iz,int idim,ldouble T[][4])
@@ -355,18 +411,6 @@ calc_metric()
 	      calc_LNRFes(gloc,eup,elo);
 	      calc_tetrades(gloc,tup,tlo);
 	      
-	      /*
-	      printf("Bardeen eup elo\n");
-	      print_tensor(eup);
-	      print_tensor(elo);
-
-	      printf("Tetrad tup tlo\n");
-	      print_tensor(tup);
-	      print_tensor(tlo);
-
-	      getchar();
-	      */
-
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
@@ -386,8 +430,6 @@ calc_metric()
 		for(j=0;j<4;j++)
 		  for(k=0;k<4;k++)
 		    set_gKr(i,j,k,ix,iy,iz,Kr[i][j][k]);
-
-
 	      	      
 	      //x-faces
 	      if(ix==-NG)
@@ -624,135 +666,6 @@ calc_metric()
   return 0;
 }
 
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
-//calculates energy-momentum tensor components basing on vector of primitivies p and given metric g
-int
-calc_Tmunu( ldouble *p, ldouble gg[][5], ldouble T[][4], ldouble *ut_ret)
-{
-  ldouble rho=p[0];
-  ldouble uu=p[1];
-  ldouble vr=p[2];
-  ldouble vth=p[3];
-  ldouble vph=p[4];
-
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
-  if(ut2<0.)
-    {
-      my_err("ut2.lt.0 in calc_Tmunu\n"); ut2=0.;
-     }
-
-  ldouble ut=sqrtl(ut2);
-
-  //passes it up to avoid doubling sqrtl
-  *ut_ret=ut;
-  
-  ldouble ur=vr*ut;
-  ldouble uth=vth*ut;
-  ldouble uph=vph*ut;
-
-  ldouble w=rho+GAMMA*uu;
-
-  ldouble Ttt=w*ut*(ut*gtt+uph*gtph)+(GAMMA-1.)*uu;
-  ldouble Ttr=w*ut*ur*grr;
-  ldouble Ttth=w*ut*uth*gthth;
-  ldouble Ttph=w*ut*(uph*gphph+ut*gtph);
-
-  ldouble Trt=w*ur*(ut*gtt+uph*gtph);
-  ldouble Trr=w*ur*ur*grr+(GAMMA-1.)*uu;
-  ldouble Trth=w*ur*uth*gthth;
-  ldouble Trph=w*ur*(uph*gphph+ut*gtph);
-
-  ldouble Ttht=w*uth*(ut*gtt+uph*gtph);
-  ldouble Tthr=w*uth*ur*grr;
-  ldouble Tthth=w*uth*uth*gthth+(GAMMA-1.)*uu;
-  ldouble Tthph=w*uth*(uph*gphph+ut*gtph);
-
-  ldouble Tpht=w*uph*(ut*gtt+uph*gtph);
-  ldouble Tphr=w*uph*ur*grr;
-  ldouble Tphth=w*uph*uth*gthth;
-  ldouble Tphph=w*uph*(uph*gphph+ut*gtph)+(GAMMA-1.)*uu;
-
-  T[0][0]=Ttt;
-  T[0][1]=Ttr;
-  T[0][2]=Ttth;
-  T[0][3]=Ttph;
-
-  T[1][0]=Trt;
-  T[1][1]=Trr;
-  T[1][2]=Trth;
-  T[1][3]=Trph;
-
-  T[2][0]=Ttht;
-  T[2][1]=Tthr;
-  T[2][2]=Tthth;
-  T[2][3]=Tthph;
-
-  T[3][0]=Tpht;
-  T[3][1]=Tphr;
-  T[3][2]=Tphth;
-  T[3][3]=Tphph;
-  
-  return 0;
-}
-
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
-//updates entropy (p[5]) basing on new primitives or stays with the old one if entropy u2p solver was involved
-int
-update_entropy(int ix,int iy,int iz,int u2pflag)
-{
-  ldouble gg[4][5];
-  pick_g(ix,iy,iz,gg);
-
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-
-  ldouble rho=get_u(p,0,ix,iy,iz);
-  ldouble uu=get_u(p,1,ix,iy,iz);
-  ldouble vr=get_u(p,2,ix,iy,iz);
-  ldouble vth=get_u(p,3,ix,iy,iz);
-  ldouble vph=get_u(p,4,ix,iy,iz);
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vph*vph*gphph + vth*vth*gthth);
-  ldouble ut=sqrtl(ut2);
-
-  ldouble S,Sut;
-
-  //u2p_hot worked
-  if(u2pflag==0 && uu>0. && rho>0.)
-    {
-      S=calc_Sfromu(rho,uu);      
-      set_u(p,5,ix,iy,iz,S);
-      set_u(u,5,ix,iy,iz,S*ut); 
-    }
-  //u2p_entropy worked
-  else if(u2pflag==-1  && uu>0. && rho>0.)
-    {
-      Sut=get_u(u,5,ix,iy,iz);
-      S=Sut/ut;
-      set_u(p,5,ix,iy,iz,S);
-    }
-  //somnething else - leave entropy as it was
-  else
-    {
-      //nothing
-    }   
-  
-  return 0;
-}
 
 //**********************************************************************
 //**********************************************************************
@@ -779,26 +692,4 @@ print_u(ldouble *u)
   return 0;
 }
 
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//returns location of the horizone in BL
-ldouble
-r_horizon_BL(ldouble a)
-{
-  return 1.+sqrtl(1-a*a);
-}
 
-//returns location of the co-rotating marginally bound orbit in BL
-ldouble
-r_mbound_BL(ldouble a)
-{
-  return 2.*(1.-a/2.+sqrtl(1.-a));
-}
-
-//returns location of the photon orbit in BL
-ldouble
-r_photon_BL(ldouble a)
-{
-  return 2.*(1.-cosl(2./3.*acosl(-a)));
-}

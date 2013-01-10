@@ -235,8 +235,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 
   ldouble aval[6];
   int verbose=0;
-  //  if(ix==5 && iz==-1) verbose=1;
-  //  calc_rad_Jac_eval(pp,gg,GG,aval,verbose);
+
   calc_rad_wavespeeds(pp,gg,GG,aval,verbose);
 
   axl=aval[0];
@@ -245,8 +244,9 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   ayr=aval[3];
   azl=aval[4];
   azr=aval[5];
+
   /*
-    TODO: limit wavespeeds
+    TODO: limit wavespeeds by optical depth
     ldouble tautot[3];
     calc_tautot(pp,xx,dx,tautot);
 
@@ -257,6 +257,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
     azr=my_min(azr, 4./3./tautot[2]);
     azl=my_max(azl, -4./3./tautot[2]);
   */
+
 #endif
 
   //**********************************************************************
@@ -290,371 +291,6 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   aaa[10]=azl;
   aaa[11]=azr;
 
-  return 0;
-}
-
-//*************************************************
-//calculates left and right wave speeds at cell center
-//in the fluid frame using fluid-frame primitives
-//*************************************************
-int
-calc_wavespeeds_lr_old(int ix, int iy, int iz,ldouble *aaa)
-{
-  //coordinates
-  ldouble xx[4];
-  xx[0]=0.;
-  xx[1]=get_x(ix,0);
-  xx[2]=get_x(iy,1);
-  xx[3]=get_x(iz,2);
-
-  //metric
-  ldouble g00=get_g(g,0,0,ix,iy,iz);
-  ldouble g03=get_g(g,0,3,ix,iy,iz);
-  ldouble g30=g03;
-  ldouble g11=get_g(g,1,1,ix,iy,iz);
-  ldouble g22=get_g(g,2,2,ix,iy,iz);  
-  ldouble g33=get_g(g,3,3,ix,iy,iz);
-
-  //inversed metric
-  ldouble G00=get_g(G,0,0,ix,iy,iz);
-  ldouble G03=get_g(G,0,3,ix,iy,iz);
-  ldouble G11=get_g(G,1,1,ix,iy,iz);
-  ldouble G22=get_g(G,2,2,ix,iy,iz);  
-  ldouble G33=get_g(G,3,3,ix,iy,iz);
-  ldouble G30=G03;
-
-  //extent of the cell
-  //TODO
-  ldouble dx[3];
-  dx[0]=get_size_x(ix,0)*sqrt(g11);
-  dx[1]=get_size_x(iy,1)*sqrt(g22);
-  dx[2]=get_size_x(iz,2)*sqrt(g33);   
-
-  ldouble pp[NV],uuu[NV];
-  int iv;
-  
-  ldouble axhdl,axhdr,ayhdl,ayhdr,azhdl,azhdr;
-  ldouble axl,axr,ayl,ayr,azl,azr;
-  axl=axr=ayl=ayr=azl=azr=1.;
-  
-  ldouble ucon[4],ucov[4],cst1,cst2,cst3,cst4;
-
-  //picking up primitives - now conserved 
-  for(iv=0;iv<NV;iv++)
-    pp[iv]=get_u(p,iv,ix,iy,iz);
-
-  //converting radiative primitives to the fluid frame
-  //debug
-  ldouble gg[4][5],GG[4][5],tup[4][4];
-  pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
-  pick_T(tmuup,ix,iy,iz,tup);
-    
-
-  //  printf("plab: \n");
-  //  print_Nvector(pp,NV);
-  prad_lab2ff(pp,pp,gg,GG,tup);
-  //  printf("pff: \n");
-  //  if(ix==5 && iz==-1) {print_Nvector(pp,NV); getchar();}
-
-  //**********************************************************************
-  //***** hydro: speed of sound ******************************************
-  //**********************************************************************
-	      
-  ldouble rho=pp[0];
-  ldouble uu=pp[1];
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
-
-  ldouble pre=(GAMMA-1.)*uu;
-  ldouble cs2=GAMMA*pre/(rho+uu+pre);
-
-  if(cs2<0.) cs2=0.;
-
-#ifdef RADIATION
-  //**********************************************************************
-  //***** radiation: characteristic wave speed ***************************
-  //**********************************************************************
-
-  ldouble tautot[3];
-  calc_tautot(pp,xx,dx,tautot);
-
-  ldouble E=pp[6];
-  ldouble nx=pp[7]/pp[6];
-  ldouble ny=pp[8]/pp[6];
-  ldouble nz=pp[9]/pp[6];
-  ldouble nl=sqrtl(nx*nx+ny*ny+nz*nz);
-
-  //solving for radiation wave speeds
-  max_eigen_lr_radx(nx,ny,nz,0,&axl,&axr);  
-  max_eigen_lr_radx(nx,ny,nz,1,&ayl,&ayr);
-  max_eigen_lr_radx(nx,ny,nz,2,&azl,&azr);
-  
-  axr=my_min(axr, 4./3./tautot[0]);
-  axl=my_max(axl, -4./3./tautot[0]);
-  ayr=my_min(ayr, 4./3./tautot[1]);
-  ayl=my_max(ayl, -4./3./tautot[1]);
-  azr=my_min(azr, 4./3./tautot[2]);
-  azl=my_max(azl, -4./3./tautot[2]);
-#endif
-
-  //**********************************************************************
-  //***** other stuff ****************************************************
-  //**********************************************************************
-  ldouble ut2=-1./(g00 + 2.*vph*g03 + vr*vr*g11 + vth*vth*g22 + vph*vph*g33 );
-  if(ut2<0.) my_err("ut2.lt.0 in wavespeeds\n");
-  
-  ldouble ut=sqrtl(ut2);  
-  ldouble ur=vr*ut;
-  ldouble uth=vth*ut;
-  ldouble uph=vph*ut;
-
-  ucon[0]=ut;
-  ucon[1]=ur;
-  ucon[2]=uth;
-  ucon[3]=uph;
-  
-  ucov[0]=g00*ucon[0]+g03*ucon[3];
-  ucov[1]=g11*ucon[1];
-  ucov[2]=g22*ucon[2];
-  ucov[3]=g33*ucon[3]+g03*ucon[0];
-
-
-  //**********************************************************************
-  //algorithm from HARM to transform the fluid frame wavespeed into lab frame
-  //**********************************************************************
-
-  ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
-
-  //**********************************************************************
-  //**********************************************************************
-  //x
-  Acov[0]=0.;
-  Acov[1]=1.;
-  Acov[2]=0.;
-  Acov[3]=0.;
-  Acon[0]=G00*Acov[0]+G03*Acov[3];
-  Acon[1]=G11*Acov[1];
-  Acon[2]=G22*Acov[2];
-  Acon[3]=G33*Acov[3]+G03*Acov[0];
-  
-  Bcov[0]=1.;
-  Bcov[1]=0.;
-  Bcov[2]=0.;
-  Bcov[3]=0.;
-  Bcon[0]=G00*Bcov[0]+G03*Bcov[3];
-  Bcon[1]=G11*Bcov[1];
-  Bcon[2]=G22*Bcov[2];
-  Bcon[3]=G33*Bcov[3]+G03*Bcov[0];
-
-
-  Asq = dot(Acon,Acov);
-  Bsq = dot(Bcon,Bcov);
-  Au = dot(Acov, ucon);
-  Bu = dot(Bcov, ucon);
-  AB = dot(Acon, Bcov);
-  Au2 = Au * Au;
-  Bu2 = Bu * Bu;
-  AuBu = Au * Bu;
-
-  //hydro
-  wspeed2=cs2;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-
-  if(discr<0.) {printf("x discr in wavespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-  if(cst2>cst1)
-    {
-      axhdl=cst1;  axhdr=cst2;
-    }
-  else
-    {
-      axhdr=cst1;  axhdl=cst2;
-    }
-
-#ifdef RADIATION
-  wspeed2=axl*axl;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("x1discr in ravespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-
-  wspeed2=axr*axr;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("x2discr in ravespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst3 = -(-B + discr) / (2. * A);
-  cst4 = -(-B - discr) / (2. * A);  
-
-  axl = my_min(my_min(cst1,cst2),my_min(cst3,cst4));
-  axr = my_max(my_max(cst1,cst2),my_max(cst3,cst4));
-#endif
-     
-  //**********************************************************************
-  //**********************************************************************
-  //y
-  Acov[0]=0.;
-  Acov[1]=0.;
-  Acov[2]=1.;
-  Acov[3]=0.;
-  Acon[0]=G00*Acov[0]+G03*Acov[3];
-  Acon[1]=G11*Acov[1];
-  Acon[2]=G22*Acov[2];
-  Acon[3]=G33*Acov[3]+G03*Acov[0];
-  
-  Asq = dot(Acon,Acov);
-  Bsq = dot(Bcon,Bcov);
-  Au = dot(Acov, ucon);
-  Bu = dot(Bcov, ucon);
-  AB = dot(Acon, Bcov);
-  Au2 = Au * Au;
-  Bu2 = Bu * Bu;
-  AuBu = Au * Bu;
-
-  //hydro
-  wspeed2=cs2;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("x discr in wavespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-  if(cst2>cst1)
-    {
-      ayhdl=cst1;  ayhdr=cst2;
-    }
-  else
-    {
-      ayhdr=cst1;  ayhdl=cst2;
-    }
- 
-#ifdef RADIATION
-  wspeed2=ayl*ayl;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("y1discr in ravespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-
-  wspeed2=ayr*ayr;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("y1discr in ravespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst3 = -(-B + discr) / (2. * A);
-  cst4 = -(-B - discr) / (2. * A);  
-
-  ayl = my_min(my_min(cst1,cst2),my_min(cst3,cst4));
-  ayr = my_max(my_max(cst1,cst2),my_max(cst3,cst4));
-#endif
-     
-   
-  //**********************************************************************
-  //**********************************************************************
-  //z
-  Acov[0]=0.;
-  Acov[1]=0.;
-  Acov[2]=0.;
-  Acov[3]=1.;
-  Acon[0]=G00*Acov[0]+G03*Acov[3];
-  Acon[1]=G11*Acov[1];
-  Acon[2]=G22*Acov[2];
-  Acon[3]=G33*Acov[3]+G03*Acov[0];
-  
-  Asq = dot(Acon,Acov);
-  Bsq = dot(Bcon,Bcov);
-  Au = dot(Acov, ucon);
-  Bu = dot(Bcov, ucon);
-  AB = dot(Acon, Bcov);
-  Au2 = Au * Au;
-  Bu2 = Bu * Bu;
-  AuBu = Au * Bu;
-
-  //hydro
-  wspeed2=cs2;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("y discr in wavespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-  if(cst2>cst1)
-    {
-      azhdl=cst1;  azhdr=cst2;
-    }
-  else
-    {
-      azhdr=cst1;  azhdl=cst2;
-    }
-
-#ifdef RADIATION
-  wspeed2=azl*azl;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("z1discr in ravespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-
-  wspeed2=azr*azr;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("z2discr in ravespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
-  cst3 = -(-B + discr) / (2. * A);
-  cst4 = -(-B - discr) / (2. * A);  
-
-  azl = my_min(my_min(cst1,cst2),my_min(cst3,cst4));
-  azr = my_max(my_max(cst1,cst2),my_max(cst3,cst4));
-#endif
-  //**********************************************************************
-  //**********************************************************************
-    
-  //zeroing 'co-going' velocities
-  if(axhdl>0.) axhdl=0.;
-  if(axhdr<0.) axhdr=0.;
-  if(ayhdl>0.) ayhdl=0.;
-  if(ayhdr<0.) ayhdr=0.;
-  if(azhdl>0.) azhdl=0.;
-  if(azhdr<0.) azhdr=0.;
-  if(axl>0.) axl=0.;
-  if(axr<0.) axr=0.;
-  if(ayl>0.) ayl=0.;
-  if(ayr<0.) ayr=0.;
-  if(azl>0.) azl=0.;
-  if(azr<0.) azr=0.;
-
-  //saving and passing up
-  aaa[0]=axhdl;
-  aaa[1]=axhdr;
-  aaa[2]=ayhdl;
-  aaa[3]=ayhdr;
-  aaa[4]=azhdl;
-  aaa[5]=azhdr;
-  aaa[6]=axl;
-  aaa[7]=axr;
-  aaa[8]=ayl;
-  aaa[9]=ayr;
-  aaa[10]=azl;
-  aaa[11]=azr;
- 
   return 0;
 }
 
@@ -700,7 +336,6 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   dlgdet[1]=gg[1][4]; //D[gdet,x2]/gdet
   dlgdet[2]=gg[2][4]; //D[gdet,x3]/gdet
   
-  ldouble gam=GAMMA;
   ldouble ut;
   ldouble T[4][4];
 
@@ -720,24 +355,16 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
  
   ldouble rho=pp[0];
   ldouble u=pp[1];
-  ldouble v1=pp[2];
-  ldouble v2=pp[3];
-  ldouble v3=pp[4];
+  ldouble vcon[4],ucon[4];
+  vcon[1]=pp[2];
+  vcon[2]=pp[3];
+  vcon[3]=pp[4];
   ldouble S=pp[5];
 
-  ldouble ucon[4];
-  ldouble ut2=-1./(g00 + 2.*v3*g03 + v1*v1*g11 + v3*v3*g33 + v2*v2*g22);
-  if(ut2<0.) 
-    my_err("ut2.lt.0 in metric_source_terms\n");
-  ut=sqrtl(ut2);
-
-  ucon[0]=ut;
-  ucon[1]=v1*ut;
-  ucon[2]=v2*ut;
-  ucon[3]=v3*ut;
- 
+  //converting to 4-velocity
+  conv_vels(vcon,ucon,VEL3,VEL4,gg,GG);
+  
   int k,l,iv;
-
   for(iv=0;iv<NV;iv++)
     ss[iv]=0.;
 
@@ -746,8 +373,8 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   /***************************************************/
 
   ldouble Rij[4][4];
-  calc_Rij(pp,gg,GG,Rij);
-  indices_2221(Rij,Rij,gg);
+  calc_Rij(pp,gg,GG,Rij); //R^ij
+  indices_2221(Rij,Rij,gg); //R^i_j
 
   //terms with Christoffels
   for(k=0;k<4;k++)
@@ -822,8 +449,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   //picking up metric from a cell face  
   ldouble gg[4][5],GG[4][5];
   pick_gb(ix,iy,iz,idim,gg);
-  pick_Gb(ix,iy,iz,idim,GG);
-  
+  pick_Gb(ix,iy,iz,idim,GG);  
   ldouble gdet=gg[3][4];
   
   //calculating Tmunu
@@ -834,20 +460,19 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   //primitives
   ldouble rho=pp[0];
   ldouble u=pp[1];
-  ldouble v1=pp[2];
-  ldouble v2=pp[3];
-  ldouble v3=pp[4];
+  ldouble vcon[4],ucon[4];
+  vcon[1]=pp[2];
+  vcon[2]=pp[3];
+  vcon[3]=pp[4];
   ldouble S=pp[5];
 
-  if(isnan(S)) 
-    {
-      printf("nan S: %d %d %d S: %Le\n",ix,iy,iz,S);
-      my_err("nan S in flux prime\n");
-    }
+  //converting to 4-velocity
+  conv_vels(vcon,ucon,VEL3,VEL4,gg,GG);
 
-  ldouble u1=v1*ut;
-  ldouble u2=v2*ut;
-  ldouble u3=v3*ut;
+  //4-velocity
+  ldouble u1=ucon[1];
+  ldouble u2=ucon[2];
+  ldouble u3=ucon[3];
   ldouble gam=GAMMA;
 
   int ii, jj;
@@ -864,45 +489,8 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
  
 #ifdef RADIATION
   ldouble Rij[4][4];
-  calc_Rij(pp,gg,GG,Rij);
-  ldouble eup[4][4],elo[4][4],tup[4][4];
-  if(idim==0)
-    {
-      pick_Tb(tmuupbx,ix,iy,iz,idim,tup);
-      pick_Tb(emuupbx,ix,iy,iz,idim,eup);
-      pick_Tb(emulobx,ix,iy,iz,idim,elo);
-    }
-  if(idim==1)
-    {
-      pick_Tb(tmuupby,ix,iy,iz,idim,tup);
-      pick_Tb(emuupby,ix,iy,iz,idim,eup);
-      pick_Tb(emuloby,ix,iy,iz,idim,elo);
-    }
-  if(idim==2)
-    {
-      pick_Tb(tmuupbz,ix,iy,iz,idim,tup);
-      pick_Tb(emuupbz,ix,iy,iz,idim,eup);
-      pick_Tb(emulobz,ix,iy,iz,idim,elo);
-    }
- 
-  /*
-  //testing with fluid frame Rij
-  //transforming radiative primitives to ortonormal fluid frame
-  int verbose=0;
-  if(pp[9]>0.) verbose=1;
-  if(verbose==1) {print_tensor(Rij);}
-    if(verbose==1) print_Nvector(pp,NV);
-
-  //prad_lab2ff(pp,pp,gg,GG,tup);
-  u2p_rad(pp,pp,gg,GG,eup,elo);
-   if(verbose==1)  print_Nvector(pp,NV);
-
-  calc_Rij_ff(pp,Rij);
-  boost22_ff2zamo(Rij,Rij,pp,gg,eup);
-  trans22_zamo2lab(Rij,Rij,gg,elo);
-  if(verbose==1) {print_tensor(Rij); getchar();}
-  */
-  indices_2221(Rij,Rij,gg);
+  calc_Rij(pp,gg,GG,Rij); //R^ij
+  indices_2221(Rij,Rij,gg); //R^i_j
 
   //to move gdet in/out derivative:
   //here, up in metric source terms, in u2p and p2u, as well as in finite.c with del4[]
@@ -1027,6 +615,87 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//calculates energy-momentum tensor components basing on vector of primitivies p and given metric g
+int
+calc_Tmunu( ldouble *p, ldouble gg[][5], ldouble T[][4], ldouble *ut_ret)
+{
+  ldouble rho=p[0];
+  ldouble uu=p[1];
+  ldouble vr=p[2];
+  ldouble vth=p[3];
+  ldouble vph=p[4];
+
+  ldouble gtt=gg[0][0];
+  ldouble gtph=gg[0][3];
+  ldouble grr=gg[1][1];
+  ldouble gthth=gg[2][2];
+  ldouble gphph=gg[3][3];
+
+
+  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
+  if(ut2<0.)
+    {
+      my_err("ut2.lt.0 in calc_Tmunu\n"); ut2=0.;
+     }
+
+  ldouble ut=sqrtl(ut2);
+
+  //passes it up to avoid doubling sqrtl
+  *ut_ret=ut;
+  
+  ldouble ur=vr*ut;
+  ldouble uth=vth*ut;
+  ldouble uph=vph*ut;
+
+  ldouble w=rho+GAMMA*uu;
+
+  ldouble Ttt=w*ut*(ut*gtt+uph*gtph)+(GAMMA-1.)*uu;
+  ldouble Ttr=w*ut*ur*grr;
+  ldouble Ttth=w*ut*uth*gthth;
+  ldouble Ttph=w*ut*(uph*gphph+ut*gtph);
+
+  ldouble Trt=w*ur*(ut*gtt+uph*gtph);
+  ldouble Trr=w*ur*ur*grr+(GAMMA-1.)*uu;
+  ldouble Trth=w*ur*uth*gthth;
+  ldouble Trph=w*ur*(uph*gphph+ut*gtph);
+
+  ldouble Ttht=w*uth*(ut*gtt+uph*gtph);
+  ldouble Tthr=w*uth*ur*grr;
+  ldouble Tthth=w*uth*uth*gthth+(GAMMA-1.)*uu;
+  ldouble Tthph=w*uth*(uph*gphph+ut*gtph);
+
+  ldouble Tpht=w*uph*(ut*gtt+uph*gtph);
+  ldouble Tphr=w*uph*ur*grr;
+  ldouble Tphth=w*uph*uth*gthth;
+  ldouble Tphph=w*uph*(uph*gphph+ut*gtph)+(GAMMA-1.)*uu;
+
+  T[0][0]=Ttt;
+  T[0][1]=Ttr;
+  T[0][2]=Ttth;
+  T[0][3]=Ttph;
+
+  T[1][0]=Trt;
+  T[1][1]=Trr;
+  T[1][2]=Trth;
+  T[1][3]=Trph;
+
+  T[2][0]=Ttht;
+  T[2][1]=Tthr;
+  T[2][2]=Tthth;
+  T[2][3]=Tthph;
+
+  T[3][0]=Tpht;
+  T[3][1]=Tphr;
+  T[3][2]=Tphth;
+  T[3][3]=Tphph;
+  
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //entropy-related routines
 
 ldouble
@@ -1042,3 +711,53 @@ calc_Sfromu(ldouble rho,ldouble u)
   return ret;
 }
 
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//updates entropy (p[5]) basing on new primitives or stays with the old one if entropy u2p solver was involved
+int
+update_entropy(int ix,int iy,int iz,int u2pflag)
+{
+  ldouble gg[4][5];
+  pick_g(ix,iy,iz,gg);
+
+  ldouble gtt=gg[0][0];
+  ldouble gtph=gg[0][3];
+  ldouble grr=gg[1][1];
+  ldouble gthth=gg[2][2];
+  ldouble gphph=gg[3][3];
+
+  ldouble rho=get_u(p,0,ix,iy,iz);
+  ldouble uu=get_u(p,1,ix,iy,iz);
+  ldouble vr=get_u(p,2,ix,iy,iz);
+  ldouble vth=get_u(p,3,ix,iy,iz);
+  ldouble vph=get_u(p,4,ix,iy,iz);
+
+  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vph*vph*gphph + vth*vth*gthth);
+  ldouble ut=sqrtl(ut2);
+
+  ldouble S,Sut;
+
+  //u2p_hot worked
+  if(u2pflag==0 && uu>0. && rho>0.)
+    {
+      S=calc_Sfromu(rho,uu);      
+      set_u(p,5,ix,iy,iz,S);
+      set_u(u,5,ix,iy,iz,S*ut); 
+    }
+  //u2p_entropy worked
+  else if(u2pflag==-1  && uu>0. && rho>0.)
+    {
+      Sut=get_u(u,5,ix,iy,iz);
+      S=Sut/ut;
+      set_u(p,5,ix,iy,iz,S);
+    }
+  //somnething else - leave entropy as it was
+  else
+    {
+      //nothing
+    }   
+  
+  return 0;
+}

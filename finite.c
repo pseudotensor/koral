@@ -264,10 +264,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   aaayrad=my_max(fabs(aaa[8]),fabs(aaa[9]));
   aaazrad=my_max(fabs(aaa[10]),fabs(aaa[11]));
 
-  //  if(ix==5 && iz==-2) {printf("%d %d %Le\n",ix,iz,aaazrad);getchar();}
-  //  if(ix==5 && iz==-1) {printf("%d %d %Le\n",ix,iz,aaazrad);getchar();}
-  //  if(ix==5 && iz==0) {printf("%d %d %Le\n",ix,iz,aaazrad);getchar();}
-
   set_u_scalar(ahdx,ix,iy,iz,aaaxhd);
   set_u_scalar(ahdy,ix,iy,iz,aaayhd);
   set_u_scalar(ahdz,ix,iy,iz,aaazhd);
@@ -364,16 +360,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       iz=loop_1[ii][2]; ldouble aaa[12];
       
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
-	 
-      if(ix==5 && iz==-1 && 0)
-	{
-	  printf("ixyz: %d %d %d\n",ix,iy,iz);
-	  calc_wavespeeds_lr(ix,iy,iz,aaa);	
-	  printf("wavespeeds lab: %Le %Le %Le %Le %Le %Le\n",aaa[6],aaa[7],aaa[8],aaa[9],aaa[10],aaa[11]);
-	  //	  calc_wavespeeds_lr_old(ix,iy,iz,aaa);	
-	  //	  printf("wavespeeds ff: %Le %Le %Le %Le %Le %Le\n",aaa[6],aaa[7],aaa[8],aaa[9],aaa[10],aaa[11]);
-	  getchar();
-	}
    
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
@@ -680,11 +666,11 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		}
 
 #ifdef RADIATION 
-	      //updating u - radiative four force
+	      //updating using radiative four force
 	      ldouble del4[4],delapl[NV];
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
-	      //implicit in lab frame in four dimensionsp2u
+	      //implicit in lab frame in four dimensions - fiducial 
 	      //primitives left intact to give good initial guess for u2p
 
 	      if(solve_implicit_lab(ix,iy,iz,dt,del4)<0) 
@@ -695,10 +681,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  calc_primitives(ix,iy,iz);
 		  //semi-implicit in the fluid frame - only approximate!
 		  solve_implicit_ff(ix,iy,iz,dt,del4);
-		  //		  boost2_ff2zamo(del4,del4,pp,gg,eup);
-		  //		  trans2_zamo2lab(del4,del4,elo);
 		  trans2_on2cc(del4,del4,tlo);
-		  boost2_ff2lab(del4,del4,pp,gg);
+		  boost2_ff2lab(del4,del4,pp,gg,GG);
 		  indices_21(del4,del4,gg);
 		}		
 #endif
@@ -707,7 +691,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //new primitives before the source operator
 	      calc_primitives(ix,iy,iz);
 	      //applied explicitly directly in lab frame
-	      solve_explicit_ff(ix,iy,iz,dt,del4);
+	      solve_explicit_lab(ix,iy,iz,dt,del4);
 	      indices_21(del4,del4,gg);
 #endif
 
@@ -719,7 +703,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //	      boost2_ff2zamo(del4,del4,pp,gg,eup);
 	      //	      trans2_zamo2lab(del4,del4,elo);
 	      trans2_on2cc(del4,del4,tlo);
-	      boost2_ff2lab(del4,del4,pp,gg);
+	      boost2_ff2lab(del4,del4,pp,gg,GG);
 	      indices_21(del4,del4,gg);
 #endif
 
@@ -734,27 +718,25 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      delapl[8]=del4[2];
 	      delapl[9]=del4[3];
 
-
-
-
-
 	      for(iv=0;iv<NV;iv++)
 		{
+
 #ifdef RADSOURCEOFF
 		  continue;
 #endif
+
 #ifdef GASRADOFF
 		  if(iv<7) continue;
 #endif
-		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
-		} 	      
-#endif
 
+		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
+
+		} 	      
+#endif //RADIATION
 
 	    }	      
 	}
     }
-
 
   return GSL_SUCCESS;
 }
@@ -1555,12 +1537,9 @@ int set_bc(ldouble t)
 	  pval[iv]=get_u(p,iv,iix,iiy,iiz);
 	  set_u(p,iv,ix,iy,iz,pval[iv]);
 	}
- 
 
       p2u(pval,uval,gg,GG);
-
-
-
+      
       for(iv=0;iv<NV;iv++)
 	{
 	  set_u(u,iv,ix,iy,iz,uval[iv]);

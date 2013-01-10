@@ -112,7 +112,7 @@ solve_all_problems_5(ldouble tstart)
       else       
 	dt=TSTEPLIM*1./tstepden;
 #else //radiation included
-      //TODO: what is below assumes wavespeed=1 but for thick flows the real characterstic speed may be lower
+      //TODO: what is below assumes wavespeed=1 but for thick flows the real characterstic speed may be lower and time step larger
       if(NZ>1)
 	tstepden=(1./min_dx + 1./min_dy + 1./min_dz);
       else if(NY>1)
@@ -157,42 +157,23 @@ solve_all_problems_5(ldouble tstart)
       //******************************* RK3 **********************************
       //TODO : clean up, think it over
       //1st
-      //printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3)); 
       copy_u(1.,u,ut0);
       f_timeder (t,dt,1.,u,0,ut0);  
-      //      printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3));
       copy_u(1.,u,ut1);
       //2nd
       copy_u(1.,u,ut2);       
       f_timeder (t,dt,1.,u,0,ut2); 
-      //      printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3));
-      //      printf("2> %Le %Le\n",get_u(u,6,2,0,3),get_u(p,6,2,0,3));
-
-   
       add_u(1.,u,-1.,ut2,ut2);   
-
-      //      printf("@ %Le %Le\n",get_u(ut0,6,-2,0,3),get_u(ut1,6,-2,0,3));   
       add_u(.75,ut0,.25,ut1,u);
-      //      printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3));
-      //      printf("2> %Le %Le\n",get_u(u,6,2,0,3),get_u(p,6,2,0,3));
       add_u(1.,u,.25,ut2,u);      
-      //      printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3));
       //3rd
       copy_u(1.,u,ut2);
- 
       f_timeder (t,dt,1.,u,0,ut2); 
-      //      printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3));
       add_u(1.,u,-1.,ut2,ut3);   
-      //      printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3));
-   
       //together     
       t+=dt;    
       add_u(1./3.,ut0,2./3.,ut2,u);
-      //      printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3));
-   
       add_u(1.,u,2./3.,ut3,u);      
-      //      printf("%Le %Le\n",get_u(u,6,-2,0,3),get_u(p,6,-2,0,3));getchar();
-
      //************************** end of RK3 **********************************
 #endif
 

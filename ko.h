@@ -207,7 +207,7 @@ struct rad_parameters
   ldouble x,y,z;
 };
 
-
+int calc_Tmunu( ldouble *p, ldouble g[][5], ldouble T[][4],ldouble*);
 ldouble max_eigen_Jac(ldouble *,ldouble*,int,void*);
 int calc_wavespeeds(int,int,int,ldouble*,ldouble*,ldouble*,ldouble*,ldouble*,ldouble*);
 int calc_wavespeeds_lr(int,int,int,ldouble*);
@@ -277,28 +277,26 @@ int pick_gb(int ix,int iy,int iz,int,ldouble gg[][5]);
 int pick_Gb(int ix,int iy,int iz,int,ldouble gg[][5]);
 int pick_T(ldouble *arr,int ix,int iy,int iz,ldouble T[][4]);
 int pick_Tb(ldouble *arr,int ix,int iy,int iz,int,ldouble T[][4]);
-
 int p2u_Sonly(ldouble *p, ldouble *u,ldouble[][5]);
 int print_p(ldouble *p);
 int print_u(ldouble *p);
-int calc_Tmunu( ldouble *p, ldouble g[][5], ldouble T[][4],ldouble*);
 int convert_uold2urel(ldouble *x,ldouble *u);
 int calc_metric();
 int calc_sourceterms(int,int,int);
 int calc_primitives(int,int,int);
 int calc_conserved(int ix,int iy,int iz);
-
 ldouble r_horizon_BL(ldouble a);
 ldouble r_mbound_BL(ldouble a);
 ldouble r_photon_BL(ldouble a);
 int update_entropy(int ix,int iy,int iz,int u2pflag);
+int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 
 //u2p.c
 int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble[][5],int*);
 int u2p_hot(ldouble*,ldouble*,ldouble[][5]);
 int u2p_entropy(ldouble*,ldouble*,ldouble[][5]);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5]);
-int u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4],int*);
+int u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int*);
 
 //p2u.c
 int p2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][5]);
@@ -306,20 +304,20 @@ int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
 int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5]);
 
 //frames.c
-int boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5]);
-int boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5]);
-int boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5]);
-int boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5]);
+int boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
+int boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
+int boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
+int boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
 int boost22_ff2zamo(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble eup[][4]);
 int boost22_zamo2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble eup[][4]);
 int boost2_zamo2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble eup[][4]);
 int boost2_ff2zamo(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble eup[][4]);
-int trans22_lab2zamo(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble eup[][4]);
-int trans22_zamo2lab(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble elo[][4]);
+int trans22_lab2zamo(ldouble T1[][4],ldouble T2[][4],ldouble tup[][4]);
+int trans22_zamo2lab(ldouble T1[][4],ldouble T2[][4],ldouble tup[][4]);
 int trans2_lab2zamo(ldouble *u1,ldouble *u2,ldouble e[][4]);
 int trans2_zamo2lab(ldouble *u1,ldouble *u2,ldouble e[][4]);
-int trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tup[][4]);
-int trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5],ldouble tlo[][4]);
+int trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble tup[][4]);
+int trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble tlo[][4]);
 int trans2_cc2on(ldouble *u1,ldouble *u2,ldouble t[][4]);
 int trans2_on2cc(ldouble *u1,ldouble *u2,ldouble t[][4]);
 int indices_2221(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5]);
@@ -336,7 +334,7 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ld
 //rad.c
 int calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
-int solve_explicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas);
+int solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas);
 int solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas);
 ldouble calc_LTE_EfromT(ldouble);
 ldouble calc_LTE_TfromE(ldouble);
@@ -356,4 +354,7 @@ int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,
 int
 calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose);
 
-
+//definitions
+#define VEL4 1 //lab four-velocity u^i
+#define VEL3 2 //lab three-velocity u^i/u^t
+#define VELR 3 //relative velocity \tilde u^i

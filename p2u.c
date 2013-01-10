@@ -20,10 +20,14 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 
   ldouble rho=p[0];
   ldouble uu=p[1];
-  ldouble vr=p[2];
-  ldouble vth=p[3];
-  ldouble vph=p[4];
+  ldouble vcon[4],ucon[4];
+  vcon[1]=p[2];
+  vcon[2]=p[3];
+  vcon[3]=p[4];
   ldouble S=p[5];
+
+  //converting to 4-velocity
+  conv_vels(vcon,ucon,VEL3,VEL4,g,G);
 
   //************************************
   //************************************
@@ -47,14 +51,14 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
   //************************************
   //************************************
  
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vph*vph*gphph + vth*vth*gthth);
 
-  if(ut2<0.)
-    {
-      my_err("ut2.lt.0 in p2u\n"); ut2=0.;
-    }
+  //TODO: generalize
+  ldouble ut=ucon[0];
+  ldouble ut2=ut*ut;
+  ldouble vr=p[2];
+  ldouble vth=p[3];
+  ldouble vph=p[4];
 
-  ldouble ut=sqrtl(ut2);
   ldouble rhout = rho*ut;
   ldouble Sut;
 
@@ -78,6 +82,10 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
   return 0.;
 }
 
+/********************************************************/
+/**** converts radiative primitives xs************************/
+/********************************************************/
+/********************************************************/
 int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
 {
   int i,j;
@@ -91,15 +99,7 @@ int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
   urf[3]=p[9];
 
   //converting to lab four-velocity
-  ldouble qsq=0.;
-  for(i=1;i<4;i++)
-    for(j=1;j<4;j++)
-      qsq+=urf[i]*urf[j]*g[i][j];
-  ldouble gamma2=1.+qsq;
-  ldouble alpha2=-1./G[0][0];
-  urf[0]=sqrtl(gamma2/alpha2);
-  for(i=1;i<4;i++)
-    urf[i]=urf[i]+urf[0]*G[0][i]/G[0][0];
+  conv_vels(urf,urf,VELR,VEL4,g,G);
   
   ldouble Rtop[4];
   Rtop[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*G[0][0]; //R^t_t
@@ -107,7 +107,7 @@ int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
   Rtop[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*G[0][2];
   Rtop[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*G[0][3];
 
-  indices_21(Rtop,Rtop,g);
+  indices_21(Rtop,Rtop,g); //R^t_mu
 
   u[6]=Rtop[0]; //R^t_t
   u[7]=Rtop[1]; //R^t_i

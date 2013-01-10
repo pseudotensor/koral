@@ -95,7 +95,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 
 #ifdef RADIATION
   int radcor;
-  u2p_rad(uu,pp,gg,GG,NULL,NULL,&radcorr);
+  u2p_rad(uu,pp,gg,GG,&radcorr);
 #endif
   
   if(radcorr>0 || hdcorr>0) *corrected=1;
@@ -109,7 +109,8 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 //**********************************************************************
 //basic conserved to primitives solver
 //'hot grhd' - pure hydro, numerical in 5D
- 
+//but currently work only for 1D problems
+//TODO: to be replaced by something much better 
 int
 print_state (int iter, gsl_multiroot_fsolver * s)
 {
@@ -258,6 +259,7 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5])
 //**********************************************************************
 //basic conserved to primitives solver
 //'hot grhd' - pure hydro, numerical in 1D
+//catastrophic cancelation!
 int
 u2p_hot(ldouble *uuu, ldouble *p, ldouble g[][5])
 {
@@ -653,70 +655,52 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5])
 
 //**********************************************************************
 //**********************************************************************
-//**********************************************************************
-
-//**********************************************************************
-//**********************************************************************
 //basic conserved to primitives solver for radiation
 //uses M1 closure in arbitrary frame/metric
+//radiative primitives: (E,\tilde u^i)
+//  E - radiative energy density in the rad.rest frame
+//  u^i - relative velocity of the rad.rest frame
 //**********************************************************************
 //**********************************************************************
 int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4], ldouble elo[][4], int *corrected)
+u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
 {
-  //whether primitives corrected for caps, floors etc.
+  //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
   int verbose=0,i;
   ldouble Rij[4][4];
 
-  //R^0mu
+  //conserved - R^t_mu
   ldouble Av[4]={uu[6],uu[7],uu[8],uu[9]};
-  //indices up
+  //indices up - R^tmu
   indices_12(Av,Av,GG);
 
-  //covariant formulation
-  
-  //g_munu R^0mu R^0nu
+  //g_munu R^tmu R^tnu
   ldouble gRR=gg[0][0]*Av[0]*Av[0]+gg[0][1]*Av[0]*Av[1]+gg[0][2]*Av[0]*Av[2]+gg[0][3]*Av[0]*Av[3]+
     gg[1][0]*Av[1]*Av[0]+gg[1][1]*Av[1]*Av[1]+gg[1][2]*Av[1]*Av[2]+gg[1][3]*Av[1]*Av[3]+
     gg[2][0]*Av[2]*Av[0]+gg[2][1]*Av[2]*Av[1]+gg[2][2]*Av[2]*Av[2]+gg[2][3]*Av[2]*Av[3]+
     gg[3][0]*Av[3]*Av[0]+gg[3][1]*Av[3]*Av[1]+gg[3][2]*Av[3]*Av[2]+gg[3][3]*Av[3]*Av[3];
  
   //the quadratic equation for u^t of the radiation rest frame (urf[0])
-  ldouble a,b,c;
+  //supposed to provide two roots for (u^t)^2 of opposite signs
+  ldouble a,b,c,delta,gamma2;
+  ldouble urfcon[4],urfcov[4],Erf;
   a=16.*gRR;
   b=8.*(gRR*GG[0][0]+Av[0]*Av[0]);
   c=gRR*GG[0][0]*GG[0][0]-Av[0]*Av[0]*GG[0][0];
-  ldouble delta=b*b-4.*a*c;
-  ldouble urfcon[4],urfcov[4],Erf;
- 
-  ldouble gamma2=  (-b-sqrtl(delta))/2./a;
-  //what about the other root?
-
-  /*
-  //formula for Erf firs
-  a=-3.*GG[0][0];
-  b=6.*Av[0];
-  c=9.*gRR;
   delta=b*b-4.*a*c;
-  Erf= (-b-sqrtl(delta))/2./a;
-  printf("Erf1: %Le\n",Erf);
-  Erf= (-b+sqrtl(delta))/2./a;
-  printf("Erf2: %Le\n",Erf);
-  */
+  gamma2=  (-b-sqrtl(delta))/2./a;
+  //if unphysical try the other root
+  if(gamma2<1.) gamma2=  (-b+sqrtl(delta))/2./a; 
 
+  //cap on u^t
   ldouble gammamax=1000.;
  
-  if(gamma2<0 || gamma2>gammamax*gammamax) 
+  if(gamma2<0 || gamma2>gammamax*gammamax || delta<0.) 
     {
-      //printf("top cap in u2p\n");
-      
-      if( (-b+sqrtl(delta))/2./a>0.)
-	my_err("You should start thinking about both roots in u2p_rad.\n");
-
+      //top cap
       *corrected=1;
-
       urfcon[0]=gammamax;
       
       //proper direction for the radiation rest frame, will be normalized later      
@@ -746,12 +730,11 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
       urfcon[3]=Afac*Arad[3];
 
       //converting to relative four velocity
-      for(i=0;i<4;i++)
-	urfcon[i]=urfcon[i]-urfcon[0]*GG[0][i]/GG[0][0];
+      conv_vels(urfcon,urfcon,VEL4,VELR,gg,GG);
     }
   else if(gamma2<1.)
     {
-      printf("low cap in u2p\n");
+      //low cap
       *corrected=1;
 
       urfcon[0]=1.;
@@ -761,22 +744,17 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
       Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
 
       //converting to relative four velocity
-      for(i=0;i<4;i++)
-	urfcon[i]=urfcon[i]-urfcon[0]*GG[0][i]/GG[0][0];
+      conv_vels(urfcon,urfcon,VEL4,VELR,gg,GG);
     }
   else
     {
+      //regular calculation
       urfcon[0]=sqrtl(gamma2);
     
       //radiative energy density in the radiation rest frame
       Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
       
-      //four-velocity of the rest frame urf^i
-      //      urfcon[1]=3./(4.*Erf*urfcon[0])*(Av[1]-1./3.*Erf*GG[0][1]);
-      //      urfcon[2]=3./(4.*Erf*urfcon[0])*(Av[2]-1./3.*Erf*GG[0][2]);
-      //      urfcon[3]=3./(4.*Erf*urfcon[0])*(Av[3]-1./3.*Erf*GG[0][3]);
-
-      //relative four-velocity
+      //relative velocity
       ldouble alpha=sqrtl(-1./GG[0][0]);
       ldouble gamma=urfcon[0]*alpha;
       for(i=1;i<4;i++)
@@ -786,9 +764,6 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[
 	}
       urfcon[0]=0.;
     }
-
-  //  printf("Erfold: %Le\n",Erf); getchar();
-
   
   //new primitives
   pp[6]=Erf;
