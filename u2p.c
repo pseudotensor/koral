@@ -692,14 +692,18 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   delta=b*b-4.*a*c;
   gamma2=  (-b-sqrtl(delta))/2./a;
   //if unphysical try the other root
-  if(gamma2<1.) gamma2=  (-b+sqrtl(delta))/2./a; 
+  if(gamma2<0.) gamma2=  (-b+sqrtl(delta))/2./a; 
 
   //cap on u^t
   ldouble gammamax=1000.;
- 
-  if(gamma2<0 || gamma2>gammamax*gammamax || delta<0.) 
+
+  //gamma in relative velocity definition
+  ldouble gammarel2=gamma2/(-GG[0][0]);
+
+   if(gammarel2<0. || gammarel2>gammamax*gammamax || delta<0.) 
     {
       //top cap
+      printf("topcap\n");
       *corrected=1;
       urfcon[0]=gammamax;
       
@@ -732,19 +736,23 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
       //converting to relative four velocity
       conv_vels(urfcon,urfcon,VEL4,VELR,gg,GG);
     }
-  else if(gamma2<1.)
+  else if(gammarel2<1.)
     {
+      printf("lowcap\n");
       //low cap
       *corrected=1;
 
-      urfcon[0]=1.;
-      urfcon[1]=urfcon[2]=urfcon[3]=0.;
+      //zeros for relative velocity
+      urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
+
+      //calculating time component of lab 4-vel
+      ldouble gammarel=1.0;
+      ldouble urflab[4];
+      ldouble alpha = sqrtl(-1./GG[0][0]);
+      urflab[0]=gammarel/alpha;
 
       //radiative energy density in the radiation rest frame
-      Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
-
-      //converting to relative four velocity
-      conv_vels(urfcon,urfcon,VEL4,VELR,gg,GG);
+      Erf=3.*Av[0]/(4.*urflab[0]*urflab[0]+GG[0][0]);
     }
   else
     {

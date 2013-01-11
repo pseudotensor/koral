@@ -17,13 +17,13 @@
 #define NZ 1
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
-#define INT_ORDER 4
+#define INT_ORDER 1
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
-#define DTOUT1 1.e7
+#define MINMOD_THETA 2.
+#define DTOUT1 1.e8
 #define ALLSTEPSOUTPUT 0
 #define VERBOSE0 0
-//#define EXPLICIT_RAD_SOURCE
+#define EXPLICIT_RAD_SOURCE
 
 #define MASS 1.
 #define MDOTEDD 2.23/16.*1e18*MASS //cm/s
@@ -37,15 +37,15 @@
 
 #define TAMB 1.e6
 
-#define FRATIO 1.
+#define FRATIO .1
 
 #define FLUXLEFT FRATIO/KAPPAES/MINX/MINX
-#define FERATIO .99
+#define FERATIO .99875
 
 //#define GASRADOFF
 
-#define MINX 1e6
-#define MAXX 1.4e6
+#define MINX 1e8
+#define MAXX 1.4e8
 
 #define KAPPA 0.
 #define KAPPAES kappaCGS2GU(0.4)
@@ -68,6 +68,6 @@
 #define EFLOOR 1.e-40
 #define CGSOUTPUT
 
-//#define PRINTGC_LEFT
-//#define PRINTGC_RIGHT
-#define OUTPUTINZAMO
+#define PRINTGC_LEFT
+#define PRINTGC_RIGHT
+//#define OUTPUTINZAMO

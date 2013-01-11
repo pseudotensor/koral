@@ -1,3 +1,4 @@
+
 //KORAL - finite.c
 //routines related to finite difference and grid
 
@@ -587,11 +588,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	    {	      
 	      ldouble fd_der[NV],t_der[NV],val,ms_der[NV],ss_der[NV],rho,uint,pp[NV],uu[NV],uuold[NV],duu[NV];
 	      
-	      ldouble gg[4][5];
+	      ldouble gg[4][5],GG[4][5];
 	      ldouble tup[4][4],tlo[4][4];
 	      pick_T(tmuup,ix,iy,iz,tup);
 	      pick_T(tmulo,ix,iy,iz,tlo);
 	      pick_g(ix,iy,iz,gg);
+	      pick_G(ix,iy,iz,GG);
 	      ldouble gdet=gg[3][4];
 	      	      
 	      //updating u - fluxes
