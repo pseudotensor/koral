@@ -56,8 +56,6 @@ calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
 int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][5], ldouble GG[][5],ldouble *f)
 {
   ldouble Rij[4][4];
-  ldouble ppp[NV];
-
   ldouble pp2[NV];
   int iv;
   for(iv=0;iv<NV;iv++)
