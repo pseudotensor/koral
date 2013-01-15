@@ -197,7 +197,7 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   struct u2photpar par = {uuu};
   gsl_multiroot_function f = {&f_u2p_hot_gsl, n, &par};
 
-  //  conv_velsinprims(p,VELR,VEL3,g,G);
+  conv_velsinprims(p,VELR,VEL3,g,G);
      
   double x_init[5] = {p[0],p[1],p[2],p[3],p[4]};
   gsl_vector *x = gsl_vector_alloc (n);
@@ -251,7 +251,7 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 
   p[5]=Sut/ut;
 
-  //  conv_velsinprims(p,VEL3,VELR,g,G);
+  conv_velsinprims(p,VEL3,VELR,g,G);
 
   gsl_multiroot_fsolver_free (s);
   gsl_vector_free (x);
@@ -474,7 +474,7 @@ u2p_hot(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   p[4]=vph;
   p[5]=S;
 
-  //  conv_velsinprims(p,VEL3,VELR,g,G);
+  conv_velsinprims(p,VEL3,VELR,g,G);
 
   /*
   print_Nvector(uuu,NV);
@@ -507,7 +507,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble Ttph=uuu[4];
   ldouble Sut=uuu[5];
 
-  //  conv_velsinprims(p,VELR,VEL3,g,G);
+  conv_velsinprims(p,VELR,VEL3,g,G);
 
   ldouble rho=p[0]; //initial guess
   ldouble uu=p[1];
