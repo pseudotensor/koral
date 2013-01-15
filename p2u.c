@@ -28,8 +28,7 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
   ldouble S=p[5];
 
   //converting to 4-velocity
-  conv_vels(vcon,ucon,VELR,VEL4,g,G);
-  //conv_vels(vcon,ucon,VEL3,VEL4,g,G);
+  conv_vels(vcon,ucon,VELPRIM,VEL4,g,G);
   indices_21(ucon,ucov,g);
 
   //************************************

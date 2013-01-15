@@ -13,8 +13,23 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
   int i,j;
   ldouble ut[4];
 
+  /*************** VEL3 -> VEL3 ***************/
+  if(which1==VEL3 && which2==VEL3)
+    {
+      for(i=0;i<4;i++) ut[i]=u1[i];      
+    }
+  /*************** VEL4 -> VEL4 ***************/
+  else if(which1==VEL4 && which2==VEL4)
+    {
+      for(i=0;i<4;i++) ut[i]=u1[i];      
+    }
+  /*************** VELR -> VELR ***************/
+  else if(which1==VELR && which2==VELR)
+    {
+      for(i=0;i<4;i++) ut[i]=u1[i];      
+    }
   /*************** VEL3 -> VEL4 ***************/
-  if(which1==VEL3 && which2==VEL4)
+  else if(which1==VEL3 && which2==VEL4)
     {
       ldouble a,b,c;
       a=b=0.;

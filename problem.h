@@ -384,3 +384,5 @@
 #define TSEC (MASSCM/CCC) //unit of time in seconds
 
 #define GMC2CM (MASSCM) //gravitational radius in cm
+
+#define VELPRIM VEL3

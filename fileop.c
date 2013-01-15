@@ -197,7 +197,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  ldouble vy=pp[3];
 						  ldouble vz=pp[4];
 						  ldouble vrel[4]={0,vx,vy,vz};
-						  conv_vels(vrel,vrel,VELR,VEL3,gg,GG);
+						  conv_vels(vrel,vrel,VELPRIM,VEL3,gg,GG);
 						  vx=vrel[1];
 						  vy=vrel[2];
 						  vz=vrel[3];

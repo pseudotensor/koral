@@ -78,8 +78,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   for(iv=1;iv<4;iv++)
     ucon[iv]=pp[1+iv];
   ucon[0]=0.;
-  conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
-  //conv_vels(ucon,ucon,VEL3,VEL4,gg,GG);
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
 
   //**********************************************************************
@@ -351,8 +350,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   ldouble S=pp[5];
 
   //converting to 4-velocity
-  conv_vels(vcon,ucon,VELR,VEL4,gg,GG);
-  //conv_vels(vcon,ucon,VEL3,VEL4,gg,GG);
+  conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
   
   int k,l,iv;
   for(iv=0;iv<NV;iv++)
@@ -457,8 +455,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
   //converting to 4-velocity
   //TODO: introduce structure of state
-  conv_vels(vcon,ucon,VELR,VEL4,gg,GG);
-  //conv_vels(vcon,ucon,VEL3,VEL4,gg,GG);
+  conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
 
   //4-velocity
   ldouble u1=ucon[1];
@@ -620,8 +617,7 @@ calc_Tmunu( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
   for(iv=1;iv<4;iv++)
     ucon[iv]=pp[1+iv];
   ucon[0]=0.;
-  conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
-  //conv_vels(ucon,ucon,VEL3,VEL4,gg,GG);
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
 
   ldouble w=rho+GAMMA*uu;
@@ -675,8 +671,7 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
   for(iv=1;iv<4;iv++)
     ucon[iv]=get_u(p,iv+1,ix,iy,iz);
   ucon[0]=0.;
-  conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
-  //conv_vels(ucon,ucon,VEL3,VEL4,gg,GG);
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   ut=ucon[0];
 
   //u2p_hot worked
