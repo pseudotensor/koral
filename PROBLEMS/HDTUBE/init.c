@@ -45,7 +45,9 @@ set_initial_profile()
 	      pp[2]=mx;
 	      pp[3]=my;
 	      pp[4]=mz;
-	      
+
+//converting from 3vel to relative velocity
+conv_velsinprims(pp,VEL3,VELR,gg,GG);
 	      
 	      if(ix>=-1) //conserved required for ix=-1 only
 		p2u(pp,uu,gg,GG);	 

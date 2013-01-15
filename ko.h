@@ -5,7 +5,7 @@
 #define K_BOLTZ (1.3806488e-16L * GGG / CCC / CCC / CCC / CCC  )
 #define M_PROTON (1.67262158e-24L * GGG / CCC / CCC)
 #define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM  * MASSCM)
-//efine A_RAD (4.*5.67e-5/CCC * GGG / CCC / CCC / CCC / CCC)
+#define A_RAD (4.*5.67e-5/CCC * GGG / CCC / CCC / CCC / CCC)
 #define MU_GAS 1.
 #define Z_RATIO (1.0)
 #define Pi (3.141592654)     
@@ -36,7 +36,6 @@
 #define KAPPA_ES_COEFF (kappaCGS2GU(0.4))
 #define KAPPA_FF_COEFF (1.7e-25/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
 #define KAPPA_BF_COEFF (4.8e-24/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
-
 
 
 #include "problem.h"
@@ -268,6 +267,7 @@ ldouble calc_dlgdet(ldouble *xx, int idim);
 
 
 //relele.c
+int conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5]);
 #define dot(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2]+A[3]*B[3])
 #define dot3(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2])
 #define kron(i,j) (i == j ? 1. : 0.)

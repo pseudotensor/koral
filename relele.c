@@ -87,11 +87,29 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
       return -1;
     }
 
-  u2[0]=ut[0];
+  //write to index 0 only when needed
+  if(which2==VEL4)
+    u2[0]=ut[0];
   u2[1]=ut[1];
   u2[2]=ut[2];
   u2[3]=ut[3];
   
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts hydro velocities as above but takes full vector of primitives
+//as an input and outputs to primitives the spatial components;
+int
+conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5])
+{
+  ldouble vt[4];
+  conv_vels(&pp[1],vt,which1,which2,gg,GG);
+  pp[2]=vt[1];
+  pp[3]=vt[2];
+  pp[4]=vt[3];
   return 0;
 }
 
