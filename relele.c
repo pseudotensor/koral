@@ -35,7 +35,30 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
       ut[2]=u1[2]*ut[0];
       ut[3]=u1[3]*ut[0];
     }
-
+  /*************** VEL3 -> VELR ***************/
+  else if(which1==VEL3 && which2==VELR)
+    {
+      ldouble a,b,c,delta;
+      c=1.; b=0.;
+      for(i=1;i<4;i++)
+	{
+	  c+=u1[i]*u1[i]*gg[i][i];
+	  b+=2.*u1[i]*gg[0][i];
+	}
+      a=gg[0][0];
+      delta=b*b-4.*a*c;
+      ut[0] = (-b+sqrtl(delta))/2./a;
+      if(ut[0]<1.) ut[0] = (-b-sqrtl(delta))/2./a;
+      if(ut[0]<1. || isnan(ut[0]))
+	{
+	  printf("ut.nan in conv_vels(%d,%d)\n",which1,which2); getchar();
+	}
+      ut[1]=u1[1]*ut[0];
+      ut[2]=u1[2]*ut[0];
+      ut[3]=u1[3]*ut[0];
+      for(i=0;i<4;i++)
+	ut[i]=u1[i]-u1[0]*GG[0][i]/GG[0][0];
+    }
   /*************** VEL4 -> VELR ***************/
   else if (which1==VEL4 && which2==VELR)
     {

@@ -11,7 +11,7 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1
+#define MINMOD_THETA 2
 #define INT_ORDER 1
 #define DTOUT1 5.e0 //dt for basic output
 #define ALLSTEPSOUTPUT 0
