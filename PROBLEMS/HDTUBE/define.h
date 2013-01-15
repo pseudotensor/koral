@@ -50,7 +50,7 @@ double ST_P3;
 
 
 
-#define U2PPREC 1.e-6
+#define U2PPREC 1.e-5
 #define U2PRADPREC 1.e-5
 #define RADFORCEPREC 1.e-5
 #define EFLOOR 1.e-40

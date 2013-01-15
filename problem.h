@@ -21,7 +21,7 @@
 //16 RADPULSE3D - radiative blob spreading around
 //17 RADDBLSHADOW - radiative shadow with two beams inclined
 
-#define PROBLEM 15
+#define PROBLEM 8
 
 #if(PROBLEM==1)
 

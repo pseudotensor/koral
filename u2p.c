@@ -32,7 +32,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]
   //************************************
   //hot hydro - conserving energy
   ret=0;
-  if(NY==1 && NZ==1) 
+  if(NY==1 && NZ==1 && 0) 
     u2pret=u2p_hot_gsl(uu,pp,gg);  //temporary 3D solver
   else
     u2pret=u2p_hot(uu,pp,gg);  //TODO: to be replaced - catastrophic cancelation!
@@ -362,7 +362,7 @@ f_u2p_hot_gsl(const gsl_vector * x, void *params,
 
   if(ut2<0.)
     {
-      my_err("ut2.lt.0 in p2u\n"); ut2=0.;
+      my_err("ut2.lt.0 in u2p_gsl\n"); ut2=0.;
     }
 
   ldouble ut=sqrtl(ut2);
