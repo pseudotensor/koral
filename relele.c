@@ -16,24 +16,25 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
   /*************** VEL3 -> VEL4 ***************/
   if(which1==VEL3 && which2==VEL4)
     {
-      ldouble a,b,c,delta;
-      c=1.; b=0.;
+      ldouble a,b,c;
+      a=b=0.;
       for(i=1;i<4;i++)
 	{
-	  c+=u1[i]*u1[i]*gg[i][i];
-	  b+=2.*u1[i]*gg[0][i];
+	  a+=u1[i]*gg[0][i];
+	  for(j=1;j<4;j++)
+	    {
+	      b+=u1[i]*u1[j]*gg[i][j];
+	    }
 	}
-      a=gg[0][0];
-      delta=b*b-4.*a*c;
-      ut[0] = (-b+sqrtl(delta))/2./a;
-      if(ut[0]<1.) ut[0] = (-b-sqrtl(delta))/2./a;
+						
+      ut[0]=sqrtl(-1./(gg[0][0]+a+b));
       if(ut[0]<1. || isnan(ut[0]))
 	{
 	  printf("ut.nan in conv_vels(%d,%d)\n",which1,which2); getchar();
 	}
       ut[1]=u1[1]*ut[0];
       ut[2]=u1[2]*ut[0];
-      ut[3]=u1[3]*ut[0];
+      ut[3]=u1[3]*ut[0];      
     }
   /*************** VEL3 -> VELR ***************/
   else if(which1==VEL3 && which2==VELR)
@@ -51,7 +52,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
       if(ut[0]<1.) ut[0] = (-b-sqrtl(delta))/2./a;
       if(ut[0]<1. || isnan(ut[0]))
 	{
-	  printf("ut.nan in conv_vels(%d,%d)\n",which1,which2); getchar();
+	  printf("ut.nan in conv_vels(%d,%d)2 %Le %Le %Le\n",which1,which2,u1[1],u1[2],u1[3]); getchar();
 	}
       ut[1]=u1[1]*ut[0];
       ut[2]=u1[2]*ut[0];
@@ -79,6 +80,22 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
       for(i=1;i<4;i++)
 	ut[i]=u1[i]+ut[0]*GG[0][i]/GG[0][0];
     }
+  /*************** VELR -> VEL3 ***************/
+  else if (which1==VELR && which2==VEL3)
+    {
+      ldouble qsq=0.;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=u1[i]*u1[j]*gg[i][j];
+      ldouble gamma2=1.+qsq;
+      ldouble alpha2=-1./GG[0][0];
+      ut[0]=sqrtl(gamma2/alpha2);
+      for(i=1;i<4;i++)
+	ut[i]=u1[i]+ut[0]*GG[0][i]/GG[0][0];
+      ut[1]/=ut[0];
+      ut[2]/=ut[0];
+      ut[3]/=ut[0];
+    }
 
   /*************** not supported  ***************/
   else
@@ -105,11 +122,19 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 int
 conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5])
 {
-  ldouble vt[4];
-  conv_vels(&pp[1],vt,which1,which2,gg,GG);
-  pp[2]=vt[1];
-  pp[3]=vt[2];
-  pp[4]=vt[3];
+  ldouble v1[4],v2[4];
+  conv_vels(&pp[1],v2,which1,which2,gg,GG);
+  pp[2]=v2[1];
+  pp[3]=v2[2];
+  pp[4]=v2[3];
+ /*  v1[0]=0.; //not considered
+  v1[1]=pp[2];
+  v1[2]=pp[3];
+  v1[3]=pp[4];
+  conv_vels(v1,v2,which1,which2,gg,GG);
+  pp[2]=v2[1];
+  pp[3]=v2[2];
+  pp[4]=v2[3];*/
   return 0;
 }
 

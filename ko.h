@@ -180,6 +180,8 @@ int set_gb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim
 #define set_gKr(i,j,k,ix,iy,iz,val) gKr[i*4*4+j*4+k + (ix+NG)*64 + (iy+NG)*(NX+2*NG)*64 + (iz+NG)*(NY+2*NG)*(NX+2*NG)*64]=val
 int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 
+//other wrappers
+#define delta(i,j) (i==j ? 1 : 0)
 
 //fileop.c
 int fread_restartfile(ldouble*);
@@ -206,7 +208,7 @@ struct rad_parameters
   ldouble x,y,z;
 };
 
-int calc_Tmunu( ldouble *p, ldouble g[][5], ldouble T[][4],ldouble*);
+int calc_Tmunu( ldouble *p, ldouble g[][5], ldouble G[][5], ldouble T[][4]);
 ldouble max_eigen_Jac(ldouble *,ldouble*,int,void*);
 int calc_wavespeeds(int,int,int,ldouble*,ldouble*,ldouble*,ldouble*,ldouble*,ldouble*);
 int calc_wavespeeds_lr(int,int,int,ldouble*);
@@ -292,9 +294,10 @@ int update_entropy(int ix,int iy,int iz,int u2pflag);
 int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 
 //u2p.c
+int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
 int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble[][5],int*);
-int u2p_hot(ldouble*,ldouble*,ldouble[][5]);
-int u2p_entropy(ldouble*,ldouble*,ldouble[][5]);
+int u2p_hot(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
+int u2p_entropy(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5]);
 int u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int*);
 

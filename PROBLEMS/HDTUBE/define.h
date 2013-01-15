@@ -11,7 +11,7 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2
+#define MINMOD_THETA 1
 #define INT_ORDER 1
 #define DTOUT1 5.e0 //dt for basic output
 #define ALLSTEPSOUTPUT 0
@@ -48,9 +48,10 @@ double ST_P3;
 
 
 
+//#define U2P_NUMTEMP
 
+#define U2PPREC 1.e-4
 
-#define U2PPREC 1.e-6
 #define U2PRADPREC 1.e-5
 #define RADFORCEPREC 1.e-5
 #define EFLOOR 1.e-40

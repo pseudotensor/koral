@@ -74,24 +74,13 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   //**********************************************************************
   //***** other stuff ****************************************************
   //**********************************************************************
-  ldouble ut2=-1./(g00 + 2.*vph*g03 + vr*vr*g11 + vth*vth*g22 + vph*vph*g33 );
-  if(ut2<0.) my_err("ut2.lt.0 in wavespeeds\n");
-  
-  ldouble ut=sqrtl(ut2);  
-  ldouble ur=vr*ut;
-  ldouble uth=vth*ut;
-  ldouble uph=vph*ut;
 
-  ucon[0]=ut;
-  ucon[1]=ur;
-  ucon[2]=uth;
-  ucon[3]=uph;
-  
-  ucov[0]=g00*ucon[0]+g03*ucon[3];
-  ucov[1]=g11*ucon[1];
-  ucov[2]=g22*ucon[2];
-  ucov[3]=g33*ucon[3]+g03*ucon[0];
-
+  for(iv=1;iv<4;iv++)
+    ucon[iv]=pp[1+iv];
+  ucon[0]=0.;
+  //  conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
+  conv_vels(ucon,ucon,VEL3,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
 
   //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
@@ -340,7 +329,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   ldouble T[4][4];
 
   //calculating stress energy tensor components
-  calc_Tmunu(pp,gg,T,&ut);
+  calc_Tmunu(pp,gg,GG,T);
 
   int ii, jj;
   for(ii=0;ii<4;ii++)
@@ -362,6 +351,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   ldouble S=pp[5];
 
   //converting to 4-velocity
+  //conv_vels(vcon,ucon,VELR,VEL4,gg,GG);
   conv_vels(vcon,ucon,VEL3,VEL4,gg,GG);
   
   int k,l,iv;
@@ -453,9 +443,8 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ldouble gdet=gg[3][4];
   
   //calculating Tmunu
-  ldouble ut;
   ldouble T[4][4];
-  calc_Tmunu(pp,gg,T,&ut);
+  calc_Tmunu(pp,gg,GG,T);
 
   //primitives
   ldouble rho=pp[0];
@@ -467,6 +456,8 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ldouble S=pp[5];
 
   //converting to 4-velocity
+  //TODO: introduce structure of state
+  //conv_vels(vcon,ucon,VELR,VEL4,gg,GG);
   conv_vels(vcon,ucon,VEL3,VEL4,gg,GG);
 
   //4-velocity
@@ -616,79 +607,29 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 //**********************************************************************
 //**********************************************************************
 //calculates energy-momentum tensor components basing on vector of primitivies p and given metric g
+//returns T^mu_nu
 int
-calc_Tmunu( ldouble *p, ldouble gg[][5], ldouble T[][4], ldouble *ut_ret)
+calc_Tmunu( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
 {
-  ldouble rho=p[0];
-  ldouble uu=p[1];
-  ldouble vr=p[2];
-  ldouble vth=p[3];
-  ldouble vph=p[4];
-
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
-  if(ut2<0.)
-    {
-      my_err("ut2.lt.0 in calc_Tmunu\n"); ut2=0.;
-     }
-
-  ldouble ut=sqrtl(ut2);
-
-  //passes it up to avoid doubling sqrtl
-  *ut_ret=ut;
+  int iv,i,j;
+  ldouble rho=pp[0];
+  ldouble uu=pp[1];
+  ldouble ucon[4],ucov[4];
   
-  ldouble ur=vr*ut;
-  ldouble uth=vth*ut;
-  ldouble uph=vph*ut;
+  //converts to 4-velocity
+  for(iv=1;iv<4;iv++)
+    ucon[iv]=pp[1+iv];
+  ucon[0]=0.;
+  //  conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
+  conv_vels(ucon,ucon,VEL3,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
 
   ldouble w=rho+GAMMA*uu;
 
-  ldouble Ttt=w*ut*(ut*gtt+uph*gtph)+(GAMMA-1.)*uu;
-  ldouble Ttr=w*ut*ur*grr;
-  ldouble Ttth=w*ut*uth*gthth;
-  ldouble Ttph=w*ut*(uph*gphph+ut*gtph);
-
-  ldouble Trt=w*ur*(ut*gtt+uph*gtph);
-  ldouble Trr=w*ur*ur*grr+(GAMMA-1.)*uu;
-  ldouble Trth=w*ur*uth*gthth;
-  ldouble Trph=w*ur*(uph*gphph+ut*gtph);
-
-  ldouble Ttht=w*uth*(ut*gtt+uph*gtph);
-  ldouble Tthr=w*uth*ur*grr;
-  ldouble Tthth=w*uth*uth*gthth+(GAMMA-1.)*uu;
-  ldouble Tthph=w*uth*(uph*gphph+ut*gtph);
-
-  ldouble Tpht=w*uph*(ut*gtt+uph*gtph);
-  ldouble Tphr=w*uph*ur*grr;
-  ldouble Tphth=w*uph*uth*gthth;
-  ldouble Tphph=w*uph*(uph*gphph+ut*gtph)+(GAMMA-1.)*uu;
-
-  T[0][0]=Ttt;
-  T[0][1]=Ttr;
-  T[0][2]=Ttth;
-  T[0][3]=Ttph;
-
-  T[1][0]=Trt;
-  T[1][1]=Trr;
-  T[1][2]=Trth;
-  T[1][3]=Trph;
-
-  T[2][0]=Ttht;
-  T[2][1]=Tthr;
-  T[2][2]=Tthth;
-  T[2][3]=Tthph;
-
-  T[3][0]=Tpht;
-  T[3][1]=Tphr;
-  T[3][2]=Tphth;
-  T[3][3]=Tphph;
-  
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+	T[i][j]=w*ucon[i]*ucov[j]+(GAMMA-1.)*uu*delta(i,j);
+      
   return 0;
 }
 
@@ -719,25 +660,24 @@ calc_Sfromu(ldouble rho,ldouble u)
 int
 update_entropy(int ix,int iy,int iz,int u2pflag)
 {
-  ldouble gg[4][5];
+  ldouble gg[4][5],GG[4][5];
+  pick_G(ix,iy,iz,GG);
   pick_g(ix,iy,iz,gg);
 
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
+  ldouble ucon[4],ut,S,Sut,rho,uu;
+  int iv;
 
-  ldouble rho=get_u(p,0,ix,iy,iz);
-  ldouble uu=get_u(p,1,ix,iy,iz);
-  ldouble vr=get_u(p,2,ix,iy,iz);
-  ldouble vth=get_u(p,3,ix,iy,iz);
-  ldouble vph=get_u(p,4,ix,iy,iz);
+  //density and energy density
+  rho=get_u(p,0,ix,iy,iz);
+  uu=get_u(p,1,ix,iy,iz);
 
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vph*vph*gphph + vth*vth*gthth);
-  ldouble ut=sqrtl(ut2);
-
-  ldouble S,Sut;
+  //converts to 4-velocity
+  for(iv=1;iv<4;iv++)
+    ucon[iv]=get_u(p,iv+1,ix,iy,iz);
+  ucon[0]=0.;
+  //  conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
+  conv_vels(ucon,ucon,VEL3,VEL4,gg,GG);
+  ut=ucon[0];
 
   //u2p_hot worked
   if(u2pflag==0 && uu>0. && rho>0.)

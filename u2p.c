@@ -12,7 +12,7 @@ int
 u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 {
   *corrected=0;
-  int verbose=0;
+  int verbose=1;
   int hdcorr=0;
   int radcorr=0;
 
@@ -36,9 +36,9 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
   //hot hydro - conserving energy
   ret=0;
 #ifdef U2P_NUMTEMP
-    u2pret=u2p_hot_gsl(uu,pp,gg);  //temporary 3D solver - not perfect - does not work for RADATM!
+    u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 3D solver - not perfect - does not work for RADATM!
 #else
-    u2pret=u2p_hot(uu,pp,gg);  //TODO: to be replaced - catastrophic cancelation!
+    u2pret=u2p_hot(uu,pp,gg,GG);  //TODO: to be replaced - catastrophic cancelation!
 #endif
   //************************************
 
@@ -50,7 +50,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
       //************************************
       //entropy solver - conserving entropy
       ret=-1;
-      u2pret=u2p_entropy(uu,pp,gg);
+      u2pret=u2p_entropy(uu,pp,gg,GG);
       //************************************
 
       if(verbose>0)
@@ -78,7 +78,6 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 	      for(u2pret=0;u2pret<NV;u2pret++)
 		pp[u2pret]=ppbak[u2pret];	  
 	      //************************************
-
 	    }
 
 	}
@@ -159,7 +158,8 @@ f_u2p_hot_gsl(const gsl_vector * x, void *params,
 
   if(ut2<0.)
     {
-      my_err("ut2.lt.0 in p2u\n"); ut2=0.;
+      return -1;
+      my_err("ut2.lt.0 in f_u2p_hot_gsl\n"); ut2=0.;
     }
 
   ldouble ut=sqrtl(ut2);
@@ -183,7 +183,7 @@ f_u2p_hot_gsl(const gsl_vector * x, void *params,
 
 
 int
-u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5])
+u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
 
   const gsl_multiroot_fsolver_type *T;
@@ -196,6 +196,8 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5])
   const size_t n = 3;
   struct u2photpar par = {uuu};
   gsl_multiroot_function f = {&f_u2p_hot_gsl, n, &par};
+
+  //  conv_velsinprims(p,VELR,VEL3,g,G);
      
   double x_init[5] = {p[0],p[1],p[2],p[3],p[4]};
   gsl_vector *x = gsl_vector_alloc (n);
@@ -228,6 +230,8 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5])
   while (status == GSL_CONTINUE && iter < 1000);
 
   if(verbose>0) printf ("status = %s\n", gsl_strerror (status));
+
+  if(status!=GSL_SUCCESS) return -1;
   
   ldouble rhout=uuu[0];
   ldouble Tttt=uuu[1];
@@ -247,12 +251,13 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5])
 
   p[5]=Sut/ut;
 
+  //  conv_velsinprims(p,VEL3,VELR,g,G);
+
   gsl_multiroot_fsolver_free (s);
   gsl_vector_free (x);
 
   return 0;
 }
-
 
 //**********************************************************************
 //**********************************************************************
@@ -261,7 +266,7 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5])
 //'hot grhd' - pure hydro, numerical in 1D
 //catastrophic cancelation!
 int
-u2p_hot(ldouble *uuu, ldouble *p, ldouble g[][5])
+u2p_hot(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
   int verbose=0;
 
@@ -460,7 +465,7 @@ u2p_hot(ldouble *uuu, ldouble *p, ldouble g[][5])
 
   if(u<0. || rho<0.) return -10;
 
- 
+
   //primitives
   p[0]=rho;
   p[1]=u;
@@ -468,6 +473,14 @@ u2p_hot(ldouble *uuu, ldouble *p, ldouble g[][5])
   p[3]=vth;
   p[4]=vph;
   p[5]=S;
+
+  //  conv_velsinprims(p,VEL3,VELR,g,G);
+
+  /*
+  print_Nvector(uuu,NV);
+  print_Nvector(p,NV);
+  if(vr>0.) getchar();
+  */
 
   return 0;
 }
@@ -477,7 +490,7 @@ u2p_hot(ldouble *uuu, ldouble *p, ldouble g[][5])
 //**********************************************************************
 //auxiliary solver based on the entropy conservation
 int
-u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5])
+u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
   ldouble gtt=g[0][0];
   ldouble gtph=g[0][3];
@@ -493,6 +506,8 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5])
   ldouble Ttth=uuu[3];
   ldouble Ttph=uuu[4];
   ldouble Sut=uuu[5];
+
+  //  conv_velsinprims(p,VELR,VEL3,g,G);
 
   ldouble rho=p[0]; //initial guess
   ldouble uu=p[1];

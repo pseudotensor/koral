@@ -20,14 +20,17 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 
   ldouble rho=p[0];
   ldouble uu=p[1];
-  ldouble vcon[4],ucon[4];
+  ldouble vcon[4],ucon[4],ucov[4];
   vcon[1]=p[2];
   vcon[2]=p[3];
   vcon[3]=p[4];
+  vcon[0]=0.;
   ldouble S=p[5];
 
   //converting to 4-velocity
+  //conv_vels(vcon,ucon,VELR,VEL4,g,G);
   conv_vels(vcon,ucon,VEL3,VEL4,g,G);
+  indices_21(ucon,ucov,g);
 
   //************************************
   //************************************
@@ -54,7 +57,6 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 
   //TODO: generalize
   ldouble ut=ucon[0];
-  ldouble ut2=ut*ut;
   ldouble vr=p[2];
   ldouble vth=p[3];
   ldouble vph=p[4];
@@ -67,11 +69,13 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
   else
     Sut=calc_Sfromu(rho,uu)*ut;
 
-  ldouble Tttt=rhout*(1+ut*(gtt+vph*gtph))+GAMMA*uu*ut2*(gtt+vph*gtph)+uu*(GAMMA-1.);  
-  ldouble Ttr=(rho+GAMMA*uu)*ut2*vr*grr;
-  ldouble Ttth=(rho+GAMMA*uu)*ut2*vth*gthth;
-  ldouble Ttph=(rho+GAMMA*uu)*ut2*(gtph+vph*gphph);
-
+  ldouble pre=(GAMMA-1.)*uu;
+  ldouble w=rho+uu+pre;
+  ldouble Tttt=rhout + w*ucon[0]*ucov[0] + pre;
+  ldouble Ttr =w*ucon[0]*ucov[1];
+  ldouble Ttth =w*ucon[0]*ucov[2];
+  ldouble Ttph =w*ucon[0]*ucov[3];
+   
   u[0]=rhout;
   u[1]=Tttt;
   u[2]=Ttr;

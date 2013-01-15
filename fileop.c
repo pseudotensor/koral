@@ -189,13 +189,18 @@ fprint_profiles(ldouble t, ldouble totmass)
 						    {
 						      uu[iv]=get_u(u,iv,ix,iy,iz);
 						      pp[iv]=get_u(p,iv,ix,iy,iz);
-						    }	      
+						    }	    
 
 						  ldouble rho=pp[0];
 						  ldouble uint=pp[1];
 						  ldouble vx=pp[2];
 						  ldouble vy=pp[3];
 						  ldouble vz=pp[4];
+						  ldouble vrel[4]={0,vx,vy,vz};
+						  conv_vels(vrel,vrel,VELR,VEL3,gg,GG);
+						  vx=vrel[1];
+						  vy=vrel[2];
+						  vz=vrel[3];
 						  ldouble S=pp[5];
 						  ldouble p=(GAMMA-1.)*uint;
 						  ldouble ut=uu[0]/rho;
@@ -241,8 +246,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //						  v2=get_u_scalar(arady,ix,iy,iz);
 						  //						  v3=get_u_scalar(aradz,ix,iy,iz);
 						  /******************/
-
-
+						  
 						  //**********************************************************************
 						  //**********************************************************************
 						  //**********************************************************************

@@ -8,10 +8,10 @@ fprint_profiles(ldouble t, ldouble totmass)
 */ 
 
  
-	    rho*=ut;
-	    vx*=rho;
-	    vy*=rho;
-	    vz*=rho;
-	    u2p_entropy(uu,pp,gg);
-	    v1=pp[1]; //u based on entropy evolution
+	    v1=rho*ut;
+	    v2=vx*rho;
+	    v3=vy*rho;
+	    v4=vz*rho;
+
+
 
