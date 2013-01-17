@@ -294,6 +294,7 @@ int update_entropy(int ix,int iy,int iz,int u2pflag);
 int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 
 //u2p.c
+int u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
 int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble[][5],int*);
 int u2p_hot(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);

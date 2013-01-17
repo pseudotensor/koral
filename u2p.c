@@ -38,7 +38,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 #ifdef U2P_NUMTEMP
     u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 3D solver - not perfect - does not work for RADATM!
 #else
-    u2pret=u2p_hot(uu,pp,gg,GG);  //TODO: to be replaced - catastrophic cancelation!
+    u2pret=u2p_hot_new(uu,pp,gg,GG);  //TODO: to be replaced - catastrophic cancelation!
 #endif
   //************************************
 
@@ -257,6 +257,161 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   gsl_vector_free (x);
 
   return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//generalized conserved to primitives solver
+//'hot grhd' - pure hydro, numerical in 2d
+//following Noble+06
+ldouble
+f_u2p_hot_new(ldouble W, ldouble* cons)
+{
+  ldouble Qn=cons[0];
+  ldouble Qt2=cons[1];
+  ldouble D=cons[2];
+
+  return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrtl(1.-Qt2/W/W);   
+}
+
+int
+u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
+{
+  int verbose=0;
+  int i,j,k;
+  ldouble rho,u,p,w,W,gamma,alpha,D;
+  ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
+  ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
+  
+  //alpha
+  alpha=sqrtl(-1./GG[0][0]);
+
+  //D
+  D=uu[0]*alpha;
+
+  //Q_mu
+  Qcov[0]=(uu[1]-uu[0])*alpha;
+  Qcov[1]=uu[2]*alpha;
+  Qcov[2]=uu[3]*alpha;
+  Qcov[3]=uu[4]*alpha;
+
+  //Q^mu
+  indices_12(Qcov,Qcon,GG);
+
+  //n_mu = (-alpha, 0, 0, 0)
+  ncov[0]=-alpha;
+  ncov[1]=ncov[2]=ncov[3]=0.;
+  
+  //n^mu
+  indices_12(ncov,ncon,GG);
+
+  //Q^mu n_mu = -alpha*Q^t
+  Qn=Qcon[0] * ncov[0];
+
+  //j^mu_nu=delta^mu_nu +n^mu n_nu
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      jmunu[i][j] = delta(i,j) + ncon[i]*ncov[j];
+
+  //Qtilda^nu = j^nu_mu Q^mu
+  for(i=0;i<4;i++)
+    {
+      Qtcon[i]=0.;
+      for(j=0;j<4;j++)
+	Qtcon[i]+=jmunu[i][j]*Qcon[j];
+    }
+
+  //Qtilda_nu
+  indices_21(Qtcon,Qtcov,gg);
+
+  //Qt2=Qtilda^mu Qtilda_mu
+  Qt2=dot(Qtcon,Qtcov);
+
+  //initial guess for W = w gamma**2 based on primitives
+  rho=pp[0];
+  u=pp[1];
+  utcon[0]=0.;
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  conv_vels(utcon,utcon,VELPRIM,VELR,gg,GG);
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=utcon[i]*utcon[j]*gg[i][j];
+  ldouble gamma2=1.+qsq;
+  W=(rho+GAMMA*u)*gamma2;
+
+  //test if does not provide reasonable gamma2
+  if(W*W<Qt2)
+    {
+      W=2.*Qt2;
+    }
+
+  //1d Newton solver
+  ldouble CONV=1.e-6;
+  ldouble EPS=1.e-6;
+  ldouble Wprev=W;
+  ldouble f0,f1,dfdW;
+  ldouble cons[3]={Qn,Qt2,D};
+  if(verbose) printf("in:%Le %Le %Le\n",Qn,Qt2,D);
+
+  int iter=0;
+  do
+    {
+      Wprev=W;
+      iter++;
+      f0=f_u2p_hot_new(W,cons);
+
+      f1=f_u2p_hot_new(W*(1.+EPS),cons);
+      dfdW=(f1-f0)/(EPS*W);
+
+      if(verbose) printf("%d %Le %Le %Le %Le\n",iter,W,f0,f1,dfdW);
+
+      if(dfdW==0.) {W*=1.1; continue;}
+      W-=f0/dfdW;
+    }
+  while(fabs((W-Wprev)/Wprev)>CONV && iter<50);
+
+  if(iter>=50)
+    {
+      if(verbose) printf("iter exceeded in u2p_hot\n");
+      return -1;
+    }
+  
+  if(verbose) {printf("the end: %Le\n",W); }
+
+  //W found, let's calculate v2 and the rest
+  ldouble v2=Qt2/W/W;
+  gamma2=1./(1.-v2);
+  gamma=sqrtl(gamma2);
+  rho=D/gamma;
+  u=1./GAMMA*(W/gamma2-rho);
+  utcon[0]=0.;
+  utcon[1]=gamma/W*Qtcon[1];
+  utcon[2]=gamma/W*Qtcon[2];
+  utcon[3]=gamma/W*Qtcon[3];
+
+  //converting to VELPRIM
+  conv_vels(utcon,utcon,VELR,VELPRIM,gg,GG);
+  
+  //returning new primitives
+  pp[0]=rho;
+  pp[1]=u;
+  pp[2]=utcon[1];
+  pp[3]=utcon[2];
+  pp[4]=utcon[3];
+
+  //entropy
+  ldouble Sut=uu[5];
+  ldouble ut=uu[0]/pp[0]; //rhout/rho
+  pp[5]=Sut/ut;
+
+  if(verbose) {print_Nvector(pp,NV);getchar();}
+
+  return 0;
+
 }
 
 //**********************************************************************
