@@ -6,8 +6,9 @@ int iix,iiy,iiz,iv;
 
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 //gdet_src=get_g(g,3,4,iix,iiy,iiz);
-ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
+ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
 pick_g(ix,iy,iz,gg);
+pick_g(ix,iy,iz,GG);
 pick_T(emuup,ix,iy,iz,eup);
 pick_T(emulo,ix,iy,iz,elo);
 ldouble xx=get_x(ix,0);
@@ -84,7 +85,12 @@ ldouble xx=get_x(ix,0);
       pp[0]=rho; pp[1]=uint; pp[4]=Vphi; pp[2]=-Vr; pp[3]=0.;
       pp[5]=calc_Sfromu(rho,uint);
 
-      p2u(pp,uu,gg,eup,elo);
+
+//converting from 3vel to relative velocity
+conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
+
+
+      p2u(pp,uu,gg,GG);
 
       return 0.;
     }
@@ -142,8 +148,9 @@ ldouble xx=get_x(ix,0);
 	
       //      pp[5]=calc_Sfromu(pp[0],pp[1]);
 
+
       if(ix==-1) //conserved unneccesary for ix=-2 
-	p2u(pp,uu,gg,eup,elo);
+	p2u(pp,uu,gg,GG);
       return 0;
     }
 
@@ -166,7 +173,9 @@ ldouble xx=get_x(ix,0);
 	  else
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      p2u(pp,uu,gg,eup,elo);
+
+
+      p2u(pp,uu,gg,GG);
       return 0;
      }
   if(iy>=NY) //equatorial plane
@@ -188,7 +197,7 @@ ldouble xx=get_x(ix,0);
 	    else
 	      pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	  }
-      p2u(pp,uu,gg,eup,elo); 
+      p2u(pp,uu,gg,GG); 
       return 0; 
     }
    

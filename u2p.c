@@ -278,7 +278,7 @@ f_u2p_hot_new(ldouble W, ldouble* cons)
 int
 u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 {
-  int verbose=0;
+  int verbose=1;
   int i,j,k;
   ldouble rho,u,p,w,W,gamma,alpha,D;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
@@ -408,7 +408,7 @@ u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   ldouble ut=uu[0]/pp[0]; //rhout/rho
   pp[5]=Sut/ut;
 
-  if(verbose) {print_Nvector(pp,NV);getchar();}
+  if(verbose) {print_Nvector(pp,NV);}
 
   return 0;
 

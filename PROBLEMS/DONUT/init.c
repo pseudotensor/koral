@@ -19,15 +19,15 @@ set_initial_profile()
 	      xx=get_x(ix,0);
 	      yy=get_x(iy,1);
 	      zz=get_x(iz,2);
-	      ldouble gg[4][5],eup[4][4],elo[4][4];
+ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
 	      pick_g(ix,iy,iz,gg);
+	      pick_G(ix,iy,iz,GG);
 	      calc_LNRFes(gg,eup,elo);
 
 	      ldouble pp[NV],T;
 
 
-	      ldouble GG[4][5];
-	      pick_G(ix,iy,iz,GG);
+	 
 	      ldouble podpierd=-(GG[0][0]-2.*ELL*GG[0][3]+ELL*ELL*GG[3][3]);
 	      ldouble ut=-1./sqrt(podpierd);
 
@@ -104,10 +104,17 @@ set_initial_profile()
 	      pp[5]=calc_Sfromu(pp[0],pp[1]);
 
 
-	      
+//converting from 3vel to relative velocity
+conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
 
-p2u(pp,uu,gg,eup,elo);
 
+p2u(pp,uu,gg,GG);
+
+/*
+print_Nvector(pp,NV);
+print_Nvector(uu,NV);
+getchar();
+*/
 
 /***********************************************/
 

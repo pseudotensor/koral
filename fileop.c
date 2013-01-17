@@ -226,25 +226,10 @@ fprint_profiles(ldouble t, ldouble totmass)
 #endif
 
 						  /******************/
-						  /* extra lines to calculate v1...v4 analytically from PROBLEMS/XXX/anasol.c */
-						  
-                                                  #include PR_ANASOL
-
-						  v1=vv[0];
-						  v2=vv[1];
-						  v3=vv[2];
-						  v4=vv[3];
-						  /******************/
-
-						  /******************/
 						  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
 
                                                   #include PR_DUMP
 
-						  //debug
-						  //						  v1=get_u_scalar(aradx,ix,iy,iz);
-						  //						  v2=get_u_scalar(arady,ix,iy,iz);
-						  //						  v3=get_u_scalar(aradz,ix,iy,iz);
 						  /******************/
 						  
 						  //**********************************************************************
