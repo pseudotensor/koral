@@ -13,12 +13,12 @@
 #define NX 50
 #define NY 50
 #define NZ 1
-#define TSTEPLIM .5
+#define TSTEPLIM .15
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define INT_ORDER 1
 #define SPECIFIC_BC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (4./3.)

@@ -12,7 +12,7 @@ int
 u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 {
   *corrected=0;
-  int verbose=1;
+  int verbose=0;
   int hdcorr=0;
   int radcorr=0;
 
@@ -198,6 +198,7 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 	correct=1;
      	  
       if(correct==0) return 0; //everything is fine
+
     }
   else
     {
@@ -207,6 +208,15 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
   //correcting and imposing gammamax keeping the direction given by spatial components
   ldouble Afac;
   ldouble gammamax=100.;
+
+  if(whichvel==VELR)
+    {
+      //convert spatial u1 to lab-frame
+      for(i=1;i<4;i++)
+	u1[i]=u1[i]+gammamax*GG[0][i]/GG[0][0];
+    }
+
+  //normalizing to u^t=gammamax
   c=0.; b=0.;
   for(i=1;i<4;i++)
     {
@@ -223,12 +233,15 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
   u2[2]=Afac*u1[2];
   u2[3]=Afac*u1[3];
 
+   //converting to whichvel
+  conv_vels(u2,u2,VEL4,whichvel,gg,GG);
+
+  /*
   print_4vector(u1);
   print_4vector(u2);
-  getchar();
-
-  //converting to VELPRIM
-  conv_vels(u2,u2,whichvel,VELPRIM,gg,GG);
+  printf("which: %d det: %Le\n",whichvel,dot(u2,u1));
+  //  getchar();
+  */
 
   //back to primitives
   pp[2]=u2[1];
@@ -897,9 +910,10 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   vr=Ttr/(grr*fff2);
   vth=Ttth/(gthth*fff2); 
 
-  if(uu<0. || rho<0.)
+  if(uu<0. || rho<0. || isnan(rho))
     {
       printf("u2p_entr didn't work: %Le %Le\n",uu,rho);
+      print_Nvector(uuu,NV);
       return -1;
     }
 
@@ -909,6 +923,13 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   p[3]=vth;
   p[4]=vph;
   p[5]=S;
+
+  //************************************
+  //************************************
+  //checking on hd floors
+  check_floors_hd(p,VEL3,g,G);
+  //************************************
+  //************************************
 
   conv_velsinprims(p,VEL3,VELPRIM,g,G);
 

@@ -99,7 +99,6 @@ solve_all_problems_5(ldouble tstart)
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1,imp_time2,tstepden;
 
-      
 #ifndef RADIATION //pure hydro
       if(NZ>1)
 	tstepden=max_ws[0]/min_dx + max_ws[1]/min_dy + max_ws[2]/min_dz;

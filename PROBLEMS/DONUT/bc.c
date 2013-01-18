@@ -8,7 +8,7 @@ gdet_bc=get_g(g,3,4,ix,iy,iz);
 //gdet_src=get_g(g,3,4,iix,iiy,iiz);
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
 pick_g(ix,iy,iz,gg);
-pick_g(ix,iy,iz,GG);
+pick_G(ix,iy,iz,GG);
 pick_T(emuup,ix,iy,iz,eup);
 pick_T(emulo,ix,iy,iz,elo);
 ldouble xx=get_x(ix,0);
@@ -19,11 +19,6 @@ ldouble xx=get_x(ix,0);
 //radius
 if(ix>=NX) //analytical solution at rout only
   {
-    ldouble gg[4][5],eup[4][4],elo[4][4],GG[4][5];
-    pick_g(ix,iy,iz,gg);
-    pick_T(emuup,ix,iy,iz,eup);
-    pick_T(emulo,ix,iy,iz,elo);
-    pick_G(ix,iy,iz,GG);
     ldouble podpierd=-(GG[0][0]-2.*ELL*GG[0][3]+ELL*ELL*GG[3][3]);
     ldouble ut=-1./sqrt(podpierd);
     ut/=UTPOT;
@@ -99,15 +94,9 @@ if(ix>=NX) //analytical solution at rout only
  else if(ix<0) //outflow near BH
    {
      ldouble gdet=get_g(g,3,4,ix,iy,iz);  
-     ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
-
      iix=0;
      iiy=iy;
      iiz=iz;
-     pick_g(ix,iy,iz,gg);
-     pick_T(emuup,ix,iy,iz,eup);
-     pick_T(emulo,ix,iy,iz,elo);
-     pick_g(iix,iiy,iiz,ggsrc);
      gdet_src=get_g(g,3,4,iix,iiy,iiz);  
      gdet_bc=get_g(g,3,4,ix,iy,iz);        
      ldouble rsrc=get_x(iix,0);
@@ -123,7 +112,7 @@ if(ix>=NX) //analytical solution at rout only
 	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*(1.+(rsrc-rbc)/(.5*(rsrc+rbc)));
 	  
 	 //unchanged primitives
-	 //pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
      /*
@@ -156,7 +145,7 @@ if(ix>=NX) //analytical solution at rout only
      //end of floor section
 
 
-     if(ix==-1) //conserved unneccesary for ix=-2 
+     if(ix==-1 || 1) //conserved unneccesary for ix=-2 
        p2u(pp,uu,gg,GG);
      return 0;
    }
@@ -169,11 +158,7 @@ if(iy<0.) //spin axis
     iix=ix;
     gdet_src=get_g(g,3,4,iix,iiy,iiz);  
     gdet_bc=get_g(g,3,4,ix,iy,iz);  
-    ldouble gg[4][5],eup[4][4],elo[4][4];
-    pick_g(ix,iy,iz,gg);
-    pick_T(emuup,ix,iy,iz,eup);
-    pick_T(emulo,ix,iy,iz,elo);
-    for(iv=0;iv<NV;iv++)
+     for(iv=0;iv<NV;iv++)
       {
 	if(iv==3)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
@@ -196,11 +181,7 @@ if(iy>=NY) //equatorial plane
     iix=ix;
     gdet_src=get_g(g,3,4,iix,iiy,iiz);  
     gdet_bc=get_g(g,3,4,ix,iy,iz);  
-    ldouble gg[4][5],eup[4][4],elo[4][4];
-    pick_g(ix,iy,iz,gg);
-    pick_T(emuup,ix,iy,iz,eup);
-    pick_T(emulo,ix,iy,iz,elo);
- 	  
+  	  
     for(iv=0;iv<NV;iv++)
       {
 	if(iv==3)
