@@ -38,7 +38,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 #ifdef U2P_NUMTEMP
   u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 3D solver - not perfect - does not work for RADATM!
 #else
-  u2pret=u2p_hot(uu,pp,gg,GG);  //TODO: to be replaced - catastrophic cancelation!
+  u2pret=u2p_hot_new(uu,pp,gg,GG);  //TODO: to be replaced - catastrophic cancelation!
 #endif
   //************************************
 
@@ -430,7 +430,7 @@ f_u2p_hot_new(ldouble W, ldouble* cons)
 int
 u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 {
-  int verbose=1;
+  int verbose=0;
   int i,j,k;
   ldouble rho,u,p,w,W,gamma,alpha,D;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
@@ -494,15 +494,16 @@ u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       qsq+=utcon[i]*utcon[j]*gg[i][j];
   ldouble gamma2=1.+qsq;
   W=(rho+GAMMA*u)*gamma2;
-
+  if(verbose) printf("initail W:%Le\n",W);
+ 
   //test if does not provide reasonable gamma2
   if(W*W<Qt2)
     {
-      W=2.*Qt2;
+      W=2.*sqrt(Qt2);
     }
 
   //1d Newton solver
-  ldouble CONV=1.e-6;
+  ldouble CONV=1.e-4;
   ldouble EPS=1.e-6;
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
@@ -532,6 +533,7 @@ u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       return -1;
     }
   
+  if(isnan(W) || isinf(W)) {if(verbose)printf("nan/inf W: %Le\n",W); getchar();}
   if(verbose) {printf("the end: %Le\n",W); }
 
   //W found, let's calculate v2 and the rest
@@ -544,6 +546,12 @@ u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   utcon[1]=gamma/W*Qtcon[1];
   utcon[2]=gamma/W*Qtcon[2];
   utcon[3]=gamma/W*Qtcon[3];
+
+  if(rho<0. || u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
+    {
+      if(verbose) printf("neg u rho in u2p_hot_new\n");
+      return -1;
+    }
 
   //converting to VELPRIM
   conv_vels(utcon,utcon,VELR,VELPRIM,gg,GG);

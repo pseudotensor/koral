@@ -13,7 +13,7 @@
 #define NX 50
 #define NY 50
 #define NZ 1
-#define TSTEPLIM .15
+#define TSTEPLIM .3
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define INT_ORDER 1
 #define SPECIFIC_BC
