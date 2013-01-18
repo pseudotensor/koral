@@ -151,7 +151,7 @@ ldouble get_u_scalar(ldouble*,int,int,int);
 int copy_u(ldouble,ldouble*,ldouble*);
 int add_u(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble *u3);
 ldouble f_timeder_source_term(ldouble t, const ldouble y[], ldouble f[],  void *params);
-int check_floors(ldouble *uu);
+
 int set_bc(ldouble);
 int if_indomain(int ix,int iy,int iz);
 int if_outsidegc(int ix,int iy,int iz);
@@ -255,6 +255,8 @@ ldouble calc_xb(int i,int idim);
 int calc_bc(int,int,int,ldouble,ldouble*, ldouble*);
 int pr_tophat_inside(ldouble x,ldouble y,ldouble z);
 int my_finger(ldouble);
+int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,ldouble *vv);
+
 
 //metric.c
 int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4]);
@@ -294,6 +296,7 @@ int update_entropy(int ix,int iy,int iz,int u2pflag);
 int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 
 //u2p.c
+int u2p_check_floors_hd(ldouble *uu, ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
 int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble[][5],int*);

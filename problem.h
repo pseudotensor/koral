@@ -385,4 +385,4 @@
 
 #define GMC2CM (MASSCM) //gravitational radius in cm
 
-#define VELPRIM VELR
+#define VELPRIM VEL3

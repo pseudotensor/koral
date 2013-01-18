@@ -86,6 +86,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
       ut[0]=sqrtl(-1./(gg[0][0]+a+b));
       if(ut[0]<1. || isnan(ut[0]))
 	{
+	  print_4vector(u1);
 	  printf("ut.nan in conv_vels(%d,%d)\n",which1,which2); getchar();
 	}
       ut[1]=u1[1]*ut[0];

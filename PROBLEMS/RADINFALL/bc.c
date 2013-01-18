@@ -6,8 +6,9 @@ int iix,iiy,iiz,iv;
 
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 gdet_src=get_g(g,3,4,iix,iiy,iiz);
-ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
+ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4],GG[4][5];
 pick_g(ix,iy,iz,gg);
+pick_G(ix,iy,iz,GG);
 pick_T(emuup,ix,iy,iz,eup);
 pick_T(emulo,ix,iy,iz,elo);
 ldouble xx=get_x(ix,0);
@@ -40,7 +41,10 @@ ldouble xx=get_x(ix,0);
       pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.; 
       pp[5]=calc_Sfromu(rho,uint);
 
-      p2u(pp,uu,gg,eup,elo);
+      //converting from 3vel to VELPRIM
+      conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
+
+      p2u(pp,uu,gg,GG);
 
       return 0.;
     }
@@ -81,13 +85,14 @@ ldouble xx=get_x(ix,0);
       //copying primitives with gdet taken into account
       for(iv=0;iv<NV;iv++)
 	{ 
+	  /*
 	  if(iv==0 || iv==1 || iv==5)
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*gdet_src/gdet_bc;
 	  if(iv==2)
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*(1.-(rsrc-rbc)/(.5*(rsrc+rbc)));
 	  if(iv==3 || iv==4)
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*(1.+(rsrc-rbc)/(.5*(rsrc+rbc)));
-
+	  */
 	  //following ~r**-1.5 scaling
 	  if(iv==0)
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*powl(rsrc/rbc,1.5);
@@ -95,10 +100,15 @@ ldouble xx=get_x(ix,0);
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*powl(rsrc/rbc,1.5*GAMMA);
 	  if(iv==2)
 	    pp[iv]=-sqrtl(2./r)*(1.-2./r) ;
+
 	  
 	  //unchanged primitives
 	  //pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
+
+      //converting from 3vel to VELPRIM
+      conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
+
       
       
       /*  
@@ -135,7 +145,7 @@ ldouble xx=get_x(ix,0);
       pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.;
       */
       
-	p2u(pp,uu,gg,eup,elo);
+	p2u(pp,uu,gg,GG);
       return 0;
     }
 
@@ -158,7 +168,7 @@ ldouble xx=get_x(ix,0);
 	  else
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      p2u(pp,uu,gg,eup,elo);
+      p2u(pp,uu,gg,GG);
       return 0;
      }
   if(iy>=NY) //equatorial plane
@@ -180,7 +190,7 @@ ldouble xx=get_x(ix,0);
 	    else
 	      pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	  }
-      p2u(pp,uu,gg,eup,elo); 
+      p2u(pp,uu,gg,GG); 
       return 0; 
     }
    

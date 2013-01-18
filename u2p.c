@@ -36,9 +36,9 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
   //hot hydro - conserving energy
   ret=0;
 #ifdef U2P_NUMTEMP
-    u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 3D solver - not perfect - does not work for RADATM!
+  u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 3D solver - not perfect - does not work for RADATM!
 #else
-    u2pret=u2p_hot_new(uu,pp,gg,GG);  //TODO: to be replaced - catastrophic cancelation!
+  u2pret=u2p_hot(uu,pp,gg,GG);  //TODO: to be replaced - catastrophic cancelation!
 #endif
   //************************************
 
@@ -84,6 +84,17 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
       
      }
 
+  if(ret<0.)
+    hdcorr=1;
+
+  //checking on hd floors
+  ret=u2p_check_floors_hd(pp,gg,GG);
+
+  if(ret<0.)
+    hdcorr=1;
+
+
+
   //************************************
   //************************************
   //************************************
@@ -101,6 +112,91 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 
   return ret;
 }
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//checks if hydro primitives make sense
+//TODO: incorporate structure of state here?
+int
+u2p_check_floors_hd(ldouble *pp, ldouble gg[][5], ldouble GG[][5])
+{
+  int i,j,k;
+  // velocities
+  ldouble u1[4],u2[4];
+  if(VELPRIM==VEL4)
+    {
+      //assumes u^t unknown
+      u1[0]=0.;
+      u1[1]=pp[2];
+      u1[2]=pp[3];
+      u1[3]=pp[4];
+      ldouble a,b,c;
+      a=gg[0][0];
+      b=0.;
+      c=1.;
+      for(i=1;i<4;i++)
+	{
+	  b+=2.*u1[i]*gg[0][i];
+	  for(j=1;j<4;j++)
+	    {
+	      c+=u1[i]*u1[j]*gg[i][j];
+	    }
+	}
+      ldouble delta=b*b-4.*a*c;
+      int correct=0;
+      if(delta<0.) 
+	correct=1;
+      else
+	{
+	  u1[0]=(-b-sqrtl(delta))/2./a;
+	  if(u1[0]<1.) u1[0]=(-b+sqrtl(delta))/2./a;
+	  if(u1[0]<1.) 
+	    correct=1;
+	}
+	  
+      if(correct==0) return 0; //everything is fine
+
+      //correcting and imposing gammamax
+      ldouble Afac;
+      ldouble gammamax=100.;
+      c=0.; b=0.;
+      for(i=1;i<4;i++)
+	{
+	  a+=u1[i]*u1[i]*gg[i][i];
+	  b+=2.*u1[i]*gg[0][i]*gammamax;
+	}
+      c=gg[0][0]*gammamax*gammamax+1.;
+      delta=b*b-4.*a*c;
+      
+      Afac= (-b+sqrtl(delta))/2./a;
+
+      u2[0]=gammamax;
+      u2[1]=Afac*u1[1];
+      u2[2]=Afac*u1[2];
+      u2[3]=Afac*u1[3];
+
+      print_4vector(u1);
+      print_4vector(u2);
+      getchar();
+
+      //converting to VELPRIM
+      conv_vels(u2,u2,VEL4,VELPRIM,gg,GG);
+
+      //back to primitives
+      pp[2]=u2[1];
+      pp[3]=u2[2];
+      pp[4]=u2[3];
+
+      //to let the others know to correct conserved
+      return -1;
+    }
+
+  return 0;
+
+
+}
+
 
 
 //**********************************************************************
@@ -231,7 +327,8 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 
   if(verbose>0) printf ("status = %s\n", gsl_strerror (status));
 
-  if(status!=GSL_SUCCESS) return -1;
+  if(status!=GSL_SUCCESS) 
+    return -1;
   
   ldouble rhout=uuu[0];
   ldouble Tttt=uuu[1];
@@ -773,7 +870,6 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 
   conv_velsinprims(p,VEL3,VELPRIM,g,G);
 
-
   return 0;
 }
 
@@ -897,7 +993,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	  a+=Arad[i]*Arad[i]*gg[i][i];
 	  b+=2.*Arad[i]*gg[0][i]*gammamax;
 	}
-      c=gg[0][0]*gammamax*gammamax;
+      c=gg[0][0]*gammamax*gammamax+1.;
       delta=b*b-4.*a*c;
       Afac= (-b+sqrtl(delta))/2./a;
 

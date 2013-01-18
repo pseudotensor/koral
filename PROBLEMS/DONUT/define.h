@@ -18,7 +18,7 @@
 #define INT_ORDER 1
 #define SPECIFIC_BC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (4./3.)
@@ -39,8 +39,7 @@
 #define ELL 4.5
 //#define ELL 3.77
 
-#define UTPOT .98
-
+#define UTPOT 1.
 
 #define RHO_AMB 3.e-1
 #define U_AMB 1.e-6
@@ -49,3 +48,5 @@
 #define U2PPREC 1.e-6
 #define U2PRADPREC 1.e-5
 #define RADFORCEPREC 1.e-5
+
+#define PRINTGC_LEFT

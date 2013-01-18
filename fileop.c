@@ -226,10 +226,19 @@ fprint_profiles(ldouble t, ldouble totmass)
 #endif
 
 						  /******************/
+						  /* calling analytical_solution() - empty by defaults - PROBLEMS/XXX/anasol.c */
+
+						  analytical_solution(t,ix,iy,iz,uu,pp,vv);
+						  v1=vv[0];
+						  v2=vv[1];
+						  v3=vv[2];
+						  v4=vv[3];
+						  /******************/
+
+						  /******************/
 						  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
 
                                                   #include PR_DUMP
-
 						  /******************/
 						  
 						  //**********************************************************************

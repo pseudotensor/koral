@@ -23,7 +23,7 @@
 	  "set origin 0,0\n"
 	  "set multiplot\n"
 	  "set autoscale\n" 
-	   "set log \n"
+	   //	   "set log \n"
 	  "set label \"t=%.2Le (%.2Le s)\" at screen .48, .98\n"
 
 	  "set lmargin at screen 0.07\n"
@@ -37,7 +37,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($14*$1**1.5) w lp ls 1 pt 7 ps .5 ti \"rho\"\n"
+	  "plot \"%s\" u 1:($14) w lp ls 1 pt 7 ps .5 ti \"rho\"\n"
 
 	  "set lmargin at screen 0.40\n"
 	  "set rmargin at screen 0.66\n"

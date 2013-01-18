@@ -201,7 +201,7 @@ conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
       return 0; 
     }
    
-  //symmetric in phi:
+  //periodic in phi:
   iiz=iz;
   iiy=iy;
   iix=ix;

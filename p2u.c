@@ -55,7 +55,6 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
   //************************************
  
 
-  //TODO: generalize
   ldouble ut=ucon[0];
   ldouble rhout = rho*ut;
   ldouble Sut;
