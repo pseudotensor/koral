@@ -90,7 +90,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
   //************************************
   //************************************
   //checking on hd floors
-  ret=u2p_check_floors_hd(pp,gg,GG);
+  ret=check_floors_hd(pp,VELPRIM,gg,GG);
 
   if(ret<0.)
     hdcorr=1;
@@ -123,19 +123,19 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 //checks if hydro primitives make sense
 //TODO: incorporate structure of state here?
 int
-u2p_check_floors_hd(ldouble *pp, ldouble gg[][5], ldouble GG[][5])
+check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 {
-  int i,j,k;
+  int i,j,k,correct;
   // velocities
+  ldouble a,b,c,delta;
   ldouble u1[4],u2[4];
-  if(VELPRIM==VEL4)
+  if(whichvel==VEL4)
     {
       //assumes u^t unknown
       u1[0]=0.;
       u1[1]=pp[2];
       u1[2]=pp[3];
       u1[3]=pp[4];
-      ldouble a,b,c;
       a=gg[0][0];
       b=0.;
       c=1.;
@@ -147,8 +147,8 @@ u2p_check_floors_hd(ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 	      c+=u1[i]*u1[j]*gg[i][j];
 	    }
 	}
-      ldouble delta=b*b-4.*a*c;
-      int correct=0;
+      delta=b*b-4.*a*c;
+      correct=0;
       if(delta<0.) 
 	correct=1;
       else
@@ -160,45 +160,83 @@ u2p_check_floors_hd(ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 	}
 	  
       if(correct==0) return 0; //everything is fine
-
-      //correcting and imposing gammamax
-      ldouble Afac;
-      ldouble gammamax=100.;
-      c=0.; b=0.;
+    }
+  else if(whichvel==VEL3)
+    {
+      //assumes u^t unknown
+      u1[0]=0.;
+      u1[1]=pp[2];
+      u1[2]=pp[3];
+      u1[3]=pp[4];
+      a=b=0.;
       for(i=1;i<4;i++)
 	{
-	  a+=u1[i]*u1[i]*gg[i][i];
-	  b+=2.*u1[i]*gg[0][i]*gammamax;
+	  a+=2.*u1[i]*gg[0][i];
+	  for(j=1;j<4;j++)
+	    {
+	      b+=u1[i]*u1[j]*gg[i][j];
+	    }
 	}
-      c=gg[0][0]*gammamax*gammamax+1.;
-      delta=b*b-4.*a*c;
+
+      correct=0;
+      if(-1./(gg[0][0]+a+b)<0.)
+	correct=1;
+     	  
+      if(correct==0) return 0; //everything is fine
+    }
+  else if(whichvel==VELR)
+    {
+      ldouble qsq=0.;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=u1[i]*u1[j]*gg[i][j];
+      ldouble gamma2=1.+qsq;
+      ldouble alpha2=-1./GG[0][0];
       
-      Afac= (-b+sqrtl(delta))/2./a;
-
-      u2[0]=gammamax;
-      u2[1]=Afac*u1[1];
-      u2[2]=Afac*u1[2];
-      u2[3]=Afac*u1[3];
-
-      print_4vector(u1);
-      print_4vector(u2);
-      getchar();
-
-      //converting to VELPRIM
-      conv_vels(u2,u2,VEL4,VELPRIM,gg,GG);
-
-      //back to primitives
-      pp[2]=u2[1];
-      pp[3]=u2[2];
-      pp[4]=u2[3];
-
-      //to let the others know to correct conserved
-      return -1;
+      correct=0;
+      if(gamma2/alpha2<0.)
+	correct=1;
+     	  
+      if(correct==0) return 0; //everything is fine
+    }
+  else
+    {
+      my_err("VEL not implemented in check_floors_hd()\n");
     }
 
-  return 0;
+  //correcting and imposing gammamax keeping the direction given by spatial components
+  ldouble Afac;
+  ldouble gammamax=100.;
+  c=0.; b=0.;
+  for(i=1;i<4;i++)
+    {
+      a+=u1[i]*u1[i]*gg[i][i];
+      b+=2.*u1[i]*gg[0][i]*gammamax;
+    }
+  c=gg[0][0]*gammamax*gammamax+1.;
+  delta=b*b-4.*a*c;
+      
+  Afac= (-b+sqrtl(delta))/2./a;
 
+  u2[0]=gammamax;
+  u2[1]=Afac*u1[1];
+  u2[2]=Afac*u1[2];
+  u2[3]=Afac*u1[3];
 
+  print_4vector(u1);
+  print_4vector(u2);
+  getchar();
+
+  //converting to VELPRIM
+  conv_vels(u2,u2,whichvel,VELPRIM,gg,GG);
+
+  //back to primitives
+  pp[2]=u2[1];
+  pp[3]=u2[2];
+  pp[4]=u2[3];
+
+  //to let the others know to correct conserved
+  return -1;
 }
 
 

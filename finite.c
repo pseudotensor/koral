@@ -453,8 +453,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       pick_gb(ix+1,iy,iz,0,gr);
       pick_Gb(ix+1,iy,iz,0,Gr);
 
-      u2p_check_floors_hd(fd_pl,gl,Gl);
-      u2p_check_floors_hd(fd_pr,gr,Gr);
+      check_floors_hd(fd_pl,VELPRIM,gl,Gl);
+      check_floors_hd(fd_pr,VELPRIM,gr,Gr);
       //end of floor section
   	      
       f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
@@ -511,8 +511,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	  pick_gb(ix,iy+1,iz,1,gr);
 	  pick_Gb(ix,iy+1,iz,1,Gr);
 
-	  u2p_check_floors_hd(fd_pl,gl,Gl);
-	  u2p_check_floors_hd(fd_pr,gr,Gr);
+	  check_floors_hd(fd_pl,VELPRIM,gl,Gl);
+	  check_floors_hd(fd_pr,VELPRIM,gr,Gr);
 	  //end of floor section
 
 	  f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
@@ -570,8 +570,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	  pick_gb(ix,iy,iz+1,2,gr);
 	  pick_Gb(ix,iy,iz+1,2,Gr);
 
-	  u2p_check_floors_hd(fd_pl,gl,Gl);
-	  u2p_check_floors_hd(fd_pr,gr,Gr);
+	  check_floors_hd(fd_pl,VELPRIM,gl,Gl);
+	  check_floors_hd(fd_pr,VELPRIM,gr,Gr);
 	  //end of floor section
 
 	  f_flux_prime(fd_pl,2,ix,iy,iz,ffl);

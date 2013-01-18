@@ -103,6 +103,9 @@ ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
 	      pp[0]=rho; pp[1]=uint; pp[4]=Vphi; pp[2]=-Vr; pp[3]=0.;
 	      pp[5]=calc_Sfromu(pp[0],pp[1]);
 
+//testing if interpolated primitives make sense
+check_floors_hd(pp,VEL3,gg,GG);
+//end of floor section
 
 //converting from 3vel to relative velocity
 conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
