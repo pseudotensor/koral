@@ -18,7 +18,7 @@
 #define GAMMA (1.4)
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
-#define BEAMNO 3
+#define BEAMNO 1
 #define IFBEAM 1
 //#define GASRADOFF
 //#define RADSOURCEOFF
