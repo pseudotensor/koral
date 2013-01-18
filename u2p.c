@@ -87,11 +87,15 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
   if(ret<0.)
     hdcorr=1;
 
+  //************************************
+  //************************************
   //checking on hd floors
   ret=u2p_check_floors_hd(pp,gg,GG);
 
   if(ret<0.)
     hdcorr=1;
+  //************************************
+  //************************************
 
 
 
