@@ -1,13 +1,13 @@
 #define TMAX 1.e10
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
-#define MINKOWSKI
+//#define MINKOWSKI
 //#define CYLINDRICAL
 //#define SPHERICAL
-//#define SCHWARZSCHILD
-#define NX 20
+#define SCHWARZSCHILD
+#define NX 30
 #define NY 1
-#define NZ 20
+#define NZ 60
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
 #define RK3STEPPING
@@ -19,7 +19,7 @@
 #define GAMMA (1.4)
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
-#define BEAMNO 4
+#define BEAMNO 2
 #define IFBEAM 1
 //#define GASRADOFF
 //#define RADSOURCEOFF
@@ -56,13 +56,13 @@
 #define MINY .99*Pi/2.
 #define MAXY 1.01*Pi/2.
 #define MINZ 0.
-#define MAXZ Pi/6.//8.*Pi/4.
+#define MAXZ Pi/4.//8.*Pi/4.
 #define RHOFLOOR 1.e-50
 #define UFLOOR 1.e-65
 #define EFLOOR 1.e-40
 #define TAMB 1e7
 #define TLEFT 1e8
-#define NLEFT 0.999
+#define NLEFT 0.98
 #define RHOAMB 1.e0
 #define KAPPA 0.
 #define SPECIFIC_BC

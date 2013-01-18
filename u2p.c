@@ -1042,8 +1042,8 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 
    if(gammarel2<0. || gammarel2>gammamax*gammamax || delta<0.) 
     {
-      //top cap
       printf("topcap\n");
+      //top cap
       *corrected=1;
       urfcon[0]=gammamax;
       
@@ -1076,7 +1076,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
       //converting to relative four velocity
       conv_vels(urfcon,urfcon,VEL4,VELR,gg,GG);
     }
-  else if(gammarel2<1.)
+   else if(gammarel2<(-1./GG[0][0]))
     {
       printf("lowcap\n");
       //low cap

@@ -21,7 +21,7 @@
 //16 RADPULSE3D - radiative blob spreading around
 //17 RADDBLSHADOW - radiative shadow with two beams inclined
 
-#define PROBLEM 3
+#define PROBLEM 1
 
 #if(PROBLEM==1)
 
@@ -385,4 +385,4 @@
 
 #define GMC2CM (MASSCM) //gravitational radius in cm
 
-#define VELPRIM VEL3
+#define VELPRIM VELR
