@@ -98,7 +98,7 @@ int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
   urf[3]=p[9];
 
   //converting to lab four-velocity
-  conv_vels(urf,urf,VELR,VEL4,g,G);
+  conv_vels(urf,urf,VELPRIMRAD,VEL4,g,G);
   
   ldouble Rtop[4];
   Rtop[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*G[0][0]; //R^t_t

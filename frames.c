@@ -109,6 +109,7 @@ print_state_prad_zamo2ff (int iter, ldouble *x, ldouble *f)
 
 int prad_zamo2ff(ldouble *ppzamo, ldouble *ppff, ldouble gg[][5], ldouble eup[][4])
 {
+
   ldouble pp0[NV],pp[NV];
   ldouble J[4][4],iJ[4][4];
   ldouble x[4],f1[4],f2[4],f3[4];
@@ -230,7 +231,7 @@ calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   ucon[1]=pp[2];
   ucon[2]=pp[3];
   ucon[3]=pp[4];
-  conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   //covariant four-velocity
   indices_21(ucon,ucov,gg);  
 
@@ -283,7 +284,7 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   wcon[1]=pp[2];
   wcon[2]=pp[3];
   wcon[3]=pp[4];
-  conv_vels(wcon,wcon,VELR,VEL4,gg,GG);
+  conv_vels(wcon,wcon,VELPRIM,VEL4,gg,GG);
   //covariant four-velocity
   indices_21(wcon,wcov,gg);  
  

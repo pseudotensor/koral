@@ -1112,6 +1112,8 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	}
       urfcon[0]=0.;
     }
+
+   conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
   
   //new primitives
   pp[6]=Erf;
@@ -1170,7 +1172,7 @@ u2p_rad_labfluxes(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int
   urf[3]=3./(4.*Erf*urf[0])*(A[3]-1./3.*Erf*GG[0][3]);
 
   //converting to three velocity
-  conv_vels(urf,urf,VEL4,VELR,gg,GG);
+  //  conv_vels(urf,urf,VEL4,VELR,gg,GG);
 
   //reading primitives
   pp[6]=Erf;

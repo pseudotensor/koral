@@ -403,6 +403,7 @@ free_arrays()
 int
 inverse_44matrix(ldouble a[][4], ldouble ia[][4])
 {
+
   ldouble mat[16],dst[16];
   int i,j;
   for(i=0;i<4;i++)

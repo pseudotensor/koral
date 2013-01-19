@@ -586,7 +586,7 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   urfcon[2]=pp[8];
   urfcon[3]=pp[9];
   //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELR,VEL4,gg,GG);
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
  
   //lab frame stress energy tensor:
   for(i=0;i<4;i++)
@@ -730,7 +730,7 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
   urfcon[3]=pp[9];
 
   //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELR,VEL4,gg,GG);
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
 
   //square of radiative wavespeed in radiative rest frame
   ldouble rv2 = 1./3.;

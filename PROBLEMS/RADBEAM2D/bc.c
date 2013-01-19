@@ -49,6 +49,8 @@ int iix,iiy,iiz,iv;
       prad_ff2lab(pp,pp,gg,GG,tlo);
 
       //if(Fz>0.) print_Nvector(pp,NV);
+      pp[7]=0.;
+      pp[8]=0.;
 
       p2u(pp,uu,gg,GG);
 
