@@ -7,7 +7,7 @@
 #define SCHWARZSCHILD
 #define NX 30
 #define NY 1
-#define NZ 60
+#define NZ 30
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
 #define RK3STEPPING
@@ -19,7 +19,7 @@
 #define GAMMA (1.4)
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
-#define BEAMNO 2
+#define BEAMNO 1
 #define IFBEAM 1
 //#define GASRADOFF
 //#define RADSOURCEOFF
