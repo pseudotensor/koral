@@ -335,7 +335,7 @@ int print_tensor(ldouble T[][4]);
 int print_metric(ldouble T[][5]);
 int print_4vector(ldouble v[4]);
 int print_Nvector(ldouble v[4],int);
-int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble eup[][4]);
+int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble elo[][4]);
 int prad_ff2zamo(ldouble *pp1, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]);
 
 //rad.c

@@ -79,7 +79,7 @@ pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz;
 
-prad_zamo2ff(pp,pp,gg,eup);
+prad_zamo2ff(pp,pp,gg,GG,eup);
 prad_ff2lab(pp,pp,gg,GG,tlo);
 
 p2u(pp,uu,gg,GG);

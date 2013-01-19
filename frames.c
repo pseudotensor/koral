@@ -80,6 +80,30 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   return 0;
 } 
 
+/***********************************************************************/
+/******radiative primitives (E,F^i) fluid frame -> (E,F^i) in ZAMO *********/
+/***********************************************************************/
+int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4])
+{
+  ldouble Rij[4][4];
+  int i,j;
+
+  //infact, closure in ZAMO flat space
+  calc_Rij_ff(pp1,Rij);
+  boost22_zamo2ff(Rij,Rij,pp1,gg,eup);
+
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+
+  //(E,F^i)_ff
+  pp2[6]=Rij[0][0];
+  pp2[7]=Rij[0][1];
+  pp2[8]=Rij[0][2];
+  pp2[9]=Rij[0][3];
+
+  return 0;
+} 
+
 /*****************************************************************/
 /********** (E,F^i) ZAMO -> (E,F^i) fluid frame ********************/
 /*****************************************************************/
@@ -107,7 +131,7 @@ print_state_prad_zamo2ff (int iter, ldouble *x, ldouble *f)
   return 0;
 }
 
-int prad_zamo2ff(ldouble *ppzamo, ldouble *ppff, ldouble gg[][5], ldouble eup[][4])
+int prad_zamo2ff_num(ldouble *ppzamo, ldouble *ppff, ldouble gg[][5],ldouble GG[][5], ldouble eup[][4])
 {
 
   ldouble pp0[NV],pp[NV];

@@ -45,12 +45,12 @@ int iix,iiy,iiz,iv;
       pp[8]=Fy;
       pp[9]=Fz;
 
-      prad_zamo2ff(pp,pp,gg,eup);
+      prad_zamo2ff(pp,pp,gg,GG,eup);
       prad_ff2lab(pp,pp,gg,GG,tlo);
 
       //if(Fz>0.) print_Nvector(pp,NV);
-      pp[7]=0.;
-      pp[8]=0.;
+      //      pp[7]=0.;
+      //pp[8]=0.;
 
       p2u(pp,uu,gg,GG);
 
@@ -193,9 +193,9 @@ int iix,iiy,iiz,iv;
       pp[8]=get_u(p,8,iix,iiy,iiz);
       pp[9]=get_u(p,9,iix,iiy,iiz);
       */
-     prad_zamo2ff(pp,pp,gg,eup);
-prad_ff2lab(pp,pp,gg,GG,tlo);
- p2u(pp,uu,gg,GG);
+      prad_zamo2ff(pp,pp,gg,GG,eup);
+      prad_ff2lab(pp,pp,gg,GG,tlo);
+      p2u(pp,uu,gg,GG);
       return 0;
     }
  
