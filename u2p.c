@@ -1003,7 +1003,7 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5])
 //**********************************************************************
 //**********************************************************************
 int
-u2p_rad_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
+u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
 {
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
@@ -1129,7 +1129,7 @@ u2p_rad_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
 //**********************************************************************
 //**********************************************************************
 int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int *corrected)
+u2p_rad_labfluxes(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int *corrected)
 {
   int verbose=0;
   ldouble Rij[4][4];
