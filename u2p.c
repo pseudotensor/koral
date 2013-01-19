@@ -1003,7 +1003,7 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5])
 //**********************************************************************
 //**********************************************************************
 int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
+u2p_rad_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
 {
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
@@ -1118,6 +1118,65 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   pp[7]=urfcon[1];
   pp[8]=urfcon[2];
   pp[9]=urfcon[3];
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//basic conserved to primitives solver for radiation
+//uses M1 closure in arbitrary frame/metric
+//**********************************************************************
+//**********************************************************************
+int
+u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int *corrected)
+{
+  int verbose=0;
+  ldouble Rij[4][4];
+
+  //R^0mu
+  ldouble A[4]={uu[6],uu[7],uu[8],uu[9]};
+  //indices up
+  indices_12(A,A,GG);
+
+  //covariant formulation
+  
+  //g_munu R^0mu R^0nu
+  ldouble gRR=gg[0][0]*A[0]*A[0]+gg[0][1]*A[0]*A[1]+gg[0][2]*A[0]*A[2]+gg[0][3]*A[0]*A[3]+
+    gg[1][0]*A[1]*A[0]+gg[1][1]*A[1]*A[1]+gg[1][2]*A[1]*A[2]+gg[1][3]*A[1]*A[3]+
+    gg[2][0]*A[2]*A[0]+gg[2][1]*A[2]*A[1]+gg[2][2]*A[2]*A[2]+gg[2][3]*A[2]*A[3]+
+    gg[3][0]*A[3]*A[0]+gg[3][1]*A[3]*A[1]+gg[3][2]*A[3]*A[2]+gg[3][3]*A[3]*A[3];
+ 
+  //the quadratic equation for u^t of the radiation rest frame (urf[0])
+  ldouble a,b,c;
+  a=16.*gRR;
+  b=8.*(gRR*GG[0][0]+A[0]*A[0]);
+  c=gRR*GG[0][0]*GG[0][0]-A[0]*A[0]*GG[0][0];
+  ldouble delta=b*b-4.*a*c;
+  ldouble urf[4],Erf;
+  urf[0]=sqrtl((-b-sqrtl(delta))/2./a);
+  if(isnan(urf[0])) 
+    {
+      my_err("top cap should be imposed\n");
+      urf[0]=1.;
+    }
+
+  //radiative energy density in the radiation rest frame
+  Erf=3.*A[0]/(4.*urf[0]*urf[0]+GG[0][0]);
+
+  //four-velocity of the rest frame
+  urf[1]=3./(4.*Erf*urf[0])*(A[1]-1./3.*Erf*GG[0][1]);
+  urf[2]=3./(4.*Erf*urf[0])*(A[2]-1./3.*Erf*GG[0][2]);
+  urf[3]=3./(4.*Erf*urf[0])*(A[3]-1./3.*Erf*GG[0][3]);
+
+  //converting to three velocity
+  conv_vels(urf,urf,VEL4,VELR,gg,GG);
+
+  //reading primitives
+  pp[6]=Erf;
+  pp[7]=urf[1];
+  pp[8]=urf[2];
+  pp[9]=urf[3];
 
   return 0;
 }

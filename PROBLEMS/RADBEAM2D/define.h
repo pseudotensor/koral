@@ -62,7 +62,7 @@
 #define EFLOOR 1.e-40
 #define TAMB 1e7
 #define TLEFT 1e8
-#define NLEFT 0.98
+#define NLEFT 0.99999
 #define RHOAMB 1.e0
 #define KAPPA 0.
 #define SPECIFIC_BC
