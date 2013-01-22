@@ -3,8 +3,8 @@
 #define RADIATION
 //#define MINKOWSKI
 //#define CYLINDRICAL
-#define SPHERICAL
-//#define SCHWARZSCHILD
+//#define SPHERICAL
+#define SCHWARZSCHILD
 #define NX 30
 #define NY 1
 #define NZ 30
@@ -61,8 +61,8 @@
 #define UFLOOR 1.e-65
 #define EFLOOR 1.e-40
 #define TAMB 1e7
-#define TLEFT 1e8
-#define NLEFT 0.99
+#define TLEFT 1e9
+#define NLEFT 0.999
 #define RHOAMB 1.e0
 #define KAPPA 0.
 #define SPECIFIC_BC

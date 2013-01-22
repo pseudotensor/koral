@@ -12,23 +12,11 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   int i,j;
 
   int verbose=0;
-  if(fabsl(pp1[2])>0.) verbose=1;
- if(verbose) printf("poczatek prad_ff2lab\n");
  
- 
-  if(verbose) print_Nvector(pp1,NV);
-  calc_Rij_ff(pp1,Rij);
-  if(verbose) print_tensor(Rij);
-  trans22_on2cc(Rij,Rij,tlo);
-  if(verbose) print_tensor(tlo);
-  if(verbose) print_tensor(Rij);
-  boost22_ff2lab(Rij,Rij,pp1,gg,GG);
-
-  if(verbose) print_tensor(Rij);
-  indices_2221(Rij,Rij,gg);
-  if(verbose) print_tensor(Rij);
-  if(verbose) printf("koniec prad_ff2lab\n");
-  if(verbose) getchar();
+  calc_Rij_ff(pp1,Rij);  
+  trans22_on2cc(Rij,Rij,tlo);  
+  boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
+  indices_2221(Rij,Rij,gg);  
 
   for(i=0;i<NVHD;i++)
     pp2[i]=pp1[i];
@@ -41,7 +29,7 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
 
   //convert to real primitives
   int corrected;
-  //u2p_rad(pp2,pp2,gg,GG,&corrected);
+  u2p_rad(pp2,pp2,gg,GG,&corrected);
 
   return 0;
 } 
