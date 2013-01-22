@@ -11,11 +11,24 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   ldouble Rij[4][4];
   int i,j;
 
+  int verbose=0;
+  if(fabsl(pp1[2])>0.) verbose=1;
+ if(verbose) printf("poczatek prad_ff2lab\n");
+ 
+ 
+  if(verbose) print_Nvector(pp1,NV);
   calc_Rij_ff(pp1,Rij);
-
+  if(verbose) print_tensor(Rij);
   trans22_on2cc(Rij,Rij,tlo);
+  if(verbose) print_tensor(tlo);
+  if(verbose) print_tensor(Rij);
   boost22_ff2lab(Rij,Rij,pp1,gg,GG);
+
+  if(verbose) print_tensor(Rij);
   indices_2221(Rij,Rij,gg);
+  if(verbose) print_tensor(Rij);
+  if(verbose) printf("koniec prad_ff2lab\n");
+  if(verbose) getchar();
 
   for(i=0;i<NVHD;i++)
     pp2[i]=pp1[i];
@@ -28,7 +41,7 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
 
   //convert to real primitives
   int corrected;
-  u2p_rad(pp2,pp2,gg,GG,&corrected);
+  //u2p_rad(pp2,pp2,gg,GG,&corrected);
 
   return 0;
 } 
@@ -759,8 +772,13 @@ boost22_zamo2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldou
   ldouble Tt[4][4];
 
   int verbose=0;
+  //debug
+  //  if(pp[2]<0.) verbose=1;
 
   if(verbose>0) print_tensor(eup);
+
+  if(verbose) printf("sqrtg: %Le %Le %Le %Le\n",sqrtl(-gg[0][0]),sqrtl(gg[1][1]),sqrtl(gg[2][2]),sqrtl(gg[3][3]));
+
   if(verbose>0) print_tensor(T1);
 
   //calculating the proper velocity of fluid as measured from ZAMO
@@ -801,6 +819,8 @@ boost22_zamo2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldou
   vpr[0]=-uzamo[1]/uzamo[0];
   vpr[1]=-uzamo[2]/uzamo[0];
   vpr[2]=-uzamo[3]/uzamo[0];
+
+  if(verbose) print_4vector(vpr);
 
   //Lorentz transformation matrix
   ldouble L[4][4];

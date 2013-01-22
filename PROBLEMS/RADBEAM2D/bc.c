@@ -45,8 +45,55 @@ int iix,iiy,iiz,iv;
       pp[8]=Fy;
       pp[9]=Fz;
 
+      if(Fz>0.)
+	{
+	  ldouble Rij[4][4];
+	  pp[2]=-0.1;
+	  print_Nvector(pp,NV);
+	  prad_zamo2ff(pp,pp,gg,GG,eup);
+	 
+	  print_Nvector(pp,NV);
+	  
+	  calc_Rij_ff(pp,Rij);
+	  print_tensor(Rij);
+	  trans22_on2cc(Rij,Rij,tlo);
+
+	  boost22_ff2zamo(Rij,Rij,pp,gg,eup);
+
+	  print_tensor(Rij);
+	  indices_2221(Rij,Rij,gg);
+	  print_tensor(Rij);
+	  getchar();
+
+	  /*
+
+
+	  pp[2]=-0.1;
+	  printf("ixyz : %d %d %d\n",ix,iy,iz);
+	  print_tensor(tlo);
+	  print_Nvector(pp,NV); 
+	  prad_zamo2ff(pp,pp,gg,GG,eup);
+	  print_Nvector(pp,NV); 
+	  prad_ff2zamo(pp,pp,gg,GG,eup);
+	  print_Nvector(pp,NV); 
+	  getchar();
+	  */
+
+
+	  pp[2]=-0.1;
+	  printf("ixyz : %d %d %d\n",ix,iy,iz);
+	  print_tensor(tlo);
+	  print_Nvector(pp,NV); 
+	  prad_zamo2ff(pp,pp,gg,GG,eup);
+	  print_Nvector(pp,NV); 
+	  prad_ff2lab(pp,pp,gg,GG,tlo);
+	  print_Nvector(pp,NV); 
+	  getchar();
+	}
+
       prad_zamo2ff(pp,pp,gg,GG,eup);
       prad_ff2lab(pp,pp,gg,GG,tlo);
+      
 
       //if(Fz>0.) print_Nvector(pp,NV);
       pp[7]=0.;
