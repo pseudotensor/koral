@@ -37,8 +37,9 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
       ldouble delta=b*b-4.*a*c;
       if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
       ut[0]=(-b-sqrtl(delta))/2./a;
-      if(ut[0]<1.) ut[0]=(-b+sqrtl(delta))/2./a;
-
+      //TODO: more strict criterion
+      if(ut[0]<0.) ut[0]=(-b+sqrtl(delta))/2./a;
+     
       for(i=1;i<4;i++) ut[i]=u1[i];      
     }
   /*************** VELR -> VELR ***************/

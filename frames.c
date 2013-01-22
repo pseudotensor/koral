@@ -79,7 +79,7 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   int i,j;
 
   calc_Rij_ff(pp1,Rij);
-  boost22_ff2zamo(Rij,Rij,pp1,gg,eup);
+  boost22_ff2zamo(Rij,Rij,pp1,gg,GG,eup);
 
   for(i=0;i<NVHD;i++)
     pp2[i]=pp1[i];
@@ -103,7 +103,7 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
 
   //infact, closure in ZAMO flat space
   calc_Rij_ff(pp1,Rij);
-  boost22_zamo2ff(Rij,Rij,pp1,gg,eup);
+  boost22_zamo2ff(Rij,Rij,pp1,gg,GG,eup);
 
   for(i=0;i<NVHD;i++)
     pp2[i]=pp1[i];
@@ -120,11 +120,11 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
 /*****************************************************************/
 /********** (E,F^i) ZAMO -> (E,F^i) fluid frame ********************/
 /*****************************************************************/
-int f_prad_zamo2ff(ldouble *ppff, ldouble *ppzamo, ldouble gg[][5], ldouble eup[][4],ldouble *f)
+int f_prad_zamo2ff(ldouble *ppff, ldouble *ppzamo, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4],ldouble *f)
 {
   ldouble Rij[4][4];
   calc_Rij_ff(ppff,Rij);
-  boost22_ff2zamo(Rij,Rij,ppff,gg,eup);
+  boost22_ff2zamo(Rij,Rij,ppff,gg,GG,eup);
 
   f[0]=-Rij[0][0]+ppzamo[6];
   f[1]=-Rij[0][1]+ppzamo[7];
@@ -166,7 +166,7 @@ int prad_zamo2ff_num(ldouble *ppzamo, ldouble *ppff, ldouble gg[][5],ldouble GG[
   if(verbose!=0)   print_Nvector(ppff,NV);
 
   //debug
-  f_prad_zamo2ff(ppzamo,pp,gg,eup,f1);
+  f_prad_zamo2ff(ppzamo,pp,gg,GG,eup,f1);
   for(i=0;i<4;i++)
     {
       x[i]=pp[i+6];
@@ -182,7 +182,7 @@ int prad_zamo2ff_num(ldouble *ppzamo, ldouble *ppff, ldouble gg[][5],ldouble GG[
 	}
 
       //valueas at zero state
-      f_prad_zamo2ff(pp,ppzamo,gg,eup,f1);
+      f_prad_zamo2ff(pp,ppzamo,gg,GG,eup,f1);
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -191,7 +191,7 @@ int prad_zamo2ff_num(ldouble *ppzamo, ldouble *ppff, ldouble gg[][5],ldouble GG[
 	    {
 	      pp[j+6]=pp[j+6]+EPS*pp[6];
 	    
-	      f_prad_zamo2ff(pp,ppzamo,gg,eup,f2);
+	      f_prad_zamo2ff(pp,ppzamo,gg,GG,eup,f2);
      
 	      J[i][j]=(f2[i] - f1[i])/(EPS*pp[6]);
 
@@ -556,7 +556,7 @@ boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
 /*****************************************************************/
 //A^i Lorentz boost ZAMO -> fluid frame
 int
-boost2_zamo2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble eup[][4])
+boost2_zamo2ff(ldouble* A1,ldouble* A2,ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble eup[][4])
 { 
   int i,j,k,l;
   ldouble At[4]   ;
@@ -569,31 +569,15 @@ boost2_zamo2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble e
   //calculating the proper velocity of fluid as measured from ZAMO
   ldouble ulab[4],uzamo[4],vpr[3];
 
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
+  ulab[0]=0.;
+  ulab[1]=pp[2];
+  ulab[2]=pp[3];
+  ulab[3]=pp[4];
 
-
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
-  if(ut2<0.) 
-    {
-      ut2=0.;
-     }
-  ldouble ut=sqrtl(ut2);
-
-  ulab[0]=ut;
-  ulab[1]=vr*ut;
-  ulab[2]=vth*ut;
-  ulab[3]=vph*ut;
-  
+  conv_vels(ulab,ulab,VELPRIM,VEL4,gg,GG);
+ 
   if(verbose>0) print_4vector(ulab);
-
+  
   //transforming 4-vector lab->zamo
   trans2_lab2zamo(ulab,uzamo,eup);
 
@@ -661,7 +645,7 @@ boost2_zamo2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble e
 /*****************************************************************/
 //A^i Lorentz boost fluid frame -> ZAMO
 int
-boost2_ff2zamo(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble eup[][4])
+boost2_ff2zamo(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble eup[][4])
 { 
   int i,j,k,l;
   ldouble At[4]   ;
@@ -674,29 +658,13 @@ boost2_ff2zamo(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble e
   //calculating the proper velocity of fluid as measured from ZAMO
   ldouble ulab[4],uzamo[4],vpr[3];
 
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
+  ulab[0]=0.;
+  ulab[1]=pp[2];
+  ulab[2]=pp[3];
+  ulab[3]=pp[4];
 
-
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
-  if(ut2<0.) 
-    {
-      ut2=0.;
-     }
-  ldouble ut=sqrtl(ut2);
-
-  ulab[0]=ut;
-  ulab[1]=vr*ut;
-  ulab[2]=vth*ut;
-  ulab[3]=vph*ut;
-  
+  conv_vels(ulab,ulab,VELPRIM,VEL4,gg,GG);
+ 
   if(verbose>0) print_4vector(ulab);
 
   //transforming 4-vector lab->zamo
@@ -766,7 +734,7 @@ boost2_ff2zamo(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble e
 /*****************************************************************/
 //T^ij Lorentz boost ZAMO -> fluid frame
 int
-boost22_zamo2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble eup[][4])
+boost22_zamo2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble eup[][4])
 { 
   int i,j,k,l;
   ldouble Tt[4][4];
@@ -784,30 +752,13 @@ boost22_zamo2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldou
   //calculating the proper velocity of fluid as measured from ZAMO
   ldouble ulab[4],uzamo[4],vpr[3];
 
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
+  ulab[0]=0.;
+  ulab[1]=pp[2];
+  ulab[2]=pp[3];
+  ulab[3]=pp[4];
 
-
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
-  if(ut2<0.) 
-    {
-      ut2=0.;
-    }
-
-  ldouble ut=sqrtl(ut2);
-
-  ulab[0]=ut;
-  ulab[1]=vr*ut;
-  ulab[2]=vth*ut;
-  ulab[3]=vph*ut;
-  
+  conv_vels(ulab,ulab,VELPRIM,VEL4,gg,GG);
+ 
   if(verbose>0) print_4vector(ulab);
 
   //transforming 4-vector lab->zamo
@@ -889,7 +840,7 @@ boost22_zamo2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldou
 /*****************************************************************/
 //T^ij Lorentz boost fluid frame -> ZAMO
 int
-boost22_ff2zamo(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble eup[][4])
+boost22_ff2zamo(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble eup[][4])
 { 
   int i,j,k,l;
   ldouble Tt[4][4];
@@ -902,28 +853,13 @@ boost22_ff2zamo(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldou
   //calculating the proper velocity of fluid as measured from ZAMO
   ldouble ulab[4],uzamo[4],vpr[3];
 
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
+  ulab[0]=0.;
+  ulab[1]=pp[2];
+  ulab[2]=pp[3];
+  ulab[3]=pp[4];
 
-  ldouble gtt=gg[0][0];
-  ldouble gtph=gg[0][3];
-  ldouble grr=gg[1][1];
-  ldouble gthth=gg[2][2];
-  ldouble gphph=gg[3][3];
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vth*vth*gthth + vph*vph*gphph );
-  if(ut2<0.) 
-    {
-      ut2=0.;
-    }
-  ldouble ut=sqrtl(ut2);
-
-  ulab[0]=ut;
-  ulab[1]=vr*ut;
-  ulab[2]=vth*ut;
-  ulab[3]=vph*ut;
-  
+  conv_vels(ulab,ulab,VELPRIM,VEL4,gg,GG);
+   
   if(verbose>0) print_4vector(ulab);
 
   //transforming 4-vector lab->zamo

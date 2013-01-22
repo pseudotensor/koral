@@ -3,8 +3,8 @@
 #define RADIATION
 //#define MINKOWSKI
 //#define CYLINDRICAL
-//#define SPHERICAL
-#define SCHWARZSCHILD
+#define SPHERICAL
+//#define SCHWARZSCHILD
 #define NX 30
 #define NY 1
 #define NZ 30

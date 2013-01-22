@@ -47,6 +47,75 @@ int iix,iiy,iiz,iv;
 
       if(Fz>0.)
 	{
+	  
+	  
+
+	  
+	  ldouble Rij[4][4];
+	  pp[2]=0.7;
+
+	  /*
+	  //test of boosting 4 velocity
+	  ldouble u1[4]={0.,0.7,0.,0.};
+	  conv_vels(u1,u1,VELPRIM,VEL4,gg,GG);
+	  print_4vector(u1);
+	  //boost2_lab2ff(u1,u1,pp,gg,GG);
+	  //trans2_cc2on(u1,u1,tup);
+	  //trans2_lab2zamo(u1,u1,eup);
+	  trans2_cc2on(u1,u1,tup);
+	  boost2_zamo2ff(u1,u1,pp,gg,GG,eup);
+	  print_4vector(u1);
+	  
+	  getchar();
+	  */
+
+
+	  pp[7]=0.7;
+	  pp[9]=0.;
+	  print_Nvector(pp,NV);
+	  calc_Rij(pp,gg,GG,Rij);
+	  print_tensor(Rij);
+
+	  boost22_lab2ff(Rij,Rij,pp,gg,GG);
+	  trans22_cc2on(Rij,Rij,tup);
+
+	  print_tensor(Rij);
+
+	  trans22_on2cc(Rij,Rij,tlo);
+	  boost22_ff2lab(Rij,Rij,pp,gg,GG);
+
+	  print_tensor(Rij);
+	  
+	  boost22_lab2ff(Rij,Rij,pp,gg,GG);
+	  trans22_lab2zamo(Rij,Rij,eup);
+	  //	  trans22_cc2on(Rij,Rij,tup);
+	  //	  boost22_zamo2ff(Rij,Rij,pp,gg,eup);
+	 
+	  print_tensor(Rij);
+	  
+	  //boost22_ff2zamo(Rij,Rij,pp,gg,eup);
+	  //	  trans22_on2cc(Rij,Rij,tlo);
+	  trans22_zamo2lab(Rij,Rij,elo);
+	  boost22_ff2lab(Rij,Rij,pp,gg,GG);
+
+	  print_tensor(Rij);
+
+	  trans22_lab2zamo(Rij,Rij,eup);
+	  boost22_zamo2ff(Rij,Rij,pp,gg,GG,eup);
+	 
+	  print_tensor(Rij);
+	  
+	  boost22_ff2zamo(Rij,Rij,pp,gg,GG,eup);
+	  trans22_zamo2lab(Rij,Rij,elo);
+	 
+	  print_tensor(Rij);
+	  //	  trans22_on2cc(Rij,Rij,tlo);
+	  //	  boost22_ff2lab(Rij,Rij,pp,gg,GG);
+	  //	  print_tensor(Rij);
+	  getchar();
+	  
+
+	  /*
 	  ldouble Rij[4][4];
 	  pp[2]=-0.1;
 	  print_Nvector(pp,NV);
@@ -64,6 +133,7 @@ int iix,iiy,iiz,iv;
 	  indices_2221(Rij,Rij,gg);
 	  print_tensor(Rij);
 	  getchar();
+	  */
 
 	  /*
 
