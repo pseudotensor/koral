@@ -1035,15 +1035,21 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	      xx[2]=get_x(iy,1);
 	      xx[3]=get_x(iz,2);
 	      calc_g(xx,gloc);
-	      dx=fabs(get_xb(ix,0)-get_xb(ix-1,0))*sqrt(gloc[1][1]);
-	      dy=fabs(get_xb(iy,1)-get_xb(iy-1,1))*sqrt(gloc[2][2]);
-	      dz=fabs(get_xb(iz,2)-get_xb(iz-1,2))*sqrt(gloc[3][3]);
+
+	      dx=fabs(get_xb(ix,0)-get_xb(ix-1,0));
+	      dy=fabs(get_xb(iy,1)-get_xb(iy-1,1));
+	      dz=fabs(get_xb(iz,2)-get_xb(iz-1,2));
+
 	      if((dx<mdx || mdx<0.)) mdx=dx;
 	      if((dy<mdx || mdy<0.)) mdy=dy;
 	      if((dz<mdx || mdz<0.)) mdz=dz;
+	      
+	      //unused
+	      /*
 	      if((dx/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dx/sqrt(-gloc[0][0]);
 	      if((dy/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dy/sqrt(-gloc[0][0]);
 	      if((dz/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dz/sqrt(-gloc[0][0]);
+	      */
 	    }
 	}
     }  

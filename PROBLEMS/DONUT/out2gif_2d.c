@@ -47,8 +47,8 @@
 	  "set tmargin at screen .92\n"
 	  "set size .5,1\n"
 	  "set autoscale\n"
-	  "set xrange [%Lf:%Lf]\n"
-	  "set yrange [%Lf:%Lf]\n"
+	  "set xrange [%f:%f]\n"
+	  "set yrange [%f:%f]\n"
 	  "unset log cb\n"
 	  //	  "set cbrange [0.005:.35]\n"
 	  "set ylabel \"y\"\n"
@@ -105,7 +105,7 @@
 	  "unset tics\n"
 	  "unset border\n"
 	  "unset log cb\n"
-	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($16*sin($2)+$17*cos($2))/(%Lf)):(($17*sin($2)+$16*cos($2))/(%Lf)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($16*sin($2)+$17*cos($2))/(%f)):(($17*sin($2)+$16*cos($2))/(%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
 
 	  "set table \"table.gp\"\n"
