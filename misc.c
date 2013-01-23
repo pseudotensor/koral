@@ -531,14 +531,14 @@ getch()
 ldouble
 r_horizon_BL(ldouble a)
 {
-  return 1.+sqrtl(1-a*a);
+  return 1.+sqrt(1-a*a);
 }
 
 //returns location of the co-rotating marginally bound orbit in BL
 ldouble
 r_mbound_BL(ldouble a)
 {
-  return 2.*(1.-a/2.+sqrtl(1.-a));
+  return 2.*(1.-a/2.+sqrt(1.-a));
 }
 
 //returns location of the photon orbit in BL

@@ -45,7 +45,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
   if(u2pret<0) 
     {
       if(verbose>0)
-	printf("u2p_hot err  >>> %d <<< %Le %Le\n",u2pret,pp[0],pp[1]);
+	printf("u2p_hot err  >>> %d <<< %e %e\n",u2pret,pp[0],pp[1]);
       
       //************************************
       //entropy solver - conserving entropy
@@ -54,12 +54,12 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
       //************************************
 
       if(verbose>0)
-	  printf("u2p_entr     >>> %d <<< %Le > %Le\n",u2pret,u0,pp[1]);
+	  printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
 
       if(u2pret<0)
 	{
 	  if(verbose>0)
-	    printf("u2p_entr err > %Le %Le\n",pp[0],pp[1]);
+	    printf("u2p_entr err > %e %e\n",pp[0],pp[1]);
 	
 	  //************************************
 	  //cold RHD - assuming u=SMALL
@@ -70,7 +70,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 	  if(u2pret<0)
 	    {
 	      if(verbose>0)
-		printf("u2p_cold err > %Le %Le\n",pp[0],pp[1]);
+		printf("u2p_cold err > %e %e\n",pp[0],pp[1]);
 	
 	      //************************************
 	      //leaving unchanged primitives - should not happen
@@ -153,8 +153,8 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 	correct=1;
       else
 	{
-	  u1[0]=(-b-sqrtl(delta))/2./a;
-	  if(u1[0]<1.) u1[0]=(-b+sqrtl(delta))/2./a;
+	  u1[0]=(-b-sqrt(delta))/2./a;
+	  if(u1[0]<1.) u1[0]=(-b+sqrt(delta))/2./a;
 	  if(u1[0]<1.) 
 	    correct=1;
 	}
@@ -226,7 +226,7 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
   c=gg[0][0]*gammamax*gammamax+1.;
   delta=b*b-4.*a*c;
       
-  Afac= (-b+sqrtl(delta))/2./a;
+  Afac= (-b+sqrt(delta))/2./a;
 
   u2[0]=gammamax;
   u2[1]=Afac*u1[1];
@@ -239,7 +239,7 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
   /*
   print_4vector(u1);
   print_4vector(u2);
-  printf("which: %d det: %Le\n",whichvel,dot(u2,u1));
+  printf("which: %d det: %e\n",whichvel,dot(u2,u1));
   //  getchar();
   */
 
@@ -313,7 +313,7 @@ f_u2p_hot_gsl(const gsl_vector * x, void *params,
       my_err("ut2.lt.0 in f_u2p_hot_gsl\n"); ut2=0.;
     }
 
-  ldouble ut=sqrtl(ut2);
+  ldouble ut=sqrt(ut2);
   ldouble rhout = rho*ut;
   ldouble Sut;
 
@@ -424,7 +424,7 @@ f_u2p_hot(ldouble W, ldouble* cons)
   ldouble Qt2=cons[1];
   ldouble D=cons[2];
 
-  return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrtl(1.-Qt2/W/W);   
+  return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrt(1.-Qt2/W/W);   
 }
 
 int
@@ -437,7 +437,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
   
   //alpha
-  alpha=sqrtl(-1./GG[0][0]);
+  alpha=sqrt(-1./GG[0][0]);
 
   //D
   D=uu[0]*alpha;
@@ -494,7 +494,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       qsq+=utcon[i]*utcon[j]*gg[i][j];
   ldouble gamma2=1.+qsq;
   W=(rho+GAMMA*u)*gamma2;
-  if(verbose) printf("initail W:%Le\n",W);
+  if(verbose) printf("initail W:%e\n",W);
  
   //test if does not provide reasonable gamma2
   if(W*W<Qt2)
@@ -508,7 +508,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
   ldouble cons[3]={Qn,Qt2,D};
-  if(verbose) printf("in:%Le %Le %Le\n",Qn,Qt2,D);
+  if(verbose) printf("in:%e %e %e\n",Qn,Qt2,D);
 
   int iter=0;
   do
@@ -520,7 +520,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       f1=f_u2p_hot(W*(1.+EPS),cons);
       dfdW=(f1-f0)/(EPS*W);
 
-      if(verbose) printf("%d %Le %Le %Le %Le\n",iter,W,f0,f1,dfdW);
+      if(verbose) printf("%d %e %e %e %e\n",iter,W,f0,f1,dfdW);
 
       if(dfdW==0.) {W*=1.1; continue;}
       W-=f0/dfdW;
@@ -533,13 +533,13 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       return -1;
     }
   
-  if(isnan(W) || isinf(W)) {if(verbose)printf("nan/inf W: %Le\n",W); getchar();}
-  if(verbose) {printf("the end: %Le\n",W); }
+  if(isnan(W) || isinf(W)) {if(verbose)printf("nan/inf W: %e\n",W); getchar();}
+  if(verbose) {printf("the end: %e\n",W); }
 
   //W found, let's calculate v2 and the rest
   ldouble v2=Qt2/W/W;
   gamma2=1./(1.-v2);
-  gamma=sqrtl(gamma2);
+  gamma=sqrt(gamma2);
   rho=D/gamma;
   u=1./GAMMA*(W/gamma2-rho);
   utcon[0]=0.;
@@ -629,7 +629,6 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
     ut2=ut*ut;
     S=Sut/ut;
    
-    //for some reason powl sometimes breaks
     uu=(ldouble)pow((pow(rho,1./GAMMAM1+1.)*exp(Sut/rhout)),GAMMAM1)/GAMMAM1;
  
     fff2=ut2*(uu*GAMMA + rho);  
@@ -674,7 +673,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
     if(iter>itmax && err>conv) 
       {
 	printf("iter exceeded in u2p_entr \n");
-	printf(" entr  iter %d> %Le [%Le] %Le >%Le< %Le\n",iter,rho,rhop1,diffrho/rho,fval,err);
+	printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
 	return -1;
       }
 
@@ -694,7 +693,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 
   if(uu<0. || rho<0. || isnan(rho))
     {
-      printf("u2p_entr didn't work: %Le %Le\n",uu,rho);
+      printf("u2p_entr didn't work: %e %e\n",uu,rho);
       print_Nvector(uuu,NV);
       return -1;
     }
@@ -804,9 +803,9 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   b=8.*(gRR*GG[0][0]+Av[0]*Av[0]);
   c=gRR*GG[0][0]*GG[0][0]-Av[0]*Av[0]*GG[0][0];
   delta=b*b-4.*a*c;
-  gamma2=  (-b-sqrtl(delta))/2./a;
+  gamma2=  (-b-sqrt(delta))/2./a;
   //if unphysical try the other root
-  if(gamma2<0.) gamma2=  (-b+sqrtl(delta))/2./a; 
+  if(gamma2<0.) gamma2=  (-b+sqrt(delta))/2./a; 
 
   //cap on u^t
   ldouble gammamax=1000.;
@@ -840,7 +839,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	}
       c=gg[0][0]*gammamax*gammamax+1.;
       delta=b*b-4.*a*c;
-      Afac= (-b+sqrtl(delta))/2./a;
+      Afac= (-b+sqrt(delta))/2./a;
 
       urfcon[0]=gammamax;
       urfcon[1]=Afac*Arad[1];
@@ -862,7 +861,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
       //calculating time component of lab 4-vel
       ldouble gammarel=1.0;
       ldouble urflab[4];
-      ldouble alpha = sqrtl(-1./GG[0][0]);
+      ldouble alpha = sqrt(-1./GG[0][0]);
       urflab[0]=gammarel/alpha;
 
       //radiative energy density in the radiation rest frame
@@ -871,13 +870,13 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   else
     {
       //regular calculation
-      urfcon[0]=sqrtl(gamma2);
+      urfcon[0]=sqrt(gamma2);
     
       //radiative energy density in the radiation rest frame
       Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
       
       //relative velocity
-      ldouble alpha=sqrtl(-1./GG[0][0]);
+      ldouble alpha=sqrt(-1./GG[0][0]);
       ldouble gamma=urfcon[0]*alpha;
       for(i=1;i<4;i++)
 	{	  
@@ -930,7 +929,7 @@ u2p_rad_labfluxes(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int
   c=gRR*GG[0][0]*GG[0][0]-A[0]*A[0]*GG[0][0];
   ldouble delta=b*b-4.*a*c;
   ldouble urf[4],Erf;
-  urf[0]=sqrtl((-b-sqrtl(delta))/2./a);
+  urf[0]=sqrt((-b-sqrt(delta))/2./a);
   if(isnan(urf[0])) 
     {
       my_err("top cap should be imposed\n");

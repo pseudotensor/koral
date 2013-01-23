@@ -125,8 +125,8 @@ int f_prad_zamo2ff(ldouble *ppff, ldouble *ppzamo, ldouble gg[][5], ldouble GG[]
 int
 print_state_prad_zamo2ff (int iter, ldouble *x, ldouble *f)
 {
-  printf ("iter = %3d x = % .3Le % .3Le % .3Le % .3Le "
-	  "f(x) = % .3Le % .3Le % .3Le % .3Le\n",
+  printf ("iter = %3d x = % .3e % .3e % .3e % .3e "
+	  "f(x) = % .3e % .3e % .3e % .3e\n",
 	  iter,
 	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
   return 0;
@@ -264,7 +264,7 @@ calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
 
   //four velocity of the lab frame
   ldouble wcon[4],wcov[4];
-  wcon[0]=1./sqrtl(-gg[0][0]);
+  wcon[0]=1./sqrt(-gg[0][0]);
   wcon[1]=wcon[2]=wcon[3]=0.;
   indices_21(wcon,wcov,gg);
 
@@ -317,7 +317,7 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
 
   //four velocity of the lab frame
   ldouble ucon[4],ucov[4];
-  ucon[0]=1./sqrtl(-gg[0][0]);
+  ucon[0]=1./sqrt(-gg[0][0]);
   ucon[1]=ucon[2]=ucon[3]=0.;
   indices_21(ucon,ucov,gg);
 
@@ -733,7 +733,7 @@ boost22_zamo2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldou
 
   if(verbose>0) print_tensor(eup);
 
-  if(verbose) printf("sqrtg: %Le %Le %Le %Le\n",sqrtl(-gg[0][0]),sqrtl(gg[1][1]),sqrtl(gg[2][2]),sqrtl(gg[3][3]));
+  if(verbose) printf("sqrtg: %e %e %e %e\n",sqrt(-gg[0][0]),sqrt(gg[1][1]),sqrt(gg[2][2]),sqrt(gg[3][3]));
 
   if(verbose>0) print_tensor(T1);
 
@@ -1297,7 +1297,7 @@ print_tensor(ldouble T[][4])
   int i;
   printf("============\n");
   for(i=0;i<4;i++)
-    printf("%10.3Le %10.3Le %10.3Le %10.3Le\n",T[i][0],T[i][1],T[i][2],T[i][3]);
+    printf("%10.3e %10.3e %10.3e %10.3e\n",T[i][0],T[i][1],T[i][2],T[i][3]);
   printf("============\n");
   return 0;  
 }
@@ -1311,7 +1311,7 @@ print_metric(ldouble T[][5])
   int i;
   printf("============\n");
   for(i=0;i<4;i++)
-    printf("%10.3Le %10.3Le %10.3Le %10.3Le\n",T[i][0],T[i][1],T[i][2],T[i][3]);
+    printf("%10.3e %10.3e %10.3e %10.3e\n",T[i][0],T[i][1],T[i][2],T[i][3]);
   printf("============\n");
   return 0;  
 }
@@ -1324,7 +1324,7 @@ print_4vector(ldouble v[4])
 {
   int i;
   printf("============\n");
-  printf("%10.3Le %10.3Le %10.3Le %10.3Le\n",v[0],v[1],v[2],v[3]);
+  printf("%10.3e %10.3e %10.3e %10.3e\n",v[0],v[1],v[2],v[3]);
   printf("============\n");
   return 0;  
 }
@@ -1338,7 +1338,7 @@ print_Nvector(ldouble v[4],int N)
   int i;
   printf("============\n");
   for(i=0;i<N;i++)
-  printf("%10.7Le ",v[i]);
+  printf("%10.7e ",v[i]);
   printf("\n============\n");
   return 0;  
 }

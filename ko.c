@@ -28,7 +28,7 @@ main(int argc, char **argv)
       for (i=0;i<NUM_INPUTARG;i++)
 	{
 	  inputarg[i]=atof(argv[i+1]);
-	  printf("%d: %Lf\n",i,inputarg[i]);
+	  printf("%d: %f\n",i,inputarg[i]);
 	}
     }
 
@@ -232,7 +232,7 @@ solve_all_problems_5(ldouble tstart)
       //output to a file
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT)
 	{
-	  printf("otpt (no #%6d) at t=%10.3Le with dt=%.3Le  (%.3Lf) (real time: %10.4Lf|%10.4Lf|%10.4Lf|%10.4Lf) mass: %Le znps: %Lf\n",nfout1,t,dt,max_ws[0],
+	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f|%10.4f|%10.4f|%10.4f) mass: %e znps: %f\n",nfout1,t,dt,max_ws[0],
 		 cons_time-start_time-imp_time1-imp_time2,imp_time1+imp_time2,end_time-cons_time,end_time-start_time,totalmass,znps);
 
 	  fprint_profiles(t,totalmass);
@@ -242,7 +242,7 @@ solve_all_problems_5(ldouble tstart)
       //or performance to screen only every second
       else if(end_time-fprintf_time>1.) 
 	{
-	  printf("step (it #%6d) at t=%10.3Le with dt=%.3Le  (%.3Lf) (real time: %10.4Lf|%10.4Lf|%10.4Lf|%10.4Lf) mass: %Le znps: %Lf\n",i1,t,dt,max_ws[0],
+	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f|%10.4f|%10.4f|%10.4f) mass: %e znps: %f\n",i1,t,dt,max_ws[0],
 		 cons_time-start_time-imp_time1-imp_time2,imp_time1+imp_time2,end_time-cons_time,end_time-start_time,totalmass,znps);
 	  fprintf_time=end_time;
 	  i2=i1;

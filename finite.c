@@ -87,7 +87,7 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	      ur[i]=u0[i]+.5*fd_flux_limiter(r0[i])*(up1[i]-u0[i]);
 	      ul[i]=u0[i]-.5*fd_flux_limiter(r0[i])*(up1[i]-u0[i]);      
 	    }
-	  if(isnan(ur[i]) || isnan (ul[i])) printf("%d %Le %Le %Le %Le %Le\n",i,um2[i],um1[i],u0[i],up1[i],up2[i]);
+	  if(isnan(ur[i]) || isnan (ul[i])) printf("%d %e %e %e %e %e\n",i,um2[i],um1[i],u0[i],up1[i],up2[i]);
 	  //u0 remains intact - in linear reconstruction cell averaged equals cell centered
 	}
     }
@@ -163,7 +163,7 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	      ur[iv]=3.*u0[iv]-2.*ul[iv];
 	    }
 	      
-	  if((u0[iv]-ul[iv])*(ul[iv]-um1[iv])<0. || (u0[iv]-ur[iv])*(ur[iv]-up1[iv])<0.) {	      printf("non-mon parabola: %Le | %Le || %Le || %Le | %Le\n",um1[iv],ul[iv],u0[iv],ur[iv],up1[iv]);getchar();}
+	  if((u0[iv]-ul[iv])*(ul[iv]-um1[iv])<0. || (u0[iv]-ur[iv])*(ur[iv]-up1[iv])<0.) {	      printf("non-mon parabola: %e | %e || %e || %e | %e\n",um1[iv],ul[iv],u0[iv],ur[iv],up1[iv]);getchar();}
 
 	  //pass up reconstructed value at center - only if reconstructing average -> center
 	  //check consistency!
@@ -183,7 +183,7 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	{
 	  ldouble VL,VR,VOR,VMP,DJM1,DJ,DJP1,DM4JPH,DM4JMH,VUL,VAV,VMD,VLC,VMIN,VMAX;
 
-	  //u_j+1/2,Left -> ur
+	  //u_j+1/2,eft -> ur
 	  VOR=(3.*um2[iv]-20.*um1[iv]+90.*u0[iv]+60.*up1[iv]-5.*up2[iv])/128.;
 	  // VOR=(20.*um2[iv]-13.*um1[iv]+47.*u0[iv]+27.*up1[iv]-3.*up2[iv])/60.;
 	  VMP=u0[iv]+DMM(up1[iv]-u0[iv],alpha*(u0[iv]-um1[iv]));
@@ -673,7 +673,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
 
-		  if(isnan(val)) {printf("i: %d %d %d %d der: %Le %Le %Le %Le %Le %Le %Le %Le %Le %Le\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz));getchar();}
+		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz));getchar();}
 
 		  set_u(u,iv,ix,iy,iz,val);		  
 		} 
@@ -949,7 +949,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	  else
 	    {
 	      al=my_max(ap1[1],am1[1]); 
-	      //	      	      if(ix==5 && iz==0) printf("ult: %Le vs %Le\n",al,1./x0[0]);
+	      //	      	      if(ix==5 && iz==0) printf("ult: %e vs %e\n",al,1./x0[0]);
 	    }
 #else
 	  al=my_max(ap1[0],am1[0]); 
@@ -1010,14 +1010,14 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 #ifdef SCHWARZSCHILD
   if(get_x(-1,0)<=r_horizon_BL(0.))
     {
-      printf("ix %d > %Lf\n",-1,get_x(-1,0));
+      printf("ix %d > %f\n",-1,get_x(-1,0));
       my_err("-1 cell inside horizon\n");
     }
 #endif
 #ifdef KERR
   if(get_x(-1,0)<=r_horizon_BL(BHSPIN))
     {
-      printf("ix %d > %Lf\n",-1,get_x(-1,0));
+      printf("ix %d > %f\n",-1,get_x(-1,0));
       my_err("-1 cell inside horizon\n");
 
     }
@@ -1035,15 +1035,15 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	      xx[2]=get_x(iy,1);
 	      xx[3]=get_x(iz,2);
 	      calc_g(xx,gloc);
-	      dx=fabs(get_xb(ix,0)-get_xb(ix-1,0))*sqrtl(gloc[1][1]);
-	      dy=fabs(get_xb(iy,1)-get_xb(iy-1,1))*sqrtl(gloc[2][2]);
-	      dz=fabs(get_xb(iz,2)-get_xb(iz-1,2))*sqrtl(gloc[3][3]);
+	      dx=fabs(get_xb(ix,0)-get_xb(ix-1,0))*sqrt(gloc[1][1]);
+	      dy=fabs(get_xb(iy,1)-get_xb(iy-1,1))*sqrt(gloc[2][2]);
+	      dz=fabs(get_xb(iz,2)-get_xb(iz-1,2))*sqrt(gloc[3][3]);
 	      if((dx<mdx || mdx<0.)) mdx=dx;
 	      if((dy<mdx || mdy<0.)) mdy=dy;
 	      if((dz<mdx || mdz<0.)) mdz=dz;
-	      if((dx/sqrtl(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dx/sqrtl(-gloc[0][0]);
-	      if((dy/sqrtl(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dy/sqrtl(-gloc[0][0]);
-	      if((dz/sqrtl(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dz/sqrtl(-gloc[0][0]);
+	      if((dx/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dx/sqrt(-gloc[0][0]);
+	      if((dy/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dy/sqrt(-gloc[0][0]);
+	      if((dz/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dz/sqrt(-gloc[0][0]);
 	    }
 	}
     }  
@@ -1136,15 +1136,15 @@ print_grid(ldouble min_dx, ldouble min_dy, ldouble min_dz)
 {
   int i1;
   for(i1=-NG;i1<=NX+NG-1;i1++)
-    printf("x: %6d %8.3Lf|%8.3Lf|%8.3Lf (%8.3Lf)\n",i1,get_xb(i1,0),get_x(i1,0),get_xb(i1+1,0),get_size_x(i1,0));
+    printf("x: %6d %8.3f|%8.3f|%8.3f (%8.3f)\n",i1,get_xb(i1,0),get_x(i1,0),get_xb(i1+1,0),get_size_x(i1,0));
   printf("\n");
   for(i1=-NG;i1<=NY+NG-1;i1++)
-    printf("y: %6d %8.3Lf|%8.3Lf|%8.3Lf (%8.3Lf)\n",i1,get_xb(i1,1),get_x(i1,1),get_xb(i1+1,1),get_size_x(i1,1));
+    printf("y: %6d %8.3f|%8.3f|%8.3f (%8.3f)\n",i1,get_xb(i1,1),get_x(i1,1),get_xb(i1+1,1),get_size_x(i1,1));
   printf("\n");
   for(i1=-NG;i1<=NZ+NG-1;i1++)
-    printf("z: %6d %8.3Lf|%8.3Lf|%8.3Lf (%8.3Lf)\n",i1,get_xb(i1,2),get_x(i1,2),get_xb(i1+1,2),get_size_x(i1,2));
+    printf("z: %6d %8.3f|%8.3f|%8.3f (%8.3f)\n",i1,get_xb(i1,2),get_x(i1,2),get_xb(i1+1,2),get_size_x(i1,2));
 
-  printf("\n min_dx = %8.3Lf\n min_dy = %8.3Lf\n min_dz = %8.3Lf\n",min_dx,min_dy,min_dz);
+  printf("\n min_dx = %8.3f\n min_dy = %8.3f\n min_dz = %8.3f\n",min_dx,min_dy,min_dz);
       
   //getchar(); 
 

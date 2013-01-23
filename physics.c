@@ -125,7 +125,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
 
   if(discr<0.) {printf("x discr in wavespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
+  discr = sqrt(discr);
   cst1 = -(-B + discr) / (2. * A);
   cst2 = -(-B - discr) / (2. * A);  
   if(cst2>cst1)
@@ -164,7 +164,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
   discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
   if(discr<0.) {printf("x discr in wavespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
+  discr = sqrt(discr);
   cst1 = -(-B + discr) / (2. * A);
   cst2 = -(-B - discr) / (2. * A);  
   if(cst2>cst1)
@@ -204,7 +204,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
   discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
   if(discr<0.) {printf("y discr in wavespeeds lt 0\n"); discr=0.;}
-  discr = sqrtl(discr);
+  discr = sqrt(discr);
   cst1 = -(-B + discr) / (2. * A);
   cst2 = -(-B - discr) / (2. * A);  
   if(cst2>cst1)
@@ -336,7 +336,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
       {
 	if(isnan(T[ii][jj])) 
 	  {
-	    printf("%d %d %Le\n",ii,jj,T[ii][jj]);
+	    printf("%d %d %e\n",ii,jj,T[ii][jj]);
 	    my_err("nan in metric_source_terms\n");
 	  }
       }
@@ -469,7 +469,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       {
 	if(isnan(T[ii][jj])) 
 	  {
-	    printf("nan tmunu: %d %d %Le\n",ii,jj,T[ii][jj]);
+	    printf("nan tmunu: %d %d %e\n",ii,jj,T[ii][jj]);
 	    print_Nvector(pp,NV);
 	    my_err("nan in flux_prime\n");
 	  }
@@ -638,7 +638,7 @@ calc_Tmunu( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
 ldouble
 calc_ufromS(ldouble S,ldouble rho)
 {  
-  return powl((powl(rho,1./(GAMMAM1)+1.)*exp(S/rho)),GAMMAM1)/(GAMMA-1.);
+  return pow((pow(rho,1./(GAMMAM1)+1.)*exp(S/rho)),GAMMAM1)/(GAMMA-1.);
 }
 
 ldouble

@@ -123,7 +123,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 #endif
 
   if(totmass!=0)
-    fprintf(fout_totmass,"%Le %Le\n",t,totmass);
+    fprintf(fout_totmass,"%e %e\n",t,totmass);
   fflush(fout_totmass);
 
 
@@ -248,10 +248,10 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //**********************************************************************
 						  //**********************************************************************
 
-						  fprintf(fout1,"%.4Le %.4Le %.4Le "
-							  "%.7Le %.7Le %.7Le %.7Le %.7Le %.7Le %.7Le %.7Le %.7Le "
-							  "%.7Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le %.10Le "
-							  "%.10Le %.10Le %.10Le %.10Le %.10Le %.10Le\n",
+						  fprintf(fout1,"%.4e %.4e %.4e "
+							  "%.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e "
+							  "%.7e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e "
+							  "%.10e %.10e %.10e %.10e %.10e %.10e\n",
 							  xx,     //1
 							  yy,     //2
 							  zz,     //3		      
@@ -268,9 +268,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 #ifdef CGSOUTPUT
 							  rhoGU2CGS(rho),    //14
 							  endenGU2CGS(uint),   //15
-							  velGU2CGS(vx*sqrtl(gg[1][1])),     //16
-							  velGU2CGS(vy*sqrtl(gg[2][2])),     //17
-							  velGU2CGS(vz*sqrtl(gg[3][3])),     //18
+							  velGU2CGS(vx*sqrt(gg[1][1])),     //16
+							  velGU2CGS(vy*sqrt(gg[2][2])),     //17
+							  velGU2CGS(vz*sqrt(gg[3][3])),     //18
 							  S,      //19
 							  endenGU2CGS(E),     //20
 							  fluxGU2CGS(Fx),     //21
@@ -279,9 +279,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 #else		    
 							  rho,    //14
 							  uint, 
-							  vx*sqrtl(gg[1][1]),     //16
-							  vy*sqrtl(gg[2][2]),     //17
-							  vz*sqrtl(gg[3][3]),     //18
+							  vx*sqrt(gg[1][1]),     //16
+							  vy*sqrt(gg[2][2]),     //17
+							  vz*sqrt(gg[3][3]),     //18
 							  S,      //19
 							  E,      //20
 							  Fx,     //21

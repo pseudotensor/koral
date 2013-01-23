@@ -87,8 +87,8 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
 int
 print_state_implicit_lab (int iter, ldouble *x, ldouble *f)
 {
-  printf ("iter = %3d x = % .3Le % .3Le % .3Le % .3Le "
-	  "f(x) = % .3Le % .3Le % .3Le % .3Le\n",
+  printf ("iter = %3d x = % .3e % .3e % .3e % .3e "
+	  "f(x) = % .3e % .3e % .3e % .3e\n",
 	  iter,
 	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
 }
@@ -444,7 +444,7 @@ calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble dt, int verbose)
      
   if(iter>=max_iter) 
     {
-      printf("lte in: %Le %Le %Le %Le\n",rho,*uint,*E,dt);
+      printf("lte in: %e %e %e %e\n",rho,*uint,*E,dt);
       my_err("iter lte did not work\n");
       return -1;
     }
@@ -454,7 +454,7 @@ calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble dt, int verbose)
   *uint=x;
   ldouble pp1 = (GAMMA-1.)*(x);
   ldouble Ttu = pp1*MU_GAS*M_PROTON/K_BOLTZ/cltep.rho;
-  ldouble Bp1 = SIGMA_RAD*powl(Ttu,4.)/Pi;
+  ldouble Bp1 = SIGMA_RAD*pow(Ttu,4.)/Pi;
   *E=(cltep.E+4.*Pi*cltep.kappa*Bp1*dt)/(1.+cltep.kappa*dt);
   
   if(*uint<0 && 0)
@@ -613,7 +613,7 @@ calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
   ny=F[1]/E;
   nz=F[2]/E;
 
-  nlen=sqrtl(nx*nx+ny*ny+nz*nz);
+  nlen=sqrt(nx*nx+ny*ny+nz*nz);
   
  
 #ifdef EDDINGTON_APR
@@ -624,7 +624,7 @@ calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
       f=1.;
     }
   else //M1
-    f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrtl(4.-3.*(nx*nx+ny*ny+nz*nz)));  
+    f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
 #endif
   
   if(nlen>0) 
@@ -682,7 +682,7 @@ ldouble calc_LTE_EfromT(ldouble T)
 
 ldouble calc_LTE_TfromE(ldouble E )
 {
-  return sqrtl(sqrtl((E/4./SIGMA_RAD)));
+  return sqrt(sqrt((E/4./SIGMA_RAD)));
 }
 
 
@@ -775,7 +775,7 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
       A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
       discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
       if(discr<0.) {printf("x1discr in ravespeeds lt 0\n"); discr=0.;}
-      discr = sqrtl(discr);
+      discr = sqrt(discr);
       ldouble cst1 = -(-B + discr) / (2. * A);
       ldouble cst2 = -(-B - discr) / (2. * A);  
 

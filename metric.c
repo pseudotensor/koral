@@ -15,7 +15,7 @@ calc_gdet(ldouble *xx)
   ldouble x3=xx[3];
  
 #ifdef SPHERICAL
-  return sqrtl(Power(x1,4)*Power(Sin(x2),2));
+  return sqrt(Power(x1,4)*Power(Sin(x2),2));
 #endif
 
 #ifdef CYLINDRICAL
@@ -34,7 +34,7 @@ calc_gdet(ldouble *xx)
 #endif
 
 #ifdef SCHWARZSCHILD
-  return sqrtl(Power(x1,4)*Power(Sin(x2),2));
+  return sqrt(Power(x1,4)*Power(Sin(x2),2));
 #endif  
 }
 
@@ -275,17 +275,17 @@ calc_LNRFes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4])
 	emulo[i][j]=0.;
       }
 
-  emuup[0][0]=sqrtl(e2nu);
-  emuup[1][1]=sqrtl(e2mu1);
-  emuup[2][2]=sqrtl(e2mu2);
-  emuup[0][3]=-omega*sqrtl(e2psi);
-  emuup[3][3]=sqrtl(e2psi);
+  emuup[0][0]=sqrt(e2nu);
+  emuup[1][1]=sqrt(e2mu1);
+  emuup[2][2]=sqrt(e2mu2);
+  emuup[0][3]=-omega*sqrt(e2psi);
+  emuup[3][3]=sqrt(e2psi);
 
-  emulo[3][0]=omega*1./sqrtl(e2nu);
-  emulo[0][0]=1./sqrtl(e2nu);
-  emulo[1][1]=1./sqrtl(e2mu1);
-  emulo[2][2]=1./sqrtl(e2mu2);
-  emulo[3][3]=1./sqrtl(e2psi);
+  emulo[3][0]=omega*1./sqrt(e2nu);
+  emulo[0][0]=1./sqrt(e2nu);
+  emulo[1][1]=1./sqrt(e2mu1);
+  emulo[2][2]=1./sqrt(e2mu2);
+  emulo[3][3]=1./sqrt(e2psi);
 
   return 0;
 }
@@ -903,7 +903,7 @@ print_Krzysie(ldouble g[][4][4])
 	{
 	  for(k=0;k<4;k++)
 	    {
-	      printf("%10Lf ",g[i][j][k]);
+	      printf("%10f ",g[i][j][k]);
 	    }
 	  printf("\n");
 	}
@@ -925,7 +925,7 @@ print_g(ldouble g[][5])
     {
       for(k=0;k<4;k++)
 	{
-	  printf("%10Lf ",g[j][k]);
+	  printf("%10f ",g[j][k]);
 	}
       printf("\n");
     }

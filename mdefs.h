@@ -10,29 +10,29 @@
 /* C language definitions for use with Mathematica output */
 
 
-#define Power(x, y)	(powl((long double)(x), (long double)(y)))
-#define Sqrt(x)		(sqrtl((long double)(x)))
-#define Sqrtl(x)        (sqrtl((long double)(x)))
+#define Power(x, y)	(powl((ldouble)(x), (ldouble)(y)))
+#define Sqrt(x)		(sqrtl((ldouble)(x)))
+#define Sqrtl(x)        (sqrtl((ldouble)(x)))
 
-#define Abs(x)		(fabsl((long double)(x)))
+#define Abs(x)		(fabsl((ldouble)(x)))
 
-#define Exp(x)		(expl((long double)(x)))
-#define Log(x)		(logl((long double)(x)))
+#define Exp(x)		(expl((ldouble)(x)))
+#define Log(x)		(logl((ldouble)(x)))
 
-#define Sin(x)		(sinl((long double)(x)))
-#define Cos(x)		(cosl((long double)(x)))
-#define Tan(x)		(tanl((long double)(x)))
+#define Sin(x)		(sinl((ldouble)(x)))
+#define Cos(x)		(cosl((ldouble)(x)))
+#define Tan(x)		(tanl((ldouble)(x)))
 
-#define ArcSin(x)       (asinl((long double)(x)))
-#define ArcCos(x)       (acosl((long double)(x)))
-#define ArcTan(x)       (atanl((long double)(x)))
+#define ArcSin(x)       (asinl((ldouble)(x)))
+#define ArcCos(x)       (acosl((ldouble)(x)))
+#define ArcTan(x)       (atanl((ldouble)(x)))
 
-#define Sinh(x)          (sinhl((long double)(x)))
-#define Cosh(x)          (coshl((long double)(x)))
-#define Tanh(x)          (tanhl((long double)(x)))
+#define Sinh(x)          (sinhl((ldouble)(x)))
+#define Cosh(x)          (coshl((ldouble)(x)))
+#define Tanh(x)          (tanhl((ldouble)(x)))
 
-#define Cot(x)          (1./tanl((long double)(x)))
-#define Csc(x)          (1./sinl((long double)(x)))
+#define Cot(x)          (1./tanl((ldouble)(x)))
+#define Csc(x)          (1./sinl((ldouble)(x)))
 
 
 

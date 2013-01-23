@@ -158,11 +158,11 @@ int iix,iiy,iiz,iv;
       iiz=iz;
       //zaczynam jednak od profilu analitycznego:   
       ldouble r=get_x(ix,0);
-      ldouble mD=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
-      ldouble mE=PAR_E/(powl(r*r*sqrtl(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
-      ldouble V=sqrtl(2./r)*(1.-2./r)           ;
-      ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
-      ldouble rho=PAR_D/(r*r*sqrtl(2./r));
+      ldouble mD=PAR_D/(r*r*sqrt(2./r*(1.-2./r)));
+      ldouble mE=PAR_E/(powl(r*r*sqrt(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
+      ldouble V=sqrt(2./r)*(1.-2./r)           ;
+      ldouble W=1./sqrt(1.-V*V*gg[1][1]);
+      ldouble rho=PAR_D/(r*r*sqrt(2./r));
       ldouble T=TAMB;
       ldouble E=calc_LTE_EfromT(T);
       ldouble uint=mE/W;

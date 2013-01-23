@@ -36,9 +36,9 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	}
       ldouble delta=b*b-4.*a*c;
       if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
-      ut[0]=(-b-sqrtl(delta))/2./a;
+      ut[0]=(-b-sqrt(delta))/2./a;
       //TODO: more strict criterion
-      if(ut[0]<0.) ut[0]=(-b+sqrtl(delta))/2./a;
+      if(ut[0]<0.) ut[0]=(-b+sqrt(delta))/2./a;
      
       for(i=1;i<4;i++) ut[i]=u1[i];      
     }
@@ -65,8 +65,8 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	}
       ldouble delta=b*b-4.*a*c;
       if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
-      ut[0]=(-b-sqrtl(delta))/2./a;
-      if(ut[0]<1.) ut[0]=(-b+sqrtl(delta))/2./a;
+      ut[0]=(-b-sqrt(delta))/2./a;
+      if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
 
       for(i=1;i<4;i++) ut[i]=u1[i]/ut[0];      
     }
@@ -84,7 +84,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	    }
 	}
 						
-      ut[0]=sqrtl(-1./(gg[0][0]+a+b));
+      ut[0]=sqrt(-1./(gg[0][0]+a+b));
       if(ut[0]<1. || isnan(ut[0]))
 	{
 	  print_4vector(u1);
@@ -108,7 +108,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	    }
 	}
 						
-      ut[0]=sqrtl(-1./(gg[0][0]+a+b));
+      ut[0]=sqrt(-1./(gg[0][0]+a+b));
       if(ut[0]<1. || isnan(ut[0]))
 	{
 	  printf("ut.nan in conv_vels(%d,%d)\n",which1,which2); getchar();
@@ -139,8 +139,8 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	}
       ldouble delta=b*b-4.*a*c;
       if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
-      ut[0]=(-b-sqrtl(delta))/2./a;
-      if(ut[0]<1.) ut[0]=(-b+sqrtl(delta))/2./a;
+      ut[0]=(-b-sqrt(delta))/2./a;
+      if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
 
       for(i=1;i<4;i++)
 	ut[i]=u1[i]-ut[0]*GG[0][i]/GG[0][0];
@@ -155,7 +155,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	  qsq+=u1[i]*u1[j]*gg[i][j];
       ldouble gamma2=1.+qsq;
       ldouble alpha2=-1./GG[0][0];
-      ut[0]=sqrtl(gamma2/alpha2);
+      ut[0]=sqrt(gamma2/alpha2);
       for(i=1;i<4;i++)
 	ut[i]=u1[i]+ut[0]*GG[0][i]/GG[0][0];
     }
@@ -168,7 +168,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	  qsq+=u1[i]*u1[j]*gg[i][j];
       ldouble gamma2=1.+qsq;
       ldouble alpha2=-1./GG[0][0];
-      ut[0]=sqrtl(gamma2/alpha2);
+      ut[0]=sqrt(gamma2/alpha2);
       for(i=1;i<4;i++)
 	ut[i]=u1[i]+ut[0]*GG[0][i]/GG[0][0];
       ut[1]/=ut[0];
@@ -815,9 +815,9 @@ calc_metric()
 int
 print_p(ldouble *p)
 {
-  printf("rho:   %10Le\nuu:    %10Le\nvr:    %10Le\nvth:   %10Le\nvph:   %10Le\nS:     %10Le\n",p[0],p[1],p[2],p[3],p[4],p[5]);
+  printf("rho:   %10e\nuu:    %10e\nvr:    %10e\nvth:   %10e\nvph:   %10e\nS:     %10e\n",p[0],p[1],p[2],p[3],p[4],p[5]);
 #ifdef RADIATION
-  printf("E:     %10Le\nFx:    %10Le\nFy:    %10Le\nFz:    %10Le\n\n",p[6],p[7],p[8],p[9]);
+  printf("E:     %10e\nFx:    %10e\nFy:    %10e\nFz:    %10e\n\n",p[6],p[7],p[8],p[9]);
 #endif
   return 0;
 }
@@ -826,9 +826,9 @@ print_p(ldouble *p)
 int
 print_u(ldouble *u)
 {
-  printf("rhout: %10Le\nTtt:   %10Le\nTtr:   %10Le\nTtth:  %10Le\nTtph:  %10Le\nSut:   %10Le\n",u[0],u[1]-u[0],u[2],u[3],u[4],u[5]);
+  printf("rhout: %10e\nTtt:   %10e\nTtr:   %10e\nTtth:  %10e\nTtph:  %10e\nSut:   %10e\n",u[0],u[1]-u[0],u[2],u[3],u[4],u[5]);
 #ifdef RADIATION
-  printf("Rtt:   %10Le\nRt1:   %10Le\nRt2:   %10Le\nRt3:   %10Le\n\n",u[6],u[7],u[8],u[9]);
+  printf("Rtt:   %10e\nRt1:   %10e\nRt2:   %10e\nRt3:   %10e\n\n",u[6],u[7],u[8],u[9]);
 #endif
   return 0;
 }

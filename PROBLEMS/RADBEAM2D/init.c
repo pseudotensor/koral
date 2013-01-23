@@ -48,11 +48,11 @@ ldouble V=0.;
 
 //zaczynam jednak od profilu analitycznego:   
 ldouble r=xx;
-ldouble mD=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
-ldouble mE=PAR_E/(powl(r*r*sqrtl(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
-V=sqrtl(2./r)*(1.-2./r)           ;
-ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
-rho=PAR_D/(r*r*sqrtl(2./r));
+ldouble mD=PAR_D/(r*r*sqrt(2./r*(1.-2./r)));
+ldouble mE=PAR_E/(powl(r*r*sqrt(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
+V=sqrt(2./r)*(1.-2./r)           ;
+ldouble W=1./sqrt(1.-V*V*gg[1][1]);
+rho=PAR_D/(r*r*sqrt(2./r));
 uint=mE/W;
 
 #ifdef FLATBACKGROUND

@@ -28,8 +28,8 @@
 	  "set bmargin at screen .12\n"
 	  "set tmargin at screen .95\n"
 	  "set size .5,1\n"
-	  "set xrange [%Lf:%Lf]\n"
-	  "set yrange [%Lf:%Lf]\n"
+	  "set xrange [%f:%f]\n"
+	  "set yrange [%f:%f]\n"
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
@@ -64,11 +64,11 @@
 	  "set ylabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
 #ifdef MINKOWSKI
-	  "plot \"%s\" u 1:3:($21/(($21*$21+$22*$22+$23*$23)**.5)/%Lf):($23/(($21*$21+$22*$22+$23*$23)**.5)/%Lf) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u 1:3:($21/(($21*$21+$22*$22+$23*$23)**.5)/%f):($23/(($21*$21+$22*$22+$23*$23)**.5)/%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  ,fname2,get_xb(0,0),get_xb(NX,0),get_xb(-NG,2),get_xb(NZ,2),fname,fname,
 	  fname,30./(get_xb(NX,0)-get_xb(0,0)),30./(get_xb(NZ,2)-get_xb(0,2)),(int)(NX/20),(int)(NZ/20));
 #else
-	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-($23)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%Lf):(($23*cos($3)+($21)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%Lf) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-($23)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%f):(($23*cos($3)+($21)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  ,fname2,
 	    
 #ifndef PLOTFULLPHI
@@ -77,9 +77,9 @@
 	    sin(get_xb(-NG,2))*get_xb(NX+NG,0),
 	    sin(get_xb(NZ+NG,2))*get_xb(NX+NG,0)
 #else
-	    get_xb(NZ+NG,2)<Pi/2. ? 0.l : -get_xb(NX+NG,0)*cos(get_xb(NZ+NG,2)) ,
+	    get_xb(NZ+NG,2)<Pi/2. ? 0.: -get_xb(NX+NG,0)*cos(get_xb(NZ+NG,2)) ,
 	    get_xb(NX+NG,0),
-	    get_xb(NZ+NG,2)<Pi ? -0.l : -get_xb(NX+NG,0)*sin(get_xb(NZ+NG,2)>1.5*Pi ? Pi/2. : get_xb(NZ+NG,2)),
+	    get_xb(NZ+NG,2)<Pi ? -0. : -get_xb(NX+NG,0)*sin(get_xb(NZ+NG,2)>1.5*Pi ? Pi/2. : get_xb(NZ+NG,2)),
 	    get_xb(NZ+NG,2)<Pi/2. ? get_xb(NX+NG,0)*cos(get_xb(NZ+NG,2)) : get_xb(NX+NG,0)
 #endif
 	    ,fname,fname,
