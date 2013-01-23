@@ -74,6 +74,12 @@ pp[9]=Fz;
 
 prad_ff2lab(pp,pp,gg,GG,tlo);
 
+/*
+printf("%d\n",ix);
+print_Nvector(pp,NV);
+getchar();
+*/
+
 #endif	      
 p2u(pp,uu,gg,GG);	 
 

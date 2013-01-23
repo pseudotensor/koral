@@ -36,9 +36,9 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
   //hot hydro - conserving energy
   ret=0;
 #ifdef U2P_NUMTEMP
-  u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 3D solver - not perfect - does not work for RADATM!
+  u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 1D numerical solver - not perfect
 #else
-  u2pret=u2p_hot_new(uu,pp,gg,GG);  //TODO: to be replaced - catastrophic cancelation!
+  u2pret=u2p_hot(uu,pp,gg,GG);  //TODO: check cancelation!
 #endif
   //************************************
 
@@ -418,7 +418,7 @@ u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 //'hot grhd' - pure hydro, numerical in 2d
 //following Noble+06
 ldouble
-f_u2p_hot_new(ldouble W, ldouble* cons)
+f_u2p_hot(ldouble W, ldouble* cons)
 {
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
@@ -428,7 +428,7 @@ f_u2p_hot_new(ldouble W, ldouble* cons)
 }
 
 int
-u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
+u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 {
   int verbose=0;
   int i,j,k;
@@ -515,9 +515,9 @@ u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
     {
       Wprev=W;
       iter++;
-      f0=f_u2p_hot_new(W,cons);
+      f0=f_u2p_hot(W,cons);
 
-      f1=f_u2p_hot_new(W*(1.+EPS),cons);
+      f1=f_u2p_hot(W*(1.+EPS),cons);
       dfdW=(f1-f0)/(EPS*W);
 
       if(verbose) printf("%d %Le %Le %Le %Le\n",iter,W,f0,f1,dfdW);
@@ -549,7 +549,7 @@ u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 
   if(rho<0. || u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
     {
-      if(verbose) printf("neg u rho in u2p_hot_new\n");
+      if(verbose) printf("neg u rho in u2p_hot\n");
       return -1;
     }
 
@@ -572,232 +572,6 @@ u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 
   return 0;
 
-}
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//basic conserved to primitives solver
-//'hot grhd' - pure hydro, numerical in 1D
-//catastrophic cancelation!
-int
-u2p_hot(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
-{
-  int verbose=0;
-
-  ldouble gtt=g[0][0];
-  ldouble gtph=g[0][3];
-  ldouble grr=g[1][1];
-  ldouble gthth=g[2][2];
-  ldouble gphph=g[3][3];
-
-  ldouble gdet=g[3][4];
-
-  ldouble rhout=uuu[0];
-  ldouble Tttt=uuu[1];
-  ldouble Ttr=uuu[2];
-  ldouble Ttth=uuu[3];
-  ldouble Ttph=uuu[4];
-  ldouble Sut=uuu[5];
- 
-  ldouble fff1,fff2,fff3,aaa,bbb,ccc,sqrt1,ut,rho,vph,vr,vth,daaadu,dcccdu,dutdu,dvrdu,dvthdu,dvphdu,ut2,del,S;
-  ldouble u,up1,um1,fval,dfval,diffu,utm1;
-  int iter=0;ldouble err;
- 
-  //initial guess
-  u=up1=um1=p[1];
-
-  ldouble conv=U2PPREC;
-  int itmax=30;
-  ldouble fvalmin[2]={0.,-1.};
-  ldouble absfval;
-
-  do{
-    iter++;
-    u=up1;
-    
-    //this mess is here to make it faster
-    fff1=(gtt-gtph*gtph/gphph);
-
-    aaa=GAMMA*u*fff1;
-    bbb=rhout*fff1;
-    ccc=Ttph*gtph/gphph + rhout + u*(GAMMA-1.) - Tttt;
-     
-    del=bbb*bbb-4.*aaa*ccc;
-
-    //calculates all terms only if they make sense
-    if(del>=0.)
-      {	
-	sqrt1=sqrtl(del);
-	ut=(-bbb-sqrt1)/2./aaa;
-	if(ut==0.) 
-	  {
-	    return -11;
-	    my_err("ut zeroed\n");
-	    ut=1.;
-	  }
-
-	ut2=ut*ut;
-	rho=rhout/ut;
-	S=Sut/ut;
-	fff2=ut2*(u*GAMMA + rho);
-    
-	vph=-(gtph/gphph) + Ttph/(gphph*fff2);
-	vr=Ttr/(grr*fff2);
-	vth=Ttth/(gthth*fff2);
-
-	daaadu=GAMMA*fff1;
-	dcccdu=GAMMA-1.;
-
-	dutdu=daaadu*(bbb/2./aaa/aaa + ccc/aaa/sqrt1 + sqrt1/2./aaa/aaa) + dcccdu/sqrt1;
-
-	fff3=dutdu*(rhout+2.*GAMMA*u*ut);
-
-	dvrdu=-Ttr/(grr*fff2)/(grr*fff2)*
-	  (fff3*grr + GAMMA*ut2*grr);
-	dvthdu=-Ttth/(gthth*fff2)/(gthth*fff2)*
-	  (fff3*gthth + GAMMA*ut2*gthth);
-	dvphdu=-Ttph/(gphph*fff2)/(gphph*fff2)*
-	  (fff3*gphph + GAMMA*ut2*gphph);
-  
-	dfval=-2./ut/ut/ut*dutdu + 2.*grr*vr*dvrdu + 2.*gthth*vth*dvthdu + 2.*gtph*dvphdu + 2.*gphph*vph*dvphdu;
-	fval=1./ut/ut+gtt+grr*vr*vr+gthth*vth*vth+2.*gtph*vph+gphph*vph*vph;	
-      }
-
-    //handling unphysical input    
-    if(del<0. || isnan(dfval) || isnan(fval) || isinf(del))
-      {
-	if(verbose>0)
-	  {
-	    printf("unphysical input in u2p at iter: %d\n",iter);
-	    printf("u: %Le (%Le, %Le)\n",u,p[1],um1);
-	    printf(" %Le %Le %Le %Le\n",del,ut,dfval,fval);
-	    getchar();
-	  }
-
-	if(iter==1)
-	  return -1; //u2p failed due to unphysical u0
-	else
-	  {
-	    return -2; //nan got lateron
-	    up1=0.5*(u+um1); //going closer to the previous, successful step
-	    continue;
-	  }
-      }
-    
-    //input ok, let's carry on
-
-     //absolute error
-    if(fval > 0)
-      absfval=fval;
-    else
-      absfval=-fval;
-
-    //putting best value of u to memory
-    if(absfval<fvalmin[1] || fvalmin[1]<0.)
-      {
-	fvalmin[0]=u;
-	fvalmin[1]=absfval;
-      }
-
-    //Newton
-    up1=u-fval/dfval;   
-
-    //difference
-    diffu=up1-u;
-    
-    if(verbose==1)
-      {
-	printf("       iter %d  > %Le [%Le] %Le >%Le< %Lf\n",iter,u,up1,diffu/u,fval,ut);
-	getchar();
-      }
-
-    //check
-    if(isnan(up1)) 
-      {
-	printf("  u2p> ======= nan \n");
-	if(iter==1)
-	  return -3; //up1 nan lateron at iter1
-	else
-	  {
-	    my_err("nan met in u2p\n");
-	    return -4; //up1 nan lateron at iter.gt.1
-
-	    up1=0.5*(u+um1); //going closer to the previous, successful step
-	    continue;
-	  }
-      }
-    
-    err =diffu/u;
-    if(err<0.) err*=-1.;
-    
-    //putting previous step in memory
-    um1=u;
-
-  } while(err>conv && iter<itmax);
-
-  //not tried even single value - should not happen - does not change primitives
-  if(fvalmin[1]<0.)
-    {
-      printf("unphysical in u2p at iter: %d\n",iter);
-      printf("u: %Le (%Le, %Le)\n",u,p[1],um1);
-      printf(" %Le %Le %Le %Le\n",del,ut,dfval,fval);
-
-      my_err("not tried even single value in u2p\n");      
-      return -6; //not tried even single value in u2p
-    }
- 
-  //recalculate primitives for u with smallest fval
-  if(iter>=itmax)
-    {
-      return -5; //iteration exceeded
-      
-      fff1=(gtt-gtph*gtph/gphph);
-      aaa=GAMMA*u*fff1;
-      bbb=rhout*fff1;
-      ccc=Ttph*gtph/gphph + rhout + u*(GAMMA-1.) - Tttt;    
-      del=bbb*bbb-4.*aaa*ccc;
-      sqrt1=sqrtl(del);
-      ut=(-bbb-sqrt1)/2./aaa;
-      ut2=ut*ut;
-      rho=rhout/ut;
-      S=Sut/ut;
-      fff2=ut2*(u*GAMMA + rho);
-      vph=-(gtph/gphph) + Ttph/(gphph*fff2);
-      vr=Ttr/(grr*fff2);
-      vth=Ttth/(gthth*fff2);
-    }
-
-  if(verbose==1)
-    {
-      printf("  u/u0   > %Le %Le %Le\n",(u)/p[1],dfval,fval);
-      printf("  u,rho,i  > %Le %Le %d\n",u,rho,iter);
-      printf("  u2p> =========\n"); getchar();
-    }
-
-  if((isnan(u) || isnan(rho)))
-    my_err("nan in u2p\n");
-
-  if(u<0. || rho<0.) return -10;
-
-
-  //primitives
-  p[0]=rho;
-  p[1]=u;
-  p[2]=vr;
-  p[3]=vth;
-  p[4]=vph;
-  p[5]=S;
-
-  conv_velsinprims(p,VEL3,VELPRIM,g,G);
-
-  /*
-  print_Nvector(uuu,NV);
-  print_Nvector(p,NV);
-  if(vr>0.) getchar();
-  */
-
-  return 0;
 }
 
 //**********************************************************************
@@ -1042,7 +816,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 
    if(gammarel2<0. || gammarel2>gammamax*gammamax || delta<0.) 
     {
-      printf("topcap\n");
+      printf("top cap\n");
       //top cap
       *corrected=1;
       urfcon[0]=gammamax;
@@ -1078,7 +852,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
     }
    else if(gammarel2<(-1./GG[0][0]))
     {
-      printf("lowcap\n");
+      printf("low cap\n");
       //low cap
       *corrected=1;
 

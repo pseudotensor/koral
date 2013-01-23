@@ -10,14 +10,6 @@
 int
 p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 {
-  ldouble gtt=g[0][0];
-  ldouble gtph=g[0][3];
-  ldouble grr=g[1][1];
-  ldouble gthth=g[2][2];
-  ldouble gphph=g[3][3];
-
-  ldouble gdet=g[3][4];
-
   ldouble rho=p[0];
   ldouble uu=p[1];
   ldouble vcon[4],ucon[4],ucov[4];

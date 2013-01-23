@@ -213,12 +213,15 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  ldouble eup[4][4],elo[4][4];
 						  pick_T(emuup,ix,iy,iz,eup);
 						  pick_T(emulo,ix,iy,iz,elo);	    
-						  
-						  //						  prad_lab2ff(pp,pp,gg,GG,tup);
-#ifdef RADOUTPUTINZAMO
-						  prad_ff2zamo(pp,pp,gg,GG,eup); //to print out radiation primitives in ZAMO
+						
+#ifdef RADOUTPUTINFF
+						  prad_lab2ff(pp,pp,gg,GG,tup);
+#elif defined(RADOUTPUTINZAMO) //to print out radiation primitives in ZAMO
+						  prad_lab2ff(pp,pp,gg,GG,tup);
+						  prad_ff2zamo(pp,pp,gg,GG,eup); 
 #endif
-						  E=pp[6];
+
+ 						  E=pp[6];
 						  Fx=pp[7];
 						  Fy=pp[8];
 						  Fz=pp[9];
