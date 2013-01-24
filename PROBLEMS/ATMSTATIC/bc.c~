@@ -1,0 +1,77 @@
+//returns problem specific BC
+//int calc_bc(int ix,int iy,int iz,ldouble t,ldouble *uval,ldouble *pval) {
+
+ldouble gdet_src,gdet_bc;
+int iix,iiy,iiz,iv;  	  
+
+gdet_bc=get_g(g,3,4,ix,iy,iz);  
+gdet_src=get_g(g,3,4,iix,iiy,iiz);
+ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
+pick_g(ix,iy,iz,gg);
+pick_T(emuup,ix,iy,iz,eup);
+pick_T(emulo,ix,iy,iz,elo);
+ldouble xx=get_x(ix,0);
+
+/**********************/
+
+  //radius
+  //  if(ix>=NX || ix<0) //analytical solution on both sides
+  if(ix>=NX || ix<0) //analytical solution at rout only
+    {
+      ldouble Fx,Fy,Fz;
+      Fz=Fy=Fx=0.;
+ldouble f = (ldouble)KAPPAES*FLUXLEFT*MINX*MINX;
+
+ldouble p0=K_BOLTZ*RHOAMB*TAMB/MU_GAS/M_PROTON;	      
+ldouble KKK=p0/powl(RHOAMB,GAMMA);
+ ldouble C3=GAMMA*KKK/(GAMMA-1.)*powl(RHOAMB,GAMMA-1.)-(1.-f)/MINX;
+
+ ldouble maxr = -powl(RHOAMB,GAMMA-1.)*GAMMA*KKK/GAMMAM1 + (1.-f)/MINX;
+maxr = 1./maxr;
+
+     
+ pval[0]=powl(GAMMAM1/GAMMA/KKK*(C3+(1.-f)/xx),1./GAMMAM1);
+
+ldouble pre=KKK*powl(pval[0],GAMMA);
+
+pval[1]=pre/GAMMAM1;
+Fz=Fy=0.;
+Fx=FLUXLEFT*(MINX/xx)*(MINX/xx);
+ldouble E=Fx/FERATIO;
+
+      pval[2]=0.;
+      pval[3]=0.;
+      pval[4]=0.;
+      pval[5]=calc_Sfromu(RHOAMB,pval[1]);
+#ifdef RADIATION
+      pval[6]=E;
+      pval[7]=Fx;
+      pval[8]=Fy;
+      pval[9]=Fz; 
+#endif	    
+      p2u(pval,uval,gg,eup,elo);
+     
+      return 0.;
+    }
+
+
+iix=ix;
+  iiz=iz;
+  iiy=iy;
+
+  //periodic
+  while(iiz<0)    iiz+=NZ;
+  while(iiz>=NZ)    iiz-=NZ; 
+  //periodic
+  while(iiy<0)    iiy+=NY;
+  while(iiy>=NY)    iiy-=NY; 
+
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uval[iv]=get_u(u,iv,iix,iiy,iiz);
+      pval[iv]=get_u(p,iv,iix,iiy,iiz);      
+    }
+  
+  return 0;
+  
