@@ -20,8 +20,9 @@
 //15 RADWAVE - 1d linear rad wave with periodic BC
 //16 RADPULSE3D - radiative blob spreading around
 //17 RADDBLSHADOW - radiative shadow with two beams inclined
+//18 ATMSTATIC - hydro atmosphere 
 
-#define PROBLEM 3
+#define PROBLEM 18
 
 #if(PROBLEM==1)
 
@@ -260,6 +261,22 @@
 #define PR_ANASOL "PROBLEMS/RADDBLSHADOW/anasol.c"
 
 #endif
+
+#if(PROBLEM==18)
+
+#define PR_DEFINE "PROBLEMS/ATMSTATIC/define.h"
+#define PR_BC "PROBLEMS/ATMSTATIC/bc.c"
+#define PR_INIT "PROBLEMS/ATMSTATIC/init.c"
+#define PR_KAPPA "PROBLEMS/ATMSTATIC/kappa.c"
+#define PR_KAPPAES "PROBLEMS/ATMSTATIC/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/ATMSTATIC/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/ATMSTATIC/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/ATMSTATIC/dump.c"
+#define PR_ANASOL "PROBLEMS/ATMSTATIC/anasol.c"
+
+#endif
+
+
 
 /*********************/
 //including problem specific definitions from PROBLEMS/XXX/define.h
