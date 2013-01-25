@@ -33,7 +33,7 @@
 
 
 #define MINX 1.e6
-#define MAXX 1.1e6
+#define MAXX 2.e6
 
 //#define LOGXGRID
 //#define LOGPAR1 2.2

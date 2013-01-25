@@ -21,13 +21,16 @@ if(ix>=NX || ix<0) //analytical solution at rout only
   {
     
 
-ldouble rho0=0.1;
-ldouble r0=100.;
-ldouble u0=0.1;
+ldouble rho0=1.;
+ldouble r0=2.e6;
+ldouble u0=0.0001;
 ldouble r=xx;
 
  ldouble rho=rho0*r0/r;
  ldouble uint=u0*r0*r0/r/r/(1.-2./r);
+
+uint=(4*r*u0 - 4*r*u0*GAMMA - 2*r*rho0 + 2*r0*rho0 + r*r0*rho0*Log(-2 + r) - r*r0*rho0*Log(r) - r*r0*rho0*Log(-2 + r0) + r*r0*rho0*Log(r0))/(4*r - 4*r*GAMMA);
+
 
  pp[0]=rho;
  pp[1]=uint;

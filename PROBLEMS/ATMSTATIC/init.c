@@ -32,9 +32,9 @@ ldouble pp[NV],T;
 //printf("%Le %Le %e %e\n",xx,f,KAPPAES,FLUXLEFT); getchar();
 
 
-ldouble rho0=0.1;
-ldouble r0=100.;
-ldouble u0=0.1;
+ldouble rho0=1.;
+ldouble r0=2.e6;
+ldouble u0=0.0001;
 ldouble r=xx;
 
 rho=rho0*r0/r;
@@ -42,7 +42,7 @@ uint=u0*r0*r0/r/r;
 
 E=exp(1.);
 
-//uint=(Power(-1 + 2/r,GAMMA/(2 - 2*GAMMA))*(r*Power((2 - r0)/r0,GAMMA/(2.*(-1 + GAMMA)))*u0*GAMMA*(-2 + 3*GAMMA) + (-(Power(2 - r,GAMMA/(2.*(-1 + GAMMA)))*Power(r,1 + GAMMA/(2 - 2*GAMMA))*r0*(-1 + GAMMA)) - Power(2 - r,GAMMA/(2.*(-1 + GAMMA)))*Power(r,GAMMA/(2 - 2*GAMMA))*r0*GAMMA + r*Power(2 - r0,GAMMA/(2.*(-1 + GAMMA)))*Power(r0,GAMMA/(2 - 2*GAMMA))*(r0*(-1 + GAMMA) + GAMMA))*rho0))/(r*GAMMA*(-2 + 3*GAMMA));
+uint=(4*r*u0 - 4*r*u0*GAMMA - 2*r*rho0 + 2*r0*rho0 + r*r0*rho0*Log(-2 + r) - r*r0*rho0*Log(r) - r*r0*rho0*Log(-2 + r0) + r*r0*rho0*Log(r0))/(4*r - 4*r*GAMMA);
 
 //printf("%e %e %e %e\n",r,rho,E,uint);  getchar();
 
