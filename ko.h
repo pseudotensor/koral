@@ -261,6 +261,8 @@ int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,l
 //metric.c
 int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4]);
 int calc_LNRFes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4]);
+int dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4]);
 int calc_g(ldouble*,ldouble[][5]);
 int calc_G(ldouble*,ldouble[][5]);
 int calc_Krzysie(ldouble*,ldouble[][4][4]);

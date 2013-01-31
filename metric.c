@@ -262,6 +262,60 @@ calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4])
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for BL -> KS
+int
+dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble t=xx[0];
+  ldouble r=xx[1];
+  ldouble th=xx[2];
+  ldouble ph=xx[3];
+
+  ldouble a=BHSPIN;
+  ldouble delta=r*r-2.*r+a*a;
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[0][1]=2.*r/delta;
+  dxdx[3][1]=a/delta;    
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for KS -> BL
+int
+dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble t=xx[0];
+  ldouble r=xx[1];
+  ldouble th=xx[2];
+  ldouble ph=xx[3];
+
+  ldouble a=BHSPIN;
+  ldouble delta=r*r-2.*r+a*a;
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[0][1]=-2.*r/delta;
+  dxdx[3][1]=-a/delta;    
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //calculates base vectors and 1-forms of LNRF to transform lab <--> LNRF
 int
 calc_LNRFes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4])
