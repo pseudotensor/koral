@@ -270,7 +270,9 @@ int print_Krzysie(ldouble g[][4][4]);
 int print_g(ldouble [][5]);
 ldouble calc_gdet(ldouble *xx);
 ldouble calc_dlgdet(ldouble *xx, int idim);
-
+int coco_N(int CO1, int CO2,ldouble *x1, ldouble *x2);
+int coco_BL2KS(ldouble *xBL, ldouble *xKS);
+int coco_KS2BL(ldouble *xBL, ldouble *xKS);
 
 //relele.c
 int conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5]);
@@ -363,7 +365,17 @@ int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,
 int
 calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose);
 
-//definitions
+//mnemonical definitions
+
+//velocities
 #define VEL4 1 //lab four-velocity u^i
 #define VEL3 2 //lab three-velocity u^i/u^t
 #define VELR 3 //relative velocity \tilde u^i
+
+//coordinates
+#define BLCOORDS 1
+#define KSCOORDS 2
+#define MKSCOORDS 3
+#define XYZCOORDS 4
+#define CYLCOORDS 5
+#define SPHCOORDS 6

@@ -259,59 +259,7 @@ calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4])
 }
 
 
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//calculates transformation matrices dxmu/dxnu
-//for BL -> KS
-int
-dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4])
-{
-  ldouble t=xx[0];
-  ldouble r=xx[1];
-  ldouble th=xx[2];
-  ldouble ph=xx[3];
 
-  ldouble a=BHSPIN;
-  ldouble delta=r*r-2.*r+a*a;
-
-  int i,j;
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      dxdx[i][j]=delta(i,j);
-  
-  dxdx[0][1]=2.*r/delta;
-  dxdx[3][1]=a/delta;    
-
-  return 0;
-}
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//calculates transformation matrices dxmu/dxnu
-//for KS -> BL
-int
-dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4])
-{
-  ldouble t=xx[0];
-  ldouble r=xx[1];
-  ldouble th=xx[2];
-  ldouble ph=xx[3];
-
-  ldouble a=BHSPIN;
-  ldouble delta=r*r-2.*r+a*a;
-
-  int i,j;
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      dxdx[i][j]=delta(i,j);
-  
-  dxdx[0][1]=-2.*r/delta;
-  dxdx[3][1]=-a/delta;    
-
-  return 0;
-}
 
 //**********************************************************************
 //**********************************************************************
@@ -1071,6 +1019,125 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//wrapper to convert coordinates
+int
+coco_N(int CO1, int CO2,ldouble *x1, ldouble *x2)
+{
+  if(CO1==BLCOORDS && CO2==KSCOORDS)
+    coco_BL2KS(x1,x2);
+  else if (CO1==KSCOORDS && CO2==BLCOORDS)
+    coco_KS2BL(x1,x2);
+  else
+    my_err("coco coordinate conversion not implemented\n");
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for BL -> KS
+int
+coco_BL2KS(ldouble *xBL, ldouble *xKS)
+{
+  ldouble r=xBL[1];
+  ldouble a=BHSPIN;
+  ldouble delta=r*r-2.*r+a*a;
+  ldouble sqrta=sqrt(1.-a*a);
+  //t
+  xKS[0]=xBL[0]+2./sqrta*atanh(sqrta/(1.-r))+log(delta);
+  //r
+  xKS[1]=xBL[1];
+  //theta
+  xKS[2]=xBL[2];
+  //phi
+  xKS[3]=xBL[3]+a/sqrta*atanh(sqrta/(1.-r));
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for BL -> KS
+int
+coco_KS2BL(ldouble *xKS, ldouble *xBL)
+{
+  ldouble r=xKS[1];
+  ldouble a=BHSPIN;
+  ldouble delta=r*r-2.*r+a*a;
+  ldouble sqrta=sqrt(1.-a*a);
+  //t
+  xBL[0]=xKS[0]-2./sqrta*atanh(sqrta/(1.-r))-log(delta);
+  //r
+  xBL[1]=xKS[1];
+  //theta
+  xBL[2]=xKS[2];
+  //phi
+  xBL[3]=xKS[3]-a/sqrta*atanh(sqrta/(1.-r));
+
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for BL -> KS
+int
+dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble t=xx[0];
+  ldouble r=xx[1];
+  ldouble th=xx[2];
+  ldouble ph=xx[3];
+
+  ldouble a=BHSPIN;
+  ldouble delta=r*r-2.*r+a*a;
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[0][1]=2.*r/delta;
+  dxdx[3][1]=a/delta;    
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for KS -> BL
+int
+dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble t=xx[0];
+  ldouble r=xx[1];
+  ldouble th=xx[2];
+  ldouble ph=xx[3];
+
+  ldouble a=BHSPIN;
+  ldouble delta=r*r-2.*r+a*a;
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[0][1]=-2.*r/delta;
+  dxdx[3][1]=-a/delta;    
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 
 int
 print_Krzysie(ldouble g[][4][4])
@@ -1110,4 +1177,28 @@ print_g(ldouble g[][5])
     }
   printf("\n");
   return -1;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//returns location of the horizone in BL
+ldouble
+r_horizon_BL(ldouble a)
+{
+  return 1.+sqrt(1-a*a);
+}
+
+//returns location of the co-rotating marginally bound orbit in BL
+ldouble
+r_mbound_BL(ldouble a)
+{
+  return 2.*(1.-a/2.+sqrt(1.-a));
+}
+
+//returns location of the photon orbit in BL
+ldouble
+r_photon_BL(ldouble a)
+{
+  return 2.*(1.-cosl(2./3.*acosl(-a)));
 }
