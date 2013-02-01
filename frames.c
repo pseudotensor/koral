@@ -993,32 +993,8 @@ multiply2(ldouble *u1,ldouble *u2,ldouble A[][4])
 int
 trans22_zamo2lab(ldouble T1[][4],ldouble T2[][4],ldouble elo[][4])
 {
-  int i,j,k,l;
-  ldouble Tt[4][4];
-
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  Tt[i][j]=T1[i][j];
-	}
-    }
-
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  T2[i][j]=0.;
-	  for(k=0;k<4;k++)
-	    {
-	      for(l=0;l<4;l++)
-		{
-		  T2[i][j]+=elo[i][k]*elo[j][l]*Tt[k][l];
-		}
-	    }
-	}
-    }
-
+  multiply22(T1,T2,elo);
+ 
   return 0;
 }
 
@@ -1029,31 +1005,7 @@ trans22_zamo2lab(ldouble T1[][4],ldouble T2[][4],ldouble elo[][4])
 int
 trans22_lab2zamo(ldouble T1[][4],ldouble T2[][4],ldouble eup[][4])
 {
-  int i,j,k,l;
-  ldouble Tt[4][4];
-
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  Tt[i][j]=T1[i][j];
-	}
-    }
-
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  T2[i][j]=0.;
-	  for(k=0;k<4;k++)
-	    {
-	      for(l=0;l<4;l++)
-		{
-		  T2[i][j]+=eup[i][k]*eup[j][l]*Tt[k][l];
-		}
-	    }
-	}
-    }
+  multiply22(T1,T2,eup);
 
   return 0;
 }
@@ -1065,20 +1017,7 @@ trans22_lab2zamo(ldouble T1[][4],ldouble T2[][4],ldouble eup[][4])
 int
 trans2_lab2zamo(ldouble *u1,ldouble *u2,ldouble eup[][4])
 {
-  int i,j,k;
-  ldouble ut[4];
-
-  for(i=0;i<4;i++)
-    ut[i]=u1[i];
-
-  for(i=0;i<4;i++)
-    {
-      u2[i]=0.;
-      for(j=0;j<4;j++)
-	{
-	  u2[i]+=ut[j]*eup[j][i];
-	}
-    }
+  multiply2(u1,u2,eup);
 
   return 0;
 }
@@ -1090,20 +1029,7 @@ trans2_lab2zamo(ldouble *u1,ldouble *u2,ldouble eup[][4])
 int
 trans2_zamo2lab(ldouble *u1,ldouble *u2,ldouble elo[][4])
 {
-  int i,j,k;
-  ldouble ut[4];
-
-  for(i=0;i<4;i++)
-    ut[i]=u1[i];
-
-  for(i=0;i<4;i++)
-    {
-      u2[i]=0.;
-      for(j=0;j<4;j++)
-	{
-	  u2[i]+=ut[j]*elo[i][j];
-	}
-    }
+  multiply2(u1,u2,elo);
 
   return 0;
 }
@@ -1115,31 +1041,7 @@ trans2_zamo2lab(ldouble *u1,ldouble *u2,ldouble elo[][4])
 int
 trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble tlo[][4])
 {
-  int i,j,k,l;
-  ldouble Tt[4][4];
-
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  Tt[i][j]=T1[i][j];
-	}
-    }
-
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  T2[i][j]=0.;
-	  for(k=0;k<4;k++)
-	    {
-	      for(l=0;l<4;l++)
-		{
-		  T2[i][j]+=tlo[i][k]*tlo[j][l]*Tt[k][l];
-		}
-	    }
-	}
-    }
+  multiply22(T1,T2,tlo);
 
   return 0;
 }
@@ -1151,31 +1053,7 @@ trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble tlo[][4])
 int
 trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble tup[][4])
 {
-  int i,j,k,l;
-  ldouble Tt[4][4];
-
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  Tt[i][j]=T1[i][j];
-	}
-    }
-
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  T2[i][j]=0.;
-	  for(k=0;k<4;k++)
-	    {
-	      for(l=0;l<4;l++)
-		{
-		  T2[i][j]+=tup[i][k]*tup[j][l]*Tt[k][l];
-		}
-	    }
-	}
-    }
+  multiply22(T1,T2,tup);
 
   return 0;
 }
@@ -1187,20 +1065,7 @@ trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble tup[][4])
 int
 trans2_cc2on(ldouble *u1,ldouble *u2,ldouble tup[][4])
 {
-  int i,j,k;
-  ldouble ut[4];
-
-  for(i=0;i<4;i++)
-    ut[i]=u1[i];
-
-  for(i=0;i<4;i++)
-    {
-      u2[i]=0.;
-      for(j=0;j<4;j++)
-	{
-	  u2[i]+=ut[j]*tup[j][i];
-	}
-    }
+  multiply2(u1,u1,tup);
 
   return 0;
 }
@@ -1212,20 +1077,7 @@ trans2_cc2on(ldouble *u1,ldouble *u2,ldouble tup[][4])
 int
 trans2_on2cc(ldouble *u1,ldouble *u2,ldouble tlo[][4])
 {
-  int i,j,k;
-  ldouble ut[4];
-
-  for(i=0;i<4;i++)
-    ut[i]=u1[i];
-
-  for(i=0;i<4;i++)
-    {
-      u2[i]=0.;
-      for(j=0;j<4;j++)
-	{
-	  u2[i]+=ut[j]*tlo[i][j];
-	}
-    }
+  multiply2(u1,u2,tlo);
 
   return 0;
 }
