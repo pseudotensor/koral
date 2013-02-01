@@ -22,7 +22,7 @@
 //17 RADDBLSHADOW - radiative shadow with two beams inclined
 //18 ATMSTATIC - hydro atmosphere 
 
-#define PROBLEM 18
+#define PROBLEM 1
 
 #if(PROBLEM==1)
 
@@ -281,11 +281,23 @@
 /*********************/
 //including problem specific definitions from PROBLEMS/XXX/define.h
 /*********************/
+
 #include PR_DEFINE
+
+/*********************/
+//important choices not-necesarily problem specific
+/*********************/
+
+#define VELPRIM VELR
+#define VELPRIMRAD VELR
 
 /*********************/
 //passive definitions
 /*********************/
+
+#ifndef BHSPIN
+#define BHSPIN 0.
+#endif
 
 #ifndef NOUTSTOP
 #define NOUTSTOP 1e7 //max n of outputs
@@ -402,5 +414,3 @@
 
 #define GMC2CM (MASSCM) //gravitational radius in cm
 
-#define VELPRIM VELR
-#define VELPRIMRAD VELR

@@ -333,14 +333,15 @@ int trans2_cc2on(ldouble *u1,ldouble *u2,ldouble t[][4]);
 int trans2_on2cc(ldouble *u1,ldouble *u2,ldouble t[][4]);
 int indices_2221(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5]);
 int indices_21(ldouble A1[4],ldouble A2[4],ldouble gg[][5]);
-int
-indices_12(ldouble A1[4],ldouble A2[4],ldouble GG[][5]);
+int indices_12(ldouble A1[4],ldouble A2[4],ldouble GG[][5]);
 int print_tensor(ldouble T[][4]);
 int print_metric(ldouble T[][5]);
 int print_4vector(ldouble v[4]);
 int print_Nvector(ldouble v[4],int);
 int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble elo[][4]);
 int prad_ff2zamo(ldouble *pp1, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]);
+int multiply22(ldouble T1[][4],ldouble T2[][4],ldouble A[][4]);
+int multiply2(ldouble *u1,ldouble *u2,ldouble A[][4]);
 
 //rad.c
 int calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4]);
