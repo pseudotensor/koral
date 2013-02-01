@@ -1037,6 +1037,69 @@ trans2_zamo2lab(ldouble *u1,ldouble *u2,ldouble elo[][4])
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
+//u^i transfromation between coordinates
+int
+trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
+{
+  ldouble dxdx[4][4];
+  if(CO1==CO2)
+    {
+      u2[0]=u1[0];
+      u2[1]=u1[1];
+      u2[2]=u1[2];
+      u2[3]=u1[3];
+    }
+  else if(CO1==KSCOORDS && CO2==BLCOORDS)
+    {
+      dxdx_KS2BL(xx,dxdx);
+      multiply2(u1,u2,dxdx);
+    }
+  else if(CO1==BLCOORDS && CO2==KSCOORDS)
+    {
+      dxdx_BL2KS(xx,dxdx);
+      multiply2(u1,u2,dxdx);
+    }
+  else
+    my_err("transformation not implemented in trans2_coco()\n");
+
+  return 0;
+}
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//u^i transfromation between coordinates
+int
+trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
+{
+  ldouble dxdx[4][4];
+  if(CO1==CO2)
+    {
+      int i,j;
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  T2[i][j]=T1[i][j];
+    }
+  else if(CO1==KSCOORDS && CO2==BLCOORDS)
+    {
+      dxdx_KS2BL(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
+  else if(CO1==BLCOORDS && CO2==KSCOORDS)
+    {
+      dxdx_BL2KS(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
+  else
+    my_err("transformation not implemented in trans2_coco()\n");
+
+  return 0;
+}
+
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
 //T^ij transfromation ortonormal to code coordinates
 int
 trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble tlo[][4])

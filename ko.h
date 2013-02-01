@@ -342,6 +342,9 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
 int prad_ff2zamo(ldouble *pp1, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]);
 int multiply22(ldouble T1[][4],ldouble T2[][4],ldouble A[][4]);
 int multiply2(ldouble *u1,ldouble *u2,ldouble A[][4]);
+int trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2);
+int trans2_coco(ldouble *xx,ldouble *,ldouble *,int CO1, int CO2);
+
 
 //rad.c
 int calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4]);
