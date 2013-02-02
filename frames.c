@@ -4,6 +4,33 @@
 #include "ko.h"
 
 /*****************************************************************/
+/********** radiative primitives (E,F^i) between coordinates  *******/
+/********** does not touch hydro primitives ***********************/
+/*****************************************************************/
+int 
+trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg[][5], ldouble GG[][5])
+{
+  if(CO1==BLCOORDS && CO2==KSCOORDS)
+    {
+      //to transform radiative primitives from BL to KS
+      ldouble Rij[4][4];
+      calc_Rij(pp1,gg,GG,Rij);
+      trans22_coco(xxvec,Rij,Rij,BLCOORDS,KSCOORDS);
+      indices_2221(Rij,Rij,gg);
+      pp1[6]=Rij[0][0];
+      pp1[7]=Rij[0][1];
+      pp1[8]=Rij[0][2];
+      pp1[9]=Rij[0][3]; int temp;
+      u2p_rad(pp1,pp2,gg,GG,&temp);
+    }
+  else
+    my_err("transformation not implemented in trans_prad_coco()\n");
+
+  return 0;
+}
+
+
+/*****************************************************************/
 /****** radiative ff primitives (E,F^i) -> primitives in lab frame  *******/
 /*****************************************************************/
 int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble tlo[][4])

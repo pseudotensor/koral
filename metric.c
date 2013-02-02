@@ -1021,7 +1021,7 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 //**********************************************************************
 //wrapper to convert coordinates
 int
-coco_N(int CO1, int CO2,ldouble *x1, ldouble *x2)
+coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
 {
   if(CO1==BLCOORDS && CO2==KSCOORDS)
     coco_BL2KS(x1,x2);

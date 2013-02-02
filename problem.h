@@ -21,8 +21,9 @@
 //16 RADPULSE3D - radiative blob spreading around
 //17 RADDBLSHADOW - radiative shadow with two beams inclined
 //18 ATMSTATIC - hydro atmosphere 
+//19 RADBEAM2DKS - beam of light in KS coordinates
 
-#define PROBLEM 1
+#define PROBLEM 19
 
 #if(PROBLEM==1)
 
@@ -273,6 +274,20 @@
 #define PR_OUT2GIF_1D "PROBLEMS/ATMSTATIC/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/ATMSTATIC/dump.c"
 #define PR_ANASOL "PROBLEMS/ATMSTATIC/anasol.c"
+
+#endif
+
+#if(PROBLEM==19)
+
+#define PR_DEFINE "PROBLEMS/RADBEAM2DKS/define.h"
+#define PR_BC "PROBLEMS/RADBEAM2DKS/bc.c"
+#define PR_INIT "PROBLEMS/RADBEAM2DKS/init.c"
+#define PR_KAPPA "PROBLEMS/RADBEAM2DKS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADBEAM2DKS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADBEAM2DKS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADBEAM2DKS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADBEAM2DKS/dump.c"
+#define PR_ANASOL "PROBLEMS/RADBEAM2DKS/anasol.c"
 
 #endif
 

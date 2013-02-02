@@ -134,6 +134,7 @@ ldouble f_der_kurganovtadmor(int ix,int iy, int yz,ldouble*);
 ldouble f_der_hlle_obsolete(int ix,int iy, int yz,ldouble*);
 ldouble f_der_muscl(int ix,int iy, int yz,ldouble*);
 //ldouble get_x(int,int);
+int get_xx(int ix,int iy,int iz,ldouble *xx);
 #define get_x(ic,idim) (idim==0 ? x[ic+NG] : (idim==1 ? x[ic+NG + NX+2*NG] : (idim==2 ? x[ic+NG + NX+2*NG + NY+2*NG ] : 0.)))
 //ldouble get_xb(int,int);
 #define get_xb(ic,idim) (idim==0 ? xb[ic+NG] : (idim==1 ? xb[ic+NG + NX+2*NG + 1] : (idim==2 ? xb[ic+NG + NX+2*NG +1 + NY+2*NG +1 ] : 0.)))
@@ -270,7 +271,7 @@ int print_Krzysie(ldouble g[][4][4]);
 int print_g(ldouble [][5]);
 ldouble calc_gdet(ldouble *xx);
 ldouble calc_dlgdet(ldouble *xx, int idim);
-int coco_N(int CO1, int CO2,ldouble *x1, ldouble *x2);
+int coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2);
 int coco_BL2KS(ldouble *xBL, ldouble *xKS);
 int coco_KS2BL(ldouble *xBL, ldouble *xKS);
 
@@ -344,6 +345,7 @@ int multiply22(ldouble T1[][4],ldouble T2[][4],ldouble A[][4]);
 int multiply2(ldouble *u1,ldouble *u2,ldouble A[][4]);
 int trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2);
 int trans2_coco(ldouble *xx,ldouble *,ldouble *,int CO1, int CO2);
+int trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble*, ldouble gg[][5], ldouble GG[][5]);
 
 
 //rad.c
