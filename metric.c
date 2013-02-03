@@ -14,35 +14,35 @@ calc_gdet(ldouble *xx)
   ldouble x2=xx[2];
   ldouble x3=xx[3];
  
-#ifdef SPHERICAL
+if(MYCOORDS==SPHCOORDS) {
   return sqrt(Power(x1,4)*Power(Sin(x2),2));
-#endif
+ }
 
-#ifdef CYLINDRICAL
+if(MYCOORDS==CYLCOORDS) {
   return x1;
-#endif
+ }
 
-#ifdef MINKOWSKI
+if(MYCOORDS==MINKCOORDS) {
   return 1.;
-#endif
+ }
 
   //TODO: verify KERR - +/- gtphi in .nb
-#ifdef KERR
+if(MYCOORDS==KERRCOORDS) {
  ldouble a=BHSPIN;
   return Sqrt(Power(Power(a,2) + 2*Power(x1,2) + 
        Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2))
     /2.;
-#endif
+ }
 
-#ifdef KERRSCHILD
+if(MYCOORDS==KSCOORDS) {
   ldouble a=BHSPIN;
 return Sqrt(Power(Power(x1,2) + Power(a,2)*Power(Cos(x2),2),2)*
 	    Power(Sin(x2),2));
-#endif
+ }
 
-#ifdef SCHWARZSCHILD
+if(MYCOORDS==SCHWCOORDS) {
   return sqrt(Power(x1,4)*Power(Sin(x2),2));
-#endif  
+ } 
 }
 
 //**********************************************************************
@@ -57,45 +57,45 @@ calc_dlgdet(ldouble *xx, int idim)
   ldouble x2=xx[2];
   ldouble x3=xx[3];
  
-#ifdef SPHERICAL
+if(MYCOORDS==SPHCOORDS) {
 ;if(idim==0) return  2/x1
 ;if(idim==1) return  Cot(x2)
 ;if(idim==2) return  0
 ;
-#endif
+}
 
-#ifdef CYLINDRICAL
+if(MYCOORDS==CYLCOORDS) {
   if(idim==0) return 1./x1;
   if(idim==1) return 0.;
   if(idim==2) return 0.;
-#endif
+}
 
-#ifdef MINKOWSKI
+if(MYCOORDS==MINKCOORDS) {
   return 0.;
-#endif
+}
 
-#ifdef KERR
+if(MYCOORDS==KERRCOORDS) {
  ldouble a=BHSPIN;
 ;if(idim==0) return  (4*x1)/(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2))
 ;if(idim==1) return  ((-Power(a,2) + 2*Power(x1,2) + 3*Power(a,2)*Cos(2*x2))*Cot(x2))/(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2))
 ;if(idim==2) return  0
 ;
-#endif
+}
 
-#ifdef KERRSCHILD
+if(MYCOORDS==KSCOORDS) {
  ldouble a=BHSPIN;
 ;if(idim==0) return  (2*x1)/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
 ;if(idim==1) return  ((-Power(a,2) + 2*Power(x1,2) + 3*Power(a,2)*Cos(2*x2))*Cot(x2))/(2.*(Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
 ;if(idim==2) return  0
 ;
-#endif
+}
 
-#ifdef SCHWARZSCHILD
+if(MYCOORDS==SCHWCOORDS) {
 ;if(idim==0) return  2/x1
 ;if(idim==1) return  Cot(x2)
 ;if(idim==2) return  0
 ;
-#endif  
+}  
 }
 
 //**********************************************************************
@@ -322,7 +322,7 @@ calc_g(ldouble *xx, ldouble g[][5])
 
   g[3][4]=calc_gdet(xx);
 
-#ifdef SCHWARZSCHILD
+if(MYCOORDS==SCHWCOORDS) {
 ;g[0][0]= -1 + 2/x1
 ;g[0][1]= 0
 ;g[0][2]= 0
@@ -340,9 +340,9 @@ calc_g(ldouble *xx, ldouble g[][5])
 ;g[3][2]= 0
 ;g[3][3]= Power(x1,2)*Power(Sin(x2),2)
 ;
-#endif
+}
 
-#ifdef KERR
+if(MYCOORDS==KERRCOORDS) {
  ldouble a=BHSPIN;
 ;g[0][0]= -1 + (2*x1)/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
 ;g[0][1]= 0
@@ -361,9 +361,9 @@ calc_g(ldouble *xx, ldouble g[][5])
 ;g[3][2]= 0
 ;g[3][3]= Power(Sin(x2),2)*(Power(a,2) + Power(x1,2) + (2*Power(a,2)*x1*Power(Sin(x2),2))/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
 ;
-#endif
+}
 
-#ifdef KERRSCHILD
+if(MYCOORDS==KSCOORDS) {
  ldouble a=BHSPIN;
 ;g[0][0]= -1 + (2*x1)/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
 ;g[0][1]= (2*x1)/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
@@ -382,9 +382,9 @@ calc_g(ldouble *xx, ldouble g[][5])
 ;g[3][2]= 0
 ;g[3][3]= Power(Sin(x2),2)*(Power(x1,2) + Power(a,2)*Power(Cos(x2),2) + Power(a,2)*(1 + (2*x1)/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))*Power(Sin(x2),2))
 ;
-#endif
+}
 
-#ifdef SPHERICAL
+if(MYCOORDS==SPHCOORDS) {
 ;g[0][0]= -1
 ;g[0][1]= 0
 ;g[0][2]= 0
@@ -402,10 +402,10 @@ calc_g(ldouble *xx, ldouble g[][5])
 ;g[3][2]= 0
    ;g[3][3]= Power(x1,2)*Power(Sin(x2),2)
 ;
-#endif
+}
 
 
-#ifdef CYLINDRICAL
+if(MYCOORDS==CYLCOORDS) {
 ;g[0][0]= -1
 ;g[0][1]= 0
 ;g[0][2]= 0
@@ -423,9 +423,9 @@ calc_g(ldouble *xx, ldouble g[][5])
 ;g[3][2]= 0
 ;g[3][3]= x1*x1 
 ;
-#endif
+}
 
-#ifdef MINKOWSKI
+if(MYCOORDS==MINKCOORDS) {
 ;g[0][0]= -1
 ;g[0][1]= 0
 ;g[0][2]= 0
@@ -443,7 +443,7 @@ calc_g(ldouble *xx, ldouble g[][5])
 ;g[3][2]= 0
 ;g[3][3]= 1
 ;
-#endif
+}
 
   return 0;
 }
@@ -460,7 +460,7 @@ calc_G(ldouble *xx, ldouble G[][5])
   ldouble x2=xx[2];
   ldouble x3=xx[3];
 
-#ifdef SCHWARZSCHILD
+if(MYCOORDS==SCHWCOORDS) {
 ;G[0][0]= x1/(2 - x1)
 ;G[0][1]= 0
 ;G[0][2]= 0
@@ -479,9 +479,9 @@ calc_G(ldouble *xx, ldouble G[][5])
 ;G[3][3]= Power(Csc(x2),2)/Power(x1,2)
 ;
 
-#endif
+}
 
-#ifdef KERR
+if(MYCOORDS==KERRCOORDS) {
  ldouble a=BHSPIN;
 ;G[0][0]= -((Power(a,4) + 2*Power(x1,4) + Power(a,2)*x1*(2 + 3*x1) + Power(a,2)*(Power(a,2) + (-2 + x1)*x1)*Cos(2*x2))/((Power(a,2) + (-2 + x1)*x1)*(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2))))
 ;G[0][1]= 0
@@ -501,9 +501,9 @@ calc_G(ldouble *xx, ldouble G[][5])
 ;G[3][3]= (2*((-2 + x1)*x1 + Power(a,2)*Power(Cos(x2),2))*Power(Csc(x2),2))/((Power(a,2) + (-2 + x1)*x1)*(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2)))
 ;
 
-#endif
+}
 
-#ifdef KERRSCHILD
+if(MYCOORDS==KSCOORDS) {
  ldouble a=BHSPIN;
 ;G[0][0]= -((x1*(2 + x1) + Power(a,2)*Power(Cos(x2),2))/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
 ;G[0][1]= (2*x1)/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
@@ -522,10 +522,10 @@ calc_G(ldouble *xx, ldouble G[][5])
 ;G[3][2]= 0
 ;G[3][3]= Power(Csc(x2),2)/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
 ;
-#endif
+}
 
 
-#ifdef SPHERICAL
+if(MYCOORDS==SPHCOORDS) {
 ;G[0][0]= -1
 ;G[0][1]= 0
 ;G[0][2]= 0
@@ -543,9 +543,9 @@ calc_G(ldouble *xx, ldouble G[][5])
 ;G[3][2]= 0
 ;G[3][3]= Power(Csc(x2),2)/Power(x1,2)
 ;
-#endif
+}
 
-#ifdef CYLINDRICAL
+if(MYCOORDS==CYLCOORDS) {
 ;G[0][0]= -1
 ;G[0][1]= 0
 ;G[0][2]= 0
@@ -563,9 +563,9 @@ calc_G(ldouble *xx, ldouble G[][5])
 ;G[3][2]= 0
 ;G[3][3]= Power(x1,-2)
 ;
-#endif
+}
 
-#ifdef MINKOWSKI
+if(MYCOORDS==MINKCOORDS) {
 ;G[0][0]= -1
 ;G[0][1]= 0
 ;G[0][2]= 0
@@ -583,7 +583,7 @@ calc_G(ldouble *xx, ldouble G[][5])
 ;G[3][2]= 0
 ;G[3][3]= 1
 ;
-#endif
+}
 
   return 0;
 }
@@ -600,7 +600,7 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
   ldouble x2=xx[2];
   ldouble x3=xx[3];
 
-#ifdef SCHWARZSCHILD
+if(MYCOORDS==SCHWCOORDS) {
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= 1/((-2 + x1)*x1)
 ;Krzys[0][0][2]= 0
@@ -668,9 +668,9 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 ;
 
 
-#endif
+}
 
-#ifdef KERRSCHILD
+if(MYCOORDS==KSCOORDS) {
  ldouble a=BHSPIN;
 ;Krzys[0][0][0]= (2*x1*(Power(x1,2) - Power(a,2)*Power(Cos(x2),2)))/Power(Power(x1,2) + Power(a,2)*Power(Cos(x2),2),3)
 ;Krzys[0][0][1]= ((Power(x1,2) - Power(a,2)*Power(Cos(x2),2))*(x1*(2 + x1) + Power(a,2)*Power(Cos(x2),2)))/Power(Power(x1,2) + Power(a,2)*Power(Cos(x2),2),3)
@@ -737,9 +737,9 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 ;Krzys[3][3][2]= ((Power(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2),2)*Cot(x2))/4. + Power(a,2)*x1*Sin(2*x2))/Power(Power(x1,2) + Power(a,2)*Power(Cos(x2),2),2)
 ;Krzys[3][3][3]= -((a*Power(Sin(x2),2)*(Power(x1,5) + Power(a,4)*x1*Power(Cos(x2),4) - Power(a,2)*Power(x1,2)*Power(Sin(x2),2) + Power(Cos(x2),2)*(2*Power(a,2)*Power(x1,3) + Power(a,4)*Power(Sin(x2),2))))/Power(Power(x1,2) + Power(a,2)*Power(Cos(x2),2),3))
 ;
-#endif
+}
 
-#ifdef KERR
+if(MYCOORDS==KERRCOORDS) {
  ldouble a=BHSPIN;
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= (-2*(Power(a,2) + Power(x1,2))*(Power(a,2) - 2*Power(x1,2) + Power(a,2)*Cos(2*x2)))/((Power(a,2) + (-2 + x1)*x1)*Power(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2),2))
@@ -806,10 +806,10 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 ;Krzys[3][3][2]= ((3*Power(a,4) + 8*Power(a,2)*x1 + 8*Power(a,2)*Power(x1,2) + 8*Power(x1,4) + 4*Power(a,2)*(Power(a,2) + 2*(-1 + x1)*x1)*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2),2))
 ;Krzys[3][3][3]= 0
 ;
-#endif
+}
 
 
-#ifdef SPHERICAL
+if(MYCOORDS==SPHCOORDS) {
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= 0
 ;Krzys[0][0][2]= 0
@@ -875,9 +875,9 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 ;Krzys[3][3][2]= Cot(x2)
 ;Krzys[3][3][3]= 0
 ;
-#endif
+}
 
-#ifdef CYLINDRICAL
+if(MYCOORDS==CYLCOORDS) {
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= 0
 ;Krzys[0][0][2]= 0
@@ -943,9 +943,9 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 ;Krzys[3][3][2]= 0
 ;Krzys[3][3][3]= 0
 ;
-#endif
+}
 
-#ifdef MINKOWSKI
+if(MYCOORDS==MINKCOORDS) {
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= 0
 ;Krzys[0][0][2]= 0
@@ -1011,7 +1011,7 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 ;Krzys[3][3][2]= 0
 ;Krzys[3][3][3]= 0
 ;
-#endif
+}
 
   return 0;
 }
@@ -1023,9 +1023,9 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 int
 coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
 {
-  if(CO1==BLCOORDS && CO2==KSCOORDS)
+  if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
     coco_BL2KS(x1,x2);
-  else if (CO1==KSCOORDS && CO2==BLCOORDS)
+  else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     coco_KS2BL(x1,x2);
   else
     my_err("coco coordinate conversion not implemented\n");

@@ -10,12 +10,19 @@
 int 
 trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg[][5], ldouble GG[][5])
 {
-  if(CO1==BLCOORDS && CO2==KSCOORDS)
+  if(CO1==CO2)
+    {
+      pp2[6]=pp1[6];
+      pp2[7]=pp1[7];
+      pp2[8]=pp1[8];
+      pp2[9]=pp1[9];
+    }
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
     {
       //to transform radiative primitives from BL to KS
       ldouble Rij[4][4];
       calc_Rij(pp1,gg,GG,Rij);
-      trans22_coco(xxvec,Rij,Rij,BLCOORDS,KSCOORDS);
+      trans22_coco(xxvec,Rij,Rij,CO1,CO2);
       indices_2221(Rij,Rij,gg);
       pp1[6]=Rij[0][0];
       pp1[7]=Rij[0][1];
@@ -1076,12 +1083,12 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       u2[2]=u1[2];
       u2[3]=u1[3];
     }
-  else if(CO1==KSCOORDS && CO2==BLCOORDS)
+  else if(CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       dxdx_KS2BL(xx,dxdx);
       multiply2(u1,u2,dxdx);
     }
-  else if(CO1==BLCOORDS && CO2==KSCOORDS)
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
     {
       dxdx_BL2KS(xx,dxdx);
       multiply2(u1,u2,dxdx);
@@ -1107,12 +1114,12 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
 	for(j=0;j<4;j++)
 	  T2[i][j]=T1[i][j];
     }
-  else if(CO1==KSCOORDS && CO2==BLCOORDS)
+  else if(CO1==KSCOORDS && (CO1==SCHWCOORDS || CO1==KERRCOORDS))
     {
       dxdx_KS2BL(xx,dxdx);
       multiply22(T1,T2,dxdx);
     }
-  else if(CO1==BLCOORDS && CO2==KSCOORDS)
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
     {
       dxdx_BL2KS(xx,dxdx);
       multiply22(T1,T2,dxdx);

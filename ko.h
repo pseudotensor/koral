@@ -378,10 +378,12 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
 #define VEL3 2 //lab three-velocity u^i/u^t
 #define VELR 3 //relative velocity \tilde u^i
 
-//coordinates
+//coordinates/metric
 #define BLCOORDS 1
+#define SCHWCOORDS 1
+#define KERRCOORDS 1
 #define KSCOORDS 2
 #define MKSCOORDS 3
-#define XYZCOORDS 4
+#define MINKCOORDS 4
 #define CYLCOORDS 5
 #define SPHCOORDS 6

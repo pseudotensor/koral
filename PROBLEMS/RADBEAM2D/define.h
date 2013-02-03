@@ -1,10 +1,8 @@
 #define TMAX 1.e10
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
-//#define MINKOWSKI
-//#define CYLINDRICAL
-//#define SPHERICAL
-#define SCHWARZSCHILD
+
+#define MYCOORDS SCHWCOORDS
 #define NX 30
 #define NY 1
 #define NZ 30

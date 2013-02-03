@@ -1,11 +1,7 @@
 #define TMAX 1.e10
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
-//#define MINKOWSKI
-//#define CYLINDRICAL
-//#define SPHERICAL
-//#define SCHWARZSCHILD
-#define KERRSCHILD
+#define MYCOORDS KSCOORDS
 #define NX 30
 #define NY 1
 #define NZ 30
@@ -67,7 +63,7 @@
 #define NLEFT 0.999
 #define RHOAMB 1.e0
 #define KAPPA 0.
-#define SPECIFIC_BC
+//#define SPECIFIC_BC
 #define COPY_XBC
 #define COPY_YBC
 #define COPY_ZBC

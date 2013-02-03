@@ -23,7 +23,7 @@
 //18 ATMSTATIC - hydro atmosphere 
 //19 RADBEAM2DKS - beam of light in KS coordinates
 
-#define PROBLEM 19
+#define PROBLEM 1
 
 #if(PROBLEM==1)
 
@@ -346,16 +346,8 @@
 #endif
 #endif
 
-#ifndef SPHERICAL
-#ifndef CYLINDRICAL
-#ifndef KERR
-#ifndef SCHWARZSCHILD
-#ifndef KERRSCHILD
-#define MINKOWSKI //spacetime
-#endif
-#endif
-#endif
-#endif
+#ifndef MYCOORDS
+#define MYCOORDS MINKCOORDS 
 #endif
 
 #ifndef NX

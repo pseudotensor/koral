@@ -83,7 +83,12 @@ prad_zamo2ff(pp,pp,gg,GG,eup);
 prad_ff2lab(pp,pp,gg,GG,tlo);
 
 //to transform radiative primitives from BL to KS
+
+print_Nvector(pp,NV);
 trans_prad_coco(pp, pp, BLCOORDS, KSCOORDS,xxvec,gg,GG);
+//trans_prad_coco(pp, pp, BLCOORDS, BLCOORDS,xxvec,gg,GG);
+print_Nvector(pp,NV);
+getchar();
 
 p2u(pp,uu,gg,GG);
 
