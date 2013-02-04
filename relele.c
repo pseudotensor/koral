@@ -549,7 +549,7 @@ calc_metric()
 		set_g(g,j,4,ix,iy,iz,calc_dlgdet(xx,j));
 	      set_g(g,3,4,ix,iy,iz,calc_gdet(xx));
 
-	      calc_LNRFes(gloc,eup,elo);
+	      calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 	      calc_tetrades(gloc,tup,tlo);
 	      
 	      for(i=0;i<4;i++)
@@ -584,7 +584,7 @@ calc_metric()
 		    for(j=0;j<4;j++)
 		      set_gb(gbx,i,j,ix,iy,iz,gloc[i][j],0);
 
-		  calc_LNRFes(gloc,eup,elo);
+		  calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 		  calc_tetrades(gloc,tup,tlo);
 
 		  for(i=0;i<4;i++)
@@ -622,7 +622,7 @@ calc_metric()
 		for(j=0;j<4;j++)
 		  set_gb(gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
 
-	      calc_LNRFes(gloc,eup,elo);
+	      calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 	      calc_tetrades(gloc,tup,tlo);
 
 	      for(i=0;i<4;i++)
@@ -661,7 +661,7 @@ calc_metric()
 		    for(j=0;j<4;j++)
 		      set_gb(gby,i,j,ix,iy,iz,gloc[i][j],1);
 
-		  calc_LNRFes(gloc,eup,elo);
+		  calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 		  calc_tetrades(gloc,tup,tlo);
 
 		  for(i=0;i<4;i++)
@@ -697,7 +697,7 @@ calc_metric()
 		for(j=0;j<4;j++)
 		  set_gb(gby,i,j,ix,iy+1,iz,gloc[i][j],1);
 
-	      calc_LNRFes(gloc,eup,elo);
+	      calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 	      calc_tetrades(gloc,tup,tlo);
 
 	      for(i=0;i<4;i++)
@@ -735,7 +735,7 @@ calc_metric()
 		    for(j=0;j<4;j++)
 		      set_gb(gbz,i,j,ix,iy,iz,gloc[i][j],2);
 
-		  calc_LNRFes(gloc,eup,elo);
+		  calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 		  calc_tetrades(gloc,tup,tlo);
 
 		  for(i=0;i<4;i++)
@@ -771,7 +771,7 @@ calc_metric()
 		for(j=0;j<4;j++)
 		  set_gb(gbz,i,j,ix,iy,iz+1,gloc[i][j],2);	  
 
-	      calc_LNRFes(gloc,eup,elo);
+	      calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 	      calc_tetrades(gloc,tup,tlo);
 
 	      for(i=0;i<4;i++)

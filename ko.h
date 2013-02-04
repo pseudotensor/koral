@@ -261,16 +261,21 @@ int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,l
 
 //metric.c
 int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4]);
-int calc_LNRFes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4]);
+int calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4],int);
 int dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4]);
 int calc_g(ldouble*,ldouble[][5]);
 int calc_G(ldouble*,ldouble[][5]);
 int calc_Krzysie(ldouble*,ldouble[][4][4]);
+int calc_g_arb(ldouble*,ldouble[][5],int);
+int calc_G_arb(ldouble*,ldouble[][5],int);
+int calc_Krzysie_arb(ldouble*,ldouble[][4][4],int);
 int print_Krzysie(ldouble g[][4][4]);
 int print_g(ldouble [][5]);
 ldouble calc_gdet(ldouble *xx);
 ldouble calc_dlgdet(ldouble *xx, int idim);
+ldouble calc_gdet_arb(ldouble *xx,int);
+ldouble calc_dlgdet_arb(ldouble *xx, int idim,int);
 int coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2);
 int coco_BL2KS(ldouble *xBL, ldouble *xKS);
 int coco_KS2BL(ldouble *xBL, ldouble *xKS);
