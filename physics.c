@@ -442,8 +442,8 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   
   //calculating Tmunu
   ldouble T[4][4];
-  calc_Tmunu(pp,gg,GG,T);
 
+  calc_Tmunu(pp,gg,GG,T);
   //primitives
   ldouble rho=pp[0];
   ldouble u=pp[1];

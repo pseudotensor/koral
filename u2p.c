@@ -874,13 +874,13 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
     
       //radiative energy density in the radiation rest frame
       Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
-      
+
       //relative velocity
       ldouble alpha=sqrt(-1./GG[0][0]);
       ldouble gamma=urfcon[0]*alpha;
       for(i=1;i<4;i++)
 	{	  
-	  urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha+GG[0][i]/alpha;
+	  urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha-GG[0][i]/GG[0][0]/alpha;
 	  urfcon[i]*=gamma;
 	}
       urfcon[0]=0.;
@@ -888,13 +888,13 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 
    conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
   
-  //new primitives
-  pp[6]=Erf;
-  pp[7]=urfcon[1];
-  pp[8]=urfcon[2];
-  pp[9]=urfcon[3];
+   //new primitives
+   pp[6]=Erf;
+   pp[7]=urfcon[1];
+   pp[8]=urfcon[2];
+   pp[9]=urfcon[3];
 
-  return 0;
+   return 0;
 }
 
 //**********************************************************************

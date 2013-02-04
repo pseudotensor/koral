@@ -72,8 +72,11 @@
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*u_step1,*u_step2,*u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,
   *pbLx,*pbRx,*pbLy,*pbRy,*pbLz,*pbRz,*sbLx,*sbRx,*sbLy,*sbRy,*sbLz,*sbRz,*ubLx,*ubRx,*ubLy,*ubRy,*ubLz,*ubRz,
-  *flbx,*flby,*flbz,*flLx,*flRx,*flLy,*flRy,*flLz,*flRz,*gKr,*gKrbx,*gKrby,*gKrbz,*G,*emuup,*emulo,*emuupbx,*emulobx,*emuupby,*emuloby,*emuupbz,*emulobz;
-ldouble *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz;
+  *flbx,*flby,*flbz,*flLx,*flRx,*flLy,*flRy,*flLz,*flRz,*gKr,*gKrbx,*gKrby,*gKrbz,*G,
+  *emuup,*emulo,*emuupbx,*emulobx,*emuupby,*emuloby,*emuupbz,*emulobz,
+  *emuup2,*emulo2,*emuupbx2,*emulobx2,*emuupby2,*emuloby2,*emuupbz2,*emulobz2,
+  *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
+  *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
 int *cellflag,**loop_1,**loop_2,Nloop_1,Nloop_2;
 //ldouble ****u;
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
@@ -258,9 +261,9 @@ int pr_tophat_inside(ldouble x,ldouble y,ldouble z);
 int my_finger(ldouble);
 int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,ldouble *vv);
 
-
 //metric.c
-int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4]);
+int calc_metric();
+int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int);
 int calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4],int);
 int dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4]);
@@ -295,7 +298,6 @@ int p2u_Sonly(ldouble *p, ldouble *u,ldouble[][5]);
 int print_p(ldouble *p);
 int print_u(ldouble *p);
 int convert_uold2urel(ldouble *x,ldouble *u);
-int calc_metric();
 int calc_sourceterms(int,int,int);
 int calc_primitives(int,int,int);
 int calc_conserved(int ix,int iy,int iz);
@@ -350,7 +352,7 @@ int multiply22(ldouble T1[][4],ldouble T2[][4],ldouble A[][4]);
 int multiply2(ldouble *u1,ldouble *u2,ldouble A[][4]);
 int trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2);
 int trans2_coco(ldouble *xx,ldouble *,ldouble *,int CO1, int CO2);
-int trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble*, ldouble gg[][5], ldouble GG[][5]);
+int trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble*, ldouble gg[][5], ldouble GG[][5], ldouble gg2[][5], ldouble GG2[][5]);
 
 
 //rad.c
@@ -376,19 +378,4 @@ int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,
 int
 calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose);
 
-//mnemonical definitions
-
-//velocities
-#define VEL4 1 //lab four-velocity u^i
-#define VEL3 2 //lab three-velocity u^i/u^t
-#define VELR 3 //relative velocity \tilde u^i
-
-//coordinates/metric
-#define BLCOORDS 1
-#define SCHWCOORDS 1
-#define KERRCOORDS 1
-#define KSCOORDS 2
-#define MKSCOORDS 3
-#define MINKCOORDS 4
-#define CYLCOORDS 5
-#define SPHCOORDS 6
+#include "mnemonics.h"

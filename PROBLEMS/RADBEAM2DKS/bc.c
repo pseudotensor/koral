@@ -45,12 +45,21 @@ ldouble xx=xxvec[1];
       pp[8]=Fy;
       pp[9]=Fz;
 
-     
-      prad_zamo2ff(pp,pp,gg,GG,eup);
-      prad_ff2lab(pp,pp,gg,GG,tlo);
+      //working in BL
+      ldouble ggBL[4][5],GGBL[4][5];
+      calc_g_arb(xxvec,ggBL,KERRCOORDS);
+      calc_G_arb(xxvec,GGBL,KERRCOORDS);
+      ldouble eupBL[4][4],eloBL[4][4];
+      ldouble tupBL[4][4],tloBL[4][4];
+      calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
+      calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
+      print_Nvector(pp,NV);
+      prad_zamo2ff(pp,pp,ggBL,GGBL,eup);
+      print_Nvector(pp,NV);
+      prad_ff2lab(pp,pp,ggBL,GGBL,tlo);
 
       //to transform radiative primitives from BL to KS
-      trans_prad_coco(pp, pp, BLCOORDS, KSCOORDS,xxvec,gg,GG);
+      trans_prad_coco(pp, pp, BLCOORDS, KSCOORDS,xxvec,ggBL,GGBL,gg,GG);
      
       p2u(pp,uu,gg,GG);
 
@@ -160,43 +169,7 @@ ldouble xx=xxvec[1];
 #endif
    else if(ix>NX-1 || 1 ) //fixed outern boundary
     {
-      iix=NX-1;
-      iiy=iy;
-      iiz=iz;
-      //zaczynam jednak od profilu analitycznego:   
-      ldouble r=get_x(ix,0);
-      ldouble mD=PAR_D/(r*r*sqrt(2./r*(1.-2./r)));
-      ldouble mE=PAR_E/(powl(r*r*sqrt(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
-      ldouble V=sqrt(2./r)*(1.-2./r)           ;
-      ldouble W=1./sqrt(1.-V*V*gg[1][1]);
-      ldouble rho=PAR_D/(r*r*sqrt(2./r));
-      ldouble T=TAMB;
-      ldouble E=calc_LTE_EfromT(T);
-      ldouble uint=mE/W;
-      ldouble Fx,Fy,Fz;
-      E=calc_LTE_Efromurho(uint,rho);
-      Fx=Fy=Fz=0.*E;
-      pp[0]=rho;
-      pp[1]=uint;
-      pp[2]=-V;
-      pp[3]=0.;
-      pp[4]=0.;
-      pp[5]=calc_Sfromu(rho,uint);
-      pp[6]=E;
-      pp[7]=pp[8]=pp[9]=0.;
-      //copy of radiative primitives
-      /*
-      pp[6]=get_u(p,6,iix,iiy,iiz);
-      pp[7]=get_u(p,7,iix,iiy,iiz);
-      pp[8]=get_u(p,8,iix,iiy,iiz);
-      pp[9]=get_u(p,9,iix,iiy,iiz);
-      */
-      prad_zamo2ff(pp,pp,gg,GG,eup);
-      prad_ff2lab(pp,pp,gg,GG,tlo);
-//to transform radiative primitives from BL to KS
-      trans_prad_coco(pp, pp, BLCOORDS, KSCOORDS,xxvec,gg,GG);
-      p2u(pp,uu,gg,GG);
-      return 0;
+      //TODO
     }
  
 

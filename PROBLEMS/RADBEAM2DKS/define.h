@@ -2,6 +2,8 @@
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
 #define MYCOORDS KSCOORDS
+//#define MYCOORDS KERRCOORDS
+#define MYCOORDS2 KERRCOORDS //suplementary, only for tetrads used when initializing problems
 #define NX 30
 #define NY 1
 #define NZ 30
@@ -12,11 +14,13 @@
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define ALLSTEPSOUTPUT 0
+#define ALLSTEPSOUTPUT 1
 #define GAMMA (1.4)
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
-#define BEAMNO 1
+
+#define BEAMNO 3
+
 #define IFBEAM 1
 //#define GASRADOFF
 //#define RADSOURCEOFF
@@ -51,7 +55,8 @@
 
 #define MINY .99*Pi/2.
 #define MAXY 1.01*Pi/2.
-#define MINZ 0.
+
+#define MINZ 0.1
 #define MAXZ Pi/4.//8.*Pi/4.
 
 #define PLOTFULLPHI

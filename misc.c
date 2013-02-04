@@ -160,6 +160,41 @@ initialize_arrays()
   //ortonormal tetrad vectors bz
   tmulobz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
 
+  //as above but for the suplementary system of coordinates
+  //LNRF2= basis one-forms
+  emuup2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  //LNRF basis vectors
+  emulo2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  //LNRF basis one-forms bx
+  emuupbx2=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  //LNRF basis vectors bx
+  emulobx2=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  //LNRF basis one-forms by
+  emuupby2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*16*sizeof(ldouble));
+  //LNRF basis vectors by
+  emuloby2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*16*sizeof(ldouble));
+  //LNRF basis one-forms bz
+  emuupbz2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
+  //LNRF basis vectors bz
+  emulobz2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
+ 
+  //ortonormal tetrad one-forms
+  tmuup2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  //ortonormal tetrad vectors
+  tmulo2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  //ortonormal tetrad one-forms bx
+  tmuupbx2=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  //ortonormal tetrad vectors bx
+  tmulobx2=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  //ortonormal tetrad one-forms by
+  tmuupby2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*16*sizeof(ldouble));
+  //ortonormal tetrad vectors by
+  tmuloby2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*16*sizeof(ldouble));
+  //ortonormal tetrad one-forms bz
+  tmuupbz2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
+  //ortonormal tetrad vectors bz
+  tmulobz2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
+
   //left-interpolated primitives at cell x-faces
   pbLx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG )*(NZ+2*NG)*NV*sizeof(ldouble));
   //right-interpolated primitives at cell x-faces
@@ -324,6 +359,22 @@ free_arrays()
   free(tmuloby);
   free(tmuupbz);
   free(tmulobz);
+  free(emuup2);
+  free(emulo2);
+  free(emuupbx2);
+  free(emulobx2);
+  free(emuupby2);
+  free(emuloby2);
+  free(emuupbz2);
+  free(emulobz2);
+  free(tmuup2);
+  free(tmulo2);
+  free(tmuupbx2);
+  free(tmulobx2);
+  free(tmuupby2);
+  free(tmuloby2);
+  free(tmuupbz2);
+  free(tmulobz2);
   free(pbLx);
   free(pbRx);
   free(pbLy);

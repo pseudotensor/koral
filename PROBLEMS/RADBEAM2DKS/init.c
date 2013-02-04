@@ -79,20 +79,22 @@ pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz;
 
-prad_zamo2ff(pp,pp,gg,GG,eup);
-prad_ff2lab(pp,pp,gg,GG,tlo);
+//working in BL
+ldouble ggBL[4][5],GGBL[4][5];
+calc_g_arb(xxvec,ggBL,KERRCOORDS);
+calc_G_arb(xxvec,GGBL,KERRCOORDS);
+ldouble eupBL[4][4],eloBL[4][4];
+ldouble tupBL[4][4],tloBL[4][4];
+calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
+calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
+prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
 
 //to transform radiative primitives from BL to KS
+trans_prad_coco(pp, pp, BLCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
 
-print_Nvector(pp,NV);
-trans_prad_coco(pp, pp, BLCOORDS, KSCOORDS,xxvec,gg,GG);
-//trans_prad_coco(pp, pp, BLCOORDS, BLCOORDS,xxvec,gg,GG);
-print_Nvector(pp,NV);
-getchar();
-
+//to calculate conserved
 p2u(pp,uu,gg,GG);
-
-
 
 /**************************/
 

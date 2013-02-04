@@ -23,7 +23,7 @@
 //18 ATMSTATIC - hydro atmosphere 
 //19 RADBEAM2DKS - beam of light in KS coordinates
 
-#define PROBLEM 1
+#define PROBLEM 19
 
 #if(PROBLEM==1)
 
@@ -300,15 +300,36 @@
 #include PR_DEFINE
 
 /*********************/
-//important choices not-necesarily problem specific
+/*********************/
+/*********************/
+/*********************/
+//important choices **/
+/*********************/
+/*********************/
+/*********************/
 /*********************/
 
+#ifndef VELPRIM
 #define VELPRIM VELR
-#define VELPRIMRAD VELR
+#endif
 
+#ifndef VELPRIMRAD
+#define VELPRIMRAD VELR
+#endif
+
+/*********************/
+/*********************/
+/*********************/
 /*********************/
 //passive definitions
 /*********************/
+/*********************/
+/*********************/
+/*********************/
+
+#ifndef MYCOORDS2
+#define MYCOORDS2 MYCOORDS
+#endif
 
 #ifndef BHSPIN
 #define BHSPIN 0.
@@ -344,10 +365,6 @@
 #define IMPLICIT_LAB_RAD_SOURCE
 #endif
 #endif
-#endif
-
-#ifndef MYCOORDS
-#define MYCOORDS MINKCOORDS 
 #endif
 
 #ifndef NX

@@ -8,28 +8,33 @@
 /********** does not touch hydro primitives ***********************/
 /*****************************************************************/
 int 
-trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg[][5], ldouble GG[][5])
+trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
 {
-  if(CO1==CO2)
+  if(CO1==CO2 && 0)
     {
       pp2[6]=pp1[6];
       pp2[7]=pp1[7];
       pp2[8]=pp1[8];
       pp2[9]=pp1[9];
     }
-  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS || 1)
     {
       //to transform radiative primitives from BL to KS
       ldouble Rij[4][4];
-      calc_Rij(pp1,gg,GG,Rij);
+      //Rij in BL
+      calc_Rij(pp1,gg1,GG1,Rij);
+      //Rij in KS
       trans22_coco(xxvec,Rij,Rij,CO1,CO2);
-      indices_2221(Rij,Rij,gg);
+      //R^i j to R^i_j
+      indices_2221(Rij,Rij,gg2);
+      //temporary place R^t_mu in primitives
       pp1[6]=Rij[0][0];
       pp1[7]=Rij[0][1];
       pp1[8]=Rij[0][2];
       pp1[9]=Rij[0][3]; int temp;
-      u2p_rad(pp1,pp2,gg,GG,&temp);
-    }
+      //convert R^t_mu to {Erf, urf[i]}
+      u2p_rad(pp1,pp2,gg2,GG2,&temp);
+   }
   else
     my_err("transformation not implemented in trans_prad_coco()\n");
 
@@ -60,7 +65,7 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   pp2[7]=Rij[0][1];
   pp2[8]=Rij[0][2];
   pp2[9]=Rij[0][3];
-
+      
   //convert to real primitives
   int corrected;
   u2p_rad(pp2,pp2,gg,GG,&corrected);
@@ -1114,7 +1119,7 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
 	for(j=0;j<4;j++)
 	  T2[i][j]=T1[i][j];
     }
-  else if(CO1==KSCOORDS && (CO1==SCHWCOORDS || CO1==KERRCOORDS))
+  else if(CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       dxdx_KS2BL(xx,dxdx);
       multiply22(T1,T2,dxdx);
@@ -1309,7 +1314,7 @@ print_tensor(ldouble T[][4])
   int i;
   printf("============\n");
   for(i=0;i<4;i++)
-    printf("%10.3e %10.3e %10.3e %10.3e\n",T[i][0],T[i][1],T[i][2],T[i][3]);
+    printf("%10.3e %10.3e %10.3e %10.3e\n",T[0][i],T[1][i],T[2][i],T[3][i]);
   printf("============\n");
   return 0;  
 }

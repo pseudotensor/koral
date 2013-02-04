@@ -9,10 +9,10 @@ OBJS = ko.o fileop.o misc.o physics.o finite.o zsolve_quartic.o problem.o metric
 
 all: $(EXECS)
 
-$(EXECS): $(OBJS) Makefile ko.h problem.h Makefile.gcc Makefile.icc
+$(EXECS): $(OBJS) Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
 	$(CC) $(CFLAGS) -o $(EXECS) $(OBJS) $(LIBS)
 
-$(OBJS): Makefile ko.h problem.h Makefile.gcc Makefile.icc
+$(OBJS): Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
 
 .c.o:
 	$(CC) $(CFLAGS) -o $*.o -c $*.c

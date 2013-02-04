@@ -846,7 +846,7 @@ if(coords==MINKCOORDS) {
 //calculates orthonormal tetrad
 //so far limited to grt.neq.0
 int
-calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4])
+calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int coords)
 {
   ldouble blob1,blob1sq;
   
@@ -1014,8 +1014,11 @@ calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4], int coords)
   ldouble gtt,gtph,gphph,grr,gthth;
   int i,j;
 
-  if(coords==KSCOORDS || MKSCOORDS)
-    my_err("ZAMO tetrad calculation not implemented yet.\n");
+  //TODO: to it in a general way
+  //the following do not work but are not supposed to be used
+  //so the error message suppressed
+  //if(coords==KSCOORDS || coords==MKSCOORDS)
+  //my_err("ZAMO tetrad calculation not implemented yet.\n");
 
   gtt=g[0][0];
   gtph=g[0][3];
@@ -1239,3 +1242,297 @@ r_photon_BL(ldouble a)
 {
   return 2.*(1.-cosl(2./3.*acosl(-a)));
 }
+
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+//precalculates metric etc. and saves it to arrays
+int
+calc_metric()
+{
+  ldouble xx[4];
+  int ix,iy,iz,i,j,k;
+  ldouble gloc[4][5];
+  ldouble Kr[4][4][4];
+  ldouble eup[4][4],elo[4][4];
+  ldouble tup[4][4],tlo[4][4];
+
+  printf("Precalculating metrics... ");
+  
+  for(ix=-NG;ix<NX+NG;ix++)
+    {
+      for(iy=-NG;iy<NY+NG;iy++)
+	{
+	  for(iz=-NG;iz<NZ+NG;iz++)
+	    {
+	      //cell centers
+	      xx[0]=0.;
+	      xx[1]=get_x(ix,0);
+	      xx[2]=get_x(iy,1);
+	      xx[3]=get_x(iz,2);
+	      calc_g(xx,gloc);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		    set_g(g,i,j,ix,iy,iz,gloc[i][j]);
+	      for(j=0;j<3;j++)
+		set_g(g,j,4,ix,iy,iz,calc_dlgdet(xx,j));
+	      set_g(g,3,4,ix,iy,iz,calc_gdet(xx));
+
+	      calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+	      calc_tetrades(gloc,tup,tlo,MYCOORDS);
+	      
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  {
+		    set_T(emuup,i,j,ix,iy,iz,eup[i][j]);
+		    set_T(emulo,i,j,ix,iy,iz,elo[i][j]);
+		    set_T(tmuup,i,j,ix,iy,iz,tup[i][j]);
+		    set_T(tmulo,i,j,ix,iy,iz,tlo[i][j]);
+		  }	      
+
+	      calc_G(xx,gloc);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		    set_g(G,i,j,ix,iy,iz,gloc[i][j]);
+	      
+	      calc_Krzysie(xx,Kr);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  for(k=0;k<4;k++)
+		    set_gKr(i,j,k,ix,iy,iz,Kr[i][j][k]);
+	      	      
+	      //x-faces
+	      if(ix==-NG)
+		{
+		  xx[0]=0.;
+		  xx[1]=get_xb(ix,0);
+		  xx[2]=get_x(iy,1);
+		  xx[3]=get_x(iz,2);
+		  calc_g(xx,gloc);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      set_gb(gbx,i,j,ix,iy,iz,gloc[i][j],0);
+
+		  calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+		  calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      {
+			set_Tb(emuupbx,i,j,ix,iy,iz,eup[i][j],0);
+			set_Tb(emulobx,i,j,ix,iy,iz,elo[i][j],0);
+			set_Tb(tmuupbx,i,j,ix,iy,iz,tup[i][j],0);
+			set_Tb(tmulobx,i,j,ix,iy,iz,tlo[i][j],0);
+		      }	      
+
+
+		  calc_G(xx,gloc);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      set_gb(Gbx,i,j,ix,iy,iz,gloc[i][j],0);
+		  for(j=0;j<3;j++)
+		    set_gb(gbx,j,4,ix,iy,iz,calc_dlgdet(xx,j),0);
+		  set_gb(gbx,3,4,ix,iy,iz,calc_gdet(xx),0);
+
+		  calc_Krzysie(xx,Kr);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      for(k=0;k<4;k++)
+			set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],0);
+
+
+		}
+	      xx[0]=0.;
+	      xx[1]=get_xb(ix+1,0);
+	      xx[2]=get_x(iy,1);
+	      xx[3]=get_x(iz,2);
+	      calc_g(xx,gloc);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  set_gb(gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
+
+	      calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+	      calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  {
+		    set_Tb(emuupbx,i,j,ix+1,iy,iz,eup[i][j],0);
+		    set_Tb(emulobx,i,j,ix+1,iy,iz,elo[i][j],0);
+		    set_Tb(tmuupbx,i,j,ix+1,iy,iz,tup[i][j],0);
+		    set_Tb(tmulobx,i,j,ix+1,iy,iz,tlo[i][j],0);
+		  }	      
+
+	      calc_G(xx,gloc);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  set_gb(Gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
+	      for(j=0;j<3;j++)
+		set_gb(gbx,j,4,ix+1,iy,iz,calc_dlgdet(xx,j),0);
+	      set_gb(gbx,3,4,ix+1,iy,iz,calc_gdet(xx),0);
+
+	      calc_Krzysie(xx,Kr);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  for(k=0;k<4;k++)
+		    set_gKrb(i,j,k,ix+1,iy,iz,Kr[i][j][k],0);
+
+		  
+	      //y-faces
+	      if(iy==-NG)
+		{
+		  xx[0]=0.;
+		  xx[1]=get_x(ix,0);
+		  xx[2]=get_xb(iy,1);
+		  xx[3]=get_x(iz,2);
+		  calc_g(xx,gloc);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      set_gb(gby,i,j,ix,iy,iz,gloc[i][j],1);
+
+		  calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+		  calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      {
+			set_Tb(emuupby,i,j,ix,iy,iz,eup[i][j],1);
+			set_Tb(emuloby,i,j,ix,iy,iz,elo[i][j],1);
+			set_Tb(tmuupby,i,j,ix,iy,iz,tup[i][j],1);
+			set_Tb(tmuloby,i,j,ix,iy,iz,tlo[i][j],1);
+		      }	      
+
+		  calc_G(xx,gloc);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      set_gb(Gby,i,j,ix,iy,iz,gloc[i][j],1);
+		  for(j=0;j<3;j++)
+		    set_gb(gby,j,4,ix,iy,iz,calc_dlgdet(xx,j),1);
+		  set_gb(gby,3,4,ix,iy,iz,calc_gdet(xx),1);
+
+		  calc_Krzysie(xx,Kr);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      for(k=0;k<4;k++)
+			set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],1);
+
+		}
+	      xx[0]=0.;
+	      xx[1]=get_x(ix,0);
+	      xx[2]=get_xb(iy+1,1);
+	      xx[3]=get_x(iz,2);
+	      calc_g(xx,gloc);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  set_gb(gby,i,j,ix,iy+1,iz,gloc[i][j],1);
+
+	      calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+	      calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  {
+		    set_Tb(emuupby,i,j,ix,iy+1,iz,eup[i][j],1);
+		    set_Tb(emuloby,i,j,ix,iy+1,iz,elo[i][j],1);
+		    set_Tb(tmuupby,i,j,ix,iy+1,iz,tup[i][j],1);
+		    set_Tb(tmuloby,i,j,ix,iy+1,iz,tlo[i][j],1);
+		  }	      
+
+	      calc_G(xx,gloc);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  set_gb(Gby,i,j,ix,iy+1,iz,gloc[i][j],1);
+	      for(j=0;j<3;j++)
+		set_gb(gby,j,4,ix,iy+1,iz,calc_dlgdet(xx,j),1);
+	      set_gb(gby,3,4,ix,iy+1,iz,calc_gdet(xx),1);
+		  
+	      calc_Krzysie(xx,Kr);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  for(k=0;k<4;k++)
+		    set_gKrb(i,j,k,ix,iy+1,iz,Kr[i][j][k],1);
+
+	      //z-faces
+	      if(iz==-NG)
+		{
+		  xx[0]=0.;
+		  xx[1]=get_x(ix,0);
+		  xx[2]=get_x(iy,1);
+		  xx[3]=get_xb(iz,2);
+		  calc_g(xx,gloc);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      set_gb(gbz,i,j,ix,iy,iz,gloc[i][j],2);
+
+		  calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+		  calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      {
+			set_Tb(emuupbz,i,j,ix,iy,iz,eup[i][j],2);
+			set_Tb(emulobz,i,j,ix,iy,iz,elo[i][j],2);
+			set_Tb(tmuupbz,i,j,ix,iy,iz,tup[i][j],2);
+			set_Tb(tmulobz,i,j,ix,iy,iz,tlo[i][j],2);
+		      }	      
+
+		  calc_G(xx,gloc);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      set_gb(Gbz,i,j,ix,iy,iz,gloc[i][j],2);
+		  for(j=0;j<3;j++)
+		    set_gb(gbz,j,4,ix,iy,iz,calc_dlgdet(xx,j),2);
+		  set_gb(gbz,3,4,ix,iy,iz,calc_gdet(xx),2);
+
+		  calc_Krzysie(xx,Kr);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      for(k=0;k<4;k++)
+			set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],2);
+
+		}
+	      xx[0]=0.;
+	      xx[1]=get_x(ix,0);
+	      xx[2]=get_x(iy,1);
+	      xx[3]=get_xb(iz+1,2);
+	      calc_g(xx,gloc);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  set_gb(gbz,i,j,ix,iy,iz+1,gloc[i][j],2);	  
+
+	      calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+	      calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  {
+		    set_Tb(emuupbz,i,j,ix,iy,iz+1,eup[i][j],2);
+		    set_Tb(emulobz,i,j,ix,iy,iz+1,elo[i][j],2);
+		    set_Tb(tmuupbz,i,j,ix,iy,iz+1,tup[i][j],2);
+		    set_Tb(tmulobz,i,j,ix,iy,iz+1,tlo[i][j],2);
+		  }	      
+
+	      calc_G(xx,gloc);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  set_gb(Gbz,i,j,ix,iy,iz+1,gloc[i][j],2);	  
+	      for(j=0;j<3;j++)
+		set_gb(gbz,j,4,ix,iy,iz+1,calc_dlgdet(xx,j),2);
+	      set_gb(gbz,3,4,ix,iy,iz+1,calc_gdet(xx),2);
+
+	      calc_Krzysie(xx,Kr);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  for(k=0;k<4;k++)
+		    set_gKrb(i,j,k,ix,iy,iz+1,Kr[i][j][k],2);
+
+	      
+	    }
+	}
+    }
+
+  printf("done!\n");
+
+  return 0;
+}
+
