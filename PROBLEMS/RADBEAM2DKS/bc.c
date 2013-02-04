@@ -53,16 +53,13 @@ ldouble xx=xxvec[1];
       ldouble tupBL[4][4],tloBL[4][4];
       calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
       calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
-      print_Nvector(pp,NV);
-      prad_zamo2ff(pp,pp,ggBL,GGBL,eup);
-      print_Nvector(pp,NV);
-      prad_ff2lab(pp,pp,ggBL,GGBL,tlo);
+      prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+      prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
 
-      //to transform radiative primitives from BL to KS
-      trans_prad_coco(pp, pp, BLCOORDS, KSCOORDS,xxvec,ggBL,GGBL,gg,GG);
+      //to transform radiative primitives from BL to MYCOORDS
+      trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
      
       p2u(pp,uu,gg,GG);
-
       
       return 0.;
     }

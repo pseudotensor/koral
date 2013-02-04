@@ -91,7 +91,7 @@ prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
 prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
 
 //to transform radiative primitives from BL to KS
-trans_prad_coco(pp, pp, BLCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
+trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
 
 //to calculate conserved
 p2u(pp,uu,gg,GG);

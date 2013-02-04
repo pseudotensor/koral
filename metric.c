@@ -1063,7 +1063,14 @@ calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4], int coords)
 int
 coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
 {
-  if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
+  if(CO1==CO2)
+    {
+      x2[0]=x1[0];
+      x2[1]=x1[1];
+      x2[2]=x1[2];
+      x2[3]=x1[3];
+    }
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
     coco_BL2KS(x1,x2);
   else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     coco_KS2BL(x1,x2);

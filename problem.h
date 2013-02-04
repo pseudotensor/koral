@@ -331,6 +331,10 @@
 #define MYCOORDS2 MYCOORDS
 #endif
 
+#ifndef OUTCOORDS
+#define OUTCOORDS MYCOORDS
+#endif
+
 #ifndef BHSPIN
 #define BHSPIN 0.
 #endif

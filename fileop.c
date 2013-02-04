@@ -164,12 +164,18 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  ldouble mx,my,mz,E,e,xx,yy,zz,phipot,xxx[4],dx[3],vv[10],a0,a1,a2,v1,v2,dphidx,v3,Tgas,Trad,v4,v5,v6,v7,Fx,Fy,Fz;
 						  ldouble gg[4][5],GG[4][5];
 						  ldouble pp[NV],uu[NV];
+						  int i,j;
 
 						  v1=v2=v3=v4=v5=v6=v7=0.;
 
-						  xx=get_x(ix,0);
-						  yy=get_x(iy,1);
-						  zz=get_x(iz,2);
+						  ldouble xxvec[4];
+
+						  //transforming code coordinates to output coordinates
+						  get_xx(ix,iy,iz,xxvec);
+						  coco_N(xxvec,xxvec,MYCOORDS,OUTCOORDS);
+						  xx=xxvec[1];
+						  yy=xxvec[2];
+						  zz=xxvec[3];						  
 
 						  xxx[0]=t;
 						  xxx[1]=xx;
@@ -212,13 +218,29 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  pick_T(tmulo,ix,iy,iz,tlo);	    
 						  ldouble eup[4][4],elo[4][4];
 						  pick_T(emuup,ix,iy,iz,eup);
-						  pick_T(emulo,ix,iy,iz,elo);	    
+						  pick_T(emulo,ix,iy,iz,elo);
+
+						  //to transform radiative primitives between coordinates if necessary
+						  //from now on gg, GG, tup, etc. defined in OUTCOORDS!
+
+						  if(MYCOORDS!=OUTCOORDS)
+						    {
+						      ldouble ggout[4][5],GGout[4][5];
+						      calc_g_arb(xxvec,ggout,OUTCOORDS);
+						      calc_G_arb(xxvec,GGout,OUTCOORDS);
+						      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
+						      for(i=0;i<4;i++)
+							for(j=0;j<5;j++)
+							  { gg[i][j]=ggout[i][j]; GG[i][j]=GGout[i][j]; }
+						      calc_tetrades(gg,tup,tlo,OUTCOORDS);
+						      calc_ZAMOes(gg,eup,elo,OUTCOORDS);
+						    }
 						
 #ifdef RADOUTPUTINFF
-						  prad_lab2ff(pp,pp,gg,GG,tup);
+						  prad_lab2ff(pp,pp,ggout,GGout,tupout);
 #elif defined(RADOUTPUTINZAMO) //to print out radiation primitives in ZAMO
-						  prad_lab2ff(pp,pp,gg,GG,tup);
-						  prad_ff2zamo(pp,pp,gg,GG,eup); 
+						  prad_lab2ff(pp,pp,ggout,GGout,tupout);
+						  prad_ff2zamo(pp,pp,ggout,GGout,eupout); 
 #endif
 
  						  E=pp[6];

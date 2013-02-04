@@ -10,14 +10,32 @@
 int 
 trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
 {
-  if(CO1==CO2 && 0)
+  if(CO1==CO2)
     {
       pp2[6]=pp1[6];
       pp2[7]=pp1[7];
       pp2[8]=pp1[8];
       pp2[9]=pp1[9];
     }
-  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS || 1)
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
+    {
+      //to transform radiative primitives from BL to KS
+      ldouble Rij[4][4];
+      //Rij in BL
+      calc_Rij(pp1,gg1,GG1,Rij);
+      //Rij in KS
+      trans22_coco(xxvec,Rij,Rij,CO1,CO2);
+      //R^i j to R^i_j
+      indices_2221(Rij,Rij,gg2);
+      //temporary place R^t_mu in primitives
+      pp1[6]=Rij[0][0];
+      pp1[7]=Rij[0][1];
+      pp1[8]=Rij[0][2];
+      pp1[9]=Rij[0][3]; int temp;
+      //convert R^t_mu to {Erf, urf[i]}
+      u2p_rad(pp1,pp2,gg2,GG2,&temp);
+   }
+  else if(CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       //to transform radiative primitives from BL to KS
       ldouble Rij[4][4];

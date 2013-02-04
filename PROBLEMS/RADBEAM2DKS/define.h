@@ -2,8 +2,9 @@
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
 #define MYCOORDS KSCOORDS
-//#define MYCOORDS KERRCOORDS
-#define MYCOORDS2 KERRCOORDS //suplementary, only for tetrads used when initializing problems
+#define MYCOORDS2 KERRCOORDS //suplementary, only for tetrads used when initializing problems - not yet used
+#define OUTCOORDS KERRCOORDS //coordinates for output
+
 #define NX 30
 #define NY 1
 #define NZ 30
@@ -14,12 +15,12 @@
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define ALLSTEPSOUTPUT 1
+#define ALLSTEPSOUTPUT 0
 #define GAMMA (1.4)
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
-#define BEAMNO 3
+#define BEAMNO 1
 
 #define IFBEAM 1
 //#define GASRADOFF
@@ -45,6 +46,7 @@
 #define BEAML 15.5
 #define BEAMR 16.5
 #define DTOUT1 1. //dt for basic output
+#define NLEFT 0.99
 #elif (BEAMNO==4)
 #define MINX 30
 #define MAXX 50
@@ -56,7 +58,7 @@
 #define MINY .99*Pi/2.
 #define MAXY 1.01*Pi/2.
 
-#define MINZ 0.1
+#define MINZ 0.
 #define MAXZ Pi/4.//8.*Pi/4.
 
 #define PLOTFULLPHI
@@ -65,10 +67,14 @@
 #define EFLOOR 1.e-40
 #define TAMB 1e7
 #define TLEFT 1e9
+
+#ifndef NLEFT
 #define NLEFT 0.999
+#endif
+
 #define RHOAMB 1.e0
 #define KAPPA 0.
-//#define SPECIFIC_BC
+#define SPECIFIC_BC
 #define COPY_XBC
 #define COPY_YBC
 #define COPY_ZBC
