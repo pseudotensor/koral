@@ -21,27 +21,6 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   pick_g(ix,iy,iz,gg);
   ldouble GG[4][5];
   pick_G(ix,iy,iz,GG);
-  ldouble g00=get_g(g,0,0,ix,iy,iz);
-  ldouble g03=get_g(g,0,3,ix,iy,iz);
-  ldouble g30=g03;
-  ldouble g11=get_g(g,1,1,ix,iy,iz);
-  ldouble g22=get_g(g,2,2,ix,iy,iz);  
-  ldouble g33=get_g(g,3,3,ix,iy,iz);
-
-  //inversed metric
-  ldouble G00=get_g(G,0,0,ix,iy,iz);
-  ldouble G03=get_g(G,0,3,ix,iy,iz);
-  ldouble G11=get_g(G,1,1,ix,iy,iz);
-  ldouble G22=get_g(G,2,2,ix,iy,iz);  
-  ldouble G33=get_g(G,3,3,ix,iy,iz);
-  ldouble G30=G03;
-
-  //extent of the cell
-  //TODO
-  ldouble dx[3];
-  dx[0]=get_size_x(ix,0)*sqrt(g11);
-  dx[1]=get_size_x(iy,1)*sqrt(g22);
-  dx[2]=get_size_x(iz,2)*sqrt(g33);   
 
   ldouble pp[NV],uuu[NV];
   int iv;
@@ -95,20 +74,13 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   Acov[1]=1.;
   Acov[2]=0.;
   Acov[3]=0.;
-  Acon[0]=G00*Acov[0]+G03*Acov[3];
-  Acon[1]=G11*Acov[1];
-  Acon[2]=G22*Acov[2];
-  Acon[3]=G33*Acov[3]+G03*Acov[0];
-  
+  indices_12(Acov,Acov,GG);
+   
   Bcov[0]=1.;
   Bcov[1]=0.;
   Bcov[2]=0.;
   Bcov[3]=0.;
-  Bcon[0]=G00*Bcov[0]+G03*Bcov[3];
-  Bcon[1]=G11*Bcov[1];
-  Bcon[2]=G22*Bcov[2];
-  Bcon[3]=G33*Bcov[3]+G03*Bcov[0];
-
+  indices_12(Bcov,Bcov,GG);
 
   Asq = dot(Acon,Acov);
   Bsq = dot(Bcon,Bcov);
@@ -145,10 +117,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   Acov[1]=0.;
   Acov[2]=1.;
   Acov[3]=0.;
-  Acon[0]=G00*Acov[0]+G03*Acov[3];
-  Acon[1]=G11*Acov[1];
-  Acon[2]=G22*Acov[2];
-  Acon[3]=G33*Acov[3]+G03*Acov[0];
+  indices_12(Acov,Acov,GG);
   
   Asq = dot(Acon,Acov);
   Bsq = dot(Bcon,Bcov);
@@ -185,11 +154,8 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   Acov[1]=0.;
   Acov[2]=0.;
   Acov[3]=1.;
-  Acon[0]=G00*Acov[0]+G03*Acov[3];
-  Acon[1]=G11*Acov[1];
-  Acon[2]=G22*Acov[2];
-  Acon[3]=G33*Acov[3]+G03*Acov[0];
-  
+  indices_12(Acov,Acov,GG);
+   
   Asq = dot(Acon,Acov);
   Bsq = dot(Bcon,Bcov);
   Au = dot(Acov, ucon);
@@ -313,12 +279,6 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   ldouble gdet=gg[3][4];
   pick_gb(ix,iy,iz,0,ggxl);
   pick_gb(ix+1,iy,iz,0,ggxr);
-
-  ldouble g00=gg[0][0];
-  ldouble g03=gg[0][3];
-  ldouble g11=gg[1][1];
-  ldouble g22=gg[2][2];
-  ldouble g33=gg[3][3];
 
   ldouble dlgdet[3];
   dlgdet[0]=gg[0][4]; //D[gdet,x1]/gdet
