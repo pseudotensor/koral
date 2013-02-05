@@ -286,7 +286,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   ldouble T[4][4];
 
   //calculating stress energy tensor components
-  calc_Tmunu(pp,gg,GG,T);
+  calc_Tij(pp,gg,GG,T);
 
   int ii, jj;
   for(ii=0;ii<4;ii++)
@@ -398,10 +398,10 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   pick_Gb(ix,iy,iz,idim,GG);  
   ldouble gdet=gg[3][4];
   
-  //calculating Tmunu
+  //calculating Tij
   ldouble T[4][4];
 
-  calc_Tmunu(pp,gg,GG,T);
+  calc_Tij(pp,gg,GG,T);
   //primitives
   ldouble rho=pp[0];
   ldouble u=pp[1];
@@ -564,7 +564,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 //calculates energy-momentum tensor components basing on vector of primitivies p and given metric g
 //returns T^mu_nu
 int
-calc_Tmunu( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
+calc_Tij( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
 {
   int iv,i,j;
   ldouble rho=pp[0];

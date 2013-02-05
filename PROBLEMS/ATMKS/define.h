@@ -4,9 +4,9 @@
 
 #define DTOUT1 1.e2
 #define ALLSTEPSOUTPUT 0
-#define NOUTSTOP 5e1
-//#define PRINTGC_LEFT
-//#define PRINTGC_RIGHT
+#define NOUTSTOP 51
+#define PRINTGC_LEFT
+#define PRINTGC_RIGHT
 
 #define NX 50
 #define NY 1

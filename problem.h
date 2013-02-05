@@ -23,8 +23,9 @@
 //18 ATMSTATIC - hydro atmosphere 
 //19 RADBEAM2DKS - beam of light in KS coordinates
 //20 ATMKS - radial atmosphere infalling in KS
+//21 DONUTKS - 2d Polish donut in KS
 
-#define PROBLEM 20
+#define PROBLEM 21
 
 #if(PROBLEM==1)
 
@@ -306,6 +307,20 @@
 
 #endif
 
+#if(PROBLEM==21)
+
+#define PR_DEFINE "PROBLEMS/DONUTKS/define.h"
+#define PR_BC "PROBLEMS/DONUTKS/bc.c"
+#define PR_INIT "PROBLEMS/DONUTKS/init.c"
+#define PR_KAPPA "PROBLEMS/DONUTKS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/DONUTKS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/DONUTKS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/DONUTKS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/DONUTKS/dump.c"
+#define PR_ANASOL "PROBLEMS/DONUTKS/anasol.c"
+
+#endif
+
 
 
 /*********************/
@@ -325,7 +340,7 @@
 /*********************/
 
 #ifndef VELPRIM
-#define VELPRIM VEL3
+#define VELPRIM VELR
 #endif
 
 #ifndef VELPRIMRAD

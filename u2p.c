@@ -12,7 +12,7 @@
 int
 calc_primitives(int ix,int iy,int iz)
 {
-  int verbose=1;
+  int verbose=0;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
   ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];

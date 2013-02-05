@@ -4,12 +4,58 @@
 #include "ko.h"
 
 /*****************************************************************/
+/********** hydro primitives (E,F^i) between coordinates  *******/
+/********** does not touch radiative primitives ***********************/
+/*****************************************************************/
+int 
+trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
+{
+  int i;
+  for(i=NVHD;i<NV;i++)
+    pp2[i]=pp1[i];
+     
+  if(CO1==CO2)
+    {
+      pp2[0]=pp1[0];
+      pp2[1]=pp1[1];
+      pp2[2]=pp1[2];
+      pp2[3]=pp1[3];
+      pp2[4]=pp1[4];
+    }
+  else
+    {
+      pp2[0]=pp1[0];
+      pp2[1]=pp1[1];
+      //velocity in CO1
+      ldouble ucon[4];
+      ucon[0]=0;
+      ucon[1]=pp1[2];
+      ucon[2]=pp1[3];
+      ucon[3]=pp1[4];
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg1,GG1);
+      //converting to CO2
+      trans2_coco(xxvec,ucon,ucon,CO1,CO2);
+      //to VELPRIM
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg2,GG2);
+      pp2[2]=ucon[1]; 
+      pp2[3]=ucon[2];
+      pp2[4]=ucon[3];
+    }
+  
+  return 0;
+}
+ 
+/*****************************************************************/
 /********** radiative primitives (E,F^i) between coordinates  *******/
 /********** does not touch hydro primitives ***********************/
 /*****************************************************************/
 int 
 trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
 {
+  int i;
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+
   if(CO1==CO2)
     {
       pp2[6]=pp1[6];
@@ -17,45 +63,25 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
       pp2[8]=pp1[8];
       pp2[9]=pp1[9];
     }
-  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
-    {
-      //to transform radiative primitives from BL to KS
-      ldouble Rij[4][4];
-      //Rij in BL
-      calc_Rij(pp1,gg1,GG1,Rij);
-      //Rij in KS
-      trans22_coco(xxvec,Rij,Rij,CO1,CO2);
-      //R^i j to R^i_j
-      indices_2221(Rij,Rij,gg2);
-      //temporary place R^t_mu in primitives
-      pp1[6]=Rij[0][0];
-      pp1[7]=Rij[0][1];
-      pp1[8]=Rij[0][2];
-      pp1[9]=Rij[0][3]; int temp;
-      //convert R^t_mu to {Erf, urf[i]}
-      u2p_rad(pp1,pp2,gg2,GG2,&temp);
-   }
-  else if(CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
-    {
-      //to transform radiative primitives from BL to KS
-      ldouble Rij[4][4];
-      //Rij in BL
-      calc_Rij(pp1,gg1,GG1,Rij);
-      //Rij in KS
-      trans22_coco(xxvec,Rij,Rij,CO1,CO2);
-      //R^i j to R^i_j
-      indices_2221(Rij,Rij,gg2);
-      //temporary place R^t_mu in primitives
-      pp1[6]=Rij[0][0];
-      pp1[7]=Rij[0][1];
-      pp1[8]=Rij[0][2];
-      pp1[9]=Rij[0][3]; int temp;
-      //convert R^t_mu to {Erf, urf[i]}
-      u2p_rad(pp1,pp2,gg2,GG2,&temp);
-   }
   else
-    my_err("transformation not implemented in trans_prad_coco()\n");
-
+    {
+      //to transform radiative primitives between coordinates
+      ldouble Rij[4][4];
+      //Rij in CO1
+      calc_Rij(pp1,gg1,GG1,Rij);
+      //Rij in CO2
+      trans22_coco(xxvec,Rij,Rij,CO1,CO2);
+      //R^ij to R^i_j
+      indices_2221(Rij,Rij,gg2);
+      //temporary place R^t_mu in primitives
+      pp1[6]=Rij[0][0];
+      pp1[7]=Rij[0][1];
+      pp1[8]=Rij[0][2];
+      pp1[9]=Rij[0][3]; int temp;
+      //convert R^t_mu to {Erf, urf[i]}
+      u2p_rad(pp1,pp2,gg2,GG2,&temp);
+   }
+  
   return 0;
 }
 
@@ -884,7 +910,7 @@ multiply22(ldouble T1[][4],ldouble T2[][4],ldouble A[][4])
 /*****************************************************************/
 /*****************************************************************/
 //multiplies 2 vector u1 by 21 tensor A
-//u2^i = A^i_k u1^k
+//u2^i = A^i_j u1^j
 int
 multiply2(ldouble *u1,ldouble *u2,ldouble A[][4])
 {
@@ -899,7 +925,7 @@ multiply2(ldouble *u1,ldouble *u2,ldouble A[][4])
       u2[i]=0.;
       for(j=0;j<4;j++)
 	{
-	  u2[i]+=ut[j]*A[j][i];
+	  u2[i]+=A[i][j]*ut[j];
 	}
     }
 

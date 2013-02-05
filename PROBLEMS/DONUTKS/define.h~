@@ -6,18 +6,19 @@
 #define NOUTSTOP 1000.
 #define VERBOSE0 0
 #define BHSPIN 0.
-#define MYCOORDS SCHWCOORDS
+#define SCHWARZSCHILD
 #define INT_ORDER 1
 #define RK3_STEPPING
+//#define KERR
 #define NX 50
 #define NY 50
 #define NZ 1
-#define TSTEPLIM .6
+#define TSTEPLIM .3
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define INT_ORDER 1
 #define SPECIFIC_BC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 2.
 #define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (4./3.)
@@ -25,7 +26,7 @@
 #define COPY_XBC
 #define COPY_YBC
 #define COPY_ZBC
-#define MINX 4.0
+#define MINX 3.0
 #define MAXX 27.8
 #define MINY 0.*Pi/4.
 #define MAXY Pi/2.
@@ -40,6 +41,7 @@
 
 #define UTPOT 1.
 
+
 #define RHO_AMB 3.e-1
 #define U_AMB 1.e-6
 #define PAR_D 1.e-4
@@ -47,5 +49,3 @@
 #define U2PPREC 1.e-6
 #define U2PRADPREC 1.e-5
 #define RADFORCEPREC 1.e-5
-
-#define PRINTGC_LEFT

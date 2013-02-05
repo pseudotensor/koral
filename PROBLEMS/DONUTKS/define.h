@@ -6,7 +6,8 @@
 #define NOUTSTOP 1000.
 #define VERBOSE0 0
 #define BHSPIN 0.
-#define MYCOORDS SCHWCOORDS
+#define MYCOORDS KSCOORDS
+#define OUTCOORDS SCHWCOORDS
 #define INT_ORDER 1
 #define RK3_STEPPING
 #define NX 50

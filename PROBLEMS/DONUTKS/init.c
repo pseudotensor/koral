@@ -14,11 +14,15 @@
 
 ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
-ldouble uu[NV];
+ldouble uu[NV],xxvec[4];
 
-xx=get_x(ix,0);
-yy=get_x(iy,1);
-zz=get_x(iz,2);
+get_xx(ix,iy,iz,xxvec);
+coco_N(xxvec,xxvec,MYCOORDS,BLCOORDS);
+xx=xxvec[1];
+yy=xxvec[2];
+zz=xxvec[3];
+
+
 ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
@@ -26,11 +30,18 @@ calc_ZAMOes(gg,eup,elo,MYCOORDS);
 
 ldouble pp[NV],T;
 
+//working in BL
+ldouble ggBL[4][5],GGBL[4][5];
+calc_g_arb(xxvec,ggBL,KERRCOORDS);
+calc_G_arb(xxvec,GGBL,KERRCOORDS);
+ldouble eupBL[4][4],eloBL[4][4];
+ldouble tupBL[4][4],tloBL[4][4];
+calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
+calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 
 	 
-ldouble podpierd=-(GG[0][0]-2.*ELL*GG[0][3]+ELL*ELL*GG[3][3]);
+ldouble podpierd=-(GGBL[0][0]-2.*ELL*GGBL[0][3]+ELL*ELL*GGBL[3][3]);
 ldouble ut=-1./sqrt(podpierd);
-
 
 
 
@@ -48,7 +59,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
     uint=U_AMB*powl(xx/2.,-5./2.);
     Vphi=0.;
     rho=PAR_D/(r*r*sqrtl(2./r));  
-    uPhi=GG[3][3]*uphi+GG[0][3]*ut;
+    uPhi=GGBL[3][3]*uphi+GGBL[0][3]*ut;
     //		  Vphi=0.*uPhi/uT;
 
     //zaczynam jednak od profilu analitycznego:   
@@ -56,7 +67,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
     ldouble mD=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
     ldouble mE=PAR_E/(powl(r*r*sqrtl(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
     ldouble V=sqrtl(2./r)*(1.-2./r);
-    W=1./sqrtl(1.-V*V*gg[1][1]);
+    W=1./sqrtl(1.-V*V*ggBL[1][1]);
     ldouble mrho=mD/W;
     ldouble muint=mE/W;	      
     //corrected rho:
@@ -93,23 +104,38 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      uint=rho*eps;
      //		  uint=KKK*powl(rho,GAMMA)/(GAMMA-1.);
      uphi=-ELL*ut;
-     uT=GG[0][0]*ut+GG[0][3]*uphi;
-     uPhi=GG[3][3]*uphi+GG[0][3]*ut;
+     uT=GGBL[0][0]*ut+GGBL[0][3]*uphi;
+     uPhi=GGBL[3][3]*uphi+GGBL[0][3]*ut;
      Vphi=uPhi/uT;
      Vr=0.;
    }       
 //	      if(rho<RHO_AMB) rho=RHO_AMB;
 //	      if(uint<U_AMB) uint=U_AMB;
-pp[0]=rho; pp[1]=uint; pp[4]=Vphi; pp[2]=-Vr; pp[3]=0.;
+
+//4-velocity in BL
+ldouble ucon[4]={0.,-Vr,0.,Vphi};
+
+
+conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
+
+//converting to KS
+trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+
+//to be written in primitives
+conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+
+
+pp[2]=ucon[1]; 
+pp[3]=ucon[2];
+pp[4]=ucon[3];
+
+//density etc.
+pp[0]=rho; pp[1]=uint; 
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 
 //testing if interpolated primitives make sense
-check_floors_hd(pp,VEL3,gg,GG);
+check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
-
-//converting from 3vel to relative velocity
-conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
-
 
 p2u(pp,uu,gg,GG);
 

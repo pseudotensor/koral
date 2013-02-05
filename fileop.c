@@ -199,6 +199,33 @@ fprint_profiles(ldouble t, ldouble totmass)
 						      pp[iv]=get_u(p,iv,ix,iy,iz);
 						    }	    
 
+						  ldouble tup[4][4],tlo[4][4];
+						  pick_T(tmuup,ix,iy,iz,tup);
+						  pick_T(tmulo,ix,iy,iz,tlo);	    
+						  ldouble eup[4][4],elo[4][4];
+						  pick_T(emuup,ix,iy,iz,eup);
+						  pick_T(emulo,ix,iy,iz,elo);
+
+						  //to transform primitives between coordinates if necessary
+						  if(MYCOORDS!=OUTCOORDS)
+						    {
+						      ldouble ggout[4][5],GGout[4][5];
+						      calc_g_arb(xxvec,ggout,OUTCOORDS);
+						      calc_G_arb(xxvec,GGout,OUTCOORDS);
+#ifdef RADIATION
+						      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
+#endif
+						      trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
+						    
+						      //from now on gg, GG, tup, etc. defined in OUTCOORDS!
+						      for(i=0;i<4;i++)
+							for(j=0;j<5;j++)
+							  { gg[i][j]=ggout[i][j]; GG[i][j]=GGout[i][j]; }
+
+						      calc_tetrades(gg,tup,tlo,OUTCOORDS);
+						      calc_ZAMOes(gg,eup,elo,OUTCOORDS);
+						    }
+						  
 						  ldouble rho=pp[0];
 						  ldouble uint=pp[1];
 						  ldouble vx=pp[2];
@@ -214,30 +241,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  ldouble ut=uu[0]/rho;
 						  Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
 
-#ifdef RADIATION
-						  ldouble tup[4][4],tlo[4][4];
-						  pick_T(tmuup,ix,iy,iz,tup);
-						  pick_T(tmulo,ix,iy,iz,tlo);	    
-						  ldouble eup[4][4],elo[4][4];
-						  pick_T(emuup,ix,iy,iz,eup);
-						  pick_T(emulo,ix,iy,iz,elo);
-
-						  //to transform radiative primitives between coordinates if necessary
-						  //from now on gg, GG, tup, etc. defined in OUTCOORDS!
-
-						  if(MYCOORDS!=OUTCOORDS)
-						    {
-						      ldouble ggout[4][5],GGout[4][5];
-						      calc_g_arb(xxvec,ggout,OUTCOORDS);
-						      calc_G_arb(xxvec,GGout,OUTCOORDS);
-						      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
-						      for(i=0;i<4;i++)
-							for(j=0;j<5;j++)
-							  { gg[i][j]=ggout[i][j]; GG[i][j]=GGout[i][j]; }
-						      calc_tetrades(gg,tup,tlo,OUTCOORDS);
-						      calc_ZAMOes(gg,eup,elo,OUTCOORDS);
-						    }
-						
+#ifdef RADIATION						
 #ifdef RADOUTPUTINFF
 						  prad_lab2ff(pp,pp,ggout,GGout,tupout);
 #elif defined(RADOUTPUTINZAMO) //to print out radiation primitives in ZAMO
