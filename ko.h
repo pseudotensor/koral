@@ -125,9 +125,9 @@ int convert_out2gif_1d(char *fname,char*,int niter,ldouble t);
 int convert_out2gif_2d(char *fname,char*,int niter,ldouble t);
 int getch(void);
 int dosthelse(void);
+
 //finite.c
 ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz);
-
 int f_timeder (ldouble t, ldouble dt,ldouble, ldouble*, int ifcopy2u0, ldouble*);
 int set_grid(ldouble*, ldouble*, ldouble*,ldouble*);
 int print_grid(ldouble,ldouble,ldouble);
@@ -284,6 +284,8 @@ int coco_BL2KS(ldouble *xBL, ldouble *xKS);
 int coco_KS2BL(ldouble *xBL, ldouble *xKS);
 
 //relele.c
+int calc_normalobs_4vel(ldouble GG[][5], ldouble *ncon);
+int set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5]);
 #define dot(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2]+A[3]*B[3])
 #define dot3(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2])
@@ -299,8 +301,6 @@ int print_p(ldouble *p);
 int print_u(ldouble *p);
 int convert_uold2urel(ldouble *x,ldouble *u);
 int calc_sourceterms(int,int,int);
-int calc_primitives(int,int,int);
-int calc_conserved(int ix,int iy,int iz);
 ldouble r_horizon_BL(ldouble a);
 ldouble r_mbound_BL(ldouble a);
 ldouble r_photon_BL(ldouble a);
@@ -308,16 +308,18 @@ int update_entropy(int ix,int iy,int iz,int u2pflag);
 int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 
 //u2p.c
+int calc_primitives(int,int,int);
 int check_floors_hd(ldouble *uu, int,ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
 int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble[][5],int*);
 int u2p_hot(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_entropy(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
-int u2p_cold(ldouble*,ldouble*,ldouble[][5]);
+int u2p_cold(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int*);
 
 //p2u.c
+int calc_conserved(int ix,int iy,int iz);
 int p2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][5]);
 int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
 int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5]);

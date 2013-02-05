@@ -41,10 +41,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 	      
   ldouble rho=pp[0];
   ldouble uu=pp[1];
-  ldouble vr=pp[2];
-  ldouble vth=pp[3];
-  ldouble vph=pp[4];
-
+ 
   ldouble pre=(GAMMA-1.)*uu;
   ldouble cs2=GAMMA*pre/(rho+uu+pre);
 
@@ -74,13 +71,13 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   Acov[1]=1.;
   Acov[2]=0.;
   Acov[3]=0.;
-  indices_12(Acov,Acov,GG);
+  indices_12(Acov,Acon,GG);
    
   Bcov[0]=1.;
   Bcov[1]=0.;
   Bcov[2]=0.;
   Bcov[3]=0.;
-  indices_12(Bcov,Bcov,GG);
+  indices_12(Bcov,Bcon,GG);
 
   Asq = dot(Acon,Acov);
   Bsq = dot(Bcon,Bcov);
@@ -117,7 +114,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   Acov[1]=0.;
   Acov[2]=1.;
   Acov[3]=0.;
-  indices_12(Acov,Acov,GG);
+  indices_12(Acov,Acon,GG);
   
   Asq = dot(Acon,Acov);
   Bsq = dot(Bcon,Bcov);
@@ -154,7 +151,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   Acov[1]=0.;
   Acov[2]=0.;
   Acov[3]=1.;
-  indices_12(Acov,Acov,GG);
+  indices_12(Acov,Acon,GG);
    
   Asq = dot(Acon,Acov);
   Bsq = dot(Bcon,Bcov);

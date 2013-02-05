@@ -213,81 +213,50 @@ conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[]
   return 0;
 }
 
-
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//calculates conserved in given cell using global array p[]
+//returns contravariant four-velocity of a normal observer
+//n_mu=(-alp,0,0,0)
 int
-calc_conserved(int ix,int iy,int iz)
+calc_normalobs_4vel(ldouble GG[][5], ldouble *ncon)
 {
-  int iv;
-  ldouble uu[NV],pp[NV];
-  ldouble gg[4][5],GG[4][5],tlo[4][4],tup[4][4];
-  
-  pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
-
-  for(iv=0;iv<NV;iv++)
-    {
-      pp[iv]=get_u(p,iv,ix,iy,iz);
-    }
-
-  p2u(pp,uu,gg,GG);
-
-
-  for(iv=0;iv<NV;iv++)
-    {
-      set_u(u,iv,ix,iy,iz,uu[iv]);
-    }
-
-  return 0;
+  ldouble alp=1./sqrt(-GG[0][0]);
+  ldouble ncov[4]={-alp,0.,0.,0.};
+  indices_12(ncov,ncon,GG);
+  return 0.;
 }
- 
 
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//calculates primitives in given cell basing on global array u[]
+//returns hydro primitives for an atmosphere
+//velocities already in VELPRIM
 int
-calc_primitives(int ix,int iy,int iz)
+set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype)
 {
-  int iv,u2pret,u2pretav;
-  ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
-  ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];
-
-  pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
-
-  for(iv=0;iv<NV;iv++)
+  if(atmtype==0)
     {
-      uu[iv]=get_u(u,iv,ix,iy,iz);
-      pp[iv]=get_u(p,iv,ix,iy,iz);
+      //normal observer
+      ldouble ucon[4];
+      calc_normalobs_4vel(GG,ucon);
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+      pp[2]=ucon[1];
+      pp[3]=ucon[2];
+      pp[4]=ucon[3];
+      //something, to be changed by user in problem specific file
+      pp[0]=1.;
+      pp[1]=0.001;
+      return 0;
     }
-
-  //converting to primitives
-  int corrected;
-  u2pret=u2p(uu,pp,gg,GG,&corrected);
-
-  //update conserved to follow corrections on primitives
-  if(corrected!=0)
-    {
-      //      printf("correcting conserved\n");
-      p2u(pp,uu,gg,GG);
-      for(iv=0;iv<NV;iv++)
-	{
-	  set_u(u,iv,ix,iy,iz,uu[iv]);
-	}
-    }
-
-  //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
-  set_cflag(0,ix,iy,iz,u2pret); 
-  
-  for(iv=0;iv<NV;iv++)    
-    set_u(p,iv,ix,iy,iz,pp[iv]);	      
-
-  return 0;
+  else
+    my_err("atmtype value not handled in set_atmosphere()\n");
+  return 0.;
 }
+
+
+
+
 
 //**********************************************************************
 //**********************************************************************

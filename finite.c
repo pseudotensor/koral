@@ -293,11 +293,9 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   if(my_max(aaayhd,aaayrad)>max_ws[1]) max_ws[1]=my_max(aaayhd,aaayrad);
   //#pragma omp critical
   if(my_max(aaazhd,aaazrad)>max_ws[2]) max_ws[2]=my_max(aaazhd,aaazrad);
-#else
- 
+#else 
   //#pragma omp critical
-  if(aaaxhd>max_ws[0]) 
-    max_ws[0]=aaaxhd;    
+  if(aaaxhd>max_ws[0]) max_ws[0]=aaaxhd;  
   //#pragma omp critical
   if(aaayhd>max_ws[1]) max_ws[1]=aaayhd;
   //#pragma omp critical
@@ -673,7 +671,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
 
-		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz));getchar();}
+		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz),dt);getchar();}
 
 		  set_u(u,iv,ix,iy,iz,val);		  
 		} 

@@ -4,6 +4,53 @@
 
 #include "ko.h"
 
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates primitives in given cell basing on global array u[]
+int
+calc_primitives(int ix,int iy,int iz)
+{
+  int verbose=1;
+  int iv,u2pret,u2pretav;
+  ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
+  ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];
+
+  pick_g(ix,iy,iz,gg);
+  pick_G(ix,iy,iz,GG);
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uu[iv]=get_u(u,iv,ix,iy,iz);
+      pp[iv]=get_u(p,iv,ix,iy,iz);
+    }
+
+  //converting to primitives
+  int corrected;
+  u2pret=u2p(uu,pp,gg,GG,&corrected);
+
+  //update conserved to follow corrections on primitives
+  if(corrected!=0)
+    {
+      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);getchar();}
+      p2u(pp,uu,gg,GG);
+      for(iv=0;iv<NV;iv++)
+	{
+	  set_u(u,iv,ix,iy,iz,uu[iv]);
+	}
+    }
+
+  //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
+  set_cflag(0,ix,iy,iz,u2pret); 
+  
+  for(iv=0;iv<NV;iv++)    
+    set_u(p,iv,ix,iy,iz,pp[iv]);	      
+
+  return 0;
+}
+
+
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
@@ -64,7 +111,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 	  //************************************
 	  //cold RHD - assuming u=SMALL
 	  ret=-2;
-	  u2pret=u2p_cold(uu,pp,gg);
+	  u2pret=u2p_cold(uu,pp,gg,GG);
 	  //************************************
 
 	  if(u2pret<0)
@@ -436,6 +483,9 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
   
+  if(verbose) {printf("********************\n");print_Nvector(uu,NV);}
+  if(verbose) {print_Nvector(pp,NV);}
+
   //alpha
   alpha=sqrt(-1./GG[0][0]);
 
@@ -494,17 +544,18 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       qsq+=utcon[i]*utcon[j]*gg[i][j];
   ldouble gamma2=1.+qsq;
   W=(rho+GAMMA*u)*gamma2;
-  if(verbose) printf("initail W:%e\n",W);
+  if(verbose) printf("initial W:%e\n",W);
  
   //test if does not provide reasonable gamma2
   if(W*W<Qt2)
     {
       W=2.*sqrt(Qt2);
+      if(verbose) printf("corrected W:%e\n",W);
     }
 
   //1d Newton solver
-  ldouble CONV=1.e-4;
-  ldouble EPS=1.e-6;
+  ldouble CONV=1.e-6;
+  ldouble EPS=1.e-8;
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
   ldouble cons[3]={Qn,Qt2,D};
@@ -533,7 +584,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       return -1;
     }
   
-  if(isnan(W) || isinf(W)) {if(verbose)printf("nan/inf W: %e\n",W); getchar();}
+  if(isnan(W) || isinf(W)) {if(verbose)printf("nan/inf W: %e\n",W); return -1;}
   if(verbose) {printf("the end: %e\n",W); }
 
   //W found, let's calculate v2 and the rest
@@ -581,6 +632,8 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 int
 u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
+  int verbose=0;
+
   ldouble gtt=g[0][0];
   ldouble gtph=g[0][3];
   ldouble grr=g[1][1];
@@ -597,6 +650,8 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble Sut=uuu[5];
 
   conv_velsinprims(p,VELPRIM,VEL3,g,G);
+
+  if(verbose) print_Nvector(p,NV);
 
   ldouble rho=p[0]; //initial guess
   ldouble uu=p[1];
@@ -660,6 +715,10 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
     //Newton
     rhop1=rho-fval/dfval;   
 
+    if(rhop1<RHOFLOOR) rhop1=rho/2.;
+
+    if(verbose) printf("%d %e %e %e\n",iter,rhop1,rho,fval);
+
     diffrho=rhop1-rho;
     
     ftest[iter][0]=rho;
@@ -693,8 +752,9 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 
   if(uu<0. || rho<0. || isnan(rho))
     {
-      printf("u2p_entr didn't work: %e %e\n",uu,rho);
+      printf("u2p_entr didn't work: %e %e\n",uu,rho); 
       print_Nvector(uuu,NV);
+      getchar();
       return -1;
     }
 
@@ -722,7 +782,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 //**********************************************************************
 //auxiliary solver assuming u=0
 int
-u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5])
+u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
   ldouble gtt=g[0][0];
   ldouble gtph=g[0][3];
@@ -762,6 +822,15 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5])
   p[3]=vth;
   p[4]=vph;
   p[5]=S;
+
+  //************************************
+  //************************************
+  //checking on hd floors
+  check_floors_hd(p,VEL3,g,G);
+  //************************************
+  //************************************
+
+  conv_velsinprims(p,VEL3,VELPRIM,g,G);
 
   return 0;
 }

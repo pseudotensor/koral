@@ -22,6 +22,7 @@ zz=get_x(iz,2);
 ldouble gg[4][5],eup[4][4],elo[4][4],GG[4][5];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
+calc_LNRFes(gg,eup,elo);
 
 ldouble pp[NV],T;
 
@@ -57,9 +58,6 @@ pp[0]=mrho; pp[1]=muint; pp[2]=-V; pp[3]=pp[4]=0.;
 #ifdef BLOB
 pp[0]*=1.+BLOBMAG*exp(-(xx-BLOBX)*(xx-BLOBX)/BLOBSIG/BLOBSIG);
 #endif
-
-      //temp
-//      pp[0]=1.; pp[1]=1.e-4; pp[2]=0.;
 
 pp[5]=calc_Sfromu(pp[0],pp[1]);	      
 

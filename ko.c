@@ -105,11 +105,7 @@ solve_all_problems_5(ldouble tstart)
       else if(NY>1)
 	tstepden=max_ws[0]/min_dx + max_ws[1]/min_dy;
       else
-	tstepden=max_ws[0]/min_dx;
-      if(dt<0.)
-	dt=TSTEPLIM*1./tstepden;
-      else       
-	dt=TSTEPLIM*1./tstepden;
+	tstepden=max_ws[0]/min_dx;            
 #else //radiation included
       //TODO: what is below assumes wavespeed=1 but for thick flows the real characterstic speed may be lower and time step larger
       if(NZ>1)
@@ -117,14 +113,11 @@ solve_all_problems_5(ldouble tstart)
       else if(NY>1)
 	tstepden=(1./min_dx + 1./min_dy);
       else 
-	tstepden=(1./min_dx);
-
-      if(dt<0.)
-	dt=INITTSTEPLIM*1./tstepden;
-      else       
-	dt=TSTEPLIM*1./tstepden;
+	tstepden=(1./min_dx);          
 #endif
       
+      dt=TSTEPLIM*1./tstepden;
+
       //reseting wavespeeds
       max_ws[0]=-1.;
       max_ws[1]=-1.;

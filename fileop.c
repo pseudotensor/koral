@@ -172,7 +172,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 
 						  //transforming code coordinates to output coordinates
 						  get_xx(ix,iy,iz,xxvec);
+						  
 						  coco_N(xxvec,xxvec,MYCOORDS,OUTCOORDS);
+						  
 						  xx=xxvec[1];
 						  yy=xxvec[2];
 						  zz=xxvec[3];						  

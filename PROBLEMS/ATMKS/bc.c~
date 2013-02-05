@@ -39,10 +39,6 @@ ldouble xx=get_x(ix,0);
       rho=PAR_D/(r*r*sqrtl(2./r));    
 
       pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.; 
-
-      //temp
-      //pp[0]=1.; pp[1]=1.e-4; pp[2]=0.;
-
       pp[5]=calc_Sfromu(rho,uint);
 
       //converting from 3vel to VELPRIM

@@ -6,6 +6,37 @@
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//calculates conserved in given cell using global array p[]
+int
+calc_conserved(int ix,int iy,int iz)
+{
+  int iv;
+  ldouble uu[NV],pp[NV];
+  ldouble gg[4][5],GG[4][5],tlo[4][4],tup[4][4];
+  
+  pick_g(ix,iy,iz,gg);
+  pick_G(ix,iy,iz,GG);
+
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=get_u(p,iv,ix,iy,iz);
+    }
+
+  p2u(pp,uu,gg,GG);
+
+
+  for(iv=0;iv<NV;iv++)
+    {
+      set_u(u,iv,ix,iy,iz,uu[iv]);
+    }
+
+  return 0;
+}
+ 
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //primitive to conserved converter
 int
 p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])

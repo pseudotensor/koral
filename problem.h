@@ -22,8 +22,9 @@
 //17 RADDBLSHADOW - radiative shadow with two beams inclined
 //18 ATMSTATIC - hydro atmosphere 
 //19 RADBEAM2DKS - beam of light in KS coordinates
+//20 ATMKS - radial atmosphere infalling in KS
 
-#define PROBLEM 19
+#define PROBLEM 20
 
 #if(PROBLEM==1)
 
@@ -291,6 +292,20 @@
 
 #endif
 
+#if(PROBLEM==20)
+
+#define PR_DEFINE "PROBLEMS/ATMKS/define.h"
+#define PR_BC "PROBLEMS/ATMKS/bc.c"
+#define PR_INIT "PROBLEMS/ATMKS/init.c"
+#define PR_KAPPA "PROBLEMS/ATMKS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/ATMKS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/ATMKS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/ATMKS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/ATMKS/dump.c"
+#define PR_ANASOL "PROBLEMS/ATMKS/anasol.c"
+
+#endif
+
 
 
 /*********************/
@@ -310,12 +325,16 @@
 /*********************/
 
 #ifndef VELPRIM
-#define VELPRIM VELR
+#define VELPRIM VEL3
 #endif
 
 #ifndef VELPRIMRAD
 #define VELPRIMRAD VELR
 #endif
+
+#define NFLAGS 1 //number of cell flags
+
+#define SMALL 1.e-50 //small number 
 
 /*********************/
 /*********************/
@@ -424,15 +443,26 @@
 #define GAMMA (5./3.) //gamma
 #endif
 
-#define GAMMAM1 (GAMMA-1.) //gamma - 1
-
-#define NFLAGS 1 //number of cell flags
-
-#define SMALL 1.e-50 //small number 
 
 #ifndef MASS
 #define MASS 1./MSUNCM //default mass of the BH used to calibrate radiation constant, Solar mass units
 #endif
+
+#ifndef U2PRADPREC
+#define U2PRADPREC 1.e-5
+#endif
+
+/*********************/
+/*********************/
+/*********************/
+/*********************/
+/***** wrappers ******/
+/*********************/
+/*********************/
+/*********************/
+/*********************/
+
+#define GAMMAM1 (GAMMA-1.) //gamma - 1
 
 #define MASSCM (MASS*MSUNCM) //mass in cm
 
