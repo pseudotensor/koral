@@ -25,7 +25,11 @@ if(ix>=NX)
     pp[1]=PAR_U;
 
     //calculating entropy
-    pp[5]=calc_Sfromu(pp[0],pp[1]);	      
+    pp[5]=calc_Sfromu(pp[0],pp[1]);
+	      
+    //testing if interpolated primitives make sense
+    check_floors_hd(pp,VELPRIM,gg,GG);
+    //end of floor section
 
     p2u(pp,uu,gg,GG);
 
@@ -45,6 +49,11 @@ if(ix>=NX)
        }
 
      if(pp[2]>0.) pp[2]=0.;
+
+     //testing if interpolated primitives make sense
+     check_floors_hd(pp,VELPRIM,gg,GG);
+     //end of floor section
+
 
      p2u(pp,uu,gg,GG);
      return 0;
