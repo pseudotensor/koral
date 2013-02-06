@@ -9,11 +9,14 @@
 #define ANAL_PROFILE
 #define RK3STEPPING
 #define INT_ORDER 1
-#define NX 500
+#define NX 100
 #define NY 1
 #define NZ 1
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
+#define NOUTSTOP 50
+#define U2P_NUMTEMP
+
 #define SPECIFIC_BC
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
@@ -32,7 +35,7 @@
 #define RHOFLOOR 1.e-20
 #define UFLOOR 1.e-15
 #define PAR_D 1.e0
-#define PAR_E 1.e-3
+#define PAR_E 1.e-5
 
 #define RHO_AMB 1.e-3
 #define U_AMB 1.e-7
@@ -44,5 +47,5 @@
 
 #define BLOB
 #define BLOBX 30.
-#define BLOBMAG 10.
+#define BLOBMAG 1.
 #define BLOBSIG 1.

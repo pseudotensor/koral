@@ -59,7 +59,7 @@ int
 u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 {
   *corrected=0;
-  int verbose=0;
+  int verbose=1;
   int hdcorr=0;
   int radcorr=0;
 
@@ -83,7 +83,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
   //hot hydro - conserving energy
   ret=0;
 #ifdef U2P_NUMTEMP
-  u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 1D numerical solver - not perfect
+  //  u2pret=u2p_hot_gsl(uu,pp,gg,GG);  //temporary 1D numerical solver - not perfect
 #else
   u2pret=u2p_hot(uu,pp,gg,GG);  //TODO: check cancelation!
 #endif
@@ -297,165 +297,6 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 
   //to let the others know to correct conserved
   return -1;
-}
-
-
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//basic conserved to primitives solver
-//'hot grhd' - pure hydro, numerical in 5D
-//but currently work only for 1D problems
-//TODO: to be replaced by something much better 
-int
-print_state (int iter, gsl_multiroot_fsolver * s)
-{
-  printf ("iter = %3d \n"
-	  "x = % .15e  % .15e  % .15e  % .15e  % .15e  "
-	  "f(x) = % .15e  % .15e  % .15e  % .15e  % .15e\n",
-	  iter,
-	  gsl_vector_get (s->x, 0),
-	  gsl_vector_get (s->x, 1),
-	  gsl_vector_get (s->x, 2),
-	  gsl_vector_get (s->x, 3),
-	  gsl_vector_get (s->x, 4),
-	  gsl_vector_get (s->f, 0),
-	  gsl_vector_get (s->f, 1),
-	  gsl_vector_get (s->f, 2),
-	  gsl_vector_get (s->f, 3),
-	  gsl_vector_get (s->f, 4));
-}
-
-struct u2photpar
-{
-  ldouble *uuu;
-  //  double g[4][5];
-};
-     
-int
-f_u2p_hot_gsl(const gsl_vector * x, void *params,
-	      gsl_vector * f)
-{
-  ldouble *uuu = ((struct u2photpar *) params)->uuu;
-    
-  ldouble rho = (ldouble)gsl_vector_get (x, 0);
-  ldouble uu = (ldouble)gsl_vector_get (x, 1);
-  ldouble vr = (ldouble)gsl_vector_get (x, 2);
-  ldouble vph = 0.*(ldouble)gsl_vector_get (x, 3);
-  ldouble vth = 0.*(ldouble)gsl_vector_get (x, 4);
-     
-  //flat
-  ldouble gtt=-1;
-  ldouble gtph=1.;
-  ldouble gphph=1.;
-  ldouble gthth=1.;
-  ldouble grr=1.;
-
-  ldouble ut2=-1./(gtt + 2.*vph*gtph + vr*vr*grr + vph*vph*gphph + vth*vth*gthth);
-
-  if(ut2<0.)
-    {
-      return -1;
-      my_err("ut2.lt.0 in f_u2p_hot_gsl\n"); ut2=0.;
-    }
-
-  ldouble ut=sqrt(ut2);
-  ldouble rhout = rho*ut;
-  ldouble Sut;
-
-  ldouble Tttt=rhout*(1+ut*(gtt+vph*gtph))+GAMMA*uu*ut2*(gtt+vph*gtph)+uu*(GAMMA-1.);  
-  ldouble Ttr=(rho+GAMMA*uu)*ut2*vr*grr;
-  ldouble Ttth=(rho+GAMMA*uu)*ut2*vth*gthth;
-  ldouble Ttph=(rho+GAMMA*uu)*ut2*(gtph+vph*gphph);
-
-     
-  gsl_vector_set (f, 0, (double)(rhout-uuu[0]));
-  gsl_vector_set (f, 1, (double)(Tttt-uuu[1]));
-  gsl_vector_set (f, 2, (double)(Ttr-uuu[2]));
-  //gsl_vector_set (f, 3, (double)(Ttth-uuu[3]));
-  //gsl_vector_set (f, 4, (double)(Ttph-uuu[4]));
-     
-  return GSL_SUCCESS;
-}
-
-
-int
-u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
-{
-
-  const gsl_multiroot_fsolver_type *T;
-  gsl_multiroot_fsolver *s;
-     
-  int verbose=0;
-  int status;
-  int iter = 0;
-     
-  const size_t n = 3;
-  struct u2photpar par = {uuu};
-  gsl_multiroot_function f = {&f_u2p_hot_gsl, n, &par};
-
-  conv_velsinprims(p,VELPRIM,VEL3,g,G);
-     
-  double x_init[5] = {p[0],p[1],p[2],p[3],p[4]};
-  gsl_vector *x = gsl_vector_alloc (n);
-     
-  gsl_vector_set (x, 0, x_init[0]);
-  gsl_vector_set (x, 1, x_init[1]);
-  gsl_vector_set (x, 2, x_init[2]);
-  //gsl_vector_set (x, 3, x_init[3]);
-  //gsl_vector_set (x, 4, x_init[4]);
-
-  T = gsl_multiroot_fsolver_hybrids;
-  s = gsl_multiroot_fsolver_alloc (T, n);
-  gsl_multiroot_fsolver_set (s, &f, x);
-     
-  if(verbose>0) print_state (iter, s);
-     
-  do
-    {
-      iter++;
-      status = gsl_multiroot_fsolver_iterate (s);
-      
-      if(verbose>0) print_state (iter, s);
-      
-      if (status)   /* check if solver is stuck */
-	break;
-      
-      status =
-	gsl_multiroot_test_residual (s->f, 1.e-7);
-    }
-  while (status == GSL_CONTINUE && iter < 1000);
-
-  if(verbose>0) printf ("status = %s\n", gsl_strerror (status));
-
-  if(status!=GSL_SUCCESS) 
-    return -1;
-  
-  ldouble rhout=uuu[0];
-  ldouble Tttt=uuu[1];
-  ldouble Ttr=uuu[2];
-  ldouble Ttth=uuu[3];
-  ldouble Ttph=uuu[4];
-  ldouble Sut=uuu[5];
-
-  p[0]=gsl_vector_get (s->x,0);
-  p[1]=gsl_vector_get (s->x,1);
-  p[2]=gsl_vector_get (s->x,2);
-  //p[3]=gsl_vector_get (x,3);
-  //p[4]=gsl_vector_get (x,4);
-  p[3]=p[4]=0.;
-
-  ldouble ut=rhout/p[0];
-
-  p[5]=Sut/ut;
-
-  conv_velsinprims(p,VEL3,VELPRIM,g,G);
-
-  gsl_multiroot_fsolver_free (s);
-  gsl_vector_free (x);
-
-  return 0;
 }
 
 //**********************************************************************
