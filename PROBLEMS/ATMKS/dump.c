@@ -25,3 +25,4 @@ v1=mvx;
 v2=mvy;
 v3=mvz;
  
+v4=get_cflag(ENTROPYFLAG,ix,iy,iz);

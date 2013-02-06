@@ -14,7 +14,7 @@
 #define NZ 1
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
-#define NOUTSTOP 20
+#define NOUTSTOP 30
 //#define U2P_TEMP
 
 #define SPECIFIC_BC
@@ -35,7 +35,7 @@
 #define RHOFLOOR 1.e-20
 #define UFLOOR 1.e-15
 #define PAR_D 1.e0
-#define PAR_E 1.e-7
+#define PAR_E 1.e-4
 
 #define RHO_AMB 1.e-3
 #define U_AMB 1.e-7
@@ -47,5 +47,5 @@
 
 #define BLOB
 #define BLOBX 30.
-#define BLOBMAG 0.1
+#define BLOBMAG 1.
 #define BLOBSIG 1.

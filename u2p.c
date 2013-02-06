@@ -42,9 +42,9 @@ calc_primitives(int ix,int iy,int iz)
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
    if(corrected!=0)
-     set_cflag(0,ix,iy,iz,-1); 
+     set_cflag(ENTROPYFLAG,ix,iy,iz,-1); 
    else 
-     set_cflag(0,ix,iy,iz,0); 
+     set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
   
   for(iv=0;iv<NV;iv++)    
     set_u(p,iv,ix,iy,iz,pp[iv]);	      
@@ -61,7 +61,7 @@ int
 u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 {
   *corrected=0;
-  int verbose=1;
+  int verbose=0;
   int hdcorr=0;
   int radcorr=0;
 

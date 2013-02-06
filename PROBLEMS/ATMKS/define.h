@@ -1,8 +1,8 @@
 #define BHSPIN 0.
-#define MYCOORDS SCHWCOORDS
+#define MYCOORDS KSCOORDS
 #define OUTCOORDS SCHWCOORDS
 
-#define DTOUT1 1.e2
+#define DTOUT1 1.e3
 #define ALLSTEPSOUTPUT 0
 #define NOUTSTOP 51
 #define PRINTGC_LEFT
@@ -11,7 +11,7 @@
 #define NX 50
 #define NY 1
 #define NZ 1
-#define MINX 100.
+#define MINX 10.
 #define MAXX 200.
 #define MINY .99*Pi/2.
 #define MAXY 1.01*Pi/2.
@@ -31,7 +31,7 @@
 
 #define GAMMA (5./3.)
 #define PAR_D 1.e0
-#define PAR_U 1.e-3
+#define PAR_U 1.e-5
 
 #define RHOFLOOR 1.e-20
 #define UFLOOR 1.e-15

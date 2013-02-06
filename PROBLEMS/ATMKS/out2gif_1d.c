@@ -63,7 +63,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($16) w lp ls 2 pt 7 ps .5  ti \"u^r/u^t\"\n"
+	  "plot \"%s\" u 1:($16) w lp ls 2 pt 7 ps .5 ti \"u^r/u^t (BL)\", \"%s\" u 1:($24) w lp ls 3 pt 7 ps .5  ti \"u^r/u^t (KS)\"\n"
 
 
 	  "set lmargin at screen 0.60\n"
@@ -74,8 +74,8 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($6) w lp ls 4 pt 7 ti \"utilde^r\""
-	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname);
+	  "plot \"%s\" u 1:($27) w lp ls 4 pt 7 ti \"entropy flag\""
+	   ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname);
 
 
 

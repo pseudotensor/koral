@@ -14,3 +14,6 @@
 #define MINKCOORDS 4
 #define CYLCOORDS 5
 #define SPHCOORDS 6
+
+//cell flags
+#define ENTROPYFLAG 0
