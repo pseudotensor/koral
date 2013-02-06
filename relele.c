@@ -235,18 +235,38 @@ calc_normalobs_4vel(ldouble GG[][5], ldouble *ncon)
 int
 set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype)
 {
-  if(atmtype==0)
+  if(atmtype==0) //normal observer plur rho \propto r^-1.5
     {
       //normal observer
-      ldouble ucon[4];
+      ldouble ucon[4],r;
       calc_normalobs_4vel(GG,ucon);
       conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
       pp[2]=ucon[1];
       pp[3]=ucon[2];
       pp[4]=ucon[3];
-      //something, to be changed by user in problem specific file
-      pp[0]=1.;
-      pp[1]=0.001;
+
+      // Bondi-like atmosphere
+      r=xx[1];
+      pp[0] = RHOATMMIN*pow(r,-1.5);
+      pp[1] = UINTATMMIN*pow(r,-2.5);
+  
+      return 0;
+    }
+  else if(atmtype==1) //normal observer plur rho \propto r^-2.0
+    {
+      //normal observer
+      ldouble ucon[4],r;
+      calc_normalobs_4vel(GG,ucon);
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+      pp[2]=ucon[1];
+      pp[3]=ucon[2];
+      pp[4]=ucon[3];
+
+      // Bondi-like atmosphere
+      r=xx[1];
+      pp[0] = RHOATMMIN*pow(r,-2.0);
+      pp[1] = UINTATMMIN*pow(r,-2.5);
+  
       return 0;
     }
   else

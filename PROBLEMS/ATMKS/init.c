@@ -17,8 +17,6 @@ pick_G(ix,iy,iz,GG);
 
 //ambient
 set_hdatmosphere(pp,xxvec,gg,GG,0);
-pp[0]=PAR_D;
-pp[1]=PAR_U;
 
 //calculating entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);	      

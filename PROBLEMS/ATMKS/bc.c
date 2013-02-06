@@ -21,8 +21,17 @@ if(ix>=NX)
   {
     //ambient
     set_hdatmosphere(pp,xxvec,gg,GG,0);
-    pp[0]=PAR_D;
-    pp[1]=PAR_U;
+
+    //BL inflow velocity
+    ldouble ucon[4];
+    ldouble r=xx;
+    ucon[1]=-sqrtl(2./r)*(1.-2./r);
+    ucon[2]=ucon[3]=0.;
+    trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+    conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+    pp[2]=ucon[1];
+    pp[3]=ucon[2];
+    pp[4]=ucon[3];
 
     //calculating entropy
     pp[5]=calc_Sfromu(pp[0],pp[1]);

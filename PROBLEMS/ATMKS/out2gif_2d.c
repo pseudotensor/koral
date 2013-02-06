@@ -90,7 +90,7 @@
 	  -.05*get_xb(NX+NG,0),
 	  1.05*get_xb(NX+NG,0),
 #endif
-	  fname,fname,fname,PAR_D,fname,fname,fname); 
+	  fname,fname,fname,0.,fname,fname,fname); 
 	    
 
 /*
