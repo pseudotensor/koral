@@ -1,17 +1,23 @@
 //returns problem specific BC
 //int calc_bc(int ix,int iy,int iz,ldouble t,ldouble *uu,ldouble *pp) {
 
-int iix,iiy,iiz,iv;  	  
-ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4],GG[4][5];
-ldouble xx,yy,zz,xxvec[4];
-pick_g(ix,iy,iz,gg);
-pick_G(ix,iy,iz,GG);
+int iix,iiy,iiz,iv;  
 
+ldouble xx,yy,zz,xxvec[4];
 get_xx(ix,iy,iz,xxvec);
-//coco_N(xxvec,xxvec,KSCOORDS,BLCOORDS);
+coco_N(xxvec,xxvec,KSCOORDS,BLCOORDS);
 xx=xxvec[1];
 yy=xxvec[2];
 zz=xxvec[3];
+
+ldouble gg[4][5],eup[4][4],elo[4][4],GG[4][5];
+pick_g(ix,iy,iz,gg);
+pick_G(ix,iy,iz,GG);
+
+//KERR metric
+ldouble ggBL[4][5],GGBL[4][5];
+calc_g_arb(xxvec,ggBL,KERRCOORDS);
+calc_G_arb(xxvec,GGBL,KERRCOORDS);
 
 
 /**********************/
@@ -27,6 +33,7 @@ if(ix>=NX)
     ldouble r=xx;
     ucon[1]=-sqrtl(2./r)*(1.-2./r);
     ucon[2]=ucon[3]=0.;
+    conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
     trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
     conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
     pp[2]=ucon[1];

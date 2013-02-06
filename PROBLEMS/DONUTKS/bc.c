@@ -39,29 +39,21 @@ if(ix>=NX) //analytical solution at rout only
     ldouble D,E,W,eps,uT,uphi,uPhi;
     if(ut<-1 || podpierd<0.|| NODONUT)
       {
-	rho=RHO_AMB*pow(xx/2.,-1.5);
-	uint=U_AMB*pow(xx/2.,-5./2.);
-	Vphi=0.;
-	Vr=0.;
-	   
-	ldouble r=get_x(ix,0);
-	D=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
-	E=PAR_E/(powl(r*r*sqrt(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
-	ldouble V=sqrtl(2./r)*(1.-2./r);
-	W=1./sqrtl(1.-V*V*ggBL[1][1]);
-	rho=D/W;
-	uint=E/W;
-	Vr=V;
-	 
-	rho=PAR_D/(r*r*sqrtl(2./r));  
-	uPhi=GGBL[3][3]*uphi+GGBL[0][3]*ut;
+	//ambient
+	set_hdatmosphere(pp,xxvec,gg,GG,0);
 
-	//	  Vr=0.;
-	//	  Vphi=0.*uPhi/uT;
-	  
-	//corrected rho:
-	uT=GGBL[0][0]*ut+GGBL[0][3]*uphi;
-
+	//BL free-fall velocity
+	ldouble ucon[4];
+	ldouble r=xx;
+	ucon[0]=0.;
+	ucon[1]=-sqrtl(2./r)*(1.-2./r);
+	ucon[2]=ucon[3]=0.;
+	conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
+	trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+	pp[2]=ucon[1];
+	pp[3]=ucon[2];
+	pp[4]=ucon[3];
       }
     else
       {
@@ -69,45 +61,32 @@ if(ix>=NX) //analytical solution at rout only
 	ldouble eps=(h-1.)/GAMMA;
 	rho=powl(eps*(GAMMA-1.)/KKK,1./(GAMMA-1.));
 	uint=rho*eps;
-	//		  uint=KKK*powl(rho,GAMMA)/(GAMMA-1.);
 	uphi=-ELL*ut;
 	uT=GGBL[0][0]*ut+GGBL[0][3]*uphi;
 	uPhi=GGBL[3][3]*uphi+GGBL[0][3]*ut;
 	Vphi=uPhi/uT;
 	Vr=0.;
 
-	/*	  uphi=-ELL*ut;
-		  uT=GGBL[0][0]*ut+GGBL[0][3]*uphi;
-		  eps=1./GAMMA*(-1./ut-1.);
-		  W=uT/sqrt(-gg[0][0]);
-		  D=powl(eps*(GAMMA-1.)/KKK,1./(GAMMA-1.))*W;
-		  E=eps*D*W;
-		  rho=D/W;
-		  uint=E/W;
-		  uPhi=GGBL[3][3]*uphi+GGBL[0][3]*ut;
-		  Vphi=uPhi/uT;
-		  Vr=0.;*/
+	//4-velocity in BL
+	ldouble ucon[4]={0.,-Vr,0.,Vphi};
+	conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
+	trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+   
+	pp[2]=ucon[1]; 
+	pp[3]=ucon[2];
+	pp[4]=ucon[3];
+
+	//density etc.
+	pp[0]=rho; pp[1]=uint; 
       }     
 
-    //4-velocity in BL
-    ldouble ucon[4]={0.,-Vr,0.,Vphi};
-    conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
-    //converting to KS
-    trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-    //to be written in primitives
-    conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
-    pp[2]=ucon[1]; 
-    pp[3]=ucon[2];
-    pp[4]=ucon[3];
-    
-    //density etc.
-    pp[0]=rho; pp[1]=uint; 
+   
     pp[5]=calc_Sfromu(pp[0],pp[1]);
     
-    //testing if interpolated primitives make sense
+    //testing if primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
-   
 
     p2u(pp,uu,gg,GG);
 
@@ -118,24 +97,27 @@ if(ix>=NX) //analytical solution at rout only
      iix=0;
      iiy=iy;
      iiz=iz;
-     //copying primitives with gdet taken into account
-     for(iv=0;iv<NV;iv++)
+
+     ldouble r=xx;
+     ldouble r0=get_x(iix,0);
+     
+     pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
+     pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
+
+     //copying MLCOORDS velocities
+     for(iv=2;iv<NV;iv++)
        { 
-	 
 	 //unchanged primitives
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
-    
-
+     if(pp[2]>0.) pp[2]=0.;
 
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,gg,GG);
      //end of floor section
 
-
-     if(ix==-1 || 1) //conserved unneccesary for ix=-2 
-       p2u(pp,uu,gg,GG);
+     p2u(pp,uu,gg,GG);
      return 0;
    }
 
@@ -159,7 +141,6 @@ if(iy<0.) //spin axis
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-
     p2u(pp,uu,gg,GG);
     return 0;
   }
@@ -181,7 +162,6 @@ if(iy>=NY) //equatorial plane
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
-
 
     p2u(pp,uu,gg,GG); 
     return 0; 

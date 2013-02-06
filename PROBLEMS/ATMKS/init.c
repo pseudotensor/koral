@@ -6,7 +6,7 @@ ldouble gg[4][5],eup[4][4],elo[4][4],GG[4][5];
 ldouble pp[NV],T,xxvec[4];
 
 get_xx(ix,iy,iz,xxvec);
-//coco_N(xxvec,xxvec,KSCOORDS,BLCOORDS);
+coco_N(xxvec,xxvec,KSCOORDS,BLCOORDS);
 xx=xxvec[1];
 yy=xxvec[2];
 zz=xxvec[3];
@@ -19,7 +19,11 @@ pick_G(ix,iy,iz,GG);
 set_hdatmosphere(pp,xxvec,gg,GG,0);
 
 //calculating entropy
-pp[5]=calc_Sfromu(pp[0],pp[1]);	      
+pp[5]=calc_Sfromu(pp[0],pp[1]);
+
+//testing if primitives make sense
+check_floors_hd(pp,VELPRIM,gg,GG);
+//end of floor section	      
 	      
 p2u(pp,uu,gg,GG);	 
 /***********************************************/

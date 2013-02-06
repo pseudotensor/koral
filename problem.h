@@ -25,7 +25,7 @@
 //20 ATMKS - radial atmosphere infalling in KS
 //21 DONUTKS - 2d Polish donut in KS
 
-#define PROBLEM 20
+#define PROBLEM 21
 
 #if(PROBLEM==1)
 

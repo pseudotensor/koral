@@ -1,4 +1,7 @@
-130206 - ** - simplify transformations of radiative primitives between coordinates - Erf intact, urf through trans2_coco()
-130205 - *** - correct u2p_entropy to generalize to relative velocities
-130205 - * - follow the radiative wavespeeds to set the timestep properly
-130205 - ** correct the cgs conversions
+0206 - *** - implement sub metric - Mathematica?
+0206 - * - solve for free fall in KS
+0206 - ** - simplify transformations of radiative primitives between coordinates - Erf intact, urf through trans2_coco()
+0205 - *** - correct u2p_entropy to generalize to relative velocities
+0205 - * - follow the radiative wavespeeds to set the timestep properly
+0205 - ** correct the cgs conversions
+^ 2013 ^
