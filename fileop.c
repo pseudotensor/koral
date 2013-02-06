@@ -232,7 +232,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  ldouble vy=pp[3];
 						  ldouble vz=pp[4];
 						  ldouble vrel[4]={0,vx,vy,vz};
-						  conv_vels(vrel,vrel,VELPRIM,VEL3,gg,GG);
+						  conv_vels(vrel,vrel,VELPRIM,OUTVEL,gg,GG);
 						  vx=vrel[1];
 						  vy=vrel[2];
 						  vz=vrel[3];
@@ -307,9 +307,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 #else		    
 							  rho,    //14
 							  uint, 
-							  vx*sqrt(gg[1][1]),     //16
-							  vy*sqrt(gg[2][2]),     //17
-							  vz*sqrt(gg[3][3]),     //18
+							  vx,     //16
+							  vy,     //17
+							  vz,     //18
 							  S,      //19
 							  E,      //20
 							  Fx,     //21

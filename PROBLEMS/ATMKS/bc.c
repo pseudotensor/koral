@@ -22,7 +22,7 @@ if(ix>=NX)
     //ambient
     set_hdatmosphere(pp,xxvec,gg,GG,0);
 
-    //BL inflow velocity
+    //BL free-fall velocity
     ldouble ucon[4];
     ldouble r=xx;
     ucon[1]=-sqrtl(2./r)*(1.-2./r);
@@ -50,8 +50,14 @@ if(ix>=NX)
      iiy=iy;
      iiz=iz;
 
-     //copying primitives with gdet taken into account
-     for(iv=0;iv<NV;iv++)
+     ldouble r=xx;
+     ldouble r0=get_x(iix,0);
+     
+     pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
+     pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
+
+     //copying MLCOORDS velocities
+     for(iv=2;iv<NV;iv++)
        { 
 	 //unchanged primitives
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
@@ -62,7 +68,6 @@ if(ix>=NX)
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,gg,GG);
      //end of floor section
-
 
      p2u(pp,uu,gg,GG);
      return 0;

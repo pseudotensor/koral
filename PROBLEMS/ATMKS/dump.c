@@ -16,7 +16,7 @@ ldouble mvx=pp[2];
 ldouble mvy=pp[3];
 ldouble mvz=pp[4];
 ldouble mvrel[4]={0,vx,vy,vz};
-conv_vels(mvrel,mvrel,VELPRIM,VEL3,ggks,GGks);
+conv_vels(mvrel,mvrel,VELPRIM,OUTVEL,ggks,GGks);
 mvx=vrel[1];
 mvy=vrel[2];
 mvz=vrel[3];

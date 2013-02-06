@@ -467,6 +467,10 @@
 #define U2PRADPREC 1.e-5
 #endif
 
+#ifndef OUTVEL
+#define OUTVEL VEL3
+#endif
+
 /*********************/
 /*********************/
 /*********************/
