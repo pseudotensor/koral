@@ -24,8 +24,9 @@
 //19 RADBEAM2DKS - beam of light in KS coordinates
 //20 ATMKS - radial atmosphere infalling in KS
 //21 DONUTKS - 2d Polish donut in KS
+//22 DONUTMKS1 - 2d Polish donut in MKS1
 
-#define PROBLEM 21
+#define PROBLEM 22
 
 #if(PROBLEM==1)
 
@@ -318,6 +319,20 @@
 #define PR_OUT2GIF_1D "PROBLEMS/DONUTKS/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/DONUTKS/dump.c"
 #define PR_ANASOL "PROBLEMS/DONUTKS/anasol.c"
+
+#endif
+
+#if(PROBLEM==22)
+
+#define PR_DEFINE "PROBLEMS/DONUTMKS1/define.h"
+#define PR_BC "PROBLEMS/DONUTMKS1/bc.c"
+#define PR_INIT "PROBLEMS/DONUTMKS1/init.c"
+#define PR_KAPPA "PROBLEMS/DONUTMKS1/kappa.c"
+#define PR_KAPPAES "PROBLEMS/DONUTMKS1/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/DONUTMKS1/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/DONUTMKS1/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/DONUTMKS1/dump.c"
+#define PR_ANASOL "PROBLEMS/DONUTMKS1/anasol.c"
 
 #endif
 
