@@ -5,7 +5,7 @@ int iix,iiy,iiz,iv;
 
 ldouble xx,yy,zz,xxvecBL[4],xxvec[4];
 get_xx(ix,iy,iz,xxvec);
-coco_N(xxvec,xxvecBL,KSCOORDS,BLCOORDS);
+coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
 xx=xxvecBL[1];
 yy=xxvecBL[2];
 zz=xxvecBL[3];
@@ -57,13 +57,17 @@ if(ix>=NX)
      iiy=iy;
      iiz=iz;
 
-     ldouble r=xx;
-     ldouble r0=get_x(iix,0);
+     ldouble r=xxvecBL[1];
+     ldouble r0,xx0[4];
+     get_xx(iix,iiy,iiz,xx0);
+     coco_N(xx0,xx0,MYCOORDS,BLCOORDS);
+     r0=xx0[1];
+
      
      pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
      pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
 
-     //copying MLCOORDS velocities
+     //copying MYCOORDS velocities
      for(iv=2;iv<NV;iv++)
        { 
 	 //unchanged primitives

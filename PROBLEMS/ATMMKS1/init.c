@@ -6,7 +6,9 @@ ldouble gg[4][5],eup[4][4],elo[4][4],GG[4][5];
 ldouble pp[NV],T,xxvec[4],xxvecBL[4];
 
 get_xx(ix,iy,iz,xxvec);
-coco_N(xxvec,xxvecBL,KSCOORDS,BLCOORDS);
+
+coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+
 xx=xxvecBL[1];
 yy=xxvecBL[2];
 zz=xxvecBL[3];
@@ -25,19 +27,24 @@ calc_G_arb(xxvecBL,GGBL,KERRCOORDS);
 set_hdatmosphere(pp,xxvec,gg,GG,0);
 
 
-
+/*
 //BL free-fall velocity
     ldouble ucon[4];
     ldouble r=xx;
-    ucon[1]=-sqrtl(2./r)*(1.-2./r);
+    ucon[1]=-sqrt(2./r)*(1.-2./r);
     ucon[2]=ucon[3]=0.;
+
     conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
+
     trans2_coco(xxvecBL,ucon,ucon,BLCOORDS,MYCOORDS);
+
     conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+
     pp[2]=ucon[1];
     pp[3]=ucon[2];
     pp[4]=ucon[3];
-
+*/
+    
 //calculating entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 

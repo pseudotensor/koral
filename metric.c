@@ -1341,12 +1341,12 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
   else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       coco_MKS12KS(x1,x2);
-      coco_KS2BL(x1,x2);
+      coco_KS2BL(x2,x2);
     }
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
     {
       coco_BL2KS(x1,x2);
-      coco_KS2MKS1(x1,x2);
+      coco_KS2MKS1(x2,x2);
     }
   else
     my_err("coco coordinate conversion not implemented\n");

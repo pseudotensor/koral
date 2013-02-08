@@ -168,16 +168,16 @@ fprint_profiles(ldouble t, ldouble totmass)
 
 						  v1=v2=v3=v4=v5=v6=v7=0.;
 
-						  ldouble xxvec[4];
+						  ldouble xxvec[4],xxvecout[4];
 
 						  //transforming code coordinates to output coordinates
 						  get_xx(ix,iy,iz,xxvec);
 
-						  coco_N(xxvec,xxvec,MYCOORDS,OUTCOORDS);
+						  coco_N(xxvec,xxvecout,MYCOORDS,OUTCOORDS);
 
-						  xx=xxvec[1];
-						  yy=xxvec[2];
-						  zz=xxvec[3];						  
+						  xx=xxvecout[1];
+						  yy=xxvecout[2];
+						  zz=xxvecout[3];						  
 
 						  xxx[0]=t;
 						  xxx[1]=xx;
@@ -210,8 +210,8 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  if(MYCOORDS!=OUTCOORDS)
 						    {
 						      ldouble ggout[4][5],GGout[4][5];
-						      calc_g_arb(xxvec,ggout,OUTCOORDS);
-						      calc_G_arb(xxvec,GGout,OUTCOORDS);
+						      calc_g_arb(xxvecout,ggout,OUTCOORDS);
+						      calc_G_arb(xxvecout,GGout,OUTCOORDS);
 
 #ifdef RADIATION
 						      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
