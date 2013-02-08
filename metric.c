@@ -1053,30 +1053,6 @@ calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4], int coords)
   return 0;
 }
 
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//wrapper to convert coordinates
-int
-coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
-{
-  if(CO1==CO2)
-    {
-      x2[0]=x1[0];
-      x2[1]=x1[1];
-      x2[2]=x1[2];
-      x2[3]=x1[3];
-    }
-  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
-    coco_BL2KS(x1,x2);
-  else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
-    coco_KS2BL(x1,x2);
-  else
-    my_err("coco coordinate conversion not implemented\n");
-  return 0;
-}
-
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
@@ -1105,7 +1081,7 @@ coco_BL2KS(ldouble *xBL, ldouble *xKS)
 //**********************************************************************
 //**********************************************************************
 //converts coordinates
-//for BL -> KS
+//for KS -> BL
 int
 coco_KS2BL(ldouble *xKS, ldouble *xBL)
 {
@@ -1122,6 +1098,96 @@ coco_KS2BL(ldouble *xKS, ldouble *xBL)
   //phi
   xBL[3]=xKS[3]-a/sqrta*atanh(sqrta/(1.-r));
 
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for KS -> MKS1
+int
+coco_KS2MKS1(ldouble *xKS, ldouble *xMKS1)
+{
+  ldouble KSx0=xKS[0];
+  ldouble KSx1=xKS[1];
+  ldouble KSx2=xKS[2];
+  ldouble KSx3=xKS[3];
+  ldouble R0;
+#if(MYCOORDS==MKS1COORDS)
+  R0=MKS1R0;
+#endif
+
+  xMKS1[0]
+    = KSx0
+    ;
+  xMKS1[1]
+    = Log(KSx1 - R0)
+    ;
+  xMKS1[2]
+    = KSx2
+    ;
+  xMKS1[3]
+    = KSx3
+    ;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for MKS1 -> KS
+int
+coco_MKS12KS(ldouble *xMKS1, ldouble *xKS)
+{
+  ldouble x0=xMKS1[0];
+  ldouble x1=xMKS1[1];
+  ldouble x2=xMKS1[2];
+  ldouble x3=xMKS1[3];
+  ldouble R0;
+#if(MYCOORDS==MKS1COORDS)
+  R0=MKS1R0;
+#endif
+
+  xKS[0]
+    = x0
+    ;
+  xKS[1]
+    = exp(x1) + R0
+    ;
+  xKS[2]
+    = x2
+    ;
+  xKS[3]
+    = x3
+    ;
+
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//wrapper to convert coordinates
+int
+coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
+{
+  if(CO1==CO2)
+    {
+      x2[0]=x1[0];
+      x2[1]=x1[1];
+      x2[2]=x1[2];
+      x2[3]=x1[3];
+    }
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
+    coco_BL2KS(x1,x2);
+  else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+    coco_KS2BL(x1,x2);
+  else
+    my_err("coco coordinate conversion not implemented\n");
   return 0;
 }
 
