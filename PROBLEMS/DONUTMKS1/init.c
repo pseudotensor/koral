@@ -14,13 +14,13 @@
 
 ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
-ldouble uu[NV],xxvec[4];
+ldouble uu[NV],xxvec[4],xxvecBL[4];
 
 get_xx(ix,iy,iz,xxvec);
-coco_N(xxvec,xxvec,MYCOORDS,BLCOORDS);
-xx=xxvec[1];
-yy=xxvec[2];
-zz=xxvec[3];
+coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+xx=xxvecBL[1];
+yy=xxvecBL[2];
+zz=xxvecBL[3];
 
 
 ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
@@ -32,8 +32,8 @@ ldouble pp[NV],T;
 
 //working in BL
 ldouble ggBL[4][5],GGBL[4][5];
-calc_g_arb(xxvec,ggBL,KERRCOORDS);
-calc_G_arb(xxvec,GGBL,KERRCOORDS);
+calc_g_arb(xxvecBL,ggBL,KERRCOORDS);
+calc_G_arb(xxvecBL,GGBL,KERRCOORDS);
 ldouble eupBL[4][4],eloBL[4][4];
 ldouble tupBL[4][4],tloBL[4][4];
 calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
@@ -67,7 +67,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      ldouble ucon[4]={0.,-Vr,0.,Vphi};
      conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
 
-     trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+     trans2_coco(xxvecBL,ucon,ucon,BLCOORDS,MYCOORDS);
 
      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
    

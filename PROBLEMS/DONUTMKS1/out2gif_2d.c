@@ -4,7 +4,7 @@
 //  FILE *fgnu=fopen("plot.gp","w");
 //  char bufor[50];
 ldouble maxx;
-if(OUTCOORDS==KSCOORDS || OUTCOORDS==KERRCOORDS)
+if(MYCOORDS==MKS1COORDS)
   maxx=exp(MAXX)+MKS1R0;
  else maxx=MAXX;
 

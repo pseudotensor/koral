@@ -3,13 +3,13 @@
 
 ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
-ldouble xxvec[4],xx,yy,zz;
+ldouble xxvec[4],xxvecBL[4],xx,yy,zz;
 
 get_xx(ix,iy,iz,xxvec);
-coco_N(xxvec,xxvec,MYCOORDS,BLCOORDS);
-xx=xxvec[1];
-yy=xxvec[2];
-zz=xxvec[3];
+coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+xx=xxvecBL[1];
+yy=xxvecBL[2];
+zz=xxvecBL[3];
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 //gdet_src=get_g(g,3,4,iix,iiy,iiz);
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
@@ -19,8 +19,8 @@ pick_T(emuup,ix,iy,iz,eup);
 pick_T(emulo,ix,iy,iz,elo);
 //working in BL
 ldouble ggBL[4][5],GGBL[4][5];
-calc_g_arb(xxvec,ggBL,KERRCOORDS);
-calc_G_arb(xxvec,GGBL,KERRCOORDS);
+calc_g_arb(xxvecBL,ggBL,KERRCOORDS);
+calc_G_arb(xxvecBL,GGBL,KERRCOORDS);
 ldouble eupBL[4][4],eloBL[4][4];
 ldouble tupBL[4][4],tloBL[4][4];
 calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
@@ -49,7 +49,7 @@ if(ix>=NX) //analytical solution at rout only
 	ucon[1]=-sqrtl(2./r)*(1.-2./r);
 	ucon[2]=ucon[3]=0.;
 	conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
-	trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+	trans2_coco(xxvecBL,ucon,ucon,BLCOORDS,MYCOORDS);
 	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
 	pp[2]=ucon[1];
 	pp[3]=ucon[2];
@@ -71,7 +71,7 @@ if(ix>=NX) //analytical solution at rout only
 	//4-velocity in BL
 	ldouble ucon[4]={0.,-Vr,0.,Vphi};
 	conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
-	trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+	trans2_coco(xxvecBL,ucon,ucon,BLCOORDS,MYCOORDS);
 	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
    
 	pp[2]=ucon[1]; 
