@@ -63,9 +63,12 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      Vr=0.;
 
      //4-velocity in BL
+     
      ldouble ucon[4]={0.,-Vr,0.,Vphi};
      conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
+
      trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+
      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
    
      pp[2]=ucon[1]; 
@@ -78,6 +81,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
 
 
 pp[5]=calc_Sfromu(pp[0],pp[1]);
+
 
 //testing if interpolated primitives make sense
 check_floors_hd(pp,VELPRIM,gg,GG);

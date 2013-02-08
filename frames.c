@@ -32,11 +32,13 @@ trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldou
       ucon[1]=pp1[2];
       ucon[2]=pp1[3];
       ucon[3]=pp1[4];
+
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg1,GG1);
       //converting to CO2
       trans2_coco(xxvec,ucon,ucon,CO1,CO2);
       //to VELPRIM
       conv_vels(ucon,ucon,VEL4,VELPRIM,gg2,GG2);
+
       pp2[2]=ucon[1]; 
       pp2[3]=ucon[2];
       pp2[4]=ucon[3];
@@ -1020,6 +1022,7 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
     {
       dxdx_MKS12KS(xx,dxdx);
       multiply2(u1,u1,dxdx);
+      coco_N(xx,xx,CO1,KSCOORDS);
       dxdx_KS2BL(xx,dxdx);
       multiply2(u1,u2,dxdx);
     }
@@ -1027,6 +1030,7 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
     {
       dxdx_BL2KS(xx,dxdx);
       multiply2(u1,u1,dxdx);
+      coco_N(xx,xx,CO1,KSCOORDS);
       dxdx_KS2MKS1(xx,dxdx);
       multiply2(u1,u2,dxdx);  
     }
@@ -1062,7 +1066,7 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       multiply22(T1,T2,dxdx);
     }
   else
-    my_err("transformation not implemented in trans2_coco()\n");
+    my_err("transformation not implemented in trans22_coco()\n");
 
   return 0;
 }

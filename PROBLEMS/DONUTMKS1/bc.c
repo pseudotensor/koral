@@ -41,6 +41,7 @@ if(ix>=NX) //analytical solution at rout only
 	//ambient
 	set_hdatmosphere(pp,xxvec,gg,GG,0);
 
+	
 	//BL free-fall velocity
 	ldouble ucon[4];
 	ldouble r=xx;
@@ -53,6 +54,7 @@ if(ix>=NX) //analytical solution at rout only
 	pp[2]=ucon[1];
 	pp[3]=ucon[2];
 	pp[4]=ucon[3];
+	
       }
     else
       {

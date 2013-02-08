@@ -10,6 +10,7 @@
 /* C language definitions for use with Mathematica output */
 
 
+
 #define Power(x, y)	(powl((ldouble)(x), (ldouble)(y)))
 #define Sqrt(x)		(sqrtl((ldouble)(x)))
 #define Sqrtl(x)        (sqrtl((ldouble)(x)))

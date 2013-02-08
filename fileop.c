@@ -172,9 +172,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 
 						  //transforming code coordinates to output coordinates
 						  get_xx(ix,iy,iz,xxvec);
-						  
+
 						  coco_N(xxvec,xxvec,MYCOORDS,OUTCOORDS);
-						  
+
 						  xx=xxvec[1];
 						  yy=xxvec[2];
 						  zz=xxvec[3];						  
@@ -212,11 +212,12 @@ fprint_profiles(ldouble t, ldouble totmass)
 						      ldouble ggout[4][5],GGout[4][5];
 						      calc_g_arb(xxvec,ggout,OUTCOORDS);
 						      calc_G_arb(xxvec,GGout,OUTCOORDS);
+
 #ifdef RADIATION
 						      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
 #endif
 						      trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
-						    
+
 						      //from now on gg, GG, tup, etc. defined in OUTCOORDS!
 						      for(i=0;i<4;i++)
 							for(j=0;j<5;j++)
@@ -225,13 +226,14 @@ fprint_profiles(ldouble t, ldouble totmass)
 						      calc_tetrades(gg,tup,tlo,OUTCOORDS);
 						      calc_ZAMOes(gg,eup,elo,OUTCOORDS);
 						    }
-						  
+						  						  					
 						  ldouble rho=pp[0];
 						  ldouble uint=pp[1];
 						  ldouble vx=pp[2];
 						  ldouble vy=pp[3];
 						  ldouble vz=pp[4];
 						  ldouble vrel[4]={0,vx,vy,vz};
+						  
 						  conv_vels(vrel,vrel,VELPRIM,OUTVEL,gg,GG);
 						  vx=vrel[1];
 						  vy=vrel[2];
@@ -344,5 +346,6 @@ fprint_profiles(ldouble t, ldouble totmass)
   
 				      nfout1++;
 				      return 0;
+
 				    }
 	  

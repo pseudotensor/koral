@@ -12,6 +12,12 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 {
   int i,j;
   ldouble ut[4];
+  int verbose=0;
+  if(verbose)
+    {
+      printf("conv_vels: %d -> %d\n",which1,which2);
+      print_4vector(u1);      
+    }
 
   /*************** VEL3 -> VEL3 ***************/
   if(which1==VEL3 && which2==VEL3)
@@ -64,7 +70,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	    }
 	}
       ldouble delta=b*b-4.*a*c;
-      if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
+      if(delta<0.) my_err("delta.lt.0 in VEL4->VEL3\n");
       ut[0]=(-b-sqrt(delta))/2./a;
       if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
 
@@ -138,7 +144,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	    }
 	}
       ldouble delta=b*b-4.*a*c;
-      if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
+      if(delta<0.) my_err("delta.lt.0 in VEL4->VELR\n");
       ut[0]=(-b-sqrt(delta))/2./a;
       if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
 
@@ -189,6 +195,12 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
   u2[1]=ut[1];
   u2[2]=ut[2];
   u2[3]=ut[3];
+
+  if(verbose)
+    {
+      print_4vector(u2);      
+      printf("conv_vels done\n",which1,which2);
+    }
   
   return 0;
 }
@@ -244,8 +256,8 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       pp[2]=ucon[1];
       pp[3]=ucon[2];
       pp[4]=ucon[3];
-
       // Bondi-like atmosphere
+      coco_N(xx,xx,MYCOORDS,BLCOORDS);
       r=xx[1];
       pp[0] = RHOATMMIN*pow(r,-1.5);
       pp[1] = UINTATMMIN*pow(r,-2.5);
@@ -263,6 +275,7 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       pp[4]=ucon[3];
 
       // Bondi-like atmosphere
+      coco_N(xx,xx,MYCOORDS,BLCOORDS);
       r=xx[1];
       pp[0] = RHOATMMIN*pow(r,-2.0);
       pp[1] = UINTATMMIN*pow(r,-2.5);

@@ -1,21 +1,26 @@
 #define BHSPIN 0.
-#define MYCOORDS MKS1COORDS
-#define OUTCOORDS KERRCOORDS
-#define OUTVEL VELR
+//#define MYCOORDS MKS1COORDS
+#define MYCOORDS KSCOORDS
+#define OUTCOORDS KSCOORDS
+#define OUTVEL VEL4
 #define DTOUT1 10.
-#define ALLSTEPSOUTPUT 0
+#define ALLSTEPSOUTPUT 1
 
 #define NX 50
 #define NY 50
 #define NZ 1
-#define MINX 0.25
-#define MAXX 3.5
+//#define MINX 1.25
+//#define MAXX 3.5
+#define MINX 4.
+#define MAXX 35.
 #define MKS1R0 .5
 #define MINY 0.*Pi/4.
 #define MAXY Pi/2.
 #define MINZ 0.
 #define MAXZ 1.
 #define SPECIFIC_BC
+#define PRINTGC_LEFT
+#define PRINTGC_RIGHT
 
 #define GAMMA (4./3.)
 #define KKK 0.03

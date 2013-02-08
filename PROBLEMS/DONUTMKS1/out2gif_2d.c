@@ -3,6 +3,11 @@
 //{
 //  FILE *fgnu=fopen("plot.gp","w");
 //  char bufor[50];
+ldouble maxx;
+if(OUTCOORDS==KSCOORDS || OUTCOORDS==KERRCOORDS)
+  maxx=exp(MAXX)+MKS1R0;
+ else maxx=MAXX;
+
   fprintf(fgnu,
 	  "set table \"table.gp\"\n"
 	  "set contour base\n"
@@ -151,12 +156,12 @@
 	  "unset log y\n"
 	  "plot \"%s\" u 1:(($16*$16)**.5) ti \"\" w l ls 2 \n"
 	  ,fname,fname2,
-	  -.02*get_xb(NX,0),
-	  1.02*get_xb(NX,0),
-	  -.02*get_xb(NX,0),
-	  1.02*get_xb(NX,0),
+	  -.02*maxx,
+	  1.02*maxx,
+	  -.02*maxx,
+	  1.02*maxx,
 	  fname,fname,fname,
-	  fname,1./(get_xb(NX,0)/11)*.5,1./(get_xb(NX,0)/11)*.5,NX/11+1,NY/11+1,
+	  fname,1./(maxx/11)*.5,1./(maxx/11)*.5,NX/11+1,NY/11+1,
 	  fname,fname,fname);  
 	    
 

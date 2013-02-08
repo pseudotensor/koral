@@ -53,9 +53,29 @@ main(int argc, char **argv)
 #ifndef RESTART
   set_initial_profile();
 #endif
-
   //sets bc
   set_bc(tstart);
+
+  //testing
+  /*
+    ldouble GG[4][5];
+    pick_G(10,0,0,GG);
+    ldouble gg[4][5];
+    pick_g(10,0,0,gg);
+	  
+    ldouble xx=get_x(10,0);
+    printf("x: %f\n",xx);
+    print_metric(gg);
+    print_metric(GG);
+    double ucon[4],ucov[4];
+    calc_normalobs_4vel(GG,ucon);
+    print_4vector(ucon);
+    indices_21(ucon,ucov,gg);
+    print_4vector(ucov);
+    printf("%e\n",dot(ucon,ucov));
+    getchar();
+  */
+
 
   //evolves
   solve_all_problems_5(tstart);
