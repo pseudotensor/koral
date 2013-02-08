@@ -1006,6 +1006,30 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       dxdx_BL2KS(xx,dxdx);
       multiply2(u1,u2,dxdx);
     }
+  else if(CO1==MKS1COORDS && CO2==KSCOORDS)
+    {
+      dxdx_MKS12KS(xx,dxdx);
+      multiply2(u1,u2,dxdx);
+    }
+  else if(CO1==KSCOORDS && CO2==MKS1COORDS)
+    {
+      dxdx_KS2MKS1(xx,dxdx);
+      multiply2(u1,u2,dxdx);
+    }
+  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+    {
+      dxdx_MKS12KS(xx,dxdx);
+      multiply2(u1,u1,dxdx);
+      dxdx_KS2BL(xx,dxdx);
+      multiply2(u1,u2,dxdx);
+    }
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
+    {
+      dxdx_BL2KS(xx,dxdx);
+      multiply2(u1,u1,dxdx);
+      dxdx_KS2MKS1(xx,dxdx);
+      multiply2(u1,u2,dxdx);  
+    }
   else
     my_err("transformation not implemented in trans2_coco()\n");
 

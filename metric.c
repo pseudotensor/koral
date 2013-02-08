@@ -1186,6 +1186,20 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     coco_BL2KS(x1,x2);
   else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     coco_KS2BL(x1,x2);
+  else if (CO1==KSCOORDS && CO2==MKS1COORDS)
+    coco_KS2MKS1(x1,x2);
+  else if (CO1==MKS1COORDS && CO2==KSCOORDS)
+    coco_MKS12KS(x1,x2);
+  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+    {
+      coco_MKS12KS(x1,x2);
+      coco_KS2BL(x1,x2);
+    }
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
+    {
+      coco_BL2KS(x1,x2);
+      coco_KS2MKS1(x1,x2);
+    }
   else
     my_err("coco coordinate conversion not implemented\n");
   return 0;
@@ -1245,6 +1259,61 @@ dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4])
 
   return 0;
 }
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for KS -> MKS1
+int
+dxdx_KS2MKS1(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble KSx0=xx[0];
+  ldouble KSx1=xx[1];
+  ldouble KSx2=xx[2];
+  ldouble KSx3=xx[3];
+  ldouble R0;
+#if(MYCOORDS==MKS1COORDS)
+  R0=MKS1R0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[1][1]=KSx1-R0;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for MKS1 -> KS
+int
+dxdx_MKS12KS(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble x0=xx[0];
+  ldouble x1=xx[1];
+  ldouble x2=xx[2];
+  ldouble x3=xx[3];
+  ldouble R0;
+#if(MYCOORDS==MKS1COORDS)
+  R0=MKS1R0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[1][1]=exp(-x1);
+
+  return 0;
+}
+
 
 //**********************************************************************
 //**********************************************************************
