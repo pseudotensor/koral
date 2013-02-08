@@ -25,7 +25,7 @@
 //20 ATMKS - radial atmosphere infalling in KS
 //21 DONUTKS - 2d Polish donut in KS
 
-#define PROBLEM 21
+#define PROBLEM 2
 
 #if(PROBLEM==1)
 
@@ -470,6 +470,15 @@
 #ifndef OUTVEL
 #define OUTVEL VEL3
 #endif
+
+#ifndef RHOATMMIN
+#define RHOATMMIN 1.
+#endif
+
+#ifndef UINTATMMIN
+#define UINTATMMIN 1.e-2
+#endif
+
 
 /*********************/
 /*********************/

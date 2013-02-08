@@ -469,8 +469,184 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 //**********************************************************************
 //**********************************************************************
 //auxiliary solver based on the entropy conservation
+//works for general metric in four velocities
 int
 u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
+{
+  int verbose=0;
+
+  ldouble gtt=g[0][0];
+  ldouble gtr=g[0][1];
+  ldouble gtth=g[0][2];
+  ldouble gtph=g[0][3];
+
+  ldouble grt=g[1][0];
+  ldouble grr=g[1][1];
+  ldouble grth=g[1][2];
+  ldouble grph=g[1][3];
+
+  ldouble gtht=g[2][0];
+  ldouble gthr=g[2][1];
+  ldouble gthth=g[2][2];
+  ldouble gthph=g[2][3];
+
+  ldouble gpht=g[3][0];
+  ldouble gphr=g[3][1];
+  ldouble gphth=g[3][2];
+  ldouble gphph=g[3][3];
+
+  ldouble rhout=uuu[0];
+  ldouble Tttt=uuu[1]; //this one unused
+  ldouble Ttr=uuu[2];
+  ldouble Ttth=uuu[3];
+  ldouble Ttph=uuu[4];
+  ldouble Sut=uuu[5];
+
+  conv_velsinprims(p,VELPRIM,VEL3,g,G);
+
+  if(verbose) print_Nvector(p,NV);
+
+  ldouble rho=p[0]; //initial guess
+  ldouble uu=p[1];
+  ldouble vr=p[2];
+  ldouble vth=p[3];
+  ldouble vph=p[4];
+  ldouble S=p[5];
+
+  ldouble ut2;
+  
+  ldouble rhop1=rho;
+  ldouble rhom1=rho;  
+
+  int iter=0;
+  ldouble err,W,fval,dfval,fval1,fval2,diffrho,ut;
+  ldouble dudrho,dWdrho,dvphdrho,dvrdrho,dvthdrho;
+
+  ldouble conv=1.e-6;
+  int itmax=30;
+  ldouble fvalmin[2]={0.,-1.};
+  ldouble absfval;
+
+  ldouble ftest[50][3];
+
+  do{
+    iter++;
+    rho=rhop1;
+    ut=rhout/rho;
+    ut2=ut*ut;
+    S=Sut/ut;
+   
+    uu=(ldouble)pow((pow(rho,1./GAMMAM1+1.)*exp(Sut/rhout)),GAMMAM1)/GAMMAM1;
+ 
+    W=ut2*(uu*GAMMA + rho);  
+
+    vr=-((gphth*gthr*Ttph - gphr*gthth*Ttph - gphth*gthph*Ttr + gphph*gthth*Ttr + gphr*gthph*Ttth - gphph*gthr*Ttth - gphth*gthr*gtph*W + gphr*gthth*gtph*W + gphth*gthph*gtr*W - gphph*gthth*gtr*W - gphr*gthph*gtth*W + gphph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W));
+    vth=-((gphth*grr*Ttph - gphr*grth*Ttph - gphth*grph*Ttr + gphph*grth*Ttr + gphr*grph*Ttth - gphph*grr*Ttth - gphth*grr*gtph*W + gphr*grth*gtph*W + gphth*grph*gtr*W - gphph*grth*gtr*W - gphr*grph*gtth*W + gphph*grr*gtth*W)/((-(gphth*grr*gthph) + gphr*grth*gthph + gphth*grph*gthr - gphph*grth*gthr - gphr*grph*gthth + gphph*grr*gthth)*W));
+    vph=(grth*gthr*Ttph - grr*gthth*Ttph - grth*gthph*Ttr + grph*gthth*Ttr + grr*gthph*Ttth - grph*gthr*Ttth - grth*gthr*gtph*W + grr*gthth*gtph*W + grth*gthph*gtr*W - grph*gthth*gtr*W - grr*gthph*gtth*W + grph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W);
+
+    fval=1./ut2 + gtt + grr*vr*vr + gthth*vth*vth + gphph*vph*vph + 2.*gtph*vph + 2.*gtr*vr + 2.*gtth*vth +
+      2.*grph*vr*vph + 2.*grth*vr*vth + 2.*gphth*vph*vth;
+
+    dudrho=(ldouble)GAMMA/GAMMAM1*exp(Sut/rhout)*pow(rho,1./GAMMAM1)*pow(exp(Sut/rhout)*pow(rho,GAMMA/GAMMAM1),GAMMA-2.);
+    dWdrho=(rhout*rhout*(rho*(GAMMA*dudrho-1.)-2.*GAMMA*uu))/rho/rho/rho;
+
+    dvrdrho=((gphth*gthr*Ttph - gphr*gthth*Ttph - gphth*gthph*Ttr + gphph*gthth*Ttr + gphr*gthph*Ttth - gphph*gthr*Ttth - gphth*gthr*gtph*W + gphr*gthth*gtph*W + gphth*gthph*gtr*W - gphph*gthth*gtr*W - gphr*gthph*gtth*W + gphph*gthr*gtth*W)*dWdrho)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*Power(W,2)) - (-(gphth*gthr*gtph*dWdrho) + gphr*gthth*gtph*dWdrho + gphth*gthph*gtr*dWdrho - gphph*gthth*gtr*dWdrho - gphr*gthph*gtth*dWdrho + gphph*gthr*gtth*dWdrho)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W);
+    dvthdrho=((gphth*grr*Ttph - gphr*grth*Ttph - gphth*grph*Ttr + gphph*grth*Ttr + gphr*grph*Ttth - gphph*grr*Ttth - gphth*grr*gtph*W + gphr*grth*gtph*W + gphth*grph*gtr*W - gphph*grth*gtr*W - gphr*grph*gtth*W + gphph*grr*gtth*W)*dWdrho)/((-(gphth*grr*gthph) + gphr*grth*gthph + gphth*grph*gthr - gphph*grth*gthr - gphr*grph*gthth + gphph*grr*gthth)*Power(W,2)) - (-(gphth*grr*gtph*dWdrho) + gphr*grth*gtph*dWdrho + gphth*grph*gtr*dWdrho - gphph*grth*gtr*dWdrho - gphr*grph*gtth*dWdrho + gphph*grr*gtth*dWdrho)/((-(gphth*grr*gthph) + gphr*grth*gthph + gphth*grph*gthr - gphph*grth*gthr - gphr*grph*gthth + gphph*grr*gthth)*W);
+    dvphdrho=-(((grth*gthr*Ttph - grr*gthth*Ttph - grth*gthph*Ttr + grph*gthth*Ttr + grr*gthph*Ttth - grph*gthr*Ttth - grth*gthr*gtph*W + grr*gthth*gtph*W + grth*gthph*gtr*W - grph*gthth*gtr*W - grr*gthph*gtth*W + grph*gthr*gtth*W)*dWdrho)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*Power(W,2))) + (-(grth*gthr*gtph*dWdrho) + grr*gthth*gtph*dWdrho + grth*gthph*gtr*dWdrho - grph*gthth*gtr*dWdrho - grr*gthph*gtth*dWdrho + grph*gthr*gtth*dWdrho)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W);
+
+    fval=1./ut2 + gtt + grr*vr*vr + gthth*vth*vth + gphph*vph*vph + 2.*gtph*vph + 2.*gtr*vr + 2.*gtth*vth +
+      2.*grph*vr*vph + 2.*grth*vr*vth + 2.*gphth*vph*vth;
+    dfval=2.*rho/rhout/rhout + 
+      2.*grr*vr*dvrdrho + 2.*gthth*vth*dvthdrho + 2.*gphph*vph*dvphdrho + 
+      2.*gtph*dvphdrho + 2.*gtr*dvrdrho + 2.*gtth*dvthdrho + 
+      2.*grph*dvrdrho*vph + 2.*grph*vr*dvphdrho + 
+      2.*grth*dvrdrho*vth + 2.*grth*vr*dvthdrho + 
+      2.*gphth*dvphdrho*vth + 2.*gphth*vph*dvthdrho;
+
+    //absolute error
+    absfval=fabs(fval);
+
+    //putting best value of u to memory
+    if(absfval<fvalmin[1] || fvalmin[1]<0.)
+      {
+	fvalmin[0]=ut;
+	fvalmin[1]=absfval;
+      }
+
+    //Newton
+    rhop1=rho-fval/dfval;   
+
+    if(rhop1<RHOFLOOR) rhop1=rho/2.;
+
+    if(verbose) printf("%d %e %e %e\n",iter,rhop1,rho,fval);
+
+    diffrho=rhop1-rho;
+    
+    ftest[iter][0]=rho;
+    ftest[iter][1]=uu;
+    ftest[iter][2]=fval;
+    ftest[iter][3]=dfval;
+
+    err =fabs(diffrho/rho);
+ 
+    if(iter>itmax && err>conv) 
+      {
+	printf("iter exceeded in u2p_entr \n");
+	printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
+	return -1;
+      }
+
+    rhom1=rho;
+
+  } while(err>conv);
+  
+  if(verbose) {printf("success %d %e %e %e\n",iter,rhop1,rho,fval);getchar();}
+
+  rho=rhop1;
+  ut=rhout/rho;
+  ut2=ut*ut;
+  S=Sut/ut;
+  uu=(ldouble)pow((pow(rho,1./GAMMAM1+1.)*exp(Sut/rhout)),GAMMAM1)/GAMMAM1;
+  W=ut2*(uu*GAMMA + rho);
+  
+  vr=-((gphth*gthr*Ttph - gphr*gthth*Ttph - gphth*gthph*Ttr + gphph*gthth*Ttr + gphr*gthph*Ttth - gphph*gthr*Ttth - gphth*gthr*gtph*W + gphr*gthth*gtph*W + gphth*gthph*gtr*W - gphph*gthth*gtr*W - gphr*gthph*gtth*W + gphph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W));
+  vth=-((gphth*grr*Ttph - gphr*grth*Ttph - gphth*grph*Ttr + gphph*grth*Ttr + gphr*grph*Ttth - gphph*grr*Ttth - gphth*grr*gtph*W + gphr*grth*gtph*W + gphth*grph*gtr*W - gphph*grth*gtr*W - gphr*grph*gtth*W + gphph*grr*gtth*W)/((-(gphth*grr*gthph) + gphr*grth*gthph + gphth*grph*gthr - gphph*grth*gthr - gphr*grph*gthth + gphph*grr*gthth)*W));
+  vph=(grth*gthr*Ttph - grr*gthth*Ttph - grth*gthph*Ttr + grph*gthth*Ttr + grr*gthph*Ttth - grph*gthr*Ttth - grth*gthr*gtph*W + grr*gthth*gtph*W + grth*gthph*gtr*W - grph*gthth*gtr*W - grr*gthph*gtth*W + grph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W);
+
+  if(uu<0. || rho<0. || isnan(rho))
+    {
+      printf("u2p_entr didn't work: %e %e\n",uu,rho); 
+      print_Nvector(uuu,NV);
+      getchar();
+      return -1;
+    }
+
+  p[0]=rho;
+  p[1]=uu;
+  p[2]=vr;
+  p[3]=vth;
+  p[4]=vph;
+  p[5]=S;
+  
+  conv_velsinprims(p,VEL3,VELPRIM,g,G);
+ 
+  //************************************
+  //************************************
+  //checking on hd floors
+  check_floors_hd(p,VELPRIM,g,G);
+  //************************************
+  //************************************
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//auxiliary solver based on the entropy conservation
+//gtph.neq.0
+int
+u2p_entropy_old(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
   int verbose=0;
 
