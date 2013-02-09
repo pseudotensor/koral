@@ -1,9 +1,9 @@
 #define BHSPIN 0.0
-#define MYCOORDS MKS1COORDS
-//#define MYCOORDS KSCOORDS
+//#define MYCOORDS MKS1COORDS
+#define MYCOORDS KSCOORDS
 #define OUTCOORDS KERRCOORDS
 
-#define DTOUT1 1.e-1
+#define DTOUT1 1.e1
 #define ALLSTEPSOUTPUT 0
 #define NOUTSTOP 51
 #define PRINTGC_LEFT
@@ -14,10 +14,10 @@
 #define NY 1
 #define NZ 1
 //#define MINX (.8*r_horizon_BL(BHSPIN))
-//#define MINX 4.
-//#define MAXX 20.
-#define MINX .2
-#define MAXX 3.
+#define MINX 4.
+#define MAXX 20.
+//#define MINX 1.2
+//#define MAXX 3.
 #define MKS1R0 .5
 
 #define MINY .99*Pi/2.

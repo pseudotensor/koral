@@ -15,6 +15,7 @@
 #define CYLCOORDS 5
 #define SPHCOORDS 6
 #define MKS1COORDS 7
+#define MKS0COORDS 8
 
 //cell flags
 #define ENTROPYFLAG 0

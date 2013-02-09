@@ -27,7 +27,7 @@
 //22 DONUTMKS1 - 2d Polish donut in MKS1
 //23 ATMMKS1 - radial atmosphere infalling in MKS1
 
-#define PROBLEM 22
+#define PROBLEM 23
 
 #if(PROBLEM==1)
 

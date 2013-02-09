@@ -49,13 +49,18 @@ if(coords==SCHWCOORDS) {
   return sqrt(Power(x1,4)*Power(Sin(x2),2));
  } 
 
+if(coords==MKS0COORDS) {
+ ldouble a=BHSPIN;
+  return Sqrt(Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2));
+ }
+
 if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
-  return Sqrt((Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)*Power(Sin(x2),2))/Power(exp(1.0),2*x1));
+  return Sqrt(Power(exp(1.0),2*x1)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2))/2.;
  } 
 }
 
@@ -117,14 +122,24 @@ if(coords==SCHWCOORDS) {
 ;
 }  
 
+if(coords==MKS0COORDS) {
+  ldouble a=BHSPIN;
+;if(idim==0) return  (16*x1)/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;if(idim==1) return  ((-Power(a,2) + 8*Power(x1,2) + 3*Power(a,2)*Cos(2*x2))*Cot(x2))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;if(idim==2) return  0
+;
+ }
+
+
+
 if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
-;if(idim==0) return  (Power(exp(1.),2*x1) - Power(R0,2) - Power(a,2)*Power(Cos(x2),2))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;if(idim==1) return  ((-Power(a,2) + 2*Power(Power(exp(1.),x1) + R0,2) + 3*Power(a,2)*Cos(2*x2))*Cot(x2))/(2.*(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;if(idim==0) return  (Power(a,2) + 6*Power(exp(1.0),2*x1) + 8*Power(exp(1.0),x1)*R0 + 2*Power(R0,2) + Power(a,2)*Cos(2*x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
+;if(idim==1) return  ((-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + 3*Power(a,2)*Cos(2*x2))*Cot(x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
 ;if(idim==2) return  0
 ;
  }
@@ -154,28 +169,52 @@ calc_g_arb(ldouble *xx, ldouble g[][5],int coords)
 
   g[3][4]=calc_gdet(xx);
 
+
+
+if(coords==MKS0COORDS) {
+ ldouble a=BHSPIN;
+;g[0][0]= -((Power(a,2) + 8*(-1 + x1)*x1 + Power(a,2)*Cos(2*x2))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2)))
+;g[0][1]= (16*x1)/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;g[0][2]= 0
+;g[0][3]= (-8*a*x1*Power(Sin(x2),2))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;g[1][0]= (16*x1)/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;g[1][1]= (4*(Power(a,2) + 8*x1*(1 + x1) + Power(a,2)*Cos(2*x2)))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;g[1][2]= 0
+;g[1][3]= (-2*a*(Power(a,2) + 8*x1*(1 + x1) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;g[2][0]= 0
+;g[2][1]= 0
+;g[2][2]= 4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)
+;g[2][3]= 0
+;g[3][0]= (-8*a*x1*Power(Sin(x2),2))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;g[3][1]= (-2*a*(Power(a,2) + 8*x1*(1 + x1) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2))
+;g[3][2]= 0
+;g[3][3]= (4*(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))*(4*x1*(4*Power(x1,3) + Power(a,2)*(1 + x1)) + Power(a,2)*(Power(a,2) + 4*(-1 + x1)*x1)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;
+ }
+
+
 if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
-;g[0][0]= -1 + (2*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;g[0][1]= (2*(Power(exp(1.),x1) + R0))/(Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;g[0][0]= -((Power(a,2) + 2*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0) + Power(a,2)*Cos(2*x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2)))
+;g[0][1]= (4*Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
 ;g[0][2]= 0
-;g[0][3]= (-2*a*(Power(exp(1.),x1) + R0)*Power(Sin(x2),2))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;g[1][0]= (2*(Power(exp(1.),x1) + R0))/(Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
-;g[1][1]= (1 + (2*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))/Power(exp(1.),2*x1)
+;g[0][3]= (-4*a*(Power(exp(1.0),x1) + R0)*Power(Sin(x2),2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
+;g[1][0]= (4*Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
+;g[1][1]= (4*Power(exp(1.0),2*x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
 ;g[1][2]= 0
-;g[1][3]= -((a*(1 + (2*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))*Power(Sin(x2),2))/Power(exp(1.),x1))
+;g[1][3]= (-4*a*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
 ;g[2][0]= 0
 ;g[2][1]= 0
-;g[2][2]= Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)
+;g[2][2]= Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)
 ;g[2][3]= 0
-;g[3][0]= (-2*a*(Power(exp(1.),x1) + R0)*Power(Sin(x2),2))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;g[3][1]= -((a*(1 + (2*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))*Power(Sin(x2),2))/Power(exp(1.),x1))
+;g[3][0]= (-4*a*(Power(exp(1.0),x1) + R0)*Power(Sin(x2),2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
+;g[3][1]= (-4*a*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
 ;g[3][2]= 0
-;g[3][3]= Power(Sin(x2),2)*(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2) + Power(a,2)*(1 + (2*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))*Power(Sin(x2),2))
+;g[3][3]= (4*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0)) + Power(a,2)*(Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
 ;
 }
 
@@ -325,29 +364,54 @@ calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
   ldouble x2=xx[2];
   ldouble x3=xx[3];
 
+
+  if(coords==MKS0COORDS) {
+ ldouble a=BHSPIN;
+;G[0][0]= -((2*x1*(2 + 2*x1) + Power(a,2)*Power(Cos(x2),2))/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
+;G[0][1]= (2*x1)/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
+;G[0][2]= 0
+;G[0][3]= 0
+;G[1][0]= (2*x1)/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
+;G[1][1]= (Power(a,2) + 2*x1*(-2 + 2*x1))/(4.*(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
+;G[1][2]= 0
+;G[1][3]= a/(2.*(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
+;G[2][0]= 0
+;G[2][1]= 0
+;G[2][2]= 1/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
+;G[2][3]= 0
+;G[3][0]= 0
+;G[3][1]= a/(2.*(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
+;G[3][2]= 0
+;G[3][3]= Power(Csc(x2),2)/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
+;
+
+}
+
   if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
-;G[0][0]= -((Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
-;G[0][1]= (2*Power(exp(1.),x1)*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;G[0][0]= -(((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Cos(x2),2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;G[0][1]= (2*(Power(exp(1.0),x1) + R0))/(Power(exp(1.0),x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
 ;G[0][2]= 0
 ;G[0][3]= 0
-;G[1][0]= (2*Power(exp(1.),x1)*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;G[1][1]= (Power(exp(1.),2*x1)*(Power(a,2) + Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(-1 + R0) + (-2 + R0)*R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;G[1][0]= (2*(Power(exp(1.0),x1) + R0))/(Power(exp(1.0),x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;G[1][1]= (Power(a,2) + (-2 + Power(exp(1.0),x1) + R0)*(Power(exp(1.0),x1) + R0))/(Power(exp(1.0),2*x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
 ;G[1][2]= 0
-;G[1][3]= (a*Power(exp(1.),x1))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;G[1][3]= a/(Power(exp(1.0),x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
 ;G[2][0]= 0
 ;G[2][1]= 0
-;G[2][2]= 1/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;G[2][2]= 1/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
 ;G[2][3]= 0
 ;G[3][0]= 0
-;G[3][1]= (a*Power(exp(1.),x1))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;G[3][1]= a/(Power(exp(1.0),x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
 ;G[3][2]= 0
-;G[3][3]= Power(Csc(x2),2)/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;G[3][3]= Power(Csc(x2),2)/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
 ;
+
+
   }
 
 if(coords==SCHWCOORDS) {
@@ -496,76 +560,146 @@ calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int coords)
   ldouble x2=xx[2];
   ldouble x3=xx[3];
 
+  if(coords==MKS0COORDS) {
+ ldouble a=BHSPIN;
+;Krzys[0][0][0]= (16*x1*(-Power(a,2) + 8*Power(x1,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][0][1]= (8*(4*x1*(1 + x1) + Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 8*Power(x1,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][0][2]= (-8*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][0][3]= (16*a*x1*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][1][0]= (8*(4*x1*(1 + x1) + Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 8*Power(x1,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][1][1]= (32*(2*x1*(1 + 2*x1) + Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 8*Power(x1,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][1][2]= (-16*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][1][3]= (8*a*(4*x1*(1 + x1) + Power(a,2)*Power(Cos(x2),2))*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][2][0]= (-8*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][2][1]= (-16*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][2][2]= (-8*Power(x1,2))/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
+;Krzys[0][2][3]= (16*Power(a,3)*x1*Cos(x2)*Power(Sin(x2),3))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][3][0]= (16*a*x1*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][3][1]= (8*a*(4*x1*(1 + x1) + Power(a,2)*Power(Cos(x2),2))*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][3][2]= (16*Power(a,3)*x1*Cos(x2)*Power(Sin(x2),3))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][3][3]= (-4*x1*(Power(a,4) + 6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + 2*x1)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][0][0]= (-2*(Power(a,2) + 4*(-1 + x1)*x1)*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][0][1]= (-4*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*(-4*x1 + Power(a,2)*Power(Sin(x2),2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][0][2]= 0
+;Krzys[1][0][3]= (2*a*(Power(a,2) + 4*(-1 + x1)*x1)*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][1][0]= (-4*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*(-4*x1 + Power(a,2)*Power(Sin(x2),2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][1][1]= (8*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*(4*x1*(1 + x1) + Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][1][2]= -((Power(a,2)*Sin(2*x2))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2)))
+;Krzys[1][1][3]= (a*(Power(a,4) - 16*Power(a,2)*x1 + 6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 128*Power(x1,3) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(-2 + Power(a,2) + 2*x1 + 8*Power(x1,2))*Cos(2*x2) + Power(a,4)*(-1 + 2*x1)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][2][0]= 0
+;Krzys[1][2][1]= -((Power(a,2)*Sin(2*x2))/(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2)))
+;Krzys[1][2][2]= -((x1*(Power(a,2) + 4*(-1 + x1)*x1))/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[1][2][3]= 0
+;Krzys[1][3][0]= (2*a*(Power(a,2) + 4*(-1 + x1)*x1)*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][3][1]= (a*(Power(a,4) - 16*Power(a,2)*x1 + 6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 128*Power(x1,3) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(-2 + Power(a,2) + 2*x1 + 8*Power(x1,2))*Cos(2*x2) + Power(a,4)*(-1 + 2*x1)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][3][2]= 0
+;Krzys[1][3][3]= -((Power(a,2) + 4*(-1 + x1)*x1)*(Power(a,4) + 6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + 2*x1)*Cos(4*x2))*Power(Sin(x2),2))/(2.*Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3))
+;Krzys[2][0][0]= (-16*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][0][1]= (-32*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][0][2]= 0
+;Krzys[2][0][3]= (16*a*x1*(Power(a,2) + 4*Power(x1,2))*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][1][0]= (-32*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][1][1]= (-64*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][1][2]= (4*x1)/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
+;Krzys[2][1][3]= (a*(3*Power(a,4) + 32*Power(a,2)*x1 + 32*Power(a,2)*Power(x1,2) + 128*Power(x1,3) + 128*Power(x1,4) + 4*Power(a,2)*(Power(a,2) + 8*Power(x1,2))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][2][0]= 0
+;Krzys[2][2][1]= (4*x1)/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
+;Krzys[2][2][2]= -((Power(a,2)*Cos(x2)*Sin(x2))/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[2][2][3]= 0
+;Krzys[2][3][0]= (16*a*x1*(Power(a,2) + 4*Power(x1,2))*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][3][1]= (a*(3*Power(a,4) + 32*Power(a,2)*x1 + 32*Power(a,2)*Power(x1,2) + 128*Power(x1,3) + 128*Power(x1,4) + 4*Power(a,2)*(Power(a,2) + 8*Power(x1,2))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][3][2]= 0
+;Krzys[2][3][3]= -((3*Power(a,6) + 20*Power(a,4)*x1 + 44*Power(a,4)*Power(x1,2) + 128*Power(a,2)*Power(x1,3) + 256*Power(a,2)*Power(x1,4) + 512*Power(x1,6) + 4*Power(a,2)*(Power(a,4) + 32*(-1 + x1)*Power(x1,3) + 4*Power(a,2)*x1*(-1 + 3*x1))*Cos(2*x2) + Power(a,4)*(Power(a,2) + 4*(-1 + x1)*x1)*Cos(4*x2))*Sin(2*x2))/(2.*Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3))
+;Krzys[3][0][0]= (-4*a*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][0][1]= (-8*a*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][0][2]= (-16*a*x1*Cot(x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[3][0][3]= (4*Power(a,2)*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][1][0]= (-8*a*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][1][1]= (-16*a*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][1][2]= (-4*a*(Power(a,2) + 8*x1*(1 + x1) + Power(a,2)*Cos(2*x2))*Cot(x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[3][1][3]= (2*(Power(a,4) + 6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + 2*x1)*Cos(4*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][2][0]= (-16*a*x1*Cot(x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[3][2][1]= (-4*a*(Power(a,2) + 8*x1*(1 + x1) + Power(a,2)*Cos(2*x2))*Cot(x2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[3][2][2]= (-2*a*x1)/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
+;Krzys[3][2][3]= ((3*Power(a,4) + 16*Power(a,2)*x1 + 32*Power(a,2)*Power(x1,2) + 128*Power(x1,4) + 4*Power(a,2)*(Power(a,2) + 4*x1*(-1 + 2*x1))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2))
+;Krzys[3][3][0]= (4*Power(a,2)*(Power(a,2) - 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][3][1]= (2*(Power(a,4) + 6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + 2*x1)*Cos(4*x2)))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][3][2]= ((3*Power(a,4) + 16*Power(a,2)*x1 + 32*Power(a,2)*Power(x1,2) + 128*Power(x1,4) + 4*Power(a,2)*(Power(a,2) + 4*x1*(-1 + 2*x1))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2))
+;Krzys[3][3][3]= -((a*(Power(a,4) + 6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + 2*x1)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3))
+;
+
+}
+
   if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
-;Krzys[0][0][0]= (2*Power(exp(1.),2*x1)*(Power(exp(1.),x1) + R0)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[0][0][1]= (Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*(Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[0][0][2]= -((Power(a,2)*(Power(exp(1.),x1) + R0)*Sin(2*x2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2))
-;Krzys[0][0][3]= (-2*a*Power(exp(1.),2*x1)*(Power(exp(1.),x1) + R0)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[0][1][0]= (Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*(Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[0][1][1]= (2*(Power(Power(exp(1.),x1) + R0,3)*(1 + Power(exp(1.),x1) + R0) - Power(a,2)*(Power(exp(1.),x1) + R0)*Power(Cos(x2),2) - Power(a,4)*Power(Cos(x2),4)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[0][1][2]= -((Power(a,2)*(Power(exp(1.),x1) + R0)*Sin(2*x2))/(Power(exp(1.),x1)*Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)))
-;Krzys[0][1][3]= -((a*Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*(Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[0][2][0]= -((Power(a,2)*(Power(exp(1.),x1) + R0)*Sin(2*x2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2))
-;Krzys[0][2][1]= -((Power(a,2)*(Power(exp(1.),x1) + R0)*Sin(2*x2))/(Power(exp(1.),x1)*Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)))
-;Krzys[0][2][2]= (-2*Power(exp(1.),2*x1)*Power(Power(exp(1.),x1) + R0,2))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;Krzys[0][2][3]= (2*Power(a,3)*(Power(exp(1.),x1) + R0)*Cos(x2)*Power(Sin(x2),3))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)
-;Krzys[0][3][0]= (-2*a*Power(exp(1.),2*x1)*(Power(exp(1.),x1) + R0)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[0][3][1]= -((a*Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*(Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[0][3][2]= (2*Power(a,3)*(Power(exp(1.),x1) + R0)*Cos(x2)*Power(Sin(x2),3))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)
-;Krzys[0][3][3]= (-2*Power(exp(1.),2*x1)*(Power(exp(1.),x1) + R0)*Power(Sin(x2),2)*(Power(a,4)*(Power(exp(1.),x1) + R0)*Power(Cos(x2),4) + Power(Power(exp(1.),x1) + R0,2)*(Power(Power(exp(1.),x1) + R0,3) - Power(a,2)*Power(Sin(x2),2)) + Power(a,2)*Power(Cos(x2),2)*(2*Power(Power(exp(1.),x1) + R0,3) + Power(a,2)*Power(Sin(x2),2))))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[1][0][0]= (Power(exp(1.),3*x1)*(Power(a,2) + Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[1][0][1]= -((Power(exp(1.),2*x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*(2*(Power(exp(1.),x1) + R0) - Power(a,2)*Power(Sin(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
+;Krzys[0][0][0]= (8*(Power(exp(1.0),x1) + R0)*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][0][1]= (4*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][0][2]= (-4*Power(a,2)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][0][3]= (8*a*(Power(exp(1.0),x1) + R0)*(Power(a,2) - 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][1][0]= (4*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][1][1]= (2*Power(exp(1.0),2*x1)*(-3*Power(a,4) - 4*Power(a,2)*Power(exp(1.0),x1) + 8*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),4*x1) - 4*Power(a,2)*R0 + 24*Power(exp(1.0),2*x1)*R0 + 32*Power(exp(1.0),3*x1)*R0 + 24*Power(exp(1.0),x1)*Power(R0,2) + 48*Power(exp(1.0),2*x1)*Power(R0,2) + 8*Power(R0,3) + 32*Power(exp(1.0),x1)*Power(R0,3) + 8*Power(R0,4) - 4*Power(a,2)*(Power(a,2) + Power(exp(1.0),x1) + R0)*Cos(2*x2) - Power(a,4)*Cos(4*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][1][2]= (-4*Power(a,2)*Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][1][3]= (-4*a*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][2][0]= (-4*Power(a,2)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][2][1]= (-4*Power(a,2)*Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][2][2]= (-2*Power(Power(exp(1.0),x1) + R0,2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;Krzys[0][2][3]= (8*Power(a,3)*(Power(exp(1.0),x1) + R0)*Cos(x2)*Power(Sin(x2),3))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][3][0]= (8*a*(Power(exp(1.0),x1) + R0)*(Power(a,2) - 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][3][1]= (-4*a*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[0][3][2]= (8*Power(a,3)*(Power(exp(1.0),x1) + R0)*Cos(x2)*Power(Sin(x2),3))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[0][3][3]= (-2*(Power(exp(1.0),x1) + R0)*(Power(a,4) + 3*Power(a,4)*Power(exp(1.0),x1) - 4*Power(a,2)*Power(exp(1.0),2*x1) + 8*Power(a,2)*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),5*x1) + 3*Power(a,4)*R0 - 8*Power(a,2)*Power(exp(1.0),x1)*R0 + 24*Power(a,2)*Power(exp(1.0),2*x1)*R0 + 40*Power(exp(1.0),4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + 24*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) + 80*Power(exp(1.0),3*x1)*Power(R0,2) + 8*Power(a,2)*Power(R0,3) + 80*Power(exp(1.0),2*x1)*Power(R0,3) + 40*Power(exp(1.0),x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(exp(1.0),x1) + R0)*(Power(a,2) + Power(exp(1.0),x1) + 2*Power(exp(1.0),2*x1) + R0 + 4*Power(exp(1.0),x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(exp(1.0),x1) + R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][0][0]= (4*(Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/(Power(exp(1.0),x1)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
+;Krzys[1][0][1]= (-4*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2))*(2*(Power(exp(1.0),x1) + R0) - Power(a,2)*Power(Sin(x2),2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
 ;Krzys[1][0][2]= 0
-;Krzys[1][0][3]= -((a*Power(exp(1.),3*x1)*(Power(a,2) + Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[1][1][0]= -((Power(exp(1.),2*x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*(2*(Power(exp(1.),x1) + R0) - Power(a,2)*Power(Sin(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[1][1][1]= (-4*(Power(exp(1.),x1) + R0)*(Power(Power(exp(1.),x1) + R0,2)*(2*Power(exp(1.),x1) + R0) + Power(a,2)*R0*Power(Cos(x2),2)) - (Power(a,2) + Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(Power(exp(1.),x1) + R0,2)*(Power(exp(1.),2*x1) + R0*(2 + R0) + Power(exp(1.),x1)*(3 + 2*R0)) + Power(a,2)*(2*Power(exp(1.),2*x1) + 2*R0*(1 + R0) + Power(exp(1.),x1)*(1 + 4*R0))*Power(Cos(x2),2) + Power(a,4)*Power(Cos(x2),4)) + Power(a,2)*(Power(Power(exp(1.),x1) + R0,2)*(Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(2 + R0) + R0*(2 + R0)) + 2*Power(a,2)*(Power(exp(1.),2*x1) + R0 + 2*Power(exp(1.),x1)*R0 + Power(R0,2))*Power(Cos(x2),2) + Power(a,4)*Power(Cos(x2),4))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[1][1][2]= -((Power(a,2)*Sin(2*x2))/(Power(a,2) + 2*Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Cos(2*x2)))
-;Krzys[1][1][3]= (a*Power(exp(1.),2*x1)*Power(Sin(x2),2)*(Power(a,4)*(Power(exp(1.),x1) + R0)*Power(Cos(x2),4) + Power(Power(exp(1.),x1) + R0,2)*(Power(exp(1.),3*x1) + 3*Power(exp(1.),2*x1)*R0 + R0*(2 + Power(R0,2)) + Power(exp(1.),x1)*(2 + 3*Power(R0,2)) - Power(a,2)*Power(Sin(x2),2)) + Power(a,2)*Power(Cos(x2),2)*(2*(Power(exp(1.),3*x1) + 3*Power(exp(1.),2*x1)*R0 + R0*(-1 + Power(R0,2)) + Power(exp(1.),x1)*(-1 + 3*Power(R0,2))) + Power(a,2)*Power(Sin(x2),2))))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
+;Krzys[1][0][3]= (4*a*(Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(a,2) - 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/(Power(exp(1.0),x1)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
+;Krzys[1][1][0]= (-4*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2))*(2*(Power(exp(1.0),x1) + R0) - Power(a,2)*Power(Sin(x2),2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[1][1][1]= (10*Power(a,6) + 8*Power(a,4)*Power(exp(1.0),x1) + 32*Power(a,2)*Power(exp(1.0),2*x1) + 36*Power(a,4)*Power(exp(1.0),2*x1) + 16*Power(a,2)*Power(exp(1.0),3*x1) - 64*Power(exp(1.0),4*x1) + 48*Power(a,2)*Power(exp(1.0),4*x1) - 32*Power(exp(1.0),5*x1) + 32*Power(exp(1.0),6*x1) + 32*Power(a,2)*Power(exp(1.0),x1)*R0 + 72*Power(a,4)*Power(exp(1.0),x1)*R0 + 32*Power(a,2)*Power(exp(1.0),2*x1)*R0 - 192*Power(exp(1.0),3*x1)*R0 + 192*Power(a,2)*Power(exp(1.0),3*x1)*R0 - 128*Power(exp(1.0),4*x1)*R0 + 192*Power(exp(1.0),5*x1)*R0 + 36*Power(a,4)*Power(R0,2) + 16*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) - 192*Power(exp(1.0),2*x1)*Power(R0,2) + 288*Power(a,2)*Power(exp(1.0),2*x1)*Power(R0,2) - 192*Power(exp(1.0),3*x1)*Power(R0,2) + 480*Power(exp(1.0),4*x1)*Power(R0,2) - 64*Power(exp(1.0),x1)*Power(R0,3) + 192*Power(a,2)*Power(exp(1.0),x1)*Power(R0,3) - 128*Power(exp(1.0),2*x1)*Power(R0,3) + 640*Power(exp(1.0),3*x1)*Power(R0,3) + 48*Power(a,2)*Power(R0,4) - 32*Power(exp(1.0),x1)*Power(R0,4) + 480*Power(exp(1.0),2*x1)*Power(R0,4) + 192*Power(exp(1.0),x1)*Power(R0,5) + 32*Power(R0,6) + Power(a,2)*(15*Power(a,4) + 16*Power(a,2)*(3*Power(exp(1.0),2*x1) + 3*Power(R0,2) + Power(exp(1.0),x1)*(1 + 6*R0)) + 16*(3*Power(exp(1.0),4*x1) + 3*Power(R0,4) + Power(exp(1.0),3*x1)*(-1 + 12*R0) + 2*Power(exp(1.0),2*x1)*(1 - R0 + 9*Power(R0,2)) + Power(exp(1.0),x1)*R0*(2 - R0 + 12*Power(R0,2))))*Cos(2*x2) + 2*Power(a,4)*(3*Power(a,2) + 6*Power(exp(1.0),2*x1) + 6*Power(R0,2) + 4*Power(exp(1.0),x1)*(1 + 3*R0))*Cos(4*x2) + Power(a,6)*Cos(6*x2))/(4.*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
+;Krzys[1][1][2]= -((Power(a,2)*Cos(x2)*Sin(x2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[1][1][3]= (a*(Power(a,4) - 8*Power(a,2)*Power(exp(1.0),x1) + 3*Power(a,4)*Power(exp(1.0),x1) - 4*Power(a,2)*Power(exp(1.0),2*x1) + 16*Power(exp(1.0),3*x1) + 8*Power(a,2)*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),5*x1) - 8*Power(a,2)*R0 + 3*Power(a,4)*R0 - 8*Power(a,2)*Power(exp(1.0),x1)*R0 + 48*Power(exp(1.0),2*x1)*R0 + 24*Power(a,2)*Power(exp(1.0),2*x1)*R0 + 40*Power(exp(1.0),4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + 48*Power(exp(1.0),x1)*Power(R0,2) + 24*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) + 80*Power(exp(1.0),3*x1)*Power(R0,2) + 16*Power(R0,3) + 8*Power(a,2)*Power(R0,3) + 80*Power(exp(1.0),2*x1)*Power(R0,3) + 40*Power(exp(1.0),x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(exp(1.0),x1) + R0)*(-2 + Power(a,2) + Power(exp(1.0),x1) + 2*Power(exp(1.0),2*x1) + R0 + 4*Power(exp(1.0),x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(exp(1.0),x1) + R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
 ;Krzys[1][2][0]= 0
-;Krzys[1][2][1]= -((Power(a,2)*Sin(2*x2))/(Power(a,2) + 2*Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Cos(2*x2)))
-;Krzys[1][2][2]= -((Power(exp(1.),3*x1)*(Power(exp(1.),x1) + R0)*(Power(a,2) + Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(-1 + R0) + (-2 + R0)*R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[1][2][1]= -((Power(a,2)*Cos(x2)*Sin(x2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[1][2][2]= -(((Power(exp(1.0),x1) + R0)*(Power(a,2) + (-2 + Power(exp(1.0),x1) + R0)*(Power(exp(1.0),x1) + R0)))/(Power(exp(1.0),x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))))
 ;Krzys[1][2][3]= 0
-;Krzys[1][3][0]= -((a*Power(exp(1.),3*x1)*(Power(a,2) + Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[1][3][1]= (a*Power(exp(1.),2*x1)*Power(Sin(x2),2)*(Power(a,4)*(Power(exp(1.),x1) + R0)*Power(Cos(x2),4) + Power(Power(exp(1.),x1) + R0,2)*(Power(exp(1.),3*x1) + 3*Power(exp(1.),2*x1)*R0 + R0*(2 + Power(R0,2)) + Power(exp(1.),x1)*(2 + 3*Power(R0,2)) - Power(a,2)*Power(Sin(x2),2)) + Power(a,2)*Power(Cos(x2),2)*(2*(Power(exp(1.),3*x1) + 3*Power(exp(1.),2*x1)*R0 + R0*(-1 + Power(R0,2)) + Power(exp(1.),x1)*(-1 + 3*Power(R0,2))) + Power(a,2)*Power(Sin(x2),2))))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
+;Krzys[1][3][0]= (4*a*(Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(a,2) - 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/(Power(exp(1.0),x1)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
+;Krzys[1][3][1]= (a*(Power(a,4) - 8*Power(a,2)*Power(exp(1.0),x1) + 3*Power(a,4)*Power(exp(1.0),x1) - 4*Power(a,2)*Power(exp(1.0),2*x1) + 16*Power(exp(1.0),3*x1) + 8*Power(a,2)*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),5*x1) - 8*Power(a,2)*R0 + 3*Power(a,4)*R0 - 8*Power(a,2)*Power(exp(1.0),x1)*R0 + 48*Power(exp(1.0),2*x1)*R0 + 24*Power(a,2)*Power(exp(1.0),2*x1)*R0 + 40*Power(exp(1.0),4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + 48*Power(exp(1.0),x1)*Power(R0,2) + 24*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) + 80*Power(exp(1.0),3*x1)*Power(R0,2) + 16*Power(R0,3) + 8*Power(a,2)*Power(R0,3) + 80*Power(exp(1.0),2*x1)*Power(R0,3) + 40*Power(exp(1.0),x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(exp(1.0),x1) + R0)*(-2 + Power(a,2) + Power(exp(1.0),x1) + 2*Power(exp(1.0),2*x1) + R0 + 4*Power(exp(1.0),x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(exp(1.0),x1) + R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
 ;Krzys[1][3][2]= 0
-;Krzys[1][3][3]= -((Power(exp(1.),3*x1)*(Power(a,2) + Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sin(x2),2)*(Power(a,4)*(Power(exp(1.),x1) + R0)*Power(Cos(x2),4) + Power(Power(exp(1.),x1) + R0,2)*(Power(Power(exp(1.),x1) + R0,3) - Power(a,2)*Power(Sin(x2),2)) + Power(a,2)*Power(Cos(x2),2)*(2*Power(Power(exp(1.),x1) + R0,3) + Power(a,2)*Power(Sin(x2),2))))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[2][0][0]= (-2*Power(a,2)*(Power(exp(1.),x1) + R0)*Cos(x2)*Sin(x2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[2][0][1]= (-2*Power(a,2)*(Power(exp(1.),x1) + R0)*Cos(x2)*Sin(x2))/(Power(exp(1.),x1)*Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
+;Krzys[1][3][3]= -(((Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(a,4) + 3*Power(a,4)*Power(exp(1.0),x1) - 4*Power(a,2)*Power(exp(1.0),2*x1) + 8*Power(a,2)*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),5*x1) + 3*Power(a,4)*R0 - 8*Power(a,2)*Power(exp(1.0),x1)*R0 + 24*Power(a,2)*Power(exp(1.0),2*x1)*R0 + 40*Power(exp(1.0),4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + 24*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) + 80*Power(exp(1.0),3*x1)*Power(R0,2) + 8*Power(a,2)*Power(R0,3) + 80*Power(exp(1.0),2*x1)*Power(R0,3) + 40*Power(exp(1.0),x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(exp(1.0),x1) + R0)*(Power(a,2) + Power(exp(1.0),x1) + 2*Power(exp(1.0),2*x1) + R0 + 4*Power(exp(1.0),x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(exp(1.0),x1) + R0)*Cos(4*x2))*Power(Sin(x2),2))/(Power(exp(1.0),x1)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)))
+;Krzys[2][0][0]= (-8*Power(a,2)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][0][1]= (-8*Power(a,2)*Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
 ;Krzys[2][0][2]= 0
-;Krzys[2][0][3]= (a*(Power(exp(1.),x1) + R0)*(Power(a,2) + Power(Power(exp(1.),x1) + R0,2))*Sin(2*x2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[2][1][0]= (-2*Power(a,2)*(Power(exp(1.),x1) + R0)*Cos(x2)*Sin(x2))/(Power(exp(1.),x1)*Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[2][1][1]= (-2*Power(a,2)*(Power(exp(1.),x1) + R0)*Cos(x2)*Sin(x2))/(Power(exp(1.),2*x1)*Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[2][1][2]= (Power(exp(1.),x1)*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;Krzys[2][1][3]= (a*Cos(x2)*Sin(x2)*(1 + (2*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)) + (2*Power(a,2)*(Power(exp(1.),x1) + R0)*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)))/(Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[2][0][3]= (8*a*(Power(exp(1.0),x1) + R0)*(Power(a,2) + Power(Power(exp(1.0),x1) + R0,2))*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][1][0]= (-8*Power(a,2)*Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][1][1]= (-8*Power(a,2)*Power(exp(1.0),2*x1)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][1][2]= (Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;Krzys[2][1][3]= (a*Power(exp(1.0),x1)*(3*Power(a,4) + 16*Power(a,2)*Power(exp(1.0),x1) + 8*Power(a,2)*Power(exp(1.0),2*x1) + 16*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),4*x1) + 16*Power(a,2)*R0 + 16*Power(a,2)*Power(exp(1.0),x1)*R0 + 48*Power(exp(1.0),2*x1)*R0 + 32*Power(exp(1.0),3*x1)*R0 + 8*Power(a,2)*Power(R0,2) + 48*Power(exp(1.0),x1)*Power(R0,2) + 48*Power(exp(1.0),2*x1)*Power(R0,2) + 16*Power(R0,3) + 32*Power(exp(1.0),x1)*Power(R0,3) + 8*Power(R0,4) + 4*Power(a,2)*(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Sin(2*x2))/(2.*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
 ;Krzys[2][2][0]= 0
-;Krzys[2][2][1]= (Power(exp(1.),x1)*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;Krzys[2][2][2]= -((Power(a,2)*Cos(x2)*Sin(x2))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[2][2][1]= (Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
+;Krzys[2][2][2]= -((Power(a,2)*Cos(x2)*Sin(x2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
 ;Krzys[2][2][3]= 0
-;Krzys[2][3][0]= (a*(Power(exp(1.),x1) + R0)*(Power(a,2) + Power(Power(exp(1.),x1) + R0,2))*Sin(2*x2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[2][3][1]= (a*Cos(x2)*Sin(x2)*(1 + (2*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)) + (2*Power(a,2)*(Power(exp(1.),x1) + R0)*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)))/(Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[2][3][0]= (8*a*(Power(exp(1.0),x1) + R0)*(Power(a,2) + Power(Power(exp(1.0),x1) + R0,2))*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[2][3][1]= (a*Power(exp(1.0),x1)*(3*Power(a,4) + 16*Power(a,2)*Power(exp(1.0),x1) + 8*Power(a,2)*Power(exp(1.0),2*x1) + 16*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),4*x1) + 16*Power(a,2)*R0 + 16*Power(a,2)*Power(exp(1.0),x1)*R0 + 48*Power(exp(1.0),2*x1)*R0 + 32*Power(exp(1.0),3*x1)*R0 + 8*Power(a,2)*Power(R0,2) + 48*Power(exp(1.0),x1)*Power(R0,2) + 48*Power(exp(1.0),2*x1)*Power(R0,2) + 16*Power(R0,3) + 32*Power(exp(1.0),x1)*Power(R0,3) + 8*Power(R0,4) + 4*Power(a,2)*(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Sin(2*x2))/(2.*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
 ;Krzys[2][3][2]= 0
-;Krzys[2][3][3]= (Sin(x2)*((-4*Power(a,2)*(Power(exp(1.),x1) + R0)*(Power(a,2) + Power(Power(exp(1.),x1) + R0,2))*Cos(x2)*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2) - 2*Cos(x2)*(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2) + Power(a,2)*(1 + (2*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))*Power(Sin(x2),2))))/(2.*(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
-;Krzys[3][0][0]= (a*Power(exp(1.),2*x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[3][0][1]= (a*Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[3][0][2]= (-2*a*(Power(exp(1.),x1) + R0)*Cot(x2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)
-;Krzys[3][0][3]= -((Power(a,2)*Power(exp(1.),2*x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[3][1][0]= (a*Power(exp(1.),x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[3][1][1]= (a*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2)))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3)
-;Krzys[3][1][2]= -((a*(Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*Cot(x2))/(Power(exp(1.),x1)*Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)))
-;Krzys[3][1][3]= (Power(exp(1.),x1)*(Power(exp(1.),x1) + R0 + (Power(a,2)*(-Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;Krzys[3][2][0]= (-2*a*(Power(exp(1.),x1) + R0)*Cot(x2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)
-;Krzys[3][2][1]= -((a*(Power(exp(1.),2*x1) + 2*Power(exp(1.),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*Cot(x2))/(Power(exp(1.),x1)*Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)))
-;Krzys[3][2][2]= -((a*Power(exp(1.),2*x1)*(Power(exp(1.),x1) + R0))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
-;Krzys[3][2][3]= (Cot(x2)*(2*Power(a,2)*Power(Power(exp(1.),x1) + R0,2)*Power(Cos(x2),2) + Power(a,4)*Power(Cos(x2),4) + (Power(exp(1.),x1) + R0)*(Power(Power(exp(1.),x1) + R0,3) + 2*Power(a,2)*Power(Sin(x2),2))))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)
-;Krzys[3][3][0]= -((Power(a,2)*Power(exp(1.),2*x1)*(Power(Power(exp(1.),x1) + R0,2) - Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
-;Krzys[3][3][1]= (Power(exp(1.),x1)*(Power(exp(1.),x1) + R0 + (Power(a,2)*(-Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)))/(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
-;Krzys[3][3][2]= (Cot(x2)*(2*Power(a,2)*Power(Power(exp(1.),x1) + R0,2)*Power(Cos(x2),2) + Power(a,4)*Power(Cos(x2),4) + (Power(exp(1.),x1) + R0)*(Power(Power(exp(1.),x1) + R0,3) + 2*Power(a,2)*Power(Sin(x2),2))))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),2)
-;Krzys[3][3][3]= -((a*Power(exp(1.),2*x1)*Power(Sin(x2),2)*(Power(a,4)*(Power(exp(1.),x1) + R0)*Power(Cos(x2),4) + Power(Power(exp(1.),x1) + R0,2)*(Power(Power(exp(1.),x1) + R0,3) - Power(a,2)*Power(Sin(x2),2)) + Power(a,2)*Power(Cos(x2),2)*(2*Power(Power(exp(1.),x1) + R0,3) + Power(a,2)*Power(Sin(x2),2))))/Power(Power(Power(exp(1.),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2),3))
+;Krzys[2][3][3]= (4*Sin(x2)*(-(Cos(x2)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0)) + Power(a,2)*(Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Cos(x2),2))*(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))) + Power(a,2)*(Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Cos(x2)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2) + Power(a,2)*Cos(x2)*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0)) + Power(a,2)*(Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Cos(x2),2))*(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2) - 2*Power(a,2)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0)) + Power(a,2)*(Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Cos(x2),2))*Sin(x2)*Sin(2*x2)))/((Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
+;Krzys[3][0][0]= (-4*a*(Power(a,2) - 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][0][1]= (4*a*Power(exp(1.0),x1)*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][0][2]= (-8*a*(Power(exp(1.0),x1) + R0)*Cot(x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[3][0][3]= (4*Power(a,2)*(Power(a,2) - 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][1][0]= (4*a*Power(exp(1.0),x1)*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][1][1]= (4*a*Power(exp(1.0),2*x1)*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][1][2]= (-4*a*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*Cot(x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[3][1][3]= (Power(exp(1.0),x1)*(Power(a,4) + 3*Power(a,4)*Power(exp(1.0),x1) - 4*Power(a,2)*Power(exp(1.0),2*x1) + 8*Power(a,2)*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),5*x1) + 3*Power(a,4)*R0 - 8*Power(a,2)*Power(exp(1.0),x1)*R0 + 24*Power(a,2)*Power(exp(1.0),2*x1)*R0 + 40*Power(exp(1.0),4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + 24*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) + 80*Power(exp(1.0),3*x1)*Power(R0,2) + 8*Power(a,2)*Power(R0,3) + 80*Power(exp(1.0),2*x1)*Power(R0,3) + 40*Power(exp(1.0),x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(exp(1.0),x1) + R0)*(Power(a,2) + Power(exp(1.0),x1) + 2*Power(exp(1.0),2*x1) + R0 + 4*Power(exp(1.0),x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(exp(1.0),x1) + R0)*Cos(4*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][2][0]= (-8*a*(Power(exp(1.0),x1) + R0)*Cot(x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[3][2][1]= (-4*a*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*Cot(x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
+;Krzys[3][2][2]= -((a*(Power(exp(1.0),x1) + R0))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
+;Krzys[3][2][3]= ((3*Power(a,4) + 8*Power(a,2)*Power(exp(1.0),x1) + 8*Power(a,2)*Power(exp(1.0),2*x1) + 8*Power(exp(1.0),4*x1) + 8*Power(a,2)*R0 + 16*Power(a,2)*Power(exp(1.0),x1)*R0 + 32*Power(exp(1.0),3*x1)*R0 + 8*Power(a,2)*Power(R0,2) + 48*Power(exp(1.0),2*x1)*Power(R0,2) + 32*Power(exp(1.0),x1)*Power(R0,3) + 8*Power(R0,4) + 4*Power(a,2)*(Power(a,2) + 2*(Power(exp(1.0),2*x1) + (-1 + R0)*R0 + Power(exp(1.0),x1)*(-1 + 2*R0)))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2))
+;Krzys[3][3][0]= (4*Power(a,2)*(Power(a,2) - 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][3][1]= (Power(exp(1.0),x1)*(Power(a,4) + 3*Power(a,4)*Power(exp(1.0),x1) - 4*Power(a,2)*Power(exp(1.0),2*x1) + 8*Power(a,2)*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),5*x1) + 3*Power(a,4)*R0 - 8*Power(a,2)*Power(exp(1.0),x1)*R0 + 24*Power(a,2)*Power(exp(1.0),2*x1)*R0 + 40*Power(exp(1.0),4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + 24*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) + 80*Power(exp(1.0),3*x1)*Power(R0,2) + 8*Power(a,2)*Power(R0,3) + 80*Power(exp(1.0),2*x1)*Power(R0,3) + 40*Power(exp(1.0),x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(exp(1.0),x1) + R0)*(Power(a,2) + Power(exp(1.0),x1) + 2*Power(exp(1.0),2*x1) + R0 + 4*Power(exp(1.0),x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(exp(1.0),x1) + R0)*Cos(4*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
+;Krzys[3][3][2]= ((3*Power(a,4) + 8*Power(a,2)*Power(exp(1.0),x1) + 8*Power(a,2)*Power(exp(1.0),2*x1) + 8*Power(exp(1.0),4*x1) + 8*Power(a,2)*R0 + 16*Power(a,2)*Power(exp(1.0),x1)*R0 + 32*Power(exp(1.0),3*x1)*R0 + 8*Power(a,2)*Power(R0,2) + 48*Power(exp(1.0),2*x1)*Power(R0,2) + 32*Power(exp(1.0),x1)*Power(R0,3) + 8*Power(R0,4) + 4*Power(a,2)*(Power(a,2) + 2*(Power(exp(1.0),2*x1) + (-1 + R0)*R0 + Power(exp(1.0),x1)*(-1 + 2*R0)))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2))
+;Krzys[3][3][3]= -((a*(Power(a,4) + 3*Power(a,4)*Power(exp(1.0),x1) - 4*Power(a,2)*Power(exp(1.0),2*x1) + 8*Power(a,2)*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),5*x1) + 3*Power(a,4)*R0 - 8*Power(a,2)*Power(exp(1.0),x1)*R0 + 24*Power(a,2)*Power(exp(1.0),2*x1)*R0 + 40*Power(exp(1.0),4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + 24*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) + 80*Power(exp(1.0),3*x1)*Power(R0,2) + 8*Power(a,2)*Power(R0,3) + 80*Power(exp(1.0),2*x1)*Power(R0,3) + 40*Power(exp(1.0),x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(exp(1.0),x1) + R0)*(Power(a,2) + Power(exp(1.0),x1) + 2*Power(exp(1.0),2*x1) + R0 + 4*Power(exp(1.0),x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(exp(1.0),x1) + R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
 ;
 }
 
@@ -1253,6 +1387,69 @@ coco_KS2BL(ldouble *xKS, ldouble *xBL)
 //**********************************************************************
 //**********************************************************************
 //converts coordinates
+//for KS -> MKS0
+int
+coco_KS2MKS0(ldouble *xKS, ldouble *xMKS0)
+{
+  ldouble KSx0=xKS[0];
+  ldouble KSx1=xKS[1];
+  ldouble KSx2=xKS[2];
+  ldouble KSx3=xKS[3];
+  ldouble R0;
+
+  xMKS0[0]
+    = KSx0
+    ;
+  xMKS0[1]
+    = .5*KSx1
+    ;
+  xMKS0[2]
+    = KSx2
+    ;
+  xMKS0[3]
+    = KSx3
+    ;
+
+  return 0;
+}
+
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for MKS0 -> KS
+int
+coco_MKS02KS(ldouble *xMKS0, ldouble *xKS)
+{
+  ldouble x0=xMKS0[0];
+  ldouble x1=xMKS0[1];
+  ldouble x2=xMKS0[2];
+  ldouble x3=xMKS0[3];
+  ldouble R0;
+
+  xKS[0]
+    = x0
+    ;
+  xKS[1]
+    = 2.*x1
+    ;
+  xKS[2]
+    = x2
+    ;
+  xKS[3]
+    = x3
+    ;
+
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
 //for KS -> MKS1
 int
 coco_KS2MKS1(ldouble *xKS, ldouble *xMKS1)
@@ -1262,6 +1459,7 @@ coco_KS2MKS1(ldouble *xKS, ldouble *xMKS1)
   ldouble KSx2=xKS[2];
   ldouble KSx3=xKS[3];
   ldouble R0;
+
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
@@ -1270,7 +1468,7 @@ coco_KS2MKS1(ldouble *xKS, ldouble *xMKS1)
     = KSx0
     ;
   xMKS1[1]
-    = Log(KSx1 - R0)
+    = log(KSx1-R0)
     ;
   xMKS1[2]
     = KSx2
@@ -1347,6 +1545,20 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     {
       coco_BL2KS(x1,x2);
       coco_KS2MKS1(x2,x2);
+    }
+  else if (CO1==KSCOORDS && CO2==MKS0COORDS)
+    coco_KS2MKS0(x1,x2);
+  else if (CO1==MKS0COORDS && CO2==KSCOORDS)
+    coco_MKS02KS(x1,x2);
+  else if (CO1==MKS0COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+    {
+      coco_MKS02KS(x1,x2);
+      coco_KS2BL(x2,x2);
+    }
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS0COORDS)
+    {
+      coco_BL2KS(x1,x2);
+      coco_KS2MKS0(x2,x2);
     }
   else
     my_err("coco coordinate conversion not implemented\n");
@@ -1430,7 +1642,7 @@ dxdx_KS2MKS1(ldouble *xx, ldouble dxdx[][4])
     for(j=0;j<4;j++)
       dxdx[i][j]=delta(i,j);
   
-  dxdx[1][1]=KSx1-R0;
+  dxdx[1][1]=1./(KSx1-R0);
 
   return 0;
 }
@@ -1457,7 +1669,7 @@ dxdx_MKS12KS(ldouble *xx, ldouble dxdx[][4])
     for(j=0;j<4;j++)
       dxdx[i][j]=delta(i,j);
   
-  dxdx[1][1]=exp(-x1);
+  dxdx[1][1]=exp(x1);
 
   return 0;
 }

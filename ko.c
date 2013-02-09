@@ -67,6 +67,21 @@ main(int argc, char **argv)
     printf("x: %f\n",xx);
     print_metric(gg);
     print_metric(GG);
+
+    int j,k;
+    double ggg=0.;
+    for(i=0;i<4;i++)
+      {
+	for(j=0;j<4;j++)
+	  {
+	    ggg=0.;
+	    for(k=0;k<4;k++)
+	      ggg+=gg[i][k]*GG[j][k];
+	    printf("%d %d ggg:%f\n",i,j,ggg);
+	  }
+      }
+
+
     double ucon[4],ucov[4];
     calc_normalobs_4vel(GG,ucon);
     print_4vector(ucon);

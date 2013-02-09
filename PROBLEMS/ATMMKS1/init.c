@@ -27,7 +27,7 @@ calc_G_arb(xxvecBL,GGBL,KERRCOORDS);
 set_hdatmosphere(pp,xxvec,gg,GG,0);
 
 
-/*
+
 //BL free-fall velocity
     ldouble ucon[4];
     ldouble r=xx;
@@ -43,7 +43,7 @@ set_hdatmosphere(pp,xxvec,gg,GG,0);
     pp[2]=ucon[1];
     pp[3]=ucon[2];
     pp[4]=ucon[3];
-*/
+
     
 //calculating entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
