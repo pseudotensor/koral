@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[    171509,       4227]
-NotebookOptionsPosition[    168678,       4129]
-NotebookOutlinePosition[    169033,       4145]
-CellTagsIndexPosition[    168990,       4142]
+NotebookDataLength[    207540,       4888]
+NotebookOptionsPosition[    204702,       4790]
+NotebookOutlinePosition[    205057,       4806]
+CellTagsIndexPosition[    205014,       4803]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -130,8 +130,8 @@ Cell[BoxData[
    3.56933374054699*^9, 3.5693337870375347`*^9}, {3.569333819340255*^9, 
    3.569333848637372*^9}, {3.5693342970123777`*^9, 3.569334302988755*^9}, 
    3.5693363255898046`*^9, 3.569364945816383*^9, {3.5693677114358587`*^9, 
-   3.569367754703516*^9}, 3.56936781397619*^9, 3.5693678499697027`*^9, 
-   3.5693685007047453`*^9}],
+   3.569367754703516*^9}, 3.56936781397619*^9, 3.5693678499697027`*^9, {
+   3.5693685007047453`*^9, 3.569368528997178*^9}}],
 
 Cell[BoxData[
  GraphicsBox[{{{}, {}}, {}, {{}, GraphicsComplexBox[CompressedData["
@@ -632,8 +632,8 @@ t/nvbf57m//e5r+3+e9t/nub/97mv7f5723+e5v//v/Hf/8fzhzcgA==
    3.56933374054699*^9, 3.5693337870375347`*^9}, {3.569333819340255*^9, 
    3.569333848637372*^9}, {3.5693342970123777`*^9, 3.569334302988755*^9}, 
    3.5693363255898046`*^9, 3.569364945816383*^9, {3.5693677114358587`*^9, 
-   3.569367754703516*^9}, 3.56936781397619*^9, 3.5693678499697027`*^9, 
-   3.5693685008582478`*^9}]
+   3.569367754703516*^9}, 3.56936781397619*^9, 3.5693678499697027`*^9, {
+   3.5693685007047453`*^9, 3.569368529151147*^9}}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -690,7 +690,7 @@ Cell[BoxData[
    3.569257904570973*^9, 3.5692579310573473`*^9}, {3.5692580167406588`*^9, 
    3.569258042716303*^9}, 3.569258886814123*^9, 3.56932797655837*^9, 
    3.569364946082471*^9, 3.569367775270258*^9, 3.569367814281336*^9, 
-   3.56936785013512*^9, 3.569368512952429*^9}]
+   3.56936785013512*^9, {3.569368512952429*^9, 3.5693685292046556`*^9}}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -786,7 +786,8 @@ Cell[BoxData[{
 Cell[BoxData[
  TagBox[GridBox[{
     {"1", "0", "0", "0"},
-    {"0", "2", "0", "0"},
+    {"0", 
+     RowBox[{"KSx1", "-", "R0"}], "0", "0"},
     {"0", "0", "1", "0"},
     {"0", "0", "0", "1"}
    },
@@ -806,7 +807,8 @@ Cell[BoxData[
   3.569250282561619*^9, 3.569257583309989*^9, {3.569257935208865*^9, 
    3.569257955122383*^9}, {3.569257995187598*^9, 3.569258044613245*^9}, 
    3.569258886877821*^9, 3.569327976607483*^9, 3.569364946134037*^9, 
-   3.5693677823114777`*^9, 3.569367814332027*^9, 3.5693678501914167`*^9}]
+   3.5693677823114777`*^9, 3.569367814332027*^9, 3.5693678501914167`*^9, 
+   3.5693685292538433`*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -831,7 +833,8 @@ Cell[BoxData[
  TagBox[GridBox[{
     {"1", "0", "0", "0"},
     {"0", 
-     FractionBox["1", "2"], "0", "0"},
+     FractionBox["1", 
+      RowBox[{"KSx1", "-", "R0"}]], "0", "0"},
     {"0", "0", "1", "0"},
     {"0", "0", "0", "1"}
    },
@@ -850,7 +853,7 @@ Cell[BoxData[
  CellChangeTimes->{{3.5692502690317507`*^9, 3.5692502931537657`*^9}, 
    3.569257586006548*^9, 3.569258055750154*^9, 3.5692588868876553`*^9, 
    3.5693279766589203`*^9, 3.569364946183943*^9, {3.5693677847790403`*^9, 
-   3.569367814369555*^9}, 3.569367850236418*^9}]
+   3.569367814369555*^9}, 3.569367850236418*^9, 3.569368529305027*^9}]
 }, Open  ]],
 
 Cell[BoxData[
@@ -1006,7 +1009,7 @@ Cell[BoxData[
   3.568656250425469*^9, 3.569250238706553*^9, 3.56925739203158*^9, 
    3.56925811627938*^9, 3.569258887010765*^9, 3.569327976735325*^9, 
    3.569364946261668*^9, {3.56936779162829*^9, 3.569367814446659*^9}, 
-   3.569367850315469*^9}]
+   3.569367850315469*^9, 3.569368529393849*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -1197,7 +1200,7 @@ Cell[BoxData[
    3.569257398592238*^9, 3.569258119210041*^9, 3.5692581561782703`*^9, 
    3.5692588873489313`*^9, 3.569327977147916*^9, {3.5693645418258457`*^9, 
    3.569364569170335*^9}, 3.5693649463236647`*^9, {3.569367795739066*^9, 
-   3.569367814505077*^9}, 3.5693678504789886`*^9}]
+   3.569367814505077*^9}, 3.5693678504789886`*^9, 3.569368529454012*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -1259,7 +1262,7 @@ Cell[BoxData[
    3.569258656954414*^9, 3.5692588881759043`*^9, 3.569327978222397*^9, 
    3.569335481628558*^9, {3.569364551659697*^9, 3.5693645608755293`*^9}, 
    3.569364600883875*^9, 3.5693649463666143`*^9, {3.569367803610684*^9, 
-   3.5693678145503607`*^9}, 3.5693678505218554`*^9}]
+   3.5693678145503607`*^9}, 3.5693678505218554`*^9, 3.569368529504216*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -1374,7 +1377,8 @@ Cell[BoxData[
         Offset[0.2]}, "RowsIndexed" -> {}}], "\[NoBreak]", ")"}],
   Function[BoxForm`e$, 
    MatrixForm[BoxForm`e$]]]], "Output",
- CellChangeTimes->{{3.569367814637919*^9, 3.569367850560689*^9}}]
+ CellChangeTimes->{{3.569367814637919*^9, 3.569367850560689*^9}, 
+   3.569368529562903*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -1448,78 +1452,128 @@ Cell[BoxData[
      RowBox[{"-", 
       FractionBox[
        RowBox[{
-        RowBox[{"4", " ", "x1", " ", 
+        RowBox[{
          RowBox[{"(", 
-          RowBox[{"1", "+", "x1"}], ")"}]}], "+", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], " ", 
+         RowBox[{"(", 
+          RowBox[{"2", "+", 
+           SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}]}], "+", 
         RowBox[{
          SuperscriptBox["a", "2"], " ", 
          SuperscriptBox[
           RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], 
        RowBox[{
-        RowBox[{"4", " ", 
-         SuperscriptBox["x1", "2"]}], "+", 
+        SuperscriptBox[
+         RowBox[{"(", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+        "+", 
         RowBox[{
          SuperscriptBox["a", "2"], " ", 
          SuperscriptBox[
           RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}]]}], 
      FractionBox[
-      RowBox[{"2", " ", "x1"}], 
+      RowBox[{"2", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", "x1"}]], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}]}], 
       RowBox[{
-       RowBox[{"4", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+       "+", 
        RowBox[{
         SuperscriptBox["a", "2"], " ", 
         SuperscriptBox[
          RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}]], "0", "0"},
     {
      FractionBox[
-      RowBox[{"2", " ", "x1"}], 
+      RowBox[{"2", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", "x1"}]], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}]}], 
       RowBox[{
-       RowBox[{"4", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+       "+", 
        RowBox[{
         SuperscriptBox["a", "2"], " ", 
         SuperscriptBox[
          RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}]], 
      FractionBox[
       RowBox[{
-       SuperscriptBox["a", "2"], "+", 
-       RowBox[{"4", " ", 
-        RowBox[{"(", 
-         RowBox[{
-          RowBox[{"-", "1"}], "+", "x1"}], ")"}], " ", "x1"}]}], 
-      RowBox[{"4", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "2"}], " ", "x1"}]], " ", 
        RowBox[{"(", 
         RowBox[{
-         RowBox[{"4", " ", 
-          SuperscriptBox["x1", "2"]}], "+", 
+         SuperscriptBox["a", "2"], "+", 
          RowBox[{
-          SuperscriptBox["a", "2"], " ", 
-          SuperscriptBox[
-           RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}]}]], "0", 
-     FractionBox["a", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "2"}], "+", 
+            SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], " ", 
+          
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}]}]}], 
+        ")"}]}], 
       RowBox[{
-       RowBox[{"8", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
-       RowBox[{"2", " ", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+       "+", 
+       RowBox[{
+        SuperscriptBox["a", "2"], " ", 
+        SuperscriptBox[
+         RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}]], "0", 
+     FractionBox[
+      RowBox[{"a", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", "x1"}]]}], 
+      RowBox[{
+       SuperscriptBox[
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+       "+", 
+       RowBox[{
         SuperscriptBox["a", "2"], " ", 
         SuperscriptBox[
          RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}]]},
     {"0", "0", 
      FractionBox["1", 
       RowBox[{
-       RowBox[{"4", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+       "+", 
        RowBox[{
         SuperscriptBox["a", "2"], " ", 
         SuperscriptBox[
          RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}]], "0"},
     {"0", 
-     FractionBox["a", 
+     FractionBox[
+      RowBox[{"a", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", "x1"}]]}], 
       RowBox[{
-       RowBox[{"8", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
-       RowBox[{"2", " ", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+       "+", 
+       RowBox[{
         SuperscriptBox["a", "2"], " ", 
         SuperscriptBox[
          RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}]], "0", 
@@ -1527,8 +1581,11 @@ Cell[BoxData[
       SuperscriptBox[
        RowBox[{"Csc", "[", "x2", "]"}], "2"], 
       RowBox[{
-       RowBox[{"4", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+       "+", 
        RowBox[{
         SuperscriptBox["a", "2"], " ", 
         SuperscriptBox[
@@ -1548,7 +1605,7 @@ Cell[BoxData[
    TableForm[BoxForm`e$]]]], "Output",
  CellChangeTimes->{
   3.569364726522579*^9, 3.569364947014904*^9, 3.569365729747499*^9, {
-   3.56936781475988*^9, 3.569367850632422*^9}}]
+   3.56936781475988*^9, 3.569367850632422*^9}, 3.56936852974216*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -1569,103 +1626,191 @@ Cell[BoxData[
       FractionBox[
        RowBox[{
         SuperscriptBox["a", "2"], "+", 
-        RowBox[{"8", " ", 
+        RowBox[{"2", " ", 
          RowBox[{"(", 
           RowBox[{
-           RowBox[{"-", "1"}], "+", "x1"}], ")"}], " ", "x1"}], "+", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{"2", " ", "x1"}]], "+", 
+           RowBox[{"2", " ", 
+            SuperscriptBox["\[ExponentialE]", "x1"], " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"-", "1"}], "+", "R0"}], ")"}]}], "+", 
+           RowBox[{
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"-", "2"}], "+", "R0"}], ")"}], " ", "R0"}]}], ")"}]}], 
+        "+", 
         RowBox[{
          SuperscriptBox["a", "2"], " ", 
          RowBox[{"Cos", "[", 
           RowBox[{"2", " ", "x2"}], "]"}]}]}], 
        RowBox[{
         SuperscriptBox["a", "2"], "+", 
-        RowBox[{"8", " ", 
-         SuperscriptBox["x1", "2"]}], "+", 
+        RowBox[{"2", " ", 
+         SuperscriptBox[
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+          "2"]}], "+", 
         RowBox[{
          SuperscriptBox["a", "2"], " ", 
          RowBox[{"Cos", "[", 
           RowBox[{"2", " ", "x2"}], "]"}]}]}]]}], 
      FractionBox[
-      RowBox[{"16", " ", "x1"}], 
+      RowBox[{"4", " ", 
+       SuperscriptBox["\[ExponentialE]", "x1"], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}]}], 
       RowBox[{
        SuperscriptBox["a", "2"], "+", 
-       RowBox[{"8", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
+       RowBox[{"2", " ", 
+        SuperscriptBox[
+         RowBox[{"(", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+         "2"]}], "+", 
        RowBox[{
         SuperscriptBox["a", "2"], " ", 
         RowBox[{"Cos", "[", 
          RowBox[{"2", " ", "x2"}], "]"}]}]}]], "0", 
      RowBox[{"-", 
       FractionBox[
-       RowBox[{"8", " ", "a", " ", "x1", " ", 
+       RowBox[{"4", " ", "a", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], " ", 
         SuperscriptBox[
          RowBox[{"Sin", "[", "x2", "]"}], "2"]}], 
        RowBox[{
         SuperscriptBox["a", "2"], "+", 
-        RowBox[{"8", " ", 
-         SuperscriptBox["x1", "2"]}], "+", 
+        RowBox[{"2", " ", 
+         SuperscriptBox[
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+          "2"]}], "+", 
         RowBox[{
          SuperscriptBox["a", "2"], " ", 
          RowBox[{"Cos", "[", 
           RowBox[{"2", " ", "x2"}], "]"}]}]}]]}]},
     {
      FractionBox[
-      RowBox[{"16", " ", "x1"}], 
+      RowBox[{"4", " ", 
+       SuperscriptBox["\[ExponentialE]", "x1"], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}]}], 
       RowBox[{
        SuperscriptBox["a", "2"], "+", 
-       RowBox[{"8", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
+       RowBox[{"2", " ", 
+        SuperscriptBox[
+         RowBox[{"(", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+         "2"]}], "+", 
        RowBox[{
         SuperscriptBox["a", "2"], " ", 
         RowBox[{"Cos", "[", 
          RowBox[{"2", " ", "x2"}], "]"}]}]}]], 
      FractionBox[
       RowBox[{"4", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"2", " ", "x1"}]], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"2", " ", "x1"}]], "+", 
+         RowBox[{"2", " ", 
+          SuperscriptBox["\[ExponentialE]", "x1"], " ", 
+          RowBox[{"(", 
+           RowBox[{"1", "+", "R0"}], ")"}]}], "+", 
+         RowBox[{"R0", " ", 
+          RowBox[{"(", 
+           RowBox[{"2", "+", "R0"}], ")"}]}], "+", 
+         RowBox[{
+          SuperscriptBox["a", "2"], " ", 
+          SuperscriptBox[
+           RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox[
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"],
+          "+", 
+         RowBox[{
+          SuperscriptBox["a", "2"], " ", 
+          SuperscriptBox[
+           RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}]}], 
+      SuperscriptBox[
        RowBox[{"(", 
         RowBox[{
          SuperscriptBox["a", "2"], "+", 
-         RowBox[{"8", " ", "x1", " ", 
-          RowBox[{"(", 
-           RowBox[{"1", "+", "x1"}], ")"}]}], "+", 
+         RowBox[{"2", " ", 
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+           "2"]}], "+", 
          RowBox[{
           SuperscriptBox["a", "2"], " ", 
           RowBox[{"Cos", "[", 
-           RowBox[{"2", " ", "x2"}], "]"}]}]}], ")"}]}], 
-      RowBox[{
-       SuperscriptBox["a", "2"], "+", 
-       RowBox[{"8", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
-       RowBox[{
-        SuperscriptBox["a", "2"], " ", 
-        RowBox[{"Cos", "[", 
-         RowBox[{"2", " ", "x2"}], "]"}]}]}]], "0", 
+           RowBox[{"2", " ", "x2"}], "]"}]}]}], ")"}], "2"]], "0", 
      RowBox[{"-", 
       FractionBox[
-       RowBox[{"2", " ", "a", " ", 
+       RowBox[{"4", " ", "a", " ", 
+        SuperscriptBox["\[ExponentialE]", "x1"], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{"2", " ", "x1"}]], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["\[ExponentialE]", "x1"], " ", 
+           RowBox[{"(", 
+            RowBox[{"1", "+", "R0"}], ")"}]}], "+", 
+          RowBox[{"R0", " ", 
+           RowBox[{"(", 
+            RowBox[{"2", "+", "R0"}], ")"}]}], "+", 
+          RowBox[{
+           SuperscriptBox["a", "2"], " ", 
+           SuperscriptBox[
+            RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+           "2"], "+", 
+          RowBox[{
+           SuperscriptBox["a", "2"], " ", 
+           SuperscriptBox[
+            RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}], " ", 
+        SuperscriptBox[
+         RowBox[{"Sin", "[", "x2", "]"}], "2"]}], 
+       SuperscriptBox[
         RowBox[{"(", 
          RowBox[{
           SuperscriptBox["a", "2"], "+", 
-          RowBox[{"8", " ", "x1", " ", 
-           RowBox[{"(", 
-            RowBox[{"1", "+", "x1"}], ")"}]}], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             RowBox[{
+              SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+            "2"]}], "+", 
           RowBox[{
            SuperscriptBox["a", "2"], " ", 
            RowBox[{"Cos", "[", 
-            RowBox[{"2", " ", "x2"}], "]"}]}]}], ")"}], " ", 
-        SuperscriptBox[
-         RowBox[{"Sin", "[", "x2", "]"}], "2"]}], 
-       RowBox[{
-        SuperscriptBox["a", "2"], "+", 
-        RowBox[{"8", " ", 
-         SuperscriptBox["x1", "2"]}], "+", 
-        RowBox[{
-         SuperscriptBox["a", "2"], " ", 
-         RowBox[{"Cos", "[", 
-          RowBox[{"2", " ", "x2"}], "]"}]}]}]]}]},
+            RowBox[{"2", " ", "x2"}], "]"}]}]}], ")"}], "2"]]}]},
     {"0", "0", 
      RowBox[{
-      RowBox[{"4", " ", 
-       SuperscriptBox["x1", "2"]}], "+", 
+      SuperscriptBox[
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"], 
+      "+", 
       RowBox[{
        SuperscriptBox["a", "2"], " ", 
        SuperscriptBox[
@@ -1673,70 +1818,119 @@ Cell[BoxData[
     {
      RowBox[{"-", 
       FractionBox[
-       RowBox[{"8", " ", "a", " ", "x1", " ", 
+       RowBox[{"4", " ", "a", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], " ", 
         SuperscriptBox[
          RowBox[{"Sin", "[", "x2", "]"}], "2"]}], 
        RowBox[{
         SuperscriptBox["a", "2"], "+", 
-        RowBox[{"8", " ", 
-         SuperscriptBox["x1", "2"]}], "+", 
+        RowBox[{"2", " ", 
+         SuperscriptBox[
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+          "2"]}], "+", 
         RowBox[{
          SuperscriptBox["a", "2"], " ", 
          RowBox[{"Cos", "[", 
           RowBox[{"2", " ", "x2"}], "]"}]}]}]]}], 
      RowBox[{"-", 
       FractionBox[
-       RowBox[{"2", " ", "a", " ", 
+       RowBox[{"4", " ", "a", " ", 
+        SuperscriptBox["\[ExponentialE]", "x1"], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{"2", " ", "x1"}]], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["\[ExponentialE]", "x1"], " ", 
+           RowBox[{"(", 
+            RowBox[{"1", "+", "R0"}], ")"}]}], "+", 
+          RowBox[{"R0", " ", 
+           RowBox[{"(", 
+            RowBox[{"2", "+", "R0"}], ")"}]}], "+", 
+          RowBox[{
+           SuperscriptBox["a", "2"], " ", 
+           SuperscriptBox[
+            RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+           "2"], "+", 
+          RowBox[{
+           SuperscriptBox["a", "2"], " ", 
+           SuperscriptBox[
+            RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}], " ", 
+        SuperscriptBox[
+         RowBox[{"Sin", "[", "x2", "]"}], "2"]}], 
+       SuperscriptBox[
         RowBox[{"(", 
          RowBox[{
           SuperscriptBox["a", "2"], "+", 
-          RowBox[{"8", " ", "x1", " ", 
-           RowBox[{"(", 
-            RowBox[{"1", "+", "x1"}], ")"}]}], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             RowBox[{
+              SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+            "2"]}], "+", 
           RowBox[{
            SuperscriptBox["a", "2"], " ", 
            RowBox[{"Cos", "[", 
-            RowBox[{"2", " ", "x2"}], "]"}]}]}], ")"}], " ", 
-        SuperscriptBox[
-         RowBox[{"Sin", "[", "x2", "]"}], "2"]}], 
-       RowBox[{
-        SuperscriptBox["a", "2"], "+", 
-        RowBox[{"8", " ", 
-         SuperscriptBox["x1", "2"]}], "+", 
-        RowBox[{
-         SuperscriptBox["a", "2"], " ", 
-         RowBox[{"Cos", "[", 
-          RowBox[{"2", " ", "x2"}], "]"}]}]}]]}], "0", 
+            RowBox[{"2", " ", "x2"}], "]"}]}]}], ")"}], "2"]]}], "0", 
      FractionBox[
       RowBox[{"4", " ", 
        RowBox[{"(", 
         RowBox[{
-         RowBox[{"4", " ", 
-          SuperscriptBox["x1", "2"]}], "+", 
+         SuperscriptBox[
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"],
+          "+", 
          RowBox[{
           SuperscriptBox["a", "2"], " ", 
           SuperscriptBox[
            RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}], " ", 
        RowBox[{"(", 
         RowBox[{
-         RowBox[{"4", " ", "x1", " ", 
+         RowBox[{
           RowBox[{"(", 
            RowBox[{
-            RowBox[{"4", " ", 
-             SuperscriptBox["x1", "3"]}], "+", 
+            SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], " ", 
+          
+          RowBox[{"(", 
+           RowBox[{
+            SuperscriptBox[
+             RowBox[{"(", 
+              RowBox[{
+               SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+             "3"], "+", 
             RowBox[{
              SuperscriptBox["a", "2"], " ", 
              RowBox[{"(", 
-              RowBox[{"1", "+", "x1"}], ")"}]}]}], ")"}]}], "+", 
+              RowBox[{"2", "+", 
+               SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], 
+              ")"}]}]}], ")"}]}], "+", 
          RowBox[{
           SuperscriptBox["a", "2"], " ", 
           RowBox[{"(", 
            RowBox[{
             SuperscriptBox["a", "2"], "+", 
-            RowBox[{"4", " ", 
+            SuperscriptBox["\[ExponentialE]", 
+             RowBox[{"2", " ", "x1"}]], "+", 
+            RowBox[{"2", " ", 
+             SuperscriptBox["\[ExponentialE]", "x1"], " ", 
              RowBox[{"(", 
               RowBox[{
-               RowBox[{"-", "1"}], "+", "x1"}], ")"}], " ", "x1"}]}], ")"}], 
+               RowBox[{"-", "1"}], "+", "R0"}], ")"}]}], "+", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"-", "2"}], "+", "R0"}], ")"}], " ", "R0"}]}], ")"}], 
           " ", 
           SuperscriptBox[
            RowBox[{"Cos", "[", "x2", "]"}], "2"]}]}], ")"}], " ", 
@@ -1746,8 +1940,12 @@ Cell[BoxData[
        RowBox[{"(", 
         RowBox[{
          SuperscriptBox["a", "2"], "+", 
-         RowBox[{"8", " ", 
-          SuperscriptBox["x1", "2"]}], "+", 
+         RowBox[{"2", " ", 
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+           "2"]}], "+", 
          RowBox[{
           SuperscriptBox["a", "2"], " ", 
           RowBox[{"Cos", "[", 
@@ -1767,7 +1965,8 @@ Cell[BoxData[
    TableForm[BoxForm`e$]]]], "Output",
  CellChangeTimes->{
   3.569364898848234*^9, 3.569364947829471*^9, {3.569365716056975*^9, 
-   3.569365762917944*^9}, 3.5693678152717648`*^9, 3.5693678510972767`*^9}]
+   3.569365762917944*^9}, 3.5693678152717648`*^9, 3.5693678510972767`*^9, 
+   3.569368530985385*^9}]
 }, Open  ]],
 
 Cell[BoxData[
@@ -1802,20 +2001,28 @@ Cell[BoxData[
    3.537802037752555*^9, {3.5693668710697927`*^9, 3.569366879692811*^9}}],
 
 Cell[BoxData[
- SqrtBox[
-  RowBox[{
-   SuperscriptBox[
-    RowBox[{"(", 
-     RowBox[{
-      SuperscriptBox["a", "2"], "+", 
-      RowBox[{"8", " ", 
-       SuperscriptBox["x1", "2"]}], "+", 
+ RowBox[{
+  FractionBox["1", "2"], " ", 
+  SqrtBox[
+   RowBox[{
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{"2", " ", "x1"}]], " ", 
+    SuperscriptBox[
+     RowBox[{"(", 
       RowBox[{
-       SuperscriptBox["a", "2"], " ", 
-       RowBox[{"Cos", "[", 
-        RowBox[{"2", " ", "x2"}], "]"}]}]}], ")"}], "2"], " ", 
-   SuperscriptBox[
-    RowBox[{"Sin", "[", "x2", "]"}], "2"]}]]], "Output",
+       SuperscriptBox["a", "2"], "+", 
+       RowBox[{"2", " ", 
+        SuperscriptBox[
+         RowBox[{"(", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+         "2"]}], "+", 
+       RowBox[{
+        SuperscriptBox["a", "2"], " ", 
+        RowBox[{"Cos", "[", 
+         RowBox[{"2", " ", "x2"}], "]"}]}]}], ")"}], "2"], " ", 
+    SuperscriptBox[
+     RowBox[{"Sin", "[", "x2", "]"}], "2"]}]]}]], "Output",
  CellChangeTimes->{{3.409395582786208*^9, 3.409395598448267*^9}, 
    3.4093988150451393`*^9, 3.40947463717456*^9, 3.5339856949396467`*^9, 
    3.533985973513277*^9, {3.533986938322811*^9, 3.533986959154168*^9}, 
@@ -1835,7 +2042,8 @@ Cell[BoxData[
    3.5402287559482117`*^9, 3.568656372176766*^9, 3.5692502395682497`*^9, 
    3.569258740204424*^9, 3.569258888685452*^9, 3.569327978794312*^9, 
    3.569364950373073*^9, 3.569365783100935*^9, {3.569366871991048*^9, 
-   3.569366882200265*^9}, 3.5693678155924273`*^9, 3.5693678513230267`*^9}]
+   3.569366882200265*^9}, 3.5693678155924273`*^9, 3.5693678513230267`*^9, 
+   3.569368533315078*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -1864,11 +2072,27 @@ Cell[BoxData[
  RowBox[{"{", 
   RowBox[{
    FractionBox[
-    RowBox[{"16", " ", "x1"}], 
     RowBox[{
      SuperscriptBox["a", "2"], "+", 
+     RowBox[{"6", " ", 
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{"2", " ", "x1"}]]}], "+", 
      RowBox[{"8", " ", 
-      SuperscriptBox["x1", "2"]}], "+", 
+      SuperscriptBox["\[ExponentialE]", "x1"], " ", "R0"}], "+", 
+     RowBox[{"2", " ", 
+      SuperscriptBox["R0", "2"]}], "+", 
+     RowBox[{
+      SuperscriptBox["a", "2"], " ", 
+      RowBox[{"Cos", "[", 
+       RowBox[{"2", " ", "x2"}], "]"}]}]}], 
+    RowBox[{
+     SuperscriptBox["a", "2"], "+", 
+     RowBox[{"2", " ", 
+      SuperscriptBox[
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"]}], 
+     "+", 
      RowBox[{
       SuperscriptBox["a", "2"], " ", 
       RowBox[{"Cos", "[", 
@@ -1879,8 +2103,12 @@ Cell[BoxData[
       RowBox[{
        RowBox[{"-", 
         SuperscriptBox["a", "2"]}], "+", 
-       RowBox[{"8", " ", 
-        SuperscriptBox["x1", "2"]}], "+", 
+       RowBox[{"2", " ", 
+        SuperscriptBox[
+         RowBox[{"(", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], 
+         "2"]}], "+", 
        RowBox[{"3", " ", 
         SuperscriptBox["a", "2"], " ", 
         RowBox[{"Cos", "[", 
@@ -1888,8 +2116,12 @@ Cell[BoxData[
      RowBox[{"Cot", "[", "x2", "]"}]}], 
     RowBox[{
      SuperscriptBox["a", "2"], "+", 
-     RowBox[{"8", " ", 
-      SuperscriptBox["x1", "2"]}], "+", 
+     RowBox[{"2", " ", 
+      SuperscriptBox[
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", "x1"], "+", "R0"}], ")"}], "2"]}], 
+     "+", 
      RowBox[{
       SuperscriptBox["a", "2"], " ", 
       RowBox[{"Cos", "[", 
@@ -1898,7 +2130,7 @@ Cell[BoxData[
   3.5402266659703407`*^9, 3.540228619618417*^9, 3.54022875607896*^9, 
   3.568656392618458*^9, 3.5692502396724358`*^9, 3.569258888856016*^9, 
   3.5693279790048857`*^9, 3.5693649506326036`*^9, 3.569365789301613*^9, 
-  3.569367815644202*^9, 3.569367851372881*^9}]
+  3.569367815644202*^9, 3.569367851372881*^9, 3.569368533508802*^9}]
 }, Open  ]],
 
 Cell[BoxData[
@@ -2075,8 +2307,8 @@ Cell[BoxData[
        Editable->True]},
      {
       RowBox[{"\<\"=\"\>", " ", 
-       InterpretationBox["\<\"2*x1\"\>",
-        CForm[2 $CellContext`x1],
+       InterpretationBox["\<\"Power(E,x1) + R0\"\>",
+        CForm[E^$CellContext`x1 + $CellContext`R0],
         AutoDelete->True,
         Editable->True]}]},
      {"\<\";\"\>"},
@@ -2121,7 +2353,7 @@ Cell[BoxData[
  CellChangeTimes->{
   3.569258950440093*^9, {3.569259025132947*^9, 3.569259117647324*^9}, 
    3.5693279879543953`*^9, 3.56936496120152*^9, 3.569367819066985*^9, 
-   3.569367854571707*^9}]
+   3.569367854571707*^9, 3.569368543799213*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -2199,8 +2431,9 @@ Cell[BoxData[
        Editable->True]},
      {
       RowBox[{"\<\"=\"\>", " ", 
-       InterpretationBox["\<\"0.5*KSx1\"\>",
-        CForm[0.5 $CellContext`KSx1],
+       InterpretationBox["\<\"Log(KSx1 - R0)\"\>",
+        CForm[
+         Log[$CellContext`KSx1 - $CellContext`R0]],
         AutoDelete->True,
         Editable->True]}]},
      {"\<\";\"\>"},
@@ -2243,7 +2476,8 @@ Cell[BoxData[
   Function[BoxForm`e$, 
    TableForm[BoxForm`e$]]]], "Output",
  CellChangeTimes->{3.569259156442648*^9, 3.5693279879899893`*^9, 
-  3.5693649612630863`*^9, 3.56936781910957*^9, 3.569367854610566*^9}]
+  3.5693649612630863`*^9, 3.56936781910957*^9, 3.569367854610566*^9, 
+  3.5693685438608103`*^9}]
 }, Open  ]],
 
 Cell[BoxData[
@@ -2268,14 +2502,15 @@ Cell[BoxData[
    "]"}]}]], "Input",
  CellChangeTimes->{{3.56933010951512*^9, 3.569330117287616*^9}}],
 
-Cell[BoxData["\<\"Sqrt(Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2))\"\>"], "Output",
+Cell[BoxData["\<\"Sqrt(Power(exp(1.0),2*x1)*Power(Power(a,2) + \
+2*Power(Power(exp(1.0),x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2))/2.\"\>"], "Output",
  CellChangeTimes->{{3.540222440461185*^9, 3.540222442498711*^9}, 
    3.54022648653897*^9, 3.5402266667985973`*^9, 3.54022862322043*^9, 
    3.540228756525999*^9, 3.5686564112341433`*^9, 3.569250242216549*^9, 
    3.569258897378927*^9, 3.569327988043545*^9, 3.569330118515559*^9, 
    3.569364961333791*^9, 3.569365798364691*^9, 3.5693678191677723`*^9, 
-   3.569367854688631*^9}]
+   3.569367854688631*^9, 3.5693685439333763`*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -2308,23 +2543,27 @@ Cell[BoxData[
   TagBox[GridBox[{
      {
       RowBox[{"\<\";if(idim==0) return \"\>", " ", 
-       InterpretationBox["\<\"(16*x1)/(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))\"\>",
-        CForm[
-        16 $CellContext`x1/($CellContext`a^2 + 
-         8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])],
+       InterpretationBox["\<\"(Power(a,2) + 6*Power(E,2*x1) + \
+8*Power(E,x1)*R0 + 2*Power(R0,2) + Power(a,2)*Cos(2*x2))/(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2))\"\>",
+        CForm[($CellContext`a^2 + 6 E^(2 $CellContext`x1) + 
+          8 E^$CellContext`x1 $CellContext`R0 + 
+          2 $CellContext`R0^2 + $CellContext`a^2 
+           Cos[2 $CellContext`x2])/($CellContext`a^2 + 
+         2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[2 $CellContext`x2])],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";if(idim==1) return \"\>", " ", 
-       InterpretationBox["\<\"((-Power(a,2) + 8*Power(x1,2) + \
-3*Power(a,2)*Cos(2*x2))*Cot(x2))/(Power(a,2) + 8*Power(x1,2) + \
+       InterpretationBox["\<\"((-Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+3*Power(a,2)*Cos(2*x2))*Cot(x2))/(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Cos(2*x2))\"\>",
         CForm[($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-1) (-$CellContext`a^2 + 
-          8 $CellContext`x1^2 + 3 $CellContext`a^2 Cos[2 $CellContext`x2]) 
-         Cot[$CellContext`x2]],
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 + 
+          3 $CellContext`a^2 Cos[2 $CellContext`x2]) Cot[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2352,7 +2591,7 @@ Power(a,2)*Cos(2*x2))\"\>",
   3.540226666809304*^9, 3.540228623235052*^9, 3.540228756533382*^9, 
   3.568656414932458*^9, 3.569250242270726*^9, 3.5692588973875923`*^9, 
   3.569327988090863*^9, 3.569364961377851*^9, 3.569365800501751*^9, 
-  3.569367819206365*^9, 3.5693678547486677`*^9}]
+  3.569367819206365*^9, 3.5693678547486677`*^9, 3.569368543993925*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -2474,22 +2713,27 @@ Cell[BoxData[
   TagBox[GridBox[{
      {
       RowBox[{"\<\";g[0][0]=\"\>", " ", 
-       InterpretationBox["\<\"-((Power(a,2) + 8*(-1 + x1)*x1 + \
-Power(a,2)*Cos(2*x2))/(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2)))\"\>",
+       InterpretationBox["\<\"-((Power(a,2) + 2*(Power(E,2*x1) + \
+2*Power(E,x1)*(-1 + R0) + (-2 + R0)*R0) + Power(a,2)*Cos(2*x2))/(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2)))\"\>",
         CForm[-($CellContext`a^2 + 
-          8 (-1 + $CellContext`x1) $CellContext`x1 + $CellContext`a^2 
-           Cos[2 $CellContext`x2])/($CellContext`a^2 + 
-         8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-1) ($CellContext`a^2 + 
+          2 (E^(2 $CellContext`x1) + 
+            2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + \
+$CellContext`R0) $CellContext`R0) + $CellContext`a^2 Cos[2 $CellContext`x2])],
+        
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";g[0][1]=\"\>", " ", 
-       InterpretationBox["\<\"(16*x1)/(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))\"\>",
+       InterpretationBox["\<\"(4*Power(E,x1)*(Power(E,x1) + R0))/(Power(a,2) \
++ 2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2))\"\>",
         CForm[
-        16 $CellContext`x1/($CellContext`a^2 + 
-         8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])],
+        4 E^$CellContext`x1 (
+          E^$CellContext`x1 + $CellContext`R0)/($CellContext`a^2 + 
+         2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[2 $CellContext`x2])],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2500,33 +2744,42 @@ Power(a,2)*Cos(2*x2))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";g[0][3]=\"\>", " ", 
-       InterpretationBox["\<\"(-8*a*x1*Power(Sin(x2),2))/(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2))\"\>",
-        CForm[(-8) $CellContext`a $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-1)
-            Sin[$CellContext`x2]^2],
+       InterpretationBox["\<\"(-4*a*(Power(E,x1) + \
+R0)*Power(Sin(x2),2))/(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2))\"\>",
+        CForm[(-4) $CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-1) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";g[1][0]=\"\>", " ", 
-       InterpretationBox["\<\"(16*x1)/(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))\"\>",
+       InterpretationBox["\<\"(4*Power(E,x1)*(Power(E,x1) + R0))/(Power(a,2) \
++ 2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2))\"\>",
         CForm[
-        16 $CellContext`x1/($CellContext`a^2 + 
-         8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])],
+        4 E^$CellContext`x1 (
+          E^$CellContext`x1 + $CellContext`R0)/($CellContext`a^2 + 
+         2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[2 $CellContext`x2])],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";g[1][1]=\"\>", " ", 
-       InterpretationBox["\<\"(4*(Power(a,2) + 8*x1*(1 + x1) + \
-Power(a,2)*Cos(2*x2)))/(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))\"\>",
+       InterpretationBox["\<\"(4*Power(E,2*x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2)))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) \
++ Power(a,2)*Cos(2*x2),2)\"\>",
         CForm[
-        4 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-1) ($CellContext`a^2 + 
-          8 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
-           Cos[2 $CellContext`x2])],
+        4 E^(2 $CellContext`x1) (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ((
+            E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2)],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2537,14 +2790,20 @@ Power(a,2)*Cos(2*x2))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";g[1][3]=\"\>", " ", 
-       InterpretationBox["\<\"(-2*a*(Power(a,2) + 8*x1*(1 + x1) + \
-Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))\"\>",
-        CForm[(-2) $CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-1) ($CellContext`a^2 + 
-          8 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) Sin[$CellContext`x2]^2],
+       InterpretationBox["\<\"(-4*a*Power(E,x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-4) $CellContext`a 
+         E^$CellContext`x1 (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ((
+            E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2561,8 +2820,10 @@ Power(a,2)*Cos(2*x2))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";g[2][2]=\"\>", " ", 
-       InterpretationBox["\<\"4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)\"\>",
-        CForm[4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2],
+       InterpretationBox["\<\"Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2)\"\>",
+        CForm[(E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2573,23 +2834,31 @@ Power(a,2)*Cos(2*x2))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";g[3][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-8*a*x1*Power(Sin(x2),2))/(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2))\"\>",
-        CForm[(-8) $CellContext`a $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-1)
-            Sin[$CellContext`x2]^2],
+       InterpretationBox["\<\"(-4*a*(Power(E,x1) + \
+R0)*Power(Sin(x2),2))/(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2))\"\>",
+        CForm[(-4) $CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-1) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";g[3][1]=\"\>", " ", 
-       InterpretationBox["\<\"(-2*a*(Power(a,2) + 8*x1*(1 + x1) + \
-Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))\"\>",
-        CForm[(-2) $CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-1) ($CellContext`a^2 + 
-          8 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) Sin[$CellContext`x2]^2],
+       InterpretationBox["\<\"(-4*a*Power(E,x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-4) $CellContext`a 
+         E^$CellContext`x1 (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ((
+            E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2600,20 +2869,23 @@ Power(a,2)*Cos(2*x2))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";g[3][3]=\"\>", " ", 
-       InterpretationBox["\<\"(4*(4*Power(x1,2) + \
-Power(a,2)*Power(Cos(x2),2))*(4*x1*(4*Power(x1,3) + Power(a,2)*(1 + x1)) + \
-Power(a,2)*(Power(a,2) + 4*(-1 + \
-x1)*x1)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) \
-+ Power(a,2)*Cos(2*x2),2)\"\>",
+       InterpretationBox["\<\"(4*(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2))*((Power(E,x1) + R0)*(Power(Power(E,x1) + R0,3) + \
+Power(a,2)*(2 + Power(E,x1) + R0)) + Power(a,2)*(Power(a,2) + Power(E,2*x1) + \
+2*Power(E,x1)*(-1 + R0) + (-2 + \
+R0)*R0)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),2)\"\>",
         CForm[
-        4 (4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2) (
-          4 $CellContext`x1 (
-            4 $CellContext`x1^3 + $CellContext`a^2 (
-              1 + $CellContext`x1)) + $CellContext`a^2 ($CellContext`a^2 + 
-            4 (-1 + $CellContext`x1) $CellContext`x1) 
-           Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Sin[$CellContext`x2]^2],
+        4 ((E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ((
+            E^$CellContext`x1 + $CellContext`R0) ((
+              E^$CellContext`x1 + $CellContext`R0)^3 + $CellContext`a^2 (2 + 
+              E^$CellContext`x1 + $CellContext`R0)) + $CellContext`a^2 \
+($CellContext`a^2 + E^(2 $CellContext`x1) + 
+            2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + \
+$CellContext`R0) $CellContext`R0) Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {"\<\";\"\>"}
@@ -2638,7 +2910,7 @@ x1)*x1)*Power(Cos(x2),2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) \
    3.540228623329979*^9, 3.540228756666259*^9, 3.568656417850609*^9, 
    3.56865655700028*^9, 3.569250242338188*^9, 3.5692588974982147`*^9, 
    3.569327988142192*^9, 3.5693649614247932`*^9, 3.5693658049143972`*^9, 
-   3.5693678192589617`*^9, 3.569367854795372*^9}]
+   3.5693678192589617`*^9, 3.569367854795372*^9, 3.569368544037964*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -2760,23 +3032,26 @@ Cell[BoxData[
   TagBox[GridBox[{
      {
       RowBox[{"\<\";G[0][0]=\"\>", " ", 
-       InterpretationBox["\<\"-((2*x1*(2 + 2*x1) + \
-Power(a,2)*Power(Cos(x2),2))/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))\"\
-\>",
-        CForm[-(
-           4 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[$CellContext`x2]^2)^(-1) (
-          2 $CellContext`x1 (2 + 2 $CellContext`x1) + $CellContext`a^2 
+       InterpretationBox["\<\"-(((Power(E,x1) + R0)*(2 + Power(E,x1) + R0) + \
+Power(a,2)*Power(Cos(x2),2))/(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2)))\"\>",
+        CForm[-((E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[$CellContext`x2]^2)^(-1) ((
+            E^$CellContext`x1 + $CellContext`R0) (2 + 
+            E^$CellContext`x1 + $CellContext`R0) + $CellContext`a^2 
            Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";G[0][1]=\"\>", " ", 
-       InterpretationBox["\<\"(2*x1)/(4*Power(x1,2) + \
-Power(a,2)*Power(Cos(x2),2))\"\>",
+       InterpretationBox["\<\"(2*(Power(E,x1) + \
+R0))/(Power(E,x1)*(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2)))\"\>",
         CForm[
-        2 $CellContext`x1/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+        2 E^(-$CellContext`x1) (
+          E^$CellContext`x1 + $CellContext`R0)/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2793,21 +3068,27 @@ Power(a,2)*Power(Cos(x2),2))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";G[1][0]=\"\>", " ", 
-       InterpretationBox["\<\"(2*x1)/(4*Power(x1,2) + \
-Power(a,2)*Power(Cos(x2),2))\"\>",
+       InterpretationBox["\<\"(2*(Power(E,x1) + \
+R0))/(Power(E,x1)*(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2)))\"\>",
         CForm[
-        2 $CellContext`x1/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+        2 E^(-$CellContext`x1) (
+          E^$CellContext`x1 + $CellContext`R0)/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";G[1][1]=\"\>", " ", 
-       InterpretationBox["\<\"(Power(a,2) + 2*x1*(-2 + \
-2*x1))/(4.*(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))\"\>",
+       InterpretationBox["\<\"(Power(a,2) + (-2 + Power(E,x1) + \
+R0)*(Power(E,x1) + R0))/(Power(E,2*x1)*(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2)))\"\>",
         CForm[
-        Rational[1, 4] ($CellContext`a^2 + 
-          2 $CellContext`x1 (-2 + 2 $CellContext`x1))/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+        E^((-2) $CellContext`x1) ($CellContext`a^2 + (-2 + 
+            E^$CellContext`x1 + $CellContext`R0) (
+            E^$CellContext`x1 + $CellContext`R0))/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2818,11 +3099,12 @@ Power(a,2)*Power(Cos(x2),2))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";G[1][3]=\"\>", " ", 
-       InterpretationBox["\<\"a/(2.*(4*Power(x1,2) + \
+       InterpretationBox["\<\"a/(Power(E,x1)*(Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Power(Cos(x2),2)))\"\>",
-        CForm[
-        Rational[1, 2] $CellContext`a/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+        CForm[$CellContext`a 
+         E^(-$CellContext`x1)/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2839,10 +3121,10 @@ Power(a,2)*Power(Cos(x2),2)))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";G[2][2]=\"\>", " ", 
-       InterpretationBox["\<\"1/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2))\
-\"\>",
-        CForm[(
-          4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)^(-1)],
+       InterpretationBox["\<\"1/(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2))\"\>",
+        CForm[((E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+           Cos[$CellContext`x2]^2)^(-1)],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2859,11 +3141,12 @@ Power(a,2)*Power(Cos(x2),2)))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";G[3][1]=\"\>", " ", 
-       InterpretationBox["\<\"a/(2.*(4*Power(x1,2) + \
+       InterpretationBox["\<\"a/(Power(E,x1)*(Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Power(Cos(x2),2)))\"\>",
-        CForm[
-        Rational[1, 2] $CellContext`a/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+        CForm[$CellContext`a 
+         E^(-$CellContext`x1)/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -2874,11 +3157,10 @@ Power(a,2)*Power(Cos(x2),2)))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";G[3][3]=\"\>", " ", 
-       InterpretationBox["\<\"Power(Csc(x2),2)/(4*Power(x1,2) + \
+       InterpretationBox["\<\"Power(Csc(x2),2)/(Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Power(Cos(x2),2))\"\>",
-        CForm[(
-           4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)^(-1)
-            Csc[$CellContext`x2]^2],
+        CForm[((E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[$CellContext`x2]^2)^(-1) Csc[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {"\<\";\"\>"}
@@ -2903,7 +3185,7 @@ Power(a,2)*Power(Cos(x2),2))\"\>",
    3.5402286234108047`*^9, 3.540228756809576*^9, {3.568656580196352*^9, 
    3.568656586381299*^9}, 3.569250242422892*^9, 3.5692588976516323`*^9, 
    3.569327988190383*^9, 3.569364961474351*^9, 3.5693658081683598`*^9, 
-   3.569367819306817*^9, 3.569367854845186*^9}]
+   3.569367819306817*^9, 3.569367854845186*^9, 3.569368544088842*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -3310,229 +3592,291 @@ Cell[BoxData[
   TagBox[GridBox[{
      {
       RowBox[{"\<\";Krzys[0][0][0]=\"\>", " ", 
-       InterpretationBox["\<\"(16*x1*(-Power(a,2) + 8*Power(x1,2) - \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(8*(Power(E,x1) + R0)*(-Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        16 $CellContext`x1 (-$CellContext`a^2 + 
-          8 $CellContext`x1^2 - $CellContext`a^2 
+        8 (E^$CellContext`x1 + $CellContext`R0) (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][0][1]=\"\>", " ", 
-       InterpretationBox["\<\"(8*(4*x1*(1 + x1) + \
-Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 8*Power(x1,2) - \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
+       InterpretationBox["\<\"(4*Power(E,x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(E,x1) + R0,2) - \
+Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        8 (4 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
+        4 E^$CellContext`x1 (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
            Cos[$CellContext`x2]^2) (-$CellContext`a^2 + 
-          8 $CellContext`x1^2 - $CellContext`a^2 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][0][2]=\"\>", " ", 
-       InterpretationBox["\<\"(-8*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)\"\>",
-        CForm[(-8) $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"(-4*Power(a,2)*(Power(E,x1) + \
+R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-4) $CellContext`a^2 (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][0][3]=\"\>", " ", 
-       InterpretationBox["\<\"(16*a*x1*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(8*a*(Power(E,x1) + R0)*(Power(a,2) - \
+2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        16 $CellContext`a $CellContext`x1 ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
+        8 $CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 - 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
            Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[$CellContext`x2]^2],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][1][0]=\"\>", " ", 
-       InterpretationBox["\<\"(8*(4*x1*(1 + x1) + \
-Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 8*Power(x1,2) - \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
+       InterpretationBox["\<\"(4*Power(E,x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(E,x1) + R0,2) - \
+Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        8 (4 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
+        4 E^$CellContext`x1 (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
            Cos[$CellContext`x2]^2) (-$CellContext`a^2 + 
-          8 $CellContext`x1^2 - $CellContext`a^2 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][1][1]=\"\>", " ", 
-       InterpretationBox["\<\"(32*(2*x1*(1 + 2*x1) + \
-Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 8*Power(x1,2) - \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(2*Power(E,2*x1)*(-3*Power(a,4) - \
+4*Power(a,2)*Power(E,x1) + 8*Power(E,3*x1) + 8*Power(E,4*x1) - \
+4*Power(a,2)*R0 + 24*Power(E,2*x1)*R0 + 32*Power(E,3*x1)*R0 + \
+24*Power(E,x1)*Power(R0,2) + 48*Power(E,2*x1)*Power(R0,2) + 8*Power(R0,3) + \
+32*Power(E,x1)*Power(R0,3) + 8*Power(R0,4) - 4*Power(a,2)*(Power(a,2) + \
+Power(E,x1) + R0)*Cos(2*x2) - Power(a,4)*Cos(4*x2)))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        32 (2 $CellContext`x1 (1 + 2 $CellContext`x1) + $CellContext`a^2 
-           Cos[$CellContext`x2]^2) (-$CellContext`a^2 + 
-          8 $CellContext`x1^2 - $CellContext`a^2 
-          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-3)],
+        2 E^(2 $CellContext`x1) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) ((-3) $CellContext`a^4 - 
+          4 $CellContext`a^2 E^$CellContext`x1 + 8 E^(3 $CellContext`x1) + 
+          8 E^(4 $CellContext`x1) - 4 $CellContext`a^2 $CellContext`R0 + 
+          24 E^(2 $CellContext`x1) $CellContext`R0 + 
+          32 E^(3 $CellContext`x1) $CellContext`R0 + 
+          24 E^$CellContext`x1 $CellContext`R0^2 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0^2 + 8 $CellContext`R0^3 + 
+          32 E^$CellContext`x1 $CellContext`R0^3 + 8 $CellContext`R0^4 - 
+          4 $CellContext`a^2 ($CellContext`a^2 + 
+           E^$CellContext`x1 + $CellContext`R0) 
+          Cos[2 $CellContext`x2] - $CellContext`a^4 Cos[4 $CellContext`x2])],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][1][2]=\"\>", " ", 
-       InterpretationBox["\<\"(-16*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) \
-+ 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)\"\>",
-        CForm[(-16) $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"(-4*Power(a,2)*Power(E,x1)*(Power(E,x1) + \
+R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-4) $CellContext`a^2 
+         E^$CellContext`x1 (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][1][3]=\"\>", " ", 
-       InterpretationBox["\<\"(8*a*(4*x1*(1 + x1) + \
-Power(a,2)*Power(Cos(x2),2))*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[
-        8 $CellContext`a (
-          4 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
-           Cos[$CellContext`x2]^2) ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[$CellContext`x2]^2],
+       InterpretationBox["\<\"(-4*a*Power(E,x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(E,x1) + R0,2) - \
+Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-4) $CellContext`a 
+         E^$CellContext`x1 (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
+          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][2][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-8*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)\"\>",
-        CForm[(-8) $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"(-4*Power(a,2)*(Power(E,x1) + \
+R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-4) $CellContext`a^2 (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][2][1]=\"\>", " ", 
-       InterpretationBox["\<\"(-16*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) \
-+ 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)\"\>",
-        CForm[(-16) $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"(-4*Power(a,2)*Power(E,x1)*(Power(E,x1) + \
+R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-4) $CellContext`a^2 
+         E^$CellContext`x1 (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][2][2]=\"\>", " ", 
-       InterpretationBox["\<\"(-8*Power(x1,2))/(4*Power(x1,2) + \
-Power(a,2)*Power(Cos(x2),2))\"\>",
-        CForm[(-8) $CellContext`x1^2/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+       InterpretationBox["\<\"(-2*Power(Power(E,x1) + \
+R0,2))/(Power(Power(E,x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))\"\>",
+        CForm[(-2) (E^$CellContext`x1 + $CellContext`R0)^2/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][2][3]=\"\>", " ", 
-       InterpretationBox["\<\"(16*Power(a,3)*x1*Cos(x2)*Power(Sin(x2),3))/\
-Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)\"\>",
+       InterpretationBox["\<\"(8*Power(a,3)*(Power(E,x1) + \
+R0)*Cos(x2)*Power(Sin(x2),3))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) \
++ Power(a,2)*Cos(2*x2),2)\"\>",
         CForm[
-        16 $CellContext`a^3 $CellContext`x1 
+        8 $CellContext`a^3 (E^$CellContext`x1 + $CellContext`R0) 
          Cos[$CellContext`x2] ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Sin[$CellContext`x2]^3],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[$CellContext`x2]^3],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][3][0]=\"\>", " ", 
-       InterpretationBox["\<\"(16*a*x1*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(8*a*(Power(E,x1) + R0)*(Power(a,2) - \
+2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        16 $CellContext`a $CellContext`x1 ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
+        8 $CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 - 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
            Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[$CellContext`x2]^2],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][3][1]=\"\>", " ", 
-       InterpretationBox["\<\"(8*a*(4*x1*(1 + x1) + \
-Power(a,2)*Power(Cos(x2),2))*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[
-        8 $CellContext`a (
-          4 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
-           Cos[$CellContext`x2]^2) ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[$CellContext`x2]^2],
+       InterpretationBox["\<\"(-4*a*Power(E,x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(E,x1) + R0,2) - \
+Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-4) $CellContext`a 
+         E^$CellContext`x1 (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
+          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][3][2]=\"\>", " ", 
-       InterpretationBox["\<\"(16*Power(a,3)*x1*Cos(x2)*Power(Sin(x2),3))/\
-Power(Power(a,2) + 8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)\"\>",
+       InterpretationBox["\<\"(8*Power(a,3)*(Power(E,x1) + \
+R0)*Cos(x2)*Power(Sin(x2),3))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) \
++ Power(a,2)*Cos(2*x2),2)\"\>",
         CForm[
-        16 $CellContext`a^3 $CellContext`x1 
+        8 $CellContext`a^3 (E^$CellContext`x1 + $CellContext`R0) 
          Cos[$CellContext`x2] ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Sin[$CellContext`x2]^3],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Sin[$CellContext`x2]^3],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[0][3][3]=\"\>", " ", 
-       InterpretationBox["\<\"(-4*x1*(Power(a,4) + 6*Power(a,4)*x1 - \
-16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + \
-8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + \
-2*x1)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-4) $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+       InterpretationBox["\<\"(-2*(Power(E,x1) + R0)*(Power(a,4) + \
+3*Power(a,4)*Power(E,x1) - 4*Power(a,2)*Power(E,2*x1) + \
+8*Power(a,2)*Power(E,3*x1) + 8*Power(E,5*x1) + 3*Power(a,4)*R0 - \
+8*Power(a,2)*Power(E,x1)*R0 + 24*Power(a,2)*Power(E,2*x1)*R0 + \
+40*Power(E,4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + \
+24*Power(a,2)*Power(E,x1)*Power(R0,2) + 80*Power(E,3*x1)*Power(R0,2) + \
+8*Power(a,2)*Power(R0,3) + 80*Power(E,2*x1)*Power(R0,3) + \
+40*Power(E,x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(E,x1) + \
+R0)*(Power(a,2) + Power(E,x1) + 2*Power(E,2*x1) + R0 + 4*Power(E,x1)*R0 + \
+2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(E,x1) + \
+R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-2) (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) ($CellContext`a^4 + 
-          6 $CellContext`a^4 $CellContext`x1 - 
-          16 $CellContext`a^2 $CellContext`x1^2 + 
-          64 $CellContext`a^2 $CellContext`x1^3 + 256 $CellContext`x1^5 + 
-          8 $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-            2 $CellContext`x1 (1 + 4 $CellContext`x1)) 
-           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 2 $CellContext`x1) 
-           Cos[4 $CellContext`x2]) Sin[$CellContext`x2]^2],
+          3 $CellContext`a^4 E^$CellContext`x1 - 4 $CellContext`a^2 
+          E^(2 $CellContext`x1) + 8 $CellContext`a^2 E^(3 $CellContext`x1) + 
+          8 E^(5 $CellContext`x1) + 3 $CellContext`a^4 $CellContext`R0 - 
+          8 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          24 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0 + 
+          40 E^(4 $CellContext`x1) $CellContext`R0 - 
+          4 $CellContext`a^2 $CellContext`R0^2 + 
+          24 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^2 + 
+          80 E^(3 $CellContext`x1) $CellContext`R0^2 + 
+          8 $CellContext`a^2 $CellContext`R0^3 + 
+          80 E^(2 $CellContext`x1) $CellContext`R0^3 + 
+          40 E^$CellContext`x1 $CellContext`R0^4 + 8 $CellContext`R0^5 + 
+          4 $CellContext`a^2 (
+            E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+            E^$CellContext`x1 + 2 E^(2 $CellContext`x1) + $CellContext`R0 + 
+            4 E^$CellContext`x1 $CellContext`R0 + 2 $CellContext`R0^2) 
+           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 
+            E^$CellContext`x1 + $CellContext`R0) Cos[4 $CellContext`x2]) 
+         Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][0][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-2*(Power(a,2) + 4*(-1 + x1)*x1)*(Power(a,2) - \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-2) ($CellContext`a^2 + 
-          4 (-1 + $CellContext`x1) $CellContext`x1) ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+       InterpretationBox["\<\"(4*(Power(a,2) + Power(E,2*x1) + \
+2*Power(E,x1)*(-1 + R0) + (-2 + R0)*R0)*(-Power(a,2) + 2*Power(Power(E,x1) + \
+R0,2) - Power(a,2)*Cos(2*x2)))/(Power(E,x1)*Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3))\"\>",
+        CForm[
+        4 E^(-$CellContext`x1) ($CellContext`a^2 + E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + $CellContext`R0) \
+$CellContext`R0) (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
+          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][0][1]=\"\>", " ", 
-       InterpretationBox["\<\"(-4*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*(-4*x1 + Power(a,2)*Power(Sin(x2),2)))/Power(Power(a,2) \
-+ 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-4) ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-3) ((-4) $CellContext`x1 + \
-$CellContext`a^2 Sin[$CellContext`x2]^2)],
+       InterpretationBox["\<\"(-4*(-Power(a,2) + 2*Power(Power(E,x1) + R0,2) \
+- Power(a,2)*Cos(2*x2))*(2*(Power(E,x1) + R0) - \
+Power(a,2)*Power(Sin(x2),2)))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) \
++ Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-4) (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
+          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) (
+          2 (E^$CellContext`x1 + $CellContext`R0) - $CellContext`a^2 
+          Sin[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -3543,75 +3887,160 @@ $CellContext`a^2 Sin[$CellContext`x2]^2)],
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][0][3]=\"\>", " ", 
-       InterpretationBox["\<\"(2*a*(Power(a,2) + 4*(-1 + x1)*x1)*(Power(a,2) \
-- 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(4*a*(Power(a,2) + Power(E,2*x1) + \
+2*Power(E,x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(a,2) - 2*Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/(Power(E,x1)*Power(Power(a,2) \
++ 2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3))\"\>",
         CForm[
-        2 $CellContext`a ($CellContext`a^2 + 
-          4 (-1 + $CellContext`x1) $CellContext`x1) ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
+        4 $CellContext`a 
+         E^(-$CellContext`x1) ($CellContext`a^2 + E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + $CellContext`R0) \
+$CellContext`R0) ($CellContext`a^2 - 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
            Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[$CellContext`x2]^2],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][1][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-4*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*(-4*x1 + Power(a,2)*Power(Sin(x2),2)))/Power(Power(a,2) \
-+ 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-4) ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-3) ((-4) $CellContext`x1 + \
-$CellContext`a^2 Sin[$CellContext`x2]^2)],
+       InterpretationBox["\<\"(-4*(-Power(a,2) + 2*Power(Power(E,x1) + R0,2) \
+- Power(a,2)*Cos(2*x2))*(2*(Power(E,x1) + R0) - \
+Power(a,2)*Power(Sin(x2),2)))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) \
++ Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-4) (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
+          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) (
+          2 (E^$CellContext`x1 + $CellContext`R0) - $CellContext`a^2 
+          Sin[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][1][1]=\"\>", " ", 
-       InterpretationBox["\<\"(8*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*(4*x1*(1 + x1) + \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(10*Power(a,6) + 8*Power(a,4)*Power(E,x1) + \
+32*Power(a,2)*Power(E,2*x1) + 36*Power(a,4)*Power(E,2*x1) + \
+16*Power(a,2)*Power(E,3*x1) - 64*Power(E,4*x1) + 48*Power(a,2)*Power(E,4*x1) \
+- 32*Power(E,5*x1) + 32*Power(E,6*x1) + 32*Power(a,2)*Power(E,x1)*R0 + \
+72*Power(a,4)*Power(E,x1)*R0 + 32*Power(a,2)*Power(E,2*x1)*R0 - \
+192*Power(E,3*x1)*R0 + 192*Power(a,2)*Power(E,3*x1)*R0 - 128*Power(E,4*x1)*R0 \
++ 192*Power(E,5*x1)*R0 + 36*Power(a,4)*Power(R0,2) + \
+16*Power(a,2)*Power(E,x1)*Power(R0,2) - 192*Power(E,2*x1)*Power(R0,2) + \
+288*Power(a,2)*Power(E,2*x1)*Power(R0,2) - 192*Power(E,3*x1)*Power(R0,2) + \
+480*Power(E,4*x1)*Power(R0,2) - 64*Power(E,x1)*Power(R0,3) + \
+192*Power(a,2)*Power(E,x1)*Power(R0,3) - 128*Power(E,2*x1)*Power(R0,3) + \
+640*Power(E,3*x1)*Power(R0,3) + 48*Power(a,2)*Power(R0,4) - \
+32*Power(E,x1)*Power(R0,4) + 480*Power(E,2*x1)*Power(R0,4) + \
+192*Power(E,x1)*Power(R0,5) + 32*Power(R0,6) + Power(a,2)*(15*Power(a,4) + \
+16*Power(a,2)*(3*Power(E,2*x1) + 3*Power(R0,2) + Power(E,x1)*(1 + 6*R0)) + \
+16*(3*Power(E,4*x1) + 3*Power(R0,4) + Power(E,3*x1)*(-1 + 12*R0) + \
+2*Power(E,2*x1)*(1 - R0 + 9*Power(R0,2)) + Power(E,x1)*R0*(2 - R0 + \
+12*Power(R0,2))))*Cos(2*x2) + 2*Power(a,4)*(3*Power(a,2) + 6*Power(E,2*x1) + \
+6*Power(R0,2) + 4*Power(E,x1)*(1 + 3*R0))*Cos(4*x2) + \
+Power(a,6)*Cos(6*x2))/(4.*Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),3))\"\>",
         CForm[
-        8 ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-3) (
-          4 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
-           Cos[2 $CellContext`x2])],
+        Rational[
+          1, 4] ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) (10 $CellContext`a^6 + 
+          8 $CellContext`a^4 E^$CellContext`x1 + 
+          32 $CellContext`a^2 E^(2 $CellContext`x1) + 
+          36 $CellContext`a^4 E^(2 $CellContext`x1) + 
+          16 $CellContext`a^2 E^(3 $CellContext`x1) - 64 
+          E^(4 $CellContext`x1) + 48 $CellContext`a^2 E^(4 $CellContext`x1) - 
+          32 E^(5 $CellContext`x1) + 32 E^(6 $CellContext`x1) + 
+          32 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          72 $CellContext`a^4 E^$CellContext`x1 $CellContext`R0 + 
+          32 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0 - 192 
+          E^(3 $CellContext`x1) $CellContext`R0 + 
+          192 $CellContext`a^2 E^(3 $CellContext`x1) $CellContext`R0 - 128 
+          E^(4 $CellContext`x1) $CellContext`R0 + 
+          192 E^(5 $CellContext`x1) $CellContext`R0 + 
+          36 $CellContext`a^4 $CellContext`R0^2 + 
+          16 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^2 - 192 
+          E^(2 $CellContext`x1) $CellContext`R0^2 + 
+          288 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0^2 - 192 
+          E^(3 $CellContext`x1) $CellContext`R0^2 + 
+          480 E^(4 $CellContext`x1) $CellContext`R0^2 - 64 
+          E^$CellContext`x1 $CellContext`R0^3 + 
+          192 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^3 - 128 
+          E^(2 $CellContext`x1) $CellContext`R0^3 + 
+          640 E^(3 $CellContext`x1) $CellContext`R0^3 + 
+          48 $CellContext`a^2 $CellContext`R0^4 - 32 
+          E^$CellContext`x1 $CellContext`R0^4 + 
+          480 E^(2 $CellContext`x1) $CellContext`R0^4 + 
+          192 E^$CellContext`x1 $CellContext`R0^5 + 
+          32 $CellContext`R0^6 + $CellContext`a^2 (15 $CellContext`a^4 + 
+            16 $CellContext`a^2 (3 E^(2 $CellContext`x1) + 
+              3 $CellContext`R0^2 + 
+              E^$CellContext`x1 (1 + 6 $CellContext`R0)) + 
+            16 (3 E^(4 $CellContext`x1) + 3 $CellContext`R0^4 + 
+              E^(3 $CellContext`x1) (-1 + 12 $CellContext`R0) + 
+              2 E^(2 $CellContext`x1) (1 - $CellContext`R0 + 
+                9 $CellContext`R0^2) + 
+              E^$CellContext`x1 $CellContext`R0 (2 - $CellContext`R0 + 
+                12 $CellContext`R0^2))) Cos[2 $CellContext`x2] + 
+          2 $CellContext`a^4 (3 $CellContext`a^2 + 6 E^(2 $CellContext`x1) + 
+            6 $CellContext`R0^2 + 4 E^$CellContext`x1 (1 + 3 $CellContext`R0))
+             Cos[4 $CellContext`x2] + $CellContext`a^6 
+           Cos[6 $CellContext`x2])],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][1][2]=\"\>", " ", 
-       InterpretationBox["\<\"-((Power(a,2)*Sin(2*x2))/(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2)))\"\>",
-        CForm[-$CellContext`a^2 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-1)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"-((Power(a,2)*Cos(x2)*Sin(x2))/(Power(Power(E,\
+x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))\"\>",
+        CForm[-$CellContext`a^2 
+         Cos[$CellContext`x2] ((
+           
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[$CellContext`x2]^2)^(-1) Sin[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][1][3]=\"\>", " ", 
-       InterpretationBox["\<\"(a*(Power(a,4) - 16*Power(a,2)*x1 + \
-6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 128*Power(x1,3) + \
-64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(-2 + \
-Power(a,2) + 2*x1 + 8*Power(x1,2))*Cos(2*x2) + Power(a,4)*(-1 + \
-2*x1)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(a*(Power(a,4) - 8*Power(a,2)*Power(E,x1) + \
+3*Power(a,4)*Power(E,x1) - 4*Power(a,2)*Power(E,2*x1) + 16*Power(E,3*x1) + \
+8*Power(a,2)*Power(E,3*x1) + 8*Power(E,5*x1) - 8*Power(a,2)*R0 + \
+3*Power(a,4)*R0 - 8*Power(a,2)*Power(E,x1)*R0 + 48*Power(E,2*x1)*R0 + \
+24*Power(a,2)*Power(E,2*x1)*R0 + 40*Power(E,4*x1)*R0 - \
+4*Power(a,2)*Power(R0,2) + 48*Power(E,x1)*Power(R0,2) + \
+24*Power(a,2)*Power(E,x1)*Power(R0,2) + 80*Power(E,3*x1)*Power(R0,2) + \
+16*Power(R0,3) + 8*Power(a,2)*Power(R0,3) + 80*Power(E,2*x1)*Power(R0,3) + \
+40*Power(E,x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(E,x1) + \
+R0)*(-2 + Power(a,2) + Power(E,x1) + 2*Power(E,2*x1) + R0 + 4*Power(E,x1)*R0 \
++ 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(E,x1) + \
+R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[$CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) ($CellContext`a^4 - 
-          16 $CellContext`a^2 $CellContext`x1 + 
-          6 $CellContext`a^4 $CellContext`x1 - 
-          16 $CellContext`a^2 $CellContext`x1^2 + 128 $CellContext`x1^3 + 
-          64 $CellContext`a^2 $CellContext`x1^3 + 256 $CellContext`x1^5 + 
-          8 $CellContext`a^2 $CellContext`x1 (-2 + $CellContext`a^2 + 
-            2 $CellContext`x1 + 8 $CellContext`x1^2) 
-           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 2 $CellContext`x1) 
-           Cos[4 $CellContext`x2]) Sin[$CellContext`x2]^2],
+          8 $CellContext`a^2 E^$CellContext`x1 + 
+          3 $CellContext`a^4 E^$CellContext`x1 - 4 $CellContext`a^2 
+          E^(2 $CellContext`x1) + 16 E^(3 $CellContext`x1) + 
+          8 $CellContext`a^2 E^(3 $CellContext`x1) + 8 E^(5 $CellContext`x1) - 
+          8 $CellContext`a^2 $CellContext`R0 + 
+          3 $CellContext`a^4 $CellContext`R0 - 8 $CellContext`a^2 
+          E^$CellContext`x1 $CellContext`R0 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0 + 
+          24 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0 + 
+          40 E^(4 $CellContext`x1) $CellContext`R0 - 
+          4 $CellContext`a^2 $CellContext`R0^2 + 
+          48 E^$CellContext`x1 $CellContext`R0^2 + 
+          24 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^2 + 
+          80 E^(3 $CellContext`x1) $CellContext`R0^2 + 16 $CellContext`R0^3 + 
+          8 $CellContext`a^2 $CellContext`R0^3 + 
+          80 E^(2 $CellContext`x1) $CellContext`R0^3 + 
+          40 E^$CellContext`x1 $CellContext`R0^4 + 8 $CellContext`R0^5 + 
+          4 $CellContext`a^2 (
+            E^$CellContext`x1 + $CellContext`R0) (-2 + $CellContext`a^2 + 
+            E^$CellContext`x1 + 2 E^(2 $CellContext`x1) + $CellContext`R0 + 
+            4 E^$CellContext`x1 $CellContext`R0 + 2 $CellContext`R0^2) 
+           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 
+            E^$CellContext`x1 + $CellContext`R0) Cos[4 $CellContext`x2]) 
+         Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -3622,20 +4051,26 @@ Power(a,2)*Cos(2*x2),3)\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][2][1]=\"\>", " ", 
-       InterpretationBox["\<\"-((Power(a,2)*Sin(2*x2))/(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2)))\"\>",
-        CForm[-$CellContext`a^2 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-1)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"-((Power(a,2)*Cos(x2)*Sin(x2))/(Power(Power(E,\
+x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))\"\>",
+        CForm[-$CellContext`a^2 
+         Cos[$CellContext`x2] ((
+             E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[$CellContext`x2]^2)^(-1) Sin[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][2][2]=\"\>", " ", 
-       InterpretationBox["\<\"-((x1*(Power(a,2) + 4*(-1 + \
-x1)*x1))/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))\"\>",
-        CForm[-$CellContext`x1 ($CellContext`a^2 + 
-          4 (-1 + $CellContext`x1) $CellContext`x1)/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+       InterpretationBox["\<\"-(((Power(E,x1) + R0)*(Power(a,2) + (-2 + \
+Power(E,x1) + R0)*(Power(E,x1) + R0)))/(Power(E,x1)*(Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Power(Cos(x2),2))))\"\>",
+        CForm[-
+         E^(-$CellContext`x1) (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + (-2 + 
+            E^$CellContext`x1 + $CellContext`R0) (
+            E^$CellContext`x1 + $CellContext`R0))/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -3646,37 +4081,63 @@ x1)*x1))/(4*Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][3][0]=\"\>", " ", 
-       InterpretationBox["\<\"(2*a*(Power(a,2) + 4*(-1 + x1)*x1)*(Power(a,2) \
-- 8*Power(x1,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(4*a*(Power(a,2) + Power(E,2*x1) + \
+2*Power(E,x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(a,2) - 2*Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/(Power(E,x1)*Power(Power(a,2) \
++ 2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3))\"\>",
         CForm[
-        2 $CellContext`a ($CellContext`a^2 + 
-          4 (-1 + $CellContext`x1) $CellContext`x1) ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
+        4 $CellContext`a 
+         E^(-$CellContext`x1) ($CellContext`a^2 + E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + $CellContext`R0) \
+$CellContext`R0) ($CellContext`a^2 - 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
            Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[$CellContext`x2]^2],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][3][1]=\"\>", " ", 
-       InterpretationBox["\<\"(a*(Power(a,4) - 16*Power(a,2)*x1 + \
-6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 128*Power(x1,3) + \
-64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + 8*Power(a,2)*x1*(-2 + \
-Power(a,2) + 2*x1 + 8*Power(x1,2))*Cos(2*x2) + Power(a,4)*(-1 + \
-2*x1)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(a*(Power(a,4) - 8*Power(a,2)*Power(E,x1) + \
+3*Power(a,4)*Power(E,x1) - 4*Power(a,2)*Power(E,2*x1) + 16*Power(E,3*x1) + \
+8*Power(a,2)*Power(E,3*x1) + 8*Power(E,5*x1) - 8*Power(a,2)*R0 + \
+3*Power(a,4)*R0 - 8*Power(a,2)*Power(E,x1)*R0 + 48*Power(E,2*x1)*R0 + \
+24*Power(a,2)*Power(E,2*x1)*R0 + 40*Power(E,4*x1)*R0 - \
+4*Power(a,2)*Power(R0,2) + 48*Power(E,x1)*Power(R0,2) + \
+24*Power(a,2)*Power(E,x1)*Power(R0,2) + 80*Power(E,3*x1)*Power(R0,2) + \
+16*Power(R0,3) + 8*Power(a,2)*Power(R0,3) + 80*Power(E,2*x1)*Power(R0,3) + \
+40*Power(E,x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(E,x1) + \
+R0)*(-2 + Power(a,2) + Power(E,x1) + 2*Power(E,2*x1) + R0 + 4*Power(E,x1)*R0 \
++ 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(E,x1) + \
+R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[$CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) ($CellContext`a^4 - 
-          16 $CellContext`a^2 $CellContext`x1 + 
-          6 $CellContext`a^4 $CellContext`x1 - 
-          16 $CellContext`a^2 $CellContext`x1^2 + 128 $CellContext`x1^3 + 
-          64 $CellContext`a^2 $CellContext`x1^3 + 256 $CellContext`x1^5 + 
-          8 $CellContext`a^2 $CellContext`x1 (-2 + $CellContext`a^2 + 
-            2 $CellContext`x1 + 8 $CellContext`x1^2) 
-           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 2 $CellContext`x1) 
-           Cos[4 $CellContext`x2]) Sin[$CellContext`x2]^2],
+          8 $CellContext`a^2 E^$CellContext`x1 + 
+          3 $CellContext`a^4 E^$CellContext`x1 - 4 $CellContext`a^2 
+          E^(2 $CellContext`x1) + 16 E^(3 $CellContext`x1) + 
+          8 $CellContext`a^2 E^(3 $CellContext`x1) + 8 E^(5 $CellContext`x1) - 
+          8 $CellContext`a^2 $CellContext`R0 + 
+          3 $CellContext`a^4 $CellContext`R0 - 8 $CellContext`a^2 
+          E^$CellContext`x1 $CellContext`R0 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0 + 
+          24 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0 + 
+          40 E^(4 $CellContext`x1) $CellContext`R0 - 
+          4 $CellContext`a^2 $CellContext`R0^2 + 
+          48 E^$CellContext`x1 $CellContext`R0^2 + 
+          24 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^2 + 
+          80 E^(3 $CellContext`x1) $CellContext`R0^2 + 16 $CellContext`R0^3 + 
+          8 $CellContext`a^2 $CellContext`R0^3 + 
+          80 E^(2 $CellContext`x1) $CellContext`R0^3 + 
+          40 E^$CellContext`x1 $CellContext`R0^4 + 8 $CellContext`R0^5 + 
+          4 $CellContext`a^2 (
+            E^$CellContext`x1 + $CellContext`R0) (-2 + $CellContext`a^2 + 
+            E^$CellContext`x1 + 2 E^(2 $CellContext`x1) + $CellContext`R0 + 
+            4 E^$CellContext`x1 $CellContext`R0 + 2 $CellContext`R0^2) 
+           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 
+            E^$CellContext`x1 + $CellContext`R0) Cos[4 $CellContext`x2]) 
+         Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -3687,41 +4148,67 @@ Power(a,2)*Cos(2*x2),3)\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[1][3][3]=\"\>", " ", 
-       InterpretationBox["\<\"-((Power(a,2) + 4*(-1 + x1)*x1)*(Power(a,4) + \
-6*Power(a,4)*x1 - 16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + \
-256*Power(x1,5) + 8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + \
-Power(a,4)*(-1 + 2*x1)*Cos(4*x2))*Power(Sin(x2),2))/(2.*Power(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2),3))\"\>",
-        CForm[
-        Rational[-1, 2] ($CellContext`a^2 + 
-          4 (-1 + $CellContext`x1) $CellContext`x1) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+       InterpretationBox["\<\"-(((Power(a,2) + Power(E,2*x1) + \
+2*Power(E,x1)*(-1 + R0) + (-2 + R0)*R0)*(Power(a,4) + \
+3*Power(a,4)*Power(E,x1) - 4*Power(a,2)*Power(E,2*x1) + \
+8*Power(a,2)*Power(E,3*x1) + 8*Power(E,5*x1) + 3*Power(a,4)*R0 - \
+8*Power(a,2)*Power(E,x1)*R0 + 24*Power(a,2)*Power(E,2*x1)*R0 + \
+40*Power(E,4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + \
+24*Power(a,2)*Power(E,x1)*Power(R0,2) + 80*Power(E,3*x1)*Power(R0,2) + \
+8*Power(a,2)*Power(R0,3) + 80*Power(E,2*x1)*Power(R0,3) + \
+40*Power(E,x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(E,x1) + \
+R0)*(Power(a,2) + Power(E,x1) + 2*Power(E,2*x1) + R0 + 4*Power(E,x1)*R0 + \
+2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(E,x1) + \
+R0)*Cos(4*x2))*Power(Sin(x2),2))/(Power(E,x1)*Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)))\"\>",
+        CForm[-
+         E^(-$CellContext`x1) ($CellContext`a^2 + E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + $CellContext`R0) \
+$CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) ($CellContext`a^4 + 
-          6 $CellContext`a^4 $CellContext`x1 - 
-          16 $CellContext`a^2 $CellContext`x1^2 + 
-          64 $CellContext`a^2 $CellContext`x1^3 + 256 $CellContext`x1^5 + 
-          8 $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-            2 $CellContext`x1 (1 + 4 $CellContext`x1)) 
-           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 2 $CellContext`x1) 
-           Cos[4 $CellContext`x2]) Sin[$CellContext`x2]^2],
+          3 $CellContext`a^4 E^$CellContext`x1 - 4 $CellContext`a^2 
+          E^(2 $CellContext`x1) + 8 $CellContext`a^2 E^(3 $CellContext`x1) + 
+          8 E^(5 $CellContext`x1) + 3 $CellContext`a^4 $CellContext`R0 - 
+          8 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          24 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0 + 
+          40 E^(4 $CellContext`x1) $CellContext`R0 - 
+          4 $CellContext`a^2 $CellContext`R0^2 + 
+          24 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^2 + 
+          80 E^(3 $CellContext`x1) $CellContext`R0^2 + 
+          8 $CellContext`a^2 $CellContext`R0^3 + 
+          80 E^(2 $CellContext`x1) $CellContext`R0^3 + 
+          40 E^$CellContext`x1 $CellContext`R0^4 + 8 $CellContext`R0^5 + 
+          4 $CellContext`a^2 (
+            E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+            E^$CellContext`x1 + 2 E^(2 $CellContext`x1) + $CellContext`R0 + 
+            4 E^$CellContext`x1 $CellContext`R0 + 2 $CellContext`R0^2) 
+           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 
+            E^$CellContext`x1 + $CellContext`R0) Cos[4 $CellContext`x2]) 
+         Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][0][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-16*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) \
-+ 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-16) $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"(-8*Power(a,2)*(Power(E,x1) + \
+R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-8) $CellContext`a^2 (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][0][1]=\"\>", " ", 
-       InterpretationBox["\<\"(-32*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) \
-+ 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-32) $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"(-8*Power(a,2)*Power(E,x1)*(Power(E,x1) + \
+R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-8) $CellContext`a^2 
+         E^$CellContext`x1 (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -3732,57 +4219,80 @@ Power(a,4)*(-1 + 2*x1)*Cos(4*x2))*Power(Sin(x2),2))/(2.*Power(Power(a,2) + \
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][0][3]=\"\>", " ", 
-       InterpretationBox["\<\"(16*a*x1*(Power(a,2) + \
-4*Power(x1,2))*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(8*a*(Power(E,x1) + R0)*(Power(a,2) + \
+Power(Power(E,x1) + R0,2))*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) \
++ R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        16 $CellContext`a $CellContext`x1 ($CellContext`a^2 + 
-          4 $CellContext`x1^2) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[2 $CellContext`x2]],
+        8 $CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + (
+            E^$CellContext`x1 + $CellContext`R0)^2) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][1][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-32*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) \
-+ 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-32) $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"(-8*Power(a,2)*Power(E,x1)*(Power(E,x1) + \
+R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-8) $CellContext`a^2 
+         E^$CellContext`x1 (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][1][1]=\"\>", " ", 
-       InterpretationBox["\<\"(-64*Power(a,2)*x1*Sin(2*x2))/Power(Power(a,2) \
-+ 8*Power(x1,2) + Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-64) $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[2 $CellContext`x2]],
+       InterpretationBox["\<\"(-8*Power(a,2)*Power(E,2*x1)*(Power(E,x1) + \
+R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[(-8) $CellContext`a^2 
+         E^(2 $CellContext`x1) (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][1][2]=\"\>", " ", 
-       InterpretationBox["\<\"(4*x1)/(4*Power(x1,2) + \
-Power(a,2)*Power(Cos(x2),2))\"\>",
+       InterpretationBox["\<\"(Power(E,x1)*(Power(E,x1) + \
+R0))/(Power(Power(E,x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))\"\>",
         CForm[
-        4 $CellContext`x1/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+        E^$CellContext`x1 (
+          E^$CellContext`x1 + $CellContext`R0)/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][1][3]=\"\>", " ", 
-       InterpretationBox["\<\"(a*(3*Power(a,4) + 32*Power(a,2)*x1 + \
-32*Power(a,2)*Power(x1,2) + 128*Power(x1,3) + 128*Power(x1,4) + \
-4*Power(a,2)*(Power(a,2) + 8*Power(x1,2))*Cos(2*x2) + \
-Power(a,4)*Cos(4*x2))*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[$CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+       InterpretationBox["\<\"(a*Power(E,x1)*(3*Power(a,4) + \
+16*Power(a,2)*Power(E,x1) + 8*Power(a,2)*Power(E,2*x1) + 16*Power(E,3*x1) + \
+8*Power(E,4*x1) + 16*Power(a,2)*R0 + 16*Power(a,2)*Power(E,x1)*R0 + \
+48*Power(E,2*x1)*R0 + 32*Power(E,3*x1)*R0 + 8*Power(a,2)*Power(R0,2) + \
+48*Power(E,x1)*Power(R0,2) + 48*Power(E,2*x1)*Power(R0,2) + 16*Power(R0,3) + \
+32*Power(E,x1)*Power(R0,3) + 8*Power(R0,4) + 4*Power(a,2)*(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2))*Cos(2*x2) + \
+Power(a,4)*Cos(4*x2))*Sin(2*x2))/(2.*Power(Power(a,2) + 2*Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Cos(2*x2),3))\"\>",
+        CForm[
+        Rational[1, 2] $CellContext`a 
+         E^$CellContext`x1 ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) (3 $CellContext`a^4 + 
-          32 $CellContext`a^2 $CellContext`x1 + 
-          32 $CellContext`a^2 $CellContext`x1^2 + 128 $CellContext`x1^3 + 
-          128 $CellContext`x1^4 + 
-          4 $CellContext`a^2 ($CellContext`a^2 + 8 $CellContext`x1^2) 
+          16 $CellContext`a^2 E^$CellContext`x1 + 
+          8 $CellContext`a^2 E^(2 $CellContext`x1) + 16 E^(3 $CellContext`x1) + 
+          8 E^(4 $CellContext`x1) + 16 $CellContext`a^2 $CellContext`R0 + 
+          16 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0 + 
+          32 E^(3 $CellContext`x1) $CellContext`R0 + 
+          8 $CellContext`a^2 $CellContext`R0^2 + 
+          48 E^$CellContext`x1 $CellContext`R0^2 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0^2 + 16 $CellContext`R0^3 + 
+          32 E^$CellContext`x1 $CellContext`R0^3 + 8 $CellContext`R0^4 + 
+          4 $CellContext`a^2 ($CellContext`a^2 + 
+            2 (E^$CellContext`x1 + $CellContext`R0)^2) 
            Cos[2 $CellContext`x2] + $CellContext`a^4 Cos[4 $CellContext`x2]) 
          Sin[2 $CellContext`x2]],
         AutoDelete->True,
@@ -3795,21 +4305,23 @@ Power(a,2)*Cos(2*x2),3)\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][2][1]=\"\>", " ", 
-       InterpretationBox["\<\"(4*x1)/(4*Power(x1,2) + \
-Power(a,2)*Power(Cos(x2),2))\"\>",
+       InterpretationBox["\<\"(Power(E,x1)*(Power(E,x1) + \
+R0))/(Power(Power(E,x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))\"\>",
         CForm[
-        4 $CellContext`x1/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+        E^$CellContext`x1 (
+          E^$CellContext`x1 + $CellContext`R0)/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][2][2]=\"\>", " ", 
-       InterpretationBox["\<\"-((Power(a,2)*Cos(x2)*Sin(x2))/(4*Power(x1,2) + \
-Power(a,2)*Power(Cos(x2),2)))\"\>",
+       InterpretationBox["\<\"-((Power(a,2)*Cos(x2)*Sin(x2))/(Power(Power(E,\
+x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))\"\>",
         CForm[-$CellContext`a^2 
-         Cos[$CellContext`x2] (
-           4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)^(-1)
-            Sin[$CellContext`x2]],
+         Cos[$CellContext`x2] ((
+             E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[$CellContext`x2]^2)^(-1) Sin[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
@@ -3820,30 +4332,45 @@ Power(a,2)*Power(Cos(x2),2)))\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][3][0]=\"\>", " ", 
-       InterpretationBox["\<\"(16*a*x1*(Power(a,2) + \
-4*Power(x1,2))*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(8*a*(Power(E,x1) + R0)*(Power(a,2) + \
+Power(Power(E,x1) + R0,2))*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(E,x1) \
++ R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        16 $CellContext`a $CellContext`x1 ($CellContext`a^2 + 
-          4 $CellContext`x1^2) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[2 $CellContext`x2]],
+        8 $CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + (
+            E^$CellContext`x1 + $CellContext`R0)^2) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[2 $CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][3][1]=\"\>", " ", 
-       InterpretationBox["\<\"(a*(3*Power(a,4) + 32*Power(a,2)*x1 + \
-32*Power(a,2)*Power(x1,2) + 128*Power(x1,3) + 128*Power(x1,4) + \
-4*Power(a,2)*(Power(a,2) + 8*Power(x1,2))*Cos(2*x2) + \
-Power(a,4)*Cos(4*x2))*Sin(2*x2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[$CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+       InterpretationBox["\<\"(a*Power(E,x1)*(3*Power(a,4) + \
+16*Power(a,2)*Power(E,x1) + 8*Power(a,2)*Power(E,2*x1) + 16*Power(E,3*x1) + \
+8*Power(E,4*x1) + 16*Power(a,2)*R0 + 16*Power(a,2)*Power(E,x1)*R0 + \
+48*Power(E,2*x1)*R0 + 32*Power(E,3*x1)*R0 + 8*Power(a,2)*Power(R0,2) + \
+48*Power(E,x1)*Power(R0,2) + 48*Power(E,2*x1)*Power(R0,2) + 16*Power(R0,3) + \
+32*Power(E,x1)*Power(R0,3) + 8*Power(R0,4) + 4*Power(a,2)*(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2))*Cos(2*x2) + \
+Power(a,4)*Cos(4*x2))*Sin(2*x2))/(2.*Power(Power(a,2) + 2*Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Cos(2*x2),3))\"\>",
+        CForm[
+        Rational[1, 2] $CellContext`a 
+         E^$CellContext`x1 ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) (3 $CellContext`a^4 + 
-          32 $CellContext`a^2 $CellContext`x1 + 
-          32 $CellContext`a^2 $CellContext`x1^2 + 128 $CellContext`x1^3 + 
-          128 $CellContext`x1^4 + 
-          4 $CellContext`a^2 ($CellContext`a^2 + 8 $CellContext`x1^2) 
+          16 $CellContext`a^2 E^$CellContext`x1 + 
+          8 $CellContext`a^2 E^(2 $CellContext`x1) + 16 E^(3 $CellContext`x1) + 
+          8 E^(4 $CellContext`x1) + 16 $CellContext`a^2 $CellContext`R0 + 
+          16 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0 + 
+          32 E^(3 $CellContext`x1) $CellContext`R0 + 
+          8 $CellContext`a^2 $CellContext`R0^2 + 
+          48 E^$CellContext`x1 $CellContext`R0^2 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0^2 + 16 $CellContext`R0^3 + 
+          32 E^$CellContext`x1 $CellContext`R0^3 + 8 $CellContext`R0^4 + 
+          4 $CellContext`a^2 ($CellContext`a^2 + 
+            2 (E^$CellContext`x1 + $CellContext`R0)^2) 
            Cos[2 $CellContext`x2] + $CellContext`a^4 Cos[4 $CellContext`x2]) 
          Sin[2 $CellContext`x2]],
         AutoDelete->True,
@@ -3856,250 +4383,384 @@ Power(a,2)*Cos(2*x2),3)\"\>",
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[2][3][3]=\"\>", " ", 
-       InterpretationBox["\<\"-((3*Power(a,6) + 20*Power(a,4)*x1 + \
-44*Power(a,4)*Power(x1,2) + 128*Power(a,2)*Power(x1,3) + \
-256*Power(a,2)*Power(x1,4) + 512*Power(x1,6) + 4*Power(a,2)*(Power(a,4) + \
-32*(-1 + x1)*Power(x1,3) + 4*Power(a,2)*x1*(-1 + 3*x1))*Cos(2*x2) + \
-Power(a,4)*(Power(a,2) + 4*(-1 + \
-x1)*x1)*Cos(4*x2))*Sin(2*x2))/(2.*Power(Power(a,2) + 8*Power(x1,2) + \
+       InterpretationBox["\<\"(4*Sin(x2)*(-(Cos(x2)*(Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Power(Cos(x2),2))*((Power(E,x1) + R0)*(Power(Power(E,x1) + \
+R0,3) + Power(a,2)*(2 + Power(E,x1) + R0)) + Power(a,2)*(Power(a,2) + \
+Power(E,2*x1) + 2*Power(E,x1)*(-1 + R0) + (-2 + \
+R0)*R0)*Power(Cos(x2),2))*(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2))) + Power(a,2)*(Power(a,2) + Power(E,2*x1) + \
+2*Power(E,x1)*(-1 + R0) + (-2 + R0)*R0)*Cos(x2)*(Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2))*(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2))*Power(Sin(x2),2) + Power(a,2)*Cos(x2)*((Power(E,x1) + \
+R0)*(Power(Power(E,x1) + R0,3) + Power(a,2)*(2 + Power(E,x1) + R0)) + \
+Power(a,2)*(Power(a,2) + Power(E,2*x1) + 2*Power(E,x1)*(-1 + R0) + (-2 + \
+R0)*R0)*Power(Cos(x2),2))*(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2))*Power(Sin(x2),2) - 2*Power(a,2)*(Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Power(Cos(x2),2))*((Power(E,x1) + R0)*(Power(Power(E,x1) + \
+R0,3) + Power(a,2)*(2 + Power(E,x1) + R0)) + Power(a,2)*(Power(a,2) + \
+Power(E,2*x1) + 2*Power(E,x1)*(-1 + R0) + (-2 + \
+R0)*R0)*Power(Cos(x2),2))*Sin(x2)*Sin(2*x2)))/((Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Power(Cos(x2),2))*Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Cos(2*x2),3))\"\>",
         CForm[
-        Rational[-1, 2] ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-3) (3 $CellContext`a^6 + 
-          20 $CellContext`a^4 $CellContext`x1 + 
-          44 $CellContext`a^4 $CellContext`x1^2 + 
-          128 $CellContext`a^2 $CellContext`x1^3 + 
-          256 $CellContext`a^2 $CellContext`x1^4 + 512 $CellContext`x1^6 + 
-          4 $CellContext`a^2 ($CellContext`a^4 + 
-            32 (-1 + $CellContext`x1) $CellContext`x1^3 + 
-            4 $CellContext`a^2 $CellContext`x1 (-1 + 3 $CellContext`x1)) 
-           Cos[2 $CellContext`x2] + $CellContext`a^4 ($CellContext`a^2 + 
-            4 (-1 + $CellContext`x1) $CellContext`x1) Cos[4 $CellContext`x2]) 
-         Sin[2 $CellContext`x2]],
+        4 ((E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[$CellContext`x2]^2)^(-1) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) 
+         Sin[$CellContext`x2] (-
+           Cos[$CellContext`x2] ((
+              E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+             Cos[$CellContext`x2]^2) ((
+              E^$CellContext`x1 + $CellContext`R0) ((
+                E^$CellContext`x1 + $CellContext`R0)^3 + $CellContext`a^2 (2 + 
+                E^$CellContext`x1 + $CellContext`R0)) + $CellContext`a^2 \
+($CellContext`a^2 + E^(2 $CellContext`x1) + 
+              2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + \
+$CellContext`R0) $CellContext`R0) Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+            2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+             Cos[2 $CellContext`x2]) + $CellContext`a^2 ($CellContext`a^2 + 
+            E^(2 $CellContext`x1) + 
+            2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + \
+$CellContext`R0) $CellContext`R0) 
+           Cos[$CellContext`x2] ((
+              E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+             Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+            2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+             Cos[2 $CellContext`x2]) 
+           Sin[$CellContext`x2]^2 + $CellContext`a^2 
+           Cos[$CellContext`x2] ((
+              E^$CellContext`x1 + $CellContext`R0) ((
+                E^$CellContext`x1 + $CellContext`R0)^3 + $CellContext`a^2 (2 + 
+                E^$CellContext`x1 + $CellContext`R0)) + $CellContext`a^2 \
+($CellContext`a^2 + E^(2 $CellContext`x1) + 
+              2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + \
+$CellContext`R0) $CellContext`R0) Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+            2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+             Cos[2 $CellContext`x2]) Sin[$CellContext`x2]^2 - 
+          2 $CellContext`a^2 ((
+             E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[$CellContext`x2]^2) ((
+             E^$CellContext`x1 + $CellContext`R0) ((
+               E^$CellContext`x1 + $CellContext`R0)^3 + $CellContext`a^2 (2 + 
+               
+               E^$CellContext`x1 + $CellContext`R0)) + $CellContext`a^2 \
+($CellContext`a^2 + E^(2 $CellContext`x1) + 
+             2 E^$CellContext`x1 (-1 + $CellContext`R0) + (-2 + \
+$CellContext`R0) $CellContext`R0) Cos[$CellContext`x2]^2) 
+          Sin[$CellContext`x2] Sin[2 $CellContext`x2])],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][0][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-4*a*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
+       InterpretationBox["\<\"(-4*a*(Power(a,2) - 2*Power(Power(E,x1) + R0,2) \
++ Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[(-4) $CellContext`a ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
            Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][0][1]=\"\>", " ", 
-       InterpretationBox["\<\"(-8*a*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-8) $CellContext`a ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+       InterpretationBox["\<\"(4*a*Power(E,x1)*(-Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[
+        4 $CellContext`a 
+         E^$CellContext`x1 (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
+          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][0][2]=\"\>", " ", 
-       InterpretationBox["\<\"(-16*a*x1*Cot(x2))/Power(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)\"\>",
-        CForm[(-16) $CellContext`a $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Cot[$CellContext`x2]],
+       InterpretationBox["\<\"(-8*a*(Power(E,x1) + \
+R0)*Cot(x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-8) $CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Cot[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][0][3]=\"\>", " ", 
-       InterpretationBox["\<\"(4*Power(a,2)*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(4*Power(a,2)*(Power(a,2) - 2*Power(Power(E,x1) \
++ R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
         4 $CellContext`a^2 ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
            Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[$CellContext`x2]^2],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][1][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-8*a*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-8) $CellContext`a ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+       InterpretationBox["\<\"(4*a*Power(E,x1)*(-Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[
+        4 $CellContext`a 
+         E^$CellContext`x1 (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
+          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][1][1]=\"\>", " ", 
-       InterpretationBox["\<\"(-16*a*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
-        CForm[(-16) $CellContext`a ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+       InterpretationBox["\<\"(4*a*Power(E,2*x1)*(-Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
+        CForm[
+        4 $CellContext`a 
+         E^(2 $CellContext`x1) (-$CellContext`a^2 + 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 - $CellContext`a^2 
+          Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][1][2]=\"\>", " ", 
-       InterpretationBox["\<\"(-4*a*(Power(a,2) + 8*x1*(1 + x1) + \
-Power(a,2)*Cos(2*x2))*Cot(x2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),2)\"\>",
-        CForm[(-4) $CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-2) ($CellContext`a^2 + 
-          8 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) Cot[$CellContext`x2]],
+       InterpretationBox["\<\"(-4*a*Power(E,x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*Cot(x2))/Power(Power(a,2) + 2*Power(Power(E,x1) \
++ R0,2) + Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-4) $CellContext`a 
+         E^$CellContext`x1 (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Cot[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][1][3]=\"\>", " ", 
-       InterpretationBox["\<\"(2*(Power(a,4) + 6*Power(a,4)*x1 - \
-16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + \
-8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + \
-2*x1)*Cos(4*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
+       InterpretationBox["\<\"(Power(E,x1)*(Power(a,4) + \
+3*Power(a,4)*Power(E,x1) - 4*Power(a,2)*Power(E,2*x1) + \
+8*Power(a,2)*Power(E,3*x1) + 8*Power(E,5*x1) + 3*Power(a,4)*R0 - \
+8*Power(a,2)*Power(E,x1)*R0 + 24*Power(a,2)*Power(E,2*x1)*R0 + \
+40*Power(E,4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + \
+24*Power(a,2)*Power(E,x1)*Power(R0,2) + 80*Power(E,3*x1)*Power(R0,2) + \
+8*Power(a,2)*Power(R0,3) + 80*Power(E,2*x1)*Power(R0,3) + \
+40*Power(E,x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(E,x1) + \
+R0)*(Power(a,2) + Power(E,x1) + 2*Power(E,2*x1) + R0 + 4*Power(E,x1)*R0 + \
+2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(E,x1) + \
+R0)*Cos(4*x2)))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        2 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+        E^$CellContext`x1 ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) ($CellContext`a^4 + 
-          6 $CellContext`a^4 $CellContext`x1 - 
-          16 $CellContext`a^2 $CellContext`x1^2 + 
-          64 $CellContext`a^2 $CellContext`x1^3 + 256 $CellContext`x1^5 + 
-          8 $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-            2 $CellContext`x1 (1 + 4 $CellContext`x1)) 
-           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 2 $CellContext`x1) 
-           Cos[4 $CellContext`x2])],
+          3 $CellContext`a^4 E^$CellContext`x1 - 4 $CellContext`a^2 
+          E^(2 $CellContext`x1) + 8 $CellContext`a^2 E^(3 $CellContext`x1) + 
+          8 E^(5 $CellContext`x1) + 3 $CellContext`a^4 $CellContext`R0 - 
+          8 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          24 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0 + 
+          40 E^(4 $CellContext`x1) $CellContext`R0 - 
+          4 $CellContext`a^2 $CellContext`R0^2 + 
+          24 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^2 + 
+          80 E^(3 $CellContext`x1) $CellContext`R0^2 + 
+          8 $CellContext`a^2 $CellContext`R0^3 + 
+          80 E^(2 $CellContext`x1) $CellContext`R0^3 + 
+          40 E^$CellContext`x1 $CellContext`R0^4 + 8 $CellContext`R0^5 + 
+          4 $CellContext`a^2 (
+            E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+            E^$CellContext`x1 + 2 E^(2 $CellContext`x1) + $CellContext`R0 + 
+            4 E^$CellContext`x1 $CellContext`R0 + 2 $CellContext`R0^2) 
+           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 
+            E^$CellContext`x1 + $CellContext`R0) Cos[4 $CellContext`x2])],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][2][0]=\"\>", " ", 
-       InterpretationBox["\<\"(-16*a*x1*Cot(x2))/Power(Power(a,2) + \
-8*Power(x1,2) + Power(a,2)*Cos(2*x2),2)\"\>",
-        CForm[(-16) $CellContext`a $CellContext`x1 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-2)
-            Cot[$CellContext`x2]],
+       InterpretationBox["\<\"(-8*a*(Power(E,x1) + \
+R0)*Cot(x2))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
+Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-8) $CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Cot[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][2][1]=\"\>", " ", 
-       InterpretationBox["\<\"(-4*a*(Power(a,2) + 8*x1*(1 + x1) + \
-Power(a,2)*Cos(2*x2))*Cot(x2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),2)\"\>",
-        CForm[(-4) $CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
-            Cos[2 $CellContext`x2])^(-2) ($CellContext`a^2 + 
-          8 $CellContext`x1 (1 + $CellContext`x1) + $CellContext`a^2 
-           Cos[2 $CellContext`x2]) Cot[$CellContext`x2]],
+       InterpretationBox["\<\"(-4*a*Power(E,x1)*(Power(E,2*x1) + \
+2*Power(E,x1)*(1 + R0) + R0*(2 + R0) + \
+Power(a,2)*Power(Cos(x2),2))*Cot(x2))/Power(Power(a,2) + 2*Power(Power(E,x1) \
++ R0,2) + Power(a,2)*Cos(2*x2),2)\"\>",
+        CForm[(-4) $CellContext`a 
+         E^$CellContext`x1 (E^(2 $CellContext`x1) + 
+          2 E^$CellContext`x1 (1 + $CellContext`R0) + $CellContext`R0 (
+            2 + $CellContext`R0) + $CellContext`a^2 
+           Cos[$CellContext`x2]^2) ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-2) Cot[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][2][2]=\"\>", " ", 
-       InterpretationBox["\<\"(-2*a*x1)/(4*Power(x1,2) + \
-Power(a,2)*Power(Cos(x2),2))\"\>",
-        CForm[(-2) $CellContext`a $CellContext`x1/(
-         4 $CellContext`x1^2 + $CellContext`a^2 Cos[$CellContext`x2]^2)],
+       InterpretationBox["\<\"-((a*(Power(E,x1) + R0))/(Power(Power(E,x1) + \
+R0,2) + Power(a,2)*Power(Cos(x2),2)))\"\>",
+        CForm[-$CellContext`a (
+          E^$CellContext`x1 + $CellContext`R0)/((
+           E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+          Cos[$CellContext`x2]^2)],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][2][3]=\"\>", " ", 
-       InterpretationBox["\<\"((3*Power(a,4) + 16*Power(a,2)*x1 + \
-32*Power(a,2)*Power(x1,2) + 128*Power(x1,4) + 4*Power(a,2)*(Power(a,2) + \
-4*x1*(-1 + 2*x1))*Cos(2*x2) + \
-Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),2))\"\>",
+       InterpretationBox["\<\"((3*Power(a,4) + 8*Power(a,2)*Power(E,x1) + \
+8*Power(a,2)*Power(E,2*x1) + 8*Power(E,4*x1) + 8*Power(a,2)*R0 + \
+16*Power(a,2)*Power(E,x1)*R0 + 32*Power(E,3*x1)*R0 + 8*Power(a,2)*Power(R0,2) \
++ 48*Power(E,2*x1)*Power(R0,2) + 32*Power(E,x1)*Power(R0,3) + 8*Power(R0,4) + \
+4*Power(a,2)*(Power(a,2) + 2*(Power(E,2*x1) + (-1 + R0)*R0 + Power(E,x1)*(-1 \
++ 2*R0)))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),2))\"\>",
         CForm[
         Rational[
           1, 2] ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-2) (3 $CellContext`a^4 + 
-          16 $CellContext`a^2 $CellContext`x1 + 
-          32 $CellContext`a^2 $CellContext`x1^2 + 128 $CellContext`x1^4 + 
+          8 $CellContext`a^2 E^$CellContext`x1 + 
+          8 $CellContext`a^2 E^(2 $CellContext`x1) + 8 E^(4 $CellContext`x1) + 
+          8 $CellContext`a^2 $CellContext`R0 + 
+          16 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          32 E^(3 $CellContext`x1) $CellContext`R0 + 
+          8 $CellContext`a^2 $CellContext`R0^2 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0^2 + 
+          32 E^$CellContext`x1 $CellContext`R0^3 + 8 $CellContext`R0^4 + 
           4 $CellContext`a^2 ($CellContext`a^2 + 
-            4 $CellContext`x1 (-1 + 2 $CellContext`x1)) 
+            2 (E^(2 $CellContext`x1) + (-1 + $CellContext`R0) $CellContext`R0 + 
+              E^$CellContext`x1 (-1 + 2 $CellContext`R0))) 
            Cos[2 $CellContext`x2] + $CellContext`a^4 Cos[4 $CellContext`x2]) 
          Cot[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][3][0]=\"\>", " ", 
-       InterpretationBox["\<\"(4*Power(a,2)*(Power(a,2) - 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3)\"\>",
+       InterpretationBox["\<\"(4*Power(a,2)*(Power(a,2) - 2*Power(Power(E,x1) \
++ R0,2) + Power(a,2)*Cos(2*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
         4 $CellContext`a^2 ($CellContext`a^2 - 
-          8 $CellContext`x1^2 + $CellContext`a^2 
+          2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
            Cos[2 $CellContext`x2]) ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 Cos[2 $CellContext`x2])^(-3)
-            Sin[$CellContext`x2]^2],
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
+            Cos[2 $CellContext`x2])^(-3) Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][3][1]=\"\>", " ", 
-       InterpretationBox["\<\"(2*(Power(a,4) + 6*Power(a,4)*x1 - \
-16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + \
-8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + \
-2*x1)*Cos(4*x2)))/Power(Power(a,2) + 8*Power(x1,2) + \
+       InterpretationBox["\<\"(Power(E,x1)*(Power(a,4) + \
+3*Power(a,4)*Power(E,x1) - 4*Power(a,2)*Power(E,2*x1) + \
+8*Power(a,2)*Power(E,3*x1) + 8*Power(E,5*x1) + 3*Power(a,4)*R0 - \
+8*Power(a,2)*Power(E,x1)*R0 + 24*Power(a,2)*Power(E,2*x1)*R0 + \
+40*Power(E,4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + \
+24*Power(a,2)*Power(E,x1)*Power(R0,2) + 80*Power(E,3*x1)*Power(R0,2) + \
+8*Power(a,2)*Power(R0,3) + 80*Power(E,2*x1)*Power(R0,3) + \
+40*Power(E,x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(E,x1) + \
+R0)*(Power(a,2) + Power(E,x1) + 2*Power(E,2*x1) + R0 + 4*Power(E,x1)*R0 + \
+2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(E,x1) + \
+R0)*Cos(4*x2)))/Power(Power(a,2) + 2*Power(Power(E,x1) + R0,2) + \
 Power(a,2)*Cos(2*x2),3)\"\>",
         CForm[
-        2 ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+        E^$CellContext`x1 ($CellContext`a^2 + 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) ($CellContext`a^4 + 
-          6 $CellContext`a^4 $CellContext`x1 - 
-          16 $CellContext`a^2 $CellContext`x1^2 + 
-          64 $CellContext`a^2 $CellContext`x1^3 + 256 $CellContext`x1^5 + 
-          8 $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-            2 $CellContext`x1 (1 + 4 $CellContext`x1)) 
-           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 2 $CellContext`x1) 
-           Cos[4 $CellContext`x2])],
+          3 $CellContext`a^4 E^$CellContext`x1 - 4 $CellContext`a^2 
+          E^(2 $CellContext`x1) + 8 $CellContext`a^2 E^(3 $CellContext`x1) + 
+          8 E^(5 $CellContext`x1) + 3 $CellContext`a^4 $CellContext`R0 - 
+          8 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          24 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0 + 
+          40 E^(4 $CellContext`x1) $CellContext`R0 - 
+          4 $CellContext`a^2 $CellContext`R0^2 + 
+          24 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^2 + 
+          80 E^(3 $CellContext`x1) $CellContext`R0^2 + 
+          8 $CellContext`a^2 $CellContext`R0^3 + 
+          80 E^(2 $CellContext`x1) $CellContext`R0^3 + 
+          40 E^$CellContext`x1 $CellContext`R0^4 + 8 $CellContext`R0^5 + 
+          4 $CellContext`a^2 (
+            E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+            E^$CellContext`x1 + 2 E^(2 $CellContext`x1) + $CellContext`R0 + 
+            4 E^$CellContext`x1 $CellContext`R0 + 2 $CellContext`R0^2) 
+           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 
+            E^$CellContext`x1 + $CellContext`R0) Cos[4 $CellContext`x2])],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][3][2]=\"\>", " ", 
-       InterpretationBox["\<\"((3*Power(a,4) + 16*Power(a,2)*x1 + \
-32*Power(a,2)*Power(x1,2) + 128*Power(x1,4) + 4*Power(a,2)*(Power(a,2) + \
-4*x1*(-1 + 2*x1))*Cos(2*x2) + \
-Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),2))\"\>",
+       InterpretationBox["\<\"((3*Power(a,4) + 8*Power(a,2)*Power(E,x1) + \
+8*Power(a,2)*Power(E,2*x1) + 8*Power(E,4*x1) + 8*Power(a,2)*R0 + \
+16*Power(a,2)*Power(E,x1)*R0 + 32*Power(E,3*x1)*R0 + 8*Power(a,2)*Power(R0,2) \
++ 48*Power(E,2*x1)*Power(R0,2) + 32*Power(E,x1)*Power(R0,3) + 8*Power(R0,4) + \
+4*Power(a,2)*(Power(a,2) + 2*(Power(E,2*x1) + (-1 + R0)*R0 + Power(E,x1)*(-1 \
++ 2*R0)))*Cos(2*x2) + Power(a,4)*Cos(4*x2))*Cot(x2))/(2.*Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),2))\"\>",
         CForm[
         Rational[
           1, 2] ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-2) (3 $CellContext`a^4 + 
-          16 $CellContext`a^2 $CellContext`x1 + 
-          32 $CellContext`a^2 $CellContext`x1^2 + 128 $CellContext`x1^4 + 
+          8 $CellContext`a^2 E^$CellContext`x1 + 
+          8 $CellContext`a^2 E^(2 $CellContext`x1) + 8 E^(4 $CellContext`x1) + 
+          8 $CellContext`a^2 $CellContext`R0 + 
+          16 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          32 E^(3 $CellContext`x1) $CellContext`R0 + 
+          8 $CellContext`a^2 $CellContext`R0^2 + 
+          48 E^(2 $CellContext`x1) $CellContext`R0^2 + 
+          32 E^$CellContext`x1 $CellContext`R0^3 + 8 $CellContext`R0^4 + 
           4 $CellContext`a^2 ($CellContext`a^2 + 
-            4 $CellContext`x1 (-1 + 2 $CellContext`x1)) 
+            2 (E^(2 $CellContext`x1) + (-1 + $CellContext`R0) $CellContext`R0 + 
+              E^$CellContext`x1 (-1 + 2 $CellContext`R0))) 
            Cos[2 $CellContext`x2] + $CellContext`a^4 Cos[4 $CellContext`x2]) 
          Cot[$CellContext`x2]],
         AutoDelete->True,
         Editable->True]}]},
      {
       RowBox[{"\<\";Krzys[3][3][3]=\"\>", " ", 
-       InterpretationBox["\<\"-((a*(Power(a,4) + 6*Power(a,4)*x1 - \
-16*Power(a,2)*Power(x1,2) + 64*Power(a,2)*Power(x1,3) + 256*Power(x1,5) + \
-8*Power(a,2)*x1*(Power(a,2) + 2*x1*(1 + 4*x1))*Cos(2*x2) + Power(a,4)*(-1 + \
-2*x1)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 8*Power(x1,2) + \
-Power(a,2)*Cos(2*x2),3))\"\>",
+       InterpretationBox["\<\"-((a*(Power(a,4) + 3*Power(a,4)*Power(E,x1) - \
+4*Power(a,2)*Power(E,2*x1) + 8*Power(a,2)*Power(E,3*x1) + 8*Power(E,5*x1) + \
+3*Power(a,4)*R0 - 8*Power(a,2)*Power(E,x1)*R0 + \
+24*Power(a,2)*Power(E,2*x1)*R0 + 40*Power(E,4*x1)*R0 - \
+4*Power(a,2)*Power(R0,2) + 24*Power(a,2)*Power(E,x1)*Power(R0,2) + \
+80*Power(E,3*x1)*Power(R0,2) + 8*Power(a,2)*Power(R0,3) + \
+80*Power(E,2*x1)*Power(R0,3) + 40*Power(E,x1)*Power(R0,4) + 8*Power(R0,5) + \
+4*Power(a,2)*(Power(E,x1) + R0)*(Power(a,2) + Power(E,x1) + 2*Power(E,2*x1) + \
+R0 + 4*Power(E,x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + \
+Power(E,x1) + R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + \
+2*Power(Power(E,x1) + R0,2) + Power(a,2)*Cos(2*x2),3))\"\>",
         CForm[-$CellContext`a ($CellContext`a^2 + 
-           8 $CellContext`x1^2 + $CellContext`a^2 
+           2 (E^$CellContext`x1 + $CellContext`R0)^2 + $CellContext`a^2 
             Cos[2 $CellContext`x2])^(-3) ($CellContext`a^4 + 
-          6 $CellContext`a^4 $CellContext`x1 - 
-          16 $CellContext`a^2 $CellContext`x1^2 + 
-          64 $CellContext`a^2 $CellContext`x1^3 + 256 $CellContext`x1^5 + 
-          8 $CellContext`a^2 $CellContext`x1 ($CellContext`a^2 + 
-            2 $CellContext`x1 (1 + 4 $CellContext`x1)) 
-           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 2 $CellContext`x1) 
-           Cos[4 $CellContext`x2]) Sin[$CellContext`x2]^2],
+          3 $CellContext`a^4 E^$CellContext`x1 - 4 $CellContext`a^2 
+          E^(2 $CellContext`x1) + 8 $CellContext`a^2 E^(3 $CellContext`x1) + 
+          8 E^(5 $CellContext`x1) + 3 $CellContext`a^4 $CellContext`R0 - 
+          8 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0 + 
+          24 $CellContext`a^2 E^(2 $CellContext`x1) $CellContext`R0 + 
+          40 E^(4 $CellContext`x1) $CellContext`R0 - 
+          4 $CellContext`a^2 $CellContext`R0^2 + 
+          24 $CellContext`a^2 E^$CellContext`x1 $CellContext`R0^2 + 
+          80 E^(3 $CellContext`x1) $CellContext`R0^2 + 
+          8 $CellContext`a^2 $CellContext`R0^3 + 
+          80 E^(2 $CellContext`x1) $CellContext`R0^3 + 
+          40 E^$CellContext`x1 $CellContext`R0^4 + 8 $CellContext`R0^5 + 
+          4 $CellContext`a^2 (
+            E^$CellContext`x1 + $CellContext`R0) ($CellContext`a^2 + 
+            E^$CellContext`x1 + 2 E^(2 $CellContext`x1) + $CellContext`R0 + 
+            4 E^$CellContext`x1 $CellContext`R0 + 2 $CellContext`R0^2) 
+           Cos[2 $CellContext`x2] + $CellContext`a^4 (-1 + 
+            E^$CellContext`x1 + $CellContext`R0) Cos[4 $CellContext`x2]) 
+         Sin[$CellContext`x2]^2],
         AutoDelete->True,
         Editable->True]}]},
      {"\<\";\"\>"}
@@ -4124,7 +4785,7 @@ Power(a,2)*Cos(2*x2),3))\"\>",
   3.540226667074626*^9, 3.540228623521008*^9, 3.540228756982563*^9, 
   3.5686566188633842`*^9, 3.569250242522291*^9, 3.5692588978261833`*^9, 
   3.569327988250231*^9, 3.5693649615321608`*^9, 3.5693658120408707`*^9, 
-  3.569367819362605*^9, 3.569367854902807*^9}]
+  3.569367819362605*^9, 3.569367854902807*^9, 3.569368544149534*^9}]
 }, Open  ]]
 },
 WindowSize->{1440, 852},
@@ -4147,87 +4808,87 @@ Notebook[{
 Cell[557, 20, 232, 4, 28, "Input"],
 Cell[CellGroupData[{
 Cell[814, 28, 3426, 81, 148, "Input"],
-Cell[4243, 111, 1274, 22, 35, "Output"],
-Cell[5520, 135, 31077, 500, 375, "Output"]
+Cell[4243, 111, 1298, 22, 35, "Output"],
+Cell[5544, 135, 31101, 500, 375, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[36634, 640, 1332, 36, 114, "Input"],
-Cell[37969, 678, 692, 14, 86, "Output"]
+Cell[36682, 640, 1332, 36, 114, "Input"],
+Cell[38017, 678, 718, 14, 28, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[38698, 697, 3062, 86, 97, "Input"],
-Cell[41763, 785, 913, 23, 92, "Output"]
+Cell[38772, 697, 3062, 86, 97, "Input"],
+Cell[41837, 785, 971, 25, 92, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[42713, 813, 519, 14, 80, "Input"],
-Cell[43235, 829, 896, 23, 100, "Output"]
+Cell[42845, 815, 519, 14, 80, "Input"],
+Cell[43367, 831, 949, 24, 100, "Output"]
 }, Open  ]],
-Cell[44146, 855, 213, 5, 28, "Input"],
+Cell[44331, 858, 213, 5, 28, "Input"],
 Cell[CellGroupData[{
-Cell[44384, 864, 4244, 122, 367, "Input"],
-Cell[48631, 988, 692, 20, 36, "Output"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[49360, 1013, 1238, 28, 80, "Input"],
-Cell[50601, 1043, 5990, 156, 138, "Output"]
+Cell[44569, 867, 4244, 122, 367, "Input"],
+Cell[48816, 991, 714, 20, 36, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[56628, 1204, 706, 16, 46, "Input"],
-Cell[57337, 1222, 1519, 39, 112, "Output"]
+Cell[49567, 1016, 1238, 28, 80, "Input"],
+Cell[50808, 1046, 6012, 156, 138, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[58893, 1266, 681, 13, 46, "Input"],
-Cell[59577, 1281, 3073, 95, 150, "Output"]
+Cell[56857, 1207, 706, 16, 46, "Input"],
+Cell[57566, 1225, 1541, 39, 112, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[62687, 1381, 2335, 61, 250, "Input"],
-Cell[65025, 1444, 3311, 106, 154, "Output"]
+Cell[59144, 1269, 681, 13, 46, "Input"],
+Cell[59828, 1284, 3099, 96, 150, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[68373, 1555, 330, 7, 28, "Input"],
-Cell[68706, 1564, 6701, 205, 154, "Output"]
-}, Open  ]],
-Cell[75422, 1772, 390, 11, 63, "Input"],
-Cell[CellGroupData[{
-Cell[75837, 1787, 731, 14, 46, "Input"],
-Cell[76571, 1803, 1842, 34, 57, "Output"]
+Cell[62964, 1385, 2335, 61, 250, "Input"],
+Cell[65302, 1448, 4981, 159, 178, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[78450, 1842, 585, 18, 46, "Input"],
-Cell[79038, 1862, 1316, 38, 54, "Output"]
+Cell[70320, 1612, 330, 7, 28, "Input"],
+Cell[70653, 1621, 11612, 347, 176, "Output"]
 }, Open  ]],
-Cell[80369, 1903, 683, 18, 46, "Input"],
-Cell[81055, 1923, 1482, 37, 46, "Input"],
-Cell[82540, 1962, 1137, 31, 46, "Input"],
-Cell[83680, 1995, 237, 5, 28, "Input"],
+Cell[82280, 1971, 390, 11, 63, "Input"],
 Cell[CellGroupData[{
-Cell[83942, 2004, 1765, 49, 114, "Input"],
-Cell[85710, 2055, 1986, 68, 224, "Output"]
+Cell[82695, 1986, 731, 14, 46, "Input"],
+Cell[83429, 2002, 2121, 43, 57, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[87733, 2128, 1764, 49, 114, "Input"],
-Cell[89500, 2179, 1938, 66, 224, "Output"]
+Cell[85587, 2050, 585, 18, 46, "Input"],
+Cell[86175, 2070, 2079, 62, 61, "Output"]
 }, Open  ]],
-Cell[91453, 2248, 271, 6, 63, "Input"],
+Cell[88269, 2135, 683, 18, 46, "Input"],
+Cell[88955, 2155, 1482, 37, 46, "Input"],
+Cell[90440, 2194, 1137, 31, 46, "Input"],
+Cell[91580, 2227, 237, 5, 28, "Input"],
 Cell[CellGroupData[{
-Cell[91749, 2258, 367, 10, 46, "Input"],
-Cell[92119, 2270, 494, 7, 28, "Output"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[92650, 2282, 891, 21, 97, "Input"],
-Cell[93544, 2305, 1920, 49, 90, "Output"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[95501, 2359, 4029, 110, 335, "Input"],
-Cell[99533, 2471, 6740, 169, 312, "Output"]
+Cell[91842, 2236, 1765, 49, 114, "Input"],
+Cell[93610, 2287, 2038, 68, 224, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[106310, 2645, 4048, 110, 335, "Input"],
-Cell[110361, 2757, 5069, 148, 312, "Output"]
+Cell[95685, 2360, 1764, 49, 114, "Input"],
+Cell[97452, 2411, 2000, 68, 224, "Output"]
+}, Open  ]],
+Cell[99467, 2482, 271, 6, 63, "Input"],
+Cell[CellGroupData[{
+Cell[99763, 2492, 367, 10, 46, "Input"],
+Cell[100133, 2504, 565, 8, 28, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[115467, 2910, 15938, 395, 1219, "Input"],
-Cell[131408, 3307, 37254, 819, 1186, "Output"]
+Cell[100735, 2517, 891, 21, 97, "Input"],
+Cell[101629, 2540, 2298, 53, 90, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[103964, 2598, 4029, 110, 335, "Input"],
+Cell[107996, 2710, 8737, 202, 312, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[116770, 2917, 4048, 110, 335, "Input"],
+Cell[120821, 3029, 5775, 158, 312, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[126633, 3192, 15938, 395, 1219, "Input"],
+Cell[142574, 3589, 62112, 1198, 1128, "Output"]
 }, Open  ]]
 }
 ]

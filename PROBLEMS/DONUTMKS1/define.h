@@ -3,7 +3,7 @@
 //#define MYCOORDS KSCOORDS
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 1.
+#define DTOUT1 1.e1
 #define ALLSTEPSOUTPUT 0
 
 #define NX 50
