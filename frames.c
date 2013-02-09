@@ -1065,6 +1065,32 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       dxdx_BL2KS(xx,dxdx);
       multiply22(T1,T2,dxdx);
     }
+  else if(CO1==MKS1COORDS && CO2==KSCOORDS)
+    {
+      dxdx_MKS12KS(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
+  else if(CO1==KSCOORDS && CO2==MKS1COORDS)
+    {
+      dxdx_KS2MKS1(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
+  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+    {
+      dxdx_MKS12KS(xx,dxdx);
+      multiply22(T1,T1,dxdx);
+      coco_N(xx,xx,CO1,KSCOORDS);
+      dxdx_KS2BL(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
+    {
+      dxdx_BL2KS(xx,dxdx);
+      multiply22(T1,T1,dxdx);
+      coco_N(xx,xx,CO1,KSCOORDS);
+      dxdx_KS2MKS1(xx,dxdx);
+      multiply22(T1,T2,dxdx);  
+    }
   else
     my_err("transformation not implemented in trans22_coco()\n");
 
