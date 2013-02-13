@@ -3,6 +3,26 @@
 //{
 //  FILE *fgnu=fopen("plot.gp","w");
 //  char bufor[50];
+
+double minx,maxx,miny,maxy;
+
+
+if(MYCOORDS==MKS1COORDS)
+  {
+    minx= (exp(get_xb( -1,0))+MKS1R0)*cos(get_xb(NZ+1,2));
+    maxx= exp(get_xb(NX+1,0))+MKS1R0;
+    miny=.5*sin(get_xb(-1,2))*(exp(get_xb(NX+1,0))+MKS1R0);
+    maxy=.5*sin(get_xb(-1,2))*(exp(get_xb(NX+1,0))+MKS1R0)+( exp(get_xb(NX+1,0))+MKS1R0-((exp(get_xb( -1,0))+MKS1R0)*
+											 cos(get_xb(NZ+1,2))));
+  }
+ else
+   {
+minx= get_xb( -1,0)*cos(get_xb(NZ+1,2));
+maxx= get_xb(NX+1,0);
+miny=.5*sin(get_xb(-1,2))*get_xb(NX+1,0);
+maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_xb(NZ+1,2)));
+   }
+
   fprintf(fgnu,
 	  "set view map\n"
 	  "set pm3d\n"
@@ -54,20 +74,9 @@
 	  fname,30./(get_xb(NX,0)-get_xb(0,0)),30./(get_xb(NZ,2)-get_xb(0,2)),(int)(NX/20),(int)(NZ/20));
 #else
 //	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-($23)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%f):(($23*cos($3)+($21)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
-	  ,fname2,
-	    
-#ifndef PLOTFULLPHI
-	    get_xb( -1,0)*cos(get_xb(NZ+1,2)),
-	    get_xb(NX+1,0),
-	    .5*sin(get_xb(-1,2))*get_xb(NX+1,0),
-	    .5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_xb(NZ+1,2)))
-	    //	    sin(get_xb(NZ+NG,2))*get_xb(NX+NG,0)
-#else
-	    get_xb(NZ+NG,2)<Pi/2. ? 0.: -get_xb(NX+NG,0)*cos(get_xb(NZ+NG,2)) ,
-	    get_xb(NX+NG,0),
-	    get_xb(NZ+NG,2)<Pi ? -0. : -get_xb(NX+NG,0)*sin(get_xb(NZ+NG,2)>1.5*Pi ? Pi/2. : get_xb(NZ+NG,2)),
-	    get_xb(NZ+NG,2)<Pi/2. ? get_xb(NX+NG,0)*cos(get_xb(NZ+NG,2)) : get_xb(NX+NG,0)
-#endif
+					  ,fname2,minx,maxx,miny,maxy
+					  
+
 	    ,fname
     //    , fname,30./(get_xb(NX,0)-get_xb(NX/2,0)),30./(get_xb(NX,0)-get_xb(NX/2,0)),(int)(NX/10),(int)(NZ/10)
 );

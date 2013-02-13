@@ -47,17 +47,15 @@
 #define BEAMR 6.2
 #define DTOUT1 .4 //dt for basic output
 #elif (BEAMNO==3)
-#ifdef myMKS1COORDS
-#define MINX 1.
-#define MAXX 3.
-#define BEAML 2.
-#define BEAMR 2.5
 #define MKS1R0 .5
+#define BEAML 15.5
+#define BEAMR 16.5
+#ifdef myMKS1COORDS
+#define MINX 2.5
+#define MAXX 3.
 #else
 #define MINX 14.5
 #define MAXX 20.5
-#define BEAML 15.5
-#define BEAMR 16.5
 #endif
 #define DTOUT1 1. //dt for basic output
 #define NLEFT 0.99

@@ -14,7 +14,7 @@ int iix,iiy,iiz,iv;
   pick_T(tmulo,ix,iy,iz,tlo);
 ldouble xxvec[4];
 get_xx(ix,iy,iz,xxvec);
-coco_N(xxvec,xxvec,KSCOORDS,BLCOORDS);
+coco_N(xxvec,xxvec,MYCOORDS,BLCOORDS);
 //BL
 ldouble xx=xxvec[1];
 

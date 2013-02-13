@@ -18,7 +18,7 @@ ldouble uu[NV];
 ldouble xxvec[4];
 
 get_xx(ix,iy,iz,xxvec);
-coco_N(xxvec,xxvec,KSCOORDS,BLCOORDS);
+coco_N(xxvec,xxvec,MYCOORDS,BLCOORDS);
 xx=xxvec[1];
 yy=xxvec[2];
 zz=xxvec[3];
@@ -90,7 +90,7 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
 prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
 
-//to transform radiative primitives from BL to KS
+//to transform radiative primitives from BL to MY
 trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
 
 //to calculate conserved
