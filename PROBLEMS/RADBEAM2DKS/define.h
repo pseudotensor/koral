@@ -1,7 +1,13 @@
 #define TMAX 1.e10
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
+//#define myMKS1COORDS
+#ifdef myMKS1COORDS
+#define MYCOORDS MKS1COORDS
+#else
 #define MYCOORDS KSCOORDS
+#endif
+
 #define MYCOORDS2 KERRCOORDS //suplementary, only for tetrads used when initializing problems - not yet used
 #define OUTCOORDS KERRCOORDS //coordinates for output
 
@@ -20,7 +26,7 @@
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
-#define BEAMNO 1
+#define BEAMNO 3
 
 #define IFBEAM 1
 //#define GASRADOFF
@@ -41,10 +47,18 @@
 #define BEAMR 6.2
 #define DTOUT1 .4 //dt for basic output
 #elif (BEAMNO==3)
+#ifdef myMKS1COORDS
+#define MINX 1.
+#define MAXX 3.
+#define BEAML 2.
+#define BEAMR 2.5
+#define MKS1R0 .5
+#else
 #define MINX 14.5
 #define MAXX 20.5
 #define BEAML 15.5
 #define BEAMR 16.5
+#endif
 #define DTOUT1 1. //dt for basic output
 #define NLEFT 0.99
 #elif (BEAMNO==4)
@@ -61,7 +75,7 @@
 #define MINZ 0.
 #define MAXZ Pi/4.//8.*Pi/4.
 
-#define PLOTFULLPHI
+//#define PLOTFULLPHI
 #define RHOFLOOR 1.e-50
 #define UFLOOR 1.e-65
 #define EFLOOR 1.e-40
@@ -69,7 +83,7 @@
 #define TLEFT 1e9
 
 #ifndef NLEFT
-#define NLEFT 0.999
+#define NLEFT 0.995
 #endif
 
 #define RHOAMB 1.e0
@@ -79,9 +93,9 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define YZXDUMP
-//#define RADOUTPUTINZAMO
-#define PRINTGC_LEFT
-#define PRINTGC_RIGHT
+#define RADOUTPUTINZAMO
+//#define PRINTGC_LEFT
+//#define PRINTGC_RIGHT
 //#define BLOB
 #define BLOBW .1
 #define BLOBP 100000.
