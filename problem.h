@@ -26,8 +26,10 @@
 //21 DONUTKS - 2d Polish donut in KS
 //22 DONUTMKS1 - 2d Polish donut in MKS1
 //23 ATMMKS1 - radial atmosphere infalling in MKS1
+//24 RADBEAMFLAT - beam of light in Cartesian 
 
-#define PROBLEM 19
+
+#define PROBLEM 24
 
 #if(PROBLEM==1)
 
@@ -352,6 +354,23 @@
 #define PR_ANASOL "PROBLEMS/ATMMKS1/anasol.c"
 
 #endif
+
+
+
+#if(PROBLEM==24)
+
+#define PR_DEFINE "PROBLEMS/RADBEAMFLAT/define.h"
+#define PR_BC "PROBLEMS/RADBEAMFLAT/bc.c"
+#define PR_INIT "PROBLEMS/RADBEAMFLAT/init.c"
+#define PR_KAPPA "PROBLEMS/RADBEAMFLAT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADBEAMFLAT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADBEAMFLAT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADBEAMFLAT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADBEAMFLAT/dump.c"
+#define PR_ANASOL "PROBLEMS/RADBEAMFLAT/anasol.c"
+
+#endif
+
 
 
 
