@@ -26,8 +26,9 @@
 //21 DONUTKS - 2d Polish donut in KS
 //22 DONUTMKS1 - 2d Polish donut in MKS1
 //23 ATMMKS1 - radial atmosphere infalling in MKS1
+//24 RDONUT - 2d radiative Polish donut in KS
 
-#define PROBLEM 19
+#define PROBLEM 24
 
 #if(PROBLEM==1)
 
@@ -350,6 +351,20 @@
 #define PR_OUT2GIF_1D "PROBLEMS/ATMMKS1/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/ATMMKS1/dump.c"
 #define PR_ANASOL "PROBLEMS/ATMMKS1/anasol.c"
+
+#endif
+
+#if(PROBLEM==24)
+
+#define PR_DEFINE "PROBLEMS/RDONUT/define.h"
+#define PR_BC "PROBLEMS/RDONUT/bc.c"
+#define PR_INIT "PROBLEMS/RDONUT/init.c"
+#define PR_KAPPA "PROBLEMS/RDONUT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RDONUT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RDONUT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RDONUT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RDONUT/dump.c"
+#define PR_ANASOL "PROBLEMS/RDONUT/anasol.c"
 
 #endif
 
