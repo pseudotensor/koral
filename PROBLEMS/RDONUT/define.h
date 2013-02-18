@@ -1,3 +1,4 @@
+#define MASS 10.
 #define BHSPIN 0.
 #define MYCOORDS KSCOORDS
 #define OUTCOORDS KERRCOORDS
@@ -17,11 +18,12 @@
 #define SPECIFIC_BC
 
 #define GAMMA (4./3.)
-#define KKK 0.03
+#define KKK 1.
 #define ELL 4.5
 #define UTPOT 1.
-#define RHOATMMIN  1.e-4
-#define UINTATMMIN  1.e-6
+#define RHOATMMIN  rhoCGS2GU(1.e-4)
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e9,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(1.e6))
 
 #define INT_ORDER 1
 #define RK3_STEPPING
@@ -33,6 +35,7 @@
 #define INFLOWING 0
 #define NSTEPSTOP 50e10
 #define NOUTSTOP 1000.
+#define CGSOUTPUT
 
 #define RHOFLOOR 1.e-40
 #define UFLOOR 1.e-40

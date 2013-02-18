@@ -12,7 +12,7 @@
   {
 */
 
-ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
+ldouble rho,mx,my,mz,m,E,uint,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
 ldouble uu[NV],xxvec[4];
 
@@ -49,6 +49,9 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
   {
     //ambient
     set_hdatmosphere(pp,xxvec,gg,GG,0);
+#ifdef RADIATION
+    set_radatmosphere(pp,xxvec,gg,GG,0);
+#endif
   }
  else
    {
@@ -62,7 +65,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      Vphi=uPhi/uT;
      Vr=0.;
 
-     //4-velocity in BL
+     //4-velocity in BL transformed to MYCOORDS
      ldouble ucon[4]={0.,-Vr,0.,Vphi};
      conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
      trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
@@ -71,9 +74,27 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      pp[2]=ucon[1]; 
      pp[3]=ucon[2];
      pp[4]=ucon[3];
-
-     //density etc.
      pp[0]=rho; pp[1]=uint; 
+
+#ifdef RADIATION
+     ldouble pgas,prad,ptot;
+     E=calc_LTE_Efromurho(uint,rho);
+     Fx=Fy=Fz=0.;
+     pp[6]=E;
+     pp[7]=Fx;
+     pp[8]=Fy;
+     pp[9]=Fz;
+
+     //transforming BL ZAMO radiative primitives to BL non-ortonormal primitives
+     ldouble eupBL[4][4],eloBL[4][4];
+     ldouble tupBL[4][4],tloBL[4][4];
+     calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
+     calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
+     prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+     prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+     //transforming radiative primitives from BL to MY
+     trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
+#endif
    }
 
 

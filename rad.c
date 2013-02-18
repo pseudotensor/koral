@@ -659,6 +659,23 @@ calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
 }
 
 //**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//returns rad primitives for an atmosphere
+int
+set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype)
+{
+#ifdef RADIATION  
+  if(atmtype==0) //no fluxes, minimal Erad
+    {
+      pp[6]=ERADATMMIN; //radiative energy density in the rad.rest frame=lab frame
+      pp[7]=pp[8]=pp[9]=0.; //VELPRIM velocity of the radiative rest frame
+    }
+#endif
+  return 0;
+}
+
+//**********************************************************************
 //suplementary routines for conversions
 //**********************************************************************
 ldouble calc_PEQ_ufromTrho(ldouble T,ldouble rho)

@@ -298,9 +298,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 #ifdef CGSOUTPUT
 							  rhoGU2CGS(rho),    //14
 							  endenGU2CGS(uint),   //15
-							  velGU2CGS(vx*sqrt(gg[1][1])),     //16
-							  velGU2CGS(vy*sqrt(gg[2][2])),     //17
-							  velGU2CGS(vz*sqrt(gg[3][3])),     //18
+							  (vx),     //16
+							  (vy),     //17
+							  (vz),     //18
 							  S,      //19
 							  endenGU2CGS(E),     //20
 							  fluxGU2CGS(Fx),     //21

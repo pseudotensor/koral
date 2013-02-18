@@ -17,3 +17,4 @@ if(ulowert<-1. || podpierd<0.)
    {
      v4=ulowert;
    }
+v1=Tgas;

@@ -41,6 +41,9 @@ if(ix>=NX) //analytical solution at rout only
       {
 	//ambient
 	set_hdatmosphere(pp,xxvec,gg,GG,0);
+#ifdef RADIATION
+	set_radatmosphere(pp,xxvec,gg,GG,0);
+#endif
 
 	//BL free-fall velocity
 	ldouble ucon[4];
@@ -67,7 +70,7 @@ if(ix>=NX) //analytical solution at rout only
 	Vphi=uPhi/uT;
 	Vr=0.;
 
-	//4-velocity in BL
+	//4-velocity in BL transformed to MYCOORDS
 	ldouble ucon[4]={0.,-Vr,0.,Vphi};
 	conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
 	trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
@@ -76,9 +79,27 @@ if(ix>=NX) //analytical solution at rout only
 	pp[2]=ucon[1]; 
 	pp[3]=ucon[2];
 	pp[4]=ucon[3];
-
-	//density etc.
 	pp[0]=rho; pp[1]=uint; 
+
+#ifdef RADIATION
+	ldouble pgas,prad,ptot;
+	E=calc_LTE_Efromurho(uint,rho);
+	Fx=Fy=Fz=0.;
+	pp[6]=E;
+	pp[7]=Fx;
+	pp[8]=Fy;
+	pp[9]=Fz;
+
+	//transforming BL ZAMO radiative primitives to BL non-ortonormal primitives
+	ldouble eupBL[4][4],eloBL[4][4];
+	ldouble tupBL[4][4],tloBL[4][4];
+	calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
+	calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
+	prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+	prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+	//transforming radiative primitives from BL to MY
+	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
+#endif
       }     
 
    
@@ -104,7 +125,7 @@ if(ix>=NX) //analytical solution at rout only
      pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
      pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
 
-     //copying MLCOORDS velocities
+     //copying MLCOORDS quantities
      for(iv=2;iv<NV;iv++)
        { 
 	 //unchanged primitives
@@ -131,11 +152,18 @@ if(iy<0.) //spin axis
     gdet_bc=get_g(g,3,4,ix,iy,iz);  
     for(iv=0;iv<NV;iv++)
       {
+	//v_theta
 	if(iv==3)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
-      }
+
+	//F_theta
+	if(iv==8)
+	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
+	else
+	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
+       }
 
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
@@ -155,6 +183,11 @@ if(iy>=NY) //equatorial plane
     for(iv=0;iv<NV;iv++)
       {
 	if(iv==3)
+	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
+	else
+	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	//F_theta
+	if(iv==8)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
