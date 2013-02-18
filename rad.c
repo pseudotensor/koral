@@ -3,8 +3,8 @@
 
 #include "ko.h"
 
-//**********************************************************************
-//******* calculates total opacity as in the fluid frame ***************
+//*********************************************************************
+//******* calculates total opacity over dx[] ***************************
 //**********************************************************************
 int
 calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
@@ -26,7 +26,7 @@ calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
 }
 
 //**********************************************************************
-//******* calculates total opacity as in the fluid frame ***************
+//******* calculates abs opacity over dx[] ***************************
 //**********************************************************************
 int
 calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
@@ -700,7 +700,7 @@ ldouble calc_LTE_Efromurho(ldouble u,ldouble rho)
 /******* using the HARM algorithm **************************************/
 /************************************************************************/
 int
-calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose)
+calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose)
 {
   int i,j;
   
@@ -733,7 +733,8 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
 
   //square of radiative wavespeed in radiative rest frame
-  ldouble rv2 = 1./3.;
+  ldouble rv2rad = 1./3.;
+  ldouble rv2,rv2tau;
 
   //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
@@ -748,6 +749,16 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
   int dim;
   for(dim=0;dim<3;dim++)
     {
+      //characterisitic limiter based on the optical depth
+      //TODO: validate against opt.thick tests
+      if(tautot[dim]>0.) 
+	{
+	  rv2tau=4./3./tautot[dim]*4./3./tautot[dim];
+	  rv2=my_min(rv2rad,rv2tau);		     
+	}
+      else
+	rv2=rv2rad;
+      
       Acov[0]=0.;
       Acov[1]=0.;
       Acov[2]=0.;
