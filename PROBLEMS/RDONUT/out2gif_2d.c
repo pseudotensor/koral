@@ -9,7 +9,7 @@
 	  "unset surface\n"
 	  "set log z\n"
 	  "set cntrparam level discrete .01,.05,.1,.3,.5,.7,.9,1.1,1.3,1.5,1.7 \n"
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):24 w l\n"
+	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):24 w l\n"
 	  "unset dgrid3d\n"
 	  "unset log z\n"
 	  "unset table\n"
@@ -51,19 +51,26 @@
 	  "set yrange [%f:%f]\n"
 	  "unset log cb\n"
 	  //	  "set cbrange [0.005:.35]\n"
-	  "set ylabel \"y\"\n"
+	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
 	  //	  "set log cb\n"
-	  "set title \"rho\"\n"
+	  "set title \"rho / velocity\"\n"
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
+
+	  "set isosam 10,10\n"
+	  "set ylabel \"\"\n"
+	  "unset tics\n"
+	  "unset border\n"
+	  "unset log cb\n"
+	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($16*sin($2)+$17*cos($2))/(%f)):(($17*sin($2)+$16*cos($2))/(%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
 	  "set ylabel \"\"\n"
 	  "unset tics\n"
 	  "unset border\n"
 	  "unset pm3d\n"
 	  "unset surface\n"
-	  "plot \"table.gp\" w l ls 1\n"
+	  //"plot \"table.gp\" w l ls 1\n"
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"
@@ -72,7 +79,7 @@
 	  "set contour base\n"
 	  "set log z\n"
 	  "set cntrparam level discrete .01,.05,.1,.3,.5,.7,.9,1.1,1.3,1.5,1.7 \n"
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):14 w l\n"
+	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):14 w l\n"
 	  "unset log z\n"
 	  "unset table\n"
 	  "unset contour\n"
@@ -82,7 +89,7 @@
 	  "unset border\n"
 	  "unset pm3d\n"
 	  "unset surface\n"
-	  "plot \"table.gp\" w l ls 11\n"
+	  //"plot \"table.gp\" w l ls 11\n"
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"	  
@@ -93,26 +100,25 @@
 	  "set tmargin at screen .92\n"
 	  "set cblabel \"\"\n"
 	  "set ylabel \"y\"\n"
-	  "set title \"mass flux / poloidal velocity\"\n"
+	  "set title \"radiative E / flux\"\n"
 	  "unset log cb\n"
-	  "set log cb\n"
-	  "set cbrange [0.001:.5]\n"
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($16*$16+$17*$17)**.5*$14) ti \"\" w l ls 1\n"
-	  "unset pm3d\n"
+	  //	  "set log cb\n"
+	  
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($20) ti \"\" w l ls 1\n"
 
-	  "set isosam 10,10\n"
+          "set isosam 10,10\n"
 	  "set ylabel \"\"\n"
 	  "unset tics\n"
 	  "unset border\n"
 	  "unset log cb\n"
-	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($16*sin($2)+$17*cos($2))/(%f)):(($17*sin($2)+$16*cos($2))/(%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($21*sin($2)+$22*cos($2))/($20*%f)):(($22*sin($2)+$21*cos($2))/($20*%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
-
+	  "unset pm3d\n"	
 	  "set table \"table.gp\"\n"
 	  "set contour base\n"
 	  "set log z\n"
 	  "set cntrparam level discrete .01,.05,.1,.3,.5,.7,.9,1.1,1.3,1.5,1.7 \n"
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):24 w l\n"
+	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):24 w l\n"
 	  "unset log z\n"
 	  "unset table\n"
 	  "unset contour\n"
@@ -122,7 +128,7 @@
 	  "unset border\n"
 	  "unset pm3d\n"
 	  "unset surface\n"
-	  "plot \"table.gp\" w l ls 1\n"
+	  //"plot \"table.gp\" w l ls 1\n"
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"	  
@@ -149,15 +155,17 @@
 	  "set ylabel \"poloidal velocity\"\n"
 	  "set autoscale\n"
 	  "unset log y\n"
-	  "plot \"%s\" u 1:(($16*$16)**.5) ti \"\" w l ls 2 \n"
-	  ,fname,fname2,
+	  "plot \"%s\" u 1:($20) ti \"\" w l ls 2 \n"
+	  ,fname2,
 	  -.02*get_xb(NX,0),
 	  1.02*get_xb(NX,0),
 	  -.02*get_xb(NX,0),
 	  1.02*get_xb(NX,0),
-	  fname,fname,fname,
+	  fname,
 	  fname,1./(get_xb(NX,0)/11)*.5,1./(get_xb(NX,0)/11)*.5,NX/11+1,NY/11+1,
-	  fname,fname,fname);  
+	  fname,
+	  fname,1./(get_xb(NX,0)/11)*.5,1./(get_xb(NX,0)/11)*.5,NX/11+1,NY/11+1,
+	  fname,fname);  
 	    
 
 /*

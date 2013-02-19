@@ -246,8 +246,8 @@ fprint_profiles(ldouble t, ldouble totmass)
 #ifdef RADIATION						
 #ifdef RADOUTPUTINFF
 						  prad_lab2ff(pp,pp,gg,GG,tup);
-#elif defined(RADPUTINZAMO) //to print  radiation primitives in ZAMO
-						  prad_lab2ff(pp,pp,ggo,GG,tup);
+#elif defined(RADPOUTPUTINZAMO) //to print  radiation primitives in ZAMO
+						  prad_lab2ff(pp,pp,gg,GG,tup);
 						  prad_ff2zamo(pp,pp,gg,GG,eup); 
 #endif
 

@@ -82,9 +82,23 @@ if(ix>=NX) //analytical solution at rout only
 	pp[0]=rho; pp[1]=uint; 
 
 #ifdef RADIATION
-	ldouble pgas,prad,ptot;
-	E=calc_LTE_Efromurho(uint,rho);
+	ldouble P,aaa,bbb;
+	P=GAMMAM1*uint;
+	//solving for T satisfying P=pgas+prad=bbb T + aaa T^4
+	aaa=4.*SIGMA_RAD;
+	bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
+	double naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
+	//  double T1=Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. - Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) - (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+	//  double T2=Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) - (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+	//  double T3=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. - Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+	double T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+	E=calc_LTE_EfromT(T4);
+
+	ldouble Fx,Fy,Fz;
 	Fx=Fy=Fz=0.;
+	uint=calc_PEQ_ufromTrho(T4,rho);
+
+	pp[1]=uint;
 	pp[6]=E;
 	pp[7]=Fx;
 	pp[8]=Fy;
@@ -153,16 +167,11 @@ if(iy<0.) //spin axis
     for(iv=0;iv<NV;iv++)
       {
 	//v_theta
-	if(iv==3)
+	if(iv==3 || iv==8)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 
-	//F_theta
-	if(iv==8)
-	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	else
-	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
     //testing if interpolated primitives make sense
@@ -182,15 +191,11 @@ if(iy>=NY) //equatorial plane
   	  
     for(iv=0;iv<NV;iv++)
       {
-	if(iv==3)
+	if(iv==3 || iv==8)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
-	//F_theta
-	if(iv==8)
-	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	else
-	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	
       }
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);

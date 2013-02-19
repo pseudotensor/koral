@@ -4,8 +4,10 @@
 #define OUTVEL VELR
 #define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
+#define PRINTGC_LEFT
+#define PRINTGC_RIGHT
 
-#define NX 150
+#define NX 50
 #define NY 50
 #define NZ 1
 #define MINX (.8*r_horizon_BL(BHSPIN))
@@ -16,7 +18,7 @@
 #define MAXZ 1.
 #define SPECIFIC_BC
 
-#define GAMMA (4./3.)
+#define GAMMA (5./3.)
 #define KKK 0.03
 #define ELL 4.5
 #define UTPOT 1.

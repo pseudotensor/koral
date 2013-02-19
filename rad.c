@@ -669,7 +669,13 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
   if(atmtype==0) //no fluxes, minimal Erad
     {
       pp[6]=ERADATMMIN; //radiative energy density in the rad.rest frame=lab frame
-      pp[7]=pp[8]=pp[9]=0.; //VELPRIM velocity of the radiative rest frame
+      //normal observer
+      ldouble ucon[4],r;
+      calc_normalobs_4vel(GG,ucon);
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+      pp[7]=ucon[1]; //VELPRIM velocity of the radiative rest frame = normal velocity
+      pp[8]=ucon[2];
+      pp[9]=ucon[3];
     }
 #endif
   return 0;

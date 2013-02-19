@@ -1,12 +1,20 @@
-#define MASS 10.
+//#define RADIATION
+//#define MASS 1.
 #define BHSPIN 0.
 #define MYCOORDS KSCOORDS
+
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VELR
 #define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
+#define NSTEPSTOP 1.e10
+#define NOUTSTOP 1000.
+//#define CGSOUTPUT
+#define RADPOUTPUTINZAMO
+#define PRINTGC_LEFT
+#define PRINTGC_RIGHT
 
-#define NX 150
+#define NX 50
 #define NY 50
 #define NZ 1
 #define MINX (.8*r_horizon_BL(BHSPIN))
@@ -17,13 +25,14 @@
 #define MAXZ 1.
 #define SPECIFIC_BC
 
-#define GAMMA (4./3.)
-#define KKK 1.
+#define GAMMA (5./3.)
+#define KKK 0.03//1.e-5
 #define ELL 4.5
 #define UTPOT 1.
-#define RHOATMMIN  rhoCGS2GU(1.e-4)
-#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e9,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(1.e6))
+//#define RHOATMMIN  rhoCGS2GU(1.e-4)
+#define RHOATMMIN  1.e-4//1000.
+#define UINTATMMIN  1.e-6//(calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(1.e10))
 
 #define INT_ORDER 1
 #define RK3_STEPPING
@@ -33,11 +42,7 @@
 
 #define NODONUT 0
 #define INFLOWING 0
-#define NSTEPSTOP 50e10
-#define NOUTSTOP 1000.
-#define CGSOUTPUT
 
 #define RHOFLOOR 1.e-40
 #define UFLOOR 1.e-40
 #define EFLOOR 1.e-40
-
