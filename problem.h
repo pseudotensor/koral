@@ -522,6 +522,10 @@
 #define RHOATMMIN 1.
 #endif
 
+#ifndef ERADATMMIN
+#define ERADATMMIN 1.
+#endif
+
 #ifndef UINTATMMIN
 #define UINTATMMIN 1.e-2
 #endif

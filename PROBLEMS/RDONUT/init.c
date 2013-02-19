@@ -28,7 +28,7 @@ pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
 calc_ZAMOes(gg,eup,elo,MYCOORDS);
 
-ldouble pp[NV],T;
+ldouble pp[NV],ppback[NV],T;
 
 //working in BL
 ldouble ggBL[4][5],GGBL[4][5];
@@ -55,6 +55,12 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
   }
  else
    {
+    //ambient
+    set_hdatmosphere(ppback,xxvec,gg,GG,0);
+#ifdef RADIATION
+    set_radatmosphere(ppback,xxvec,gg,GG,0);
+#endif
+
      ldouble h=-1./ut;
      ldouble eps=(h-1.)/GAMMA;
      rho=powl(eps*(GAMMA-1.)/KKK,1./(GAMMA-1.));
@@ -74,7 +80,8 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      pp[2]=ucon[1]; 
      pp[3]=ucon[2];
      pp[4]=ucon[3];
-     pp[0]=rho; pp[1]=uint; 
+     pp[0]=my_max(rho,ppback[0]); 
+     pp[1]=my_max(uint,ppback[1]);
 
 #ifdef RADIATION
      ldouble P,aaa,bbb;
@@ -89,8 +96,8 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      Fx=Fy=Fz=0.;
      uint=calc_PEQ_ufromTrho(T4,rho);
 
-     pp[1]=uint;
-     pp[6]=E;
+     pp[1]=my_max(uint,ppback[1]);
+     pp[6]=my_max(E,ppback[6]);
      pp[7]=Fx;
      pp[8]=Fy;
      pp[9]=Fz;

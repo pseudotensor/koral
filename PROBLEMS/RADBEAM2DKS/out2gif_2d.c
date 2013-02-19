@@ -28,7 +28,11 @@ maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_
 	  "set pm3d\n"
 	  "unset key\n"
 	  "set style line 1 lt 1 lw 2 lc 2\n"
-	  "set style arrow 1 head nofilled size screen 0.002,35 ls 1\n"
+	  //	  "set style arrow 1 head nofilled size screen 0.002,35 ls 1\n"
+
+
+
+	  "set style arrow 1 ls 1\n"
 	  "set palette model RGB rgbformulae 7,5,15\n"
 	  "set palette model RGB rgbformulae 30,31,32\n"
 	  "set palette model RGB rgbformulae 21,22,23\n"
@@ -74,11 +78,11 @@ maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_
 	  fname,30./(get_xb(NX,0)-get_xb(0,0)),30./(get_xb(NZ,2)-get_xb(0,2)),(int)(NX/20),(int)(NZ/20));
 #else
 //	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-($23)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%f):(($23*cos($3)+($21)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
-					  ,fname2,minx,maxx,miny,maxy
-					  
+	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-$23*sin($3))/(%e)):(($23*cos($3)+$21*sin($3))/%e) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+  
 
-	    ,fname
-    //    , fname,30./(get_xb(NX,0)-get_xb(NX/2,0)),30./(get_xb(NX,0)-get_xb(NX/2,0)),(int)(NX/10),(int)(NZ/10)
+,fname2,minx,maxx,miny,maxy,fname
+	    , fname,4.e-18,4.e-18,(int)(NX/10),(int)(NZ/10)
 );
 #endif
 	    

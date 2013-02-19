@@ -695,7 +695,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  pp[iv]=get_u(p,iv,ix,iy,iz);      
 		}
 
-#ifdef RADIATION 
+#ifdef RADIATION
 	      //updating using radiative four force
 	      ldouble del4[4],delapl[NV];
 

@@ -99,7 +99,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],uu[NV],uu0[NV],uup[NV]; 
-  ldouble f1[4],f2[4],f3[4],x[4];
+  ldouble f1[4],f2[4],f3[4],xxx[4];
   ldouble gg[4][5];
   ldouble GG[4][5];
   pick_g(ix,iy,iz,gg);
@@ -112,12 +112,22 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       uu0[iv]=uu[iv];
     }
 
-  ldouble EPS = 1.e-6;
+  ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6 ;
 
-  int verbose=0;
+  int verbose=1;
   int iter=0;
 
+  if(verbose) 
+    {
+      ldouble xx,yy,zz;
+      xx=get_x(ix,0);
+      yy=get_x(iy,1);
+      zz=get_x(iz,2);
+      printf("=== i: %d %d %d\n=== x: %e %e %e\n",ix,iy,iz,xx,yy,zz);
+      print_Nvector(pp,NV);
+      print_metric(gg);
+    }
   do
     {
       iter++;
@@ -154,22 +164,22 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       //updating x
       for(i=0;i<4;i++)
 	{
-	  x[i]=uup[i+6];
+	  xxx[i]=uup[i+6];
 	}
 
       for(i=0;i<4;i++)
 	{
 	  for(j=0;j<4;j++)
 	    {
-	      x[i]-=iJ[i][j]*f1[j];
+	      xxx[i]-=iJ[i][j]*f1[j];
 	    }
 	}
 
-      if(verbose>0)    print_state_implicit_lab (iter,x,f1); 
+      if(verbose>0)    print_state_implicit_lab (iter,xxx,f1); 
 
       for(i=0;i<4;i++)
 	{
-	  uu[i+6]=x[i];
+	  uu[i+6]=xxx[i];
 	}
   
       //test convergence
@@ -180,7 +190,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
-	break;
+	{
+	  if(verbose) printf("success ===\n");
+	  break;
+	}
 
       if(iter>50)
 	{

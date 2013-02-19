@@ -25,8 +25,9 @@
 	  "set style line 2 lt 1 lw 2 lc 2\n"
 	  "set style line 3 lt 1 lw 2 lc 2\n"
 	  "set style line 21 lt 3 lw 1 lc -1\n"
-	  "set style arrow 1 head nofilled size screen 0.002,35 ls 3\n"
-
+	  //	  "set style arrow 1 head nofilled size screen 0.002,35 ls 3\n"
+	  "set style arrow 1 ls 1\n"
+	  
 	  "set palette model RGB rgbformulae 7,5,15\n"
 	  "set palette model RGB rgbformulae 30,31,32\n"
 	  "set palette model RGB rgbformulae 21,22,23\n"
@@ -63,7 +64,7 @@
 	  "unset tics\n"
 	  "unset border\n"
 	  "unset log cb\n"
-	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($16*sin($2)+$17*cos($2))/(%f)):(($17*sin($2)+$16*cos($2))/(%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($16*sin($2)+$17*cos($2))/(%f)):((-$17*sin($2)+$16*cos($2))/(%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
 	  "set ylabel \"\"\n"
 	  "unset tics\n"
@@ -111,7 +112,7 @@
 	  "unset tics\n"
 	  "unset border\n"
 	  "unset log cb\n"
-	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($21*sin($2)+$22*cos($2))/($20*%f)):(($22*sin($2)+$21*cos($2))/($20*%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($21*sin($2)+$22*cos($2))/(%f)):((-$22*sin($2)+$21*cos($2))/(%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
 	  "unset pm3d\n"	
 	  "set table \"table.gp\"\n"
@@ -164,7 +165,7 @@
 	  fname,
 	  fname,1./(get_xb(NX,0)/11)*.5,1./(get_xb(NX,0)/11)*.5,NX/11+1,NY/11+1,
 	  fname,
-	  fname,1./(get_xb(NX,0)/11)*.5,1./(get_xb(NX,0)/11)*.5,NX/11+1,NY/11+1,
+	  fname,30.,30.,NX/11+1,NY/11+1,
 	  fname,fname);  
 	    
 
