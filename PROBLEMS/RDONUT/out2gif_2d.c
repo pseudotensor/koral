@@ -20,7 +20,7 @@
 	  "set pm3d\n"
 	  "unset surface\n"
 	  "unset key\n"
-	  "set style line 1 lt 1 lw 1 lc 3\n"
+	  "set style line 1 lt 1 lw 2 lc 3\n"
 	  "set style line 11 lt 1 lw 2 lc 6\n"
 	  "set style line 2 lt 1 lw 2 lc 2\n"
 	  "set style line 3 lt 1 lw 2 lc 2\n"
