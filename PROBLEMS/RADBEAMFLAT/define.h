@@ -12,7 +12,7 @@
 #define INT_ORDER 1
 #define RK3STEPPING
 
-#define RADPUTINZAMO
+#define RADOUTPUTINZAMO
 
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
