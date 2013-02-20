@@ -752,13 +752,14 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   if(gamma2<0.) gamma2=  (-b+sqrt(delta))/2./a; 
 
   //cap on u^t
-  ldouble gammamax=10000.;
+  ldouble gammamax=1000.;
 
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2/(-GG[0][0]);
 
    if(gammarel2<0. || gammarel2>gammamax*gammamax || delta<0.) 
-    {
+    {      
+      
       printf("top cap\n");
       //top cap
       *corrected=1;
@@ -772,10 +773,10 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	{
 	  Arad[i]=(Av[i]-1./3.*Erf*GG[0][i])/(4./3.*Erf*gammamax);
 	}
-      
+       
       //is normalized now
       ldouble Afac;
-      c=0.; b=0.;
+      a=0.; c=0.; b=0.;
       for(i=1;i<4;i++)
 	{
 	  a+=Arad[i]*Arad[i]*gg[i][i];
@@ -784,14 +785,14 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
       c=gg[0][0]*gammamax*gammamax+1.;
       delta=b*b-4.*a*c;
       Afac= (-b+sqrt(delta))/2./a;
-
+      
       urfcon[0]=gammamax;
       urfcon[1]=Afac*Arad[1];
       urfcon[2]=Afac*Arad[2];
       urfcon[3]=Afac*Arad[3];
 
       //converting to relative four velocity
-      conv_vels(urfcon,urfcon,VEL4,VELR,gg,GG);
+      conv_vels(urfcon,urfcon,VEL4,VELPRIMRAD,gg,GG);
     }
    else if(gammarel2<(-1./GG[0][0]))
     {
