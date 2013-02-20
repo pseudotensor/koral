@@ -14,3 +14,7 @@ calc_tautot(pp,xxx,dx,tau);
 v3=tau[0];
 calc_tauabs(pp,xxx,dx,tau);
 v4=tau[0];
+
+v3=get_u_scalar(aradx,ix,iy,iz);
+v4=get_u_scalar(aradz,ix,iy,iz);
+ 

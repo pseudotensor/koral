@@ -9,13 +9,13 @@
 #define YZXDUMP
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
-#define RK2STEPPING
+#define RK3STEPPING
 
 //#define RADOUTPUTINZAMO
 
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (4./3.)
 #define EXPLICIT_RAD_SOURCE

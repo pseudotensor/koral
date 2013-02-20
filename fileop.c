@@ -161,6 +161,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //within domain:
 						  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 
+
 						  ldouble mx,my,mz,E,e,xx,yy,zz,phipot,xxx[4],dx[3],vv[10],a0,a1,a2,v1,v2,dphidx,v3,Tgas,Trad,v4,v5,v6,v7,Fx,Fy,Fz;
 						  ldouble gg[4][5],GG[4][5];
 						  ldouble pp[NV],uu[NV];

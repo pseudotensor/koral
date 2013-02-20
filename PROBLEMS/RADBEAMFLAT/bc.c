@@ -43,8 +43,8 @@ int iix,iiy,iiz,iv;
       pp[9]=Fz;
 
      
-      prad_zamo2ff(pp,pp,gg,GG,eup);
-      prad_ff2lab(pp,pp,gg,GG,tlo);
+      //      prad_zamo2ff(pp,pp,gg,GG,eup);
+      //      prad_ff2lab(pp,pp,gg,GG,tlo);
      
       p2u(pp,uu,gg,GG);
 
@@ -53,7 +53,7 @@ int iix,iiy,iiz,iv;
     }
   else if(iz<0 )
     {
-      
+       ldouble Fx,Fy,Fz,rho,E,uint,vx;
       
       iiz=0;
       iiy=iy;
@@ -65,6 +65,30 @@ int iix,iiy,iiz,iv;
       //flux azimuthal only
       pp[7]=0.;
       pp[9]=0.;
+
+      E= RADBEAMFLAT_ERAD;
+
+      uint=get_u(p,1,iix,iiy,iiz);
+      rho=get_u(p,0,iix,iiy,iiz);
+      
+      Fz=0.;
+      Fy=Fx=0.;     
+
+      pp[0]=rho;
+      pp[1]=uint;
+      pp[2]=0.;
+      pp[3]=0.;
+      pp[4]=0.;
+      pp[5]=calc_Sfromu(rho,uint);
+      pp[6]=E;
+      pp[7]=Fx;
+      pp[8]=Fy;
+      pp[9]=Fz;
+
+     
+      //      prad_zamo2ff(pp,pp,gg,GG,eup);
+      //      prad_ff2lab(pp,pp,gg,GG,tlo);
+ 
 
       p2u(pp,uu,gg,GG);
 

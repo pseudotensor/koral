@@ -752,14 +752,14 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   if(gamma2<0.) gamma2=  (-b+sqrt(delta))/2./a; 
 
   //cap on u^t
-  ldouble gammamax=1000.;
+  ldouble gammamax=10000.;
 
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2/(-GG[0][0]);
 
    if(gammarel2<0. || gammarel2>gammamax*gammamax || delta<0.) 
     {
-      //printf("top cap\n");
+      printf("top cap\n");
       //top cap
       *corrected=1;
       urfcon[0]=gammamax;

@@ -33,10 +33,10 @@
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
-	  "set title \"rad. energy density \" offset 0,-1\n"
+	  "set title \"PRAD0\" offset 0,-1\n"
 #ifdef MINKOWSKI
 	  //	  "splot \"%s\" u 1:3:20 ti \"\"\n"
-	  "splot \"%s\" u 1:3:10 ti \"\"\n"
+	  "splot \"%s\" u 1:3:20 ti \"\"\n"
 #else
 	  //	  "set autoscale\n"
 	  "splot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):20 ti \"\" w l \n"
@@ -49,7 +49,7 @@
 	  "set tmargin at screen .95\n"
 	  "unset log cb\n"
 	  "set cblabel \"\"\n"
-	  "set title \"Flux\" offset 0,-1\n"
+	  "set title \"PRAD3 / PRAD 3-vector\" offset 0,-1\n"
 	  //	  "set cbrange [0:1]\n"
 #ifdef MINKOWSKI
 	  //	  "splot \"%s\" u 1:3:(($21*$21+$22*$22+$23*$23)**.5) ti \"\"\n"
