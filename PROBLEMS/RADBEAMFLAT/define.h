@@ -35,7 +35,8 @@
 #define BEAMR .6
 #define DTOUT1 .1 //dt for basic output
 
-#define RADBEAMFLAT_FRATIO 0.99
+//#define RADBEAMFLAT_FRATIO 0.99
+#define RADBEAMFLAT_FRATIO 0.995
 #define RADBEAMFLAT_ERAD 1.
 #define RADBEAMFLAT_RHO 1.
 #define RADBEAMFLAT_UU 0.1
