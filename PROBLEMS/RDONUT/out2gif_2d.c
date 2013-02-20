@@ -112,7 +112,8 @@
 	  "unset tics\n"
 	  "unset border\n"
 	  "unset log cb\n"
-	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($21*sin($2)+$22*cos($2))/(%f)):((-$22*sin($2)+$21*cos($2))/(%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  //	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($21*sin($2)+$22*cos($2))/(%f)):((-$22*sin($2)+$21*cos($2))/(%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($21*sin($2)+$22*cos($2))/($20/%f)):((-$22*sin($2)+$21*cos($2))/($20/%f)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
 	  "unset pm3d\n"	
 	  "set table \"table.gp\"\n"
@@ -153,9 +154,10 @@
 	  "set tmargin at screen .40\n"
 	  "set title \"\"\n"
 	  "set yrange [0.09:.5]\n"
-	  "set ylabel \"poloidal velocity\"\n"
+	  "set ylabel \"radiative en.density\"\n"
 	  "set autoscale\n"
 	  "unset log y\n"
+	  "set label 1 \"t=%f\" at screen .45, .015\n"
 	  "plot \"%s\" u 1:($20) ti \"\" w l ls 2 \n"
 	  ,fname2,
 	  -.02*get_xb(NX,0),
@@ -165,8 +167,8 @@
 	  fname,
 	  fname,1./(get_xb(NX,0)/11)*.5,1./(get_xb(NX,0)/11)*.5,NX/11+1,NY/11+1,
 	  fname,
-	  fname,30.,30.,NX/11+1,NY/11+1,
-	  fname,fname);  
+	  fname,3.,3.,NX/11+1,NY/11+1,
+	  fname,t,fname);  
 	    
 
 /*

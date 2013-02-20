@@ -69,7 +69,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
 
   //calculating primitives  
   int corr;
-  u2p(uu,pp2,gg,GG,&corr);
+  if(u2p(uu,pp2,gg,GG,&corr)<0) return -1;
 
   //radiative four-force
   ldouble Gi[4];
@@ -115,7 +115,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6 ;
 
-  int verbose=1;
+  int verbose=0;
   int iter=0;
 
   if(verbose) 
@@ -138,7 +138,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       //values at zero state
-      f_implicit_lab(uu0,uu,pp,dt,gg,GG,f1);
+      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,f1)<0) return -1;
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -150,7 +150,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      else del=EPS*uup[j+6];
 	      uu[j+6]=uup[j+6]-del;
 
-	      f_implicit_lab(uu0,uu,pp,dt,gg,GG,f2);
+	      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,f2)<0) return -1;
      
 	      J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
 

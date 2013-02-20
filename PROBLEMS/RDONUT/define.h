@@ -1,6 +1,6 @@
 #define RADIATION
 //#define RADSOURCEOFF
-#define EXPLICIT_RAD_SOURCE
+//#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
 #define MASS 10.
@@ -9,7 +9,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VELR
-#define DTOUT1 5.
+#define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -21,7 +21,7 @@
 #define NX 50
 #define NY 50
 #define NZ 1
-#define MINX (1.8*r_horizon_BL(BHSPIN))
+#define MINX (.8*r_horizon_BL(BHSPIN))
 #define MAXX 27.8
 #define MINY 0.*Pi/4.
 #define MAXY Pi/2.
@@ -34,9 +34,9 @@
 #define ELL 4.5
 #define UTPOT 1.
 //#define RHOATMMIN  rhoCGS2GU(1.e-4)
-#define RHOATMMIN  10.
+#define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(1.e10))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e9))
 
 #define INT_ORDER 1
 #define RK3_STEPPING

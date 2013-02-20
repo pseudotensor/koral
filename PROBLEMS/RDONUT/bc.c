@@ -42,7 +42,25 @@ if(ix>=NX) //analytical solution at rout only
 	//ambient
 	set_hdatmosphere(pp,xxvec,gg,GG,0);
 #ifdef RADIATION
-	set_radatmosphere(pp,xxvec,gg,GG,0);
+	ldouble ppatm[NV];
+	ldouble urf[4];
+	set_radatmosphere(ppatm,xxvec,gg,GG,0);
+
+	//outflow-no-inflow for radiation
+	pp[6]=get_u(p,6,iix,iiy,iiz);
+	pp[7]=get_u(p,6,iix,iiy,iiz);
+	pp[8]=get_u(p,8,iix,iiy,iiz);
+	pp[9]=get_u(p,9,iix,iiy,iiz);
+
+	urf[1]=pp[7];
+	urf[2]=pp[8];
+	urf[3]=pp[9];
+	//converting to lab four-velocity
+	conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
+	if(urf[1]<0.) //inflow
+	  pp[7]=ppatm[7];
+ 
+
 #endif
 
 	//BL free-fall velocity

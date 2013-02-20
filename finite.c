@@ -701,8 +701,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
 	      //implicit in lab frame in four dimensions - fiducial 
-	      //primitives left intact to give good initial guess for u2p
-
+	      //primitives left intact to give good initial guess for u2
+	    
 	      if(solve_implicit_lab(ix,iy,iz,dt,del4)<0) 
 	      //numerical implicit in 4D did not work
 		{
@@ -715,6 +715,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  boost2_ff2lab(del4,del4,pp,gg,GG);
 		  indices_21(del4,del4,gg);
 		}		
+
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE
