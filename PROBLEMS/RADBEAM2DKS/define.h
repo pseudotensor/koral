@@ -1,7 +1,8 @@
 #define TMAX 1.e10
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
-#define myMKS1COORDS
+//#define myMKS1COORDS
+
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
 #else

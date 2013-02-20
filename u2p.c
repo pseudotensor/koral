@@ -106,6 +106,16 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 	{
 	  if(verbose>0)
 	    printf("u2p_entr err > %e %e\n",pp[0],pp[1]);
+
+	  //************************************
+	  //leaving unchanged primitives - should not happen
+	  ret=-3;
+	  for(u2pret=0;u2pret<NV;u2pret++)
+	    pp[u2pret]=ppbak[u2pret];	  
+	  //************************************
+
+	  return -3;
+
 	
 	  //************************************
 	  //cold RHD - assuming u=SMALL
@@ -616,8 +626,8 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   if(uu<0. || rho<0. || isnan(rho))
     {
       printf("u2p_entr didn't work: %e %e\n",uu,rho); 
-      print_Nvector(uuu,NV);
-      getchar();
+      //print_Nvector(uuu,NV);
+      //getchar();
       return -1;
     }
 

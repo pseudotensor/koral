@@ -1,11 +1,22 @@
+#define RADIATION
+//#define RADSOURCEOFF
+//#define EXPLICIT_RAD_SOURCE
+//#define IMPLICIT_FF_RAD_SOURCE
+
+#define MASS 10.
 #define BHSPIN 0.
 #define MYCOORDS KSCOORDS
+
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VELR
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
-#define PRINTGC_LEFT
-#define PRINTGC_RIGHT
+#define NSTEPSTOP 100e10
+#define NOUTSTOP 1000.
+//#define CGSOUTPUT
+#define RADOUTPUTINZAMO
+//#define PRINTGC_LEFT
+//#define PRINTGC_RIGHT
 
 #define NX 50
 #define NY 50
@@ -19,11 +30,13 @@
 #define SPECIFIC_BC
 
 #define GAMMA (5./3.)
-#define KKK 0.03
+#define KKK 1.e-5
 #define ELL 4.5
 #define UTPOT 1.
-#define RHOATMMIN  1.e-4
-#define UINTATMMIN  1.e-6
+//#define RHOATMMIN  rhoCGS2GU(1.e-4)
+#define RHOATMMIN  1.e-2
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e9))
 
 #define INT_ORDER 1
 #define RK3_STEPPING
@@ -33,10 +46,7 @@
 
 #define NODONUT 0
 #define INFLOWING 0
-#define NSTEPSTOP 50e10
-#define NOUTSTOP 1000.
 
 #define RHOFLOOR 1.e-40
 #define UFLOOR 1.e-40
 #define EFLOOR 1.e-40
-

@@ -188,7 +188,15 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   ldouble aval[6];
   int verbose=0;
 
-  calc_rad_wavespeeds(pp,gg,GG,aval,verbose);
+  //physical size of the cell
+  ldouble dx[3];
+  dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
+  dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
+  dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);
+  ldouble tautot[3];
+  calc_tautot(pp,xx,dx,tautot);
+
+  calc_rad_wavespeeds(pp,gg,GG,tautot,aval,verbose);
 
   axl=aval[0];
   axr=aval[1];
@@ -196,19 +204,6 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   ayr=aval[3];
   azl=aval[4];
   azr=aval[5];
-
-  /*
-    TODO: limit wavespeeds by optical depth
-    ldouble tautot[3];
-    calc_tautot(pp,xx,dx,tautot);
-
-    axr=my_min(axr, 4./3./tautot[0]);
-    axl=my_max(axl, -4./3./tautot[0]);
-    ayr=my_min(ayr, 4./3./tautot[1]);
-    ayl=my_max(ayl, -4./3./tautot[1]);
-    azr=my_min(azr, 4./3./tautot[2]);
-    azl=my_max(azl, -4./3./tautot[2]);
-  */
 
 #endif
 

@@ -3,8 +3,8 @@
 
 #include "ko.h"
 
-//**********************************************************************
-//******* calculates total opacity as in the fluid frame ***************
+//*********************************************************************
+//******* calculates total opacity over dx[] ***************************
 //**********************************************************************
 int
 calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
@@ -26,7 +26,7 @@ calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
 }
 
 //**********************************************************************
-//******* calculates total opacity as in the fluid frame ***************
+//******* calculates abs opacity over dx[] ***************************
 //**********************************************************************
 int
 calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
@@ -69,7 +69,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
 
   //calculating primitives  
   int corr;
-  u2p(uu,pp2,gg,GG,&corr);
+  if(u2p(uu,pp2,gg,GG,&corr)<0) return -1;
 
   //radiative four-force
   ldouble Gi[4];
@@ -99,7 +99,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],uu[NV],uu0[NV],uup[NV]; 
-  ldouble f1[4],f2[4],f3[4],x[4];
+  ldouble f1[4],f2[4],f3[4],xxx[4];
   ldouble gg[4][5];
   ldouble GG[4][5];
   pick_g(ix,iy,iz,gg);
@@ -112,12 +112,22 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       uu0[iv]=uu[iv];
     }
 
-  ldouble EPS = 1.e-6;
+  ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6 ;
 
   int verbose=0;
   int iter=0;
 
+  if(verbose) 
+    {
+      ldouble xx,yy,zz;
+      xx=get_x(ix,0);
+      yy=get_x(iy,1);
+      zz=get_x(iz,2);
+      printf("=== i: %d %d %d\n=== x: %e %e %e\n",ix,iy,iz,xx,yy,zz);
+      print_Nvector(pp,NV);
+      print_metric(gg);
+    }
   do
     {
       iter++;
@@ -128,7 +138,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       //values at zero state
-      f_implicit_lab(uu0,uu,pp,dt,gg,GG,f1);
+      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,f1)<0) return -1;
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -140,7 +150,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      else del=EPS*uup[j+6];
 	      uu[j+6]=uup[j+6]-del;
 
-	      f_implicit_lab(uu0,uu,pp,dt,gg,GG,f2);
+	      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,f2)<0) return -1;
      
 	      J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
 
@@ -154,22 +164,22 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       //updating x
       for(i=0;i<4;i++)
 	{
-	  x[i]=uup[i+6];
+	  xxx[i]=uup[i+6];
 	}
 
       for(i=0;i<4;i++)
 	{
 	  for(j=0;j<4;j++)
 	    {
-	      x[i]-=iJ[i][j]*f1[j];
+	      xxx[i]-=iJ[i][j]*f1[j];
 	    }
 	}
 
-      if(verbose>0)    print_state_implicit_lab (iter,x,f1); 
+      if(verbose>0)    print_state_implicit_lab (iter,xxx,f1); 
 
       for(i=0;i<4;i++)
 	{
-	  uu[i+6]=x[i];
+	  uu[i+6]=xxx[i];
 	}
   
       //test convergence
@@ -180,7 +190,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
-	break;
+	{
+	  if(verbose) printf("success ===\n");
+	  break;
+	}
 
       if(iter>50)
 	{
@@ -659,6 +672,29 @@ calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
 }
 
 //**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//returns rad primitives for an atmosphere
+int
+set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype)
+{
+#ifdef RADIATION  
+  if(atmtype==0) //no fluxes, minimal Erad
+    {
+      pp[6]=ERADATMMIN; //radiative energy density in the rad.rest frame=lab frame
+      //normal observer
+      ldouble ucon[4],r;
+      calc_normalobs_4vel(GG,ucon);
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+      pp[7]=ucon[1]; //VELPRIM velocity of the radiative rest frame = normal velocity
+      pp[8]=ucon[2];
+      pp[9]=ucon[3];
+    }
+#endif
+  return 0;
+}
+
+//**********************************************************************
 //suplementary routines for conversions
 //**********************************************************************
 ldouble calc_PEQ_ufromTrho(ldouble T,ldouble rho)
@@ -700,7 +736,7 @@ ldouble calc_LTE_Efromurho(ldouble u,ldouble rho)
 /******* using the HARM algorithm **************************************/
 /************************************************************************/
 int
-calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose)
+calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose)
 {
   int i,j;
   
@@ -733,7 +769,8 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
 
   //square of radiative wavespeed in radiative rest frame
-  ldouble rv2 = 1./3.;
+  ldouble rv2rad = 1./3.;
+  ldouble rv2,rv2tau;
 
   //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
@@ -748,6 +785,16 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,in
   int dim;
   for(dim=0;dim<3;dim++)
     {
+      //characterisitic limiter based on the optical depth
+      //TODO: validate against opt.thick tests
+      if(tautot[dim]>0.) 
+	{
+	  rv2tau=4./3./tautot[dim]*4./3./tautot[dim];
+	  rv2=my_min(rv2rad,rv2tau);		     
+	}
+      else
+	rv2=rv2rad;
+      
       Acov[0]=0.;
       Acov[1]=0.;
       Acov[2]=0.;

@@ -1,43 +1,45 @@
-#define GGG (6.674e-8)
-#define CCC 2.998e10
+//physics
+#define GGG0 (6.674e-8)
+#define CCC0 (2.998e10)
+#define gTILDA (1.e-10)
+#define cTILDA (1.)
+#define GGG (GGG0/gTILDA)
+#define CCC (CCC0/cTILDA)
+
+//GM/C2 for Msun in cm
 #define MSUNCM 147700.
 
-#define K_BOLTZ (1.3806488e-16L * GGG / CCC / CCC / CCC / CCC  )
-#define M_PROTON (1.67262158e-24L * GGG / CCC / CCC)
-#define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM  * MASSCM)
-#define A_RAD (4.*5.67e-5/CCC * GGG / CCC / CCC / CCC / CCC)
-#define MU_GAS 1.
-#define Z_RATIO (1.0)
-#define Pi (3.141592654)     
-
-#define SOURCETERMS
-#define NUM_SOURCESTEPS 1
-
-#define my_max(x,y) (x>y?x:y)
-
-
-#define lenCGS2GU(x)    (x/MASSCM )
-#define lenGU2CGS(x)    (x*MASSCM )
+//conversions
+#define lenCGS2GU(x)    (x/MASSCM)
+#define lenGU2CGS(x)    (x*MASSCM)
 #define timeCGS2GU(x)   (x/MASSCM*CCC)
 #define timeGU2CGS(x)   (x*MASSCM/CCC)
 #define velCGS2GU(x)    (x/CCC)
 #define velGU2CGS(x)    (x*CCC)
-#define rhoCGS2GU(x)    (x*GGG/CCC/CCC*MASSCM*MASSCM*MASSCM)
-#define rhoGU2CGS(x)    (x/GGG*CCC*CCC/MASSCM/MASSCM/MASSCM)
-#define massCGS2GU(x)    (x*GGG/CCC/CCC)
-#define massGU2CGS(x)    (x/GGG*CCC*CCC)
-#define kappaGU2CGS(x)  (x*GGG/CCC/CCC*MASSCM*MASSCM)
-#define kappaCGS2GU(x)  (x/GGG*CCC*CCC/MASSCM/MASSCM)
-#define endenCGS2GU(x) (x*GGG*MASSCM*MASSCM*MASSCM/CCC/CCC/CCC/CCC)
-#define endenGU2CGS(x) (x/GGG/MASSCM/MASSCM/MASSCM*CCC*CCC*CCC*CCC)
-#define fluxCGS2GU(x) (x*GGG*MASSCM*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC)
-#define fluxGU2CGS(x) (x/GGG/MASSCM/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC)
+#define rhoCGS2GU(x)    (x*GGG/CCC/CCC*MASSCM*MASSCM)
+#define rhoGU2CGS(x)    (x/GGG*CCC*CCC/MASSCM/MASSCM)
+#define massCGS2GU(x)    (x*GGG/CCC/CCC/MASSCM)
+#define massGU2CGS(x)    (x/GGG*CCC*CCC*MASSCM)
+#define kappaCGS2GU(x)  (x/GGG*CCC*CCC/MASSCM)
+#define kappaGU2CGS(x)  (x*GGG/CCC/CCC*MASSCM)
+#define endenCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC)
+#define endenGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC)
+#define fluxCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC)
+#define fluxGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC)
 
+//constants
+#define K_BOLTZ (1.3806488e-16L * GGG / CCC / CCC / CCC / CCC / MASSCM)
+#define M_PROTON massCGS2GU(1.67262158e-24)
+#define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM)
+#define MU_GAS 1.
+#define Z_RATIO (1.0)
+#define Pi (3.141592654)     
 #define KAPPA_ES_COEFF (kappaCGS2GU(0.4))
-#define KAPPA_FF_COEFF (1.7e-25/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
-#define KAPPA_BF_COEFF (4.8e-24/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
+//to verify
+//#define KAPPA_FF_COEFF (1.7e-25/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
+//#define KAPPA_BF_COEFF (4.8e-24/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
 
-
+//other stuff
 #include "problem.h"
 
 #include "mdefs.h"
@@ -69,6 +71,7 @@
 #define ldouble double
 #define gSIZE 20 //size of metric arrays = 16 + 1 (gdet) + 3 (dlgdet)
 
+//global variables
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*u_step1,*u_step2,*u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,
   *pbLx,*pbRx,*pbLy,*pbRy,*pbLz,*pbRz,*sbLx,*sbRx,*sbLy,*sbRy,*sbLz,*sbRz,*ubLx,*ubRx,*ubLy,*ubRy,*ubLz,*ubRz,
@@ -78,19 +81,19 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*u_step1,*u_step2,*u_step3
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
 int *cellflag,**loop_1,**loop_2,Nloop_1,Nloop_2;
-//ldouble ****u;
+
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
 
 ldouble inputarg[10];
 int **gcidx;
 
-
 ldouble max_ws[3],max_dt;
 ldouble min_dx,min_dy,min_dz;
-  
-
 FILE *fout1,*fout_totmass;
 int nfout1;
+
+//some macros
+#define my_max(x,y) (x>y?x:y)
 
 //main.c
 int solve_all_problems_5(ldouble);
@@ -379,6 +382,6 @@ int calc_Gi_ff(ldouble *pp, ldouble Gi[4]);
 int calc_Gi(ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble Gi[4]);
 int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int);
 int
-calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int verbose);
+calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose);
 
 #include "mnemonics.h"
