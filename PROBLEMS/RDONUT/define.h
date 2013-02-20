@@ -9,7 +9,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VELR
-#define DTOUT1 1.
+#define DTOUT1 5.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -18,8 +18,8 @@
 //#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
 
-#define NX 50
-#define NY 50
+#define NX 100
+#define NY 100
 #define NZ 1
 #define MINX (.8*r_horizon_BL(BHSPIN))
 #define MAXX 27.8
@@ -29,8 +29,8 @@
 #define MAXZ 1.
 #define SPECIFIC_BC
 
-#define GAMMA (5./3.)
-#define KKK 1.e-5
+#define GAMMA (4./3.)
+#define KKK 1.e-4
 #define ELL 4.5
 #define UTPOT 1.
 //#define RHOATMMIN  rhoCGS2GU(1.e-4)
