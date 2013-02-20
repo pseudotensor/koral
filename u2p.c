@@ -759,7 +759,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 
    if(gammarel2<0. || gammarel2>gammamax*gammamax || delta<0.) 
     {
-      //      printf("top cap\n");
+      //printf("top cap\n");
       //top cap
       *corrected=1;
       urfcon[0]=gammamax;
