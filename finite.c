@@ -707,6 +707,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //numerical implicit in 4D did not work
 		{
 		  //use the explicit-implicit backup method
+		  printf("imp_ff at %d,%d,%d\n",ix,iy,iz);
 		  //new primitives before the source operator
 		  calc_primitives(ix,iy,iz);
 		  //semi-implicit in the fluid frame - only approximate!

@@ -39,13 +39,38 @@ if(ix>=NX) //analytical solution at rout only
     ldouble D,E,W,eps,uT,uphi,uPhi;
     if(ut<-1 || podpierd<0.|| NODONUT)
       {
+
+	iix=NX-1;
+	iiy=iy;
+	iiz=iz;
+
 	//ambient
 	set_hdatmosphere(pp,xxvec,gg,GG,0);
 #ifdef RADIATION
+
 	ldouble ppatm[NV];
 	ldouble urf[4];
-	set_radatmosphere(ppatm,xxvec,gg,GG,0);
+	set_radatmosphere(pp,xxvec,gg,GG,0);\
 
+	/*
+	pp[6]=ERADATMMIN;
+	pp[7]=0.;
+	pp[8]=0.;
+	pp[9]=0.;
+
+	//transforming BL ZAMO radiative primitives to BL non-ortonormal primitives
+	ldouble eupBL[4][4],eloBL[4][4];
+	ldouble tupBL[4][4],tloBL[4][4];
+	calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
+	calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
+	prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+	prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+	//transforming radiative primitives from BL to MYCOORDS
+	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
+	*/
+
+	
+	set_radatmosphere(ppatm,xxvec,gg,GG,0);
 	//outflow-no-inflow for radiation
 	pp[6]=get_u(p,6,iix,iiy,iiz);
 	pp[7]=get_u(p,6,iix,iiy,iiz);
@@ -58,11 +83,12 @@ if(ix>=NX) //analytical solution at rout only
 	//converting to lab four-velocity
 	conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
 	if(urf[1]<0.) //inflow
-	  pp[7]=ppatm[7];
- 
+	  pp[7]=0.*ppatm[7];
+	
 
 #endif
 
+	
 	//BL free-fall velocity
 	ldouble ucon[4];
 	ldouble r=xx;
@@ -75,6 +101,8 @@ if(ix>=NX) //analytical solution at rout only
 	pp[2]=ucon[1];
 	pp[3]=ucon[2];
 	pp[4]=ucon[3];
+	
+
       }
     else
       {
@@ -177,6 +205,7 @@ if(ix>=NX) //analytical solution at rout only
 //reflections in theta 
 if(iy<0.) //spin axis
   {      
+    /*
     iiy=-iy-1;
     iiz=iz;
     iix=ix;
@@ -189,8 +218,18 @@ if(iy<0.) //spin axis
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
-
        }
+    */  
+
+    //temporary pure outflow
+    iiy=0;
+    iiz=iz;
+    iix=ix;
+    	  
+    for(iv=0;iv<NV;iv++)
+      {
+	pp[iv]=get_u(p,iv,iix,iiy,iiz);	
+      }
 
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
@@ -215,6 +254,9 @@ if(iy>=NY) //equatorial plane
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	
       }
+
+ 
+
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section

@@ -30,7 +30,7 @@
 //25 RDONUT - 2d radiative Polish donut in KS
 
 
-#define PROBLEM 24
+#define PROBLEM 25
 
 #if(PROBLEM==1)
 

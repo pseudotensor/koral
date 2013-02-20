@@ -23,7 +23,7 @@
 #define NZ 1
 #define MINX (.8*r_horizon_BL(BHSPIN))
 #define MAXX 27.8
-#define MINY 0.*Pi/4.
+#define MINY 0*Pi/4.
 #define MAXY Pi/2.
 #define MINZ 0.
 #define MAXZ 1.

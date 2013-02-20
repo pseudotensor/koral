@@ -51,6 +51,24 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
     set_hdatmosphere(pp,xxvec,gg,GG,0);
 #ifdef RADIATION
     set_radatmosphere(pp,xxvec,gg,GG,0);
+
+    /*
+    pp[6]=ERADATMMIN;
+    pp[7]=0.;
+    pp[8]=0.;
+    pp[9]=0.;
+
+    //transforming BL ZAMO radiative primitives to BL non-ortonormal primitives
+    ldouble eupBL[4][4],eloBL[4][4];
+    ldouble tupBL[4][4],tloBL[4][4];
+    calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
+    calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
+    prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+    prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+    //transforming radiative primitives from BL to MYCOORDS
+    trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
+    */
+
 #endif
   }
  else
