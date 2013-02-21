@@ -4,16 +4,18 @@
 //  FILE *fgnu=fopen("plot.gp","w");
 //  char bufor[50];
 
-double minx,maxx,miny,maxy;
+double minx,maxx,miny,maxy,minz,maxz;
 
 
 if(MYCOORDS==MKS1COORDS)
   {
+    /*
     minx= (exp(get_xb( -1,0))+MKS1R0)*cos(get_xb(NZ+1,2));
     maxx= exp(get_xb(NX+1,0))+MKS1R0;
     miny=.5*sin(get_xb(-1,2))*(exp(get_xb(NX+1,0))+MKS1R0);
     maxy=.5*sin(get_xb(-1,2))*(exp(get_xb(NX+1,0))+MKS1R0)+( exp(get_xb(NX+1,0))+MKS1R0-((exp(get_xb( -1,0))+MKS1R0)*
 											 cos(get_xb(NZ+1,2))));
+    */
   }
  else
    {
@@ -21,6 +23,13 @@ minx= get_xb( -1,0)*cos(get_xb(NZ+1,2));
 maxx= get_xb(NX+1,0);
 miny=.5*sin(get_xb(-1,2))*get_xb(NX+1,0);
 maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_xb(NZ+1,2)));
+
+//could be better
+minx=-.3*get_xb(NX+3,0);;
+maxx=get_xb(NX+3,0);
+ minz=-.3*maxx;
+ maxz=maxx;
+
    }
 
   fprintf(fgnu,
@@ -58,12 +67,7 @@ maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
 	  "set title \"rad. energy density / flux \" offset 0,0\n"
-#ifdef MINKOWSKI
-	  "splot \"%s\" u 1:3:20 ti \"\"\n"
-#else
-	  //	  "set autoscale\n"
-	  "splot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):20 ti \"\" w l \n"
-#endif
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):20 ti \"\" w l \n"
 
 	  "unset pm3d\n"
 	  "set isosam 10,10\n"
@@ -72,19 +76,13 @@ maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
-#ifdef MINKOWSKI
-	  "plot \"%s\" u 1:3:($21/(($21*$21+$22*$22+$23*$23)**.5)/%f):($23/(($21*$21+$22*$22+$23*$23)**.5)/%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
-	  ,fname2,get_xb(0,0),get_xb(NX,0),get_xb(-NG,2),get_xb(NZ,2),fname,fname,
-	  fname,30./(get_xb(NX,0)-get_xb(0,0)),30./(get_xb(NZ,2)-get_xb(0,2)),(int)(NX/20),(int)(NZ/20));
-#else
-//	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-($23)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%f):(($23*cos($3)+($21)*sin($3))/(($21*cos($3)*$21*cos($3)+$23*sin($3)*$23*sin($3)+1.e-30*$20)**.5)/%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
-	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-$23*sin($3))/(%e)):(($23*cos($3)+$21*sin($3))/%e) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($21*sin($2)+$22*cos($2))/(%e)):((-$22*sin($2)+$21*cos($2))/%e) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
   
 
-,fname2,minx,maxx,miny,maxy,fname
-	    , fname,4.e-18,4.e-18,(int)(NX/10),(int)(NZ/10)
+,fname2,minx,maxx,minz,maxz,fname
+	  //	    , fname,4.e-17,4.e-17,(int)(NX/10),(int)(NY/10)
+	    , fname,8.e-18,8.e-18,(int)(NX/10),(int)(NY/10)
 );
-#endif
 	    
 
 /*

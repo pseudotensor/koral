@@ -14,7 +14,7 @@
 
 #define NX 30
 #define NY 1
-#define NZ 30
+#define NZ 15
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
 #define RK3STEPPING
@@ -27,7 +27,7 @@
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
-#define BEAMNO 3
+#define BEAMNO 2
 
 #define IFBEAM 1
 //#define GASRADOFF
@@ -36,14 +36,18 @@
 
 
 #if (BEAMNO==1)
+#define MKS1R0 .5
 #define MINX 2.6
 #define MAXX 3.5
 #define BEAML 2.9
 #define BEAMR 3.1
 #define DTOUT1 .1 //dt for basic output
 #elif (BEAMNO==2)
+#define MKS1R0 .5
+
 #define MINX 5.5
-#define MAXX 7.5
+//#define MAXX 7.5
+#define MAXX 12.5
 #define BEAML 5.8
 #define BEAMR 6.2
 #define DTOUT1 .4 //dt for basic output
@@ -72,7 +76,7 @@
 #define MAXY 1.01*Pi/2.
 
 #define MINZ 0.
-#define MAXZ Pi/4.//8.*Pi/4.
+#define MAXZ 2.*Pi/4.//8.*Pi/4.
 
 //#define PLOTFULLPHI
 #define RHOFLOOR 1.e-50

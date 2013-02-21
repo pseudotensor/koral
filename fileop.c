@@ -153,7 +153,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 #else
 				      for(iz=0;iz<NZ;iz++)
 					{
-					  for(iy=-0*NG;iy<NY+0*NG;iy++)
+					  for(iy=-gcl*NG;iy<NY+gcr*NG;iy++)
 					    {
 					      for(ix=-gcl*NG;ix<NX+gcr*NG;ix++)
 						{

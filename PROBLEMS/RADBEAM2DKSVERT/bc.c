@@ -19,20 +19,20 @@ coco_N(xxvec,xxvec,MYCOORDS,BLCOORDS);
 ldouble xx=xxvec[1];
 
   //radius
-  if(iz<0 && xx>BEAML && xx<BEAMR && IFBEAM) //hot boundary
+  if(iy>=NY && xx>BEAML && xx<BEAMR && IFBEAM) //hot boundary
     {
       ldouble Fx,Fy,Fz,rho,E,uint,vx;
       iix=ix;
-      iiy=iy;
-      iiz=0;
+      iiy=NY-1;
+      iiz=iz;
       rho=RHOAMB;
       E=calc_LTE_EfromT(TLEFT);
       uint=get_u(p,1,iix,iiy,iiz);
       rho=get_u(p,0,iix,iiy,iiz);
       vx=get_u(p,2,iix,iiy,iiz);
       
-      Fz=NLEFT*E;
-      Fy=Fx=0.;     
+      Fy=-NLEFT*E;
+      Fz=Fx=0.;     
 
       pp[0]=rho;
       pp[1]=uint;
@@ -63,7 +63,7 @@ ldouble xx=xxvec[1];
       
       return 0.;
     }
-  else if(iz<0 )
+  else if(iy>=NY )
     {
       /*
       ldouble Fx,Fy,Fz,rho,E,uint,vx,T;
@@ -88,8 +88,8 @@ ldouble xx=xxvec[1];
       */
       
       
-      iiz=0;
-      iiy=iy;
+      iiz=iz;
+      iiy=NY-1;
       iix=ix;
       for(iv=0;iv<NV;iv++)
 	{ 
@@ -97,6 +97,7 @@ ldouble xx=xxvec[1];
 	}
       //flux azimuthal only
       pp[7]=0.;
+      pp[8]=0.;
       pp[9]=0.;
 
       p2u(pp,uu,gg,GG);
@@ -106,13 +107,13 @@ ldouble xx=xxvec[1];
       
     }
   
-  else if(iz>=NZ ) //copy
+  else if(iy<0 ) //copy
     {
       ldouble gdet=get_g(g,3,4,ix,iy,iz);  
 
       iix=ix;
-      iiy=iy;
-      iiz=NZ-1;
+      iiy=0;
+      iiz=iz;
       for(iv=0;iv<NV;iv++)
 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
@@ -120,31 +121,27 @@ ldouble xx=xxvec[1];
       p2u(pp,uu,gg,GG);
       return 0;
     }
-  else if(ix<0 && 1) //copy
+   else if(ix<0) //copy
     {
+
       ldouble gdet=get_g(g,3,4,ix,iy,iz);  
 
       iix=0;
       iiy=iy;
       iiz=iz;
       for(iv=0;iv<NV;iv++)
-	{ 
+ 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      
       ldouble Fx,Fy,Fz,rho,E,uint,vx;
       //       rho=RHOAMB;
        //      E=calc_LTE_EfromT(TAMB);
       //pp[6]=E;
-
-
       p2u(pp,uu,gg,GG);
-
-
       return 0;
     }
-#ifdef FLATBACKGROUND
-   else if(ix>NX-1 || ix<0) //copy
+
+else if(ix>NX-1) //copy
     {
 
       ldouble gdet=get_g(g,3,4,ix,iy,iz);  
@@ -163,23 +160,13 @@ ldouble xx=xxvec[1];
       p2u(pp,uu,gg,GG);
       return 0;
     }
-#endif
-   else if(ix>NX-1 || 1 ) //fixed outern boundary
-    {
-      //TODO
-    }
- 
-
 
   iix=ix;
   iiz=iz;
   iiy=iy;
-  //copy
-  while(iix<0)    iix=0.;//iix+=NX;
-  while(iix>=NX)    iix=NX-1;//iix-=NX; 
   //periodic
-  while(iiy<0)    iiy+=NY;
-  while(iiy>=NY)    iiy-=NY; 
+  while(iiz<0)    iiz+=NZ;
+  while(iiz>=NZ)    iiz-=NZ; 
  
   for(iv=0;iv<NV;iv++)
     {

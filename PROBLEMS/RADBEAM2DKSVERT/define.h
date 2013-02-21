@@ -12,7 +12,7 @@
 #define OUTCOORDS KERRCOORDS //coordinates for output
 
 #define NX 30
-#define NY 30
+#define NY 15
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
@@ -26,7 +26,7 @@
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
-#define BEAMNO 3
+#define BEAMNO 1
 
 #define IFBEAM 1
 //#define GASRADOFF
@@ -35,14 +35,14 @@
 
 
 #if (BEAMNO==1)
-#define MINX 2.6
+#define MINX 2.3
 #define MAXX 3.5
 #define BEAML 2.9
 #define BEAMR 3.1
-#define DTOUT1 .1 //dt for basic output
+#define DTOUT1 1. //dt for basic output
 #elif (BEAMNO==2)
 #define MINX 5.5
-#define MAXX 7.5
+#define MAXX 12.5
 #define BEAML 5.8
 #define BEAMR 6.2
 #define DTOUT1 .4 //dt for basic output
@@ -67,7 +67,7 @@
 #define DTOUT1 .25 //dt for basic output
 #endif
 
-#define MINY .5*Pi/2.
+#define MINY 0.02*Pi/2.
 #define MAXY Pi/2.
 
 #define MINZ 0.
@@ -89,8 +89,8 @@
 #define SPECIFIC_BC
 //#define YZXDUMP
 #define RADOUTPUTINZAMO
-//#define PRINTGC_LEFT
-//#define PRINTGC_RIGHT
+#define PRINTGC_LEFT
+#define PRINTGC_RIGHT
 
 #define U2PPREC 1.e-6
 #define U2PRADPREC 1.e-4
