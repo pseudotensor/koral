@@ -27,16 +27,21 @@ ldouble xx=xxvec[1];
       iiz=iz;
       rho=RHOAMB;
       E=calc_LTE_EfromT(TLEFT);
-      uint=get_u(p,1,iix,iiy,iiz);
-      rho=get_u(p,0,iix,iiy,iiz);
-      vx=get_u(p,2,iix,iiy,iiz);
+      uint=calc_PEQ_ufromTrho(TAMB,rho);
+
+      //rho=get_u(p,0,iix,iiy,iiz);
+      //      vx=get_u(p,2,iix,iiy,iiz);
       
       Fy=-NLEFT*E;
       Fz=Fx=0.;     
 
+      //      pp[0]=100.*rho;
+      //      pp[1]=100.*uint;
+      //      vx=-1.;
       pp[0]=rho;
       pp[1]=uint;
-      pp[2]=vx;
+      pp[2]=0.;
+      //pp[3]=-0.1;
       pp[3]=0.;
       pp[4]=0.;
       pp[5]=calc_Sfromu(rho,uint);

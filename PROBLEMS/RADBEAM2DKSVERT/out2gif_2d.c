@@ -68,6 +68,7 @@ maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
 	  "set title \"rad. energy density / flux \" offset 0,0\n"
+	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):20 ti \"\" w l \n"
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):20 ti \"\" w l \n"
 
 	  "unset pm3d\n"
