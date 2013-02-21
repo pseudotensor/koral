@@ -22,7 +22,7 @@
 #define NX 30
 #define NY 30
 #define NZ 1
-#define MINX (1.5*r_horizon_BL(BHSPIN))
+#define MINX (.8*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define MINY 0.1*Pi/4.
 #define MAXY Pi/2.
@@ -37,13 +37,13 @@
 //#define RHOATMMIN  rhoCGS2GU(1.e-4)
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e8))
+#define ERADATMMIN  (calc_LTE_EfromT(1.e9))
 
 #define INT_ORDER 1
 #define RK3_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 
 #define NODONUT 0
 #define INFLOWING 0
