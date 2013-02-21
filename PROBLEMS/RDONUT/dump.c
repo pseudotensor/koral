@@ -29,3 +29,14 @@ ldouble pgas=GAMMAM1*calc_PEQ_ufromTrho(Tgas,rho);
 				  v3=prad/(prad+pgas);
 
 				  
+ldouble nx,ny,nz,nlen,f;
+
+  nx=Fx/E;
+  ny=Fy/E;
+  nz=Fz/E;
+
+  nlen=sqrt(nx*nx+ny*ny+nz*nz);
+  
+ 
+   f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
+v4=f;

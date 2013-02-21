@@ -68,7 +68,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
     //transforming radiative primitives from BL to MYCOORDS
     trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
     */
-
+    
 #endif
   }
  else
