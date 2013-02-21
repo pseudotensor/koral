@@ -28,7 +28,7 @@
 //23 ATMMKS1 - radial atmosphere infalling in MKS1
 //24 RADBEAMFLAT - beam of light in Cartesian 
 //25 RDONUT - 2d radiative Polish donut in KS
-
+//26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
 
 #define PROBLEM 25
 
@@ -381,6 +381,20 @@
 #define PR_OUT2GIF_1D "PROBLEMS/RDONUT/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RDONUT/dump.c"
 #define PR_ANASOL "PROBLEMS/RDONUT/anasol.c"
+
+#endif
+
+#if(PROBLEM==26)
+
+#define PR_DEFINE "PROBLEMS/RADBEAM2DKSVERT/define.h"
+#define PR_BC "PROBLEMS/RADBEAM2DKSVERT/bc.c"
+#define PR_INIT "PROBLEMS/RADBEAM2DKSVERT/init.c"
+#define PR_KAPPA "PROBLEMS/RADBEAM2DKSVERT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADBEAM2DKSVERT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADBEAM2DKSVERT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADBEAM2DKSVERT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADBEAM2DKSVERT/dump.c"
+#define PR_ANASOL "PROBLEMS/RADBEAM2DKSVERT/anasol.c"
 
 #endif
 
