@@ -998,7 +998,15 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       u2[2]=u1[2];
       u2[3]=u1[3];
     }
-  else if(CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+  else if(((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==SPHCOORDS) ||
+	  ((CO2==SCHWCOORDS || CO2==KERRCOORDS) && CO1==SPHCOORDS))
+    {
+      u2[0]=u1[0];
+      u2[1]=u1[1];
+      u2[2]=u1[2];
+      u2[3]=u1[3];
+    }
+   else if(CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       dxdx_KS2BL(xx,dxdx);
       multiply2(u1,u2,dxdx);
@@ -1049,6 +1057,14 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
 {
   ldouble dxdx[4][4];
   if(CO1==CO2)
+    {
+      int i,j;
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  T2[i][j]=T1[i][j];
+    }
+  else if(((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==SPHCOORDS) ||
+	  ((CO2==SCHWCOORDS || CO2==KERRCOORDS) && CO1==SPHCOORDS))
     {
       int i,j;
       for(i=0;i<4;i++)

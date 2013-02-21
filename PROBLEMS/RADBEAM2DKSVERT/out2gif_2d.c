@@ -25,10 +25,11 @@ miny=.5*sin(get_xb(-1,2))*get_xb(NX+1,0);
 maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_xb(NZ+1,2)));
 
 //could be better
-minx=-.3*get_xb(NX+3,0);;
-maxx=get_xb(NX+3,0);
- minz=-.3*maxx;
- maxz=maxx;
+ minx=get_xb(-3,0)*sin(get_xb(-3,1));//-.3*get_xb(NX+3,0);;
+ if(minx < 0) minx*=3.; else minx*=.8;
+ maxx=get_xb(NX+3,0)*sin(get_xb(NY+3,1));//get_xb(NX+3,0);
+ minz=get_xb(-3,0)*cos(get_xb(NY+3,1));//-.3*maxx;
+ maxz=get_xb(NX+3,0)*cos(get_xb(-3,1));//maxx;
 
    }
 
@@ -64,7 +65,7 @@ maxx=get_xb(NX+3,0);
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
 	  "set xlabel \"x\"\n"
-	  "set ylabel \"y\"\n"
+	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
 	  "set title \"rad. energy density / flux \" offset 0,0\n"
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):20 ti \"\" w l \n"

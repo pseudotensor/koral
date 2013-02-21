@@ -5,14 +5,14 @@
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
 #else
-#define MYCOORDS KSCOORDS
+#define MYCOORDS SPHCOORDS//KSCOORDS
 #endif
 
 #define MYCOORDS2 KERRCOORDS //suplementary, only for tetrads used when initializing problems - not yet used
 #define OUTCOORDS KERRCOORDS //coordinates for output
 
 #define NX 30
-#define NY 15
+#define NY 30
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
@@ -26,15 +26,26 @@
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
-#define BEAMNO 1
+#define BEAMNO 5
 
 #define IFBEAM 1
 //#define GASRADOFF
 //#define RADSOURCEOFF
 #define FLATBACKGROUND
 
+#define MINY -.25*Pi/2.
+#define MAXY .27*Pi/2.
 
-#if (BEAMNO==1)
+#define MINZ 0.
+#define MAXZ .01*Pi/4.//8.*Pi/4.
+
+#if (BEAMNO==5)
+#define MINX 5.5
+#define MAXX 12.5
+#define BEAML 7.
+#define BEAMR 9.
+#define DTOUT1 .4 //dt for basic output
+#elif (BEAMNO==1)
 #define MINX 2.3
 #define MAXX 3.5
 #define BEAML 2.9
@@ -67,11 +78,6 @@
 #define DTOUT1 .25 //dt for basic output
 #endif
 
-#define MINY 0.02*Pi/2.
-#define MAXY Pi/2.
-
-#define MINZ 0.
-#define MAXZ Pi/4.//8.*Pi/4.
 
 //#define PLOTFULLPHI
 #define RHOFLOOR 1.e-50

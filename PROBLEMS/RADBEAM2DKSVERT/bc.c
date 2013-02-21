@@ -95,7 +95,6 @@ ldouble xx=xxvec[1];
 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      //flux azimuthal only
       pp[7]=0.;
       pp[8]=0.;
       pp[9]=0.;
@@ -117,8 +116,36 @@ ldouble xx=xxvec[1];
       for(iv=0;iv<NV;iv++)
 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
-	}
+	} 
+
+      /*
+	//copying lab fluxes R^0mu - did not help
+      ldouble GGsrc[4][5],ggsrc[4][5];
+      pick_g(iix,iiy,iiz,ggsrc);
+      pick_G(iix,iiy,iiz,GGsrc);      
+      ldouble Rij[4][4];
+      calc_Rij(pp,ggsrc,GGsrc,Rij);
+      //lowering indices to get conserved but in the ghost cell
+      indices_2221(Rij,Rij,gg); //R^t_mu
+      uu[6]=Rij[0][0]; //R^t_t
+      uu[7]=Rij[0][1]; //R^t_i
+      uu[8]=Rij[0][2];
+      uu[9]=Rij[0][3]; int cor;
+      //radiative primitives
+      u2p_rad(uu,pp,gg,GG,&cor);
+      */
+
+      /*
+      pp[6]=calc_LTE_E1fromT(TAMB);
+      pp[7]=0.;
+      pp[8]=0.;
+      pp[9]=0.;
+      */
+      
       p2u(pp,uu,gg,GG);
+
+
+
       return 0;
     }
    else if(ix<0) //copy
