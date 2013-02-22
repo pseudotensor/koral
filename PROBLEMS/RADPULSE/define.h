@@ -2,12 +2,7 @@
 #define U2PRADPREC 1.e-5
 #define RADFORCEPREC 1.e-5
 #define VERBOSE0 0
-//#define CYLINDRICAL
-//#define KERR
-//#define BHSPIN 0.
-//#define SCHWARZSCHILD
-//#define SPHERICAL
-#define MINKOWSKI
+#define MYCOORDS MINKCOORDS
 
 #define RK3STEPPING
 #define INT_ORDER 1
@@ -21,9 +16,9 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
-#define DTOUT1 1.e3
-#define ALLSTEPSOUTPUT 1
+#define MINMOD_THETA 1.
+#define DTOUT1 1.e2
+#define ALLSTEPSOUTPUT 0
 #define GAMMA (ldouble)(5./3.)
 #define MINX -50.
 #define MAXX 50.
