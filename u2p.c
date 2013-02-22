@@ -32,7 +32,7 @@ calc_primitives(int ix,int iy,int iz)
   //update conserved to follow corrections on primitives
   if(corrected!=0)
     {
-      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);getchar();}
+      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);}//getchar();}
       p2u(pp,uu,gg,GG);
       for(iv=0;iv<NV;iv++)
 	{

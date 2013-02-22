@@ -30,7 +30,7 @@
 //25 RDONUT - 2d radiative Polish donut in KS
 //26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
 
-#define PROBLEM 19
+#define PROBLEM 25
 
 #if(PROBLEM==1)
 

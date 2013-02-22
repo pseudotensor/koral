@@ -182,18 +182,18 @@ if(ix>=NX) //analytical solution at rout only
      ldouble r=xx;
      ldouble r0=get_x(iix,0);
      
-     pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
-     pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
 
-     //copying MLCOORDS quantities
-     for(iv=2;iv<NV;iv++)
+     //copying YLCOORDS quantities
+     for(iv=0;iv<NV;iv++)
        { 
 	 //unchanged primitives
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
-     if(pp[2]>0.) pp[2]=0.;
-
+     //   pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
+     //   pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
+     //   pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-.5);
+     
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,gg,GG);
      //end of floor section
