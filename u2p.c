@@ -823,7 +823,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	      {
 		urfcon[i]=Aradrel[i];
 	      }
-	    if(verbose) {printf("topcapgamma Erf=%g gammarel=%g gammatemp=%g\n",Erf,sqrt(gammarel2),gammatemp);}
+	    if(verbose) {printf("topcapgamma Erf=%g gammaorg=%g gammanow=%g\n",Erf,gamma2/alpha/alpha,sqrt(gammarel2));}
 	  }
 	  else if(0){ //going through VEL4
 	    ldouble Arad[4];
