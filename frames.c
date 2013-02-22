@@ -270,7 +270,7 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   //four velocity of the lab frame
   ldouble alpha=-1./GG[0][0];
   ldouble ucon[4],ucov[4]={-alpha,0.,0.,0.};
-  indices_12(wcov,wcon,GG);
+  indices_12(ucov,ucon,GG);
 
   //ucon[0]=1./sqrt(-gg[0][0]);
   //ucon[1]=ucon[2]=ucon[3]=0.;
