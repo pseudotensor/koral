@@ -7,8 +7,9 @@
 	  "set view map\n"
 	  "set pm3d\n"
 	  "unset key\n"
-	  "set style line 1 lt 1 lw 2 lc 2\n"
+	  "set style line 1 lw 2 lc 2\n"
 	  "set style arrow 1 head nofilled size screen 0.002,35 ls 1\n"
+	  "set style arrow 1 ls 1\n"
 	  "set palette model RGB rgbformulae 7,5,15\n"
 	  "set palette model RGB rgbformulae 30,31,32\n"
 	  "set palette model RGB rgbformulae 21,22,23\n"
@@ -24,11 +25,13 @@
 	  "set rmargin at screen 0.8\n"
 	  "set bmargin at screen .12\n"
 	  "set tmargin at screen .95\n"
-	  "set xrange [%Lf:%Lf]\n"
-	  "set yrange [%Lf:%Lf]\n"
-	  "set cbrange [1.e-37:1.e-33]\n"
+	  "set xrange [%f:%f]\n"
+	  "set yrange [%f:%f]\n"
+	  //	  "set cbrange [1.e-37:1.e-33]\n"
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
+	  "set format cb \"%%.2e\"\n"
+	 
 	  "set cblabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
 	  "splot \"%s\" u 1:3:20 ti \"\"\n"
@@ -37,9 +40,11 @@
 	  "set format y \"\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:3:($21/(($21*$21+$22*$22+$23*$23)**.5)/%Lf):($23/(($21*$21+$22*$22+$23*$23)**.5)/%Lf) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u 1:3:($21/(($21*$21+$22*$22+$23*$23)**.5)/%f):($23/(($21*$21+$22*$22+$23*$23)**.5)/%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  ,fname2,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1),fname,fname,
-	  30./(get_xb(NX,0)-get_xb(0,0)),30./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NZ/20));
+	  //30./(get_xb(NX,0)-get_xb(0,0)),30./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NZ/20));
+	  .3,.3,(int)(NX/20),(int)(NZ/20));
+//(int)(NX/20),(int)(NZ/20));
 	    
 
 /*

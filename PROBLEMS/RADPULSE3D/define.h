@@ -1,13 +1,9 @@
+
 #define U2PPREC 1.e-5
 #define U2PRADPREC 1.e-5
 #define RADFORCEPREC 1.e-5
 #define VERBOSE0 0
-//#define CYLINDRICAL
-//#define KERR
-//#define BHSPIN 0.
-//#define SCHWARZSCHILD
-//#define SPHERICAL
-#define MINKOWSKI
+#define MYCOORDS MINKCOORDS
 
 #define RK3STEPPING
 #define INT_ORDER 1
@@ -41,17 +37,18 @@
 #define BLOBW 5.
 //#define YZSLICE
 
+#define RADOUTPUTINZAMO
 #define RADIATION
 //#define GASRADOFF
 
 #define KAPPA 0.
-#define KAPPAES 1.e-6
+#define KAPPAES 0.
 
 //#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
 
-//#define EXPLICIT_RAD_SOURCE
-#define IMPLICIT_FF_RAD_SOURCE
+#define EXPLICIT_RAD_SOURCE
+//#define IMPLICIT_FF_RAD_SOURCE
 
 #define UFLOOR 1.e-40
 #define RHOFLOOR 1.e-40
