@@ -33,7 +33,7 @@ ldouble pp[NV],T;
 rho=RADBEAMFLAT_RHO;
 uint=RADBEAMFLAT_UU;
 
-  E= RADBEAMFLAT_ERAD;
+ E= RADBEAMFLAT_ERAD;
 Fx=Fy=Fz=0.*E;
 
 

@@ -23,7 +23,7 @@ int iix,iiy,iiz,iv;
       iiz=0;
      
 
-      E= 1000.*RADBEAMFLAT_ERAD;
+      E= 100.*RADBEAMFLAT_ERAD;
 
       uint=get_u(p,1,iix,iiy,iiz);
       rho=get_u(p,0,iix,iiy,iiz);

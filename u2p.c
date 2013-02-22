@@ -263,28 +263,28 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 
   //correcting and imposing gammamax keeping the direction given by spatial components
   ldouble Afac;
-  ldouble gammamax=100.;
+  ldouble gammamaxhd=GAMMAMAXHD;
 
   if(whichvel==VELR)
     {
       //convert spatial u1 to lab-frame
       for(i=1;i<4;i++)
-	u1[i]=u1[i]+gammamax*GG[0][i]/GG[0][0];
+	u1[i]=u1[i]+gammamaxhd*GG[0][i]/GG[0][0];
     }
 
-  //normalizing to u^t=gammamax
+  //normalizing to u^t=gammamaxhd
   c=0.; b=0.;
   for(i=1;i<4;i++)
     {
       a+=u1[i]*u1[i]*gg[i][i];
-      b+=2.*u1[i]*gg[0][i]*gammamax;
+      b+=2.*u1[i]*gg[0][i]*gammamaxhd;
     }
-  c=gg[0][0]*gammamax*gammamax+1.;
+  c=gg[0][0]*gammamaxhd*gammamaxhd+1.;
   delta=b*b-4.*a*c;
       
   Afac= (-b+sqrt(delta))/2./a;
 
-  u2[0]=gammamax;
+  u2[0]=gammamaxhd;
   u2[1]=Afac*u1[1];
   u2[2]=Afac*u1[2];
   u2[3]=Afac*u1[3];
@@ -722,11 +722,17 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 int
 u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
 {
+  if(VELPRIMRAD!=VELR){
+    printf("u2p_rad() only setup for relative 4-velocity, currently.\n");
+    getchar();
+  }
+
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
-  int verbose=0,i;
+  int verbose=1,i,j;
   ldouble Rij[4][4];
+  ldouble alpha = sqrt(-1./GG[0][0]);
 
   //conserved - R^t_mu
   ldouble Av[4]={uu[6],uu[7],uu[8],uu[9]};
@@ -752,83 +758,178 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   if(gamma2<0.) gamma2=  (-b+sqrt(delta))/2./a; 
 
   //cap on u^t
-  ldouble gammamax=1000.;
+  ldouble gammamax=GAMMAMAXRAD;
 
   //gamma in relative velocity definition
-  ldouble gammarel2=gamma2/(-GG[0][0]);
+  ldouble gammarel2=gamma2/alpha/alpha;
 
-   if(gammarel2<0. || gammarel2>gammamax*gammamax || delta<0.) 
+  if(gammarel2<0.0 || delta<0.)
+    {
+      // can't assume this conditions means large gamma, because if not, then leads to crazy boost of energy.
+      Erf=ERADFLOOR;
+      urfcon[0]=0.;
+      urfcon[1]=0.;
+      urfcon[2]=0.;
+      urfcon[3]=0.;
+      if(verbose) {printf("topcapbad: gammarel2=%g gamma2=%g\n",gammarel2,gamma2);}
+    }
+  else if(gammarel2>gammamax*gammamax) 
     {      
-      
-      //printf("top cap\n");
       //top cap
       *corrected=1;
-      urfcon[0]=gammamax;
-      
+      //urfcon[0]=gammamax;
+      ldouble gammarel=gammamax;
+      gammarel2=gammamax*gammamax;
+
       //proper direction for the radiation rest frame, will be normalized later      
-      Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+      //Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+      Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
-      ldouble Arad[4];
-      for(i=1;i<4;i++)
+      if(Erf<ERADFLOOR)
 	{
-	  Arad[i]=(Av[i]-1./3.*Erf*GG[0][i])/(4./3.*Erf*gammamax);
-	}
+	  Erf=ERADFLOOR;
+	  urfcon[0]=0.;
+	  urfcon[1]=0.;
+	  urfcon[2]=0.;
+	  urfcon[3]=0.;
+	  if(verbose) {printf("topcapErfneg: gammarel2=%g gamma2=%g\n",gammarel2,gamma2);}
+	}					
+      else
+	{
+	  if(1){ //VELR
+	    // lab-frame radiation relative 4-velocity
+	    ldouble Aradrel[4];
+	    for(i=1;i<4;i++)
+	      Aradrel[i] = alpha * (Av[i] + 1./3.*Erf*GG[0][i]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
+
+	    /* skipping as Aradrel[] constructed assuming gammamax
+	    // compute \gammarel using this
+	    ldouble qsq=0.;
+	    for(i=1;i<4;i++)
+	      for(j=1;j<4;j++)
+		qsq+=Aradrel[i]*Aradrel[j]*gg[i][j];
+	    ldouble gammatemp=sqrt(1.+qsq);
+
+	    //MYFUN(gamma_calc_fromuconrel(Aradrel,ptrgeom,&gammatemp,&qsqtemp),"ucon_calc_rel4vel_fromuconrel: gamma_calc_fromuconrel failed\n","phys.tools.rad.c",1);
+
+	    // now rescale Aradrel[i] so will give desired \gammamax
+	    for(i=1;i<4;i++)
+	    {
+	    Aradrel[i] *= (gammamax/gammatemp);
+	    }
+	    */
+
+	    for(i=1;i<4;i++)
+	      {
+		urfcon[i]=Aradrel[i];
+	      }
+	    if(verbose) {printf("topcapgamma Erf=%g gammarel=%g gammatemp=%g\n",Erf,sqrt(gammarel2),gammatemp);}
+	  }
+	  else if(0){ //going through VEL4
+	    ldouble Arad[4];
+	    for(i=1;i<4;i++)
+	      {
+		Arad[i]=(Av[i]-1./3.*Erf*GG[0][i])/(4./3.*Erf*gammamax);
+	      }
        
-      //is normalized now
-      ldouble Afac;
-      a=0.; c=0.; b=0.;
-      for(i=1;i<4;i++)
-	{
-	  a+=Arad[i]*Arad[i]*gg[i][i];
-	  b+=2.*Arad[i]*gg[0][i]*gammamax;
-	}
-      c=gg[0][0]*gammamax*gammamax+1.;
-      delta=b*b-4.*a*c;
-      Afac= (-b+sqrt(delta))/2./a;
+	    //is normalized now
+	    ldouble Afac;
+	    a=0.; c=0.; b=0.;
+	    for(i=1;i<4;i++)
+	      {
+		a+=Arad[i]*Arad[i]*gg[i][i];
+		b+=2.*Arad[i]*gg[0][i]*gammamax;
+	      }
+	    c=gg[0][0]*gammamax*gammamax+1.;
+	    delta=b*b-4.*a*c;
+	    Afac= (-b+sqrt(delta))/2./a;
       
-      urfcon[0]=gammamax;
-      urfcon[1]=Afac*Arad[1];
-      urfcon[2]=Afac*Arad[2];
-      urfcon[3]=Afac*Arad[3];
+	    urfcon[0]=gammamax;
+	    urfcon[1]=Afac*Arad[1];
+	    urfcon[2]=Afac*Arad[2];
+	    urfcon[3]=Afac*Arad[3];
 
-      //converting to relative four velocity
-      conv_vels(urfcon,urfcon,VEL4,VELPRIMRAD,gg,GG);
+	    //converting to relative four velocity
+	    conv_vels(urfcon,urfcon,VEL4,VELPRIMRAD,gg,GG);
+
+	    if(verbose) {printf("topcapolek: Erf=%g Afac=%g Arad123=%g %g %g\n",Erf,Afac,Arad[1],Arad[2],Arad[3]);}
+	  }// end Olek method
+	}// end else if Erf>0
     }
-   else if(gammarel2<(-1./GG[0][0]))
+  //  else if(gammarel2<(-1./GG[0][0]))
+  else if(gammarel2<1.)
     {
-      printf("low cap\n");
       //low cap
       *corrected=1;
 
-      //zeros for relative velocity
-      urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
+      if(0)
+	{
+	  //zeros for relative velocity
+	  urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
+	  
+	  //calculating time component of lab 4-vel
+	  ldouble gammarel=1.0;
+	  ldouble urflab[4];
+	  
+	  urflab[0]=gammarel/alpha;
+	  
+	  //radiative energy density in the radiation rest frame
+	  Erf=3.*Av[0]/(4.*urflab[0]*urflab[0]+GG[0][0]);
+	}
+      else //in VELR
+	{
+	  gammarel2=1.0;
+	  Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
+	  //zeros for relative velocity
+	  urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
+	}
 
-      //calculating time component of lab 4-vel
-      ldouble gammarel=1.0;
-      ldouble urflab[4];
-      ldouble alpha = sqrt(-1./GG[0][0]);
-      urflab[0]=gammarel/alpha;
-
-      //radiative energy density in the radiation rest frame
-      Erf=3.*Av[0]/(4.*urflab[0]*urflab[0]+GG[0][0]);
+      if(verbose) {printf("midcapalt: Erf=%g\n",Erf);}
+	 
+      if(Erf<ERADFLOOR)
+	{ 
+	  // Can't have Erf<0.  Like floor on internal energy density.  If leave Erf<0, then will drive code crazy with free energy.
+	  if(verbose) {printf("midcapaltnegErf: Erf=%g\n",Erf);}
+	  Erf=ERADFLOOR;
+	}	
     }
   else
     {
       //regular calculation
-      urfcon[0]=sqrt(gamma2);
-    
+      //urfcon[0]=sqrt(gamma2);
       //radiative energy density in the radiation rest frame
-      Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+      //Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
+      Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
-      //relative velocity
-      ldouble alpha=sqrt(-1./GG[0][0]);
-      ldouble gamma=urfcon[0]*alpha;
-      for(i=1;i<4;i++)
-	{	  
-	  urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha-GG[0][i]/GG[0][0]/alpha;
-	  urfcon[i]*=gamma;
+      if(Erf<ERADFLOOR)
+	{
+	  Erf=ERADFLOOR;
+	  urfcon[0]=0.;
+	  urfcon[1]=0.;
+	  urfcon[2]=0.;
+	  urfcon[3]=0.;
+	  if(verbose) {printf("nocapbad: gammarel2=%g\n",gammarel2);}
+	}					
+ 
+      if(1) //VELR
+	{
+	  ldouble gammarel=sqrt(gammarel2);
+	  for(i=1;i<4;i++)
+	    {	  
+	      urfcon[i] = alpha * (Av[i] + 1./3.*Erf*GG[0][i]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
+	    }
 	}
-      urfcon[0]=0.;
+      else
+	{
+	  //relative velocity
+	  ldouble gamma=urfcon[0]*alpha;
+	  for(i=1;i<4;i++)
+	    {	  
+	      urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha-GG[0][i]/GG[0][0]/alpha;
+	      urfcon[i]*=gamma;
+	    }
+	  urfcon[0]=0.;
+	}
     }
 
    conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
