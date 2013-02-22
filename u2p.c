@@ -764,20 +764,21 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   ldouble gammarel2=gamma2*alpha*alpha;
 
   /*
-  if(gammarel2<0.0 || delta<0. && 0)
+  if(delta<0.)
     {
       // can't assume this conditions means large gamma, because if not, then leads to crazy boost of energy.
       Erf=ERADFLOOR;
-
-      gammarel2=1.0;
-      Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
+      //gammarel2=1.0;
+      //Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
       //zeros for relative velocity
       urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
 
       if(verbose) {printf("topcapbad: gammarel2=%g gamma2=%g delta=%g\n",gammarel2,gamma2,delta);}
     }
-    else if(gammarel2>gammamax*gammamax ) */
-    if(gammarel2>gammamax*gammamax || gammarel2<0.0 || delta<0.) 
+  else 
+  */
+
+  if(gammarel2>gammamax*gammamax) 
     {      
       //top cap
       *corrected=1;
@@ -822,9 +823,9 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 
 	    // now rescale Aradrel[i] so will give desired \gammamax
 	    for(i=1;i<4;i++)
-	    {
-	    Aradrel[i] *= (gammamax/gammatemp);
-	    }
+	      {
+		Aradrel[i] *= (gammamax/gammatemp);
+	      }
 	    
 
 	    for(i=1;i<4;i++)
@@ -865,7 +866,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	}// end else if Erf>0
     }
   //  else if(gammarel2<(-1./GG[0][0]))
-  else if(gammarel2<1.)
+  else if(gammarel2<1. || delta<0.)
     {
       //low cap
       *corrected=1;
