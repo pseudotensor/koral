@@ -14,7 +14,7 @@
 
 #define NX 30
 #define NY 1
-#define NZ 15
+#define NZ 30
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
 #define RK3STEPPING
@@ -46,8 +46,8 @@
 #define MKS1R0 .5
 
 #define MINX 5.5
-//#define MAXX 7.5
-#define MAXX 12.5
+#define MAXX 7.5
+//#define MAXX 12.5
 #define BEAML 5.8
 #define BEAMR 6.2
 #define DTOUT1 .4 //dt for basic output

@@ -761,25 +761,32 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   ldouble gammamax=GAMMAMAXRAD;
 
   //gamma in relative velocity definition
-  ldouble gammarel2=gamma2/alpha/alpha;
+  ldouble gammarel2=gamma2*alpha*alpha;
 
-  if(gammarel2<0.0 || delta<0.)
+  /*
+  if(gammarel2<0.0 || delta<0. && 0)
     {
       // can't assume this conditions means large gamma, because if not, then leads to crazy boost of energy.
       Erf=ERADFLOOR;
-      urfcon[0]=0.;
-      urfcon[1]=0.;
-      urfcon[2]=0.;
-      urfcon[3]=0.;
-      if(verbose) {printf("topcapbad: gammarel2=%g gamma2=%g\n",gammarel2,gamma2);}
+
+      gammarel2=1.0;
+      Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
+      //zeros for relative velocity
+      urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
+
+      if(verbose) {printf("topcapbad: gammarel2=%g gamma2=%g delta=%g\n",gammarel2,gamma2,delta);}
     }
-  else if(gammarel2>gammamax*gammamax) 
+    else if(gammarel2>gammamax*gammamax ) */
+    if(gammarel2>gammamax*gammamax || gammarel2<0.0 || delta<0.) 
     {      
       //top cap
       *corrected=1;
       //urfcon[0]=gammamax;
-      ldouble gammarel=gammamax;
-      gammarel2=gammamax*gammamax;
+      ldouble gammarel;
+      
+      gammarel=gammamax;
+
+      gammarel2=gammarel*gammarel;
 
       //proper direction for the radiation rest frame, will be normalized later      
       //Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
@@ -787,6 +794,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 
       if(Erf<ERADFLOOR)
 	{
+	  
 	  Erf=ERADFLOOR;
 	  urfcon[0]=0.;
 	  urfcon[1]=0.;
@@ -802,7 +810,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	    for(i=1;i<4;i++)
 	      Aradrel[i] = alpha * (Av[i] + 1./3.*Erf*GG[0][i]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
 
-	    /* skipping as Aradrel[] constructed assuming gammamax
+	    // skipping as Aradrel[] constructed assuming gammamax
 	    // compute \gammarel using this
 	    ldouble qsq=0.;
 	    for(i=1;i<4;i++)
@@ -817,13 +825,13 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	    {
 	    Aradrel[i] *= (gammamax/gammatemp);
 	    }
-	    */
+	    
 
 	    for(i=1;i<4;i++)
 	      {
 		urfcon[i]=Aradrel[i];
 	      }
-	    if(verbose) {printf("topcapgamma Erf=%g gammaorg=%g gammanow=%g\n",Erf,gamma2/alpha/alpha,sqrt(gammarel2));}
+	    if(verbose) {printf("topcapgamma Erf=%g gammaorg=%g gammatemp=%g gammanow=%g\n",Erf,gamma2/alpha/alpha,gammatemp,gammamax);}
 	  }
 	  else if(0){ //going through VEL4
 	    ldouble Arad[4];

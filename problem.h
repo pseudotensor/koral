@@ -30,7 +30,7 @@
 //25 RDONUT - 2d radiative Polish donut in KS
 //26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
 
-#define PROBLEM 24
+#define PROBLEM 19
 
 #if(PROBLEM==1)
 
@@ -573,11 +573,11 @@
 #endif
 
 #ifndef GAMMAMAXHD
-#define GAMMAMAXHD 100.
+#define GAMMAMAXHD 1000.
 #endif
 
 #ifndef GAMMAMAXRAD
-#define GAMMAMAXRAD 100.
+#define GAMMAMAXRAD 1000.
 #endif
 
 /*********************/
