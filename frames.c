@@ -212,10 +212,13 @@ calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   if(verbose>0) print_4vector(ucon);
 
   //four velocity of the lab frame
-  ldouble wcon[4],wcov[4];
-  wcon[0]=1./sqrt(-gg[0][0]);
-  wcon[1]=wcon[2]=wcon[3]=0.;
-  indices_21(wcon,wcov,gg);
+  ldouble alpha=-1./GG[0][0];
+  ldouble wcon[4],wcov[4]={-alpha,0.,0.,0.};
+  indices_12(wcov,wcon,GG);
+
+  //wcon[0]=1./sqrt(-gg[0][0]);
+  //wcon[1]=wcon[2]=wcon[3]=0.;
+  //indices_21(wcon,wcov,gg);
 
   if(verbose>0) print_4vector(wcon);
 
@@ -265,10 +268,13 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   if(verbose>0) print_4vector(wcon);
 
   //four velocity of the lab frame
-  ldouble ucon[4],ucov[4];
-  ucon[0]=1./sqrt(-gg[0][0]);
-  ucon[1]=ucon[2]=ucon[3]=0.;
-  indices_21(ucon,ucov,gg);
+  ldouble alpha=-1./GG[0][0];
+  ldouble ucon[4],ucov[4]={-alpha,0.,0.,0.};
+  indices_12(wcov,wcon,GG);
+
+  //ucon[0]=1./sqrt(-gg[0][0]);
+  //ucon[1]=ucon[2]=ucon[3]=0.;
+  //indices_21(ucon,ucov,gg);
 
   if(verbose>0) print_4vector(ucon);
 
