@@ -31,7 +31,7 @@
 //26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
 //27 RADFLATNESS - flat but with non-zero four-force
 
-#define PROBLEM 10
+#define PROBLEM 27
 
 #if(PROBLEM==1)
 
@@ -607,7 +607,9 @@
 
 #define GAMMAM1 (GAMMA-1.) //gamma - 1
 
+#ifndef MASSCM
 #define MASSCM (MASS*MSUNCM) //mass in cm
+#endif
 
 #define LCM (MASSCM) //unit of length in cm
 

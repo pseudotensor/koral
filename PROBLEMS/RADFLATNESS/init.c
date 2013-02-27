@@ -30,26 +30,16 @@ ldouble pp[NV],T;
 
 /*****************************/
 
-rho=RADBEAMFLAT_RHO;
-uint=RADBEAMFLAT_UU;
-
- E= RADBEAMFLAT_ERAD;
-Fx=Fy=Fz=0.*E;
-
-
-pp[0]=rho;
-pp[1]=uint;
+pp[0]=1.;
+pp[1]=1.;
 pp[2]=0.;
 pp[3]=0.;
 pp[4]=0.;
 pp[5]=calc_Sfromu(rho,uint);
-pp[6]=E;
-pp[7]=Fx;
-pp[8]=Fy;
-pp[9]=Fz;
-
-prad_zamo2ff(pp,pp,gg,GG,eup);
-prad_ff2lab(pp,pp,gg,GG,tlo);
+pp[6]=LTEFACTOR*calc_LTE_Efromurho(pp[0],pp[1]);
+pp[7]=URFX;
+pp[8]=0.;
+pp[9]=0.;
 
 p2u(pp,uu,gg,GG);
 

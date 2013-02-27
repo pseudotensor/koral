@@ -1,3 +1,4 @@
+0226 - *** - average over neighbors for unsuccesfull inversions etc
 0208 - ** - correct u2p_cold to generalize to relative velocities
 0208 - **** - that tetrad issue, multiplying conserved by alpha?
 0206 - ** - simplify transformations of radiative primitives between coordinates - Erf intact, urf through trans2_coco()
