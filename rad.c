@@ -525,9 +525,8 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
   ldouble rho=pp[0];
   ldouble u=pp[1];
   ldouble p= (GAMMA-1.)*(ldouble)u;
-  ldouble T = p*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
   ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
   ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);
   ldouble chi=kappa+kappaes;
