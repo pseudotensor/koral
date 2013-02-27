@@ -29,6 +29,7 @@
 //24 RADBEAMFLAT - beam of light in Cartesian 
 //25 RDONUT - 2d radiative Polish donut in KS
 //26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
+//27 RADFLATNESS - flat but with non-zero four-force
 
 #define PROBLEM 10
 
@@ -395,6 +396,20 @@
 #define PR_OUT2GIF_1D "PROBLEMS/RADBEAM2DKSVERT/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADBEAM2DKSVERT/dump.c"
 #define PR_ANASOL "PROBLEMS/RADBEAM2DKSVERT/anasol.c"
+
+#endif
+
+#if(PROBLEM==27)
+
+#define PR_DEFINE "PROBLEMS/RADFLATNESS/define.h"
+#define PR_BC "PROBLEMS/RADFLATNESS/bc.c"
+#define PR_INIT "PROBLEMS/RADFLATNESS/init.c"
+#define PR_KAPPA "PROBLEMS/RADFLATNESS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADFLATNESS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADFLATNESS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADFLATNESS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADFLATNESS/dump.c"
+#define PR_ANASOL "PROBLEMS/RADFLATNESS/anasol.c"
 
 #endif
 
