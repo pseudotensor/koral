@@ -212,7 +212,7 @@ calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   if(verbose>0) print_4vector(ucon);
 
   //four velocity of the lab frame
-  ldouble alpha=-1./GG[0][0];
+  ldouble alpha=sqrt(-1./GG[0][0]);
   ldouble wcon[4],wcov[4]={-alpha,0.,0.,0.};
   indices_12(wcov,wcon,GG);
 
@@ -268,7 +268,7 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   if(verbose>0) print_4vector(wcon);
 
   //four velocity of the lab frame
-  ldouble alpha=-1./GG[0][0];
+  ldouble alpha=sqrt(-1./GG[0][0]);
   ldouble ucon[4],ucov[4]={-alpha,0.,0.,0.};
   indices_12(ucov,ucon,GG);
 
@@ -321,7 +321,7 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
   calc_Lorentz_lab2ff(pp,gg,GG,L);
 
   //copying and multiplying by lapse to express T1 in ZAMO
-  ldouble alpha=sqrt(-GG[0][0]);  
+  ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
     {
       for(j=0;j<4;j++)
@@ -411,7 +411,7 @@ boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
     } 
 
   //dividing by lapse to express T2 in no-frame
-  ldouble alpha=sqrt(-GG[0][0]);  
+  ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
     {
       for(j=0;j<4;j++)
@@ -447,7 +447,7 @@ boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
   calc_Lorentz_lab2ff(pp,gg,GG,L);
 
   //copying and multiplying by lapse to express A1 in ZAMO
-  ldouble alpha=sqrt(-GG[0][0]);  
+  ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
     {
       At[i]=A1[i]*alpha;
@@ -509,7 +509,7 @@ boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
     }
 
   //dividing by lapse to express A2 in no-frame
-  ldouble alpha=sqrt(-GG[0][0]);  
+  ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
     {      
       A2[i]=A2[i]/alpha;	

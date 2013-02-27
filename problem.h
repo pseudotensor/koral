@@ -31,7 +31,7 @@
 //26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
 //27 RADFLATNESS - flat but with non-zero four-force
 
-#define PROBLEM 27
+#define PROBLEM 19
 
 #if(PROBLEM==1)
 

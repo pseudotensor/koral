@@ -81,8 +81,17 @@ maxy=.5*sin(get_xb(-1,2))*get_xb(NX+1,0)+( get_xb(NX+1,0)-get_xb( -1,0)*cos(get_
 	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-$23*sin($3))/(%e)):(($23*cos($3)+$21*sin($3))/%e) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
   
 
-,fname2,minx,maxx,miny,maxy,fname
-	    , fname,4.e-18,4.e-18,(int)(NX/10),(int)(NZ/10)
+,fname2,minx,maxx,miny,maxy,fname, fname,
+#if(BEAMNO==1)
+	    4.e-17,4.e-17,
+#endif
+#if(BEAMNO==2)
+4.e-18,4.e-18,
+#endif
+#if(BEAMNO==3)
+4.e-18,4.e-18,
+#endif
+(int)(NX/10),(int)(NZ/10)
 );
 #endif
 	    

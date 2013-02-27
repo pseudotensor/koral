@@ -27,7 +27,7 @@
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
-#define BEAMNO 2
+#define BEAMNO 1
 
 #define IFBEAM 1
 //#define GASRADOFF
