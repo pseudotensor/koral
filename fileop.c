@@ -110,16 +110,16 @@ fprint_profiles(ldouble t, ldouble totmass)
   fout1=fopen(bufor,"w");
 
   int ix,iy,iz,iv;
-  int gcl,gcr;
+  int gclx,gcrx,gcly,gcry,gclz,gcrz;
 
   //whether print ghost cells or not - default values
-  gcl=gcr=0;
-
+  gclx=gcly=gclz=0;
+  gcrx=gcry=gcrz=0;
 #ifdef PRINTGC_LEFT
-  gcl=1;
+  gclx=1;
 #endif
 #ifdef PRINTGC_RIGHT
-  gcr=1;
+  gcrx=1;
 #endif
 
   if(totmass!=0)
@@ -132,30 +132,30 @@ fprint_profiles(ldouble t, ldouble totmass)
 #ifdef YZXDUMP
   for(iy=0;iy<NY;iy++)
     {
-      for(iz=-gcl*NG;iz<NZ+gcr*NG;iz++)
+      for(iz=-gclz*NG;iz<NZ+gcrz*NG;iz++)
 	{
-	  for(ix=-gcl*NG;ix<NX+gcr*NG;ix++)
+	  for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
 	    {
 #elif defined(YSLICE)
 	      for(iy=YSLICE;iy<YSLICE+1;iy++)
 		{
 		  for(iz=0;iz<NZ;iz++)
 		    {
-		      for(ix=-gcl*NG;ix<NX+gcr*NG;ix++)
+		      for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
 			{
 #elif defined(YZSLICE)
 			  for(iy=NY/2;iy<NY/2+1;iy++)
 			    {
 			      for(iz=NZ/2;iz<NZ/2+1;iz++)
 				{
-				  for(ix=-gcl*NG;ix<NX+gcr*NG;ix++)
+				  for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
 				    {
 #else
 				      for(iz=0;iz<NZ;iz++)
 					{
-					  for(iy=-gcl*NG;iy<NY+gcr*NG;iy++)
+					  for(iy=-gcly*NG;iy<NY+gcry*NG;iy++)
 					    {
-					      for(ix=-gcl*NG;ix<NX+gcr*NG;ix++)
+					      for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
 						{
 #endif
 						  //within domain:

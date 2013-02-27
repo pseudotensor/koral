@@ -30,8 +30,9 @@
 //25 RDONUT - 2d radiative Polish donut in KS
 //26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
 //27 RADFLATNESS - flat but with non-zero four-force
+//28 BOWSHOCK - bow shock hydro test
 
-#define PROBLEM 19
+#define PROBLEM 28
 
 #if(PROBLEM==1)
 
@@ -410,6 +411,20 @@
 #define PR_OUT2GIF_1D "PROBLEMS/RADFLATNESS/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADFLATNESS/dump.c"
 #define PR_ANASOL "PROBLEMS/RADFLATNESS/anasol.c"
+
+#endif
+
+#if(PROBLEM==28)
+
+#define PR_DEFINE "PROBLEMS/BOWSHOCK/define.h"
+#define PR_BC "PROBLEMS/BOWSHOCK/bc.c"
+#define PR_INIT "PROBLEMS/BOWSHOCK/init.c"
+#define PR_KAPPA "PROBLEMS/BOWSHOCK/kappa.c"
+#define PR_KAPPAES "PROBLEMS/BOWSHOCK/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/BOWSHOCK/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/BOWSHOCK/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/BOWSHOCK/dump.c"
+#define PR_ANASOL "PROBLEMS/BOWSHOCK/anasol.c"
 
 #endif
 
