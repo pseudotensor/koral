@@ -71,23 +71,23 @@ ldouble zz=get_x(iz,2);
       return 0;
     }
 
-  //reflections in theta 
-  if(iy<0.) //spin axis
+  //theta 
+  if(iy<0.) //spin axis, transmissive
     {      
       iiy=-iy-1;
-      iiz=iz;
+      iiz=NZ-1-iz;
       iix=ix;
       for(iv=0;iv<NV;iv++)
 	{
-	  if(iv==3)
-	    pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	  else
-	    pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	   if(iv==4)
+	      pp[iv]=-get_u(p,iv,iix,iiy,iiz);
+	   else
+	     pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
       p2u(pp,uu,gg,GG);
       return 0;
      }
-  if(iy>=NY) //equatorial plane
+  if(iy>=NY) //equatorial plane, reflection
     {
       iiy=NY-(iy-NY)-1;
       iiz=iz;

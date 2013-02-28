@@ -30,7 +30,7 @@
 #define MINZ 0.
 #define MAXZ Pi
 #define NX 20
-#define NY 20
+#define NY 10
 #define NZ 20
 #define MINX 6.
 #define MAXX 20.
@@ -49,7 +49,7 @@
 
 #define SPECIFIC_BC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.5
 
 #define DTOUT1 30.
 #define ALLSTEPSOUTPUT 0
