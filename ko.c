@@ -127,6 +127,10 @@ solve_all_problems_5(ldouble tstart)
   //main time loop
   while (t < t1 && nfout1<NOUTSTOP && i1<NSTEPSTOP)
     {    
+
+	  fprintf(stderr,"nfout1=%d\n",nfout1);
+	  fprintf(stderr,"i1=%d\n",i1);
+
      //initial time mark
 #ifndef SKIP_CLOCK
       clock_gettime(CLOCK_REALTIME,&temp_clock);

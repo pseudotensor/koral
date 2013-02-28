@@ -4,9 +4,10 @@
 #define VERBOSE0 0
 #define MYCOORDS MINKCOORDS
 
-#define RK3STEPPING
+//#define RK3STEPPING
+#define RK2STEPPING
 #define INT_ORDER 1
-#define NX 101
+#define NX 100
 #define NY 1
 #define NZ 1
 #define TSTEPLIM .5
@@ -16,8 +17,9 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
-#define DTOUT1 1.e2
+#define MINMOD_THETA 2.
+//#define DTOUT1 1.e2
+#define DTOUT1 0.1
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (ldouble)(5./3.)
 #define MINX -50.
@@ -26,6 +28,7 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1.
+#define TMAX 1e2
 
 #define RHO_AMB 1.e0
 #define T_AMB 1.e6
@@ -38,7 +41,17 @@
 //#define GASRADOFF
 
 #define KAPPA 0.
-#define KAPPAES 1.e3
+//#define KAPPAES 1.e3
+
+#define KAPPAES (5.90799*1E3)
+//#define KAPPAES (5.90799)
+//#define KAPPAES (5.90799*1E-1)
+//#define KAPPAES (5.90799*1E-2)
+//#define KAPPAES (5.90799*1E-3)
+//#define KAPPAES (5.90799*1E-3*1E-10)
+
+
+//#define KAPPAES (1E-2)
 //#define EDDINGTON_APR
 
 //#define PRINTGC_LEFT
@@ -46,6 +59,7 @@
 
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
+#define IMPLICIT_LAB_RAD_SOURCE
 #define RADOUTPUTINZAMO
 #define UFLOOR 1.e-40
 #define RHOFLOOR 1.e-40

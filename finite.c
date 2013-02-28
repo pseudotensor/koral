@@ -610,6 +610,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 #pragma omp parallel for private(iy,iz,iv) schedule (guided)
   for(ix=0;ix<NX;ix++)
     {
+	  fprintf(stderr,"LOOP ix=%d\n",ix);
       for(iy=0;iy<NY;iy++)
 	{
 	  for(iz=0;iz<NZ;iz++)
@@ -669,6 +670,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  //unsplit scheme
 		  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
 
+		  fprintf(stderr,"2LOOP ix=%d\n",ix);
+
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
 
 		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz),dt);getchar();}
@@ -683,6 +686,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //metric source terms
 	      f_metric_source_term(ix,iy,iz,ms);
 
+		  fprintf(stderr,"3LOOP ix=%d\n",ix);
+
 	      for(iv=0;iv<NV;iv++)
 		{
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*ms[iv]*dt;
@@ -694,6 +699,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		{
 		  pp[iv]=get_u(p,iv,ix,iy,iz);      
 		}
+
+		  fprintf(stderr,"4LOOP ix=%d\n",ix);
 
 #ifdef RADIATION
 	      //updating using radiative four force
@@ -720,8 +727,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE
+		  fprintf(stderr,"EX ix=%d\n",ix);
+	  
 	      //new primitives before the source operator
-	      calc_primitives(ix,iy,iz);
+		  //	      calc_primitives(ix,iy,iz); // leads to split method.
 	      //applied explicitly directly in lab frame
 	      solve_explicit_lab(ix,iy,iz,dt,del4);
 	      indices_21(del4,del4,gg);
@@ -846,8 +855,11 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       al=1.;
 #endif
 
+
       //Lax-Friedrich
       fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - al * (fd_uRl[i] - fd_uLl[i]));
+
+	  fprintf(stderr,"ix=%d pl=%d ctoppl=%g U_l=%g U_r=%g F_l=%g F_r=%g F=%g\n",ix,i,al,fd_uLl[i],fd_uRl[i],get_ub(flLx,i,ix,iy,iz,0),get_ub(flRx,i,ix,iy,iz,0),fd_fstarl[i]);
   
       set_ubx(flbx,i,ix,iy,iz,fd_fstarl[i]);
     }

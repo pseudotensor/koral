@@ -192,6 +192,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	{
 	  if(verbose) printf("success ===\n");
+	  fprintf(stderr,"success iter=%d\n",iter);
 	  break;
 	}
 
@@ -200,14 +201,25 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	  printf("iter exceeded in solve_implicit_lab()\n");	  
 	  return -1;
 	}
+	  fprintf(stderr,"iter=%d\n",iter);
      
     }
   while(1);
+
+
+
 
   deltas[0]=uu[6]-uu0[6];
   deltas[1]=uu[7]-uu0[7];
   deltas[2]=uu[8]-uu0[8];
   deltas[3]=uu[9]-uu0[9];
+
+
+  fprintf(stderr,"ix=%d implicitGd[%d]=%g dt=%g\n",ix,0,-deltas[0]/dt,dt);
+  fprintf(stderr,"ix=%d implicitGd[%d]=%g dt=%g\n",ix,1,-deltas[1]/dt,dt);
+  fprintf(stderr,"ix=%d implicitGd[%d]=%g dt=%g\n",ix,2,-deltas[2]/dt,dt);
+  fprintf(stderr,"ix=%d implicitGd[%d]=%g dt=%g\n",ix,3,-deltas[3]/dt,dt);
+
   
   return 0;
 }
@@ -272,6 +284,11 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 
   deltas[0]=E-pp[6];
 
+  ldouble downdeltas[4];
+  indices_21(deltas,downdeltas,gg);
+  fprintf(stderr,"ix=%d implicitFFGd[%d]=%g dt=%g\n",ix,0,-deltas[0]/dt,dt);
+
+
   return 0;
 
 }
@@ -301,6 +318,16 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 
   ldouble Gi[4];
   calc_Gi(pp,gg,GG,Gi);
+
+#if(1)
+  ldouble dx[4];
+  dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
+  fprintf(stderr,"ix=%d explicitGd[%d]=%g vs=%g\n",ix,0,-Gi[0],dx[0]/(dt/TSTEPLIM));
+  fprintf(stderr,"ix=%d explicitGd[%d]=%g vs=%g\n",ix,1,-Gi[1],dx[0]/(dt/TSTEPLIM));
+  fprintf(stderr,"ix=%d explicitGd[%d]=%g vs=%g\n",ix,2,-Gi[2],dx[0]/(dt/TSTEPLIM));
+  fprintf(stderr,"ix=%d explicitGd[%d]=%g vs=%g\n",ix,3,-Gi[3],dx[0]/(dt/TSTEPLIM));
+#endif
+
   
   deltas[0]=-Gi[0]*dt;
   deltas[1]=-Gi[1]*dt;
@@ -531,6 +558,7 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
   ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
   ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);
   ldouble chi=kappa+kappaes;
+  fprintf(stderr,"rho=%g u=%g T=%g B=%g Erad=%g\n",rho,u/rho,T,B/rho,pp[6]/rho);
 
   //contravariant four-force in the lab frame
 
@@ -540,6 +568,25 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
     for(j=0;j<4;j++)
       Ruu+=Rij[i][j]*ucov[i]*ucov[j];
 
+  for(j=0;j<4;j++) fprintf(stderr,"ucov[%d]=%g ucon[%d]=%g\n",j,ucov[j],j,ucon[j]);
+
+
+  ldouble uradcon[4],uradcov[4];
+  uradcon[0]=0.;
+  uradcon[1]=pp[7];
+  uradcon[2]=pp[8];
+  uradcon[3]=pp[9];
+  //converting to lab four-velocity
+  conv_vels(uradcon,uradcon,VELPRIMRAD,VEL4,gg,GG);
+
+  indices_21(uradcon,uradcov,gg);
+  
+  for(j=0;j<4;j++) fprintf(stderr,"uradcov[%d]=%g uradcon[%d]=%g\n",j,uradcov[j],j,uradcon[j]);
+
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+	  fprintf(stderr,"i=%d j=%d Rij=%g\n",i,j,Rij[i][j]);
+
   ldouble Ru;
   for(i=0;i<4;i++)
     {
@@ -547,6 +594,9 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
       for(j=0;j<4;j++)
 	Ru+=Rij[i][j]*ucov[j];
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
+
+	  fprintf(stderr,"i=%d : Ruu=%g Ru=%g chi=%g Gi=%g\n",i,Ruu/rho,Ru/rho,chi,Gi[i]/rho);
+
     }
 
   return 0;

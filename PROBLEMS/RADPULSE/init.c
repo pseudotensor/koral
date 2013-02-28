@@ -30,7 +30,9 @@ set_initial_profile()
 
       ldouble rho0,Tgas0,ur,Tgas,Trad,r,rcm,prad,pgas,vx,ut;
 
-Tgas=T_AMB*(1.+BLOBP*exp(-((xx)*(xx)+(yy)*(yy)+(zz)*(zz))/BLOBW/BLOBW));
+//Tgas=T_AMB*(1.+BLOBP*exp(-((xx)*(xx)+(yy)*(yy)+(zz)*(zz))/BLOBW/BLOBW));
+
+Tgas=T_AMB*(1.+BLOBP*exp(-((xx)*(xx))/BLOBW/BLOBW));
 
 //if(ix==NX/2 ) {printf("%d %Le %Le %Le %Le %Le %e\n",ix,xx,yy,zz,Tgas,(ldouble)4.*SIGMA_RAD*Tgas*Tgas*Tgas*Tgas,SIGMA_RAD); getchar();}
 E=calc_LTE_EfromT(Tgas);

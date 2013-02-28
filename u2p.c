@@ -727,6 +727,8 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
     getchar();
   }
 
+  fprintf(stderr,"ADIDINVERSION: %g %g %g %g : %g %g %g %g\n",uu[6],uu[7],uu[8],uu[9],pp[6],pp[7],pp[8],pp[9]);
+
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
@@ -948,6 +950,9 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
    pp[7]=urfcon[1];
    pp[8]=urfcon[2];
    pp[9]=urfcon[3];
+
+   fprintf(stderr,"BDIDINVERSION: %g %g %g %g : %g %g %g %g\n",uu[6],uu[7],uu[8],uu[9],pp[6],pp[7],pp[8],pp[9]);
+
 
    return 0;
 }
