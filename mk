@@ -1,3 +1,3 @@
 make clean
-make
+make -j 8
 ./ko

@@ -12,7 +12,7 @@ maxx= 1.01*get_xb(NX+1,0);
 miny=minx;
 maxy=maxx;
 #endif
-#ifdef SPHERICAL
+#ifdef SPHERICAL 
 minx= -1.1*get_xb(NX+1,0);
 maxx= 1.1*get_xb(NX+1,0);
 miny=-0.05*maxx;
@@ -36,7 +36,12 @@ miny=-0.05*maxx;
 
 
 	  "unset surface\n"
+#ifdef CYLINDRICAL
+	  "set term gif large size 800,700\n"
+#endif
+#ifdef SPHERICAL
 	  "set term gif large size 1200,700\n"
+#endif
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
 	  "set origin 0,0\n"
