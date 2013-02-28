@@ -36,9 +36,12 @@
 #define MAXX 20.
 #endif
 
+#define GAMMA (ldouble)(5./3.)
+#define MACH 3
 
-#define VELINX -0.1
 #define UINTFRAC .001
+#define SOUNDSPEED sqrt(GAMMA*(GAMMA-1.)*UINTFRAC)
+#define VELINX -MACH*SOUNDSPEED
 
 #define RK3STEPPING
 #define INT_ORDER 1
@@ -53,7 +56,6 @@
 
 #define DTOUT1 30.
 #define ALLSTEPSOUTPUT 0
-#define GAMMA (ldouble)(5./3.)
 
 
 
