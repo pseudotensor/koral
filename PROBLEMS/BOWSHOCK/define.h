@@ -4,8 +4,8 @@
 #define VERBOSE0 0
 #define BHSPIN 0.
 
-//efine CYLINDRICAL
-#define SPHERICAL
+#define CYLINDRICAL
+//#define SPHERICAL
 
 #ifdef CYLINDRICAL
 #define MYCOORDS CYLCOORDS
@@ -15,11 +15,11 @@
 #define MAXZ 2.*Pi
 #define YZXDUMP
 #define PRINTZONEMORE
-#define NX 80
+#define NX 60
 #define NY 1 
 #define NZ 80
 #define MINX 6.
-#define MAXX 40.
+#define MAXX 30.
 #endif
 
 #ifdef SPHERICAL
