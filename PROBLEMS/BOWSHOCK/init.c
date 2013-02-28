@@ -30,7 +30,18 @@ ldouble pp[NV],T;
 pp[0]=1.;
 pp[1]=UINTFRAC;
 pp[2]=pp[3]=pp[4]=0.;
-pp[2]=VELINX;
+
+#ifdef SPHERICAL
+pp[2]=VELINX*cos(zz)*sin(yy)/sqrt(gg[1][1]);
+pp[3]=VELINX*cos(zz)*cos(yy)/sqrt(gg[2][2]);
+pp[4]=-VELINX*sin(zz)/sqrt(gg[3][3]);
+#endif
+
+#ifdef CYLINDRICAL
+pp[2]=VELINX*cos(zz);
+pp[4]=-VELINX*sin(zz)/sqrt(gg[3][3]);
+#endif
+
 pp[5]=calc_Sfromu(pp[0],pp[1]);	      
 
 //converting from 3vel to VELPRIM

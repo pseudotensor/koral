@@ -121,6 +121,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 #ifdef PRINTGC_RIGHT
   gcrx=1;
 #endif
+#ifdef PRINTZONEMORE
+  gcrz=1;
+#endif
 
   if(totmass!=0)
     fprintf(fout_totmass,"%e %e\n",t,totmass);
