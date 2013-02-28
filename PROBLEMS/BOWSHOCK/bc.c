@@ -21,10 +21,22 @@ ldouble zz=get_x(iz,2);
 #ifdef SPHERICAL
   if(ix>=NX) //imposing velocity inflow
     {
-      pp[0]=1.;
-      pp[1]=UINTFRAC;
-      pp[2]=pp[3]=pp[4]=0.;
-
+      if(zz>Pi/2.) //outflow
+	{
+	  iiy=iy;
+	  iiz=iz;
+	  iix=NX-1;
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	    }
+	}
+      else
+	{
+	  pp[0]=1.;
+	  pp[1]=UINTFRAC;
+	}
+      
       pp[2]=VELINX*cos(zz)*sin(yy)/sqrt(gg[1][1]);
       pp[3]=VELINX*cos(zz)*cos(yy)/sqrt(gg[2][2]);
       pp[4]=-VELINX*sin(zz)/sqrt(gg[3][3]);

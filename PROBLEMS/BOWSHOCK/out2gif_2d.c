@@ -71,7 +71,7 @@ miny=-0.05*maxx;
 #endif
 #ifdef SPHERICAL
 	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($16*cos($3)-$18*$1*sin($3))*(%e)):(($18*$1*cos($3)+$16*sin($3))*%e) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
-,fname2,minx,maxx,miny,maxy,fname, fname, 20.,20., (int)(NX/10),(int)(NZ/20)
+,fname2,minx,maxx,miny,maxy,fname, fname, 15.,15., (int)(NX/10),(int)(NZ/20)
 #endif
 
 );

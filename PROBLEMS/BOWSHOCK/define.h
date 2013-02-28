@@ -15,6 +15,11 @@
 #define MAXZ 2.*Pi
 #define YZXDUMP
 #define PRINTZONEMORE
+#define NX 80
+#define NY 1 
+#define NZ 80
+#define MINX 6.
+#define MAXX 40.
 #endif
 
 #ifdef SPHERICAL
@@ -24,6 +29,11 @@
 #define MAXY 1.*Pi/2.
 #define MINZ 0.
 #define MAXZ Pi
+#define NX 20
+#define NY 20
+#define NZ 20
+#define MINX 6.
+#define MAXX 20.
 #endif
 
 
@@ -32,9 +42,6 @@
 
 #define RK3STEPPING
 #define INT_ORDER 1
-#define NX 20
-#define NY 20
-#define NZ 20
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define NOUTSTOP 1000
@@ -42,14 +49,12 @@
 
 #define SPECIFIC_BC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 2.
 
 #define DTOUT1 30.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (ldouble)(5./3.)
 
-#define MINX 6.
-#define MAXX 40.
 
 
 #define RHOFLOOR 1.e-20
