@@ -40,7 +40,7 @@ miny=-0.05*maxx;
 	  "set term gif large size 800,700\n"
 #endif
 #ifdef SPHERICAL
-	  "set term gif large size 1200,700\n"
+	  "set term gif large size 1200,550\n"
 #endif
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"

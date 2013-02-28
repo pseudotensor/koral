@@ -52,7 +52,7 @@
 
 #define SPECIFIC_BC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 
 #define DTOUT1 30.
 #define ALLSTEPSOUTPUT 0
