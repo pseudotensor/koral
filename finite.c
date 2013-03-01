@@ -708,36 +708,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		{
 		  //use the explicit-implicit backup method
 		  printf("imp_ff at %d,%d,%d\n",ix,iy,iz);
-		  //new primitives before the source operator
 		  calc_primitives(ix,iy,iz);
-		  //semi-implicit in the fluid frame - only approximate!
 		  solve_implicit_ff(ix,iy,iz,dt,del4);
 		  trans2_on2cc(del4,del4,tlo);
 		  boost2_ff2lab(del4,del4,pp,gg,GG);
 		  indices_21(del4,del4,gg);
 		}		
-
-#endif
-
-#ifdef EXPLICIT_RAD_SOURCE
-	      //new primitives before the source operator
-	      calc_primitives(ix,iy,iz);
-	      //applied explicitly directly in lab frame
-	      solve_explicit_lab(ix,iy,iz,dt,del4);
-	      indices_21(del4,del4,gg);
-#endif
-
-#ifdef IMPLICIT_FF_RAD_SOURCE
-	      //new primitives before the source operator
-	      calc_primitives(ix,iy,iz);
-	      //semi-implicit in the fluid frame - only approximate!
-	      solve_implicit_ff(ix,iy,iz,dt,del4);
-	      //	      boost2_ff2zamo(del4,del4,pp,gg,eup);
-	      //	      trans2_zamo2lab(del4,del4,elo);
-	      trans2_on2cc(del4,del4,tlo);
-	      boost2_ff2lab(del4,del4,pp,gg,GG);
-	      indices_21(del4,del4,gg);
-#endif
 
 	      delapl[0]=0.;
 	      delapl[1]=-del4[0];
@@ -752,18 +728,134 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 	      for(iv=0;iv<NV;iv++)
 		{
-
 #ifdef RADSOURCEOFF
 		  continue;
 #endif
-
 #ifdef GASRADOFF
 		  if(iv<7) continue;
 #endif
-
 		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
+		}
+#endif
 
-		} 	      
+#ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
+	      double fdt, fdta, maxfu=-1., fu;
+	      
+	      fdt=fdta=0.;
+
+	      do
+		{
+		  //new primitives
+		  calc_primitives(ix,iy,iz);
+		  //vector of changes of conserved assuming original dt which only multiplies source terms
+		  solve_explicit_lab(ix,iy,iz,dt,del4);
+		  indices_21(del4,del4,gg);
+		  //changes to conserved
+		  delapl[0]=0.;
+		  delapl[1]=-del4[0];
+		  delapl[2]=-del4[1];
+		  delapl[3]=-del4[2];
+		  delapl[4]=-del4[3];
+		  delapl[5]=0.;
+		  delapl[6]=del4[0];
+		  delapl[7]=del4[1];
+		  delapl[8]=del4[2];
+		  delapl[9]=del4[3];
+		  //comparing with conserved to get the largest change
+		  maxfu=-1.;
+		  for(iv=0;iv<NV;iv++)
+		    {
+		      fu=fabs(delapl[iv]/get_u(u,iv,ix,iy,iz));
+		      if(fu>maxfu) maxfu=fu;
+		    }
+		  if(fu<1./MAX_EXPLICIT_NSUBSTEPS)
+		    fdt=1.-fdta;
+		  else
+		    fdt=1./MAX_EXPLICIT_NSUBSTEPS;
+		  
+	
+		  for(iv=0;iv<NV;iv++)
+		    {
+#ifdef RADSOURCEOFF
+		      continue;
+#endif
+#ifdef GASRADOFF
+		      if(iv<7) continue;
+#endif
+		      set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv]*fdt);
+		    }
+
+		  fdta+=fdt;
+
+		}
+	      while(fdta<1.);	     
+
+#endif
+
+#ifdef EXPLICIT_RAD_SOURCE
+	      //new primitives before the source operator
+	      calc_primitives(ix,iy,iz);
+	      //applied explicitly directly in lab frame
+	      solve_explicit_lab(ix,iy,iz,dt,del4);
+	      indices_21(del4,del4,gg);
+
+	      delapl[0]=0.;
+	      delapl[1]=-del4[0];
+	      delapl[2]=-del4[1];
+	      delapl[3]=-del4[2];
+	      delapl[4]=-del4[3];
+	      delapl[5]=0.;
+	      delapl[6]=del4[0];
+	      delapl[7]=del4[1];
+	      delapl[8]=del4[2];
+	      delapl[9]=del4[3];
+
+	      for(iv=0;iv<NV;iv++)
+		{
+#ifdef RADSOURCEOFF
+		  continue;
+#endif
+#ifdef GASRADOFF
+		  if(iv<7) continue;
+#endif
+		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
+		}
+#endif
+
+#ifdef IMPLICIT_FF_RAD_SOURCE
+	      //new primitives before the source operator
+	      calc_primitives(ix,iy,iz);
+	      //semi-implicit in the fluid frame - only approximate!
+	      solve_implicit_ff(ix,iy,iz,dt,del4);
+	      trans2_on2cc(del4,del4,tlo);
+	      boost2_ff2lab(del4,del4,pp,gg,GG);
+	      indices_21(del4,del4,gg);
+
+	      delapl[0]=0.;
+	      delapl[1]=-del4[0];
+	      delapl[2]=-del4[1];
+	      delapl[3]=-del4[2];
+	      delapl[4]=-del4[3];
+	      delapl[5]=0.;
+	      delapl[6]=del4[0];
+	      delapl[7]=del4[1];
+	      delapl[8]=del4[2];
+	      delapl[9]=del4[3];
+
+	      for(iv=0;iv<NV;iv++)
+		{
+#ifdef RADSOURCEOFF
+		  continue;
+#endif
+#ifdef GASRADOFF
+		  if(iv<7) continue;
+#endif
+		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
+		}
+#endif
+
+
+	      
 #endif //RADIATION
 
 	    }	      

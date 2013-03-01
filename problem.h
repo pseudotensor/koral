@@ -32,7 +32,7 @@
 //27 RADFLATNESS - flat but with non-zero four-force
 //28 BOWSHOCK - bow shock hydro test
 
-#define PROBLEM 28
+#define PROBLEM 10
 
 #if(PROBLEM==1)
 
@@ -610,6 +610,15 @@
 #define GAMMAMAXRAD 1000.
 #endif
 
+#ifndef MASSCM
+#define MASSCM (MASS*MSUNCM) //mass in cm
+#endif
+
+#ifndef MAXEXPLICITNSUBSTEPS
+#define MAXEXPLICITNSUBSTEPS 1000.
+#endif
+
+
 /*********************/
 /*********************/
 /*********************/
@@ -622,9 +631,6 @@
 
 #define GAMMAM1 (GAMMA-1.) //gamma - 1
 
-#ifndef MASSCM
-#define MASSCM (MASS*MSUNCM) //mass in cm
-#endif
 
 #define LCM (MASSCM) //unit of length in cm
 
