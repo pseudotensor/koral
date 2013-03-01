@@ -768,10 +768,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		      fu=fabs(delapl[iv]/get_u(u,iv,ix,iy,iz));
 		      if(fu>maxfu) maxfu=fu;
 		    }
-		  if(fu<1./MAX_EXPLICIT_NSUBSTEPS)
+		  if(fu<1./MAXEXPLICITNSUBSTEPS)
 		    fdt=1.-fdta;
 		  else
-		    fdt=1./MAX_EXPLICIT_NSUBSTEPS;
+		    fdt=1./MAXEXPLICITNSUBSTEPS;
 		  
 	
 		  for(iv=0;iv<NV;iv++)
@@ -787,8 +787,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  fdta+=fdt;
 
+		  printf("%d %d %d %f %f %f\n",ix,iy,iz,fu,fdt,fdta);
+
 		}
 	      while(fdta<1.);	     
+
+	      getchar();
 
 #endif
 
