@@ -739,7 +739,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 #endif
 
 #ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
-	      double fdt, fdta, maxfu=-1., fu;
+	      double fdt, fdta, maxfu=-1., fu, uval;
 	      
 	      fdt=fdta=0.;
 
@@ -763,15 +763,24 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  delapl[9]=del4[3];
 		  //comparing with conserved to get the largest change
 		  maxfu=-1.;
+
+		  //fluxes can be zero and their relative change large
+		  //so far considering only energy densities
 		  for(iv=0;iv<NV;iv++)
 		    {
-		      fu=fabs(delapl[iv]/get_u(u,iv,ix,iy,iz));
+		      uval=get_u(u,iv,ix,iy,iz);
+		      if(uval<SMALL)  //to avoid dividing by 0
+			fu=1.;
+		      else
+			fu=fabs(delapl[iv]/uval);
 		      if(fu>maxfu) maxfu=fu;
 		    }
-		  if(fu<1./MAXEXPLICITNSUBSTEPS)
-		    fdt=1.-fdta;
+		  if(maxfu<MAXEXPLICITSUBSTEPCHANGE)
+		    fdt=1.;
 		  else
-		    fdt=1./MAXEXPLICITNSUBSTEPS;
+		    fdt=MAXEXPLICITSUBSTEPCHANGE/maxfu;
+		  
+		  if(fdta+fdt>1.) fdt=1.-fdta;
 		  
 	
 		  for(iv=0;iv<NV;iv++)
