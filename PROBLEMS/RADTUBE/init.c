@@ -28,7 +28,7 @@ zz=get_x(iz,2);
 
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
-calc_tetrades(gg,tup,tlo);
+calc_tetrades(gg,tup,tlo,MYCOORDS);
 
 /************************/
 /************************/
@@ -59,9 +59,15 @@ vx=ux/ut;
 Fz=Fy=0.;
 pp[0]=rho;
 pp[1]=uint;
-pp[2]=vx;
-pp[3]=0.;
-pp[4]=0.;
+
+    //pp[2]=vx;
+    //4-velocity in BL transformed to MYCOORDS
+    ldouble ucon[4]={0.,vx,0.,0.};
+    conv_vels(ucon,ucon,VEL3,VELPRIM,gg,GG);
+    pp[2]=ucon[1]; 
+    pp[3]=ucon[2];
+    pp[4]=ucon[3]; 
+
 pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
 pp[6]=E;
@@ -73,7 +79,11 @@ prad_ff2lab(pp,pp,gg,GG,tlo);
 #endif
 
 //converting to conserved
-p2u(pp,uu,gg);	 
+
+//printf("%d %d %d\n",ix,iy,iz);
+//print_Nvector(pp,NV);
+p2u(pp,uu,gg,GG);	
+//print_Nvector(pp,NV); getchar();
 
 /* modify above */
 /***********************************************/

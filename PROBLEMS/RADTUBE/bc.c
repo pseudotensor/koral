@@ -12,7 +12,7 @@ gdet_bc=get_g(g,3,4,ix,iy,iz);
 //gdet_src=get_g(g,3,4,iix,iiy,iiz);
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],tup[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
-pick_g(ix,iy,iz,gg);
+pick_G(ix,iy,iz,GG);
 pick_T(tmuup,ix,iy,iz,tup);
 pick_T(tmulo,ix,iy,iz,tlo);
 ldouble xx=get_x(ix,0);
@@ -34,9 +34,15 @@ if(ix<0 &&  1)
     Fz=Fy=0.;
     pp[0]=rho;
     pp[1]=uint;
-    pp[2]=vx;
-    pp[3]=0.;
-    pp[4]=0.;
+
+    //pp[2]=vx;
+    //4-velocity in BL transformed to MYCOORDS
+    ldouble ucon[4]={0.,vx,0.,0.};
+    conv_vels(ucon,ucon,VEL3,VELPRIM,gg,GG);
+    pp[2]=ucon[1]; 
+    pp[3]=ucon[2];
+    pp[4]=ucon[3]; 
+
     pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
     pp[6]=E;
@@ -46,7 +52,7 @@ if(ix<0 &&  1)
     prad_ff2lab(pp,pp,gg,GG,tlo);
 
 #endif
-    p2u(pp,uu,gg);
+    p2u(pp,uu,gg,GG);
     return 0.;
   }
 
@@ -63,9 +69,15 @@ if(ix>=NX && 1)
     Fz=Fy=0.;
     pp[0]=rho;
     pp[1]=uint;
-    pp[2]=vx;
-    pp[3]=0.;
-    pp[4]=0.;
+
+    //pp[2]=vx;
+    //4-velocity in BL transformed to MYCOORDS
+    ldouble ucon[4]={0.,vx,0.,0.};
+    conv_vels(ucon,ucon,VEL3,VELPRIM,gg,GG);
+    pp[2]=ucon[1]; 
+    pp[3]=ucon[2];
+    pp[4]=ucon[3]; 
+
     pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
     pp[6]=E;
@@ -74,7 +86,7 @@ if(ix>=NX && 1)
     pp[9]=Fz;
     prad_ff2lab(pp,pp,gg,GG,tlo); 
 #endif
-    p2u(pp,uu,gg);
+    p2u(pp,uu,gg,GG);
     return 0.;
   }
 
@@ -94,7 +106,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //converting to conserved
-p2u(pp,uu,gg);
+p2u(pp,uu,gg,GG);
   
 return 0;
   
