@@ -320,6 +320,7 @@ int u2p_hot(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_entropy(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int*);
+int u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],ldouble tup[][4], ldouble tlo[][4],int*);
 
 //p2u.c
 int calc_conserved(int ix,int iy,int iz);

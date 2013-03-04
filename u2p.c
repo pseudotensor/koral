@@ -962,3 +962,153 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
    return 0;
 }
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//numerical conserved to primitives solver for radiation
+//works in ortonormal fluid frame
+//used e.g. for not-frame-invariant  Eddington apr. 
+//solves in 4dimensions using frame boosts etc.
+int f_u2prad_num(ldouble *uu,ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tlo[][4],ldouble *f)
+{
+  ldouble Rij[4][4];
+  ldouble ppp[NV];
+
+  calc_Rij_ff(pp,Rij);  
+  trans22_on2cc(Rij,Rij,tlo);  
+  boost22_ff2lab(Rij,Rij,pp,gg,GG); 
+  indices_2221(Rij,Rij,gg);  
+
+  f[0]=-Rij[0][0]+uu[6];
+  f[1]=-Rij[0][1]+uu[7];
+  f[2]=-Rij[0][2]+uu[8];
+  f[3]=-Rij[0][3]+uu[9];
+
+  return 0;
+} 
+
+int
+print_state_u2prad_num (int iter, ldouble *x, ldouble *f)
+{
+  printf ("iter = %3d x = % .3e % .3e % .3e % .3e "
+	  "f(x) = % .3e % .3e % .3e % .3e\n",
+	  iter,
+	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
+}
+
+int
+u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4], ldouble tlo[][4], int *corrected)
+{
+  ldouble pp0[NV],pporg[NV];
+  ldouble J[4][4],iJ[4][4];
+  ldouble x[4],f1[4],f2[4],f3[4];
+  int i,j,k,iter=0;
+
+  ldouble EPS = 1.e-6;
+  ldouble CONV = U2PRADPREC;
+
+  int verbose=1;
+
+  for(i=6;i<NV;i++)
+    {
+      pporg[i]=pp[i];
+    }
+
+  //converting radiative primitives to fluid frame ortonormal
+  prad_lab2ff(pp,pp,gg,GG,tup);
+
+  if(verbose!=0)   print_Nvector(uu,NV);
+  do
+    {
+      iter++;
+      for(i=6;i<NV;i++)
+	{
+	  pp0[i]=pp[i];
+	}
+
+      //valueas at zero state
+      f_u2prad_num(uu,pp,gg,GG,tlo,f1);
+ 
+      //calculating approximate Jacobian
+      for(i=0;i<4;i++)
+	{
+	  for(j=0;j<4;j++)
+	    {
+	      pp[j+6]=pp[j+6]+EPS*pp[6];
+	    
+	      f_u2prad_num(uu,pp,gg,GG,tlo,f2);
+     
+	      J[i][j]=(f2[i] - f1[i])/(EPS*pp[6]);
+
+	      pp[j+6]=pp0[j+6];
+	    }
+	}
+
+      //inversion
+      inverse_44matrix(J,iJ);
+
+      //updating x
+      for(i=0;i<4;i++)
+	{
+	  x[i]=pp0[i+6];
+	}
+
+      for(i=0;i<4;i++)
+	{
+	  for(j=0;j<4;j++)
+	    {
+	      x[i]-=iJ[i][j]*f1[j];
+	    }
+	}
+      if(verbose>0)    print_state_u2prad_num (iter,x,f1); 
+
+      for(i=0;i<4;i++)
+	{
+	  pp[i+6]=x[i];
+	}
+  
+      //test convergence
+      for(i=0;i<4;i++)
+	{
+	  f3[i]=(pp[i+6]-pp0[i+6]);
+	  f3[i]=fabs(f3[i]/pp0[6]);
+	}
+
+      if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
+	break;
+
+      if(iter>50)
+	{
+	  printf("iter exceeded in u2prad_num()\n");
+	  
+	  for(i=6;i<NV;i++)
+	    {
+	      pp[i]=pporg[i];
+	    }
+	  
+	  *corrected=1;
+	  return -1;
+
+	  break;
+	}
+     
+    }
+  while(1);
+  
+  if(pp[6]<EFLOOR) 
+    {
+      printf("enegative u2prad()\n");
+      pp[6]=EFLOOR;
+      *corrected=1;
+    }
+  
+  //converting to lab primitives
+  prad_ff2lab(pp,pp,gg,GG,tlo);
+  
+  if(verbose!=0)   {print_Nvector(pp,NV);}
+  if(verbose>0)   printf("----\n");
+
+  *corrected=0;
+  return 0;
+
+}
