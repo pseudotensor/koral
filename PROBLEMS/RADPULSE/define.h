@@ -9,7 +9,7 @@
 #define NX 101
 #define NY 1
 #define NZ 1
-#define TSTEPLIM .5
+#define TSTEPLIM .005
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define SPECIFIC_BC
 #define COPY_XBC
@@ -40,14 +40,13 @@
 #define KAPPA 0.
 #define KAPPAES 1.e3
 //#define KAPPA 5.90799
-//#define EDDINGTON_APR
 
 //#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
 
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
-#define EXPLICIT_SUBSTEP_RAD_SOURCE
+//#define EXPLICIT_SUBSTEP_RAD_SOURCE
 #define RADOUTPUTINZAMO
 #define UFLOOR 1.e-40
 #define RHOFLOOR 1.e-40

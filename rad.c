@@ -3,6 +3,7 @@
 
 #include "ko.h"
 
+
 //*********************************************************************
 //******* calculates total opacity over dx[] ***************************
 //**********************************************************************
@@ -309,6 +310,7 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   deltas[2]=-Gi[2]*dt;
   deltas[3]=-Gi[3]*dt;
 
+
   return 0;
 
 }
@@ -611,6 +613,12 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   trans22_on2cc(Rij,Rij,tlo);  
   boost22_ff2lab(Rij,Rij,pp,gg,GG); 
 #else  
+  urfcon[0]=0.;
+  urfcon[1]=pp[7];
+  urfcon[2]=pp[8];
+  urfcon[3]=pp[9];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
   //lab frame stress energy tensor:
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)

@@ -8,4 +8,4 @@
 0208 - ** - correct u2p_cold to generalize to relative velocities
 0206 - ** - simplify transformations of radiative primitives between coordinates - Erf intact, urf through trans2_coco()
 0205 - *** - follow the radiative wavespeeds to set the timestep properly
-^ 2013 ^
+^ 2013 

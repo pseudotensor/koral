@@ -739,10 +739,19 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 #endif
 
 #ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
-	      double fdt, fdta, maxfu=-1., fu, uval;
-	      
+	      double fdt, fdta, maxfu=-1., fu, uval,futau;
+	      //calculating reference time step basing on maximal tautot
+	      ldouble dx[3],xx[4];
+	      get_xx(ix,iy,iz,xx);
+	      dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
+	      dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
+	      dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);
+	      ldouble tautot[3],taumax;
+	      calc_tautot(pp,xx,dx,tautot);
+	      taumax=my_max(tautot[0],my_max(tautot[1],tautot[2]));
+	      futau=1./taumax;
+	      //reference time step only approximate
 	      fdt=fdta=0.;
-
 	      do
 		{
 		  //new primitives
@@ -766,13 +775,16 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  //fluxes can be zero and their relative change large
 		  //so far considering only energy densities
-		  for(iv=0;iv<NV;iv++)
+		  for(iv=1;iv<NV;iv++)
 		    {
+		      if(iv==5) continue;
 		      uval=get_u(u,iv,ix,iy,iz);
-		      if(uval<SMALL)  //to avoid dividing by 0
-			fu=1.;
+		      if(fabs(uval)<SMALL)  //to avoid dividing by 0
+			fu=futau;
 		      else
 			fu=fabs(delapl[iv]/uval);
+
+		      //		      printf("> %d %e %e %e\n",iv,fu,uval,delapl[iv]);
 		      if(fu>maxfu) maxfu=fu;
 		    }
 		  if(maxfu<MAXEXPLICITSUBSTEPCHANGE)
@@ -796,12 +808,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  fdta+=fdt;
 
-		  printf("%d %d %d %f %f %f\n",ix,iy,iz,fu,fdt,fdta);
+		  //		  printf("%d %d %d %f %f %f\n",ix,iy,iz,maxfu,fdt,fdta);
 
 		}
 	      while(fdta<1.);	     
 
-	      getchar();
+	      //	      getchar();
 
 #endif
 

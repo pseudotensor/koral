@@ -32,7 +32,7 @@
 //27 RADFLATNESS - flat but with non-zero four-force
 //28 BOWSHOCK - bow shock hydro test
 
-#define PROBLEM 6
+#define PROBLEM 10
 
 #if(PROBLEM==1)
 
@@ -617,7 +617,7 @@
 #endif
 
 #ifndef MAXEXPLICITSUBSTEPCHANGE
-#define MAXEXPLICITSUBSTEPCHANGE 1.e-3
+#define MAXEXPLICITSUBSTEPCHANGE 1.e-1
 #endif
 
 
