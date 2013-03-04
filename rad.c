@@ -593,12 +593,22 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   ldouble Erf=pp[6];
   //relative velocity
   ldouble urfcon[4];
+
+#ifdef EDDINGTON_APR //taking fluid velocity to close Rij emulating the Eddington approximation
+  urfcon[0]=0.;
+  urfcon[1]=pp[2];
+  urfcon[2]=pp[3];
+  urfcon[3]=pp[4];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIM,VEL4,gg,GG);
+#else
   urfcon[0]=0.;
   urfcon[1]=pp[7];
   urfcon[2]=pp[8];
   urfcon[3]=pp[9];
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+#endif
  
   //lab frame stress energy tensor:
   for(i=0;i<4;i++)
@@ -626,7 +636,6 @@ calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
   nz=F[2]/E;
 
   nlen=sqrt(nx*nx+ny*ny+nz*nz);
-  
  
 #ifdef EDDINGTON_APR
   f=1./3.;
