@@ -53,7 +53,7 @@ calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
 //******* the fiducial approach *****************************************
 //**********************************************************************
 
-int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][5], ldouble GG[][5],ldouble *f)
+int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][5], ldouble GG[][5],ldouble tup[][4], ldouble tlo[][4],ldouble *f)
 {
   ldouble Rij[4][4];
   ldouble pp2[NV];
@@ -69,7 +69,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
 
   //calculating primitives  
   int corr;
-  if(u2p(uu,pp2,gg,GG,&corr)<0) return -1;
+  if(u2p(uu,pp2,gg,GG,tup,tlo,&corr)<0) return -1;
 
   //radiative four-force
   ldouble Gi[4];
@@ -100,10 +100,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],uu[NV],uu0[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3[4],xxx[4];
-  ldouble gg[4][5];
-  ldouble GG[4][5];
+  ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];
+
   pick_g(ix,iy,iz,gg);
   pick_G(ix,iy,iz,GG);
+  pick_T(tmuup,ix,iy,iz,tup);
+  pick_T(tmulo,ix,iy,iz,tlo);
 
   for(iv=0;iv<NV;iv++)
     {
@@ -138,7 +140,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       //values at zero state
-      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,f1)<0) return -1;
+      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,tup,tlo,f1)<0) return -1;
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -150,7 +152,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      else del=EPS*uup[j+6];
 	      uu[j+6]=uup[j+6]-del;
 
-	      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,f2)<0) return -1;
+	      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,tup,tlo,f2)<0) return -1;
      
 	      J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
 
@@ -594,26 +596,26 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   //relative velocity
   ldouble urfcon[4];
 
-#ifdef EDDINGTON_APR //taking fluid velocity to close Rij emulating the Eddington approximation
+#ifdef EDDINGTON_APR_WRONG //taking fluid velocity to close Rij emulating the Eddington approximation
   urfcon[0]=0.;
   urfcon[1]=pp[2];
   urfcon[2]=pp[3];
   urfcon[3]=pp[4];
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIM,VEL4,gg,GG);
-#else
-  urfcon[0]=0.;
-  urfcon[1]=pp[7];
-  urfcon[2]=pp[8];
-  urfcon[3]=pp[9];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
 #endif
- 
+
+#ifdef EDDINGTON_APR_WRONG
+  prad_lab2ff(pp,pp,gg,GG,tup);
+  calc_Rij_ff(pp,Rij);  
+  trans22_on2cc(Rij,Rij,tlo);  
+  boost22_ff2lab(Rij,Rij,pp,gg,GG); 
+#else  
   //lab frame stress energy tensor:
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+#endif
 
   return 0;
 }

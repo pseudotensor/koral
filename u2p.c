@@ -18,7 +18,9 @@ calc_primitives(int ix,int iy,int iz)
 
   pick_g(ix,iy,iz,gg);
   pick_G(ix,iy,iz,GG);
-
+  pick_T(tmuup,ix,iy,iz,tup);
+  pick_T(tmulo,ix,iy,iz,tlo);
+ 
   for(iv=0;iv<NV;iv++)
     {
       uu[iv]=get_u(u,iv,ix,iy,iz);
@@ -27,7 +29,7 @@ calc_primitives(int ix,int iy,int iz)
 
   //converting to primitives
   int corrected;
-  u2p(uu,pp,gg,GG,&corrected);
+  u2p(uu,pp,gg,GG,tup,tlo,&corrected);
 
   //update conserved to follow corrections on primitives
   if(corrected!=0)
@@ -58,7 +60,7 @@ calc_primitives(int ix,int iy,int iz)
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
+u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],ldouble tlo[][4],int *corrected)
 {
   *corrected=0;
   int verbose=0;
@@ -165,7 +167,11 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],int *corrected)
 
 #ifdef RADIATION
   int radcor;
+#ifdef EDDINGTON_APR
+  u2p_rad_onff(uu,pp,gg,GG,tup,tlo,&radcorr);
+#else
   u2p_rad(uu,pp,gg,GG,&radcorr);
+#endif
 #endif
   
   if(radcorr>0 || hdcorr>0) *corrected=1;
@@ -734,7 +740,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   //indices up - R^tmu
   indices_12(Av,Av,GG);
 
-#ifdef EDDINGTON_APR //emulating Eddington approximation
+#ifdef EDDINGTON_APR_WRONG //emulating Eddington approximation
   urfcon[1]=pp[2];
   urfcon[2]=pp[3];
   urfcon[3]=pp[4];
@@ -1007,7 +1013,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble
   ldouble EPS = 1.e-6;
   ldouble CONV = U2PRADPREC;
 
-  int verbose=1;
+  int verbose=0;
 
   for(i=6;i<NV;i++)
     {
@@ -1106,7 +1112,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble
   prad_ff2lab(pp,pp,gg,GG,tlo);
   
   if(verbose!=0)   {print_Nvector(pp,NV);}
-  if(verbose>0)   printf("----\n");
+  if(verbose>0)   {printf("----\n");}
 
   *corrected=0;
   return 0;

@@ -1,7 +1,7 @@
 #define MYCOORDS MINKCOORDS //metric
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
-//#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
+#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
 //#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
 //#define IMPLICIT_FF_RAD_SOURCE //whether to use the explicit-implicit approximate implicit method
 
@@ -14,7 +14,8 @@
 
 #define TMAX 1.e10 //end time
 #define NOUTSTOP 1e3 //number of outputs to stop
-//#define RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
+//#define RADOUTPUTINFF
 
 #define NX 200 //x-resoltution
 #define NY 1 //y-resolution
@@ -40,7 +41,7 @@
 #define FLUXLIMITER 0 //type of flux limiter for linear reconstruction - 0 (generalized minmod)
 #define MINMOD_THETA 1. //theta for the limiter - 1 (minmod) - 2 (MC)
 
-#define DTOUT1 2.e-0 //time step for outputs
+#define DTOUT1 1.e-0 //time step for outputs
 #define ALLSTEPSOUTPUT 0 //0 (print every DTOUT1), 1 (print every step)
 //#define PRINTGC_LEFT //if x-left ghost cells are to be printed out, 
 //#define PRINTGC_RIGHT //if x-right ghost cells are to be printed out 
