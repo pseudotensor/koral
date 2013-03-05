@@ -768,6 +768,31 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  delapl[8]=del4[2];
 		  delapl[9]=del4[3];
 		
+#if(1) //my old dtsub esitmation based on single dimension
+		  //comparing with conserved to get the largest change
+		  maxfu=-1.;
+
+		  //fluxes can be zero and their relative change large
+		  //so far considering only energy densities
+		  for(iv=1;iv<NV;iv++)
+		    {
+		      if(iv==5) continue;
+		      uval=get_u(u,iv,ix,iy,iz);
+		      if(fabs(uval)<SMALL)  //to avoid dividing by 0
+			fu=futau;
+		      else
+			fu=fabs(delapl[iv]/uval);
+
+		      if(ix==NX/2 ) printf("> %d %e %e %e\n",iv,fu,uval,delapl[iv]);
+		      if(fu>maxfu) maxfu=fu;
+		    }
+		  if(maxfu<MAXEXPLICITSUBSTEPCHANGE)
+		    fdt=1.;
+		  else
+		    fdt=MAXEXPLICITSUBSTEPCHANGE/maxfu;
+		   if(ix==NX/2 ) printf("----\n%e\n",maxfu);
+		  
+#else //Jon's spacetime
 		  //substep
 		  ldouble Umhd,Urad,Gtot,iUmhd,iUrad,idtsub,dtsub;
 		  Umhd=Urad=Gtot=0.;
@@ -782,13 +807,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  iUrad=1.0/(fabs(Urad)+SMALL);
 		  idtsub=SMALL+fabs(Gtot*my_max(iUmhd,iUrad));
 		  dtsub=1./idtsub;
-		   if(ix==NX/2 ) printf("----\n%e %e %e\n",Gtot,Umhd,Urad);
+		  if(ix==NX/2 ) printf("----\n%e %e %e\n",Gtot,Umhd,Urad);
 		  if(dtsub>1.)
 		    fdt=1.;
 		  else
 		    fdt=dtsub;
-		  
-		  //		  fdt=0.001;
+#endif		 
 		  
 		  if(fdta+fdt>1.) fdt=1.-fdta;
 	
@@ -800,7 +824,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  fdta+=fdt;
 
-		    if(ix==NX/2 ) printf("%d %d %d %e %f %f\n",ix,iy,iz,dtsub,fdt,fdta);
+		  if(ix==NX/2 ) printf("%d %d %d %f %f\n",ix,iy,iz,fdt,fdta);
 
 		}
 	      while(fdta<1.);	     
