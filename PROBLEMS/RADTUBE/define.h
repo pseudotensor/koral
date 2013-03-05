@@ -2,7 +2,7 @@
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
 //#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
-//#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
+#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
 //#define IMPLICIT_FF_RAD_SOURCE //whether to use the explicit-implicit approximate implicit method
 
 #define MASS 1./MSUNCM //defines unit of length
@@ -17,7 +17,7 @@
 //#define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 
-#define NX 800 //x-resoltution
+#define NX 200 //x-resoltution
 #define NY 1 //y-resolution
 #define NZ 1 //z=rezolution
 
