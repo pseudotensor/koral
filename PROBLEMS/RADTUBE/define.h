@@ -18,7 +18,7 @@
 #define TMAX 1.e10 //end time
 #define NOUTSTOP 1e3 //number of outputs to stop
 //#define RADOUTPUTINZAMO
-//#define RADOUTPUTINFF
+#define RADOUTPUTINFF
 
 #define NX 200 //x-resoltution
 #define NY 1 //y-resolution
@@ -54,7 +54,7 @@
 #define MUGAS 1. //mean molecular weight (default = 1)
 
 //problem specific definitions
-#define NTUBE 1
+#define NTUBE 3
 
 #undef SIGMA_RAD
 #if (NTUBE==1)
