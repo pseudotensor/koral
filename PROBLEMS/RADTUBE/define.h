@@ -1,7 +1,7 @@
 #define MYCOORDS MINKCOORDS //metric
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
-#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
+//#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
 //#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
 //#define IMPLICIT_FF_RAD_SOURCE //whether to use the explicit-implicit approximate implicit method
 
@@ -39,7 +39,7 @@
 #define RK3STEPPING //type of time stepping
 #define INT_ORDER 1 //order of reconstruction - 1 (linear), 2 (parabolic), 4 (MP5)
 #define FLUXLIMITER 0 //type of flux limiter for linear reconstruction - 0 (generalized minmod)
-#define MINMOD_THETA 1. //theta for the limiter - 1 (minmod) - 2 (MC)
+#define MINMOD_THETA 2. //theta for the limiter - 1 (minmod) - 2 (MC)
 
 #define DTOUT1 1.e-0 //time step for outputs
 #define ALLSTEPSOUTPUT 0 //0 (print every DTOUT1), 1 (print every step)
