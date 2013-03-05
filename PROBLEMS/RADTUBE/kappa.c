@@ -6,7 +6,7 @@
 //from rad.c
 //**********************
 
-if(NTUBE==1) return 0.4*rho;
+if(NTUBE==1) return  0.4*rho*1.e3;
 if(NTUBE==2) return 0.2*rho;
 if(NTUBE==3) return 0.3*rho;
 if(NTUBE==31) return 25.*rho;

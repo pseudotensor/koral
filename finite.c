@@ -692,7 +692,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //old primitives 
 	      for(iv=0;iv<NV;iv++)
 		{
-		  pp[iv]=get_u(p,iv,ix,iy,iz);      
+		  pp[iv]=get_u(p,iv,ix,iy,iz);
+		  uu[iv]=get_u(u,iv,ix,iy,iz);      
 		}
 
 #ifdef RADIATION
@@ -727,12 +728,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 	      for(iv=0;iv<NV;iv++)
 		{
-#ifdef RADSOURCEOFF
-		  continue;
-#endif
-#ifdef GASRADOFF
-		  if(iv<7) continue;
-#endif
 		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
 		}
 #endif
@@ -755,6 +750,9 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		{
 		  //new primitives
 		  calc_primitives(ix,iy,iz);
+		  //conserved
+		  for(iv=0;iv<NV;iv++)
+		    uu[iv]=get_u(u,iv,ix,iy,iz);
 		  //vector of changes of conserved assuming original dt which only multiplies source terms
 		  solve_explicit_lab(ix,iy,iz,dt,del4);
 		  indices_21(del4,del4,gg);
@@ -769,45 +767,40 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  delapl[7]=del4[1];
 		  delapl[8]=del4[2];
 		  delapl[9]=del4[3];
-		  //comparing with conserved to get the largest change
-		  maxfu=-1.;
-
-		  //fluxes can be zero and their relative change large
-		  //so far considering only energy densities
-		  for(iv=1;iv<NV;iv++)
+		
+		  //substep
+		  ldouble Umhd,Urad,Gtot,iUmhd,iUrad,idtsub,dtsub;
+		  Umhd=Urad=Gtot=0.;
+		  for(iv=0;iv<4;iv++)
 		    {
-		      if(iv==5) continue;
-		      uval=get_u(u,iv,ix,iy,iz);
-		      if(fabs(uval)<SMALL)  //to avoid dividing by 0
-			fu=futau;
-		      else
-			fu=fabs(delapl[iv]/uval);
-
-		      //		      printf("> %d %e %e %e\n",iv,fu,uval,delapl[iv]);
-		      if(fu>maxfu) maxfu=fu;
+		      Umhd+=uu[1+iv]*uu[1+iv]*GG[iv][iv]; //GG?
+		      Urad+=uu[6+iv]*uu[6+iv]*GG[iv][iv]; //GG?
+		      Gtot+=del4[iv]*del4[iv]*GG[iv][iv]; //GG?
 		    }
-		  if(maxfu<MAXEXPLICITSUBSTEPCHANGE)
+
+		  iUmhd=1.0/(fabs(Umhd)+SMALL);
+		  iUrad=1.0/(fabs(Urad)+SMALL);
+		  idtsub=SMALL+fabs(Gtot*my_max(iUmhd,iUrad));
+		  dtsub=1./idtsub;
+		   if(ix==NX/2 ) printf("----\n%e %e %e\n",Gtot,Umhd,Urad);
+		  if(dtsub>1.)
 		    fdt=1.;
 		  else
-		    fdt=MAXEXPLICITSUBSTEPCHANGE/maxfu;
+		    fdt=dtsub;
+		  
+		  //		  fdt=0.001;
 		  
 		  if(fdta+fdt>1.) fdt=1.-fdta;
-		  
 	
 		  for(iv=0;iv<NV;iv++)
 		    {
-#ifdef RADSOURCEOFF
-		      continue;
-#endif
-#ifdef GASRADOFF
-		      if(iv<7) continue;
-#endif
-		      set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv]*fdt);
+		      uu[iv]+=delapl[iv]*fdt;
+		      set_u(u,iv,ix,iy,iz, uu[iv]);
 		    }
 
 		  fdta+=fdt;
 
-		  //		  printf("%d %d %d %f %f %f\n",ix,iy,iz,maxfu,fdt,fdta);
+		    if(ix==NX/2 ) printf("%d %d %d %e %f %f\n",ix,iy,iz,dtsub,fdt,fdta);
 
 		}
 	      while(fdta<1.);	     
@@ -836,12 +829,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 	      for(iv=0;iv<NV;iv++)
 		{
-#ifdef RADSOURCEOFF
-		  continue;
-#endif
-#ifdef GASRADOFF
-		  if(iv<7) continue;
-#endif
 		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
 		}
 #endif
@@ -868,12 +855,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 	      for(iv=0;iv<NV;iv++)
 		{
-#ifdef RADSOURCEOFF
-		  continue;
-#endif
-#ifdef GASRADOFF
-		  if(iv<7) continue;
-#endif
 		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
 		}
 #endif
