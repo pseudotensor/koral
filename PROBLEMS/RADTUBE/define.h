@@ -44,7 +44,7 @@
 #define MINMOD_THETA 1. //theta for the limiter - 1 (minmod) - 2 (MC)
 
 #define DTOUT1 1.e-0 //time step for outputs
-#define ALLSTEPSOUTPUT 1 //0 (print every DTOUT1), 1 (print every step)
+#define ALLSTEPSOUTPUT 0 //0 (print every DTOUT1), 1 (print every step)
 //#define PRINTGC_LEFT //if x-left ghost cells are to be printed out, 
 //#define PRINTGC_RIGHT //if x-right ghost cells are to be printed out 
 #define VERBOSE0 0 //verbose level for some routines

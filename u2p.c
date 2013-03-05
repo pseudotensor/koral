@@ -329,6 +329,8 @@ f_u2p_hot(ldouble W, ldouble* cons)
 
   return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrt(1.-Qt2/W/W);   
 
+  //a bit more clear
+
   ldouble v2 = Qt2/W/W;
   ldouble gamma2 = 1./(1.-v2);
   ldouble gamma = sqrt(gamma2);
