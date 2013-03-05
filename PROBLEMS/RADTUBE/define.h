@@ -1,8 +1,8 @@
 #define MINKOWSKI //metric
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
-#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
-//#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
+//#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
+#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
 //#define IMPLICIT_FF_RAD_SOURCE //whether to use the explicit-implicit approximate implicit method
 
 #define MASS 1./MSUNCM //mass in Msun of BH used for unit conversion
@@ -15,7 +15,7 @@
 #define TMAX 1.e10 //end time
 #define NOUTSTOP 1e3 //number of outputs to stop
 
-#define NX 800 //x-resoltution
+#define NX 200 //x-resoltution
 #define NY 1 //y-resolution
 #define NZ 1 //z=rezolution
 
@@ -49,7 +49,7 @@
 #define MUGAS 1. //mean molecular weight (default = 1)
 
 //problem specific definitions
-#define NTUBE 2
+#define NTUBE 1
 
 #undef SIGMA_RAD
 #if (NTUBE==1)
