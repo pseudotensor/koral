@@ -11,7 +11,7 @@
 int
 calc_primitives(int ix,int iy,int iz)
 {
-  int verbose=0;
+  int verbose=1;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
   ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];
@@ -49,7 +49,7 @@ calc_primitives(int ix,int iy,int iz)
      set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
   
   for(iv=0;iv<NV;iv++)    
-    set_u(p,iv,ix,iy,iz,pp[iv]);	      
+    set_u(p,iv,ix,iy,iz,pp[iv]);
 
   return 0;
 }
@@ -63,7 +63,7 @@ int
 u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],ldouble tlo[][4],int *corrected)
 {
   *corrected=0;
-  int verbose=0;
+  int verbose=1;
   int hdcorr=0;
   int radcorr=0;
 
@@ -148,7 +148,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],l
   //************************************
   //************************************
   //checking on hd floors
-  ret=check_floors_hd(pp,VELPRIM,gg,GG);
+    ret=check_floors_hd(pp,VELPRIM,gg,GG);
 
   if(ret<0.)
     hdcorr=1;
@@ -167,7 +167,7 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],l
 
 #ifdef RADIATION
   int radcor;
-#ifdef EDDINGTON_APR
+#ifdef EDDINGTON_APR_WRONG
   u2p_rad_onff(uu,pp,gg,GG,tup,tlo,&radcorr);
 #else
   u2p_rad(uu,pp,gg,GG,&radcorr);
@@ -328,6 +328,18 @@ f_u2p_hot(ldouble W, ldouble* cons)
   ldouble D=cons[2];
 
   return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrt(1.-Qt2/W/W);   
+
+  ldouble v2 = Qt2/W/W;
+  ldouble gamma2 = 1./(1.-v2);
+  ldouble gamma = sqrt(gamma2);
+  ldouble w = W/gamma2;
+  ldouble rho = D/gamma;
+  ldouble u = (w - rho) / GAMMA;
+  ldouble p = (GAMMA-1)*u;
+
+  return Qn + W - p;
+ 
+  
 }
 
 int
@@ -335,7 +347,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 {
   int verbose=0;
   int i,j,k;
-  ldouble rho,u,p,w,W,gamma,alpha,D;
+  ldouble rho,u,p,w,W,alpha,D;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
   
@@ -364,8 +376,9 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   //n^mu
   indices_12(ncov,ncon,GG);
 
-  //Q^mu n_mu = -alpha*Q^t
+  //Q_mu n^mu = Q^mu n_mu = -alpha*Q^t
   Qn=Qcon[0] * ncov[0];
+  //Qn = dot(Qcov,ncon);
 
   //j^mu_nu=delta^mu_nu +n^mu n_nu
   for(i=0;i<4;i++)
@@ -394,12 +407,17 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   utcon[2]=pp[3];
   utcon[3]=pp[4];
   conv_vels(utcon,utcon,VELPRIM,VELR,gg,GG);
+
   ldouble qsq=0.;
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
       qsq+=utcon[i]*utcon[j]*gg[i][j];
   ldouble gamma2=1.+qsq;
+  ldouble gamma=sqrt(gamma2);
+
+  //W
   W=(rho+GAMMA*u)*gamma2;
+
   if(verbose) printf("initial W:%e\n",W);
  
   //test if does not provide reasonable gamma2
@@ -410,8 +428,8 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
     }
 
   //1d Newton solver
-  ldouble CONV=1.e-6;
-  ldouble EPS=1.e-8;
+  ldouble CONV=1.e-8;
+  ldouble EPS=1.e-6;
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
   ldouble cons[3]={Qn,Qt2,D};
@@ -446,6 +464,8 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   //W found, let's calculate v2 and the rest
   ldouble v2=Qt2/W/W;
   gamma2=1./(1.-v2);
+  ldouble ut2 = Qt2/(W*W - Qt2);
+  gamma2=1. + ut2;
   gamma=sqrt(gamma2);
   rho=D/gamma;
   u=1./GAMMA*(W/gamma2-rho);
@@ -475,7 +495,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   ldouble ut=uu[0]/pp[0]; //rhout/rho
   pp[5]=Sut/ut;
 
-  if(verbose) {print_Nvector(pp,NV);}
+  if(verbose) {print_Nvector(pp,NV); getchar();}
 
   return 0;
 

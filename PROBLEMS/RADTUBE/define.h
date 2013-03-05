@@ -3,9 +3,11 @@
 #define RADIATION //whether to solve for radiation (or pure hydro)
 //#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
 #define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
+//#define RADSOURCEOFF
 //#define IMPLICIT_FF_RAD_SOURCE //whether to use the explicit-implicit approximate implicit method
 
 #define MASS 1./MSUNCM //defines unit of length
+#define MASSCM 1.
 #define U2PPREC 1.e-7 //precision of the numerical hydro solver for conserved to primitives solver
 #define U2PRADPREC 1.e-7 //precision of the numerical radiation converter, used only for Eddington approximation
 #define RHOFLOOR 1.e-50 //floors (are not strictly enforced)
@@ -14,7 +16,7 @@
 
 #define TMAX 1.e10 //end time
 #define NOUTSTOP 1e3 //number of outputs to stop
-#define RADOUTPUTINZAMO
+//#define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 
 #define NX 200 //x-resoltution
@@ -34,7 +36,7 @@
 #define COPY_YBC
 #define COPY_ZBC
 
-#define TSTEPLIM .15 //Courant limiter
+#define TSTEPLIM .5 //Courant limiter
 #define INITTSTEPLIM (TSTEPLIM/100.) //Courant limiter for the first step
 #define RK3STEPPING //type of time stepping
 #define INT_ORDER 1 //order of reconstruction - 1 (linear), 2 (parabolic), 4 (MP5)
@@ -56,25 +58,25 @@
 #undef SIGMA_RAD
 #if (NTUBE==1)
 #define SIGMA_RAD (1e-8/pow(calc_PEQ_Tfromurho(3.e-5/(GAMMA-1.),1.),4.)/4.)
-#define GAMMA 5.l/3.l
+#define GAMMA (5./3.)
 #elif (NTUBE==2)
 #define SIGMA_RAD (2e-5/pow(calc_PEQ_Tfromurho(4.e-3/(GAMMA-1.),1.),4.)/4.)
-#define GAMMA 5.l/3.l
+#define GAMMA (5./3.)
 #elif (NTUBE==3)
 #define SIGMA_RAD (2./pow(calc_PEQ_Tfromurho(60./(GAMMA-1.),1.),4.)/4.)
-#define GAMMA 2.l
+#define GAMMA 2.
 #elif (NTUBE==31)
 #define SIGMA_RAD (2./pow(calc_PEQ_Tfromurho(60./(GAMMA-1.),1.),4.)/4.)
-#define GAMMA 2.l
+#define GAMMA 2.
 #elif (NTUBE==4)
 #define SIGMA_RAD (.18/pow(calc_PEQ_Tfromurho(6.e-3/(GAMMA-1.),1.),4.)/4.)
-#define GAMMA 5.l/3.l
+#define GAMMA (5./3.)
 #elif (NTUBE==41)
 #define SIGMA_RAD (.18/pow(calc_PEQ_Tfromurho(6.e-3/(GAMMA-1.),1.),4.)/4.)
-#define GAMMA 5.l/3.l
+#define GAMMA (5./3.)
 #elif (NTUBE==5)
 #define SIGMA_RAD (2./pow(calc_PEQ_Tfromurho(60./(GAMMA-1.),1.),4.)/4.)
-#define GAMMA 2.l
+#define GAMMA 2.
 #undef DTOUT1
 #undef MINX
 #undef MAXX

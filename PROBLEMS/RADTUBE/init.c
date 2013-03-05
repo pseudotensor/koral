@@ -37,6 +37,9 @@ calc_tetrades(gg,tup,tlo,MYCOORDS);
       
 ldouble rho0,Tgas0,ur,Tgas,Trad,r,rcm,prad,pgas,vx,ut,ux;
 
+
+
+
 if(xx<(MAXX+MINX)/2.)
   {
     rho=1.;
@@ -54,6 +57,9 @@ if(xx<(MAXX+MINX)/2.)
      if(NTUBE==4 || NTUBE==41) {rho=3.65;uint =3.59e-2 / (GAMMA - 1.);E=1.30; Fx=1.e-2*E;ux=0.189;}	  
      if(NTUBE==5) {rho=1.0;uint = 60. / (GAMMA - 1.);E=2.; Fx=1.e-2*E;ux=1.10;}
    }
+
+
+
 ut=sqrt(ux*ux+1.);
 vx=ux/ut;
 Fz=Fy=0.;
@@ -76,14 +82,34 @@ pp[8]=Fy;
 pp[9]=Fz; 
 
 prad_ff2lab(pp,pp,gg,GG,tlo);
+
+//pp[2]=0.;
 #endif
 
 //converting to conserved
+p2u(pp,uu,gg,GG);	
 
+/*
 //printf("%d %d %d\n",ix,iy,iz);
 //print_Nvector(pp,NV);
+if(ix==1) printf("> %g ",pp[1]);
+
 p2u(pp,uu,gg,GG);	
 //print_Nvector(pp,NV); getchar();
+if(ix==1) printf("> %g ",uu[1]);
+
+u2p_hot(uu,pp,gg,GG);
+
+if(ix==1) printf("> %g ",pp[1]);
+
+p2u(pp,uu,gg,GG);	
+
+if(ix==1) printf("> %g ",uu[1]);
+
+u2p_hot(uu,pp,gg,GG);
+
+if(ix==1) { printf("> %g \n",pp[1]); getchar();}
+*/
 
 /* modify above */
 /***********************************************/

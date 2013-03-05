@@ -28,9 +28,9 @@
 #define fluxGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC)
 
 //constants
-#define K_BOLTZ (1.3806488e-16L * GGG / CCC / CCC / CCC / CCC / MASSCM)
+#define K_BOLTZ (1.3806488e-16 * GGG / CCC / CCC / CCC / CCC / MASSCM)
 #define M_PROTON massCGS2GU(1.67262158e-24)
-//#define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM)
+#define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM)
 #define MU_GAS 1.
 #define Z_RATIO (1.0)
 #define Pi (3.141592654)     
