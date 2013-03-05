@@ -237,10 +237,6 @@ fprint_profiles(ldouble t, ldouble totmass)
 
                                                   #include PR_DUMP
 
-						  //debug
-						  v1=get_u_scalar(aradx,ix,iy,iz);
-						  v2=get_u_scalar(arady,ix,iy,iz);
-						  v3=get_u_scalar(aradz,ix,iy,iz);
 						  /******************/
 
 
