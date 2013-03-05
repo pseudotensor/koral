@@ -14,10 +14,10 @@
 
 #define TMAX 1.e10 //end time
 #define NOUTSTOP 1e3 //number of outputs to stop
-#define RADOUTPUTINZAMO
+//#define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 
-#define NX 200 //x-resoltution
+#define NX 800 //x-resoltution
 #define NY 1 //y-resolution
 #define NZ 1 //z=rezolution
 
@@ -39,7 +39,7 @@
 #define RK3STEPPING //type of time stepping
 #define INT_ORDER 1 //order of reconstruction - 1 (linear), 2 (parabolic), 4 (MP5)
 #define FLUXLIMITER 0 //type of flux limiter for linear reconstruction - 0 (generalized minmod)
-#define MINMOD_THETA 2. //theta for the limiter - 1 (minmod) - 2 (MC)
+#define MINMOD_THETA 1. //theta for the limiter - 1 (minmod) - 2 (MC)
 
 #define DTOUT1 1.e-0 //time step for outputs
 #define ALLSTEPSOUTPUT 0 //0 (print every DTOUT1), 1 (print every step)

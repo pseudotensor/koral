@@ -54,14 +54,14 @@ if(xx<(MAXX+MINX)/2.)
      if(NTUBE==4 || NTUBE==41) {rho=3.65;uint =3.59e-2 / (GAMMA - 1.);E=1.30; Fx=1.e-2*E;ux=0.189;}	  
      if(NTUBE==5) {rho=1.0;uint = 60. / (GAMMA - 1.);E=2.; Fx=1.e-2*E;ux=1.10;}
    }
-ut=sqrtl(ux*ux+1.);
+ut=sqrt(ux*ux+1.);
 vx=ux/ut;
 Fz=Fy=0.;
 pp[0]=rho;
 pp[1]=uint;
 
     //pp[2]=vx;
-    //4-velocity in BL transformed to MYCOORDS
+    //3-velocity in BL transformed to VELR
     ldouble ucon[4]={0.,vx,0.,0.};
     conv_vels(ucon,ucon,VEL3,VELPRIM,gg,GG);
     pp[2]=ucon[1]; 
