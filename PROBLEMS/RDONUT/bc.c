@@ -72,10 +72,11 @@ if(ix>=NX) //analytical solution at rout only
 	
 	set_radatmosphere(ppatm,xxvec,gg,GG,0);
 	//outflow-no-inflow for radiation
-	pp[6]=get_u(p,6,iix,iiy,iiz);
+	
 	pp[7]=get_u(p,6,iix,iiy,iiz);
 	pp[8]=get_u(p,8,iix,iiy,iiz);
 	pp[9]=get_u(p,9,iix,iiy,iiz);
+
 
 	urf[1]=pp[7];
 	urf[2]=pp[8];
@@ -84,11 +85,12 @@ if(ix>=NX) //analytical solution at rout only
 	conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
 	if(urf[1]<0.) //inflow
 	  pp[7]=0.*ppatm[7];
-	
+	else
+	  pp[6]=get_u(p,6,iix,iiy,iiz);	
 
 #endif
 
-	
+	/*
 	//BL free-fall velocity
 	ldouble ucon[4];
 	ldouble r=xx;
@@ -101,7 +103,7 @@ if(ix>=NX) //analytical solution at rout only
 	pp[2]=ucon[1];
 	pp[3]=ucon[2];
 	pp[4]=ucon[3];
-	
+	*/
 
       }
     else
@@ -192,7 +194,10 @@ if(ix>=NX) //analytical solution at rout only
 
      //   pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
      //   pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
-     //   pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-.5);
+     //pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-.5);
+     //this works only for Kerr
+     //if(pp[7]>0.) pp[7]=0.;
+     //if(pp[2]>0.) pp[2]=0.;
      
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,gg,GG);

@@ -11,7 +11,7 @@
 int
 calc_primitives(int ix,int iy,int iz)
 {
-  int verbose=1;
+  int verbose=0;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
   ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];
@@ -30,6 +30,13 @@ calc_primitives(int ix,int iy,int iz)
   //converting to primitives
   int corrected;
   u2p(uu,pp,gg,GG,tup,tlo,&corrected);
+  /*
+  if(corrected!=0) 
+    { 
+      printf("happened at %d %d %d\n",ix,iy,iz);
+      getchar();
+    }
+  */
 
   //update conserved to follow corrections on primitives
   if(corrected!=0)
@@ -63,7 +70,7 @@ int
 u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],ldouble tlo[][4],int *corrected)
 {
   *corrected=0;
-  int verbose=1;
+  int verbose=0;
   int hdcorr=0;
   int radcorr=0;
 
@@ -430,7 +437,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
     }
 
   //1d Newton solver
-  ldouble CONV=1.e-8;
+  ldouble CONV=1.e-6;
   ldouble EPS=1.e-6;
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
@@ -904,9 +911,11 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   else if(gammarel2<1. || delta<0.)
     {
       //low cap
-      *corrected=1;
-
-      if(0)
+     
+      //this usually happens when gamma=0.99999999 so enforcing 1. makes sense
+       *corrected=0;
+       if(verbose>1) {printf("midcapalt: gamma: %.20e\n",sqrt(gammarel2));}
+       if(0)
 	{
 	  //zeros for relative velocity
 	  urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
@@ -928,7 +937,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	  urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
 	}
 
-      if(verbose) {printf("midcapalt: Erf=%g\n",Erf);}
+      if(verbose>1) {printf("midcapalt: Erf=%g\n",Erf);}
 	 
       if(Erf<ERADFLOOR)
 	{ 

@@ -103,7 +103,7 @@
 	  "set ylabel \"y\"\n"
 	  "set title \"radiative E / flux\"\n"
 	  "unset log cb\n"
-	  "set log cb\n"
+	  //"set log cb\n"
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($20) ti \"\" w l ls 1\n"
 
