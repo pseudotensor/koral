@@ -749,10 +749,15 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      do
 		{
 		  //new primitives
+		  //TODO: check here and there if worked
 		  calc_primitives(ix,iy,iz);
 		  //conserved
 		  for(iv=0;iv<NV;iv++)
-		    uu[iv]=get_u(u,iv,ix,iy,iz);
+		    {
+		      uu[iv]=get_u(u,iv,ix,iy,iz);
+		      pp[iv]=get_u(p,iv,ix,iy,iz);
+		    }
+
 		  //vector of changes of conserved assuming original dt which only multiplies source terms
 		  solve_explicit_lab(ix,iy,iz,dt,del4);
 		  indices_21(del4,del4,gg);
@@ -768,7 +773,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  delapl[8]=del4[2];
 		  delapl[9]=del4[3];
 		
-#if(1) //my old dtsub esitmation based on single dimension
+#if(0) //my old dtsub esitmation based on single dimension
 		  //comparing with conserved to get the largest change
 		  maxfu=-1.;
 
@@ -786,10 +791,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		      if(ix==NX/2 ) printf("> %d %e %e %e\n",iv,fu,uval,delapl[iv]);
 		      if(fu>maxfu) maxfu=fu;
 		    }
+		  
 		  if(maxfu<MAXEXPLICITSUBSTEPCHANGE)
 		    fdt=1.;
 		  else
 		    fdt=MAXEXPLICITSUBSTEPCHANGE/maxfu;
+
 		   if(ix==NX/2 ) printf("----\n%e\n",maxfu);
 		  
 #else //Jon's spacetime
@@ -807,11 +814,25 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  iUrad=1.0/(fabs(Urad)+SMALL);
 		  idtsub=SMALL+fabs(Gtot*my_max(iUmhd,iUrad));
 		  dtsub=1./idtsub;
-		  if(ix==NX/2 ) printf("----\n%e %e %e\n",Gtot,Umhd,Urad);
+		  /*
+		  if(ix==42 && pp[7]!=0 && 0)
+		    {
+		      print_Nvector(pp,NV);
+		      print_4vector(del4);
+		      printf("----\n%e %e %e > %e\n",Gtot,Umhd,Urad,dtsub);getchar();
+		    }
+		  */
 		  if(dtsub>1.)
 		    fdt=1.;
 		  else
 		    fdt=dtsub;
+
+		  if(fdt<1.e-6 && 0) 
+		    {
+		      printf("----\n%e %e %e > %e\n",Gtot,Umhd,Urad,dtsub);
+		      printf("%d %d %d %f %f\n",ix,iy,iz,fdt,fdta);
+		      getchar();
+		    }
 #endif		 
 		  
 		  if(fdta+fdt>1.) fdt=1.-fdta;
@@ -824,13 +845,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  fdta+=fdt;
 
-		  if(ix==NX/2 ) printf("%d %d %d %f %f\n",ix,iy,iz,fdt,fdta);
-
 		}
 	      while(fdta<1.);	     
-
-	      //	      getchar();
-
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE

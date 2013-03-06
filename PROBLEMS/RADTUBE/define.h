@@ -2,7 +2,7 @@
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
 //#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
-//#define EXPLICIT_SUBSTEP_RAD_SOURCE
+#define EXPLICIT_SUBSTEP_RAD_SOURCE
 //#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
 //#define RADSOURCEOFF
 //#define IMPLICIT_FF_RAD_SOURCE //whether to use the explicit-implicit approximate implicit method
@@ -45,7 +45,7 @@
 #define MINMOD_THETA 1. //theta for the limiter - 1 (minmod) - 2 (MC)
 
 #define DTOUT1 1.e-0 //time step for outputs
-#define ALLSTEPSOUTPUT 0 //0 (print every DTOUT1), 1 (print every step)
+#define ALLSTEPSOUTPUT 1 //0 (print every DTOUT1), 1 (print every step)
 //#define PRINTGC_LEFT //if x-left ghost cells are to be printed out, 
 //#define PRINTGC_RIGHT //if x-right ghost cells are to be printed out 
 #define VERBOSE0 0 //verbose level for some routines
@@ -54,7 +54,7 @@
 #define MUGAS 1. //mean molecular weight (default = 1)
 
 //problem specific definitions
-#define NTUBE 3
+#define NTUBE 31
 
 #undef SIGMA_RAD
 #if (NTUBE==1)

@@ -49,7 +49,7 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
-	  "plot \"%s\" u 1:20 w lp ls 2 pt 7 ps .5  ti \"E_rad\"\n"
+	  "plot \"%s\" u 1:20 w lp ls 2 pt 7 ps .5  ti \"E_rf\"\n"
 
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -60,7 +60,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($21+1.e-80) w lp ls 2 pt 7 ps .5  ti \"Fx\"\n"
+	  "plot \"%s\" u 1:($21+1.e-80) w lp ls 2 pt 7 ps .5  ti \"urf[1]\"\n"
 
 	  "set lmargin at screen 0.07\n"
 	  "set rmargin at screen 0.33\n"
@@ -72,7 +72,7 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  //	  "set log y\n"
-	  "plot \"%s\" u 1:15 w lp ls 3 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:20 w lp ls 7 pt 7 ps .5 ti \"E_rad\"\n"
+	  "plot \"%s\" u 1:15 w lp ls 3 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:20 w lp ls 7 pt 7 ps .5 ti \"E_rf\"\n"
 	  //	  "unset log y\n"
 
 	  "set lmargin at screen 0.40\n"

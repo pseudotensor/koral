@@ -32,7 +32,7 @@
 //27 RADFLATNESS - flat but with non-zero four-force
 //28 BOWSHOCK - bow shock hydro test
 
-#define PROBLEM 25
+#define PROBLEM 6
 
 #if(PROBLEM==1)
 
