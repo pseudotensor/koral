@@ -67,6 +67,28 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
     }
   else
     {
+      //Erf unchanged
+      pp2[6]=pp1[6];
+
+       //velocity in CO1
+      ldouble ucon[4];
+      ucon[0]=0;
+      ucon[1]=pp1[7];
+      ucon[2]=pp1[8];
+      ucon[3]=pp1[9];
+
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg1,GG1);
+      //converting to CO2
+      trans2_coco(xxvec,ucon,ucon,CO1,CO2);
+      //to VELPRIM
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg2,GG2);
+
+      pp2[7]=ucon[1]; 
+      pp2[8]=ucon[2];
+      pp2[9]=ucon[3];
+
+      /*
+
       //to transform radiative primitives between coordinates
       ldouble Rij[4][4];
       //Rij in CO1
@@ -82,6 +104,8 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
       pp1[9]=Rij[0][3]; int temp;
       //convert R^t_mu to {Erf, urf[i]}
       u2p_rad(pp1,pp2,gg2,GG2,&temp);
+
+      */
    }
   
   return 0;

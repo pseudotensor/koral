@@ -3,6 +3,21 @@
 //{
 //  FILE *fgnu=fopen("plot.gp","w");
 //  char bufor[50];
+
+ldouble minx,miny,maxx,maxy;
+
+#ifdef myMKS1COORDS
+minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
+maxx= .66*(exp(get_xb(NX,0))+MKS1R0);
+miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
+maxy= .66*(exp(get_xb(NX,0))+MKS1R0);
+#else
+minx= -.02*get_xb(NX,0);
+maxx= 1.02*get_xb(NX,0);
+miny= -.02*get_xb(NX,0);
+maxy= 1.02*get_xb(NX,0);
+#endif
+
   fprintf(fgnu,
 	  "set table \"table.gp\"\n"
 	  "set contour base\n"
@@ -160,10 +175,10 @@
 	  "set label 1 \"t=%f\" at screen .45, .015\n"
 	  "plot \"%s\" u 1:($20) ti \"\" w l ls 2 \n"
 	  ,fname2,
-	  -.02*get_xb(NX,0),
-	  1.02*get_xb(NX,0),
-	  -.02*get_xb(NX,0),
-	  1.02*get_xb(NX,0),
+	  minx,
+	  maxx,
+	  miny,
+	  maxy,
 	  fname,
 	  fname,1./(get_xb(NX,0)/11)*.5,1./(get_xb(NX,0)/11)*.5,NX/11+1,NY/11+1,
 	  fname,

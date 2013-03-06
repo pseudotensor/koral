@@ -3,10 +3,10 @@
 
 ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
-ldouble xxvec[4],xx,yy,zz;
+ldouble xxvec[4],xxvecBL[4],xx,yy,zz;
 
 get_xx(ix,iy,iz,xxvec);
-coco_N(xxvec,xxvec,MYCOORDS,BLCOORDS);
+coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
 xx=xxvec[1];
 yy=xxvec[2];
 zz=xxvec[3];
@@ -19,8 +19,8 @@ pick_T(emuup,ix,iy,iz,eup);
 pick_T(emulo,ix,iy,iz,elo);
 //working in BL
 ldouble ggBL[4][5],GGBL[4][5];
-calc_g_arb(xxvec,ggBL,KERRCOORDS);
-calc_G_arb(xxvec,GGBL,KERRCOORDS);
+calc_g_arb(xxvecBL,ggBL,KERRCOORDS);
+calc_G_arb(xxvecBL,GGBL,KERRCOORDS);
 ldouble eupBL[4][4],eloBL[4][4];
 ldouble tupBL[4][4],tloBL[4][4];
 calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
@@ -68,7 +68,10 @@ if(ix>=NX) //analytical solution at rout only
 	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
 	*/
 
-	
+	//atmosphere
+	set_radatmosphere(pp,xxvec,gg,GG,0);
+
+	/*
 	//atmosphere
 	set_radatmosphere(ppatm,xxvec,gg,GG,2);
 
@@ -95,18 +98,19 @@ if(ix>=NX) //analytical solution at rout only
 	  }
 	else
 	  pp[6]=get_u(p,6,iix,iiy,iiz);	
+	*/
 
 #endif
 
 	/*
 	//BL free-fall velocity
 	ldouble ucon[4];
-	ldouble r=xx;
+	ldouble r=xxvecBL[1];
 	ucon[0]=0.;
 	ucon[1]=-sqrtl(2./r)*(1.-2./r);
 	ucon[2]=ucon[3]=0.;
 	conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
-	trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+	trans2_coco(xxvecBL,ucon,ucon,BLCOORDS,MYCOORDS);
 	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
 	pp[2]=ucon[1];
 	pp[3]=ucon[2];
@@ -129,7 +133,7 @@ if(ix>=NX) //analytical solution at rout only
 	//4-velocity in BL transformed to MYCOORDS
 	ldouble ucon[4]={0.,-Vr,0.,Vphi};
 	conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
-	trans2_coco(xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+	trans2_coco(xxvecBL,ucon,ucon,BLCOORDS,MYCOORDS);
 	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
    
 	pp[2]=ucon[1]; 
@@ -168,7 +172,7 @@ if(ix>=NX) //analytical solution at rout only
 	prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
 	prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
 	//transforming radiative primitives from BL to MY
-	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
+	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
 #endif
       }     
 
@@ -189,7 +193,7 @@ if(ix>=NX) //analytical solution at rout only
      iiy=iy;
      iiz=iz;
 
-     ldouble r=xx;
+     ldouble r=xxvecBL[1];
      ldouble xxout[4]={0.,get_x(iix,0),get_x(iiy,1),get_x(iiz,2)};
      coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
      ldouble r0=xxout[1];      
@@ -206,16 +210,16 @@ if(ix>=NX) //analytical solution at rout only
      pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
 
      //atmosphere
-     //set_radatmosphere(pp,xxvec,gg,GG,2);
+     //set_radatmosphere(pp,xxvec,gg,GG,0);
 
      //imposing inflowing velocity of the normal observer
-     //ldouble ucon[4];
-     //calc_normalobs_4vel(GG,ucon);
-     //pp[7]=ucon[1];
+     ldouble ucon[4];
+     calc_normalobs_4vel(GG,ucon);
+     pp[7]=ucon[1];
 
      //copying with scalings
-     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-4.);
-     pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
+     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
+     //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
     
      //this works only for Kerr
      //if(pp[7]>0.) pp[7]=0.;
