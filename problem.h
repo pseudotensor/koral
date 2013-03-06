@@ -44,7 +44,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADBEAM2D/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADBEAM2D/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADBEAM2D/dump.c"
-#define PR_ANASOL "PROBLEMS/RADBEAM2D/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADBEAM2D/tools.c"
 
 #endif
 
@@ -58,7 +58,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADINFALL/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADINFALL/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADINFALL/dump.c"
-#define PR_ANASOL "PROBLEMS/RADINFALL/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADINFALL/tools.c"
 
 #endif
 
@@ -72,7 +72,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/DONUT/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/DONUT/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/DONUT/dump.c"
-#define PR_ANASOL "PROBLEMS/DONUT/anasol.c"
+#define PR_TOOLS "PROBLEMS/DONUT/tools.c"
 
 #endif
 
@@ -86,7 +86,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/GEODESICINFALL/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/GEODESICINFALL/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/GEODESICINFALL/dump.c"
-#define PR_ANASOL "PROBLEMS/GEODESICINFALL/anasol.c"
+#define PR_TOOLS "PROBLEMS/GEODESICINFALL/tools.c"
 
 #endif
 
@@ -100,7 +100,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/EDDINFALL/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/EDDINFALL/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/EDDINFALL/dump.c"
-#define PR_ANASOL "PROBLEMS/EDDINFALL/anasol.c"
+#define PR_TOOLS "PROBLEMS/EDDINFALL/tools.c"
 
 #endif
 
@@ -114,7 +114,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADTUBE/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADTUBE/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADTUBE/dump.c"
-#define PR_ANASOL "PROBLEMS/RADTUBE/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADTUBE/tools.c"
 
 #endif
 
@@ -128,7 +128,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/BONDI/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/BONDI/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/BONDI/dump.c"
-#define PR_ANASOL "PROBLEMS/BONDI/anasol.c"
+#define PR_TOOLS "PROBLEMS/BONDI/tools.c"
 
 #endif
 
@@ -142,7 +142,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/HDTUBE/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/HDTUBE/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/HDTUBE/dump.c"
-#define PR_ANASOL "PROBLEMS/HDTUBE/anasol.c"
+#define PR_TOOLS "PROBLEMS/HDTUBE/tools.c"
 
 #endif
 
@@ -156,7 +156,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/HDTUBE2D/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/HDTUBE2D/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/HDTUBE2D/dump.c"
-#define PR_ANASOL "PROBLEMS/HDTUBE2D/anasol.c"
+#define PR_TOOLS "PROBLEMS/HDTUBE2D/tools.c"
 
 #endif
 
@@ -170,7 +170,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADPULSE/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADPULSE/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADPULSE/dump.c"
-#define PR_ANASOL "PROBLEMS/RADPULSE/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADPULSE/tools.c"
 
 #endif
 
@@ -184,7 +184,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADSHADOW/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADSHADOW/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADSHADOW/dump.c"
-#define PR_ANASOL "PROBLEMS/RADSHADOW/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADSHADOW/tools.c"
 
 #endif
 
@@ -198,7 +198,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADATM/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADATM/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADATM/dump.c"
-#define PR_ANASOL "PROBLEMS/RADATM/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADATM/tools.c"
 
 #endif
 
@@ -212,7 +212,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/DONUTOSC/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/DONUTOSC/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/DONUTOSC/dump.c"
-#define PR_ANASOL "PROBLEMS/DONUTOSC/anasol.c"
+#define PR_TOOLS "PROBLEMS/DONUTOSC/tools.c"
 
 #endif
 
@@ -226,7 +226,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADWAVEBC/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADWAVEBC/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADWAVEBC/dump.c"
-#define PR_ANASOL "PROBLEMS/RADWAVEBC/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADWAVEBC/tools.c"
 
 #endif
 
@@ -240,7 +240,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADWAVE/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADWAVE/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADWAVE/dump.c"
-#define PR_ANASOL "PROBLEMS/RADWAVE/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADWAVE/tools.c"
 
 #endif
 
@@ -254,7 +254,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADPULSE3D/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADPULSE3D/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADPULSE3D/dump.c"
-#define PR_ANASOL "PROBLEMS/RADPULSE3D/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADPULSE3D/tools.c"
 
 #endif
 
@@ -268,7 +268,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADDBLSHADOW/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADDBLSHADOW/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADDBLSHADOW/dump.c"
-#define PR_ANASOL "PROBLEMS/RADDBLSHADOW/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADDBLSHADOW/tools.c"
 
 #endif
 
@@ -282,7 +282,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/ATMSTATIC/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/ATMSTATIC/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/ATMSTATIC/dump.c"
-#define PR_ANASOL "PROBLEMS/ATMSTATIC/anasol.c"
+#define PR_TOOLS "PROBLEMS/ATMSTATIC/tools.c"
 
 #endif
 
@@ -296,7 +296,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADBEAM2DKS/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADBEAM2DKS/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADBEAM2DKS/dump.c"
-#define PR_ANASOL "PROBLEMS/RADBEAM2DKS/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADBEAM2DKS/tools.c"
 
 #endif
 
@@ -310,7 +310,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/ATMKS/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/ATMKS/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/ATMKS/dump.c"
-#define PR_ANASOL "PROBLEMS/ATMKS/anasol.c"
+#define PR_TOOLS "PROBLEMS/ATMKS/tools.c"
 
 #endif
 
@@ -324,7 +324,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/DONUTKS/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/DONUTKS/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/DONUTKS/dump.c"
-#define PR_ANASOL "PROBLEMS/DONUTKS/anasol.c"
+#define PR_TOOLS "PROBLEMS/DONUTKS/tools.c"
 
 #endif
 
@@ -338,7 +338,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/DONUTMKS1/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/DONUTMKS1/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/DONUTMKS1/dump.c"
-#define PR_ANASOL "PROBLEMS/DONUTMKS1/anasol.c"
+#define PR_TOOLS "PROBLEMS/DONUTMKS1/tools.c"
 
 #endif
 
@@ -354,7 +354,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/ATMMKS1/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/ATMMKS1/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/ATMMKS1/dump.c"
-#define PR_ANASOL "PROBLEMS/ATMMKS1/anasol.c"
+#define PR_TOOLS "PROBLEMS/ATMMKS1/tools.c"
 
 #endif
 
@@ -368,7 +368,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADBEAMFLAT/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADBEAMFLAT/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADBEAMFLAT/dump.c"
-#define PR_ANASOL "PROBLEMS/RADBEAMFLAT/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADBEAMFLAT/tools.c"
 
 #endif
 
@@ -382,7 +382,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RDONUT/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RDONUT/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RDONUT/dump.c"
-#define PR_ANASOL "PROBLEMS/RDONUT/anasol.c"
+#define PR_TOOLS "PROBLEMS/RDONUT/tools.c"
 
 #endif
 
@@ -396,7 +396,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADBEAM2DKSVERT/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADBEAM2DKSVERT/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADBEAM2DKSVERT/dump.c"
-#define PR_ANASOL "PROBLEMS/RADBEAM2DKSVERT/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADBEAM2DKSVERT/tools.c"
 
 #endif
 
@@ -410,7 +410,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/RADFLATNESS/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/RADFLATNESS/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADFLATNESS/dump.c"
-#define PR_ANASOL "PROBLEMS/RADFLATNESS/anasol.c"
+#define PR_TOOLS "PROBLEMS/RADFLATNESS/tools.c"
 
 #endif
 
@@ -424,7 +424,7 @@
 #define PR_OUT2GIF_2D "PROBLEMS/BOWSHOCK/out2gif_2d.c"
 #define PR_OUT2GIF_1D "PROBLEMS/BOWSHOCK/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/BOWSHOCK/dump.c"
-#define PR_ANASOL "PROBLEMS/BOWSHOCK/anasol.c"
+#define PR_TOOLS "PROBLEMS/BOWSHOCK/tools.c"
 
 #endif
 

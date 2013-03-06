@@ -16,7 +16,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 1.
+#define DTOUT1 5.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -29,15 +29,15 @@
 #ifdef myMKS1COORDS
 #define MKS1R0 0.
 #define MINX (log(1.7-MKS1R0))
-#define MAXX (log(40.-MKS1R0))
-#define NX 50
+#define MAXX (log(50.-MKS1R0))
+#define NX 90
 #else
-#define MINX (.8*r_horizon_BL(BHSPIN))
+#define MINX (1.8*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
-#define NX 70
+#define NX 60
 #endif
 
-#define NY 30
+#define NY 60
 #define NZ 1
 
 
@@ -50,7 +50,7 @@
 #define GAMMA (4./3.)
 #define KKK 1.e-4
 #define ELL 4.5
-#define UTPOT 1.
+#define UTPOT .98
 //#define RHOATMMIN  rhoCGS2GU(1.e-4)
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
@@ -60,7 +60,7 @@
 #define RK3_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 
 #define NODONUT 0
 #define INFLOWING 0

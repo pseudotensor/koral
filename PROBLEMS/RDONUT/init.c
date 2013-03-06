@@ -23,9 +23,10 @@ yy=xxvecBL[2];
 zz=xxvecBL[3];
 
 
-ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
+ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
+pick_T(tmulo,ix,iy,iz,tlo);
 calc_ZAMOes(gg,eup,elo,MYCOORDS);
 
 ldouble pp[NV],ppback[NV],T;
@@ -120,7 +121,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      pp[8]=Fy;
      pp[9]=Fz;
 
-     //transforming BL ZAMO radiative primitives to BL non-ortonormal primitives
+     //transforming BL ZAMO radiative primitives to code non-ortonormal primitives
      ldouble eupBL[4][4],eloBL[4][4];
      ldouble tupBL[4][4],tloBL[4][4];
      calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
@@ -129,6 +130,97 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
      //transforming radiative primitives from BL to MYCOORDS
      trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+
+     //estimating F = -1/chi E,i
+     ldouble kappa,kappaes,chi;
+     chi=calc_kappa(pp[0],calc_PEQ_Tfromurho(pp[1],pp[0]),xxvec[1],xxvec[2],xxvec[3])
+       +
+       calc_kappaes(pp[0],calc_PEQ_Tfromurho(pp[1],pp[0]),xxvec[1],xxvec[2],xxvec[3]);
+
+     ldouble xxvectemp[4]={xxvec[0],xxvec[1],xxvec[2],xxvec[3]};
+     ldouble pptemp[NV],E1,E2,ggt[4][5],GGt[4][5];
+     int anret,anretmin=0;
+
+     //r dimension
+     xxvectemp[1]=1.01*xxvecBL[1];
+     xxvectemp[2]=1.0*xxvecBL[2];
+     xxvectemp[3]=1.0*xxvecBL[3];
+     calc_g_arb(xxvectemp,ggt,KERRCOORDS);
+     calc_G_arb(xxvectemp,GGt,KERRCOORDS);
+
+     anret=donut_analytical_solution(pptemp,xxvectemp,ggt,GGt);
+     if(anret<0) anretmin=-1;
+     E1=pptemp[6];
+
+     xxvectemp[1]=.99*xxvecBL[1];
+     xxvectemp[2]=1.0*xxvecBL[2];
+     xxvectemp[3]=1.0*xxvecBL[3];
+     calc_g_arb(xxvectemp,ggt,KERRCOORDS);
+     calc_G_arb(xxvectemp,GGt,KERRCOORDS);
+
+     anret=donut_analytical_solution(pptemp,xxvectemp,ggt,GGt);
+     if(anret<0) anretmin=-1;
+     E2=pptemp[6];
+
+     //     printf(">> %e %e\n",E2,E1);
+
+     Fx=(E2-E1)/(.02*xxvecBL[1]*ggBL[1][1])/chi/3.;
+
+     //th dimension
+     xxvectemp[1]=1.0*xxvecBL[1];
+     xxvectemp[2]=1.01*xxvecBL[2];
+     xxvectemp[3]=1.0*xxvecBL[3];
+     calc_g_arb(xxvectemp,ggt,KERRCOORDS);
+     calc_G_arb(xxvectemp,GGt,KERRCOORDS);
+
+     anret=donut_analytical_solution(pptemp,xxvectemp,ggt,GGt);
+     if(anret<0) anretmin=-1;
+     E1=pptemp[6];
+
+     xxvectemp[1]=1.0*xxvecBL[1];
+     xxvectemp[2]=0.99*xxvecBL[2];
+     xxvectemp[3]=1.0*xxvecBL[3];
+     calc_g_arb(xxvectemp,ggt,KERRCOORDS);
+     calc_G_arb(xxvectemp,GGt,KERRCOORDS);
+
+     anret=donut_analytical_solution(pptemp,xxvectemp,ggt,GGt);
+     if(anret<0) anretmin=-1;
+     E2=pptemp[6];
+
+     Fy=(E2-E1)/(.02*xxvecBL[2]*ggBL[2][2])/chi/3.;
+
+     //ph dimension
+     Fz=0.;
+
+     if(anretmin<0)
+       Fx=Fy=Fz=0.;
+     else
+       {
+	 ldouble Fl=sqrt(Fx*Fx+Fy*Fy+Fz*Fz);
+	 if(Fl>.99*E)
+	   {
+	     Fx=Fx/Fl*0.99*E;
+	     Fy=Fy/Fl*0.99*E;
+	     Fz=Fz/Fl*0.99*E;
+	   }
+       }
+
+     //saving ff values to pp[]
+     pp[7]=Fx;
+     pp[8]=Fy;
+     pp[9]=Fz;
+
+     //int_4vector(&pp[6]);
+
+     //boosting to lab
+     //transforming BL ZAMO radiative primitives to code non-ortonormal primitives
+     prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+     prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+     //transforming radiative primitives from BL to MYCOORDS
+     trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+     
+     //printf("%d > ",anretmin);print_4vector(&pp[6]); getchar();
+
 #endif
    }
 

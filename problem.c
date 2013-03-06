@@ -148,16 +148,10 @@ int my_finger(ldouble t)
 }
 
 /*********************************************/
-/* suplementary routine to calculate vv[4] during the dumping */
-/* uses PROBLEMS/XXX/anasol.c */   
+/* suplementary routines
+/* uses PROBLEMS/XXX/tools.c */   
 /*********************************************/
-int
-analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,ldouble *vv)
-{
-#include PR_ANASOL
-  return 0;
-}
-
+#include PR_TOOLS
 
 
 
