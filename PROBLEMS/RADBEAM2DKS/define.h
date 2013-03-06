@@ -1,7 +1,7 @@
 #define TMAX 1.e10
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
-//#define myMKS1COORDS
+#define myMKS1COORDS
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -37,8 +37,13 @@
 
 #if (BEAMNO==1)
 #define MKS1R0 .5
+#ifdef myMKS1COORDS
+#define MINX .6
+#define MAXX 1.2
+#else
 #define MINX 2.6
 #define MAXX 3.5
+#endif
 #define BEAML 2.9
 #define BEAMR 3.1
 #define DTOUT1 .1 //dt for basic output

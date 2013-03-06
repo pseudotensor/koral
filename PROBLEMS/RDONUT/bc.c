@@ -190,7 +190,9 @@ if(ix>=NX) //analytical solution at rout only
      iiz=iz;
 
      ldouble r=xx;
-     ldouble r0=get_x(iix,0);
+     ldouble xxout[4]={0.,get_x(iix,0),get_x(iiy,1),get_x(iiz,2)};
+     coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
+     ldouble r0=xxout[1];      
      
 
      //copying YLCOORDS quantities

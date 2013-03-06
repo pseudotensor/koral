@@ -303,17 +303,21 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
   if(atmtype==0) //normal observer plur rho \propto r^-1.5
     {
       //normal observer
-      ldouble ucon[4],r;
+      ldouble ucon[4];
+      ldouble xx2[4];
       calc_normalobs_4vel(GG,ucon);
       conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
       pp[2]=ucon[1];
       pp[3]=ucon[2];
       pp[4]=ucon[3];
       // Bondi-like atmosphere
-      coco_N(xx,xx,MYCOORDS,BLCOORDS);
-      r=xx[1];
-      pp[0] = RHOATMMIN*pow(r,-1.5);
-      pp[1] = UINTATMMIN*pow(r,-2.5);
+      coco_N(xx,xx2,MYCOORDS,BLCOORDS);
+      ldouble r=xx2[1];
+
+      ldouble rout=2.; //RHOATMMIN etc. given at rout=2
+
+      pp[0] = RHOATMMIN*pow(r/rout,-1.5);
+      pp[1] = UINTATMMIN*pow(r/rout,-2.5);
   
       return 0;
     }
@@ -321,6 +325,7 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
     {
       //normal observer
       ldouble ucon[4],r;
+      ldouble xx2[4];
       calc_normalobs_4vel(GG,ucon);
       conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
       pp[2]=ucon[1];
@@ -328,10 +333,13 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       pp[4]=ucon[3];
 
       // Bondi-like atmosphere
-      coco_N(xx,xx,MYCOORDS,BLCOORDS);
+      coco_N(xx,xx2,MYCOORDS,BLCOORDS);
       r=xx[1];
-      pp[0] = RHOATMMIN*pow(r,-2.0);
-      pp[1] = UINTATMMIN*pow(r,-2.5);
+
+      ldouble rout=2.; //RHOATMMIN etc. given at rout=2
+
+      pp[0] = RHOATMMIN*pow(r/rout,-2.0);
+      pp[1] = UINTATMMIN*pow(r/rout,-2.5);
   
       return 0;
     }

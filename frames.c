@@ -1028,6 +1028,7 @@ int
 trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
 {
   ldouble dxdx[4][4];
+  ldouble xx2[4];
   if(CO1==CO2)
     {
       u2[0]=u1[0];
@@ -1066,18 +1067,18 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
   else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       dxdx_MKS12KS(xx,dxdx);
-      multiply2(u1,u1,dxdx);
-      coco_N(xx,xx,CO1,KSCOORDS);
-      dxdx_KS2BL(xx,dxdx);
       multiply2(u1,u2,dxdx);
+      coco_N(xx,xx2,CO1,KSCOORDS);
+      dxdx_KS2BL(xx2,dxdx);
+      multiply2(u2,u2,dxdx);
     }
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
     {
       dxdx_BL2KS(xx,dxdx);
-      multiply2(u1,u1,dxdx);
-      coco_N(xx,xx,CO1,KSCOORDS);
-      dxdx_KS2MKS1(xx,dxdx);
-      multiply2(u1,u2,dxdx);  
+      multiply2(u1,u2,dxdx);
+      coco_N(xx,xx2,CO1,KSCOORDS);
+      dxdx_KS2MKS1(xx2,dxdx);
+      multiply2(u2,u2,dxdx);  
     }
   else
     my_err("transformation not implemented in trans2_coco()\n");
@@ -1093,6 +1094,7 @@ int
 trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
 {
   ldouble dxdx[4][4];
+  ldouble xx2[4];
   if(CO1==CO2)
     {
       int i,j;
@@ -1131,18 +1133,18 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
   else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       dxdx_MKS12KS(xx,dxdx);
-      multiply22(T1,T1,dxdx);
-      coco_N(xx,xx,CO1,KSCOORDS);
-      dxdx_KS2BL(xx,dxdx);
       multiply22(T1,T2,dxdx);
+      coco_N(xx,xx2,CO1,KSCOORDS);
+      dxdx_KS2BL(xx2,dxdx);
+      multiply22(T2,T2,dxdx);
     }
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
     {
       dxdx_BL2KS(xx,dxdx);
-      multiply22(T1,T1,dxdx);
-      coco_N(xx,xx,CO1,KSCOORDS);
-      dxdx_KS2MKS1(xx,dxdx);
-      multiply22(T1,T2,dxdx);  
+      multiply22(T1,T2,dxdx);
+      coco_N(xx,xx2,CO1,KSCOORDS);
+      dxdx_KS2MKS1(xx2,dxdx);
+      multiply22(T2,T2,dxdx);  
     }
   else
     my_err("transformation not implemented in trans22_coco()\n");

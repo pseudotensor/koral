@@ -722,14 +722,35 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
     }
   if(atmtype==2) //optically thin atmosphere, scalings from numerical solution of radiall influx
     {
-      ldouble gammamax=100.;
-      ldouble rout=get_x(NX-1,0);
-      ldouble r=xx[1];
+      ldouble gammamax=10.;
+      //ldouble xxout[4]={0.,get_x(NX-1,0),0.,0.};
+      //      coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
+      //      ldouble rout=xxout[1];
 
+      ldouble rout=2.; //normalize at r_BL=2
+
+      ldouble xxBL[4];
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      ldouble r=xxBL[1];
+     
       pp[6]=ERADATMMIN*(rout/r)*(rout/r)*(rout/r)*(rout/r);
-      pp[7]=-gammamax*pow(r/rout,1.);
-      pp[8]=0.;
-      pp[9]=0.;
+
+      ldouble ut[4]={0.,-gammamax*pow(r/rout,1.),0.,0.};
+
+      ldouble ggBL[4][5],GGBL[4][5];
+      calc_g_arb(xxBL,ggBL,KERRCOORDS);
+      calc_G_arb(xxBL,GGBL,KERRCOORDS);
+
+      conv_vels(ut,ut,VELR,VEL4,ggBL,GGBL);
+
+      trans2_coco(xxBL,ut,ut,KERRCOORDS,MYCOORDS);
+
+      conv_vels(ut,ut,VEL4,VELPRIM,gg,GG);
+      
+      pp[7]=ut[1];      
+      pp[8]=ut[2];      
+      pp[9]=ut[3];
+
     }
 #endif
   return 0;

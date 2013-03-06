@@ -5,10 +5,17 @@
 
 #define MASS 10.
 #define BHSPIN 0.
-#define MYCOORDS KSCOORDS
 
-#define OUTCOORDS KSCOORDS
-#define OUTVEL VEL4
+#define myMKS1COORDS
+
+#ifdef myMKS1COORDS
+#define MYCOORDS MKS1COORDS
+#else
+#define MYCOORDS KSCOORDS
+#endif
+
+#define OUTCOORDS KERRCOORDS
+#define OUTVEL VELR
 #define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
@@ -22,8 +29,16 @@
 #define NX 100
 #define NY 1
 #define NZ 1
+
+#ifdef myMKS1COORDS
+#define MKS1R0 .7
+#define MINX 0.
+#define MAXX 3.
+#else
 #define MINX (.8*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
+#endif
+
 #define MINY 0.*Pi/4.
 #define MAXY Pi/2.
 #define MINZ 0.
