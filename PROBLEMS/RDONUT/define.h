@@ -7,20 +7,20 @@
 #define BHSPIN 0.
 #define MYCOORDS KSCOORDS
 
-#define OUTCOORDS KERRCOORDS
+#define OUTCOORDS KSCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 1.
+#define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
 //#define CGSOUTPUT
-#define RADOUTPUTINZAMO
+//#define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
-//#define PRINTGC_LEFT
+#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
 
-#define NX 70
-#define NY 60
+#define NX 100
+#define NY 1
 #define NZ 1
 #define MINX (.8*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
@@ -45,7 +45,7 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 
-#define NODONUT 0
+#define NODONUT 1
 #define INFLOWING 0
 
 #define RHOFLOOR 1.e-40

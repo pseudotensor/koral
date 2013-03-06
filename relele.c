@@ -242,6 +242,59 @@ calc_normalobs_4vel(ldouble GG[][5], ldouble *ncon)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//returns contravariant four-velocity of a photon
+//with radial motion and given gammamax
+int
+calc_photonrad_4vel(ldouble gg[][5],ldouble GG[][5], ldouble *ucon)
+{
+#if(0) //going through VEL4
+    int i,j;
+    ldouble gammamax=100.;
+    // radial motion in VEL4
+    ldouble ncon[4]={gammamax,-1.,0.,0.};  
+    // is normalized now
+    ldouble Afac,a,b,c,delta;
+    a=0.; c=0.; b=0.;
+    for(i=1;i<4;i++)
+      {
+	a+=ncon[i]*ncon[i]*gg[i][i];
+	b+=2.*ncon[i]*gg[0][i]*gammamax;
+      }
+    c=gg[0][0]*gammamax*gammamax+1.;
+    delta=b*b-4.*a*c;
+    Afac= (-b+sqrt(delta))/2./a;
+      
+    ucon[0]=gammamax;
+    ucon[1]=Afac*ncon[1];
+    ucon[2]=Afac*ncon[2];
+    ucon[3]=Afac*ncon[3];
+#else //imposing gamma in VELR
+    int i,j;
+    ldouble gammamax=1000.;
+    // radial motion in VELR
+    ldouble ncon[4]={0.,-1.,0.,0.};  
+    // compute \gammarel using ncon
+    ldouble qsq=0.;
+    for(i=1;i<4;i++)
+      for(j=1;j<4;j++)
+	qsq+=ncon[i]*ncon[j]*gg[i][j];
+    ldouble gammatemp=sqrt(1.+qsq);
+    // now rescale ncon[i] so will give desired \gammamax
+    for(i=1;i<4;i++)
+      {
+	ncon[i] *= (gammamax/gammatemp);
+	ucon[i] = ncon[i];
+      }
+    //convert ncon to VEL4
+    conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
+#endif
+  
+  return 0.;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //returns hydro primitives for an atmosphere
 //velocities already in VELPRIM
 int

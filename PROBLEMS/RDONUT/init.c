@@ -50,7 +50,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
     //ambient
     set_hdatmosphere(pp,xxvec,gg,GG,0);
 #ifdef RADIATION
-    set_radatmosphere(pp,xxvec,gg,GG,0);
+    set_radatmosphere(pp,xxvec,gg,GG,2);
 
     /*
     pp[6]=ERADATMMIN;
@@ -76,7 +76,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
     //ambient
     set_hdatmosphere(ppback,xxvec,gg,GG,0);
 #ifdef RADIATION
-    set_radatmosphere(ppback,xxvec,gg,GG,0);
+    set_radatmosphere(ppback,xxvec,gg,GG,2);
 #endif
 
      ldouble h=-1./ut;

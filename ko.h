@@ -289,6 +289,7 @@ int coco_KS2BL(ldouble *xBL, ldouble *xKS);
 //relele.c
 int calc_normalobs_4vel(ldouble GG[][5], ldouble *ncon);
 int set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
+int calc_photonrad_4vel(ldouble gg[][5],ldouble GG[][5], ldouble *ucon);
 int conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5]);
 #define dot(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2]+A[3]*B[3])
 #define dot3(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2])
@@ -363,6 +364,7 @@ int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, l
 
 
 //rad.c
+int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
 int solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas);

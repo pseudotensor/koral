@@ -697,16 +697,39 @@ int
 set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype)
 {
 #ifdef RADIATION  
-  if(atmtype==0) //no fluxes, minimal Erad
+  if(atmtype==0) //fixed Erf, urf of normal observer
     {
-      pp[6]=ERADATMMIN; //radiative energy density in the rad.rest frame=lab frame
-      //normal observer
-      ldouble ucon[4],r;
+      pp[6]=ERADATMMIN; 
+      ldouble ucon[4];
       calc_normalobs_4vel(GG,ucon);
-      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
-      pp[7]=ucon[1]; //VELPRIM velocity of the radiative rest frame = normal velocity
+      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
+      pp[7]=ucon[1]; 
       pp[8]=ucon[2];
       pp[9]=ucon[3];
+    }
+  if(atmtype==1) //optically thin atmosphere, photon flying radially 
+    {
+      ldouble ucon[4];
+      calc_photonrad_4vel(gg,GG,ucon);
+      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
+
+      pp[6]=ERADATMMIN; 
+      pp[7]=ucon[1]; 
+      pp[8]=ucon[2];
+      pp[9]=ucon[3];
+
+      //printf("%g > ",xx[1]);  print_4vector(&pp[6]); getchar();
+    }
+  if(atmtype==2) //optically thin atmosphere, scalings from numerical solution of radiall influx
+    {
+      ldouble gammamax=100.;
+      ldouble rout=get_x(NX-1,0);
+      ldouble r=xx[1];
+
+      pp[6]=ERADATMMIN*(rout/r)*(rout/r)*(rout/r)*(rout/r);
+      pp[7]=-gammamax*pow(r/rout,1.);
+      pp[8]=0.;
+      pp[9]=0.;
     }
 #endif
   return 0;
