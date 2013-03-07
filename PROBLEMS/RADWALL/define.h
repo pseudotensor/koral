@@ -2,8 +2,8 @@
 #define RADIATION
 
 #define MYCOORDS MINKCOORDS
-#define NX 31
-#define NY 1
+#define NX 120
+#define NY 21
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
@@ -19,20 +19,21 @@
 #define DTOUT1 .5
 #define NOUTSTOP 100
 #define GAMMA (4./3.)
-//#define EXPLICIT_RAD_SOURCE
+#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
-#define MINX 0
-#define MAXX 1
+#define MINX -6
+#define MAXX 3
 #define MINY 0
-#define MAXY 1
+#define MAXY 1.5
 #define MINZ 0
 #define MAXZ 1
 
 #define MASSCM 1.
 
 #define LTEFACTOR 1.
-#define URFX 10.
+#define URFX 13.
+#define URFY -13.
 
 #define KAPPA 0.
 #define KAPPAES 0.

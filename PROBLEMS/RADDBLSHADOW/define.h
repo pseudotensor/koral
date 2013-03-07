@@ -11,13 +11,13 @@
 #define RK3STEPPING
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (1.4)
 #define DTOUT1 2.e-1
 
-#define IMPLICIT_FF_RAD_SOURCE
-//#define EXPLICIT_RAD_SOURCE
+//#define IMPLICIT_FF_RAD_SOURCE
+#define EXPLICIT_RAD_SOURCE
 #define MASS 10.
 
 #define MINX -6.
@@ -39,7 +39,7 @@
 #define RHOBLOB 1.e-4// 1.e3
 
 #define BLOBW 5.e-2
-#define KAPPA 1.e0
+#define KAPPA 0.
 
 #define NLEFT 0.999
 

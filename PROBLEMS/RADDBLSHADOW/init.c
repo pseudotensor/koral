@@ -57,6 +57,11 @@ pp[9]=Fz;
 
 prad_ff2lab(pp,pp,gg,GG,tlo);
 
+/*
+pp[6]=1.;
+pp[7]=pp[8]=0.;
+*/
+
 p2u(pp,uu,gg,GG);
 
 /**************************/

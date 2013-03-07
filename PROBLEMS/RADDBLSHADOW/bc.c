@@ -28,18 +28,15 @@ if(iy<0)
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);      
       }
     //change sign of y components
-    pp[3]*=-1.;
+    // pp[3]*=-1.;
     
- //    prad_lab2ff(pp,pp,gg,GG,tup);
-
     pp[8]*=-1.;
 
- //    prad_ff2lab(pp,pp,gg,GG,tlo);
     p2u(pp,uu,gg,GG);
     return 0.;
   }
 //source of light
- else if(iy>NY-1 || (ix<0 && yy>.3&& 0))
+ else if(iy>NY-1 || (ix<0 && yy>.3&& 1))
    {
      ldouble Fx,Fy,Fz,rho,E,uint,vx;
      iix=ix;
@@ -70,9 +67,15 @@ if(iy<0)
       pp[6]=E;
       pp[7]=Fx;
       pp[8]=Fy;
-      pp[9]=Fz;
+      p [9]=Fz;
 
       prad_ff2lab(pp,pp,gg,GG,tlo);
+
+      /*
+      pp[6]=100.;
+      pp[7]=pp[8]=13.;
+      pp[8]*=-1.;
+      */
 
       p2u(pp,uu,gg,GG);
       return 0.;
@@ -111,6 +114,11 @@ if(iy<0)
 
       prad_ff2lab(pp,pp,gg,GG,tlo);
 
+      /*
+      pp[6]=1.;
+      pp[7]=pp[8]=0.;
+      */
+
       p2u(pp,uu,gg,GG);
       return 0.;
     }
@@ -119,14 +127,17 @@ if(iy<0)
   iix=ix;
   iiz=iz;
   iiy=iy;
-  //copy
-  while(iix>=NX)    iix=NX-1;//iix-=NX; 
-  //periodic
-  while(iiy<0)    iiy=0 ;
+
+//outflow
+while(iix<0)    iix=0 ;
+while(iix>=NX)    iix=NX-1;
+//outflow
+while(iiy<0)    iiy=0 ;
 while(iiy>=NY)    iiy=NY-1;
 //periodic
-while(iiz<0)    iiz=0 ;
-while(iiz>=NZ)    iiz=NZ-1;
+while(iiz<0)    iiz+=NZ;
+while(iiz>=NZ)    iiz-=NZ; 
+ 
  
   for(iv=0;iv<NV;iv++)
     {
