@@ -116,7 +116,7 @@ fprint_profiles(ldouble t, ldouble totmass)
   gclx=gcly=gclz=0;
   gcrx=gcry=gcrz=0;
 #ifdef PRINTGC_LEFT
-  gclx=1;
+  gclx=1;gcly=1;
 #endif
 #ifdef PRINTGC_RIGHT
   gcrx=1;
