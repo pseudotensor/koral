@@ -31,8 +31,9 @@
 //26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
 //27 RADFLATNESS - flat but with non-zero four-force
 //28 BOWSHOCK - bow shock hydro test
+//29 RADWALL - flat with wall
 
-#define PROBLEM 17
+#define PROBLEM 29
 
 #if(PROBLEM==1)
 
@@ -425,6 +426,21 @@
 #define PR_OUT2GIF_1D "PROBLEMS/BOWSHOCK/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/BOWSHOCK/dump.c"
 #define PR_TOOLS "PROBLEMS/BOWSHOCK/tools.c"
+
+#endif
+
+
+#if(PROBLEM==29)
+
+#define PR_DEFINE "PROBLEMS/RADWALL/define.h"
+#define PR_BC "PROBLEMS/RADWALL/bc.c"
+#define PR_INIT "PROBLEMS/RADWALL/init.c"
+#define PR_KAPPA "PROBLEMS/RADWALL/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADWALL/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADWALL/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADWALL/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADWALL/dump.c"
+#define PR_TOOLS "PROBLEMS/RADWALL/tools.c"
 
 #endif
 
