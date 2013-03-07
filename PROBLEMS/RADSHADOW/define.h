@@ -42,7 +42,7 @@
 
 #define SPECIFIC_BC
 
-//efine RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
 #define PRINTGC_LEFT
 
 #define U2PPREC 1.e-6

@@ -42,8 +42,8 @@
 	  "set tmargin at screen .85\n"
 	  
 	  "set size .5,1\n"
-	  "set xrange [%Lf:%Lf]\n"
-	  "set yrange [%Lf:%Lf]\n"
+	  "set xrange [%f:%f]\n"
+	  "set yrange [%f:%f]\n"
 	  //	  "set log cb\n"
 	  //"set cbrange [1.e6:5.e6]\n"
 	  "set xlabel \"x\"\n"
@@ -66,8 +66,8 @@
 	  "set format x \"%%.2f\"\n"
 	  "set format y \"%%.2f\"\n"
 	  //	  "set autoscale\n"
-	  //	  "set xrange [%Lf:%Lf]\n"
-	  //	  "set yrange [%Lf:%Lf]\n"
+	  //	  "set xrange [%f:%f]\n"
+	  //	  "set yrange [%f:%f]\n"
 
 	  //	  "set lmargin at screen 0.55\n"
 	  //	  "set rmargin at screen 0.9\n"

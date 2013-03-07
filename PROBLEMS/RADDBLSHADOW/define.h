@@ -1,15 +1,14 @@
 #define TMAX 1.e10
 #define RADIATION
-//#define MINKOWSKI
-//#define CYLINDRICAL
-//#define SPHERICAL
-//#define SCHWARZSCHILD
-#define NX 60
-#define NY 10
+
+#define MYCOORDS MINKCOORDS
+
+#define NX 100
+#define NY 40
 #define NZ 1
 #define TSTEPLIM 1.//kind of courant limiter
 #define INT_ORDER 1
-#define RK3STEPPING
+#define RK2STEPPING
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -17,13 +16,7 @@
 #define GAMMA (1.4)
 #define DTOUT1 2.e-1
 
-//#define EDDINGTON_APR
-
-//#define EXPLICIT_RAD_SOURCE
-#define IMPLICIT_FF_RAD_SOURCE
-
-//#define GASRADOFF
-//#define RADSOURCEOFF
+//#define IMPLICIT_FF_RAD_SOURCE
 
 #define MASS 10.
 
