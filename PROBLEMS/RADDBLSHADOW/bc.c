@@ -5,16 +5,17 @@ ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
 
   gdet_bc=get_g(g,3,4,ix,iy,iz);  
-  ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
+ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4],tlo[4][4];
   pick_g(ix,iy,iz,gg);
+  pick_G(ix,iy,iz,GG);
   pick_T(emuup,ix,iy,iz,eup);
   pick_T(emulo,ix,iy,iz,elo);
+  pick_T(tmulo,ix,iy,iz,tlo);
   ldouble xx=get_x(ix,0);
 ldouble yy=get_x(iy,1);
 
-
 ldouble angle=.4;
-//printf("aa\n");
+
 
 //symmetry with respect to the lower axis
 if(iy<0)
@@ -71,9 +72,9 @@ if(iy<0)
       pp[8]=Fy;
       pp[9]=Fz;
 
-      prad_zamo2ff(pp,pp,gg,eup);
+      prad_ff2lab(pp,pp,gg,GG,tlo);
 
-      p2u(pp,uu,gg,eup,elo);
+      p2u(pp,uu,gg,GG);
       return 0.;
     }
   else if(ix<0.)
@@ -108,9 +109,9 @@ if(iy<0)
       pp[8]=Fy;
       pp[9]=Fz;
 
-      prad_zamo2ff(pp,pp,gg,eup);
+      prad_ff2lab(pp,pp,gg,GG,tlo);
 
-      p2u(pp,uu,gg,eup,elo);
+      p2u(pp,uu,gg,GG);
       return 0.;
     }
  
@@ -132,6 +133,6 @@ while(iiz>=NZ)    iiz=NZ-1;
       
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
     }
-  p2u(pp,uu,gg,eup,elo);
+  p2u(pp,uu,gg,GG);
 return 0;
   
