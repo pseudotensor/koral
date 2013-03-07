@@ -30,7 +30,7 @@
 #define MKS1R0 0.
 #define MINX (log(1.7-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 90
+#define NX 100
 #else
 #define MINX (1.8*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
