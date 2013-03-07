@@ -42,14 +42,14 @@
 	  "set tmargin at screen .85\n"
 	  
 	  "set size .5,1\n"
-	  "set xrange [%Lf:%Lf]\n"
-	  "set yrange [%Lf:%Lf]\n"
+	  "set xrange [%f:%f]\n"
+	  "set yrange [%f:%f]\n"
 	  //	  "set log cb\n"
 	  //"set cbrange [1.e6:5.e6]\n"
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
-	  "set title \"T (colors), rho (contours)\"\n"
+	  "set title \"E (colors), rho (contours)\"\n"
 	  //	  "set dgrid3d 100,100,16\n"
 	    	  
 	  "splot \"%s\" u 1:2:20 ti \"\"\n"
@@ -66,8 +66,8 @@
 	  "set format x \"%%.2f\"\n"
 	  "set format y \"%%.2f\"\n"
 	  "set autoscale\n"
-	  "set xrange [%Lf:%Lf]\n"
-	  "set yrange [%Lf:%Lf]\n"
+	  "set xrange [%f:%f]\n"
+	  "set yrange [%f:%f]\n"
 
 	  "set lmargin at screen 0.55\n"
 	  "set rmargin at screen 0.9\n"
@@ -80,7 +80,7 @@
 
 	  //	  "set cbrange [0:2]\n"	  
 	  
-	  "splot \"%s\" u 1:2:(($24)) ti \"\"\n"
+	  "splot \"%s\" u 1:2:(($21)) ti \"\"\n"
 	  //"splot \"%s\" u 1:2:(($11*$11)**.5) ti \"\"\n"
 	  "unset dgrid3d\n"
 	  
