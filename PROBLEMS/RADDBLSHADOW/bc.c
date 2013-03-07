@@ -36,7 +36,7 @@ if(iy<0)
     return 0.;
   }
 //source of light
- else if(iy>NY-1 || (ix<0 && yy>.3))
+ else if(iy>NY-1 || (ix<0 && yy>.3 && 1))
    {
      ldouble Fx,Fy,Fz,rho,E,uint,vx;
      iix=ix;
@@ -72,6 +72,8 @@ if(iy<0)
 
      prad_zamo2ff(pp,pp,gg,eup);
      prad_ff2lab(pp,pp,gg,GG,tlo);
+
+
      p2u(pp,uu,gg);
      return 0.;
    }

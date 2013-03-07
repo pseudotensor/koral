@@ -1,7 +1,52 @@
+//physics
+#define GGG0 (6.674e-8)
+#define CCC0 (2.998e10)
+#define gTILDA (1.e-10)
+#define cTILDA (1.)
+#define GGG (GGG0/gTILDA)
+#define CCC (CCC0/cTILDA)
+#define MSUNCM 147700.
+
+/*
 #define GGG (6.674e-8)
 #define CCC 2.998e10
 #define MSUNCM 147700.
+*/
 
+#define SOURCETERMS
+#define NUM_SOURCESTEPS 1
+
+#define my_max(x,y) (x>y?x:y)
+
+
+//conversions
+#define lenCGS2GU(x)    (x/MASSCM)
+#define lenGU2CGS(x)    (x*MASSCM)
+#define timeCGS2GU(x)   (x/MASSCM*CCC)
+#define timeGU2CGS(x)   (x*MASSCM/CCC)
+#define velCGS2GU(x)    (x/CCC)
+#define velGU2CGS(x)    (x*CCC)
+#define rhoCGS2GU(x)    (x*GGG/CCC/CCC*MASSCM*MASSCM)
+#define rhoGU2CGS(x)    (x/GGG*CCC*CCC/MASSCM/MASSCM)
+#define massCGS2GU(x)    (x*GGG/CCC/CCC/MASSCM)
+#define massGU2CGS(x)    (x/GGG*CCC*CCC*MASSCM)
+#define kappaCGS2GU(x)  (x/GGG*CCC*CCC/MASSCM)
+#define kappaGU2CGS(x)  (x*GGG/CCC/CCC*MASSCM)
+#define endenCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC)
+#define endenGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC)
+#define fluxCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC)
+#define fluxGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC)
+
+//constants
+#define K_BOLTZ (1.3806488e-16 * GGG / CCC / CCC / CCC / CCC / MASSCM)
+#define M_PROTON massCGS2GU(1.67262158e-24)
+#define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM)
+#define MU_GAS 1.
+#define Z_RATIO (1.0)
+#define Pi (3.141592654)     
+#define KAPPA_ES_COEFF (kappaCGS2GU(0.4))
+
+/*
 #define K_BOLTZ (1.3806488e-16L * GGG / CCC / CCC / CCC / CCC  )
 #define M_PROTON (1.67262158e-24L * GGG / CCC / CCC)
 #define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM  * MASSCM)
@@ -9,11 +54,6 @@
 #define MU_GAS 1.
 #define Z_RATIO (1.0)
 #define Pi (3.141592654)     
-
-#define SOURCETERMS
-#define NUM_SOURCESTEPS 1
-
-#define my_max(x,y) (x>y?x:y)
 
 
 #define lenCGS2GU(x)    (x/MASSCM )
@@ -36,7 +76,7 @@
 #define KAPPA_ES_COEFF (kappaCGS2GU(0.4))
 #define KAPPA_FF_COEFF (1.7e-25/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
 #define KAPPA_BF_COEFF (4.8e-24/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
-
+*/
 
 
 #include "problem.h"
