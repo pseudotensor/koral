@@ -110,6 +110,16 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 /********************************************************/
 int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
 {
+#ifdef LABRADFLUXES
+  
+  u[6]=p[6]; //R^t_t
+  u[7]=p[7]; //R^t_i
+  u[8]=p[8];
+  u[9]=p[9];
+  return 0;
+ 
+#endif
+
   int i,j;
   ldouble Erf=p[6];
 

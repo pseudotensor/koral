@@ -752,10 +752,11 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 //radiative primitives: (E,\tilde u^i)
 //  E - radiative energy density in the rad.rest frame
 //  u^i - relative velocity of the rad.rest frame
+//takes conserved R^t_mu in uu
 //**********************************************************************
 //**********************************************************************
 int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
+u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
 {
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
@@ -769,19 +770,6 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   //indices up - R^tmu
   indices_12(Av,Av,GG);
 
-#ifdef EDDINGTON_APR_WRONG //emulating Eddington approximation
-  urfcon[1]=pp[2];
-  urfcon[2]=pp[3];
-  urfcon[3]=pp[4];
-  conv_vels(urfcon,urfcon,VELPRIM,VELR,gg,GG);
-  ldouble qsq=0.;
-  for(i=1;i<4;i++)
-    for(j=1;j<4;j++)
-      qsq+=urfcon[i]*urfcon[j]*gg[i][j];
-  ldouble gammagas2=1.+qsq;
-  Erf=3.*Av[0]*alpha*alpha/(4.*gammagas2-1.0);
-  
-#else
   //g_munu R^tmu R^tnu
   ldouble gRR=gg[0][0]*Av[0]*Av[0]+gg[0][1]*Av[0]*Av[1]+gg[0][2]*Av[0]*Av[2]+gg[0][3]*Av[0]*Av[3]+
     gg[1][0]*Av[1]*Av[0]+gg[1][1]*Av[1]*Av[1]+gg[1][2]*Av[1]*Av[2]+gg[1][3]*Av[1]*Av[3]+
@@ -805,6 +793,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2*alpha*alpha;
 
+  
   /*
   if(delta<0.)
     {
@@ -986,7 +975,6 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 	  urfcon[0]=0.;
 	}
     }
-#endif
 
    conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
   
@@ -996,10 +984,28 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
    pp[8]=urfcon[2];
    pp[9]=urfcon[3];
 
-
-
    return 0;
 }
+
+int
+u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
+{
+  //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
+  *corrected=0;
+
+#ifdef LABRADFLUXES
+  //primitives = R^t_mu
+  pp[6]=uu[6];
+  pp[7]=uu[7];
+  pp[8]=uu[8];
+  pp[9]=uu[9];
+  return 0;
+#endif
+  
+  u2p_rad_urf(uu,pp,gg,GG,corrected);
+  return 0;
+}
+
 
 //**********************************************************************
 //**********************************************************************

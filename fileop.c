@@ -259,7 +259,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  Fx=pp[7];
 						  Fy=pp[8];
 						  Fz=pp[9];
-						  Trad=calc_LTE_TfromE(E);
+						  Trad=calc_LTE_TfromE(fabs(E));
 #endif
 
 						  /******************/

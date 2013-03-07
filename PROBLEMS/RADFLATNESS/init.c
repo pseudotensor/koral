@@ -41,7 +41,11 @@ pp[7]=URFX;
 pp[8]=0.;
 pp[9]=0.;
 
+prad_ff2lab(pp,pp,gg,GG,tlo);
+
 p2u(pp,uu,gg,GG);
+//print_Nvector(pp,NV);
+//print_Nvector(uu,NV);getchar();
 
 
 

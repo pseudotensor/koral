@@ -1,6 +1,8 @@
 #define TMAX 1.e10
 #define RADIATION
 
+#define LABRADFLUXES
+
 #define MYCOORDS MINKCOORDS
 #define NX 31
 #define NY 1
@@ -28,11 +30,11 @@
 
 #define MASSCM 1.
 
-#define LTEFACTOR 2.
-#define URFX 0.1
+#define LTEFACTOR 1.
+#define URFX 0.
 
 #define KAPPA 0.
-#define KAPPAES 1.
+#define KAPPAES 0.
 #define PERIODIC_XBC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC

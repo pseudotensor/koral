@@ -591,28 +591,18 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 {
   int verbose=0;
   int i,j;
-
   //covariant formulation
+
+#ifdef LABRADFLUXES
+  //artificially puts pp=uu and converts them to urf and Erf using the regular converter
+  u2p_rad_urf(pp,pp,gg,GG,&i);
+#endif
+
   //radiative energy density in the radiation rest frame
   ldouble Erf=pp[6];
   //relative velocity
   ldouble urfcon[4];
 
-#ifdef EDDINGTON_APR_WRONG //taking fluid velocity to close Rij emulating the Eddington approximation
-  urfcon[0]=0.;
-  urfcon[1]=pp[2];
-  urfcon[2]=pp[3];
-  urfcon[3]=pp[4];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIM,VEL4,gg,GG);
-#endif
-
-#ifdef EDDINGTON_APR_WRONG
-  prad_lab2ff(pp,pp,gg,GG,tup);
-  calc_Rij_ff(pp,Rij);  
-  trans22_on2cc(Rij,Rij,tlo);  
-  boost22_ff2lab(Rij,Rij,pp,gg,GG); 
-#else  
   urfcon[0]=0.;
   urfcon[1]=pp[7];
   urfcon[2]=pp[8];
@@ -623,7 +613,6 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
-#endif
 
   return 0;
 }
@@ -817,6 +806,11 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3
   ldouble G22=GG[2][2];
   ldouble G33=GG[3][3];
   ldouble G30=G03;
+
+#ifdef LABRADFLUXES
+  //artificially puts pp=uu and converts them to urf and Erf using the regular converter
+  u2p_rad_urf(pp,pp,gg,GG,&i);
+#endif
   
   //radiative energy density in the radiation rest frame
   ldouble Erf=pp[6];

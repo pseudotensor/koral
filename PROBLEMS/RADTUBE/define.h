@@ -1,3 +1,4 @@
+#define LABRADFLUXES
 #define MYCOORDS MINKCOORDS //metric
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
@@ -54,7 +55,7 @@
 #define MUGAS 1. //mean molecular weight (default = 1)
 
 //problem specific definitions
-#define NTUBE 5
+#define NTUBE 1
 
 #undef SIGMA_RAD
 #if (NTUBE==1)
