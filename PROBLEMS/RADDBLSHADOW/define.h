@@ -4,8 +4,8 @@
 //#define CYLINDRICAL
 //#define SPHERICAL
 //#define SCHWARZSCHILD
-#define NX 60
-#define NY 10
+#define NX 120
+#define NY 20
 #define NZ 1
 #define TSTEPLIM 1.//kind of courant limiter
 #define INT_ORDER 1
@@ -20,7 +20,7 @@
 //#define EDDINGTON_APR
 
 //#define EXPLICIT_RAD_SOURCE
-#define IMPLICIT_FF_RAD_SOURCE
+//#define IMPLICIT_FF_RAD_SOURCE
 
 //#define GASRADOFF
 //#define RADSOURCEOFF
