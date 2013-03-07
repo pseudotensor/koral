@@ -9,13 +9,15 @@
 #define INT_ORDER 1
 #define RK3STEPPING
 
-//#define RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
+
+//#define VELPRIMRAD VEL4
 
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define ALLSTEPSOUTPUT 1
-#define DTOUT1 1.0
-#define NOUTSTOP 50
+#define ALLSTEPSOUTPUT 0
+#define DTOUT1 .5
+#define NOUTSTOP 100
 #define GAMMA (4./3.)
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE

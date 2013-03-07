@@ -52,20 +52,36 @@ if(ix<0)
     p2u(pp,uu,gg,GG);
     return 0.;
   }
+
+if(ix>=NX) //wall
+  {
+    iix=NX-1-(ix-NX);
+    iiy=iy;
+    iiz=iz;
+
+    for(iv=0;iv<NV;iv++)
+      {      
+	pp[iv]=get_u(p,iv,iix,iiy,iiz);      
+      }
+
+    pp[7]*=-1.;
+
+    p2u(pp,uu,gg,GG);
+
+    return 0;
+  }
  
 
 iix=ix;
 iiz=iz;
 iiy=iy;
-//copy
-while(iix>=NX)    iix=NX-1;//iix-=NX; 
 
 //periodic
 while(iiy<0)    iiy=0 ;
 while(iiy>=NY)    iiy=NY-1;
 //periodic
 while(iiz<0)    iiz+=NZ;
-while(iiz>=NY)    iiz-=NZ; 
+while(iiz>=NZ)    iiz-=NZ; 
  
 for(iv=0;iv<NV;iv++)
   {      
