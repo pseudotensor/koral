@@ -3,11 +3,11 @@
 
 #define MYCOORDS MINKCOORDS
 #define NX 120
-#define NY 21
+#define NY 41
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
-#define RK3STEPPING
+#define RK2STEPPING
 
 #define RADOUTPUTINZAMO
 
@@ -32,8 +32,8 @@
 #define MASSCM 1.
 
 #define LTEFACTOR 1.
-#define URFX 13.
-#define URFY -13.
+#define URFX 10.
+#define URFY -3.
 
 #define KAPPA 0.
 #define KAPPAES 0.
@@ -44,7 +44,7 @@
 //#define PERIODIC_YBC
 //#define PERIODIC_ZBC
 
-#define PRINTGC_LEFT
+//#define PRINTGC_LEFT
 
 #define U2PPREC 1.e-6
 #define U2PRADPREC 1.e-4

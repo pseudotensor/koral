@@ -93,14 +93,14 @@
 	  "set format y \"\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:2:($21/(($21*$21+$22*$22)**.5)/15):($22/(($21*$21+$22*$22)**.5)/15) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u 1:2:($21/(($21*$21+$22*$22)**.5)/10):($22/(($21*$21+$22*$22)**.5)/10) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  "unset pm3d\n"
 	  "unset surface\n"
 	  //"plot \"table.gp\" w l lc 3 lw 3\n"
 	  "set pm3d\n"
 	  //fname,fname2,get_xb(-2,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1),fname,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1),fname,fname,(int)(NX/20),(int)(NY/8));
 	  ,fname,fname2,get_x(-NG,0),get_xb(NX,0),get_xb(-NG,1),get_xb(NY,1),fname
-	  ,fname,(int)(NX/8),(int)(NY/24)  
+	  ,fname,(int)(NX/20),(int)(NY/4)  
 );
 
 	    

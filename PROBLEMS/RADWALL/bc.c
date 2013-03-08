@@ -16,7 +16,7 @@ ldouble yy=get_x(iy,1);
 
 //source of light
 //x<0 && yy>.5)
-if (iy>=NY || (ix<0 && yy>.4))
+if (iy>=NY || (ix<0 && yy>.3 ))
   {
     ldouble Fx,Fy,Fz,rho,E,uint,vx;
     iix=ix;
@@ -35,7 +35,7 @@ if (iy>=NY || (ix<0 && yy>.4))
     vx=0.;
 
     //directly
-    E=100.;
+    E=pow(100,4.);
     Fx=URFX;
     Fy=URFY;
       
