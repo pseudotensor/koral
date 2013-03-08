@@ -30,14 +30,14 @@
 #define MKS1R0 0.
 #define MINX (log(1.7-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 100
+#define NX 30
 #else
 #define MINX (1.8*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define NX 60
 #endif
 
-#define NY 60
+#define NY 30
 #define NZ 1
 
 
@@ -57,10 +57,10 @@
 #define ERADATMMIN  (calc_LTE_EfromT(1.e8))
 
 #define INT_ORDER 1
-#define RK3_STEPPING
+#define RK2_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 
 #define NODONUT 0
 #define INFLOWING 0

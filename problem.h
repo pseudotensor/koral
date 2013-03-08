@@ -33,7 +33,7 @@
 //28 BOWSHOCK - bow shock hydro test
 //29 RADWALL - flat with wall
 
-#define PROBLEM 29
+#define PROBLEM 6
 
 #if(PROBLEM==1)
 

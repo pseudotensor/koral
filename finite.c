@@ -347,8 +347,22 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	}
     }
 
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+  //fixup here
+  
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
   //projects primitives onto ghost cells
   set_bc(t);
+
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
 	      
   //calculates and saves wavespeeds
 #pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (guided)
@@ -697,212 +711,34 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  uu[iv]=get_u(u,iv,ix,iy,iz);      
 		}
 
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
+
 #ifdef RADIATION
-	      //updating using radiative four force
-	      ldouble del4[4],delapl[NV];
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
 	      //implicit in lab frame in four dimensions - fiducial 
-	      //primitives left intact to give good initial guess for u2
-	      if(solve_implicit_lab(ix,iy,iz,dt,del4)<0) 
-	      //numerical implicit in 4D did not work
-		{
-		  //use the explicit-implicit backup method
-		  printf("imp_ff at %d,%d,%d\n",ix,iy,iz);
-		  calc_primitives(ix,iy,iz);
-		  solve_implicit_ff(ix,iy,iz,dt,del4);
-		  trans2_on2cc(del4,del4,tlo);
-		  boost2_ff2lab(del4,del4,pp,gg,GG);
-		  indices_21(del4,del4,gg);
-		}		
-
-	      delapl[0]=0.;
-	      delapl[1]=-del4[0];
-	      delapl[2]=-del4[1];
-	      delapl[3]=-del4[2];
-	      delapl[4]=-del4[3];
-	      delapl[5]=0.;
-	      delapl[6]=del4[0];
-	      delapl[7]=del4[1];
-	      delapl[8]=del4[2];
-	      delapl[9]=del4[3];
-
-	      for(iv=0;iv<NV;iv++)
-		{
-		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
-		}
+	      implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
 #endif
 
 #ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
-	      double fdt, fdta, maxfu=-1., fu, uval,futau;
-	      //calculating reference time step basing on maximal tautot
-	      ldouble dx[3],xx[4];
-	      get_xx(ix,iy,iz,xx);
-	      dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
-	      dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
-	      dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);
-	      ldouble tautot[3],taumax;
-	      calc_tautot(pp,xx,dx,tautot);
-	      taumax=my_max(tautot[0],my_max(tautot[1],tautot[2]));
-	      futau=1./taumax;
-	      //reference time step only approximate
-	      fdt=fdta=0.;
-	      do
-		{
-		  //new primitives
-		  //TODO: check here and there if worked
-		  calc_primitives(ix,iy,iz);
-		  //conserved
-		  for(iv=0;iv<NV;iv++)
-		    {
-		      uu[iv]=get_u(u,iv,ix,iy,iz);
-		      pp[iv]=get_u(p,iv,ix,iy,iz);
-		    }
-
-		  //vector of changes of conserved assuming original dt which only multiplies source terms
-		  solve_explicit_lab(ix,iy,iz,dt,del4);
-		  indices_21(del4,del4,gg);
-		  //changes to conserved
-		  delapl[0]=0.;
-		  delapl[1]=-del4[0];
-		  delapl[2]=-del4[1];
-		  delapl[3]=-del4[2];
-		  delapl[4]=-del4[3];
-		  delapl[5]=0.;
-		  delapl[6]=del4[0];
-		  delapl[7]=del4[1];
-		  delapl[8]=del4[2];
-		  delapl[9]=del4[3];
-		
-#if(0) //my old dtsub esitmation based on single dimension
-		  //comparing with conserved to get the largest change
-		  maxfu=-1.;
-
-		  //fluxes can be zero and their relative change large
-		  //so far considering only energy densities
-		  for(iv=1;iv<NV;iv++)
-		    {
-		      if(iv==5) continue;
-		      uval=get_u(u,iv,ix,iy,iz);
-		      if(fabs(uval)<SMALL)  //to avoid dividing by 0
-			fu=futau;
-		      else
-			fu=fabs(delapl[iv]/uval);
-
-		      if(ix==NX/2 ) printf("> %d %e %e %e\n",iv,fu,uval,delapl[iv]);
-		      if(fu>maxfu) maxfu=fu;
-		    }
-		  
-		  if(maxfu<MAXEXPLICITSUBSTEPCHANGE)
-		    fdt=1.;
-		  else
-		    fdt=MAXEXPLICITSUBSTEPCHANGE/maxfu;
-
-		   if(ix==NX/2 ) printf("----\n%e\n",maxfu);
-		  
-#else //Jon's spacetime
-		  //substep
-		  ldouble Umhd,Urad,Gtot,iUmhd,iUrad,idtsub,dtsub;
-		  Umhd=Urad=Gtot=0.;
-		  for(iv=0;iv<4;iv++)
-		    {
-		      Umhd+=uu[1+iv]*uu[1+iv]*GG[iv][iv]; //GG?
-		      Urad+=uu[6+iv]*uu[6+iv]*GG[iv][iv]; //GG?
-		      Gtot+=del4[iv]*del4[iv]*GG[iv][iv]; //GG?
-		    }
-
-		  iUmhd=1.0/(fabs(Umhd)+SMALL);
-		  iUrad=1.0/(fabs(Urad)+SMALL);
-		  idtsub=SMALL+fabs(Gtot*my_max(iUmhd,iUrad));
-		  dtsub=1./idtsub;
-		  /*
-		  if(ix==42 && pp[7]!=0 && 0)
-		    {
-		      print_Nvector(pp,NV);
-		      print_4vector(del4);
-		      printf("----\n%e %e %e > %e\n",Gtot,Umhd,Urad,dtsub);getchar();
-		    }
-		  */
-		  if(dtsub>1.)
-		    fdt=1.;
-		  else
-		    fdt=dtsub;
-
-		  if(fdt<1.e-6 && 0) 
-		    {
-		      printf("----\n%e %e %e > %e\n",Gtot,Umhd,Urad,dtsub);
-		      printf("%d %d %d %f %f\n",ix,iy,iz,fdt,fdta);
-		      getchar();
-		    }
-#endif		 
-		  
-		  if(fdta+fdt>1.) fdt=1.-fdta;
-	
-		  for(iv=0;iv<NV;iv++)
-		    {
-		      uu[iv]+=delapl[iv]*fdt;
-		      set_u(u,iv,ix,iy,iz, uu[iv]);
-		    }
-
-		  fdta+=fdt;
-
-		}
-	      while(fdta<1.);	     
+	      explicit_substep_rad_source_term(ix,iy,iz,dt,gg,GG);
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE
-	      //new primitives before the source operator
-	      calc_primitives(ix,iy,iz);
-	      //applied explicitly directly in lab frame
-	      solve_explicit_lab(ix,iy,iz,dt,del4);
-	      indices_21(del4,del4,gg);
-
-	      delapl[0]=0.;
-	      delapl[1]=-del4[0];
-	      delapl[2]=-del4[1];
-	      delapl[3]=-del4[2];
-	      delapl[4]=-del4[3];
-	      delapl[5]=0.;
-	      delapl[6]=del4[0];
-	      delapl[7]=del4[1];
-	      delapl[8]=del4[2];
-	      delapl[9]=del4[3];
-
-	      for(iv=0;iv<NV;iv++)
-		{
-		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
-		}
+	      explicit_rad_source_term(ix,iy,iz,dt,gg,GG);
 #endif
 
 #ifdef IMPLICIT_FF_RAD_SOURCE
-	      //new primitives before the source operator
-	      calc_primitives(ix,iy,iz);
-	      //semi-implicit in the fluid frame - only approximate!
-	      solve_implicit_ff(ix,iy,iz,dt,del4);
-	      trans2_on2cc(del4,del4,tlo);
-	      boost2_ff2lab(del4,del4,pp,gg,GG);
-	      indices_21(del4,del4,gg);
-
-	      delapl[0]=0.;
-	      delapl[1]=-del4[0];
-	      delapl[2]=-del4[1];
-	      delapl[3]=-del4[2];
-	      delapl[4]=-del4[3];
-	      delapl[5]=0.;
-	      delapl[6]=del4[0];
-	      delapl[7]=del4[1];
-	      delapl[8]=del4[2];
-	      delapl[9]=del4[3];
-
-	      for(iv=0;iv<NV;iv++)
-		{
-		  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
-		}
+	      implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
 #endif
-
-
 	      
 #endif //RADIATION
+
+/************************************************************************/
+/************************************************************************/
+/************************************************************************/
 
 	    }	      
 	}

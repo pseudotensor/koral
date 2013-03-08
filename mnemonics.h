@@ -19,3 +19,4 @@
 
 //cell flags
 #define ENTROPYFLAG 0
+#define RADSOURCEFLAG 1
