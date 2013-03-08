@@ -11,7 +11,7 @@
 #define INT_ORDER 1
 #define RK3STEPPING
 
-//#define RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
 
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
@@ -30,11 +30,11 @@
 
 #define MASSCM 1.
 
-#define LTEFACTOR 1.
+#define LTEFACTOR 2.
 #define URFX 0.
 
-#define KAPPA 0.
-#define KAPPAES 0.
+#define KAPPA .1
+#define KAPPAES 1.
 #define PERIODIC_XBC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC

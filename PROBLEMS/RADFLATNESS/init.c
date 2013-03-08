@@ -37,15 +37,15 @@ pp[3]=0.;
 pp[4]=0.;
 pp[5]=calc_Sfromu(rho,uint);
 pp[6]=LTEFACTOR*calc_LTE_Efromurho(pp[0],pp[1]);
-pp[7]=URFX;
+pp[7]=URFX*pp[6];
 pp[8]=0.;
 pp[9]=0.;
+
+
 
 prad_ff2lab(pp,pp,gg,GG,tlo);
 
 p2u(pp,uu,gg,GG);
-//print_Nvector(pp,NV);
-//print_Nvector(uu,NV);getchar();
 
 
 

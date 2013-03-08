@@ -1,3 +1,4 @@
+#define LABRADFLUXES
 #define TMAX 1.e10
 #define RADIATION
 #define MYCOORDS MINKCOORDS
@@ -38,7 +39,7 @@
 #define BLOBW 5.e-2
 #define KAPPA 1.e0
 
-#define NLEFT 0.99999
+#define NLEFT 0.99
 
 #define SPECIFIC_BC
 

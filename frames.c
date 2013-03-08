@@ -135,9 +135,12 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   pp2[7]=Rij[0][1];
   pp2[8]=Rij[0][2];
   pp2[9]=Rij[0][3];
+
+  //  print_tensor(Rij);
       
   //convert to real primitives
   int corrected;
+
   u2p_rad(pp2,pp2,gg,GG,&corrected);
 
   return 0;

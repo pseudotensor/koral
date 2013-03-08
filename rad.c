@@ -552,6 +552,8 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
     }
 
+  //  print_4vector(Gi);getchar();
+
   return 0;
 }
 
@@ -587,15 +589,19 @@ calc_Gi_ff(ldouble *pp, ldouble Gi[4])
 //******* takes primitives and closes Rij in arbitrary frame ****************************
 //***********************************************************************************
 int
-calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
+calc_Rij(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 {
+  ldouble pp[NV];
   int verbose=0;
   int i,j;
   //covariant formulation
 
 #ifdef LABRADFLUXES
   //artificially puts pp=uu and converts them to urf and Erf using the regular converter
-  u2p_rad_urf(pp,pp,gg,GG,&i);
+  u2p_rad_urf(pp0,pp,gg,GG,&i);
+#else
+  for(i=0;i<NV;i++)
+    pp[i]=pp0[i];
 #endif
 
   //radiative energy density in the radiation rest frame
@@ -613,6 +619,8 @@ calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+
+  //  if(pp[7]!=0.) {print_tensor(Rij); getchar();}
 
   return 0;
 }
@@ -888,6 +896,15 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3
       aval[dim*2+0]=axl;
       aval[dim*2+1]=axr;
     }
+
+  /*
+  if(fabs(pp[7])>1.e-3)
+    {
+      print_Nvector(pp,NV);
+      print_Nvector(&aval[0],6);
+      getchar();
+    }
+  */
 
   return 0;
 }

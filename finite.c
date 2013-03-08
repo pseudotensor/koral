@@ -436,6 +436,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 	  //primitives - to be interpolated
 	  fd_p0[i]=get_u(p,i,ix,iy,iz);
+	  //	  if(i==6 && ix==NX/2-10) printf("%e\n",fd_p0[i]);
 	  fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
 	  fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
 	  fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
@@ -454,9 +455,9 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       check_floors_hd(fd_pl,VELPRIM,gl,Gl);
       check_floors_hd(fd_pr,VELPRIM,gr,Gr);
       //end of floor section
-  	      
+
       f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
-      f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr);   	          
+      f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr);   	  
 
       //saving to memory
       for(i=0;i<NV;i++)
@@ -948,7 +949,13 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   pick_gb(ix,iy,iz,0,gg);
   pick_Gb(ix,iy,iz,0,GG);
    
+  //  print_Nvector(fd_uLl,NV);
+
   p2u(fd_uLl,fd_uLl,gg,GG);
+
+  //  print_Nvector(fd_uLl,NV);
+  //  getchar();
+
   p2u(fd_uRl,fd_uRl,gg,GG);
 
   //save calculated conserved basing on primitives on faces
@@ -985,7 +992,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
       //Lax-Friedrich
       fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - al * (fd_uRl[i] - fd_uLl[i]));
-  
+
       set_ubx(flbx,i,ix,iy,iz,fd_fstarl[i]);
     }
 

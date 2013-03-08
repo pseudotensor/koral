@@ -1,3 +1,5 @@
+#define LABRADFLUXES
+
 #define TMAX 1.e10
 #define RADIATION
 
@@ -41,7 +43,7 @@
 #define BLOBW 5.e-2
 #define KAPPA 0.
 
-#define NLEFT 0.999
+#define NLEFT 0.9
 
 #define SPECIFIC_BC
 
