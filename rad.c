@@ -69,8 +69,8 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
   uu[4] = uu0[4] - (uu[9]-uu0[9]);
 
   //calculating primitives  
-  int corr;
-  if(u2p(uu,pp2,gg,GG,tup,tlo,&corr)<0) return -1;
+  int corr,fixup[2];
+  if(u2p(uu,pp2,gg,GG,tup,tlo,&corr,fixup)<0) return -1;
 
   //radiative four-force
   ldouble Gi[4];

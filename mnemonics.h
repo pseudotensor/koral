@@ -20,3 +20,5 @@
 //cell flags
 #define ENTROPYFLAG 0
 #define RADSOURCEFLAG 1
+#define HDFIXUPFLAG 2
+#define RADFIXUPFLAG 3

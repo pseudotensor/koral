@@ -351,7 +351,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
   //**********************************************************************
 
-  //fixup here
+  //fixup here after invetrsions
   
   //**********************************************************************
   //**********************************************************************
@@ -390,7 +390,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       iz=loop_1[ii][2]; ldouble aaa[12];
 
       //parasite to update of entropy
-      update_entropy(ix,iy,iz,get_cflag(0,ix,iy,iz));
+      update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz));
 
       //interpolating conserved quantities
       ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
@@ -606,6 +606,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
     }
 
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
 #pragma omp parallel for private(iy,iz,ix)  schedule (guided) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
@@ -695,6 +699,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      ldouble ms[NV],ss[NV];
 	      int iv;
 
+	      //**********************************************************************
+	      //**********************************************************************
+	      //**********************************************************************
+
 	      //metric source terms
 	      f_metric_source_term(ix,iy,iz,ms);
 
@@ -702,43 +710,67 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		{
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*ms[iv]*dt;
 		  set_u(u,iv,ix,iy,iz,val);	
+		  uu[iv]=val;
 		} 
-	      
-	      //old primitives 
-	      for(iv=0;iv<NV;iv++)
-		{
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
-		  uu[iv]=get_u(u,iv,ix,iy,iz);      
-		}
 
-/************************************************************************/
-/************************************************************************/
-/************************************************************************/
+	      /************************************************************************/
+	      /************************************************************************/
+	      /************************************************************************/
 
 #ifdef RADIATION
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
 	      //implicit in lab frame in four dimensions - fiducial 
-	      implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
+	      implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
 #endif
 
 #ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
-	      explicit_substep_rad_source_term(ix,iy,iz,dt,gg,GG);
+	      explicit_substep_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG);
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE
-	      explicit_rad_source_term(ix,iy,iz,dt,gg,GG);
+	      explicit_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG);
 #endif
 
 #ifdef IMPLICIT_FF_RAD_SOURCE
-	      implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
+	      implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
 #endif
+
+	      //************************************
+	      //************************************
+
+	     
+	      if(get_cflag(RADSOURCEFLAG,ix,iy,iz)<0)
+		{
+		   set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
+		   set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
+		}
+	      else
+		{
+		  set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
+		  set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
+		}
+		  
+
+	      //************************************
+	      //************************************
+
+	      //**********************************************************************
+	      //**********************************************************************
+	      //**********************************************************************
+
+	      //fixup here after rad source term
+  
+	      //**********************************************************************
+	      //**********************************************************************
+	      //**********************************************************************
+
 	      
 #endif //RADIATION
 
-/************************************************************************/
-/************************************************************************/
-/************************************************************************/
+	      /************************************************************************/
+	      /************************************************************************/
+	      /************************************************************************/
 
 	    }	      
 	}

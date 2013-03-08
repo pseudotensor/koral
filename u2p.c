@@ -28,17 +28,11 @@ calc_primitives(int ix,int iy,int iz)
     }
 
   //converting to primitives
-  int corrected;
-  u2p(uu,pp,gg,GG,tup,tlo,&corrected);
-  /*
-  if(corrected!=0) 
-    { 
-      printf("happened at %d %d %d\n",ix,iy,iz);
-      getchar();
-    }
-  */
+  int corrected, fixups[2];
+  u2p(uu,pp,gg,GG,tup,tlo,&corrected,fixups);
 
   //update conserved to follow corrections on primitives
+  //should I skip this when going to fixup - if averagin primitives this will have no effect?
   if(corrected!=0)
     {
       if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);}//getchar();}
@@ -48,6 +42,16 @@ calc_primitives(int ix,int iy,int iz)
 	  set_u(u,iv,ix,iy,iz,uu[iv]);
 	}
     }
+
+  //sets the flags for fixups of unsuccessful cells
+  if(fixups[0]!=0)
+     set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
+   else 
+     set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
+  if(fixups[1]!=0)
+     set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
+   else 
+     set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
    if(corrected!=0)
@@ -67,7 +71,7 @@ calc_primitives(int ix,int iy,int iz)
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],ldouble tlo[][4],int *corrected)
+u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],ldouble tlo[][4],int *corrected,int fixups[2])
 {
   *corrected=0;
   int verbose=0;
@@ -123,9 +127,10 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],l
 	    pp[u2pret]=ppbak[u2pret];	  
 	  //************************************
 
-	  return -3;
+	  /*
 
-	
+	  //cold RHD currently not working for VELR
+
 	  //************************************
 	  //cold RHD - assuming u=SMALL
 	  ret=-2;
@@ -145,6 +150,8 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],l
 	      //************************************
 	    }
 
+	  */
+
 	}
       
      }
@@ -154,11 +161,24 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],l
 
   //************************************
   //************************************
+  if(ret<-1) //do not fix up for entropy solver
+    fixups[0]=1;
+  else
+    fixups[0]=0;
+  //************************************
+  //************************************
+
+
+  //************************************
+  //************************************
   //checking on hd floors
-    ret=check_floors_hd(pp,VELPRIM,gg,GG);
+  ret=check_floors_hd(pp,VELPRIM,gg,GG);
 
   if(ret<0.)
-    hdcorr=1;
+    {
+      hdcorr=1;
+      fixups[0]=1;
+    }
   //************************************
   //************************************
 
@@ -181,6 +201,15 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],l
 #endif
 #endif
   
+  //************************************
+  //************************************
+  if(radcorr>0)
+    fixups[1]=1;
+  else
+    fixups[1]=0;
+  //************************************
+  //************************************
+
   if(radcorr>0 || hdcorr>0) *corrected=1;
 
   return ret;

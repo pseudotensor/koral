@@ -316,7 +316,7 @@ int calc_primitives(int,int,int);
 int check_floors_hd(ldouble *uu, int,ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
-int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble[][5],ldouble tup[][4], ldouble tlo[][4],int*);
+int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble[][5],ldouble tup[][4], ldouble tlo[][4],int*,int*);
 int u2p_hot(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_entropy(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
