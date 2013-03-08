@@ -3,8 +3,8 @@
 #define RADIATION
 #define MYCOORDS MINKCOORDS
 
-#define NX 50
-#define NY 30
+#define NX 30
+#define NY 20
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1

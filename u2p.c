@@ -787,6 +787,14 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //if unphysical try the other root
   if(gamma2<0.) gamma2=  (-b+sqrt(delta))/2./a; 
 
+  /*
+  if(isnan(gamma2) || gamma2<0. || 1)
+    {
+      print_4vector(Av);
+      printf("nan gamma2! %e %e\n", (-b-sqrt(delta))/2./a, (-b+sqrt(delta))/2./a); //getchar();
+    }
+  */
+
   //cap on u^t
   ldouble gammamax=GAMMAMAXRAD;
 
@@ -809,7 +817,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   else 
   */
 
-  if(gammarel2>gammamax*gammamax) 
+  if(gammarel2>gammamax*gammamax || gamma2<0.) 
     {      
       //top cap
       *corrected=1;
@@ -905,7 +913,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
      
       //this usually happens when gamma=0.99999999 so enforcing 1. makes sense
        *corrected=0;
-       if(verbose>1) {printf("midcapalt: gamma: %.20e\n",sqrt(gammarel2));}
+       if(verbose) {printf("midcapalt: gamma: %.20e\n",sqrt(gammarel2));}
        if(0)
 	{
 	  //zeros for relative velocity
@@ -928,7 +936,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
 	  urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
 	}
 
-      if(verbose>1) {printf("midcapalt: Erf=%g\n",Erf);}
+      if(verbose) {printf("midcapalt: Erf=%g\n",Erf);}
 	 
       if(Erf<ERADFLOOR)
 	{ 
