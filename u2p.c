@@ -761,7 +761,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
-  int verbose=1,i,j;
+  int verbose=0,i,j;
   ldouble Rij[4][4];
   ldouble urfcon[4],urfcov[4],Erf;
   ldouble alpha = sqrt(-1./GG[0][0]);

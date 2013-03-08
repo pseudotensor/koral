@@ -36,7 +36,7 @@ if(iy<0)
     return 0.;
   }
 //source of light
- else if(iy>NY-1 || (ix<0 && yy>.3&& 0))
+ else if(iy>NY-1 || (ix<0 && yy>.3&& 1))
    {
      ldouble Fx,Fy,Fz,rho,E,uint,vx;
      iix=ix;

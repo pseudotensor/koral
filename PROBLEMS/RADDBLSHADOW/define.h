@@ -19,7 +19,7 @@
 #define DTOUT1 2.e-1
 
 //#define IMPLICIT_FF_RAD_SOURCE
-#define EXPLICIT_RAD_SOURCE
+//#define EXPLICIT_RAD_SOURCE
 #define MASS 10.
 
 #define MINX -6.
@@ -38,10 +38,10 @@
 
 #define RHOAMB 1.e-4
 
-#define RHOBLOB 1.e-4// 1.e3
+#define RHOBLOB 1.e3
 
 #define BLOBW 5.e-2
-#define KAPPA 0.
+#define KAPPA 1.
 
 #define NLEFT 0.99
 
