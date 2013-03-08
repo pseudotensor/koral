@@ -48,7 +48,7 @@
 #define BLOBW 5.e-2
 #define KAPPA 0.//1.e0
 
-#define NLEFT 0.999
+#define NLEFT 0.99
 
 #define SPECIFIC_BC
 
