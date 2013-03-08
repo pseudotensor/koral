@@ -1,6 +1,7 @@
 #define TMAX 1.e10
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
+#define LABRADFLUXES
 
 #define MYCOORDS SCHWCOORDS
 #define NX 30
