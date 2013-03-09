@@ -1114,13 +1114,23 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 
   for(iv=1;iv<NV;iv++)
     {
+ 
       if(iv==5) continue; //skip entropy
+      if(iv==3 && NY==1) continue; //skip y-momentum
+      if(iv==8 && NY==1) continue; //skip y-momentum
+      if(iv==4 && NZ==1) continue; //skip y-momentum
+      if(iv==9 && NZ==1) continue; //skip y-momentum
+
       uval=uu[iv];
+
       if(fabs(uval)<SMALL) //to avoid dividing by 0
 	maxdu=my_max(maxdu,1./SMALL);
       else
 	maxdu=my_max(maxdu,delapl[iv]/uval);
     }
+
+  //debug
+  //printf("%d %d %d: if implicit = %e | %d\n",ix,iy,iz,maxdu,maxdu < DULIMIT ? 0 : 1); getchar();
 
   if(maxdu<0.1)
     return 0; //can do explicit
