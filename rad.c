@@ -972,6 +972,36 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3
   return 0;
 }
 
+
+/************************************************************************/
+/******* aplying radiative four velocity-related changes in conserved ******/
+/************************************************************************/
+int
+apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
+{
+  ldouble delapl[NV];
+
+  delapl[0]=0.;
+  delapl[1]=-del4[0];
+  delapl[2]=-del4[1];
+  delapl[3]=-del4[2];
+  delapl[4]=-del4[3];
+  delapl[5]=0.;
+  delapl[6]=del4[0];
+  delapl[7]=del4[1];
+  delapl[8]=del4[2];
+  delapl[9]=del4[3];
+
+  int iv;
+  for(iv=0;iv<NV;iv++)
+    {
+      set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
+    }
+
+  return 0;
+}
+
+
 /************************************************************************/
 /******* explicit radiative source term  ***********************************/
 /************************************************************************/
@@ -986,21 +1016,7 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], 
   solve_explicit_lab(ix,iy,iz,dt,del4);
   indices_21(del4,del4,gg);
 
-  delapl[0]=0.;
-  delapl[1]=-del4[0];
-  delapl[2]=-del4[1];
-  delapl[3]=-del4[2];
-  delapl[4]=-del4[3];
-  delapl[5]=0.;
-  delapl[6]=del4[0];
-  delapl[7]=del4[1];
-  delapl[8]=del4[2];
-  delapl[9]=del4[3];
-
-  for(iv=0;iv<NV;iv++)
-    {
-      set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
-    }
+  apply_rad_source_del4(ix,iy,iz,del4);
 
   set_cflag(RADSOURCEFLAG,ix,iy,iz,0); 
 
@@ -1028,21 +1044,7 @@ int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5
   boost2_ff2lab(del4,del4,pp,gg,GG);
   indices_21(del4,del4,gg);
 
-  delapl[0]=0.;
-  delapl[1]=-del4[0];
-  delapl[2]=-del4[1];
-  delapl[3]=-del4[2];
-  delapl[4]=-del4[3];
-  delapl[5]=0.;
-  delapl[6]=del4[0];
-  delapl[7]=del4[1];
-  delapl[8]=del4[2];
-  delapl[9]=del4[3];
-
-  for(iv=0;iv<NV;iv++)
-    {
-      set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
-    }
+  apply_rad_source_del4(ix,iy,iz,del4);
 
   set_cflag(RADSOURCEFLAG,ix,iy,iz,0); 
 
@@ -1200,22 +1202,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
   else
     {
       //success in lab frame
-
-      delapl[0]=0.;
-      delapl[1]=-del4[0];
-      delapl[2]=-del4[1];
-      delapl[3]=-del4[2];
-      delapl[4]=-del4[3];
-      delapl[5]=0.;
-      delapl[6]=del4[0];
-      delapl[7]=del4[1];
-      delapl[8]=del4[2];
-      delapl[9]=del4[3];
-
-      for(iv=0;iv<NV;iv++)
-	{
-	  set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
-	}
+      apply_rad_source_del4(ix,iy,iz,del4);
     }
 
   set_cflag(RADSOURCEFLAG,ix,iy,iz,0); 
