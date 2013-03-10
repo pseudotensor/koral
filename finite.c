@@ -342,6 +342,11 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	{
 	  for(iz=0;iz<NZ;iz++)
 	    {	      
+	      //zero fixup flags
+	      set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
+	      set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
+
+
 	      calc_primitives(ix,iy,iz);
 	    }
 	}
@@ -762,12 +767,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		   set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
 		   set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
 		}
-	      else
-		{
-		  set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
-		  set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
-		}
-		  
 
 	      //************************************
 	      //************************************

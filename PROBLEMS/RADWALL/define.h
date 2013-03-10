@@ -2,8 +2,8 @@
 #define RADIATION
 
 #define MYCOORDS MINKCOORDS
-#define NX 120
-#define NY 41
+#define NX 60
+#define NY 21
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
@@ -32,8 +32,8 @@
 #define MASSCM 1.
 
 #define LTEFACTOR 1.
-#define URFX 10.
-#define URFY -3.
+#define URFX 100.
+#define URFY -30.
 
 #define KAPPA 0.
 #define KAPPAES 0.

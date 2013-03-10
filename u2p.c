@@ -44,14 +44,11 @@ calc_primitives(int ix,int iy,int iz)
     }
 
   //sets the flags for fixups of unsuccessful cells
-  if(fixups[0]!=0)
+  if(fixups[0]>0)
      set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
-   else 
-     set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
-  if(fixups[1]!=0)
+
+  if(fixups[1]>0)
      set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
-   else 
-     set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
    if(corrected!=0)
@@ -790,7 +787,8 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
-  int verbose=1,i,j;
+  int verbose=1;
+  int i,j;
   ldouble Rij[4][4];
   ldouble urfcon[4],urfcov[4],Erf;
   ldouble alpha = sqrt(-1./GG[0][0]);
@@ -846,11 +844,12 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   else 
   */
 
-  if(gammarel2>gammamax*gammamax || gammarel2<0. || delta<0.) 
+  if(gammarel2>1.01*gammamax*gammamax) || gammarel2<0. || delta<0.) 
     {      
+      
       //top cap
       *corrected=1;
-      if(verbose) printf("topcap\n");
+      if(verbose) printf("topcap %e %e %e \n",gammarel2,gammamax*gammamax,delta);
 			 
       //urfcon[0]=gammamax;
       ldouble gammarel;
@@ -902,7 +901,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
 	      {
 		urfcon[i]=Aradrel[i];
 	      }
-	    if(verbose) {printf("topcapgamma Erf=%g gammaorg=%g gammatemp=%g gammanow=%g\n",Erf,gamma2/alpha/alpha,gammatemp,gammamax);}
+	    if(verbose) {printf("topcapgamma Erf=%g gammaorg=%.7e gammatemp=%g gammanow=%g\n",Erf,gamma2/alpha/alpha,gammatemp,gammamax);}
 	  }
 	  else if(0){ //going through VEL4
 	    ldouble Arad[4];
