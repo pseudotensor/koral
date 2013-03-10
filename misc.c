@@ -538,7 +538,8 @@ inverse_44matrix(ldouble a[][4], ldouble ia[][4])
   det = 1/det; 
 
   if(isnan(det))
-    my_err("det in inverse 4x4 zero\n");
+    //    my_err("det in inverse 4x4 zero\n");
+    return -1;
 
   for (j = 0; j < 16; j++)
     dst[j] *= det;

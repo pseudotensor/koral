@@ -665,8 +665,8 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
  
     if(iter>itmax && err>conv) 
       {
-	printf("iter exceeded in u2p_entr \n");
-	printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
+	if(verbose) printf("iter exceeded in u2p_entr \n");
+	if(verbose) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
 	return -1;
       }
 
@@ -689,7 +689,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 
   if(uu<0. || rho<0. || isnan(rho))
     {
-      printf("u2p_entr didn't work: %e %e\n",uu,rho); 
+      //printf("u2p_entr didn't work: %e %e\n",uu,rho); 
       //print_Nvector(uuu,NV);
       //getchar();
       return -1;
@@ -790,7 +790,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
-  int verbose=0,i,j;
+  int verbose=1,i,j;
   ldouble Rij[4][4];
   ldouble urfcon[4],urfcov[4],Erf;
   ldouble alpha = sqrt(-1./GG[0][0]);
@@ -846,7 +846,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   else 
   */
 
-  if(gammarel2>gammamax*gammamax || gamma2<0.) 
+  if(gammarel2>gammamax*gammamax || gammarel2<0. || delta<0.) 
     {      
       //top cap
       *corrected=1;

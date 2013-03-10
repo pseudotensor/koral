@@ -16,7 +16,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 5.
+#define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -41,9 +41,9 @@
 #define NZ 1
 
 
-#define MINY 0.*Pi/4.
+#define MINY (0.*Pi/4.)
 #define MAXY Pi/2.
-#define MINZ 0.
+#define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
 

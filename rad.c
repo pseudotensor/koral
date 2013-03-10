@@ -162,7 +162,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       //inversion
-      inverse_44matrix(J,iJ);
+      if(inverse_44matrix(J,iJ)<0)
+	return -1;
 
       //updating x
       for(i=0;i<4;i++)
@@ -271,7 +272,8 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   deltas[3]=Fnew[2]-Fold[2];
 
   //solving in parallel for E and u
-  calc_LTE_ff(rho,&u,&E,dt,0); 
+  if(calc_LTE_ff(rho,&u,&E,dt,0)<0) 
+    return -1;
 
   deltas[0]=E-pp[6];
 
@@ -461,8 +463,7 @@ calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble dt, int verbose)
      
   if(iter>=max_iter) 
     {
-      printf("lte in: %e %e %e %e\n",rho,*uint,*E,dt);
-      my_err("iter lte did not work\n");
+      if(verbose) printf("lte error in calc_LTE_ff: %e %e %e %e\n",rho,*uint,*E,dt);
       return -1;
     }
 
@@ -1283,19 +1284,24 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 {
   ldouble del4[4],delapl[NV];
   int iv;
+  int verbose=1;
   
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
   if(solve_implicit_lab(ix,iy,iz,dt,del4)<0)
     {
       //numerical implicit in 4D did not work
+      if(verbose) printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\ntrying imp_ff... ",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
       //use the explicit-implicit backup method
       if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)
 	{
+	  if(verbose) printf("imp_ff didn't work either. requesting fixup.\n");
 	  //this one failed too - failure
 	  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1); 
 	  return -1;	  
 	}
+      else
+	if(verbose) printf("worked.\n");
     }
   else
     {
