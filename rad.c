@@ -1007,6 +1007,8 @@ apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
 /************************************************************************/
 int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5])
 {
+  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT);   
+
   ldouble del4[4],delapl[NV];
   int iv;
 
@@ -1018,7 +1020,7 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], 
 
   apply_rad_source_del4(ix,iy,iz,del4);
 
-  set_cflag(RADSOURCEFLAG,ix,iy,iz,0); 
+  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
 
   return 0;
 }
@@ -1028,6 +1030,8 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], 
 /************************************************************************/
 int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5],ldouble tlo[][4], ldouble tup[][4],ldouble *pp)
 {
+  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITFF); 
+
   ldouble del4[4],delapl[NV];
   int iv;
 
@@ -1036,7 +1040,7 @@ int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5
   if(solve_implicit_ff(ix,iy,iz,dt,del4)<0) 
     {
       //failure, keeping u[] intact, reporting
-      set_cflag(RADSOURCEFLAG,ix,iy,iz,-1); 
+      set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1); 
       return -1;
     }
 
@@ -1046,7 +1050,7 @@ int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5
 
   apply_rad_source_del4(ix,iy,iz,del4);
 
-  set_cflag(RADSOURCEFLAG,ix,iy,iz,0); 
+  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
 
   return 0;
 }
@@ -1147,6 +1151,8 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 /************************************************************************/
 int explicit_substep_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5])
 {
+  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICITSUBSTEP); 
+
   int iv;
   ldouble del4[4],delapl[NV],uu[NV],pp[NV];
   double fdt, fdta, maxfu=-1., fu, uval,futau;
@@ -1264,7 +1270,7 @@ int explicit_substep_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble g
     }
   while(fdta<1.);
 	    
-  set_cflag(RADSOURCEFLAG,ix,iy,iz,0); 
+  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
 
   return 0;
 }
@@ -1278,15 +1284,16 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
   ldouble del4[4],delapl[NV];
   int iv;
   
+  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
+
   if(solve_implicit_lab(ix,iy,iz,dt,del4)<0)
     {
       //numerical implicit in 4D did not work
-      printf("imp_ff at %d,%d,%d\n",ix,iy,iz);
       //use the explicit-implicit backup method
       if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)
 	{
 	  //this one failed too - failure
-	  set_cflag(RADSOURCEFLAG,ix,iy,iz,-1); 
+	  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1); 
 	  return -1;	  
 	}
     }
@@ -1296,7 +1303,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
       apply_rad_source_del4(ix,iy,iz,del4);
     }
 
-  set_cflag(RADSOURCEFLAG,ix,iy,iz,0); 
+  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
 
   return 0;
 }
