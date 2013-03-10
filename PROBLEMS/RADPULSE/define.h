@@ -4,7 +4,7 @@
 #define VERBOSE0 0
 #define MYCOORDS MINKCOORDS
 
-#define LABRADFLUXES
+//#define LABRADFLUXES
 
 #define RK3STEPPING
 #define INT_ORDER 1
@@ -21,7 +21,7 @@
 #define MINMOD_THETA 1.
 #define DTOUT1 1.e0
 #define ALLSTEPSOUTPUT 1
-#define NOUTSTOPS 100
+#define NOUTSTOP 100
 #define GAMMA (ldouble)(5./3.)
 #define MINX -50.
 #define MAXX 50.
@@ -41,7 +41,7 @@
 //#define GASRADOFF
 
 #define KAPPA 0.
-#define KAPPAES 0.
+#define KAPPAES 1.e3
 //#define KAPPA 5.90799
 
 //#define PRINTGC_LEFT

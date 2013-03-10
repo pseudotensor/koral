@@ -724,9 +724,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //test if implicit necessary
 	      ldouble del4[4]; 
 	      if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
-		  implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
 	      else
-		apply_rad_source_del4(ix,iy,iz,del4);	      
+		{
+		    set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
+		    apply_rad_source_del4(ix,iy,iz,del4);	      
+		}
 #endif
 
 #ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
@@ -742,9 +745,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //test if implicit necessary
 	      ldouble del4[4]; 
 	      if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
-		  implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
 	      else
-		apply_rad_source_del4(ix,iy,iz,del4);	      
+		{
+		  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
+		  apply_rad_source_del4(ix,iy,iz,del4);	      
+		}
 #endif
 
 	      //************************************

@@ -33,7 +33,7 @@
 //28 BOWSHOCK - bow shock hydro test
 //29 RADWALL - flat with wall
 
-#define PROBLEM 6
+#define PROBLEM 10
 
 #if(PROBLEM==1)
 
@@ -469,8 +469,6 @@
 #ifndef VELPRIMRAD
 #define VELPRIMRAD VELR
 #endif
-
-#define NFLAGS 1 //number of cell flags
 
 #define SMALL 1.e-50 //small number 
 
