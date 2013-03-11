@@ -797,6 +797,18 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //indices up - R^tmu
   indices_12(Av,Av,GG);
 
+#if(1)
+  //ortonormal classic formulation
+  ldouble Avlen2=Av[1]*Av[1]+Av[2]*Av[2]+Av[3]*Av[3];
+  if(Avlen2>Av[0]*Av[0])
+    {
+      ldouble AE=sqrt(Avlen2/Av[0]/Av[0]);
+      Av[1]/=1.00001*AE;
+      Av[2]/=1.00001*AE;
+      Av[3]/=1.00001*AE;
+      //printf("F/E: %e %e %e f:%e\n",Av[1]/Av[0],Av[2]/Av[0],Av[3]/Av[0],sqrt(Av[1]*Av[1]+Av[2]*Av[2]+Av[3]*Av[3])/Av[0]);getchar();
+    }
+
   //g_munu R^tmu R^tnu
   ldouble gRR=gg[0][0]*Av[0]*Av[0]+gg[0][1]*Av[0]*Av[1]+gg[0][2]*Av[0]*Av[2]+gg[0][3]*Av[0]*Av[3]+
     gg[1][0]*Av[1]*Av[0]+gg[1][1]*Av[1]*Av[1]+gg[1][2]*Av[1]*Av[2]+gg[1][3]*Av[1]*Av[3]+
@@ -814,13 +826,66 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //if unphysical try the other root
   if(gamma2<0.) gamma2=  (-b+sqrt(delta))/2./a; 
 
-  /*
-  if(isnan(gamma2) || gamma2<0. || 1)
+  //cap on u^t
+  ldouble gammamax=GAMMAMAXRAD;
+
+  //gamma in relative velocity definition
+  ldouble gammarel2=gamma2*alpha*alpha;
+  int debug=0;
+
+  Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
+
+  if(Erf<ERADFLOOR)
     {
-      print_4vector(Av);
-      printf("nan gamma2! %e %e\n", (-b-sqrt(delta))/2./a, (-b+sqrt(delta))/2./a); //getchar();
+      Erf=ERADFLOOR;
+      urfcon[0]=0.;
+      urfcon[1]=0.;
+      urfcon[2]=0.;
+      urfcon[3]=0.;
+      if(verbose) {printf("nocapbad: gammarel2=%g\n",gammarel2);}
+    }					
+ 
+  if(1) //VELR
+    {
+      ldouble gammarel=sqrt(gammarel2);
+      for(i=1;i<4;i++)
+	{	  
+	  urfcon[i] = alpha * (Av[i] + 1./3.*Erf*GG[0][i]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
+	}
     }
-  */
+  else
+    {
+      //relative velocity
+      ldouble gamma=urfcon[0]*alpha;
+      for(i=1;i<4;i++)
+	{	  
+	  urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha-GG[0][i]/GG[0][0]/alpha;
+	  urfcon[i]*=gamma;
+	}
+      urfcon[0]=0.;
+    }
+
+
+#else
+
+
+  //g_munu R^tmu R^tnu
+  ldouble gRR=gg[0][0]*Av[0]*Av[0]+gg[0][1]*Av[0]*Av[1]+gg[0][2]*Av[0]*Av[2]+gg[0][3]*Av[0]*Av[3]+
+    gg[1][0]*Av[1]*Av[0]+gg[1][1]*Av[1]*Av[1]+gg[1][2]*Av[1]*Av[2]+gg[1][3]*Av[1]*Av[3]+
+    gg[2][0]*Av[2]*Av[0]+gg[2][1]*Av[2]*Av[1]+gg[2][2]*Av[2]*Av[2]+gg[2][3]*Av[2]*Av[3]+
+    gg[3][0]*Av[3]*Av[0]+gg[3][1]*Av[3]*Av[1]+gg[3][2]*Av[3]*Av[2]+gg[3][3]*Av[3]*Av[3];
+ 
+  //the quadratic equation for u^t of the radiation rest frame (urf[0])
+  //supposed to provide two roots for (u^t)^2 of opposite signs
+  ldouble a,b,c,delta,gamma2;
+  a=16.*gRR;
+  b=8.*(gRR*GG[0][0]+Av[0]*Av[0]);
+  c=gRR*GG[0][0]*GG[0][0]-Av[0]*Av[0]*GG[0][0];
+  delta=b*b-4.*a*c;
+  gamma2=  (-b-sqrt(delta))/2./a;
+  //if unphysical try the other root
+  if(gamma2<0.) gamma2=  (-b+sqrt(delta))/2./a; 
+
 
   //cap on u^t
   ldouble gammamax=GAMMAMAXRAD;
@@ -828,7 +893,18 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2*alpha*alpha;
 
-  
+  if(gammarel2>1.0*gammamax*gammamax || gammarel2<1. || delta<0. && verbose) 
+    {
+      debug=1;
+      print_4vector(Av);
+      printf("F/E: %e %e %e f:%e\n",Av[1]/Av[0],Av[2]/Av[0],Av[3]/Av[0],sqrt(Av[1]*Av[1]+Av[2]*Av[2]+Av[3]*Av[3])/Av[0]);
+      printf("gamma2: %.20e %e\n", (-b-sqrt(delta))/2./a, (-b+sqrt(delta))/2./a); 
+      printf("delta: %e gRR: %e Erf: %e\n",delta,gRR,3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0));
+      
+      //      getchar();
+    }
+ 
+
   /*
   if(delta<0.)
     {
@@ -844,7 +920,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   else 
   */
 
-  if(gammarel2>1.01*gammamax*gammamax) || gammarel2<0. || delta<0.) 
+  if(gammarel2>1.01*gammamax*gammamax || gammarel2<0. || delta<0.) 
     {      
       
       //top cap
@@ -1012,6 +1088,8 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
 	}
     }
 
+#endif
+
    conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
   
    //new primitives
@@ -1019,6 +1097,19 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
    pp[7]=urfcon[1];
    pp[8]=urfcon[2];
    pp[9]=urfcon[3];
+
+   if(debug==1 && verbose)
+     {
+       ldouble Rij[4][4];
+       calc_Rij(pp,gg,GG,Rij);
+       indices_2122(Rij,Rij,GG);
+       ldouble Avv[4]={Rij[0][0],Rij[0][1], Rij[0][2],Rij[0][3]};
+       indices_12(Avv,Avv,GG);
+       print_4vector(Avv);
+       printf("F/E: %e %e %e f:%e\n",Avv[1]/Avv[0],Avv[2]/Avv[0],Avv[3]/Avv[0],sqrt(Avv[1]*Avv[1]+Avv[2]*Avv[2]+Avv[3]*Avv[3])/Avv[0]);
+ 
+       getchar();
+     }
 
    return 0;
 }
