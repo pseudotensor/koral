@@ -6,6 +6,8 @@
 //from problem.c
 //**********************
 
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
 ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
@@ -49,7 +51,7 @@ if(ix<0 &&  1)
     pp[7]=Fx;
     pp[8]=Fy;
     pp[9]=Fz; 
-    prad_ff2lab(pp,pp,gg,GG,tlo);
+    prad_ff2lab(pp,pp,&geom);
 
 #endif
     p2u(pp,uu,gg,GG);
@@ -84,7 +86,7 @@ if(ix>=NX && 1)
     pp[7]=Fx;
     pp[8]=Fy;
     pp[9]=Fz;
-    prad_ff2lab(pp,pp,gg,GG,tlo); 
+    prad_ff2lab(pp,pp,&geom); 
 #endif
     p2u(pp,uu,gg,GG);
     return 0.;

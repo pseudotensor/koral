@@ -10,6 +10,14 @@ coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
 xx=xxvec[1];
 yy=xxvec[2];
 zz=xxvec[3];
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+
+struct geometry geomBL;
+fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 //gdet_src=get_g(g,3,4,iix,iiy,iiz);
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
@@ -170,7 +178,7 @@ if(ix>=NX) //analytical solution at rout only
 	calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
 	calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 	prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-	prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+	prad_ff2lab(pp,pp,&geomBL);
 	//transforming radiative primitives from BL to MY
 	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
 #endif

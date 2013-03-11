@@ -164,6 +164,8 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //within domain:
 						  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 
+						  struct geometry geom;
+						  fill_geometry(ix,iy,iz,&geom);
 
 						  ldouble mx,my,mz,E,e,xx,yy,zz,phipot,xxx[4],dx[3],vv[10],a0,a1,a2,v1,v2,dphidx,v3,Tgas,Trad,v4,v5,v6,v7,Fx,Fy,Fz;
 						  ldouble gg[4][5],GG[4][5];
@@ -214,15 +216,18 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  if(MYCOORDS!=OUTCOORDS)
 						    {
 						      ldouble ggout[4][5],GGout[4][5];
+						      struct geometry geomout;
 						      calc_g_arb(xxvecout,ggout,OUTCOORDS);
 						      calc_G_arb(xxvecout,GGout,OUTCOORDS);
+						      fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
 
 #ifdef RADIATION
 						      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
 #endif
 						      trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
 
-						      //from now on gg, GG, tup, etc. defined in OUTCOORDS!
+						      //from now on geom,gg, GG, tup, etc. defined in OUTCOORDS!
+						      fill_geometry_arb(ix,iy,iz,&geom,OUTCOORDS);
 						      for(i=0;i<4;i++)
 							for(j=0;j<5;j++)
 							  { gg[i][j]=ggout[i][j]; GG[i][j]=GGout[i][j]; }
@@ -249,9 +254,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 
 #ifdef RADIATION						
 #ifdef RADOUTPUTINFF
-						  prad_lab2ff(pp,pp,gg,GG,tup);
+						  prad_lab2ff(pp,pp,&geom);
 #elif defined(RADOUTPUTINZAMO) //to print  radiation primitives in ZAMO
-						  prad_lab2ff(pp,pp,gg,GG,tup);
+						  prad_lab2ff(pp,pp,&geom);
 						  prad_ff2zamo(pp,pp,gg,GG,eup); 
 #endif
 

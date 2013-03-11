@@ -95,6 +95,17 @@ int nfout1;
 //some macros
 #define my_max(x,y) (x>y?x:y)
 
+//geometry structure
+struct geometry
+{
+  int ix,iy,iz;
+  ldouble gg[4][5];
+  ldouble GG[4][5];
+  ldouble alpha;
+  ldouble tlo[4][4];
+  ldouble tup[4][4];
+};
+
 //main.c
 int solve_all_problems_5(ldouble);
 int solve_all_problems_6(ldouble);
@@ -265,6 +276,11 @@ int my_finger(ldouble);
 int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,ldouble *vv);
 
 //metric.c
+
+int 
+fill_geometry(int ix,int iy,int iz,void *geom);
+int 
+fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS);
 int calc_metric();
 int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int);
 int calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4],int);
@@ -316,12 +332,12 @@ int calc_primitives(int,int,int);
 int check_floors_hd(ldouble *uu, int,ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
-int u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble[][5],ldouble tup[][4], ldouble tlo[][4],int*,int*);
+int u2p(ldouble *uu, ldouble *pp, void*,int*,int*);
 int u2p_hot(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_entropy(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
-int u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],int*);
-int u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5],ldouble tup[][4], ldouble tlo[][4],int*);
+int u2p_rad(ldouble *uu, ldouble *pp, void*,int*);
+int u2p_rad_onff(ldouble *uu, ldouble *pp, void*,int*);
 
 //p2u.c
 int calc_conserved(int ix,int iy,int iz);
@@ -353,6 +369,8 @@ int print_tensor(ldouble T[][4]);
 int print_metric(ldouble T[][5]);
 int print_4vector(ldouble v[4]);
 int print_Nvector(ldouble v[4],int);
+int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg);
+int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg);
 int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble elo[][4]);
 int prad_ff2zamo(ldouble *pp1, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]);
 int multiply22(ldouble T1[][4],ldouble T2[][4],ldouble A[][4]);

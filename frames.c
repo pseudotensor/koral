@@ -115,8 +115,22 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
 /*****************************************************************/
 /****** radiative ff primitives (E,F^i) -> primitives in lab frame  *******/
 /*****************************************************************/
-int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble tlo[][4])
+int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
 {
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+  /*
+print_metric(gg);print_metric(GG);
+print_tensor(tlo);print_tensor(tup);getchar();
+  */
+
   ldouble Rij[4][4];
   int i,j;
 
@@ -141,7 +155,7 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
   //convert to real primitives
   int corrected;
 
-  u2p_rad(pp2,pp2,gg,GG,&corrected);
+  u2p_rad(pp2,pp2,geom,&corrected);
 
   return 0;
 } 
@@ -149,8 +163,17 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ld
 //*****************************************************************/
 /********** radiative primitives lab -> (E,F^i) in fluid frame *********/
 /*****************************************************************/
-int prad_lab2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4])
+int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
 {
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
   ldouble Rij[4][4];
   int i,j;  
 

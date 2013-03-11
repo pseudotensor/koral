@@ -14,13 +14,16 @@ calc_primitives(int ix,int iy,int iz)
   int verbose=0;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
-  ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];
+  ldouble tlo[4][4],tup[4][4];
+  ldouble (*gg)[5],(*GG)[5];
 
-  pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
-  pick_T(tmuup,ix,iy,iz,tup);
-  pick_T(tmulo,ix,iy,iz,tlo);
- 
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  //temporary using local arrays
+  gg=geom.gg;
+  GG=geom.GG;
+
   for(iv=0;iv<NV;iv++)
     {
       uu[iv]=get_u(u,iv,ix,iy,iz);
@@ -29,7 +32,7 @@ calc_primitives(int ix,int iy,int iz)
 
   //converting to primitives
   int corrected, fixups[2];
-  u2p(uu,pp,gg,GG,tup,tlo,&corrected,fixups);
+  u2p(uu,pp,&geom,&corrected,fixups);
 
   //update conserved to follow corrections on primitives
   //should I skip this when going to fixup - if averagin primitives this will have no effect?
@@ -68,8 +71,15 @@ calc_primitives(int ix,int iy,int iz)
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],ldouble tlo[][4],int *corrected,int fixups[2])
+u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
 {
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
   *corrected=0;
   int verbose=0;
   int hdcorr=0;
@@ -192,9 +202,9 @@ u2p(ldouble *uu, ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble tup[][4],l
 #ifdef RADIATION
   int radcor;
 #ifdef EDDINGTON_APR_WRONG
-  u2p_rad_onff(uu,pp,gg,GG,tup,tlo,&radcorr);
+  u2p_rad_onff(uu,pp,ggg,&radcorr);
 #else
-  u2p_rad(uu,pp,gg,GG,&radcorr);
+  u2p_rad(uu,pp,geom,&radcorr);
 #endif
 #endif
   
@@ -782,12 +792,21 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 //**********************************************************************
 //**********************************************************************
 int
-u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
+u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 {
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+
+
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
-  int verbose=1;
+  int verbose=1,debug=0;
   int i,j;
   ldouble Rij[4][4];
   ldouble urfcon[4],urfcov[4],Erf;
@@ -797,7 +816,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //indices up - R^tmu
   indices_12(Av,Av,GG);
 
-#if(1)
+#if(0)
   //ortonormal classic formulation
   ldouble Avlen2=Av[1]*Av[1]+Av[2]*Av[2]+Av[3]*Av[3];
   if(Avlen2>Av[0]*Av[0])
@@ -831,7 +850,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
 
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2*alpha*alpha;
-  int debug=0;
+  debug=0;
 
   Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
@@ -893,7 +912,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2*alpha*alpha;
 
-  if(gammarel2>1.0*gammamax*gammamax || gammarel2<1. || delta<0. && verbose) 
+  if(gammarel2>1.0*gammamax*gammamax || gammarel2<.9 || delta<0. && verbose) 
     {
       debug=1;
       print_4vector(Av);
@@ -1102,20 +1121,19 @@ u2p_rad_urf(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *cor
      {
        ldouble Rij[4][4];
        calc_Rij(pp,gg,GG,Rij);
-       indices_2122(Rij,Rij,GG);
+       //       trans22_on2cc(Rij,Rij,tlo);
        ldouble Avv[4]={Rij[0][0],Rij[0][1], Rij[0][2],Rij[0][3]};
-       indices_12(Avv,Avv,GG);
        print_4vector(Avv);
        printf("F/E: %e %e %e f:%e\n",Avv[1]/Avv[0],Avv[2]/Avv[0],Avv[3]/Avv[0],sqrt(Avv[1]*Avv[1]+Avv[2]*Avv[2]+Avv[3]*Avv[3])/Avv[0]);
  
-       getchar();
+       //       getchar();
      }
 
    return 0;
 }
 
 int
-u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *corrected)
+u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
 {
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
@@ -1129,7 +1147,7 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
   return 0;
 #endif
   
-  u2p_rad_urf(uu,pp,gg,GG,corrected);
+  u2p_rad_urf(uu,pp,ggg,corrected);
   return 0;
 }
 
@@ -1141,8 +1159,17 @@ u2p_rad(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], int *correct
 //works in ortonormal fluid frame
 //used e.g. for not-frame-invariant  Eddington apr. 
 //solves in 4dimensions using frame boosts etc.
-int f_u2prad_num(ldouble *uu,ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tlo[][4],ldouble *f)
+int f_u2prad_num(ldouble *uu,ldouble *pp, void* ggg,ldouble *f)
 {
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
   ldouble Rij[4][4];
   ldouble ppp[NV];
 
@@ -1169,8 +1196,11 @@ print_state_u2prad_num (int iter, ldouble *x, ldouble *f)
 }
 
 int
-u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble tup[][4], ldouble tlo[][4], int *corrected)
+u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
 {
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
   ldouble pp0[NV],pporg[NV];
   ldouble J[4][4],iJ[4][4];
   ldouble x[4],f1[4],f2[4],f3[4];
@@ -1187,7 +1217,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble
     }
 
   //converting radiative primitives to fluid frame ortonormal
-  prad_lab2ff(pp,pp,gg,GG,tup);
+  prad_lab2ff(pp,pp,geom);
 
   if(verbose!=0)   print_Nvector(uu,NV);
   do
@@ -1199,7 +1229,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble
 	}
 
       //valueas at zero state
-      f_u2prad_num(uu,pp,gg,GG,tlo,f1);
+      f_u2prad_num(uu,pp,geom,f1);
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -1208,7 +1238,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble
 	    {
 	      pp[j+6]=pp[j+6]+EPS*pp[6];
 	    
-	      f_u2prad_num(uu,pp,gg,GG,tlo,f2);
+	      f_u2prad_num(uu,pp,geom,f2);
      
 	      J[i][j]=(f2[i] - f1[i])/(EPS*pp[6]);
 
@@ -1275,7 +1305,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble
     }
   
   //converting to lab primitives
-  prad_ff2lab(pp,pp,gg,GG,tlo);
+  prad_ff2lab(pp,pp,geom);
   
   if(verbose!=0)   {print_Nvector(pp,NV);}
   if(verbose>0)   {printf("----\n");}

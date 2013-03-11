@@ -988,6 +988,52 @@ if(coords==MINKCOORDS) {
   return 0;
 }
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//fills geometry structure for cell ix,iy,iz
+int 
+fill_geometry(int ix,int iy,int iz,void *geom)
+{
+ struct geometry *ggg 
+   = (struct geometry *) geom;
+
+  pick_g(ix,iy,iz,ggg->gg);
+  pick_G(ix,iy,iz,ggg->GG);
+  pick_T(tmuup,ix,iy,iz,ggg->tup);
+  pick_T(tmulo,ix,iy,iz,ggg->tlo);
+  ggg->alpha=sqrt(-1./ggg->GG[0][0]);
+  ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//fills geometry structure for cell ix,iy,iz in arbitrary metric
+int 
+fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
+{
+  struct geometry *ggg 
+    = (struct geometry *) geom;
+
+  ldouble xxvec[4],xxvecBL[4];
+
+  get_xx(ix,iy,iz,xxvec);
+  coco_N(xxvec,xxvecBL,MYCOORDS,COORDS);
+
+  calc_g_arb(xxvecBL,ggg->gg,COORDS);
+  calc_G_arb(xxvecBL,ggg->GG,COORDS);
+
+  calc_tetrades(ggg->gg,ggg->tup,ggg->tlo,COORDS);
+ 
+  ggg->alpha=sqrt(-1./ggg->GG[0][0]);
+  ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+
+  return 0;
+}
+
 
 //**********************************************************************
 //**********************************************************************

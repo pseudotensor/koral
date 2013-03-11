@@ -54,8 +54,15 @@ calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
 //******* the fiducial approach *****************************************
 //**********************************************************************
 
-int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][5], ldouble GG[][5],ldouble tup[][4], ldouble tlo[][4],ldouble *f)
+int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldouble *f)
 {
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
   ldouble Rij[4][4];
   ldouble pp2[NV];
   int iv;
@@ -70,7 +77,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,ldouble gg[][
 
   //calculating primitives  
   int corr,fixup[2];
-  if(u2p(uu,pp2,gg,GG,tup,tlo,&corr,fixup)<0) return -1;
+  if(u2p(uu,pp2,ggg,&corr,fixup)<0) return -1;
 
   //radiative four-force
   ldouble Gi[4];
@@ -101,12 +108,15 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],uu[NV],uu0[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3[4],xxx[4];
-  ldouble gg[4][5],GG[4][5], tlo[4][4],tup[4][4];
 
-  pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
-  pick_T(tmuup,ix,iy,iz,tup);
-  pick_T(tmulo,ix,iy,iz,tlo);
+  ldouble (*gg)[5],(*GG)[5];
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  //temporary using local arrays
+  gg=geom.gg;
+  GG=geom.GG;
 
   for(iv=0;iv<NV;iv++)
     {
@@ -141,7 +151,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	}
 
       //values at zero state
-      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,tup,tlo,f1)<0) return -1;
+      if(f_implicit_lab(uu0,uu,pp,dt,&geom,f1)<0) return -1;
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -153,7 +163,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      else del=EPS*uup[j+6];
 	      uu[j+6]=uup[j+6]-del;
 
-	      if(f_implicit_lab(uu0,uu,pp,dt,gg,GG,tup,tlo,f2)<0) return -1;
+	      if(f_implicit_lab(uu0,uu,pp,dt,&geom,f2)<0) return -1;
      
 	      J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
 
@@ -228,13 +238,15 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 {
   int i1,i2,i3,iv;
   ldouble pp[NV];
-  ldouble tup[4][4],tlo[4][4];
-  pick_T(tmuup,ix,iy,iz,tup);
-  pick_T(tmulo,ix,iy,iz,tlo);
-  ldouble gg[4][5];
-  pick_g(ix,iy,iz,gg);
-  ldouble GG[4][5];
-  pick_G(ix,iy,iz,GG);
+
+  ldouble (*gg)[5],(*GG)[5];
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  //temporary using local arrays
+  gg=geom.gg;
+  GG=geom.GG;
 
   for(iv=0;iv<NV;iv++)
     {
@@ -242,7 +254,7 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     }
 
   //transforming radiative primitives to ortonormal fluid frame
-  prad_lab2ff(pp,pp,gg,GG,tup);
+  prad_lab2ff(pp,pp,&geom);
   
   //four-force in the fluid frame
   ldouble Gi[4];

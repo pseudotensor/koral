@@ -26,6 +26,13 @@ zz=xxvecBL[3];
 ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+struct geometry geomBL;
+fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+
 pick_T(tmulo,ix,iy,iz,tlo);
 calc_ZAMOes(gg,eup,elo,MYCOORDS);
 
@@ -39,6 +46,7 @@ ldouble eupBL[4][4],eloBL[4][4];
 ldouble tupBL[4][4],tloBL[4][4];
 calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
 calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
+
 
 ldouble podpierd=-(GGBL[0][0]-2.*ELL*GGBL[0][3]+ELL*ELL*GGBL[3][3]);
 ldouble ut=-1./sqrt(podpierd);
@@ -127,7 +135,13 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
      calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
      prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-     prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+     /*
+print_metric(ggBL);print_metric(geomBL.gg);
+print_metric(GGBL);print_metric(geomBL.GG);
+print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
+     */
+
+     prad_ff2lab(pp,pp,&geomBL);
      //transforming radiative primitives from BL to MYCOORDS
      trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
 
@@ -215,7 +229,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
      //boosting to lab
      //transforming BL ZAMO radiative primitives to code non-ortonormal primitives
      prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-     prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+     prad_ff2lab(pp,pp,&geomBL);
      //transforming radiative primitives from BL to MYCOORDS
      trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
      
