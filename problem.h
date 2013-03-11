@@ -34,7 +34,7 @@
 //29 RADWALL - flat with wall
 //30 RADNT - emission from midplane
 
-#define PROBLEM 30
+#define PROBLEM 11
 
 #if(PROBLEM==30)
 

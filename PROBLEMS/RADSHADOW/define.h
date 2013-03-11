@@ -1,4 +1,4 @@
-#define LABRADFLUXES
+//#define LABRADFLUXES
 #define TMAX 1.e10
 #define RADIATION
 #define MYCOORDS MINKCOORDS
@@ -12,7 +12,7 @@
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define ALLSTEPSOUTPUT 0
+#define ALLSTEPSOUTPUT 1
 #define GAMMA (1.4)
 #define DTOUT1 .5
 
