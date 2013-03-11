@@ -32,8 +32,23 @@
 //27 RADFLATNESS - flat but with non-zero four-force
 //28 BOWSHOCK - bow shock hydro test
 //29 RADWALL - flat with wall
+//30 RADNT - emission from midplane
 
-#define PROBLEM 25
+#define PROBLEM 30
+
+#if(PROBLEM==30)
+
+#define PR_DEFINE "PROBLEMS/RADNT/define.h"
+#define PR_BC "PROBLEMS/RADNT/bc.c"
+#define PR_INIT "PROBLEMS/RADNT/init.c"
+#define PR_KAPPA "PROBLEMS/RADNT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADNT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADNT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADNT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADNT/dump.c"
+#define PR_TOOLS "PROBLEMS/RADNT/tools.c"
+
+#endif
 
 #if(PROBLEM==1)
 
