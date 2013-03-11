@@ -5,13 +5,14 @@
 
 #define MASS 10.
 #define BHSPIN 0.
+#define GAMMAMAXRAD 1000.
 
 #define myMKS1COORDS
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
 #else
-#define MYCOORDS KSCOORDS
+#define MYCOORDS KERRCOORDS
 #endif
 
 #define OUTCOORDS KERRCOORDS
@@ -54,7 +55,7 @@
 //#define RHOATMMIN  rhoCGS2GU(1.e-4)
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(1.e8))
+#define ERADATMMIN  (calc_LTE_EfromT(1.e9))
 
 #define INT_ORDER 1
 #define RK2_STEPPING

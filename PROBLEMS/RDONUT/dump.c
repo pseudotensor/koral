@@ -39,8 +39,10 @@ ldouble nx,ny,nz,nlen,f;
   
  
    f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
-v4=f;
+
 
 				  v2=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);
 				  v3=get_cflag(HDFIXUPFLAG,ix,iy,iz);
 				   v4=get_cflag(RADFIXUPFLAG,ix,iy,iz);
+
+v3=f;

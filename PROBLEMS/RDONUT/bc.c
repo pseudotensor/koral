@@ -225,6 +225,9 @@ if(ix>=NX) //analytical solution at rout only
      calc_normalobs_4vel(GG,ucon);
      pp[7]=ucon[1];
 
+     if(MYCOORDS==KERRCOORDS)
+       pp[7]=-100.;
+
      //copying with scalings
      pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);

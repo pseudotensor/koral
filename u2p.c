@@ -807,7 +807,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
-  int verbose=1,debug=0;
+  int verbose=0,debug=0;
   int i,j;
   ldouble Rij[4][4];
   ldouble urfcon[4],urfcov[4],Erf;
@@ -913,7 +913,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2*alpha*alpha;
 
-  if(gammarel2>1.0*gammamax*gammamax || gammarel2<.9 || delta<0. && verbose) 
+  if((gammarel2>1.0*gammamax*gammamax || gammarel2<.9 || delta<0.) && verbose) 
     {
       debug=1;
       print_4vector(Av);
