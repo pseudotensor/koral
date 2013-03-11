@@ -12,6 +12,8 @@
   {
 */
 
+struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
 ldouble rho,mx,my,mz,m,E,uint,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
 ldouble uu[NV];
@@ -55,7 +57,7 @@ pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz;
 
-prad_ff2lab(pp,pp,gg,GG,tlo);
+prad_ff2lab(pp,pp,&geom);
 
 /*
 pp[6]=1.;

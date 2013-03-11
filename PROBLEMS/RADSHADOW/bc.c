@@ -3,8 +3,10 @@
 
 ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
+
  struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
+
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 ldouble gg[4][5],GG[4][5],tlo[4][4];
 pick_g(ix,iy,iz,gg);

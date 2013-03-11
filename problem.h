@@ -3,23 +3,26 @@
 
 //available problems:
 
-//1 RADBEAM2D - beam of light 
+//* denotes tested and working problems
+//(if you need more, email me :)
+
+//1* RADBEAM2D - beam of light 
 //2 RADINFALL - radial inflow
 //3 DONUT - 2d Polish donut
 //4 GEODESICINFALL - geodesic infall with blobs or not
 //5 EDDINFALL - infall with flux from inside
-//6 RADTUBE- radiative shock tubes as in Farris et al 09 - assumes Edd.approximation which is currently not handled
+//6* RADTUBE- radiative shock tubes as in Farris et al 09 - assumes Edd.approximation which is currently not handled
 //7 BONDI - like in Fragile's paper
 //8 HDTUBE - relativistic shock tube
 //9 HDTUBE2D - in 2d
-//10 RADPULSE - radiative blob spreading around
-//11 RADSHADOW - radiative shadow
+//10* RADPULSE - radiative blob spreading around
+//11* RADSHADOW - radiative shadow
 //12 RADATM - atmosphere enlighted
 //13 DONUTOSC - 2d Polish donut oscillating
 //14 RADWAVEBC - 1d linear rad wave imposed on boundary
 //15 RADWAVE - 1d linear rad wave with periodic BC
 //16 RADPULSE3D - radiative blob spreading around
-//17 RADDBLSHADOW - radiative shadow with two beams inclined
+//17* RADDBLSHADOW - radiative shadow with two beams inclined
 //18 ATMSTATIC - hydro atmosphere 
 //19 RADBEAM2DKS - beam of light in KS coordinates
 //20 ATMKS - radial atmosphere infalling in KS
@@ -27,14 +30,14 @@
 //22 DONUTMKS1 - 2d Polish donut in MKS1
 //23 ATMMKS1 - radial atmosphere infalling in MKS1
 //24 RADBEAMFLAT - beam of light in Cartesian 
-//25 RDONUT - 2d radiative Polish donut in KS
+//25* RDONUT - 2d radiative Polish donut in KS
 //26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
 //27 RADFLATNESS - flat but with non-zero four-force
 //28 BOWSHOCK - bow shock hydro test
-//29 RADWALL - flat with wall
-//30 RADNT - emission from midplane
+//29* RADWALL - flat with wall
+//30* RADNT - emission from midplane
 
-#define PROBLEM 11
+#define PROBLEM 30
 
 #if(PROBLEM==30)
 

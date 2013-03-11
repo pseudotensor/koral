@@ -19,7 +19,8 @@ maxy= 1.02*get_xb(NX,0);
 #endif
 
   fprintf(fgnu,
-	  "set term gif large size 1000,1000\n"
+	  //	  "set term gif large size 1000,1000\n"
+	  "set term jpeg large size 1000,1000\n"
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
 	  "set origin 0,0\n"
