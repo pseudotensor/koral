@@ -797,10 +797,11 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4];
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
+  tup=geom->tup;
 
 
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
@@ -1121,12 +1122,12 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
      {
        ldouble Rij[4][4];
        calc_Rij(pp,gg,GG,Rij);
-       //       trans22_on2cc(Rij,Rij,tlo);
+       trans22_cc2on(Rij,Rij,tup);
        ldouble Avv[4]={Rij[0][0],Rij[0][1], Rij[0][2],Rij[0][3]};
        print_4vector(Avv);
        printf("F/E: %e %e %e f:%e\n",Avv[1]/Avv[0],Avv[2]/Avv[0],Avv[3]/Avv[0],sqrt(Avv[1]*Avv[1]+Avv[2]*Avv[2]+Avv[3]*Avv[3])/Avv[0]);
  
-       //       getchar();
+       getchar();
      }
 
    return 0;
