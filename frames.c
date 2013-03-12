@@ -4,6 +4,19 @@
 #include "ko.h"
 
 /*****************************************************************/
+/********** all primitives between coordinates  ***************/
+/*****************************************************************/
+int 
+trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
+{
+  trans_phd_coco(pp1, pp2, CO1,CO2,xxvec,gg1,GG1,gg2,GG2);
+#ifdef RADIATION
+  trans_prad_coco(pp1, pp2, CO1,CO2,xxvec,gg1,GG1,gg2,GG2);
+#endif
+  return 0;
+}
+
+/*****************************************************************/
 /********** hydro primitives (E,F^i) between coordinates  *******/
 /********** does not touch radiative primitives ***********************/
 /*****************************************************************/

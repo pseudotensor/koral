@@ -7,14 +7,15 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-//#define myMKS1COORDS
+#define myMKS1COORDS
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
 #else
-#define MYCOORDS SPHCOORDS//KERRCOORDS
+#define MYCOORDS KERRCOORDS//SPHCOORDS//KERRCOORDS
 #endif
 
+#define IMAGETYPE "jpg"
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
 #define DTOUT1 1.
@@ -33,12 +34,12 @@
 #define MAXX (log(50.-MKS1R0))
 #define NX 30
 #else
-#define MINX (1.8*r_horizon_BL(BHSPIN))
+#define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define NX 60
 #endif
 
-#define NY 30
+#define NY 60
 #define NZ 1
 
 

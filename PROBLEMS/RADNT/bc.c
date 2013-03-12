@@ -200,14 +200,17 @@ if(iy>=NY) //equatorial plane
 
 	//Keplerian gas
 	ldouble Om=1./pow(rBL,1.5);
-	pp[2]=pp[3]=0.;
-	pp[4]=Om;
-
-	conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
 	
-	prad_ff2lab(pp,pp,&geom);
+	ldouble ucon[4]={0.,0.,0.,Om};
+	conv_vels(ucon,ucon,VEL3,VELPRIM,ggBL,GGBL);
+		
+	pp[2]=ucon[1];
+	pp[3]=ucon[2];
+	pp[4]=ucon[3];	
 
-
+	prad_ff2lab(pp,pp,&geomBL);
+	
+	trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
       }
     
 

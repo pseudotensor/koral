@@ -10,7 +10,9 @@ int
 fprint_openfiles()
 {
   fout_totmass=fopen("0log.dat","w");
-  int i=system("rm dumps/*dat gifs/*gif");
+  char bufor[100];
+  sprintf(bufor,"rm dumps/*dat gifs/*%s",IMAGETYPE);
+  int i=system(bufor);
 
   nfout1=0;
   return 0;
@@ -106,7 +108,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 {
   char bufor[50],bufor2[50];
   sprintf(bufor,"dumps/out%04d.dat",nfout1);
-  sprintf(bufor2,"gifs/out%04d.gif",nfout1);  
+  sprintf(bufor2,"gifs/out%04d.%s",nfout1,IMAGETYPE);  
   fout1=fopen(bufor,"w");
 
   int ix,iy,iz,iv;

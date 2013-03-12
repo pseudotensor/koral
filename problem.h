@@ -652,6 +652,10 @@
 #define MAXEXPLICITSUBSTEPCHANGE 1.e-2
 #endif
 
+#ifndef IMAGETYPE
+#define "gif"
+#endif
+
 
 
 /*********************/
