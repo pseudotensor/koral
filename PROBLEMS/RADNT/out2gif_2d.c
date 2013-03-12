@@ -8,6 +8,7 @@ ldouble minx,miny,maxx,maxy;
 
 #ifdef myMKS1COORDS
 minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
+minx=-5.;
 maxx= .66*(exp(get_xb(NX,0))+MKS1R0);
 miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
 maxy= .66*(exp(get_xb(NX,0))+MKS1R0);
@@ -64,7 +65,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set title \"F_phi\"\n"
 	  "set log cb\n"
 	  "set cbrange [1e-6:1]\n"
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($23) ti \"\" w l ls 1\n"
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):23 ti \"\" w l ls 1\n"
 	  "set autoscale cb\n"
 
 	  "set lmargin at screen 0.08\n"

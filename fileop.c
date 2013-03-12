@@ -123,6 +123,24 @@ fprint_profiles(ldouble t, ldouble totmass)
 #ifdef PRINTGC_RIGHT
   gcrx=1;
 #endif
+#ifdef PRINTXGC_LEFT
+  gclx=1;
+#endif
+#ifdef PRINTXGC_RIGHT
+  gcrx=1;
+#endif
+#ifdef PRINTYGC_LEFT
+  gcly=1;
+#endif
+#ifdef PRINTYGC_RIGHT
+  gcry=1;
+#endif
+#ifdef PRINTZGC_LEFT
+  gclz=1;
+#endif
+#ifdef PRINTZGC_RIGHT
+  gcrz=1;
+#endif
 #ifdef PRINTZONEMORE
   gcrz=1;
 #endif

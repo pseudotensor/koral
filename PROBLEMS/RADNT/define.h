@@ -27,6 +27,7 @@
 //#define RADOUTPUTINFF
 //#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
+#define PRINTYGC_LEFT
 
 #ifdef myMKS1COORDS
 #define MKS1R0 0.
@@ -39,11 +40,11 @@
 #define NX 60
 #endif
 
-#define NY 60
+#define NY 30
 #define NZ 1
 
 
-#define MINY (0.*Pi/4.)
+#define MINY (0.2*Pi/4.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.

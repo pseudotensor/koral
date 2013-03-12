@@ -197,6 +197,7 @@ if(iy>=NY) //equatorial plane
 
 	pp[6]=calc_LTE_EfromT(1.e11)*(1.-sqrt(rin/rBL))/pow(rBL,3.);
 	pp[7]=pp[8]=pp[9]=0.;
+	pp[8]=-.5*pp[6];
 
 	//Keplerian gas
 	ldouble Om=1./pow(rBL,1.5);
@@ -207,7 +208,7 @@ if(iy>=NY) //equatorial plane
 	pp[2]=ucon[1];
 	pp[3]=ucon[2];
 	pp[4]=ucon[3];	
-
+	
 	prad_ff2lab(pp,pp,&geomBL);
 	
 	trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
