@@ -18,7 +18,7 @@
 #define RADOUTPUTINZAMO
 //#define PRINTYGC_LEFT
 
-#define MINX 2.
+#define MINX 4.
 #define MAXX 100.
 
 #define NX 120
