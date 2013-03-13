@@ -1,0 +1,13 @@
+git add	PROBLEMS/ATMMKS1/tools.c
+git add	PROBLEMS/BOWSHOCK/tools.c
+git add	PROBLEMS/DONUT/tools.c
+git add	PROBLEMS/RADATM/tools.c
+git add	PROBLEMS/RADBEAM2D/tools.c
+git add	PROBLEMS/RADBEAM2DKS/tools.c
+git add	PROBLEMS/RADBEAM2DKSVERT/tools.c
+git add	PROBLEMS/RADBEAMFLAT/tools.c
+git add	PROBLEMS/RADFLATNESS/tools.c
+git add	PROBLEMS/RADPULSE/tools.c
+git add	PROBLEMS/RADSHADOW/tools.c
+git add	PROBLEMS/RADTUBE/tools.c
+git add	PROBLEMS/RDONUT/tools.c

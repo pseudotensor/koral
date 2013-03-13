@@ -36,8 +36,23 @@
 //28 BOWSHOCK - bow shock hydro test
 //29* RADWALL - flat with wall
 //30* RADNT - emission from midplane
+//31* FLATDISK - emission from flat disk
 
-#define PROBLEM 30
+#define PROBLEM 31
+
+#if(PROBLEM==31)
+
+#define PR_DEFINE "PROBLEMS/FLATDISK/define.h"
+#define PR_BC "PROBLEMS/FLATDISK/bc.c"
+#define PR_INIT "PROBLEMS/FLATDISK/init.c"
+#define PR_KAPPA "PROBLEMS/FLATDISK/kappa.c"
+#define PR_KAPPAES "PROBLEMS/FLATDISK/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/FLATDISK/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/FLATDISK/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/FLATDISK/dump.c"
+#define PR_TOOLS "PROBLEMS/FLATDISK/tools.c"
+
+#endif
 
 #if(PROBLEM==30)
 
