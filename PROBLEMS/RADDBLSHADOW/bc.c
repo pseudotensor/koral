@@ -69,7 +69,7 @@ if(iy<0)
       pp[6]=E;
       pp[7]=Fx;
       pp[8]=Fy;
-      p [9]=Fz;
+      pp[9]=Fz;
 
       prad_ff2lab(pp,pp,&geom);
 

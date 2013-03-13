@@ -67,3 +67,4 @@ v3=Rij[1][1]/E;
 v4=Rij[2][2]/E;
 
 v3=f;
+				   v4=get_cflag(RADFIXUPFLAG,ix,iy,iz);

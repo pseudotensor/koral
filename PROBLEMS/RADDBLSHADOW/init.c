@@ -33,7 +33,7 @@ ldouble pamb=calc_PEQ_ufromTrho(TAMB,RHOAMB);
 rho=(RHOBLOB-RHOAMB)*exp(-powl(sqrtl(xx*xx+yy*yy+zz*zz),2.)/BLOBW)+RHOAMB;      
 mx=my=mz=0.;
 T=TAMB*RHOAMB/rho;
-T=TAMB;
+//T=TAMB;
 
 uint=calc_PEQ_ufromTrho(T,rho);
 E=calc_LTE_EfromT(T);

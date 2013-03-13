@@ -1,6 +1,6 @@
 //#define LABRADFLUXES
 
-#define TMAX 1.e10
+#define TMAX 200.
 #define RADIATION
 
 #define MYCOORDS MINKCOORDS
@@ -16,11 +16,11 @@
 #define MINMOD_THETA 1.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (1.4)
-#define DTOUT1 2.e-1
+#define DTOUT1 1.
 
 //#define IMPLICIT_FF_RAD_SOURCE
 //#define EXPLICIT_RAD_SOURCE
-#define MASS 10.
+#define MASS 1./MSUNCM
 
 #define MINX -6.
 #define MAXX 3.
@@ -41,7 +41,7 @@
 #define RHOBLOB 1.e3
 
 #define BLOBW 5.e-2
-#define KAPPA 1.
+#define KAPPA .1
 
 #define NLEFT 0.99
 
