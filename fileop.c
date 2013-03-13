@@ -223,7 +223,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 						    {
 						      uu[iv]=get_u(u,iv,ix,iy,iz);
 						      pp[iv]=get_u(p,iv,ix,iy,iz);
-						    }	    
+						    }	 
+
+						  
 
 						  ldouble tup[4][4],tlo[4][4];
 						  pick_T(tmuup,ix,iy,iz,tup);

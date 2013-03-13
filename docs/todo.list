@@ -1,3 +1,4 @@
+0313 - ** - in topcap include a limiter for switching between GAMMAMAX for tau<<1 and fluid frame for tau>>1
 0312 - ** - metric tetrad order does not correspond to eup,elo - cross check
 0310 - **** - geometry struct
 0307 - ** - coco vs LABRADFLUX

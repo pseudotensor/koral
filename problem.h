@@ -37,8 +37,23 @@
 //29* RADWALL - flat with wall
 //30* RADNT - emission from midplane
 //31* FLATDISK - emission from flat disk
+//32* CYLBEAM - beam towards the axis in cylindrical
 
-#define PROBLEM 31
+#define PROBLEM 32
+
+#if(PROBLEM==32)
+
+#define PR_DEFINE "PROBLEMS/CYLBEAM/define.h"
+#define PR_BC "PROBLEMS/CYLBEAM/bc.c"
+#define PR_INIT "PROBLEMS/CYLBEAM/init.c"
+#define PR_KAPPA "PROBLEMS/CYLBEAM/kappa.c"
+#define PR_KAPPAES "PROBLEMS/CYLBEAM/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/CYLBEAM/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/CYLBEAM/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/CYLBEAM/dump.c"
+#define PR_TOOLS "PROBLEMS/CYLBEAM/tools.c"
+
+#endif
 
 #if(PROBLEM==31)
 

@@ -1381,6 +1381,31 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       x2[2]=x1[2];
       x2[3]=x1[3];
     }
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==CYLCOORDS)
+    {
+      ldouble r,th,ph;
+      r=x1[1];
+      th=x1[2];
+      ph=x1[3];
+            
+      x2[0]=x1[0];
+      x2[3]=ph;
+      x2[2]=r*cos(th);
+      x2[1]=r*sin(th);
+    }
+  else if((CO2==SCHWCOORDS || CO2==KERRCOORDS) && CO1==CYLCOORDS)
+    {
+      ldouble R,z,ph;
+      R=x1[1];
+      z=x1[2];
+      ph=x1[3];
+            
+      x2[0]=x1[0];
+      x2[3]=ph;
+      x2[1]=sqrt(R*R+z*z);
+      x2[2]=asin(R/x2[1]);
+    }
+  
   else if(((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==SPHCOORDS) ||
 	  ((CO2==SCHWCOORDS || CO2==KERRCOORDS) && CO1==SPHCOORDS))
     {
@@ -1408,7 +1433,10 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       coco_KS2MKS1(x2,x2);
     }
   else
-    my_err("coco coordinate conversion not implemented\n");
+    {
+      printf("coco: %d -> %d\n",CO1,CO2);
+      my_err("coco coordinate conversion not implemented\n");
+    }
   return 0;
 }
 
