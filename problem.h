@@ -39,7 +39,7 @@
 //31* FLATDISK - emission from flat disk
 //32* CYLBEAM - beam towards the axis in cylindrical
 
-#define PROBLEM 17
+#define PROBLEM 32
 
 #if(PROBLEM==32)
 
