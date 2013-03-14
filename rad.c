@@ -910,6 +910,10 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3
 
   //square of radiative wavespeed in radiative rest frame
   ldouble rv2rad = 1./3.;
+  
+  //test
+  //rv2rad = 1.;
+
   ldouble rv2,rv2tau;
 
   //**********************************************************************

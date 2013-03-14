@@ -58,6 +58,7 @@ if(ix>=NX) //analytical solution at rout only
 
 #ifdef RADIATION
 	pp[6]=calc_LTE_EfromT(1.e10);
+	pp[6]=1.;
 	pp[7]=pp[8]=pp[9]=0.;
 	pp[7]=-.5*pp[6]; //isotropic
 

@@ -10,7 +10,7 @@
 
 #define IMAGETYPE "gif"
 #define OUTVEL VELPRIMRAD
-#define DTOUT1 1.
+#define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 100

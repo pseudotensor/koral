@@ -60,6 +60,8 @@ if(1)
     pp[1]=.1;
 #ifdef RADIATION
     set_radatmosphere(pp,xxvec,gg,GG,0);
+    pp[6]=0.0001;
+    pp[7]=pp[8]=pp[9]=0.;
 
     /*
     pp[6]=ERADATMMIN;

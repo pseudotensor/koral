@@ -36,3 +36,7 @@ ldouble nx,ny,nz,nlen,f;
 				   v4=get_cflag(RADFIXUPFLAG,ix,iy,iz);
 
 v3=f;
+
+				  ldouble RR[4][4];
+				  calc_Rij_ff(pp,RR);
+				  v4=RR[3][3];
