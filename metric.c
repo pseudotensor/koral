@@ -176,6 +176,7 @@ calc_g_arb(ldouble *xx, ldouble g[][5],int coords)
 
 if(coords==MCYL1COORDS) {
 #if(MYCOORDS==MCYL1COORDS)
+  ldouble R0;
   R0=MKS1R0;
 #endif
 ;g[0][0]= -1
@@ -1599,6 +1600,39 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       x2[3]=ph;
       x2[2]=r*cos(th);
       x2[1]=r*sin(th);
+    }
+  else if((CO2==SCHWCOORDS || CO2==KERRCOORDS) && CO1==MCYL1COORDS)
+    {
+      //to CYL
+      coco_MCYL12CYL(x1,x1); 
+
+      //to BL/SPH
+      ldouble R,z,ph;
+      R=x1[1];
+      z=x1[2];
+      ph=x1[3];
+            
+      x2[0]=x1[0];
+      x2[3]=ph;
+      x2[1]=sqrt(R*R+z*z);
+      x2[2]=asin(R/x2[1]);
+    }
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MCYL1COORDS)
+    {
+      ldouble r,th,ph;
+
+      r=x1[1];
+      th=x1[2];
+      ph=x1[3];
+
+      //to CYL
+      x2[0]=x1[0];
+      x2[3]=ph;
+      x2[2]=r*cos(th);
+      x2[1]=r*sin(th);
+      
+      //to MCYL1
+      coco_CYL2MCYL1(x2,x2);  
     }
   else if((CO2==SCHWCOORDS || CO2==KERRCOORDS) && CO1==CYLCOORDS)
     {

@@ -9,6 +9,12 @@ ldouble miny=0.;
 ldouble maxx=get_x(NX,0);
 ldouble maxy=maxx;
 
+#ifdef myMCYL1COORDS
+maxx= 1.1*(exp(get_xb(NX,0))+MKS1R0);
+maxy= maxx;
+#endif
+
+
 #ifdef FULLPHI
 minx=-maxx;
 miny=-maxx;
@@ -55,7 +61,7 @@ miny=-maxx;
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
 	  "set log cb\n"
-	  //"set cbrange [0.001:.1]\n"
+	  "set cbrange [0.1:10.]\n"
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
@@ -81,7 +87,7 @@ miny=-maxx;
 	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-($23)*sin($3))*%f)"
 	  ":(($23*cos($3)+($21)*sin($3))*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  ,fname,fname2,minx,maxx,miny,maxy,fname,fname,
-	  .5,.5,(int)(NX/15),(int)(NZ/20));
+	  1.,1.,(int)(NX/15),(int)(NZ/20));
 	    
 	    
 

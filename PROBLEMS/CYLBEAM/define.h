@@ -6,26 +6,41 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
+#define myMCYL1COORDS
+
+#ifdef myMCYL1COORDS
+#define MYCOORDS MCYL1COORDS
+#else
 #define MYCOORDS CYLCOORDS
+#endif
+
+#define OUTCOORDS CYLCOORDS
 
 #define IMAGETYPE "gif"
 #define OUTVEL VELPRIMRAD
 #define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
-#define NOUTSTOP 100
-#define RADOUTPUTINZAMO
-#define PRINTXGC_LEFT
+#define NOUTSTOP 1000
+//#define RADOUTPUTINZAMO
+//#define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 
 
+#ifdef myMCYL1COORDS
+#define MKS1R0 -10.
+#define MINX (log(0.-MKS1R0))
+#define MAXX (log(20.-MKS1R0))
+#define NX 100
+#else
 #define MINX  0.
 #define MAXX 20.
+#define NX 120
+#endif
 
 
-#define NX 50
 #define NY 1
-#define NZ 40
+#define NZ 1
 #define YZXDUMP
 
 
@@ -35,7 +50,7 @@
 
 #define MINZ 0.
 
-#define FULLPHI
+//#define FULLPHI
 
 #ifdef FULLPHI
 #define MAXZ 2.*Pi
@@ -47,7 +62,7 @@
 #define SPECIFIC_BC
 
 #define GAMMA (4./3.)
-#define OMSCALE 1.
+#define OMSCALE 0.
 
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))

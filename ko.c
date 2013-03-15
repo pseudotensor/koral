@@ -34,6 +34,7 @@ main(int argc, char **argv)
 
   //sets the grid
   set_grid(&min_dx,&min_dy,&min_dz,&max_dt);
+  //print_grid(min_dx,min_dy,min_dz);
 
   //precalculates metric etc.
   calc_metric();

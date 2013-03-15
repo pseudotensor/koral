@@ -9,6 +9,21 @@
 /****************************************/
 /****************************************/
 /****************************************/
+
+ldouble minx,maxx,miny,maxy;
+#ifdef myMCYL1COORDS
+minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
+maxx= 1.02*(exp(get_xb(NX,0))+MKS1R0);
+miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
+maxy= 1.02*(exp(get_xb(NX,0))+MKS1R0);
+#else
+minx= -.02*get_xb(NX,0);
+maxx= 1.02*get_xb(NX,0);
+miny= -.02*get_xb(NX,0);
+maxy= 1.02*get_xb(NX,0);
+#endif
+
+
 fprintf(fgnu,
 	"set style line 1 lw 2 lc 1 lt 1\n"
 	"set style line 2 lw 2 lc 2 lt 1\n"
@@ -95,7 +110,7 @@ fprintf(fgnu,
 	"set xlabel \"\"\n"
 	"set ylabel \"\"\n"
 	"plot \"%s\" u 1:($23) w lp ls 4 pt 7 ti \"Fph\""
-	,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname);
+	,fname2,t,t/CCC,minx,maxx,fname,fname,fname,fname,fname,fname,fname);
 
 /****************************************/
 /****************************************/

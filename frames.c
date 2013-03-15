@@ -90,11 +90,11 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
       ucon[2]=pp1[8];
       ucon[3]=pp1[9];
 
-      conv_vels(ucon,ucon,VELPRIM,VEL4,gg1,GG1);
+      conv_vels(ucon,ucon,VELPRIMRAD,VEL4,gg1,GG1);
       //converting to CO2
       trans2_coco(xxvec,ucon,ucon,CO1,CO2);
       //to VELPRIM
-      conv_vels(ucon,ucon,VEL4,VELPRIM,gg2,GG2);
+      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg2,GG2);
 
       pp2[7]=ucon[1]; 
       pp2[8]=ucon[2];
