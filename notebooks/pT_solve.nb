@@ -1,0 +1,167 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[      4442,        158]
+NotebookOptionsPosition[      3962,        136]
+NotebookOutlinePosition[      4322,        152]
+CellTagsIndexPosition[      4279,        149]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"sT", "=", 
+   RowBox[{"Solve", "[", 
+    RowBox[{
+     RowBox[{"P", "\[Equal]", 
+      RowBox[{
+       RowBox[{"aaa", " ", 
+        SuperscriptBox[
+         RowBox[{"T", "[", "r", "]"}], "4"]}], "+", 
+       RowBox[{"bbb", " ", 
+        RowBox[{"T", "[", "r", "]"}]}]}]}], ",", 
+     RowBox[{"T", "[", "r", "]"}]}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.570266983485281*^9, 3.570266984332508*^9}, {
+  3.570267236102248*^9, 3.5702672638300867`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"CForm", "[", 
+  SuperscriptBox[
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"9", " ", "aaa", " ", 
+      SuperscriptBox["bbb", "2"]}], "-", 
+     RowBox[{
+      SqrtBox["3"], " ", 
+      SqrtBox[
+       RowBox[{
+        RowBox[{"27", " ", 
+         SuperscriptBox["aaa", "2"], " ", 
+         SuperscriptBox["bbb", "4"]}], "+", 
+        RowBox[{"256", " ", 
+         SuperscriptBox["aaa", "3"], " ", 
+         SuperscriptBox[
+          RowBox[{"P", "[", "r", "]"}], "3"]}]}]]}]}], ")"}], 
+   RowBox[{"1", "/", "3"}]], "]"}]], "Input"],
+
+Cell["\<\
+Power(9*aaa*Power(bbb,2) - 
+    Sqrt(3)*Sqrt(27*Power(aaa,2)*
+        Power(bbb,4) + 
+       256*Power(aaa,3)*Power(P(r),3)),
+   0.3333333333333333)\
+\>", "Output",
+ CellChangeTimes->{3.5702674249888573`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"CForm", "[", 
+  RowBox[{"sT", "[", 
+   RowBox[{"[", 
+    RowBox[{"1", ",", "1", ",", "2"}], "]"}], "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.5702672386492443`*^9, 3.570267268661282*^9}}],
+
+Cell["\<\
+Sqrt((-4*Power(0.6666666666666666,
+          0.3333333333333333)*P)/
+       Power(9*aaa*Power(bbb,2) - 
+         Sqrt(3)*
+          Sqrt(27*Power(aaa,2)*
+             Power(bbb,4) + 
+            256*Power(aaa,3)*Power(P,3)),
+        0.3333333333333333) + 
+      Power(9*aaa*Power(bbb,2) - 
+         Sqrt(3)*
+          Sqrt(27*Power(aaa,2)*
+             Power(bbb,4) + 
+            256*Power(aaa,3)*Power(P,3)),
+        0.3333333333333333)/
+       (Power(2,0.3333333333333333)*
+         Power(3,0.6666666666666666)*aaa))
+     /2. - Sqrt((4*
+         Power(0.6666666666666666,
+          0.3333333333333333)*P)/
+       Power(9*aaa*Power(bbb,2) - 
+         Sqrt(3)*
+          Sqrt(27*Power(aaa,2)*
+             Power(bbb,4) + 
+            256*Power(aaa,3)*Power(P,3)),
+        0.3333333333333333) - 
+      Power(9*aaa*Power(bbb,2) - 
+         Sqrt(3)*
+          Sqrt(27*Power(aaa,2)*
+             Power(bbb,4) + 
+            256*Power(aaa,3)*Power(P,3)),
+        0.3333333333333333)/
+       (Power(2,0.3333333333333333)*
+         Power(3,0.6666666666666666)*aaa)\\
+       - (2*bbb)/
+       (aaa*Sqrt((-4*
+              Power(0.6666666666666666,
+               0.3333333333333333)*P)/
+            Power(9*aaa*Power(bbb,2) - 
+              Sqrt(3)*
+               Sqrt(27*Power(aaa,2)*
+                Power(bbb,4) + 
+                256*Power(aaa,3)*
+                Power(P,3)),
+             0.3333333333333333) + 
+           Power(9*aaa*Power(bbb,2) - 
+              Sqrt(3)*
+               Sqrt(27*Power(aaa,2)*
+                Power(bbb,4) + 
+                256*Power(aaa,3)*
+                Power(P,3)),
+             0.3333333333333333)/
+            (Power(2,0.3333333333333333)*
+              Power(3,0.6666666666666666)*
+              aaa))))/2.\
+\>", "Output",
+ CellChangeTimes->{{3.570267245206915*^9, 3.570267269279662*^9}}]
+}, Open  ]]
+},
+WindowSize->{740, 867},
+WindowMargins->{{Automatic, 191}, {Automatic, 265}},
+Magnification->1.25,
+FrontEndVersion->"9.0 for Linux x86 (64-bit) (November 20, 2012)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[557, 20, 493, 14, 43, "Input"],
+Cell[CellGroupData[{
+Cell[1075, 38, 556, 18, 104, "Input"],
+Cell[1634, 58, 218, 7, 141, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1889, 70, 214, 5, 38, "Input"],
+Cell[2106, 77, 1840, 56, 1183, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
