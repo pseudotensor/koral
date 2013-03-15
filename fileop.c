@@ -11,7 +11,7 @@ fprint_openfiles()
 {
   fout_totmass=fopen("0log.dat","w");
   char bufor[100];
-  sprintf(bufor,"rm dumps/*dat gifs/*%s",IMAGETYPE);
+  sprintf(bufor,"rm dumps/*dat gifs/*");
   int i=system(bufor);
 
   nfout1=0;
@@ -163,6 +163,13 @@ fprint_profiles(ldouble t, ldouble totmass)
 	      for(iy=YSLICE;iy<YSLICE+1;iy++)
 		{
 		  for(iz=0;iz<NZ;iz++)
+		    {
+		      for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
+			{
+#elif defined(ZSLICE)
+	      for(iz=ZSLICE;iz<ZSLICE+1;iz++)
+		{
+		  for(iy=0;iy<NY;iy++)
 		    {
 		      for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
 			{

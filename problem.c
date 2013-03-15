@@ -144,6 +144,11 @@ initialize_problem()
 /*********************************************/
 int my_finger(ldouble t)
 {
+
+#ifdef PR_FINGER
+#include PR_FINGER
+#endif
+
   return 0;
 }
 

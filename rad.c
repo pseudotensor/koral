@@ -613,11 +613,12 @@ calc_Rij(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 
 #ifdef LABRADFLUXES
 
-#if(0)
+#if(1)
   //artificially puts pp=uu and converts them to urf and Erf using the regular converter
   u2p_rad_urf(pp0,pp,gg,GG,&i);
 
-#else //from labfluxes
+#else 
+  //from labfluxes branch
 
   for(i=0;i<NV;i++)
     pp[i]=pp0[i];

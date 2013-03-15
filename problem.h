@@ -38,8 +38,24 @@
 //30* RADNT - emission from midplane
 //31* FLATDISK - emission from flat disk
 //32* CYLBEAM - beam towards the axis in cylindrical
+//33* RADDOT - radiating dot
 
-#define PROBLEM 10
+#define PROBLEM 33
+
+#if(PROBLEM==33)
+
+#define PR_DEFINE "PROBLEMS/RADDOT/define.h"
+#define PR_BC "PROBLEMS/RADDOT/bc.c"
+#define PR_INIT "PROBLEMS/RADDOT/init.c"
+#define PR_KAPPA "PROBLEMS/RADDOT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADDOT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADDOT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADDOT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADDOT/dump.c"
+#define PR_TOOLS "PROBLEMS/RADDOT/tools.c"
+#define PR_FINGER "PROBLEMS/RADDOT/finger.c"
+
+#endif
 
 #if(PROBLEM==32)
 
