@@ -1127,6 +1127,16 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       dxdx_KS2MKS1(xx,dxdx);
       multiply2(u1,u2,dxdx);
     }
+  else if(CO1==MCYL1COORDS && CO2==CYLCOORDS)
+    {
+      dxdx_MCYL12CYL(xx,dxdx);
+      multiply2(u1,u2,dxdx);
+    }
+  else if(CO1==CYLCOORDS && CO2==MCYL1COORDS)
+    {
+      dxdx_CYL2MCYL1(xx,dxdx);
+      multiply2(u1,u2,dxdx);
+    }
   else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       dxdx_MKS12KS(xx,dxdx);
@@ -1191,6 +1201,16 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
   else if(CO1==KSCOORDS && CO2==MKS1COORDS)
     {
       dxdx_KS2MKS1(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
+  else if(CO1==MCYL1COORDS && CO2==CYLCOORDS)
+    {
+      dxdx_MCYL12CYL(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
+  else if(CO1==CYLCOORDS && CO2==MCYL1COORDS)
+    {
+      dxdx_CYL2MCYL1(xx,dxdx);
       multiply22(T1,T2,dxdx);
     }
   else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))

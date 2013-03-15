@@ -57,6 +57,15 @@ if(coords==MKS1COORDS) {
 #endif
   return Sqrt(Power(exp(1.0),2*x1)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2))/2.;
  } 
+
+if(coords==MCYL1COORDS) {
+  ldouble R0;
+#if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+  return Sqrt(Power(exp(1.0),2*x1)*Power(x1,2));
+ } 
+
 }
 
 //**********************************************************************
@@ -129,6 +138,17 @@ if(coords==MKS1COORDS) {
 ;
  }
 
+if(coords==MCYL1COORDS) {
+  ldouble R0;
+#if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+;if(idim==0) return  1+1/x1
+;if(idim==1) return  0
+;if(idim==2) return  0
+;
+ }
+
 
 
 }
@@ -153,6 +173,29 @@ calc_g_arb(ldouble *xx, ldouble g[][5],int coords)
   ldouble x3=xx[3];
 
   g[3][4]=calc_gdet(xx);
+
+if(coords==MCYL1COORDS) {
+#if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+;g[0][0]= -1
+;g[0][1]= 0
+;g[0][2]= 0
+;g[0][3]= 0
+;g[1][0]= 0
+;g[1][1]= Power(exp(1.0),2*x1)
+;g[1][2]= 0
+;g[1][3]= 0
+;g[2][0]= 0
+;g[2][1]= 0
+;g[2][2]= 1
+;g[2][3]= 0
+;g[3][0]= 0
+;g[3][1]= 0
+;g[3][2]= 0
+;g[3][3]= Power(x1,2)
+;
+}
 
 if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
@@ -324,6 +367,30 @@ calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
   ldouble x1=xx[1];
   ldouble x2=xx[2];
   ldouble x3=xx[3];
+
+  if(coords==MCYL1COORDS) {
+  ldouble R0;
+#if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+;G[0][0]= -1
+;G[0][1]= 0
+;G[0][2]= 0
+;G[0][3]= 0
+;G[1][0]= 0
+;G[1][1]= Power(exp(1.0),-2*x1)
+;G[1][2]= 0
+;G[1][3]= 0
+;G[2][0]= 0
+;G[2][1]= 0
+;G[2][2]= 1
+;G[2][3]= 0
+;G[3][0]= 0
+;G[3][1]= 0
+;G[3][2]= 0
+;G[3][3]= Power(x1,-2)
+;
+  }
 
   if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
@@ -498,6 +565,78 @@ calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int coords)
   ldouble x2=xx[2];
   ldouble x3=xx[3];
 
+
+  if(coords==MCYL1COORDS) {
+  ldouble R0;
+#if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+;Krzys[0][0][0]= 0
+;Krzys[0][0][1]= 0
+;Krzys[0][0][2]= 0
+;Krzys[0][0][3]= 0
+;Krzys[0][1][0]= 0
+;Krzys[0][1][1]= 0
+;Krzys[0][1][2]= 0
+;Krzys[0][1][3]= 0
+;Krzys[0][2][0]= 0
+;Krzys[0][2][1]= 0
+;Krzys[0][2][2]= 0
+;Krzys[0][2][3]= 0
+;Krzys[0][3][0]= 0
+;Krzys[0][3][1]= 0
+;Krzys[0][3][2]= 0
+;Krzys[0][3][3]= 0
+;Krzys[1][0][0]= 0
+;Krzys[1][0][1]= 0
+;Krzys[1][0][2]= 0
+;Krzys[1][0][3]= 0
+;Krzys[1][1][0]= 0
+;Krzys[1][1][1]= 1
+;Krzys[1][1][2]= 0
+;Krzys[1][1][3]= 0
+;Krzys[1][2][0]= 0
+;Krzys[1][2][1]= 0
+;Krzys[1][2][2]= 0
+;Krzys[1][2][3]= 0
+;Krzys[1][3][0]= 0
+;Krzys[1][3][1]= 0
+;Krzys[1][3][2]= 0
+;Krzys[1][3][3]= -(x1/Power(exp(1.0),2*x1))
+;Krzys[2][0][0]= 0
+;Krzys[2][0][1]= 0
+;Krzys[2][0][2]= 0
+;Krzys[2][0][3]= 0
+;Krzys[2][1][0]= 0
+;Krzys[2][1][1]= 0
+;Krzys[2][1][2]= 0
+;Krzys[2][1][3]= 0
+;Krzys[2][2][0]= 0
+;Krzys[2][2][1]= 0
+;Krzys[2][2][2]= 0
+;Krzys[2][2][3]= 0
+;Krzys[2][3][0]= 0
+;Krzys[2][3][1]= 0
+;Krzys[2][3][2]= 0
+;Krzys[2][3][3]= 0
+;Krzys[3][0][0]= 0
+;Krzys[3][0][1]= 0
+;Krzys[3][0][2]= 0
+;Krzys[3][0][3]= 0
+;Krzys[3][1][0]= 0
+;Krzys[3][1][1]= 0
+;Krzys[3][1][2]= 0
+;Krzys[3][1][3]= 1/x1
+;Krzys[3][2][0]= 0
+;Krzys[3][2][1]= 0
+;Krzys[3][2][2]= 0
+;Krzys[3][2][3]= 0
+;Krzys[3][3][0]= 0
+;Krzys[3][3][1]= 1/x1
+;Krzys[3][3][2]= 0
+;Krzys[3][3][3]= 0
+;
+  }
 
   if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
@@ -1366,6 +1505,74 @@ coco_MKS12KS(ldouble *xMKS1, ldouble *xKS)
   return 0;
 }
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for MCYL1 -> CYL
+int
+coco_MCYL12CYL(ldouble *xMCYL1, ldouble *xCYL)
+{
+  ldouble x0=xMCYL1[0];
+  ldouble x1=xMCYL1[1];
+  ldouble x2=xMCYL1[2];
+  ldouble x3=xMCYL1[3];
+  ldouble R0;
+#if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+
+  xCYL[0]
+    = x0
+    ;
+  xCYL[1]
+    = exp(x1) + R0
+    ;
+  xCYL[2]
+    = x2
+    ;
+  xCYL[3]
+    = x3
+    ;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for CYL -> MCYL1
+int
+coco_CYL2MCYL1(ldouble *xCYL, ldouble *xMCYL1)
+{
+  ldouble CYLx0=xCYL[0];
+  ldouble CYLx1=xCYL[1];
+  ldouble CYLx2=xCYL[2];
+  ldouble CYLx3=xCYL[3];
+  ldouble R0;
+
+#if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+
+  xMCYL1[0]
+    = CYLx0
+    ;
+  xMCYL1[1]
+    = log(CYLx1-R0)
+    ;
+  xMCYL1[2]
+    = CYLx2
+    ;
+  xMCYL1[3]
+    = CYLx3
+    ;
+
+  return 0;
+}
+
+
 
 //**********************************************************************
 //**********************************************************************
@@ -1422,6 +1629,10 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     coco_KS2MKS1(x1,x2);
   else if (CO1==MKS1COORDS && CO2==KSCOORDS)
     coco_MKS12KS(x1,x2);
+  else if (CO1==MCYL1COORDS && CO2==CYLCOORDS)
+    coco_MCYL12CYL(x1,x2);
+  else if (CO1==CYLCOORDS && CO2==MCYL1COORDS)
+    coco_CYL2MCYL1(x1,x2);  
   else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
     {
       coco_MKS12KS(x1,x2);
@@ -1536,6 +1747,60 @@ dxdx_MKS12KS(ldouble *xx, ldouble dxdx[][4])
   ldouble x3=xx[3];
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
+  R0=MKS1R0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[1][1]=exp(x1);
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for CYL -> MCYL1
+int
+dxdx_CYL2MCYL1(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble CYLx0=xx[0];
+  ldouble CYLx1=xx[1];
+  ldouble CYLx2=xx[2];
+  ldouble CYLx3=xx[3];
+  ldouble R0;
+#if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[1][1]=1./(CYLx1-R0);
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for MCYL1 -> CYL
+int
+dxdx_MCYL12CYL(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble x0=xx[0];
+  ldouble x1=xx[1];
+  ldouble x2=xx[2];
+  ldouble x3=xx[3];
+  ldouble R0;
+#if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
 
