@@ -1148,10 +1148,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 	maxdu=my_max(maxdu,1./SMALL);
       else
 	{
-	  int delidx;
-	  if(iv<5) delidx=iv-1;
-	  if(iv>5) delidx=iv-1-5; 
-	  maxdu=my_max(maxdu,fabs(delapl[delidx]/uval));
+	  maxdu=my_max(maxdu,fabs(delapl[iv]/uval));
 	}
     }
 

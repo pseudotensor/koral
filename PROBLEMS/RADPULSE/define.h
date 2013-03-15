@@ -19,8 +19,8 @@
 #define COPY_ZBC
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define DTOUT1 1.e0
-#define ALLSTEPSOUTPUT 1
+#define DTOUT1 100.
+#define ALLSTEPSOUTPUT 0
 #define NOUTSTOP 100
 #define GAMMA (ldouble)(5./3.)
 #define MINX -50.
