@@ -22,16 +22,16 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000
-//#define RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
 //#define PRINTXGC_LEFT
-#define PRINTXGC_RIGHT
+//#define PRINTXGC_RIGHT
 
 
 #ifdef myMCYL1COORDS
-#define MKS1R0 -10.
+#define MKS1R0 -1.
 #define MINX (log(0.-MKS1R0))
 #define MAXX (log(20.-MKS1R0))
-#define NX 100
+#define NX 50
 #else
 #define MINX  0.
 #define MAXX 20.
@@ -40,7 +40,7 @@
 
 
 #define NY 1
-#define NZ 1
+#define NZ 30
 #define YZXDUMP
 
 
@@ -62,7 +62,7 @@
 #define SPECIFIC_BC
 
 #define GAMMA (4./3.)
-#define OMSCALE 0.
+#define OMSCALE 1.
 
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))

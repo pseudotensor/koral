@@ -35,9 +35,16 @@ calc_tetrades(ggCYL,tupCYL,tloCYL,CYLCOORDS);
 calc_ZAMOes(ggCYL,eupCYL,eloCYL,CYLCOORDS);
 /**********************/
 
+
+
+
+//radius
+if(ix>=NX) //analytical solution at rout only
+  {
+    /*
 print_metric(GGCYL);
 ldouble XX[4][4];
-dxdx_CYL2MCYL1(xxvec,XX);
+dxdx_CYL2MCYL1(xxvecCYL,XX);
 print_tensor(XX);
 ldouble metric[4][4];
 int i,j;
@@ -48,12 +55,9 @@ multiply22(metric,metric,XX);
 print_tensor(metric);
 print_metric(GG);
 getchar();
+    */
 
 
-//radius
-if(ix>=NX) //analytical solution at rout only
-  {
-   
     ldouble uint,Vphi,rho,Vr;
     ldouble xx=get_x(ix,0);
     ldouble D,E,W,eps,uT,uphi,uPhi;
@@ -75,7 +79,7 @@ if(ix>=NX) //analytical solution at rout only
 	pp[6]=1.;
 	pp[7]=pp[8]=pp[9]=0.;
 	pp[7]=-.5*pp[6]; //isotropic
-	pp[7]=0.;
+	//	pp[7]=0.;
 
 	//Keplerian gas
 	ldouble rCYL=xxvecCYL[1];

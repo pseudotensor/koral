@@ -63,7 +63,7 @@ if(coords==MCYL1COORDS) {
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
-  return Sqrt(Power(exp(1.0),2*x1)*Power(x1,2));
+  return Sqrt(Power(exp(1.0),2*x1)*Power(Power(exp(1.0),x1) + R0,2));
  } 
 
 }
@@ -143,7 +143,7 @@ if(coords==MCYL1COORDS) {
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
-;if(idim==0) return  1+1/x1
+;if(idim==0) return  (2*Power(exp(1.0),x1) + R0)/(Power(exp(1.0),x1) + R0)
 ;if(idim==1) return  0
 ;if(idim==2) return  0
 ;
@@ -178,7 +178,7 @@ if(coords==MCYL1COORDS) {
 #if(MYCOORDS==MCYL1COORDS)
   ldouble R0;
   R0=MKS1R0;
-#endif
+
 ;g[0][0]= -1
 ;g[0][1]= 0
 ;g[0][2]= 0
@@ -194,8 +194,9 @@ if(coords==MCYL1COORDS) {
 ;g[3][0]= 0
 ;g[3][1]= 0
 ;g[3][2]= 0
-;g[3][3]= Power(x1,2)
+;g[3][3]= Power(Power(exp(1.0),x1) + R0,2)
 ;
+#endif
 }
 
 if(coords==MKS1COORDS) {
@@ -389,8 +390,9 @@ calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
 ;G[3][0]= 0
 ;G[3][1]= 0
 ;G[3][2]= 0
-;G[3][3]= Power(x1,-2)
+;G[3][3]= Power(Power(exp(1.0),x1) + R0,-2)
 ;
+
   }
 
   if(coords==MKS1COORDS) {
@@ -603,7 +605,7 @@ calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int coords)
 ;Krzys[1][3][0]= 0
 ;Krzys[1][3][1]= 0
 ;Krzys[1][3][2]= 0
-;Krzys[1][3][3]= -(x1/Power(exp(1.0),2*x1))
+;Krzys[1][3][3]= -1 - R0/Power(exp(1.0),x1)
 ;Krzys[2][0][0]= 0
 ;Krzys[2][0][1]= 0
 ;Krzys[2][0][2]= 0
@@ -627,13 +629,13 @@ calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int coords)
 ;Krzys[3][1][0]= 0
 ;Krzys[3][1][1]= 0
 ;Krzys[3][1][2]= 0
-;Krzys[3][1][3]= 1/x1
+;Krzys[3][1][3]= Power(exp(1.0),x1)/(Power(exp(1.0),x1) + R0)
 ;Krzys[3][2][0]= 0
 ;Krzys[3][2][1]= 0
 ;Krzys[3][2][2]= 0
 ;Krzys[3][2][3]= 0
 ;Krzys[3][3][0]= 0
-;Krzys[3][3][1]= 1/x1
+;Krzys[3][3][1]= Power(exp(1.0),x1)/(Power(exp(1.0),x1) + R0)
 ;Krzys[3][3][2]= 0
 ;Krzys[3][3][3]= 0
 ;
