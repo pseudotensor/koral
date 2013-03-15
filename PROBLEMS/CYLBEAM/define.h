@@ -10,7 +10,7 @@
 
 #define IMAGETYPE "gif"
 #define OUTVEL VELPRIMRAD
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 100
@@ -22,18 +22,32 @@
 #define MINX  0.
 #define MAXX 20.
 
-#define NX 200
+
+#define NX 50
 #define NY 1
-#define NZ 1
+#define NZ 40
+#define YZXDUMP
+
 
 
 #define MINY -1.
 #define MAXY 1.
-#define MINZ -1.
-#define MAXZ 1.
+
+#define MINZ 0.
+
+#define FULLPHI
+
+#ifdef FULLPHI
+#define MAXZ 2.*Pi
+#define PRINTZONEMORE
+#else
+#define MAXZ Pi/2.5
+#endif
+
 #define SPECIFIC_BC
 
 #define GAMMA (4./3.)
+#define OMSCALE 1.
 
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))

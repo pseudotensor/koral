@@ -64,8 +64,7 @@ if(ix>=NX) //analytical solution at rout only
 
 	//Keplerian gas
 	ldouble rBL=xx;
-	ldouble Om=1./pow(rBL,1.5)*1.;
-	//Om=0.;
+	ldouble Om=1./pow(rBL,1.5)*OMSCALE;
 
 	ldouble ucon[4]={0.,0.,0.,Om};
 	conv_vels(ucon,ucon,VEL3,VELPRIM,ggBL,GGBL);
@@ -91,11 +90,19 @@ if(ix>=NX) //analytical solution at rout only
 
     return 0.;
   }
- else if(ix<0) //cylindrical axis - reflection
+ else if(ix<0) //cylindrical axis - reflection or transmissive
    {
+#ifdef FULLPHI
+     iix=-ix-1;
+     iiz=iz+NZ/2;
+     if(iiz>=NZ) iiz-=NZ;
+     iiy=iy;
+#else
      iix=-ix-1;
      iiz=iz;
      iiy=iy;
+#endif
+
      gdet_src=get_g(g,3,4,iix,iiy,iiz);  
      gdet_bc=get_g(g,3,4,ix,iy,iz);  
      for(iv=0;iv<NV;iv++)
