@@ -39,8 +39,8 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   //***** hydro: speed of sound ******************************************
   //**********************************************************************
 	      
-  ldouble rho=pp[0];
-  ldouble uu=pp[1];
+  ldouble rho=pp[RHO];
+  ldouble uu=pp[UU];
  
   ldouble pre=(GAMMA-1.)*uu;
   ldouble cs2=GAMMA*pre/(rho+uu+pre);
@@ -294,8 +294,8 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 	  }
       }
  
-  ldouble rho=pp[0];
-  ldouble u=pp[1];
+  ldouble rho=pp[RHO];
+  ldouble u=pp[UU];
   ldouble vcon[4],ucon[4];
   vcon[1]=pp[2];
   vcon[2]=pp[3];
@@ -398,8 +398,8 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
   calc_Tij(pp,gg,GG,T);
   //primitives
-  ldouble rho=pp[0];
-  ldouble u=pp[1];
+  ldouble rho=pp[RHO];
+  ldouble u=pp[UU];
   ldouble vcon[4],ucon[4];
   vcon[1]=pp[2];
   vcon[2]=pp[3];
@@ -562,8 +562,8 @@ int
 calc_Tij( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
 {
   int iv,i,j;
-  ldouble rho=pp[0];
-  ldouble uu=pp[1];
+  ldouble rho=pp[RHO];
+  ldouble uu=pp[UU];
   ldouble ucon[4],ucov[4];
   
   //converts to 4-velocity

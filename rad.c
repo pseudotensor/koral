@@ -10,7 +10,7 @@
 int
 calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
 {
-  ldouble rho=pp[0];
+  ldouble rho=pp[RHO];
   ldouble u=pp[1];  
   ldouble pr=(GAMMA-1.)*(u);
   ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
@@ -32,7 +32,7 @@ calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
 int
 calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
 {
-  ldouble rho=pp[0];
+  ldouble rho=pp[RHO];
   ldouble u=pp[1];  
   ldouble pr=(GAMMA-1.)*(u);
   ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
@@ -261,7 +261,7 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   calc_Gi_ff(pp,Gi);
   
   //implicit flux:
-  ldouble rho=pp[0];
+  ldouble rho=pp[RHO];
   ldouble u=pp[1];  
   ldouble E=pp[6];  
   ldouble pr=(GAMMA-1.)*(u);
@@ -539,7 +539,7 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
   indices_21(ucon,ucov,gg);  
 
   //gas properties
-  ldouble rho=pp[0];
+  ldouble rho=pp[RHO];
   ldouble u=pp[1];
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
@@ -577,7 +577,7 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
 int
 calc_Gi_ff(ldouble *pp, ldouble Gi[4])
 {
-  ldouble rho=pp[0];
+  ldouble rho=pp[RHO];
   ldouble u=pp[1];
   ldouble E=pp[6];
   ldouble F[3]={pp[7],pp[8],pp[9]};

@@ -1,3 +1,5 @@
+0318 - **** - dumped lab implicit to allow for longer timesteps, see below
+0318 - **** - follow the radiative wavespeeds to set the timestep properly
 0314 - **** - correct LABFLUXES by providing geom to u2p_rad_urf
 0313 - *** - implement Eddington approximation
 0313 - ** - in topcap include a limiter for switching between GAMMAMAX for tau<<1 and fluid frame for tau>>1
@@ -7,8 +9,7 @@
 0303 - *** - clean up after EDD
 0303 - ** - radiative wave speed limiter as separated routine
 0227 - ** - correct explicit sub-stepping
-0227 - **** - Rosenbock method for implicit_lab
 0226 - ****** - average over neighbors for unsuccesfull inversions etc
 0208 - ** - correct u2p_cold to generalize to relative velocities
-0205 - ***** - follow the radiative wavespeeds to set the timestep properly
+
 ^ 2013 

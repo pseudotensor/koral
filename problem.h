@@ -40,7 +40,7 @@
 //32* CYLBEAM - beam towards the axis in cylindrical
 //33* RADDOT - radiating dot
 
-#define PROBLEM 10
+#define PROBLEM 6
 
 #if(PROBLEM==33)
 
