@@ -569,8 +569,12 @@
 #define NDIM 3
 #endif
 
-#ifndef NRFL
-#define NRFL (2*NDIM)
+#ifndef NRF
+#ifndef MULTIRADFLUID
+#define NRF 1
+#else
+#define NRF (2*NDIM)
+#endif
 #endif
 
 #ifndef MYCOORDS2
@@ -663,7 +667,7 @@
 #ifdef RADIATION
 
 #ifdef MULTIRADFLUID
-#define NV (6+4*NRFL)
+#define NV (6+4*NRF)
 #else
 #define NV 10 //number of variables
 #endif

@@ -51,19 +51,37 @@ pp[5]=calc_Sfromu(rho,uint);
 
 #ifdef RADIATION
 
+ldouble E1,E2;
 
 E=calc_LTE_EfromT(T_AMB);
-E+=calc_LTE_EfromT(T_AMB*(BLOBP*exp(-((xx-BLOBX1)*(xx-BLOBX1)+(yy)*(yy)+(zz)*(zz))/BLOBW/BLOBW)));
-E+=calc_LTE_EfromT(T_AMB*(BLOBP*exp(-((xx-BLOBX2)*(xx-BLOBX2)+(yy)*(yy)+(zz)*(zz))/BLOBW/BLOBW)));
+E1=E+calc_LTE_EfromT(T_AMB*(BLOBP*exp(-((xx-BLOBX1)*(xx-BLOBX1)+(yy)*(yy)+(zz)*(zz))/BLOBW/BLOBW)));
+E2=E+calc_LTE_EfromT(T_AMB*(BLOBP*exp(-((xx-BLOBX2)*(xx-BLOBX2)+(yy)*(yy)+(zz)*(zz))/BLOBW/BLOBW)));
 				      
-pp[6]=E;
+pp[6]=E1;
 pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
+
+#ifdef MULTIRADFLUID
+int irf;
+for(irf=1;irf<NRF;irf++)
+  {
+    pp[FX(irf)]=pp[FY(irf)]=pp[FZ(irf)]=0.;
+    pp[EE(irf)]=SMALL;
+  }
+
+//temporarily
+pp[EE(1)]=E2;
+//ultimately
+//redistribute_radfluids(pp);
+#endif
+
+
+
 #endif
 
 prad_ff2lab(pp,pp,&geom);
-//print_Nvector(pp,NV);
+//print_Nvector(pp,NV);getchar();
 p2u(pp,uu,gg,GG);	 
 //print_Nvector(uu,NV);getchar();
 

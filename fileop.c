@@ -311,7 +311,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  fprintf(fout1,"%.4e %.4e %.4e "
 							  "%.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e "
 							  "%.7e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e "
-							  "%.10e %.10e %.10e %.10e %.10e %.10e\n",
+							  "%.10e %.10e ",
 							  xx,     //1
 							  yy,     //2
 							  zz,     //3		      
@@ -346,10 +346,32 @@ fprint_profiles(ldouble t, ldouble totmass)
 							  E,      //20
 							  Fx,     //21
 							  Fy,     //22
-							  Fz,     //23
+							  Fz     //23
+#endif
+							  );
+
+#ifdef MULTIRADFLUID
+						  int irf;
+						  for(irf=1;irf<NRF;irf++)
+						    {
+						      fprintf(fout1,"%.10e %.10e %.10e %.10e ",
+#ifdef CGSOUTPUT
+							      endenGU2CGS(pp[EE(irf)]),     //20
+							      fluxGU2CGS(pp[FX(irf)]),     //21
+							      fluxGU2CGS(pp[FY(irf)]),     //22
+							      fluxGU2CGS(pp[FZ(irf)]),     //23						      
+#else
+							      pp[EE(irf)],      //20
+							      pp[FX(irf)],     //21
+							      pp[FY(irf)],     //22
+							      pp[FZ(irf)]     //23
+							      );
+						    }
+#endif
+						  
 #endif
 
-
+						  fprintf(fout1,"%.10e %.10e %.10e %.10e\n",
 							  v1,     //24
 							  v2,     //25
 							  v3,     //26 

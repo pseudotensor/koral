@@ -35,10 +35,11 @@
 #define BLOBP 100.
 #define BLOBW 1.
 
-#define BLOBX1 -20.
-#define BLOBX2 20.
+#define BLOBX1 (-20.)
+#define BLOBX2 (20.)
 
 #define RADIATION
+#define MULTIRADFLUID
 
 #define KAPPA 0.
 #define KAPPAES 0.

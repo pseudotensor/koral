@@ -833,13 +833,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   pick_gb(ix,iy,iz,0,gg);
   pick_Gb(ix,iy,iz,0,GG);
    
-  //  print_Nvector(fd_uLl,NV);
-
   p2u(fd_uLl,fd_uLl,gg,GG);
-
-  //  print_Nvector(fd_uLl,NV);
-  //  getchar();
-
   p2u(fd_uRl,fd_uRl,gg,GG);
 
   //save calculated conserved basing on primitives on faces

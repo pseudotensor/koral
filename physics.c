@@ -196,7 +196,11 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   ldouble tautot[3];
   calc_tautot(pp,xx,dx,tautot);
 
+#ifndef MULTIRADFLUID
   calc_rad_wavespeeds(pp,gg,GG,tautot,aval,verbose);
+#else
+  calc_rad_wavespeeds_mf(pp,gg,GG,tautot,aval,verbose);
+#endif
 
   axl=aval[0];
   axr=aval[1];
@@ -313,6 +317,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 #ifdef RADIATION
   /***************************************************/
 
+#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   calc_Rij(pp,gg,GG,Rij); //R^ij
   indices_2221(Rij,Rij,gg); //R^i_j
@@ -344,7 +349,58 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
       ss[7]+=-dlgdet[l-1]*(Rij[l][1]);
       ss[8]+=-dlgdet[l-1]*(Rij[l][2]);
       ss[9]+=-dlgdet[l-1]*(Rij[l][3]);
-    } 
+    }
+#else
+  int irf;
+  ldouble Rij[NRF][4][4];
+  calc_Rij_mf(pp,gg,GG,Rij); //R^ij
+  for(ii=0;ii<NRF;ii++)
+    indices_2221(Rij[ii],Rij[ii],gg); //R^i_jl
+
+  //terms with Christoffels
+  //hydro first
+  for(k=0;k<4;k++)
+    for(l=0;l<4;l++)
+      {
+	ss[1]+=T[k][l]*get_gKr(l,0,k,ix,iy,iz);
+	ss[2]+=T[k][l]*get_gKr(l,1,k,ix,iy,iz);
+	ss[3]+=T[k][l]*get_gKr(l,2,k,ix,iy,iz);
+	ss[4]+=T[k][l]*get_gKr(l,3,k,ix,iy,iz);	 
+      }
+  //now radiation
+  for(irf=0;irf<NRF;irf++)
+    for(k=0;k<4;k++)
+      for(l=0;l<4;l++)
+	{
+	  ss[EE(irf)]+=Rij[irf][k][l]*get_gKr(l,0,k,ix,iy,iz);
+	  ss[FX(irf)]+=Rij[irf][k][l]*get_gKr(l,1,k,ix,iy,iz);
+	  ss[FY(irf)]+=Rij[irf][k][l]*get_gKr(l,2,k,ix,iy,iz);
+	  ss[FZ(irf)]+=Rij[irf][k][l]*get_gKr(l,3,k,ix,iy,iz);
+	}
+
+  //terms with dloggdet
+  //hydro first
+  for(l=1;l<4;l++)
+    {
+      ss[0]+=-dlgdet[l-1]*rho*ucon[l];
+      ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
+      ss[2]+=-dlgdet[l-1]*(T[l][1]);
+      ss[3]+=-dlgdet[l-1]*(T[l][2]);
+      ss[4]+=-dlgdet[l-1]*(T[l][3]);
+      ss[5]+=-dlgdet[l-1]*S*ucon[l];
+    }
+
+  //rad now
+  for(irf=0;irf<NRF;irf++)
+    for(l=1;l<4;l++)
+      {
+	ss[EE(irf)]+=-dlgdet[l-1]*(Rij[irf][l][0]);
+	ss[FX(irf)]+=-dlgdet[l-1]*(Rij[irf][l][1]);
+	ss[FY(irf)]+=-dlgdet[l-1]*(Rij[irf][l][2]);
+	ss[FZ(irf)]+=-dlgdet[l-1]*(Rij[irf][l][3]);
+      }
+
+#endif
 
   /***************************************************/
 #else
@@ -416,7 +472,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ldouble u3=ucon[3];
   ldouble gam=GAMMA;
 
-  int ii, jj;
+  int ii, jj, irf;
   for(ii=0;ii<4;ii++)
     for(jj=0;jj<4;jj++)
       {
@@ -438,7 +494,12 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ldouble Rij[NRF][4][4];
   calc_Rij_mf(pp,gg,GG,Rij); //R^ij
   for(ii=0;ii<NRF;ii++)
-    indices_2221(&Rij[ii],&Rij[ii],gg); //R^i_j
+    {
+
+      indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
+      //      printf(": %d\n",ii);print_tensor(Rij[ii]);
+    }
+  //  if(Rij[0][0][1]!=0.) getchar();
 #endif
 
   //to move gdet in/out derivative:
@@ -466,6 +527,14 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[8]= Rij[1][2];
       
       ff[9]= Rij[1][3];
+#else
+      for(irf=0;irf<NRF;irf++)
+	{
+	  ff[EE(irf)]=Rij[irf][1][0];
+	  ff[FX(irf)]=Rij[irf][1][1];
+	  ff[FY(irf)]=Rij[irf][1][2];
+	  ff[FZ(irf)]=Rij[irf][1][3];
+	}
 #endif
     }  
   if(idim==1) //y
@@ -490,6 +559,14 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[8]= Rij[2][2];
       
       ff[9]= Rij[2][3];
+#else
+      for(irf=0;irf<NRF;irf++)
+	{
+	  ff[EE(irf)]=Rij[irf][2][0];
+	  ff[FX(irf)]=Rij[irf][2][1];
+	  ff[FY(irf)]=Rij[irf][2][2];
+	  ff[FZ(irf)]=Rij[irf][2][3];
+	}
 #endif
     }  
   if(idim==2) //z
@@ -514,6 +591,14 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[8]= Rij[3][2];
        
       ff[9]= Rij[3][3];
+#else
+      for(irf=0;irf<NRF;irf++)
+	{
+	  ff[EE(irf)]=Rij[irf][3][0];
+	  ff[FX(irf)]=Rij[irf][3][1];
+	  ff[FY(irf)]=Rij[irf][3][2];
+	  ff[FZ(irf)]=Rij[irf][3][3];
+	}
 #endif
     } 
 

@@ -384,6 +384,8 @@ int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, l
 //rad.mf.c
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int calc_Rij_mf(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4][4]);
+int calc_rad_wavespeeds_mf(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose);
+int calc_Rij_ff_mf(ldouble *pp, ldouble  Rij[][4][4]);
 
 //rad.c
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
@@ -406,7 +408,6 @@ int calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tauabs);
 int calc_Gi_ff(ldouble *pp, ldouble Gi[4]);
 int calc_Gi(ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble Gi[4]);
 int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int);
-int
-calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose);
+int calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose);
 
 #include "mnemonics.h"
