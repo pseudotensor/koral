@@ -546,6 +546,18 @@
 /*********************/
 /*********************/
 
+#if (NY==1 && NZ==1)
+#define NDIM 1
+#elif (NZ==1 || NY==1)
+#define NDIM 2
+#else
+#define NDIM 3
+#endif
+
+#ifndef NRFL
+#define NRFL (2*NDIM)
+#endif
+
 #ifndef MYCOORDS2
 #define MYCOORDS2 MYCOORDS
 #endif
@@ -634,7 +646,13 @@
 #endif
 
 #ifdef RADIATION
+
+#ifdef MULTIRADFLUID
+#define NV (6+4*NRFL)
+#else
 #define NV 10 //number of variables
+#endif
+
 #else
 #define NV 6
 #endif

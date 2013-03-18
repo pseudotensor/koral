@@ -429,9 +429,17 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       }
  
 #ifdef RADIATION
+
+#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   calc_Rij(pp,gg,GG,Rij); //R^ij
   indices_2221(Rij,Rij,gg); //R^i_j
+#else
+  ldouble Rij[NRF][4][4];
+  calc_Rij_mf(pp,gg,GG,Rij); //R^ij
+  for(ii=0;ii<NRF;ii++)
+    indices_2221(&Rij[ii],&Rij[ii],gg); //R^i_j
+#endif
 
   //to move gdet in/out derivative:
   //here, up in metric source terms, in u2p and p2u, as well as in finite.c with del4[]
@@ -450,6 +458,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[5]= S*u1;
 
+#ifndef MULTIRADFLUID
       ff[6]= Rij[1][0];
       
       ff[7]= Rij[1][1];
@@ -457,6 +466,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[8]= Rij[1][2];
       
       ff[9]= Rij[1][3];
+#endif
     }  
   if(idim==1) //y
     {
@@ -472,6 +482,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[5]= S*u2;
  
+#ifndef MULTIRADFLUID
       ff[6]= Rij[2][0];
       
       ff[7]= Rij[2][1];
@@ -479,6 +490,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[8]= Rij[2][2];
       
       ff[9]= Rij[2][3];
+#endif
     }  
   if(idim==2) //z
     {
@@ -494,6 +506,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[5]= S*u3;
  
+#ifndef MULTIRADFLUID
       ff[6]= Rij[3][0];
       
       ff[7]= Rij[3][1];
@@ -501,6 +514,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[8]= Rij[3][2];
        
       ff[9]= Rij[3][3];
+#endif
     } 
 
 #else //pure hydro
