@@ -191,6 +191,8 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //within domain:
 						  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 
+						  calc_primitives(ix,iy,iz);
+
 						  struct geometry geom;
 						  fill_geometry(ix,iy,iz,&geom);
 

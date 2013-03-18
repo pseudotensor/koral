@@ -39,8 +39,23 @@
 //31* FLATDISK - emission from flat disk
 //32* CYLBEAM - beam towards the axis in cylindrical
 //33* RADDOT - radiating dot
+//34* MFPULSE - multi fluid pulse
 
-#define PROBLEM 6
+#define PROBLEM 34
+
+#if(PROBLEM==34)
+
+#define PR_DEFINE "PROBLEMS/MFPULSE/define.h"
+#define PR_BC "PROBLEMS/MFPULSE/bc.c"
+#define PR_INIT "PROBLEMS/MFPULSE/init.c"
+#define PR_KAPPA "PROBLEMS/MFPULSE/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFPULSE/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFPULSE/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFPULSE/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFPULSE/dump.c"
+#define PR_TOOLS "PROBLEMS/MFPULSE/tools.c"
+
+#endif
 
 #if(PROBLEM==33)
 
