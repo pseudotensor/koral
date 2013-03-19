@@ -5,16 +5,15 @@
 #define TMAX 1.e10
 #define GAMMA 1.4
 #define RADIATION
-#define SCHWARZSCHILD
-//#define KERR
-#define BHSPIN .1
-#define RK3STEPPING
-//#define SPHERICAL
-//#define MINKOWSKI
-//#define SKIPLORENTZ
+
+#define MYCOORDS SCHWCOORDS
+
+#define RK2STEPPING
+
 #define NX 40
 #define NY 1
 #define NZ 1
+
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define INT_ORDER 1
@@ -70,4 +69,4 @@
 
 #define PRINTGC_LEFT
 #define PRINTGC_RIGHT
-//#define OUTPUTINZAMO
+#define RADOUTPUTINZAMO

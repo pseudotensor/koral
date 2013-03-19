@@ -2,7 +2,10 @@
 //int calc_bc(int ix,int iy,int iz,ldouble t,ldouble *uu,ldouble *pp) {
 
 ldouble gdet_src,gdet_bc;
-int iix,iiy,iiz,iv;  	  
+int iix,iiy,iiz,iv;  
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);	  
 
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 gdet_src=get_g(g,3,4,iix,iiy,iiz);
@@ -45,7 +48,7 @@ if(ix>=NX || ix<0) //analytical solution at rout only
     pp[7]=Fx;
     pp[8]=Fy;
     pp[9]=Fz; 
-    prad_ff2lab(pp,pp,gg,GG,tlo);
+    prad_ff2lab(pp,pp,&geom);
 
 #endif	    
     p2u(pp,uu,gg,GG);

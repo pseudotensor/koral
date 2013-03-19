@@ -16,14 +16,16 @@ ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;
 ldouble xx,yy,zz;
 ldouble uu[NV];
 
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
 xx=get_x(ix,0);
 yy=get_x(iy,1);
 zz=get_x(iz,2);
 ldouble gg[4][5],GG[4][5],tup[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
-calc_tetrades(gg,tup,tlo);
-
 ldouble pp[NV],T;
 
 /************************/
@@ -72,7 +74,7 @@ pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
 
-prad_ff2lab(pp,pp,gg,GG,tlo);
+prad_ff2lab(pp,pp,&geom);
 
 /*
 printf("%d\n",ix);
