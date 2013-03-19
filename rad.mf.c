@@ -100,11 +100,13 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	  A[irf][0]=vxr/(vxl+vxr);
 	  A[irf][1]=vxl/(vxl+vxr);
 
-	  //mixing square in characteristic velocities
+	  //mixing to arb. power in characteristic velocities
+	  
 	  vxl=fabs(vxl);
-	  ldouble power=2.;
+	  ldouble power=5.;
 	  A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power));
 	  A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power));
+	  
 
 	  //discrete mixing
 	  /*
