@@ -268,7 +268,7 @@ solve_all_problems_5(ldouble tstart)
 	{
 	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f|%10.4f|%10.4f|%10.4f) mass: %e znps: %f\n",nfout1,t,dt,max_ws[0],
 		 cons_time-start_time-imp_time1-imp_time2,imp_time1+imp_time2,end_time-cons_time,end_time-start_time,totalmass,znps);
-
+	  
 	  //projects primitives onto ghost cells
 	  set_bc(t);
 

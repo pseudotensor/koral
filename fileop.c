@@ -226,13 +226,13 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);   
 						  dx[0]=get_size_x(ix,0);
 
+						  calc_primitives(ix,iy,iz);
+
 						  for(iv=0;iv<NV;iv++)
 						    {
 						      uu[iv]=get_u(u,iv,ix,iy,iz);
 						      pp[iv]=get_u(p,iv,ix,iy,iz);
 						    }	 
-
-						  
 
 						  ldouble tup[4][4],tlo[4][4];
 						  pick_T(tmuup,ix,iy,iz,tup);

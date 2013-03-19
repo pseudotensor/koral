@@ -722,6 +722,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      /************************************************************************/
 	      /************************************************************************/
 
+
+
 #ifdef RADIATION
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
@@ -757,6 +759,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  apply_rad_source_del4(ix,iy,iz,del4);	      
 		}
 #endif
+
 
 	      //************************************
 	      //************************************

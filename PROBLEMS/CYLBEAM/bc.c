@@ -79,7 +79,7 @@ getchar();
 	pp[6]=1.;
 	pp[7]=pp[8]=pp[9]=0.;
 	pp[7]=-.5*pp[6]; //isotropic
-	//	pp[7]=0.;
+	//pp[7]=0.;
 
 	//Keplerian gas
 	ldouble rCYL=xxvecCYL[1];

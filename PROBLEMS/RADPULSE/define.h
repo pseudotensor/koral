@@ -42,6 +42,7 @@
 
 #define KAPPA 0.
 #define KAPPAES 1.e3
+//#define MASS 1.
 //#define KAPPA 5.90799
 
 //#define PRINTGC_LEFT
