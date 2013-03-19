@@ -432,10 +432,10 @@ calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble dt, int verbose)
   cltep.E=*E;
   cltep.verbose=verbose;
   
-  if(cltep.E<EFLOOR && 0)
+  if(cltep.E<EEFLOOR && 0)
     {
-      printf("imposing EFLOOR\n");
-      cltep.E=EFLOOR;
+      printf("imposing EEFLOOR\n");
+      cltep.E=EEFLOOR;
     }
   
   ldouble p=(GAMMA-1.)*cltep.u;

@@ -859,9 +859,9 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
       Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
-      if(Erf<EEFLOOR)
+      if(Erf<EEEFLOOR)
 	{
-	  Erf=EEFLOOR;
+	  Erf=EEEFLOOR;
 	  urfcon[0]=0.;
 	  urfcon[1]=0.;
 	  urfcon[2]=0.;
@@ -933,7 +933,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	if(delta<0.)
 	{
 	// can't assume this conditions means large gamma, because if not, then leads to crazy boost of energy.
-	Erf=EEFLOOR;
+	Erf=EEEFLOOR;
 	//gammarel2=1.0;
 	//Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 	//zeros for relative velocity
@@ -1303,10 +1303,10 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
     }
   while(1);
   
-  if(pp[6]<EFLOOR) 
+  if(pp[6]<EEFLOOR) 
     {
       printf("enegative u2prad()\n");
-      pp[6]=EFLOOR;
+      pp[6]=EEFLOOR;
       *corrected=1;
     }
   

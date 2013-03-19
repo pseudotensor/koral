@@ -40,8 +40,23 @@
 //32* CYLBEAM - beam towards the axis in cylindrical
 //33* RADDOT - radiating dot
 //34* MFPULSE - multi fluid pulse
+//35* MFBEAMS - multi fluid colliding beams
 
-#define PROBLEM 34
+#define PROBLEM 35
+
+#if(PROBLEM==35)
+
+#define PR_DEFINE "PROBLEMS/MFBEAMS/define.h"
+#define PR_BC "PROBLEMS/MFBEAMS/bc.c"
+#define PR_INIT "PROBLEMS/MFBEAMS/init.c"
+#define PR_KAPPA "PROBLEMS/MFBEAMS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFBEAMS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFBEAMS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFBEAMS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFBEAMS/dump.c"
+#define PR_TOOLS "PROBLEMS/MFBEAMS/tools.c"
+
+#endif
 
 #if(PROBLEM==34)
 

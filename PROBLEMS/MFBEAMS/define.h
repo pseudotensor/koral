@@ -11,18 +11,18 @@
 #define NZ 1
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
-//#define SPECIFIC_BC
-#define COPY_XBC
-#define COPY_YBC
-#define COPY_ZBC
+
+#define SPECIFIC_BC
+
+
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define DTOUT1 3.
+#define DTOUT1 .075
 #define ALLSTEPSOUTPUT 0
 #define NOUTSTOP 60
 #define GAMMA (ldouble)(5./3.)
-#define MINX -300.
-#define MAXX 300.
+#define MINX -1.
+#define MAXX 1.
 #define MINY -1.
 #define MAXY 1.
 #define MINZ -1.
@@ -31,12 +31,11 @@
 #define RHO_AMB 1.e0
 #define T_AMB 1.e6
 
-#define EFLOOR 1.e-50
-#define BLOBP 100.
-#define BLOBW 1.
-
-#define BLOBX1 (-50.)
-#define BLOBX2 (50.)
+#define EEAMB 1.e-4
+#define EEBEAM1 1.
+#define EEBEAM2 1.
+#define FRATIO1 .99
+#define FRATIO2 .99
 
 #define RADIATION
 #define MULTIRADFLUID
