@@ -41,8 +41,24 @@
 //33* RADDOT - radiating dot
 //34* MFPULSE - multi fluid pulse
 //35* MFBEAMS - multi fluid colliding beams
+//36* MFDOTS - multi fluid radiating dots
 
-#define PROBLEM 35
+#define PROBLEM 36
+
+#if(PROBLEM==36)
+
+#define PR_DEFINE "PROBLEMS/MFDOTS/define.h"
+#define PR_BC "PROBLEMS/MFDOTS/bc.c"
+#define PR_INIT "PROBLEMS/MFDOTS/init.c"
+#define PR_KAPPA "PROBLEMS/MFDOTS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFDOTS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFDOTS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFDOTS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFDOTS/dump.c"
+#define PR_TOOLS "PROBLEMS/MFDOTS/tools.c"
+#define PR_FINGER "PROBLEMS/MFDOTS/finger.c"
+
+#endif
 
 #if(PROBLEM==35)
 
