@@ -197,9 +197,9 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   calc_tautot(pp,xx,dx,tautot);
 
 #ifndef MULTIRADFLUID
-  calc_rad_wavespeeds(pp,gg,GG,tautot,aval,verbose);
+  calc_rad_wavespeeds(pp,gg,GG,tautot,aval);
 #else
-  calc_rad_wavespeeds_mf(pp,gg,GG,tautot,aval,verbose);
+  calc_rad_wavespeeds_mf_total(pp,gg,GG,tautot,aval);
 #endif
 
   axl=aval[0];

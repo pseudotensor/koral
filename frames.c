@@ -273,18 +273,20 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   int i,j,irf;
 
   calc_Rij_ff_mf(pp1,Rij);
+
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+
   for(irf=0;irf<NRF;irf++)
     {
       boost22_ff2zamo(Rij[irf],Rij[irf],pp1,gg,GG,eup);
+
       //(E,F^i)_ZAMO
       pp2[EE(irf)]=Rij[irf][0][0];
       pp2[FX(irf)]=Rij[irf][0][1];
       pp2[FY(irf)]=Rij[irf][0][2];
-      pp2[FX(irf)]=Rij[irf][0][3];
+      pp2[FZ(irf)]=Rij[irf][0][3];
     }
-  
-  for(i=0;i<NVHD;i++)
-    pp2[i]=pp1[i];
 #endif  
 
   return 0;

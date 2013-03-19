@@ -50,7 +50,7 @@
 	  "set ylabel \"\"\n"
 	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
 #ifdef MULTIRADFLUID
-	  "plot \"%s\" u 1:20 w lp ls 2 pt 7 ps .5  ti \"E_1\", \"%s\" u 1:24 w lp ls 2 pt 7 ps .5  ti \"E_2\"\n"
+	  "plot \"%s\" u 1:20 w lp ls 2 pt 7 ps .5  ti \"E_1\", \"%s\" u 1:24 w lp ls 3 pt 7 ps .5  ti \"E_2\"\n"
 #else
 	  "plot \"%s\" u 1:20 w lp ls 2 pt 7 ps .5  ti \"E\"\n"
 #endif
@@ -63,7 +63,11 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($21+1.e-80) w lp ls 2 pt 7 ps .5  ti \"urf[1]\"\n"
+#ifdef MULTIRADFLUID
+	   "plot \"%s\" u 1:21 w lp ls 2 pt 7 ps .5  ti \"F_1\", \"%s\" u 1:25 w lp ls 3 pt 7 ps .5  ti \"F_2\"\n"
+#else
+	  "plot \"%s\" u 1:($21+1.e-80) w lp ls 2 pt 7 ps .5  ti \"Fx/urf[1]\"\n"
+#endif
 
 	  "set lmargin at screen 0.07\n"
 	  "set rmargin at screen 0.33\n"
@@ -98,7 +102,7 @@
 	  "set ylabel \"\"\n"
 	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"vx\""
 #ifdef MULTIRADFLUID
-	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname,fname);
+	   ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname,fname,fname);
 #else
 	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname);
 #endif

@@ -57,7 +57,7 @@ E=calc_LTE_EfromT(T_AMB);
 E1=E+calc_LTE_EfromT(T_AMB*(BLOBP*exp(-((xx-BLOBX1)*(xx-BLOBX1)+(yy)*(yy)+(zz)*(zz))/BLOBW/BLOBW)));
 E2=E+calc_LTE_EfromT(T_AMB*(BLOBP*exp(-((xx-BLOBX2)*(xx-BLOBX2)+(yy)*(yy)+(zz)*(zz))/BLOBW/BLOBW)));
 				      
-pp[6]=E1;
+pp[6]=E1+E2;
 pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
@@ -71,9 +71,9 @@ for(irf=1;irf<NRF;irf++)
   }
 
 //temporarily
-pp[EE(1)]=E2;
+//pp[EE(1)]=E2;
 //ultimately
-//redistribute_radfluids(pp);
+
 #endif
 
 
@@ -81,9 +81,15 @@ pp[EE(1)]=E2;
 #endif
 
 prad_ff2lab(pp,pp,&geom);
-//print_Nvector(pp,NV);getchar();
 p2u(pp,uu,gg,GG);	 
-//print_Nvector(uu,NV);getchar();
+
+//print_Nvector(pp,NV);
+
+redistribute_radfluids(pp,uu,&geom);
+//print_Nvector(uu,NV);
+
+u2p_rad(uu,pp,&geom,&irf);
+//print_Nvector(pp,NV);getchar();
 
 
 /***********************************************/

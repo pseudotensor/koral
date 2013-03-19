@@ -372,7 +372,7 @@ int print_Nvector(ldouble v[4],int);
 int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg);
 int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg);
 int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble elo[][4]);
-int prad_ff2zamo(ldouble *pp1, ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]);
+int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4]);
 int multiply22(ldouble T1[][4],ldouble T2[][4],ldouble A[][4]);
 int multiply2(ldouble *u1,ldouble *u2,ldouble A[][4]);
 int trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2);
@@ -384,8 +384,11 @@ int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, l
 //rad.mf.c
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int calc_Rij_mf(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4][4]);
-int calc_rad_wavespeeds_mf(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose);
+int calc_rad_wavespeeds_mf_total(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval);
+int calc_rad_wavespeeds_pure_mf_each(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble aval[][6]);
 int calc_Rij_ff_mf(ldouble *pp, ldouble  Rij[][4][4]);
+int redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg);
+
 
 //rad.c
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
@@ -408,6 +411,7 @@ int calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tauabs);
 int calc_Gi_ff(ldouble *pp, ldouble Gi[4]);
 int calc_Gi(ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble Gi[4]);
 int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int);
-int calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose);
+int calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval);
+int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval);
 
 #include "mnemonics.h"

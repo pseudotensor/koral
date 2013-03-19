@@ -751,7 +751,7 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ut=fff/rhout;
 					       
   rho=rhout/ut;
-  uu=UFLOOR;
+  uu=UUFLOOR;
   vr=Ttr/grr/fff;
   vph=Ttph/gphph/fff - gtph/gphph;
   vth=Ttth/gthth/fff;
@@ -859,9 +859,9 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
       Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
-      if(Erf<ERADFLOOR)
+      if(Erf<EEFLOOR)
 	{
-	  Erf=ERADFLOOR;
+	  Erf=EEFLOOR;
 	  urfcon[0]=0.;
 	  urfcon[1]=0.;
 	  urfcon[2]=0.;
@@ -933,7 +933,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	if(delta<0.)
 	{
 	// can't assume this conditions means large gamma, because if not, then leads to crazy boost of energy.
-	Erf=ERADFLOOR;
+	Erf=EEFLOOR;
 	//gammarel2=1.0;
 	//Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 	//zeros for relative velocity
@@ -962,10 +962,10 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	  //Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
 	  Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
-	  if(Erf<ERADFLOOR)
+	  if(Erf<EEFLOOR)
 	    {
 	  
-	      Erf=ERADFLOOR;
+	      Erf=EEFLOOR;
 	      urfcon[0]=0.;
 	      urfcon[1]=0.;
 	      urfcon[2]=0.;
@@ -1066,11 +1066,11 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
 	  if(verbose) {printf("midcapalt: Erf=%g\n",Erf);}
 	 
-	  if(Erf<ERADFLOOR)
+	  if(Erf<EEFLOOR)
 	    { 
 	      // Can't have Erf<0.  Like floor on internal energy density.  If leave Erf<0, then will drive code crazy with free energy.
 	      if(verbose) {printf("midcapaltnegErf: Erf=%g\n",Erf);}
-	      Erf=ERADFLOOR;
+	      Erf=EEFLOOR;
 	    }	
 	}
       else
@@ -1081,9 +1081,9 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	  //Erf=3.*Av[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
 	  Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
-	  if(Erf<ERADFLOOR)
+	  if(Erf<EEFLOOR)
 	    {
-	      Erf=ERADFLOOR;
+	      Erf=EEFLOOR;
 	      urfcon[0]=0.;
 	      urfcon[1]=0.;
 	      urfcon[2]=0.;

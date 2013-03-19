@@ -563,18 +563,13 @@
 
 #if (NY==1 && NZ==1)
 #define NDIM 1
+#define NRF 2
 #elif (NZ==1 || NY==1)
 #define NDIM 2
+#define NRF 4
 #else
 #define NDIM 3
-#endif
-
-#ifndef NRF
-#ifndef MULTIRADFLUID
-#define NRF 1
-#else
-#define NRF (2*NDIM)
-#endif
+#define NRF 8
 #endif
 
 #ifndef MYCOORDS2
@@ -707,16 +702,16 @@
 #define UINTATMMIN 1.e-2
 #endif
 
-#ifndef ERADFLOOR
-#define ERADFLOOR 1.e-50
+#ifndef EEFLOOR
+#define EEFLOOR 1.e-50
 #endif
 
 #ifndef RHOFLOOR
 #define RHOFLOOR 1.e-50
 #endif
 
-#ifndef UFLOOR
-#define UFLOOR 1.e-50
+#ifndef UUFLOOR
+#define UUFLOOR 1.e-50
 #endif
 
 #ifndef GAMMAMAXHD
