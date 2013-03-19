@@ -3,7 +3,8 @@
 #define U2PRADPREC 1.e-7
 #define RADFORCEPREC 1.e-5
 #define VERBOSE0 0
-#define MINKOWSKI
+
+#define MYCOORDS MINKCOORDS
 
 #define RK3STEPPING
 #define INT_ORDER 1
@@ -38,7 +39,7 @@
 #undef SIGMA_RAD
 
 #define NWAVE 5
-//#define RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
 
 #if (NWAVE==5) //sound wave with radiation set up according to Jiang+12
 //#define FLUXDISSIPATIONOFF
@@ -110,10 +111,10 @@
 #define DTOUT1 1.e-2
 #endif
 
-#define RHO (ldouble)1.
+#define RHOZERO (ldouble)1.
 #define KK 2.*Pi
-#define UINT (ldouble)((1./CC/CC)*RHO/GAMMA/(GAMMA-1.-1./CC/CC)) //to get proper sound speed
-#define TEMP (ldouble)(calc_PEQ_Tfromurho(UINT,RHO)) //temperature from rho and uint
+#define UINT (ldouble)((1./CC/CC)*RHOZERO/GAMMA/(GAMMA-1.-1./CC/CC)) //to get proper sound speed
+#define TEMP (ldouble)(calc_PEQ_Tfromurho(UINT,RHOZERO)) //temperature from rho and uint
 #define SIGMA_RAD (ldouble)((1./4.*PP*(GAMMA-1.)*UINT/TEMP/TEMP/TEMP/TEMP)) //to get the proper radiation to gas pressure ratio, PP=4 sig T^4 / P
 #define ERAD (ldouble)(calc_LTE_EfromT(TEMP)) //to get thermal equilibrium, E=4 sig T^4
 
@@ -127,12 +128,12 @@
 #define CC 1.e6
 #define VX 1.e-3
 #define DTOUT1 (.05/VX)
-#define RHO 1.
+#define RHOZERO 1.
 #define AAA 1.e-5
 #define ERAD 1.
 #define KK 2.*Pi
-#define UINT (1./CC/CC)*RHO/GAMMA/(GAMMA-1.-1./CC/CC)
-#define TEMP calc_PEQ_Tfromurho(UINT,RHO)
+#define UINT (1./CC/CC)*RHOZERO/GAMMA/(GAMMA-1.-1./CC/CC)
+#define TEMP calc_PEQ_Tfromurho(UINT,RHOZERO)
 #define SIGMA_RAD (1./4.*PP*(GAMMA-1.)*UINT/TEMP/TEMP/TEMP/TEMP)
 #endif
 
@@ -142,12 +143,12 @@
 #define CC 1.e6
 #define DTOUT1 (.05*CC)
 #define VX 0.
-#define RHO 1.
+#define RHOZERO 1.
 #define AAA 1.e-5
 #define ERAD 1.
 #define KK 2.*Pi
-#define UINT (1./CC/CC)*RHO/GAMMA/(GAMMA-1.-1./CC/CC)
-#define TEMP calc_PEQ_Tfromurho(UINT,RHO)
+#define UINT (1./CC/CC)*RHOZERO/GAMMA/(GAMMA-1.-1./CC/CC)
+#define TEMP calc_PEQ_Tfromurho(UINT,RHOZERO)
 #define SIGMA_RAD (1./4.*PP*(GAMMA-1.)*UINT/TEMP/TEMP/TEMP/TEMP)
 #endif
 
@@ -157,11 +158,11 @@
 #define CC 1.e6
 #define VX 1.e-2
 #define DTOUT1 (.0005/VX)
-#define RHO 1.
+#define RHOZERO 1.
 #define AAA 1.e-5
 #define KK 2.*Pi
-#define UINT (1./CC/CC)*RHO/GAMMA/(GAMMA-1.-1./CC/CC)
-#define TEMP calc_PEQ_Tfromurho(UINT,RHO)
+#define UINT (1./CC/CC)*RHOZERO/GAMMA/(GAMMA-1.-1./CC/CC)
+#define TEMP calc_PEQ_Tfromurho(UINT,RHOZERO)
 #define SIGMA_RAD (1./4.*PP*(GAMMA-1.)*UINT/TEMP/TEMP/TEMP/TEMP)
 #define ERAD calc_LTE_EfromT(TEMP)
 #define RADIATION
@@ -176,11 +177,11 @@
 #define CC 1.e2
 #define DTOUT1 (.005*CC)
 #define VX 0.
-#define RHO 1.
+#define RHOZERO 1.
 #define AAA 1.e-1
 #define KK 2.*Pi
-#define UINT (1./CC/CC)*RHO/GAMMA/(GAMMA-1.-1./CC/CC)
-#define TEMP calc_PEQ_Tfromurho(UINT,RHO)
+#define UINT (1./CC/CC)*RHOZERO/GAMMA/(GAMMA-1.-1./CC/CC)
+#define TEMP calc_PEQ_Tfromurho(UINT,RHOZERO)
 #define SIGMA_RAD (1./4.*PP*(GAMMA-1.)*UINT/TEMP/TEMP/TEMP/TEMP)
 #define ERAD calc_LTE_EfromT(TEMP)
 #define RADIATION

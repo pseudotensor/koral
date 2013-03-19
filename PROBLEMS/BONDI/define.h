@@ -4,14 +4,14 @@
 
 #define TMAX 1.e10
 #define RADIATION
-#define SCHWARZSCHILD
+#define MYCOORDS SCHWCOORDS
+
 #define RK3STEPPING
-//#define SPHERICAL
-//#define MINKOWSKI
-//#define SKIPLORENTZ
+
 #define NX 112
 #define NY 1
 #define NZ 1
+
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define INT_ORDER 1
@@ -53,12 +53,14 @@
 #define TAMB 1.e5
 #define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 #undef MUGAS
+
 #define MUGAS .5
-//#define EXPLICITRADFORCE
-//#define EDDINGTON_APR
+
 #define MINX 3.5
 #define MAXX 2e3
+
 #define LOGXGRID
+
 #define LOGPAR1 2.2
 #define LOGPAR2 2.
 
@@ -69,12 +71,8 @@
 #define RHOFLOOR 1.e-50
 #define UFLOOR 1.e-65
 #define SPECIFIC_BC
-//#define COPY_XBC
-//#define COPY_YBC
-//#define COPY_ZBC
+
 #define EFLOOR 1.e-40
 #define CGSOUTPUT
 
-//#define PRINTGC_LEFT
-//#define PRINTGC_RIGHT
-//#define OUTPUTINZAMO
+#define RADOUTPUTINZAMO

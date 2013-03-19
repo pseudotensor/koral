@@ -12,15 +12,15 @@
 //4 GEODESICINFALL - geodesic infall with blobs or not
 //5 EDDINFALL - infall with flux from inside
 //6* RADTUBE- radiative shock tubes as in Farris et al 09 - assumes Edd.approximation which is currently not handled
-//7 BONDI - like in Fragile's paper
+//7* BONDI - like in Fragile's paper
 //8 HDTUBE - relativistic shock tube
 //9 HDTUBE2D - in 2d
 //10* RADPULSE - radiative blob spreading around
 //11* RADSHADOW - radiative shadow
-//12 RADATM - atmosphere enlighted
+//12* RADATM - atmosphere enlighted
 //13 DONUTOSC - 2d Polish donut oscillating
 //14 RADWAVEBC - 1d linear rad wave imposed on boundary
-//15 RADWAVE - 1d linear rad wave with periodic BC
+//15* RADWAVE - 1d linear rad wave with periodic BC
 //16 RADPULSE3D - radiative blob spreading around
 //17* RADDBLSHADOW - radiative shadow with two beams inclined
 //18 ATMSTATIC - hydro atmosphere 
@@ -40,7 +40,7 @@
 //32* CYLBEAM - beam towards the axis in cylindrical
 //33* RADDOT - radiating dot
 
-#define PROBLEM 12
+#define PROBLEM 15
 
 #if(PROBLEM==33)
 
