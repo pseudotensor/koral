@@ -572,6 +572,8 @@
 #define NRF 8
 #endif
 
+
+
 #ifndef MYCOORDS2
 #define MYCOORDS2 MYCOORDS
 #endif
@@ -665,6 +667,8 @@
 #define NV (6+4*NRF)
 #else
 #define NV 10 //number of variables
+#undef NRF
+#define NRF 1
 #endif
 
 #else
