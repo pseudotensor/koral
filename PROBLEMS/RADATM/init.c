@@ -72,7 +72,13 @@ pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
 
+fprintf(stderr,"BEFORE ix=%d rho=%g uint=%g E=%g Fx=%g\n",ix,pp[0],pp[1],E,Fx);
+
+
 prad_ff2lab(pp,pp,gg,GG,tlo);
+
+fprintf(stderr,"AFTER ix=%d rho=%g uint=%g E=%g Fx=%g\n",ix,pp[0],pp[1],E,Fx);
+
 
 /*
 printf("%d\n",ix);

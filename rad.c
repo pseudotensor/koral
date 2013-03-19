@@ -83,6 +83,9 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldo
   ldouble Gi[4];
   calc_Gi(pp2,gg,GG,Gi); 
   indices_21(Gi,Gi,gg);
+
+  fprintf(stderr,"Gd=%g %g %g %g\n",Gi[0],Gi[1],Gi[2],Gi[3]); fflush(stderr);
+
  
   f[0] = uu[6] - uu0[6] + dt * Gi[0];
   f[1] = uu[7] - uu0[7] + dt * Gi[1];
@@ -152,6 +155,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 
       //values at zero state
       if(f_implicit_lab(uu0,uu,pp,dt,&geom,f1)<0) return -1;
+
+      fprintf(stderr,"iter=%d f1: %g %g %g %g\n",iter,f1[0],f1[1],f1[2],f1[3]);
+
  
       //calculating approximate Jacobian
       for(i=0;i<4;i++)
@@ -164,6 +170,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      uu[j+6]=uup[j+6]-del;
 
 	      if(f_implicit_lab(uu0,uu,pp,dt,&geom,f2)<0) return -1;
+
+          fprintf(stderr,"iter=%d f2: %g %g %g %g\n",iter,f2[0],f2[1],f2[2],f2[3]);
      
 	      J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
 
@@ -206,6 +214,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	{
 	  if(verbose) printf("success ===\n");
+      fprintf(stderr,"iterDONE1=%d : %g %g %g %g\n",iter,f3[0],f3[1],f3[2],f3[3]); fflush(stderr);
 	  break;
 	}
 
@@ -215,6 +224,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	  return -1;
 	}
      
+      fprintf(stderr,"iter=%d : %g %g %g %g\n",iter,f3[0],f3[1],f3[2],f3[3]); fflush(stderr);
     }
   while(1);
 
@@ -528,6 +538,10 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
   ldouble Rij[4][4];
   calc_Rij(pp,gg,GG,Rij);
 
+  for(i=0;i<4;i++) for(j=0;j<4;j++) fprintf(stderr,"i=%d j=%d Rijkoral=%g\n",i,j,Rij[i][j]); fflush(stderr);
+  fprintf(stderr,"i prad: %g %g %g %g\n",pp[6],pp[7],pp[8],pp[9]); fflush(stderr);
+
+
   //the four-velocity of fluid in lab frame
   ldouble ucon[4],ucov[4],vpr[3];
   ucon[1]=pp[2];
@@ -563,7 +577,9 @@ calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
       for(j=0;j<4;j++)
 	Ru+=Rij[i][j]*ucov[j];
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
+      fprintf(stderr,"i=%d Ruu=%g Ru=%g kappa=%g kappaes=%g chi=%g B=%g ucon=%g %g %g %g\n",i,Ruu,Ru,kappa,kappaes,chi,B,ucon[0],ucon[1],ucon[2],ucon[3]);
     }
+
 
   //  print_4vector(Gi);getchar();
 
@@ -925,6 +941,8 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3
   ldouble axl,axr,ayl,ayr,azl,azr;
   axl=axr=ayl=ayr=azl=azr=1.;
    
+  fprintf(stderr,"tautot=%g\n",tautot[0]); fflush(stderr);
+
   //**********************************************************************
   //**********************************************************************
   int dim;
@@ -1304,6 +1322,8 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
   ldouble del4[4],delapl[NV];
   int iv;
   int verbose=1;
+
+  fprintf(stderr,"ix=%d\n",ix); fflush(stderr);
   
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 

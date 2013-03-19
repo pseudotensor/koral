@@ -55,4 +55,4 @@
 
 #define PRINTGC_LEFT
 #define PRINTGC_RIGHT
-//#define OUTPUTINZAMO
+#define OUTPUTINZAMO

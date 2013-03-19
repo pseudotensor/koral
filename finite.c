@@ -648,76 +648,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      pick_G(ix,iy,iz,GG);
 	      ldouble gdet=gg[3][4];
 	      	      
-	      //updating u - fluxes
-	      for(iv=0;iv<NV;iv++)
-		{
-		  ldouble flxr,flyr,flzr,flxl,flyl,flzl;
 
-		  ldouble dx=get_size_x(ix,0);
-		  ldouble dy=get_size_x(iy,1);
-		  ldouble dz=get_size_x(iz,2);
 
-		  if(INT_ORDER==1 || INT_ORDER==2) //linear or parabolic
-		    {
-		      flxl=get_ub(flbx,iv,ix,iy,iz,0);
-		      flxr=get_ub(flbx,iv,ix+1,iy,iz,0);
-		      flyl=get_ub(flby,iv,ix,iy,iz,1);
-		      flyr=get_ub(flby,iv,ix,iy+1,iz,1);
-		      flzl=get_ub(flbz,iv,ix,iy,iz,2);
-		      flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
-		    }
-		  if(INT_ORDER==4) //MP5
-		    {
-		      if(1)
-			{
-			  //flux reconstruction based on 3-point stencil near the boundaries
-			  flxr=13./12*get_ub(flbx,iv,ix+1,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
-			  flxl=13./12*get_ub(flbx,iv,ix,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0));
-			  flyr=13./12*get_ub(flby,iv,ix,iy+1,iz,1) -1./24. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
-			  flyl=13./12*get_ub(flby,iv,ix,iy,iz,1) -1./24. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1));
-			  flzr=13./12*get_ub(flbz,iv,ix,iy,iz+1,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
-			  flzl=13./12*get_ub(flbz,iv,ix,iy,iz,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2));
-			}
-		      else
-			{
-			  //flux reconstruction based on 5-point stencil 			  
-			  flxr=1067./960.*get_ub(flbx,iv,ix+1,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0)) +3./640. *(get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+3,iy,iz,0));
-			  flxl=1067./960.*get_ub(flbx,iv,ix,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0))+3./640. *(get_ub(flbx,iv,ix-2,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
-			  flyr=1067./960.*get_ub(flby,iv,ix,iy+1,iz,1) -29./480. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+3,iz,1));
-			  flyl=1067./960.*get_ub(flby,iv,ix,iy,iz,1) -29./480. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-2,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
-			  flzr=1067./960.*get_ub(flbz,iv,ix,iy,iz+1,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+3,2));
-			  flzl=1067./960.*get_ub(flbz,iv,ix,iy,iz,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-2,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
-			}
-		    }
-		  
-		  //unsplit scheme
-		  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
 
-		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
 
-		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz),dt);getchar();}
 
-		  set_u(u,iv,ix,iy,iz,val);		  
-		} 
-	      	      
-	      //updating u - geometrical source terms
-	      ldouble ms[NV],ss[NV];
-	      int iv;
-
-	      //**********************************************************************
-	      //**********************************************************************
-	      //**********************************************************************
-
-	      //metric source terms
-	      f_metric_source_term(ix,iy,iz,ms);
-
-	      for(iv=0;iv<NV;iv++)
-		{
-		  val=get_u(u,iv,ix,iy,iz)+tfactor*ms[iv]*dt;
-		  set_u(u,iv,ix,iy,iz,val);	
-		  uu[iv]=val;
-		} 
-
+#if(0)
 	      /************************************************************************/
 	      /************************************************************************/
 	      /************************************************************************/
@@ -728,9 +664,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
  	      //implicit in lab frame in four dimensions - fiducial 
 	      //test if implicit necessary
 	      ldouble del4[4]; 
-	      if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
+	      //if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
 		implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
-	      else
+	      //else
+          if(0)
 		{
 		    set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
 		    apply_rad_source_del4(ix,iy,iz,del4);	      
@@ -786,9 +723,161 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 	      /************************************************************************/
 	      /************************************************************************/
+#endif
+
+
+
+
+	      //updating u - fluxes
+	      for(iv=0;iv<NV;iv++)
+		{
+		  ldouble flxr,flyr,flzr,flxl,flyl,flzl;
+
+		  ldouble dx=get_size_x(ix,0);
+		  ldouble dy=get_size_x(iy,1);
+		  ldouble dz=get_size_x(iz,2);
+
+		  if(INT_ORDER==1 || INT_ORDER==2) //linear or parabolic
+		    {
+		      flxl=get_ub(flbx,iv,ix,iy,iz,0);
+		      flxr=get_ub(flbx,iv,ix+1,iy,iz,0);
+		      flyl=get_ub(flby,iv,ix,iy,iz,1);
+		      flyr=get_ub(flby,iv,ix,iy+1,iz,1);
+		      flzl=get_ub(flbz,iv,ix,iy,iz,2);
+		      flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
+		    }
+		  if(INT_ORDER==4) //MP5
+		    {
+		      if(1)
+			{
+			  //flux reconstruction based on 3-point stencil near the boundaries
+			  flxr=13./12*get_ub(flbx,iv,ix+1,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
+			  flxl=13./12*get_ub(flbx,iv,ix,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0));
+			  flyr=13./12*get_ub(flby,iv,ix,iy+1,iz,1) -1./24. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
+			  flyl=13./12*get_ub(flby,iv,ix,iy,iz,1) -1./24. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1));
+			  flzr=13./12*get_ub(flbz,iv,ix,iy,iz+1,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
+			  flzl=13./12*get_ub(flbz,iv,ix,iy,iz,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2));
+			}
+		      else
+			{
+			  //flux reconstruction based on 5-point stencil 			  
+			  flxr=1067./960.*get_ub(flbx,iv,ix+1,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0)) +3./640. *(get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+3,iy,iz,0));
+			  flxl=1067./960.*get_ub(flbx,iv,ix,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0))+3./640. *(get_ub(flbx,iv,ix-2,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
+			  flyr=1067./960.*get_ub(flby,iv,ix,iy+1,iz,1) -29./480. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+3,iz,1));
+			  flyl=1067./960.*get_ub(flby,iv,ix,iy,iz,1) -29./480. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-2,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
+			  flzr=1067./960.*get_ub(flbz,iv,ix,iy,iz+1,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+3,2));
+			  flzl=1067./960.*get_ub(flbz,iv,ix,iy,iz,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-2,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
+			}
+		    }
+
+
+#if(1)		  
+		  //unsplit scheme
+		  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
+
+		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
+
+		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz),dt);getchar();}
+
+		  set_u(u,iv,ix,iy,iz,val);		  
+#endif
+		} 
+	      	      
+	      //updating u - geometrical source terms
+	      ldouble ms[NV],ss[NV];
+	      int iv;
+
+	      //**********************************************************************
+	      //**********************************************************************
+	      //**********************************************************************
+
+	      //metric source terms
+	      f_metric_source_term(ix,iy,iz,ms);
+
+	      for(iv=0;iv<NV;iv++)
+		{
+		  val=get_u(u,iv,ix,iy,iz)+tfactor*ms[iv]*dt;
+		  set_u(u,iv,ix,iy,iz,val);	
+		  uu[iv]=val;
+		} 
+
 	      /************************************************************************/
 
-	    }	      
+
+#if(1)
+	      /************************************************************************/
+	      /************************************************************************/
+	      /************************************************************************/
+
+#ifdef RADIATION
+
+#ifdef IMPLICIT_LAB_RAD_SOURCE
+ 	      //implicit in lab frame in four dimensions - fiducial 
+	      //test if implicit necessary
+	      ldouble del4[4]; 
+	      //if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
+		implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+	      //else
+          if(0)
+		{
+		    set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
+		    apply_rad_source_del4(ix,iy,iz,del4);	      
+		}
+#endif
+
+#ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
+	      explicit_substep_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG);
+#endif
+
+#ifdef EXPLICIT_RAD_SOURCE
+	      explicit_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG);
+#endif
+
+#ifdef IMPLICIT_FF_RAD_SOURCE
+	      //implicit in ff frame - backup
+	      //test if implicit necessary
+	      ldouble del4[4]; 
+	      if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
+		implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+	      else
+		{
+		  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
+		  apply_rad_source_del4(ix,iy,iz,del4);	      
+		}
+#endif
+
+	      //************************************
+	      //************************************
+
+	     
+	      if(get_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz)<0)
+		{
+		   set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
+		   set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
+		}
+
+	      //************************************
+	      //************************************
+
+	      //**********************************************************************
+	      //**********************************************************************
+	      //**********************************************************************
+
+	      //fixup here after rad source term
+  
+	      //**********************************************************************
+	      //**********************************************************************
+	      //**********************************************************************
+
+	      
+#endif //RADIATION
+
+	      /************************************************************************/
+	      /************************************************************************/
+#endif
+
+
+	    }
 	}
     }
 

@@ -6,6 +6,7 @@
 #define GAMMA 1.4
 #define RADIATION
 #define SCHWARZSCHILD
+#define MYCOORDS KSCOORDS
 //#define KERR
 #define BHSPIN .1
 #define RK3STEPPING

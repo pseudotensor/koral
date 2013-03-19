@@ -1,7 +1,8 @@
 //physics
 #define GGG0 (6.674e-8)
 #define CCC0 (2.998e10)
-#define gTILDA (1.e-10)
+//#define gTILDA (1.e-10)
+#define gTILDA (1.0)
 #define cTILDA (1.)
 #define GGG (GGG0/gTILDA)
 #define CCC (CCC0/cTILDA)

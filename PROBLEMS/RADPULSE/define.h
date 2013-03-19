@@ -6,18 +6,19 @@
 
 //#define LABRADFLUXES
 
-#define RK3STEPPING
+//#define RK3STEPPING
+#define RK2STEPPING
 #define INT_ORDER 1
 #define NX 101
 #define NY 1
 #define NZ 1
-#define TSTEPLIM .5
+#define TSTEPLIM .8
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define SPECIFIC_BC
 #define COPY_XBC
 #define COPY_YBC
 #define COPY_ZBC
-#define FLUXLIMITER 0
+#define FLUXLIMITER 0 // ?
 #define MINMOD_THETA 1.
 #define DTOUT1 100.
 #define ALLSTEPSOUTPUT 0
