@@ -62,8 +62,9 @@ pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
 
-#ifdef MULTIRADFLUID
 int irf;
+#ifdef MULTIRADFLUID
+
 for(irf=1;irf<NRF;irf++)
   {
     pp[FX(irf)]=pp[FY(irf)]=pp[FZ(irf)]=0.;
@@ -84,11 +85,13 @@ prad_ff2lab(pp,pp,&geom);
 p2u(pp,uu,gg,GG);	 
 
 //print_Nvector(pp,NV);
+#ifdef MULTIRADFLUID
 
 redistribute_radfluids(pp,uu,&geom);
 //print_Nvector(uu,NV);
 
 u2p_rad(uu,pp,&geom,&irf);
+#endif
 //print_Nvector(pp,NV);getchar();
 
 

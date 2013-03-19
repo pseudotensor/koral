@@ -4,12 +4,45 @@
 #include "ko.h"
 
 //***********************************************************************************
+//******* redistributes radiation fluids wrapper ***************************************
+//***********************************************************************************
+int
+redistribute_radfluids_at_cell(int ix,int iy,int iz)
+{
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  int iv;
+  ldouble pp[NV],uu[NV];
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uu[iv]=get_u(u,iv,ix,iy,iz);
+      pp[iv]=get_u(p,iv,ix,iy,iz);
+    }
+
+  redistribute_radfluids(pp,uu,&geom);
+
+  u2p_rad(uu,pp,&geom,&iv);
+
+  for(iv=0;iv<NV;iv++)
+    {
+      set_u(u,iv,ix,iy,iz,uu[iv]);
+      set_u(p,iv,ix,iy,iz,pp[iv]);
+    }
+	
+  return 0;
+}
+
+//***********************************************************************************
 //******* redistributes radiation fluids ***********************************************
 //***********************************************************************************
 int
 redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 {
-  int verbose=1;
+  int verbose=0;
+  
+  //  if(pp[7]!=0.) verbose=1;
+
   struct geometry *geom
    = (struct geometry *) ggg;
 
@@ -44,6 +77,8 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
 
+  ldouble MINVEL=1.e-5;
+
   for(irf=0;irf<NRF;irf++)
     {
       //in aval[NRF][6] one has rad.char.wavespeeds for [irf] fluid
@@ -55,24 +90,12 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
       if(NDIM==1)
 	{
 	  ldouble vxl,vxr;
-	  vxl=aval[irf][0];
-	  vxr=aval[irf][1];
-	  if(vxl>0.)
-	    {
-	      A[irf][0]=1.;
-	      A[irf][1]=0.;
-	    }
-	  else if(vxr<0.)
-	    {
-	      A[irf][0]=0.;
-	      A[irf][1]=1.;
-	    }
-	  else
-	    {
-	      vxl=fabs(vxl);
-	      A[irf][0]=vxr/(vxl+vxr);
-	      A[irf][1]=vxl/(vxl+vxr);
-	    }
+	  vxl=my_min(aval[irf][0],-MINVEL);
+	  vxr=my_max(aval[irf][1],MINVEL);
+	  
+	  vxl=fabs(vxl);
+	  A[irf][0]=vxr/(vxl+vxr);
+	  A[irf][1]=vxl/(vxl+vxr);
 	}
 
       if(NDIM==2)
@@ -100,7 +123,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       {
 	if(verbose)
-	  printf(" %d %d : %e\n",jj,ii,A[jj][ii]);
+	  printf(" %d -> %d : %e\n",jj,ii,A[jj][ii]);
 
 	uu1[EE(ii)]+=uu0[EE(jj)]*A[jj][ii];
 	uu1[FX(ii)]+=uu0[FX(jj)]*A[jj][ii];
@@ -112,7 +135,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
     {
       printf("=== uu1 ===\n");
       print_Nvector(uu1,NV);
-      //      if(geom->ix>105) getchar();
+      getchar();
     }
 
   for(ii=NVHD;ii<NV;ii++)
