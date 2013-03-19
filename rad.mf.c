@@ -41,16 +41,18 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 {
   int verbose=0;
   
-  //  if(pp[7]!=0.) verbose=1;
-
   struct geometry *geom
    = (struct geometry *) ggg;
+
+  //  if(geom->ix==100  && (pp[7]!=0. || pp[FX(1)]!=0.)) verbose=1;
 
   if(verbose)
     {
       printf("\noooooooooo %d %d %d oooooooooo\n\n",geom->ix,geom->iy,geom->iz);
       printf("=== uu0 ===\n");
       print_Nvector(uu0,NV);
+      printf("=== pp0 ===\n");
+      print_Nvector(pp,NV);
     }
 
   ldouble (*gg)[5],(*GG)[5];
@@ -63,7 +65,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
   int irf,ii,jj;
   ldouble uu1[NV],A[NRF][NRF];
 
-  calc_rad_wavespeeds_pure_mf_each(pp,gg,GG,aval);
+  calc_rad_wavespeeds_pure_mf_each(pp,geom,aval);
 
   if(verbose)
     {
@@ -77,7 +79,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
 
-  ldouble MINVEL=1.e-5;
+  ldouble MINVEL=1.e-10;
 
   for(irf=0;irf<NRF;irf++)
     {
@@ -93,9 +95,36 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	  vxl=my_min(aval[irf][0],-MINVEL);
 	  vxr=my_max(aval[irf][1],MINVEL);
 	  
+	  //mixing linear in characteristic velocities
 	  vxl=fabs(vxl);
 	  A[irf][0]=vxr/(vxl+vxr);
 	  A[irf][1]=vxl/(vxl+vxr);
+
+	  //mixing square in characteristic velocities
+	  vxl=fabs(vxl);
+	  ldouble power=2.;
+	  A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power));
+	  A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power));
+
+	  //discrete mixing
+	  /*
+	  if(fabs((vxr-vxl)/vxr)<1.e-5)
+	     {
+	      A[irf][0]=.5;
+	      A[irf][1]=.5;
+	    }
+	  else if(vxr>vxl)
+	    {
+	      A[irf][0]=1.-MINVEL;
+	      A[irf][1]=0.+MINVEL;
+	    }
+	  else
+	    {
+	      A[irf][1]=1.-MINVEL;
+	      A[irf][0]=0.+MINVEL;
+	    }
+	  */
+	  
 	}
 
       if(NDIM==2)
@@ -321,9 +350,17 @@ calc_rad_wavespeeds_mf_total(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble
 /******* returns one wavespeed for each fluids ****************************/
 /************************************************************************/
 int
-calc_rad_wavespeeds_pure_mf_each(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble aval[][6])
+calc_rad_wavespeeds_pure_mf_each(ldouble *pp,void *ggg,ldouble aval[][6])
 {
 #ifdef MULTIRADFLUID
+
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+  
   int i,j,irf;
   
   //metric
@@ -372,7 +409,7 @@ calc_rad_wavespeeds_pure_mf_each(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldo
       //**********************************************************************
 
       ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
-      ldouble axl,axr,ayl,ayr,azl,azr;
+      ldouble axl,axr,ayl,ayr,azl,azr,cst1,cst2;
       axl=axr=ayl=ayr=azl=azr=1.;
    
       //**********************************************************************
@@ -410,8 +447,8 @@ calc_rad_wavespeeds_pure_mf_each(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldo
 	  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
 	  if(discr<0.) {printf("x1discr in ravespeeds lt 0\n"); discr=0.;}
 	  discr = sqrt(discr);
-	  ldouble cst1 = -(-B + discr) / (2. * A);
-	  ldouble cst2 = -(-B - discr) / (2. * A);  
+	  cst1 = -(-B + discr) / (2. * A);
+	  cst2 = -(-B - discr) / (2. * A);  
 
 	  axl = my_min(cst1,cst2);
 	  axr = my_max(cst1,cst2);
@@ -419,7 +456,19 @@ calc_rad_wavespeeds_pure_mf_each(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldo
 	  aval[irf][dim*2+0]=my_min(axl,aval[irf][dim*2+0]);
 	  aval[irf][dim*2+1]=my_max(axr,aval[irf][dim*2+1]);
 	}
+
+      if(geom->ix==100 && (pp[7]!=0. || pp[FX(1)]!=0.) && 0)
+	{
+	  printf("--- %d\n",irf);
+	  print_4vector(&pp[EE(irf)]);
+	  print_4vector(urfcon);
+	  printf("%e %e\n",cst1,cst2);
+	  print_Nvector(aval[irf],6);
+	  getchar();
+	}
     }
+
+ 
  
 
   return 0;

@@ -18,7 +18,7 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define DTOUT1 2.
-#define ALLSTEPSOUTPUT 1
+#define ALLSTEPSOUTPUT 0
 #define NOUTSTOP 50
 #define GAMMA (ldouble)(5./3.)
 #define MINX -200.
@@ -35,11 +35,11 @@
 #define BLOBP 100.
 #define BLOBW 1.
 
-#define BLOBX1 (-20.)
-#define BLOBX2 (20.)
+#define BLOBX1 (-50.)
+#define BLOBX2 (50.)
 
 #define RADIATION
-//#define MULTIRADFLUID
+#define MULTIRADFLUID
 
 #define KAPPA 0.
 #define KAPPAES 0.

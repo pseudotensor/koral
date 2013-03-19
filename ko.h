@@ -385,7 +385,7 @@ int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, l
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int calc_Rij_mf(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4][4]);
 int calc_rad_wavespeeds_mf_total(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval);
-int calc_rad_wavespeeds_pure_mf_each(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble aval[][6]);
+int calc_rad_wavespeeds_pure_mf_each(ldouble *pp,void*,ldouble aval[][6]);
 int calc_Rij_ff_mf(ldouble *pp, ldouble  Rij[][4][4]);
 int redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg);
 int redistribute_radfluids_at_cell(int ix,int iy,int iz);

@@ -1,3 +1,4 @@
+0319 - ****** - why primitives changed during the advective operator
 0318 - **** - dumped lab implicit to allow for longer timesteps, see below
 0318 - **** - follow the radiative wavespeeds to set the timestep properly
 0314 - **** - correct LABFLUXES by providing geom to u2p_rad_urf
