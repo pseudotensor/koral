@@ -130,10 +130,21 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
       if(NDIM==2)
 	{
 	  ldouble vxl,vxr,vyl,vyr;
-	  vxl=my_min(aval[irf][0],-MINVEL);
-	  vxr=my_max(aval[irf][1],MINVEL);
-	  vyl=my_min(aval[irf][2],-MINVEL);
-	  vyr=my_max(aval[irf][3],MINVEL);
+	  if(NZ==1)
+	    {
+	      vxl=my_min(aval[irf][0],-MINVEL);
+	      vxr=my_max(aval[irf][1],MINVEL);
+	      vyl=my_min(aval[irf][2],-MINVEL);
+	      vyr=my_max(aval[irf][3],MINVEL);
+	    }
+	  else if(NY==1)
+	    {
+	      vxl=my_min(aval[irf][0],-MINVEL);
+	      vxr=my_max(aval[irf][1],MINVEL);
+	      vyl=my_min(aval[irf][4],-MINVEL);
+	      vyr=my_max(aval[irf][5],MINVEL);
+	    }
+	    
 	  
 	  //mixing linear in characteristic velocities
 	  vxl=fabs(vxl);
@@ -145,17 +156,28 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	  A[irf][3]=vxr/(vxl+vxr)*vyl/(vyl+vyr);
 
 	  //arbitrary power
-	  double power=5.;
+	  double power=10.;
 	  A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
 	  A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
 	  A[irf][2]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
 	  A[irf][3]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
 
+	  /*
 	  //discrete + damping
-	  vxl=aval[irf][0];
-	  vxr=aval[irf][1];
-	  vyl=aval[irf][2];
-	  vyr=aval[irf][3];
+	  if(NZ==1)
+	    {
+	      vxl=aval[irf][0];
+	      vxr=aval[irf][1];
+	      vyl=aval[irf][2];
+	      vyr=aval[irf][3];
+	    }
+	  else if(NY==1)
+	    {
+	      vxl=aval[irf][0];
+	      vxr=aval[irf][1];
+	      vyl=aval[irf][4];
+	      vyr=aval[irf][5];
+	    }
 	  vxl=fabs(vxl);
 	  vyl=fabs(vyl);
 	  ldouble DUMPEDGE=1.e-2;
@@ -190,53 +212,16 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 		  }
 		}
 	    }
-	  else //special handling of aligned fluxes - not sure if necessary
+	    else //special handling of aligned fluxes - not sure if necessary
 	    {
-	      for(ii=0;ii<NRF;ii++)
-		A[irf][ii]=MINMIXING;
-	      A[irf][irf]=1.-3.*MINMIXING;
-	      /*
-	      if(uu0[FX(irf)]==uu0[FY(irf)] && uu0[FX(irf)]>0.)
-		{
-		  A[irf][0]=A[irf][1]=0.5*(1.-dumping*2./4.);
-		  A[irf][2]=A[irf][3]=dumping*1./4.;
-		  if(A[irf][2]<MINMIXING) {
-		    A[irf][2]=A[irf][3]=MINMIXING;
-		    A[irf][0]-=MINMIXING;A[irf][1]-=MINMIXING;
-		  } 		  
-		}
-	      if(uu0[FX(irf)]==uu0[FY(irf)] && uu0[FX(irf)]<0.)
-		{
-		  A[irf][2]=A[irf][3]=0.5*(1.-dumping*2./4.);
-		  A[irf][0]=A[irf][1]=dumping*1./4.;
-		  if(A[irf][0]<MINMIXING) {
-		    A[irf][0]=A[irf][1]=MINMIXING;
-		    A[irf][2]-=MINMIXING;A[irf][3]-=MINMIXING;
-		  } 
-		}
-	      if(uu0[FX(irf)]==-uu0[FY(irf)] && uu0[FX(irf)]>0.)
-		{
-		  A[irf][0]=A[irf][3]=0.5*(1.-dumping*2./4.);
-		  A[irf][2]=A[irf][1]=dumping*1./4.;
-		  if(A[irf][2]<MINMIXING) {
-		    A[irf][2]=A[irf][1]=MINMIXING;
-		    A[irf][0]-=MINMIXING;A[irf][3]-=MINMIXING;
-		  } 		  
-		}
-	      if(uu0[FX(irf)]==-uu0[FY(irf)] && uu0[FX(irf)]<0.)
-		{
-		  A[irf][2]=A[irf][1]=0.5*(1.-dumping*2./4.);
-		  A[irf][0]=A[irf][3]=dumping*1./4.;
-		  if(A[irf][0]<MINMIXING) {
-		    A[irf][0]=A[irf][3]=MINMIXING;
-		    A[irf][2]-=MINMIXING;A[irf][1]-=MINMIXING;
-		  } 
-		}
-	      */
+	    for(ii=0;ii<NRF;ii++)
+	    A[irf][ii]=MINMIXING;
+	    A[irf][irf]=1.-3.*MINMIXING;
 	    }
+	  
 
 	  if(verbose) printf("=== dumping for irf=%d -> %f\n",irf,dumping);
-
+	  */
 	}
 
       if(NDIM==3)

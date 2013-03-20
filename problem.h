@@ -42,8 +42,23 @@
 //34* MFPULSE - multi fluid pulse
 //35* MFBEAMS - multi fluid colliding beams
 //36* MFDOTS - multi fluid radiating dots
+//37* MFCYLBEAM - beam towards the axis in cylindrical with multifluids
 
-#define PROBLEM 36
+#define PROBLEM 37
+
+#if(PROBLEM==37)
+
+#define PR_DEFINE "PROBLEMS/MFCYLBEAM/define.h"
+#define PR_BC "PROBLEMS/MFCYLBEAM/bc.c"
+#define PR_INIT "PROBLEMS/MFCYLBEAM/init.c"
+#define PR_KAPPA "PROBLEMS/MFCYLBEAM/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFCYLBEAM/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFCYLBEAM/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFCYLBEAM/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFCYLBEAM/dump.c"
+#define PR_TOOLS "PROBLEMS/MFCYLBEAM/tools.c"
+
+#endif
 
 #if(PROBLEM==36)
 
