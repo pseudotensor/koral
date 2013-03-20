@@ -110,7 +110,6 @@ if(ix>=NX)
 #ifdef MULTIRADFLUID
 
     redistribute_radfluids(pp,uu,&geom);
-    u2p_rad(uu,pp,&geom,&irf);
 #endif						
     
     return 0;

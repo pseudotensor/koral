@@ -378,7 +378,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       iz=loop_1[ii][2]; ldouble aaa[12];
       
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
-   
+
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
 
@@ -693,11 +693,15 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  //unsplit scheme
 		  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
 
+
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
 
 		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz),dt);getchar();}
 
-		  set_u(u,iv,ix,iy,iz,val);		  
+		  //		  if(ix==IXDOT1 && iy==IYDOT1-1) {printf("%d %d %d %d %e %e %e %e %e | %e -> %e\n",ix,iy,iz,iv,t_der[iv],flxr,flxl,flyr,flyl,get_u(u,iv,ix,iy,iz),val);getchar();}	  
+
+		  set_u(u,iv,ix,iy,iz,val);	
+		  
 		} 
 	      	      
 	      //**********************************************************************
@@ -705,8 +709,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //**********************************************************************
 	      //redistributing radiative fluids
 #ifdef MULTIRADFLUID
+	      //	      if(t<0.2){
 	      calc_primitives(ix,iy,iz);
 	      redistribute_radfluids_at_cell(ix,iy,iz);
+	      //	      }
 #endif
 
 	      //**********************************************************************
@@ -729,7 +735,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      /************************************************************************/
 	      /************************************************************************/
 
-#ifdef RADIATION
+#ifdef SKIP_RADIATION
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
  	      //implicit in lab frame in four dimensions - fiducial 

@@ -44,7 +44,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  //  if(geom->ix==100  && (pp[7]!=0. || pp[FX(1)]!=0.)) verbose=1;
+  //  if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1 ) verbose=1;
 
   if(verbose)
     {
@@ -79,7 +79,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
 
-  ldouble MINVEL=1.e-10;
+  ldouble MINVEL=1.e-5;
 
   for(irf=0;irf<NRF;irf++)
     {
@@ -100,14 +100,12 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	  A[irf][0]=vxr/(vxl+vxr);
 	  A[irf][1]=vxl/(vxl+vxr);
 
-	  //mixing to arb. power in characteristic velocities
-	  
+	  //mixing to arb. power in characteristic velocities	  
 	  vxl=fabs(vxl);
 	  ldouble power=5.;
 	  A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power));
 	  A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power));
 	  
-
 	  //discrete mixing
 	  /*
 	  if(fabs((vxr-vxl)/vxr)<1.e-5)
@@ -131,7 +129,26 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 
       if(NDIM==2)
 	{
-	  my_err("NDIM==2 not implemented in redistribute()\n");
+	  ldouble vxl,vxr,vyl,vyr;
+	  vxl=my_min(aval[irf][0],-MINVEL);
+	  vxr=my_max(aval[irf][1],MINVEL);
+	  vyl=my_min(aval[irf][2],-MINVEL);
+	  vyr=my_max(aval[irf][3],MINVEL);
+	  
+	  //mixing linear in characteristic velocities
+	  vxl=fabs(vxl);
+	  vyl=fabs(vyl);
+
+	  A[irf][0]=vxr/(vxl+vxr)*vyr/(vyl+vyr);
+	  A[irf][1]=vxl/(vxl+vxr)*vyr/(vyl+vyr);
+	  A[irf][2]=vxl/(vxl+vxr)*vyl/(vyl+vyr);
+	  A[irf][3]=vxr/(vxl+vxr)*vyl/(vyl+vyr);
+
+	  double power=5.;
+	  A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
+	  A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
+	  A[irf][2]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
+	  A[irf][3]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
 	}
 
       if(NDIM==3)
@@ -171,7 +188,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 
   for(ii=NVHD;ii<NV;ii++)
     uu0[ii]=uu1[ii];
-
+  
   return 0;
 }
 

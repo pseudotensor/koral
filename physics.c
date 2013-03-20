@@ -499,7 +499,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
       //      printf(": %d\n",ii);print_tensor(Rij[ii]);
     }
-  //  if(Rij[0][0][1]!=0.) getchar();
+  //  if(1||Rij[0][0][1]!=0.) getchar();
 #endif
 
   //to move gdet in/out derivative:

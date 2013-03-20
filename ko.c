@@ -212,6 +212,32 @@ solve_all_problems_5(ldouble tstart)
 #endif
       ldouble cons_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
 
+      
+      //**********************************************************************
+      //************************* redistribution  ?***********************************
+      //**********************************************************************
+
+
+#ifdef SKIP_MULTIRADFLUID
+
+#pragma omp parallel for private(iy,iz,iv) schedule (guided)
+  for(ix=0;ix<NX;ix++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {	      
+
+	      //	      if(t<0.2){
+	      calc_primitives(ix,iy,iz);
+	      redistribute_radfluids_at_cell(ix,iy,iz);
+	      //	      }
+	    }
+	}
+    }
+#endif
+
+
       //**********************************************************************
       //************************* outputs ************************************
       //**********************************************************************
