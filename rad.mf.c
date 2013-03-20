@@ -44,7 +44,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  //  if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1 ) verbose=1;
+  //  if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1+2 ) verbose=1;
 
   if(verbose)
     {
@@ -144,11 +144,39 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	  A[irf][2]=vxl/(vxl+vxr)*vyl/(vyl+vyr);
 	  A[irf][3]=vxr/(vxl+vxr)*vyl/(vyl+vyr);
 
+	  //arbitrary power
 	  double power=5.;
 	  A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
 	  A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
 	  A[irf][2]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
 	  A[irf][3]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
+
+	  //discrete + dumping
+	  ldouble fdump=fabs((vxr-vxl)/vxr+(vyr-vyl)/vyr); //goes to zero for zero fluxes = zero rad.frame velocity
+	  int wedgeno;
+	  if(uu0[FX(irf)]>fabs(uu0[FY(irf)]))
+	    wedgeno=0;
+	  if(uu0[FX(irf)]<-fabs(uu0[FY(irf)]))
+	    wedgeno=2;
+	  if(uu0[FY(irf)]>=fabs(uu0[FX(irf)]))
+	    wedgeno=1;
+	  if(uu0[FY(irf)]<=-fabs(uu0[FX(irf)]))
+	    wedgeno=3;
+
+	  ldouble dumping=exp(-fdump/MINVEL);
+	  A[irf][wedgeno]=1.-dumping*3./4.;
+	  for(ii=0;ii<NRF;ii++)
+	    {
+	      if(ii==wedgeno) continue;
+	      A[irf][ii]=dumping*1./4.;
+	      if(A[irf][ii]<MINVEL) {
+		A[irf][ii]=MINVEL;
+		A[irf][wedgeno]-=MINVEL;
+	      }
+	    }
+
+	  if(verbose) printf("=== dumping for irf=%d -> %f\n",irf,dumping);
+
 	}
 
       if(NDIM==3)
