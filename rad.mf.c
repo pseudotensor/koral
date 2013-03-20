@@ -151,28 +151,88 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	  A[irf][2]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
 	  A[irf][3]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
 
-	  //discrete + dumping
-	  ldouble fdump=fabs((vxr-vxl)/vxr+(vyr-vyl)/vyr); //goes to zero for zero fluxes = zero rad.frame velocity
-	  int wedgeno;
+	  //discrete + damping
+	  vxl=aval[irf][0];
+	  vxr=aval[irf][1];
+	  vyl=aval[irf][2];
+	  vyr=aval[irf][3];
+	  vxl=fabs(vxl);
+	  vyl=fabs(vyl);
+	  ldouble DUMPEDGE=1.e-2;
+	  ldouble MINMIXING=1.e-5;
+	  ldouble fdump=fabs((vxr-vxl)/(vxr+vxl))+fabs((vyr-vyl)/(vyr+vyl)); //goes to zero for zero fluxes = zero rad.frame velocity
+
+	  //temporary, only for ortonormal basis
+	  fdump=(uu0[FX(irf)]*uu0[FX(irf)]+uu0[FY(irf)]*uu0[FY(irf)])/uu0[EE(irf)]/uu0[EE(irf)];
+
+	  ldouble dumping=exp(-fdump/DUMPEDGE);
+
+	  int wedgeno=-1;
 	  if(uu0[FX(irf)]>fabs(uu0[FY(irf)]))
 	    wedgeno=0;
 	  if(uu0[FX(irf)]<-fabs(uu0[FY(irf)]))
 	    wedgeno=2;
-	  if(uu0[FY(irf)]>=fabs(uu0[FX(irf)]))
+	  if(uu0[FY(irf)]>fabs(uu0[FX(irf)]))
 	    wedgeno=1;
-	  if(uu0[FY(irf)]<=-fabs(uu0[FX(irf)]))
+	  if(uu0[FY(irf)]<-fabs(uu0[FX(irf)]))
 	    wedgeno=3;
 
-	  ldouble dumping=exp(-fdump/MINVEL);
-	  A[irf][wedgeno]=1.-dumping*3./4.;
-	  for(ii=0;ii<NRF;ii++)
+	  if(wedgeno>=0) //not aligned with axes
 	    {
-	      if(ii==wedgeno) continue;
-	      A[irf][ii]=dumping*1./4.;
-	      if(A[irf][ii]<MINVEL) {
-		A[irf][ii]=MINVEL;
-		A[irf][wedgeno]-=MINVEL;
-	      }
+	      A[irf][wedgeno]=1.-dumping*3./4.;
+	      for(ii=0;ii<NRF;ii++)
+		{
+		  if(ii==wedgeno) continue;
+		  A[irf][ii]=dumping*1./4.;
+		  if(A[irf][ii]<MINMIXING) {
+		    A[irf][ii]=MINMIXING;
+		    A[irf][wedgeno]-=MINMIXING;
+		  }
+		}
+	    }
+	  else //special handling of aligned fluxes - not sure if necessary
+	    {
+	      for(ii=0;ii<NRF;ii++)
+		A[irf][ii]=MINMIXING;
+	      A[irf][irf]=1.-3.*MINMIXING;
+	      /*
+	      if(uu0[FX(irf)]==uu0[FY(irf)] && uu0[FX(irf)]>0.)
+		{
+		  A[irf][0]=A[irf][1]=0.5*(1.-dumping*2./4.);
+		  A[irf][2]=A[irf][3]=dumping*1./4.;
+		  if(A[irf][2]<MINMIXING) {
+		    A[irf][2]=A[irf][3]=MINMIXING;
+		    A[irf][0]-=MINMIXING;A[irf][1]-=MINMIXING;
+		  } 		  
+		}
+	      if(uu0[FX(irf)]==uu0[FY(irf)] && uu0[FX(irf)]<0.)
+		{
+		  A[irf][2]=A[irf][3]=0.5*(1.-dumping*2./4.);
+		  A[irf][0]=A[irf][1]=dumping*1./4.;
+		  if(A[irf][0]<MINMIXING) {
+		    A[irf][0]=A[irf][1]=MINMIXING;
+		    A[irf][2]-=MINMIXING;A[irf][3]-=MINMIXING;
+		  } 
+		}
+	      if(uu0[FX(irf)]==-uu0[FY(irf)] && uu0[FX(irf)]>0.)
+		{
+		  A[irf][0]=A[irf][3]=0.5*(1.-dumping*2./4.);
+		  A[irf][2]=A[irf][1]=dumping*1./4.;
+		  if(A[irf][2]<MINMIXING) {
+		    A[irf][2]=A[irf][1]=MINMIXING;
+		    A[irf][0]-=MINMIXING;A[irf][3]-=MINMIXING;
+		  } 		  
+		}
+	      if(uu0[FX(irf)]==-uu0[FY(irf)] && uu0[FX(irf)]<0.)
+		{
+		  A[irf][2]=A[irf][1]=0.5*(1.-dumping*2./4.);
+		  A[irf][0]=A[irf][3]=dumping*1./4.;
+		  if(A[irf][0]<MINMIXING) {
+		    A[irf][0]=A[irf][3]=MINMIXING;
+		    A[irf][2]-=MINMIXING;A[irf][1]-=MINMIXING;
+		  } 
+		}
+	      */
 	    }
 
 	  if(verbose) printf("=== dumping for irf=%d -> %f\n",irf,dumping);

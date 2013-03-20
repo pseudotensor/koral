@@ -6,8 +6,8 @@
 //#define LABRADFLUXES
 
 #define MYCOORDS MINKCOORDS
-#define NX 40
-#define NY 40
+#define NX 41
+#define NY 41
 #define NZ 1
 //#define ZSLICE 20
 
@@ -22,13 +22,14 @@
 #define ALLSTEPSOUTPUT 0
 
 #ifdef FORGETDOTS
-#define DTOUT1 .025
+#define DTOUT1 .005
 #else
 #define DTOUT1 .025
 #endif
 
 #define GAMMA (4./3.)
 #define NOUTSTOP 100
+
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
@@ -41,14 +42,14 @@
 
 
 #define IXDOT1 10
-#define IYDOT1 20//10//20
+#define IYDOT1 10//10//20
 #define IZDOT1 0
 #define FXDOT1 0.
 #define FYDOT1 0.
 #define FZDOT1 0.
 
 #define IXDOT2 30
-#define IYDOT2 20//30//20
+#define IYDOT2 30//30//20
 #define IZDOT2 0
 #define FXDOT2 0.
 #define FYDOT2 0.
