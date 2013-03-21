@@ -39,8 +39,23 @@
 //31* FLATDISK - emission from flat disk
 //32* CYLBEAM - beam towards the axis in cylindrical
 //33* RADDOT - radiating dot
+//40* CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
 
-#define PROBLEM 15
+#define PROBLEM 32
+
+#if(PROBLEM==40)
+
+#define PR_DEFINE "PROBLEMS/CYLBEAMCART/define.h"
+#define PR_BC "PROBLEMS/CYLBEAMCART/bc.c"
+#define PR_INIT "PROBLEMS/CYLBEAMCART/init.c"
+#define PR_KAPPA "PROBLEMS/CYLBEAMCART/kappa.c"
+#define PR_KAPPAES "PROBLEMS/CYLBEAMCART/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/CYLBEAMCART/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/CYLBEAMCART/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/CYLBEAMCART/dump.c"
+#define PR_TOOLS "PROBLEMS/CYLBEAMCART/tools.c"
+
+#endif
 
 #if(PROBLEM==33)
 

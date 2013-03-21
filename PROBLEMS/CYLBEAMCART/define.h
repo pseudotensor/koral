@@ -6,18 +6,11 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-#define myMCYL1COORDS
 
-//#define DISCRETESRC
-//#define FULLPHI
+#define DISCRETESRC
+#define FULLPHI
 
-#ifdef myMCYL1COORDS
-#define MYCOORDS MCYL1COORDS
-#else
-#define MYCOORDS CYLCOORDS
-#endif
-
-#define OUTCOORDS CYLCOORDS
+#define MYCOORDS MINKCOORDS
 
 #define IMAGETYPE "gif"
 #define OUTVEL VELPRIMRAD
@@ -26,45 +19,20 @@
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000
 #define RADOUTPUTINZAMO
-//#define PRINTXGC_LEFT
-//#define PRINTXGC_RIGHT
+#define PRINTXGC_LEFT
+#define PRINTXGC_RIGHT
 
 
-#ifdef myMCYL1COORDS
-#define MKS1R0 -1.
-#define MINX (log(0.-MKS1R0))
-#define MAXX (log(20.-MKS1R0))
-#define NX 50
-#else
-#define MINX  .5
+#define MINX  -20.
 #define MAXX 20.
-#define NX 40
-#endif
-
-
-#define NY 1
-#ifndef FULLPHI
-#define NZ 40
-#else
-#define NZ 180
-#endif
-#define YZXDUMP
-
-
-
-#define MINY -1.
-#define MAXY 1.
+#define MINY  -20.
+#define MAXY 20.
+#define NX 80
+#define NY 80
+#define NZ 1
 
 #define MINZ 0.
-
-
-
-#ifdef FULLPHI
-#define MAXZ 2.*Pi
-#define PRINTZONEMORE
-#else
-#define MAXZ Pi/2.5
-#endif
+#define MAXZ 1.
 
 #define SPECIFIC_BC
 

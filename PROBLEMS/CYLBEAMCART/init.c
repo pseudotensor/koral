@@ -27,8 +27,8 @@ ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
 
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
+struct geometry geom;
+fill_geometry(ix,iy,iz,&geom);
 
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,MYCOORDS);
@@ -54,13 +54,12 @@ ldouble D,W,eps,uT,uphi,uPhi;
 if(1)
   {
     //ambient
-    set_hdatmosphere(pp,xxvec,gg,GG,0);
-    pp[2]=0.;
+
+    pp[2]=pp[3]=pp[4]=0.;
     pp[0]=1.;
     pp[1]=0.1;
 #ifdef RADIATION
-    set_radatmosphere(pp,xxvec,gg,GG,0);
-    pp[6]=0.001;
+    pp[6]=0.0001;
     pp[7]=pp[8]=pp[9]=0.;
 
     /*

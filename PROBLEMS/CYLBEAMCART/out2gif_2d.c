@@ -26,7 +26,7 @@ miny=-maxx;
 	  "unset surface\n"
 	  "set log z\n"
 	  "set cntrparam levels 10 \n"
-	  "splot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):20 w l\n"
+	  "splot \"%s\" u 1:2:20 w l\n"
 	  "unset dgrid3d\n"
 	  "unset log z\n"
 	  "unset table\n"
@@ -62,12 +62,11 @@ miny=-maxx;
 	  "set yrange [%f:%f]\n"
 	  "set log cb\n"
 	  "set cbrange [0.01:1.]\n"
-	  "set cbrange [0.1:10.]\n"
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
-	  "splot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):20 w l ti \"\"\n"
+	  "splot \"%s\" u 1:2:20 w l ti \"\"\n"
 
 	  "unset tics\n"
 	  "unset border\n"
@@ -85,10 +84,10 @@ miny=-maxx;
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
-	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-($23)*sin($3))*%f)"
-	  ":(($23*cos($3)+($21)*sin($3))*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "plot \"%s\" u 1:2:($21*%f)"
+	  ":($22*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  ,fname,fname2,minx,maxx,miny,maxy,fname,fname,
-	  1.,1.,(int)(NX/15),(int)(NZ/20));
+	  1.,1.,(int)(NX/15),(int)(NY/15));
 	    
 	    
 

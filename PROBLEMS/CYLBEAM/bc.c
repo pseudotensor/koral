@@ -14,7 +14,6 @@ zz=xxvec[3];
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
-
 struct geometry geomCYL;
 fill_geometry_arb(ix,iy,iz,&geomCYL,CYLCOORDS);
 
@@ -35,8 +34,23 @@ calc_tetrades(ggCYL,tupCYL,tloCYL,CYLCOORDS);
 calc_ZAMOes(ggCYL,eupCYL,eloCYL,CYLCOORDS);
 /**********************/
 
+int src=0;
 
+#ifndef DISCRETESRC
+src=1;
+#else
+ldouble phi=xxvecCYL[3]*180/M_PI;
 
+int ii;
+for (ii=0;ii<4;ii++)
+  {
+    //    if(phi>(0.+(ldouble)ii*45.) && phi<(10.+(ldouble)ii*45.)) src=1;
+    if(phi>(0.+(ldouble)ii*90.) && phi<(10.+(ldouble)ii*90.)) src=1;
+
+    //    printf("%f %f %f-> %d\n",phi,(0.+(ldouble)ii*45.),(10.+(ldouble)ii*45.),src);
+  }
+//getchar();
+#endif
 
 //radius
 if(ix>=NX) //analytical solution at rout only
@@ -75,31 +89,49 @@ getchar();
 	pp[1]=0.1;
 
 #ifdef RADIATION
-	pp[6]=calc_LTE_EfromT(1.e10);
-	pp[6]=1.;
-	pp[7]=pp[8]=pp[9]=0.;
-	pp[7]=-.5*pp[6]; //isotropic
-	//pp[7]=0.;
 
-	//Keplerian gas
-	ldouble rCYL=xxvecCYL[1];
-	ldouble Om=1./pow(rCYL,1.5)*OMSCALE;
+	if(src==1 )
+	  {	
 
-	ldouble ucon[4]={0.,0.,0.,Om};
-	conv_vels(ucon,ucon,VEL3,VELPRIM,ggCYL,GGCYL);
-	//	trans2_coco(xxvecCYL,ucon,ucon,CYLCOORDS,MYCOORDS);
-	//	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+	    pp[6]=1.;
+
+	    
+	    pp[7]=pp[8]=pp[9]=0.;
+	    pp[7]=-.5*pp[6]; //isotropic
+	    //pp[7]=0.;
+
+	    //Keplerian gas
+	    ldouble rCYL=xxvecCYL[1];
+	    ldouble Om=1./pow(rCYL,1.5)*OMSCALE;
+
+	    ldouble ucon[4]={0.,0.,0.,Om};
+	    conv_vels(ucon,ucon,VEL3,VELPRIM,ggCYL,GGCYL);
+	    //	trans2_coco(xxvecCYL,ucon,ucon,CYLCOORDS,MYCOORDS);
+	    //	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
 		
-	pp[2]=ucon[1];
-	pp[3]=ucon[2];
-	pp[4]=ucon[3];	
+	    pp[2]=ucon[1];
+	    pp[3]=ucon[2];
+	    pp[4]=ucon[3];	
 	
-	prad_ff2lab(pp,pp,&geomCYL);
+	    prad_ff2lab(pp,pp,&geomCYL);
 
-	pp[4]=0.;
+	    pp[4]=0.;
 	
-	trans_pall_coco(pp, pp, CYLCOORDS, MYCOORDS,xxvecCYL,ggCYL,GGCYL,gg,GG);
-	//	print_Nvector(pp,NV);getchar();
+	    trans_pall_coco(pp, pp, CYLCOORDS, MYCOORDS,xxvecCYL,ggCYL,GGCYL,gg,GG);
+	    //	print_Nvector(pp,NV);getchar();
+	  }
+	else
+	  {
+	    pp[6]=0.001;
+	    pp[7]=pp[8]=pp[9]=0.;
+	    /*
+	    pp[7]=get_u(p,NX-1,iy,iz,7);
+	    pp[8]=get_u(p,NX-1,iy,iz,8);
+	    pp[9]=get_u(p,NX-1,iy,iz,9);
+	    pp[6]=get_u(p,NX-1,iy,iz,6);
+	    if(pp[7]<0.) pp[7]=0.;
+	    */
+	  }
 #endif
       }
       
