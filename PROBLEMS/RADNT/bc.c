@@ -197,10 +197,10 @@ if(iy>=NY) //equatorial plane
 
 	pp[6]=calc_LTE_EfromT(1.e11)*(1.-sqrt(rin/rBL))/pow(rBL,3.);
 	pp[7]=pp[8]=pp[9]=0.;
-	pp[8]=-.5*pp[6];
+	pp[8]=0.*pp[6];
 
 	//Keplerian gas
-	ldouble Om=1./pow(rBL,1.5);
+	ldouble Om=1./pow(rBL,1.5)*OMSCALE;
 	
 	ldouble ucon[4]={0.,0.,0.,Om};
 	conv_vels(ucon,ucon,VEL3,VELPRIM,ggBL,GGBL);

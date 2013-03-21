@@ -719,19 +719,19 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      if(isnan(geom->eup[i][j])||isnan(geom->eup[i][j])||isinf(geom->elo[i][j])||isinf(geom->elo[i][j]))
+      if(isnan(geom->tup[i][j])||isnan(geom->tup[i][j])||isinf(geom->tlo[i][j])||isinf(geom->tlo[i][j]))
 	{
 	  printf("%d %d %d %f %f %f\n",geom->ix,geom->iy,geom->iz,geom->xx,geom->yy,geom->zz);
-	  print_tensor( geom->eup);
-	   print_tensor( geom->elo);
-	   getchar();
+	  print_tensor( geom->tup);
+	  print_tensor( geom->tlo);
+	  getchar();
 	}
 
   //to ortonormal coordinates
   int prever=0;
   if(prever) print_tensor(Rij);
       
-  trans22_cc2on(Rij,Rij,geom->eup);
+  trans22_cc2on(Rij,Rij,geom->tup);
   if(prever) print_tensor(Rij);
 
   //modify the closure
@@ -792,7 +792,7 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   if(prever) print_tensor(Rij);
 
   //back to code coordinates
-  trans22_on2cc(Rij,Rij,geom->elo);
+  trans22_on2cc(Rij,Rij,geom->tlo);
 
 
 

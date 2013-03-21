@@ -7,13 +7,18 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-#define myMKS1COORDS
+//#define myMKS1COORDS
+
+#define OMSCALE 1.
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
 #else
-#define MYCOORDS KERRCOORDS//SPHCOORDS//KERRCOORDS
+#define MYCOORDS KERRCOORDS//KSCOORDS//SPHCOORDS//KERRCOORDS
 #endif
+
+#define WIDENPRESSURE
+#define WIDENPRESSUREPOWER 10.
 
 #define IMAGETYPE "jpg"
 #define OUTCOORDS KERRCOORDS
@@ -27,24 +32,24 @@
 //#define RADOUTPUTINFF
 //#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
-#define PRINTYGC_LEFT
+//#define PRINTYGC_LEFT
 
 #ifdef myMKS1COORDS
 #define MKS1R0 0.
-#define MINX (log(1.7-MKS1R0))
+#define MINX (log(1.9-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
 #define NX 30
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
-#define NX 60
+#define NX 80
 #endif
 
 #define NY 30
 #define NZ 1
 
 
-#define MINY (0.2*Pi/4.)
+#define MINY (0.02*Pi/4.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.

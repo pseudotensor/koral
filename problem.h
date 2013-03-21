@@ -42,7 +42,7 @@
 //40* CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
 //41* FLATDOT - similar to discrete CYLBEAM but in cartesian 
 
-#define PROBLEM 31
+#define PROBLEM 30
 
 #if(PROBLEM==41)
 
