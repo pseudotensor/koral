@@ -99,11 +99,14 @@ int nfout1;
 struct geometry
 {
   int ix,iy,iz;
+  ldouble xx,yy,zz;
   ldouble gg[4][5];
   ldouble GG[4][5];
   ldouble alpha;
   ldouble tlo[4][4];
   ldouble tup[4][4];
+  ldouble elo[4][4];
+  ldouble eup[4][4];
 };
 
 //main.c

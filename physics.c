@@ -202,7 +202,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 
   calc_rad_wavespeeds(pp,&geom,tautot,aval,verbose);
 
-#ifdef WIDENPRESSURE
+#ifdef SKIP_WIDENPRESSURE
   if(MYCOORDS!=MINKCOORDS || (NZ>1 && NY>1))
     my_err("widen pressure only for minkowski and less than 2d\n");
   if(NZ==1 && NY==1)

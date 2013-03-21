@@ -1144,8 +1144,13 @@ fill_geometry(int ix,int iy,int iz,void *geom)
   pick_G(ix,iy,iz,ggg->GG);
   pick_T(tmuup,ix,iy,iz,ggg->tup);
   pick_T(tmulo,ix,iy,iz,ggg->tlo);
+  pick_T(emuup,ix,iy,iz,ggg->eup);
+  pick_T(emulo,ix,iy,iz,ggg->elo);
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+  ggg->xx=get_x(ix,0);
+  ggg->yy=get_x(iy,1);
+  ggg->zz=get_x(iz,2);
 
   return 0;
 }
@@ -1162,10 +1167,32 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
 
   pick_gb(ix,iy,iz,idim,ggg->gg);
   pick_Gb(ix,iy,iz,idim,ggg->GG);
-  pick_Tb(tmuup,ix,iy,iz,idim,ggg->tup);
-  pick_Tb(tmulo,ix,iy,iz,idim,ggg->tlo);
+  if(idim==0)
+    {
+      pick_Tb(tmuupbx,ix,iy,iz,idim,ggg->tup);
+      pick_Tb(tmulobx,ix,iy,iz,idim,ggg->tlo);
+      pick_Tb(emuupbx,ix,iy,iz,idim,ggg->eup);
+      pick_Tb(emulobx,ix,iy,iz,idim,ggg->elo);
+    }
+  if(idim==1)
+    {
+      pick_Tb(tmuupby,ix,iy,iz,idim,ggg->tup);
+      pick_Tb(tmuloby,ix,iy,iz,idim,ggg->tlo);
+      pick_Tb(emuupby,ix,iy,iz,idim,ggg->eup);
+      pick_Tb(emuloby,ix,iy,iz,idim,ggg->elo);
+    }
+  if(idim==2)
+    {
+      pick_Tb(tmuupbz,ix,iy,iz,idim,ggg->tup);
+      pick_Tb(tmulobz,ix,iy,iz,idim,ggg->tlo);
+      pick_Tb(emuupbz,ix,iy,iz,idim,ggg->eup);
+      pick_Tb(emulobz,ix,iy,iz,idim,ggg->elo);
+    }
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+  ggg->xx=get_xb(ix,0);
+  ggg->yy=get_xb(iy,1);
+  ggg->zz=get_xb(iz,2);
 
   return 0;
 }
@@ -1189,9 +1216,13 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
   calc_G_arb(xxvecBL,ggg->GG,COORDS);
 
   calc_tetrades(ggg->gg,ggg->tup,ggg->tlo,COORDS);
- 
+  calc_ZAMOes(ggg->gg,ggg->eup,ggg->elo,COORDS);
+
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+  ggg->xx=get_x(ix,0);
+  ggg->yy=get_x(iy,1);
+  ggg->zz=get_x(iz,2);
 
   return 0;
 }
@@ -1397,17 +1428,17 @@ calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4], int coords)
 	emulo[i][j]=0.;
       }
 
-  emuup[0][0]=sqrt(e2nu);
-  emuup[1][1]=sqrt(e2mu1);
-  emuup[2][2]=sqrt(e2mu2);
-  emuup[0][3]=-omega*sqrt(e2psi);
-  emuup[3][3]=sqrt(e2psi);
+  emuup[0][0]=sqrt(fabs(e2nu));
+  emuup[1][1]=sqrt(fabs(e2mu1));
+  emuup[2][2]=sqrt(fabs(e2mu2));
+  emuup[0][3]=-omega*sqrt(fabs(e2psi));
+  emuup[3][3]=sqrt(fabs(e2psi));
 
-  emulo[3][0]=omega*1./sqrt(e2nu);
-  emulo[0][0]=1./sqrt(e2nu);
-  emulo[1][1]=1./sqrt(e2mu1);
-  emulo[2][2]=1./sqrt(e2mu2);
-  emulo[3][3]=1./sqrt(e2psi);
+  emulo[3][0]=omega*1./sqrt(fabs(e2nu));
+  emulo[0][0]=1./sqrt(fabs(e2nu));
+  emulo[1][1]=1./sqrt(fabs(e2mu1));
+  emulo[2][2]=1./sqrt(fabs(e2mu2));
+  emulo[3][3]=1./sqrt(fabs(e2psi));
 
   return 0;
 }

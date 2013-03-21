@@ -7,7 +7,10 @@
 #define GAMMAMAXRAD 1000.
 
 #define MYCOORDS SPHCOORDS
+//#define LABRADFLUXES
 
+//#define WIDENPRESSURE
+#define WIDENPRESSUREPOWER 1.5
 
 #define IMAGETYPE "jpg"
 #define OUTVEL VEL4
@@ -26,7 +29,7 @@
 #define NZ 1
 
 
-#define MINY (0.*Pi/4.)
+#define MINY (0.1*Pi/4.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.

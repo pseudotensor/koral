@@ -714,10 +714,25 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
 
-  //test
 #ifdef WIDENPRESSURE
+  //test
+
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      if(isnan(geom->eup[i][j])||isnan(geom->eup[i][j])||isinf(geom->elo[i][j])||isinf(geom->elo[i][j]))
+	{
+	  printf("%d %d %d %f %f %f\n",geom->ix,geom->iy,geom->iz,geom->xx,geom->yy,geom->zz);
+	  print_tensor( geom->eup);
+	   print_tensor( geom->elo);
+	   getchar();
+	}
+
   //to ortonormal coordinates
-  trans22_cc2on(Rij,Rij,tup);
+  int prever=0;
+  if(prever) print_tensor(Rij);
+      
+  trans22_cc2on(Rij,Rij,geom->eup);
+  if(prever) print_tensor(Rij);
 
   //modify the closure
   ldouble E=Rij[0][0];
@@ -738,11 +753,12 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   else //M1
     {
       f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
-	      
+	  
+      if(prever) printf("1: %f\n",f);
       //bias it artificially towards 1/3
       ldouble power=WIDENPRESSUREPOWER;
       f=1./3.+pow(f-1./3.,power)*pow(2./3.,-power+1.);
-
+      if(prever) printf("1: %f\n",f);
     }
   
   if(nlen>0) 
@@ -755,7 +771,7 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
     {
       ;
     }
- 
+  
   Rij[0][0]=E;
   Rij[0][1]=Rij[1][0]=F[0];
   Rij[0][2]=Rij[2][0]=F[1];
@@ -772,9 +788,17 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   Rij[3][1]=E*(.5*(3.*f - 1.)*nz*nx);
   Rij[3][2]=E*(.5*(3.*f - 1.)*nz*ny);
   Rij[3][3]=E*(.5*(1.-f) + .5*(3.*f - 1.)*nz*nz);
-    
+  
+  if(prever) print_tensor(Rij);
+
   //back to code coordinates
-  trans22_on2cc(Rij,Rij,tlo);
+  trans22_on2cc(Rij,Rij,geom->elo);
+
+
+
+  if(prever) print_tensor(Rij);
+
+  if(prever) if(Rij[0][1]!=0. ) getchar();
 
 #endif //WIDENPRESSURE
 
