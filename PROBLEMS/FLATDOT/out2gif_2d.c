@@ -44,7 +44,7 @@
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
 	  "set log cb\n"
-	  "set cbrange [0.001:.1]\n"
+	  "set cbrange [0.1:10.]\n"
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"

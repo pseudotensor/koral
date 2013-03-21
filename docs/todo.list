@@ -1,7 +1,6 @@
 0320 - ** - generalize atmospheres for non-BL like coords
 0318 - **** - dumped lab implicit to allow for longer timesteps, see below
 0318 - **** - follow the radiative wavespeeds to set the timestep properly
-0314 - **** - correct LABFLUXES by providing geom to u2p_rad_urf
 0313 - *** - implement Eddington approximation
 0313 - ** - in topcap include a limiter for switching between GAMMAMAX for tau<<1 and fluid frame for tau>>1
 0312 - ** - metric tetrad order does not correspond to eup,elo - cross check

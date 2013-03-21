@@ -135,9 +135,9 @@ if(iy<0)
 	pp[9]=0.;
 
 	if(NZ==1)
-	  pp[6]*=100.;
-	else
 	  pp[6]*=10000.;
+	else
+	  pp[6]*=100000000.;
 	pp[7]=FXDOT*pp[6];
 	pp[8]=FYDOT*pp[6];
 	pp[9]=FZDOT*pp[6];

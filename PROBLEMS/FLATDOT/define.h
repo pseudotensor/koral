@@ -1,7 +1,7 @@
 #define TMAX 1.e10
 #define RADIATION
 
-#define LABRADFLUXES
+//#define LABRADFLUXES
 
 #define MYCOORDS MINKCOORDS
 #define NX 41
@@ -43,7 +43,8 @@
 #define FYDOT 0.
 #define FZDOT 0.
 
-//#define WIDENPRESSURE
+#define WIDENPRESSURE
+#define WIDENPRESSUREPOWER 1.
 
 #define MASSCM 1.
 
