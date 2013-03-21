@@ -53,6 +53,7 @@ main(int argc, char **argv)
   //sets initial profile of primitives
 #ifndef RESTART
   set_initial_profile();
+  my_finger(0.);
 #endif
   //sets bc
   set_bc(tstart);

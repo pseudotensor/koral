@@ -1,4 +1,8 @@
 
+#ifdef HOTBOUNDARY
+return 0;
+#endif
+
 int ix,iy,iz;
 
 ldouble pp[NV],uu[NV];

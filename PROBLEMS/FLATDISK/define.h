@@ -21,7 +21,7 @@
 #define MINX 4.
 #define MAXX 100.
 
-#define NX 120
+#define NX 40
 #define NY 40
 #define NZ 1
 

@@ -18,9 +18,9 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define ALLSTEPSOUTPUT 0
-#define DTOUT1 .05
+#define DTOUT1 .2
 #define GAMMA (4./3.)
-#define NOUTSTOP 60
+#define NOUTSTOP 100
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
@@ -31,11 +31,13 @@
 #define MINZ 0
 #define MAXZ 1
 
-#define IXDOTMIN NX/2
-#define IYDOTMIN NY/2
+#define HOTBOUNDARY
+
+#define IXDOTMIN 0
+#define IYDOTMIN 0
 #define IZDOTMIN 0
-#define IXDOTMAX NX/2
-#define IYDOTMAX NY/2
+#define IXDOTMAX 5
+#define IYDOTMAX 0
 #define IZDOTMAX 0
 #define FXDOT 0.
 #define FYDOT 0.
@@ -49,6 +51,7 @@
 #define KAPPA 0.
 #define KAPPAES 0.
 
+#define SPECIFIC_BC
 #define COPY_XBC
 #define COPY_YBC
 #define COPY_ZBC
