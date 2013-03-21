@@ -21,6 +21,7 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
     }
 
   redistribute_radfluids(pp,uu,&geom);
+  //redistribute_radfluids_axes(pp,uu,&geom); //test
 
   u2p_rad(uu,pp,&geom,&iv);
 
@@ -79,7 +80,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
 
-  ldouble MINVEL=1.e-5;
+  ldouble MINVEL=1.e-3;
 
   for(irf=0;irf<NRF;irf++)
     {
@@ -252,6 +253,129 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	uu1[FZ(ii)]+=uu0[FZ(jj)]*A[jj][ii];
       }
 
+  if(verbose) 
+    {
+      printf("=== uu1 ===\n");
+      print_Nvector(uu1,NV);
+      getchar();
+    }
+
+  for(ii=NVHD;ii<NV;ii++)
+    uu0[ii]=uu1[ii];
+  
+  return 0;
+}
+
+//***********************************************************************************
+//******* redistributes radiation fluids projecting on the axes *********************
+//***********************************************************************************
+int
+redistribute_radfluids_axes(ldouble *pp, ldouble *uu0, void* ggg)
+{
+  int verbose=0;
+  
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  //  if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1 ) verbose=1;
+
+  if(verbose)
+    {
+      printf("\noooooooooo %d %d %d oooooooooo\n\n",geom->ix,geom->iy,geom->iz);
+      printf("=== uu0 ===\n");
+      print_Nvector(uu0,NV);
+      printf("=== pp0 ===\n");
+      print_Nvector(pp,NV);
+    }
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+  
+  //calculates wavespeed for each of the fluids
+  ldouble aval[NRF][6];
+
+  int irf,ii,jj,i2;
+  ldouble uu1[NV],Fmag,Etot,phi;
+  ldouble FRAC=.01;
+  ldouble MINCONTRAST=1.e-3;
+  for(ii=0;ii<NV;ii++)
+    uu1[ii]=uu0[ii];
+
+  Etot=uu0[EE(0)]+uu0[EE(1)]+uu0[EE(2)]+uu0[EE(3)];
+  
+  for(irf=0;irf<NRF;irf++)
+    {
+      //irf = 0 - x+ axis
+      //irf = 1 - y+ axis
+      //irf = 2 - x- axis
+      //irf = 3 - y- axis
+
+      phi=atan2(uu0[FY(irf)],uu0[FX(irf)]);
+      Fmag=sqrt(uu0[FX(irf)]*uu0[FX(irf)]+uu0[FY(irf)]*uu0[FY(irf)]);
+
+      //perpendicular
+      if(irf==0 || irf==2) 
+	{
+	  i2=-1;
+	  if(uu0[FY(irf)]>0.) i2=1;
+	  if(uu0[FY(irf)]<0.) i2=3;
+	  if(i2>=0 && fabs((uu1[EE(irf)]-FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag)/Etot)>MINCONTRAST)
+	    {
+	      uu1[FY(i2)]+=FRAC*uu0[FY(irf)];
+	      uu1[EE(i2)]+=FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag;
+	      uu1[FY(irf)]-=FRAC*uu0[FY(irf)];
+	      uu1[EE(irf)]-=FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag;
+	    }
+	}
+
+      if(irf==1 || irf==3) 
+	{
+	  i2=-1;
+	  if(uu0[FX(irf)]>0.) i2=0;
+	  if(uu0[FX(irf)]<0.) i2=2;
+	  
+	  if(i2>=0 && fabs((uu1[EE(irf)]-FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag)/Etot)>MINCONTRAST)
+	    {	      
+	      uu1[FX(i2)]+=FRAC*uu0[FX(irf)];
+	      uu1[EE(i2)]+=FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag;
+	      uu1[FX(irf)]-=FRAC*uu0[FX(irf)];
+	      uu1[EE(irf)]-=FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag;
+	    }
+	}
+
+      //parallel
+      if(irf==0 || irf==2)
+	{
+	  i2=-1;
+	  if(uu0[FX(irf)]<0. && irf==0) i2=2;
+	  if(uu0[FX(irf)]>0. && irf==2) i2=0;
+	  
+	  if(i2>=0 && fabs((uu1[EE(irf)]-FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag)/Etot)>MINCONTRAST)
+	    {
+	      uu1[FX(i2)]+=FRAC*uu0[FX(irf)];
+	      uu1[EE(i2)]+=FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag;
+	      uu1[FX(irf)]-=FRAC*uu0[FX(irf)];
+	      uu1[EE(irf)]-=FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag;
+	    }
+	}
+
+      if(irf==1 || irf==3)
+	{
+	  i2=-1;
+	  if(uu0[FY(irf)]<0. && irf==1) i2=3;
+	  if(uu0[FY(irf)]>0. && irf==3) i2=1;
+	  
+	  if(i2>=0 && fabs((uu1[EE(irf)]-FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag)/Etot)>MINCONTRAST)
+	    {
+	      uu1[FY(i2)]+=FRAC*uu0[FY(irf)];
+	      uu1[EE(i2)]+=FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag;
+	      uu1[FY(irf)]-=FRAC*uu0[FY(irf)];
+	      uu1[EE(irf)]-=FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag;
+	    }
+	}
+    }
+  
   if(verbose) 
     {
       printf("=== uu1 ===\n");
