@@ -1121,7 +1121,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
    if(debug==1 && verbose)
      {
        ldouble Rij[4][4];
-       calc_Rij(pp,gg,GG,Rij);
+       calc_Rij(pp,ggg,Rij);
        trans22_cc2on(Rij,Rij,tup);
        ldouble Avv[4]={Rij[0][0],Rij[0][1], Rij[0][2],Rij[0][3]};
        print_4vector(Avv);

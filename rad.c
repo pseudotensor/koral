@@ -81,7 +81,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldo
 
   //radiative four-force
   ldouble Gi[4];
-  calc_Gi(pp2,gg,GG,Gi); 
+  calc_Gi(pp2,ggg,Gi); 
   indices_21(Gi,Gi,gg);
  
   f[0] = uu[6] - uu0[6] + dt * Gi[0];
@@ -300,15 +300,17 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 int
 solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 {
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom.gg;
+  GG=geom.GG;
+
   int i1,i2,i3,iv;
   ldouble pp[NV];
   ldouble eup[4][4],elo[4][4];
   pick_T(emuup,ix,iy,iz,eup);
   pick_T(emulo,ix,iy,iz,elo);
-  ldouble gg[4][5];
-  pick_g(ix,iy,iz,gg);
-  ldouble GG[4][5];
-  pick_G(ix,iy,iz,GG);
   ldouble gdet=gg[3][4];
 
   for(iv=0;iv<NV;iv++)
@@ -317,7 +319,7 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     }
 
   ldouble Gi[4];
-  calc_Gi(pp,gg,GG,Gi);
+  calc_Gi(pp,&geom,Gi);
   
   deltas[0]=-Gi[0]*dt;
   deltas[1]=-Gi[1]*dt;
@@ -520,13 +522,19 @@ ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z)
 //****** and calculates contravariant four-force ***********************
 //**********************************************************************
 int
-calc_Gi(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Gi[4])
+calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 {
   int i,j,k;
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
 
   //radiative stress tensor in the lab frame
   ldouble Rij[4][4];
-  calc_Rij(pp,gg,GG,Rij);
+  calc_Rij(pp,ggg,Rij);
 
   //the four-velocity of fluid in lab frame
   ldouble ucon[4],ucov[4],vpr[3];
@@ -598,12 +606,20 @@ calc_Gi_ff(ldouble *pp, ldouble Gi[4])
   return 0;
 }
 
+
 //***********************************************************************************
 //******* takes primitives and closes Rij in arbitrary frame ****************************
 //***********************************************************************************
 int
-calc_Rij(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
+calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 {
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
   ldouble pp[NV],Erf;
   int verbose=0;
   int i,j;
@@ -615,7 +631,7 @@ calc_Rij(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 
 #if(1)
   //artificially puts pp=uu and converts them to urf and Erf using the regular converter
-  u2p_rad_urf(pp0,pp,gg,GG,&i);
+  u2p_rad_urf(pp0,pp,ggg,&i);
 
 #else 
   //from labfluxes branch
@@ -670,7 +686,6 @@ calc_Rij(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
-
   return 0;
 
 #endif
@@ -684,7 +699,6 @@ calc_Rij(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
 
   //radiative energy density in the radiation rest frame
   Erf=pp[6];
- 
 
   urfcon[0]=0.;
   urfcon[1]=pp[7];
@@ -697,8 +711,67 @@ calc_Rij(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4])
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
 
-  //  if(pp[7]!=0.) {print_tensor(Rij); getchar();}
+  //test
+#ifdef WIDENPRESSURE
+  if(1)
+    {
+      if(Rij[2][2]>1./3.*Rij[0][0])
+	{
+	  ldouble E=Rij[0][0];
+	  ldouble F[3]={Rij[0][1],Rij[0][2],Rij[0][3]};
 
+	  ldouble nx,ny,nz,nlen,f;
+
+	  nx=F[0]/E;
+	  ny=F[1]/E;
+	  nz=F[2]/E;
+
+	  nlen=sqrt(nx*nx+ny*ny+nz*nz);
+ 
+	  if(nlen>=1.)
+	    {
+	      f=1.;
+	    }
+	  else //M1
+	    {
+	      f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
+	      
+	      //bias it artificially towards 1/3
+	      ldouble power=2.;
+	      f=1./3.+pow(f-1./3.,power)*pow(2./3.,-power+1.);
+
+	    }
+  
+	  if(nlen>0) 
+	    {
+	      nx/=nlen;
+	      ny/=nlen;
+	      nz/=nlen;
+	    }
+	  else
+	    {
+	      ;
+	    }
+ 
+	  Rij[0][0]=E;
+	  Rij[0][1]=Rij[1][0]=F[0];
+	  Rij[0][2]=Rij[2][0]=F[1];
+	  Rij[0][3]=Rij[3][0]=F[2];
+
+	  Rij[1][1]=E*(.5*(1.-f) + .5*(3.*f - 1.)*nx*nx);
+	  Rij[1][2]=E*(.5*(3.*f - 1.)*nx*ny);
+	  Rij[1][3]=E*(.5*(3.*f - 1.)*nx*nz);
+
+	  Rij[2][1]=E*(.5*(3.*f - 1.)*ny*nx);
+	  Rij[2][2]=E*(.5*(1.-f) + .5*(3.*f - 1.)*ny*ny);
+	  Rij[2][3]=E*(.5*(3.*f - 1.)*ny*nz);
+
+	  Rij[3][1]=E*(.5*(3.*f - 1.)*nz*nx);
+	  Rij[3][2]=E*(.5*(3.*f - 1.)*nz*ny);
+	  Rij[3][3]=E*(.5*(1.-f) + .5*(3.*f - 1.)*nz*nz);
+	}
+    }
+#endif
   return 0;
 }
 
@@ -872,8 +945,15 @@ ldouble calc_LTE_Efromurho(ldouble u,ldouble rho)
 /******* using the HARM algorithm **************************************/
 /************************************************************************/
 int
-calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose)
+calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int verbose)
 {
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
   int i,j;
   
   //metric
@@ -894,7 +974,7 @@ calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3
 
 #ifdef LABRADFLUXES
   //artificially puts pp=uu and converts them to urf and Erf using the regular converter
-  u2p_rad_urf(pp,pp,gg,GG,&i);
+  u2p_rad_urf(pp,pp,ggg,&i);
 #endif
   
   //radiative energy density in the radiation rest frame

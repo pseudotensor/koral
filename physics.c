@@ -16,11 +16,15 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   xx[2]=get_x(iy,1);
   xx[3]=get_x(iz,2);
 
-  //metric
-  ldouble gg[4][5];
-  pick_g(ix,iy,iz,gg);
-  ldouble GG[4][5];
-  pick_G(ix,iy,iz,GG);
+  ldouble (*gg)[5],(*GG)[5];
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  //temporary using local arrays
+  gg=geom.gg;
+  GG=geom.GG;
+
 
   ldouble pp[NV],uuu[NV];
   int iv;
@@ -196,7 +200,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   ldouble tautot[3];
   calc_tautot(pp,xx,dx,tautot);
 
-  calc_rad_wavespeeds(pp,gg,GG,tautot,aval,verbose);
+  calc_rad_wavespeeds(pp,&geom,tautot,aval,verbose);
 
   axl=aval[0];
   axr=aval[1];
@@ -264,14 +268,14 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(i=0;i<NV;i++)
     pp[i]=get_u(p,i,ix,iy,iz);  
 
-  ldouble gg[4][5],GG[4][5],ggxl[4][5],ggxr[4][5];
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  ldouble (*gg)[5],(*GG)[5];
+ 
+  gg=geom.gg;
+  GG=geom.GG;
 
-  pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
-  ldouble gdet=gg[3][4];
-  pick_gb(ix,iy,iz,0,ggxl);
-  pick_gb(ix+1,iy,iz,0,ggxr);
-
+  ldouble gdet=gg[3][4]; 
   ldouble dlgdet[3];
   dlgdet[0]=gg[0][4]; //D[gdet,x1]/gdet
   dlgdet[1]=gg[1][4]; //D[gdet,x2]/gdet
@@ -314,7 +318,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   /***************************************************/
 
   ldouble Rij[4][4];
-  calc_Rij(pp,gg,GG,Rij); //R^ij
+  calc_Rij(pp,&geom,Rij); //R^ij
   indices_2221(Rij,Rij,gg); //R^i_j
 
   //terms with Christoffels
@@ -388,9 +392,13 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     ff[iv]=0.;
 
   //picking up metric from a cell face  
-  ldouble gg[4][5],GG[4][5];
-  pick_gb(ix,iy,iz,idim,gg);
-  pick_Gb(ix,iy,iz,idim,GG);  
+  struct geometry geom;
+  fill_geometry_face(ix,iy,iz,idim,&geom);
+ 
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom.gg;
+  GG=geom.GG;
+
   ldouble gdet=gg[3][4];
   
   //calculating Tij
@@ -430,7 +438,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
  
 #ifdef RADIATION
   ldouble Rij[4][4];
-  calc_Rij(pp,gg,GG,Rij); //R^ij
+  calc_Rij(pp,&geom,Rij); //R^ij
   indices_2221(Rij,Rij,gg); //R^i_j
 
   //to move gdet in/out derivative:

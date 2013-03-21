@@ -100,25 +100,6 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
       pp2[8]=ucon[2];
       pp2[9]=ucon[3];
 
-      /*
-
-      //to transform radiative primitives between coordinates
-      ldouble Rij[4][4];
-      //Rij in CO1
-      calc_Rij(pp1,gg1,GG1,Rij);
-      //Rij in CO2
-      trans22_coco(xxvec,Rij,Rij,CO1,CO2);
-      //R^ij to R^i_j
-      indices_2221(Rij,Rij,gg2);
-      //temporary place R^t_mu in primitives
-      pp1[6]=Rij[0][0];
-      pp1[7]=Rij[0][1];
-      pp1[8]=Rij[0][2];
-      pp1[9]=Rij[0][3]; int temp;
-      //convert R^t_mu to {Erf, urf[i]}
-      u2p_rad(pp1,pp2,gg2,GG2,&temp);
-
-      */
    }
   
   return 0;
@@ -190,7 +171,7 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
   ldouble Rij[4][4];
   int i,j;  
 
-  calc_Rij(pp1,gg,GG,Rij);
+  calc_Rij(pp1,ggg,Rij);
   boost22_lab2ff(Rij,Rij,pp1,gg,GG);
   trans22_cc2on(Rij,Rij,tup);
 

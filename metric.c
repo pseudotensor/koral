@@ -1153,6 +1153,26 @@ fill_geometry(int ix,int iy,int iz,void *geom)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//fills geometry structure for cell face ix,iy,iz in idim
+int 
+fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
+{
+  struct geometry *ggg 
+    = (struct geometry *) geom;
+
+  pick_gb(ix,iy,iz,idim,ggg->gg);
+  pick_Gb(ix,iy,iz,idim,ggg->GG);
+  pick_Tb(tmuup,ix,iy,iz,idim,ggg->tup);
+  pick_Tb(tmulo,ix,iy,iz,idim,ggg->tlo);
+  ggg->alpha=sqrt(-1./ggg->GG[0][0]);
+  ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //fills geometry structure for cell ix,iy,iz in arbitrary metric
 int 
 fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)

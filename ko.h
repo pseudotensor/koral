@@ -277,10 +277,9 @@ int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,l
 
 //metric.c
 
-int 
-fill_geometry(int ix,int iy,int iz,void *geom);
-int 
-fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS);
+int fill_geometry(int ix,int iy,int iz,void *geom);
+int fill_geometry_face(int ix,int iy,int iz,int,void *geom);
+int fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS);
 int calc_metric();
 int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int);
 int calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4],int);
@@ -338,6 +337,7 @@ int u2p_entropy(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_rad(ldouble *uu, ldouble *pp, void*,int*);
 int u2p_rad_onff(ldouble *uu, ldouble *pp, void*,int*);
+int u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected);
 
 //p2u.c
 int calc_conserved(int ix,int iy,int iz);
@@ -383,7 +383,7 @@ int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, l
 
 //rad.c
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
-int calc_Rij(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4]);
+int calc_Rij(ldouble *pp, void*, ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
 int solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas);
 int solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas);
@@ -400,9 +400,8 @@ int solve_radforce(int ix,int iy,int iz,ldouble dt);
 int calc_tautot(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tautot);
 int calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tauabs);
 int calc_Gi_ff(ldouble *pp, ldouble Gi[4]);
-int calc_Gi(ldouble *pp, ldouble gg[][5],ldouble GG[][5],ldouble Gi[4]);
+int calc_Gi(ldouble *pp, void*,ldouble Gi[4]);
 int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int);
-int
-calc_rad_wavespeeds(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval,int verbose);
+int calc_rad_wavespeeds(ldouble *pp,void*,ldouble tautot[3],ldouble *aval,int verbose);
 
 #include "mnemonics.h"
