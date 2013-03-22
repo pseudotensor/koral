@@ -56,7 +56,6 @@
 #define PR_OUT2GIF_1D "PROBLEMS/RVDONUT/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RVDONUT/dump.c"
 #define PR_TOOLS "PROBLEMS/RVDONUT/tools.c"
-#define PR_FINGER "PROBLEMS/RVDONUT/finger.c"
 
 #endif
 

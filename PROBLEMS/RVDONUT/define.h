@@ -8,7 +8,7 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-//#define myMKS1COORDS
+#define myMKS1COORDS
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -16,14 +16,16 @@
 #define MYCOORDS KERRCOORDS
 #endif
 
+#define UTPOT .975
+
 #define VISCOSITY
 #define SIMPLEVISCOSITY
-#define ALPHAVISC 0.1
+#define ALPHAVISC 0.001
 #define RMINVISC 6.
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 100.
+#define DTOUT1 1.e2
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -34,7 +36,7 @@
 //#define PRINTGC_RIGHT
 
 #ifdef myMKS1COORDS
-#define MKS1R0 -2.
+#define MKS1R0 -5.
 #define MINX (log(1.7-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
 #define NX 50
@@ -57,7 +59,6 @@
 #define GAMMA (4./3.)
 #define KKK 1.e-4
 #define ELL 4.5
-#define UTPOT .98
 //#define RHOATMMIN  rhoCGS2GU(1.e-4)
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))

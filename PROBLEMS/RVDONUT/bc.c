@@ -247,8 +247,8 @@ if(ix>=NX) //analytical solution at rout only
      return 0;
    }
 
-//reflections in theta 
-if(iy<0.) //spin axis
+//reflections/outflow in theta 
+if(iy<0.) //spin axis 
   {      
     
     iiy=-iy-1;
@@ -264,7 +264,7 @@ if(iy<0.) //spin axis
 	else
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
-    /* 
+     
 
     //temporary pure outflow
     iiy=0;
@@ -275,7 +275,7 @@ if(iy<0.) //spin axis
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);	
       }
-    */
+    
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section

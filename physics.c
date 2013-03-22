@@ -657,8 +657,8 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
   ldouble p=(GAMMA-1.)*pp[UU];
 
-  T[1][3]=-ALPHAVISC*p;
-  T[3][1]=-ALPHAVISC*p;
+  T[1][3]=ALPHAVISC*p;
+  T[3][1]=ALPHAVISC*p;
 
   trans22_on2cc(T,T,tlo);
   boost22_ff2lab(T,T,pp,gg,GG); 
