@@ -16,9 +16,12 @@
 #define MYCOORDS KERRCOORDS
 #endif
 
+#define SIMPLEVISCOSITY
+#define ALPHAVISC 0.
+
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
