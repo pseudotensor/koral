@@ -11,8 +11,8 @@ xx=xxvec[1];
 yy=xxvec[2];
 zz=xxvec[3];
 
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
+struct geometry geom;
+fill_geometry(ix,iy,iz,&geom);
 
 
 struct geometry geomBL;
@@ -220,6 +220,7 @@ if(ix>=NX) //analytical solution at rout only
      //atmosphere
      //set_radatmosphere(pp,xxvec,gg,GG,0);
 
+#ifdef RADIATION
      //imposing inflowing velocity of the normal observer
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);
@@ -235,6 +236,8 @@ if(ix>=NX) //analytical solution at rout only
      //this works only for Kerr
      //if(pp[7]>0.) pp[7]=0.;
      //if(pp[2]>0.) pp[2]=0.;
+
+#endif
      
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,gg,GG);

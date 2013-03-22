@@ -1,44 +1,56 @@
-//int
-//analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,ldouble *vv)
-//{
+int
+donut_analytical_solution(ldouble *pp,ldouble *xxvecBL,ldouble ggBL[][5],ldouble GGBL[][5] )
+{
 
-ldouble gg[4][5],GG[4][5];
-pick_g(ix,iy,iz,gg);
-pick_G(ix,iy,iz,GG);
-ldouble podpierd=-(GG[0][0]-2.*ELL*GG[0][3]+ELL*ELL*GG[3][3]);
-ldouble ut=-1./sqrt(podpierd);
-ut/=UTPOT;
-ldouble uint,Vphi,rho;
-ldouble xx=get_x(ix,0);
-if(ut<-1. || podpierd<0. )
-  {
-    rho=RHOFLOOR;
-    uint=UFLOOR;
-    Vphi=0.;
-  }
- else
-   {
-     ldouble D,E,W,eps,uT,uphi,uPhi;
-     /*     uphi=-ELL*ut;
-	    uT=GG[0][0]*ut+GG[0][3]*uphi;
-	    eps=1./GAMMA*(-1./ut-1.);
-	    W=uT/sqrt(-gg[0][0]);
-	    D=pow(eps*(GAMMA-1.)/KKK,1./(GAMMA-1.))*W;
-	    E=eps*D*W;
-	    rho=D/W;
-	    uint=E/W;
-	    uPhi=GG[3][3]*uphi+GG[0][3]*ut;
-	    Vphi=uPhi/uT;*/
-     ldouble h=-1./ut;
-     eps=(h-1.)/GAMMA;
-     rho=powl(eps*(GAMMA-1.)/KKK,1./(GAMMA-1.));
-     uint=rho*eps;
-     //		  uint=KKK*powl(rho,GAMMA)/(GAMMA-1.);
-     uphi=-ELL*ut;
-     uT=GG[0][0]*ut+GG[0][3]*uphi;
-     uPhi=GG[3][3]*uphi+GG[0][3]*ut;
-     Vphi=uPhi/uT;
-		  
-   }     
+  ldouble xx=xxvecBL[1];
 
-vv[0]=rho; vv[1]=uint; vv[2]=Vphi; vv[3]=0.;
+ 
+  ldouble podpierd=-(GGBL[0][0]-2.*ELL*GGBL[0][3]+ELL*ELL*GGBL[3][3]);
+  ldouble ut=-1./sqrt(podpierd);
+
+  ut/=UTPOT; //rescales rin
+  ldouble Vphi,Vr;
+  ldouble D,W,eps,uT,uphi,uPhi,rho,ucon[4],uint,E,Fx,Fy,Fz;
+  if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING)
+    return -1; //outside donut
+
+  ldouble h=-1./ut;
+  eps=(h-1.)/GAMMA;
+  rho=powl(eps*(GAMMA-1.)/KKK,1./(GAMMA-1.));
+  uint=rho*eps;
+  uphi=-ELL*ut;
+  uT=GGBL[0][0]*ut+GGBL[0][3]*uphi;
+  uPhi=GGBL[3][3]*uphi+GGBL[0][3]*ut;
+  Vphi=uPhi/uT;
+  Vr=0.;
+
+  //4-velocity in BL
+
+  pp[2]=ucon[1]; 
+  pp[3]=ucon[2];
+  pp[4]=ucon[3];
+  pp[0]=rho;
+  pp[1]=uint;
+
+#ifdef RADIATION
+  ldouble P,aaa,bbb;
+  P=GAMMAM1*uint;
+  //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
+  aaa=4.*SIGMA_RAD;
+  bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
+  ldouble naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
+  ldouble T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+
+  E=calc_LTE_EfromT(T4);
+  Fx=Fy=Fz=0.;
+  uint=calc_PEQ_ufromTrho(T4,rho);
+
+  pp[1]=uint;
+  pp[6]=E;
+  pp[7]=Fx;
+  pp[8]=Fy;
+  pp[9]=Fz;
+#endif
+
+  return 0;
+}

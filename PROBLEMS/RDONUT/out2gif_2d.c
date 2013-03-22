@@ -56,9 +56,11 @@ maxy= 1.02*get_xb(NX,0);
 	  "unset log cb\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
-	  "set title \"v2\"\n"
+	  //	  "set title \"v2\"\n"\
+	  "set title \"rho\"\n"
 	  
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($25) ti \"\" w l ls 1\n"
+	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($25) ti \"\" w l ls 1\n"
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
 	  "set lmargin at screen 0.08\n"
 	  "set rmargin at screen 0.43\n"
@@ -67,10 +69,12 @@ maxy= 1.02*get_xb(NX,0);
 	  "unset log cb\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
-	  "set title \"v4\"\n"
+	  //	  "set title \"v4\"\n"
+	  "set title \"uu\"\n"
 	  
 	  "set palette model RGB rgbformulae 23,28,3\n"
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($27) ti \"\" w l ls 1\n"
+	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($27) ti \"\" w l ls 1\n"
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($15) ti \"\" w l ls 1\n"
 
 	  "set lmargin at screen 0.55\n"
 	  "set rmargin at screen 0.90\n"

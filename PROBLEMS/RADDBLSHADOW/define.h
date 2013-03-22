@@ -5,9 +5,20 @@
 
 #define MYCOORDS MINKCOORDS
 
-#define NX 120
-#define NY 20
+#define NX 150
+#define NY 50
 #define NZ 1
+#define ANGLE .3
+
+
+#define MINX -6.
+#define MAXX 3.//3.
+#define MINY 0.
+#define MAXY 3.//1.5
+
+#define BEAMY (MAXY/4.)//.3
+
+
 #define TSTEPLIM 1.//kind of courant limiter
 #define INT_ORDER 1
 #define RK3STEPPING
@@ -22,10 +33,7 @@
 //#define EXPLICIT_RAD_SOURCE
 #define MASS 1./MSUNCM
 
-#define MINX -6.
-#define MAXX 3.
-#define MINY 0.
-#define MAXY 1.5
+
 #define MINZ -1.
 #define MAXZ 1.
 
@@ -38,12 +46,13 @@
 
 #define RHOAMB 1.e-4
 
+//#define BLOB
 #define RHOBLOB 1.e3
 
 #define BLOBW 5.e-2
-#define KAPPA .1
+#define KAPPA 0.//.1
 
-#define NLEFT 0.99
+#define NLEFT 0.999
 
 #define SPECIFIC_BC
 

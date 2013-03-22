@@ -1,4 +1,5 @@
-#define RADIATION
+//#define RADIATION
+
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
@@ -17,7 +18,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 1.
+#define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -28,21 +29,21 @@
 //#define PRINTGC_RIGHT
 
 #ifdef myMKS1COORDS
-#define MKS1R0 0.
+#define MKS1R0 -2.
 #define MINX (log(1.7-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 30
+#define NX 50
 #else
 #define MINX (1.8*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define NX 60
 #endif
 
-#define NY 30
+#define NY 40
 #define NZ 1
 
 
-#define MINY (0.*Pi/4.)
+#define MINY (0.3*Pi/4.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.

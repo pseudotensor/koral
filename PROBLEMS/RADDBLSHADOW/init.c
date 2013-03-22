@@ -30,7 +30,11 @@ ldouble pp[NV],T;
 /*****************************/
 
 ldouble pamb=calc_PEQ_ufromTrho(TAMB,RHOAMB);
+#ifdef BLOB
 rho=(RHOBLOB-RHOAMB)*exp(-powl(sqrtl(xx*xx+yy*yy+zz*zz),2.)/BLOBW)+RHOAMB;      
+#else
+rho=RHOAMB;
+#endif
 mx=my=mz=0.;
 T=TAMB*RHOAMB/rho;
 //T=TAMB;

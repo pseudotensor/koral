@@ -4,6 +4,10 @@
 //  FILE *fgnu=fopen("plot.gp","w");
 //  char bufor[50];
 
+ldouble sizex=(get_xb(NX,0)-get_xb(0,0))/9.*1200.;
+ldouble sizey=(get_xb(NY,1)-get_xb(0,1))/2. *250.;
+
+
   fprintf(fgnu,
 
 	  
@@ -31,7 +35,8 @@
 
 
 	  "unset surface\n"
-	  "set term gif large size 1200,250\n"
+	  //	  "set term gif large size 1200,250\n"
+	  "set term gif large size %d,%d\n"
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
 	  "set origin 0,0\n"
@@ -99,7 +104,7 @@
 	  //"plot \"table.gp\" w l lc 3 lw 3\n"
 	  "set pm3d\n"
 	  //fname,fname2,get_xb(-2,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1),fname,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1),fname,fname,(int)(NX/20),(int)(NY/8));
-	  ,fname,fname2,get_x(-NG,0),get_xb(NX,0),get_xb(-NG,1),get_xb(NY,1),fname,fname,(int)(NX/20),(int)(NY/8)  );
+	  ,fname,(int)sizex,(int)sizey,fname2,get_x(-NG,0),get_xb(NX,0),get_xb(-NG,1),get_xb(NY,1),fname,fname,(int)(NX/20),(int)(NY/8)  );
 
 	    
 

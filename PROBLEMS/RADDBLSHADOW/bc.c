@@ -16,7 +16,7 @@ ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4],tlo[4][4];
   ldouble xx=get_x(ix,0);
 ldouble yy=get_x(iy,1);
 
-ldouble angle=.4;
+ldouble angle=ANGLE;
 
 
 //symmetry with respect to the lower axis
@@ -38,7 +38,7 @@ if(iy<0)
     return 0.;
   }
 //source of light
- else if(iy>NY-1 || (ix<0 && yy>.3&& 1))
+ else if(iy>NY-1 || (ix<0 && yy>BEAMY && 1))
    {
      ldouble Fx,Fy,Fz,rho,E,uint,vx;
      iix=ix;

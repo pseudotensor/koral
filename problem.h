@@ -8,7 +8,7 @@
 
 //1* RADBEAM2D - beam of light 
 //2 RADINFALL - radial inflow
-//3 DONUT - 2d Polish donut
+//3* DONUT - 2d Polish donut
 //4 GEODESICINFALL - geodesic infall with blobs or not
 //5 EDDINFALL - infall with flux from inside
 //6* RADTUBE- radiative shock tubes as in Farris et al 09 - assumes Edd.approximation which is currently not handled
@@ -27,7 +27,7 @@
 //19 RADBEAM2DKS - beam of light in KS coordinates
 //20 ATMKS - radial atmosphere infalling in KS
 //21 DONUTKS - 2d Polish donut in KS
-//22 DONUTMKS1 - 2d Polish donut in MKS1
+//22* DONUTMKS1 - 2d Polish donut in MKS1
 //23 ATMMKS1 - radial atmosphere infalling in MKS1
 //24 RADBEAMFLAT - beam of light in Cartesian 
 //25* RDONUT - 2d radiative Polish donut in KS
@@ -42,7 +42,7 @@
 //40* CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
 //41* FLATDOT - similar to discrete CYLBEAM but in cartesian 
 
-#define PROBLEM 30
+#define PROBLEM 25
 
 #if(PROBLEM==41)
 

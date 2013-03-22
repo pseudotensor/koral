@@ -206,8 +206,6 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   aval[0]=aval[1]=1./sqrt(gg[1][1]);
   aval[2]=aval[3]=1./sqrt(gg[2][2]);
   aval[4]=aval[5]=1./sqrt(gg[3][3]);
-
-
 #endif
   
 
@@ -588,14 +586,29 @@ calc_Tij( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
     ucon[iv]=pp[1+iv];
   ucon[0]=0.;
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
+  //indices_21(ucon,ucov,gg);
 
   ldouble w=rho+GAMMA*uu;
+  ldouble p=(GAMMA-1.)*uu;
+
+  /*
+  //this formulation works even at the polar axis but provides wrong Tij there
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      T[i][j]=w*ucon[i]*ucov[j]+p*delta(i,j);
+  */
 
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-	T[i][j]=w*ucon[i]*ucov[j]+(GAMMA-1.)*uu*delta(i,j);
-      
+      T[i][j]=w*ucon[i]*ucon[j]+p*GG[i][j];
+
+#ifdef SIMPLEVISCOSITY
+  T[1][3]+=ALPHAVISC*p;
+  T[3][1]+=ALPHAVISC*p;
+#endif  
+
+  indices_2221(T,T,gg);
+
   return 0;
 }
 

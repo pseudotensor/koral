@@ -48,4 +48,4 @@
 #define U2PRADPREC 1.e-5
 #define RADFORCEPREC 1.e-5
 
-#define PRINTGC_LEFT
+//#define PRINTGC_LEFT
