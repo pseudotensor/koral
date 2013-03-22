@@ -292,7 +292,8 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   ldouble T[4][4];
 
   //calculating stress energy tensor components
-  calc_Tij(pp,gg,GG,T);
+  calc_Tij(pp,&geom,T);
+  indices_2221(T,T,gg);
 
   int ii, jj;
   for(ii=0;ii<4;ii++)
@@ -411,7 +412,9 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   //calculating Tij
   ldouble T[4][4];
 
-  calc_Tij(pp,gg,GG,T);
+  calc_Tij(pp,&geom,T);
+  indices_2221(T,T,gg);
+
   //primitives
   ldouble rho=pp[RHO];
   ldouble u=pp[UU];
@@ -572,10 +575,17 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 //**********************************************************************
 //**********************************************************************
 //calculates energy-momentum tensor components basing on vector of primitivies p and given metric g
-//returns T^mu_nu
+//returns T^munu
 int
-calc_Tij( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
+calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 {
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
   int iv,i,j;
   ldouble rho=pp[RHO];
   ldouble uu=pp[UU];
@@ -592,7 +602,7 @@ calc_Tij( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
   ldouble p=(GAMMA-1.)*uu;
 
   /*
-  //this formulation works even at the polar axis but provides wrong Tij there
+  //this old mixed formulation worked even at the polar axis but provides wrong Tij there
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       T[i][j]=w*ucon[i]*ucov[j]+p*delta(i,j);
@@ -602,14 +612,60 @@ calc_Tij( ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble T[][4])
     for(j=0;j<4;j++)
       T[i][j]=w*ucon[i]*ucon[j]+p*GG[i][j];
 
-#ifdef SIMPLEVISCOSITY
-  T[1][3]+=ALPHAVISC*p;
-  T[3][1]+=ALPHAVISC*p;
+#ifdef VISCOSITY
+  ldouble Tvisc[4][4];
+  calc_visc_Tij(pp,ggg,Tvisc);
+  //print_tensor(T);print_tensor(Tvisc);getchar();
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      T[i][j]+=Tvisc[i][j];
 #endif  
 
-  indices_2221(T,T,gg);
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates viscouss energy-momentum tensor components
+//returns T^munu
+int
+calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
+{
+  int i,j;
+
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+  
+#ifdef SIMPLEVISCOSITY
+    //fluid frame
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      T[i][j]=0.;
+
+  ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
+  ldouble xxvecBL[4];
+  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+  
+  if(xxvecBL[1]<RMINVISC) return 0;
+
+  ldouble p=(GAMMA-1.)*pp[UU];
+
+  T[1][3]=-ALPHAVISC*p;
+  T[3][1]=-ALPHAVISC*p;
+
+  trans22_on2cc(T,T,tlo);
+  boost22_ff2lab(T,T,pp,gg,GG); 
+#endif
 
   return 0;
+
 }
 
 

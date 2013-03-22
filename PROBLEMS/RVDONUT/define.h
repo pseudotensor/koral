@@ -1,4 +1,4 @@
-#define RADIATION
+//#define RADIATION
 
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
@@ -8,7 +8,7 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-#define myMKS1COORDS
+//#define myMKS1COORDS
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -16,9 +16,14 @@
 #define MYCOORDS KERRCOORDS
 #endif
 
+#define VISCOSITY
+#define SIMPLEVISCOSITY
+#define ALPHAVISC 0.1
+#define RMINVISC 6.
+
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 1.
+#define DTOUT1 100.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.

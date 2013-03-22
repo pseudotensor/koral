@@ -229,7 +229,8 @@ struct rad_parameters
   ldouble x,y,z;
 };
 
-int calc_Tij( ldouble *p, ldouble g[][5], ldouble G[][5], ldouble T[][4]);
+int calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4]);
+int calc_Tij( ldouble *p, void*, ldouble T[][4]);
 ldouble max_eigen_Jac(ldouble *,ldouble*,int,void*);
 int calc_wavespeeds(int,int,int,ldouble*,ldouble*,ldouble*,ldouble*,ldouble*,ldouble*);
 int calc_wavespeeds_lr(int,int,int,ldouble*);

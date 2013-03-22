@@ -41,8 +41,24 @@
 //33* RADDOT - radiating dots
 //40* CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
 //41* FLATDOT - similar to discrete CYLBEAM but in cartesian 
+//42* RVDONUT - radiative and viscous 
 
-#define PROBLEM 25
+#define PROBLEM 42
+
+#if(PROBLEM==42)
+
+#define PR_DEFINE "PROBLEMS/RVDONUT/define.h"
+#define PR_BC "PROBLEMS/RVDONUT/bc.c"
+#define PR_INIT "PROBLEMS/RVDONUT/init.c"
+#define PR_KAPPA "PROBLEMS/RVDONUT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RVDONUT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RVDONUT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RVDONUT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RVDONUT/dump.c"
+#define PR_TOOLS "PROBLEMS/RVDONUT/tools.c"
+#define PR_FINGER "PROBLEMS/RVDONUT/finger.c"
+
+#endif
 
 #if(PROBLEM==41)
 
@@ -58,6 +74,7 @@
 #define PR_FINGER "PROBLEMS/FLATDOT/finger.c"
 
 #endif
+
 #if(PROBLEM==40)
 
 #define PR_DEFINE "PROBLEMS/CYLBEAMCART/define.h"
