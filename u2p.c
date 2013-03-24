@@ -863,26 +863,28 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       urfcon[2]=0.;
       urfcon[3]=0.;
       if(verbose) {printf("nocapbad: gammarel2=%g\n",gammarel2);}
-    }					
- 
-  if(1) //VELR
-    {
-      ldouble gammarel=sqrt(gammarel2);
-      for(i=1;i<4;i++)
-	{	  
-	  urfcon[i] = alpha * (Av[i] + 1./3.*Erf*GG[0][i]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
-	}
-    }
+    }				
   else
-    {
-      //relative velocity
-      ldouble gamma=urfcon[0]*alpha;
-      for(i=1;i<4;i++)
-	{	  
-	  urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha-GG[0][i]/GG[0][0]/alpha;
-	  urfcon[i]*=gamma;
+    { 
+      if(1) //VELR
+	{
+	  ldouble gammarel=sqrt(gammarel2);
+	  for(i=1;i<4;i++)
+	    {	  
+	      urfcon[i] = alpha * (Av[i] + 1./3.*Erf*GG[0][i]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
+	    }
 	}
-      urfcon[0]=0.;
+      else
+	{
+	  //relative velocity
+	  ldouble gamma=urfcon[0]*alpha;
+	  for(i=1;i<4;i++)
+	    {	  
+	      urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha-GG[0][i]/GG[0][0]/alpha;
+	      urfcon[i]*=gamma;
+	    }
+	  urfcon[0]=0.;
+	}
     }
 
 
@@ -923,22 +925,6 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       
       //      getchar();
     }
- 
-
-  /*
-  if(delta<0.)
-    {
-      // can't assume this conditions means large gamma, because if not, then leads to crazy boost of energy.
-      Erf=ERADFLOOR;
-      //gammarel2=1.0;
-      //Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
-      //zeros for relative velocity
-      urfcon[0]=urfcon[1]=urfcon[2]=urfcon[3]=0.;
-
-      if(verbose) {printf("topcapbad: gammarel2=%g gamma2=%g delta=%g\n",gammarel2,gamma2,delta);}
-    }
-  else 
-  */
 
   if(gammarel2>1.01*gammamax*gammamax || gammarel2<0. || delta<0.) 
     {      
@@ -1085,26 +1071,28 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	  urfcon[2]=0.;
 	  urfcon[3]=0.;
 	  if(verbose) {printf("nocapbad: gammarel2=%g\n",gammarel2);}
-	}					
- 
-      if(1) //VELR
-	{
-	  ldouble gammarel=sqrt(gammarel2);
-	  for(i=1;i<4;i++)
-	    {	  
-	      urfcon[i] = alpha * (Av[i] + 1./3.*Erf*GG[0][i]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
-	    }
-	}
+	}	
       else
 	{
-	  //relative velocity
-	  ldouble gamma=urfcon[0]*alpha;
-	  for(i=1;i<4;i++)
-	    {	  
-	      urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha-GG[0][i]/GG[0][0]/alpha;
-	      urfcon[i]*=gamma;
+	  if(1) //VELR
+	    {
+	      ldouble gammarel=sqrt(gammarel2);
+	      for(i=1;i<4;i++)
+		{	  
+		  urfcon[i] = alpha * (Av[i] + 1./3.*Erf*GG[0][i]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
+		}
 	    }
-	  urfcon[0]=0.;
+	  else
+	    {
+	      //relative velocity
+	      ldouble gamma=urfcon[0]*alpha;
+	      for(i=1;i<4;i++)
+		{	  
+		  urfcon[i]=(3.*Av[i]-Erf*GG[0][i])/(3.*Av[0]-Erf*GG[0][0])/alpha-GG[0][i]/GG[0][0]/alpha;
+		  urfcon[i]*=gamma;
+		}
+	      urfcon[0]=0.;
+	    }
 	}
     }
 
