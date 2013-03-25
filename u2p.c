@@ -851,6 +851,9 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2*alpha*alpha;
+  if((gammarel2-1.0)>-1E-13 && gammarel2<1.0) gammarel2=1.0;
+
+
   debug=0;
 
   Erf=3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
@@ -914,6 +917,9 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
   //gamma in relative velocity definition
   ldouble gammarel2=gamma2*alpha*alpha;
+
+  //to avoid the machine precision error
+  if((gammarel2-1.0)>-1E-13 && gammarel2<1.0) gammarel2=1.0;
 
   if((gammarel2>1.0*gammamax*gammamax || gammarel2<.9 || delta<0.) && verbose) 
     {
@@ -1016,8 +1022,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	  }// end Olek method
 	}// end else if Erf>0
     }
-  //  else if(gammarel2<(-1./GG[0][0]))
-  else if(gammarel2<1. || delta<0.)
+  else if(gammarel2<1.)
     {
       //low cap
      

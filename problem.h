@@ -43,7 +43,7 @@
 //41* FLATDOT - similar to discrete CYLBEAM but in cartesian 
 //42* RVDONUT - radiative and viscous 
 
-#define PROBLEM 42
+#define PROBLEM 1
 
 #if(PROBLEM==42)
 
