@@ -3,7 +3,7 @@
 #define RADIATION
 //#define LABRADFLUXES
 
-#define MYCOORDS SCHWCOORDS//SPHCOORDS// SCHWCOORDS
+#define MYCOORDS SPHCOORDS// SCHWCOORDS
 #define NX 30
 #define NY 1
 #define NZ 30
@@ -69,7 +69,7 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define YZXDUMP
-//#define RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
 #define PRINTGC_LEFT
 #define PRINTGC_RIGHT
 //#define BLOB

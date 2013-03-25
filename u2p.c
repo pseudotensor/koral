@@ -911,7 +911,6 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   //if unphysical try the other root
   if(gamma2<0.) gamma2=  (-b+sqrt(delta))/2./a; 
 
-
   //cap on u^t
   ldouble gammamax=GAMMAMAXRAD;
 
@@ -924,15 +923,16 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   if((gammarel2>1.0*gammamax*gammamax || gammarel2<.9 || delta<0.) && verbose) 
     {
       debug=1;
+
       print_4vector(Av);
-      printf("F/E: %e %e %e f:%e\n",Av[1]/Av[0],Av[2]/Av[0],Av[3]/Av[0],sqrt(Av[1]*Av[1]+Av[2]*Av[2]+Av[3]*Av[3])/Av[0]);
+      printf("F/E: %e %e %e f:%e\n",Av[1]*sqrt(gg[1][1])/Av[0],Av[2]*sqrt(gg[2][2])/Av[0],sqrt(gg[3][3])*Av[3]/Av[0],sqrt(Av[1]*Av[1]+Av[2]*Av[2]+Av[3]*Av[3])/Av[0]);
       printf("gamma2: %.20e %e\n", (-b-sqrt(delta))/2./a, (-b+sqrt(delta))/2./a); 
       printf("delta: %e gRR: %e Erf: %e\n",delta,gRR,3.*Av[0]*alpha*alpha/(4.*gammarel2-1.0));
       
-      //      getchar();
+      //getchar();
     }
 
-  if(gammarel2>1.01*gammamax*gammamax || gammarel2<0. || delta<0.) 
+  if(gammarel2>1.0*gammamax*gammamax || gammarel2<0. || delta<0.) 
     {      
       
       //top cap
@@ -1113,13 +1113,15 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
    if(debug==1 && verbose)
      {
+#ifndef LABRADFLUXES
        ldouble Rij[4][4];
        calc_Rij(pp,ggg,Rij);
        trans22_cc2on(Rij,Rij,tup);
        ldouble Avv[4]={Rij[0][0],Rij[0][1], Rij[0][2],Rij[0][3]};
        print_4vector(Avv);
        printf("F/E: %e %e %e f:%e\n",Avv[1]/Avv[0],Avv[2]/Avv[0],Avv[3]/Avv[0],sqrt(Avv[1]*Avv[1]+Avv[2]*Avv[2]+Avv[3]*Avv[3])/Avv[0]);
- 
+#endif
+
        getchar();
      }
 
