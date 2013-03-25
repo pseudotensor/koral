@@ -224,6 +224,12 @@ print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
      pp[8]=Fy;
      pp[9]=Fz;
 
+#ifdef NOINITFLUX
+     pp[7]=0.;
+     pp[8]=0.;
+     pp[9]=0.;
+#endif
+
      //int_4vector(&pp[6]);
 
      //boosting to lab

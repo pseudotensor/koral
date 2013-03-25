@@ -12,11 +12,11 @@
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define ALLSTEPSOUTPUT 1
+#define ALLSTEPSOUTPUT 0
 #define GAMMA (1.4)
 #define DTOUT1 .5
 
-#define MASS 10.
+#define MASS 1./MSUNCM
 
 #define MINX -1
 #define MAXX 3
@@ -37,13 +37,13 @@
 #define RHOBLOB 1.e3
 
 #define BLOBW 5.e-2
-#define KAPPA 1.e0
+#define KAPPA 1.
 
-#define NLEFT 0.99
+#define NLEFT 0.9999
 
 #define SPECIFIC_BC
 
-#define RADOUTPUTINZAMO
+//#define RADOUTPUTINZAMO
 #define PRINTGC_LEFT
 
 #define U2PPREC 1.e-6

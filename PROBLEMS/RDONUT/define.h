@@ -22,7 +22,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
-//#define CGSOUTPUT
+#define CGSOUTPUT
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 //#define PRINTGC_LEFT

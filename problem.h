@@ -40,10 +40,10 @@
 //32* CYLBEAM - beam towards the axis in cylindrical
 //33* RADDOT - radiating dots
 //40* CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
-//41* FLATDOT - similar to discrete CYLBEAM but in cartesian 
-//42* RVDONUT - radiative and viscous 
+//41* FLATDOT - dot which may be bigger than a dot
+//42* RVDONUT - radiative and viscous dougnut
 
-#define PROBLEM 1
+#define PROBLEM 10
 
 #if(PROBLEM==42)
 

@@ -546,7 +546,10 @@ inverse_44matrix(ldouble a[][4], ldouble ia[][4])
 
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      ia[i][j]= dst[i*4+j];
+      {
+	ia[i][j]= dst[i*4+j];
+	if(isnan(ia[i][j])) return -1;
+      }
 
   return 0;
 }

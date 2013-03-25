@@ -96,7 +96,7 @@ int
 print_state_implicit_lab (int iter, ldouble *x, ldouble *f)
 {
   printf ("iter = %3d x = % .3e % .3e % .3e % .3e "
-	  "f(x) = % .3e % .3e % .3e % .3e\n",
+	  "f(x) = % .13e % .13e % .13e % .13e\n",
 	  iter,
 	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
 }
@@ -106,7 +106,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 {
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
-  ldouble pp[NV],uu[NV],uu0[NV],uup[NV]; 
+  ldouble pp[NV],uu[NV],uu0[NV],uu00[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3[4],xxx[4];
 
   ldouble (*gg)[5],(*GG)[5];
@@ -122,14 +122,23 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     {
       pp[iv]=get_u(p,iv,ix,iy,iz);      
       uu[iv]=get_u(u,iv,ix,iy,iz);  
+      uu00[iv]=uu[iv];
       uu0[iv]=uu[iv];
-    }
+   }
 
-  ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6 ;
+  ldouble EPS = 1.e-6;
+  ldouble CONV = 1.e-6;
+  ldouble DAMP = 0.5;
+
+  ldouble frdt = 1.0;
+  ldouble dttot = 0.;
 
   int verbose=0;
   int iter=0;
+  int failed=0;
+
+  //loop in dt
+
 
   if(verbose) 
     {
@@ -141,87 +150,203 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       print_Nvector(pp,NV);
       print_metric(gg);
     }
-  do
+
+  do 
     {
-      iter++;
+
+      if(verbose) 
+	{
+	  printf("====\n===\n Trying imp lab with frdt | dttot : %f | %f\n",frdt,dttot);
+	  //	  if(frdt<1.) getchar();
+	}
       
-      for(i=0;i<NV;i++)
-	{
-	  uup[i]=uu[i];
-	}
 
-      //values at zero state
-      if(f_implicit_lab(uu0,uu,pp,dt,&geom,f1)<0) return -1;
+      failed=0;
+      iter=0;
+
+      do
+	{
+	  iter++;
+      
+	  for(i=0;i<NV;i++)
+	    {
+	      uup[i]=uu[i];
+	    }
+
+	  //values at zero state
+	  if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f1)<0) 
+	    {
+	      failed=1;
+	      break;
+	      //	  return -1;
+	    }
  
-      //calculating approximate Jacobian
-      for(i=0;i<4;i++)
-	{
-	  for(j=0;j<4;j++)
+	  //calculating approximate Jacobian
+	  for(i=0;i<4;i++)
 	    {
-	      ldouble del;
-	      if(uup[j+6]==0.) del=EPS*uup[6];
-	      else del=EPS*uup[j+6];
-	      uu[j+6]=uup[j+6]-del;
+	      for(j=0;j<4;j++)
+		{
+		  ldouble del;
 
-	      if(f_implicit_lab(uu0,uu,pp,dt,&geom,f2)<0) return -1;
-     
-	      J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
+		  del=EPS*uup[6]; 
 
-	      uu[j+6]=uup[j+6];
+		  uu[j+6]=uup[j+6]-del;
+
+		  if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f2)<0) 
+		    {
+		      failed=1;
+		    }
+		  
+		  if(verbose>0)
+		    {
+		      printf("ij : %d %d\n",i,j);
+		      print_Nvector(uu,NV);
+		      print_state_implicit_lab (iter,xxx,f2); 
+		    }
+
+		  J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
+
+		  uu[j+6]=uup[j+6];
+
+		  if(failed!=0) break;
+		}
 	    }
-	}
 
-      //inversion
-      if(inverse_44matrix(J,iJ)<0)
-	return -1;
+	  if(failed!=0) break;
+	  
+	  if(verbose)
+	    print_tensor(J);
 
-      //updating x
-      for(i=0;i<4;i++)
-	{
-	  xxx[i]=uup[i+6];
-	}
-
-      for(i=0;i<4;i++)
-	{
-	  for(j=0;j<4;j++)
+	  //inversion
+	  if(inverse_44matrix(J,iJ)<0)
 	    {
-	      xxx[i]-=iJ[i][j]*f1[j];
+	      failed=1;
+	      if(verbose) getchar();
+	      break;
 	    }
-	}
 
-      if(verbose>0)    print_state_implicit_lab (iter,xxx,f1); 
+	  if(verbose)
+	    print_tensor(iJ);
 
-      for(i=0;i<4;i++)
-	{
-	  uu[i+6]=xxx[i];
-	}
+	  //updating x
+	  for(i=0;i<4;i++)
+	    {
+	      xxx[i]=uup[i+6];
+	    }
+
+	  for(i=0;i<4;i++)
+	    {
+	      for(j=0;j<4;j++)
+		{
+		  xxx[i]-=iJ[i][j]*f1[j];
+		}
+	    }
+
+	  if(verbose>0)    print_state_implicit_lab (iter,xxx,f1); 
+
+	  for(i=0;i<4;i++)
+	    {
+	      uu[i+6]=xxx[i];
+	    }
   
-      //test convergence
-      for(i=0;i<4;i++)
-	{
-	  f3[i]=(uu[i+6]-uup[i+6]);
-	  f3[i]=fabs(f3[i]/uup[6]);
-	}
+	  //test convergence
+	  for(i=0;i<4;i++)
+	    {
+	      f3[i]=(uu[i+6]-uup[i+6]);
+	      
+	      /*
+	      if(i>0 && fabs(uup[i+6])<EPS)
+		f3[i]=fabs(f3[i]/EPS);
+	      else
+		f3[i]=fabs(f3[i]/uup[i+6]);
+	      */
 
-      if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
-	{
-	  if(verbose) printf("success ===\n");
-	  break;
-	}
+	      f3[i]=fabs(f3[i]/uup[6]);
+	    }
 
-      if(iter>50)
+	  if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
+	    {
+	      if(verbose) printf("success ===\n");
+	      break;
+	    }
+
+	  if(iter>50)
+	    {
+	      return -1;
+	      if(verbose) 
+		{
+		  printf("iter exceeded in solve_implicit_lab() for frdt=%f | %f\n",frdt,dttot);	  
+		}
+	      failed=1;
+	      break;
+	      
+	    }
+     
+	}
+      while(1);
+
+      if(failed==0) 
 	{
-	  printf("iter exceeded in solve_implicit_lab()\n");	  
+	  //opposite changes in gas quantities
+	  uu[1] = uu0[1] - (uu[6]-uu0[6]);
+	  uu[2] = uu0[2] - (uu[7]-uu0[7]);
+	  uu[3] = uu0[3] - (uu[8]-uu0[8]);
+	  uu[4] = uu0[4] - (uu[9]-uu0[9]);
+
+	  //saving basis for next iteration if necessary
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      uu0[iv]=uu[iv];
+	    }
+	  
+	  if(frdt>=1.) 
+	    {
+	      if(verbose) {
+		printf("worked!frdt=%f | %f===\n",frdt,dttot);
+		if(dttot>0.) getchar();}
+	      break;
+	    }
+	  else
+	    {
+	      if(verbose) 
+		{
+		  printf("worked but not the end! frdt=%f | %f===\n",frdt,dttot);
+		  
+		}
+	      dttot+=frdt*(1.-dttot);
+	      frdt*=2.; 
+	      if(frdt>1.) frdt=1.;
+	    }
+
+	  continue;
+	}
+      
+      //didn't work - decreasing time step
+      frdt *= DAMP;
+
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu[iv]=uu0[iv];
+	}
+      
+      if(frdt<0.0001) 
+	{
+	  if(verbose) 
+	    {
+	      printf("time step too small - aborting implicit_lab() ===\n");
+	      getchar();
+	    }
 	  return -1;
 	}
-     
     }
   while(1);
+  
+  //  if(verbose) getchar();
 
-  deltas[0]=uu[6]-uu0[6];
-  deltas[1]=uu[7]-uu0[7];
-  deltas[2]=uu[8]-uu0[8];
-  deltas[3]=uu[9]-uu0[9];
+  deltas[0]=uu[6]-uu00[6];
+  deltas[1]=uu[7]-uu00[7];
+  deltas[2]=uu[8]-uu00[8];
+  deltas[3]=uu[9]-uu00[9];
   
   return 0;
 }
