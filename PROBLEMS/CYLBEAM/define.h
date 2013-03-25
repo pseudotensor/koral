@@ -32,7 +32,7 @@
 
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
-#define MINX (log(0.-MKS1R0))
+#define MINX (log(0.01-MKS1R0))
 #define MAXX (log(20.-MKS1R0))
 #define NX 50
 #else
@@ -69,7 +69,7 @@
 #define SPECIFIC_BC
 
 #define GAMMA (4./3.)
-#define OMSCALE 1.
+#define OMSCALE 0.
 
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
