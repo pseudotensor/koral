@@ -225,12 +225,17 @@ if(ix>=NX) //analytical solution at rout only
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);
      pp[7]=ucon[1];
+     pp[8]=ucon[2];
+     pp[9]=ucon[3];
 
      if(MYCOORDS==KERRCOORDS)
        pp[7]=-100.;
 
+     //pure copy
+     pp[6]=get_u(p,6,iix,iiy,iiz);
+
      //copying with scalings
-     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
+     //pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
     
      //this works only for Kerr

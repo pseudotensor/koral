@@ -43,7 +43,7 @@
 //41* FLATDOT - dot which may be bigger than a dot
 //42* RVDONUT - radiative and viscous dougnut
 
-#define PROBLEM 10
+#define PROBLEM 42
 
 #if(PROBLEM==42)
 
@@ -636,6 +636,10 @@
 #endif
 #endif
 #endif
+#endif
+
+#ifndef ALLOW_EXPLICIT_RAD_SOURCE
+#define ALLOW_EXPLICIT_RAD_SOURCE 0 //whether to allow reducing implicit_lab to explicit
 #endif
 
 #ifndef NX

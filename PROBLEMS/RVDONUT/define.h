@@ -3,6 +3,7 @@
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
+#define ALLOW_EXPLICIT_RAD_SOURCE 1
 
 #define MASS 10.
 #define BHSPIN 0.
@@ -20,7 +21,7 @@
 
 #define VISCOSITY
 #define SIMPLEVISCOSITY
-#define ALPHAVISC 0.001
+#define ALPHAVISC 0.01
 #define RMINVISC 6.
 
 #define OUTCOORDS KERRCOORDS

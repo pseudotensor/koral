@@ -642,12 +642,13 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
-  
-#ifdef SIMPLEVISCOSITY
-    //fluid frame
+
+  //fluid frame
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       T[i][j]=0.;
+  
+#ifdef SIMPLEVISCOSITY
 
   ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
   ldouble xxvecBL[4];

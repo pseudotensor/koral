@@ -1315,88 +1315,164 @@ int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5
 int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5], ldouble *del4)
 {
   int iv;
-  ldouble delapl[NV],uu[NV],pp[NV];
-
-  //calculating radforce
-  //new primitives
-  calc_primitives(ix,iy,iz);
-  //rad-for-force
-  solve_explicit_lab(ix,iy,iz,dt,del4);
-  //del4[] will be passed up
-  indices_21(del4,del4,gg); 
-  
-#if(0)
-
-  //basing on maximal tautot
-  ldouble TAULIMIT=0.1;
-  ldouble dx[3],xx[4];
-  get_xx(ix,iy,iz,xx);
-  dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
-  dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
-  dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);
-  ldouble tautot[3],taumax;
-  calc_tautot(pp,xx,dx,tautot);
-  taumax=my_max(tautot[0],my_max(tautot[1],tautot[2]));
-  if(taumax<TAULIMIT) 
-    return 0; //can do explicit
-  else
-    return 1; //must do implicitxs
-
-#else 
-
-  //based on comparison of Gi[i] with uu[i]
-  ldouble DULIMIT=0.1;
-
-  //gettin' pp & uu
-  for(iv=0;iv<NV;iv++)
-    {
-      uu[iv]=get_u(u,iv,ix,iy,iz);
-      pp[iv]=get_u(p,iv,ix,iy,iz);
-    }
-
-  //changes to conserved
-  delapl[0]=0.;
-  delapl[1]=-del4[0];
-  delapl[2]=-del4[1];
-  delapl[3]=-del4[2];
-  delapl[4]=-del4[3];
-  delapl[5]=0.;
-  delapl[6]=del4[0];
-  delapl[7]=del4[1];
-  delapl[8]=del4[2];
-  delapl[9]=del4[3];
-  
-  //comparing with conserved to get the largest change
-  ldouble maxdu=-1., uval;
-
-  for(iv=1;iv<NV;iv++)
-    {
+  ldouble delapl[NV],uu[NV],pp[NV],uu0[NV];
  
-      if(iv==5) continue; //skip entropy
-      if(iv==3 && NY==1) continue; //skip y-momentum
-      if(iv==8 && NY==1) continue; //skip y-momentum
-      if(iv==4 && NZ==1) continue; //skip z-momentum
-      if(iv==9 && NZ==1) continue; //skip z-momentum
+  int method=0;
+  
+  if(method==0) //checks if inversion succesful and then max of du/u < DULIMIT
+    {
+      //calculating radforce
+      //new primitives
+      calc_primitives(ix,iy,iz);
+      //rad-for-force
+      solve_explicit_lab(ix,iy,iz,dt,del4);
+      //del4[] will be passed up
+      indices_21(del4,del4,gg); 
+      //changes to conserved
+      delapl[0]=0.;
+      delapl[1]=-del4[0];
+      delapl[2]=-del4[1];
+      delapl[3]=-del4[2];
+      delapl[4]=-del4[3];
+      delapl[5]=0.;
+      delapl[6]=del4[0];
+      delapl[7]=del4[1];
+      delapl[8]=del4[2];
+      delapl[9]=del4[3];
 
-      uval=uu[iv];
-
-      if(fabs(uval)<SMALL) //to avoid dividing by 0
-	maxdu=my_max(maxdu,1./SMALL);
-      else
+      //gettin' pp & uu
+      for(iv=0;iv<NV;iv++)
 	{
-	  maxdu=my_max(maxdu,fabs(delapl[iv]/uval));
+	  uu0[iv]=get_u(u,iv,ix,iy,iz);
+	  pp[iv]=get_u(p,iv,ix,iy,iz);
+	  uu[iv]=uu0[iv]+delapl[iv];
 	}
+
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+  
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu[iv]=get_u(u,iv,ix,iy,iz);
+	  pp[iv]=get_u(p,iv,ix,iy,iz);
+	}
+
+      //converting to primitives
+      int corrected, fixups[2];
+      u2p(uu,pp,&geom,&corrected,fixups);
+
+      if(corrected!=0) return 1; //must do implicit
+      
+      //comparing with conserved to get the largest change
+      ldouble maxdu=-1., uval;
+      ldouble DULIMIT=0.1;
+
+      for(iv=1;iv<NV;iv++)
+	{
+ 	  if(iv==5) continue; //skip entropy
+	  if(iv==3 && NY==1) continue; //skip y-momentum
+	  if(iv==8 && NY==1) continue; //skip y-momentum
+	  if(iv==4 && NZ==1) continue; //skip z-momentum
+	  if(iv==9 && NZ==1) continue; //skip z-momentum
+
+	  uval=uu[iv];
+
+	  if(fabs(uval)<SMALL) //to avoid dividing by 0
+	    maxdu=my_max(maxdu,1./SMALL);
+	  else
+	    {
+	      maxdu=my_max(maxdu,fabs(delapl[iv]/uval));
+	    }
+	}
+
+      if(maxdu<DULIMIT)
+	return 0; //can do explicit
+      else
+	return 1; //must do implicit
+
     }
 
-  //debug
-  //printf("%d %d %d: if implicit = %e | %d\n",ix,iy,iz,maxdu,maxdu < DULIMIT ? 0 : 1); getchar();
+  if(method==1) //basing on maximal tautot
+    {
+      ldouble TAULIMIT=0.1;
+      ldouble dx[3],xx[4];
+      get_xx(ix,iy,iz,xx);
+      dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
+      dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
+      dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);
+      ldouble tautot[3],taumax;
+      calc_tautot(pp,xx,dx,tautot);
+      taumax=my_max(tautot[0],my_max(tautot[1],tautot[2]));
+      if(taumax<TAULIMIT) 
+	return 0; //can do explicit
+      else
+	return 1; //must do implicitxs
+    }
 
-  if(maxdu<DULIMIT)
-    return 0; //can do explicit
-  else
-    return 1; //must do implicit
+  if(method==2) //based on comparison of Gi[i] with uu[i]
+    {
+      //calculating radforce
+      //new primitives
+      calc_primitives(ix,iy,iz);
+      //rad-for-force
+      solve_explicit_lab(ix,iy,iz,dt,del4);
+      //del4[] will be passed up
+      indices_21(del4,del4,gg); 
 
-#endif
+      ldouble DULIMIT=0.1;
+
+      //gettin' pp & uu
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu[iv]=get_u(u,iv,ix,iy,iz);
+	  pp[iv]=get_u(p,iv,ix,iy,iz);
+	}
+
+      //changes to conserved
+      delapl[0]=0.;
+      delapl[1]=-del4[0];
+      delapl[2]=-del4[1];
+      delapl[3]=-del4[2];
+      delapl[4]=-del4[3];
+      delapl[5]=0.;
+      delapl[6]=del4[0];
+      delapl[7]=del4[1];
+      delapl[8]=del4[2];
+      delapl[9]=del4[3];
+  
+      //comparing with conserved to get the largest change
+      ldouble maxdu=-1., uval;
+
+      for(iv=1;iv<NV;iv++)
+	{
+ 
+	  if(iv==5) continue; //skip entropy
+	  if(iv==3 && NY==1) continue; //skip y-momentum
+	  if(iv==8 && NY==1) continue; //skip y-momentum
+	  if(iv==4 && NZ==1) continue; //skip z-momentum
+	  if(iv==9 && NZ==1) continue; //skip z-momentum
+
+	  uval=uu[iv];
+
+	  if(fabs(uval)<SMALL) //to avoid dividing by 0
+	    maxdu=my_max(maxdu,1./SMALL);
+	  else
+	    {
+	      maxdu=my_max(maxdu,fabs(delapl[iv]/uval));
+	    }
+	}
+
+      //debug
+      //printf("%d %d %d: if implicit = %e | %d\n",ix,iy,iz,maxdu,maxdu < DULIMIT ? 0 : 1); getchar();
+
+      if(maxdu<DULIMIT)
+	return 0; //can do explicit
+      else
+	return 1; //must do implicit
+
+    }
+
+  return 1;
 
 }
   

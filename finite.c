@@ -730,13 +730,18 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
  	      //implicit in lab frame in four dimensions - fiducial 
 	      //test if implicit necessary
 	      ldouble del4[4]; 
-	      if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4) || 1)
-		implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
-	      else
+	      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
 		{
-		    set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
-		    apply_rad_source_del4(ix,iy,iz,del4);	      
+		  if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
+		    implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		  else
+		    {
+		      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
+		      apply_rad_source_del4(ix,iy,iz,del4);	      
+		    }
 		}
+	      else
+		implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
 #endif
 
 #ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
