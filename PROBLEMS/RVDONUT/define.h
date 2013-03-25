@@ -14,19 +14,19 @@
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
 #else
-#define MYCOORDS KERRCOORDS
+#define MYCOORDS KSCOORDS
 #endif
 
 #define UTPOT .975
 
-#define VISCOSITY
+//#define VISCOSITY
 #define SIMPLEVISCOSITY
 #define ALPHAVISC 0.01
 #define RMINVISC 6.
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 5.e0
+#define DTOUT1 10.e0
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -37,17 +37,17 @@
 //#define PRINTGC_RIGHT
 
 #ifdef myMKS1COORDS
-#define MKS1R0 -10.
-#define MINX (log(1.7-MKS1R0))
+#define MKS1R0 0.
+#define MINX (log(1.5-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 32
+#define NX 48
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 30.//27.8
 #define NX 70
 #endif
 
-#define NY 32
+#define NY 24
 #define NZ 1
 
 

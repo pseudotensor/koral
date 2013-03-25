@@ -615,7 +615,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 #ifdef VISCOSITY
   ldouble Tvisc[4][4];
   calc_visc_Tij(pp,ggg,Tvisc);
-  //print_tensor(T);print_tensor(Tvisc);getchar();
+  //  if(geom->ix>20 && geom->iy==NY-1) {print_tensor(T);print_tensor(Tvisc);getchar();}
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       T[i][j]+=Tvisc[i][j];
