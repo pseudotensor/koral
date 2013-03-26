@@ -42,8 +42,23 @@
 //40* CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
 //41* FLATDOT - dot which may be bigger than a dot
 //42* RVDONUT - radiative and viscous dougnut
+//43* RVDONUTIN - radiative and viscous dougnut inflowing
 
-#define PROBLEM 24
+#define PROBLEM 43
+
+#if(PROBLEM==43)
+
+#define PR_DEFINE "PROBLEMS/RVDONUTIN/define.h"
+#define PR_BC "PROBLEMS/RVDONUTIN/bc.c"
+#define PR_INIT "PROBLEMS/RVDONUTIN/init.c"
+#define PR_KAPPA "PROBLEMS/RVDONUTIN/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RVDONUTIN/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RVDONUTIN/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RVDONUTIN/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RVDONUTIN/dump.c"
+#define PR_TOOLS "PROBLEMS/RVDONUTIN/tools.c"
+
+#endif
 
 #if(PROBLEM==42)
 

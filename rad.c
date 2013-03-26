@@ -1614,7 +1614,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 {
   ldouble del4[4],delapl[NV];
   int iv;
-  int verbose=1;
+  int verbose=0;
   
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
