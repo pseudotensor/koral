@@ -202,7 +202,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 
   calc_rad_wavespeeds(pp,&geom,tautot,aval,verbose);
 
-#ifdef WIDENPRESSURE
+#ifdef FULLRADWAVESPEEDS
   aval[0]=aval[1]=1./sqrt(gg[1][1]);
   aval[2]=aval[3]=1./sqrt(gg[2][2]);
   aval[4]=aval[5]=1./sqrt(gg[3][3]);

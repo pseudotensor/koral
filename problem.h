@@ -43,8 +43,23 @@
 //41* FLATDOT - dot which may be bigger than a dot
 //42* RVDONUT - radiative and viscous dougnut
 //43* RVDONUTIN - radiative and viscous dougnut inflowing
+//44* RADNTCYL - emission from midplane in cylindrical
 
-#define PROBLEM 43
+#define PROBLEM 44
+
+#if(PROBLEM==44)
+
+#define PR_DEFINE "PROBLEMS/RADNTCYL/define.h"
+#define PR_BC "PROBLEMS/RADNTCYL/bc.c"
+#define PR_INIT "PROBLEMS/RADNTCYL/init.c"
+#define PR_KAPPA "PROBLEMS/RADNTCYL/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADNTCYL/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADNTCYL/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADNTCYL/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADNTCYL/dump.c"
+#define PR_TOOLS "PROBLEMS/RADNTCYL/tools.c"
+
+#endif
 
 #if(PROBLEM==43)
 
