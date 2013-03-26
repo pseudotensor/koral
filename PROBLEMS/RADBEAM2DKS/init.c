@@ -17,6 +17,10 @@ ldouble xx,yy,zz;
 ldouble uu[NV];
 ldouble xxvec[4];
 
+
+  struct geometry geomBL;
+fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
 get_xx(ix,iy,iz,xxvec);
 coco_N(xxvec,xxvec,MYCOORDS,BLCOORDS);
 xx=xxvec[1];
@@ -88,7 +92,7 @@ ldouble tupBL[4][4],tloBL[4][4];
 calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
 calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+prad_ff2lab(pp,pp,&geomBL);
 
 //to transform radiative primitives from BL to MY
 trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);

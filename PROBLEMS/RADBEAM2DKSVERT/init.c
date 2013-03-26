@@ -80,6 +80,9 @@ pp[8]=Fy;
 pp[9]=Fz;
 
 //working in BL
+
+  struct geometry geom;
+fill_geometry_arb(ix,iy,iz,&geom,BLCOORDS);
 ldouble ggBL[4][5],GGBL[4][5];
 calc_g_arb(xxvec,ggBL,KERRCOORDS);
 calc_G_arb(xxvec,GGBL,KERRCOORDS);
@@ -88,7 +91,7 @@ ldouble tupBL[4][4],tloBL[4][4];
 calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
 calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
+prad_ff2lab(pp,pp,&geom);
 
 //to transform radiative primitives from BL to MY
 trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);

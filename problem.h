@@ -24,16 +24,16 @@
 //16 RADPULSE3D - radiative blob spreading around
 //17* RADDBLSHADOW - radiative shadow with two beams inclined
 //18 ATMSTATIC - hydro atmosphere 
-//19 RADBEAM2DKS - beam of light in KS coordinates
+//19* RADBEAM2DKS - beam of light in KS coordinates
 //20 ATMKS - radial atmosphere infalling in KS
 //21 DONUTKS - 2d Polish donut in KS
 //22* DONUTMKS1 - 2d Polish donut in MKS1
 //23 ATMMKS1 - radial atmosphere infalling in MKS1
-//24 RADBEAMFLAT - beam of light in Cartesian 
+//24* RADBEAMFLAT - beam of light in Cartesian 
 //25* RDONUT - 2d radiative Polish donut in KS
-//26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
-//27 RADFLATNESS - flat but with non-zero four-force
-//28 BOWSHOCK - bow shock hydro test
+//26* RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
+//27* RADFLATNESS - flat but with non-zero four-force
+//28* BOWSHOCK - bow shock hydro test
 //29* RADWALL - flat with wall
 //30* RADNT - emission from midplane
 //31* FLATDISK - emission from flat disk
@@ -43,7 +43,7 @@
 //41* FLATDOT - dot which may be bigger than a dot
 //42* RVDONUT - radiative and viscous dougnut
 
-#define PROBLEM 42
+#define PROBLEM 24
 
 #if(PROBLEM==42)
 

@@ -29,7 +29,7 @@
 #define NZ 1
 
 
-#define MINY (0.1*Pi/4.)
+#define MINY (0.001*Pi/4.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.

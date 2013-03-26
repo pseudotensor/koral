@@ -33,8 +33,8 @@
 //#define RADSOURCEOFF
 #define FLATBACKGROUND
 
-#define MINY -.25*Pi/2.
-#define MAXY .27*Pi/2.
+#define MINY 0.001*Pi/2.
+#define MAXY .25*Pi/2.
 
 #define MINZ 0.
 #define MAXZ .01*Pi/4.//8.*Pi/4.
