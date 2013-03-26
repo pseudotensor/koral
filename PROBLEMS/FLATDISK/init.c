@@ -27,8 +27,8 @@ ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
 
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
+struct geometry geom;
+fill_geometry(ix,iy,iz,&geom);
 
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);

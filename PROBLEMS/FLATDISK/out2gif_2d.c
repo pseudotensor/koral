@@ -62,10 +62,11 @@ maxy= 1.02*get_xb(NX,0);
 	  //	  "set title \"v2\"\n"
 	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($25) ti \"\" w l ls 1\n"
 
-	  "set title \"F_phi\"\n"
+	  //	  "set title \"F_phi\"\n"
+	  "set title \"rho\"\n"
 	  "set log cb\n"
 	  "set cbrange [1e-6:1]\n"
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):23 ti \"\" w l ls 1\n"
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):14 ti \"\" w l ls 1\n"
 	  "set autoscale cb\n"
 
 	  "set lmargin at screen 0.08\n"

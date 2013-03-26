@@ -126,7 +126,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       uu0[iv]=uu[iv];
    }
 
-  ldouble EPS = 1.e-6;
+  ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6;
   ldouble DAMP = 0.5;
 
@@ -272,7 +272,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 
 	  if(iter>50)
 	    {
-	      return -1;
+	      //return -1;
 	      if(verbose) 
 		{
 		  printf("iter exceeded in solve_implicit_lab() for frdt=%f | %f\n",frdt,dttot);	  
@@ -310,8 +310,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	    {
 	      if(verbose) 
 		{
-		  printf("worked but not the end! frdt=%f | %f===\n",frdt,dttot);
-		  
+		  printf("worked but not the end! frdt=%f | %f===\n",frdt,dttot);		  
 		}
 	      dttot+=frdt*(1.-dttot);
 	      frdt*=2.; 
@@ -1614,14 +1613,18 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 {
   ldouble del4[4],delapl[NV];
   int iv;
-  int verbose=0;
+  int verbose=1;
   
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
   if(solve_implicit_lab(ix,iy,iz,dt,del4)<0)
     {
       //numerical implicit in 4D did not work
-      if(verbose) printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\ntrying imp_ff... ",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
+      if(verbose) 
+	{
+	  printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\ntrying imp_ff... ",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
+	  //getchar();
+	}
       //use the explicit-implicit backup method
       if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)
 	{

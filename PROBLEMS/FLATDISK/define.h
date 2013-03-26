@@ -1,5 +1,5 @@
 #define RADIATION
-#define EXPLICIT_RAD_SOURCE
+//#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
 #define MASS 10.
@@ -19,7 +19,7 @@
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
 #define RADOUTPUTINZAMO
-//#define PRINTYGC_LEFT
+#define PRINTYGC_RIGHT
 
 #define MINX 4.
 #define MAXX 100.
@@ -29,11 +29,14 @@
 #define NZ 1
 
 
-#define MINY (0.001*Pi/4.)
+#define MINY (0.01*Pi/4.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
+//#define COPY_XBC
+//#define COPY_YBC
+//#define COPY_ZBC
 
 #define GAMMA (4./3.)
 #define KKK 1.e-4

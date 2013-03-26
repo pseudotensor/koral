@@ -189,13 +189,13 @@ if(iy>=NY) //equatorial plane
       }
 
     ldouble rBL=xxvecBL[1];
-    ldouble rdisk=15.;
+    ldouble rdisk=25.;
     if(rBL<rdisk) //hot boundary
       {
 
 	pp[6]=calc_LTE_EfromT(1.e11);
 	pp[7]=pp[8]=pp[9]=0.;
-	//	pp[8]=-.5*pp[6];
+	//pp[8]=-.5*pp[6];
 
 
 	//Keplerian gas
@@ -214,8 +214,15 @@ if(iy>=NY) //equatorial plane
 	
 	trans_pall_coco(pp, pp, SPHCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
       }
+ 
+    /*   
+    if(rBL<20.) {
+      printf("%f\n",rBL); 
+      print_Nvector(pp,NV);
+      getchar();
+    }
+    */
     
-
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
