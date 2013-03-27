@@ -8,6 +8,7 @@
 
 #define myMCYL1COORDS
 #define MULTIRADFLUID
+#define OMSCALE 1.
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS
@@ -31,7 +32,7 @@
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
 #define MINX (log(0.-MKS1R0))
-#define MAXX (log(20.-MKS1R0))
+#define MAXX (log(10.-MKS1R0))
 #define NX 50
 #else
 #define MINX  0.
@@ -51,7 +52,7 @@
 
 #define MINZ 0.
 
-#define FULLPHI
+//#define FULLPHI
 
 #ifdef FULLPHI
 #define MAXZ 2.*Pi
@@ -63,7 +64,7 @@
 #define SPECIFIC_BC
 
 #define GAMMA (4./3.)
-#define OMSCALE 0.
+
 
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))

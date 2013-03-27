@@ -248,6 +248,125 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
   return 0;
 } 
 
+/*****************************************************************/
+/****** radiative lab-frame on primitives (E,F^i) -> primitives in lab frame  *******/
+/*****************************************************************/
+int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+#ifndef MULTIRADFLUID
+  ldouble Rij[4][4];
+  int i,j;
+
+  int verbose=0;
+ 
+  calc_Rij_ff(pp1,Rij);  
+  trans22_on2cc(Rij,Rij,tlo);  
+  indices_2221(Rij,Rij,gg);  
+
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+
+  //temporarily store conserved in pp2[]
+  pp2[6]=Rij[0][0];
+  pp2[7]=Rij[0][1];
+  pp2[8]=Rij[0][2];
+  pp2[9]=Rij[0][3];
+
+  //convert to real primitives
+  int corrected;
+
+  u2p_rad(pp2,pp2,geom,&corrected);
+#else
+  ldouble Rij[NRF][4][4];
+  int i,j,irf;
+  int verbose=0;
+
+  calc_Rij_ff_mf(pp1,Rij);  
+  for(irf=0;irf<NRF;irf++)
+    {
+      trans22_on2cc(Rij[irf],Rij[irf],tlo);  
+      indices_2221(Rij[irf],Rij[irf],gg);  
+      //temporarily store conserved in pp2[]
+      pp2[EE(irf)]=Rij[irf][0][0];
+      pp2[FX(irf)]=Rij[irf][0][1];
+      pp2[FY(irf)]=Rij[irf][0][2];
+      pp2[FZ(irf)]=Rij[irf][0][3];
+    }
+
+  //hydro
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+
+  //convert to real primitives
+  int corrected;
+
+  u2p_rad(pp2,pp2,geom,&corrected);
+#endif
+
+  return 0;
+} 
+
+//*****************************************************************/
+/********** radiative primitives lab -> (E,F^i) in lab frame *********/
+/*****************************************************************/
+int prad_lab2on(ldouble *pp1, ldouble *pp2, void *ggg)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+#ifndef MULTIRADFLUID
+  ldouble Rij[4][4];
+  int i,j;  
+
+  calc_Rij(pp1,gg,GG,Rij);
+  trans22_cc2on(Rij,Rij,tup);
+
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+
+  //E,F^i
+  pp2[6]=Rij[0][0];
+  pp2[7]=Rij[0][1];
+  pp2[8]=Rij[0][2];
+  pp2[9]=Rij[0][3];
+#else
+  ldouble Rij[NRF][4][4];
+  int i,j,irf;  
+
+  calc_Rij_mf(pp1,gg,GG,Rij);
+  for(irf=0;irf<NRF;irf++)
+    {
+      trans22_cc2on(Rij[irf],Rij[irf],tup);
+      //E,F^i
+      pp2[EE(irf)]=Rij[irf][0][0];
+      pp2[FX(irf)]=Rij[irf][0][1];
+      pp2[FY(irf)]=Rij[irf][0][2];
+      pp2[FZ(irf)]=Rij[irf][0][3];
+    }
+
+  for(i=0;i<NVHD;i++)
+    pp2[i]=pp1[i];
+  
+#endif
+
+  return 0;
+} 
+
 /***********************************************************************/
 /******radiative primitives (E,F^i) fluid frame -> (E,F^i) in ZAMO *********/
 /***********************************************************************/
@@ -1538,10 +1657,30 @@ print_4vector(ldouble v[4])
 int
 print_Nvector(ldouble v[4],int N)
 {
+#ifndef MULTIRADFLUID
   int i;
   printf("============\n");
   for(i=0;i<N;i++)
   printf("%10.7e ",v[i]);
   printf("\n============\n");
   return 0;  
+#else
+  int i; 
+  printf("============\n");
+  if(N!=NV)
+    {
+      for(i=0;i<N;i++)
+	printf("%10.7e ",v[i]);
+    }
+  else
+    {
+      for(i=0;i<NVHD;i++)
+	printf("%10.7e ",v[i]);
+      for(i=0;i<NRF;i++)
+	printf("\n%10.7e %10.7e %10.7e %10.7e",v[EE(i)],v[FX(i)],v[FY(i)],v[FZ(i)]);
+      printf("\n");
+    }
+  printf("\n============\n");
+  return 0;  
+#endif
 }

@@ -40,12 +40,14 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
 int
 redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 {
+  int method=1;
+  ldouble power=10.;
   int verbose=0;
   
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  //  if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1+2 ) verbose=1;
+  //if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1+2 ) verbose=1;
 
   if(verbose)
     {
@@ -68,6 +70,16 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 
   calc_rad_wavespeeds_pure_mf_each(pp,geom,aval);
 
+  for(ii=0;ii<NRF;ii++)
+    {
+      aval[ii][0]*=sqrt(gg[1][1]);
+      aval[ii][1]*=sqrt(gg[1][1]);
+      aval[ii][2]*=sqrt(gg[2][2]);
+      aval[ii][3]*=sqrt(gg[2][2]);
+      aval[ii][4]*=sqrt(gg[3][3]);
+      aval[ii][5]*=sqrt(gg[3][3]);
+    }
+
   if(verbose)
     {
       printf("=== wavespeeds ===\n");
@@ -75,7 +87,6 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	printf("%d : [%e %e] [%e %e] [%e %e]\n",ii,aval[ii][0],aval[ii][1],aval[ii][2],aval[ii][3],aval[ii][4],aval[ii][5]);
     }
 
-  
   for(ii=0;ii<NRF;ii++)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
@@ -96,35 +107,41 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	  vxl=my_min(aval[irf][0],-MINVEL);
 	  vxr=my_max(aval[irf][1],MINVEL);
 	  
-	  //mixing linear in characteristic velocities
-	  vxl=fabs(vxl);
-	  A[irf][0]=vxr/(vxl+vxr);
-	  A[irf][1]=vxl/(vxl+vxr);
+	  if(method==0)
+	    {
+	      //mixing linear in characteristic velocities
+	      vxl=fabs(vxl);
+	      A[irf][0]=vxr/(vxl+vxr);
+	      A[irf][1]=vxl/(vxl+vxr);
+	    }
 
-	  //mixing to arb. power in characteristic velocities	  
-	  vxl=fabs(vxl);
-	  ldouble power=5.;
-	  A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power));
-	  A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power));
+	  if(method==1)
+	    {
+	      //mixing to arb. power in characteristic velocities	  
+	      vxl=fabs(vxl);
+	      A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power));
+	      A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power));
+	    }
 	  
-	  //discrete mixing
-	  /*
-	  if(fabs((vxr-vxl)/vxr)<1.e-5)
-	     {
-	      A[irf][0]=.5;
-	      A[irf][1]=.5;
-	    }
-	  else if(vxr>vxl)
+	  if(method==2)
 	    {
-	      A[irf][0]=1.-MINVEL;
-	      A[irf][1]=0.+MINVEL;
+	      //discrete mixing	      
+	      if(fabs((vxr-vxl)/vxr)<1.e-5)
+		{
+		  A[irf][0]=.5;
+		  A[irf][1]=.5;
+		}
+	      else if(vxr>vxl)
+		{
+		  A[irf][0]=1.-MINVEL;
+		  A[irf][1]=0.+MINVEL;
+		}
+	      else
+		{
+		  A[irf][1]=1.-MINVEL;
+		  A[irf][0]=0.+MINVEL;
+		}
 	    }
-	  else
-	    {
-	      A[irf][1]=1.-MINVEL;
-	      A[irf][0]=0.+MINVEL;
-	    }
-	  */
 	  
 	}
 
@@ -146,83 +163,87 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	      vyr=my_max(aval[irf][5],MINVEL);
 	    }
 	    
-	  
-	  //mixing linear in characteristic velocities
-	  vxl=fabs(vxl);
-	  vyl=fabs(vyl);
-
-	  A[irf][0]=vxr/(vxl+vxr)*vyr/(vyl+vyr);
-	  A[irf][1]=vxl/(vxl+vxr)*vyr/(vyl+vyr);
-	  A[irf][2]=vxl/(vxl+vxr)*vyl/(vyl+vyr);
-	  A[irf][3]=vxr/(vxl+vxr)*vyl/(vyl+vyr);
-
-	  //arbitrary power
-	  double power=10.;
-	  A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
-	  A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
-	  A[irf][2]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
-	  A[irf][3]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
-
-	  /*
-	  //discrete + damping
-	  if(NZ==1)
+	  if(method==0)
 	    {
-	      vxl=aval[irf][0];
-	      vxr=aval[irf][1];
-	      vyl=aval[irf][2];
-	      vyr=aval[irf][3];
+	      //mixing linear in characteristic velocities
+	      vxl=fabs(vxl);
+	      vyl=fabs(vyl);
+	      
+	      A[irf][0]=vxr/(vxl+vxr)*vyr/(vyl+vyr);
+	      A[irf][1]=vxl/(vxl+vxr)*vyr/(vyl+vyr);
+	      A[irf][2]=vxl/(vxl+vxr)*vyl/(vyl+vyr);
+	      A[irf][3]=vxr/(vxl+vxr)*vyl/(vyl+vyr);
 	    }
-	  else if(NY==1)
+
+	  if(method==1)
 	    {
-	      vxl=aval[irf][0];
-	      vxr=aval[irf][1];
-	      vyl=aval[irf][4];
-	      vyr=aval[irf][5];
+	      //arbitrary power
+	      A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
+	      A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
+	      A[irf][2]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
+	      A[irf][3]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
 	    }
-	  vxl=fabs(vxl);
-	  vyl=fabs(vyl);
-	  ldouble DUMPEDGE=1.e-2;
-	  ldouble MINMIXING=1.e-5;
-	  ldouble fdump=fabs((vxr-vxl)/(vxr+vxl))+fabs((vyr-vyl)/(vyr+vyl)); //goes to zero for zero fluxes = zero rad.frame velocity
 
-	  //temporary, only for ortonormal basis
-	  fdump=(uu0[FX(irf)]*uu0[FX(irf)]+uu0[FY(irf)]*uu0[FY(irf)])/uu0[EE(irf)]/uu0[EE(irf)];
-
-	  ldouble dumping=exp(-fdump/DUMPEDGE);
-
-	  int wedgeno=-1;
-	  if(uu0[FX(irf)]>fabs(uu0[FY(irf)]))
-	    wedgeno=0;
-	  if(uu0[FX(irf)]<-fabs(uu0[FY(irf)]))
-	    wedgeno=2;
-	  if(uu0[FY(irf)]>fabs(uu0[FX(irf)]))
-	    wedgeno=1;
-	  if(uu0[FY(irf)]<-fabs(uu0[FX(irf)]))
-	    wedgeno=3;
-
-	  if(wedgeno>=0) //not aligned with axes
+	  if(method==2)
 	    {
-	      A[irf][wedgeno]=1.-dumping*3./4.;
-	      for(ii=0;ii<NRF;ii++)
+	      //discrete + damping
+	      if(NZ==1)
 		{
-		  if(ii==wedgeno) continue;
-		  A[irf][ii]=dumping*1./4.;
-		  if(A[irf][ii]<MINMIXING) {
-		    A[irf][ii]=MINMIXING;
-		    A[irf][wedgeno]-=MINMIXING;
-		  }
+		  vxl=aval[irf][0];
+		  vxr=aval[irf][1];
+		  vyl=aval[irf][2];
+		  vyr=aval[irf][3];
 		}
-	    }
-	    else //special handling of aligned fluxes - not sure if necessary
-	    {
-	    for(ii=0;ii<NRF;ii++)
-	    A[irf][ii]=MINMIXING;
-	    A[irf][irf]=1.-3.*MINMIXING;
-	    }
-	  
+	      else if(NY==1)
+		{
+		  vxl=aval[irf][0];
+		  vxr=aval[irf][1];
+		  vyl=aval[irf][4];
+		  vyr=aval[irf][5];
+		}
+	      vxl=fabs(vxl);
+	      vyl=fabs(vyl);
+	      ldouble DUMPEDGE=1.e-2;
+	      ldouble MINMIXING=1.e-5;
+	      ldouble fdump=fabs((vxr-vxl)/(vxr+vxl))+fabs((vyr-vyl)/(vyr+vyl)); //goes to zero for zero fluxes = zero rad.frame velocity
 
-	  if(verbose) printf("=== dumping for irf=%d -> %f\n",irf,dumping);
-	  */
+	      //temporary, only for ortonormal basis
+	      fdump=(uu0[FX(irf)]*uu0[FX(irf)]+uu0[FY(irf)]*uu0[FY(irf)])/uu0[EE(irf)]/uu0[EE(irf)];
+
+	      ldouble dumping=exp(-fdump/DUMPEDGE);
+
+	      int wedgeno=-1;
+	      if(uu0[FX(irf)]>fabs(uu0[FY(irf)]))
+		wedgeno=0;
+	      if(uu0[FX(irf)]<-fabs(uu0[FY(irf)]))
+		wedgeno=2;
+	      if(uu0[FY(irf)]>fabs(uu0[FX(irf)]))
+		wedgeno=1;
+	      if(uu0[FY(irf)]<-fabs(uu0[FX(irf)]))
+		wedgeno=3;
+
+	      if(wedgeno>=0) //not aligned with axes
+		{
+		  A[irf][wedgeno]=1.-dumping*3./4.;
+		  for(ii=0;ii<NRF;ii++)
+		    {
+		      if(ii==wedgeno) continue;
+		      A[irf][ii]=dumping*1./4.;
+		      if(A[irf][ii]<MINMIXING) {
+			A[irf][ii]=MINMIXING;
+			A[irf][wedgeno]-=MINMIXING;
+		      }
+		    }
+		}
+	      else //special handling of aligned fluxes - not sure if necessary
+		{
+		  for(ii=0;ii<NRF;ii++)
+		    A[irf][ii]=MINMIXING;
+		  A[irf][irf]=1.-3.*MINMIXING;
+		}	   
+
+	      if(verbose) printf("=== dumping for irf=%d -> %f\n",irf,dumping);
+	    }
 	}
 
       if(NDIM==3)
@@ -268,41 +289,49 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 
 //***********************************************************************************
 //******* redistributes radiation fluids projecting on the axes *********************
+//******* should not be used throughout the simulation only for initial cond ********
 //***********************************************************************************
 int
-redistribute_radfluids_axes(ldouble *pp, ldouble *uu0, void* ggg)
+redistribute_radfluids_along_axes(ldouble *pp, ldouble *uu, void* ggg)
 {
   int verbose=0;
   
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  //  if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1 ) verbose=1;
+  //  if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1+1) verbose=1;
 
   if(verbose)
     {
       printf("\noooooooooo %d %d %d oooooooooo\n\n",geom->ix,geom->iy,geom->iz);
-      printf("=== uu0 ===\n");
-      print_Nvector(uu0,NV);
-      printf("=== pp0 ===\n");
+      printf("=== uu ===\n");
+      print_Nvector(uu,NV);
+      printf("=== pp ===\n");
       print_Nvector(pp,NV);
     }
 
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
   GG=geom->GG;
-  
-  //calculates wavespeed for each of the fluids
-  ldouble aval[NRF][6];
+
+  //to ortonormal basis
+  ldouble pp0[NV],pp1[NV];
+  prad_lab2on(pp,pp0,ggg);
+
+  if(verbose)
+    {
+      printf("=== pp on ===\n");
+      print_Nvector(pp0,NV);
+    }
 
   int irf,ii,jj,i2;
-  ldouble uu1[NV],Fmag,Etot,phi;
-  ldouble FRAC=.01;
-  ldouble MINCONTRAST=1.e-3;
+  ldouble Fmag2,Etot,phi;
+  ldouble FRAC=0.5;
+  ldouble MINCONTRAST=1.e-2;
   for(ii=0;ii<NV;ii++)
-    uu1[ii]=uu0[ii];
+    pp1[ii]=pp0[ii];
 
-  Etot=uu0[EE(0)]+uu0[EE(1)]+uu0[EE(2)]+uu0[EE(3)];
+  Etot=pp0[EE(0)]+pp0[EE(1)]+pp0[EE(2)]+pp0[EE(3)];
   
   for(irf=0;irf<NRF;irf++)
     {
@@ -311,80 +340,77 @@ redistribute_radfluids_axes(ldouble *pp, ldouble *uu0, void* ggg)
       //irf = 2 - x- axis
       //irf = 3 - y- axis
 
-      phi=atan2(uu0[FY(irf)],uu0[FX(irf)]);
-      Fmag=sqrt(uu0[FX(irf)]*uu0[FX(irf)]+uu0[FY(irf)]*uu0[FY(irf)]);
+      phi=atan2(pp0[FY(irf)],pp0[FX(irf)]);
+      Fmag2=(pp0[FX(irf)]*pp0[FX(irf)]+pp0[FY(irf)]*pp0[FY(irf)]);
 
-      //perpendicular
-      if(irf==0 || irf==2) 
-	{
-	  i2=-1;
-	  if(uu0[FY(irf)]>0.) i2=1;
-	  if(uu0[FY(irf)]<0.) i2=3;
-	  if(i2>=0 && fabs((uu1[EE(irf)]-FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag)/Etot)>MINCONTRAST)
-	    {
-	      uu1[FY(i2)]+=FRAC*uu0[FY(irf)];
-	      uu1[EE(i2)]+=FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag;
-	      uu1[FY(irf)]-=FRAC*uu0[FY(irf)];
-	      uu1[EE(irf)]-=FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag;
-	    }
-	}
+      ldouble frac,tE;
 
-      if(irf==1 || irf==3) 
-	{
-	  i2=-1;
-	  if(uu0[FX(irf)]>0.) i2=0;
-	  if(uu0[FX(irf)]<0.) i2=2;
+      //FX
+      i2=-1;
+      if((irf==1 || irf==3 || irf==2) && pp0[FX(irf)]>0.) i2=0;
+      if((irf==1 || irf==3 || irf==0) && pp0[FX(irf)]<0.) i2=2;
 	  
-	  if(i2>=0 && fabs((uu1[EE(irf)]-FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag)/Etot)>MINCONTRAST)
-	    {	      
-	      uu1[FX(i2)]+=FRAC*uu0[FX(irf)];
-	      uu1[EE(i2)]+=FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag;
-	      uu1[FX(irf)]-=FRAC*uu0[FX(irf)];
-	      uu1[EE(irf)]-=FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag;
+      if(i2>=0)
+	{
+	  tE=pp1[EE(irf)]-FRAC*pp0[EE(irf)]*pp0[FX(irf)]*pp0[FX(irf)]/Fmag2;
+	  if(tE<MINCONTRAST*Etot) 
+	    {
+	      tE=MINCONTRAST*Etot;
+	      frac=-(tE-pp1[EE(irf)])/(pp0[EE(irf)]*pp0[FX(irf)]*pp0[FX(irf)]/Fmag2);
 	    }
+	  else
+	    frac=FRAC;
+
+	  pp1[FX(i2)]+=frac*pp0[FX(irf)];
+	  pp1[EE(i2)]+=frac*pp0[EE(irf)]*pp0[FX(irf)]*pp0[FX(irf)]/Fmag2;
+	  pp1[FX(irf)]-=frac*pp0[FX(irf)];
+	  pp1[EE(irf)]-=frac*pp0[EE(irf)]*pp0[FX(irf)]*pp0[FX(irf)]/Fmag2;
 	}
 
-      //parallel
-      if(irf==0 || irf==2)
-	{
-	  i2=-1;
-	  if(uu0[FX(irf)]<0. && irf==0) i2=2;
-	  if(uu0[FX(irf)]>0. && irf==2) i2=0;
-	  
-	  if(i2>=0 && fabs((uu1[EE(irf)]-FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag)/Etot)>MINCONTRAST)
-	    {
-	      uu1[FX(i2)]+=FRAC*uu0[FX(irf)];
-	      uu1[EE(i2)]+=FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag;
-	      uu1[FX(irf)]-=FRAC*uu0[FX(irf)];
-	      uu1[EE(irf)]-=FRAC*uu0[EE(irf)]*uu0[FX(irf)]*cos(phi)/Fmag;
-	    }
-	}
+      //FY
+      i2=-1;
+      if((irf==0 || irf==2 || irf==3) && pp0[FY(irf)]>0.) i2=1;
+      if((irf==0 || irf==2 || irf==1) && pp0[FY(irf)]<0.) i2=3;
 
-      if(irf==1 || irf==3)
+      if(i2>=0)
 	{
-	  i2=-1;
-	  if(uu0[FY(irf)]<0. && irf==1) i2=3;
-	  if(uu0[FY(irf)]>0. && irf==3) i2=1;
-	  
-	  if(i2>=0 && fabs((uu1[EE(irf)]-FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag)/Etot)>MINCONTRAST)
+	  tE=pp1[EE(irf)]-FRAC*pp0[EE(irf)]*pp0[FY(irf)]*pp0[FY(irf)]/Fmag2;
+	  if(tE<MINCONTRAST*Etot) 
 	    {
-	      uu1[FY(i2)]+=FRAC*uu0[FY(irf)];
-	      uu1[EE(i2)]+=FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag;
-	      uu1[FY(irf)]-=FRAC*uu0[FY(irf)];
-	      uu1[EE(irf)]-=FRAC*uu0[EE(irf)]*uu0[FY(irf)]*sin(phi)/Fmag;
+	      tE=MINCONTRAST*Etot;
+	      frac=-(tE-pp1[EE(irf)])/(pp0[EE(irf)]*pp0[FY(irf)]*pp0[FY(irf)]/Fmag2);
 	    }
-	}
+	  else
+	    frac=FRAC;
+
+	  //if(verbose) printf("irf: %d FY: %f %e %e %e\n",irf,frac,tE,pp1[EE(irf)]-FRAC*pp0[EE(irf)]*pp0[FY(irf)]*pp0[FY(irf)]/Fmag2,MINCONTRAST*Etot);
+
+	  pp1[FY(i2)]+=frac*pp0[FY(irf)];
+	  pp1[EE(i2)]+=frac*pp0[EE(irf)]*pp0[FY(irf)]*pp0[FY(irf)]/Fmag2;
+	  pp1[FY(irf)]-=frac*pp0[FY(irf)];
+	  pp1[EE(irf)]-=frac*pp0[EE(irf)]*pp0[FY(irf)]*pp0[FY(irf)]/Fmag2;
+	}	
     }
   
   if(verbose) 
     {
-      printf("=== uu1 ===\n");
-      print_Nvector(uu1,NV);
-      getchar();
+      printf("=== pp1 on ===\n");
+      print_Nvector(pp1,NV);      
     }
 
   for(ii=NVHD;ii<NV;ii++)
-    uu0[ii]=uu1[ii];
+    pp0[ii]=pp1[ii];
+
+  //back to code coordinates
+  prad_on2lab(pp0,pp,ggg);
+  p2u(pp,uu,gg,GG);
+
+  if(verbose) 
+    {
+      printf("=== pp ===\n");
+      print_Nvector(pp,NV);
+      getchar();
+    }
   
   return 0;
 }
