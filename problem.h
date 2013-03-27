@@ -44,7 +44,7 @@
 //36* MFDOTS - multi fluid radiating dots
 //37* MFCYLBEAM - beam towards the axis in cylindrical with multifluids
 
-#define PROBLEM 36
+#define PROBLEM 37
 
 #if(PROBLEM==37)
 

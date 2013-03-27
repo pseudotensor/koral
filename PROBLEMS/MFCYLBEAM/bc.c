@@ -120,9 +120,11 @@ getchar();
 
     p2u(pp,uu,gg,GG);
 
+    //    print_Nvector(pp,NV);getchar();
+
 #ifdef MULTIRADFLUID
     int irf;
-    redistribute_radfluids(pp,uu,&geom);
+    redistribute_radfluids_along_axes(pp,uu,&geom);
     u2p_rad(uu,pp,&geom,&irf);
 #endif
 

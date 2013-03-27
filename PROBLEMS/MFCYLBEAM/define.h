@@ -26,12 +26,12 @@
 #define NOUTSTOP 1000
 #define RADOUTPUTINZAMO
 //#define PRINTXGC_LEFT
-//#define PRINTXGC_RIGHT
+#define PRINTXGC_RIGHT
 
 
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
-#define MINX (log(0.-MKS1R0))
+#define MINX (log(0.01-MKS1R0))
 #define MAXX (log(10.-MKS1R0))
 #define NX 50
 #else
