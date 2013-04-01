@@ -9,9 +9,6 @@
 #define MYCOORDS SPHCOORDS
 //#define LABRADFLUXES
 
-//#define WIDENPRESSURE
-#define WIDENPRESSUREPOWER 1.5
-
 #define IMAGETYPE "jpg"
 #define OUTVEL VEL4
 #define DTOUT1 1.
@@ -19,7 +16,7 @@
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
 #define RADOUTPUTINZAMO
-#define PRINTYGC_RIGHT
+//#define PRINTXGC_LEFT
 
 #define MINX 4.
 #define MAXX 100.

@@ -343,6 +343,21 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
   
       return 0;
     }
+  if(atmtype==2) //normal observer constant density/pressure
+    {
+      //normal observer
+      ldouble ucon[4];
+      ldouble xx2[4];
+      calc_normalobs_4vel(GG,ucon);
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+      pp[2]=ucon[1];
+      pp[3]=ucon[2];
+      pp[4]=ucon[3];
+      pp[0] = RHOATMMIN;
+      pp[1] = UINTATMMIN;
+  
+      return 0;
+    }
   else
     my_err("atmtype value not handled in set_atmosphere()\n");
   return 0.;

@@ -54,7 +54,7 @@ ldouble D,W,eps,uT,uphi,uPhi;
 if(1)
   {
     //ambient
-    set_hdatmosphere(pp,xxvec,gg,GG,0);
+    set_hdatmosphere(pp,xxvec,gg,GG,2);
 #ifdef RADIATION
     set_radatmosphere(pp,xxvec,gg,GG,0);
 

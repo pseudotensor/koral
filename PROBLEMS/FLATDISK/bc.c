@@ -51,7 +51,7 @@ if(ix>=NX) //analytical solution at rout only
 	iiz=iz;
 
 	//ambient
-	set_hdatmosphere(pp,xxvec,gg,GG,0);
+	set_hdatmosphere(pp,xxvec,gg,GG,2);
 #ifdef RADIATION
 
 	ldouble ppatm[NV];
@@ -111,6 +111,10 @@ if(ix>=NX) //analytical solution at rout only
      ldouble xxout[4]={0.,get_x(iix,0),get_x(iiy,1),get_x(iiz,2)};
      coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
      ldouble r0=xxout[1];      
+
+
+     r=get_x(ix,0);
+     r0=get_x(iix,0);
      
 
      //copying MYCOORDS quantities
@@ -120,12 +124,13 @@ if(ix>=NX) //analytical solution at rout only
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
-     pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
-     pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
+     //     pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
+     //     pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
 
      //atmosphere
      //set_radatmosphere(pp,xxvec,gg,GG,0);
 
+#ifdef RADIATION
      //imposing inflowing velocity of the normal observer
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);
@@ -138,6 +143,8 @@ if(ix>=NX) //analytical solution at rout only
      //   pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
        
+#endif
+
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,gg,GG);
      //end of floor section
@@ -189,6 +196,7 @@ if(iy>=NY) //equatorial plane
       }
 
     ldouble rBL=xxvecBL[1];
+#ifdef RADIATION
     ldouble rdisk=25.;
     if(rBL<rdisk) //hot boundary
       {
@@ -214,6 +222,7 @@ if(iy>=NY) //equatorial plane
 	
 	trans_pall_coco(pp, pp, SPHCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
       }
+#endif
  
     /*   
     if(rBL<20.) {
