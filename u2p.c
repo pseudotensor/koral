@@ -812,7 +812,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
       *corrected=0;
 
-      int verbose=0,debug=0;
+      int verbose=1,debug=0;
       int i,j;
       ldouble Rij[4][4];
       ldouble urfcon[4],urfcov[4],Erf;
@@ -927,6 +927,8 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	{
 	  debug=1;
 
+	  printf("irf: %d\n",irf);
+	  print_Nvector(uu,NV);
 	  print_4vector(Av);
 	  printf("F/E: %e %e %e f:%e\n",Av[1]*sqrt(gg[1][1])/Av[0],Av[2]*sqrt(gg[2][2])/Av[0],sqrt(gg[3][3])*Av[3]/Av[0],sqrt(Av[1]*Av[1]+Av[2]*Av[2]+Av[3]*Av[3])/Av[0]);
 	  printf("gamma2: %.20e %e\n", (-b-sqrt(delta))/2./a, (-b+sqrt(delta))/2./a); 
