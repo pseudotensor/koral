@@ -638,7 +638,7 @@ redistribute_radfluids_along_axes(ldouble *pp, ldouble *uu, void* ggg)
     }
 
   //redistribution to make it more uniform
-  ldouble REDISTR=.1;
+  ldouble REDISTR=.2;
   ldouble MINCONTRAST=1.e-7;
   ldouble invsum[4]={0.,0.,0.,0.};
   ldouble dEE,dFX,dFY,dFZ;
