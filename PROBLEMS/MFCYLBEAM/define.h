@@ -7,7 +7,7 @@
 #define GAMMAMAXRAD 1000.
 
 #define myMCYL1COORDS
-#define MULTIRADFLUID
+//#define MULTIRADFLUID
 #define OMSCALE 1.
 
 #ifdef myMCYL1COORDS

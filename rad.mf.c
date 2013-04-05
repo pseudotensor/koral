@@ -40,8 +40,8 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
 int
 redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 {
-  int method=4;
-  ldouble power=10.;
+  int method=1;
+  ldouble power=1.;
   int verbose=0;
   
   struct geometry *geom

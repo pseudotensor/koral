@@ -49,7 +49,7 @@
 //43* RVDONUTIN - radiative and viscous dougnut inflowing
 //44* RADNTCYL - emission from midplane in cylindrical
 
-#define PROBLEM 31
+#define PROBLEM 36
 
 #if(PROBLEM==44)
 
