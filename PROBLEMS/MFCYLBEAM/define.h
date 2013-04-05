@@ -8,7 +8,6 @@
 
 #define myMCYL1COORDS
 #define MULTIRADFLUID
-#define MFMETHOD 4
 #define MFPOWER 10.
 
 #define OMSCALE 1.
@@ -29,7 +28,7 @@
 #define NOUTSTOP 1000
 #define RADOUTPUTINZAMO
 //#define PRINTXGC_LEFT
-#define PRINTXGC_RIGHT
+//#define PRINTXGC_RIGHT
 
 
 #ifdef myMCYL1COORDS

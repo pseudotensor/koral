@@ -21,6 +21,7 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
     }
 
   redistribute_radfluids(pp,uu,&geom);
+  //redistribute_radfluids_along_axes(pp,uu,&geom);
 
   u2p_rad(uu,pp,&geom,&iv);
 
@@ -38,6 +39,318 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
 //***********************************************************************************
 int
 redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
+{
+  int NDIM=2;
+  int method=4;
+  ldouble power=10.;
+  int verbose=0;
+  
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  //if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1+2 ) verbose=1;
+
+  if(verbose)
+    {
+      printf("\noooooooooo %d %d %d oooooooooo\n\n",geom->ix,geom->iy,geom->iz);
+      printf("=== uu0 ===\n");
+      print_Nvector(uu0,NV);
+      printf("=== pp0 ===\n");
+      print_Nvector(pp,NV);
+    }
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+  
+  //calculates wavespeed for each of the fluids
+  ldouble aval[NRF][6];
+
+  int irf,ii,jj;
+  ldouble uu1[NV],A[NRF][NRF];
+
+  calc_rad_wavespeeds_pure_mf_each(pp,geom,aval);
+
+  for(ii=0;ii<NRF;ii++)
+    {
+      aval[ii][0]*=sqrt(gg[1][1]);
+      aval[ii][1]*=sqrt(gg[1][1]);
+      aval[ii][2]*=sqrt(gg[2][2]);
+      aval[ii][3]*=sqrt(gg[2][2]);
+      aval[ii][4]*=sqrt(gg[3][3]);
+      aval[ii][5]*=sqrt(gg[3][3]);
+    }
+
+  if(verbose)
+    {
+      printf("=== wavespeeds ===\n");
+      for(ii=0;ii<NRF;ii++)
+	printf("%d : [%e %e] [%e %e] [%e %e]\n",ii,aval[ii][0],aval[ii][1],aval[ii][2],aval[ii][3],aval[ii][4],aval[ii][5]);
+    }
+
+  for(ii=0;ii<NRF;ii++)
+    for(jj=0;jj<NRF;jj++)
+      A[ii][jj]=0.;
+
+  ldouble MINVEL=1.e-3;
+
+  for(irf=0;irf<NRF;irf++)
+    {
+      //in aval[NRF][6] one has rad.char.wavespeeds for [irf] fluid
+      //aval[irf][0] - min left going in x
+      //aval[irf][1] - max right going in x
+      //aval[irf][2] - min left going in y 
+      //etc...
+
+      if(NDIM==1)
+	{
+	  ldouble vxl,vxr;
+	  vxl=my_min(aval[irf][0],-MINVEL);
+	  vxr=my_max(aval[irf][1],MINVEL);
+	  
+	  if(method==0)
+	    {
+	      //mixing linear in characteristic velocities
+	      vxl=fabs(vxl);
+	      A[irf][0]=vxr/(vxl+vxr);
+	      A[irf][1]=vxl/(vxl+vxr);
+	    }
+
+	  if(method==1)
+	    {
+	      //mixing to arb. power in characteristic velocities	  
+	      vxl=fabs(vxl);
+	      A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power));
+	      A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power));
+	    }
+	  
+	  if(method==2)
+	    {
+	      //discrete mixing	      
+	      if(fabs((vxr-vxl)/vxr)<1.e-5)
+		{
+		  A[irf][0]=.5;
+		  A[irf][1]=.5;
+		}
+	      else if(vxr>vxl)
+		{
+		  A[irf][0]=1.-MINVEL;
+		  A[irf][1]=0.+MINVEL;
+		}
+	      else
+		{
+		  A[irf][1]=1.-MINVEL;
+		  A[irf][0]=0.+MINVEL;
+		}
+	    }
+	  
+	}
+
+      if(NDIM==2)
+	{
+	  ldouble vxl,vxr,vyl,vyr;
+	  if(method==0 || method==1)
+	    //direct vchar
+	    {
+	      if(NZ==1)
+		{
+		  vxl=my_min(aval[irf][0],-MINVEL);
+		  vxr=my_max(aval[irf][1],MINVEL);
+		  vyl=my_min(aval[irf][2],-MINVEL);
+		  vyr=my_max(aval[irf][3],MINVEL);
+		}
+	      else if(NY==1)
+		{
+		  vxl=my_min(aval[irf][0],-MINVEL);
+		  vxr=my_max(aval[irf][1],MINVEL);
+		  vyl=my_min(aval[irf][4],-MINVEL);
+		  vyr=my_max(aval[irf][5],MINVEL);
+		}
+	      vxl=fabs(vxl);
+	      vyl=fabs(vyl);	      
+	    }
+
+	  if(method==3 || method==4)
+	    //diagonal velocities
+	    {
+	      ldouble vxl0,vxr0,vyl0,vyr0;
+	      if(NZ==1)
+		{
+		  vxl0=my_min(aval[irf][0],-MINVEL);
+		  vxr0=my_max(aval[irf][1],MINVEL);
+		  vyl0=my_min(aval[irf][2],-MINVEL);
+		  vyr0=my_max(aval[irf][3],MINVEL);
+		}
+	      else if(NY==1)
+		{
+		  vxl0=my_min(aval[irf][0],-MINVEL);
+		  vxr0=my_max(aval[irf][1],MINVEL);
+		  vyl0=my_min(aval[irf][4],-MINVEL);
+		  vyr0=my_max(aval[irf][5],MINVEL);
+		}
+	      
+	      vxr=sqrt(vxr0*vxr0+vyl0*vyl0);
+	      vyr=sqrt(vxr0*vxr0+vyr0*vyr0);
+	      vxl=sqrt(vxl0*vxl0+vyr0*vyr0);
+	      vyl=sqrt(vxl0*vxl0+vyl0*vyl0);
+	    }
+	    
+	  if(method==0 || method==3)
+	    {
+	      //mixing linear in characteristic velocities
+	      
+	      A[irf][0]=vxr/(vxl+vxr)*vyr/(vyl+vyr);
+	      A[irf][1]=vxl/(vxl+vxr)*vyr/(vyl+vyr);
+	      A[irf][2]=vxl/(vxl+vxr)*vyl/(vyl+vyr);
+	      A[irf][3]=vxr/(vxl+vxr)*vyl/(vyl+vyr);
+	    }
+
+	  if(method==1 || method==4)
+	    {
+	      //arbitrary power
+	      A[irf][0]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
+	      A[irf][1]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyr,power)/(pow(vyl,power)+pow(vyr,power));
+	      A[irf][2]=pow(vxl,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
+	      A[irf][3]=pow(vxr,power)/(pow(vxl,power)+pow(vxr,power))*pow(vyl,power)/(pow(vyl,power)+pow(vyr,power));
+	    }
+
+	  if(method==2)
+	    {
+	      ldouble DUMPEDGE=0.001;
+	      ldouble MINMIXING=1.e-5;
+		  
+	      if(NZ==1)
+		{
+		  //to ortonormal basis
+		  ldouble pp0[NV];
+		  prad_lab2on(pp,pp0,ggg);
+		  ldouble fdump=(pp0[FX(irf)]*pp0[FX(irf)]+pp0[FY(irf)]*pp0[FY(irf)]+pp0[FZ(irf)]*pp0[FZ(irf)])/pp0[EE(irf)]/pp0[EE(irf)];
+
+		  ldouble dumping=exp(-fdump/DUMPEDGE);
+
+		  int wedgeno=-1;
+		  if(pp0[FX(irf)]>fabs(pp0[FY(irf)]))
+		    wedgeno=0;
+		  if(pp0[FX(irf)]<-fabs(pp0[FY(irf)]))
+		    wedgeno=2;
+		  if(pp0[FY(irf)]>fabs(pp0[FX(irf)]))
+		    wedgeno=1;
+		  if(pp0[FY(irf)]<-fabs(pp0[FX(irf)]))
+		    wedgeno=3;
+
+		  if(wedgeno>=0) //not aligned with axes
+		    {
+		      A[irf][wedgeno]=1.-dumping*3./4.;
+		      for(ii=0;ii<NRF;ii++)
+			{
+			  if(ii==wedgeno) continue;
+			  A[irf][ii]=dumping*1./4.;
+			  if(A[irf][ii]<MINMIXING) {
+			    A[irf][ii]=MINMIXING;
+			    A[irf][wedgeno]-=MINMIXING;
+			  }
+			}
+		    }
+		  else //special handling of aligned fluxes - not sure if necessary
+		    {
+		      for(ii=0;ii<NRF;ii++)
+			A[irf][ii]=MINMIXING;
+		      A[irf][irf]=1.-3.*MINMIXING;
+		    }	   
+
+		  if(verbose) printf("=== dumping for irf=%d -> %f\n",irf,dumping);
+		}
+	      if(NY==1)
+		{
+		  //to ortonormal basis
+		  ldouble pp0[NV];
+		  prad_lab2on(pp,pp0,ggg);
+		  ldouble fdump=(pp0[FX(irf)]*pp0[FX(irf)]+pp0[FY(irf)]*pp0[FY(irf)]+pp0[FZ(irf)]*pp0[FZ(irf)])/pp0[EE(irf)]/pp0[EE(irf)];
+
+		  ldouble dumping=exp(-fdump/DUMPEDGE);
+
+		  int wedgeno=-1;
+		  if(pp0[FX(irf)]>fabs(pp0[FZ(irf)]))
+		    wedgeno=0;
+		  if(pp0[FX(irf)]<-fabs(pp0[FZ(irf)]))
+		    wedgeno=2;
+		  if(pp0[FZ(irf)]>fabs(pp0[FX(irf)]))
+		    wedgeno=1;
+		  if(pp0[FZ(irf)]<-fabs(pp0[FX(irf)]))
+		    wedgeno=3;
+
+		  if(wedgeno>=0) //not aligned with axes
+		    {
+		      A[irf][wedgeno]=1.-dumping*3./4.;
+		      for(ii=0;ii<NRF;ii++)
+			{
+			  if(ii==wedgeno) continue;
+			  A[irf][ii]=dumping*1./4.;
+			  if(A[irf][ii]<MINMIXING) {
+			    A[irf][ii]=MINMIXING;
+			    A[irf][wedgeno]-=MINMIXING;
+			  }
+			}
+		    }
+		  else //special handling of aligned fluxes - not sure if necessary
+		    {
+		      for(ii=0;ii<NRF;ii++)
+			A[irf][ii]=MINMIXING;
+		      A[irf][irf]=1.-3.*MINMIXING;
+		    }	   
+
+		  if(verbose) printf("=== dumping for irf=%d -> %f\n",irf,dumping);
+		}
+	    }
+	}
+
+      if(NDIM==3)
+	{
+	  my_err("NDIM==3 not implemented in redistribute()\n");
+	}
+    }  
+
+  for(ii=0;ii<NVHD;ii++)
+    uu1[ii]=uu0[ii];
+  for(ii=NVHD;ii<NV;ii++)
+    uu1[ii]=0.;
+
+  if(verbose) 
+    {
+      printf("=== coefficients ===\n");
+    }
+  
+  for(ii=0;ii<NRF;ii++)
+    for(jj=0;jj<NRF;jj++)
+      {
+	if(verbose)
+	  printf(" %d -> %d : %e\n",jj,ii,A[jj][ii]);
+
+	uu1[EE(ii)]+=uu0[EE(jj)]*A[jj][ii];
+	uu1[FX(ii)]+=uu0[FX(jj)]*A[jj][ii];
+	uu1[FY(ii)]+=uu0[FY(jj)]*A[jj][ii];
+	uu1[FZ(ii)]+=uu0[FZ(jj)]*A[jj][ii];
+      }
+
+  if(verbose) 
+    {
+      printf("=== uu1 ===\n");
+      print_Nvector(uu1,NV);
+      getchar();
+    }
+
+  for(ii=NVHD;ii<NV;ii++)
+    uu0[ii]=uu1[ii];
+  
+  return 0;
+}
+
+
+//***********************************************************************************
+//******* redistributes radiation fluids ***********************************************
+//***********************************************************************************
+int
+redistribute_radfluids_new(ldouble *pp, ldouble *uu0, void* ggg)
 {
 #ifdef MULTIRADFLUID
 
@@ -70,6 +383,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 
   calc_rad_wavespeeds_pure_mf_each(pp,geom,aval);
 
+  //to ortonormal - too simple?
   for(ii=0;ii<NRF;ii++)
     {
       aval[ii][0]*=sqrt(gg[1][1]);
@@ -126,13 +440,37 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 
       sumvel=vxl+vxr+vyl+vyr+vzl+vzr;
 
+      //test
+      sumvel=vxl+vxr+vzl+vzr;
+
       //arbitrary power
       A[irf][0]=vxr/sumvel;
       A[irf][1]=vxl/sumvel;
       A[irf][2]=vyr/sumvel;
       A[irf][3]=vyl/sumvel;
-      A[irf][4]=vzr/sumvel;
-      A[irf][5]=vzl/sumvel;
+      //A[irf][4]=vzr/sumvel;
+      //A[irf][5]=vzl/sumvel;
+
+      //test 2d, NRF =4, to work with along_axes
+      A[irf][2]=vzr/sumvel;
+      A[irf][3]=vzl/sumvel;
+
+      /*
+      //test - old approach
+      ldouble vxr0=vxr;
+      ldouble vzr0=vzr;
+      ldouble vxl0=vxl;
+      ldouble vzl0=vzl;
+      
+      vxr=sqrt(vxr0*vxr0+vzl0*vzl0);
+      vzr=sqrt(vxr0*vxr0+vzr0*vzr0);
+      vxl=sqrt(vxl0*vxl0+vzr0*vzr0);
+      vzl=sqrt(vxl0*vxl0+vzl0*vzl0);
+      A[irf][0]=vxr/(vxl+vxr)*vzr/(vzl+vzr);
+      A[irf][1]=vxl/(vxl+vxr)*vzr/(vzl+vzr);
+      A[irf][2]=vxl/(vxl+vxr)*vzl/(vzl+vzr);
+      A[irf][3]=vxr/(vxl+vxr)*vzl/(vzl+vzr);
+      */
     }  
 
   for(ii=0;ii<NVHD;ii++)
@@ -300,7 +638,7 @@ redistribute_radfluids_along_axes(ldouble *pp, ldouble *uu, void* ggg)
     }
 
   //redistribution to make it more uniform
-  ldouble REDISTR=.5;
+  ldouble REDISTR=.1;
   ldouble MINCONTRAST=1.e-7;
   ldouble invsum[4]={0.,0.,0.,0.};
   ldouble dEE,dFX,dFY,dFZ;
