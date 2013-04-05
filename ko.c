@@ -58,42 +58,6 @@ main(int argc, char **argv)
   //sets bc
   set_bc(tstart);
 
-  //testing
-  /*
-    ldouble GG[4][5];
-    pick_G(10,0,0,GG);
-    ldouble gg[4][5];
-    pick_g(10,0,0,gg);
-	  
-    ldouble xx=get_x(10,0);
-    printf("x: %f\n",xx);
-    print_metric(gg);
-    print_metric(GG);
-
-    int j,k;
-    double ggg=0.;
-    for(i=0;i<4;i++)
-      {
-	for(j=0;j<4;j++)
-	  {
-	    ggg=0.;
-	    for(k=0;k<4;k++)
-	      ggg+=gg[i][k]*GG[j][k];
-	    printf("%d %d ggg:%f\n",i,j,ggg);
-	  }
-      }
-
-
-    double ucon[4],ucov[4];
-    calc_normalobs_4vel(GG,ucon);
-    print_4vector(ucon);
-    indices_21(ucon,ucov,gg);
-    print_4vector(ucov);
-    printf("%e\n",dot(ucon,ucov));
-    getchar();
-  */
-
-
   //evolves
   solve_all_problems_5(tstart);
 
@@ -122,6 +86,8 @@ solve_all_problems_5(ldouble tstart)
 #ifndef RESTART
   fprint_profiles(t,totalmass);				
 #endif
+
+  //  return 0;
 
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=1.;
@@ -166,7 +132,7 @@ solve_all_problems_5(ldouble tstart)
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
-
+      
 #ifdef RK2STEPPING
       //******************************* RK2 **********************************
       //1st
@@ -232,9 +198,9 @@ solve_all_problems_5(ldouble tstart)
       add_u(1.,u,1./6.,ut4,u);
 
      //************************** end of RK4 **********************************
-
+     
 #endif
-
+      
       //**********************************************************************
       //************************* finger  ************************************
       //**********************************************************************
@@ -246,6 +212,32 @@ solve_all_problems_5(ldouble tstart)
       clock_gettime(CLOCK_REALTIME,&temp_clock);    
 #endif
       ldouble cons_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
+
+      
+      //**********************************************************************
+      //************************* redistribution  ?***********************************
+      //**********************************************************************
+
+
+#ifdef SKIP_MULTIRADFLUID
+
+#pragma omp parallel for private(iy,iz,iv) schedule (guided)
+  for(ix=0;ix<NX;ix++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {	      
+
+	      //	      if(t<0.2){
+	      calc_primitives(ix,iy,iz);
+	      redistribute_radfluids_at_cell(ix,iy,iz);
+	      //	      }
+	    }
+	}
+    }
+#endif
+
 
       //**********************************************************************
       //************************* outputs ************************************

@@ -378,7 +378,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       iz=loop_1[ii][2]; ldouble aaa[12];
       
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
-   
+
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
 
@@ -693,20 +693,33 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  //unsplit scheme
 		  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
 
+
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
 
 		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz),dt);getchar();}
 
-		  set_u(u,iv,ix,iy,iz,val);		  
+		  //		  if(ix==IXDOT1 && iy==IYDOT1-1) {printf("%d %d %d %d %e %e %e %e %e | %e -> %e\n",ix,iy,iz,iv,t_der[iv],flxr,flxl,flyr,flyl,get_u(u,iv,ix,iy,iz),val);getchar();}	  
+
+		  set_u(u,iv,ix,iy,iz,val);	
+		  
 		} 
 	      	      
-	      //updating u - geometrical source terms
-	      ldouble ms[NV],ss[NV];
-	      int iv;
+	      //**********************************************************************
+	      //**********************************************************************
+	      //**********************************************************************
+	      //redistributing radiative fluids
+#ifdef MULTIRADFLUID
+	      //	      if(t<0.2){
+	      calc_primitives(ix,iy,iz);
+	      redistribute_radfluids_at_cell(ix,iy,iz);
+	      //	      }
+#endif
 
 	      //**********************************************************************
 	      //**********************************************************************
 	      //**********************************************************************
+	      //updating u - geometrical source terms
+	      ldouble ms[NV];
 
 	      //metric source terms
 	      f_metric_source_term(ix,iy,iz,ms);
@@ -721,8 +734,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      /************************************************************************/
 	      /************************************************************************/
 	      /************************************************************************/
-
-
 
 #ifdef RADIATION
 
@@ -757,7 +768,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //test if implicit necessary
 	      ldouble del4[4]; 
 	      if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
-		implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		{
+		  for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
+		  implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		}
 	      else
 		{
 		  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
@@ -841,13 +855,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   pick_gb(ix,iy,iz,0,gg);
   pick_Gb(ix,iy,iz,0,GG);
    
-  //  print_Nvector(fd_uLl,NV);
-
   p2u(fd_uLl,fd_uLl,gg,GG);
-
-  //  print_Nvector(fd_uLl,NV);
-  //  getchar();
-
   p2u(fd_uRl,fd_uRl,gg,GG);
 
   //save calculated conserved basing on primitives on faces

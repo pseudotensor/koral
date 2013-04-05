@@ -39,6 +39,10 @@
 //31* FLATDISK - emission from flat disk
 //32* CYLBEAM - beam towards the axis in cylindrical
 //33* RADDOT - radiating dots
+//34* MFPULSE - multi fluid pulse
+//35* MFBEAMS - multi fluid colliding beams
+//36* MFDOTS - multi fluid radiating dots
+//37* MFCYLBEAM - beam towards the axis in cylindrical with multifluids
 //40* CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
 //41* FLATDOT - dot which may be bigger than a dot
 //42* RVDONUT - radiative and viscous dougnut
@@ -115,6 +119,63 @@
 #define PR_OUT2GIF_1D "PROBLEMS/CYLBEAMCART/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/CYLBEAMCART/dump.c"
 #define PR_TOOLS "PROBLEMS/CYLBEAMCART/tools.c"
+
+#endif
+
+#if(PROBLEM==37)
+
+#define PR_DEFINE "PROBLEMS/MFCYLBEAM/define.h"
+#define PR_BC "PROBLEMS/MFCYLBEAM/bc.c"
+#define PR_INIT "PROBLEMS/MFCYLBEAM/init.c"
+#define PR_KAPPA "PROBLEMS/MFCYLBEAM/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFCYLBEAM/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFCYLBEAM/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFCYLBEAM/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFCYLBEAM/dump.c"
+#define PR_TOOLS "PROBLEMS/MFCYLBEAM/tools.c"
+
+#endif
+
+#if(PROBLEM==36)
+
+#define PR_DEFINE "PROBLEMS/MFDOTS/define.h"
+#define PR_BC "PROBLEMS/MFDOTS/bc.c"
+#define PR_INIT "PROBLEMS/MFDOTS/init.c"
+#define PR_KAPPA "PROBLEMS/MFDOTS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFDOTS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFDOTS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFDOTS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFDOTS/dump.c"
+#define PR_TOOLS "PROBLEMS/MFDOTS/tools.c"
+#define PR_FINGER "PROBLEMS/MFDOTS/finger.c"
+
+#endif
+
+#if(PROBLEM==35)
+
+#define PR_DEFINE "PROBLEMS/MFBEAMS/define.h"
+#define PR_BC "PROBLEMS/MFBEAMS/bc.c"
+#define PR_INIT "PROBLEMS/MFBEAMS/init.c"
+#define PR_KAPPA "PROBLEMS/MFBEAMS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFBEAMS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFBEAMS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFBEAMS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFBEAMS/dump.c"
+#define PR_TOOLS "PROBLEMS/MFBEAMS/tools.c"
+
+#endif
+
+#if(PROBLEM==34)
+
+#define PR_DEFINE "PROBLEMS/MFPULSE/define.h"
+#define PR_BC "PROBLEMS/MFPULSE/bc.c"
+#define PR_INIT "PROBLEMS/MFPULSE/init.c"
+#define PR_KAPPA "PROBLEMS/MFPULSE/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFPULSE/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFPULSE/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFPULSE/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFPULSE/dump.c"
+#define PR_TOOLS "PROBLEMS/MFPULSE/tools.c"
 
 #endif
 
@@ -622,6 +683,19 @@
 /*********************/
 /*********************/
 
+#if (NY==1 && NZ==1)
+#define NDIM 1
+#define NRF 2
+#elif (NZ==1 || NY==1)
+#define NDIM 2
+#define NRF 4
+#else
+#define NDIM 3
+#define NRF 8
+#endif
+
+
+
 #ifndef MYCOORDS2
 #define MYCOORDS2 MYCOORDS
 #endif
@@ -714,7 +788,15 @@
 #endif
 
 #ifdef RADIATION
+
+#ifdef MULTIRADFLUID
+#define NV (6+4*NRF)
+#else
 #define NV 10 //number of variables
+#undef NRF
+#define NRF 1
+#endif
+
 #else
 #define NV 6
 #endif
@@ -750,16 +832,16 @@
 #define UINTATMMIN 1.e-2
 #endif
 
-#ifndef ERADFLOOR
-#define ERADFLOOR 1.e-50
+#ifndef EEFLOOR
+#define EEFLOOR 1.e-50
 #endif
 
 #ifndef RHOFLOOR
 #define RHOFLOOR 1.e-50
 #endif
 
-#ifndef UFLOOR
-#define UFLOOR 1.e-50
+#ifndef UUFLOOR
+#define UUFLOOR 1.e-50
 #endif
 
 #ifndef GAMMAMAXHD

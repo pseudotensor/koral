@@ -1,4 +1,6 @@
 0320 - ** - generalize atmospheres for non-BL like coords
+0319 - *** - explicit criterion
+0319 - ****** - why primitives changed during the advective operator
 0318 - **** - dumped lab implicit to allow for longer timesteps, see below
 0318 - **** - follow the radiative wavespeeds to set the timestep properly
 0313 - *** - implement Eddington approximation

@@ -558,10 +558,10 @@ calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble dt, int verbose)
   cltep.E=*E;
   cltep.verbose=verbose;
   
-  if(cltep.E<EFLOOR && 0)
+  if(cltep.E<EEFLOOR && 0)
     {
-      printf("imposing EFLOOR\n");
-      cltep.E=EFLOOR;
+      printf("imposing EEFLOOR\n");
+      cltep.E=EEFLOOR;
     }
   
   ldouble p=(GAMMA-1.)*cltep.u;
@@ -1096,7 +1096,7 @@ ldouble calc_LTE_Efromurho(ldouble u,ldouble rho)
 /************************************************************************/
 /******* calculates wavespeeds in the lab frame takin 1/@3 in ************/
 /******* radiative rest frame and boosting it to lab frame *****************/
-/******* using the HARM algorithm **************************************/
+/******* using the HARM algorithm - with taul limiter ********************/
 /************************************************************************/
 int
 calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int verbose)
@@ -1173,6 +1173,120 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	}
       else
 	rv2=rv2rad;
+      
+      Acov[0]=0.;
+      Acov[1]=0.;
+      Acov[2]=0.;
+      Acov[3]=0.;
+      Acov[dim+1]=1.;
+      indices_12(Acov,Acon,GG);
+  
+      Bcov[0]=1.;
+      Bcov[1]=0.;
+      Bcov[2]=0.;
+      Bcov[3]=0.;
+      indices_12(Bcov,Bcon,GG);
+
+      Asq = dot(Acon,Acov);
+      Bsq = dot(Bcon,Bcov);
+      Au = dot(Acov, urfcon);
+      Bu = dot(Bcov, urfcon);
+      AB = dot(Acon, Bcov);
+      Au2 = Au * Au;
+      Bu2 = Bu * Bu;
+      AuBu = Au * Bu;
+
+      wspeed2=rv2;
+      B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
+      A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
+      discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
+      if(discr<0.) {printf("x1discr in ravespeeds lt 0\n"); discr=0.;}
+      discr = sqrt(discr);
+      ldouble cst1 = -(-B + discr) / (2. * A);
+      ldouble cst2 = -(-B - discr) / (2. * A);  
+
+      axl = my_min(cst1,cst2);
+      axr = my_max(cst1,cst2);
+
+      aval[dim*2+0]=axl;
+      aval[dim*2+1]=axr;
+    }
+
+  /*
+  if(fabs(pp[7])>1.e-3)
+    {
+      print_Nvector(pp,NV);
+      print_Nvector(&aval[0],6);
+      getchar();
+    }
+  */
+
+  return 0;
+}
+
+
+/************************************************************************/
+/******* calculates wavespeeds in the lab frame takin 1/@3 in ************/
+/******* radiative rest frame and boosting it to lab frame *****************/
+/******* using the HARM algorithm - no tau limiting **********************/
+/************************************************************************/
+int
+calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval)
+{
+  int i,j;
+  
+  //metric
+  ldouble g00=gg[0][0];
+  ldouble g03=gg[0][3];
+  ldouble g30=g03;
+  ldouble g11=gg[1][1];
+  ldouble g22=gg[2][2];
+  ldouble g33=gg[3][3];
+
+  //inversed metric
+  ldouble G00=GG[0][0];
+  ldouble G03=GG[0][3];
+  ldouble G11=GG[1][1];
+  ldouble G22=GG[2][2];
+  ldouble G33=GG[3][3];
+  ldouble G30=G03;
+
+#ifdef LABRADFLUXES
+  //artificially puts pp=uu and converts them to urf and Erf using the regular converter
+  u2p_rad_urf(pp,pp,gg,GG,&i);
+#endif
+  
+  //radiative energy density in the radiation rest frame
+  ldouble Erf=pp[6];
+  //relative four-velocity
+  ldouble urfcon[4];
+  urfcon[0]=0.;
+  urfcon[1]=pp[7];
+  urfcon[2]=pp[8];
+  urfcon[3]=pp[9];
+
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+
+  //square of radiative wavespeed in radiative rest frame
+  ldouble rv2rad = 1./3.;
+
+  ldouble rv2,rv2tau;
+
+  //**********************************************************************
+  //algorithm from HARM to transform the fluid frame wavespeed into lab frame
+  //**********************************************************************
+
+  ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
+  ldouble axl,axr,ayl,ayr,azl,azr;
+  axl=axr=ayl=ayr=azl=azr=1.;
+   
+  //**********************************************************************
+  //**********************************************************************
+  int dim;
+  for(dim=0;dim<3;dim++)
+    {
+      rv2=rv2rad;
       
       Acov[0]=0.;
       Acov[1]=0.;

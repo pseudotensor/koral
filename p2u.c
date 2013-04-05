@@ -119,32 +119,36 @@ int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
   return 0;
  
 #endif
-
-  int i,j;
-  ldouble Erf=p[6];
-
-  //relative four-velocity
-  ldouble urf[4];
-  urf[0]=0.;
-  urf[1]=p[7];
-  urf[2]=p[8];
-  urf[3]=p[9];
-
-  //converting to lab four-velocity
-  conv_vels(urf,urf,VELPRIMRAD,VEL4,g,G);
   
-  ldouble Rtop[4];
-  Rtop[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*G[0][0]; //R^t_t
-  Rtop[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*G[0][1];
-  Rtop[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*G[0][2];
-  Rtop[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*G[0][3];
+  int i,j,irf;
 
-  indices_21(Rtop,Rtop,g); //R^t_mu
+  for(irf=0;irf<NRF;irf++)
+    {
+      ldouble Erf=p[EE(irf)];
 
-  u[6]=Rtop[0]; //R^t_t
-  u[7]=Rtop[1]; //R^t_i
-  u[8]=Rtop[2];
-  u[9]=Rtop[3];
+      //relative four-velocity
+      ldouble urf[4];
+      urf[0]=0.;
+      urf[1]=p[FX(irf)];
+      urf[2]=p[FY(irf)];
+      urf[3]=p[FZ(irf)];
+
+      //converting to lab four-velocity
+      conv_vels(urf,urf,VELPRIMRAD,VEL4,g,G);
+  
+      ldouble Rtop[4];
+      Rtop[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*G[0][0]; //R^t_t
+      Rtop[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*G[0][1];
+      Rtop[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*G[0][2];
+      Rtop[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*G[0][3];
+
+      indices_21(Rtop,Rtop,g); //R^t_mu
+
+      u[EE(irf)]=Rtop[0]; //R^t_t
+      u[FX(irf)]=Rtop[1]; //R^t_i
+      u[FY(irf)]=Rtop[2];
+      u[FZ(irf)]=Rtop[3];
+    }
 
   return 0;
 }

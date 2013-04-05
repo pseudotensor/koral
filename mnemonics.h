@@ -12,10 +12,19 @@
 #define VY 3
 #define VZ 4
 #define ENTR 5
-#define EE 6
-#define FX 7
-#define FY 8
-#define FZ 9
+
+//multi rad-fluid macros
+#define FX(nf) (7+nf*4)
+#define FY(nf) (8+nf*4)
+#define FZ(nf) (9+nf*4)
+#define EE(nf) (6+nf*4)
+
+//single fluid macros
+#define EE0 EE(0)
+#define FX0 FX(0)
+#define FY0 FY(0)
+#define FZ0 FZ(0)
+
 
 //coordinates/metric
 #define BLCOORDS 1
