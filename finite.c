@@ -313,6 +313,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 {
   int ix,iy,iz,iv,ii;
 
+
   //global
   max_ws[0]=max_ws[1]=max_ws[2]=-1.;
 
@@ -351,7 +352,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	    }
 	}
     }
-
+ 
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -381,7 +382,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
-
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -610,7 +610,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	}
 
     }
-
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -698,21 +697,17 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz),dt);getchar();}
 
-		  //		  if(ix==IXDOT1 && iy==IYDOT1-1) {printf("%d %d %d %d %e %e %e %e %e | %e -> %e\n",ix,iy,iz,iv,t_der[iv],flxr,flxl,flyr,flyl,get_u(u,iv,ix,iy,iz),val);getchar();}	  
-
 		  set_u(u,iv,ix,iy,iz,val);	
 		  
-		} 
+		}
 	      	      
 	      //**********************************************************************
 	      //**********************************************************************
 	      //**********************************************************************
 	      //redistributing radiative fluids
 #ifdef MULTIRADFLUID
-	      //	      if(t<0.2){
 	      calc_primitives(ix,iy,iz);
 	      redistribute_radfluids_at_cell(ix,iy,iz);
-	      //	      }
 #endif
 
 	      //**********************************************************************
@@ -736,6 +731,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      /************************************************************************/
 
 #ifdef RADIATION
+#ifndef MULTIRADFLUID
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
  	      //implicit in lab frame in four dimensions - fiducial 
@@ -804,6 +800,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //**********************************************************************
 
 	      
+#endif //MULTIRADFLUID
 #endif //RADIATION
 
 	      /************************************************************************/

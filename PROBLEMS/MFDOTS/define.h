@@ -24,7 +24,7 @@
 #ifdef FORGETDOTS
 #define DTOUT1 .005
 #else
-#define DTOUT1 .25
+#define DTOUT1 .025
 #endif
 
 #define GAMMA (4./3.)

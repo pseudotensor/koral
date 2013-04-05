@@ -191,8 +191,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //within domain:
 						  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 
-						  calc_primitives(ix,iy,iz);
-
+						  
 						  struct geometry geom;
 						  fill_geometry(ix,iy,iz,&geom);
 
@@ -235,6 +234,13 @@ fprint_profiles(ldouble t, ldouble totmass)
 						      uu[iv]=get_u(u,iv,ix,iy,iz);
 						      pp[iv]=get_u(p,iv,ix,iy,iz);
 						    }	 
+
+						  /*
+						  if(ix==IXDOT2 && iy==IYDOT2 && iz==IZDOT2 && 1)
+						    {
+						      print_Nvector(uu,NV);print_Nvector(pp,NV);getchar();
+						    }
+						  */
 
 						  ldouble tup[4][4],tlo[4][4];
 						  pick_T(tmuup,ix,iy,iz,tup);

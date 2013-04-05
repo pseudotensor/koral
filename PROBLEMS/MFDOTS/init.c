@@ -78,10 +78,10 @@ p2u(pp,uu,gg,GG);
 
 #ifdef MULTIRADFLUID
 
-//print_Nvector(uu,NV);
-redistribute_radfluids_along_axes(pp,uu,&geom);
-//redistribute_radfluids(pp,uu,&geom);
-//print_Nvector(uu,NV);getchar();
+//  print_Nvector(uu,NV);
+//redistribute_radfluids_along_axes(pp,uu,&geom);
+redistribute_radfluids(pp,uu,&geom);
+//    print_Nvector(uu,NV);
 u2p_rad(uu,pp,&geom,&irf);
 
 #endif
@@ -89,7 +89,6 @@ u2p_rad(uu,pp,&geom,&irf);
 /**************************/
 
 int iv;
-
 for(iv=0;iv<NV;iv++)
   {
     set_u(u,iv,ix,iy,iz,uu[iv]);

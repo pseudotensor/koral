@@ -1,3 +1,4 @@
+0404 - *** - calculate wavespeeds independently for each fluid
 0320 - ** - generalize atmospheres for non-BL like coords
 0319 - *** - explicit criterion
 0319 - ****** - why primitives changed during the advective operator

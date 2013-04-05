@@ -28,7 +28,7 @@ fill_geometry(ix,iy,iz,&geom);
 
 
 pp[6]=LTEFACTOR*calc_LTE_Efromurho(pp[0],pp[1]);
-pp[6]*=100.;
+pp[6]*=1000.;
 pp[FX(irf)]=FXDOT1*pp[6];
 pp[FY(irf)]=FYDOT1*pp[6];
 pp[FZ(irf)]=FZDOT1*pp[6];
@@ -78,7 +78,7 @@ fill_geometry(ix,iy,iz,&geom);
 
 
 pp[6]=LTEFACTOR*calc_LTE_Efromurho(pp[0],pp[1]);
-pp[6]*=100.;
+pp[6]*=1000.;
 pp[FX(irf)]=FXDOT2*pp[6];
 pp[FY(irf)]=FYDOT2*pp[6];
 pp[FZ(irf)]=FZDOT2*pp[6];

@@ -18,6 +18,7 @@ main(int argc, char **argv)
   //preparing arrays
   initialize_arrays();
 
+
   if(argc!=NUM_INPUTARG+1)
     {
       my_err("Not enough input arguments.\n");
@@ -55,6 +56,7 @@ main(int argc, char **argv)
   set_initial_profile();
   my_finger(0.);
 #endif
+
   //sets bc
   set_bc(tstart);
 
@@ -136,7 +138,7 @@ solve_all_problems_5(ldouble tstart)
 #ifdef RK2STEPPING
       //******************************* RK2 **********************************
       //1st
-      f_timeder (t,dt,1.,u,1,ut0);  
+      f_timeder (t,dt,1.,u,1,ut0); 
       copy_u(1.,u,ut1);
       //2nd
       f_timeder (t,dt,1.,u,1,ut2); 
@@ -145,6 +147,7 @@ solve_all_problems_5(ldouble tstart)
       t+=dt;    
       add_u(.5,ut0,.5,ut1,u);
       add_u(1.,u,.5,ut2,u);      
+
      //************************** end of RK2 **********************************
 #endif
 
