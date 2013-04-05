@@ -698,18 +698,8 @@
 /*********************/
 /*********************/
 
-#if (NY==1 && NZ==1)
-#define NDIM 1
-#define NRF 2
-#elif (NZ==1 || NY==1)
-#define NDIM 2
-#define NRF 4
-#else
-#define NDIM 3
-#define NRF 8
-#endif
-
-
+//default number of radiative fluids
+#define NRF 6
 
 #ifndef MYCOORDS2
 #define MYCOORDS2 MYCOORDS

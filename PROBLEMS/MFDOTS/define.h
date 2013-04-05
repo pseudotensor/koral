@@ -2,7 +2,7 @@
 #define RADIATION
 #define MULTIRADFLUID
 #define MFMETHOD 4
-#define MFPOWER 10
+#define MFPOWER 10.
 
 //#define FORGETDOTS
 
