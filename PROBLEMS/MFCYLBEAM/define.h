@@ -7,7 +7,10 @@
 #define GAMMAMAXRAD 1000.
 
 #define myMCYL1COORDS
-//#define MULTIRADFLUID
+#define MULTIRADFLUID
+#define MFMETHOD 4
+#define MFPOWER 10.
+
 #define OMSCALE 1.
 
 #ifdef myMCYL1COORDS
@@ -42,7 +45,7 @@
 
 
 #define NY 1
-#define NZ 30
+#define NZ 10
 #define YZXDUMP
 
 

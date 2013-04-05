@@ -21,7 +21,6 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
     }
 
   redistribute_radfluids(pp,uu,&geom);
-  //redistribute_radfluids_along_axis(pp,uu,&geom); //test
 
   u2p_rad(uu,pp,&geom,&iv);
 
@@ -40,8 +39,10 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
 int
 redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 {
-  int method=4;
-  ldouble power=10.;
+#ifdef MULTIRADFLUID
+
+  int method=MFMETHOD;
+  ldouble power=MFPOWER;
   int verbose=0;
   
   struct geometry *geom
@@ -341,6 +342,8 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
   for(ii=NVHD;ii<NV;ii++)
     uu0[ii]=uu1[ii];
   
+#endif
+
   return 0;
 }
 
@@ -351,7 +354,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 int
 redistribute_radfluids_along_axes(ldouble *pp, ldouble *uu, void* ggg)
 {
-  int verbose=0;
+  int verbose=1;
   
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -472,7 +475,7 @@ redistribute_radfluids_along_axes(ldouble *pp, ldouble *uu, void* ggg)
     }
 
   //redistribution to make it more uniform
-  ldouble REDISTR=0.1;
+  ldouble REDISTR=.5;
   ldouble MINCONTRAST=1.e-7;
   ldouble invsum[4]={0.,0.,0.,0.};
   ldouble dEE,dFX,dFY,dFZ;

@@ -1,6 +1,9 @@
 #define TMAX 1.e10
 #define RADIATION
 #define MULTIRADFLUID
+#define MFMETHOD 4
+#define MFPOWER 10
+
 //#define FORGETDOTS
 
 //#define LABRADFLUXES
