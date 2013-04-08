@@ -50,7 +50,7 @@
 //44* RADNTCYL - emission from midplane in cylindrical
 //45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
 
-#define PROBLEM 37
+#define PROBLEM 36
 
 #if(PROBLEM==45)
 
@@ -699,7 +699,9 @@
 /*********************/
 
 //default number of radiative fluids
+#ifndef MORERADFLUIDS
 #define NRF 4
+#endif
 
 #ifndef MYCOORDS2
 #define MYCOORDS2 MYCOORDS

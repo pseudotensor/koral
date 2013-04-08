@@ -1,8 +1,8 @@
 #define TMAX 1.e10
 #define RADIATION
 #define MULTIRADFLUID
-#define MFMETHOD 4
-#define MFPOWER 10.
+#define MORERADFLUIDS
+#define NRF 8
 
 //#define FORGETDOTS
 
@@ -45,14 +45,14 @@
 
 
 #define IXDOT1 10
-#define IYDOT1 20//10//20
+#define IYDOT1 10//10//20
 #define IZDOT1 0
 #define FXDOT1 0.
 #define FYDOT1 0.
 #define FZDOT1 0.
 
 #define IXDOT2 30
-#define IYDOT2 20//30//20
+#define IYDOT2 30//30//20
 #define IZDOT2 0
 #define FXDOT2 0.
 #define FYDOT2 0.

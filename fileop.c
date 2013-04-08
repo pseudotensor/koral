@@ -314,6 +314,17 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //**********************************************************************
 						  //**********************************************************************
 
+						  //summing up multifluids
+						  int irf;
+						  E=Fx=Fy=Fz=0.;
+						  for(irf=0;irf<NRF;irf++)
+						    {
+						      E+=pp[EE(irf)];
+						      Fx+=pp[FX(irf)];
+						      Fy+=pp[FY(irf)];
+						      Fz+=pp[FZ(irf)];
+						    }
+
 						  fprintf(fout1,"%.4e %.4e %.4e "
 							  "%.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e "
 							  "%.7e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e "
@@ -341,7 +352,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 							  endenGU2CGS(E),     //20
 							  fluxGU2CGS(Fx),     //21
 							  fluxGU2CGS(Fy),     //22
-							  fluxGU2CGS(Fz),     //23
+							  fluxGU2CGS(Fz),
 #else		    
 							  rho,    //14
 							  uint, 
@@ -349,33 +360,13 @@ fprint_profiles(ldouble t, ldouble totmass)
 							  vy,     //17
 							  vz,     //18
 							  S,      //19
-							  E,      //20
-							  Fx,     //21
-							  Fy,     //22
-							  Fz     //23
+							  E,
+							  Fx,
+							  Fy,
+							  Fz
 #endif
 							  );
 
-#ifdef MULTIRADFLUID
-						  int irf;
-						  for(irf=1;irf<NRF;irf++)
-						    {
-						      fprintf(fout1,"%.10e %.10e %.10e %.10e ",
-#ifdef CGSOUTPUT
-							      endenGU2CGS(pp[EE(irf)]),     //20
-							      fluxGU2CGS(pp[FX(irf)]),     //21
-							      fluxGU2CGS(pp[FY(irf)]),     //22
-							      fluxGU2CGS(pp[FZ(irf)]),     //23						      
-#else
-							      pp[EE(irf)],      //20
-							      pp[FX(irf)],     //21
-							      pp[FY(irf)],     //22
-							      pp[FZ(irf)]     //23
-							      );
-						    }
-#endif
-						  
-#endif
 
 						  fprintf(fout1,"%.10e %.10e %.10e %.10e\n",
 							  v1,     //24

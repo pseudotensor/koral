@@ -9,7 +9,7 @@
 	  "unset surface\n"
 	  "set log z\n"
 	  "set cntrparam levels 20 \n"
-#ifdef MULTIRADFLUID
+#ifdef SKIP_MULTIRADFLUID
 	  "splot \"%s\" u 1:2:($20+$24+$28+$32) w l\n"
 #else
 	  "splot \"%s\" u 1:2:($20) w l\n"
@@ -59,7 +59,7 @@
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
 	  "set title \"PRAD0\" offset 0,-1\n"
-#ifdef MULTIRADFLUID
+#ifdef SKIP_MULTIRADFLUID
 	  "splot \"%s\" u 1:2:($20+$24+$28+$32) w l ti \"\"\n"
 #else
 	  "splot \"%s\" u 1:2:($20) w l ti \"\"\n"
@@ -81,7 +81,7 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
-#ifdef MULTIRADFLUID
+#ifdef SKIP_MULTIRADFLUID
 	  "plot \"%s\" u 1:2:(($21+$25+$29+$33)"
 	  "/((($21+$25+$29+$33)*($21+$25+$29+$33)+($22+$26+$30+$34)*($22+$26+$30+$34))**.5)/%f):"
 	  "(($22+$26+$30+$34)/((($21+$25+$29+$33)*($21+$25+$29+$33)+($22+$26+$30+$34)*($22+$26+$30+$34))**.5)/%f)"

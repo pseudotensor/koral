@@ -125,6 +125,7 @@ struct evolve_fluxes_2_param
 };
 
 //misc.c
+ldouble step_function(ldouble x,ldouble k);
 int calc_stationary1d_solution()  ;
 ldouble calc_totalmass();
 int initialize_arrays();

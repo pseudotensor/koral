@@ -1,4 +1,4 @@
-CC=cc -D SKIP_CLOCK
+CC=cc
 CFLAGS=-O3 -fopenmp
 LIBS=-lm -lgsl -lgslcblas -L/opt/local/lib -I/opt/local/include
 RM=/bin/rm

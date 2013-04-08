@@ -707,7 +707,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //redistributing radiative fluids
 #ifdef MULTIRADFLUID
 	      calc_primitives(ix,iy,iz);
-	      //	      redistribute_radfluids_at_cell(ix,iy,iz);
+	      redistribute_radfluids_at_cell(ix,iy,iz);
 #endif
 
 	      //**********************************************************************

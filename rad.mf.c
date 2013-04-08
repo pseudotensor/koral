@@ -35,10 +35,201 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
 }
 
 //***********************************************************************************
+//******* assignes no. of wedge for discrete mixing basing on flux direction *******
+//***********************************************************************************
+int
+assign_wedge_discrete(ldouble F[], ldouble Avec[NRF])
+{
+  int NDIM=2; 
+  int irf;
+
+  if(NDIM==2)
+    {
+      if(NZ!=1) my_err("assign_wedge_discrete() not working for 3D\n");
+
+      ldouble factor=50.;
+      ldouble nrf=(ldouble)NRF;
+      ldouble phi,n0,n1,n,r,p;
+
+      phi=atan2(F[1],F[0]);
+      if(phi<0.) phi+=2.*M_PI;
+      n0=(phi-2.*M_PI/2./nrf)/(2.*M_PI/nrf);
+      n1=floor(n0);
+      r=n0-n1;
+      
+      /*
+      //pure power
+      ldouble power=10.;
+      if(r<0.5) 
+	p=-pow(((1.-r)-.5)*2.,power)/2.;
+      else
+	p=pow((r-.5)*2.,power)/2.;
+      */
+      
+      //exponent based smoothed step function
+      r-=0.5;
+      p=my_sign(r)*0.5*(exp(factor*fabs(r))-1.)/(exp(0.5*factor)-1.);
+
+      n=n1+p+1.;
+
+      //mixing coefficients
+      for(irf=0;irf<NRF;irf++)
+	Avec[irf]=0.;
+
+      int i1,i2;
+      i1=(int)floor(n);
+      i2=(int)floor(n)+1;
+
+      if(i1>NRF-1) i1-=NRF;
+      if(i2>NRF-1) i2-=NRF;
+
+      Avec[i1]=1.-(n-floor(n));
+      Avec[i2]=(n-floor(n));
+      
+      /*
+      print_Nvector(F,3);
+      printf("%f %f %f %f %f\n",phi,n0,n1,n,nrf);      
+      print_Nvector(Avec,NRF);
+      */
+    }
+
+  return 0;
+}
+
+
+//***********************************************************************************
 //******* redistributes radiation fluids ***********************************************
 //***********************************************************************************
 int
 redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
+{
+  int NDIM=2;
+  int verbose=0,ii,jj,irf;
+  ldouble A[NRF][NRF],uu1[NV];
+
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  //(geom->ix==IXDOT1-1 && geom->iy==IYDOT1-1) verbose=1;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  //to ortonormal basis
+  ldouble ppon[NV],pp1[NV];
+  prad_lab2on(pp,ppon,ggg);
+
+  if(verbose)
+    {
+      printf("\noooooooooo %d %d %d oooooooooo\n\n",geom->ix,geom->iy,geom->iz);
+      printf("=== uu0 ===\n");
+      print_Nvector(uu0,NV);
+      printf("=== ppon ===\n");
+      print_Nvector(ppon,NV);
+    }
+
+
+  for(ii=0;ii<NRF;ii++)
+    for(jj=0;jj<NRF;jj++)
+      A[ii][jj]=0.;
+
+  ldouble flux[3],f;
+  for(irf=0;irf<NRF;irf++)
+    {
+      flux[0]=ppon[FX(irf)]/ppon[EE(irf)];
+      flux[1]=ppon[FY(irf)]/ppon[EE(irf)];
+      flux[2]=ppon[FZ(irf)]/ppon[EE(irf)];
+      //f=|F|/cE
+      f=sqrt(flux[0]*flux[0]+flux[1]*flux[1]+flux[2]*flux[2]);
+
+      if(f<1.e-8)
+	{
+	  for(ii=0;ii<NRF;ii++)
+	    A[irf][ii]=1./(ldouble)NRF;
+	}
+      else
+	{      
+	  //coefficients telling where irf fluid should be moved
+	  ldouble Avec[NRF];
+	  assign_wedge_discrete(flux,Avec);
+
+	  
+	  /*
+	    for(phi=-M_PI;phi<3.*M_PI;phi+=M_PI/30.)
+	    {
+	    flux[0]=1.*cos(phi);
+	    flux[1]=0.;
+	    flux[2]=1.*sin(phi);
+	    assign_wedge_discrete(flux,Avec);
+	    }
+	    getchar();
+	  */
+
+	  //transition from opticaly thin to thick
+	  ldouble ftrans=0.1;
+	  ldouble Atrans=step_function(f-ftrans,ftrans/10.);
+
+	  //to get rid of zeros
+	  ldouble MINMIX=1.e-6;
+	  if(Atrans>(1.-MINMIX)) Atrans=(1.-MINMIX);
+
+	  if(verbose) 
+	    {
+	      print_Nvector(flux,3);
+	      printf("=== coeff %d ===\n\n",irf);
+	      print_Nvector(Avec,NRF);
+	      printf("Atrans: %e\n",Atrans);
+	    }
+			       
+	  for(ii=0;ii<NRF;ii++)
+	    A[irf][ii]=Avec[ii]*Atrans + 1./(ldouble)NRF*(1.-Atrans);
+
+	}
+    }
+
+  
+  for(ii=0;ii<NVHD;ii++)
+    uu1[ii]=uu0[ii];
+  for(ii=NVHD;ii<NV;ii++)
+    uu1[ii]=0.;
+
+  if(verbose) 
+    {
+      printf("=== coefficients ===\n");
+    }
+  
+  for(ii=0;ii<NRF;ii++)
+    for(jj=0;jj<NRF;jj++)
+      {
+	if(verbose)
+	  printf(" %d -> %d : %e\n",jj,ii,A[jj][ii]);
+
+	uu1[EE(ii)]+=uu0[EE(jj)]*A[jj][ii];
+	uu1[FX(ii)]+=uu0[FX(jj)]*A[jj][ii];
+	uu1[FY(ii)]+=uu0[FY(jj)]*A[jj][ii];
+	uu1[FZ(ii)]+=uu0[FZ(jj)]*A[jj][ii];
+      }
+
+  if(verbose) 
+    {
+      printf("=== uu1 ===\n");
+      print_Nvector(uu1,NV);
+      getchar();
+    }
+
+  for(ii=NVHD;ii<NV;ii++)
+    uu0[ii]=uu1[ii];
+
+  return 0;
+}
+			     
+
+//***********************************************************************************
+//******* redistributes radiation fluids ***********************************************
+//***********************************************************************************
+int
+redistribute_radfluids_oldest(ldouble *pp, ldouble *uu0, void* ggg)
 {
   int NDIM=2;
   int method=4;
@@ -350,11 +541,11 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 //******* redistributes radiation fluids ***********************************************
 //***********************************************************************************
 int
-redistribute_radfluids_new(ldouble *pp, ldouble *uu0, void* ggg)
+redistribute_radfluids_old(ldouble *pp, ldouble *uu0, void* ggg)
 {
 #ifdef MULTIRADFLUID
 
-  ldouble power=MFPOWER;
+  ldouble power=10.;
   int verbose=0;
   
   struct geometry *geom
