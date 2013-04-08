@@ -352,7 +352,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 							  endenGU2CGS(E),     //20
 							  fluxGU2CGS(Fx),     //21
 							  fluxGU2CGS(Fy),     //22
-							  fluxGU2CGS(Fz),
+							  fluxGU2CGS(Fz)
 #else		    
 							  rho,    //14
 							  uint, 

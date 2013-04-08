@@ -126,8 +126,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       uu0[iv]=uu[iv];
    }
 
-  ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6;
+  ldouble EPS = 1.e-6;
+  ldouble CONV = 1.e-4;
   ldouble DAMP = 0.5;
 
   ldouble frdt = 1.0;
@@ -262,6 +262,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      */
 
 	      f3[i]=fabs(f3[i]/uup[6]);
+	      //f3[i]=fabs(f3[i]/my_max(uup[6],uup[1]));
 	    }
 
 	  if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)

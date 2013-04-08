@@ -27,8 +27,8 @@ ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
 
-struct geometry geom;
-fill_geometry(ix,iy,iz,&geom);
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
 
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
@@ -223,6 +223,12 @@ print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
      pp[7]=Fx;
      pp[8]=Fy;
      pp[9]=Fz;
+
+#ifdef NOINITFLUX
+     pp[7]=0.;
+     pp[8]=0.;
+     pp[9]=0.;
+#endif
 
      //int_4vector(&pp[6]);
 

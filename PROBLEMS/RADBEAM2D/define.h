@@ -3,7 +3,7 @@
 #define RADIATION
 //#define LABRADFLUXES
 
-#define MYCOORDS SPHCOORDS// SCHWCOORDS
+#define MYCOORDS  SCHWCOORDS
 #define NX 30
 #define NY 1
 #define NZ 30
@@ -18,7 +18,7 @@
 #define GAMMA (1.4)
 #define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
-#define BEAMNO 3
+#define BEAMNO 1
 #define IFBEAM 1
 //#define GASRADOFF
 //#define RADSOURCEOFF

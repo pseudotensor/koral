@@ -17,14 +17,14 @@
 #define MYCOORDS KSCOORDS
 #endif
 
-#define VISCOSITY
+//#define VISCOSITY
 #define SIMPLEVISCOSITY
 #define ALPHAVISC 1.
 #define RMINVISC 2.
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 10.e0
+#define DTOUT1 1.e0
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -45,7 +45,7 @@
 #define NX 70
 #endif
 
-#define NY 48
+#define NY 32
 #define NZ 1
 
 

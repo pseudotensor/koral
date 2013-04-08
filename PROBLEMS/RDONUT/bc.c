@@ -225,12 +225,17 @@ if(ix>=NX) //analytical solution at rout only
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);
      pp[7]=ucon[1];
+     pp[8]=ucon[2];
+     pp[9]=ucon[3];
 
      if(MYCOORDS==KERRCOORDS)
        pp[7]=-100.;
 
+     //pure copy
+     pp[6]=get_u(p,6,iix,iiy,iiz);
+
      //copying with scalings
-     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
+     //pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
     
      //this works only for Kerr
@@ -247,8 +252,8 @@ if(ix>=NX) //analytical solution at rout only
      return 0;
    }
 
-//reflections in theta 
-if(iy<0.) //spin axis
+//reflections/outflow in theta 
+if(iy<0.) //spin axis 
   {      
     
     iiy=-iy-1;
@@ -264,7 +269,7 @@ if(iy<0.) //spin axis
 	else
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
-    /* 
+     
 
     //temporary pure outflow
     iiy=0;
@@ -275,7 +280,7 @@ if(iy<0.) //spin axis
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);	
       }
-    */
+    
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
