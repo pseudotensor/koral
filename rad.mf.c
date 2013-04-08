@@ -36,9 +36,10 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
 
 //***********************************************************************************
 //******* assignes no. of wedge for discrete mixing basing on flux direction *******
+//******* flux distributed always between adjacent wedges *******
 //***********************************************************************************
 int
-assign_wedge_discrete(ldouble F[], ldouble Avec[NRF])
+assign_wedge_discrete_m1(ldouble F[], ldouble Avec[NRF])
 {
   int NDIM=2; 
   int irf;
@@ -89,6 +90,124 @@ assign_wedge_discrete(ldouble F[], ldouble Avec[NRF])
       /*
       print_Nvector(F,3);
       printf("%f %f %f %f %f\n",phi,n0,n1,n,nrf);      
+      print_Nvector(Avec,NRF);
+      */
+    }
+
+  return 0;
+}
+
+//***********************************************************************************
+//******* assignes no. of wedge for discrete mixing basing on flux direction *******
+//******* flux distributed basing on Lorentz boost of isotropic 1/3 along urf
+//***********************************************************************************
+int
+assign_wedge_discrete_m2(ldouble flux[], ldouble Avec[NRF])
+{
+  int NDIM=2; 
+  int irf;
+
+  if(NDIM==2)
+    {
+      if(NZ!=1) my_err("assign_wedge_discrete() not working for 3D\n");
+
+      ldouble nrf=(ldouble)NRF;
+      ldouble phi[3],n0,n1,n,r,p;
+      
+      phi[0]=atan2(flux[1],flux[0]);
+      if(phi[0]<0.) phi[0]+=2.*M_PI;
+      
+      //estimation of the radiative velocity
+      ldouble urf=(flux[0]*flux[0]+flux[1]*flux[1]+flux[2]*flux[2]);
+      urf=pow(urf,.05);
+      
+      ldouble vpar=(1./3.+urf)/(1.+1./3.*urf);
+      ldouble vperp=sqrt(1./9.+urf*urf-1./9.*urf*urf);
+
+      ldouble fan=atan(vperp/vpar);
+      //fan=2.*M_PI/nrf/2.;
+      
+      phi[1]=phi[0]-fan;
+      phi[2]=phi[0]+fan;
+
+      /*
+      if(phi[0]<0.) phi[0]+=2.*M_PI;
+      if(phi[1]<0.) phi[1]+=2.*M_PI;
+      if(phi[2]<0.) phi[2]+=2.*M_PI;
+
+      if(phi[1]>phi[2]) {fan=phi[1];phi[1]=phi[2];phi[2]=fan;}
+      */
+      
+      //wedges edges
+      ldouble wedge[NRF+1];
+      for(irf=1;irf<NRF+1;irf++)
+	{
+	  wedge[irf]=((ldouble)irf - 0.5) * 2.*M_PI/nrf;
+	}
+      wedge[0]=wedge[NRF]-2.*M_PI;
+      // wedge[NRF]=wedge[0]+2.*M_PI;
+
+      //print_Nvector(wedge,NRF+1);
+
+      //mixing coefficients
+      for(irf=0;irf<NRF;irf++)
+	Avec[irf]=0.;
+
+      //indices of wedges for phi[1-2]
+      int phiedge[3]={-1,-1,-1};
+      for(irf=-NRF;irf<2*NRF;irf++)
+	{
+	  //printf("%d %f\n",irf,((ldouble)(irf+1) - 0.5) * 2.*M_PI/nrf);
+	  if(phi[1]>((ldouble)(irf+1) - 0.5) * 2.*M_PI/nrf)
+	    phiedge[1]=irf+1;
+	  if(phi[2]>((ldouble)(irf+1) - 0.5) * 2.*M_PI/nrf)
+	    phiedge[2]=irf+1;
+	}
+
+      //printf("phi in wedges : %d %d\n",phiedge[1],phiedge[2]);
+
+      int wno(int n)
+      {
+	while(n<0) n+=NRF;
+	while(n>=NRF) n-=NRF;
+	return n;
+      }
+
+      if(phiedge[2]-phiedge[1]>=2)
+	{
+	  for(irf=phiedge[1]+1;irf<=phiedge[2]-1;irf++)
+	    Avec[wno(irf)]=1.;
+	  Avec[wno(phiedge[1])]=((((ldouble)(phiedge[1]+1) - 0.5) * 2.*M_PI/nrf)-phi[1])/
+	    (2.*M_PI/nrf);
+	  Avec[wno(phiedge[2])]=(phi[2]-(((ldouble)(phiedge[2]+1-1)- 0.5) * 2.*M_PI/nrf))/
+	    (2.*M_PI/nrf);
+	  
+	}
+      if(phiedge[2]-phiedge[1]==1)
+	{
+	  Avec[wno(phiedge[1])]=((((ldouble)(phiedge[1]+1) - 0.5) * 2.*M_PI/nrf)-phi[1])/
+	    (2.*M_PI/nrf);
+	  Avec[wno(phiedge[2])]=(phi[2]-(((ldouble)(phiedge[2]+1-1) - 0.5) * 2.*M_PI/nrf))/
+	    (2.*M_PI/nrf);
+	}
+      if(phiedge[2]-phiedge[1]==0)
+	{
+	  Avec[wno(phiedge[1])]=(phi[2]-phi[1])/
+	    (2.*M_PI/nrf);	 
+	}
+    
+      //print_Nvector(Avec,NRF);
+
+      ldouble sum=0;
+      for(irf=0;irf<NRF;irf++)
+	sum+=Avec[irf];
+       
+      for(irf=0;irf<NRF;irf++)
+	Avec[irf]=Avec[irf]/sum;
+
+      /*
+      print_Nvector(flux,3);
+      printf("phi %f %f %f\n",phi[0],phi[1],phi[2]);      
       print_Nvector(Avec,NRF);
       */
     }
@@ -152,19 +271,19 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	{      
 	  //coefficients telling where irf fluid should be moved
 	  ldouble Avec[NRF];
-	  assign_wedge_discrete(flux,Avec);
+	  assign_wedge_discrete_m2(flux,Avec);
 
-	  
 	  /*
-	    for(phi=-M_PI;phi<3.*M_PI;phi+=M_PI/30.)
+	  ldouble phi;	  
+	  for(phi=0.;phi<2.*M_PI;phi+=M_PI/30.)
 	    {
 	    flux[0]=1.*cos(phi);
-	    flux[1]=0.;
-	    flux[2]=1.*sin(phi);
-	    assign_wedge_discrete(flux,Avec);
+	    flux[1]=1.*sin(phi);
+	    flux[2]=0.;
+	    assign_wedge_discrete_m2(flux,Avec);getchar();
 	    }
-	    getchar();
 	  */
+	    
 
 	  //transition from opticaly thin to thick
 	  ldouble ftrans=0.1;

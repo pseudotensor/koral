@@ -178,7 +178,7 @@ print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
 
      //     printf(">> %e %e\n",E2,E1);
 
-     Fx=(E2-E1)/(.02*xxvecBL[1]*ggBL[1][1])/chi/3.;
+     Fx=(E2-E1)/(.02*xxvecBL[1]*sqrt(ggBL[1][1]))/chi/3.;
 
      //th dimension
      xxvectemp[1]=1.0*xxvecBL[1];
@@ -201,7 +201,7 @@ print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
      if(anret<0) anretmin=-1;
      E2=pptemp[6];
 
-     Fy=(E2-E1)/(.02*xxvecBL[2]*ggBL[2][2])/chi/3.;
+     Fy=(E2-E1)/(.02*xxvecBL[2]*sqrt(ggBL[2][2]))/chi/3.;
 
      //ph dimension
      Fz=0.;
