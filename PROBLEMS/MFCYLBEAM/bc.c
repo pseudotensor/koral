@@ -124,9 +124,13 @@ getchar();
 
 #ifdef MULTIRADFLUID
     int irf;
-    //    print_Nvector(uu,NV);
+    //print_Nvector(uu,NV);
     //    redistribute_radfluids_along_axes(pp,uu,&geom);
     redistribute_radfluids(pp,uu,&geom);
+    //    print_Nvector(uu,NV);
+    u2p_rad(uu,pp,&geom,&irf);
+    //    mf_correct_in_azimuth(pp,uu,&geom,-1.);
+
     //    print_Nvector(uu,NV);getchar();
     u2p_rad(uu,pp,&geom,&irf);
 #endif
@@ -150,11 +154,14 @@ getchar();
      gdet_bc=get_g(g,3,4,ix,iy,iz);  
      for(iv=0;iv<NV;iv++)
        {
-	 //radial component
-	 //if(iv==9)
-	 //pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	 //else
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
+
+	 int irf;
+	 for(irf=0;irf<NRF;irf++)
+	   if(iv==FX(irf))
+	     //radial component
+	     pp[iv]=-get_u(p,iv,iix,iiy,iiz);
+
        }
    
     //testing if interpolated primitives make sense
@@ -166,6 +173,19 @@ getchar();
     //print_Nvector(pp,NV); 
 
     p2u(pp,uu,gg,GG);
+
+#ifdef MULTIRADFLUID
+    int irf;
+    //print_Nvector(uu,NV);
+    //    redistribute_radfluids_along_axes(pp,uu,&geom);
+    //redistribute_radfluids(pp,uu,&geom);
+    //    print_Nvector(uu,NV);
+    //u2p_rad(uu,pp,&geom,&irf);
+    //mf_correct_in_azimuth(pp,uu,&geom,-1.);
+
+    //    print_Nvector(uu,NV);getchar();
+    //    u2p_rad(uu,pp,&geom,&irf);
+#endif
 
     return 0;
   }

@@ -80,7 +80,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   coco_N(xxvec,xxvecCYL,MYCOORDS,CYLCOORDS);
   radius=xxvecCYL[1];
 
-  if(pp[FX(0)]!=0.) verbose=1;
+  //  if(pp[FX(0)]!=0.) verbose=1;
 
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
@@ -89,6 +89,17 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   //to ortonormal basis
   ldouble ppon[NV],ppon2[NV],pptemp[NV];
   prad_lab2on(pp,ppon,ggg);
+
+  //total flux and energy
+  ldouble Eon,Fon[3]={0.,0.,0.};
+  Eon=0.;
+  for(ii=0;ii<NRF;ii++)
+    {
+      Eon+=ppon[EE(ii)];
+      Fon[0]+=ppon[FX(ii)];
+      Fon[1]+=ppon[FY(ii)];
+      Fon[2]+=ppon[FZ(ii)];
+    }
 
   for(ii=0;ii<NVHD;ii++)
     {
@@ -109,10 +120,14 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   for(irf=0;irf<NRF;irf++)
     {
       //within each fluid we check if the flux falls into the forbidden region
-      //and we split onto fixed angle r-component
+      //and we split onto fixed angle r-component along ksi
 
-      ldouble ksi=M_PI/2./4.5; //20 deg
-      
+      ldouble ksi; 
+
+      ksi=radius/10.*(M_PI/2./9.);//10 deg at r=10
+      //ksi=(M_PI/2./9.);
+      //      ksi=0.;
+
       ldouble EF[4]={ppon[EE(irf)],ppon[FX(irf)],ppon[FY(irf)],ppon[FZ(irf)]};
       ldouble f0=sqrt(EF[1]*EF[1]+EF[2]*EF[2]+EF[3]*EF[3])/EF[0];
 
@@ -149,9 +164,18 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  ldouble Fzero = sqrt(EF[1]*EF[1]+EF[3]*EF[3]);
 	  
 	  //fraction applied:
+	  ldouble frac;
 	  //TODO: better estimate the velocity?
-	  ldouble frac = dt / (radius / (1./3.));
-	  if(frac>1.) frac=1.;
+	  if(dt<0.)
+	    frac=1.;
+	  else
+	    {
+	      frac = dt / (radius / (1./3.)) * 10.;
+	      if(frac>1.) frac=1.;
+	    }
+
+
+	  
 
 	  if(verbose) printf("frac applied: %e\n",frac);
 
@@ -177,6 +201,8 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 
 	  //correcting for zero flux limit
 	  ldouble f;
+	  if(En<EEFLOOR) f=0.;
+	  else
 	  f=sqrt(Fn[0]*Fn[0]+Fn[1]*Fn[1]+Fn[2]*Fn[2])/En;
 	  if(f<1.e-8)
 	    {
@@ -218,6 +244,8 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	    }
 	 
 	  //correcting for zero flux limit
+	  if(En<EEFLOOR) f=0.; 
+	  else
 	  f=sqrt(Fn[0]*Fn[0]+Fn[1]*Fn[1]+Fn[2]*Fn[2])/En;
 	  if(f<1.e-8)
 	    {
@@ -257,9 +285,30 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
       getchar();
     }
 
+  //end total flux and energy
+  ldouble Eon2,Fon2[3]={0.,0.,0.};
+  Eon2=0.;
+  for(ii=0;ii<NRF;ii++)
+    {
+      Eon2+=ppon2[EE(ii)];
+      Fon2[0]+=ppon2[FX(ii)];
+      Fon2[1]+=ppon2[FY(ii)];
+      Fon2[2]+=ppon2[FZ(ii)];
+    }
+
+  if((fabs(1.-Eon2/Eon)>1.e-5) ||
+     (Fon[0]!=0. && (fabs(1.-Fon2[0]/Fon[0])>1.e-5)) || 
+     (Fon[1]!=0. && (fabs(1.-Fon2[1]/Fon[1])>1.e-5)) || 
+     (Fon[2]!=0. && (fabs(1.-Fon2[2]/Fon[2])>1.e-5)))
+    {
+      printf("EF ratios: %f %f %f %f\n",Eon2/Eon,Fon2[0]/Fon[0],Fon2[1]/Fon[1],Fon2[2]/Fon[2]);
+      getchar();
+    }
+
+
 
   //to code basis
-  prad_on2lab(ppon,pp,ggg);
+  prad_on2lab(ppon2,pp,ggg);
 
   //to conserved
   p2u_rad(pp,uu,gg,GG);
@@ -528,7 +577,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	  ldouble Atrans=step_function(f-ftrans,ftrans/10.);
 
 	  //to get rid of zeros
-	  ldouble MINMIX=1.e-6;
+	  ldouble MINMIX=1.e-8;
 	  if(Atrans>(1.-MINMIX)) Atrans=(1.-MINMIX);
 
 	  if(verbose) 

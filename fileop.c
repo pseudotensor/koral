@@ -318,6 +318,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  int irf;
 						  E=Fx=Fy=Fz=0.;
 						  for(irf=0;irf<NRF;irf++)
+						  
 						    {
 						      E+=pp[EE(irf)];
 						      Fx+=pp[FX(irf)];

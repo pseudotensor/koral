@@ -13,7 +13,7 @@
 
 #define MFPOWER 10.
 
-#define OMSCALE 1.
+#define OMSCALE 0.
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS
@@ -36,7 +36,7 @@
 
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
-#define MINX (log(0.01-MKS1R0))
+#define MINX (log(0.001-MKS1R0))
 #define MAXX (log(10.-MKS1R0))
 #define NX 50
 #else
