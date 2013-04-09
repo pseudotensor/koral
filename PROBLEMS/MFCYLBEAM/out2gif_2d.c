@@ -66,7 +66,7 @@ miny=-maxx;
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
-#ifdef MULTIRADFLUID
+#ifdef SKIP_MULTIRADFLUID
 	  "splot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):($20+$24+$28+$32) w l ti \"\"\n"
 #else
 	  "splot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):20 w l ti \"\"\n"
@@ -88,7 +88,7 @@ miny=-maxx;
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
-#ifdef MULTIRADFLUID
+#ifdef SKIP_MULTIRADFLUID
 	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):((($21+$25+$29+$33)*cos($3)-(($23+$27+$31+$35))*sin($3))*%f)"
 	  ":((($23+$27+$31+$35)*cos($3)+(($21+$25+$29+$33))*sin($3))*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  ,fname,fname2,minx,maxx,miny,maxy,fname,fname,

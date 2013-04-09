@@ -7,7 +7,10 @@
 #define GAMMAMAXRAD 1000.
 
 #define myMCYL1COORDS
+
 #define MULTIRADFLUID
+//#define MFCORRECTPHI
+
 #define MFPOWER 10.
 
 #define OMSCALE 1.
@@ -37,7 +40,7 @@
 #define MAXX (log(10.-MKS1R0))
 #define NX 50
 #else
-#define MINX  0.
+#define MINX  0.001
 #define MAXX 20.
 #define NX 50
 #endif

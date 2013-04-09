@@ -21,7 +21,6 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
     }
 
   redistribute_radfluids(pp,uu,&geom);
-  //redistribute_radfluids_along_axes(pp,uu,&geom);
 
   u2p_rad(uu,pp,&geom,&iv);
 
@@ -35,6 +34,242 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
 }
 
 //***********************************************************************************
+//******* redistributes radiation fluids wrapper ***************************************
+//***********************************************************************************
+int
+mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble dt)
+{
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  int iv;
+  ldouble pp[NV],uu[NV];
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uu[iv]=get_u(u,iv,ix,iy,iz);
+      pp[iv]=get_u(p,iv,ix,iy,iz);
+    }
+
+  mf_correct_in_azimuth(pp,uu,&geom,dt);
+
+  for(iv=0;iv<NV;iv++)
+    {
+      set_u(u,iv,ix,iy,iz,uu[iv]);
+      set_u(p,iv,ix,iy,iz,pp[iv]);
+    }
+	
+  return 0;
+}
+
+//***********************************************************************************
+//******* corrects the distribution in azimuth by splitting highly azimuthal *******
+//******* beams into almost-radial and more azimuthal one to avoid the *************
+//******* the inner funnel *********************************************************
+//***********************************************************************************
+int
+mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
+{
+  int NDIM=2;
+  int verbose=0,ii,jj,irf;
+  
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble radius,xxvec[4],xxvecCYL[4];
+  get_xx(geom->ix,geom->iy,geom->iz,xxvec);
+  coco_N(xxvec,xxvecCYL,MYCOORDS,CYLCOORDS);
+  radius=xxvecCYL[1];
+
+  if(pp[FX(0)]!=0.) verbose=1;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  //to ortonormal basis
+  ldouble ppon[NV],ppon2[NV],pptemp[NV];
+  prad_lab2on(pp,ppon,ggg);
+
+  for(ii=0;ii<NVHD;ii++)
+    {
+      ppon2[ii]=ppon[ii];
+      pptemp[ii]=ppon[ii];
+    }
+
+  for(ii=NVHD;ii<NV;ii++)
+    ppon2[ii]=0.;
+
+  if(verbose)
+    {
+      printf("\noooooooooo %d %d %d oooooooooo\n\n",geom->ix,geom->iy,geom->iz);
+      printf("=== ppon ===\n");
+      print_Nvector(ppon,NV);
+    }
+
+  for(irf=0;irf<NRF;irf++)
+    {
+      //within each fluid we check if the flux falls into the forbidden region
+      //and we split onto fixed angle r-component
+
+      ldouble ksi=M_PI/2./4.5; //20 deg
+      
+      ldouble EF[4]={ppon[EE(irf)],ppon[FX(irf)],ppon[FY(irf)],ppon[FZ(irf)]};
+      ldouble f0=sqrt(EF[1]*EF[1]+EF[2]*EF[2]+EF[3]*EF[3])/EF[0];
+
+      //TODO: generalize to 3d
+      ldouble phi = atan2(EF[3],EF[1]); //angle on the r-phi plane
+      
+      if(phi<0.) phi+=2.*M_PI;
+
+      if(verbose)
+	{
+	  printf("===\nfluid:  %d\n",irf);
+	  printf("phi: %f ksi: %f\n",phi*180./M_PI,ksi*180./M_PI);
+	}
+
+      if(phi<=M_PI/2. || phi>=3.*M_PI/2. || f0<1.e-8 || fabs(phi-M_PI)<ksi)
+	//flux pointing outwards, small or close to r-axis
+	{
+	  ppon2[EE(irf)]+=EF[0];
+	  ppon2[FX(irf)]+=EF[1];
+	  ppon2[FY(irf)]+=EF[2];
+	  ppon2[FZ(irf)]+=EF[3];
+	}
+      else
+	{
+	  //inclined tetrad
+	  ldouble erp[3]={-cos(ksi),0,sin(ksi)};
+	  ldouble efp[3]={sin(ksi),0,cos(ksi)};
+
+	  //components along the inclined tetrad
+	  ldouble Frp = EF[1]*erp[0] + EF[3]*erp[2];
+	  ldouble Ffp = EF[1]*efp[0] + EF[3]*efp[2];
+
+	  //length of the original
+	  ldouble Fzero = sqrt(EF[1]*EF[1]+EF[3]*EF[3]);
+	  
+	  //fraction applied:
+	  //TODO: better estimate the velocity?
+	  ldouble frac = dt / (radius / (1./3.));
+	  if(frac>1.) frac=1.;
+
+	  if(verbose) printf("frac applied: %e\n",frac);
+
+	  ppon2[EE(irf)]+=(1.-frac)*EF[0];
+	  ppon2[FX(irf)]+=(1.-frac)*EF[1];
+	  ppon2[FY(irf)]+=(1.-frac)*EF[2];
+	  ppon2[FZ(irf)]+=(1.-frac)*EF[3];
+
+	  //new component
+	  ldouble En,Fn[3];
+	  En=Frp/(Frp+Ffp)*EF[0];
+	  Fn[0]=Frp*erp[0];
+	  Fn[1]=Frp/(Frp+Ffp)*EF[2];
+	  Fn[2]=Frp*erp[2];
+
+	  if(verbose)
+	    {
+	      printf("component 1:\n %e %e %e %e\n",En,Fn[0],Fn[1],Fn[2]);
+	    }
+
+	  //distributing it over wedges
+	  ldouble Avec[NRF];
+
+	  //correcting for zero flux limit
+	  ldouble f;
+	  f=sqrt(Fn[0]*Fn[0]+Fn[1]*Fn[1]+Fn[2]*Fn[2])/En;
+	  if(f<1.e-8)
+	    {
+	      for(ii=0;ii<NRF;ii++)
+		Avec[ii]=1./(ldouble)NRF;
+	    }
+	  else
+	    {      
+	      assign_wedge_discrete_m1(Fn,Avec);	  
+	      if(verbose) print_Nvector(Avec,NRF);
+	      //transition from opticaly thin to thick
+	      ldouble ftrans=0.1;
+	      ldouble Atrans=step_function(f-ftrans,ftrans/10.);
+	      //to get rid of zeros
+	      ldouble MINMIX=1.e-6;
+	      if(Atrans>(1.-MINMIX)) Atrans=(1.-MINMIX);
+	      for(ii=0;ii<NRF;ii++)
+		Avec[ii]=Avec[ii]*Atrans + 1./(ldouble)NRF*(1.-Atrans);
+	      //if(verbose) print_Nvector(Avec,NRF);
+	    }	
+
+	  for(ii=0;ii<NRF;ii++)
+	    {
+	      ppon2[EE(ii)]+=frac*Avec[ii]*En;
+	      ppon2[FX(ii)]+=frac*Avec[ii]*Fn[0];
+	      ppon2[FY(ii)]+=frac*Avec[ii]*Fn[1];
+	      ppon2[FZ(ii)]+=frac*Avec[ii]*Fn[2];
+	    }
+
+	  //the other component
+	  En=Ffp/(Frp+Ffp)*EF[0];
+	  Fn[0]=Ffp*efp[0];
+	  Fn[1]=Ffp/(Frp+Ffp)*EF[2];
+	  Fn[2]=Ffp*efp[2];
+
+	  if(verbose)
+	    {
+	      printf("component 2:\n %e %e %e %e\n",En,Fn[0],Fn[1],Fn[2]);
+	    }
+	 
+	  //correcting for zero flux limit
+	  f=sqrt(Fn[0]*Fn[0]+Fn[1]*Fn[1]+Fn[2]*Fn[2])/En;
+	  if(f<1.e-8)
+	    {
+	      for(ii=0;ii<NRF;ii++)
+		Avec[ii]=1./(ldouble)NRF;
+	    }
+	  else
+	    {      
+	      assign_wedge_discrete_m1(Fn,Avec);
+	      if(verbose) print_Nvector(Avec,NRF);
+	      //transition from opticaly thin to thick
+	      ldouble ftrans=0.1;
+	      ldouble Atrans=step_function(f-ftrans,ftrans/10.);
+	      //to get rid of zeros
+	      ldouble MINMIX=1.e-6;
+	      if(Atrans>(1.-MINMIX)) Atrans=(1.-MINMIX);
+	      for(ii=0;ii<NRF;ii++)
+		Avec[ii]=Avec[ii]*Atrans + 1./(ldouble)NRF*(1.-Atrans);
+	      //	      if(verbose) print_Nvector(Avec,NRF);
+	    }
+	  
+	  for(ii=0;ii<NRF;ii++)
+	    {
+	      ppon2[EE(ii)]+=frac*Avec[ii]*En;
+	      ppon2[FX(ii)]+=frac*Avec[ii]*Fn[0];
+	      ppon2[FY(ii)]+=frac*Avec[ii]*Fn[1];
+	      ppon2[FZ(ii)]+=frac*Avec[ii]*Fn[2];
+	    }
+	}
+    }
+
+  //in ppon2[] target ortonormal fluids
+  if(verbose)
+    {
+      printf("=== ppon2 ===\n");
+      print_Nvector(ppon2,NV);
+      getchar();
+    }
+
+
+  //to code basis
+  prad_on2lab(ppon,pp,ggg);
+
+  //to conserved
+  p2u_rad(pp,uu,gg,GG);
+
+  return 0;
+}
+
+
+
+//***********************************************************************************
 //******* assignes no. of wedge for discrete mixing basing on flux direction *******
 //******* flux distributed always between adjacent wedges *******
 //***********************************************************************************
@@ -46,13 +281,16 @@ assign_wedge_discrete_m1(ldouble F[], ldouble Avec[NRF])
 
   if(NDIM==2)
     {
-      if(NZ!=1) my_err("assign_wedge_discrete() not working for 3D\n");
-
       ldouble factor=50.;
       ldouble nrf=(ldouble)NRF;
       ldouble phi,n0,n1,n,r,p;
+      
+      if(NZ==1)
+	phi=atan2(F[1],F[0]);
+      else if(NY==1)
+	phi=atan2(F[2],F[0]);
+      else my_err("assign_wedge_discrete_m1() not working for this setup\n");
 
-      phi=atan2(F[1],F[0]);
       if(phi<0.) phi+=2.*M_PI;
       n0=(phi-2.*M_PI/2./nrf)/(2.*M_PI/nrf);
       n1=floor(n0);
@@ -271,7 +509,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 	{      
 	  //coefficients telling where irf fluid should be moved
 	  ldouble Avec[NRF];
-	  assign_wedge_discrete_m2(flux,Avec);
+	  assign_wedge_discrete_m1(flux,Avec);
 
 	  /*
 	  ldouble phi;	  
