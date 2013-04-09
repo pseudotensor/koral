@@ -7,7 +7,7 @@
 #define RADIATION
 #define MULTIRADFLUID
 #define REFLECT
-
+#define MFREDISTRIBUTEMETHOD 2
 
 #define RK2STEPPING
 #define INT_ORDER 1

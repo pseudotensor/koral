@@ -961,13 +961,14 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
 
 //***********************************************************************************
 //******* redistributes radiation fluids ***********************************************
+//******* basing on velocities along axes **********************************************
 //***********************************************************************************
 int
 redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
 {
 #ifdef MULTIRADFLUID
 
-  ldouble power=20.;
+  ldouble skew=10.;
   int verbose=0;
   
   struct geometry *geom
@@ -1018,7 +1019,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
 
-  ldouble MINVEL=1.e-3;
+  ldouble MINVEL=1.e-4;
 
   for(irf=0;irf<NRF;irf++)
     {
@@ -1029,12 +1030,12 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
       //etc...
 
       ldouble vxl,vxr,vyl,vyr,vzr,vzl,sumvel;
-      vxl=my_min(aval[irf][0],-MINVEL);
-      vxr=my_max(aval[irf][1],MINVEL);
-      vyl=my_min(aval[irf][2],-MINVEL);
-      vyr=my_max(aval[irf][3],MINVEL);
-      vzl=my_min(aval[irf][4],-MINVEL);
-      vzr=my_max(aval[irf][5],MINVEL);
+      vxl=fabs(my_min(aval[irf][0],-MINVEL));
+      vxr=fabs(my_max(aval[irf][1],MINVEL));
+      vyl=fabs(my_min(aval[irf][2],-MINVEL));
+      vyr=fabs(my_max(aval[irf][3],MINVEL));
+      vzl=fabs(my_min(aval[irf][4],-MINVEL));
+      vzr=fabs(my_max(aval[irf][5],MINVEL));
     
       //wedges (x,y,z)
       //0 (x+)
@@ -1044,46 +1045,60 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
       //4 (z+)
       //5 (z-)
 
+      /*
       vxl=pow(fabs(vxl),power);
       vxr=pow(fabs(vxr),power);
       vyl=pow(fabs(vyl),power);
       vyr=pow(fabs(vyr),power);
       vzl=pow(fabs(vzl),power);
       vzr=pow(fabs(vzr),power);
+      */
+      
+      ldouble expskew(ldouble vel, ldouble skew) 
+      {
+	return (exp(skew*vel)-1.0)/(exp(skew)-1.0);
+      }
+
+      vxl=expskew(vxl,skew);
+      vxr=expskew(vxr,skew);
+      vyl=expskew(vyl,skew);
+      vyr=expskew(vyr,skew);
+      vzl=expskew(vzl,skew);
+      vzr=expskew(vzr,skew);
 
       sumvel=vxl+vxr+vyl+vyr+vzl+vzr;
 
-      //test
-      sumvel=vxl+vxr+vzl+vzr;
+      if(NY==1)
+	sumvel=vxl+vxr+vzl+vzr;
+      if(NZ==1)
+	sumvel=vxl+vxr+vyl+vyr;
+      if(NY==1 && NZ==1)
+	sumvel=vxl+vxr+2.*expskew(MINVEL,skew);
 
       //arbitrary power
       A[irf][0]=vxr/sumvel;
       A[irf][1]=vxl/sumvel;
       A[irf][2]=vyr/sumvel;
       A[irf][3]=vyl/sumvel;
-      //A[irf][4]=vzr/sumvel;
-      //A[irf][5]=vzl/sumvel;
 
-      //test 2d, NRF =4, to work with along_axes
-      A[irf][2]=vzr/sumvel;
-      A[irf][3]=vzl/sumvel;
+      if(NY==1)
+	{
+	  A[irf][2]=vzr/sumvel;
+	  A[irf][3]=vzl/sumvel;
+	}
 
-      /*
-      //test - old approach
-      ldouble vxr0=vxr;
-      ldouble vzr0=vzr;
-      ldouble vxl0=vxl;
-      ldouble vzl0=vzl;
-      
-      vxr=sqrt(vxr0*vxr0+vzl0*vzl0);
-      vzr=sqrt(vxr0*vxr0+vzr0*vzr0);
-      vxl=sqrt(vxl0*vxl0+vzr0*vzr0);
-      vzl=sqrt(vxl0*vxl0+vzl0*vzl0);
-      A[irf][0]=vxr/(vxl+vxr)*vzr/(vzl+vzr);
-      A[irf][1]=vxl/(vxl+vxr)*vzr/(vzl+vzr);
-      A[irf][2]=vxl/(vxl+vxr)*vzl/(vzl+vzr);
-      A[irf][3]=vxr/(vxl+vxr)*vzl/(vzl+vzr);
-      */
+      if(NY==1 && NZ==1)
+	{
+	  A[irf][2]=expskew(MINVEL,skew)/sumvel;
+	  A[irf][3]=expskew(MINVEL,skew)/sumvel;
+	}
+
+      if(NRF==6)
+	{
+	  A[irf][4]=vzr/sumvel;
+	  A[irf][5]=vzl/sumvel;
+	}
+
     }  
 
   for(ii=0;ii<NVHD;ii++)

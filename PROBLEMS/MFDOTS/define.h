@@ -1,8 +1,9 @@
 #define TMAX 1.e10
 #define RADIATION
+
 #define MULTIRADFLUID
-#define MORERADFLUIDS
-#define NRF 8
+//#define MORERADFLUIDS
+//#define NRF 8
 
 //#define FORGETDOTS
 
