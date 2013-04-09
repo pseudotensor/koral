@@ -20,6 +20,7 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
+  //redistribute_radfluids_oldest(pp,uu,&geom);
   redistribute_radfluids(pp,uu,&geom);
 
   u2p_rad(uu,pp,&geom,&iv);

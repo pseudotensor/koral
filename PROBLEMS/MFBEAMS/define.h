@@ -4,6 +4,11 @@
 #define VERBOSE0 0
 #define MYCOORDS MINKCOORDS
 
+#define RADIATION
+#define MULTIRADFLUID
+#define REFLECT
+
+
 #define RK2STEPPING
 #define INT_ORDER 1
 #define NX 201
@@ -13,11 +18,12 @@
 #define INITTSTEPLIM (TSTEPLIM/10.)
 
 #define SPECIFIC_BC
-
+#define PRINTXGC_LEFT
+#define PRINTXGC_RIGHT
 
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define DTOUT1 .075
+#define DTOUT1 .175
 #define ALLSTEPSOUTPUT 0
 #define NOUTSTOP 60
 #define GAMMA (ldouble)(5./3.)
@@ -37,8 +43,6 @@
 #define FRATIO1 .99
 #define FRATIO2 .99
 
-#define RADIATION
-#define MULTIRADFLUID
 
 #define KAPPA 0.
 #define KAPPAES 0.

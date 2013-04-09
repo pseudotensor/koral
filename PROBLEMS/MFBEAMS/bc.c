@@ -20,6 +20,7 @@ ldouble rho,E,Fx,Fy,Fz,uint;
 
 if(ix<0 ) 
   {
+#ifndef REFLECT
     ldouble rho0,Tgas0,ur,Tgas,Trad,r,rcm,prad,pgas,vx,ut;
     
     //flat gas profiles
@@ -64,6 +65,36 @@ if(ix<0 )
 #endif						
     
     return 0;
+
+#else
+    iix=-ix-1;
+    iiz=iz;
+    iiy=iy;
+int irf;
+    for(iv=0;iv<NV;iv++)
+      {
+	pp[iv]=get_u(p,iv,iix,iiy,iiz);
+
+	
+	for(irf=0;irf<NRF;irf++)
+	  if(iv==FX(irf))
+	    //x component
+	    pp[iv]=-get_u(p,iv,iix,iiy,iiz);
+      }
+   
+    //testing if interpolated primitives make sense
+    check_floors_hd(pp,VELPRIM,gg,GG);
+   
+
+    p2u(pp,uu,gg,GG);
+
+#ifdef MULTIRADFLUID
+
+    redistribute_radfluids(pp,uu,&geom);
+    u2p_rad(uu,pp,&geom,&irf);
+#endif
+return 0;
+#endif
   }
 
 if(ix>=NX) 
@@ -110,6 +141,7 @@ if(ix>=NX)
 #ifdef MULTIRADFLUID
 
     redistribute_radfluids(pp,uu,&geom);
+    u2p_rad(uu,pp,&geom,&irf);
 #endif						
     
     return 0;
