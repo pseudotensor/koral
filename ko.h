@@ -396,6 +396,9 @@ int calc_rad_wavespeeds_mf_total(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldo
 int calc_rad_wavespeeds_pure_mf_each(ldouble *pp,void*,ldouble aval[][6]);
 int calc_Rij_ff_mf(ldouble *pp, ldouble  Rij[][4][4]);
 int redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg);
+int redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg);
+int redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg);
+int redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg);
 int redistribute_radfluids_along_axes(ldouble *pp, ldouble *uu0, void* ggg);
 int redistribute_radfluids_at_cell(int ix,int iy,int iz);
 int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);

@@ -150,9 +150,7 @@ getchar();
      iiy=iy;
 #endif
 
-     gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-     gdet_bc=get_g(g,3,4,ix,iy,iz);  
-     for(iv=0;iv<NV;iv++)
+      for(iv=0;iv<NV;iv++)
        {
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
 
@@ -168,19 +166,15 @@ getchar();
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
     
-    //    printf("bc %d > %d",ix,iix);
-    //    print_4vector(&get_u(p,6,iix,iiy,iiz));
-    //print_Nvector(pp,NV); 
-
     p2u(pp,uu,gg,GG);
 
 #ifdef MULTIRADFLUID
     int irf;
     //print_Nvector(uu,NV);
     //    redistribute_radfluids_along_axes(pp,uu,&geom);
-    //redistribute_radfluids(pp,uu,&geom);
+    redistribute_radfluids(pp,uu,&geom);
+    u2p_rad(uu,pp,&geom,&irf);
     //    print_Nvector(uu,NV);
-    //u2p_rad(uu,pp,&geom,&irf);
     //mf_correct_in_azimuth(pp,uu,&geom,-1.);
 
     //    print_Nvector(uu,NV);getchar();

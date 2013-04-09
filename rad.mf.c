@@ -20,8 +20,12 @@ redistribute_radfluids_at_cell(int ix,int iy,int iz)
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
-  //redistribute_radfluids_oldest(pp,uu,&geom);
-  redistribute_radfluids(pp,uu,&geom);
+  if(MFREDISTRIBUTEMETHOD==1)
+    redistribute_radfluids_m1(pp,uu,&geom);
+  if(MFREDISTRIBUTEMETHOD==2)
+    redistribute_radfluids_m2(pp,uu,&geom);
+  if(MFREDISTRIBUTEMETHOD==3)
+    redistribute_radfluids_m3(pp,uu,&geom);
 
   u2p_rad(uu,pp,&geom,&iv);
 
@@ -215,7 +219,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	      assign_wedge_discrete_m1(Fn,Avec);	  
 	      if(verbose) print_Nvector(Avec,NRF);
 	      //transition from opticaly thin to thick
-	      ldouble ftrans=0.1;
+	      ldouble ftrans=0.0001;
 	      ldouble Atrans=step_function(f-ftrans,ftrans/10.);
 	      //to get rid of zeros
 	      ldouble MINMIX=1.e-6;
@@ -258,7 +262,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	      assign_wedge_discrete_m1(Fn,Avec);
 	      if(verbose) print_Nvector(Avec,NRF);
 	      //transition from opticaly thin to thick
-	      ldouble ftrans=0.1;
+	      ldouble ftrans=0.0001;
 	      ldouble Atrans=step_function(f-ftrans,ftrans/10.);
 	      //to get rid of zeros
 	      ldouble MINMIX=1.e-6;
@@ -503,12 +507,23 @@ assign_wedge_discrete_m2(ldouble flux[], ldouble Avec[NRF])
   return 0;
 }
 
+int
+redistribute_radfluids(ldouble *pp, ldouble *uu, void* ggg)
+{
+  if(MFREDISTRIBUTEMETHOD==1)
+    redistribute_radfluids_m1(pp,uu,ggg);
+  if(MFREDISTRIBUTEMETHOD==2)
+    redistribute_radfluids_m2(pp,uu,ggg);
+  if(MFREDISTRIBUTEMETHOD==3)
+    redistribute_radfluids_m3(pp,uu,ggg);
+  return 0; 
+}
 
 //***********************************************************************************
-//******* redistributes radiation fluids ***********************************************
+//******* redistributes radiation fluids ***** discrete ********************************
 //***********************************************************************************
 int
-redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
+redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
 {
   int NDIM=2;
   int verbose=0,ii,jj,irf;
@@ -636,7 +651,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg)
 //******* redistributes radiation fluids ***********************************************
 //***********************************************************************************
 int
-redistribute_radfluids_oldest(ldouble *pp, ldouble *uu0, void* ggg)
+redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
 {
   int NDIM=2;
   int method=4;
@@ -948,11 +963,11 @@ redistribute_radfluids_oldest(ldouble *pp, ldouble *uu0, void* ggg)
 //******* redistributes radiation fluids ***********************************************
 //***********************************************************************************
 int
-redistribute_radfluids_old(ldouble *pp, ldouble *uu0, void* ggg)
+redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
 {
 #ifdef MULTIRADFLUID
 
-  ldouble power=10.;
+  ldouble power=20.;
   int verbose=0;
   
   struct geometry *geom

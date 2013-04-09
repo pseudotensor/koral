@@ -9,11 +9,11 @@
 #define myMCYL1COORDS
 
 #define MULTIRADFLUID
-//#define MFCORRECTPHI
+#define MFCORRECTPHI
+#define MFREDISTRIBUTEMETHOD 3
 
-#define MFPOWER 10.
 
-#define OMSCALE 0.
+#define OMSCALE 1.
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS
@@ -41,7 +41,7 @@
 #define NX 50
 #else
 #define MINX  0.001
-#define MAXX 20.
+#define MAXX 10.
 #define NX 50
 #endif
 
