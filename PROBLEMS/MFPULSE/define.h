@@ -39,7 +39,7 @@
 #define BLOBX2 (50.)
 
 #define RADIATION
-#define MULTIRADFLUID
+//#define MULTIRADFLUID
 
 #define KAPPA 0.
 #define KAPPAES 0.
