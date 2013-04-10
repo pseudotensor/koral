@@ -147,7 +147,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  printf("phi: %f ksi: %f\n",phi*180./M_PI,ksi*180./M_PI);
 	}
 
-      if(phi<=M_PI/2. || phi>=3.*M_PI/2. || f0<1.e-8 || fabs(phi-M_PI)<ksi)
+      if(phi<=1.01*M_PI/2. || phi>=.99*3.*M_PI/2. || f0<1.e-8 || fabs(phi-M_PI)<ksi)
 	//flux pointing outwards, small or close to r-axis
 	{
 	  ppon2[EE(irf)]+=EF[0];
@@ -175,12 +175,10 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	    frac=1.;
 	  else
 	    {
-	      frac = dt / (radius / (1./3.)) * 10.;
+	      frac = dt / (radius / (1./3.)) * 3.;
 	      if(frac>1.) frac=1.;
 	    }
 
-
-	  
 
 	  if(verbose) printf("frac applied: %e\n",frac);
 
@@ -649,6 +647,7 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
 
 //***********************************************************************************
 //******* redistributes radiation fluids ***********************************************
+//******* basing on skewed characteristic velocitites **********************************
 //***********************************************************************************
 int
 redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
@@ -968,7 +967,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
 {
 #ifdef MULTIRADFLUID
 
-  ldouble skew=10.;
+  ldouble skew=30.;
   int verbose=0;
   
   struct geometry *geom
@@ -1019,7 +1018,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
 
-  ldouble MINVEL=1.e-4;
+  ldouble MINVEL=1.e-3;
 
   for(irf=0;irf<NRF;irf++)
     {
@@ -1066,37 +1065,47 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
       vzl=expskew(vzl,skew);
       vzr=expskew(vzr,skew);
 
-      sumvel=vxl+vxr+vyl+vyr+vzl+vzr;
-
-      if(NY==1)
-	sumvel=vxl+vxr+vzl+vzr;
-      if(NZ==1)
-	sumvel=vxl+vxr+vyl+vyr;
-      if(NY==1 && NZ==1)
-	sumvel=vxl+vxr+2.*expskew(MINVEL,skew);
-
-      //arbitrary power
-      A[irf][0]=vxr/sumvel;
-      A[irf][1]=vxl/sumvel;
-      A[irf][2]=vyr/sumvel;
-      A[irf][3]=vyl/sumvel;
-
-      if(NY==1)
-	{
-	  A[irf][2]=vzr/sumvel;
-	  A[irf][3]=vzl/sumvel;
-	}
-
-      if(NY==1 && NZ==1)
-	{
-	  A[irf][2]=expskew(MINVEL,skew)/sumvel;
-	  A[irf][3]=expskew(MINVEL,skew)/sumvel;
-	}
-
       if(NRF==6)
 	{
+	  sumvel=vxl+vxr+vyl+vyr+vzl+vzr;
+	  A[irf][0]=vxr/sumvel;
+	  A[irf][1]=vxl/sumvel;
+	  A[irf][2]=vyr/sumvel;
+	  A[irf][3]=vyl/sumvel;
 	  A[irf][4]=vzr/sumvel;
 	  A[irf][5]=vzl/sumvel;
+	}
+
+      if(NRF==4)
+	{
+	  if(NY==1)
+	    sumvel=vxl+vxr+vzl+vzr;
+	  if(NZ==1)
+	    sumvel=vxl+vxr+vyl+vyr;
+	  if(NY==1 && NZ==1)
+	    sumvel=vxl+vxr+2.*expskew(MINVEL,skew);
+
+	  //arbitrary power
+	  A[irf][0]=vxr/sumvel;
+	  A[irf][1]=vxl/sumvel;
+
+	  if(NZ==1)
+	    {
+	      A[irf][2]=vyr/sumvel;
+	      A[irf][3]=vyl/sumvel;
+	    }
+
+	  if(NY==1)
+	    {
+	      A[irf][2]=vzr/sumvel;
+	      A[irf][3]=vzl/sumvel;
+	    }
+
+	  if(NY==1 && NZ==1)
+	    {
+	      A[irf][2]=expskew(MINVEL,skew)/sumvel;
+	      A[irf][3]=expskew(MINVEL,skew)/sumvel;
+	    }
 	}
 
     }  

@@ -175,7 +175,9 @@ getchar();
     redistribute_radfluids(pp,uu,&geom);
     u2p_rad(uu,pp,&geom,&irf);
     //    print_Nvector(uu,NV);
-    //mf_correct_in_azimuth(pp,uu,&geom,-1.);
+#ifdef MFCORRECTPHI
+    mf_correct_in_azimuth(pp,uu,&geom,-1.);
+#endif
 
     //    print_Nvector(uu,NV);getchar();
     //    u2p_rad(uu,pp,&geom,&irf);
