@@ -183,7 +183,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	      frac = dt / (radius / (1./3.)) * 3.;
 	      if(frac>1.) frac=1.;
 	    }
-
+	  frac=1.;
 
 	  if(verbose) printf("frac applied: %e\n",frac);
 
