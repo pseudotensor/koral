@@ -183,7 +183,6 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	      frac = dt / (radius / (1./3.)) * 3.;
 	      if(frac>1.) frac=1.;
 	    }
-	  frac=1.;
 
 	  if(verbose) printf("frac applied: %e\n",frac);
 
@@ -203,7 +202,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  ldouble Avec[NRF];
 	  ldouble skew=10.;
 	  calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
-	  redistribute_with_velocities(avals,Avec,skew,1.e-6);
+	  redistribute_with_velocities(avals,Avec,skew,1.e-2);
 
 	  if(verbose)
 	    {
@@ -229,7 +228,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 
 	  //distributing it over wedges
 	  calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
-	  redistribute_with_velocities(avals,Avec,skew,1.e-6);
+	  redistribute_with_velocities(avals,Avec,skew,1.e-2);
 
 	  if(verbose)
 	    {
