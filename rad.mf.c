@@ -86,6 +86,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   radius=xxvecCYL[1];
 
   //  if(pp[FX(0)]!=0.) verbose=1;
+  if(geom->iy==0 && radius>4. && radius<4.5) verbose=1;
 
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
