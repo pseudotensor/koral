@@ -108,8 +108,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
       Fon[2]+=ppon[FZ(ii)];
     }
 
-  //
-  if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
+  //if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
   //if(geom->iy==0 && radius>4. && radius<4.5 && fabs(Fon[0]/Eon)>1.e-2) verbose=1;
 
   for(ii=0;ii<NVHD;ii++)
@@ -200,42 +199,19 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  Fn[1]=Frp/(Frp+Ffp)*EF[2];
 	  Fn[2]=Frp*erp[2];
 
-	  if(verbose)
-	    {
-	      printf("component 1:\n %e %e %e %e\n",En,Fn[0]/En,Fn[0]/En,Fn[0]/En);
-	      
-	      calc_rad_wavespeeds_on(Fn[0]/En,Fn[0]/En,Fn[0]/En,avals);
-
-	      printf("wavespeeds 1:\n %e %e | %e %e | %e %e\n",avals[0],avals[1],avals[2],avals[3],avals[4],avals[5]);
-	    }
-
 	  //distributing it over wedges
 	  ldouble Avec[NRF];
+	  ldouble skew=10.;
+	  calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
+	  redistribute_with_velocities(avals,Avec,skew,1.e-6);
 
-	  //correcting for zero flux limit
-	  ldouble f;
-	  if(En<EEFLOOR) f=0.;
-	  else
-	  f=sqrt(Fn[0]*Fn[0]+Fn[1]*Fn[1]+Fn[2]*Fn[2])/En;
-	  if(f<1.e-8)
+	  if(verbose)
 	    {
-	      for(ii=0;ii<NRF;ii++)
-		Avec[ii]=1./(ldouble)NRF;
+	      printf("component 1:\n %e %e %e %e\n",En,Fn[0]/En,Fn[1]/En,Fn[2]/En);
+	      printf("wavespeeds 1:\n %e %e | %e %e | %e %e\n",avals[0],avals[1],avals[2],avals[3],avals[4],avals[5]);
+	      printf("coefficients 1:\n %e %e %e %e %e %e\n",Avec[0],Avec[1],Avec[2],Avec[3],Avec[4],Avec[5]);
 	    }
-	  else
-	    {      
-	      assign_wedge_discrete_m1(Fn,Avec);	  
-	      if(verbose) print_Nvector(Avec,NRF);
-	      //transition from opticaly thin to thick
-	      ldouble ftrans=0.0001;
-	      ldouble Atrans=step_function(f-ftrans,ftrans/10.);
-	      //to get rid of zeros
-	      ldouble MINMIX=1.e-6;
-	      if(Atrans>(1.-MINMIX)) Atrans=(1.-MINMIX);
-	      for(ii=0;ii<NRF;ii++)
-		Avec[ii]=Avec[ii]*Atrans + 1./(ldouble)NRF*(1.-Atrans);
-	      //if(verbose) print_Nvector(Avec,NRF);
-	    }	
+
 
 	  for(ii=0;ii<NRF;ii++)
 	    {
@@ -251,39 +227,17 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  Fn[1]=Ffp/(Frp+Ffp)*EF[2];
 	  Fn[2]=Ffp*efp[2];
 
+	  //distributing it over wedges
+	  calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
+	  redistribute_with_velocities(avals,Avec,skew,1.e-6);
+
 	  if(verbose)
 	    {
-	      printf("component 2:\n %e %e %e %e\n",En,Fn[0]/En,Fn[0]/En,Fn[0]/En);
-	      
-	      calc_rad_wavespeeds_on(Fn[0]/En,Fn[0]/En,Fn[0]/En,avals);
+	      printf("component 2:\n %e %e %e %e\n",En,Fn[0]/En,Fn[1]/En,Fn[2]/En);
+	      printf("wavespeeds 2:\n %e %e | %e %e | %e %e\n",avals[0],avals[1],avals[2],avals[3],avals[4],avals[5]);
+	      printf("coefficients 2:\n %e %e %e %e %e %e\n",Avec[0],Avec[1],Avec[2],Avec[3],Avec[4],Avec[5]);
+	    }
 
-	      printf("wavespeeds 1:\n %e %e | %e %e | %e %e\n",avals[0],avals[1],avals[2],avals[3],avals[4],avals[5]);
-	    }
-	 
-	  //correcting for zero flux limit
-	  if(En<EEFLOOR) f=0.; 
-	  else
-	  f=sqrt(Fn[0]*Fn[0]+Fn[1]*Fn[1]+Fn[2]*Fn[2])/En;
-	  if(f<1.e-8)
-	    {
-	      for(ii=0;ii<NRF;ii++)
-		Avec[ii]=1./(ldouble)NRF;
-	    }
-	  else
-	    {      
-	      assign_wedge_discrete_m1(Fn,Avec);
-	      if(verbose) print_Nvector(Avec,NRF);
-	      //transition from opticaly thin to thick
-	      ldouble ftrans=0.0001;
-	      ldouble Atrans=step_function(f-ftrans,ftrans/10.);
-	      //to get rid of zeros
-	      ldouble MINMIX=1.e-6;
-	      if(Atrans>(1.-MINMIX)) Atrans=(1.-MINMIX);
-	      for(ii=0;ii<NRF;ii++)
-		Avec[ii]=Avec[ii]*Atrans + 1./(ldouble)NRF*(1.-Atrans);
-	      //	      if(verbose) print_Nvector(Avec,NRF);
-	    }
-	  
 	  for(ii=0;ii<NRF;ii++)
 	    {
 	      ppon2[EE(ii)]+=frac*Avec[ii]*En;
@@ -976,11 +930,8 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
 //******* basing on velocities along axes **********************************************
 //***********************************************************************************
 int
-redistribute_with_velocities(ldouble avals[6],ldouble A[NRF])
+redistribute_with_velocities(ldouble avals[6],ldouble A[NRF],ldouble skew,ldouble MINVEL)
 {
-  ldouble skew=30.;
-  ldouble MINVEL=1.e-3;
-  
   ldouble expskew(ldouble vel, ldouble skew) 
   {
     return (exp(skew*vel)-1.0)/(exp(skew)-1.0);
@@ -988,13 +939,16 @@ redistribute_with_velocities(ldouble avals[6],ldouble A[NRF])
 
   ldouble vxl,vxr,vyl,vyr,vzl,vzr,sumvel;
 
-  vxl=avals[0];
-  vxr=avals[1];
-  vyl=avals[2];
-  vyr=avals[3];
-  vzl=avals[4];
-  vzr=avals[5];
-
+  vxl=fabs(my_min(avals[0],-MINVEL));
+  vxr=fabs(my_max(avals[1],MINVEL));
+  vyl=fabs(my_min(avals[2],-MINVEL));
+  vyr=fabs(my_max(avals[3],MINVEL));
+  if(NRF==6)
+    {
+      vzl=fabs(my_min(avals[4],-MINVEL));
+      vzr=fabs(my_max(avals[5],MINVEL));
+    }
+ 
   vxl=expskew(vxl,skew);
   vxr=expskew(vxr,skew);
   vyl=expskew(vyl,skew);
@@ -1003,22 +957,22 @@ redistribute_with_velocities(ldouble avals[6],ldouble A[NRF])
   vzr=expskew(vzr,skew);
 
   //wedges (x,y,z)
-  //0 (x+)
-  //1 (x-)
-  //2 (y+)
-  //3 (y-)
-  //4 (z+)
-  //5 (z-)
+  //0 (x-)
+  //1 (x+)
+  //2 (y-)
+  //3 (y+)
+  //4 (z-)
+  //5 (z+)
 
   if(NRF==6)
     {
       sumvel=vxl+vxr+vyl+vyr+vzl+vzr;
-      A[0]=vxr/sumvel;
-      A[1]=vxl/sumvel;
-      A[2]=vyr/sumvel;
-      A[3]=vyl/sumvel;
-      A[4]=vzr/sumvel;
-      A[5]=vzl/sumvel;
+      A[0]=vxl/sumvel;
+      A[1]=vxr/sumvel;
+      A[2]=vyl/sumvel;
+      A[3]=vyr/sumvel;
+      A[4]=vzl/sumvel;
+      A[5]=vzr/sumvel;
     }
 
   if(NRF==4)
@@ -1031,19 +985,19 @@ redistribute_with_velocities(ldouble avals[6],ldouble A[NRF])
 	sumvel=vxl+vxr+2.*expskew(MINVEL,skew);
 
       //arbitrary power
-      A[0]=vxr/sumvel;
-      A[1]=vxl/sumvel;
+      A[0]=vxl/sumvel;
+      A[1]=vxr/sumvel;
 
       if(NZ==1)
 	{
-	  A[2]=vyr/sumvel;
-	  A[3]=vyl/sumvel;
+	  A[2]=vyl/sumvel;
+	  A[3]=vyr/sumvel;
 	}
 
       if(NY==1)
 	{
-	  A[2]=vzr/sumvel;
-	  A[3]=vzl/sumvel;
+	  A[2]=vzl/sumvel;
+	  A[3]=vzr/sumvel;
 	}
 
       if(NY==1 && NZ==1)
@@ -1115,8 +1069,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
 
-  ldouble MINVEL=1.e-3;
-
+ 
   for(ii=0;ii<NRF;ii++)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
@@ -1129,17 +1082,8 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
       //aval[irf][2] - min left going in y 
       //etc...
 
-      ldouble avalmixed[6],sumvel;
-      avalmixed[0]=fabs(my_min(aval[irf][0],-MINVEL));
-      avalmixed[1]=fabs(my_max(aval[irf][1],MINVEL));
-      avalmixed[2]=fabs(my_min(aval[irf][2],-MINVEL));
-      avalmixed[3]=fabs(my_max(aval[irf][3],MINVEL));
-      avalmixed[4]=fabs(my_min(aval[irf][4],-MINVEL));
-      avalmixed[5]=fabs(my_max(aval[irf][5],MINVEL));
-    
       ldouble Avec[NRF];
-      
-      redistribute_with_velocities(avalmixed,Avec);
+      redistribute_with_velocities(&aval[irf][0],Avec,30.,1.e-4);
 
       for(ii=0;ii<NRF;ii++)
 	A[irf][ii]=Avec[ii];
@@ -1798,7 +1742,7 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
   gsl_complex z1,z2,z3,z4;
   ldouble e1,e2,e3,e4;
 
-  ldouble nlen=sqrtl(nx*nx+ny*ny+nz*nz);
+  ldouble nlen=sqrt(nx*nx+ny*ny+nz*nz);
   if(nlen>1.)
     {
       nx/=nlen;
@@ -1808,12 +1752,12 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
   
   if(fabs(nx)<1.e-20 && fabs(ny)<1.e-20 && fabs(nz)<1.e-20)
     {
-      avals[0]=-sqrtl(1./3.);
-      avals[1]=sqrtl(1./3.);
-      avals[2]=-sqrtl(1./3.);
-      avals[3]=sqrtl(1./3.);
-      avals[4]=-sqrtl(1./3.);
-      avals[5]=sqrtl(1./3.);
+      avals[0]=-sqrt(1./3.);
+      avals[1]=sqrt(1./3.);
+      avals[2]=-sqrt(1./3.);
+      avals[3]=sqrt(1./3.);
+      avals[4]=-sqrt(1./3.);
+      avals[5]=sqrt(1./3.);
       return 0;
     }
   
@@ -1822,18 +1766,18 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
     {
       if(idim==0)
 	{
-	  j21=(0. + 24.*Power(nx,2) - 68.*Power(nx,4) + 28.*Power(ny,2) - 64.*Power(nx,2)*Power(ny,2) + 4.*Power(ny,4) + 28.*Power(nz,2) - 64.*Power(nx,2)*Power(nz,2) + 8.*Power(ny,2)*Power(nz,2) + 4.*Power(nz,4) + 15.*Power(nx,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 20.*Power(nx,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 13.*Power(ny,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(nx,2)*Power(ny,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(ny,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 13.*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(nx,2)*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 8.*Power(ny,2)*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(nz,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j22=nx*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nx,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2) + (1.*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/(Power(nx,2) + Power(ny,2) + Power(nz,2)));
-	  j23=ny*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nx,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
-	  j24=nz*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nx,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
-	  j31=(0. - 4.*nx*ny - 72.*Power(nx,3)*ny - 72.*nx*Power(ny,3) - 72.*nx*ny*Power(nz,2) + 2.*nx*ny*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,3)*ny*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(ny,3)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*ny*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j32=(ny*((0.5*Power(nx,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j33=(nx*((0.5*Power(ny,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j34=(nx*ny*((0.5*nz*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*nz*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j41=(0. - 4.*nx*nz - 72.*Power(nx,3)*nz - 72.*nx*Power(ny,2)*nz - 72.*nx*Power(nz,3) + 2.*nx*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,3)*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(ny,2)*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(nz,3)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j42=(nz*((0.5*Power(nx,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j43=(nx*nz*((0.5*ny*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*ny*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j44=(nx*((0.5*Power(nz,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j21=(0. + 24.*Power(nx,2) - 68.*Power(nx,4) + 28.*Power(ny,2) - 64.*Power(nx,2)*Power(ny,2) + 4.*Power(ny,4) + 28.*Power(nz,2) - 64.*Power(nx,2)*Power(nz,2) + 8.*Power(ny,2)*Power(nz,2) + 4.*Power(nz,4) + 15.*Power(nx,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 20.*Power(nx,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 13.*Power(ny,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(nx,2)*Power(ny,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(ny,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 13.*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(nx,2)*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 8.*Power(ny,2)*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(nz,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j22=nx*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nx,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2) + (1.*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/(Power(nx,2) + Power(ny,2) + Power(nz,2)));
+	  j23=ny*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nx,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
+	  j24=nz*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nx,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
+	  j31=(0. - 4.*nx*ny - 72.*Power(nx,3)*ny - 72.*nx*Power(ny,3) - 72.*nx*ny*Power(nz,2) + 2.*nx*ny*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,3)*ny*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(ny,3)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*ny*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j32=(ny*((0.5*Power(nx,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j33=(nx*((0.5*Power(ny,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j34=(nx*ny*((0.5*nz*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*nz*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j41=(0. - 4.*nx*nz - 72.*Power(nx,3)*nz - 72.*nx*Power(ny,2)*nz - 72.*nx*Power(nz,3) + 2.*nx*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,3)*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(ny,2)*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(nz,3)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j42=(nz*((0.5*Power(nx,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j43=(nx*nz*((0.5*ny*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*ny*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j44=(nx*((0.5*Power(nz,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
 
 	  a=1;
 	  b=-j22 - j33 - j44;
@@ -1844,18 +1788,18 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
 
       if(idim==1)
 	{
-	  j21=(0. - 4.*nx*ny - 72.*Power(nx,3)*ny - 72.*nx*Power(ny,3) - 72.*nx*ny*Power(nz,2) + 2.*nx*ny*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,3)*ny*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(ny,3)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*ny*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j22=(ny*((0.5*Power(nx,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j23=(nx*((0.5*Power(ny,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j24=(nx*ny*((0.5*nz*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*nz*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j31=(0. + 28.*Power(nx,2) + 4.*Power(nx,4) + 24.*Power(ny,2) - 64.*Power(nx,2)*Power(ny,2) - 68.*Power(ny,4) + 28.*Power(nz,2) + 8.*Power(nx,2)*Power(nz,2) - 64.*Power(ny,2)*Power(nz,2) + 4.*Power(nz,4) + 13.*Power(nx,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(nx,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 15.*Power(ny,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(nx,2)*Power(ny,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 20.*Power(ny,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 13.*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 8.*Power(nx,2)*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(ny,2)*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(nz,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j32=nx*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(ny,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
-	  j33=ny*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(ny,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2) + (1.*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/(Power(nx,2) + Power(ny,2) + Power(nz,2)));
-	  j34=nz*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(ny,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
-	  j41=(0. - 4.*ny*nz - 72.*Power(nx,2)*ny*nz - 72.*Power(ny,3)*nz - 72.*ny*Power(nz,3) + 2.*ny*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,2)*ny*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(ny,3)*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*ny*Power(nz,3)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j42=(ny*nz*((0.5*nx*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*nx*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j43=(nz*((0.5*Power(ny,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j44=(ny*((0.5*Power(nz,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j21=(0. - 4.*nx*ny - 72.*Power(nx,3)*ny - 72.*nx*Power(ny,3) - 72.*nx*ny*Power(nz,2) + 2.*nx*ny*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,3)*ny*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(ny,3)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*ny*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j22=(ny*((0.5*Power(nx,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j23=(nx*((0.5*Power(ny,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j24=(nx*ny*((0.5*nz*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*nz*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j31=(0. + 28.*Power(nx,2) + 4.*Power(nx,4) + 24.*Power(ny,2) - 64.*Power(nx,2)*Power(ny,2) - 68.*Power(ny,4) + 28.*Power(nz,2) + 8.*Power(nx,2)*Power(nz,2) - 64.*Power(ny,2)*Power(nz,2) + 4.*Power(nz,4) + 13.*Power(nx,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(nx,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 15.*Power(ny,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(nx,2)*Power(ny,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 20.*Power(ny,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 13.*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 8.*Power(nx,2)*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(ny,2)*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(nz,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j32=nx*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(ny,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
+	  j33=ny*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(ny,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2) + (1.*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/(Power(nx,2) + Power(ny,2) + Power(nz,2)));
+	  j34=nz*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(ny,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
+	  j41=(0. - 4.*ny*nz - 72.*Power(nx,2)*ny*nz - 72.*Power(ny,3)*nz - 72.*ny*Power(nz,3) + 2.*ny*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,2)*ny*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(ny,3)*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*ny*Power(nz,3)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j42=(ny*nz*((0.5*nx*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*nx*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j43=(nz*((0.5*Power(ny,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j44=(ny*((0.5*Power(nz,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
 
 	  a=1;
 	  b=-j22 - j33 - j44;
@@ -1867,18 +1811,18 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
 
       if(idim==2)
 	{
-	  j21=(0. - 4.*nx*nz - 72.*Power(nx,3)*nz - 72.*nx*Power(ny,2)*nz - 72.*nx*Power(nz,3) + 2.*nx*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,3)*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(ny,2)*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(nz,3)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j22=(nz*((0.5*Power(nx,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j23=(nx*nz*((0.5*ny*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*ny*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j24=(nx*((0.5*Power(nz,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j31=(0. - 4.*ny*nz - 72.*Power(nx,2)*ny*nz - 72.*Power(ny,3)*nz - 72.*ny*Power(nz,3) + 2.*ny*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,2)*ny*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(ny,3)*nz*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*ny*Power(nz,3)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j32=(ny*nz*((0.5*nx*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*nx*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j33=(nz*((0.5*Power(ny,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j34=(ny*((0.5*Power(nz,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
-	  j41=(0. + 28.*Power(nx,2) + 4.*Power(nx,4) + 28.*Power(ny,2) + 8.*Power(nx,2)*Power(ny,2) + 4.*Power(ny,4) + 24.*Power(nz,2) - 64.*Power(nx,2)*Power(nz,2) - 64.*Power(ny,2)*Power(nz,2) - 68.*Power(nz,4) + 13.*Power(nx,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(nx,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 13.*Power(ny,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 8.*Power(nx,2)*Power(ny,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(ny,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 15.*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(nx,2)*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(ny,2)*Power(nz,2)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 20.*Power(nz,4)*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
-	  j42=nx*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nz,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
-	  j43=ny*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nz,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
-	  j44=nz*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nz,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2) + (1.*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrtl(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/(Power(nx,2) + Power(ny,2) + Power(nz,2)));
+	  j21=(0. - 4.*nx*nz - 72.*Power(nx,3)*nz - 72.*nx*Power(ny,2)*nz - 72.*nx*Power(nz,3) + 2.*nx*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,3)*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(ny,2)*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*nx*Power(nz,3)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j22=(nz*((0.5*Power(nx,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nx,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j23=(nx*nz*((0.5*ny*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*ny*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j24=(nx*((0.5*Power(nz,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j31=(0. - 4.*ny*nz - 72.*Power(nx,2)*ny*nz - 72.*Power(ny,3)*nz - 72.*ny*Power(nz,3) + 2.*ny*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(nx,2)*ny*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*Power(ny,3)*nz*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 24.*ny*Power(nz,3)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j32=(ny*nz*((0.5*nx*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*nx*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j33=(nz*((0.5*Power(ny,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(ny,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j34=(ny*((0.5*Power(nz,2)*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - 1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))) + 0.5*(Power(nx,2) + Power(ny,2) + Power(nz,2))*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2);
+	  j41=(0. + 28.*Power(nx,2) + 4.*Power(nx,4) + 28.*Power(ny,2) + 8.*Power(nx,2)*Power(ny,2) + 4.*Power(ny,4) + 24.*Power(nz,2) - 64.*Power(nx,2)*Power(nz,2) - 64.*Power(ny,2)*Power(nz,2) - 68.*Power(nz,4) + 13.*Power(nx,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(nx,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 13.*Power(ny,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 8.*Power(nx,2)*Power(ny,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 4.*Power(ny,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) + 15.*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(nx,2)*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 16.*Power(ny,2)*Power(nz,2)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))) - 20.*Power(nz,4)*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2));
+	  j42=nx*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nz,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
+	  j43=ny*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nz,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2));
+	  j44=nz*((-41. + 12.*Power(nx,2) + 12.*Power(ny,2) + 12.*Power(nz,2) - 20.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) + (0.5*Power(nz,2)*(246. - 72.*Power(nx,2) - 72.*Power(ny,2) - 72.*Power(nz,2) + 120.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))))/((Power(nx,2) + Power(ny,2) + Power(nz,2))*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2)))*Power(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))),2)) - (1.*Power(nz,2)*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/Power(Power(nx,2) + Power(ny,2) + Power(nz,2),2) + (1.*(-1. + (3.*(3. + 4.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))/(5. + 2.*Sqrt(4. - 3.*(Power(nx,2) + Power(ny,2) + Power(nz,2))))))/(Power(nx,2) + Power(ny,2) + Power(nz,2)));
 
 	  a=1;
 	  b=-j22 - j33 - j44;
