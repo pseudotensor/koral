@@ -156,7 +156,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	    frac=maxfrac;
 	  else
 	    {
-	      frac = dt / (radius / (1./3.)) * 3.;
+	      frac = dt / (radius / (1./3.)) * 3. * MFFRACSCALE;
 	      if(frac>maxfrac) frac=maxfrac;
 	    }
 	  
@@ -224,7 +224,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	      //distributing it over wedges
 	      ldouble Avec[NRF];
 	      ldouble SKEW,MINVEL;
-	      SKEW=20.;MINVEL=1.e-4;
+	      SKEW=MFSKEW;MINVEL=1.e-4;
 	      calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
 	      redistribute_with_velocities(avals,Avec,SKEW,MINVEL);
 
@@ -1306,7 +1306,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
       //etc...
 
       ldouble Avec[NRF];
-      ldouble SKEW=20.;
+      ldouble SKEW=MFSKEW;
       ldouble MINVEL=1.e-4;
       redistribute_with_velocities(&aval[irf][0],Avec,SKEW,MINVEL);
 

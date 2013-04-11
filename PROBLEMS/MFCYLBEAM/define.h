@@ -10,6 +10,9 @@
 
 #define MULTIRADFLUID
 #define MFCORRECTPHI
+#define MFSKEW 20.
+#define MFFRACSCALE 1.
+
 #define MFREDISTRIBUTEMETHOD 2
 #define MORERADFLUIDS
 #define NRF 6

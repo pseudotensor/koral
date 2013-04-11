@@ -703,6 +703,14 @@
 #define NRF 4
 #endif
 
+#ifndef MFSKEW
+#define MFSKEW 20.
+#endif
+
+#ifndef MFFRACSCALE
+#define MFFRACSCALE 1.
+#endif
+
 #ifndef MFREDISTRIBUTEMETHOD
 #define MFREDISTRIBUTEMETHOD 2
 #endif
