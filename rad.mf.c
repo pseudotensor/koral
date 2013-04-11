@@ -104,7 +104,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
       Fon[2]+=ppon[FZ(ii)];
     }
 
-  if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
+  //if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
   //if(geom->iy==2 && radius>4. && radius<4.5 && fabs(Fon[0]/Eon)>1.e-2) verbose=1;
 
   for(ii=0;ii<NVHD;ii++)
@@ -133,8 +133,8 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  printf("===\nfluid:  %d\n",irf);
 	}
 
-      if(f0<1.e-8)
-	//flux small
+      if(f0<1.e-8 || EF[0]<1.e-8*Eon)
+	//flux small or empty wedge
 	{
 	  ppon2[EE(irf)]+=EF[0];
 	  ppon2[FX(irf)]+=EF[1];
@@ -171,62 +171,88 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  //new components
 	  for(jj=0;jj<3;jj++)
 	    {
-	      ldouble En,Fn[3],avals[6];
+	      ldouble En,Fn[3],avals[6],fracloc;
 
-	      if(jj==0) //roughly along r
+	      if(jj==0) //along r
 		{
-		  En=   fabs(Frp)/sumF*EF[0];
-		  if(En<1.e-8*EF[0]) continue;
-
+		  En=fabs(Frp)/sumF*EF[0];
 		  Fn[0]=Frp;
 		  Fn[1]=0.;
 		  Fn[2]=0.;
+		  if(Frp==0.) continue;
+
+		  if(Frp>0.) ii=1;
+		  if(Frp<0.) ii=0;
 		}
 
-	      if(jj==1) //roughly along phi
+	      if(jj==1) //along theta/z
 		{
-		  //the other component
-		  En=   fabs(Ffp)/sumF*EF[0];
-		  if(En<1.e-8*EF[0]) continue;
-
-		  Fn[0]=0.;
-		  Fn[1]=0.;
-		  Fn[2]=Ffp;
-		}
-
-	      if(jj==2) //z component
-		{
-		  //the other component
-		  En=   fabs(Ftp)/sumF*EF[0];
-
-		  if(En<1.e-8*EF[0]) continue;
+		  En=fabs(Ftp)/sumF*EF[0];
 		  Fn[0]=0.;
 		  Fn[1]=Ftp;
 		  Fn[2]=0.;
+		  if(Ftp==0.) continue;
+		  
+		  if(Ftp>0.) ii=3;
+		  if(Ftp<0.) ii=2;
 		}
 
-	      //distributing it over wedges
-	      ldouble Avec[NRF];
-	      ldouble SKEW,MINVEL;
-	      SKEW=50.;MINVEL=1.e-3;
+	      if(jj==2) //along phi
+		{
+		  En=fabs(Ffp)/sumF*EF[0];
+		  Fn[0]=0.;
+		  Fn[1]=0.;
+		  Fn[2]=Ffp;
+		  if(Ffp==0.) continue;
 
-	      calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
-	      redistribute_with_velocities(avals,Avec,SKEW,MINVEL);
+		  if(Ffp>0.) ii=5;
+		  if(Ffp<0.) ii=4;
+		}
 
+
+	      //to check if new fluid goes out of bounds
+	      ldouble Fx0=ppon2[FX(ii)];
+	      ldouble Fy0=ppon2[FY(ii)];
+	      ldouble Fz0=ppon2[FZ(ii)];
+	      ldouble E0=ppon2[EE(ii)];
+	      ldouble Fx1=Fn[0];
+	      ldouble Fy1=Fn[1];
+	      ldouble Fz1=Fn[2];
+	      ldouble E1=En;
+
+	      fracloc=(-2*E0*E1 + 2*Fx0*Fx1 + 2*Fy0*Fy1 + 2*Fz0*Fz1 + 
+		       Sqrt(Power(2*E0*E1 - 2*Fx0*Fx1 - 2*Fy0*Fy1 - 2*Fz0*Fz1,2) - 
+			    4*(Power(E0,2) - Power(Fx0,2) - Power(Fy0,2) - Power(Fz0,2))*
+			    (Power(E1,2) - Power(Fx1,2) - Power(Fy1,2) - Power(Fz1,2))))/
+		(2.*(Power(E1,2) - Power(Fx1,2) - Power(Fy1,2) - Power(Fz1,2)));
+
+	      if(fracloc<0. || isnan(fracloc) || fracloc<frac)
+		fracloc=frac;
+
+	      ppon2[EE(ii)]+=fracloc*En;
+	      ppon2[FX(ii)]+=fracloc*Fn[0];
+	      ppon2[FY(ii)]+=fracloc*Fn[1];
+	      ppon2[FZ(ii)]+=fracloc*Fn[2];
+
+	      /*
+	      ppon2[EE(irf)]+=(1.-(fracloc-frac))*EF[0];
+	      ppon2[FX(irf)]+=(1.-(fracloc-frac))*EF[1];
+	      ppon2[FY(irf)]+=(1.-(fracloc-frac))*EF[2];
+	      ppon2[FZ(irf)]+=(1.-(fracloc-frac))*EF[3];
+	      */
+	      /*
+	      if(sqrt(ppon2[FX(ii)]*ppon2[FX(ii)]+ppon2[FX(ii)]*ppon2[FX(ii)]+ppon2[FX(ii)]*ppon2[FX(ii)])
+		 /ppon2[EE(ii)]>1.0001) 
+		printf("F/cE exceeded!\n");
+	      */
+	   
 	      if(verbose)
 		{
-		  printf("component %d:\n %e %e %e %e\n",jj,En,Fn[0]/En,Fn[1]/En,Fn[2]/En);
-		  printf("wavespeeds %d:\n %e %e | %e %e | %e %e\n",jj,avals[0],avals[1],avals[2],avals[3],avals[4],avals[5]);
-		  printf("coefficients %d:\n %e %e %e %e %e %e\n",jj,Avec[0],Avec[1],Avec[2],Avec[3],Avec[4],Avec[5]);
+		  printf("\n component %d:\n %e %e %e %e\n",jj,En,Fn[0]/En,Fn[1]/En,Fn[2]/En);
+		  printf("fracs:\n %e %e \n",frac,fracloc);
+		  printf("new %d fluid:\n %e %e %e %e \n\n",ii,ppon2[EE(ii)],ppon2[FX(ii)]/ppon2[EE(ii)],ppon2[FY(ii)]/ppon2[EE(ii)],ppon2[FZ(ii)]/ppon2[EE(ii)]);
 		}
 
-	      for(ii=0;ii<NRF;ii++)
-		{
-		  ppon2[EE(ii)]+=frac*Avec[ii]*En;
-		  ppon2[FX(ii)]+=frac*Avec[ii]*Fn[0];
-		  ppon2[FY(ii)]+=frac*Avec[ii]*Fn[1];
-		  ppon2[FZ(ii)]+=frac*Avec[ii]*Fn[2];
-		}
 	    }
 	}
     }
