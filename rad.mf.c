@@ -85,6 +85,211 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   coco_N(xxvec,xxvecCYL,MYCOORDS,CYLCOORDS);
   radius=xxvecCYL[1];
 
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  //to ortonormal basis
+  ldouble ppon[NV],ppon2[NV],pptemp[NV];
+  prad_lab2on(pp,ppon,ggg);
+
+  //total flux and energy
+  ldouble Eon,Fon[3]={0.,0.,0.};
+  Eon=0.;
+  for(ii=0;ii<NRF;ii++)
+    {
+      Eon+=ppon[EE(ii)];
+      Fon[0]+=ppon[FX(ii)];
+      Fon[1]+=ppon[FY(ii)];
+      Fon[2]+=ppon[FZ(ii)];
+    }
+
+  if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
+  //if(geom->iy==2 && radius>4. && radius<4.5 && fabs(Fon[0]/Eon)>1.e-2) verbose=1;
+
+  for(ii=0;ii<NVHD;ii++)
+    {
+      ppon2[ii]=ppon[ii];
+      pptemp[ii]=ppon[ii];
+    }
+
+  for(ii=NVHD;ii<NV;ii++)
+    ppon2[ii]=0.;
+
+  if(verbose)
+    {
+      printf("\noooooooooo %d %d %d oooooooooo\n\n",geom->ix,geom->iy,geom->iz);
+      printf("=== ppon ===\n");
+      print_Nvector(ppon,NV);
+    }
+
+  for(irf=0;irf<NRF;irf++)
+    {
+      ldouble EF[4]={ppon[EE(irf)],ppon[FX(irf)],ppon[FY(irf)],ppon[FZ(irf)]};
+      ldouble f0=sqrt(EF[1]*EF[1]+EF[2]*EF[2]+EF[3]*EF[3])/EF[0];
+
+      if(verbose)
+	{
+	  printf("===\nfluid:  %d\n",irf);
+	}
+
+      if(f0<1.e-8)
+	//flux small
+	{
+	  ppon2[EE(irf)]+=EF[0];
+	  ppon2[FX(irf)]+=EF[1];
+	  ppon2[FY(irf)]+=EF[2];
+	  ppon2[FZ(irf)]+=EF[3];
+	}
+      else
+	{
+	  //components along the tetrad
+	  ldouble Frp = EF[1];
+	  ldouble Ftp = EF[2];
+	  ldouble Ffp = EF[3];
+	  ldouble sumF = fabs(Frp)+fabs(Ftp)+fabs(Ffp);
+
+	  //fraction applied:
+	  ldouble frac;
+	  ldouble fraccorr[3]={1.,1.,1.};
+	  //TODO: better estimate the velocity?
+	  if(dt<0.)
+	    frac=1.;
+	  else
+	    {
+	      frac = dt / (radius / (1./3.)) * 1./5.;
+	      if(frac>1.) frac=1.;
+	    }
+	  
+	  if(verbose) printf("frac applied: %e\n",frac);
+
+	  ppon2[EE(irf)]+=(1.-frac)*EF[0];
+	  ppon2[FX(irf)]+=(1.-frac)*EF[1];
+	  ppon2[FY(irf)]+=(1.-frac)*EF[2];
+	  ppon2[FZ(irf)]+=(1.-frac)*EF[3];
+
+	  //new components
+	  for(jj=0;jj<3;jj++)
+	    {
+	      ldouble En,Fn[3],avals[6];
+
+	      if(jj==0) //roughly along r
+		{
+		  En=   fabs(Frp)/sumF*EF[0];
+		  if(En<1.e-8*EF[0]) continue;
+
+		  Fn[0]=Frp;
+		  Fn[1]=0.;
+		  Fn[2]=0.;
+		}
+
+	      if(jj==1) //roughly along phi
+		{
+		  //the other component
+		  En=   fabs(Ffp)/sumF*EF[0];
+		  if(En<1.e-8*EF[0]) continue;
+
+		  Fn[0]=0.;
+		  Fn[1]=0.;
+		  Fn[2]=Ffp;
+		}
+
+	      if(jj==2) //z component
+		{
+		  //the other component
+		  En=   fabs(Ftp)/sumF*EF[0];
+
+		  if(En<1.e-8*EF[0]) continue;
+		  Fn[0]=0.;
+		  Fn[1]=Ftp;
+		  Fn[2]=0.;
+		}
+
+	      //distributing it over wedges
+	      ldouble Avec[NRF];
+	      ldouble SKEW,MINVEL;
+	      SKEW=50.;MINVEL=1.e-3;
+
+	      calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
+	      redistribute_with_velocities(avals,Avec,SKEW,MINVEL);
+
+	      if(verbose)
+		{
+		  printf("component %d:\n %e %e %e %e\n",jj,En,Fn[0]/En,Fn[1]/En,Fn[2]/En);
+		  printf("wavespeeds %d:\n %e %e | %e %e | %e %e\n",jj,avals[0],avals[1],avals[2],avals[3],avals[4],avals[5]);
+		  printf("coefficients %d:\n %e %e %e %e %e %e\n",jj,Avec[0],Avec[1],Avec[2],Avec[3],Avec[4],Avec[5]);
+		}
+
+	      for(ii=0;ii<NRF;ii++)
+		{
+		  ppon2[EE(ii)]+=frac*Avec[ii]*En;
+		  ppon2[FX(ii)]+=frac*Avec[ii]*Fn[0];
+		  ppon2[FY(ii)]+=frac*Avec[ii]*Fn[1];
+		  ppon2[FZ(ii)]+=frac*Avec[ii]*Fn[2];
+		}
+	    }
+	}
+    }
+
+  //in ppon2[] target ortonormal fluids
+  if(verbose)
+    {
+      printf("=== ppon2 ===\n");
+      print_Nvector(ppon2,NV);
+      getchar();
+    }
+
+  //end total flux and energy
+  ldouble Eon2,Fon2[3]={0.,0.,0.};
+  Eon2=0.;
+  for(ii=0;ii<NRF;ii++)
+    {
+      Eon2+=ppon2[EE(ii)];
+      Fon2[0]+=ppon2[FX(ii)];
+      Fon2[1]+=ppon2[FY(ii)];
+      Fon2[2]+=ppon2[FZ(ii)];
+    }
+
+  if((fabs(1.-Eon2/Eon)>1.e-5) ||
+     (Fon[0]!=0. && (fabs(1.-Fon2[0]/Fon[0])>1.e-5)) || 
+     (Fon[1]!=0. && (fabs(1.-Fon2[1]/Fon[1])>1.e-5)) || 
+     (Fon[2]!=0. && (fabs(1.-Fon2[2]/Fon[2])>1.e-5)))
+    {
+      printf("EF ratios: %f %f %f %f\n",Eon2/Eon,Fon2[0]/Fon[0],Fon2[1]/Fon[1],Fon2[2]/Fon[2]);
+      getchar();
+    }
+
+
+
+  //to code basis
+  prad_on2lab(ppon2,pp,ggg);
+
+  //to conserved
+  p2u_rad(pp,uu,gg,GG);
+
+  return 0;
+}
+
+
+//***********************************************************************************
+//******* corrects the distribution in azimuth by splitting highly azimuthal *******
+//******* beams into almost-radial and more azimuthal one to avoid the *************
+//******* the inner funnel *********************************************************
+//***********************************************************************************
+int
+mf_correct_in_azimuth_old(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
+{
+  int NDIM=2;
+  int verbose=0,ii,jj,irf;
+  
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble radius,xxvec[4],xxvecCYL[4];
+  get_xx(geom->ix,geom->iy,geom->iz,xxvec);
+  coco_N(xxvec,xxvecCYL,MYCOORDS,CYLCOORDS);
+  radius=xxvecCYL[1];
+
   //  if(pp[FX(0)]!=0.) verbose=1;
 
   ldouble (*gg)[5],(*GG)[5];
@@ -290,7 +495,6 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 
   return 0;
 }
-
 
 
 //***********************************************************************************
@@ -1028,7 +1232,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  //if(geom->ix==IXDOT1+1 && geom->iy==IYDOT1   ) verbose=1;
+  //  if(geom->ix==49   ) verbose=1;
 
   if(verbose)
     {
@@ -1756,6 +1960,10 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
       nz/=nlen;
     }
   
+  if(isnan(nx)) nx=0.;
+  if(isnan(ny)) ny=0.;
+  if(isnan(nz)) nz=0.;
+
   if(fabs(nx)<1.e-20 && fabs(ny)<1.e-20 && fabs(nz)<1.e-20)
     {
       avals[0]=-sqrt(1./3.);
