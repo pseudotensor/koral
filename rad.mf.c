@@ -150,7 +150,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  ldouble sumF = Frp*Frp+Ftp*Ftp+Ffp*Ffp;
 
 	  //fraction applied:
-	  ldouble frac,maxfrac=1.;
+	  ldouble frac,maxfrac=.1,minfrac=0.;
 	  //TODO: better estimate the velocity?
 	  if(dt<0.)
 	    frac=maxfrac;
@@ -158,8 +158,8 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	    {
 	      frac = dt / (radius / (1./3.)) * 3. * MFFRACSCALE;
 	      if(frac>maxfrac) frac=maxfrac;
+	      if(frac<minfrac) frac=minfrac;
 	    }
-	  
 	  if(verbose) printf("frac applied: %e\n",frac);
 
 	  ppon2[EE(irf)]+=(1.-frac)*EF[0];
@@ -178,10 +178,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 		  Fn[0]=Frp;
 		  Fn[1]=0.;
 		  Fn[2]=0.;
-		  if(En<EEFLOOR) continue;
-
-		  if(Frp>0.) ii=1;
-		  if(Frp<0.) ii=0;
+		  //		  if(En<EEFLOOR) continue;
 		}
 
 	      if(jj==1) //along theta/z
@@ -190,10 +187,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 		  Fn[0]=0.;
 		  Fn[1]=Ftp;
 		  Fn[2]=0.;
-		  if(En<EEFLOOR) continue;
-		  
-		  if(Ftp>0.) ii=3;
-		  if(Ftp<0.) ii=2;
+		  //		  if(En<EEFLOOR) continue;
 		}
 
 	      if(jj==2) //along phi
@@ -202,10 +196,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 		  Fn[0]=0.;
 		  Fn[1]=0.;
 		  Fn[2]=Ffp;
-		  if(En<EEFLOOR) continue;
-
-		  if(Ffp>0.) ii=5;
-		  if(Ffp<0.) ii=4;
+		  //		  if(En<EEFLOOR) continue;
 		}
 	      
 	      /*
@@ -224,7 +215,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	      //distributing it over wedges
 	      ldouble Avec[NRF];
 	      ldouble SKEW,MINVEL;
-	      SKEW=MFSKEW;MINVEL=1.e-4;
+	      SKEW=MFSKEW;MINVEL=MFMINVEL;
 	      calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
 	      redistribute_with_velocities(avals,Avec,SKEW,MINVEL);
 
@@ -251,7 +242,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
     {
       printf("=== ppon2 ===\n");
       print_Nvector(ppon2,NV);
-      getchar();
+      //      getchar();
     }
 
   //end total flux and energy
@@ -1307,7 +1298,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
 
       ldouble Avec[NRF];
       ldouble SKEW=MFSKEW;
-      ldouble MINVEL=1.e-4;
+      ldouble MINVEL=MFMINVEL;
       redistribute_with_velocities(&aval[irf][0],Avec,SKEW,MINVEL);
 
       for(ii=0;ii<NRF;ii++)

@@ -50,7 +50,7 @@
 //44* RADNTCYL - emission from midplane in cylindrical
 //45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
 
-#define PROBLEM 37
+#define PROBLEM 45
 
 #if(PROBLEM==45)
 
@@ -705,6 +705,10 @@
 
 #ifndef MFSKEW
 #define MFSKEW 20.
+#endif
+
+#ifndef MFMINVEL
+#define MFMINVEL 1.e-3
 #endif
 
 #ifndef MFFRACSCALE
