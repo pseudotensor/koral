@@ -1306,7 +1306,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
       //etc...
 
       ldouble Avec[NRF];
-      ldouble SKEW=10.;
+      ldouble SKEW=20.;
       ldouble MINVEL=1.e-4;
       redistribute_with_velocities(&aval[irf][0],Avec,SKEW,MINVEL);
 

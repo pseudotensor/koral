@@ -14,8 +14,7 @@
 #define MORERADFLUIDS
 #define NRF 6
 
-
-#define OMSCALE 0.
+#define OMSCALE 1.
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS
@@ -49,7 +48,7 @@
 
 
 #define NY 1
-#define NZ 1
+#define NZ 5
 #define YZXDUMP
 
 
