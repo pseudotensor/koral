@@ -147,18 +147,17 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  ldouble Frp = EF[1];
 	  ldouble Ftp = EF[2];
 	  ldouble Ffp = EF[3];
-	  ldouble sumF = fabs(Frp)+fabs(Ftp)+fabs(Ffp);
+	  ldouble sumF = Frp*Frp+Ftp*Ftp+Ffp*Ffp;
 
 	  //fraction applied:
-	  ldouble frac;
-	  ldouble fraccorr[3]={1.,1.,1.};
+	  ldouble frac,maxfrac=1.;
 	  //TODO: better estimate the velocity?
 	  if(dt<0.)
-	    frac=1.;
+	    frac=maxfrac;
 	  else
 	    {
-	      frac = dt / (radius / (1./3.)) * 1./5.;
-	      if(frac>1.) frac=1.;
+	      frac = dt / (radius / (1./3.)) * 3.;
+	      if(frac>maxfrac) frac=maxfrac;
 	    }
 	  
 	  if(verbose) printf("frac applied: %e\n",frac);
@@ -171,15 +170,15 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  //new components
 	  for(jj=0;jj<3;jj++)
 	    {
-	      ldouble En,Fn[3],avals[6],fracloc;
+	      ldouble En,Fn[3],avals[6];
 
 	      if(jj==0) //along r
 		{
-		  En=fabs(Frp)/sumF*EF[0];
+		  En=Frp*Frp/sumF*EF[0];
 		  Fn[0]=Frp;
 		  Fn[1]=0.;
 		  Fn[2]=0.;
-		  if(Frp==0.) continue;
+		  if(En<EEFLOOR) continue;
 
 		  if(Frp>0.) ii=1;
 		  if(Frp<0.) ii=0;
@@ -187,11 +186,11 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 
 	      if(jj==1) //along theta/z
 		{
-		  En=fabs(Ftp)/sumF*EF[0];
+		  En=Ftp*Ftp/sumF*EF[0];
 		  Fn[0]=0.;
 		  Fn[1]=Ftp;
 		  Fn[2]=0.;
-		  if(Ftp==0.) continue;
+		  if(En<EEFLOOR) continue;
 		  
 		  if(Ftp>0.) ii=3;
 		  if(Ftp<0.) ii=2;
@@ -199,60 +198,50 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 
 	      if(jj==2) //along phi
 		{
-		  En=fabs(Ffp)/sumF*EF[0];
+		  En=Ffp*Ffp/sumF*EF[0];
 		  Fn[0]=0.;
 		  Fn[1]=0.;
 		  Fn[2]=Ffp;
-		  if(Ffp==0.) continue;
+		  if(En<EEFLOOR) continue;
 
 		  if(Ffp>0.) ii=5;
 		  if(Ffp<0.) ii=4;
 		}
-
-
-	      //to check if new fluid goes out of bounds
-	      ldouble Fx0=ppon2[FX(ii)];
-	      ldouble Fy0=ppon2[FY(ii)];
-	      ldouble Fz0=ppon2[FZ(ii)];
-	      ldouble E0=ppon2[EE(ii)];
-	      ldouble Fx1=Fn[0];
-	      ldouble Fy1=Fn[1];
-	      ldouble Fz1=Fn[2];
-	      ldouble E1=En;
-
-	      fracloc=(-2*E0*E1 + 2*Fx0*Fx1 + 2*Fy0*Fy1 + 2*Fz0*Fz1 + 
-		       Sqrt(Power(2*E0*E1 - 2*Fx0*Fx1 - 2*Fy0*Fy1 - 2*Fz0*Fz1,2) - 
-			    4*(Power(E0,2) - Power(Fx0,2) - Power(Fy0,2) - Power(Fz0,2))*
-			    (Power(E1,2) - Power(Fx1,2) - Power(Fy1,2) - Power(Fz1,2))))/
-		(2.*(Power(E1,2) - Power(Fx1,2) - Power(Fy1,2) - Power(Fz1,2)));
-
-	      if(fracloc<0. || isnan(fracloc) || fracloc<frac)
-		fracloc=frac;
-
-	      ppon2[EE(ii)]+=fracloc*En;
-	      ppon2[FX(ii)]+=fracloc*Fn[0];
-	      ppon2[FY(ii)]+=fracloc*Fn[1];
-	      ppon2[FZ(ii)]+=fracloc*Fn[2];
-
+	      
 	      /*
-	      ppon2[EE(irf)]+=(1.-(fracloc-frac))*EF[0];
-	      ppon2[FX(irf)]+=(1.-(fracloc-frac))*EF[1];
-	      ppon2[FY(irf)]+=(1.-(fracloc-frac))*EF[2];
-	      ppon2[FZ(irf)]+=(1.-(fracloc-frac))*EF[3];
-	      */
-	      /*
-	      if(sqrt(ppon2[FX(ii)]*ppon2[FX(ii)]+ppon2[FX(ii)]*ppon2[FX(ii)]+ppon2[FX(ii)]*ppon2[FX(ii)])
-		 /ppon2[EE(ii)]>1.0001) 
-		printf("F/cE exceeded!\n");
-	      */
-	   
+	      ppon2[EE(ii)]+=frac*En;
+	      ppon2[FX(ii)]+=frac*Fn[0];
+	      ppon2[FY(ii)]+=frac*Fn[1];
+	      ppon2[FZ(ii)]+=frac*Fn[2];	      
 	      if(verbose)
 		{
 		  printf("\n component %d:\n %e %e %e %e\n",jj,En,Fn[0]/En,Fn[1]/En,Fn[2]/En);
-		  printf("fracs:\n %e %e \n",frac,fracloc);
 		  printf("new %d fluid:\n %e %e %e %e \n\n",ii,ppon2[EE(ii)],ppon2[FX(ii)]/ppon2[EE(ii)],ppon2[FY(ii)]/ppon2[EE(ii)],ppon2[FZ(ii)]/ppon2[EE(ii)]);
 		}
 
+	      */
+
+	      //distributing it over wedges
+	      ldouble Avec[NRF];
+	      ldouble SKEW,MINVEL;
+	      SKEW=20.;MINVEL=1.e-4;
+	      calc_rad_wavespeeds_on(Fn[0]/En,Fn[1]/En,Fn[2]/En,avals);
+	      redistribute_with_velocities(avals,Avec,SKEW,MINVEL);
+
+	      for(ii=0;ii<NRF;ii++)
+		{
+		  ppon2[EE(ii)]+=frac*Avec[ii]*En;
+		  ppon2[FX(ii)]+=frac*Avec[ii]*Fn[0];
+		  ppon2[FY(ii)]+=frac*Avec[ii]*Fn[1];
+		  ppon2[FZ(ii)]+=frac*Avec[ii]*Fn[2];
+		}
+
+	      if(verbose)
+		{
+		  printf("\ncomponent %d:\n %e %e %e %e\n",jj,En,Fn[0]/En,Fn[1]/En,Fn[2]/En);
+		  printf("wavespeeds %d:\n %e %e | %e %e | %e %e\n",jj,avals[0],avals[1],avals[2],avals[3],avals[4],avals[5]);
+		  printf("coefficients %d:\n %e %e %e %e %e %e\n\n",jj,Avec[0],Avec[1],Avec[2],Avec[3],Avec[4],Avec[5]);
+		}
 	    }
 	}
     }
@@ -1317,7 +1306,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
       //etc...
 
       ldouble Avec[NRF];
-      ldouble SKEW=50.;
+      ldouble SKEW=10.;
       ldouble MINVEL=1.e-4;
       redistribute_with_velocities(&aval[irf][0],Avec,SKEW,MINVEL);
 

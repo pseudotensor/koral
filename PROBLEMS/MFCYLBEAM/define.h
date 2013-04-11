@@ -15,7 +15,7 @@
 #define NRF 6
 
 
-#define OMSCALE 1.
+#define OMSCALE 0.
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS
@@ -49,7 +49,7 @@
 
 
 #define NY 1
-#define NZ 10
+#define NZ 1
 #define YZXDUMP
 
 

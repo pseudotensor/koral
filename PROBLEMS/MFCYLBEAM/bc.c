@@ -126,13 +126,13 @@ getchar();
     int irf;
     //print_Nvector(uu,NV);
     //    redistribute_radfluids_along_axes(pp,uu,&geom);
-    //redistribute_radfluids(pp,uu,&geom);
+    redistribute_radfluids(pp,uu,&geom);
     //print_Nvector(uu,NV);
     u2p_rad(uu,pp,&geom,&irf);
     //    mf_correct_in_azimuth(pp,uu,&geom,-1.);
 
     //print_Nvector(uu,NV);getchar();
-    u2p_rad(uu,pp,&geom,&irf);
+    //u2p_rad(uu,pp,&geom,&irf);
 #endif
 
     return 0.;
