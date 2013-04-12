@@ -105,7 +105,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
       Fon[2]+=ppon[FZ(ii)];
     }
 
-  //if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
+  //  if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
   //if(geom->iy==2 && radius>4. && radius<4.5 && fabs(Fon[0]/Eon)>1.e-2) verbose=1;
 
   for(ii=0;ii<NVHD;ii++)
@@ -176,11 +176,31 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 
 	  //searching for maximal allowed decomposition towards axes
 	  ldouble E0,Fx,Fy,Fz,fmax1,fmax2,fmax;
+	  ldouble En[3],Fn[3][3],lenF[3],sumF;
 	  E0=EF[0];
 	  Fx=EF[1];
 	  Fy=EF[2];
 	  Fz=EF[3];
 	  
+	  if(fabs(Fx)+fabs(Fy)+fabs(Fz)<E0) 
+	    fmax=0.; //complete decomposition allowed
+	  else
+	    {
+	      ldouble check,f;
+	      f=1.;
+	      do
+		{
+		  f-=0.05;
+		  check=(Sqrt((Power(f,2)*(Power(Fx,2) + Power(Fy,2)))/9. + (1 - (4*f)/3. + (4*Power(f,2))/9.)*Power(Fz,2)) + Sqrt((1 - (4*f)/3. + (4*Power(f,2))/9.)*Power(Fy,2) + (Power(f,2)*(Power(Fx,2) + Power(Fz,2)))/9.) + 
+			 Sqrt((1 - (4*f)/3. + (4*Power(f,2))/9.)*Power(Fx,2) + (Power(f,2)*(Power(Fy,2) + Power(Fz,2)))/9.))/E0;
+		  if(verbose) printf("fmax: %e %e\n",f,check);
+		}
+	      while(check<1. && f>0.);
+	      fmax=f+0.05;	
+	      //	      if(verbose) getchar();
+	    }
+	
+	  /*
 	  fmax1=(Power(E0,2)*Power(Fx,2) - Power(Fx,4) + Power(E0,2)*Power(Fz,2) + 
 		2*Power(Fx,2)*Power(Fz,2) - Power(Fz,4) - 
 		Sqrt(Power(E0,6)*Power(Fx,2) - 2*Power(E0,4)*Power(Fx,4) + 
@@ -211,13 +231,13 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  if(fmax1<1. && fmax2<1.) {printf("confused\n");fmax=fmax1;}
 	  else if(fmax1<1.) fmax=fmax1;
 	  else if(fmax2<1.) fmax=fmax2;
+	  */
 	        
-	  if(fmax<0.) fmax=0.;
-	  if(fmax>.99) fmax=.99;
+	  if(fmax<0.0) fmax=0.0;
+	  if(fmax>1.) fmax=1.;
 
 	  //decomposition, so far in 2d
-	  ldouble En[3],Fn[3][3],lenF[3],sumF;
-
+	  /*
 	  Fn[0][0]=Fx*(1.-.5*fmax);
 	  Fn[0][1]=0.;
 	  Fn[0][2]=0.5*fmax*Fz;
@@ -229,10 +249,24 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  Fn[2][0]=0.5*fmax*Fx;
 	  Fn[2][1]=0.;
 	  Fn[2][2]=Fz*(1.-.5*fmax);
+	  */
+
+	  Fn[0][0]=Fx*(1.-2./3.*fmax);
+	  Fn[0][1]=1./3.*fmax*Fy;
+	  Fn[0][2]=1./3.*fmax*Fz;
 	  
+	  Fn[1][0]=1./3.*fmax*Fx;
+	  Fn[1][1]=Fy*(1.-2./3.*fmax);
+	  Fn[1][2]=1./3.*fmax*Fz;
+	  
+	  Fn[2][0]=1./3.*fmax*Fx;
+	  Fn[2][1]=1./3.*fmax*Fy;
+	  Fn[2][2]=Fz*(1.-2./3.*fmax);
+
 	  lenF[0]=sqrt(Fn[0][0]*Fn[0][0]+Fn[0][1]*Fn[0][1]+Fn[0][2]*Fn[0][2]);
 	  lenF[1]=sqrt(Fn[1][0]*Fn[1][0]+Fn[1][1]*Fn[1][1]+Fn[1][2]*Fn[1][2]);
 	  lenF[2]=sqrt(Fn[2][0]*Fn[2][0]+Fn[2][1]*Fn[2][1]+Fn[2][2]*Fn[2][2]);
+
 	  sumF=lenF[0]+lenF[1]+lenF[2];
 
 	  En[0]=lenF[0]/sumF*E0;
@@ -274,7 +308,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
     {
       printf("=== ppon2 ===\n");
       print_Nvector(ppon2,NV);
-      getchar();
+      //      getchar();
     }
 
   //end total flux and energy

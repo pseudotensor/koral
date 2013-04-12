@@ -8,8 +8,8 @@
 
 #define myMCYL1COORDS
 
-//#define MULTIRADFLUID
-//#define MFCORRECTPHI
+#define MULTIRADFLUID
+#define MFCORRECTPHI
 #define MFSKEW 25.
 #define MFFRACMETHOD 1
 #define MFFRACSKEW 1.
