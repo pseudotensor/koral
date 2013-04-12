@@ -1,14 +1,14 @@
+0307 - ****** - coco vs LABRADFLUX
 0404 - *** - calculate wavespeeds independently for each fluid
 0320 - ** - generalize atmospheres for non-BL like coords
 0319 - *** - explicit criterion
 0319 - ****** - why primitives changed during the advective operator
-0318 - **** - dumped lab implicit to allow for longer timesteps, see below
+0318 - **** - damped lab implicit to allow for longer timesteps, see below
 0318 - **** - follow the radiative wavespeeds to set the timestep properly
 0313 - *** - implement Eddington approximation
 0313 - ** - in topcap include a limiter for switching between GAMMAMAX for tau<<1 and fluid frame for tau>>1
 0312 - ** - metric tetrad order does not correspond to eup,elo - cross check
-0310 - ***** - geometry struct
-0307 - **** - coco vs LABRADFLUX
+0310 - ** - geometry struct
 0303 - *** - clean up after EDD
 0303 - ** - radiative wave speed limiter as separated routine
 0227 - ** - correct explicit sub-stepping

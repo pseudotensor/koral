@@ -83,7 +83,7 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
       //Erf unchanged
       pp2[6]=pp1[6];
 
-       //velocity in CO1
+      //velocity in CO1
       ldouble ucon[4];
       ucon[0]=0;
       ucon[1]=pp1[7];

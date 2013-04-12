@@ -49,8 +49,23 @@
 //43* RVDONUTIN - radiative and viscous dougnut inflowing
 //44* RADNTCYL - emission from midplane in cylindrical
 //45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
+//46* MFRADNTSPH - multi fluid emission from midplane in spherical
 
-#define PROBLEM 6
+#define PROBLEM 46
+
+#if(PROBLEM==46)
+
+#define PR_DEFINE "PROBLEMS/MFRADNTSPH/define.h"
+#define PR_BC "PROBLEMS/MFRADNTSPH/bc.c"
+#define PR_INIT "PROBLEMS/MFRADNTSPH/init.c"
+#define PR_KAPPA "PROBLEMS/MFRADNTSPH/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFRADNTSPH/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFRADNTSPH/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFRADNTSPH/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFRADNTSPH/dump.c"
+#define PR_TOOLS "PROBLEMS/MFRADNTSPH/tools.c"
+
+#endif
 
 #if(PROBLEM==45)
 

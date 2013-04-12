@@ -191,6 +191,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  //within domain:
 						  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 
+
 						  
 						  struct geometry geom;
 						  fill_geometry(ix,iy,iz,&geom);
@@ -248,7 +249,6 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  ldouble eup[4][4],elo[4][4];
 						  pick_T(emuup,ix,iy,iz,eup);
 						  pick_T(emulo,ix,iy,iz,elo);
-
 						  //to transform primitives between coordinates if necessary
 						  if(MYCOORDS!=OUTCOORDS)
 						    {
@@ -272,7 +272,6 @@ fprint_profiles(ldouble t, ldouble totmass)
 						      calc_tetrades(gg,tup,tlo,OUTCOORDS);
 						      calc_ZAMOes(gg,eup,elo,OUTCOORDS);
 						    }
-						  						  					
 						  ldouble rho=pp[0];
 						  ldouble uint=pp[1];
 						  ldouble vx=pp[2];
@@ -289,12 +288,14 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  ldouble ut=uu[0]/rho;
 						  Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
 
-#ifdef RADIATION						
+#ifdef RADIATION
+#ifndef LABRADFLUXES						
 #ifdef RADOUTPUTINFF
 						  prad_lab2ff(pp,pp,&geom);
 #elif defined(RADOUTPUTINZAMO) //to print  radiation primitives in ZAMO
 						  prad_lab2ff(pp,pp,&geom);
 						  prad_ff2zamo(pp,pp,gg,GG,eup); 
+#endif
 #endif
 
  						  E=pp[6];
