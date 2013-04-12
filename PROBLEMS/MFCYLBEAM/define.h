@@ -10,8 +10,9 @@
 
 #define MULTIRADFLUID
 #define MFCORRECTPHI
-#define MFSKEW 20.
-#define MFFRACSCALE 1.
+#define MFSKEW 35.
+#define MFFRACSCALE 5.
+#define MFFRAC 0.01
 
 #define MFREDISTRIBUTEMETHOD 2
 #define MORERADFLUIDS
