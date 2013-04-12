@@ -8,10 +8,11 @@
 
 #define myMCYL1COORDS
 
-#define MULTIRADFLUID
-#define MFCORRECTPHI
-#define MFSKEW 35.
-#define MFFRACSCALE 5.
+//#define MULTIRADFLUID
+//#define MFCORRECTPHI
+#define MFSKEW 25.
+#define MFFRACMETHOD 1
+#define MFFRACSKEW 1.
 #define MFFRAC 0.01
 
 #define MFREDISTRIBUTEMETHOD 2

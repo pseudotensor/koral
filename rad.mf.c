@@ -156,13 +156,16 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	    frac=maxfrac;
 	  else
 	    {
-	      frac = dt / radius * MFFRACSCALE;
+	      if(MFFRACMETHOD==1)
+		frac = MFFRAC / ((radius+MFFRACSKEW)/(10.+MFFRACSKEW));
+	      if(MFFRACMETHOD==2)
+		frac=MFFRAC;
 
 	      if(frac>maxfrac) frac=maxfrac;
 	      if(frac<minfrac) frac=minfrac;
 	    }
 
-	  frac=MFFRAC;
+
 
 	  if(verbose) printf("frac applied: %e\n",frac);
 
