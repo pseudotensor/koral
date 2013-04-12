@@ -11,10 +11,10 @@
 
 #define MULTIRADFLUID
 #define MFCORRECTPHI
-#define MFSKEW 20.
-#define MFMINVEL 1.e-3
+#define MFSKEW 15.
+#define MFMINVEL 1.e-4
 #define MFFRACMETHOD 1.
-#define MFFRACSKEW 2.
+#define MFFRACSKEW 1.
 #define MFFRAC 0.05
 
 #define MFREDISTRIBUTEMETHOD 2
