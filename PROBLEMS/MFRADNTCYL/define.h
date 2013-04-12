@@ -12,7 +12,7 @@
 #define MULTIRADFLUID
 #define MFCORRECTPHI
 #define MFSKEW 15.
-#define MFMINVEL 1.e-3
+#define MFMINVEL 1.e-1
 #define MFFRACSCALE 5.
 #define MFREDISTRIBUTEMETHOD 2
 #define MORERADFLUIDS
@@ -30,7 +30,7 @@
 #define OUTCOORDS CYLCOORDS
 
 #define OUTVEL VEL4
-#define DTOUT1 1.
+#define DTOUT1 5.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 100
@@ -46,14 +46,14 @@
 #define MKS1R0 -1.
 #define MINX (log(0.1-MKS1R0))
 #define MAXX (log(15.-MKS1R0))
-#define NX 40
+#define NX 30
 #else
 #define MINX (0.01)
 #define MAXX 15.
 #define NX 80
 #endif
 
-#define NY 30 
+#define NY 20 
 #define NZ 1
 
 #define MINY 0

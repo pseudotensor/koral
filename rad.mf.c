@@ -156,7 +156,14 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	    frac=maxfrac;
 	  else
 	    {
-	      frac = dt / (radius / (1./3.)) * 3. * MFFRACSCALE;
+	      frac = dt / radius * MFFRACSCALE;
+
+	      /*
+	      if(radius>10.) frac=0.;
+	      else
+		frac = dt * (1./radius - 1./10.) * MFFRACSCALE ;
+	      */
+		
 	      if(frac>maxfrac) frac=maxfrac;
 	      if(frac<minfrac) frac=minfrac;
 	    }
@@ -262,7 +269,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
      (Fon[2]!=0. && (fabs(1.-Fon2[2]/Fon[2])>1.e-5)))
     {
       printf("EF ratios: %f %f %f %f\n",Eon2/Eon,Fon2[0]/Fon[0],Fon2[1]/Fon[1],Fon2[2]/Fon[2]);
-      getchar();
+      //      getchar();
     }
 
 
@@ -1959,9 +1966,9 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
   ldouble e1,e2,e3,e4;
 
   ldouble nlen=sqrt(nx*nx+ny*ny+nz*nz);
-  if(nlen>1.)
+  if(nlen>1.1)
     {
-      printf("nlen.gt.1 in calc_rad_wavespeeds_on\n");
+      //      printf("nlen.gt.1.1 in calc_rad_wavespeeds_on: %f\n",nlen);
       nx/=nlen;
       ny/=nlen;
       nz/=nlen;
@@ -2103,5 +2110,9 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
 
     }
 
+  /*
+  if(nlen>1.1)
+    print_Nvector(avals,6);
+  */
   return 0;
 }

@@ -710,7 +710,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      redistribute_radfluids_at_cell(ix,iy,iz);
 #ifdef MFCORRECTPHI
 	      mf_correct_in_azimuth_at_cell(ix,iy,iz,dt);
-	      redistribute_radfluids_at_cell(ix,iy,iz);
+	      //	      redistribute_radfluids_at_cell(ix,iy,iz);
 #endif	      
 	      
 #endif
