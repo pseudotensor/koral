@@ -1961,6 +1961,7 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
   ldouble nlen=sqrt(nx*nx+ny*ny+nz*nz);
   if(nlen>1.)
     {
+      printf("nlen.gt.1 in calc_rad_wavespeeds_on\n");
       nx/=nlen;
       ny/=nlen;
       nz/=nlen;
