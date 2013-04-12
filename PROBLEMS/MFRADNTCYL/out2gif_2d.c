@@ -11,7 +11,7 @@ ldouble maxx=get_x(NX,0);
 ldouble maxy=get_x(NY,0);
 
 #ifdef myMCYL1COORDS
-maxx= 1.*(exp(get_xb(NX+2,0))+MKS1R0);
+maxx= 1.*(exp(get_xb(NX,0))+MKS1R0);
 maxy= maxx;
 #endif
 

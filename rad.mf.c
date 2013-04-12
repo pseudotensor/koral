@@ -328,7 +328,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
      (Fon[2]!=0. && (fabs(1.-Fon2[2]/Fon[2])>1.e-5)))
     {
       printf("EF ratios: %f %f %f %f\n",Eon2/Eon,Fon2[0]/Fon[0],Fon2[1]/Fon[1],Fon2[2]/Fon[2]);
-      getchar();
+      //getchar();
     }
 
 
@@ -772,7 +772,7 @@ mf_correct_in_azimuth_old(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
      (Fon[2]!=0. && (fabs(1.-Fon2[2]/Fon[2])>1.e-5)))
     {
       printf("EF ratios: %f %f %f %f\n",Eon2/Eon,Fon2[0]/Fon[0],Fon2[1]/Fon[1],Fon2[2]/Fon[2]);
-      getchar();
+      //      getchar();
     }
 
 

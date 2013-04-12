@@ -11,9 +11,12 @@
 
 #define MULTIRADFLUID
 #define MFCORRECTPHI
-#define MFSKEW 15.
-#define MFMINVEL 1.e-1
-#define MFFRACSCALE 5.
+#define MFSKEW 20.
+#define MFMINVEL 1.e-3
+#define MFFRACMETHOD 1.
+#define MFFRACSKEW 2.
+#define MFFRAC 0.05
+
 #define MFREDISTRIBUTEMETHOD 2
 #define MORERADFLUIDS
 #define NRF 6
@@ -30,7 +33,7 @@
 #define OUTCOORDS CYLCOORDS
 
 #define OUTVEL VEL4
-#define DTOUT1 5.
+#define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 100
