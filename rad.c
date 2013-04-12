@@ -182,34 +182,34 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	    }
  
 	  //calculating approximate Jacobian
-	  for(i=0;i<4;i++)
+	  for(j=0;j<4;j++)
 	    {
-	      for(j=0;j<4;j++)
+	      ldouble del;
+
+	      del=EPS*uup[6]; 
+
+	      uu[j+6]=uup[j+6]-del;
+
+	      if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f2)<0) 
 		{
-		  ldouble del;
-
-		  del=EPS*uup[6]; 
-
-		  uu[j+6]=uup[j+6]-del;
-
-		  if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f2)<0) 
-		    {
-		      failed=1;
-		    }
-		  
-		  if(verbose>0)
-		    {
-		      printf("ij : %d %d\n",i,j);
-		      print_Nvector(uu,NV);
-		      print_state_implicit_lab (iter,xxx,f2); 
-		    }
-
-		  J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
-
-		  uu[j+6]=uup[j+6];
-
-		  if(failed!=0) break;
+		  failed=1;
 		}
+  
+	      if(verbose>0)
+		{
+		  printf("ij : %d %d\n",i,j);
+		  print_Nvector(uu,NV);
+		  print_state_implicit_lab (iter,xxx,f2); 
+		}
+
+	      for(i=0;i<4;i++)
+    	        {
+		  J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
+		}
+
+	      uu[j+6]=uup[j+6];
+
+	      if(failed!=0) break;
 	    }
 
 	  if(failed!=0) break;
