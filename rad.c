@@ -180,7 +180,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 	      break;
 	      //	  return -1;
 	    }
- 
+	  
 	  //calculating approximate Jacobian
 	  for(j=0;j<4;j++)
 	    {
