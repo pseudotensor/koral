@@ -83,8 +83,16 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 
   ldouble radius,xxvec[4],xxvecCYL[4];
   get_xx(geom->ix,geom->iy,geom->iz,xxvec);
-  coco_N(xxvec,xxvecCYL,MYCOORDS,CYLCOORDS);
-  radius=xxvecCYL[1];
+  if(MYCOORDS==MCYL1COORDS || MYCOORDS==CYLCOORDS)
+    {
+      coco_N(xxvec,xxvecCYL,MYCOORDS,CYLCOORDS);
+      radius=xxvecCYL[1];
+    }
+  else if(MYCOORDS==SPHCOORDS || MYCOORDS==BLCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==MKS1COORDS)
+    {
+      coco_N(xxvec,xxvecCYL,MYCOORDS,BLCOORDS);
+      radius=xxvecCYL[1]*sin(xxvecCYL[2]);
+    }
 
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
@@ -182,6 +190,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  Fy=EF[2];
 	  Fz=EF[3];
 	  
+	  //TODO: convert to bisection
 	  if(fabs(Fx)+fabs(Fy)+fabs(Fz)<E0) 
 	    fmax=0.; //complete decomposition allowed
 	  else
@@ -197,59 +206,10 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 		}
 	      while(check<1. && f>0.);
 	      fmax=f+0.05;	
-	      //	      if(verbose) getchar();
 	    }
 	
-	  /*
-	  fmax1=(Power(E0,2)*Power(Fx,2) - Power(Fx,4) + Power(E0,2)*Power(Fz,2) + 
-		2*Power(Fx,2)*Power(Fz,2) - Power(Fz,4) - 
-		Sqrt(Power(E0,6)*Power(Fx,2) - 2*Power(E0,4)*Power(Fx,4) + 
-		     Power(E0,2)*Power(Fx,6) + Power(E0,6)*Power(Fz,2) - 
-		     Power(E0,2)*Power(Fx,4)*Power(Fz,2) - 
-		     2*Power(E0,4)*Power(Fz,4) - 
-		     Power(E0,2)*Power(Fx,2)*Power(Fz,4) + Power(E0,2)*Power(Fz,6)
-		     ))/(Power(E0,2)*Power(Fx,2) - Power(Fx,4) + 
-			 Power(E0,2)*Power(Fz,2) + 2*Power(Fx,2)*Power(Fz,2) - 
-			 Power(Fz,4));
-	  
-	  fmax2=(Power(E0,2)*Power(Fx,2) - Power(Fx,4) + Power(E0,2)*Power(Fz,2) + 
-		2*Power(Fx,2)*Power(Fz,2) - Power(Fz,4) + 
-		Sqrt(Power(E0,6)*Power(Fx,2) - 2*Power(E0,4)*Power(Fx,4) + 
-		     Power(E0,2)*Power(Fx,6) + Power(E0,6)*Power(Fz,2) - 
-		     Power(E0,2)*Power(Fx,4)*Power(Fz,2) - 
-		     2*Power(E0,4)*Power(Fz,4) - 
-		     Power(E0,2)*Power(Fx,2)*Power(Fz,4) + Power(E0,2)*Power(Fz,6)
-		     ))/(Power(E0,2)*Power(Fx,2) - Power(Fx,4) + 
-			 Power(E0,2)*Power(Fz,2) + 2*Power(Fx,2)*Power(Fz,2) - 
-			 Power(Fz,4));
-	  
-
-	  if(verbose)
-	    printf("max f: %f %f\n",fmax1,fmax2);
-
-	  if(isnan(fmax1) && isnan(fmax2)) fmax=1.;
-	  if(fmax1<1. && fmax2<1.) {printf("confused\n");fmax=fmax1;}
-	  else if(fmax1<1.) fmax=fmax1;
-	  else if(fmax2<1.) fmax=fmax2;
-	  */
-	        
 	  if(fmax<0.0) fmax=0.0;
 	  if(fmax>1.) fmax=1.;
-
-	  //decomposition, so far in 2d
-	  /*
-	  Fn[0][0]=Fx*(1.-.5*fmax);
-	  Fn[0][1]=0.;
-	  Fn[0][2]=0.5*fmax*Fz;
-	  
-	  Fn[1][0]=0.;
-	  Fn[1][1]=Fy;
-	  Fn[1][2]=0.;
-	  
-	  Fn[2][0]=0.5*fmax*Fx;
-	  Fn[2][1]=0.;
-	  Fn[2][2]=Fz*(1.-.5*fmax);
-	  */
 
 	  Fn[0][0]=Fx*(1.-2./3.*fmax);
 	  Fn[0][1]=1./3.*fmax*Fy;
@@ -322,6 +282,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
       Fon2[2]+=ppon2[FZ(ii)];
     }
 
+  /*
   if((fabs(1.-Eon2/Eon)>1.e-5) ||
      (Fon[0]!=0. && (fabs(1.-Fon2[0]/Fon[0])>1.e-5)) || 
      (Fon[1]!=0. && (fabs(1.-Fon2[1]/Fon[1])>1.e-5)) || 
@@ -330,7 +291,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
       printf("EF ratios: %f %f %f %f\n",Eon2/Eon,Fon2[0]/Fon[0],Fon2[1]/Fon[1],Fon2[2]/Fon[2]);
       //getchar();
     }
-
+  */
 
 
   //to code basis
@@ -2393,3 +2354,31 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
   */
   return 0;
 }
+
+int
+calc_rad_wavespeeds_on_base_mf(ldouble *pp, ldouble *avaltop)
+{
+  int i,irf;
+  for(i=0;i<6;i++)
+    avaltop[i]=0.;
+  
+  ldouble nx,ny,nz;
+  ldouble aval[6];
+
+  for(irf=0;irf<NRF;irf++)
+    {
+      nx=pp[FX(irf)]/pp[EE(irf)];
+      nx=pp[FY(irf)]/pp[EE(irf)];
+      nx=pp[FZ(irf)]/pp[EE(irf)];
+      
+      calc_rad_wavespeeds_on(nx,ny,nz,aval);
+
+      for(i=0;i<3;i++)
+	{
+	  avaltop[i*2+0]=my_min(aval[i*2+0],avaltop[i*2+0]);
+	  avaltop[i*2+1]=my_max(aval[i*2+1],avaltop[i*2+1]);
+	}
+    }
+
+  return 0; 
+}						 

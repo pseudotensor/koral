@@ -1,6 +1,6 @@
 #define RADIATION
 //#define RADSOURCEOFF
-//#define EXPLICIT_RAD_SOURCE
+#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
 #define MASS 10.
@@ -10,6 +10,18 @@
 //#define myMKS1COORDS
 
 #define OMSCALE 1.
+
+#define MULTIRADFLUID
+#define MFCORRECTPHI
+#define MFSKEW 15.
+#define MFMINVEL 1.e-4
+#define MFFRACMETHOD 1
+#define MFFRACSKEW 1.
+#define MFFRAC 0.05
+
+#define MFREDISTRIBUTEMETHOD 2
+#define MORERADFLUIDS
+#define NRF 6
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -41,14 +53,14 @@
 #else
 #define MINX (.5*r_horizon_BL(BHSPIN))
 #define MAXX 15.//27.8
-#define NX 80
+#define NX 50
 #endif
 
 #define NY 30
 #define NZ 1
 
 
-#define MINY (0.001*Pi/4.)
+#define MINY (0.1*Pi/4.)
 #define MAXY Pi/2.
 
 #define MINZ -1.

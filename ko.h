@@ -389,6 +389,8 @@ int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, l
 
 
 //rad.mf.c
+int
+calc_rad_wavespeeds_on_base_mf(ldouble *pp, ldouble *avaltop);
 int redistribute_with_velocities(ldouble avals[6],ldouble A[NRF],ldouble,ldouble);
 int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals);
 int mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg,ldouble);

@@ -327,6 +327,8 @@ fprint_profiles(ldouble t, ldouble totmass)
 						      Fz+=pp[FZ(irf)];
 						    }
 
+						  if(E<EEFLOOR || isnan(E)) E=EEFLOOR;
+
 						  fprintf(fout1,"%.4e %.4e %.4e "
 							  "%.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e "
 							  "%.7e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e "

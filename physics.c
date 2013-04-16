@@ -201,7 +201,11 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   calc_tautot(pp,xx,dx,tautot);
   
 #ifndef MULTIRADFLUID
+#ifdef EDDINGTON_APR
+  calc_rad_wavespeeds_on_base_mf(pp,tautot,aval);
+#else
   calc_rad_wavespeeds(pp,&geom,tautot,aval,verbose);
+#endif
 
 #ifdef FULLRADWAVESPEEDS
   aval[0]=aval[1]=1./sqrt(gg[1][1]);
@@ -210,7 +214,12 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 #endif
 
 #else
+
+#ifdef EDDINGTON_APR
+  calc_rad_wavespeeds_on_base_mf(pp,tautot,aval);
+#else
   calc_rad_wavespeeds_mf_total(pp,gg,GG,tautot,aval);
+#endif
 #endif
 
   axl=aval[0];
@@ -331,7 +340,11 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
+#ifndef EDDINGTON_APR
   calc_Rij(pp,&geom,Rij); //R^ij
+#else
+  calc_Rij_ff(pp,Rij);
+#endif
   indices_2221(Rij,Rij,gg); //R^i_j
 
   //terms with Christoffels
@@ -365,7 +378,11 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 #else
   int irf;
   ldouble Rij[NRF][4][4];
+#ifndef EDDINGTON_APR
   calc_Rij_mf(pp,gg,GG,Rij); //R^ij
+#else
+  calc_Rij_ff_mf(pp,Rij);
+#endif
   for(ii=0;ii<NRF;ii++)
     indices_2221(Rij[ii],Rij[ii],gg); //R^i_jl
 
@@ -506,19 +523,27 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
+#ifndef EDDINGTON_APR
   calc_Rij(pp,&geom,Rij); //R^ij
+#else
+  calc_Rij_ff(pp,Rij); //R^ij
+#endif
+
   indices_2221(Rij,Rij,gg); //R^i_j
 #else
   ldouble Rij[NRF][4][4];
+#ifndef EDDINGTON_APR
   calc_Rij_mf(pp,gg,GG,Rij); //R^ij
+#else
+  calc_Rij_ff_mf(pp,Rij); //R^ij
+#endif
+
   for(ii=0;ii<NRF;ii++)
     {
-
+      
       indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
-      //      printf(": %d\n",ii);print_tensor(Rij[ii]);
     }
-  //  if(1||Rij[0][0][1]!=0.) getchar();
-#endif
+ #endif
 
   //to move gdet in/out derivative:
   //here, up in metric source terms, in u2p and p2u, as well as in finite.c with del4[]

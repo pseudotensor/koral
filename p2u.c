@@ -110,6 +110,46 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 /********************************************************/
 int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
 {
+
+#ifdef EDDINGTON_APR
+  int irf,ii;
+  int pp10[10];
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+  ldouble Rij[4][4];
+  for(ii=0;ii<NVHD;ii++)
+    {
+      pp10[ii]=pp[ii];
+      uu10[ii]=uu[ii];
+    }
+  
+  for(irf=0;irf<NRF;irf++)
+    {
+      pp10[EE(0)]=p[EE(irf)];
+      pp10[FX(0)]=p[FX(irf)];
+      pp10[FY(0)]=p[FY(irf)];
+      pp10[FZ(0)]=p[FZ(irf)];
+
+      calc_Rij_ff(pp10,Rij);  
+      trans22_on2cc(Rij,Rij,tlo);  
+      boost22_ff2lab(Rij,Rij,pp,gg,GG); 
+      indices_2221(Rij,Rij,gg);  
+
+      u[EE(irf)]=Rij[0][0];
+      u[FX(irf)]=Rij[0][1];
+      u[FY(irf)]=Rij[0][2];
+      u[FZ(irf)]=Rij[0][3];
+    }
+  return 0;
+#endif
+
 #ifdef LABRADFLUXES
   
   u[6]=p[6]; //R^t_t

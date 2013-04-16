@@ -39,63 +39,21 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 //radius
 if(ix>=NX) //analytical solution at rout only
   {
-    ldouble podpierd=-(GGBL[0][0]-2.*ELL*GGBL[0][3]+ELL*ELL*GGBL[3][3]);
-    ldouble ut=-1./sqrt(podpierd);
-    ut/=UTPOT;
-    ldouble uint,Vphi,rho,Vr;
-    ldouble xx=get_x(ix,0);
-    ldouble D,E,W,eps,uT,uphi,uPhi;
-    if(1)
+
+    int irf;    
+    iix=NX-1;
+    iiz=iz;
+    iiy=iy;
+    gdet_src=get_g(g,3,4,iix,iiy,iiz);  
+    gdet_bc=get_g(g,3,4,ix,iy,iz);  
+    for(iv=0;iv<NV;iv++)
       {
+	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 
-	iix=NX-1;
-	iiy=iy;
-	iiz=iz;
-
-	//ambient
-	set_hdatmosphere(pp,xxvec,gg,GG,0);
-#ifdef RADIATION
-
-	ldouble ppatm[NV];
-	ldouble urf[4];
-       
-	
-	//atmosphere
-	set_radatmosphere(ppatm,xxvec,gg,GG,2);
-
-	//outflow-no-inflow for radiation	
-	pp[7]=get_u(p,7,iix,iiy,iiz);
-	pp[8]=get_u(p,8,iix,iiy,iiz);
-	pp[9]=get_u(p,9,iix,iiy,iiz);
-
-	urf[1]=pp[7];
-	urf[2]=pp[8];
-	urf[3]=pp[9];
-
-	//converting to lab four-velocity
-	conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
-
-	//if flux outflowing - outflow BC
-	//if inflowing - atmosphere
-	if(urf[1]<0.) 
-	  {
-	    pp[6]=ppatm[6];
-	    pp[7]=ppatm[7];
-	    pp[8]=ppatm[8];
-	    pp[9]=ppatm[9];
-	  }
-	else
-	  pp[6]=get_u(p,6,iix,iiy,iiz);	
-
-
-	
-
-#endif
-      }
-      
-
-   
-    pp[5]=calc_Sfromu(pp[0],pp[1]);
+	  for(irf=0;irf<NRF;irf++)
+	    if(iv==FX(irf))
+	      if(pp[iv]<0.) pp[iv]=0.;
+      }  
     
     check_floors_hd(pp,VELPRIM,gg,GG);
 
@@ -122,35 +80,42 @@ if(ix>=NX) //analytical solution at rout only
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
-     pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
-     pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
-
+ 
      //atmosphere
      //set_radatmosphere(pp,xxvec,gg,GG,0);
 
      //imposing inflowing velocity of the normal observer
      ldouble ucon[4];
-     calc_normalobs_4vel(GG,ucon);
-     pp[7]=ucon[1];
+     int irf;
 
      if(MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS)
-       pp[7]=-10.;
-
-     //copying with scalings
-     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
-     //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
+       {
+	 for(irf=0;irf<NRF;irf++)
+	   if(pp[FX(irf)]>0.) pp[FX(irf)]=0.;
+       }
+     else
+       {
+	 pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
+	 pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
+	 calc_normalobs_4vel(GG,ucon);
+	 for(irf=0;irf<NRF;irf++)
+	   {
+	     pp[FX(irf)]=ucon[1];
+	     pp[EE(irf)]=get_u(p,EE(irf),iix,iiy,iiz)*pow(r/r0,-2.5);
+	   }
+       }
        
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,gg,GG);
      //end of floor section
-    p2u(pp,uu,gg,GG);
+     p2u(pp,uu,gg,GG);
      return 0;
    }
 
 //reflections in theta 
 if(iy<0.) //spin axis
   {      
-    
+    int irf;
     iiy=-iy-1;
     iiz=iz;
     iix=ix;
@@ -158,12 +123,20 @@ if(iy<0.) //spin axis
     gdet_bc=get_g(g,3,4,ix,iy,iz);  
     for(iv=0;iv<NV;iv++)
       {
+	pp[iv]=get_u(p,iv,iix,iiy,iiz);
+
+	/*
+	  //reflection
 	//v_theta
-	if(iv==3 || iv==8)
+	if(iv==3)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	else
-	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
-       }
+
+	for(irf=0;irf<NRF;irf++)
+	  if(iv==FY(irf))
+	    //radial component
+	    pp[iv]=-get_u(p,iv,iix,iiy,iiz);
+	*/
+        }
    
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
@@ -171,11 +144,21 @@ if(iy<0.) //spin axis
    
 
     p2u(pp,uu,gg,GG);
+
+#ifdef SKIP_MULTIRADFLUID
+    redistribute_radfluids(pp,uu,&geom);
+    u2p_rad(uu,pp,&geom,&irf);
+#ifdef MFCORRECTPHI
+    mf_correct_in_azimuth(pp,uu,&geom,-1.);
+#endif
+#endif
+
+
     return 0;
   }
 if(iy>=NY) //equatorial plane
   {
-    
+    int irf;
     iiy=NY-(iy-NY)-1;
     iiz=iz;
     iix=ix;
@@ -184,10 +167,13 @@ if(iy>=NY) //equatorial plane
 
     for(iv=0;iv<NV;iv++)
       {
-	if(iv==3 || iv==8)
+	pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	if(iv==3)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	else
-	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	for(irf=0;irf<NRF;irf++)
+	  if(iv==FY(irf))
+	    //radial component
+	    pp[iv]=-get_u(p,iv,iix,iiy,iiz);
       }
 
     ldouble rBL=xxvecBL[1];
@@ -197,7 +183,7 @@ if(iy>=NY) //equatorial plane
 
 	pp[6]=calc_LTE_EfromT(1.e11)*(1.-sqrt(rin/rBL))/pow(rBL,3.);
 	pp[7]=pp[8]=pp[9]=0.;
-	pp[8]=0.*pp[6];
+	pp[8]=-0.*pp[6];
 
 	//Keplerian gas
 	ldouble Om=1./pow(rBL,1.5)*OMSCALE;
@@ -209,6 +195,17 @@ if(iy>=NY) //equatorial plane
 	pp[3]=ucon[2];
 	pp[4]=ucon[3];	
 	
+	int irf;
+#ifdef MULTIRADFLUID
+
+	for(irf=1;irf<NRF;irf++)
+	  {
+	    pp[FX(irf)]=pp[FY(irf)]=pp[FZ(irf)]=0.;
+	    pp[EE(irf)]=EEFLOOR;
+	  }
+
+#endif	
+
 	prad_ff2lab(pp,pp,&geomBL);
 	
 	trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
@@ -220,6 +217,14 @@ if(iy>=NY) //equatorial plane
     //end of floor section
     
     p2u(pp,uu,gg,GG); 
+#ifdef MULTIRADFLUID
+    redistribute_radfluids(pp,uu,&geom);
+    u2p_rad(uu,pp,&geom,&irf);
+#ifdef MFCORRECTPHI
+    mf_correct_in_azimuth(pp,uu,&geom,-1.);
+#endif
+#endif
+
     return 0; 
   }
    

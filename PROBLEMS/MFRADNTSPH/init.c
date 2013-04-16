@@ -60,7 +60,14 @@ if(1)
     set_hdatmosphere(pp,xxvec,gg,GG,0);
 #ifdef RADIATION
     set_radatmosphere(pp,xxvec,gg,GG,0);
-
+    int irf;
+    for(irf=1;irf<NRF;irf++)
+      {
+	pp[EE(irf)]=EEFLOOR;
+	pp[FX(irf)]=0.;
+	pp[FY(irf)]=0.;
+	pp[FZ(irf)]=0.;
+      }
     /*
     pp[6]=ERADATMMIN;
     pp[7]=0.;
@@ -89,6 +96,11 @@ check_floors_hd(pp,VELPRIM,gg,GG);
 
 p2u(pp,uu,gg,GG);
 
+#ifdef MULTIRADFLUID
+int irf;
+redistribute_radfluids(pp,uu,&geom);
+u2p_rad(uu,pp,&geom,&irf);
+#endif
 /***********************************************/
 
 int iv;

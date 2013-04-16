@@ -938,8 +938,9 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 int
 calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
 {
-  ldouble E=pp[6];
-  ldouble F[3]={pp[7],pp[8],pp[9]};
+  int irf=0;
+  ldouble E=pp[EE(irf)];
+  ldouble F[3]={pp[FX(irf)],pp[FY(irf)],pp[FZ(irf)]};
 
   ldouble nx,ny,nz,nlen,f;
 
