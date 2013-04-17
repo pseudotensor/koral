@@ -2414,7 +2414,7 @@ int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals)
 }
 
 int
-calc_rad_wavespeeds_on_base_mf(ldouble *pp, ldouble *avaltop)
+calc_rad_wavespeeds_on_base_mf(ldouble *pp, ldouble tautot[3],ldouble *avaltop)
 {
   int i,irf;
   for(i=0;i<6;i++)
@@ -2432,7 +2432,13 @@ calc_rad_wavespeeds_on_base_mf(ldouble *pp, ldouble *avaltop)
       calc_rad_wavespeeds_on(nx,ny,nz,aval);
 
       for(i=0;i<3;i++)
-	{
+	{	  
+	  if(tautot[i]>0.) 
+	    {
+	      aval[i*2+0]=my_max(aval[i*2+0],-4./3./tautot[i]*4./3./tautot[i]);
+	      aval[i*2+1]=my_min(aval[i*2+1],4./3./tautot[i]*4./3./tautot[i]);
+	    }
+
 	  avaltop[i*2+0]=my_min(aval[i*2+0],avaltop[i*2+0]);
 	  avaltop[i*2+1]=my_max(aval[i*2+1],avaltop[i*2+1]);
 	}

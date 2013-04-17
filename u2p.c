@@ -1158,7 +1158,7 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
 
 #ifdef EDDINGTON_APR
   int irf,ii;
-  int pp10[10],uu10[10];
+  ldouble pp10[10],uu10[10];
   for(ii=0;ii<NVHD;ii++)
     {
       pp10[ii]=pp[ii];
@@ -1176,7 +1176,7 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
       uu10[FY(0)]=uu[FY(irf)];
       uu10[FZ(0)]=uu[FZ(irf)];
 
-      u2p_rad_onff(uu10,pp10, ggg, corrected)
+      u2p_rad_onff(uu10,pp10, ggg, corrected);
 
       pp[EE(irf)]=pp10[EE(0)];
       pp[FX(irf)]=pp10[FX(0)];

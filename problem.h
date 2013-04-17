@@ -51,7 +51,7 @@
 //45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
 
-#define PROBLEM 37
+#define PROBLEM 6
 
 #if(PROBLEM==46)
 
