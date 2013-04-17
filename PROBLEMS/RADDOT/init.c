@@ -56,7 +56,7 @@ if(ix==IXDOT && iy==IYDOT && iz==IZDOT)
 
 prad_ff2lab(pp,pp,&geom);
 
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
 
 
 

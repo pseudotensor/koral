@@ -51,7 +51,7 @@
 //45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
 
-#define PROBLEM 6
+#define PROBLEM 36
 
 #if(PROBLEM==46)
 
@@ -715,7 +715,7 @@
 
 //default number of radiative fluids
 #ifndef MORERADFLUIDS
-#define NRF 4
+#define NRF 6
 #endif
 
 #ifndef MFSKEW

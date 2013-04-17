@@ -1,7 +1,8 @@
 #define TMAX 1.e10
 #define RADIATION
 
-#define MULTIRADFLUID
+//#define EDDINGTON_APR
+//#define MULTIRADFLUID
 //#define MORERADFLUIDS
 //#define NRF 8
 

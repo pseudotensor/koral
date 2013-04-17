@@ -1275,19 +1275,20 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
       f_u2prad_num(uu,pp,geom,f1);
  
       //calculating approximate Jacobian
-      for(i=0;i<4;i++)
+      for(j=0;j<4;j++)
 	{
-	  for(j=0;j<4;j++)
-	    {
-	      pp[j+6]=pp[j+6]+EPS*pp[6];
+	  pp[j+6]=pp[j+6]+EPS*pp[6];
 	    
-	      f_u2prad_num(uu,pp,geom,f2);
+	  f_u2prad_num(uu,pp,geom,f2);
      
+	  for(i=0;i<4;i++)
+	    {
 	      J[i][j]=(f2[i] - f1[i])/(EPS*pp[6]);
-
-	      pp[j+6]=pp0[j+6];
 	    }
+
+	  pp[j+6]=pp0[j+6];
 	}
+	
 
       //inversion
       inverse_44matrix(J,iJ);

@@ -44,7 +44,7 @@ for(irf=1;irf<NRF;irf++)
 
 prad_ff2lab(pp,pp,&geom);
 
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
 
 
 #ifdef MULTIRADFLUID
@@ -94,7 +94,7 @@ for(irf=1;irf<NRF;irf++)
 
 prad_ff2lab(pp,pp,&geom);
 
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
 
 
 #ifdef MULTIRADFLUID

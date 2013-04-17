@@ -71,7 +71,7 @@ for(irf=1;irf<NRF;irf++)
 
 prad_ff2lab(pp,pp,&geom);
 
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom );
 //printf("%d %d %d\n",ix,iy,iz);
 //print_Nvector(uu,NV);
 //print_Nvector(uu,NV);getchar();
