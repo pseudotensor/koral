@@ -9,19 +9,20 @@
 
 #define myMCYL1COORDS
 
-//#define MULTIRADFLUID
+#define MULTIRADFLUID
 #define MFCORRECTPHI
 #define MFSKEW 15.
 #define MFMINVEL 1.e-4
-#define MFFRACMETHOD 1.
+#define MFFRACMETHOD 2.
 #define MFFRACSKEW 1.
-#define MFFRAC 0.05
+#define MFFRAC 1.
+#define MFMAXCOSANGLE .8
 
 #define MFREDISTRIBUTEMETHOD 2
 #define MORERADFLUIDS
 #define NRF 6
 
-#define OMSCALE 0.
+#define OMSCALE 1.
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS
