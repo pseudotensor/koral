@@ -94,7 +94,7 @@ pp[5]=calc_Sfromu(pp[0],pp[1]);
 check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
 
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
 
 #ifdef MULTIRADFLUID
 int irf;

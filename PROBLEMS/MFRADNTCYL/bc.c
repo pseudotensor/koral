@@ -55,7 +55,7 @@ if(iy>NY-1)
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
 #ifdef SKMULTIRADFLUID    
     redistribute_radfluids(pp,uu,&geom);
@@ -90,7 +90,7 @@ if(ix>NX-1)
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
 #ifdef SKMULTIRADFLUID   
     redistribute_radfluids(pp,uu,&geom);
@@ -124,7 +124,7 @@ if(ix<0.) //spin axis
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
 #ifdef MULTIRADFLUID
     int irf;
@@ -186,7 +186,10 @@ if(iy<0) //equatorial plane
 	  }
 
 #endif	
+
+#ifndef EDDINGTON_APR
 	prad_ff2lab(pp,pp,&geomCYL);
+#endif
 	
 	trans_pall_coco(pp, pp, CYLCOORDS, MYCOORDS,xxvecCYL,ggCYL,GGCYL,gg,GG);
       }
@@ -214,7 +217,7 @@ if(iy<0) //equatorial plane
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
-    p2u(pp,uu,gg,GG); 
+    p2u(pp,uu,&geom); 
   
 #ifdef MULTIRADFLUID
     int irf;

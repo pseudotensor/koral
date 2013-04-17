@@ -8,11 +8,11 @@
 
 //#define myMCYL1COORDS
 
-#define EDDINGTON_APR
+//#define EDDINGTON_APR
 //#define LABRADFLUXES
 
-//#define MULTIRADFLUID
-#define MFCORRECTPHI
+#define MULTIRADFLUID
+//#define MFCORRECTPHI
 #define MFSKEW 15.
 #define MFFRACMETHOD 1
 #define MFFRACSKEW 1.
@@ -43,7 +43,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000
-//#define RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
 //#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 

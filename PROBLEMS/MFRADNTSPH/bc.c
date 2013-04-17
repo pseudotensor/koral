@@ -57,7 +57,7 @@ if(ix>=NX) //analytical solution at rout only
     
     check_floors_hd(pp,VELPRIM,gg,GG);
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     return 0.;
   }
@@ -108,7 +108,7 @@ if(ix>=NX) //analytical solution at rout only
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,gg,GG);
      //end of floor section
-     p2u(pp,uu,gg,GG);
+     p2u(pp,uu,&geom);
      return 0;
    }
 
@@ -142,7 +142,7 @@ if(iy<0.) //spin axis
     //end of floor section
    
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
 #ifdef SKIP_MULTIRADFLUID
     redistribute_radfluids(pp,uu,&geom);
@@ -215,7 +215,7 @@ if(iy>=NY) //equatorial plane
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
     
-    p2u(pp,uu,gg,GG); 
+    p2u(pp,uu,&geom); 
 #ifdef MULTIRADFLUID
     redistribute_radfluids(pp,uu,&geom);
     u2p_rad(uu,pp,&geom,&irf);

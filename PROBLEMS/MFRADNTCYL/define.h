@@ -7,9 +7,11 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-#define myMCYL1COORDS
+//#define myMCYL1COORDS
 
-#define MULTIRADFLUID
+//#define EDDINGTON_APR
+
+//#define MULTIRADFLUID
 #define MFCORRECTPHI
 #define MFSKEW 15.
 #define MFMINVEL 1.e-4
@@ -22,7 +24,7 @@
 #define MORERADFLUIDS
 #define NRF 6
 
-#define OMSCALE 1.
+#define OMSCALE 0.
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS

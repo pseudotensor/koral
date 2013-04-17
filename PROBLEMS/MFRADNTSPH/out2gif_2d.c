@@ -24,7 +24,19 @@ maxy= 1.02*get_xb(NX,0);
 #endif
 
   fprintf(fgnu,
-	  //	  "set term gif large size 1000,1000\n"
+          "set table \"table.gp\"\n"
+	  "set contour base\n"
+	  "unset surface\n"
+	  "set log cb\n"
+	  "set cbrange [1.e-15:1e-11]\n"
+	  "set cntrparam levels 20 \n"
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):20 ti \"\" w l ls 1\n"
+	  "unset dgrid3d\n"
+	  "unset log z\n"
+	  "unset table\n"
+	  "unset contour\n"
+	  "unset surface\n"
+
 	  "set term gif large size 900,800\n"
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
@@ -40,6 +52,8 @@ maxy= 1.02*get_xb(NX,0);
 	  "set style line 2 lt 1 lw 2 lc 2\n"
 	  "set style line 3 lt 1 lw 2 lc 2\n"
 	  "set style line 21 lt 3 lw 1 lc -1\n"
+	  "set style line 1 lt 1 lw 2 lc 2\n"
+	  "set style line 2 lt 1 lw 3 lc 3\n"
 	 
 	  "set style arrow 1 ls 1\n"
 	  
@@ -77,6 +91,15 @@ maxy= 1.02*get_xb(NX,0);
 	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):(($21*sin($2)+$22*cos($2))/(($21*$21+$22*$22)**.5/%f*2)):((-$22*sin($2)+$21*cos($2))/(($21*$21+$22*$22)**.5/%f*2)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  //	  "plot \"%s\" u 1:2:(($21)/(($21*$21+$22*$22)**.5/%f*2)):(($22)/(($21*$21+$22*$22)**.5/%f*2)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
+	  "unset tics\n"
+	  "unset border\n"
+	  "unset pm3d\n"
+	  "unset surface\n"
+	  "plot \"table.gp\" w l ls 2\n"
+	  "set pm3d\n"
+	  "set tics\n"
+	  "set border\n"
+	  ,fname
 	  ,fname2,
 	  minx,
 	  maxx,

@@ -8,7 +8,7 @@
 ldouble minx=0.;
 ldouble miny=0.;
 ldouble maxx=get_x(NX,0);
-ldouble maxy=get_x(NY,0);
+ldouble maxy=get_x(NY,1);
 
 #ifdef myMCYL1COORDS
 maxx= 1.*(exp(get_xb(NX,0))+MKS1R0);
