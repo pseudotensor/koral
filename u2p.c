@@ -1172,7 +1172,12 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
       uu10[FY(0)]=uu[FY(irf)];
       uu10[FZ(0)]=uu[FZ(irf)];
 
-      u2p_rad_onff(uu10,pp10, ggg, corrected);
+      if(uu10[EE(0)]<EEFLOOR)
+	u2p_rad_onff(uu10,pp10, ggg, corrected);
+      else
+	{
+	  p2u_rad(pp10,uu10,ggg);
+	}
 
       pp[EE(irf)]=pp10[EE(0)];
       pp[FX(irf)]=pp10[FX(0)];
@@ -1250,7 +1255,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
   int i,j,k,iter=0;
 
   ldouble EPS = 1.e-6;
-  ldouble CONV = U2PRADPREC;
+  ldouble CONV = 1.e-6;
 
   int verbose=0;
 
@@ -1260,7 +1265,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
     }
 
   //converting radiative primitives to fluid frame ortonormal
-  prad_lab2ff(pp,pp,geom);
+  //ad_lab2ff(pp,pp,geom);
 
   if(verbose!=0)   print_Nvector(uu,NV);
   do
@@ -1279,7 +1284,9 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
 	{
 	  pp[j+6]=pp[j+6]+EPS*pp[6];
 	    
-	  f_u2prad_num(uu,pp,geom,f2);
+	  if(verbose>0)    print_Nvector(pp,NV);
+ 	  f_u2prad_num(uu,pp,geom,f2);
+	  if(verbose>0)    print_state_u2prad_num (iter,x,f2); 
      
 	  for(i=0;i<4;i++)
 	    {
@@ -1323,14 +1330,12 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	break;
 
-      if(iter>50)
+      if(iter>20)
 	{
-	  printf("iter exceeded in u2prad_num()\n");
-	  
-	  for(i=6;i<NV;i++)
-	    {
-	      pp[i]=pporg[i];
-	    }
+	  printf("iter exceeded in u2prad_num() %d %d %d\n",geom->ix,geom->iy,geom->iz);getchar();
+
+	  pp[6]=pporg[6];
+	  pp[7]=pp[8]=pp[9]=0.;
 	  
 	  *corrected=1;
 	  return -1;
@@ -1343,9 +1348,11 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
   
   if(pp[6]<EEFLOOR) 
     {
-      printf("enegative u2prad()\n");
+      printf("enegative u2prad() %d %d %d\n",geom->ix,geom->iy,geom->iz); getchar();
       pp[6]=EEFLOOR;
+      pp[7]=pp[8]=pp[9]=0.;
       *corrected=1;
+      return -1;
     }
   
   //converting to lab primitives
@@ -1353,7 +1360,7 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
   //prad_ff2lab(pp,pp,geom);
   
   if(verbose!=0)   {print_Nvector(pp,NV);}
-  if(verbose>0)   {printf("----\n");getchar();}
+  if(verbose>0)   {printf("----\n");}//getchar();}
 
   *corrected=0;
   return 0;

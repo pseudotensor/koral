@@ -8,8 +8,8 @@
 
 //#define myMCYL1COORDS
 
-//#define EDDINGTON_APR
-#define LABRADFLUXES
+#define EDDINGTON_APR
+//#define LABRADFLUXES
 
 //#define MULTIRADFLUID
 #define MFCORRECTPHI
@@ -27,7 +27,7 @@
 #define SIMPLERADVISCOSITY
 #define ALPHARADVISC 0.05
 
-#define OMSCALE 1.
+#define OMSCALE 0.
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS
@@ -39,7 +39,7 @@
 
 #define IMAGETYPE "gif"
 #define OUTVEL VELPRIMRAD
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000
@@ -55,7 +55,7 @@
 #define MAXX (log(10.-MKS1R0))
 #define NX 50
 #else
-#define MINX  0.001
+#define MINX  1.
 #define MAXX 10.
 #define NX 50
 #endif
@@ -92,7 +92,7 @@
 
 #define INT_ORDER 1
 #define RK2_STEPPING
-#define TSTEPLIM .6
+#define TSTEPLIM .06
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 
