@@ -116,7 +116,9 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 /********************************************************/
 int p2u_rad(ldouble *p,ldouble *u,void *ggg)
 {
-  struct geometry *geom
+  int i,j,irf;
+
+   struct geometry *geom
    = (struct geometry *) ggg;
 
   ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
@@ -126,14 +128,13 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   tup=geom->tup;
   
 #ifdef EDDINGTON_APR
-  int irf,ii;
-  int pp10[10];
+  int ii;
+  ldouble pp10[10];
   ldouble Rij[4][4];
 
   for(ii=0;ii<NVHD;ii++)
     {
-      pp10[ii]=pp[ii];
-      uu10[ii]=uu[ii];
+      pp10[ii]=p[ii];
     }
   
   for(irf=0;irf<NRF;irf++)
@@ -145,7 +146,7 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
 
       calc_Rij_ff(pp10,Rij);  
       trans22_on2cc(Rij,Rij,tlo);  
-      boost22_ff2lab(Rij,Rij,pp,gg,GG); 
+      boost22_ff2lab(Rij,Rij,pp10,gg,GG); 
       indices_2221(Rij,Rij,gg);  
 
       u[EE(irf)]=Rij[0][0];
@@ -166,9 +167,7 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
  
 #endif
   
-  int i,j,irf;
-
-  for(irf=0;irf<NRF;irf++)
+ for(irf=0;irf<NRF;irf++)
     {
       ldouble Erf=p[EE(irf)];
 

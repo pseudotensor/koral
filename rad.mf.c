@@ -1884,6 +1884,12 @@ int
 calc_Rij_mf(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4][4])
 {
 #ifdef MULTIRADFLUID
+
+#ifdef EDDINGTON_APR
+  calc_Rij_ff_mf(pp0,Rij);
+  return 0;
+#endif
+
   ldouble pp[NV],Erf;
   int verbose=0;
   int i,j,irf;

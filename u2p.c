@@ -201,11 +201,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
 
 #ifdef RADIATION
   int radcor;
-#ifdef EDDINGTON_APR_WRONG
-  u2p_rad_onff(uu,pp,ggg,&radcorr);
-#else
   u2p_rad(uu,pp,geom,&radcorr);
-#endif
 #endif
   
   //************************************
@@ -1352,10 +1348,11 @@ u2p_rad_onff(ldouble *uu, ldouble *pp, void* ggg, int *corrected)
     }
   
   //converting to lab primitives
-  prad_ff2lab(pp,pp,geom);
+  //no - in EDD_APR I use fluid frame fluxes as primitives
+  //prad_ff2lab(pp,pp,geom);
   
   if(verbose!=0)   {print_Nvector(pp,NV);}
-  if(verbose>0)   {printf("----\n");}
+  if(verbose>0)   {printf("----\n");getchar();}
 
   *corrected=0;
   return 0;

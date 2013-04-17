@@ -756,6 +756,11 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ldouble urfcon[4];
   //covariant formulation
 
+#ifdef EDDINGTON_APR
+  calc_Rij_ff(pp0,Rij);
+  return 0;
+#endif
+
 #ifdef LABRADFLUXES
 
 #if(1)
@@ -839,93 +844,6 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
 
-#ifdef WIDENPRESSURE
-  //test
-
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      if(isnan(geom->tup[i][j])||isnan(geom->tup[i][j])||isinf(geom->tlo[i][j])||isinf(geom->tlo[i][j]))
-	{
-	  printf("%d %d %d %f %f %f\n",geom->ix,geom->iy,geom->iz,geom->xx,geom->yy,geom->zz);
-	  print_tensor( geom->tup);
-	  print_tensor( geom->tlo);
-	  getchar();
-	}
-
-  //to ortonormal coordinates
-  int prever=0;
-  if(prever) print_tensor(Rij);
-      
-  trans22_cc2on(Rij,Rij,geom->tup);
-  if(prever) print_tensor(Rij);
-
-  //modify the closure
-  ldouble E=Rij[0][0];
-  ldouble F[3]={Rij[0][1],Rij[0][2],Rij[0][3]};
-
-  ldouble nx,ny,nz,nlen,f;
-
-  nx=F[0]/E;
-  ny=F[1]/E;
-  nz=F[2]/E;
-
-  nlen=sqrt(nx*nx+ny*ny+nz*nz);
- 
-  if(nlen>=1.)
-    {
-      f=1.;
-    }
-  else //M1
-    {
-      f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
-	  
-      if(prever) printf("1: %f\n",f);
-      //bias it artificially towards 1/3
-      ldouble power=WIDENPRESSUREPOWER;
-      f=1./3.+pow(f-1./3.,power)*pow(2./3.,-power+1.);
-      if(prever) printf("1: %f\n",f);
-    }
-  
-  if(nlen>0) 
-    {
-      nx/=nlen;
-      ny/=nlen;
-      nz/=nlen;
-    }
-  else
-    {
-      ;
-    }
-  
-  Rij[0][0]=E;
-  Rij[0][1]=Rij[1][0]=F[0];
-  Rij[0][2]=Rij[2][0]=F[1];
-  Rij[0][3]=Rij[3][0]=F[2];
-
-  Rij[1][1]=E*(.5*(1.-f) + .5*(3.*f - 1.)*nx*nx);
-  Rij[1][2]=E*(.5*(3.*f - 1.)*nx*ny);
-  Rij[1][3]=E*(.5*(3.*f - 1.)*nx*nz);
-
-  Rij[2][1]=E*(.5*(3.*f - 1.)*ny*nx);
-  Rij[2][2]=E*(.5*(1.-f) + .5*(3.*f - 1.)*ny*ny);
-  Rij[2][3]=E*(.5*(3.*f - 1.)*ny*nz);
-
-  Rij[3][1]=E*(.5*(3.*f - 1.)*nz*nx);
-  Rij[3][2]=E*(.5*(3.*f - 1.)*nz*ny);
-  Rij[3][3]=E*(.5*(1.-f) + .5*(3.*f - 1.)*nz*nz);
-  
-  if(prever) print_tensor(Rij);
-
-  //back to code coordinates
-  trans22_on2cc(Rij,Rij,geom->tlo);
-
-
-
-  if(prever) print_tensor(Rij);
-
-  if(prever) if(Rij[0][1]!=0. ) getchar();
-
-#endif //WIDENPRESSURE
 
 #ifdef RADVISCOSITY
   ldouble Tvisc[4][4];

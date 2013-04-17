@@ -340,11 +340,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
-#ifndef EDDINGTON_APR
   calc_Rij(pp,&geom,Rij); //R^ij
-#else
-  calc_Rij_ff(pp,Rij);
-#endif
   indices_2221(Rij,Rij,gg); //R^i_j
 
   //terms with Christoffels
@@ -378,11 +374,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 #else
   int irf;
   ldouble Rij[NRF][4][4];
-#ifndef EDDINGTON_APR
   calc_Rij_mf(pp,gg,GG,Rij); //R^ij
-#else
-  calc_Rij_ff_mf(pp,Rij);
-#endif
   for(ii=0;ii<NRF;ii++)
     indices_2221(Rij[ii],Rij[ii],gg); //R^i_jl
 
@@ -523,24 +515,14 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
-#ifndef EDDINGTON_APR
   calc_Rij(pp,&geom,Rij); //R^ij
-#else
-  calc_Rij_ff(pp,Rij); //R^ij
-#endif
-
   indices_2221(Rij,Rij,gg); //R^i_j
 #else
   ldouble Rij[NRF][4][4];
-#ifndef EDDINGTON_APR
   calc_Rij_mf(pp,gg,GG,Rij); //R^ij
-#else
-  calc_Rij_ff_mf(pp,Rij); //R^ij
-#endif
 
   for(ii=0;ii<NRF;ii++)
     {
-      
       indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
     }
  #endif
