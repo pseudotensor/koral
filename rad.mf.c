@@ -356,7 +356,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   prad_on2lab(ppon2,pp,ggg);
 
   //to conserved
-  p2u_rad(pp,uu,gg,GG);
+  p2u_rad(pp,uu,ggg);
 #endif
   return 0;
 }

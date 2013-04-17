@@ -118,7 +118,7 @@ getchar();
     
     check_floors_hd(pp,VELPRIM,gg,GG);
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     //    print_Nvector(pp,NV);getchar();
 
@@ -166,7 +166,7 @@ getchar();
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
     
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
 #ifdef MULTIRADFLUID
     int irf;

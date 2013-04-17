@@ -61,6 +61,9 @@ if(1)
 #ifdef RADIATION
     set_radatmosphere(pp,xxvec,gg,GG,0);
     pp[6]=0.0001;
+#ifdef LABRADFLUXES
+    pp[6]=-0.0001;
+#endif
     pp[7]=pp[8]=pp[9]=0.;
 
     int irf;
@@ -98,7 +101,7 @@ pp[5]=calc_Sfromu(pp[0],pp[1]);
 check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
 
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
 
 #ifdef MULTIRADFLUID
 

@@ -236,13 +236,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 						      pp[iv]=get_u(p,iv,ix,iy,iz);
 						    }	 
 
-						  /*
-						  if(ix==IXDOT2 && iy==IYDOT2 && iz==IZDOT2 && 1)
-						    {
-						      print_Nvector(uu,NV);print_Nvector(pp,NV);getchar();
-						    }
-						  */
-
+						  
 						  ldouble tup[4][4],tlo[4][4];
 						  pick_T(tmuup,ix,iy,iz,tup);
 						  pick_T(tmulo,ix,iy,iz,tlo);	    
@@ -297,12 +291,6 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  prad_ff2zamo(pp,pp,gg,GG,eup); 
 #endif
 #endif
-
- 						  E=pp[6];
-						  Fx=pp[7];
-						  Fy=pp[8];
-						  Fz=pp[9];
-						  Trad=calc_LTE_TfromE(fabs(E));
 #endif
 
 						  /******************/
@@ -321,11 +309,17 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  for(irf=0;irf<NRF;irf++)
 						  
 						    {
+						      //E+=-uu[EE(irf)];
 						      E+=pp[EE(irf)];
 						      Fx+=pp[FX(irf)];
 						      Fy+=pp[FY(irf)];
 						      Fz+=pp[FZ(irf)];
 						    }
+#ifdef LABRADFLUXES
+						  E*=-1.;
+#endif
+
+						  Trad=calc_LTE_TfromE(fabs(E));
 
 						  if(E<EEFLOOR || isnan(E)) E=EEFLOOR;
 

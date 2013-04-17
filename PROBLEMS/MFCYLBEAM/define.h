@@ -6,9 +6,12 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-#define myMCYL1COORDS
+//#define myMCYL1COORDS
 
-#define MULTIRADFLUID
+//#define EDDINGTON_APR
+#define LABRADFLUXES
+
+//#define MULTIRADFLUID
 #define MFCORRECTPHI
 #define MFSKEW 15.
 #define MFFRACMETHOD 1
@@ -40,7 +43,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000
-#define RADOUTPUTINZAMO
+//#define RADOUTPUTINZAMO
 //#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 
@@ -48,6 +51,7 @@
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
 #define MINX (log(0.001-MKS1R0))
+
 #define MAXX (log(10.-MKS1R0))
 #define NX 50
 #else
