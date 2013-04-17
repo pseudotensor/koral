@@ -113,7 +113,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
       Fon[2]+=ppon[FZ(ii)];
     }
 
-  //  if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
+  //if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
   //if(geom->iy==2 && radius>4. && radius<4.5 && fabs(Fon[0]/Eon)>1.e-2) verbose=1;
 
   for(ii=0;ii<NVHD;ii++)
@@ -190,6 +190,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  Fy=EF[2];
 	  Fz=EF[3];
 	  
+	  /*
 	  //TODO: convert to bisection
 	  if(fabs(Fx)+fabs(Fy)+fabs(Fz)<E0) 
 	    fmax=0.; //complete decomposition allowed
@@ -207,9 +208,55 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	      while(check<1. && f>0.);
 	      fmax=f+0.05;	
 	    }
+	  */
+
+	  if(Fx>0.) //radially outward flux
+	    fmax=1.; //no decomposition
+	  else
+	    {
+	      ldouble check,f,cosangle,dot;
+	      ldouble ex[3]={-1.,0.,0.};
+	      f=1.;
+	      do
+		{
+		  f-=0.05;
+
+		  Fn[0][0]=Fx*(1.-2./3.*f);
+		  Fn[0][1]=1./3.*f*Fy;
+		  Fn[0][2]=1./3.*f*Fz;
+
+		  lenF[0]=sqrt(Fn[0][0]*Fn[0][0]+Fn[0][1]*Fn[0][1]+Fn[0][2]*Fn[0][2]);
+
+		  dot=Fn[0][0]*ex[0]+Fn[0][1]*ex[1]+Fn[0][2]*ex[2];
+		  cosangle=dot/lenF[0]/1.; //cos of the angle between Fn[0] and the -x versor
+
+		  //if(cosangle>MFMAXCOSANGLE) break; //decomposition leads to the x-component too close to the x-axis
+	  
+		  Fn[1][0]=1./3.*f*Fx;
+		  Fn[1][1]=Fy*(1.-2./3.*f);
+		  Fn[1][2]=1./3.*f*Fz;
+	  
+		  Fn[2][0]=1./3.*f*Fx;
+		  Fn[2][1]=1./3.*f*Fy;
+		  Fn[2][2]=Fz*(1.-2./3.*f);
+	  
+		  lenF[1]=sqrt(Fn[1][0]*Fn[1][0]+Fn[1][1]*Fn[1][1]+Fn[1][2]*Fn[1][2]);
+		  lenF[2]=sqrt(Fn[2][0]*Fn[2][0]+Fn[2][1]*Fn[2][1]+Fn[2][2]*Fn[2][2]);
+
+		  sumF=lenF[0]+lenF[1]+lenF[2];
+		  En[0]=lenF[0]/sumF*E0;
+		  En[1]=lenF[1]/sumF*E0;
+		  En[2]=lenF[2]/sumF*E0;
+
+		  if(verbose) printf("f: %e sumF/E0: %e cos angle=%f\n",f,sumF/E0,cosangle);
+
+		}
+	      while(sumF<E0 && cosangle<MFMAXCOSANGLE && f>0.);
+	      fmax=f+0.05;
 	
-	  if(fmax<0.0) fmax=0.0;
-	  if(fmax>1.) fmax=1.;
+	      if(fmax<0.0) fmax=0.0;
+	      if(fmax>1.) fmax=1.;
+	    }
 
 	  Fn[0][0]=Fx*(1.-2./3.*fmax);
 	  Fn[0][1]=1./3.*fmax*Fy;
@@ -268,7 +315,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
     {
       printf("=== ppon2 ===\n");
       print_Nvector(ppon2,NV);
-      //      getchar();
+      getchar();
     }
 
   //end total flux and energy

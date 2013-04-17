@@ -616,7 +616,7 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
-//T^ij Lorentz boost from lab to fluid frame
+//T^ij Lorentz boost from fluid frame to lab
 int
 boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5])
 { 
@@ -626,6 +626,87 @@ boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
   int verbose=0;
 
   if(verbose>0) print_tensor(T1);
+
+  //Lorentz transformation matrix
+  ldouble L[4][4];
+  calc_Lorentz_ff2lab(pp,gg,GG,L);
+
+  //copying
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Tt[i][j]=T1[i][j];
+	}
+    }
+  
+ 
+  if(verbose>0) print_tensor(L);
+
+  //boosting
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  T2[i][j]=0.;
+	  for(k=0;k<4;k++)
+	    {
+	      for(l=0;l<4;l++)
+		{
+		  T2[i][j]+=L[i][k]*L[j][l]*Tt[k][l];
+		}
+	    }
+	}
+    } 
+
+  //dividing by lapse to express T2 in no-frame
+  ldouble alpha=sqrt(-1./GG[0][0]);  
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  T2[i][j]=T2[i][j]/alpha;
+	}
+    }
+
+  if(verbose>0) print_tensor(T2);
+
+  if(verbose>0) getchar();
+
+  return 0;
+}
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//T^ij Lorentz boost from radiation rest frame to lab
+int
+boost22_rf2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5])
+{ 
+#ifdef LABRADFLUXES
+  my_err("boost22_rf2lab() not working for LABRADFLUXES\n");
+#endif
+
+#ifdef EDDDINGTON_APR
+  my_err("boost22_rf2lab() not working for EDDINGTON_APR\n");
+#endif
+
+  int i,j,k,l;
+  ldouble Tt[4][4];
+  ldouble pp[NV];
+  for(i=0;i<NV;i++)
+    pp[i]=pp0[i];
+
+  int verbose=0;
+
+  if(verbose>0) print_tensor(T1);
+
+  //artificial and temporary substitution
+  ldouble urf[4]={0.,pp[FX(0)],pp[FY(0)],pp[FZ(0)]};
+  conv_vels(urf,urf,VELPRIMRAD,VELPRIM,gg,GG);
+  pp[2]=urf[1];
+  pp[3]=urf[2];
+  pp[4]=urf[3];
 
   //Lorentz transformation matrix
   ldouble L[4][4];

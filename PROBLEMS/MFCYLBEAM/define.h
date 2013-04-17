@@ -13,7 +13,8 @@
 #define MFSKEW 25.
 #define MFFRACMETHOD 1
 #define MFFRACSKEW 1.
-#define MFFRAC 0.01
+#define MFFRAC 1.
+#define MFMAXCOSANGLE .98
 
 #define MFREDISTRIBUTEMETHOD 2
 #define MORERADFLUIDS

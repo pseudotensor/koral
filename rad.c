@@ -927,7 +927,54 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
 #endif //WIDENPRESSURE
 
+#ifdef RADVISCOSITY
+  ldouble Tvisc[4][4];
+  calc_visc_Rij(pp,ggg,Tvisc);
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      T[i][j]+=Tvisc[i][j];
+#endif  
+
   return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+int
+calc_visc_Rij(ldouble *pp, void* ggg, ldouble T[][4])
+{
+  int i,j;
+
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+  //fluid frame
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      T[i][j]=0.;
+  
+#ifdef SIMPLERADVISCOSITY
+
+  ldouble p=pp[EE(0)]/3.;
+
+  T[1][3]=ALPHARADVISC*p;
+  T[3][1]=ALPHARADVISC*p;
+
+  //from ortonormal to code coordinates
+  trans22_on2cc(T,T,tlo);
+  //from radiative rest frame to lab frame
+  boost22_ff2lab(T,T,pp,gg,GG); 
+#endif
+
+  return 0;
+
 }
 
 //**********************************************************************
