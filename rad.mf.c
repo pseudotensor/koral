@@ -574,7 +574,7 @@ mf_correct_in_azimuth_newold(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   prad_on2lab(ppon2,pp,ggg);
 
   //to conserved
-  p2u_rad(pp,uu,gg,GG);
+  p2u_rad(pp,uu,ggg);
 
   return 0;
 }
@@ -800,7 +800,7 @@ mf_correct_in_azimuth_old(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   prad_on2lab(ppon2,pp,ggg);
 
   //to conserved
-  p2u_rad(pp,uu,gg,GG);
+  p2u_rad(pp,uu,ggg);
 
   return 0;
 }
@@ -1865,7 +1865,7 @@ redistribute_radfluids_along_axes(ldouble *pp, ldouble *uu, void* ggg)
 
   //back to code coordinates
   prad_on2lab(pp0,pp,ggg);
-  p2u(pp,uu,gg,GG);
+  p2u(pp,uu,ggg);
 
   if(verbose) 
     {

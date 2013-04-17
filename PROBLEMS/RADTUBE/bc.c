@@ -54,7 +54,7 @@ if(ix<0 &&  1)
     prad_ff2lab(pp,pp,&geom);
 
 #endif
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
     return 0.;
   }
 
@@ -88,7 +88,7 @@ if(ix>=NX && 1)
     pp[9]=Fz;
     prad_ff2lab(pp,pp,&geom); 
 #endif
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
     return 0.;
   }
 
@@ -108,7 +108,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //converting to conserved
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
   
 return 0;
   

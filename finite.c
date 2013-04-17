@@ -825,7 +825,9 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 {
   int i;
-
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
   ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3],dx;
   ldouble a0[2],am1[2],ap1[2],al,ar,amax,cmin,cmax,csLl[2],csLr[2],csRl[2],csRr[2];
   ldouble fd_u0[NV],fd_up1[NV],fd_up2[NV],fd_um1[NV],fd_um2[NV],fd_r0[NV],fd_rm1[NV],fd_rp1[NV];
@@ -857,8 +859,8 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   pick_gb(ix,iy,iz,0,gg);
   pick_Gb(ix,iy,iz,0,GG);
    
-  p2u(fd_uLl,fd_uLl,gg,GG);
-  p2u(fd_uRl,fd_uRl,gg,GG);
+  p2u(fd_uLl,fd_uLl,&geom);
+  p2u(fd_uRl,fd_uRl,&geom);
 
   //save calculated conserved basing on primitives on faces
   for(i=0;i<NV;i++)
@@ -918,8 +920,8 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       pick_gb(ix,iy,iz,1,gg);
       pick_Gb(ix,iy,iz,1,GG);
  	    
-      p2u(fd_uLl,fd_uLl,gg,GG);
-      p2u(fd_uRl,fd_uRl,gg,GG);
+      p2u(fd_uLl,fd_uLl,&geom);
+      p2u(fd_uRl,fd_uRl,&geom);
 
       for(i=0;i<NV;i++)
 	{
@@ -976,8 +978,8 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       pick_gb(ix,iy,iz,2,gg);
       pick_Gb(ix,iy,iz,2,GG);
 
-      p2u(fd_uLl,fd_uLl,gg,GG);
-      p2u(fd_uRl,fd_uRl,gg,GG);
+      p2u(fd_uLl,fd_uLl,&geom);
+      p2u(fd_uRl,fd_uRl,&geom);
 
       for(i=0;i<NV;i++)
 	{
@@ -1569,7 +1571,10 @@ int set_bc(ldouble t)
       ix=loop_2[ii][0];
       iy=loop_2[ii][1];
       iz=loop_2[ii][2];
-	  
+
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+ 
       ldouble uval[NV],pval[NV];	  
       int iix,iiy,iiz,iv;
       iix=ix;
@@ -1634,7 +1639,7 @@ int set_bc(ldouble t)
 	  set_u(p,iv,ix,iy,iz,pval[iv]);
 	}
 
-      p2u(pval,uval,gg,GG);
+      p2u(pval,uval,&geom);
       
       for(iv=0;iv<NV;iv++)
 	{

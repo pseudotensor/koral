@@ -14,16 +14,15 @@ calc_conserved(int ix,int iy,int iz)
   ldouble uu[NV],pp[NV];
   ldouble gg[4][5],GG[4][5],tlo[4][4],tup[4][4];
   
-  pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
 
   for(iv=0;iv<NV;iv++)
     {
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
-  p2u(pp,uu,gg,GG);
-
+  p2u(pp,uu,&geom);
 
   for(iv=0;iv<NV;iv++)
     {
@@ -39,8 +38,15 @@ calc_conserved(int ix,int iy,int iz)
 //**********************************************************************
 //primitive to conserved converter
 int
-p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
+p2u(ldouble *p, ldouble *u, void *ggg)
 {
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
   ldouble rho=p[0];
   ldouble uu=p[1];
   ldouble vcon[4],ucon[4],ucov[4];
@@ -52,8 +58,8 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 
   //converting to 4-velocity
 
-  conv_vels(vcon,ucon,VELPRIM,VEL4,g,G);
-  indices_21(ucon,ucov,g);
+  conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
 
   //************************************
   //************************************
@@ -65,7 +71,7 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 
 #ifdef RADIATION
   
-  p2u_rad(p,u,g,G);
+  p2u_rad(p,u,ggg);
  
 #endif
 
@@ -108,22 +114,22 @@ p2u(ldouble *p, ldouble *u, ldouble g[][5], ldouble G[][5])
 /**** converts radiative primitives xs************************/
 /********************************************************/
 /********************************************************/
-int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
+int p2u_rad(ldouble *p,ldouble *u,void *ggg)
 {
-
-#ifdef EDDINGTON_APR
-  int irf,ii;
-  int pp10[10];
   struct geometry *geom
-    = (struct geometry *) ggg;
+   = (struct geometry *) ggg;
 
   ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
-
+  
+#ifdef EDDINGTON_APR
+  int irf,ii;
+  int pp10[10];
   ldouble Rij[4][4];
+
   for(ii=0;ii<NVHD;ii++)
     {
       pp10[ii]=pp[ii];
@@ -174,15 +180,15 @@ int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5])
       urf[3]=p[FZ(irf)];
 
       //converting to lab four-velocity
-      conv_vels(urf,urf,VELPRIMRAD,VEL4,g,G);
+      conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
   
       ldouble Rtop[4];
-      Rtop[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*G[0][0]; //R^t_t
-      Rtop[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*G[0][1];
-      Rtop[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*G[0][2];
-      Rtop[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*G[0][3];
+      Rtop[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^t_t
+      Rtop[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*GG[0][1];
+      Rtop[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*GG[0][2];
+      Rtop[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*GG[0][3];
 
-      indices_21(Rtop,Rtop,g); //R^t_mu
+      indices_21(Rtop,Rtop,gg); //R^t_mu
 
       u[EE(irf)]=Rtop[0]; //R^t_t
       u[FX(irf)]=Rtop[1]; //R^t_i

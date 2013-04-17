@@ -39,7 +39,7 @@ calc_primitives(int ix,int iy,int iz)
   if(corrected!=0)
     {
       if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);}//getchar();}
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       for(iv=0;iv<NV;iv++)
 	{
 	  set_u(u,iv,ix,iy,iz,uu[iv]);

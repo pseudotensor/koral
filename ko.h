@@ -346,9 +346,9 @@ int u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected);
 
 //p2u.c
 int calc_conserved(int ix,int iy,int iz);
-int p2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][5]);
+int p2u(ldouble *p, ldouble *u,void*);
 int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
-int p2u_rad(ldouble *p,ldouble *u,ldouble g[][5],ldouble G[][5]);
+int p2u_rad(ldouble *p,ldouble *u,void*);
 
 //frames.c
 int boost22_rf2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5]);

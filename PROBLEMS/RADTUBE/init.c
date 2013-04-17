@@ -91,14 +91,14 @@ prad_ff2lab(pp,pp,&geom);
 #endif
 
 //converting to conserved
-p2u(pp,uu,gg,GG);	
+p2u(pp,uu,&geom);	
 
 /*
 //printf("%d %d %d\n",ix,iy,iz);
 //print_Nvector(pp,NV);
 if(ix==1) printf("> %g ",pp[1]);
 
-p2u(pp,uu,gg,GG);	
+p2u(pp,uu,&geom);	
 //print_Nvector(pp,NV); getchar();
 if(ix==1) printf("> %g ",uu[1]);
 
@@ -106,7 +106,7 @@ u2p_hot(uu,pp,gg,GG);
 
 if(ix==1) printf("> %g ",pp[1]);
 
-p2u(pp,uu,gg,GG);	
+p2u(pp,uu,&geom);	
 
 if(ix==1) printf("> %g ",uu[1]);
 
