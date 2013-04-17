@@ -81,7 +81,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble radius,xxvec[4],xxvecCYL[4];
+  ldouble radius,xxvec[4],xxvecCYL[4],xxvecSPH[4];
   get_xx(geom->ix,geom->iy,geom->iz,xxvec);
   if(MYCOORDS==MCYL1COORDS || MYCOORDS==CYLCOORDS)
     {
@@ -90,8 +90,8 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
     }
   else if(MYCOORDS==SPHCOORDS || MYCOORDS==BLCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==MKS1COORDS)
     {
-      coco_N(xxvec,xxvecCYL,MYCOORDS,BLCOORDS);
-      radius=xxvecCYL[1]*sin(xxvecCYL[2]);
+      coco_N(xxvec,xxvecSPH,MYCOORDS,BLCOORDS);
+      radius=xxvecSPH[1]*sin(xxvecSPH[2]);
     }
 
   ldouble (*gg)[5],(*GG)[5];
@@ -114,7 +114,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
     }
 
   //if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
-  //if(geom->iy==2 && radius>4. && radius<4.5 && fabs(Fon[0]/Eon)>1.e-2) verbose=1;
+  //if(geom->iy==NY-2 && radius>4. && radius<4.5 && fabs(Fon[0]/Eon)>1.e-5) verbose=1;
 
   for(ii=0;ii<NVHD;ii++)
     {
@@ -158,7 +158,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  ldouble Ffp = EF[3];
 
 	  //fraction applied:
-	  ldouble frac,maxfrac=.5,minfrac=0.;
+	  ldouble frac,maxfrac=1.,minfrac=0.;
 	  //TODO: better estimate the velocity?
 	  if(dt<0.)
 	    frac=maxfrac;
@@ -215,7 +215,18 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  else
 	    {
 	      ldouble check,f,cosangle,dot;
-	      ldouble ex[3]={-1.,0.,0.};
+	      ldouble ex[3];
+	      if(MYCOORDS==CYLCOORDS || MYCOORDS==MCYL1COORDS || 1)
+		{
+		  ex[0]=-1.; ex[1]=ex[2]=0.;
+		}
+	      else if(MYCOORDS==SPHCOORDS || MYCOORDS==BLCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==MKS1COORDS)
+		{
+		  ex[0]=-sin(xxvecSPH[2]); ex[1]=-cos(xxvecSPH[2]); ex[2]=0.;
+		}
+	      else 
+		my_err("err 1290434\n");
+
 	      f=1.;
 	      do
 		{

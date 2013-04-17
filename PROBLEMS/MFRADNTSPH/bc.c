@@ -125,8 +125,7 @@ if(iy<0.) //spin axis
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
 
-	/*
-	  //reflection
+	//reflection
 	//v_theta
 	if(iv==3)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
@@ -135,7 +134,7 @@ if(iy<0.) //spin axis
 	  if(iv==FY(irf))
 	    //radial component
 	    pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	*/
+	
         }
    
     //testing if interpolated primitives make sense

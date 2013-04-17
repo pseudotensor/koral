@@ -15,9 +15,10 @@
 #define MFCORRECTPHI
 #define MFSKEW 15.
 #define MFMINVEL 1.e-4
-#define MFFRACMETHOD 1
+#define MFFRACMETHOD 2
 #define MFFRACSKEW 1.
-#define MFFRAC 0.05
+#define MFFRAC 1.
+#define MFMAXCOSANGLE .8
 
 #define MFREDISTRIBUTEMETHOD 2
 #define MORERADFLUIDS
@@ -60,7 +61,7 @@
 #define NZ 1
 
 
-#define MINY (0.1*Pi/4.)
+#define MINY (0.01*Pi/4.)
 #define MAXY Pi/2.
 
 #define MINZ -1.
