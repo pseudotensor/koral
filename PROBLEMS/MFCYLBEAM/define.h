@@ -8,7 +8,7 @@
 
 #define myMCYL1COORDS
 
-#define MULTIRADFLUID
+//#define MULTIRADFLUID
 #define MFCORRECTPHI
 #define MFSKEW 25.
 #define MFFRACMETHOD 1
@@ -19,6 +19,10 @@
 #define MFREDISTRIBUTEMETHOD 2
 #define MORERADFLUIDS
 #define NRF 6
+
+#define RADVISCOSITY
+#define SIMPLERADVISCOSITY
+#define ALPHARADVISC 0.05
 
 #define OMSCALE 1.
 

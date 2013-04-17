@@ -929,10 +929,10 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
 #ifdef RADVISCOSITY
   ldouble Tvisc[4][4];
-  calc_visc_Rij(pp,ggg,Tvisc);
+  calc_visc_Rij(pp,ggg,Tvisc,Rij);
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      T[i][j]+=Tvisc[i][j];
+      Rij[i][j]+=Tvisc[i][j];
 #endif  
 
   return 0;
@@ -942,12 +942,25 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 //**********************************************************************
 //**********************************************************************
 int
-calc_visc_Rij(ldouble *pp, void* ggg, ldouble T[][4])
+calc_visc_Rij(ldouble *pp, void* ggg, ldouble T[][4], ldouble Rij[][4])
 {
   int i,j;
 
   struct geometry *geom
    = (struct geometry *) ggg;
+
+  ldouble radius,xxvec[4],xxvecCYL[4],xxvecSPH[4];
+  get_xx(geom->ix,geom->iy,geom->iz,xxvec);
+  if(MYCOORDS==MCYL1COORDS || MYCOORDS==CYLCOORDS)
+    {
+      coco_N(xxvec,xxvecCYL,MYCOORDS,CYLCOORDS);
+      radius=xxvecCYL[1];
+    }
+  else if(MYCOORDS==SPHCOORDS || MYCOORDS==BLCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==MKS1COORDS)
+    {
+      coco_N(xxvec,xxvecSPH,MYCOORDS,BLCOORDS);
+      radius=xxvecSPH[1]*sin(xxvecSPH[2]);
+    }
 
   ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
   gg=geom->gg;
@@ -955,22 +968,30 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble T[][4])
   tlo=geom->tlo;
   tup=geom->tup;
 
-  //fluid frame
+  ldouble Rij0[4][4];
+  //viscous component
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      T[i][j]=0.;
+      {
+	T[i][j]=0.;
+	Rij0[i][j]=Rij[i][j];
+      }
+
+  trans22_cc2on(Rij0,Rij0,tup);
   
 #ifdef SIMPLERADVISCOSITY
 
-  ldouble p=pp[EE(0)]/3.;
-
-  T[1][3]=ALPHARADVISC*p;
-  T[3][1]=ALPHARADVISC*p;
+  //ldouble p=pp[EE(0)]/3.;
+  ldouble p=Rij0[3][3];
+  ldouble alphaeff=ALPHARADVISC*radius/10.;
+  if(alphaeff>0.1) alphaeff=0.1;
+  T[1][3]=alphaeff*p;
+  T[3][1]=alphaeff*p;
 
   //from ortonormal to code coordinates
   trans22_on2cc(T,T,tlo);
   //from radiative rest frame to lab frame
-  boost22_ff2lab(T,T,pp,gg,GG); 
+  //boost22_rf2lab(T,T,pp,gg,GG); 
 #endif
 
   return 0;

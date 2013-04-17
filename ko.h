@@ -411,7 +411,7 @@ int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);
 
 
 //rad.c
-int calc_visc_Rij(ldouble *pp, void* ggg, ldouble T[][4]);
+int calc_visc_Rij(ldouble *pp, void* ggg, ldouble T[][4], ldouble R[][4]);
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int calc_Rij(ldouble *pp, void*, ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
