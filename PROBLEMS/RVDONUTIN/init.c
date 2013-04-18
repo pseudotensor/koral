@@ -66,9 +66,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
 
     //4-velocity in BL transformed to MYCOORDS
     ldouble ucon[4]={0.,-Vr,0.,Vphi};
-    conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
-    trans2_coco(xxvecBL,ucon,ucon,BLCOORDS,MYCOORDS);
-    conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+    conv_vels(ucon,ucon,VEL3,VELPRIM,ggBL,GGBL);
    
     pp[2]=ucon[1]; 
     pp[3]=ucon[2];
@@ -95,11 +93,19 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
     pp[8]=Fy;
     pp[9]=Fz;
 
-    //estimating flux: F = -1/chi E,i
-    ldouble kappa,kappaes,chi;
-    chi=calc_kappa(pp[0],calc_PEQ_Tfromurho(pp[1],pp[0]),xxvec[1],xxvec[2],xxvec[3])
-      +
-      calc_kappaes(pp[0],calc_PEQ_Tfromurho(pp[1],pp[0]),xxvec[1],xxvec[2],xxvec[3]);
+ 
+    //now estimating flux in r,theta plane: F = -1/chi E,i in lab coordinates
+    ldouble rho=pp[RHO];
+    ldouble u=pp[1];  
+    ldouble E=pp[6];  
+    ldouble pr=(GAMMA-1.)*(u);
+    ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+    ldouble xx=get_x(ix,0);
+    ldouble yy=get_x(iy,1);
+    ldouble zz=get_x(iz,2);
+
+    ldouble kappa=calc_kappa(rho,T,xx,yy,zz);
+    ldouble chi=kappa+calc_kappaes(rho,T,xx,yy,zz);  
     
     ldouble xxvectemp[4]={xxvec[0],xxvec[1],xxvec[2],xxvec[3]};
     ldouble pptemp[NV],E1,E2,ggt[4][5],GGt[4][5];
@@ -151,7 +157,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
 
     Fy=(E2-E1)/(.02*xxvecBL[2]*sqrt(ggBL[2][2]))/chi/3.;
 
-    //ph dimension - symmetry
+    //ph dimension - symmetry so not modified
     Fz=0.;
 
     if(anretmin<0) //one of the points outside the donut
@@ -178,14 +184,16 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
      pp[9]=0.;
 #endif
 
-     //transforming from BL ZAMO radiative primitives to code non-ortonormal primitives
-     prad_on2lab(pp,pp,&geomBL);
-     //transforming radiative primitives from BL to MYCOORDS
-     trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
-     
-     //printf("%d > ",anretmin);print_4vector(&pp[6]); getchar();
+     //if(ix==NX-1 && iy==NY-1){print_Nvector(pp,NV);}
 
+     //transforming from BL lab radiative primitives to code non-ortonormal primitives
+     prad_ff2lab(pp,pp,&geomBL);
+
+     //if(ix==NX-1 && iy==NY-1){print_Nvector(pp,NV);getchar();}
+     
 #endif
+     //transforming primitives from BL to MYCOORDS
+     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
    }
 
 //entropy

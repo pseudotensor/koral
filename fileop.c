@@ -165,7 +165,8 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 	{
 	  ldouble xx[4],xxout[4];
 	  get_xx(ix,iy,iz,xx);
-	  coco_N(xx,xxout,MYCOORDS,BLCOORDS);
+	  coco_N(xx,xxout,MYCOORDS,BLCOORDS); 
+	  if(xxout[1]<r_horizon_BL(BHSPIN)) continue;
 	  fprintf(fout_radprofiles,"%e ",xxout[1]);
 	  for(iv=0;iv<NRADPROFILES;iv++)
 	    fprintf(fout_radprofiles,"%e ",profiles[iv][ix]);
@@ -216,7 +217,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  //within domain:
 						  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 
-
+						  
 						  
 						  struct geometry geom;
 						  fill_geometry(ix,iy,iz,&geom);
@@ -237,7 +238,10 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 
 						  xx=xxvecout[1];
 						  yy=xxvecout[2];
-						  zz=xxvecout[3];						  
+						  zz=xxvecout[3];
+
+						  if((OUTCOORDS==KERRCOORDS || OUTCOORDS==BLCOORDS)
+						     && xx<r_horizon_BL(BHSPIN)) continue;
 
 						  xxx[0]=t;
 						  xxx[1]=xx;
@@ -251,7 +255,6 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
 						  dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
 						  dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);   
-						  dx[0]=get_size_x(ix,0);
 
 						  calc_primitives(ix,iy,iz);
 

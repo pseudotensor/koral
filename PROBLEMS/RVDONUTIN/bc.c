@@ -3,7 +3,7 @@
 
 /**********************/
 //geometries
-ldouble gdet_src,gdet_bc;
+ldouble gdet_src,gdet_bc,Fx,Fy,Fz,ppback[NV];
 int iix,iiy,iiz,iv;  	  
 ldouble xxvec[4],xxvecBL[4],xx,yy,zz;
 
@@ -57,22 +57,26 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	ldouble urf[4];
 	
 	//pure atmosphere
-	//set_radatmosphere(pp,xxvec,gg,GG,0);
-
-	//outflow-no-inflow for radiation	
-	set_radatmosphere(ppatm,xxvec,gg,GG,2);
+	set_radatmosphere(ppatm,xxvec,gg,GG,0);
 
 	pp[6]=get_u(p,6,iix,iiy,iiz);
 	pp[7]=get_u(p,7,iix,iiy,iiz);
 	pp[8]=get_u(p,8,iix,iiy,iiz);
 	pp[9]=get_u(p,9,iix,iiy,iiz);
-
+		
+	pp[6]=ppatm[6];
+	pp[7]=ppatm[7];
+	pp[8]=ppatm[8];
+	pp[9]=ppatm[9];
+	/*
+	//outflow-no-inflow for radiation	
 	urf[1]=pp[7];
 	urf[2]=pp[8];
 	urf[3]=pp[9];
 
-	//converting to lab four-velocity
+	//converting to BL lab four-velocity
 	conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
+	trans2_coco(xxvec,urf,urf,MYCOORDS,BLCOORDS);
 
 	//if flux inflowing - zero flux
 	if(urf[1]<0.) 
@@ -80,12 +84,14 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	    urf[1]=0.;
 	  }
 	
-	//converting to VELPRIM
+	//converting back to MYCOORDS / VELPRIMRAD
+	trans2_coco(xxvecBL,urf,urf,BLCOORDS,MYCOORDS);
 	conv_vels(urf,urf,VEL4,VELPRIMRAD,gg,GG);
 
 	pp[7]=urf[1];
 	pp[8]=urf[2];
 	pp[9]=urf[3];
+	*/
 #endif
 
 	/*
@@ -116,11 +122,9 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	Vphi=uPhi/uT;
 	Vr=0.;
 
-	//4-velocity in BL transformed to MYCOORDS
+	//3-velocity in BL 
 	ldouble ucon[4]={0.,-Vr,0.,Vphi};
-	conv_vels(ucon,ucon,VEL3,VEL4,ggBL,GGBL);
-	trans2_coco(xxvecBL,ucon,ucon,BLCOORDS,MYCOORDS);
-	conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+	conv_vels(ucon,ucon,VEL3,VELPRIM,ggBL,GGBL);
    
 	pp[2]=ucon[1]; 
 	pp[3]=ucon[2];
@@ -128,37 +132,120 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	pp[0]=rho; pp[1]=uint; 
 
 #ifdef RADIATION
-	ldouble P,aaa,bbb;
-	P=GAMMAM1*uint;
-	//solving for T satisfying P=pgas+prad=bbb T + aaa T^4
-	aaa=4.*SIGMA_RAD;
-	bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
-	double naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
-	double T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
-	E=calc_LTE_EfromT(T4);
+    ldouble P,aaa,bbb;
+    P=GAMMAM1*uint;
+    //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
+    aaa=4.*SIGMA_RAD;
+    bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
+    ldouble naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
+    ldouble T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
 
-	ldouble Fx,Fy,Fz;
-	Fx=Fy=Fz=0.;
-	uint=calc_PEQ_ufromTrho(T4,rho);
+    E=calc_LTE_EfromT(T4);
+    Fx=Fy=Fz=0.;
+    uint=calc_PEQ_ufromTrho(T4,rho);
 
-	pp[1]=uint;
-	pp[6]=E;
-	pp[7]=Fx;
-	pp[8]=Fy;
-	pp[9]=Fz;
+    pp[1]=my_max(uint,ppback[1]);
+    pp[6]=my_max(E,ppback[6]);
+    pp[7]=Fx;
+    pp[8]=Fy;
+    pp[9]=Fz;
 
-	//transforming BL ZAMO radiative primitives to BL non-ortonormal primitives
-	ldouble eupBL[4][4],eloBL[4][4];
-	ldouble tupBL[4][4],tloBL[4][4];
-	calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
-	calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
-	prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-	prad_ff2lab(pp,pp,&geomBL);
-	//transforming radiative primitives from BL to MY
-	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+
+   //estimating flux: F = -1/chi E,i
+    ldouble kappa,kappaes,chi;
+    chi=calc_kappa(pp[0],calc_PEQ_Tfromurho(pp[1],pp[0]),xxvec[1],xxvec[2],xxvec[3])
+      +
+      calc_kappaes(pp[0],calc_PEQ_Tfromurho(pp[1],pp[0]),xxvec[1],xxvec[2],xxvec[3]);
+    
+    ldouble xxvectemp[4]={xxvec[0],xxvec[1],xxvec[2],xxvec[3]};
+    ldouble pptemp[NV],E1,E2,ggt[4][5],GGt[4][5];
+    int anret,anretmin=0;
+
+    //r dimension
+    xxvectemp[1]=1.01*xxvecBL[1];
+    xxvectemp[2]=1.0*xxvecBL[2];
+    xxvectemp[3]=1.0*xxvecBL[3];
+    calc_g_arb(xxvectemp,ggt,KERRCOORDS);
+    calc_G_arb(xxvectemp,GGt,KERRCOORDS);
+
+    anret=donut_analytical_solution(pptemp,xxvectemp,ggt,GGt);
+    if(anret<0) anretmin=-1;
+    E1=pptemp[6];
+
+    xxvectemp[1]=.99*xxvecBL[1];
+    xxvectemp[2]=1.0*xxvecBL[2];
+    xxvectemp[3]=1.0*xxvecBL[3];
+    calc_g_arb(xxvectemp,ggt,KERRCOORDS);
+    calc_G_arb(xxvectemp,GGt,KERRCOORDS);
+
+    anret=donut_analytical_solution(pptemp,xxvectemp,ggt,GGt);
+    if(anret<0) anretmin=-1;
+    E2=pptemp[6];
+
+    Fx=(E2-E1)/(.02*xxvecBL[1]*sqrt(ggBL[1][1]))/chi/3.;
+
+    //th dimension
+    xxvectemp[1]=1.0*xxvecBL[1];
+    xxvectemp[2]=1.01*xxvecBL[2];
+    xxvectemp[3]=1.0*xxvecBL[3];
+    calc_g_arb(xxvectemp,ggt,KERRCOORDS);
+    calc_G_arb(xxvectemp,GGt,KERRCOORDS);
+
+    anret=donut_analytical_solution(pptemp,xxvectemp,ggt,GGt);
+    if(anret<0) anretmin=-1;
+    E1=pptemp[6];
+
+    xxvectemp[1]=1.0*xxvecBL[1];
+    xxvectemp[2]=0.99*xxvecBL[2];
+    xxvectemp[3]=1.0*xxvecBL[3];
+    calc_g_arb(xxvectemp,ggt,KERRCOORDS);
+    calc_G_arb(xxvectemp,GGt,KERRCOORDS);
+
+    anret=donut_analytical_solution(pptemp,xxvectemp,ggt,GGt);
+    if(anret<0) anretmin=-1;
+    E2=pptemp[6];
+
+    Fy=(E2-E1)/(.02*xxvecBL[2]*sqrt(ggBL[2][2]))/chi/3.;
+
+    //ph dimension - symmetry
+    Fz=0.;
+
+    if(anretmin<0) //one of the points outside the donut
+      Fx=Fy=Fz=0.;
+    else
+      {
+	ldouble Fl=sqrt(Fx*Fx+Fy*Fy+Fz*Fz);
+	if(Fl>.99*E)
+	  {
+	    Fx=Fx/Fl*0.99*E;
+	    Fy=Fy/Fl*0.99*E;
+	    Fz=Fz/Fl*0.99*E;
+	  }
+      }
+
+     //saving ff values to pp[]
+     pp[7]=Fx;
+     pp[8]=Fy;
+     pp[9]=Fz;
+
+#ifdef NOINITFLUX
+     pp[7]=0.;
+     pp[8]=0.;
+     pp[9]=0.;
 #endif
-      }     
 
+     //if(ix==NX && iy==NY-1){print_Nvector(pp,NV);}
+
+     //transforming from BL lab radiative primitives to code non-ortonormal primitives
+     prad_ff2lab(pp,pp,&geomBL);
+
+     //if(ix==NX && iy==NY-1){print_Nvector(pp,NV);getchar();}
+
+#endif
+      //transforming all primitives from BL to MYCOORDS
+     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+      }     
+    
    
     pp[5]=calc_Sfromu(pp[0],pp[1]);
     
@@ -207,10 +294,10 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
        pp[7]=-100.;
 
      //pure copy
-     pp[6]=get_u(p,6,iix,iiy,iiz);
+     //pp[6]=get_u(p,6,iix,iiy,iiz);
 
      //copying with scalings
-     //pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
+     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
     
      //this works only for Kerr
@@ -239,9 +326,11 @@ if(iy<0.) //spin axis
     for(iv=0;iv<NV;iv++)
       {
 	//v_theta
+#ifndef PUREAXISOUTFLOW
 	if(iv==3 || iv==8)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
+#endif
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
      

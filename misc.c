@@ -9,22 +9,25 @@
 int calc_radialprofiles(ldouble profiles[][NX])
 {
   int ix,iy,iz,iv;
-  ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],ucon3[4],ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
+  ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],ucon3[4];
+  ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
+  ldouble tautot[3];
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
     {
       //vertically integrated/averaged profiles
 
-      profiles[0][ix]=0.;
-      profiles[1][ix]=0.;
-      profiles[2][ix]=0.;
+      for(iv=0;iv<NRADPROFILES;iv++)
+	profiles[iv][ix]=0.;
 
       if(NZ==1) //phi-symmetry
 	{
 	  iz=0;
 	  for(iy=0;iy<NY;iy++)
 	    {
+	      calc_primitives(ix,iy,iz);
+
 	      for(iv=0;iv<NVHD;iv++)
 		pp[iv]=get_u(p,iv,ix,iy,iz);
 
@@ -57,6 +60,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      dx[1]=dx[1]*sqrt(ggBL[2][2]);
 	      dx[2]=2.*M_PI*sqrt(ggBL[3][3]);
 
+	      calc_tautot(pp,xxBL,dx,tautot);
+
 	      //surface density
 	      profiles[0][ix]+=rho*dx[1]*dx[2];
 	      //rest mass flux
@@ -65,6 +70,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[2][ix]+=ucon[1]*rho*dx[1]*dx[2];
 	      //rho-weighted u_phi
 	      profiles[3][ix]+=ucov[3]*rho*dx[1]*dx[2];	
+	      //optical depth
+	      profiles[5][ix]+=tautot[1];	
 	    }
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];

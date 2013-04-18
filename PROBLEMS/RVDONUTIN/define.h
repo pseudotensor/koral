@@ -1,4 +1,4 @@
-//#define RADIATION
+#define RADIATION
 
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
@@ -19,15 +19,14 @@
 
 #define VISCOSITY
 #define SIMPLEVISCOSITY
-#define ALPHAVISC .1
+#define ALPHAVISC .5
 #define RMINVISC 2.
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 10.e0
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
-#define NOUTSTOP 1000.
+#define NOUTSTOP 5000.
 #define CGSOUTPUT
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
@@ -36,7 +35,7 @@
 
 #ifdef myMKS1COORDS
 #define MKS1R0 -2.
-#define MINX (log(1.5-MKS1R0))
+#define MINX (log(1.25-MKS1R0))
 #define MAXX (log(16.-MKS1R0))
 #define NX 64
 #else
@@ -49,27 +48,35 @@
 #define NZ 1
 
 
-#define MINY (0.005*Pi/2.)
+#define MINY (0.05*Pi/2.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
-
-#undef gTILDA
-#define gTILDA 1.e-10
+//#define PUREAXISOUTFLOW
 
 #define GAMMA (4./3.)
-#define KKK 9.e-4//1.e-4
 #define ELL 4.5
+ 
+#ifdef RADIATION
 
-//#define UTPOT .9725
+#define KKK 1.e3 //the higher KKK the hotter disk i.e. the lower density - the larger prad/pgas
+#define UTPOT .9715//.9715
+#define RHOATMMIN  1.e-23
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(1.e6))
+#define DTOUT1 5.e1
+
+#else
+
+#define KKK 9.e-4//1.e-4
 #define UTPOT .99
-//#define NOINITFLUX
-
-//#define RHOATMMIN  rhoCGS2GU(1.e-4)
 #define RHOATMMIN  3.e-1
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(1.e8))
+#define DTOUT1 10.e0
+
+#endif
+
 
 #define INT_ORDER 1
 #define RK2_STEPPING

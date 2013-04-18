@@ -113,7 +113,7 @@ maxy= 1.02*get_xb(NX,0);
 #else
 */
   fprintf(fgnu,
-"set table \"table.gp\"\n"
+	  "set table \"table.gp\"\n"
 	  "set contour base\n"
 	  "unset surface\n"
 	  "set log z\n"

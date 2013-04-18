@@ -230,7 +230,7 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
 } 
 
 /*****************************************************************/
-/****** radiative lab-frame on primitives (E,F^i) -> primitives in lab frame  *******/
+/****** (E,F^i) in lab frame =? radiative primitives lab *******/
 /*****************************************************************/
 int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
 {
