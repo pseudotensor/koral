@@ -81,7 +81,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble radius,xxvec[4],xxvecCYL[4],xxvecSPH[4];
+  ldouble radius,xxvec[4],xxvecCYL[4],xxvecBL[4];
   get_xx(geom->ix,geom->iy,geom->iz,xxvec);
   if(MYCOORDS==MCYL1COORDS || MYCOORDS==CYLCOORDS)
     {
@@ -90,17 +90,36 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
     }
   else if(MYCOORDS==SPHCOORDS || MYCOORDS==BLCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==MKS1COORDS)
     {
-      coco_N(xxvec,xxvecSPH,MYCOORDS,BLCOORDS);
-      radius=xxvecSPH[1]*sin(xxvecSPH[2]);
+      coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+      radius=xxvecBL[1]*sin(xxvecBL[2]);
     }
 
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
   GG=geom->GG;
 
-  //to ortonormal basis
   ldouble ppon[NV],ppon2[NV],pptemp[NV];
-  prad_lab2on(pp,ppon,ggg);
+  ldouble ggBL[4][5],GGBL[4][5];
+  struct geometry geomBL;
+  //convert to well defined coordinates first, i.e. BL/SPH coordinates which have radial versor pointing radially
+  if(MYCOORDS==KSCOORDS || MYCOORDS==MKS1COORDS)
+    {
+      ldouble MINR=3.;      
+      if(xxvecBL[1]<MINR) return 0; //no decomposition within MINR to avoid the horizon
+
+      //BL geometry
+      calc_g_arb(xxvecBL,ggBL,BLCOORDS);
+      calc_G_arb(xxvecBL,GGBL,BLCOORDS);
+      fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geomBL,BLCOORDS);
+     
+      //to BLCOORDS
+      trans_prad_coco(pp,pp,MYCOORDS,BLCOORDS,xxvec,gg,GG,ggBL,GGBL);
+      //to ortonormal basis in BLCOORDS
+      prad_lab2on(pp,ppon,&geomBL);
+    }
+  else //already in radial-enough coordinates
+    prad_lab2on(pp,ppon,ggg);   
+
 
   //total flux and energy
   ldouble Eon,Fon[3]={0.,0.,0.};
@@ -188,23 +207,15 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 	  Fy=EF[2];
 	  Fz=EF[3];
 	  
-	  //TODO: 
-	  if(Fx>0.) //radially outward flux
-	    fmax=1.; //no decomposition
+	  if(Fx>0.) //no decomposition for radially outward flux
+	    fmax=1.; 
 	  else
 	    {
 	      ldouble check,f,cosangle,dot;
 	      ldouble ex[3];
-	      if(MYCOORDS==CYLCOORDS || MYCOORDS==MCYL1COORDS || 1)
-		{
-		  ex[0]=-1.; ex[1]=ex[2]=0.;
-		}
-	      else if(MYCOORDS==SPHCOORDS || MYCOORDS==BLCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==MKS1COORDS)
-		{
-		  ex[0]=-sin(xxvecSPH[2]); ex[1]=-cos(xxvecSPH[2]); ex[2]=0.;
-		}
-	      else 
-		my_err("err 1290434\n");
+
+	      //radial versor
+	      ex[0]=-1.; ex[1]=ex[2]=0.;
 
 	      f=1.;
 	      do
@@ -332,7 +343,14 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 
 
   //to code basis
-  prad_on2lab(ppon2,pp,ggg);
+  if(MYCOORDS==KSCOORDS || MYCOORDS==MKS1COORDS)
+    {
+      prad_on2lab(ppon2,pp,&geomBL);
+      //convert back to MYCOORDS     
+      trans_prad_coco(pp,pp,BLCOORDS,MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+    }
+  else //already in MYCOORDS
+    prad_on2lab(ppon2,pp,ggg);
 
   //to conserved
   p2u_rad(pp,uu,ggg);
