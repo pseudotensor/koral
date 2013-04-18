@@ -1,6 +1,8 @@
 //returns problem specific BC
 //int calc_bc(int ix,int iy,int iz,ldouble t,ldouble *uu,ldouble *pp) {
 
+/**********************/
+//geometries
 ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
 ldouble xxvec[4],xxvecBL[4],xx,yy,zz;
@@ -14,17 +16,15 @@ zz=xxvec[3];
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
-
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
-gdet_bc=get_g(g,3,4,ix,iy,iz);  
-//gdet_src=get_g(g,3,4,iix,iiy,iiz);
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
 pick_T(emuup,ix,iy,iz,eup);
 pick_T(emulo,ix,iy,iz,elo);
+
 //working in BL
 ldouble ggBL[4][5],GGBL[4][5];
 calc_g_arb(xxvecBL,ggBL,KERRCOORDS);
@@ -35,9 +35,8 @@ calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
 calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 /**********************/
 
-
 //radius
-if(ix>=NX) //analytical solution at rout only
+if(ix>=NX) //analytical solution within the torus and atmosphere outside
   {
     ldouble podpierd=-(GGBL[0][0]-2.*ELL*GGBL[0][3]+ELL*ELL*GGBL[3][3]);
     ldouble ut=-1./sqrt(podpierd);
@@ -45,9 +44,8 @@ if(ix>=NX) //analytical solution at rout only
     ldouble uint,Vphi,rho,Vr;
     ldouble xx=get_x(ix,0);
     ldouble D,E,W,eps,uT,uphi,uPhi;
-    if(ut<-1 || podpierd<0.|| NODONUT)
+    if(ut<-1 || podpierd<0.|| NODONUT) //outside torus
       {
-
 	iix=NX-1;
 	iiy=iy;
 	iiz=iz;
@@ -55,35 +53,16 @@ if(ix>=NX) //analytical solution at rout only
 	//ambient
 	set_hdatmosphere(pp,xxvec,gg,GG,0);
 #ifdef RADIATION
-
 	ldouble ppatm[NV];
 	ldouble urf[4];
 	
-	/*
-	pp[6]=ERADATMMIN;
-	pp[7]=0.;
-	pp[8]=0.;
-	pp[9]=0.;
-
-	//transforming BL ZAMO radiative primitives to BL non-ortonormal primitives
-	ldouble eupBL[4][4],eloBL[4][4];
-	ldouble tupBL[4][4],tloBL[4][4];
-	calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
-	calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
-	prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-	prad_ff2lab(pp,pp,ggBL,GGBL,tloBL);
-	//transforming radiative primitives from BL to MYCOORDS
-	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvec,ggBL,GGBL,gg,GG);
-	*/
-
-	//atmosphere
-	set_radatmosphere(pp,xxvec,gg,GG,0);
-
-	/*
-	//atmosphere
-	set_radatmosphere(ppatm,xxvec,gg,GG,2);
+	//pure atmosphere
+	//set_radatmosphere(pp,xxvec,gg,GG,0);
 
 	//outflow-no-inflow for radiation	
+	set_radatmosphere(ppatm,xxvec,gg,GG,2);
+
+	pp[6]=get_u(p,6,iix,iiy,iiz);
 	pp[7]=get_u(p,7,iix,iiy,iiz);
 	pp[8]=get_u(p,8,iix,iiy,iiz);
 	pp[9]=get_u(p,9,iix,iiy,iiz);
@@ -95,19 +74,18 @@ if(ix>=NX) //analytical solution at rout only
 	//converting to lab four-velocity
 	conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
 
-	//if flux outflowing - outflow BC
-	//if inflowing - atmosphere
+	//if flux inflowing - zero flux
 	if(urf[1]<0.) 
 	  {
-	    pp[6]=ppatm[6];
-	    pp[7]=ppatm[7];
-	    pp[8]=ppatm[8];
-	    pp[9]=ppatm[9];
+	    urf[1]=0.;
 	  }
-	else
-	  pp[6]=get_u(p,6,iix,iiy,iiz);	
-	*/
+	
+	//converting to VELPRIM
+	conv_vels(urf,urf,VEL4,VELPRIMRAD,gg,GG);
 
+	pp[7]=urf[1];
+	pp[8]=urf[2];
+	pp[9]=urf[3];
 #endif
 
 	/*
@@ -156,9 +134,6 @@ if(ix>=NX) //analytical solution at rout only
 	aaa=4.*SIGMA_RAD;
 	bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
 	double naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
-	//  double T1=Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. - Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) - (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
-	//  double T2=Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) - (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
-	//  double T3=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. - Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
 	double T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
 	E=calc_LTE_EfromT(T4);
 
@@ -270,16 +245,6 @@ if(iy<0.) //spin axis
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
      
-
-    //temporary pure outflow
-    iiy=0;
-    iiz=iz;
-    iix=ix;
-    	  
-    for(iv=0;iv<NV;iv++)
-      {
-	pp[iv]=get_u(p,iv,iix,iiy,iiz);	
-      }
     
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,gg,GG);

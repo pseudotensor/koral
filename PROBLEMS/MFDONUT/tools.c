@@ -1,9 +1,7 @@
 int
 donut_analytical_solution(ldouble *pp,ldouble *xxvecBL,ldouble ggBL[][5],ldouble GGBL[][5] )
 {
-
   ldouble xx=xxvecBL[1];
-
  
   ldouble podpierd=-(GGBL[0][0]-2.*ELL*GGBL[0][3]+ELL*ELL*GGBL[3][3]);
   ldouble ut=-1./sqrt(podpierd);
@@ -25,7 +23,6 @@ donut_analytical_solution(ldouble *pp,ldouble *xxvecBL,ldouble ggBL[][5],ldouble
   Vr=0.;
 
   //4-velocity in BL
-
   pp[2]=ucon[1]; 
   pp[3]=ucon[2];
   pp[4]=ucon[3];

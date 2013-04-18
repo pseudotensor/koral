@@ -1,4 +1,4 @@
-#define RADIATION
+//#define RADIATION
 
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
@@ -17,18 +17,18 @@
 #define MYCOORDS KSCOORDS
 #endif
 
-//#define VISCOSITY
+#define VISCOSITY
 #define SIMPLEVISCOSITY
 #define ALPHAVISC 1.
 #define RMINVISC 2.
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 1.e0
+#define DTOUT1 10.e0
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
-//#define CGSOUTPUT
+#define CGSOUTPUT
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 //#define PRINTGC_LEFT

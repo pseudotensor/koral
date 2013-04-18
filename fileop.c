@@ -324,9 +324,9 @@ fprint_profiles(ldouble t, ldouble totmass)
 						  if(E<EEFLOOR || isnan(E)) E=EEFLOOR;
 
 						  fprintf(fout1,"%.4e %.4e %.4e "
-							  "%.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e %.7e "
-							  "%.7e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e "
-							  "%.10e %.10e ",
+							  "%.3e %.3e %.3e %.3e %.3e %.3e %.3e %.3e %.3e "
+							  "%.3e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e "
+							  "%.6e %.6e ",
 							  xx,     //1
 							  yy,     //2
 							  zz,     //3		      
@@ -366,11 +366,14 @@ fprint_profiles(ldouble t, ldouble totmass)
 							  );
 
 
-						  fprintf(fout1,"%.10e %.10e %.10e %.10e\n",
+						  fprintf(fout1,"%.3e %.3e %.3e %.3e %.3e %.3e %.3e\n",
 							  v1,     //24
 							  v2,     //25
 							  v3,     //26 
-							  v4      //27 
+							  v4,     //27
+							  v5,     //28
+							  v6,     //29 
+							  v7      //30 
 							  );
 
 						}
