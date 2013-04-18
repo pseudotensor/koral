@@ -3,6 +3,95 @@
 
 #include "ko.h"
 
+/*********************************************/
+/* calculates radial profiles - L(r) etc. */
+/*********************************************/
+int calc_radialprofiles(ldouble profiles[][NX])
+{
+  int ix,iy,iz,iv;
+  ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],ucon3[4],ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
+
+  //search for appropriate radial index
+  for(ix=0;ix<NX;ix++)
+    {
+      //vertically integrated/averaged profiles
+
+      profiles[0][ix]=0.;
+      profiles[1][ix]=0.;
+      profiles[2][ix]=0.;
+
+      if(NZ==1) //phi-symmetry
+	{
+	  iz=0;
+	  for(iy=0;iy<NY;iy++)
+	    {
+	      for(iv=0;iv<NVHD;iv++)
+		pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	      get_xx(ix,iy,iz,xx);
+	      dx[0]=get_size_x(ix,0);
+	      dx[1]=get_size_x(iy,1);
+	      dx[2]=get_size_x(iz,2);
+	      pick_g(ix,iy,iz,gg);
+	      pick_G(ix,iy,iz,GG);
+
+	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+
+	      calc_g_arb(xxBL,ggBL,KERRCOORDS);
+	      calc_G_arb(xxBL,GGBL,KERRCOORDS);
+
+	      trans_phd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,gg,GG,ggBL,GGBL);
+
+	      rho=pp[0];
+
+	      ucon[1]=pp[2];
+	      ucon[2]=pp[3];
+	      ucon[3]=pp[4];
+
+	      conv_vels(ucon,ucon3,VELPRIM,VEL3,ggBL,GGBL);
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,ggBL,GGBL);
+	     
+	      indices_21(ucon,ucov,ggBL);
+
+	      dx[0]=dx[0]*sqrt(ggBL[0][0]);
+	      dx[1]=dx[1]*sqrt(ggBL[2][2]);
+	      dx[2]=2.*M_PI*sqrt(ggBL[3][3]);
+
+	      //surface density
+	      profiles[0][ix]+=rho*dx[1]*dx[2];
+	      //rest mass flux
+	      profiles[1][ix]+=-rho*ucon[1]*dx[1]*dx[2];
+	      //rho-weighted radial velocity
+	      profiles[2][ix]+=ucon[1]*rho*dx[1]*dx[2];
+	      //rho-weighted u_phi
+	      profiles[3][ix]+=ucov[3]*rho*dx[1]*dx[2];	
+	    }
+	  //normalizing by sigma
+	  profiles[2][ix]/=profiles[0][ix];
+	  profiles[3][ix]/=profiles[0][ix];
+	  //Keplerian u_phi
+	  ldouble r=xxBL[1];
+	  profiles[4][ix]=(r*r/(sqrt(r*(r*r-3.*r))));	
+	}
+    }
+
+  return 0;
+}
+
+/*********************************************/
+/* calculates scalars - total mass, accretion rate etc. */
+/*********************************************/
+int calc_scalars(ldouble *scalars)
+{
+  //total mass inside the domain
+  scalars[0]=calc_totalmass();
+
+  //accretion rate through horizon
+  scalars[1]=calc_mdot(r_horizon_BL(BHSPIN))/calc_mdotEdd();
+  return 0;
+}
+
+
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
@@ -11,10 +100,8 @@ ldouble
 calc_totalmass()
 {
   int ix,iy,iz;
-  ldouble dx,dy,dz,mass,rho;
-  dx=(MAXX-MINX)/NX;
-  dy=(MAXY-MINY)/NY;
-  dz=(MAXZ-MINZ)/NZ;
+  ldouble xx[4],dx[3],mass,rho,gdet;
+  
   mass=0.;
   for(iz=0;iz<NZ;iz++)
     {
@@ -22,13 +109,122 @@ calc_totalmass()
 	{
 	  for(ix=0;ix<NX;ix++)
 	    {
+	      get_xx(ix,iy,iz,xx);
+	      dx[0]=get_size_x(ix,0);
+	      dx[1]=get_size_x(iy,1);
+	      dx[2]=get_size_x(iz,2);
+	      gdet=calc_gdet(xx);
 	      rho=get_u(u,0,ix,iy,iz);
-	      mass+=rho*dx*dy*dz;
-
+	      mass+=rho*dx[0]*dx[1]*dx[2]*gdet;
 	    }
 	}
     }
   return mass;
+}
+	  
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates the Eddington mass accretion rate
+ldouble
+calc_mdotEdd()
+{
+  ldouble mcgs=2.23e18*MASS; //g/cm
+
+#ifdef CGSOUTPUT
+  return mcgs;
+#else
+  return 1.;
+#endif
+}
+
+//**********************************************************************
+//**********************************************************************
+//*********************************************************************
+//calculates the Eddington luminosity
+ldouble
+calc_lumEdd()
+{
+  ldouble Lcgs=1.25e38*MASS; //erg/s
+
+#ifdef CGSOUTPUT
+  return Lcgs;
+#else
+  return 1.;
+#endif
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates rest mass flux through r=radius within range of thetas
+//normalized to 2pi in phi
+ldouble
+calc_mdot(ldouble radius)
+{
+  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS)
+    return -1.; //no BH
+
+  int ix,iy,iz,iv;
+  ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
+
+  //search for appropriate radial index
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,iy,iz,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
+
+  mdot=0.;
+
+  if(NZ==1) //phi-symmetry
+    {
+      iz=0;
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iv=0;iv<NVHD;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  get_xx(ix,iy,iz,xx);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=get_size_x(iz,2);
+	  pick_g(ix,iy,iz,gg);
+	  pick_G(ix,iy,iz,GG);
+
+	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+
+	  calc_g_arb(xxBL,ggBL,KERRCOORDS);
+	  calc_G_arb(xxBL,GGBL,KERRCOORDS);
+
+	  trans_phd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,gg,GG,ggBL,GGBL);
+
+	  rho=pp[0];
+
+	  ucon[1]=pp[2];
+	  ucon[2]=pp[3];
+	  ucon[3]=pp[4];
+
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,ggBL,GGBL);
+
+	  dx[1]=dx[1]*sqrt(ggBL[2][2]);
+	  dx[2]=2.*M_PI*sqrt(ggBL[3][3]);
+
+#ifdef CGSOUTPUT
+	  rho=rhoGU2CGS(rho);
+	  ucon[1]=velGU2CGS(ucon[1]);
+	  dx[1]=lenGU2CGS(dx[1]);
+	  dx[2]=lenGU2CGS(dx[2]);
+#endif
+
+	  mdot+=rho*ucon[1]*dx[1]*dx[2];
+	}
+    }
+  else
+    return -1;
+
+  return -mdot;
 }
 	  
 //**********************************************************************

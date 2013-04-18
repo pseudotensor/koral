@@ -84,9 +84,12 @@ solve_all_problems_5(ldouble tstart)
    
   i1=i2=0.;
 
+  ldouble scalars[NSCALARS];
+  calc_scalars(scalars);
+
   //prints initial profiles to out0000.dat
 #ifndef RESTART
-  fprint_profiles(t,totalmass);				
+  fprint_profiles(t,scalars,NSCALARS);				
 #endif
 
   //  return 0;
@@ -246,8 +249,6 @@ solve_all_problems_5(ldouble tstart)
       //************************* outputs ************************************
       //**********************************************************************
    
-      //integral of rho
-      totalmass= calc_totalmass();
 
 #ifndef SKIP_CLOCK
       //time mark
@@ -268,7 +269,10 @@ solve_all_problems_5(ldouble tstart)
 	  //projects primitives onto ghost cells
 	  set_bc(t);
 
-	  fprint_profiles(t,totalmass);
+	  //calculate scalars
+	  calc_scalars(scalars,NSCALARS);
+
+	  fprint_profiles(t,scalars,NSCALARS);
 	  lasttout=t;
 	  lasttout_floor=floor(t/dtout);	 
 	}

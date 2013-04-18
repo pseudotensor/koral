@@ -19,7 +19,7 @@
 
 #define VISCOSITY
 #define SIMPLEVISCOSITY
-#define ALPHAVISC 1.
+#define ALPHAVISC .1
 #define RMINVISC 2.
 
 #define OUTCOORDS KERRCOORDS
@@ -61,11 +61,13 @@
 #define GAMMA (4./3.)
 #define KKK 9.e-4//1.e-4
 #define ELL 4.5
-#define UTPOT .9725
+
+//#define UTPOT .9725
+#define UTPOT .99
 //#define NOINITFLUX
 
 //#define RHOATMMIN  rhoCGS2GU(1.e-4)
-#define RHOATMMIN  3.e-5
+#define RHOATMMIN  3.e-1
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(1.e8))
 

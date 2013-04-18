@@ -89,7 +89,7 @@ int **gcidx;
 
 ldouble max_ws[3],max_dt;
 ldouble min_dx,min_dy,min_dz;
-FILE *fout1,*fout_totmass;
+FILE *fout1,*fout_totmass,*fout_radprofiles;
 int nfout1;
 
 //some macros
@@ -125,9 +125,13 @@ struct evolve_fluxes_2_param
 };
 
 //misc.c
+ldouble calc_mdotEdd();
+ldouble calc_lumEdd();
+int calc_radialprofiles(ldouble profiles[][NX]);
 ldouble step_function(ldouble x,ldouble k);
 int calc_stationary1d_solution()  ;
 ldouble calc_totalmass();
+ldouble calc_mdot(ldouble radius);
 int initialize_arrays();
 int free_arrays();
 ldouble my_min(ldouble a, ldouble b);
@@ -209,7 +213,7 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 int fread_restartfile(ldouble*);
 int fprint_openfiles();
 int fprint_closefiles();
-int fprint_profiles(ldouble,ldouble);
+int fprint_profiles(ldouble,ldouble*,int);
 int print_profiles();
 
 //physics.c

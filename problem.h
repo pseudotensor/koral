@@ -869,6 +869,14 @@
 #define U2PRADPREC 1.e-5
 #endif
 
+#ifndef NSCALARS
+#define NSCALARS 2
+#endif
+
+#ifndef NRADPROFILES
+#define NRADPROFILES 5
+#endif
+
 #ifndef OUTVEL
 #define OUTVEL VEL3
 #endif

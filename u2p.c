@@ -111,7 +111,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
   if(u2pret<0) 
     {
       if(verbose>0)
-	printf("u2p_hot err  >>> %d <<< %e %e\n",u2pret,pp[0],pp[1]);
+	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
       
       //************************************
       //entropy solver - conserving entropy

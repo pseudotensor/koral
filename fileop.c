@@ -9,10 +9,10 @@
 int 
 fprint_openfiles()
 {
-  fout_totmass=fopen("0log.dat","w");
   char bufor[100];
   sprintf(bufor,"rm dumps/*dat gifs/*");
   int i=system(bufor);
+  fout_totmass=fopen("dumps/scalars.dat","w");
 
   nfout1=0;
   return 0;
@@ -104,9 +104,12 @@ fprint_closefiles()
 /* prints dumps to files and calls gnuplot */
 /*********************************************/
 int
-fprint_profiles(ldouble t, ldouble totmass)
+fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 {
   char bufor[50],bufor2[50];
+  sprintf(bufor,"dumps/rad%04d.dat",nfout1);
+  fout_radprofiles=fopen(bufor,"w");
+
   sprintf(bufor,"dumps/out%04d.dat",nfout1);
   sprintf(bufor2,"gifs/out%04d.%s",nfout1,IMAGETYPE);  
   fout1=fopen(bufor,"w");
@@ -145,10 +148,32 @@ fprint_profiles(ldouble t, ldouble totmass)
   gcrz=1;
 #endif
 
-  if(totmass!=0)
-    fprintf(fout_totmass,"%e %e\n",t,totmass);
+  //printing scalars
+  fprintf(fout_totmass,"%e ",t);
+  for(iv=0;iv<nscalars;iv++)
+    fprintf(fout_totmass,"%e ",scalars[iv]);
+  fprintf(fout_totmass,"\n",scalars[iv]);
   fflush(fout_totmass);
 
+  if(MYCOORDS == BLCOORDS || MYCOORDS == KSCOORDS || MYCOORDS == MKS1COORDS)
+    {
+      //calculating radial profiles
+      ldouble profiles[NRADPROFILES][NX];
+      calc_radialprofiles(profiles);
+      //printing radial profiles  
+      for(ix=0;ix<NX;ix++)
+	{
+	  ldouble xx[4],xxout[4];
+	  get_xx(ix,iy,iz,xx);
+	  coco_N(xx,xxout,MYCOORDS,BLCOORDS);
+	  fprintf(fout_radprofiles,"%e ",xxout[1]);
+	  for(iv=0;iv<NRADPROFILES;iv++)
+	    fprintf(fout_radprofiles,"%e ",profiles[iv][ix]);
+	  fprintf(fout_radprofiles,"\n",xxout[1]);
+	}
+      fflush(fout_radprofiles);
+    }
+  fclose(fout_radprofiles);
 
   /**************************/  
 
