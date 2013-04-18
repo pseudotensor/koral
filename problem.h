@@ -50,8 +50,23 @@
 //44* RADNTCYL - emission from midplane in cylindrical
 //45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
+//47* MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
 
-#define PROBLEM 45
+#define PROBLEM 47 
+
+#if(PROBLEM==47)
+
+#define PR_DEFINE "PROBLEMS/MFDONUT/define.h"
+#define PR_BC "PROBLEMS/MFDONUT/bc.c"
+#define PR_INIT "PROBLEMS/MFDONUT/init.c"
+#define PR_KAPPA "PROBLEMS/MFDONUT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MFDONUT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MFDONUT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MFDONUT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MFDONUT/dump.c"
+#define PR_TOOLS "PROBLEMS/MFDONUT/tools.c"
+
+#endif
 
 #if(PROBLEM==46)
 

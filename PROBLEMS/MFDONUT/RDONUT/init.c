@@ -27,8 +27,8 @@ ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4],tlo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
 
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
+struct geometry geom;
+fill_geometry(ix,iy,iz,&geom);
 
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
@@ -178,7 +178,7 @@ print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
 
      //     printf(">> %e %e\n",E2,E1);
 
-     Fx=(E2-E1)/(.02*xxvecBL[1]*sqrt(ggBL[1][1]))/chi/3.;
+     Fx=(E2-E1)/(.02*xxvecBL[1]*ggBL[1][1])/chi/3.;
 
      //th dimension
      xxvectemp[1]=1.0*xxvecBL[1];
@@ -201,7 +201,7 @@ print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
      if(anret<0) anretmin=-1;
      E2=pptemp[6];
 
-     Fy=(E2-E1)/(.02*xxvecBL[2]*sqrt(ggBL[2][2]))/chi/3.;
+     Fy=(E2-E1)/(.02*xxvecBL[2]*ggBL[2][2])/chi/3.;
 
      //ph dimension
      Fz=0.;
@@ -224,20 +224,12 @@ print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
      pp[8]=Fy;
      pp[9]=Fz;
 
-#ifdef NOINITFLUX
-     pp[7]=0.;
-     pp[8]=0.;
-     pp[9]=0.;
-#endif
-
      //int_4vector(&pp[6]);
 
      //boosting to lab
      //transforming BL ZAMO radiative primitives to code non-ortonormal primitives
-     //prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-     //prad_ff2lab(pp,pp,&geomBL);
-
-     prad_on2lab(pp,pp,&geomBL);
+     prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+     prad_ff2lab(pp,pp,&geomBL);
      //transforming radiative primitives from BL to MYCOORDS
      trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
      
@@ -253,7 +245,7 @@ pp[5]=calc_Sfromu(pp[0],pp[1]);
 check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
 
-p2u(pp,uu,&geom);
+p2u(pp,uu,gg,GG);
 
 /***********************************************/
 
