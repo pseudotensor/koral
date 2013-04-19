@@ -777,6 +777,120 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   return 0;
 }
 
+
+
+// get's gamma^2 for lab-frame gamma  using Rd and gcon
+static int get_m1closure_gammarel2(void *ggg, ldouble *Avcon, ldouble *Avcov, ldouble *gammarel2return)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  ldouble gamma2,gammarel2,delta,numerator,divisor;
+  ldouble gamma2a,gamma2b;
+
+  // mathematica solution that avoids catastrophic cancellation when Rtt very small (otherwise above gives gamma2=1/2 oddly when gamma2=1) -- otherwise same as above
+  // well, then had problems for R~1E-14 for some reason when near BH.  Couldn't quickly figure out, so use no replacement of gv11.
+  // see u2p_inversion.nb
+  static ldouble gctt, gn11, gn12,  gn13,  gn14,  gn22,  gn23,  gn24,  gn33,  gn34,  gn44,  Rtt,  Rtx,  Rty,  Rtz,  Rdtt,  Rdtx,  Rdty,  Rdtz;
+  gn11=GG[0][0];
+  gn12=GG[0][1];
+  gn13=GG[0][2];
+  gn14=GG[0][3];
+  gn22=GG[1][1];
+  gn23=GG[1][2];
+  gn24=GG[1][3];
+  gn33=GG[2][2];
+  gn34=GG[2][3];
+  gn44=GG[3][3];
+
+  Rtt=Avcon[0];
+  Rtx=Avcon[1];
+  Rty=Avcon[2];
+  Rtz=Avcon[3];
+
+  Rdtt=Avcov[0];
+  Rdtx=Avcov[1];
+  Rdty=Avcov[2];
+  Rdtz=Avcov[3];
+
+  gamma2a=(-0.25*(2.*Power(gn11,2)*Power(Rdtt,2) + (gn12*Rdtx + gn13*Rdty + gn14*Rdtz)*
+        (gn12*Rdtx + gn13*Rdty + gn14*Rdtz + Sqrt(4.*Power(gn11,2)*Power(Rdtt,2) + Power(gn12*Rdtx + gn13*Rdty + gn14*Rdtz,2) + 
+            gn11*(8.*gn12*Rdtt*Rdtx + 3.*gn22*Power(Rdtx,2) + 8.*gn13*Rdtt*Rdty + 6.*gn23*Rdtx*Rdty + 3.*gn33*Power(Rdty,2) + 
+               8.*gn14*Rdtt*Rdtz + 6.*gn24*Rdtx*Rdtz + 6.*gn34*Rdty*Rdtz + 3.*gn44*Power(Rdtz,2)))) + 
+       gn11*(4.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 2.*gn24*Rdtx*Rdtz + 
+          2.*gn34*Rdty*Rdtz + gn44*Power(Rdtz,2) + Rdtt*
+           (4.*gn13*Rdty + 4.*gn14*Rdtz + Sqrt(4.*Power(gn11,2)*Power(Rdtt,2) + Power(gn12*Rdtx + gn13*Rdty + gn14*Rdtz,2) + 
+               gn11*(8.*gn12*Rdtt*Rdtx + 3.*gn22*Power(Rdtx,2) + 8.*gn13*Rdtt*Rdty + 6.*gn23*Rdtx*Rdty + 3.*gn33*Power(Rdty,2) + 
+                  8.*gn14*Rdtt*Rdtz + 6.*gn24*Rdtx*Rdtz + 6.*gn34*Rdty*Rdtz + 3.*gn44*Power(Rdtz,2)))))))/
+   (gn11*Power(Rdtt,2) + 2.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 2.*gn13*Rdtt*Rdty + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 
+    2.*(gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2));
+
+
+  if( gamma2a<GAMMASMALLLIMIT || !isfinite(gamma2a) ){
+    gamma2b=(0.25*(-2.*Power(gn11,2)*Power(Rdtt,2) - 1.*gn11*(4.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 
+                                                              Rdty*(4.*gn13*Rdtt + 2.*gn23*Rdtx + gn33*Rdty) + 2.*(2.*gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2)) + 
+                   gn11*Rdtt*Sqrt(4.*Power(gn11,2)*Power(Rdtt,2) + Power(gn12*Rdtx + gn13*Rdty + gn14*Rdtz,2) + 
+                                  gn11*(8.*gn12*Rdtt*Rdtx + 3.*gn22*Power(Rdtx,2) + 8.*gn13*Rdtt*Rdty + 6.*gn23*Rdtx*Rdty + 3.*gn33*Power(Rdty,2) + 
+                                        8.*gn14*Rdtt*Rdtz + 6.*gn24*Rdtx*Rdtz + 6.*gn34*Rdty*Rdtz + 3.*gn44*Power(Rdtz,2))) + 
+                   (gn12*Rdtx + gn13*Rdty + gn14*Rdtz)*(-1.*gn12*Rdtx - 1.*gn13*Rdty - 1.*gn14*Rdtz + 
+                                                        Sqrt(4.*Power(gn11,2)*Power(Rdtt,2) + Power(gn12*Rdtx + gn13*Rdty + gn14*Rdtz,2) + 
+                                                             gn11*(8.*gn12*Rdtt*Rdtx + 3.*gn22*Power(Rdtx,2) + 8.*gn13*Rdtt*Rdty + 6.*gn23*Rdtx*Rdty + 3.*gn33*Power(Rdty,2) + 
+                                                                   8.*gn14*Rdtt*Rdtz + 6.*gn24*Rdtx*Rdtz + 6.*gn34*Rdty*Rdtz + 3.*gn44*Power(Rdtz,2))))))/
+      (gn11*Power(Rdtt,2) + 2.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 2.*gn13*Rdtt*Rdty + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 
+       2.*(gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2));
+    gamma2=gamma2b;
+  }
+  else{
+    // choose
+    gamma2=gamma2a;
+  }
+
+  ////////////////////////
+  //
+  //cap on u^t
+  //
+  ///////////////////////
+  ldouble alpha=geom->alpha;
+
+
+  // get relative 4-velocity, that is always >=1 even in GR
+  gammarel2 = gamma2*alpha*alpha;
+
+  // check for machine error away from 1.0 that happens sometimes
+  if(gammarel2>GAMMASMALLLIMIT && gammarel2<1.0){
+    // if(debugfail>=2) dualfprintf(fail_file,"Hit machine error of gammarel2=%27.20g fixed to be 1.0\n",gammarel2);
+    gammarel2=1.0;
+  }
+
+  *gammarel2return=gammarel2;
+  return(0);
+}
+
+
+// get Erf
+static int get_m1closure_Erf(void *ggg, ldouble *Avcon, ldouble gammarel2, ldouble *Erfreturn)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble alpha=geom->alpha;
+
+  ////////////
+  //
+  // get initial attempt for Erf
+  // If delta<0, then gammarel2=nan and Erf<RADLIMIT check below will fail as good.
+  //
+  ////////////
+  *Erfreturn = 3.*Avcon[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
+
+  return(0);
+}
+
+
 //**********************************************************************
 //**********************************************************************
 //basic conserved to primitives solver for radiation
@@ -789,6 +903,52 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 //**********************************************************************
 int
 u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+  int irf;
+
+  //multi-rad-fluids
+  for(irf=0;irf<NRF;irf++)
+    {
+      //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
+      *corrected=0;
+
+      int verbose=0,debug=0;
+      int i,j;
+      ldouble Rij[4][4];
+      ldouble urfcon[4],urfcov[4],Erf;
+      ldouble alpha = sqrt(-1./GG[0][0]);
+      //conserved - R^t_mu
+      ldouble Avcov[4]={uu[EE(irf)],uu[FX(irf)],uu[FY(irf)],uu[FZ(irf)]};
+      ldouble Avcon[4];
+      //indices up - R^tmu
+      indices_12(Avcov,Avcon,GG);
+
+    }
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//basic conserved to primitives solver for radiation
+//uses M1 closure in arbitrary frame/metric
+//radiative primitives: (E,\tilde u^i)
+//  E - radiative energy density in the rad.rest frame
+//  u^i - relative velocity of the rad.rest frame
+//takes conserved R^t_mu in uu
+//**********************************************************************
+//**********************************************************************
+int
+u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 {
   struct geometry *geom
     = (struct geometry *) ggg;

@@ -925,6 +925,9 @@
 #define IMAGETYPE "gif"
 #endif
 
+#ifndef GAMMASMALLLIMIT
+#define GAMMASMALLLIMIT (1.0-1E-10) // at what point above which assume gamma^2=1.0
+#endif
 
 
 /*********************/

@@ -37,14 +37,14 @@
 #define MKS1R0 -2.
 #define MINX (log(1.25-MKS1R0))
 #define MAXX (log(16.-MKS1R0))
-#define NX 64
+#define NX 50//64
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 30.//27.8
 #define NX 70
 #endif
 
-#define NY 32
+#define NY 24//32
 #define NZ 1
 
 
@@ -80,7 +80,7 @@
 
 #define INT_ORDER 1
 #define RK2_STEPPING
-#define TSTEPLIM .6
+#define TSTEPLIM .2
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 
