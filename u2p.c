@@ -1,4 +1,3 @@
-
 //KORAL - u2p.c
 //conserved to primitives conversion
 
@@ -1267,7 +1266,8 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
       if(Erf<EEFLOOR)
 	{
-	  Erf=EEFLOOR;
+	  Erf=EEFLOOR;      printf("imposing EEFLOOR 1\n");
+
 	  urfcon[0]=0.;
 	  urfcon[1]=0.;
 	  urfcon[2]=0.;
@@ -1364,7 +1364,8 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	  if(Erf<EEFLOOR)
 	    {
 	  
-	      Erf=EEFLOOR;
+	      Erf=EEFLOOR;      printf("imposing EEFLOOR 2\n");
+
 	      urfcon[0]=0.;
 	      urfcon[1]=0.;
 	      urfcon[2]=0.;
@@ -1468,7 +1469,8 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	    { 
 	      // Can't have Erf<0.  Like floor on internal energy density.  If leave Erf<0, then will drive code crazy with free energy.
 	      if(verbose) {printf("midcapaltnegErf: Erf=%g\n",Erf);}
-	      Erf=EEFLOOR;
+	      Erf=EEFLOOR;      printf("imposing EEFLOOR 3\n");
+
 	    }	
 	}
       else
@@ -1481,7 +1483,8 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
 	  if(Erf<EEFLOOR)
 	    {
-	      Erf=EEFLOOR;
+	      Erf=EEFLOOR;      printf("imposing EEFLOOR 4\n");
+
 	      urfcon[0]=0.;
 	      urfcon[1]=0.;
 	      urfcon[2]=0.;
@@ -1580,7 +1583,7 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
       uu10[FY(0)]=uu[FY(irf)];
       uu10[FZ(0)]=uu[FZ(irf)];
 
-      if(uu10[EE(0)]<EEFLOOR)
+      if(uu10[EE(0)]<EEFLOsOR)
 	u2p_rad_onff(uu10,pp10, ggg, corrected);
       else
 	{

@@ -102,7 +102,7 @@ print_state_implicit_lab (int iter, ldouble *x, ldouble *f)
 }
 
 int
-solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
+solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
@@ -133,7 +133,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   ldouble frdt = 1.0;
   ldouble dttot = 0.;
 
-  int verbose=0;
   int iter=0;
   int failed=0;
 
@@ -148,6 +147,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       zz=get_x(iz,2);
       printf("=== i: %d %d %d\n=== x: %e %e %e\n",ix,iy,iz,xx,yy,zz);
       print_Nvector(pp,NV);
+      print_Nvector(uu,NV);
       print_metric(gg);
     }
 
@@ -157,7 +157,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
       if(verbose) 
 	{
 	  printf("====\n===\n Trying imp lab with frdt | dttot : %f | %f\n",frdt,dttot);
-	  //	  if(frdt<1.) getchar();
+	  getchar();
 	}
       
 
@@ -197,7 +197,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   
 	      if(verbose>0)
 		{
-		  printf("ij : %d %d\n",i,j);
+		  printf("j :  %d\n",j);
 		  print_Nvector(uu,NV);
 		  print_state_implicit_lab (iter,xxx,f2); 
 		}
@@ -561,7 +561,7 @@ calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble dt, int verbose)
   
   if(cltep.E<EEFLOOR && 0)
     {
-      printf("imposing EEFLOOR\n");
+      printf("imposing EEFLOOR 0\n");
       cltep.E=EEFLOOR;
     }
   
@@ -1605,13 +1605,15 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
   
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
-  if(solve_implicit_lab(ix,iy,iz,dt,del4)<0)
+  if(solve_implicit_lab(ix,iy,iz,dt,del4,0)<0)
     {
       //numerical implicit in 4D did not work
       if(verbose) 
 	{
 	  printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\ntrying imp_ff... ",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
-	  //getchar();
+	  //
+	  //	  solve_implicit_lab(ix,iy,iz,dt,del4,1);
+	  //	  getchar();
 	}
       //use the explicit-implicit backup method
       if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)

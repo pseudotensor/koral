@@ -734,6 +734,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      /************************************************************************/
 	      /************************************************************************/
 	      /************************************************************************/
+	      calc_primitives(ix,iy,iz);
 
 #ifdef RADIATION
 #ifndef MULTIRADFLUID

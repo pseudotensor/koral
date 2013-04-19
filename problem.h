@@ -52,7 +52,7 @@
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
 //47* MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
 
-#define PROBLEM 6
+#define PROBLEM 43
 
 #if(PROBLEM==47)
 

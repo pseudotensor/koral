@@ -12,6 +12,8 @@
 #define MSUNCM 147700.
 
 //conversions
+#define tempCGS2GU(x)    (x)
+#define tempGU2CGS(x)    (x)
 #define lenCGS2GU(x)    (x/MASSCM)
 #define lenGU2CGS(x)    (x*MASSCM)
 #define timeCGS2GU(x)   (x/MASSCM*CCC)
@@ -37,9 +39,6 @@
 #define Z_RATIO (1.0)
 #define Pi (3.141592654)     
 #define KAPPA_ES_COEFF (kappaCGS2GU(0.4))
-//to verify
-//#define KAPPA_FF_COEFF (1.7e-25/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
-//#define KAPPA_BF_COEFF (4.8e-24/1.67262158e-24/1.67262158e-24*CCC*CCC*CCC*CCC/GGG/GGG/MASSCM/MASSCM/MASSCM/MASSCM/MASSCM)
 
 //other stuff
 #include "problem.h"
@@ -441,6 +440,7 @@ int calc_Gi(ldouble *pp, void*,ldouble Gi[4]);
 int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int);
 int calc_rad_wavespeeds(ldouble *pp,void*,ldouble tautot[3],ldouble *aval,int verbose);
 int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval);
+int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose);
 
 #include "mnemonics.h"
 

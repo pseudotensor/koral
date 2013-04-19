@@ -231,7 +231,7 @@ calc_mdot(ldouble radius)
   else
     return -1;
 
-  return -mdot;
+  return -mdot*2.;
 }
 	  
 //**********************************************************************

@@ -235,6 +235,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  get_xx(ix,iy,iz,xxvec);
 						      
 						  coco_N(xxvec,xxvecout,MYCOORDS,OUTCOORDS);
+						  coco_N(xxvec,xxvecout,MYCOORDS,BLCOORDS);
 
 						  xx=xxvecout[1];
 						  yy=xxvecout[2];
@@ -315,8 +316,9 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 #ifdef RADOUTPUTINFF
 						  prad_lab2ff(pp,pp,&geom);
 #elif defined(RADOUTPUTINZAMO) //to print  radiation primitives in ZAMO
-						  prad_lab2ff(pp,pp,&geom);
-						  prad_ff2zamo(pp,pp,gg,GG,eup); 
+						  //						  prad_lab2ff(pp,pp,&geom);
+						  //						  prad_ff2zamo(pp,pp,gg,GG,eup); 
+						  prad_lab2on(pp,pp,&geom);
 #endif
 #endif
 #endif

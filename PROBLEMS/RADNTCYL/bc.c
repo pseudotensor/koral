@@ -52,7 +52,7 @@ if(iy>NY-1)
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
     return 0;
   }
 
@@ -73,7 +73,7 @@ if(ix>NX-1)
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
     return 0;
   }
 if(ix<0.) //spin axis
@@ -97,7 +97,7 @@ if(ix<0.) //spin axis
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
     return 0;
   }
 if(iy<0) //equatorial plane
@@ -161,7 +161,7 @@ if(iy<0) //equatorial plane
     check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
     
-    p2u(pp,uu,gg,GG); 
+    p2u(pp,uu,&geom); 
     return 0; 
   }
    
