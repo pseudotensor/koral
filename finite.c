@@ -358,6 +358,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
 
   //fixup here after invetrsions
+  cell_fixup();
   
   //**********************************************************************
   //**********************************************************************
@@ -1648,6 +1649,110 @@ int set_bc(ldouble t)
 	}	  
 #endif 	      
     }
+
+  return 0;
+}
+
+int
+cell_fixup()
+{
+  int ix,iy,iz,iv;
+  int in,ii;
+
+  copy_u(1.,u,u_bak);
+  copy_u(1.,p,p_bak);
+
+  ldouble ppn[6][NV],pp[NV],uu[NV];
+  //calculates the primitives
+#pragma omp parallel for private(iy,iz,iv) schedule (guided)
+  for(ix=0;ix<NX;ix++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {	      
+	      if(get_cflag(HDFIXUPFLAG,ix,iy,iz)!=0 || get_cflag(RADFIXUPFLAG,ix,iy,iz)!=0)
+		{
+		  //total fixups  
+		  struct geometry geom;
+		  fill_geometry(ix,iy,iz,&geom);
+
+		  in=0; //number of successfull neighbors
+		  
+		  if(ix-1>=0 && get_cflag(HDFIXUPFLAG,ix-1,iy,iz)==0 && get_cflag(RADFIXUPFLAG,ix-1,iy,iz)==0)
+		    {
+		      in++;
+		      for(iv=0;iv<NV;iv++)
+			ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
+		    }
+
+		  if(ix+1<NX && get_cflag(HDFIXUPFLAG,ix+1,iy,iz)==0 && get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0)
+		    {
+		      in++;
+		      for(iv=0;iv<NV;iv++)
+			ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
+		    }
+
+		  if(iy-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy-1,iz)==0 && get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0)
+		    {
+		      in++;
+		      for(iv=0;iv<NV;iv++)
+			ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
+		    }
+
+		  if(iy+1<NX && get_cflag(HDFIXUPFLAG,ix,iy+1,iz)==0 && get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0)
+		    {
+		      in++;
+		      for(iv=0;iv<NV;iv++)
+			ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
+		    }
+
+		  if(iz-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy,iz-1)==0 && get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0)
+		    {
+		      in++;
+		      for(iv=0;iv<NV;iv++)
+			ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
+		    }
+
+		  if(iz+1<NZ && get_cflag(HDFIXUPFLAG,ix,iy,iz+1)==0 && get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0)
+		    {
+		      in++;
+		      for(iv=0;iv<NV;iv++)
+			ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
+		    }
+
+		  if((NZ==1 && NY==1 && in>1) ||
+		     (NZ==1 && in>1) ||
+		     (NY==1 && in>1) ||
+		     in>3) //sufficient number of neighbors
+		    {
+		      for(iv=0;iv<NV;iv++)
+			{
+			  pp[iv]=0;
+			  for(ii=0;ii<in;ii++)
+			    pp[iv]+=ppn[ii][iv];
+			  pp[iv]/=(ldouble)in;
+			}
+		      p2u(pp,uu,&geom);
+
+		      printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
+
+		      //save to updated arrays memory
+		      for(iv=0;iv<NV;iv++)
+			{
+			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
+			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
+			}
+
+		    }
+		}
+	    }
+	}
+    }
+
+  //restoring to memory
+  copy_u(1.,u_bak,u);
+  copy_u(1.,p_bak,p);
 
   return 0;
 }

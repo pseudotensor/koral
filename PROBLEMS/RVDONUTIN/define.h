@@ -36,7 +36,7 @@
 #ifdef myMKS1COORDS
 #define MKS1R0 -2.
 #define MINX (log(1.25-MKS1R0))
-#define MAXX (log(16.-MKS1R0))
+#define MAXX (log(20.-MKS1R0))//(log(16.-MKS1R0))
 #define NX 48//64
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
@@ -61,11 +61,12 @@
 #ifdef RADIATION
 
 #define KKK 2.e3 //the higher KKK the hotter disk i.e. the lower density - the larger prad/pgas
-#define UTPOT .9715//.9715
+#define UTPOT .975//.9715
 #define RHOATMMIN  1.e-23
+#define URIN 0.1
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(1.e6))
-#define DTOUT1 5.e1
+#define DTOUT1 5.e-1
 
 #else
 
@@ -80,12 +81,12 @@
 
 #define INT_ORDER 1
 #define RK2_STEPPING
-#define TSTEPLIM .6
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 
 #define NODONUT 0
-#define INFLOWING 0
+#define INFLOWING 1
 
 #define RHOFLOOR 1.e-40
 #define UFLOOR 1.e-40

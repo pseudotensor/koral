@@ -1607,6 +1607,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 
   if(solve_implicit_lab(ix,iy,iz,dt,del4,0)<0)
     {
+      set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1);
       //numerical implicit in 4D did not work
       if(verbose) 
 	{
@@ -1620,19 +1621,21 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 	{
 	  if(verbose) printf("imp_ff didn't work either. requesting fixup.\n");
 	  //this one failed too - failure
-	  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1); 
 	  return -1;	  
 	}
       else
-	if(verbose) printf("worked.\n");
+	{
+	  if(verbose) printf("worked.\n");
+	  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITFF); 
+	}	    
     }
   else
     {
       //success in lab frame
+      set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
       apply_rad_source_del4(ix,iy,iz,del4);
     }
 
-  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
 
   return 0;
 }

@@ -122,8 +122,10 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	Vphi=uPhi/uT;
 	Vr=0.;
 
+	Vr=-URIN;
+
 	//3-velocity in BL 
-	ldouble ucon[4]={0.,-Vr,0.,Vphi};
+	ldouble ucon[4]={0.,Vr,0.,Vphi};
 	conv_vels(ucon,ucon,VEL3,VELPRIM,ggBL,GGBL);
    
 	pp[2]=ucon[1]; 
