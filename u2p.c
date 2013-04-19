@@ -778,9 +778,106 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 }
 
 
+// get's gamma assuming fixed E rather than using original R^t_t that we assume is flawed near floor regions.  We want to preserve R^t_i (i.e conserved momentum)
+static int get_m1closure_gammarel2_cold(int verbose,
+					void *ggg, 
+					FTYPE *Avcon, 
+					FTYPE *Avcov, 
+					FTYPE *gammarel2return, 
+					FTYPE *deltareturn, 
+					FTYPE *numeratorreturn, 
+					FTYPE *divisorreturn, 
+					FTYPE *Erfreturn, 
+					FTYPE *urfconrel)
+{
+   struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  FTYPE gamma2,gammarel2,delta;
+  FTYPE Erf;
+  FTYPE alpha=geom->alpha;
+  int jj;
+
+  static FTYPE gctt, gn11, gn12,  gn13,  gn14,  gn22,  gn23,  gn24,  gn33,  gn34,  gn44,  Rtt,  Rtx,  Rty,  Rtz,  Rdtt,  Rdtx,  Rdty,  Rdtz;
+  gn11=GG[0][0];
+  gn12=GG[0][1];
+  gn13=GG[0][2];
+  gn14=GG[0][3];
+  gn22=GG[1][1];
+  gn23=GG[1][2];
+  gn24=GG[1][3];
+  gn33=GG[2][2];
+  gn34=GG[2][3];
+  gn44=GG[3][3]; 
+
+  Rtt=Avcon[0];
+  Rtx=Avcon[1];
+  Rty=Avcon[2];
+  Rtz=Avcon[3];
+
+  Rdtt=Avcov[0];
+  Rdtx=Avcov[1];
+  Rdty=Avcov[2];
+  Rdtz=Avcov[3];
+
+  // choose gamma
+  if(gammarel2return==NULL){
+    FTYPE gammamax=GAMMAMAXRAD;
+    gammarel2=gammamax*gammamax;
+  }
+  else gammarel2=*gammarel2return; // feed in desired gammarel2
+
+  FTYPE utsq=gammarel2/(alpha*alpha);
+
+  FTYPE Avcovorig[NDIM],Avconorig[NDIM];
+  DLOOPA(jj) Avcovorig[jj]=Avcov[jj];
+  DLOOPA(jj) Avconorig[jj]=Avcon[jj];
+
+  // get new Avcov[0]=R^t_t
+
+  // NOTEMARK: Note that Sqrt() is only ever negative when gammarel2<0, so never has to be concern.
+  Avcov[0]=(0.25*(-4.*(gn12*Rdtx + gn13*Rdty + gn14*Rdtz)*utsq*(gn11 + utsq) + 
+                        Sqrt((Power(gn12,2)*Power(Rdtx,2) + 2.*gn12*Rdtx*(gn13*Rdty + gn14*Rdtz) + Power(gn13*Rdty + gn14*Rdtz,2) - 
+                              1.*gn11*(gn22*Power(Rdtx,2) + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 2.*gn24*Rdtx*Rdtz + 2.*gn34*Rdty*Rdtz + 
+                                       gn44*Power(Rdtz,2)))*utsq*(gn11 + utsq)*Power(gn11 + 4.*utsq,2))))/(gn11*utsq*(gn11 + utsq));
+
+  Erf=(0.75*Sqrt((Power(gn12,2)*Power(Rdtx,2) + 2.*gn12*Rdtx*(gn13*Rdty + gn14*Rdtz) + Power(gn13*Rdty + gn14*Rdtz,2) - 
+                           1.*gn11*(gn22*Power(Rdtx,2) + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 2.*gn24*Rdtx*Rdtz + 2.*gn34*Rdty*Rdtz + 
+                                    gn44*Power(Rdtz,2)))*utsq*(gn11 + utsq)*Power(gn11 + 4.*utsq,2)))/(utsq*(gn11 + utsq)*(gn11 + 4.*utsq));
+
+  if(verbose) printf("NOR SOL: Avcov0new=%g Avcov0old=%g Erf=%g :: %g %g %g\n",Avcov[0],Avcovorig[0],Erf,Rtx,Rty,Rtz);
+
+  //modify Avcon
+  indices_12(Avcov,Avcon,GG);
+  if(verbose) DLOOPA(jj) printf("jj=%d Avconorig=%g Avconnew=%g\n",jj,Avconorig[jj],Avcon[jj]);
+
+ 
+  delta=0; // not yet
+
+  *gammarel2return=gammarel2;
+  *deltareturn=delta;
+
+  // get good relative velocity
+  FTYPE gammarel=sqrt(gammarel2);
+
+  // get relative 4-velocity
+  if(Erf>0.0) SLOOPA(jj) urfconrel[jj] = alpha * (Avcon[jj] + 1./3.*Erf*GG[0][jj]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
+  else SLOOPA(jj) urfconrel[jj] = 0.0;
+
+  *Erfreturn=Erf; // pass back new Erf to pointer
+
+  return(0);
+}
+
+
+
 
 // get's gamma^2 for lab-frame gamma  using Rd and gcon
-static int get_m1closure_gammarel2(void *ggg, ldouble *Avcon, ldouble *Avcov, ldouble *gammarel2return)
+static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldouble *Avcov, ldouble *gammarel2return,ldouble *deltareturn, ldouble *numeratorreturn, ldouble *divisorreturn)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -862,11 +959,14 @@ static int get_m1closure_gammarel2(void *ggg, ldouble *Avcon, ldouble *Avcov, ld
 
   // check for machine error away from 1.0 that happens sometimes
   if(gammarel2>GAMMASMALLLIMIT && gammarel2<1.0){
-    // if(debugfail>=2) dualfprintf(fail_file,"Hit machine error of gammarel2=%27.20g fixed to be 1.0\n",gammarel2);
+    if(verbose) printf("Hit machine error of gammarel2=%27.20g fixed to be 1.0\n",gammarel2);
     gammarel2=1.0;
   }
 
-  *gammarel2return=gammarel2;
+  *gammarel2return=gammarel2; 
+  *deltareturn=delta=0;
+  *numeratorreturn=numerator=0;
+  *divisorreturn=divisor=0;
   return(0);
 }
 
@@ -887,8 +987,143 @@ static int get_m1closure_Erf(void *ggg, ldouble *Avcon, ldouble gammarel2, ldoub
   ////////////
   *Erfreturn = 3.*Avcon[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
+  //  printf("ee %d %d %d %e\n",geom->ix,geom->iy,geom->iz,*Erfreturn);
+
   return(0);
 }
+
+// get contravariant relative 4-velocity in lab frame
+static int get_m1closure_urfconrel(int verbose, 
+				   void *ggg, 
+				   ldouble *pp, 
+				   ldouble *Avcon, 
+				   ldouble *Avcov, 
+				   ldouble gammarel2, 
+				   ldouble delta, 
+				   ldouble numerator, 
+				   ldouble divisor, 
+				   ldouble *Erfreturn,
+				   ldouble *urfconrel, 
+				   int *corflag)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  ldouble alpha=geom->alpha;
+
+  ldouble Erf=*Erfreturn; // get initial Erf
+  ldouble gammamax=GAMMAMAXRAD;
+  int ii,jj,kk;
+
+  //////////////////////
+  //
+  // Fix-up inversion if problem with gamma (i.e. velocity) or energy density in radiation rest-frame (i.e. Erf)
+  //
+  //////////////////////
+
+  // NOTE: gammarel2 just below 1.0 already fixed to be =1.0
+  int nonfailure=gammarel2>=1.0 && Erf>ERADLIMIT && gammarel2<=gammamax*gammamax/GAMMASMALLLIMIT/GAMMASMALLLIMIT;
+  // falilure1 : gammarel2 normal, but already Erf<ERADLIMIT (note for M1 that gammarel2>=1/4 for any reasonable chance for correct non-zero Erf
+  int failure1=Avcon[0]<0.0 || (gammarel2>0.0 && gammarel2<=0.25 && delta>=0.0 && divisor!=0.0) || numerator==0.0 || gammarel2>=1.0 && delta>=0.0 && divisor!=0.0 && Erf<ERADLIMIT;
+  // gamma probably around 1
+  int failure2=gammarel2<1.0 && gammarel2>0.0 && delta>=0.0;
+  // i.e. all else, so not really used below.
+  int failure3=gammarel2>gammamax*gammamax && Erf>=ERADLIMIT || gammarel2<0.0 || delta<0.  || divisor==0.0 && numerator==0.0 || divisor==0.0 && numerator!=0.0;
+
+  // any failure
+  int failure=!nonfailure || !isfinite(gammarel2) || !isfinite(Erf);
+
+  if(failure && (failure1==0 && failure2==0 && failure3==0)){
+    printf("Undetected failure, now considered\n");
+  }
+
+
+  if(nonfailure){
+    // get good relative velocity
+    ldouble gammarel=sqrt(gammarel2);
+ 
+    for(ii=1;ii<4;ii++)
+      {	  
+	urfconrel[ii] = alpha * (Avcon[ii] + 1./3.*Erf*GG[0][ii]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
+      }
+
+    *Erfreturn=Erf; // pass back new Erf to pointer
+    *corflag=0;
+    return(0);
+  }
+  else{
+    if(verbose) 
+      {
+	printf("failure: %d %d %d %d %d\n",nonfailure,failure1,failure2,failure3,failure);
+	printf("%e %e\n",Erf,gammarel2);
+	getchar();
+      }
+    // get \gammarel=1 case
+    ldouble gammarel2slow=pow(1.0+10.0*NUMEPSILON,2.0);
+    ldouble Avconslow[4],Avcovslow[4],Erfslow,urfconrelslow[4];
+    for(jj=0;jj<4;jj++)
+      {
+	Avconslow[jj]=Avcon[jj];
+	Avcovslow[jj]=Avcov[jj];
+      }
+    Erfslow=Erf;
+    get_m1closure_gammarel2_cold(verbose,ggg,Avconslow,Avcovslow,&gammarel2slow,&delta,&numerator,&divisor,&Erfslow,urfconrelslow);
+
+    // get \gammarel=gammamax case
+    ldouble gammarel2fast=gammamax*gammamax;
+    ldouble Avconfast[4],Avcovfast[4],Erffast,urfconrelfast[4];
+    for(jj=0;jj<4;jj++)
+      {
+	Avconfast[jj]=Avcon[jj];
+	Avcovfast[jj]=Avcov[jj];
+      }
+    Erffast=Erf;
+    get_m1closure_gammarel2_cold(verbose,ggg,Avconfast,Avcovfast,&gammarel2fast,&delta,&numerator,&divisor,&Erffast,urfconrelfast);
+
+    int usingfast=1;
+    // choose by which Avcov[0] is closest to original
+    if( fabs(Avcovslow[0]-Avcov[0])>fabs(Avcovfast[0]-Avcov[0]) ){
+      usingfast=1;
+      for(jj=0;jj<4;jj++)
+	{
+	  Avcon[jj]=Avconfast[jj];
+	  Avcov[jj]=Avcovfast[jj];
+	  urfconrel[jj]=urfconrelfast[jj];
+	}
+      gammarel2=gammarel2fast;
+      Erf=Erffast;
+    }
+    else{
+      usingfast=0;
+      for(jj=0;jj<4;jj++)
+	{
+	  Avcon[jj]=Avconslow[jj];
+	  Avcov[jj]=Avcovslow[jj];
+	  urfconrel[jj]=urfconrelslow[jj];
+	}
+      gammarel2=gammarel2slow;
+      Erf=Erfslow;
+    }    
+
+    // report
+    *corflag=1;
+    if(verbose) printf("CASEGEN: gammarel>gammamax (cold, usingfast=%d): gammarel2=%g Erf=%g : i=%d j=%d k=%d\n",usingfast,gammarel2,Erf,geom->ix,geom->iy,geom->iz);
+  }
+
+
+  *Erfreturn=Erf; // pass back new Erf to pointer
+
+  if(!isfinite(Erf) || !isfinite(gammarel2) || !isfinite(urfconrel[0])|| !isfinite(urfconrel[1])|| !isfinite(urfconrel[2])|| !isfinite(urfconrel[3]) ){
+      printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g : %d %d %d %d : %g %g %g %g\n",geom->ix,geom->iy,geom->iz,Erf,gammarel2,urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
+  }
+
+  return(0);
+}
+
 
 
 //**********************************************************************
@@ -913,7 +1148,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   tlo=geom->tlo;
   tup=geom->tup;
 
-  int irf;
+  int irf,verbose=0;
 
   //multi-rad-fluids
   for(irf=0;irf<NRF;irf++)
@@ -921,17 +1156,30 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
       *corrected=0;
 
-      int verbose=0,debug=0;
-      int i,j;
       ldouble Rij[4][4];
       ldouble urfcon[4],urfcov[4],Erf;
-      ldouble alpha = sqrt(-1./GG[0][0]);
       //conserved - R^t_mu
       ldouble Avcov[4]={uu[EE(irf)],uu[FX(irf)],uu[FY(irf)],uu[FZ(irf)]};
       ldouble Avcon[4];
       //indices up - R^tmu
       indices_12(Avcov,Avcon,GG);
 
+      ldouble gammarel2,delta,numerator,divisor;
+
+      // get \gamma^2 for relative 4-velocity
+      get_m1closure_gammarel2(verbose,ggg,Avcon,Avcov,&gammarel2,&delta,&numerator,&divisor);
+
+      // get E in radiation frame
+      get_m1closure_Erf(ggg,Avcon,gammarel2,&Erf);
+
+      // get relative 4-velocity
+      get_m1closure_urfconrel(verbose,ggg,pp,Avcon,Avcov,gammarel2,delta,numerator,divisor,&Erf,urfcon,corrected);
+
+      //new primitives
+      pp[EE(irf)]=Erf;
+      pp[FX(irf)]=urfcon[1];
+      pp[FY(irf)]=urfcon[2];
+      pp[FZ(irf)]=urfcon[3];
     }
 
   return 0;
@@ -968,7 +1216,7 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
       *corrected=0;
 
-      int verbose=0,debug=0;
+      int verbose=1,debug=0;
       int i,j;
       ldouble Rij[4][4];
       ldouble urfcon[4],urfcov[4],Erf;

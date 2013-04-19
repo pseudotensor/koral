@@ -75,8 +75,7 @@ int
 mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 {
 #ifdef MFCORRECTPHI
-  int NDIM=2;
-  int verbose=0,ii,jj,irf;
+   int verbose=0,ii,jj,irf;
   
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -365,10 +364,10 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
 int
 assign_wedge_discrete_m1(ldouble F[], ldouble Avec[NRF])
 {
-  int NDIM=2; 
+  int ndim=2; 
   int irf;
 
-  if(NDIM==2)
+  if(ndim==2)
     {
       ldouble factor=50.;
       ldouble nrf=(ldouble)NRF;
@@ -431,10 +430,10 @@ assign_wedge_discrete_m1(ldouble F[], ldouble Avec[NRF])
 int
 assign_wedge_discrete_m2(ldouble flux[], ldouble Avec[NRF])
 {
-  int NDIM=2; 
+  int ndim=2; 
   int irf;
 
-  if(NDIM==2)
+  if(ndim==2)
     {
       if(NZ!=1) my_err("assign_wedge_discrete() not working for 3D\n");
 
@@ -560,7 +559,7 @@ redistribute_radfluids(ldouble *pp, ldouble *uu, void* ggg)
 int
 redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
 {
-  int NDIM=2;
+  int ndim=2;
   int verbose=0,ii,jj,irf;
   ldouble A[NRF][NRF],uu1[NV];
 
@@ -689,7 +688,7 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
 int
 redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
 {
-  int NDIM=2;
+  int ndim=2;
   int method=4;
   ldouble power=10.;
   int verbose=0;
@@ -751,7 +750,7 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
       //aval[irf][2] - min left going in y 
       //etc...
 
-      if(NDIM==1)
+      if(ndim==1)
 	{
 	  ldouble vxl,vxr;
 	  vxl=my_min(aval[irf][0],-MINVEL);
@@ -795,7 +794,7 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
 	  
 	}
 
-      if(NDIM==2)
+      if(ndim==2)
 	{
 	  ldouble vxl,vxr,vyl,vyr;
 	  if(method==0 || method==1)
@@ -953,9 +952,9 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
 	    }
 	}
 
-      if(NDIM==3)
+      if(ndim==3)
 	{
-	  my_err("NDIM==3 not implemented in redistribute()\n");
+	  my_err("ndim==3 not implemented in redistribute()\n");
 	}
     }  
 

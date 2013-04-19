@@ -52,7 +52,7 @@
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
 //47* MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
 
-#define PROBLEM 43
+#define PROBLEM 6
 
 #if(PROBLEM==47)
 
@@ -718,6 +718,8 @@
 
 #define SMALL 1.e-50 //small number 
 
+#define ERADLIMIT (10.*SMALL)
+
 /*********************/
 /*********************/
 /*********************/
@@ -929,6 +931,7 @@
 #define GAMMASMALLLIMIT (1.0-1E-10) // at what point above which assume gamma^2=1.0
 #endif
 
+#define NUMEPSILON DBL_EPSILON
 
 /*********************/
 /*********************/

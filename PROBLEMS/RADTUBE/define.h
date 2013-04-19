@@ -1,4 +1,4 @@
-#define LABRADFLUXES
+//#define LABRADFLUXES
 #define MYCOORDS MINKCOORDS //metric
 
 #define RADIATION //whether to solve for radiation (or pure hydro)

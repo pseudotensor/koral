@@ -1,3 +1,5 @@
+#define NDIM 4
+
 //physics
 #define GGG0 (6.674e-8)
 #define CCC0 (2.998e10)
@@ -69,6 +71,7 @@
 #include <gsl/gsl_multiroots.h>
 
 #define ldouble double
+#define FTYPE ldouble
 #define gSIZE 20 //size of metric arrays = 16 + 1 (gdet) + 3 (dlgdet)
 
 //global variables
@@ -440,3 +443,22 @@ int calc_rad_wavespeeds(ldouble *pp,void*,ldouble tautot[3],ldouble *aval,int ve
 int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval);
 
 #include "mnemonics.h"
+
+/*********************/
+/*********************/
+/*********************/
+/*********************/
+/*****  loops   ******/
+/*********************/
+/*********************/
+/*********************/
+/*********************/
+
+/* loop over all Dimensions; second rank loop */
+#define DLOOP(j,k) for(j=0;j<NDIM;j++)for(k=0;k<NDIM;k++)
+/* loop over all Dimensions; first rank loop */
+#define DLOOPA(j) for(j=0;j<NDIM;j++)
+/* loop over all Space dimensions; second rank loop */
+#define SLOOP(j,k) for(j=1;j<NDIM;j++)for(k=1;k<NDIM;k++)
+/* loop over all Space dimensions; first rank loop */
+#define SLOOPA(j) for(j=1;j<NDIM;j++)
