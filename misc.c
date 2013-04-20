@@ -178,7 +178,7 @@ calc_mdot(ldouble radius)
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
     {
-      get_xx(ix,iy,iz,xx);
+      get_xx(ix,0,0,xx);
       coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
       if(xxBL[1]>radius) break;
     }

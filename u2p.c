@@ -1058,7 +1058,9 @@ static int get_m1closure_urfconrel(int verbose,
     if(verbose) 
       {
 	printf("failure: %d %d %d %d %d\n",nonfailure,failure1,failure2,failure3,failure);
-	printf("%e %e\n",Erf,gammarel2);
+	printf("%e %e %e\n",Erf,gammarel2,Avcov[0]);
+	print_4vector(Avcon);
+	print_4vector(Avcov);
 	getchar();
       }
     // get \gammarel=1 case

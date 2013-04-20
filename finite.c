@@ -358,7 +358,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
 
   //fixup here after invetrsions
-  cell_fixup();
+  //  cell_fixup();
   
   //**********************************************************************
   //**********************************************************************
@@ -721,6 +721,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //**********************************************************************
 	      //updating u - geometrical source terms
 	      ldouble ms[NV];
+	      calc_primitives(ix,iy,iz);
 
 	      //metric source terms
 	      f_metric_source_term(ix,iy,iz,ms);
@@ -814,7 +815,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
 
   //fixup here after rad source term
-  cell_fixup();
+  //  cell_fixup();
   
   //**********************************************************************
   //**********************************************************************

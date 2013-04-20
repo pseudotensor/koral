@@ -34,7 +34,7 @@ if(iy<0)
     
     pp[8]*=-1.;
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
     return 0.;
   }
 //source of light
@@ -79,7 +79,7 @@ if(iy<0)
       pp[8]*=-1.;
       */
 
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       return 0.;
     }
   else if(ix<0.)
@@ -121,7 +121,7 @@ if(iy<0)
       pp[7]=pp[8]=0.;
       */
 
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       return 0.;
     }
  
@@ -146,6 +146,6 @@ while(iiz>=NZ)    iiz-=NZ;
       
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
     }
-  p2u(pp,uu,gg,GG);
+  p2u(pp,uu,&geom);
 return 0;
   

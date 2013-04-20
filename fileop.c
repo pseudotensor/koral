@@ -164,7 +164,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
       for(ix=0;ix<NX;ix++)
 	{
 	  ldouble xx[4],xxout[4];
-	  get_xx(ix,iy,iz,xx);
+	  get_xx(ix,0,0,xx);
 	  coco_N(xx,xxout,MYCOORDS,BLCOORDS); 
 	  if(xxout[1]<r_horizon_BL(BHSPIN)) continue;
 	  fprintf(fout_radprofiles,"%e ",xxout[1]);
@@ -235,7 +235,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  get_xx(ix,iy,iz,xxvec);
 						      
 						  coco_N(xxvec,xxvecout,MYCOORDS,OUTCOORDS);
-						  coco_N(xxvec,xxvecout,MYCOORDS,BLCOORDS);
+						  //						  coco_N(xxvec,xxvecout,MYCOORDS,BLCOORDS);
 
 						  xx=xxvecout[1];
 						  yy=xxvecout[2];
