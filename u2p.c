@@ -80,7 +80,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
   GG=geom->GG;
 
   *corrected=0;
-  int verbose=0;
+  int verbose=1;
   int hdcorr=0;
   int radcorr=0;
 
@@ -109,7 +109,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
 
   if(u2pret<0) 
     {
-      if(verbose>0)
+      if(verbose>1)
 	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
       
       //************************************
@@ -118,13 +118,13 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
       u2pret=u2p_entropy(uu,pp,gg,GG);
       //************************************
 
-      if(verbose>0)
+      if(verbose>1)
 	  printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
 
       if(u2pret<0)
 	{
 	  if(verbose>0)
-	    printf("u2p_entr err > %e %e\n",pp[0],pp[1]);
+	    printf("u2p_entr err > %e %e > %d %d %d\n",pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 
 	  //************************************
 	  //leaving unchanged primitives - should not happen
@@ -704,7 +704,8 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   p[4]=vph;
   p[5]=S;
   
-  conv_velsinprims(p,VEL3,VELPRIM,g,G);
+  if(conv_velsinprims(p,VEL3,VELPRIM,g,G)!=0) 
+    return -1;
  
   //************************************
   //************************************
@@ -724,6 +725,7 @@ int
 u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
   printf("Should not be in u2p_cold() yet - to be generalized.\n");
+  return -1;
 
   ldouble gtt=g[0][0];
   ldouble gtph=g[0][3];

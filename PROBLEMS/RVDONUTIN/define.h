@@ -66,7 +66,7 @@
 #define URIN 0.1
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(1.e6))
-#define DTOUT1 5.e1
+#define DTOUT1 5.e0
 
 #else
 

@@ -70,7 +70,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	    }
 	}
       ldouble delta=b*b-4.*a*c;
-      if(delta<0.) my_err("delta.lt.0 in VEL4->VEL3\n");
+      if(delta<0.) {printf("delta.lt.0 in VEL4->VEL3\n");return -1;}
       ut[0]=(-b-sqrt(delta))/2./a;
       if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
 
@@ -93,8 +93,8 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
       ut[0]=sqrt(-1./(gg[0][0]+a+b));
       if(ut[0]<1. || isnan(ut[0]))
 	{
-	  printf("ut.nan in conv_vels(%d,%d) VEL3->VEL4 - forcing ut[]=1.0\n",which1,which2); //getchar();
-	  ut[0]=1.0;
+	  printf("ut.nan in conv_vels(%d,%d) VEL3->VEL4 - returning error\n",which1,which2); //getchar();
+	  return -1;//ut[0]=1.0;
 	}
       ut[1]=u1[1]*ut[0];
       ut[2]=u1[2]*ut[0];
@@ -117,8 +117,9 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
       ut[0]=sqrt(-1./(gg[0][0]+a+b));
       if(ut[0]<1. || isnan(ut[0]))
 	{
-	  printf("ut.nan in conv_vels(%d,%d) VEL3->VELR - forcing ut[]=1.0\n",which1,which2);//getchar();
-	  ut[0]=1.0;
+	  printf("ut.nan in conv_vels(%d,%d) VEL3->VELR - returning error\n",which1,which2);
+	  print_4vector(u1);//getchar();
+	  return -1;//ut[0]=1.0;
 	}
       //to 4-velocity
       ut[1]=u1[1]*ut[0];
@@ -145,7 +146,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	    }
 	}
       ldouble delta=b*b-4.*a*c;
-      if(delta<0.) my_err("delta.lt.0 in VEL4->VELR\n");
+      if(delta<0.) {("delta.lt.0 in VEL4->VELR\n");return -1;}
       ut[0]=(-b-sqrt(delta))/2./a;
       if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
 
@@ -214,16 +215,24 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 int
 conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5])
 {
+  int ret=0;
   ldouble v1[4],v2[4];
   v1[0]=0.; //not considered
   v1[1]=pp[2];
   v1[2]=pp[3];
   v1[3]=pp[4];
-  conv_vels(v1,v2,which1,which2,gg,GG);
-  pp[2]=v2[1];
-  pp[3]=v2[2];
-  pp[4]=v2[3];
-  return 0;
+  ret=conv_vels(v1,v2,which1,which2,gg,GG);
+  if(ret==0)
+    {
+      pp[2]=v2[1];
+      pp[3]=v2[2];
+      pp[4]=v2[3];
+      return 0;
+    }
+  else
+    {
+      return -1;
+    }
 }
 
 //**********************************************************************
