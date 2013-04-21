@@ -44,7 +44,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
     ldouble uint,Vphi,rho,Vr;
     ldouble xx=get_x(ix,0);
     ldouble D,E,W,eps,uT,uphi,uPhi;
-    if(ut<-1 || podpierd<0.|| NODONUT) //outside torus
+    if(ut<-1 || podpierd<0.|| NODONUT ) //outside torus
       {
 	iix=NX-1;
 	iiy=iy;
@@ -114,7 +114,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
       {
 	ldouble h=-1./ut;
 	ldouble eps=(h-1.)/GAMMA;
-	rho=powl(eps*(GAMMA-1.)/KKK,1./(GAMMA-1.));
+	rho=pow(eps*(GAMMA-1.)/KKK,1./(GAMMA-1.));
 	uint=rho*eps;
 	uphi=-ELL*ut;
 	uT=GGBL[0][0]*ut+GGBL[0][3]*uphi;
@@ -140,14 +140,16 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
     aaa=4.*SIGMA_RAD;
     bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
     ldouble naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
-    ldouble T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+
+    //    ldouble T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+    ldouble T4=-Sqrt((-4*cbrt(0.666666666666)*P)/naw1 + naw1/(cbrt(2.)*cbrt(9.)*aaa))/2. + Sqrt((4*cbrt(0.666666666666)*P)/naw1 - naw1/(cbrt(2.)*cbrt(9.)*aaa) + (2*bbb)/(aaa*Sqrt((-4*cbrt(0.666666666666)*P)/naw1 + naw1/(cbrt(2.)*cbrt(9.)*aaa))))/2.;
 
     E=calc_LTE_EfromT(T4);
     Fx=Fy=Fz=0.;
     uint=calc_PEQ_ufromTrho(T4,rho);
 
-    pp[1]=my_max(uint,ppback[1]);
-    pp[6]=my_max(E,ppback[6]);
+    pp[1]=uint;
+    pp[6]=E;
     pp[7]=Fx;
     pp[8]=Fy;
     pp[9]=Fz;
@@ -235,12 +237,10 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
      pp[8]=0.;
      pp[9]=0.;
 #endif
-
-     //if(ix==NX && iy==NY-1){print_Nvector(pp,NV);}
-
+     
      //transforming from BL lab radiative primitives to code non-ortonormal primitives
      prad_ff2lab(pp,pp,&geomBL);
-
+ 
      //if(ix==NX && iy==NY-1){print_Nvector(pp,NV);getchar();}
 
 #endif

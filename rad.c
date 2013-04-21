@@ -77,12 +77,14 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldo
 
   //calculating primitives  
   int corr,fixup[2];
-  if(u2p(uu,pp2,ggg,&corr,fixup)<0) return -1;
+  if(u2p(uu,pp2,ggg,&corr,fixup)<-1) return -1;
 
   //radiative four-force
   ldouble Gi[4];
   calc_Gi(pp2,ggg,Gi); 
   indices_21(Gi,Gi,gg);
+
+  //printf("Gi: ");print_4vector(Gi);
  
   f[0] = uu[6] - uu0[6] + dt * Gi[0];
   f[1] = uu[7] - uu0[7] + dt * Gi[1];
@@ -111,6 +113,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ldouble (*gg)[5],(*GG)[5];
 
+  //  verbose=1;
+
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
   
@@ -127,7 +131,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
    }
 
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-8;
+  ldouble CONV = 1.e-6;
   ldouble DAMP = 0.5;
 
   ldouble frdt = 1.0;
@@ -157,7 +161,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       if(verbose) 
 	{
 	  printf("====\n===\n Trying imp lab with frdt | dttot : %f | %f\n",frdt,dttot);
-	  getchar();
+	  //	  getchar();
 	}
       
 
@@ -174,7 +178,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	    }
 
 	  //values at zero state
-	  if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f1)<0) 
+	  if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f1)<-1) 
 	    {
 	      failed=1;
 	      break;
@@ -190,16 +194,16 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
 	      uu[j+6]=uup[j+6]-del;
 
-	      if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f2)<0) 
+	      if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f2)<-1) 
 		{
 		  failed=1;
 		}
   
 	      if(verbose>0)
 		{
-		  printf("j :  %d\n",j);
-		  print_Nvector(uu,NV);
-		  print_state_implicit_lab (iter,xxx,f2); 
+		  //		  printf("j :  %d\n",j);
+		  //		  print_Nvector(uu,NV);
+		  //		  print_state_implicit_lab (iter,xxx,f2); 
 		}
 
 	      for(i=0;i<4;i++)
@@ -214,8 +218,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
 	  if(failed!=0) break;
 	  
-	  if(verbose)
-	    print_tensor(J);
+	  //	  if(verbose)	    print_tensor(J);
 
 	  //inversion
 	  if(inverse_44matrix(J,iJ)<0)
@@ -225,8 +228,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      break;
 	    }
 
-	  if(verbose)
-	    print_tensor(iJ);
+	  //if(verbose)	    print_tensor(iJ);
 
 	  //updating x
 	  for(i=0;i<4;i++)
@@ -288,6 +290,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
       if(failed==0) 
 	{
+	  if(verbose)
+	    {
+	      printf("output:\n");
+	      print_Nvector(uu0,NV);
+	      print_Nvector(uu,NV);
+	      //	      getchar();
+	    }
+
 	  //opposite changes in gas quantities
 	  uu[1] = uu0[1] - (uu[6]-uu0[6]);
 	  uu[2] = uu0[2] - (uu[7]-uu0[7]);
@@ -329,9 +339,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  uu[iv]=uu0[iv];
 	}
       
-      if(frdt<0.0001) 
+      if(frdt<0.0001 || 1) 
 	{
-	  if(verbose) 
+	  if(verbose || 1) 
 	    {
 	      printf("time step too small - aborting implicit_lab() ===\n");
 	      getchar();
@@ -1602,11 +1612,12 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
   ldouble del4[4],delapl[NV];
   int iv;
   int verbose=1;
-  
+  //  if(ix==63) verbose=1;
+
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
   if(solve_implicit_lab(ix,iy,iz,dt,del4,0)<0)
-    {
+      {
       set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1);
       //numerical implicit in 4D did not work
       if(verbose) 

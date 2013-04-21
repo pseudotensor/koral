@@ -358,7 +358,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
 
   //fixup here after invetrsions
-  //  cell_fixup();
+  //cell_fixup();
   
   //**********************************************************************
   //**********************************************************************
@@ -771,15 +771,23 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //implicit in ff frame - backup
 	      //test if implicit necessary
 	      ldouble del4[4]; 
-	      if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
+	      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
 		{
-		  for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
-		  implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		  if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
+		    {
+		      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
+		      implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		    }
+		  else
+		    {
+		      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
+		      apply_rad_source_del4(ix,iy,iz,del4);	      
+		    }
 		}
 	      else
 		{
-		  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
-		  apply_rad_source_del4(ix,iy,iz,del4);	      
+		      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
+		      implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
 		}
 #endif
 

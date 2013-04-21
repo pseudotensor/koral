@@ -30,12 +30,12 @@ calc_primitives(int ix,int iy,int iz)
     }
 
   //converting to primitives
-  int corrected, fixups[2];
-  u2p(uu,pp,&geom,&corrected,fixups);
+  int corrected[2], fixups[2];
+  u2p(uu,pp,&geom,corrected,fixups);
 
   //update conserved to follow corrections on primitives
   //should I skip this when going to fixup - if averagin primitives this will have no effect?
-  if(corrected!=0)
+  if(corrected[0]!=0 || corrected[1]!=0)
     {
       if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);}//getchar();}
       p2u(pp,uu,&geom);
@@ -53,7 +53,7 @@ calc_primitives(int ix,int iy,int iz)
      set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
-   if(corrected!=0)
+   if(corrected[0]!=0)
      set_cflag(ENTROPYFLAG,ix,iy,iz,-1); 
    else 
      set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
@@ -70,7 +70,7 @@ calc_primitives(int ix,int iy,int iz)
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
+u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 {
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -79,7 +79,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
   gg=geom->gg;
   GG=geom->GG;
 
-  *corrected=0;
+  corrected[0]=corrected[1]=0;
   int verbose=1;
   int hdcorr=0;
   int radcorr=0;
@@ -124,7 +124,10 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
       if(u2pret<0)
 	{
 	  if(verbose>0)
-	    printf("u2p_entr err > %e %e > %d %d %d\n",pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+	    {
+	      printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+	      //	      getchar();
+	    }
 
 	  //************************************
 	  //leaving unchanged primitives - should not happen
@@ -178,13 +181,16 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
   //************************************
   //************************************
   //checking on hd floors
-  ret=check_floors_hd(pp,VELPRIM,gg,GG);
+  
+  int floorret;
+  floorret=check_floors_hd(pp,VELPRIM,gg,GG);
 
-  if(ret<0.)
+  if(floorret<0.)
     {
       hdcorr=1;
       fixups[0]=1;
     }
+
   //************************************
   //************************************
 
@@ -212,7 +218,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int *corrected,int fixups[2])
   //************************************
   //************************************
 
-  if(radcorr>0 || hdcorr>0) *corrected=1;
+  if(hdcorr>0) corrected[0]=1;
+  if(radcorr>0) corrected[1]=1;
 
   return ret;
 }
@@ -598,7 +605,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble err,W,fval,dfval,fval1,fval2,diffrho,ut;
   ldouble dudrho,dWdrho,dvphdrho,dvrdrho,dvthdrho;
 
-  ldouble conv=1.e-6;
+  ldouble conv=1.e-4;
   int itmax=30;
   ldouble fvalmin[2]={0.,-1.};
   ldouble absfval;
@@ -1089,7 +1096,7 @@ static int get_m1closure_urfconrel(int verbose,
 
     int usingfast=1;
     // choose by which Avcov[0] is closest to original
-    if( fabs(Avcovslow[0]-Avcov[0])>fabs(Avcovfast[0]-Avcov[0]) ){
+    if( fabs(Avcovslow[0]-Avcov[0])>fabs(Avcovfast[0]-Avcov[0])){
       usingfast=1;
       for(jj=0;jj<4;jj++)
 	{
@@ -1219,7 +1226,7 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
       *corrected=0;
 
-      int verbose=1,debug=0;
+      int verbose=0,debug=0;
       int i,j;
       ldouble Rij[4][4];
       ldouble urfcon[4],urfcov[4],Erf;
