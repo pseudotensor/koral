@@ -339,12 +339,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  uu[iv]=uu0[iv];
 	}
       
-      if(frdt<0.0001 || 1) 
+      if(frdt<0.0001) 
 	{
-	  if(verbose || 1) 
+	  if(verbose) 
 	    {
 	      printf("time step too small - aborting implicit_lab() ===\n");
-	      getchar();
 	    }
 	  return -1;
 	}
