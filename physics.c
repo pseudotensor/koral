@@ -755,14 +755,21 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       T[i][j]=0.;
   
 #ifdef SIMPLEVISCOSITY
-
   ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
   ldouble xxvecBL[4];
   coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
   
   if(xxvecBL[1]<RMINVISC) return 0;
 
-  ldouble p=(GAMMA-1.)*pp[UU];
+  ldouble pgas=(GAMMA-1.)*pp[UU];
+
+  ldouble prad=1./3.*pp[EE(0)];
+
+#ifdef ALPHATOTALPRESSURE
+  ldouble p=pgas+prad;
+#else
+  ldouble p=pgas;
+#endif
 
   T[1][3]=ALPHAVISC*p;
   T[3][1]=ALPHAVISC*p;
