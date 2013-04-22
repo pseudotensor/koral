@@ -763,13 +763,43 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
   ldouble pgas=(GAMMA-1.)*pp[UU];
 
-  ldouble prad=1./3.*pp[EE(0)];
-
+#ifdef RADIATION
 #ifdef ALPHATOTALPRESSURE
+
+  //currently suppressing radiation pressure by looking at diagonal fluid-frame rad.pressure components
+  ldouble Rij[4][4];
+  calc_Rij(pp,ggg,Rij);
+  boost22_lab2ff(Rij,Rij,pp,gg,GG);
+  trans22_cc2on(Rij,Rij,tup);
+  ldouble diag[3]={Rij[1][1],Rij[2][2],Rij[3][3]};
+  ldouble maxdiag=my_max(diag[0],my_max(diag[1],diag[2]))/Rij[0][0];
+  
+  ldouble THINSUPPPARAM = 0.001; //prad=0 for maxdiag=0.4
+  ldouble prad=1./3.*Rij[0][0]*exp(-(maxdiag-1./3.)*(maxdiag-1./3.)/THINSUPPPARAM);
+
+  /*
+  if(geom->ix==NX-1)
+    {
+      printf("ix: %d %d\n",geom->ix,geom->iy);
+      print_Nvector(pp,NV);
+      print_tensor(Rij);
+      printf("%f\n",maxdiag);
+      printf("prad: %e -> %e\n",1./3.*Rij[0][0],
+	     1./3.*Rij[0][0]*exp(-(maxdiag-1./3.)*(maxdiag-1./3.)/THINSUPPPARAM));
+      getchar();
+    }
+  */
+
   ldouble p=pgas+prad;
 #else
   ldouble p=pgas;
 #endif
+
+#else //RADIATION
+
+  ldouble p=pgas;
+#endif
+  
 
   T[1][3]=ALPHAVISC*p;
   T[3][1]=ALPHAVISC*p;

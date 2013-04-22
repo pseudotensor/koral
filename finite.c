@@ -736,9 +736,9 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      /************************************************************************/
 	      /************************************************************************/
 	      /************************************************************************/
-	      calc_primitives(ix,iy,iz);
 
 #ifdef RADIATION
+	      calc_primitives(ix,iy,iz);
 #ifndef MULTIRADFLUID
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE

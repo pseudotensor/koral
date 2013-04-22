@@ -78,7 +78,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
     ldouble P,aaa,bbb;
     P=GAMMAM1*uint;
     //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
-    aaa=4.*SIGMA_RAD;
+    aaa=4.*SIGMA_RAD/3.;
     bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
     ldouble naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
     ldouble T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;

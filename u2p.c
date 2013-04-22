@@ -109,15 +109,27 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   if(u2pret<0) 
     {
-      if(verbose>1)
+      if(u2pret<0)
+	{
+	  //************************************
+	  //leaving unchanged primitives - should not happen
+	  ret=-3;
+	  for(u2pret=0;u2pret<NV;u2pret++)
+	    pp[u2pret]=ppbak[u2pret];	  
+	  //************************************
+	}
+
+     if(verbose>1)
 	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
       
+     /*
       //************************************
       //entropy solver - conserving entropy
       ret=-1;
       u2pret=u2p_entropy(uu,pp,gg,GG);
       //************************************
 
+       
       if(verbose>1)
 	  printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
 
@@ -129,28 +141,23 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	      //	      getchar();
 	    }
 
-	  //************************************
+	  /************************************
 	  //leaving unchanged primitives - should not happen
 	  ret=-3;
 	  for(u2pret=0;u2pret<NV;u2pret++)
 	    pp[u2pret]=ppbak[u2pret];	  
-	  //************************************
+	    //************************************
 
-	  /*
-
-	  //cold RHD currently not working for VELR
-
+	  
 	  //************************************
 	  //cold RHD - assuming u=SMALL
 	  ret=-2;
 	  u2pret=u2p_cold(uu,pp,gg,GG);
 	  //************************************
+	  if(verbose>0) getchar();
 
 	  if(u2pret<0)
 	    {
-	      if(verbose>0)
-		printf("u2p_cold err > %e %e\n",pp[0],pp[1]);
-	
 	      //************************************
 	      //leaving unchanged primitives - should not happen
 	      ret=-3;
@@ -159,11 +166,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	      //************************************
 	    }
 
-	  */
-
 	}
-      
-     }
+      */
+    }
 
   if(ret<0.)
     hdcorr=1;
@@ -232,6 +237,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 {
+  //  if(pp[1]<1.e-5*pp[0]) pp[1]=1.e-5*pp[0];
+  //  return 0;
+
   int i,j,k,correct;
   // velocities
   ldouble a,b,c,delta;
@@ -265,8 +273,6 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 	  if(u1[0]<1.) 
 	    correct=1;
 	}
-	  
-      if(correct==0) return 0; //everything is fine
     }
   else if(whichvel==VEL3)
     {
@@ -288,8 +294,6 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
       correct=0;
       if(-1./(gg[0][0]+a+b)<0.)
 	correct=1;
-     	  
-      if(correct==0) return 0; //everything is fine
     }
   else if(whichvel==VELR)
     {
@@ -303,14 +307,13 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
       correct=0;
       if(gamma2/alpha2<0.)
 	correct=1;
-     	  
-      if(correct==0) return 0; //everything is fine
-
     }
   else
     {
       my_err("VEL not implemented in check_floors_hd()\n");
     }
+
+  if(correct==0) return 0;
 
   //correcting and imposing gammamax keeping the direction given by spatial components
   ldouble Afac;
@@ -731,23 +734,39 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 int
 u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
-  printf("Should not be in u2p_cold() yet - to be generalized.\n");
-  return -1;
+  int verbose=0;
 
   ldouble gtt=g[0][0];
+  ldouble gtr=g[0][1];
+  ldouble gtth=g[0][2];
   ldouble gtph=g[0][3];
+
+  ldouble grt=g[1][0];
   ldouble grr=g[1][1];
+  ldouble grth=g[1][2];
+  ldouble grph=g[1][3];
+
+  ldouble gtht=g[2][0];
+  ldouble gthr=g[2][1];
   ldouble gthth=g[2][2];
+  ldouble gthph=g[2][3];
+
+  ldouble gpht=g[3][0];
+  ldouble gphr=g[3][1];
+  ldouble gphth=g[3][2];
   ldouble gphph=g[3][3];
 
-  ldouble gdet=g[3][4];
-
   ldouble rhout=uuu[0];
-  ldouble Ttt=uuu[1]-rhout;
+  ldouble Tttt=uuu[1]; //this one unused
   ldouble Ttr=uuu[2];
   ldouble Ttth=uuu[3];
   ldouble Ttph=uuu[4];
   ldouble Sut=uuu[5];
+  ldouble Ttt;
+
+  conv_velsinprims(p,VELPRIM,VEL3,g,G);
+
+  if(verbose) print_Nvector(p,NV);
 
   ldouble rho,uu,vr,vth,vph,S,fff,ut;
   

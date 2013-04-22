@@ -137,7 +137,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
     ldouble P,aaa,bbb;
     P=GAMMAM1*uint;
     //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
-    aaa=4.*SIGMA_RAD;
+    aaa=4.*SIGMA_RAD/3.;
     bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
     ldouble naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
 
@@ -278,9 +278,19 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
-     pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
-     pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
+     if(MYCOORDS==SPHCOORDS)
+       {
+	 pp[0]=get_u(p,0,iix,iiy,iiz);
+	 pp[1]=get_u(p,1,iix,iiy,iiz);
+	 pp[2]=-10.;
+       }
+     else
 
+       {
+	 pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
+	 pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
+       }
+ 
      //atmosphere
      //set_radatmosphere(pp,xxvec,gg,GG,0);
 
