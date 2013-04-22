@@ -1,4 +1,4 @@
-//#define RADIATION
+#define RADIATION
 
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
@@ -19,7 +19,7 @@
 
 #define VELPRIM VELR
 
-//#define VISCOSITY
+#define VISCOSITY
 #define SIMPLEVISCOSITY
 #define ALPHAVISC .1
 #define ALPHATOTALPRESSURE
@@ -60,12 +60,12 @@
 #define GAMMA (4./3.)
 #define ELL 4.5
 
-#define URIN 0.5//(5.23e8/CCC/10.)
+#define URIN (5.23e8/CCC)
  
 #ifdef RADIATION
 
-#define KKK 1894.//7845//1.e3 //the higher KKK the hotter disk i.e. the lower density - the larger prad/pgas
-#define UTPOT .9735//.983//.9715//.9715
+#define KKK 7845//1.e3 //the higher KKK the hotter disk i.e. the lower density - the larger prad/pgas
+#define UTPOT .983//.9715//.9715
 #define RHOATMMIN  1.e-23
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(1.e6))

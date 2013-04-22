@@ -118,7 +118,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	    pp[u2pret]=ppbak[u2pret];	  
 	  //************************************
 	}
-
+      //u2pret=u2p_entropy(uu,pp,gg,GG);
+     
      if(verbose>1)
 	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
       
