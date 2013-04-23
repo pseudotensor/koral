@@ -368,7 +368,24 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
   
       return 0;
     }
-  else
+  if(atmtype==3)
+    {
+      ldouble r=xx[1];
+      ldouble D=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
+      ldouble E=PAR_E/(pow(r*r*sqrt(2./r),GAMMA)*pow(1.-2./r,(GAMMA+1.)/4.));
+      ldouble V=sqrtl(2./r)*(1.-2./r);
+      ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
+      ldouble rho=D/W;
+      ldouble uint=E;
+      //corrected rho:
+      rho=PAR_D/(r*r*sqrtl(2./r));    
+
+      pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.; 
+      conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
+  
+      return 0;
+    }
+  
     my_err("atmtype value not handled in set_atmosphere()\n");
   return 0.;
 }

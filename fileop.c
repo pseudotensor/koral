@@ -257,7 +257,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
 						  dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);   
 
-						  calc_primitives(ix,iy,iz);
+						  //						  calc_primitives(ix,iy,iz);
 
 						  for(iv=0;iv<NV;iv++)
 						    {

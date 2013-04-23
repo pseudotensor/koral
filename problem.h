@@ -51,8 +51,24 @@
 //45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
 //47* MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
+//48* RVDTEST - testing the entropy near the axis
 
-#define PROBLEM 43
+#define PROBLEM 48
+
+
+#if(PROBLEM==48)
+
+#define PR_DEFINE "PROBLEMS/RVDTEST/define.h"
+#define PR_BC "PROBLEMS/RVDTEST/bc.c"
+#define PR_INIT "PROBLEMS/RVDTEST/init.c"
+#define PR_KAPPA "PROBLEMS/RVDTEST/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RVDTEST/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RVDTEST/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RVDTEST/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RVDTEST/dump.c"
+#define PR_TOOLS "PROBLEMS/RVDTEST/tools.c"
+
+#endif
 
 #if(PROBLEM==47)
 

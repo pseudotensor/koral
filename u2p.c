@@ -10,7 +10,7 @@
 int
 calc_primitives(int ix,int iy,int iz)
 {
-  int verbose=0;
+  int verbose=1;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
   ldouble tlo[4][4],tup[4][4];
@@ -54,7 +54,10 @@ calc_primitives(int ix,int iy,int iz)
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
    if(corrected[0]!=0)
-     set_cflag(ENTROPYFLAG,ix,iy,iz,-1); 
+     {
+       //getchar();
+       set_cflag(ENTROPYFLAG,ix,iy,iz,-1); 
+     }
    else 
      set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
   
@@ -80,7 +83,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   GG=geom->GG;
 
   corrected[0]=corrected[1]=0;
-  int verbose=1;
+  int verbose=2;
   int hdcorr=0;
   int radcorr=0;
 
@@ -109,6 +112,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   if(u2pret<0) 
     {
+      /*
       if(u2pret<0)
 	{
 	  //************************************
@@ -119,11 +123,11 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	  //************************************
 	}
       //u2pret=u2p_entropy(uu,pp,gg,GG);
-     
+      */
      if(verbose>1)
 	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
       
-     /*
+     
       //************************************
       //entropy solver - conserving entropy
       ret=-1;
@@ -142,7 +146,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	      //	      getchar();
 	    }
 
-	  /************************************
+	  //************************************
 	  //leaving unchanged primitives - should not happen
 	  ret=-3;
 	  for(u2pret=0;u2pret<NV;u2pret++)
@@ -150,7 +154,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	    //************************************
 
 	  
-	  //************************************
+	  /************************************
 	  //cold RHD - assuming u=SMALL
 	  ret=-2;
 	  u2pret=u2p_cold(uu,pp,gg,GG);
@@ -166,9 +170,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		pp[u2pret]=ppbak[u2pret];	  
 	      //************************************
 	    }
-
+	  */
 	}
-      */
+      
     }
 
   if(ret<0.)
