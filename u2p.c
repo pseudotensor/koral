@@ -64,6 +64,9 @@ calc_primitives(int ix,int iy,int iz)
   for(iv=0;iv<NV;iv++)    
     set_u(p,iv,ix,iy,iz,pp[iv]);
 
+  //  update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz));
+
+
   return 0;
 }
 
@@ -546,9 +549,11 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   pp[4]=utcon[3];
 
   //entropy
-  ldouble Sut=uu[5];
-  ldouble ut=uu[0]/pp[0]; //rhout/rho
-  pp[5]=Sut/ut;
+  //  ldouble Sut=uu[5];
+  //  ldouble ut=uu[0]/pp[0]; //rhout/rho
+  //  pp[5]=Sut/ut;
+
+  pp[5]=calc_Sfromu(rho,u);
 
   if(verbose) {print_Nvector(pp,NV); getchar();}
 
