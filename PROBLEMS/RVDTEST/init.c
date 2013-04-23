@@ -204,7 +204,7 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //hd floors
-check_floors_hd(pp,VELPRIM,gg,GG);
+//check_floors_hd(pp,VELPRIM,gg,GG);
 //to conserved
 p2u(pp,uu,&geom);
 

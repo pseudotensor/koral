@@ -1841,7 +1841,7 @@ cell_fixup()
 		    }
 
 		  if((NZ==1 && NY==1 && in>=1) ||
-		     (NZ==1 && in>=1) ||
+		     (NZ==1 && in>=2) ||
 		     (NY==1 && in>=1) ||
 		     in>3) //sufficient number of neighbors
 		    {

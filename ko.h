@@ -340,7 +340,7 @@ int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldou
 
 //u2p.c
 int calc_primitives(int,int,int);
-int check_floors_hd(ldouble *uu, int,ldouble gg[][5], ldouble GG[][5]);
+int check_floors_hd(ldouble *uu, int,void*);
 int u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
 int u2p(ldouble *uu, ldouble *pp, void*,int*,int*);

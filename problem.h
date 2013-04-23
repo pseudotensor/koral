@@ -732,7 +732,7 @@
 #define VELPRIMRAD VELR
 #endif
 
-#define ALLOWENTROPYU2P
+//#define ALLOWENTROPYU2P
 
 #define SMALL 1.e-50 //small number 
 

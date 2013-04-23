@@ -206,7 +206,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //checking on hd floors
   
   int floorret;
-  floorret=check_floors_hd(pp,VELPRIM,gg,GG);
+  floorret=check_floors_hd(pp,VELPRIM,ggg);
 
   if(floorret<0.)
     {
@@ -253,18 +253,39 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 //checks if hydro primitives make sense
 //TODO: incorporate structure of state here?
 int
-check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
+check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
   int verbose=1;
   int ret=0;
+
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
 
   //absolute rho
   if(pp[0]<RHOFLOOR) {pp[0]=RHOFLOOR; ret=-1; if(verbose) printf("hd_floors CASE 1\n");}
 
   //uint/rho ratios
-  ldouble UURHORATIO=1.e-5;
-  if(pp[1]<UURHORATIO*pp[0]) {pp[1]=UURHORATIO*pp[0];ret=-1;if(verbose) printf("hd_floors CASE 2\n");}
-  if(pp[1]>1./UURHORATIO*pp[0]) {pp[1]=1./UURHORATIO*pp[0];ret=-1;if(verbose) printf("hd_floors CASE 3\n");}
+  ldouble UURHORATIO=1.e-7;
+  if(pp[1]<UURHORATIO*pp[0]) {pp[1]=UURHORATIO*pp[0];ret=-1;}//if(verbose) printf("hd_floors CASE 2\n");}
+  if(pp[1]>1./UURHORATIO*pp[0]) {pp[1]=1./UURHORATIO*pp[0];ret=-1;}//if(verbose) printf("hd_floors CASE 3\n");}
+
+#ifdef RADIATION
+  //EE/rho ratios
+  ldouble EERHORATIO=1.e-7;
+  ldouble pp2[NV];
+  prad_lab2ff(pp, pp2, ggg);
+  
+  if(pp[6]<EERHORATIO*pp[0]) {pp[6]=EERHORATIO*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
+  if(pp[6]>1./EERHORATIO*pp[0]) {pp[6]=1./EERHORATIO*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
+
+  prad_ff2lab(pp2, pp, ggg);
+#endif
+ 
 
   //velocities
   int i,j,k,correct;
@@ -342,7 +363,7 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 	  if(verbose) 
 	    {
 	      printf("hd_floors CASE 4 %e %e %e\n",gamma2/alpha2,gamma2,GAMMAMAXHD*GAMMAMAXHD);
-	      print_4vector(u1);getchar();
+	      print_4vector(u1);//getchar();
 	    }
 	  correct=1;
 	}
@@ -435,7 +456,7 @@ f_u2p_hot(ldouble W, ldouble* cons)
 int
 u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 {
-  int verbose=1;
+  int verbose=0;
   int i,j,k;
   ldouble rho,u,p,w,W,alpha,D;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
