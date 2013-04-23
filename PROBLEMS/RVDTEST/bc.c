@@ -51,7 +51,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	iiz=iz;
 
 	//ambient
-	set_hdatmosphere(pp,xxvec,gg,GG,3);
+	set_hdatmosphere(pp,xxvec,gg,GG,0);
 #ifdef RADIATION
 	ldouble ppatm[NV];
 	ldouble urf[4];

@@ -41,7 +41,7 @@ ldouble D,W,eps,uT,uphi,uPhi;
 if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
   {
     //ambient
-    set_hdatmosphere(pp,xxvec,gg,GG,3);
+    set_hdatmosphere(pp,xxvec,gg,GG,0);
 
 #ifdef BLOB
     pp[0]*=(1.+10.*exp(-(xx-14)*(xx-14)/.1));

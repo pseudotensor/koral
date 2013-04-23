@@ -9,7 +9,7 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-//#define myMKS1COORDS
+#define myMKS1COORDS
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -18,7 +18,7 @@
 #endif
 
 #define VELPRIM VELR
-#define BLOB
+//#define BLOB
 
 //#define VISCOSITY
 #define SIMPLEVISCOSITY
@@ -34,7 +34,7 @@
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 //#define PRINTGC_LEFT
-#define PRINTGC_RIGHT
+//#define PRINTGC_RIGHT
 
 #define PAR_D 1.e0
 #define PAR_E 1.e-8
@@ -47,10 +47,10 @@
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
-#define NX 170
+#define NX 48
 #endif
 
-#define NY 1
+#define NY 32
 #define NZ 1
 
 
@@ -80,8 +80,8 @@
 
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  3.e-1
-#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define RHOATMMIN  3.e1
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
 #define DTOUT1 10.e0
 
 #endif
@@ -91,9 +91,9 @@
 #define RK2_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 2.
 
-#define NODONUT 1
+#define NODONUT 0
 #define INFLOWING 0
 
 #define RHOFLOOR 1.e-40

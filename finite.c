@@ -77,6 +77,17 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	    {	  
 	      ur[i]=u0[i]+.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
 	      ul[i]=u0[i]-.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
+	      /*
+	      //FFF
+	      if(i<2 &&( ur[i]==0. || ul[i]==0.))
+		{
+		  printf("ur: %e %e %e %e %e\n",u0[i],.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i])),
+			 MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
+		  printf("ul: %e %e %e %e %e\n",u0[i],-.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i])),
+			 MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
+		  getchar();
+		}
+	      */
 	    }
 	  else
 	    {
@@ -343,11 +354,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	{
 	  for(iz=0;iz<NZ;iz++)
 	    {	      
-	      //zero fixup flags
-	      set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
-	      set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
-
-
 	      calc_primitives(ix,iy,iz);
 	    }
 	}
@@ -358,7 +364,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
 
   //fixup here after invetrsions
-  //cell_fixup();
+  cell_fixup();
   
   //**********************************************************************
   //**********************************************************************
@@ -523,6 +529,26 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	    }
 
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
+
+	  /*
+	  //FFF
+	  if(fd_pl[1]==0.) 
+	    {
+
+	      printf("==\n");
+	      print_Nvector(fd_p0,NV);
+	      print_Nvector(fd_pp1,NV);
+	      print_Nvector(fd_pp2,NV);
+	      print_Nvector(fd_pm1,NV);
+	      print_Nvector(fd_pm2,NV);
+
+	      printf("==\n");
+	      print_Nvector(fd_pl,NV);
+	      print_Nvector(fd_pr,NV);
+	     
+	      my_err("zero!");
+	    }
+	  */
 
 	  //testing if interpolated primitives make sense
 	  pick_gb(ix,iy,iz,1,gl);
@@ -696,18 +722,58 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
 
-		  if(isnan(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,get_u(u,iv,ix,iy,iz),dt);getchar();}
+		  if(isnan(val) || isinf(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
+						       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
 
 		  set_u(u,iv,ix,iy,iz,val);	
 		  
 		}
+	    }
+	}
+    }
+
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+  //calculates the primitives
+#pragma omp parallel for private(iy,iz,iv) schedule (guided)
+  for(ix=0;ix<NX;ix++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {	      
+	      calc_primitives(ix,iy,iz);
+	    }
+	}
+    }	      
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+  cell_fixup();
+
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+  //again over cells
+#pragma omp parallel for private(iy,iz,iv) schedule (guided)
+  for(ix=0;ix<NX;ix++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {	      
+	  
 	      	      
 	      //**********************************************************************
 	      //**********************************************************************
 	      //**********************************************************************
 	      //redistributing radiative fluids
 #ifdef MULTIRADFLUID
-	      calc_primitives(ix,iy,iz);
+	      //calc_primitives(ix,iy,iz);
 	      redistribute_radfluids_at_cell(ix,iy,iz);
 #ifdef MFCORRECTPHI
 	      mf_correct_in_azimuth_at_cell(ix,iy,iz,dt);
@@ -720,8 +786,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //**********************************************************************
 	      //**********************************************************************
 	      //updating u - geometrical source terms
-	      ldouble ms[NV];
-	      calc_primitives(ix,iy,iz);
+	      ldouble ms[NV],val,uu[NV];
+	      // calc_primitives(ix,iy,iz);
 
 	      //metric source terms
 	      f_metric_source_term(ix,iy,iz,ms);
@@ -931,11 +997,25 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	  fd_uRl[i]=get_ub(pbRy,i,ix,iy,iz,1);
 	}
 
+       /*
+       //FFF
+       if(fabs(fd_uRl[5])<SMALL) my_err("zero");
+       */
+
       pick_gb(ix,iy,iz,1,gg);
       pick_Gb(ix,iy,iz,1,GG);
  	    
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
+
+      /*
+      //FFF
+      if(isinf(fd_uRl[5])){ print_Nvector(fd_uRl,NV);  for(i=0;i<NV;i++)
+	{
+	  fd_uLl[i]=get_ub(pbLy,i,ix,iy,iz,1);
+	  fd_uRl[i]=get_ub(pbRy,i,ix,iy,iz,1);
+	}printf(">> %e\n",get_ub(pbRy,5,ix,iy,iz,1)); print_Nvector(fd_uRl,NV);}
+      */
 
       for(i=0;i<NV;i++)
 	{
@@ -968,6 +1048,15 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
 	  fd_fstarl[i] = .5*(get_ub(flRy,i,ix,iy,iz,1) + get_ub(flLy,i,ix,iy,iz,1) - al * (fd_uRl[i] - fd_uLl[i]));
       
+	  /*
+	  //FFF
+	  if(isinf(fd_fstarl[i]))
+	    {
+	      printf(">%e %e %e %e %e\n",get_ub(flRy,i,ix,iy,iz,1) , get_ub(flLy,i,ix,iy,iz,1), al , fd_uRl[i] , fd_uLl[i]);
+	      getchar();
+	    }
+	  */
+
 	  set_uby(flby,i,ix,iy,iz,fd_fstarl[i]);
  	}
     }
@@ -1659,7 +1748,7 @@ int set_bc(ldouble t)
 	{
 	  set_u(u,iv,ix,iy,iz,uval[iv]);
 	}	  
-#endif 	      
+#endif 	      exceeded
     }
 
   return 0;
@@ -1670,6 +1759,7 @@ cell_fixup()
 {
   int ix,iy,iz,iv;
   int in,ii;
+  int verbose=0;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
@@ -1747,7 +1837,7 @@ cell_fixup()
 			}
 		      p2u(pp,uu,&geom);
 
-		      printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
+		      if(verbose) printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
 
 		      //save to updated arrays memory
 		      for(iv=0;iv<NV;iv++)

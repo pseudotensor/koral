@@ -63,7 +63,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 
   //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
-  //TODO IMMEDIATELY: generalize!
+  //TODO IMMEDIATELY: generalize! ???
   //**********************************************************************
 
   ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
@@ -673,7 +673,13 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     } 
 
 #endif
+  /*
 
+  if(isinf(ff[5]))
+    {
+      printf("%e %e %e \n",S,u1,u2); getchar();
+    }
+  */
   return 0.;
 }
 

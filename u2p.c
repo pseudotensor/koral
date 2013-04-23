@@ -10,7 +10,7 @@
 int
 calc_primitives(int ix,int iy,int iz)
 {
-  int verbose=1;
+  int verbose=0;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
   ldouble tlo[4][4],tup[4][4];
@@ -48,9 +48,13 @@ calc_primitives(int ix,int iy,int iz)
   //sets the flags for fixups of unsuccessful cells
   if(fixups[0]>0)
      set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
+  else
+     set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
 
   if(fixups[1]>0)
      set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
+  else
+     set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
    if(corrected[0]!=0)
@@ -64,8 +68,15 @@ calc_primitives(int ix,int iy,int iz)
   for(iv=0;iv<NV;iv++)    
     set_u(p,iv,ix,iy,iz,pp[iv]);
 
-  //  update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz));
+  //  ldouble u1=get_u(u,5,ix,iy,iz);
+  //  printf("%e %e\n",get_u(u,5,ix,iy,iz),get_u(p,5,ix,iy,iz));
+  update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz)); //updates u[5]=Sut(rho,u) when u2p_hot() succeded or calculates p[5]=S from previous Sut if the other case
 
+
+
+  // ldouble u2=get_u(u,5,ix,iy,iz);
+  // printf("%e %e %d\n",get_u(u,5,ix,iy,iz),get_u(p,5,ix,iy,iz),get_cflag(ENTROPYFLAG,ix,iy,iz));
+  //     if(fabs((u1-u2)/u2)>1.e-5 && get_cflag(ENTROPYFLAG,ix,iy,iz)==0)   getchar();
 
   return 0;
 }
@@ -86,7 +97,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   GG=geom->GG;
 
   corrected[0]=corrected[1]=0;
-  int verbose=2;
+  int verbose=1;
   int hdcorr=0;
   int radcorr=0;
 
@@ -134,35 +145,40 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
       //************************************
       //entropy solver - conserving entropy
       ret=-1;
+      //      print_Nvector(uu,NV);
+      //      print_Nvector(ppbak,NV);
+      //      print_Nvector(pp,NV);
+      
       u2pret=u2p_entropy(uu,pp,gg,GG);
       //************************************
 
        
       if(verbose>1)
+	{
 	  printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
+	}
 
       if(u2pret<0)
 	{
 	  if(verbose>0)
 	    {
 	      printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-	      //	      getchar();
 	    }
 
-	  //************************************
+	  /************************************
 	  //leaving unchanged primitives - should not happen
 	  ret=-3;
 	  for(u2pret=0;u2pret<NV;u2pret++)
 	    pp[u2pret]=ppbak[u2pret];	  
-	    //************************************
+	    ************************************/
 
 	  
-	  /************************************
+	  //************************************
 	  //cold RHD - assuming u=SMALL
 	  ret=-2;
 	  u2pret=u2p_cold(uu,pp,gg,GG);
 	  //************************************
-	  if(verbose>0) getchar();
+	  //	  if(verbose>0) getchar();
 
 	  if(u2pret<0)
 	    {
@@ -173,7 +189,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		pp[u2pret]=ppbak[u2pret];	  
 	      //************************************
 	    }
-	  */
+	  
 	}
       
     }
@@ -183,7 +199,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   //************************************
   //************************************
-  if(ret<-1) //do not fix up for entropy solver
+  if(ret<0) //do fix up for entropy solver
     fixups[0]=1;
   else
     fixups[0]=0;
@@ -245,8 +261,11 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 {
-  //  if(pp[1]<1.e-5*pp[0]) pp[1]=1.e-5*pp[0];
-  //  return 0;
+  if(pp[0]<RHOFLOOR) pp[0]=RHOFLOOR;
+
+  ldouble UURHORATIO=1.e-10;
+  if(pp[1]<UURHORATIO*pp[0]) pp[1]=UURHORATIO*pp[0];
+  //return 0;
 
   int i,j,k,correct;
   // velocities
@@ -598,11 +617,11 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble Ttph=uuu[4];
   ldouble Sut=uuu[5];
 
+ 
   conv_velsinprims(p,VELPRIM,VEL3,g,G);
-
-  if(verbose) print_Nvector(p,NV);
-
+ 
   ldouble rho=p[0]; //initial guess
+  ldouble rho0=p[0]; //initial guess
   ldouble uu=p[1];
   ldouble vr=p[2];
   ldouble vth=p[3];
@@ -618,7 +637,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble err,W,fval,dfval,fval1,fval2,diffrho,ut;
   ldouble dudrho,dWdrho,dvphdrho,dvrdrho,dvthdrho;
 
-  ldouble conv=1.e-4;
+  ldouble conv=1.e-6;
   int itmax=30;
   ldouble fvalmin[2]={0.,-1.};
   ldouble absfval;
@@ -687,8 +706,12 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
  
     if(iter>itmax && err>conv) 
       {
-	if(verbose) printf("iter exceeded in u2p_entr \n");
-	if(verbose) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
+	if(verbose || 1) printf("iter exceeded in u2p_entr \n");
+	if(verbose || 1) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
+	if(verbose || 1) print_Nvector(p,NV);
+	if(verbose || 1) print_Nvector(uuu,NV);
+
+	getchar();
 	return -1;
       }
 
@@ -696,7 +719,9 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 
   } while(err>conv);
   
-  if(verbose) {printf("success %d %e %e %e\n",iter,rhop1,rho,fval);getchar();}
+  if(verbose) {printf("success %d %e %e %e\n",iter,rhop1,rho,fval);
+    
+  }
 
   rho=rhop1;
   ut=rhout/rho;
@@ -711,9 +736,11 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 
   if(uu<0. || rho<0. || isnan(rho))
     {
-      //printf("u2p_entr didn't work: %e %e\n",uu,rho); 
-      //print_Nvector(uuu,NV);
-      //getchar();
+      if(verbose || 1) printf("iter didn't work in u2p_entr \n");
+      if(verbose || 1) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
+      if(verbose || 1) print_Nvector(p,NV);
+      if(verbose || 1) print_Nvector(uuu,NV);
+      getchar();
       return -1;
     }
 
@@ -725,7 +752,12 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   p[5]=S;
   
   if(conv_velsinprims(p,VEL3,VELPRIM,g,G)!=0) 
-    return -1;
+    {
+      print_Nvector(p,NV);
+      printf("conv vels in _entropy failed %e ut\n",ut);
+      getchar();
+      return -1;
+    }
  
   //************************************
   //************************************
@@ -744,7 +776,9 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 int
 u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 {
-  int verbose=0;
+  int verbose=1;
+
+  my_err("cold");
 
   ldouble gtt=g[0][0];
   ldouble gtr=g[0][1];
@@ -767,16 +801,15 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble gphph=g[3][3];
 
   ldouble rhout=uuu[0];
-  ldouble Tttt=uuu[1]; //this one unused
+  ldouble Tttt=uuu[1]; 
   ldouble Ttr=uuu[2];
   ldouble Ttth=uuu[3];
   ldouble Ttph=uuu[4];
   ldouble Sut=uuu[5];
-  ldouble Ttt;
+  ldouble Ttt=Tttt+rhout;
 
-  conv_velsinprims(p,VELPRIM,VEL3,g,G);
+  //  conv_velsinprims(p,VELPRIM,VEL3,g,G);
 
-  if(verbose) print_Nvector(p,NV);
 
   ldouble rho,uu,vr,vth,vph,S,fff,ut;
   
@@ -807,8 +840,13 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   //checking on hd floors
   check_floors_hd(p,VEL3,g,G);
   //************************************
-  //************************************
+  //***********************************
 
+  /*
+ if(verbose) print_Nvector(uuu,NV);
+ if(verbose) print_Nvector(p,NV);
+ if(verbose) getchar();
+  */
   conv_velsinprims(p,VEL3,VELPRIM,g,G);
 
   return 0;
