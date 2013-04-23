@@ -43,7 +43,7 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(16.-MKS1R0))//(log(16.-MKS1R0))
-#define NX 72
+#define NX 64
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
@@ -84,7 +84,7 @@
 #define UTPOT .99
 #define RHOATMMIN  3.e-1
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define DTOUT1 10.e0
+#define DTOUT1 10.e-1
 
 #endif
 

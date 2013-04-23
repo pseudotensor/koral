@@ -49,7 +49,7 @@ calc_primitives(int ix,int iy,int iz)
   if(fixups[0]>0)
      set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
   else
-     set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
+    set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
 
   if(fixups[1]>0)
      set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
@@ -165,18 +165,18 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	      printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 	    }
 
-	  /************************************
+	  //************************************
 	  //leaving unchanged primitives - should not happen
 	  ret=-3;
 	  for(u2pret=0;u2pret<NV;u2pret++)
 	    pp[u2pret]=ppbak[u2pret];	  
-	    ************************************/
+	  //************************************/
 
 	  
-	  //************************************
+	  /***********************************
 	  //cold RHD - assuming u=SMALL
-	  ret=-2;
-	  u2pret=u2p_cold(uu,pp,gg,GG);
+	  //	  ret=-2;
+	  //u2pret=u2p_cold(uu,pp,gg,GG);
 	  //************************************
 	  //	  if(verbose>0) getchar();
 
@@ -189,7 +189,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		pp[u2pret]=ppbak[u2pret];	  
 	      //************************************
 	    }
-	  
+	  */
 	}
       
     }
@@ -199,7 +199,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   //************************************
   //************************************
-  if(ret<0) //do fix up for entropy solver
+  if(ret<-1) //do not fix up for entropy solver
     fixups[0]=1;
   else
     fixups[0]=0;
@@ -712,7 +712,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
 	if(verbose || 1) print_Nvector(p,NV);
 	if(verbose || 1) print_Nvector(uuu,NV);
 
-	getchar();
+	//	getchar();
 	return -1;
       }
 
@@ -741,7 +741,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
       if(verbose || 1) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
       if(verbose || 1) print_Nvector(p,NV);
       if(verbose || 1) print_Nvector(uuu,NV);
-      getchar();
+      //      getchar();
       return -1;
     }
 
@@ -756,7 +756,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
     {
       print_Nvector(p,NV);
       printf("conv vels in _entropy failed %e ut\n",ut);
-      getchar();
+      //      getchar();
       return -1;
     }
  
