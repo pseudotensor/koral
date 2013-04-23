@@ -793,11 +793,12 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //**********************************************************************
 	      //updating u - geometrical source terms
 	      ldouble ms[NV],val;
-	      calc_primitives(ix,iy,iz);
 
+	      calc_primitives(ix,iy,iz);
+		  
 	      //metric source terms
 	      f_metric_source_term(ix,iy,iz,ms);
-
+		  
 	      for(iv=0;iv<NV;iv++)
 		{
 		  val=get_u(u,iv,ix,iy,iz)+tfactor*ms[iv]*dt;
@@ -1771,7 +1772,7 @@ int set_bc(ldouble t)
 int
 cell_fixup()
 {
-  //  return 0;
+  //return 0;
 
   int ix,iy,iz,iv;
   int in,ii;
