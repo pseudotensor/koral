@@ -766,7 +766,14 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	{
 	  for(iz=0;iz<NZ;iz++)
 	    {	      
-	  
+	      ldouble gg[4][5],GG[4][5];
+	      ldouble tup[4][4],tlo[4][4];
+	      pick_T(tmuup,ix,iy,iz,tup);
+	      pick_T(tmulo,ix,iy,iz,tlo);
+	      pick_g(ix,iy,iz,gg);
+	      pick_G(ix,iy,iz,GG);
+	      ldouble gdet=gg[3][4];
+	      ldouble pp[NV],uu[NV];
 	      	      
 	      //**********************************************************************
 	      //**********************************************************************
@@ -786,7 +793,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //**********************************************************************
 	      //**********************************************************************
 	      //updating u - geometrical source terms
-	      ldouble ms[NV],val,uu[NV];
+	      ldouble ms[NV],val;
 	      // calc_primitives(ix,iy,iz);
 
 	      //metric source terms
@@ -805,6 +812,13 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 #ifdef RADIATION
 	      calc_primitives(ix,iy,iz);
+	      for(iv=0;iv<NV;iv++)
+		{
+		  pp[iv]=get_u(p,iv,ix,iy,iz);
+		} 
+
+
+
 #ifndef MULTIRADFLUID
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
@@ -889,7 +903,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
 
   //fixup here after rad source term
-  //  cell_fixup();
+  cell_fixup();
   
   //**********************************************************************
   //**********************************************************************
@@ -1757,6 +1771,8 @@ int set_bc(ldouble t)
 int
 cell_fixup()
 {
+  //  return 0;
+
   int ix,iy,iz,iv;
   int in,ii;
   int verbose=0;
@@ -1823,9 +1839,9 @@ cell_fixup()
 			ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
 		    }
 
-		  if((NZ==1 && NY==1 && in>1) ||
-		     (NZ==1 && in>1) ||
-		     (NY==1 && in>1) ||
+		  if((NZ==1 && NY==1 && in>=1) ||
+		     (NZ==1 && in>=1) ||
+		     (NY==1 && in>=1) ||
 		     in>3) //sufficient number of neighbors
 		    {
 		      for(iv=0;iv<NV;iv++)
@@ -1833,7 +1849,7 @@ cell_fixup()
 			  pp[iv]=0;
 			  for(ii=0;ii<in;ii++)
 			    pp[iv]+=ppn[ii][iv];
-			  pp[iv]/=(ldouble)in;
+			  pp[iv]/=(ldouble)in;  
 			}
 		      p2u(pp,uu,&geom);
 
@@ -1847,6 +1863,8 @@ cell_fixup()
 			}
 
 		    }
+		  else
+		    printf("didn't manage to fixup\n");
 		}
 	    }
 	}

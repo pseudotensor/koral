@@ -265,6 +265,7 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 
   ldouble UURHORATIO=1.e-10;
   if(pp[1]<UURHORATIO*pp[0]) pp[1]=UURHORATIO*pp[0];
+  if(pp[1]>1./UURHORATIO*pp[0]) pp[1]=1./UURHORATIO*pp[0];
   //return 0;
 
   int i,j,k,correct;

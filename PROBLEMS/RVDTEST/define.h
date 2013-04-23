@@ -1,4 +1,4 @@
-//#define RADIATION
+#define RADIATION
 
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
@@ -20,7 +20,7 @@
 #define VELPRIM VELR
 //#define BLOB
 
-//#define VISCOSITY
+#define VISCOSITY
 #define SIMPLEVISCOSITY
 #define ALPHAVISC .1
 #define ALPHATOTALPRESSURE
@@ -43,7 +43,7 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(16.-MKS1R0))//(log(16.-MKS1R0))
-#define NX 42
+#define NX 72
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
@@ -64,9 +64,10 @@
 #define GAMMA (4./3.)
 #define ELL 4.5
 
-#define URIN 0.//(5.23e8/CCC)
  
 #ifdef RADIATION
+
+#define URIN (5.23e8/CCC)
 
 #define KKK 7845//1.e3 //the higher KKK the hotter disk i.e. the lower density - the larger prad/pgas
 #define UTPOT .983//.9715//.9715
@@ -77,11 +78,12 @@
 #define CGSOUTPUT
 
 #else
+#define URIN 0.5
 
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  3.e1
-#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
+#define RHOATMMIN  3.e-1
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define DTOUT1 10.e0
 
 #endif
@@ -91,7 +93,7 @@
 #define RK2_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.
 
 #define NODONUT 0
 #define INFLOWING 0
