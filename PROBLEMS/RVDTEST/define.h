@@ -1,4 +1,4 @@
-#define RADIATION
+//#define RADIATION
 
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
@@ -20,7 +20,7 @@
 #define VELPRIM VELR
 //#define BLOB
 
-#define VISCOSITY
+//#define VISCOSITY
 #define SIMPLEVISCOSITY
 #define ALPHAVISC .1
 #define ALPHATOTALPRESSURE
@@ -43,14 +43,14 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(16.-MKS1R0))//(log(16.-MKS1R0))
-#define NX 64
+#define NX 48
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
 #define NX 48
 #endif
 
-#define NY 32
+#define NY 16
 #define NZ 1
 
 
@@ -89,7 +89,7 @@
 #endif
 
 
-#define INT_ORDER 1
+#define INT_ORDER 2
 #define RK2_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0

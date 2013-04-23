@@ -462,7 +462,6 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 
 	  //primitives - to be interpolated
 	  fd_p0[i]=get_u(p,i,ix,iy,iz);
-	  //	  if(i==6 && ix==NX/2-10) printf("%e\n",fd_p0[i]);
 	  fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
 	  fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
 	  fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
@@ -478,8 +477,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       pick_gb(ix+1,iy,iz,0,gr);
       pick_Gb(ix+1,iy,iz,0,Gr);
 
-      check_floors_hd(fd_pl,VELPRIM,gl,Gl);
-      check_floors_hd(fd_pr,VELPRIM,gr,Gr);
+      //check_floors_hd(fd_pl,VELPRIM,gl,Gl);
+      //check_floors_hd(fd_pr,VELPRIM,gr,Gr);
       //end of floor section
 
       f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
@@ -556,8 +555,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	  pick_gb(ix,iy+1,iz,1,gr);
 	  pick_Gb(ix,iy+1,iz,1,Gr);
 
-	  check_floors_hd(fd_pl,VELPRIM,gl,Gl);
-	  check_floors_hd(fd_pr,VELPRIM,gr,Gr);
+	  //check_floors_hd(fd_pl,VELPRIM,gl,Gl);
+	  //check_floors_hd(fd_pr,VELPRIM,gr,Gr);
 	  //end of floor section
 
 	  f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
@@ -615,8 +614,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	  pick_gb(ix,iy,iz+1,2,gr);
 	  pick_Gb(ix,iy,iz+1,2,Gr);
 
-	  check_floors_hd(fd_pl,VELPRIM,gl,Gl);
-	  check_floors_hd(fd_pr,VELPRIM,gr,Gr);
+	  //check_floors_hd(fd_pl,VELPRIM,gl,Gl);
+	  //check_floors_hd(fd_pr,VELPRIM,gr,Gr);
 	  //end of floor section
 
 	  f_flux_prime(fd_pl,2,ix,iy,iz,ffl);
@@ -794,7 +793,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //**********************************************************************
 	      //updating u - geometrical source terms
 	      ldouble ms[NV],val;
-	      // calc_primitives(ix,iy,iz);
+	      calc_primitives(ix,iy,iz);
 
 	      //metric source terms
 	      f_metric_source_term(ix,iy,iz,ms);
@@ -815,6 +814,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      for(iv=0;iv<NV;iv++)
 		{
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
+		  uu[iv]=get_u(u,iv,ix,iy,iz);
 		} 
 
 
@@ -902,7 +902,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
   //**********************************************************************
 
-  //fixup here after rad source term
+  //fixup here after rad source term and metric
   cell_fixup();
   
   //**********************************************************************
@@ -1762,7 +1762,7 @@ int set_bc(ldouble t)
 	{
 	  set_u(u,iv,ix,iy,iz,uval[iv]);
 	}	  
-#endif 	      exceeded
+#endif 	    
     }
 
   return 0;

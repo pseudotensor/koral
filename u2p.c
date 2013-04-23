@@ -126,74 +126,68 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   if(u2pret<0) 
     {
-      /*
-      if(u2pret<0)
-	{
-	  //************************************
-	  //leaving unchanged primitives - should not happen
-	  ret=-3;
-	  for(u2pret=0;u2pret<NV;u2pret++)
-	    pp[u2pret]=ppbak[u2pret];	  
-	  //************************************
-	}
-      //u2pret=u2p_entropy(uu,pp,gg,GG);
-      */
-     if(verbose>1)
+      if(verbose>1)
 	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
-      
+      ret=-1;
+    }
      
+#ifdef ALLOWENTROPYU2P
+  if(u2pret<0)
+    {
       //************************************
       //entropy solver - conserving entropy
       ret=-1;
       //      print_Nvector(uu,NV);
       //      print_Nvector(ppbak,NV);
       //      print_Nvector(pp,NV);
-      
       u2pret=u2p_entropy(uu,pp,gg,GG);
       //************************************
 
-       
       if(verbose>1)
 	{
 	  printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
 	}
-
+    
       if(u2pret<0)
 	{
 	  if(verbose>0)
 	    {
 	      printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+	      getchar();
 	    }
-
-	  //************************************
-	  //leaving unchanged primitives - should not happen
-	  ret=-3;
-	  for(u2pret=0;u2pret<NV;u2pret++)
-	    pp[u2pret]=ppbak[u2pret];	  
-	  //************************************/
-
-	  
-	  /***********************************
-	  //cold RHD - assuming u=SMALL
-	  //	  ret=-2;
-	  //u2pret=u2p_cold(uu,pp,gg,GG);
-	  //************************************
-	  //	  if(verbose>0) getchar();
-
-	  if(u2pret<0)
-	    {
-	      //************************************
-	      //leaving unchanged primitives - should not happen
-	      ret=-3;
-	      for(u2pret=0;u2pret<NV;u2pret++)
-		pp[u2pret]=ppbak[u2pret];	  
-	      //************************************
-	    }
-	  */
 	}
-      
+    }
+#endif
+
+#ifdef ALLOWCOLDU2P
+
+  if(u2pret<0.)
+    {
+      //***********************************
+       //cold RHD - assuming u=SMALL
+      ret=-2;
+      u2pret=u2p_cold(uu,pp,gg,GG);
+      //************************************
+
+      if(u2perr<0)
+	  if(verbose>0)
+	    {
+	      printf("u2p_cold err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+	    }
     }
 
+#endif
+
+  if(u2pret<0)
+    {
+      //************************************
+      //leaving unchanged primitives - should not happen
+      ret=-3;
+      for(u2pret=0;u2pret<NV;u2pret++)
+	pp[u2pret]=ppbak[u2pret];	  
+      //************************************
+    }
+  
   if(ret<0.)
     hdcorr=1;
 
@@ -261,15 +255,20 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
 {
-  if(pp[0]<RHOFLOOR) pp[0]=RHOFLOOR;
+  int verbose=1;
+  int ret=0;
 
-  ldouble UURHORATIO=1.e-10;
-  if(pp[1]<UURHORATIO*pp[0]) pp[1]=UURHORATIO*pp[0];
-  if(pp[1]>1./UURHORATIO*pp[0]) pp[1]=1./UURHORATIO*pp[0];
-  //return 0;
+  //absolute rho
+  if(pp[0]<RHOFLOOR) {pp[0]=RHOFLOOR; ret=-1; if(verbose) printf("hd_floors CASE 1\n");}
 
+  //uint/rho ratios
+  ldouble UURHORATIO=1.e-5;
+  if(pp[1]<UURHORATIO*pp[0]) {pp[1]=UURHORATIO*pp[0];ret=-1;if(verbose) printf("hd_floors CASE 2\n");}
+  if(pp[1]>1./UURHORATIO*pp[0]) {pp[1]=1./UURHORATIO*pp[0];ret=-1;if(verbose) printf("hd_floors CASE 3\n");}
+
+  //velocities
   int i,j,k,correct;
-  // velocities
+  //velocities
   ldouble a,b,c,delta;
   ldouble u1[4],u2[4];
   if(whichvel==VEL4)
@@ -325,6 +324,11 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
     }
   else if(whichvel==VELR)
     {
+      u1[0]=0.;
+      u1[1]=pp[2];
+      u1[2]=pp[3];
+      u1[3]=pp[4];
+
       ldouble qsq=0.;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
@@ -333,15 +337,22 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
       ldouble alpha2=-1./GG[0][0];
       
       correct=0;
-      if(gamma2/alpha2<0.)
-	correct=1;
+      if(gamma2/alpha2<0. || gamma2>GAMMAMAXHD*GAMMAMAXHD)
+	{
+	  if(verbose) 
+	    {
+	      printf("hd_floors CASE 4 %e %e %e\n",gamma2/alpha2,gamma2,GAMMAMAXHD*GAMMAMAXHD);
+	      print_4vector(u1);getchar();
+	    }
+	  correct=1;
+	}
     }
   else
     {
       my_err("VEL not implemented in check_floors_hd()\n");
     }
 
-  if(correct==0) return 0;
+  if(correct==0) return ret;
 
   //correcting and imposing gammamax keeping the direction given by spatial components
   ldouble Afac;
@@ -387,7 +398,8 @@ check_floors_hd(ldouble *pp, int whichvel,ldouble gg[][5], ldouble GG[][5])
   pp[4]=u2[3];
 
   //to let the others know to correct conserved
-  return -1;
+  ret=-1;
+  return ret;
 }
 
 //**********************************************************************
@@ -423,14 +435,14 @@ f_u2p_hot(ldouble W, ldouble* cons)
 int
 u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 {
-  int verbose=0;
+  int verbose=1;
   int i,j,k;
   ldouble rho,u,p,w,W,alpha,D;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
   
-  if(verbose) {printf("********************\n");print_Nvector(uu,NV);}
-  if(verbose) {print_Nvector(pp,NV);}
+  if(verbose>1) {printf("********************\n");print_Nvector(uu,NV);}
+  if(verbose>1) {print_Nvector(pp,NV);}
 
   //alpha
   alpha=sqrt(-1./GG[0][0]);
@@ -496,22 +508,22 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
   //W
   W=(rho+GAMMA*u)*gamma2;
 
-  if(verbose) printf("initial W:%e\n",W);
+  if(verbose>1) printf("initial W:%e\n",W);
  
   //test if does not provide reasonable gamma2
   if(W*W<Qt2)
     {
       W=2.*sqrt(Qt2);
-      if(verbose) printf("corrected W:%e\n",W);
+      if(verbose>0) printf("corrected W:%e\n",W);
     }
 
   //1d Newton solver
-  ldouble CONV=1.e-6;
+  ldouble CONV=1.e-4;
   ldouble EPS=1.e-6;
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
   ldouble cons[3]={Qn,Qt2,D};
-  if(verbose) printf("in:%e %e %e\n",Qn,Qt2,D);
+  if(verbose>1) printf("in:%e %e %e\n",Qn,Qt2,D);
 
   int iter=0;
   do
@@ -523,21 +535,42 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       f1=f_u2p_hot(W*(1.+EPS),cons);
       dfdW=(f1-f0)/(EPS*W);
 
-      if(verbose) printf("%d %e %e %e %e\n",iter,W,f0,f1,dfdW);
+      if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,f1,dfdW);
 
       if(dfdW==0.) {W*=1.1; continue;}
-      W-=f0/dfdW;
+
+      ldouble Wnew=W-f0/dfdW;
+
+      //test if does produce nan and damp solution if so
+      if(Wnew*Wnew<Qt2)
+	{
+	  int idump=0;
+	  ldouble dumpfac=1.;
+	  do
+	    {
+	      idump++;
+	      dumpfac/=2.;
+	      Wnew=W-dumpfac*f0/dfdW;
+	    }
+	  while(Wnew*Wnew<Qt2 && idump<100);
+	  
+	  if(idump>=100) return -1;
+
+	  if(verbose>0) printf("damped successfuly\n");
+	}
+
+      W=Wnew; 
     }
   while(fabs((W-Wprev)/Wprev)>CONV && iter<50);
 
   if(iter>=50)
     {
-      if(verbose) printf("iter exceeded in u2p_hot\n");
+      if(verbose>0) printf("iter exceeded in u2p_hot\n");
       return -1;
     }
   
-  if(isnan(W) || isinf(W)) {if(verbose)printf("nan/inf W: %e\n",W); return -1;}
-  if(verbose) {printf("the end: %e\n",W); }
+  if(isnan(W) || isinf(W)) {if(verbose>0)printf("nan/inf W: %e\n",W); getchar();return -1;}
+  if(verbose>1) {printf("the end: %e\n",W); }
 
   //W found, let's calculate v2 and the rest
   ldouble v2=Qt2/W/W;
@@ -554,7 +587,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 
   if(rho<0. || u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
     {
-      if(verbose) printf("neg u rho in u2p_hot\n");
+      if(verbose>0) printf("neg u rho in u2p_hot %e %e %e %e\n",rho,u,gamma2,W);//getchar();
       return -1;
     }
 
@@ -575,7 +608,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 
   pp[5]=calc_Sfromu(rho,u);
 
-  if(verbose) {print_Nvector(pp,NV); getchar();}
+  if(verbose>1) {print_Nvector(pp,NV); getchar();}
 
   return 0;
 
@@ -653,7 +686,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
     S=Sut/ut;
    
     uu=(ldouble)pow((pow(rho,1./GAMMAM1+1.)*exp(Sut/rhout)),GAMMAM1)/GAMMAM1;
- 
+
     W=ut2*(uu*GAMMA + rho);  
 
     vr=-((gphth*gthr*Ttph - gphr*gthth*Ttph - gphth*gthph*Ttr + gphph*gthth*Ttr + gphr*gthph*Ttth - gphph*gthr*Ttth - gphth*gthr*gtph*W + gphr*gthth*gtph*W + gphth*gthph*gtr*W - gphph*gthth*gtr*W - gphr*gthph*gtth*W + gphph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W));
@@ -763,7 +796,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   //************************************
   //************************************
   //checking on hd floors
-  check_floors_hd(p,VELPRIM,g,G);
+  //check_floors_hd(p,VELPRIM,g,G);
   //************************************
   //************************************
 
@@ -839,7 +872,7 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   //************************************
   //************************************
   //checking on hd floors
-  check_floors_hd(p,VEL3,g,G);
+  //check_floors_hd(p,VEL3,g,G);
   //************************************
   //***********************************
 

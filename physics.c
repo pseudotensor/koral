@@ -880,7 +880,7 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
   //somnething else - leave entropy as it was
   else
     {
-      //nothing
+      my_err("err in update entropy\n");//nothing
     }   
   
   return 0;
