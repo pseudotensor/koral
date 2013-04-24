@@ -732,7 +732,7 @@
 #define VELPRIMRAD VELR
 #endif
 
-#define ALLOWENTROPYU2P
+//#define ALLOWENTROPYU2P
 
 //#define WAVESPEEDSATFACES
 

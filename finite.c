@@ -1905,10 +1905,23 @@ cell_fixup()
 		    {
 		      for(iv=0;iv<NV;iv++)
 			{
-			  pp[iv]=0;
-			  for(ii=0;ii<in;ii++)
-			    pp[iv]+=ppn[ii][iv];
-			  pp[iv]/=(ldouble)in;  
+#ifdef AVERAGEONLYUINT
+			  if(iv==1)
+			    {
+			      pp[iv]=0;
+			      for(ii=0;ii<in;ii++)
+				pp[iv]+=ppn[ii][iv];
+			      pp[iv]/=(ldouble)in;  
+			    }
+			  else
+			    pp[iv]=get_u(p,iv,ix,iy,iz);
+#else
+			   pp[iv]=0;
+			      for(ii=0;ii<in;ii++)
+				pp[iv]+=ppn[ii][iv];
+			      pp[iv]/=(ldouble)in;  
+#endif
+			      
 			}
 		      p2u(pp,uu,&geom);
 
@@ -1923,7 +1936,7 @@ cell_fixup()
 
 		    }
 		  else
-		    printf("didn't manage to fixup\n");
+		    printf("didn't manage to fixup at %d %d %d\n",ix,iy,iz);
 		}
 	    }
 	}

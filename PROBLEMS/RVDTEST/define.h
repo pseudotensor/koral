@@ -64,6 +64,7 @@
 #define GAMMA (4./3.)
 #define ELL 4.5
 
+#define AVERAGEONLYUINT
 #define UURHORATIOMIN 1.e-7
 #define UURHORATIOMAX 1.e3
 #define EERHORATIOMIN 1.e-7
@@ -78,8 +79,8 @@
 #define RHOATMMIN  1.e-23
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
-#define DTOUT1 1.e1
-#define CGSOUTPUT
+#define DTOUT1 1.e-2
+//#define CGSOUTPUT
 
 #else
 #define URIN 0.5
