@@ -123,7 +123,7 @@ solve_all_problems_5(ldouble tstart)
       else 
 	tstepden=(1./min_dx);          
 #endif
-      
+
       dt=TSTEPLIM*1./tstepden;
 
       //reseting wavespeeds

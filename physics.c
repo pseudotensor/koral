@@ -895,18 +895,35 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
       set_u(p,5,ix,iy,iz,S);
       set_u(u,5,ix,iy,iz,S*ut); 
     }
-  //u2p_entropy worked
-  else if(u2pflag==-1  && uu>0. && rho>0.)
+  //u2p_hot didn't work
+  //keeping Sut, updating pp[5]
+  else
     {
       Sut=get_u(u,5,ix,iy,iz);
       S=Sut/ut;
+
+      ldouble uint=calc_ufromS(S,rho);
+      /*
+      if(uint/rho > 1.) 
+	{
+	  printf("damping freeely evolving entropy to u/rho=1\n");
+	  S=calc_Sfromu(rho,rho);
+	  Sut=S*ut;
+	  set_u(u,5,ix,iy,iz,Sut);	  
+	}
+      */
+      /*
+      if(S > 0.) 
+	{
+	  printf("damping freeely evolving entropy to u/rho=1\n");
+	  S=0.;
+	  Sut=0.;
+	  set_u(u,5,ix,iy,iz,Sut);	  
+	}
+      */
+
       set_u(p,5,ix,iy,iz,S);
     }
-  //somnething else - leave entropy as it was
-  else
-    {
-      my_err("err in update entropy\n");//nothing
-    }   
   
   return 0;
 }
