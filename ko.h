@@ -348,6 +348,7 @@ int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
 int u2p(ldouble *uu, ldouble *pp, void*,int*,int*);
 int u2p_hot(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_entropy(ldouble*,ldouble*,void*);
+int u2p_entropy_harm(ldouble*,ldouble*,void*);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_rad(ldouble *uu, ldouble *pp, void*,int*);
 int u2p_rad_onff(ldouble *uu, ldouble *pp, void*,int*);

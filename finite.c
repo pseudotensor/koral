@@ -305,11 +305,11 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   //#pragma omp critical
   if(my_max(aaazhd,aaazrad)>max_ws[2]) max_ws[2]=my_max(aaazhd,aaazrad);
 #else 
-  //#pragma omp critical
+  #pragma omp critical
   if(aaaxhd>max_ws[0]) max_ws[0]=aaaxhd;  
-  //#pragma omp critical
+  #pragma omp critical
   if(aaayhd>max_ws[1]) max_ws[1]=aaayhd;
-  //#pragma omp critical
+  #pragma omp critical
   if(aaazhd>max_ws[2]) max_ws[2]=aaazhd;
 #endif 
 
@@ -1830,7 +1830,8 @@ int set_bc(ldouble t)
 int
 cell_fixup()
 {
-  //return 0;
+  if(DOFIXUPS==0)
+    return 0;
 
   int ix,iy,iz,iv;
   int in,ii;
@@ -1916,10 +1917,10 @@ cell_fixup()
 			  else
 			    pp[iv]=get_u(p,iv,ix,iy,iz);
 #else
-			   pp[iv]=0;
-			      for(ii=0;ii<in;ii++)
-				pp[iv]+=ppn[ii][iv];
-			      pp[iv]/=(ldouble)in;  
+			  pp[iv]=0;
+			  for(ii=0;ii<in;ii++)
+			    pp[iv]+=ppn[ii][iv];
+			  pp[iv]/=(ldouble)in;  
 #endif
 			      
 			}

@@ -732,9 +732,23 @@
 #define VELPRIMRAD VELR
 #endif
 
-//#define ALLOWENTROPYU2P
+#ifndef DOFIXUPS
+#define DOFIXUPS 1
+#endif
 
-//#define WAVESPEEDSATFACES
+#ifndef ALLOWENTROPYU2P
+#define ALLOWENTROPYU2P 1
+#endif
+
+#ifndef ALLOWCOLDU2P
+#define ALLOWCOLDU2P 0
+#endif
+
+#ifndef FIXUPAFTERENTROPY
+#define FIXUPAFTERENTROPY 0
+#endif
+
+
 
 #define SMALL 1.e-50 //small number 
 
@@ -983,6 +997,7 @@
 
 #define GAMMAM1 (GAMMA-1.) //gamma - 1
 
+#define IGAMMAR (GAMMAM1/GAMMA)
 
 #define LCM (MASSCM) //unit of length in cm
 

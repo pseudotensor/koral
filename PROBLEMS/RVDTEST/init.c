@@ -208,6 +208,10 @@ pp[5]=calc_Sfromu(pp[0],pp[1]);
 //to conserved
 p2u(pp,uu,&geom);
 
+//test
+//u2p_entropy(uu,pp,&geom);
+//u2p_entropy_harm(uu,pp,&geom);
+
 /***********************************************/
 
 int iv;

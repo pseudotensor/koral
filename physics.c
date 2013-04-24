@@ -27,6 +27,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int 
   ldouble pre=(GAMMA-1.)*uu;
   ldouble cs2=GAMMA*pre/(rho+uu+pre);
 
+  if(cs2>=1.0) cs2=0.99999;
   if(cs2<0.) cs2=0.;
 
   //**********************************************************************
@@ -272,6 +273,15 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 
   calc_wavespeeds_lr_pure(pp,gg,GG,ix,iy,iz,aaa);
 
+  /*
+  conv_velsinprims(pp,VELPRIM,VEL3,gg,GG);
+  if(fabs(pp[2])>.2 || (ix==NX-1 && iy==NY-1))
+    {
+      printf("%d %d %d\n %e %e %e\n",ix,iy,iz,pp[2],pp[3],pp[4]);
+      print_Nvector(aaa,6);
+      getchar();
+    }
+  */
   return 0;
 }
 
