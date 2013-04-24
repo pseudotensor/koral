@@ -732,9 +732,29 @@
 #define VELPRIMRAD VELR
 #endif
 
-//#define ALLOWENTROPYU2P
+#define ALLOWENTROPYU2P
+
+//#define WAVESPEEDSATFACES
 
 #define SMALL 1.e-50 //small number 
+
+#ifndef UURHORATIOMIN
+#define UURHORATIOMIN 1.e-7
+#endif
+
+#ifndef UURHORATIOMAX 
+#define UURHORATIOMAX 1.e3
+#endif
+
+#ifndef EERHORATIOMIN
+#define EERHORATIOMIN 1.e-7
+#endif
+
+#ifndef EERHORATIOMAX 
+#define EERHORATIOMAX 1.e3
+#endif
+
+
 
 #define ERADLIMIT (10.*SMALL)
 

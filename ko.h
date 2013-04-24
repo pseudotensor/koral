@@ -237,6 +237,8 @@ struct rad_parameters
   ldouble x,y,z;
 };
 
+int 
+calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int,int,int,ldouble *aaa);
 int calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4]);
 int calc_Tij( ldouble *p, void*, ldouble T[][4]);
 ldouble max_eigen_Jac(ldouble *,ldouble*,int,void*);
@@ -345,7 +347,7 @@ int u2p_hot_new(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5]);
 int u2p_hot_gsl(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5]);
 int u2p(ldouble *uu, ldouble *pp, void*,int*,int*);
 int u2p_hot(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
-int u2p_entropy(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
+int u2p_entropy(ldouble*,ldouble*,void*);
 int u2p_cold(ldouble*,ldouble*,ldouble[][5],ldouble[][5]);
 int u2p_rad(ldouble *uu, ldouble *pp, void*,int*);
 int u2p_rad_onff(ldouble *uu, ldouble *pp, void*,int*);

@@ -140,7 +140,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
       //      print_Nvector(uu,NV);
       //      print_Nvector(ppbak,NV);
       //      print_Nvector(pp,NV);
-      u2pret=u2p_entropy(uu,pp,gg,GG);
+      u2pret=u2p_entropy(uu,pp,ggg);
       //************************************
 
       if(verbose>1)
@@ -153,7 +153,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	  if(verbose>0)
 	    {
 	      printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-	      getchar();
+	      //	      getchar();
 	    }
 	}
     }
@@ -265,23 +265,21 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   gg=geom->gg;
   GG=geom->GG;
 
-
   //absolute rho
   if(pp[0]<RHOFLOOR) {pp[0]=RHOFLOOR; ret=-1; if(verbose) printf("hd_floors CASE 1\n");}
 
   //uint/rho ratios
-  ldouble UURHORATIO=1.e-7;
-  if(pp[1]<UURHORATIO*pp[0]) {pp[1]=UURHORATIO*pp[0];ret=-1;}//if(verbose) printf("hd_floors CASE 2\n");}
-  if(pp[1]>1./UURHORATIO*pp[0]) {pp[1]=1./UURHORATIO*pp[0];ret=-1;}//if(verbose) printf("hd_floors CASE 3\n");}
+  
+  if(pp[1]<UURHORATIOMIN*pp[0]) {pp[1]=UURHORATIOMIN*pp[0];ret=-1;}//if(verbose) printf("hd_floors CASE 2\n");}
+  if(pp[1]>UURHORATIOMAX*pp[0]) {pp[0]=1./UURHORATIOMAX*pp[1];ret=-1;}//if(verbose) printf("hd_floors CASE 3\n");}
 
 #ifdef RADIATION
   //EE/rho ratios
-  ldouble EERHORATIO=1.e-7;
   ldouble pp2[NV];
   prad_lab2ff(pp, pp2, ggg);
   
-  if(pp[6]<EERHORATIO*pp[0]) {pp[6]=EERHORATIO*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
-  if(pp[6]>1./EERHORATIO*pp[0]) {pp[6]=1./EERHORATIO*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
+  if(pp[6]<EERHORATIOMIN*pp[0]) {pp[6]=EERHORATIOMIN*pp[0];ret=-1;}//if(verbose) printf("hd_floors CASE R2\n");}
+  if(pp[6]>EERHORATIOMAX*pp[0]) {pp[0]=1./EERHORATIOMAX*pp[6];ret=-1;}//if(verbose) printf("hd_floors CASE R3\n");}
 
   prad_ff2lab(pp2, pp, ggg);
 #endif
@@ -590,7 +588,7 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
       return -1;
     }
   
-  if(isnan(W) || isinf(W)) {if(verbose>0)printf("nan/inf W: %e\n",W); getchar();return -1;}
+  if(isnan(W) || isinf(W)) {if(verbose>0)printf("nan/inf W: %e\n",W); return -1;}
   if(verbose>1) {printf("the end: %e\n",W); }
 
   //W found, let's calculate v2 and the rest
@@ -641,9 +639,25 @@ u2p_hot(ldouble *uu, ldouble *pp, ldouble gg[][5], ldouble GG[][5])
 //auxiliary solver based on the entropy conservation
 //works for general metric in four velocities
 int
-u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
+u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
 {
   int verbose=0;
+  int superverbose=0;
+
+  if(superverbose)
+    {
+      printf("start of u2p_entropy()\n");
+      printf("in:\n");
+      print_Nvector(uuu,NV);
+      print_Nvector(p,NV);
+    }
+
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*g)[5],(*G)[5];
+  g=geom->gg;
+  G=geom->GG;
 
   ldouble gtt=g[0][0];
   ldouble gtr=g[0][1];
@@ -820,6 +834,25 @@ u2p_entropy(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   //check_floors_hd(p,VELPRIM,g,G);
   //************************************
   //************************************
+
+  ldouble uuu2[NV];
+  int iv;
+  p2u(p,uuu2,ggg);
+  for(iv=0;iv<NVHD;iv++)
+    {
+      if(iv==1) continue;
+      if(fabs(uuu2[iv]-uuu[iv])/uuu[iv]>1.e-8) superverbose=1;
+    }
+     
+
+  if(superverbose)
+    {
+      printf("u2p_entropy lost precision:\n");
+      print_Nvector(uuu,NV);
+      print_Nvector(uuu2,NV);
+      print_Nvector(p,NV);
+      //      getchar();
+    }
 
   return 0;
 }
@@ -1192,7 +1225,7 @@ static int get_m1closure_urfconrel(int verbose,
 	printf("%e %e %e\n",Erf,gammarel2,Avcov[0]);
 	print_4vector(Avcon);
 	print_4vector(Avcov);
-	getchar();
+	//	getchar();
       }
     // get \gammarel=1 case
     ldouble gammarel2slow=pow(1.0+10.0*NUMEPSILON,2.0);

@@ -2,31 +2,12 @@
 //some problem independent physics
 
 #include "ko.h"
-
 //*************************************************
 //calculates left and right wave speeds at cell center
 //*************************************************
 int
-calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
+calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int iy,int iz,ldouble *aaa)
 {
-  //coordinates
-  ldouble xx[4];
-  xx[0]=0.;
-  xx[1]=get_x(ix,0);
-  xx[2]=get_x(iy,1);
-  xx[3]=get_x(iz,2);
-
-  ldouble (*gg)[5],(*GG)[5];
-
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
-  
-  //temporary using local arrays
-  gg=geom.gg;
-  GG=geom.GG;
-
-
-  ldouble pp[NV],uuu[NV];
   int iv;
   
   ldouble axhdl,axhdr,ayhdl,ayhdr,azhdl,azhdr;
@@ -34,10 +15,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   axl=axr=ayl=ayr=azl=azr=1.;
   
   ldouble ucon[4],ucov[4],cst1,cst2,cst3,cst4;
-
-  //picking up primitives 
-  for(iv=0;iv<NV;iv++)
-    pp[iv]=get_u(p,iv,ix,iy,iz);
+  
 
   //**********************************************************************
   //***** hydro: speed of sound ******************************************
@@ -188,12 +166,17 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   //**********************************************************************
   //***** radiation: characteristic wave speed ***************************
   //**********************************************************************
+ struct geometry geom;
+ fill_geometry(ix,iy,iz,&geom);
 
   ldouble aval[6];
   int verbose=0;
 
   //physical size of the cell
   ldouble dx[3];
+  ldouble xx[4];
+  get_xx(ix,iy,iz,xx);
+
   dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
   dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
   dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);
@@ -261,6 +244,33 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   aaa[9]=ayr;
   aaa[10]=azl;
   aaa[11]=azr;
+
+  return 0;
+}
+
+//*************************************************
+//calculates left and right wave speeds at cell center
+//*************************************************
+int
+calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
+{
+  ldouble (*gg)[5],(*GG)[5];
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  //temporary using local arrays
+  gg=geom.gg;
+  GG=geom.GG;
+
+  ldouble pp[NV];
+  int iv;
+
+  //picking up primitives 
+  for(iv=0;iv<NV;iv++)
+    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+  calc_wavespeeds_lr_pure(pp,gg,GG,ix,iy,iz,aaa);
 
   return 0;
 }
@@ -834,6 +844,11 @@ ldouble
 calc_Sfromu(ldouble rho,ldouble u)
 {
   ldouble ret = rho*log(pow((GAMMAM1*u/rho),1./GAMMAM1)/rho);
+  
+  //HARM - gives the same result
+  //ldouble indexn=1.0/GAMMAM1;
+  //printf("entr: %e %e\n",ret,rho*log(pow(GAMMAM1*u,indexn)/pow(rho,indexn+1.0)));getchar();
+
   return ret;
 }
 

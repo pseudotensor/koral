@@ -358,6 +358,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	    }
 	}
     }
+
  
   //**********************************************************************
   //**********************************************************************
@@ -376,7 +377,18 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
-	      
+	
+  int superverbose=0;
+
+  ldouble pp[NV];
+  if(superverbose)
+    {
+      ix=10;iy=1;iz=0;
+      for(iv=0;iv<NVHD;iv++)
+	pp[iv]=get_u(p,iv,ix,iy,iz);
+      print_Nvector(pp,NV);
+    }
+      
   //calculates and saves wavespeeds
 #pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (guided)
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
@@ -401,6 +413,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
+      
+      
       //parasite to update of entropy
       //      update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz));
 
@@ -743,7 +757,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	{
 	  for(iz=0;iz<NZ;iz++)
 	    {	      
-	      calc_primitives(ix,iy,iz);
+	      //	      calc_primitives(ix,iy,iz);
 	    }
 	}
     }	      
@@ -751,11 +765,21 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
   //**********************************************************************
   //**********************************************************************
 
-  cell_fixup();
+  //  cell_fixup();
 
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
+
+
+  if(superverbose)
+    {
+      ix=10;iy=1;iz=0;
+      for(iv=0;iv<NVHD;iv++)
+	pp[iv]=get_u(p,iv,ix,iy,iz);
+      print_Nvector(pp,NV);
+      getchar();
+    }
 
   //again over cells
 #pragma omp parallel for private(iy,iz,iv) schedule (guided)
@@ -794,7 +818,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      //updating u - geometrical source terms
 	      ldouble ms[NV],val;
 
-	      calc_primitives(ix,iy,iz);
+
+	      //calc_primitives(ix,iy,iz);
 		  
 	      //metric source terms
 	      f_metric_source_term(ix,iy,iz,ms);
@@ -953,9 +978,20 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //converting interpolated primitives to conserved
   pick_gb(ix,iy,iz,0,gg);
   pick_Gb(ix,iy,iz,0,GG);
+
+#ifdef WAVESPEEDSATFACES
+  ldouble aaa[12];
+  calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+  am1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
+  am1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
+  calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+  ap1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
+  ap1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
+#endif
    
   p2u(fd_uLl,fd_uLl,&geom);
   p2u(fd_uRl,fd_uRl,&geom);
+
 
   //save calculated conserved basing on primitives on faces
   for(i=0;i<NV;i++)
@@ -1019,6 +1055,17 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
       pick_gb(ix,iy,iz,1,gg);
       pick_Gb(ix,iy,iz,1,GG);
+
+
+#ifdef WAVESPEEDSATFACES
+  ldouble aaa[12];
+  calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+  am1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
+  am1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
+  calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+  ap1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
+  ap1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
+#endif
  	    
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
@@ -1095,6 +1142,17 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
       pick_gb(ix,iy,iz,2,gg);
       pick_Gb(ix,iy,iz,2,GG);
+
+
+#ifdef WAVESPEEDSATFACES
+  ldouble aaa[12];
+  calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+  am1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
+  am1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
+  calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+  ap1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
+  ap1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
+#endif
 
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
