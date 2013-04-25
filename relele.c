@@ -370,6 +370,12 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
     }
   if(atmtype==3)
     {
+#ifndef PAR_D
+#define PAR_D 1.e0
+#endif
+#ifndef PAR_E
+#define PAR_E 1.e-4
+#endif
       ldouble r=xx[1];
       ldouble D=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
       ldouble E=PAR_E/(pow(r*r*sqrt(2./r),GAMMA)*pow(1.-2./r,(GAMMA+1.)/4.));

@@ -33,7 +33,6 @@
 
 #define VISCOSITY
 #define SIMPLEVISCOSITY
-#define ALPHAVISC .1
 #define ALPHATOTALPRESSURE
 #define RMINVISC 2.
 
@@ -54,14 +53,14 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(15.3-MKS1R0))//(log(16.-MKS1R0))
-#define NX 48
+#define NX 64
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
 #define NX 48
 #endif
 
-#define NY 16
+#define NY 32
 #define NZ 1
 
 
@@ -78,19 +77,46 @@
 
 #ifdef RADIATION
 
-#define URIN (5.23e8/CCC)
+//mdot = 0.5
+#define ALPHAVISC .1
+#define URIN (1.57e7/CCC)
+#define KKK 291.
+#define UTPOT .9704
 
-#define KKK 7845.//1.e3 //the higher KKK the hotter disk i.e. the lower density - the larger prad/pgas
-#define UTPOT .983//.9715//.9715
+//mdot = 1
+/*
+#define ALPHAVISC .1
+#define URIN (5.23e7/CCC)
+#define KKK 1894.
+#define UTPOT .9734
+*/
+
+//mdot = 10
+/*
+#define ALPHAVISC .1
+#define URIN (3.92e8/CCC)
+#define KKK 7127.
+#define UTPOT .983
+*/
+
+//mdot = 10
+/*
+#define ALPHAVISC .01
+#define URIN (3.92e7/CCC)
+#define KKK 3300.
+#define UTPOT .983
+*/
+
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
-#define DTOUT1 1.e0
+#define DTOUT1 1.e5
 #define CGSOUTPUT
 
-#else
-#define URIN 0.5
+#else //purehd
 
+#define ALPHAVISC .1
+#define URIN 0.5
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
 #define RHOATMMIN  3.e-3

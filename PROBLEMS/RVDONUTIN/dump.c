@@ -39,5 +39,6 @@ ldouble prad=calc_LTE_EfromT(Trad)/3.;
 				  v4=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);
 				  v5=get_cflag(HDFIXUPFLAG,ix,iy,iz);
 				  v6=get_cflag(RADFIXUPFLAG,ix,iy,iz);
+				  v1=get_cflag(ENTROPYFLAG,ix,iy,iz);
 
-				  v7=f;
+				  v7=v1;

@@ -50,10 +50,10 @@
 //44* RADNTCYL - emission from midplane in cylindrical
 //45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
-//47* MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
+//47 MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
 //48* RVDTEST - testing the entropy near the axis
 
-#define PROBLEM 48
+#define PROBLEM 43
 
 
 #if(PROBLEM==48)

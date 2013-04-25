@@ -42,6 +42,11 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
   {
     //ambient
     set_hdatmosphere(pp,xxvec,gg,GG,0);
+
+#ifdef BLOB
+    pp[0]*=(1.+10.*exp(-(xx-14)*(xx-14)/.1));
+#endif
+
 #ifdef RADIATION
     set_radatmosphere(pp,xxvec,gg,GG,0);
 #endif
@@ -199,9 +204,13 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //hd floors
-check_floors_hd(pp,VELPRIM,gg,GG);
+//check_floors_hd(pp,VELPRIM,gg,GG);
 //to conserved
 p2u(pp,uu,&geom);
+
+//test
+//u2p_entropy(uu,pp,&geom);
+//u2p_entropy_harm(uu,pp,&geom);
 
 /***********************************************/
 

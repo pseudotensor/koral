@@ -64,6 +64,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      calc_tautot(pp,xxBL,dx,tautot);
 
+#ifdef CGSOUTPUT
+	      rho=rhoGU2CGS(rho);
+#endif
+
 	      //surface density (2)
 	      profiles[0][ix]+=rho*dx[1]*dx[2];
 	      //rest mass flux (3)
@@ -190,7 +194,7 @@ calc_lum()
       iz=0; ix=NX-1;
       for(iy=0;iy<NY;iy++)
 	{
-	  for(iv=0;iv<NVHD;iv++)
+	  for(iv=0;iv<NV;iv++)
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 
 	  ldouble (*gg)[5],(*GG)[5];
@@ -214,9 +218,10 @@ calc_lum()
 	  prad_lab2on(pp,pp,&geomBL);
 
 	  Fr=pp[FX(0)];	
+	  if(Fr<0.) Fr=0.;
 
-	  dx[1]=dx[1]*sqrt(geomBL.gg[2][2]);
-	  dx[2]=2.*M_PI*sqrt(geomBL.gg[3][3]);
+	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
+	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
 
 #ifdef CGSOUTPUT
 	  Fr=fluxGU2CGS(Fr);
@@ -287,8 +292,8 @@ calc_mdot(ldouble radius)
 
 	  conv_vels(ucon,ucon,VELPRIM,VEL4,ggBL,GGBL);
 
-	  dx[1]=dx[1]*sqrt(ggBL[2][2]);
-	  dx[2]=2.*M_PI*sqrt(ggBL[3][3]);
+	  dx[1]=dx[1]*sqrt(gg[2][2]);
+	  dx[2]=2.*M_PI*sqrt(gg[3][3]);
 
 #ifdef CGSOUTPUT
 	  rho=rhoGU2CGS(rho);
