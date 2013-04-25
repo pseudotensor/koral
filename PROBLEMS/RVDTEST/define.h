@@ -1,4 +1,4 @@
-//#define RADIATION
+#define RADIATION
 
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
@@ -31,7 +31,7 @@
 #define VELPRIM VELR
 //#define BLOB
 
-//#define VISCOSITY
+#define VISCOSITY
 #define SIMPLEVISCOSITY
 #define ALPHAVISC .1
 #define ALPHATOTALPRESSURE
@@ -85,7 +85,7 @@
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
-#define DTOUT1 1.e1
+#define DTOUT1 1.e0
 //#define CGSOUTPUT
 
 #else
