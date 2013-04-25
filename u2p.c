@@ -1853,41 +1853,6 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
 
-#ifdef EDDINGTON_APR
-  int irf,ii;
-  ldouble pp10[10],uu10[10];
-  for(ii=0;ii<NVHD;ii++)
-    {
-      pp10[ii]=pp[ii];
-      uu10[ii]=uu[ii];
-    }
-  
-  for(irf=0;irf<NRF;irf++)
-    {
-      pp10[EE(0)]=pp[EE(irf)];
-      pp10[FX(0)]=pp[FX(irf)];
-      pp10[FY(0)]=pp[FY(irf)];
-      pp10[FZ(0)]=pp[FZ(irf)];
-      uu10[EE(0)]=uu[EE(irf)];
-      uu10[FX(0)]=uu[FX(irf)];
-      uu10[FY(0)]=uu[FY(irf)];
-      uu10[FZ(0)]=uu[FZ(irf)];
-
-      if(uu10[EE(0)]<EEFLOsOR)
-	u2p_rad_onff(uu10,pp10, ggg, corrected);
-      else
-	{
-	  p2u_rad(pp10,uu10,ggg);
-	}
-
-      pp[EE(irf)]=pp10[EE(0)];
-      pp[FX(irf)]=pp10[FX(0)];
-      pp[FY(irf)]=pp10[FY(0)];
-      pp[FZ(irf)]=pp10[FZ(0)];
-    }
-  return 0;
-#endif
-
 #ifdef LABRADFLUXES
   //primitives = R^t_mu
   pp[6]=uu[6];

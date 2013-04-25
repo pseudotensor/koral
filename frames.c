@@ -687,9 +687,6 @@ boost22_rf2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldou
   my_err("boost22_rf2lab() not working for LABRADFLUXES\n");
 #endif
 
-#ifdef EDDDINGTON_APR
-  my_err("boost22_rf2lab() not working for EDDINGTON_APR\n");
-#endif
 
   int i,j,k,l;
   ldouble Tt[4][4];

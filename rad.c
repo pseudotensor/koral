@@ -765,75 +765,9 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ldouble urfcon[4];
   //covariant formulation
 
-#ifdef EDDINGTON_APR
-  calc_Rij_ff(pp0,Rij);
-  return 0;
-#endif
-
 #ifdef LABRADFLUXES
-
-#if(1)
   //artificially puts pp=uu and converts them to urf and Erf using the regular converter
   u2p_rad_urf(pp0,pp,ggg,&i);
-
-#else 
-  //from labfluxes branch
-
-  for(i=0;i<NV;i++)
-    pp[i]=pp0[i];
-  //R^0_mu
-  ldouble A[4]={pp[6],pp[7],pp[8],pp[9]};
-
-  //indices up
-  indices_12(A,A,GG);
-
-  //covariant formulation
-  
-  //g_munu R^0mu R^0nu
-  ldouble gRR=gg[0][0]*A[0]*A[0]+gg[0][1]*A[0]*A[1]+gg[0][2]*A[0]*A[2]+gg[0][3]*A[0]*A[3]+
-    gg[1][0]*A[1]*A[0]+gg[1][1]*A[1]*A[1]+gg[1][2]*A[1]*A[2]+gg[1][3]*A[1]*A[3]+
-    gg[2][0]*A[2]*A[0]+gg[2][1]*A[2]*A[1]+gg[2][2]*A[2]*A[2]+gg[2][3]*A[2]*A[3]+
-    gg[3][0]*A[3]*A[0]+gg[3][1]*A[3]*A[1]+gg[3][2]*A[3]*A[2]+gg[3][3]*A[3]*A[3];
- 
-  //the quadratic equation for u^t of the radiation rest frame (urf[0])
-  ldouble a,b,c;
-  a=16.*gRR;
-  b=8.*(gRR*GG[0][0]+A[0]*A[0]);
-  c=gRR*GG[0][0]*GG[0][0]-A[0]*A[0]*GG[0][0];
-  ldouble delta=b*b-4.*a*c;
-  urfcon[0]=sqrtl((-b-sqrtl(delta))/2./a);
-  if(isnan(urfcon[0])) 
-    {
-      //      printf("err\n");
-      //      print_4vector(Av);
-      
-      //TODO: gtph
-      ldouble utaim=10.;
-      ldouble Afac = sqrtl((-1.-utaim*utaim*gg[0][0])/(A[1]*A[1]*gg[1][1]+A[2]*A[2]*gg[2][2]+A[3]*A[3]*gg[3][3]));
-      
-      urfcon[0]=utaim;
-      urfcon[1]=Afac*A[1];
-      urfcon[2]=Afac*A[2];
-      urfcon[3]=Afac*A[3];
-    }
-
-  //radiative energy density in the radiation rest frame
-  Erf=3.*A[0]/(4.*urfcon[0]*urfcon[0]+GG[0][0]);
-
-  //four-velocity of the rest frame
-  urfcon[1]=3./(4.*Erf*urfcon[0])*(A[1]-1./3.*Erf*GG[0][1]);
-  urfcon[2]=3./(4.*Erf*urfcon[0])*(A[2]-1./3.*Erf*GG[0][2]);
-  urfcon[3]=3./(4.*Erf*urfcon[0])*(A[3]-1./3.*Erf*GG[0][3]);
-
-  //lab frame:
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
-
-  return 0;
-
-#endif //method
-
 #else
   for(i=0;i<NV;i++)
     pp[i]=pp0[i];

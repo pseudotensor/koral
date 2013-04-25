@@ -185,11 +185,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int 
   calc_tautot(pp,xx,dx,tautot);
   
 #ifndef MULTIRADFLUID
-#ifdef EDDINGTON_APR
-  calc_rad_wavespeeds_on_base_mf(pp,tautot,aval);
-#else
   calc_rad_wavespeeds(pp,&geom,tautot,aval,verbose);
-#endif
 
 #ifdef FULLRADWAVESPEEDS
   aval[0]=aval[1]=1./sqrt(gg[1][1]);
@@ -197,13 +193,8 @@ calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int 
   aval[4]=aval[5]=1./sqrt(gg[3][3]);
 #endif
 
-#else
-
-#ifdef EDDINGTON_APR
-  calc_rad_wavespeeds_on_base_mf(pp,tautot,aval);
-#else
+#else //multifluid
   calc_rad_wavespeeds_mf_total(pp,gg,GG,tautot,aval);
-#endif
 #endif
 
   axl=aval[0];

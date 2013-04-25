@@ -127,36 +127,6 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   tlo=geom->tlo;
   tup=geom->tup;
   
-#ifdef EDDINGTON_APR
-  int ii;
-  ldouble pp10[10];
-  ldouble Rij[4][4];
-
-  for(ii=0;ii<NVHD;ii++)
-    {
-      pp10[ii]=p[ii];
-    }
-  
-  for(irf=0;irf<NRF;irf++)
-    {
-      pp10[EE(0)]=p[EE(irf)];
-      pp10[FX(0)]=p[FX(irf)];
-      pp10[FY(0)]=p[FY(irf)];
-      pp10[FZ(0)]=p[FZ(irf)];
-
-      calc_Rij_ff(pp10,Rij);  
-      trans22_on2cc(Rij,Rij,tlo);  
-      boost22_ff2lab(Rij,Rij,pp10,gg,GG); 
-      indices_2221(Rij,Rij,gg);  
-
-      u[EE(irf)]=Rij[0][0];
-      u[FX(irf)]=Rij[0][1];
-      u[FY(irf)]=Rij[0][2];
-      u[FZ(irf)]=Rij[0][3];
-    }
-  return 0;
-#endif
-
 #ifdef LABRADFLUXES
   
   u[6]=p[6]; //R^t_t
