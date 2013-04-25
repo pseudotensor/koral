@@ -54,14 +54,14 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(16.-MKS1R0))//(log(16.-MKS1R0))
-#define NX 64
+#define NX 72
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
 #define NX 48
 #endif
 
-#define NY 24
+#define NY 32
 #define NZ 1
 
 
@@ -86,7 +86,7 @@
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
 #define DTOUT1 1.e0
-//#define CGSOUTPUT
+#define CGSOUTPUT
 
 #else
 #define URIN 0.5
