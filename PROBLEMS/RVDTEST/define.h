@@ -53,15 +53,15 @@
 #ifdef myMKS1COORDS
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
-#define MAXX (log(16.-MKS1R0))//(log(16.-MKS1R0))
-#define NX 72
+#define MAXX (log(15.3-MKS1R0))//(log(16.-MKS1R0))
+#define NX 48
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
 #define NX 48
 #endif
 
-#define NY 32
+#define NY 16
 #define NZ 1
 
 

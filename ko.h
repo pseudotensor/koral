@@ -134,6 +134,7 @@ ldouble step_function(ldouble x,ldouble k);
 int calc_stationary1d_solution()  ;
 ldouble calc_totalmass();
 ldouble calc_mdot(ldouble radius);
+ldouble calc_lum();
 int initialize_arrays();
 int free_arrays();
 ldouble my_min(ldouble a, ldouble b);

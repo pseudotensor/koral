@@ -720,7 +720,9 @@ int verbose=0;
   for(iv=0;iv<NVHD;iv++)
     {
       if(iv==5) continue;
-      if(fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-6 && fabs(uu[iv])>SMALL) lostprecision=1;
+      if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6) ||
+	 ((iv>1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6 && fabs(uu[iv])>1.e-6))
+	lostprecision=1;
     }
      
 
@@ -952,21 +954,28 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
 
   ldouble uuu2[NV];
   int iv;
+  int lostprecision=0;
   p2u(p,uuu2,ggg);
   for(iv=0;iv<NVHD;iv++)
     {
       if(iv==1) continue;
-      if(fabs(uuu2[iv]-uuu[iv])/uuu[iv]>1.e-6) superverbose=1;
-    }
-     
+      if(((iv==0 || iv==5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6) ||
+	 ((iv>2 && iv<5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6 && fabs(uuu[iv])>1.e-6))
+	lostprecision=1;
+     }    
 
   if(superverbose)
     {
-      printf("superverbose or u2p_entropy lost precision:\n");
+      printf("superverbose in u2p_entropy:\n");
       print_Nvector(uuu,NV);
-      print_Nvector(uuu2,NV);      
-      // char();
-      //turn -1;
+      print_Nvector(uuu2,NV);         
+    }
+
+  if(lostprecision)
+    {
+      printf("u2p_entropy lost precision:\n");
+      print_Nvector(uuu,NV);
+      print_Nvector(uuu2,NV);          
     }
 
   return 0;

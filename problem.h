@@ -924,7 +924,7 @@
 #endif
 
 #ifndef NSCALARS
-#define NSCALARS 2
+#define NSCALARS 3
 #endif
 
 #ifndef NRADPROFILES

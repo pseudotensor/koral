@@ -8,6 +8,8 @@
 /*********************************************/
 int calc_radialprofiles(ldouble profiles[][NX])
 {
+  //adjust NRADPROFILES in problem.h
+
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],ucon3[4];
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
@@ -62,23 +64,23 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      calc_tautot(pp,xxBL,dx,tautot);
 
-	      //surface density
+	      //surface density (2)
 	      profiles[0][ix]+=rho*dx[1]*dx[2];
-	      //rest mass flux
+	      //rest mass flux (3)
 	      profiles[1][ix]+=-rho*ucon[1]*dx[1]*dx[2];
-	      //rho-weighted radial velocity
-	      profiles[2][ix]+=ucon[1]*rho*dx[1]*dx[2];
-	      //rho-weighted u_phi
+	      //rho-weighted minus radial velocity (4)
+	      profiles[2][ix]+=-ucon[1]*rho*dx[1]*dx[2];
+	      //rho-weighted u_phi (5)
 	      profiles[3][ix]+=ucov[3]*rho*dx[1]*dx[2];	
-	      //optical depth
+	      //optical depth (7)
 	      profiles[5][ix]+=tautot[1];	
 	    }
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
 	  profiles[3][ix]/=profiles[0][ix];
-	  //Keplerian u_phi
+	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
-	  profiles[4][ix]=(r*r/(sqrt(r*(r*r-3.*r))));	
+	  profiles[4][ix]=(r*r/(sqrt(r*(r*r-3.*r))));  
 	}
     }
 
@@ -90,11 +92,17 @@ int calc_radialprofiles(ldouble profiles[][NX])
 /*********************************************/
 int calc_scalars(ldouble *scalars)
 {
-  //total mass inside the domain
+  //adjust NSCALARS in problem.h
+
+  //total mass inside the domain (2)
   scalars[0]=calc_totalmass();
 
-  //accretion rate through horizon
+  //accretion rate through horizon (3)
   scalars[1]=calc_mdot(r_horizon_BL(BHSPIN))/calc_mdotEdd();
+
+  //luminosity (4)
+  scalars[2]=calc_lum()/calc_lumEdd();
+
   return 0;
 }
 
@@ -159,6 +167,70 @@ calc_lumEdd()
 #else
   return 1.;
 #endif
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates luminosity by integrating positive flux over outer boundary
+//normalized to total sphere
+ldouble
+calc_lum()
+{
+  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS)
+    return -1.; //no BH
+
+  int ix,iy,iz,iv;
+  ldouble xx[4],xxBL[4],dx[3],pp[NV],ggBL[4][5],GGBL[4][5],Fr;
+
+  ldouble lum=0.;
+
+  if(NZ==1) //phi-symmetry
+    {
+      iz=0; ix=NX-1;
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iv=0;iv<NVHD;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  ldouble (*gg)[5],(*GG)[5];
+
+	  struct geometry geomBL;
+	  fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+
+	  get_xx(ix,iy,iz,xx);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=get_size_x(iz,2);
+	
+	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+
+	  calc_g_arb(xxBL,ggBL,KERRCOORDS);
+	  calc_G_arb(xxBL,GGBL,KERRCOORDS);
+
+	  trans_prad_coco(pp,pp,MYCOORDS,KERRCOORDS,xx,geom.gg,geom.GG,geomBL.gg,geomBL.GG);
+	  prad_lab2on(pp,pp,&geomBL);
+
+	  Fr=pp[FX(0)];	
+
+	  dx[1]=dx[1]*sqrt(geomBL.gg[2][2]);
+	  dx[2]=2.*M_PI*sqrt(geomBL.gg[3][3]);
+
+#ifdef CGSOUTPUT
+	  Fr=fluxGU2CGS(Fr);
+	  dx[1]=lenGU2CGS(dx[1]);
+	  dx[2]=lenGU2CGS(dx[2]);
+#endif
+
+	  lum+=Fr*dx[1]*dx[2];
+	}
+
+      return lum*2.; //because of equatorial plane symmetry
+    }
+  else
+    return -1;
 }
 
 //**********************************************************************
