@@ -282,28 +282,22 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   //absolute rho
   if(pp[0]<RHOFLOOR) {pp[0]=RHOFLOOR; ret=-1; if(verbose) printf("hd_floors CASE 1\n");}
 
-  //uint/rho ratios
-  
+  //uint/rho ratios  
   if(pp[1]<UURHORATIOMIN*pp[0]) 
     {
-      pp[1]=UURHORATIOMIN*pp[0];ret=-1;
-    }//if(verbose) printf("hd_floors CASE 2\n");}
+      pp[1]=UURHORATIOMIN*pp[0];
+      ret=-1;
+      //if(verbose) printf("hd_floors CASE 2\n");}
+    }
 
   if(pp[1]>UURHORATIOMAX*pp[0]) 
     {
       pp[1]=UURHORATIOMAX*pp[0];
-      /*
-      ldouble ucon[4];
-      calc_normalobs_4vel(GG,ucon);
-      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
-      pp[2]=ucon[1];
-      pp[3]=ucon[2];
-      pp[4]=ucon[3];
-      */
-      ret=-1;
-      
+      ret=-1;      
       if(verbose) printf("hd_floors CASE 3\n");
     }
+
+  //entropy too small
 
 #ifdef RADIATION
   //EE/rho ratios
@@ -674,11 +668,11 @@ int verbose=0;
 
   if(iter>=50)
     {
-      if(verbose>0) printf("iter exceeded in u2p_hot\n");
+      if(verbose>0 || 1) printf("iter exceeded in u2p_hot\n");
       return -1;
     }
   
-  if(isnan(W) || isinf(W)) {if(verbose>0)printf("nan/inf W: %e\n",W); return -1;}
+  if(isnan(W) || isinf(W)) {if(verbose>0 || 1)printf("nan/inf W: %e\n",W); return -1;}
   if(verbose>1) {printf("the end: %e\n",W); }
 
   //W found, let's calculate v2 and the rest
@@ -829,6 +823,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   do{
     iter++;
     rho=rhop1;
+
     ut=rhout/rho;
     ut2=ut*ut;
     S=Sut/ut;
@@ -872,6 +867,11 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
 
     //Newton
     rhop1=rho-fval/dfval;   
+
+    if(isnan(rhop1)) {print_Nvector(uuu,NV); printf("nan rhop1: %e %e %e %e %e %e %e %e\n",rho,fval,dfval,ut,uu,
+						    Sut,rhout,
+						 exp(Sut/rhout))
+					       ;return -1;}
 
     if(rhop1<RHOFLOOR) rhop1=rho/2.;
 

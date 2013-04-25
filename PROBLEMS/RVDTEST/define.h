@@ -12,7 +12,7 @@
 //#define AVERAGEONLYUINT
 //#define FULLDISSIPATION
 #define UURHORATIOMIN 1.e-7
-#define UURHORATIOMAX 1.e3
+#define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-7
 #define EERHORATIOMAX 1.e3
 
@@ -104,7 +104,7 @@
 #define RK2_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.
 
 #define NODONUT 0
 #define INFLOWING 0
