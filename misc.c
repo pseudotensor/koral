@@ -66,16 +66,19 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 #ifdef CGSOUTPUT
 	      rho=rhoGU2CGS(rho);
+	      dx[0]=lenGU2CGS(dx[0]); //dr
+	      dx[1]=lenGU2CGS(dx[1]); //dth
+	      dx[2]=lenGU2CGS(dx[2]); //dph
 #endif
 
 	      //surface density (2)
-	      profiles[0][ix]+=rho*dx[1]*dx[2];
+	      profiles[0][ix]+=rho*dx[1];
 	      //rest mass flux (3)
-	      profiles[1][ix]+=-rho*ucon[1]*dx[1]*dx[2];
+	      profiles[1][ix]+=-rho*ucon[1]*dx[1];
 	      //rho-weighted minus radial velocity (4)
-	      profiles[2][ix]+=-ucon[1]*rho*dx[1]*dx[2];
+	      profiles[2][ix]+=-ucon[1]*rho*dx[1];
 	      //rho-weighted u_phi (5)
-	      profiles[3][ix]+=ucov[3]*rho*dx[1]*dx[2];	
+	      profiles[3][ix]+=ucov[3]*rho*dx[1];	
 	      //optical depth (7)
 	      profiles[5][ix]+=tautot[1];	
 	    }

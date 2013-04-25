@@ -79,7 +79,7 @@
 #define RADOUTPUTINZAMO
 #define CGSOUTPUT
 //#define PRINTGC_LEFT
-//#define PRINTGC_RIGHT
+#define PRINTGC_RIGHT
 
 /************************************/
 //common physics / atmosphere
