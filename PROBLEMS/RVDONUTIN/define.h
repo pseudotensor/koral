@@ -79,7 +79,7 @@
 #define RADOUTPUTINZAMO
 #define CGSOUTPUT
 //#define PRINTGC_LEFT
-#define PRINTGC_RIGHT
+//#define PRINTGC_RIGHT
 
 /************************************/
 //common physics / atmosphere
@@ -91,32 +91,33 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 5
 
 /************************************/
-#if (NDONUT==1) //mdot = 0.5, alpha = 0.1
+#if (NDONUT==5) //mdot = 100, alpha = 0.1
 /************************************/
 #define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .1
-#define URIN (1.57e7/CCC)
-#define KKK 291.
-#define UTPOT .9704
-#define DTOUT1 1.e5
-#define RHOATMMIN  1.e-22
+#define URIN (1.57e9/CCC)
+#define KKK 9713.
+#define UTPOT .9925
+#define DTOUT1 5.e-1
+#define RHOATMMIN  1.e-23
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+
 
 /************************************/
-#elif (NDONUT==2) //mdot = 1, alpha = 0.1
+#elif (NDONUT==4) //mdot = 10, alpha = 0.01
 /************************************/
 #define RADIATION
 #define ELL 4.5
-#define ALPHAVISC .1
-#define URIN (5.23e7/CCC)
-#define KKK 1894.
-#define UTPOT .9734
-#define DTOUT1 1.e5
+#define ALPHAVISC .01
+#define URIN (3.92e7/CCC)
+#define KKK 3300.
+#define UTPOT .983
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
@@ -130,24 +131,41 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 1.e5
+#define DTOUT1 5.e-1
+#define RHOATMMIN  1.e-23
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+
+/************************************/
+#elif (NDONUT==2) //mdot = 1, alpha = 0.1
+/************************************/
+#define RADIATION
+#define ELL 4.5
+#define ALPHAVISC .1
+#define URIN (5.23e7/CCC)
+#define KKK 1894.
+#define UTPOT .9734
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
 
 /************************************/
-#elif (NDONUT==4) //mdot = 10, alpha = 0.01
+#elif (NDONUT==1) //mdot = 0.5, alpha = 0.1
 /************************************/
 #define RADIATION
 #define ELL 4.5
-#define ALPHAVISC .01
-#define URIN (3.92e7/CCC)
-#define KKK 3300.
-#define UTPOT .983
-#define DTOUT1 1.e5
+#define ALPHAVISC .1
+#define URIN (1.57e7/CCC)
+#define KKK 291.
+#define UTPOT .9704
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
+
+
+
 
 /************************************/
 #elif (NDONUT==0) //pure hd

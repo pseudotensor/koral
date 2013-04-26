@@ -1583,3 +1583,48 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 
   return 0;
 }
+
+/*************************************************************************/
+/****** radiative lab M1-like primitives to lam Edd-like primitives*******/
+/*************************************************************************/
+int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+#ifndef MULTIRADFLUID
+  ldouble Rij[4][4],uufake[NV];
+  int i,j;
+
+  calc_Rij(pp1,ggg,Rij);
+  boost22_lab2ff(Rij,Rij,pp1,gg,GG);
+
+  //now set 1/3 on the diagonal and move back to lab frame and do u2p_rad()
+
+  Rij[1][1]=Rij[2][2]=Rij[3][3]=1./3.*Rij[0][0];
+  Rij[1][2]=Rij[2][1]=Rij[1][3]=Rij[3][1]=Rij[2][3]=Rij[3][2]=0.;
+
+  boost22_ff2lab(Rij,Rij,pp1,gg,GG);
+
+  indices_2221(Rij,Rij,gg);
+
+  uufake[6]=Rij[0][0];
+  uufake[7]=Rij[0][1];
+  uufake[8]=Rij[0][2];
+  uufake[9]=Rij[0][3];
+
+  u2p_rad(uufake,pp2,ggg,&i);
+#else
+  my_err("Edd does not work with multifluids yet\n");
+#endif
+
+  return 0;
+} 
+
+//*
