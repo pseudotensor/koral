@@ -49,10 +49,10 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MKS1R0 -2.
-#define MINX (log(1.5-MKS1R0))
-#define MAXX (log(15.3-MKS1R0))
-#define NX 48
-#define NY 16
+#define MINX (log(15.25-MKS1R0))
+#define MAXX (log(15.35-MKS1R0))
+#define NX 2
+#define NY 64
 #define NZ 1
 #else //Scharzschild
 #define MYCOORDS SCHWCOORDS
@@ -62,7 +62,7 @@
 #define NY 32
 #define NZ 1
 #endif
-#define MINY (0.005*Pi/2.)
+#define MINY (0.5*Pi/2.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.
@@ -71,15 +71,16 @@
 /************************************/
 //output
 /************************************/
+#define ZXYDUMP
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define RADOUTPUTINZAMO
-#define CGSOUTPUT
-//#define PRINTGC_LEFT
-//#define PRINTGC_RIGHT
+//#define CGSOUTPUT
+//#define PRINTXGC_LEFT
+//#define PRINTXGC_RIGHT
 
 /************************************/
 //common physics / atmosphere
@@ -91,7 +92,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 4
 
 /************************************/
 #if (NDONUT==5) //mdot = 100, alpha = 0.1

@@ -36,7 +36,7 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 /**********************/
 
 //radius
-if(ix>=NX) //analytical solution within the torus and atmosphere outside
+if(ix>=NX || ix<0) //analytical solution within the torus and atmosphere outside
   {
     ldouble podpierd=-(GGBL[0][0]-2.*ELL*GGBL[0][3]+ELL*ELL*GGBL[3][3]);
     ldouble ut=-1./sqrt(podpierd);
@@ -122,7 +122,6 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	Vphi=uPhi/uT;
 	Vr=0.;
 
-	Vr=-URIN;
 
 	//3-velocity in BL 
 	ldouble ucon[4]={0.,Vr,0.,Vphi};
@@ -259,78 +258,12 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 
     return 0.;
   }
- else if(ix<0) //outflow near BH
-   {
-     iix=0;
-     iiy=iy;
-     iiz=iz;
 
-     ldouble r=xxvecBL[1];
-     ldouble xxout[4]={0.,get_x(iix,0),get_x(iiy,1),get_x(iiz,2)};
-     coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
-     ldouble r0=xxout[1];      
-     
-
-     //copying YLCOORDS quantities
-     for(iv=0;iv<NV;iv++)
-       { 
-	 //unchanged primitives
-	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
-       }
-
-     if(MYCOORDS==SPHCOORDS)
-       {
-	 pp[0]=get_u(p,0,iix,iiy,iiz);
-	 pp[1]=get_u(p,1,iix,iiy,iiz);
-	 pp[2]=-10.;
-       }
-     else
-
-       {
-	 pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
-	 pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
-       }
- 
-     //atmosphere
-     //set_radatmosphere(pp,xxvec,gg,GG,0);
-
-#ifdef RADIATION
-     //imposing inflowing velocity of the normal observer
-     ldouble ucon[4];
-     calc_normalobs_4vel(GG,ucon);
-     pp[7]=ucon[1];
-     pp[8]=ucon[2];
-     pp[9]=ucon[3];
-
-     if(MYCOORDS==KERRCOORDS)
-       pp[7]=-100.;
-
-     //pure copy
-     //pp[6]=get_u(p,6,iix,iiy,iiz);
-
-     //copying with scalings
-     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
-     //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
-    
-     //this works only for Kerr
-     //if(pp[7]>0.) pp[7]=0.;
-     //if(pp[2]>0.) pp[2]=0.;
-
-#endif
-     
-     //testing if interpolated primitives make sense
-     //     check_floors_hd(pp,VELPRIM,gg,GG);
-     //end of floor section
-
-     p2u(pp,uu,&geom);
-     return 0;
-   }
-
-//reflections/outflow in theta 
+//outflow in theta 
 if(iy<0.) //spin axis 
   {      
     
-    iiy=-iy-1;
+    iiy=0;
     iiz=iz;
     iix=ix;
     gdet_src=get_g(g,3,4,iix,iiy,iiz);  
@@ -338,11 +271,6 @@ if(iy<0.) //spin axis
     for(iv=0;iv<NV;iv++)
       {
 	//v_theta
-#ifndef PUREAXISOUTFLOW
-	if(iv==3 || iv==8)
-	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	else
-#endif
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
      

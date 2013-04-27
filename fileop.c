@@ -185,6 +185,13 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 	{
 	  for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
 	    {
+#elif defined(ZXYDUMP)
+  for(iz=0;iz<NZ;iz++)
+    {
+      for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
+	{
+	  for(iy=-gcly*NG;iy<NY+gcry*NG;iy++)
+	    {
 #elif defined(YSLICE)
 	      for(iy=YSLICE;iy<YSLICE+1;iy++)
 		{
