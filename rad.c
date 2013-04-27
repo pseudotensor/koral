@@ -727,10 +727,9 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 
   for(i=0;i<4;i++)
     Gi[i]=kappa*(EE-4.*Pi*B)*ucon[i] + chi * Fcon[i];
-#endif
-  
+#endif  
 
-  //  print_4vector(Gi);getchar();
+  //print_4vector(Gi);getchar();
 
   return 0;
 }
@@ -796,7 +795,7 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
     pp[i]=pp0[i];
 #endif //LABRADFLUXES
 
-#ifndef EDDINGTON_APR
+#ifndef EDDINGTON_APR //M1 here
   //radiative energy density in the radiation rest frame
   Erf=pp[6];
 
@@ -810,7 +809,9 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
-#else
+
+#else //Eddington
+
   ldouble h[4][4];
   ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
@@ -1194,10 +1195,10 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
     }
 
   /*
-  if(fabs(pp[7])>1.e-3)
+  if(fabs(pp[7])>1.e-3 || 1)
     {
       print_Nvector(pp,NV);
-      print_Nvector(&aval[0],6);
+      print_Nvector(&aval[0],NV);
       getchar();
     }
   */

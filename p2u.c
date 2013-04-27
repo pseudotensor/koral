@@ -164,6 +164,7 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   return 0;
 #endif
   
+  //M1
   for(irf=0;irf<NRF;irf++)
     {
       ldouble Erf=p[EE(irf)];

@@ -94,27 +94,16 @@ prad_ff2lab(pp,pp,&geom);
 p2u(pp,uu,&geom);	
 
 /*
-//printf("%d %d %d\n",ix,iy,iz);
-//print_Nvector(pp,NV);
-if(ix==1) printf("> %g ",pp[1]);
+printf("%d %d %d\n",ix,iy,iz);
+print_Nvector(uu,NV);
+
+int t1[2],t2[3];
+u2p(uu,pp,&geom,t1,t2);
+print_Nvector(pp,NV);
 
 p2u(pp,uu,&geom);	
-//print_Nvector(pp,NV); getchar();
-if(ix==1) printf("> %g ",uu[1]);
-
-u2p_hot(uu,pp,gg,GG);
-
-if(ix==1) printf("> %g ",pp[1]);
-
-p2u(pp,uu,&geom);	
-
-if(ix==1) printf("> %g ",uu[1]);
-
-u2p_hot(uu,pp,gg,GG);
-
-if(ix==1) { printf("> %g \n",pp[1]); getchar();}
+getchar();
 */
-
 /* modify above */
 /***********************************************/
 /***********************************************/

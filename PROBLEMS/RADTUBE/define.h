@@ -1,4 +1,14 @@
-#define EDDINGTON_APR
+
+/************************************/
+//reconstruction / Courant
+/************************************/
+#define INT_ORDER 1
+#define RK2_STEPPING
+#define TSTEPLIM .6
+#define FLUXLIMITER 0
+#define MINMOD_THETA 1.
+
+
 //#define LABRADFLUXES
 #define MYCOORDS MINKCOORDS //metric
 
@@ -39,12 +49,6 @@
 #define COPY_YBC
 #define COPY_ZBC
 
-#define TSTEPLIM .5 //Courant limiter
-#define INITTSTEPLIM (TSTEPLIM/100.) //Courant limiter for the first step
-#define RK3STEPPING //type of time stepping
-#define INT_ORDER 1 //order of reconstruction - 1 (linear), 2 (parabolic), 4 (MP5)
-#define FLUXLIMITER 0 //type of flux limiter for linear reconstruction - 0 (generalized minmod)
-#define MINMOD_THETA 1. //theta for the limiter - 1 (minmod) - 2 (MC)
 
 #define DTOUT1 1.e-0 //time step for outputs
 #define ALLSTEPSOUTPUT 0 //0 (print every DTOUT1), 1 (print every step)

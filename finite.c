@@ -1846,6 +1846,8 @@ cell_fixup()
   if(DOFIXUPS==0)
     return 0;
 
+  //there must be a bug somewhere - does not work with RADTUBE
+
   int ix,iy,iz,iv;
   int in,ii;
   int verbose=0;
