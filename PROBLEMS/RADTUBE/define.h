@@ -1,3 +1,4 @@
+#define EDDINGTON_APR
 //#define LABRADFLUXES
 #define MYCOORDS MINKCOORDS //metric
 

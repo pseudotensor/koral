@@ -318,13 +318,13 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
 
 #ifdef RADIATION
-#ifndef LABRADFLUXES						
+#ifndef LABRADFLUXES
+#ifndef EDDINGTON_APR						
 #ifdef RADOUTPUTINFF
 						  prad_lab2ff(pp,pp,&geom);
 #elif defined(RADOUTPUTINZAMO) //to print  radiation primitives in ZAMO
-						  //						  prad_lab2ff(pp,pp,&geom);
-						  //						  prad_ff2zamo(pp,pp,gg,GG,eup); 
 						  prad_lab2on(pp,pp,&geom);
+#endif
 #endif
 #endif
 #endif

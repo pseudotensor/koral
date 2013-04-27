@@ -1861,6 +1861,44 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   pp[9]=uu[9];
   return 0;
 #endif
+
+#ifdef EDDINGTON_APR
+  int ii;
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,W;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet;
+
+  ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
+  W=gdet*ucon[0];
+  ldouble Rcon[4],Rcov[4]={uu[6]*gdet, uu[7]*gdet, uu[8]*gdet, uu[9]*gdet};
+  indices_12(Rcov,Rcon,GG);
+  ldouble EE, Fcon[4],Fcov[4];
+
+  //Fragile's formulae
+  EE=3.*((Rcon[0]+2.*ucon[0]*dot(ucov,Rcon))/(gdet*GG[0][0]-2.*W*ucon[0]));
+  Fcon[0]=-1./gdet*(W*EE+dot(ucov,Rcon));
+  for(ii=1;ii<4;ii++)
+    Fcon[ii]=Rcon[ii]/W - Fcon[0]*ucon[ii]/ucon[0] - 4./3.*EE*ucon[ii] - GG[0][ii]*EE/3./ucon[0];
+  indices_21(Fcon,Fcov,gg);
+
+  if(dot(Fcon,Fcov)>=EE*EE)
+    {
+      my_err("Flux in Edd. exceeded EE\n");
+      *corrected=1;
+    }
+
+  pp[6]=EE;
+  pp[7]=Fcon[1];
+  pp[8]=Fcon[2];
+  pp[9]=Fcon[3];
+  return 0;
+#endif
   
   u2p_rad_urf(uu,pp,ggg,corrected);
   return 0;

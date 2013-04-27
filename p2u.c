@@ -136,8 +136,35 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   return 0;
  
 #endif
+
+#ifdef EDDINGTON_APR
+  int ii,jj;
+  ldouble Rij[4][4],h[4][4];
+  ldouble ucov[4],ucon[4]={0,p[2],p[3],p[4]};
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
+  ldouble EE=p[6];
+  ldouble Fcon[4]={0.,p[6],p[7],p[8]};
+  Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
+  //projection tensor
+  for(ii=0;ii<4;ii++)
+    for(jj=0;jj<4;jj++)
+      h[ii][jj]=GG[ii][jj] + ucon[ii]*ucon[jj];
+  //Fragile's formula
+  for(ii=0;ii<4;ii++)
+    for(jj=0;jj<4;jj++)
+      Rij[ii][jj]=EE*ucon[ii]*ucon[jj] + Fcon[ii]*ucon[jj] + Fcon[jj]*ucon[ii] + 1./3.*EE*delta(ii,jj)*h[ii][jj];
+  indices_2221(Rij,Rij,gg);
+      
+  u[6]=Rij[0][0];
+  u[7]=Rij[0][1];
+  u[8]=Rij[0][2];
+  u[9]=Rij[0][3];
+
+  return 0;
+#endif
   
- for(irf=0;irf<NRF;irf++)
+  for(irf=0;irf<NRF;irf++)
     {
       ldouble Erf=p[EE(irf)];
 
