@@ -102,7 +102,7 @@
 #define URIN (1.57e9/CCC)
 #define KKK 9713.
 #define UTPOT .9925
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-23
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
@@ -117,7 +117,7 @@
 #define URIN (3.92e7/CCC)
 #define KKK 3300.
 #define UTPOT .983
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
@@ -131,7 +131,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-23
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
@@ -145,7 +145,7 @@
 #define URIN (5.23e7/CCC)
 #define KKK 1894.
 #define UTPOT .9734
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
