@@ -3,17 +3,17 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define RK2_STEPPING
+#define RK3_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-
+//#define WAVESPEEDSATFACES
 
 //#define LABRADFLUXES
 #define MYCOORDS MINKCOORDS //metric
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
-//#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
+#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
 //#define EXPLICIT_SUBSTEP_RAD_SOURCE
 //#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
 //#define RADSOURCEOFF

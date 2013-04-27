@@ -56,7 +56,6 @@
 
 #define PROBLEM 6
 
-
 #if(PROBLEM==49)
 
 #define PR_DEFINE "PROBLEMS/RVRING/define.h"

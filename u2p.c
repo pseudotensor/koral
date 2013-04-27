@@ -1887,11 +1887,21 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
     Fcon[ii]=Rcon[ii]/W - Fcon[0]*ucon[ii]/ucon[0] - 4./3.*EE*ucon[ii] - GG[0][ii]*EE/3./ucon[0];
   indices_21(Fcon,Fcov,gg);
 
-  if(dot(Fcon,Fcov)>=EE*EE)
-    {
-      my_err("Flux in Edd. exceeded EE\n");
+  int iter=0;
+  while(dot(Fcon,Fcov)>=EE*EE && iter<50)
+    {     
+      iter++;
+      Fcon[1]/=1.1;
+      Fcon[2]/=1.1;
+      Fcon[3]/=1.1;
+      Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
+
+      indices_21(Fcon,Fcov,gg);
+
       *corrected=1;
     }
+  
+  if(iter>=50) printf("flux damping didn't work in u2p_rad for Edd\n");
 
   pp[6]=EE;
   pp[7]=Fcon[1];

@@ -707,17 +707,19 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 	Ru+=Rij[i][j]*ucov[j];
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
     }
+
 #else //Eddington apr. here
+
   ldouble rho=pp[RHO];
   ldouble u=pp[1];
   ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
   ldouble EE=pp[6];
-  ldouble Fcon[4]={0.,pp[6],pp[7],pp[8]};
+  ldouble Fcon[4]={0.,pp[7],pp[8],pp[9]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
  
-  ldouble p= (GAMMA-1.)*(ldouble)u;
+  ldouble p= (GAMMA-1.)*u;
   ldouble T = p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
@@ -817,7 +819,7 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
   ldouble EE=pp[6];
-  ldouble Fcon[4]={0.,pp[6],pp[7],pp[8]};
+  ldouble Fcon[4]={0.,pp[7],pp[8],pp[9]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
   //projection tensor
   for(i=0;i<4;i++)
@@ -1107,7 +1109,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   //relative four-velocity
   ldouble urfcon[4];
 
-#ifdef EDDINGTON_APR //in Eddington I take the fluid velocity
+#ifdef EDDINGTON_APR //in Eddington I take the fluid velocity - think over, maybe use max(cs2,1/3)?
   urfcon[0]=0.;
   urfcon[1]=pp[2];
   urfcon[2]=pp[3];
@@ -1653,23 +1655,31 @@ int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
   ldouble Rij[4][4],uufake[NV];
   int i,j;
 
-  //to ortonormal!
-  calc_Rij(pp1,ggg,Rij);
-  boost22_lab2ff(Rij,Rij,pp1,gg,GG);
+  print_Nvector(pp1,NV);
+  //to ortonormal fluid frame
+  prad_lab2ff(pp1,pp1,ggg);
 
+  print_Nvector(pp1,NV);
   //now set 1/3 on the diagonal and move back to lab frame and do u2p_rad()
 
+  Rij[0][0]=pp1[6];
+  Rij[0][1]=Rij[1][0]=pp1[7];
+  Rij[0][2]=Rij[2][0]=pp1[8];
+  Rij[0][3]=Rij[3][0]=pp1[9];
   Rij[1][1]=Rij[2][2]=Rij[3][3]=1./3.*Rij[0][0];
   Rij[1][2]=Rij[2][1]=Rij[1][3]=Rij[3][1]=Rij[2][3]=Rij[3][2]=0.;
 
-  boost22_ff2lab(Rij,Rij,pp1,gg,GG);
-
-  indices_2221(Rij,Rij,gg);
+  trans22_on2cc(Rij,Rij,tlo);  
+  boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
+  indices_2221(Rij,Rij,gg);  
 
   uufake[6]=Rij[0][0];
   uufake[7]=Rij[0][1];
   uufake[8]=Rij[0][2];
   uufake[9]=Rij[0][3];
+
+  //  print_Nvector(uufake,NV);
+  //  getchar();
 
   u2p_rad(uufake,pp2,ggg,&i);
 #else

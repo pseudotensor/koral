@@ -144,7 +144,7 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
   ldouble EE=p[6];
-  ldouble Fcon[4]={0.,p[6],p[7],p[8]};
+  ldouble Fcon[4]={0.,p[7],p[8],p[9]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
   //projection tensor
   for(ii=0;ii<4;ii++)
@@ -155,6 +155,10 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
     for(jj=0;jj<4;jj++)
       Rij[ii][jj]=EE*ucon[ii]*ucon[jj] + Fcon[ii]*ucon[jj] + Fcon[jj]*ucon[ii] + 1./3.*EE*delta(ii,jj)*h[ii][jj];
   indices_2221(Rij,Rij,gg);
+
+  //  print_Nvector(p,NV);
+  //  print_4vector(ucon);
+  //  print_4vector(Fcon);
       
   u[6]=Rij[0][0];
   u[7]=Rij[0][1];
