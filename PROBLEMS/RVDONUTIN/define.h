@@ -48,11 +48,11 @@
 #define myMKS1COORDS
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MKS1R0 -2.
-#define MINX (log(1.5-MKS1R0))
-#define MAXX (log(15.3-MKS1R0))
-#define NX 48
-#define NY 16
+#define MKS1R0 -5.
+#define MINX (log(.5-MKS1R0))
+//#define MAXX (log(15.3-MKS1R0))
+#define NX 80
+#define NY 40
 #define NZ 1
 #else //Scharzschild
 #define MYCOORDS SCHWCOORDS
@@ -78,7 +78,7 @@
 #define NOUTSTOP 5000
 #define RADOUTPUTINZAMO
 #define CGSOUTPUT
-//#define PRINTGC_LEFT
+#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
 
 /************************************/
@@ -91,11 +91,58 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 8
 
 /************************************/
-#if (NDONUT==5) //mdot = 100, alpha = 0.1
+#if (NDONUT==8) //mdot = 100, alpha = 0.1
 /************************************/
+#define MAXX (log(50.-MKS1R0))
+#define RADIATION
+#define ELL 7.3657
+#define ALPHAVISC .1
+#define URIN (4.00e8/CCC)
+#define KKK 4676.
+#define UTPOT .9980
+#define DTOUT1 5.e-1
+#define RHOATMMIN  1.e-23
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+
+/************************************/
+#elif (NDONUT==7) //mdot = 10, alpha = 0.1
+/************************************/
+#define MAXX (log(50.-MKS1R0))
+#define RADIATION
+#define ELL 7.3657
+#define ALPHAVISC .1
+#define URIN (8.00e7/CCC)
+#define KKK 2381.
+#define UTPOT .9937
+#define DTOUT1 5.e-1
+#define RHOATMMIN  1.e-23
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+
+/************************************/
+#elif (NDONUT==6) //mdot = 1, alpha = 0.1
+/************************************/
+#define MAXX (log(50.-MKS1R0))
+#define RADIATION
+#define ELL 7.3657
+#define ALPHAVISC .1
+#define URIN (4.80e6/CCC)
+#define KKK 490.
+#define UTPOT .9912
+#define DTOUT1 5.e-1
+#define RHOATMMIN  1.e-22
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6))
+
+
+/************************************/
+#elif (NDONUT==5) //mdot = 100, alpha = 0.1
+/************************************/
+#define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .1
@@ -111,6 +158,7 @@
 /************************************/
 #elif (NDONUT==4) //mdot = 10, alpha = 0.01
 /************************************/
+#define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .01
@@ -125,6 +173,7 @@
 /************************************/
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
+#define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .1
@@ -139,6 +188,7 @@
 /************************************/
 #elif (NDONUT==2) //mdot = 1, alpha = 0.1
 /************************************/
+#define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .1
@@ -153,6 +203,7 @@
 /************************************/
 #elif (NDONUT==1) //mdot = 0.5, alpha = 0.1
 /************************************/
+#define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .1
@@ -170,6 +221,7 @@
 /************************************/
 #elif (NDONUT==0) //pure hd
 /************************************/
+#define MAXX (log(15.3-MKS1R0))
 #define ALPHAVISC .1
 #define URIN 0.5
 #define KKK 9.e-4//1.e-4
