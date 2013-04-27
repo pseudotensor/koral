@@ -52,9 +52,24 @@
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
 //47 MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
 //48* RVDTEST - testing the entropy near the axis
+//48* RVRING - 1d donut ring
 
 #define PROBLEM 43
 
+
+#if(PROBLEM==49)
+
+#define PR_DEFINE "PROBLEMS/RVRING/define.h"
+#define PR_BC "PROBLEMS/RVRING/bc.c"
+#define PR_INIT "PROBLEMS/RVRING/init.c"
+#define PR_KAPPA "PROBLEMS/RVRING/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RVRING/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RVRING/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RVRING/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RVRING/dump.c"
+#define PR_TOOLS "PROBLEMS/RVRING/tools.c"
+
+#endif
 
 #if(PROBLEM==48)
 
