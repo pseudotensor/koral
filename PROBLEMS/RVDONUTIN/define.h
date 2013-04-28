@@ -48,8 +48,8 @@
 #define myMKS1COORDS
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MKS1R0 -5.
-#define MINX (log(.5-MKS1R0))
+#define MKS1R0 -3.//-2.
+#define MINX (log(1.25-MKS1R0))
 //#define MAXX (log(15.3-MKS1R0))
 #define NX 80
 #define NY 40
@@ -78,7 +78,7 @@
 #define NOUTSTOP 5000
 #define RADOUTPUTINZAMO
 #define CGSOUTPUT
-//#define PRINTGC_LEFT
+//#define PRINTXGC_LEFT
 //#define PRINTGC_RIGHT
 
 /************************************/
@@ -103,10 +103,10 @@
 #define URIN (4.00e8/CCC)
 #define KKK 4676.
 #define UTPOT .9980
-#define DTOUT1 5.e1
-#define RHOATMMIN  1.e-23
+#define DTOUT1 5.e0
+#define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
 /************************************/
 #elif (NDONUT==7) //mdot = 10, alpha = 0.1
@@ -119,9 +119,9 @@
 #define KKK 2381.
 #define UTPOT .9937
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-23
+#define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
 /************************************/
 #elif (NDONUT==6) //mdot = 1, alpha = 0.1
@@ -136,7 +136,7 @@
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
 
 /************************************/
