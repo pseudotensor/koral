@@ -16,7 +16,7 @@
 /************************************/
 #define INT_ORDER 1
 #define RK2_STEPPING
-#define TSTEPLIM .6
+#define TSTEPLIM .3
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 
@@ -25,7 +25,7 @@
 /************************************/
 #define UURHORATIOMIN 1.e-7
 #define UURHORATIOMAX 1.e2
-#define EERHORATIOMIN 1.e-7
+#define EERHORATIOMIN 1.e-5
 #define EERHORATIOMAX 1.e3
 
 /************************************/
