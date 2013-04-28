@@ -7,7 +7,7 @@
 /************************************/
 //hydro choices
 /************************************/
-#define ALLOWENTROPYU2P 0
+#define ALLOWENTROPYU2P 1
 #define FIXUPAFTERENTROPY 0
 #define DOFIXUPS 0
 
@@ -48,7 +48,7 @@
 #define myMKS1COORDS
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MKS1R0 -3.//-2.
+#define MKS1R0 -2.
 #define MINX (log(1.25-MKS1R0))
 //#define MAXX (log(15.3-MKS1R0))
 #define NX 80

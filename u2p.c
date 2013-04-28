@@ -720,9 +720,9 @@ int verbose=0;
   for(iv=0;iv<NVHD;iv++)
     {
       if(iv==5) continue;
-      if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6) ||
-	 ((iv>1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6 && fabs(uu[iv])>1.e-6))
-	lostprecision=1;
+      //      if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6) ||
+      //	 ((iv>1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6 && fabs(uu[iv])>1.e-6))
+      //	lostprecision=1;
     }
      
 
@@ -959,9 +959,9 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   for(iv=0;iv<NVHD;iv++)
     {
       if(iv==1) continue;
-      if(((iv==0 || iv==5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6) ||
-	 ((iv>2 && iv<5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6 && fabs(uuu[iv])>1.e-6))
-	lostprecision=1;
+      //      if(((iv==0 || iv==5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6) ||
+      //	 ((iv>2 && iv<5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6 && fabs(uuu[iv])>1.e-6))
+      //	lostprecision=1;
      }    
 
   if(superverbose)
