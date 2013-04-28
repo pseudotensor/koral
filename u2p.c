@@ -1861,7 +1861,56 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   pp[9]=uu[9];
   return 0;
 #endif
+
+#ifdef EDDINGTON_APR
+  int ii;
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,W;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet;
+
+  ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
+  W=gdet*ucon[0];
+  ldouble Rcon[4],Rcov[4]={uu[6]*gdet, uu[7]*gdet, uu[8]*gdet, uu[9]*gdet};
+  indices_12(Rcov,Rcon,GG);
+  ldouble EE, Fcon[4],Fcov[4];
+
+  //Fragile's formulae
+  EE=3.*((Rcon[0]+2.*ucon[0]*dot(ucov,Rcon))/(gdet*GG[0][0]-2.*W*ucon[0]));
+  Fcon[0]=-1./gdet*(W*EE+dot(ucov,Rcon));
+  for(ii=1;ii<4;ii++)
+    Fcon[ii]=Rcon[ii]/W - Fcon[0]*ucon[ii]/ucon[0] - 4./3.*EE*ucon[ii] - GG[0][ii]*EE/3./ucon[0];
+  indices_21(Fcon,Fcov,gg);
+
+  int iter=0;
+  while(dot(Fcon,Fcov)>=EE*EE && iter<50)
+    {     
+      iter++;
+      Fcon[1]/=1.1;
+      Fcon[2]/=1.1;
+      Fcon[3]/=1.1;
+      Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
+
+      indices_21(Fcon,Fcov,gg);
+
+      *corrected=1;
+    }
   
+  if(iter>=50) printf("flux damping didn't work in u2p_rad for Edd\n");
+
+  pp[6]=EE;
+  pp[7]=Fcon[1];
+  pp[8]=Fcon[2];
+  pp[9]=Fcon[3];
+  return 0;
+#endif
+  
+  //M1
   u2p_rad_urf(uu,pp,ggg,corrected);
   return 0;
 }

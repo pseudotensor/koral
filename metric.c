@@ -1151,6 +1151,7 @@ fill_geometry(int ix,int iy,int iz,void *geom)
   ggg->xx=get_x(ix,0);
   ggg->yy=get_x(iy,1);
   ggg->zz=get_x(iz,2);
+  ggg->gdet=ggg->gg[3][4];
 
   return 0;
 }
@@ -1194,6 +1195,8 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
   ggg->yy=get_xb(iy,1);
   ggg->zz=get_xb(iz,2);
 
+  ggg->gdet=ggg->gg[3][4];
+
   return 0;
 }
 
@@ -1223,6 +1226,8 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
   ggg->xx=get_x(ix,0);
   ggg->yy=get_x(iy,1);
   ggg->zz=get_x(iz,2);
+  
+  ggg->gdet=ggg->gg[3][4];
 
   return 0;
 }

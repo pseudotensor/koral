@@ -52,10 +52,9 @@
 //46* MFRADNTSPH - multi fluid emission from midplane in spherical
 //47 MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
 //48* RVDTEST - testing the entropy near the axis
-//48* RVRING - 1d donut ring
+//49* RVRING - 1d donut ring
 
-#define PROBLEM 43
-
+#define PROBLEM 6
 
 #if(PROBLEM==49)
 
@@ -748,7 +747,7 @@
 #endif
 
 #ifndef DOFIXUPS
-#define DOFIXUPS 1
+#define DOFIXUPS 0
 #endif
 
 #ifndef ALLOWENTROPYU2P
@@ -772,7 +771,7 @@
 #endif
 
 #ifndef UURHORATIOMAX 
-#define UURHORATIOMAX 1.e3
+#define UURHORATIOMAX 1.e2
 #endif
 
 #ifndef EERHORATIOMIN

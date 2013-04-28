@@ -85,34 +85,31 @@ pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
 
+#ifdef EDDINGTON_APR
+//prad_m12edd(pp,pp,&geom);
+#endif
+
+//print_Nvector(pp,NV);
+
 prad_ff2lab(pp,pp,&geom);
+//print_Nvector(pp,NV);
 
 //pp[2]=0.;
 #endif
 
+
+
 //converting to conserved
 p2u(pp,uu,&geom);	
 
+//print_Nvector(uu,NV);
+//getchar();
 /*
-//printf("%d %d %d\n",ix,iy,iz);
-//print_Nvector(pp,NV);
-if(ix==1) printf("> %g ",pp[1]);
+int t1[2],t2[3];
+u2p(uu,pp,&geom,t1,t2);
+print_Nvector(pp,NV);
 
 p2u(pp,uu,&geom);	
-//print_Nvector(pp,NV); getchar();
-if(ix==1) printf("> %g ",uu[1]);
-
-u2p_hot(uu,pp,gg,GG);
-
-if(ix==1) printf("> %g ",pp[1]);
-
-p2u(pp,uu,&geom);	
-
-if(ix==1) printf("> %g ",uu[1]);
-
-u2p_hot(uu,pp,gg,GG);
-
-if(ix==1) { printf("> %g \n",pp[1]); getchar();}
 */
 
 /* modify above */

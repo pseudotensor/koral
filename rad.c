@@ -666,6 +666,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   gg=geom->gg;
   GG=geom->GG;
 
+#ifndef EDDINGTON_APR //M1 here
   //radiative stress tensor in the lab frame
   ldouble Rij[4][4];
   calc_Rij(pp,ggg,Rij);
@@ -707,7 +708,30 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
     }
 
-  //  print_4vector(Gi);getchar();
+#else //Eddington apr. here
+
+  ldouble rho=pp[RHO];
+  ldouble u=pp[1];
+  ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
+  ldouble EE=pp[6];
+  ldouble Fcon[4]={0.,pp[7],pp[8],pp[9]};
+  Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
+ 
+  ldouble p= (GAMMA-1.)*u;
+  ldouble T = p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+  ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);
+  ldouble chi=kappa+kappaes;
+
+  for(i=0;i<4;i++)
+    Gi[i]=kappa*(EE-4.*Pi*B)*ucon[i] + chi * Fcon[i];
+#endif  
+
+  //print_4vector(Gi);getchar();
 
   return 0;
 }
@@ -773,6 +797,7 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
     pp[i]=pp0[i];
 #endif //LABRADFLUXES
 
+#ifndef EDDINGTON_APR //M1 here
   //radiative energy density in the radiation rest frame
   Erf=pp[6];
 
@@ -786,6 +811,25 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+
+#else //Eddington
+
+  ldouble h[4][4];
+  ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
+  ldouble EE=pp[6];
+  ldouble Fcon[4]={0.,pp[7],pp[8],pp[9]};
+  Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
+  //projection tensor
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      h[i][j]=GG[i][j] + ucon[i]*ucon[j];
+  //Fragile's formula
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=EE*ucon[i]*ucon[j] + Fcon[i]*ucon[j] + Fcon[j]*ucon[i] + 1./3.*EE*delta(i,j)*h[i][j];
+#endif
 
 
 #ifdef RADVISCOSITY
@@ -1062,17 +1106,26 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   u2p_rad_urf(pp,pp,ggg,&i);
 #endif
   
-  //radiative energy density in the radiation rest frame
-  ldouble Erf=pp[6];
   //relative four-velocity
   ldouble urfcon[4];
+
+#ifdef EDDINGTON_APR //in Eddington I take the fluid velocity - think over, maybe use max(cs2,1/3)?
+  urfcon[0]=0.;
+  urfcon[1]=pp[2];
+  urfcon[2]=pp[3];
+  urfcon[3]=pp[4];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIM,VEL4,gg,GG);
+#else 
   urfcon[0]=0.;
   urfcon[1]=pp[7];
   urfcon[2]=pp[8];
   urfcon[3]=pp[9];
-
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+#endif
+
+
 
   //square of radiative wavespeed in radiative rest frame
   ldouble rv2rad = 1./3.;
@@ -1144,10 +1197,10 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
     }
 
   /*
-  if(fabs(pp[7])>1.e-3)
+  if(fabs(pp[7])>1.e-3 || 1)
     {
       print_Nvector(pp,NV);
-      print_Nvector(&aval[0],6);
+      print_Nvector(&aval[0],NV);
       getchar();
     }
   */
@@ -1585,7 +1638,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 }
 
 /*************************************************************************/
-/****** radiative lab M1-like primitives to lam Edd-like primitives*******/
+/****** radiative lab M1-like primitives to lab Edd-like primitives*******/
 /*************************************************************************/
 int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
 {
@@ -1602,22 +1655,31 @@ int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
   ldouble Rij[4][4],uufake[NV];
   int i,j;
 
-  calc_Rij(pp1,ggg,Rij);
-  boost22_lab2ff(Rij,Rij,pp1,gg,GG);
+  print_Nvector(pp1,NV);
+  //to ortonormal fluid frame
+  prad_lab2ff(pp1,pp1,ggg);
 
+  print_Nvector(pp1,NV);
   //now set 1/3 on the diagonal and move back to lab frame and do u2p_rad()
 
+  Rij[0][0]=pp1[6];
+  Rij[0][1]=Rij[1][0]=pp1[7];
+  Rij[0][2]=Rij[2][0]=pp1[8];
+  Rij[0][3]=Rij[3][0]=pp1[9];
   Rij[1][1]=Rij[2][2]=Rij[3][3]=1./3.*Rij[0][0];
   Rij[1][2]=Rij[2][1]=Rij[1][3]=Rij[3][1]=Rij[2][3]=Rij[3][2]=0.;
 
-  boost22_ff2lab(Rij,Rij,pp1,gg,GG);
-
-  indices_2221(Rij,Rij,gg);
+  trans22_on2cc(Rij,Rij,tlo);  
+  boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
+  indices_2221(Rij,Rij,gg);  
 
   uufake[6]=Rij[0][0];
   uufake[7]=Rij[0][1];
   uufake[8]=Rij[0][2];
   uufake[9]=Rij[0][3];
+
+  //  print_Nvector(uufake,NV);
+  //  getchar();
 
   u2p_rad(uufake,pp2,ggg,&i);
 #else
