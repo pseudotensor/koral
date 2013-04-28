@@ -269,7 +269,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
-  int verbose=1;
+  int verbose=0;
   int ret=0;
 
   struct geometry *geom
@@ -870,10 +870,10 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
     //Newton
     rhop1=rho-fval/dfval;   
 
-    if(isnan(rhop1)) {print_Nvector(uuu,NV); printf("nan rhop1: %e %e %e %e %e %e %e %e\n",rho,fval,dfval,ut,uu,
+    if(isnan(rhop1)) {if(verbose) {print_Nvector(uuu,NV); printf("nan rhop1: %e %e %e %e %e %e %e %e\n",rho,fval,dfval,ut,uu,
 						    Sut,rhout,
 						 exp(Sut/rhout))
-					       ;return -1;}
+							    ;}return -1;}
 
     if(rhop1<RHOFLOOR) rhop1=rho/2.;
 
@@ -892,10 +892,10 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
  
     if(iter>itmax && err>conv) 
       {
-	if(verbose || 1) printf("iter exceeded in u2p_entr \n");
-	if(verbose || 1) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
-	if(verbose || 1) print_Nvector(p,NV);
-	if(verbose || 1) print_Nvector(uuu,NV);
+	if(verbose) printf("iter exceeded in u2p_entr \n");
+	if(verbose ) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
+	if(verbose ) print_Nvector(p,NV);
+	if(verbose ) print_Nvector(uuu,NV);
 
 	//	getchar();
 	return -1;
@@ -922,10 +922,10 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
 
   if(uu<0. || rho<0. || isnan(rho))
     {
-      if(verbose || 1) printf("iter didn't work in u2p_entr \n");
-      if(verbose || 1) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
-      if(verbose || 1) print_Nvector(p,NV);
-      if(verbose || 1) print_Nvector(uuu,NV);
+      if(verbose ) printf("iter didn't work in u2p_entr \n");
+      if(verbose ) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
+      if(verbose ) print_Nvector(p,NV);
+      if(verbose ) print_Nvector(uuu,NV);
       //      getchar();
       return -1;
     }
@@ -940,7 +940,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   if(conv_velsinprims(p,VEL3,VELPRIM,g,G)!=0) 
     {
       print_Nvector(p,NV);
-      printf("conv vels in _entropy failed %e ut\n",ut);
+      if(verbose) printf("conv vels in _entropy failed %e ut\n",ut);
       //      getchar();
       return -1;
     }
@@ -1406,8 +1406,10 @@ static int get_m1closure_urfconrel(int verbose,
 
   *Erfreturn=Erf; // pass back new Erf to pointer
 
-  if(isinf(Erf) || isinf(gammarel2) || isinf(urfconrel[0])|| isinf(urfconrel[1])|| isinf(urfconrel[2])|| isinf(urfconrel[3]) ){
-      printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g : %d %d %d %d : %g %g %g %g\n",geom->ix,geom->iy,geom->iz,Erf,gammarel2,urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
+  if(isinf(Erf) || isinf(gammarel2) || isinf(urfconrel[0])|| isinf(urfconrel[1])|| isinf(urfconrel[2])|| isinf(urfconrel[3]) )
+    {
+      if(verbose)      printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g : %d %d %d %d : %g %g %g %g\n",geom->ix,geom->iy,geom->iz,Erf,gammarel2,urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
+      return -1;
   }
 
   return(0);
@@ -1462,7 +1464,8 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       get_m1closure_Erf(ggg,Avcon,gammarel2,&Erf);
 
       // get relative 4-velocity
-      get_m1closure_urfconrel(verbose,ggg,pp,Avcon,Avcov,gammarel2,delta,numerator,divisor,&Erf,urfcon,corrected);
+      if(get_m1closure_urfconrel(verbose,ggg,pp,Avcon,Avcov,gammarel2,delta,numerator,divisor,&Erf,urfcon,corrected)<0)
+	return -1;
 
       //new primitives
       pp[EE(irf)]=Erf;
@@ -2101,7 +2104,7 @@ FTYPE compute_inside_entropy_wmrho0_idealgas(FTYPE rho0, FTYPE wmrho0)
   pressure=pressure_wmrho0_idealgas(rho0,wmrho0);
   indexn=1.0/GAMMAM1;
 
-  // Don't limit rho0 and pressure since this is used for iterative scheme that requires to know if beyond valid domain or not.  Nan will be terminated during inversion.
+  // Don't limit rho0 and pressure since this is used for iterative scheme that requires to know if beyond valid domain or not.  Na winll be terminated during inversion.
   //  if(rho0<SMALL) rho0=SMALL;
   //  if(pressure<SMALL) pressure=SMALL;
   

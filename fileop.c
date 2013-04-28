@@ -376,7 +376,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 							  uu[7],  //11
 							  uu[8],  //12
 							  uu[9],  //13
-#ifdef CGSOUTPUT
+#ifdef SKIPHERE_CGSOUTPUT
 							  rhoGU2CGS(rho),    //14
 							  endenGU2CGS(uint),   //15
 							  (vx),     //16
