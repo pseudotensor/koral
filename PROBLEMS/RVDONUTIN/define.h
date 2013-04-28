@@ -103,7 +103,7 @@
 #define URIN (4.00e8/CCC)
 #define KKK 4676.
 #define UTPOT .9980
-#define DTOUT1 5.e0
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
