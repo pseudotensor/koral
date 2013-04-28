@@ -78,7 +78,7 @@
 #define NOUTSTOP 5000
 #define RADOUTPUTINZAMO
 #define CGSOUTPUT
-#define PRINTGC_LEFT
+//#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
 
 /************************************/

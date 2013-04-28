@@ -575,7 +575,7 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
     {
       for(j=0;j<4;j++)
 	{
-	  //	  Tt[i][j]=T1[i][j]*alpha;
+	  Tt[i][j]=T1[i][j]*alpha;
 	}
     }
   
@@ -665,7 +665,7 @@ boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
     {
       for(j=0;j<4;j++)
 	{
-	  //	  T2[i][j]=T2[i][j]/alpha;
+	  T2[i][j]=T2[i][j]/alpha;
 	}
     }
 
@@ -743,7 +743,7 @@ boost22_rf2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldou
     {
       for(j=0;j<4;j++)
 	{
-	  //	  T2[i][j]=T2[i][j]/alpha;
+	  T2[i][j]=T2[i][j]/alpha;
 	}
     }
 
@@ -777,7 +777,7 @@ boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
   ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
     {
-      //      At[i]=A1[i]*alpha;
+      At[i]=A1[i]*alpha;
     }
   
   if(verbose>0) print_tensor(L);
@@ -839,7 +839,7 @@ boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
   ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
     {      
-      //      A2[i]=A2[i]/alpha;	
+      A2[i]=A2[i]/alpha;	
     }
 
 
