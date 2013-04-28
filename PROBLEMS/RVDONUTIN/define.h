@@ -24,7 +24,7 @@
 //hd floors
 /************************************/
 #define UURHORATIOMIN 1.e-7
-#define UURHORATIOMAX 1.e2
+#define UURHORATIOMAX 1.e1
 #define EERHORATIOMIN 1.e-7
 #define EERHORATIOMAX 1.e3
 
@@ -91,10 +91,25 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 8
+#define NDONUT 10
 
 /************************************/
-#if (NDONUT==9) //mdot = 100, alpha = 0.01
+#if (NDONUT==10) //mdot = 100, alpha = 0.01, r=30
+/************************************/
+#define MAXX (log(30.-MKS1R0))
+#define RADIATION
+#define ELL 5.868
+#define ALPHAVISC .1
+#define URIN (7.29e8/CCC)
+#define KKK 7133.
+#define UTPOT .9974
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-22
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+
+/************************************/
+#elif (NDONUT==9) //mdot = 100, alpha = 0.01
 /************************************/
 #define MAXX (log(50.-MKS1R0))
 #define RADIATION
