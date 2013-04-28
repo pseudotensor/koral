@@ -94,7 +94,22 @@
 #define NDONUT 8
 
 /************************************/
-#if (NDONUT==8) //mdot = 100, alpha = 0.1
+#if (NDONUT==9) //mdot = 100, alpha = 0.01
+/************************************/
+#define MAXX (log(50.-MKS1R0))
+#define RADIATION
+#define ELL 7.3657
+#define ALPHAVISC .1
+#define URIN (4.00e7/CCC)
+#define KKK 2170.
+#define UTPOT .9980
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-22
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+
+/************************************/
+#elif (NDONUT==8) //mdot = 100, alpha = 0.1
 /************************************/
 #define MAXX (log(50.-MKS1R0))
 #define RADIATION
