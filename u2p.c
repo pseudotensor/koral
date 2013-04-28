@@ -1214,7 +1214,7 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
     2.*(gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2));
 
 
-  if( gamma2a<GAMMASMALLLIMIT || !isfinite(gamma2a) ){
+  if( gamma2a<GAMMASMALLLIMIT || isinf(gamma2a) ){
     gamma2b=(0.25*(-2.*Power(gn11,2)*Power(Rdtt,2) - 1.*gn11*(4.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 
                                                               Rdty*(4.*gn13*Rdtt + 2.*gn23*Rdtx + gn33*Rdty) + 2.*(2.*gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2)) + 
                    gn11*Rdtt*Sqrt(4.*Power(gn11,2)*Power(Rdtt,2) + Power(gn12*Rdtx + gn13*Rdty + gn14*Rdtz,2) + 
@@ -1322,7 +1322,7 @@ static int get_m1closure_urfconrel(int verbose,
   int failure3=gammarel2>gammamax*gammamax && Erf>=ERADLIMIT || gammarel2<0.0 || delta<0.  || divisor==0.0 && numerator==0.0 || divisor==0.0 && numerator!=0.0;
 
   // any failure
-  int failure=!nonfailure || !isfinite(gammarel2) || !isfinite(Erf);
+  int failure=!nonfailure || isinf(gammarel2) || isinf(Erf);
 
   if(failure && (failure1==0 && failure2==0 && failure3==0)){
     printf("Undetected failure, now considered\n");
@@ -1406,7 +1406,7 @@ static int get_m1closure_urfconrel(int verbose,
 
   *Erfreturn=Erf; // pass back new Erf to pointer
 
-  if(!isfinite(Erf) || !isfinite(gammarel2) || !isfinite(urfconrel[0])|| !isfinite(urfconrel[1])|| !isfinite(urfconrel[2])|| !isfinite(urfconrel[3]) ){
+  if(isinf(Erf) || isinf(gammarel2) || isinf(urfconrel[0])|| isinf(urfconrel[1])|| isinf(urfconrel[2])|| isinf(urfconrel[3]) ){
       printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g : %d %d %d %d : %g %g %g %g\n",geom->ix,geom->iy,geom->iz,Erf,gammarel2,urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
   }
 
