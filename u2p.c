@@ -668,7 +668,7 @@ int verbose=0;
 
   if(iter>=50)
     {
-      if(verbose>0 || 1) printf("iter exceeded in u2p_hot\n");
+      if(verbose>0 || 1) printf("iter exceeded in u2p_hot\n"); getchar();
       return -1;
     }
   
