@@ -24,7 +24,7 @@
 //hd floors
 /************************************/
 #define UURHORATIOMIN 1.e-7
-#define UURHORATIOMAX 1.e1
+#define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-7
 #define EERHORATIOMAX 1.e3
 
@@ -91,7 +91,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 10
+#define NDONUT 8
 
 /************************************/
 #if (NDONUT==10) //mdot = 100, alpha = 0.01, r=30
@@ -104,7 +104,7 @@
 #define KKK 7133.
 #define UTPOT .9974
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-21
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -119,7 +119,7 @@
 #define KKK 2170.
 #define UTPOT .9980
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-21
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -134,7 +134,7 @@
 #define KKK 4676.
 #define UTPOT .9980
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-21
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -149,7 +149,7 @@
 #define KKK 2381.
 #define UTPOT .9937
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-21
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -164,13 +164,13 @@
 #define KKK 490.
 #define UTPOT .9912
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-21
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
 
 /************************************/
-#elif (NDONUT==5) //mdot = 100, alpha = 0.1
+#elif (NDONUT==5) //mdot = 100, alpha = 0.1, r=15 (and below)
 /************************************/
 #define MAXX (log(15.3-MKS1R0))
 #define RADIATION
@@ -180,7 +180,7 @@
 #define KKK 9713.
 #define UTPOT .9925
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-23
+#define RHOATMMIN  1.e-22
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
 
