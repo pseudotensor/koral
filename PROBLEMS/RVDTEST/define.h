@@ -119,8 +119,8 @@
 #define URIN 0.
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  1.e-2
-#define UINTATMMIN 1.e-4
+#define RHOATMMIN  1.e-6
+#define UINTATMMIN 1.e-8
 #define DTOUT1 10.e-1
 
 #endif

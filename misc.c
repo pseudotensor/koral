@@ -74,7 +74,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //surface density (2)
 	      profiles[0][ix]+=rho*dx[1];
 	      //rest mass flux (3)
-	      profiles[1][ix]+=-rho*ucon[1]*dx[1];
+	      profiles[1][ix]+=-rho*ucon[1]*dx[1]*dx[2];
 	      //rho-weighted minus radial velocity (4)
 	      profiles[2][ix]+=-ucon[1]*rho*dx[1];
 	      //rho-weighted u_phi (5)

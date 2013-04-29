@@ -122,7 +122,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //hot hydro - conserving energy
   ret=0;
   u2pret=u2p_hot(uu,pp,ggg);  
-
   //************************************
 
   if(u2pret<0) 
