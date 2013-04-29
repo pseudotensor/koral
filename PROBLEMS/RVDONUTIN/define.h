@@ -91,18 +91,50 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 8
+#define NDONUT 12
 
 /************************************/
-#if (NDONUT==10) //mdot = 100, alpha = 0.01, r=30
+#if (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
+/************************************/
+#define MAXX (log(30.-MKS1R0))
+#undef NY
+#define NY 80
+#define RADIATION
+#define ELL 5.868
+#define ALPHAVISC .1
+#define URIN (4.e6/CCC)
+#define KKK 131.859
+#define UTPOT 0.98424
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-21
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+
+/************************************/
+#elif (NDONUT==11) //mdot = 0.5, alpha = 0.1, r=50
+/************************************/
+#define MAXX (log(50.-MKS1R0))
+#define RADIATION
+#define ELL 7.3657
+#define ALPHAVISC .1
+#define URIN (1.6e6/CCC)
+#define KKK 23.41
+#define UTPOT 0.99025
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-21
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+
+/************************************/
+#elif (NDONUT==10) //mdot = 100, alpha = 0.1, r=30
 /************************************/
 #define MAXX (log(30.-MKS1R0))
 #define RADIATION
 #define ELL 5.868
 #define ALPHAVISC .1
 #define URIN (7.29e8/CCC)
-#define KKK 7133.
-#define UTPOT .9974
+#define KKK 18455.
+#define UTPOT 1.015//.9974
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-21
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
@@ -116,8 +148,8 @@
 #define ELL 7.3657
 #define ALPHAVISC .1
 #define URIN (4.00e7/CCC)
-#define KKK 2170.
-#define UTPOT .9980
+#define KKK 5548.
+#define UTPOT 1.008//.9980
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-21
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
@@ -131,8 +163,8 @@
 #define ELL 7.3657
 #define ALPHAVISC .1
 #define URIN (4.00e8/CCC)
-#define KKK 4676.
-#define UTPOT .9980
+#define KKK 11954.//4676.
+#define UTPOT 1.008//.9980
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-21
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
