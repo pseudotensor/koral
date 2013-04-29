@@ -538,7 +538,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   gg=geom->gg;
   GG=geom->GG;
 
-int verbose=0;
+  int verbose=0;
   int i,j,k;
   ldouble rho,u,p,w,W,alpha,D;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
@@ -635,7 +635,7 @@ int verbose=0;
       iter++;
       f_u2p_hot(W,cons,&f0,&dfdW);
 
-      //      f1=f_u2p_hot(W*(1.+EPS),cons);
+      //f_u2p_hot(W*(1.+EPS),cons,&f1,&dfdW);
       //dfdW=(f1-f0)/(EPS*W);
 
       if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,f1,dfdW);
@@ -888,16 +888,16 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
 
     err =fabs(diffrho/rho);
 
-    if(err<conv && fabs(fval)>1.e-5) my_err("entropy problem?\n");
+    //  if(err<conv && fabs(fval)>1.e-5) my_err("entropy problem?\n");
  
     if(iter>itmax && err>conv) 
       {
-	if(verbose) printf("iter exceeded in u2p_entr \n");
+	if(verbose || 1) printf("iter exceeded in u2p_entr \n");
 	if(verbose ) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
 	if(verbose ) print_Nvector(p,NV);
 	if(verbose ) print_Nvector(uuu,NV);
 
-	//	getchar();
+	getchar();
 	return -1;
       }
 
@@ -922,7 +922,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
 
   if(uu<0. || rho<0. || isnan(rho))
     {
-      if(verbose ) printf("iter didn't work in u2p_entr \n");
+      if(verbose || 1) printf("iter didn't work in u2p_entr \n");
       if(verbose ) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
       if(verbose ) print_Nvector(p,NV);
       if(verbose ) print_Nvector(uuu,NV);
@@ -940,8 +940,8 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   if(conv_velsinprims(p,VEL3,VELPRIM,g,G)!=0) 
     {
       print_Nvector(p,NV);
-      if(verbose) printf("conv vels in _entropy failed %e ut\n",ut);
-      //      getchar();
+      if(verbose || 1) printf("conv vels in _entropy failed %e ut\n",ut);
+      getchar();
       return -1;
     }
  

@@ -8,7 +8,7 @@
 #define ALLOWENTROPYU2P 1
 #define FIXUPAFTERENTROPY 0
 #define DOFIXUPS 0
-#define WAVESPEEDSATFACES
+//#define WAVESPEEDSATFACES
 //#define AVERAGEONLYUINT
 //#define FULLDISSIPATION
 #define UURHORATIOMIN 1.e-7
@@ -38,7 +38,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define ALLSTEPSOUTPUT 1
+#define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 5000.
 #define RADOUTPUTINZAMO
@@ -119,8 +119,8 @@
 #define URIN 0.
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  3.e0
-#define UINTATMMIN 1.e-1
+#define RHOATMMIN  1.e-2
+#define UINTATMMIN 1.e-4
 #define DTOUT1 10.e-1
 
 #endif
