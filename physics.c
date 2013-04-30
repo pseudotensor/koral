@@ -27,6 +27,9 @@ calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int 
   ldouble pre=(GAMMA-1.)*uu;
   ldouble cs2=GAMMA*pre/(rho+uu+pre);
 
+  //test
+  cs2*=4.;
+
   if(cs2>=1.0) cs2=0.99999;
   if(cs2<0.) cs2=0.;
 
@@ -893,7 +896,7 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
       Sut=get_u(u,5,ix,iy,iz);
       S=Sut/ut;
 
-      ldouble uint=calc_ufromS(S,rho);
+      //ldouble uint=calc_ufromS(S,rho);
       /*
       if(uint/rho > 1.) 
 	{

@@ -268,11 +268,11 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
-  int verbose=0;
+  int verbose=1;
   int ret=0;
 
   struct geometry *geom
-   = (struct geometry *) ggg;
+    = (struct geometry *) ggg;
 
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
@@ -284,12 +284,13 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   //uint/rho ratios  
   if(pp[1]<UURHORATIOMIN*pp[0]) 
     {
+      if(verbose) {printf("hd_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);getchar();}
       pp[1]=UURHORATIOMIN*pp[0];
       ret=-1;
-      //if(verbose) printf("hd_floors CASE 2\n");}
+
     }
 
-  if(pp[1]>UURHORATIOMAX*pp[0]) 
+if(pp[1]>UURHORATIOMAX*pp[0]) 
     {
       pp[1]=UURHORATIOMAX*pp[0];
       ret=-1;      
@@ -386,7 +387,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 	  if(verbose) 
 	    {
 	      printf("hd_floors CASE 4 %e %e %e\n",gamma2/alpha2,gamma2,GAMMAMAXHD*GAMMAMAXHD);
-	      print_4vector(u1);//getchar();
+	      print_4vector(u1);getchar();
 	    }
 	  correct=1;
 	}
@@ -398,6 +399,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 
   if(correct==0) return ret;
 
+//what's below assumes VEL4!!!
   //correcting and imposing gammamax keeping the direction given by spatial components
   ldouble Afac;
   ldouble gammamaxhd=GAMMAMAXHD;
