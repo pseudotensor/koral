@@ -766,7 +766,11 @@
 #define BIG (1./SMALL) //big number
 
 #ifndef UURHORATIOMIN
-#define UURHORATIOMIN 1.e-7
+#define UURHORATIOMIN 0.
+#endif
+
+#ifndef UURHORATIOU2PCOLD
+#define UURHORATIOU2PCOLD 1.e-10
 #endif
 
 #ifndef UURHORATIOMAX 

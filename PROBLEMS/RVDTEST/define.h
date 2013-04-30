@@ -6,13 +6,14 @@
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 
 #define ALLOWENTROPYU2P 1
+#define ALLOWCOLDU2P 0
 #define FIXUPAFTERENTROPY 0
 #define DOFIXUPS 0
 #define WAVESPEEDSATFACES
 //#define AVERAGEONLYUINT
 //#define FULLDISSIPATION
-#define UURHORATIOMIN 0.
-#define UURHORATIOMAX 1.e2
+#define UURHORATIOMIN 1.e-10
+#define UURHORATIOMAX 1.e3
 #define EERHORATIOMIN 1.e-7
 #define EERHORATIOMAX 1.e3
 
@@ -119,8 +120,8 @@
 #define URIN 0.
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  1.e-4
-#define UINTATMMIN 1.e-6
+#define RHOATMMIN  1.e-2
+#define UINTATMMIN 1.e-4
 #define DTOUT1 1.e1
 
 #endif
