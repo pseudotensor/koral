@@ -762,9 +762,8 @@
 #define FIXUPAFTERENTROPY 0
 #endif
 
-
-
 #define SMALL 1.e-50 //small number 
+#define BIG (1./SMALL) //big number
 
 #ifndef UURHORATIOMIN
 #define UURHORATIOMIN 1.e-7

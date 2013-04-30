@@ -171,7 +171,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	    if(verbose>0)
 	      {
 		printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-		getchar();
+		//		getchar();
 	      }
 	  }
 	
@@ -389,7 +389,7 @@ if(pp[1]>UURHORATIOMAX*pp[0])
 	  if(verbose) 
 	    {
 	      printf("hd_floors CASE 4 %e %e %e\n",gamma2/alpha2,gamma2,GAMMAMAXHD*GAMMAMAXHD);
-	      print_4vector(u1);getchar();
+	      print_4vector(u1);//getchar();
 	    }
 	  correct=1;
 	}
@@ -2255,7 +2255,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   gg=geom->gg;
   GG=geom->GG;
 
-  int verbose=2;
+  int verbose=0;
   int superverbose=0;
 
   if(superverbose)
@@ -2355,7 +2355,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   ldouble wmrho0 = w - rho0; //u+p
 
   //1d Newton solver
-  ldouble CONV=1.e-6;
+  ldouble CONV=1.e-8;
   ldouble EPS=1.e-6;
   ldouble Wpprev=Wp,Wpprev2=Wp;
   ldouble f0,f1,dfdWp,Wpnew,v2,ut2;
@@ -2368,7 +2368,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
   if(isnan(f0)|| isnan(dfdWp) || isinf(f0) || isinf(dfdWp))
     {
-      W=1.1*sqrt(D*D+Qt2);
+      W=1.01*sqrt(D*D+Qt2);
       Wp=W-D;
       v2 = Qt2/W/W;
       gamma2 = 1./(1.-v2);
@@ -2378,7 +2378,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
       wmrho0 = w - rho0;
 
       f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
-      printf(">>> %e %e\n",f0,wmrho0);      
+      if(verbose>1) printf(">>> %e %e\n",f0,wmrho0);      
     }
   
   idump=0;
@@ -2415,32 +2415,43 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(verbose>1) printf("initial:%e %e %e %e\n",Wp,rho0,wmrho0,compute_inside_entropy_wmrho0_idealgas(rho0,wmrho0));
 
-
+  ldouble dampfac;
+  ldouble f0temp,dfdWptemp;
   do
     {
       Wpprev=Wp;
       iter++;
-      idump=0; 
-      
+      dampfac=1.;
+
+      f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+
+      //f_u2p_entropy_harm(Wp*(1.+EPS),cons,&f1,&dfdWp);
+      //dfdWp=(f1-f0)/(EPS*Wp);
+
       do
 	{
-	  if(idump>0)
-	    Wp=Wpprev2+(Wp-Wpprev2)/2.;
-	  f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+	  Wp=Wpprev-dampfac*f0/dfdWp;
+	  
+	  W=Wp+D;
+	  v2 = Qt2/W/W;
+	  gamma2 = 1./(1.-v2);
+	  gamma = sqrt(gamma2);
+	  w = W/gamma2;
+	  rho0 = D/gamma;
+	  wmrho0 = w - rho0;
+	  u = wmrho0 / GAMMA;
 
-	  f_u2p_entropy_harm(Wp*(1.+EPS),cons,&f1,&dfdWp);
-	  dfdWp=(f1-f0)/(EPS*Wp);
+	  f_u2p_entropy_harm(Wp,cons,&f0temp,&dfdWptemp);
 
-	  idump++; 
-	  if(verbose>1) printf("substep: %d %e %e %e\n",idump,Wp,f0,dfdWp);
+	  if(verbose>1) printf("substep: %f %e %e %e %e\n",dampfac,Wp,f0temp,dfdWptemp,u);
+	  dampfac/=2.;
 
-	  if(idump>50) {printf("damping unsuccesful at %d\n",iter); getchar(); return -1;}
+	  if(dampfac<1.e-7) break;
 	}
-      while(isnan(f0) || isnan(dfdWp) || isinf(f0) || isinf(dfdWp));
+      while(u<0. || isnan(f0temp) || isinf(f0temp) || isnan(dfdWptemp) || isinf(dfdWptemp));
 
-      f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);	  
-
-      if(idump>1 && verbose>1) {printf("damping succesful\n"); }
+      if(dampfac<1.e-7) {printf("damping unsuccesful at entropy_harm\n");return -1; getchar(); }
+      else  if(verbose>1) {printf("damping succesful\n"); }
 
       if(verbose>1) 
 	{
@@ -2456,26 +2467,10 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  printf("%d %e %e %e -> wmrho %e\n",iter,Wp,f0,dfdWp,u);
 	}
 
-      if(fabs(dfdWp)<SMALL) {printf("derivative zero. asssuming found solution\n"); break;}
+      //      if(fabs(dfdWp)<SMALL ) {if(verbose) printf("derivative zero. asssuming found solution\n"); return -1;getchar(); break;}
+      if(fabs(Wp)>BIG) {if(verbose) printf("Wp has gone out of bounds\n"); return -1;getchar(); break;}
 
-      Wpprev2=Wp;
-
-      Wp-=f0/dfdWp;
-
-      W=Wp+D;
-      v2=Qt2/W/W;
-      gamma2=1./(1.-v2);
-      //      ut2 = Qt2/(W*W - Qt2);
-      //      gamma2=1. + ut2;
-      gamma=sqrt(gamma2);
-      rho=D/gamma;
-      u=1./GAMMA*(W/gamma2-rho);
- 
-      printf("check: %d %e %e %e -> wmrho %e\n",iter,Wp,f0,dfdWp,u);
-
-      if(isnan(Wp) || isinf(Wp)) {printf("nan/inf Wp: %e %e %e %e\n",Wp,f0,dfdWp,W); getchar(); return -1;}
-  
-     
+      if(isnan(Wp) || isinf(Wp)) {printf("nan/inf Wp: %e %e %e %e\n",Wp,f0,dfdWp,W);  return -1;getchar();}
     }
   //  while(( fabs((Wp-Wpprev)/Wpprev)>CONV || u<0. || rho<0.) && iter<50);
   while(( fabs((Wp-Wpprev)/Wpprev)>CONV) && iter<50);
@@ -2488,7 +2483,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
     }
   
 
-  if(verbose>1) {printf("the end: %e\n",Wp); }
+  if(verbose>1) {printf("the end: %e\n",Wp); }//getchar();}
 
   //Wp found, let's calculate W, v2 and the rest
   W=Wp+D;
