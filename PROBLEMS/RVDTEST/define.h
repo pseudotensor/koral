@@ -20,7 +20,7 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-#define myMKS1COORDS
+//#define myMKS1COORDS
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -53,14 +53,14 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(15.3-MKS1R0))//(log(16.-MKS1R0))
-#define NX 48//
+#define NX 24
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
 #define NX 16//
 #endif
 
-#define NY 32//
+#define NY 16
 #define NZ 1
 
 
@@ -119,9 +119,9 @@
 #define URIN 0.
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  1.e-2
-#define UINTATMMIN 1.e-4
-#define DTOUT1 1.e0
+#define RHOATMMIN  1.e-6
+#define UINTATMMIN 1.e-8
+#define DTOUT1 1.e1
 
 #endif
 
