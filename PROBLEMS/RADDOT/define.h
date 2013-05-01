@@ -2,6 +2,7 @@
 #define RADIATION
 
 //#define LABRADFLUXES
+//#define EDDINGTON_APR
 
 #define MYCOORDS MINKCOORDS
 #define NX 41
@@ -32,13 +33,13 @@
 #define MAXZ 1
 
 #define IXDOTMIN NX/2
-#define IYDOTMIN NY/2
+#define IYDOTMIN NY/3
 #define IZDOTMIN 0
 #define IXDOTMAX NX/2
-#define IYDOTMAX NY/2
+#define IYDOTMAX NY/3
 #define IZDOTMAX 0
 #define FXDOT 0.
-#define FYDOT 0.
+#define FYDOT 0.9
 #define FZDOT 0.
 
 #define MASSCM 1.

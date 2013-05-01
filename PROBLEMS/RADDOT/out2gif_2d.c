@@ -17,6 +17,7 @@
 	  "unset surface\n"
 
 	   "set term gif large size 800,700\n"
+	  "set format cb \"%%.0e\"\n" 
 	   "set output \"%s\"\n"
 	   "set view map\n"
 	  "unset surface\n"
@@ -44,7 +45,7 @@
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
 	  "set log cb\n"
-	  "set cbrange [0.001:.1]\n"
+	  "set cbrange [1.e-13:1.e-11]\n"
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
