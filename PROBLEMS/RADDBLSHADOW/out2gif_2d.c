@@ -27,7 +27,7 @@ ldouble sizey=(get_xb(NY,1)-get_xb(0,1))/2. *250.;
 	  "set pm3d\n"
 	  "unset key\n"
 	  "set style line 1 lt 1 lw 3 lc 3\n"
-	  "set style arrow 1 head nofilled size screen 0.002,35 ls 1\n"
+	  "set style arrow 1 head filled size 0.075,35 ls 1\n"
 	  "set palette model RGB rgbformulae 7,5,15\n"
 	  "set palette model RGB rgbformulae 30,31,32\n"
 	  "set palette model RGB rgbformulae 21,22,23\n"

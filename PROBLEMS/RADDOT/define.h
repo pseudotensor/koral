@@ -5,8 +5,8 @@
 //#define EDDINGTON_APR
 
 #define MYCOORDS MINKCOORDS
-#define NX 41
-#define NY 41
+#define NX 101
+#define NY 101
 #define NZ 1 
 //#define ZSLICE 20
 
@@ -21,7 +21,7 @@
 #define ALLSTEPSOUTPUT 0
 #define DTOUT1 .05
 #define GAMMA (4./3.)
-#define NOUTSTOP 60
+#define NOUTSTOP 50
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
@@ -39,7 +39,7 @@
 #define IYDOTMAX NY/3
 #define IZDOTMAX 0
 #define FXDOT 0.
-#define FYDOT 0.9
+#define FYDOT 0.99
 #define FZDOT 0.
 
 #define MASSCM 1.

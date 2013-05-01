@@ -33,8 +33,8 @@
 //#define CGSOUTPUT
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
-#define PRINTGC_LEFT
-#define PRINTGC_RIGHT
+//#define PRINTGC_LEFT
+//#define PRINTGC_RIGHT
 
 #ifdef myMKS1COORDS
 #define MKS1R0 -2.

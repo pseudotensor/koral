@@ -29,6 +29,7 @@
 	  "set style line 1 lt 1 lw 2 lc 2\n"
 	  "set style line 2 lt 1 lw 3 lc 3\n"
 	  "set style arrow 1 head nofilled size screen 0.002,35 ls 1\n"
+	  "set style arrow 1 head size 0.0125,30 filled ls 1\n"
 	  "set palette model RGB rgbformulae 7,5,15\n"
 	  "set palette model RGB rgbformulae 30,31,32\n"
 	  "set palette model RGB rgbformulae 21,22,23\n"
