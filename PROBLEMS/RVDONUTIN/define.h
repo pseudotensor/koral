@@ -235,6 +235,10 @@
 /************************************/
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
+#undef NX
+#define NX 120
+#undef NY
+#define NY 100
 #define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
