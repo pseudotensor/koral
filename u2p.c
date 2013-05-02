@@ -272,7 +272,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
-  int verbose=1;
+  int verbose=0;
   int ret=0;
 
   struct geometry *geom
