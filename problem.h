@@ -54,7 +54,7 @@
 //48* RVDTEST - testing the entropy near the axis
 //49* RVRING - 1d donut ring
 
-#define PROBLEM 17
+#define PROBLEM 43
 
 #if(PROBLEM==49)
 

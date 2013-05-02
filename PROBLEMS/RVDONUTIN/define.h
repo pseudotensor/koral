@@ -23,8 +23,8 @@
 /************************************/
 //hd floors
 /************************************/
-#define UURHORATIOMIN 1.e-7
-#define UURHORATIOMAX 1.e2
+#define UURHORATIOMIN 1.e-15
+#define UURHORATIOMAX 1.e3
 #define EERHORATIOMIN 1.e-7
 #define EERHORATIOMAX 1.e3
 
@@ -91,7 +91,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 2
+#define NDONUT 3
 
 /************************************/
 #if (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
@@ -258,7 +258,7 @@
 #define KKK 1894.
 #define UTPOT .9734
 #define DTOUT1 5.e-1
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-23
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
 
