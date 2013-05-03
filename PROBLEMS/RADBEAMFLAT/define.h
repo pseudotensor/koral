@@ -3,9 +3,9 @@
 
 #define MYCOORDS MINKCOORDS
 #define MINKOWSKI
-#define NX 31
+#define NX 61
 #define NY 1
-#define NZ 31
+#define NZ 61
 #define YZXDUMP
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
@@ -33,7 +33,9 @@
 
 #define BEAML .4
 #define BEAMR .6
-#define DTOUT1 .1 //dt for basic output
+#define DTOUT1 .05 //dt for basic output
+
+#define EDDINGTON_APR
 
 //#define RADBEAMFLAT_FRATIO 0.99
 #define RADBEAMFLAT_FRATIO 0.995

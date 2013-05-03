@@ -79,7 +79,7 @@
 #define RADOUTPUTINZAMO
 #define CGSOUTPUT
 //#define PRINTXGC_LEFT
-//#define PRINTGC_RIGHT
+#define PRINTGC_RIGHT
 
 /************************************/
 //common physics / atmosphere
@@ -91,7 +91,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 2
 
 /************************************/
 #if (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
@@ -261,7 +261,7 @@
 #define URIN (5.23e7/CCC)
 #define KKK 1894.
 #define UTPOT .9734
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-23
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))

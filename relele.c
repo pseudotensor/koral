@@ -391,7 +391,41 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
   
       return 0;
     }
+  if(atmtype==4) //zero BL velocity
+    {
+      //normal observer
+      ldouble ucon[4];
+      ldouble xx2[4];
+      ldouble GGBL[4][5];
+
+      // BL coords
+      coco_N(xx,xx2,MYCOORDS,BLCOORDS);
+      calc_G_arb(xx2,GGBL,BLCOORDS);
+
+      // normal observer in BL = stationary observer
+      calc_normalobs_4vel(GGBL,ucon);
+
+      // to MYCOORDS
+      trans2_coco(xx2,ucon,ucon,BLCOORDS,MYCOORDS);
+
+      // to VELPRIM
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+
+      pp[2]=ucon[1];
+      pp[3]=ucon[2];
+      pp[4]=ucon[3];
+
+      //density etc.
+      ldouble r=xx2[1];
+
+      ldouble rout=2.; //RHOATMMIN etc. given at rout=2
+
+      pp[0] = RHOATMMIN*pow(r/rout,-1.5);
+      pp[1] = UINTATMMIN*pow(r/rout,-2.5);
   
+      return 0;
+    }
+ 
     my_err("atmtype value not handled in set_atmosphere()\n");
   return 0.;
 }

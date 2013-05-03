@@ -2,6 +2,7 @@
 //#define FLUXDISSIPATIONFULL
 #define RADIATION
 //#define LABRADFLUXES
+//#define EDDINGTON_APR
 
 #define MYCOORDS  SCHWCOORDS
 #define NX 30

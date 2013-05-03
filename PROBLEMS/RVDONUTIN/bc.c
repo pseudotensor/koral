@@ -51,10 +51,12 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	iiz=iz;
 
 	//ambient
-	set_hdatmosphere(pp,xxvec,gg,GG,0);
+	set_hdatmosphere(pp,xxvec,gg,GG,4);
+
+
 #ifdef RADIATION
 	ldouble ppatm[NV];
-	ldouble urf[4];
+	ldouble ucon[4];
 	
 	//pure atmosphere
 	set_radatmosphere(ppatm,xxvec,gg,GG,0);
@@ -68,30 +70,8 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	pp[7]=ppatm[7];
 	pp[8]=ppatm[8];
 	pp[9]=ppatm[9];
-	/*
-	//outflow-no-inflow for radiation	
-	urf[1]=pp[7];
-	urf[2]=pp[8];
-	urf[3]=pp[9];
-
-	//converting to BL lab four-velocity
-	conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
-	trans2_coco(xxvec,urf,urf,MYCOORDS,BLCOORDS);
-
-	//if flux inflowing - zero flux
-	if(urf[1]<0.) 
-	  {
-	    urf[1]=0.;
-	  }
 	
-	//converting back to MYCOORDS / VELPRIMRAD
-	trans2_coco(xxvecBL,urf,urf,BLCOORDS,MYCOORDS);
-	conv_vels(urf,urf,VEL4,VELPRIMRAD,gg,GG);
-
-	pp[7]=urf[1];
-	pp[8]=urf[2];
-	pp[9]=urf[3];
-	*/
+	
 #endif
 
 	/*

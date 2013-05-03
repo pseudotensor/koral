@@ -45,9 +45,11 @@ return Sqrt(Power(Power(x1,2) + Power(a,2)*Power(Cos(x2),2),2)*
 	    Power(Sin(x2),2));
  }
 
+/*
 if(coords==SCHWCOORDS) {
   return sqrt(Power(x1,4)*Power(Sin(x2),2));
  } 
+*/
 
 if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
@@ -118,13 +120,13 @@ if(coords==KSCOORDS) {
 ;if(idim==2) return  0
 ;
 }
-
+/*
 if(coords==SCHWCOORDS) {
 ;if(idim==0) return  2/x1
 ;if(idim==1) return  Cot(x2)
 ;if(idim==2) return  0
 ;
-}  
+}  */
 
 if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
@@ -225,26 +227,6 @@ if(coords==MKS1COORDS) {
 }
 
 
-if(coords==SCHWCOORDS) {
-;g[0][0]= -1 + 2/x1
-;g[0][1]= 0
-;g[0][2]= 0
-;g[0][3]= 0
-;g[1][0]= 0
-;g[1][1]= 1/(1 - 2/x1)
-;g[1][2]= 0
-;g[1][3]= 0
-;g[2][0]= 0
-;g[2][1]= 0
-;g[2][2]= Power(x1,2)
-;g[2][3]= 0
-;g[3][0]= 0
-;g[3][1]= 0
-;g[3][2]= 0
-;g[3][3]= Power(x1,2)*Power(Sin(x2),2)
-;
-}
-
 if(coords==KERRCOORDS) {
  ldouble a=BHSPIN;
 ;g[0][0]= -1 + (2*x1)/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2))
@@ -265,6 +247,28 @@ if(coords==KERRCOORDS) {
 ;g[3][3]= Power(Sin(x2),2)*(Power(a,2) + Power(x1,2) + (2*Power(a,2)*x1*Power(Sin(x2),2))/(Power(x1,2) + Power(a,2)*Power(Cos(x2),2)))
 ;
 }
+
+/*
+if(coords==SCHWCOORDS) {
+;g[0][0]= -1 + 2/x1
+;g[0][1]= 0
+;g[0][2]= 0
+;g[0][3]= 0
+;g[1][0]= 0
+;g[1][1]= 1/(1 - 2/x1)
+;g[1][2]= 0
+;g[1][3]= 0
+;g[2][0]= 0
+;g[2][1]= 0
+;g[2][2]= Power(x1,2)
+;g[2][3]= 0
+;g[3][0]= 0
+;g[3][1]= 0
+;g[3][2]= 0
+;g[3][3]= Power(x1,2)*Power(Sin(x2),2)
+;
+}
+*/
 
 if(coords==KSCOORDS) {
  ldouble a=BHSPIN;
@@ -422,27 +426,6 @@ calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
 
   }
 
-if(coords==SCHWCOORDS) {
-;G[0][0]= x1/(2 - x1)
-;G[0][1]= 0
-;G[0][2]= 0
-;G[0][3]= 0
-;G[1][0]= 0
-;G[1][1]= (-2 + x1)/x1
-;G[1][2]= 0
-;G[1][3]= 0
-;G[2][0]= 0
-;G[2][1]= 0
-;G[2][2]= Power(x1,-2)
-;G[2][3]= 0
-;G[3][0]= 0
-;G[3][1]= 0
-;G[3][2]= 0
-;G[3][3]= Power(Csc(x2),2)/Power(x1,2)
-;
-
-}
-
 if(coords==KERRCOORDS) {
  ldouble a=BHSPIN;
 ;G[0][0]= -((Power(a,4) + 2*Power(x1,4) + Power(a,2)*x1*(2 + 3*x1) + Power(a,2)*(Power(a,2) + (-2 + x1)*x1)*Cos(2*x2))/((Power(a,2) + (-2 + x1)*x1)*(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2))))
@@ -463,6 +446,29 @@ if(coords==KERRCOORDS) {
 ;G[3][3]= (2*((-2 + x1)*x1 + Power(a,2)*Power(Cos(x2),2))*Power(Csc(x2),2))/((Power(a,2) + (-2 + x1)*x1)*(Power(a,2) + 2*Power(x1,2) + Power(a,2)*Cos(2*x2)))
 ;
 }
+
+/*
+if(coords==SCHWCOORDS) {
+;G[0][0]= x1/(2 - x1)
+;G[0][1]= 0
+;G[0][2]= 0
+;G[0][3]= 0
+;G[1][0]= 0
+;G[1][1]= (-2 + x1)/x1
+;G[1][2]= 0
+;G[1][3]= 0
+;G[2][0]= 0
+;G[2][1]= 0
+;G[2][2]= Power(x1,-2)
+;G[2][3]= 0
+;G[3][0]= 0
+;G[3][1]= 0
+;G[3][2]= 0
+;G[3][3]= Power(Csc(x2),2)/Power(x1,2)
+;
+
+}
+*/
 
 if(coords==KSCOORDS) {
  ldouble a=BHSPIN;
@@ -713,7 +719,7 @@ calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int coords)
 ;Krzys[3][3][3]= -((a*(Power(a,4) + 3*Power(a,4)*Power(exp(1.0),x1) - 4*Power(a,2)*Power(exp(1.0),2*x1) + 8*Power(a,2)*Power(exp(1.0),3*x1) + 8*Power(exp(1.0),5*x1) + 3*Power(a,4)*R0 - 8*Power(a,2)*Power(exp(1.0),x1)*R0 + 24*Power(a,2)*Power(exp(1.0),2*x1)*R0 + 40*Power(exp(1.0),4*x1)*R0 - 4*Power(a,2)*Power(R0,2) + 24*Power(a,2)*Power(exp(1.0),x1)*Power(R0,2) + 80*Power(exp(1.0),3*x1)*Power(R0,2) + 8*Power(a,2)*Power(R0,3) + 80*Power(exp(1.0),2*x1)*Power(R0,3) + 40*Power(exp(1.0),x1)*Power(R0,4) + 8*Power(R0,5) + 4*Power(a,2)*(Power(exp(1.0),x1) + R0)*(Power(a,2) + Power(exp(1.0),x1) + 2*Power(exp(1.0),2*x1) + R0 + 4*Power(exp(1.0),x1)*R0 + 2*Power(R0,2))*Cos(2*x2) + Power(a,4)*(-1 + Power(exp(1.0),x1) + R0)*Cos(4*x2))*Power(Sin(x2),2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3))
 ;
 }
-
+  /*
 if(coords==SCHWCOORDS) {
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= 1/((-2 + x1)*x1)
@@ -783,7 +789,7 @@ if(coords==SCHWCOORDS) {
 
 
 }
-
+  */
 if(coords==KSCOORDS) {
  ldouble a=BHSPIN;
 ;Krzys[0][0][0]= (2*x1*(Power(x1,2) - Power(a,2)*Power(Cos(x2),2)))/Power(Power(x1,2) + Power(a,2)*Power(Cos(x2),2),3)

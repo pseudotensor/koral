@@ -14,6 +14,8 @@ int iix,iiy,iiz,iv;
   pick_T(tmulo,ix,iy,iz,tlo);
   ldouble xx=get_x(ix,0);
 
+  struct geometry geom;
+fill_geometry(ix,iy,iz,&geom);
   //radius
   if(iz<0 && xx>BEAML && xx<BEAMR && IFBEAM) //hot boundary
     {
@@ -46,7 +48,7 @@ int iix,iiy,iiz,iv;
       //      prad_zamo2ff(pp,pp,gg,GG,eup);
       //      prad_ff2lab(pp,pp,gg,GG,tlo);
      
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
 
       
       return 0.;
@@ -90,7 +92,7 @@ int iix,iiy,iiz,iv;
       //      prad_ff2lab(pp,pp,gg,GG,tlo);
  
 
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
 
 
       return 0;
@@ -108,7 +110,7 @@ int iix,iiy,iiz,iv;
 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       return 0;
     }
   else if(ix<0) //copy
@@ -129,7 +131,7 @@ int iix,iiy,iiz,iv;
       //pp[6]=E;
 
 
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
 
 
       return 0;
@@ -150,7 +152,7 @@ int iix,iiy,iiz,iv;
       //       rho=RHOAMB;
        //      E=calc_LTE_EfromT(TAMB);
       //pp[6]=E;
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       return 0;
     }
 
@@ -169,6 +171,6 @@ int iix,iiy,iiz,iv;
       
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
     }
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
 return 0;
   

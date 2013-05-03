@@ -48,7 +48,7 @@ int iix,iiy,iiz,iv;
       prad_zamo2ff(pp,pp,gg,GG,eup);
       prad_ff2lab(pp,pp,&geom);
      
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
 
       
       return 0.;
@@ -89,7 +89,7 @@ int iix,iiy,iiz,iv;
       pp[7]=0.;
       pp[9]=0.;
 
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
 
 
       return 0;
@@ -107,7 +107,7 @@ int iix,iiy,iiz,iv;
 	{ 
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       return 0;
     }
   else if(ix<0 && 1) //copy
@@ -128,7 +128,7 @@ int iix,iiy,iiz,iv;
       //pp[6]=E;
 
 
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
 
 
       return 0;
@@ -150,7 +150,7 @@ int iix,iiy,iiz,iv;
       //       rho=RHOAMB;
        //      E=calc_LTE_EfromT(TAMB);
       //pp[6]=E;
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       return 0;
     }
 #endif
@@ -189,7 +189,7 @@ int iix,iiy,iiz,iv;
       */
       prad_zamo2ff(pp,pp,gg,GG,eup);
       prad_ff2lab(pp,pp,&geom);
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       return 0;
     }
  
@@ -210,6 +210,6 @@ int iix,iiy,iiz,iv;
       
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
     }
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
 return 0;
   
