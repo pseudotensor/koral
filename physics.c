@@ -30,7 +30,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int 
   //test
   //cs2*=4.;
 
-  if(cs2>=1.0) cs2=0.99999;
+  //if(cs2>=1.0) cs2=0.99999;
   if(cs2<0.) cs2=0.;
 
   //**********************************************************************
@@ -841,19 +841,20 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 ldouble
 calc_ufromS(ldouble S,ldouble rho)
 {  
+  //return exp(S/rho)*pow(rho,GAMMA)/GAMMAM1;
   return pow((pow(rho,1./(GAMMAM1)+1.)*exp(S/rho)),GAMMAM1)/(GAMMA-1.);
 }
 
 ldouble
 calc_Sfromu(ldouble rho,ldouble u)
 {
-  ldouble ret = rho*log(pow((GAMMAM1*u/rho),1./GAMMAM1)/rho);
+  //eturn rho*log((GAMMAM1)*u/pow(rho,GAMMA));
+  return rho*log(pow((GAMMAM1*u/rho),1./GAMMAM1)/rho);
   
   //HARM - gives the same result
   //ldouble indexn=1.0/GAMMAM1;
   //printf("entr: %e %e\n",ret,rho*log(pow(GAMMAM1*u,indexn)/pow(rho,indexn+1.0)));getchar();
 
-  return ret;
 }
 
 

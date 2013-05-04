@@ -272,7 +272,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
-  int verbose=0;
+  int verbose=1;
   int ret=0;
 
   struct geometry *geom
@@ -294,12 +294,18 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 
     }
 
-if(pp[1]>UURHORATIOMAX*pp[0]) 
+  if(pp[1]>UURHORATIOMAX*pp[0]) 
     {
       pp[1]=UURHORATIOMAX*pp[0];
       ret=-1;      
       if(verbose) printf("hd_floors CASE 3\n");
     }
+
+  //rho relative to rho max
+//TODO: calculate rho max
+  ldouble rhomax=100.;
+  if(pp[0]<RHORHOMAXRATIOMIN*rhomax) {pp[0]=RHORHOMAXRATIOMIN*rhomax; ret=-1; if(verbose) printf("hd_floors CASE 5\n");}
+
 
   //entropy too small
 
@@ -308,14 +314,14 @@ if(pp[1]>UURHORATIOMAX*pp[0])
   ldouble pp2[NV];
   prad_lab2ff(pp, pp2, ggg);
   
-  if(pp[6]<EERHORATIOMIN*pp[0]) {pp[6]=EERHORATIOMIN*pp[0];ret=-1;}//if(verbose) printf("hd_floors CASE R2\n");}
-  if(pp[6]>EERHORATIOMAX*pp[0]) {pp[0]=1./EERHORATIOMAX*pp[6];ret=-1;}//if(verbose) printf("hd_floors CASE R3\n");}
+  if(pp[6]<EERHORATIOMIN*pp[0]) {pp[6]=EERHORATIOMIN*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
+  if(pp[6]>EERHORATIOMAX*pp[0]) {pp[0]=1./EERHORATIOMAX*pp[6];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
 
   prad_ff2lab(pp2, pp, ggg);
 #endif
  
-
   //velocities
+
   int i,j,k,correct;
   //velocities
   ldouble a,b,c,delta;
@@ -373,6 +379,8 @@ if(pp[1]>UURHORATIOMAX*pp[0])
     }
   else if(whichvel==VELR)
     {
+      
+
       u1[0]=0.;
       u1[1]=pp[2];
       u1[2]=pp[3];
@@ -406,8 +414,6 @@ if(pp[1]>UURHORATIOMAX*pp[0])
   //converting to whichvel
   conv_vels(u1,u1,whichvel,VEL4,gg,GG);
 
-
-//what's below assumes VEL4!!!
   //correcting and imposing gammamax keeping the direction given by spatial components
   ldouble Afac;
   ldouble gammamaxhd=GAMMAMAXHD;
@@ -630,7 +636,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
     }
 
   //1d Newton solver
-  ldouble CONV=1.e-6;
+  ldouble CONV=1.e-8;
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
@@ -719,8 +725,6 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   //  pp[5]=Sut/ut;
 
   pp[5]=calc_Sfromu(rho,u);
-
- pp[5]=calc_Sfromu(rho,u);
 
   ldouble uu2[NV];
   int iv;
@@ -824,7 +828,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   ldouble err,W,fval,dfval,fval1,fval2,diffrho,ut;
   ldouble dudrho,dWdrho,dvphdrho,dvrdrho,dvthdrho;
 
-  ldouble conv=1.e-6;
+  ldouble conv=1.e-8;
   int itmax=30;
   ldouble fvalmin[2]={0.,-1.};
   ldouble absfval;
