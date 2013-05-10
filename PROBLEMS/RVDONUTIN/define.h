@@ -79,7 +79,7 @@
 #define RADOUTPUTINZAMO
 #define CGSOUTPUT
 //#define PRINTXGC_LEFT
-#define PRINTGC_RIGHT
+//#define PRINTGC_RIGHT
 
 /************************************/
 //common physics / atmosphere
@@ -91,7 +91,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 2
 
 /************************************/
 #if (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
