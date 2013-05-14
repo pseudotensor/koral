@@ -85,7 +85,7 @@ solve_all_problems_5(ldouble tstart)
   i1=i2=0.;
 
   ldouble scalars[NSCALARS];
-  calc_scalars(scalars);
+  calc_scalars(scalars,tstart);
 
   //prints initial profiles to out0000.dat
 #ifndef RESTART
@@ -275,7 +275,7 @@ solve_all_problems_5(ldouble tstart)
 	  set_bc(t);
 
 	  //calculate scalars
-	  calc_scalars(scalars,NSCALARS);
+	  calc_scalars(scalars,t);
 
 	  fprint_profiles(t,scalars,NSCALARS);
 	  lasttout=t;

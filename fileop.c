@@ -402,7 +402,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 							  );
 
 
-						  fprintf(fout1,"%.3e %.3e %.3e %.3e %.3e %.3e %.3e\n",
+						  fprintf(fout1,"%.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
 							  v1,     //24
 							  v2,     //25
 							  v3,     //26 

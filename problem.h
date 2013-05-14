@@ -53,8 +53,23 @@
 //47 MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
 //48* RVDTEST - testing the entropy near the axis
 //49* RVRING - 1d donut ring
+//50* HDWAVE - hydro wave for testing entropy
 
-#define PROBLEM 48
+#define PROBLEM 50
+
+#if(PROBLEM==50)
+
+#define PR_DEFINE "PROBLEMS/HDWAVE/define.h"
+#define PR_BC "PROBLEMS/HDWAVE/bc.c"
+#define PR_INIT "PROBLEMS/HDWAVE/init.c"
+#define PR_KAPPA "PROBLEMS/HDWAVE/kappa.c"
+#define PR_KAPPAES "PROBLEMS/HDWAVE/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/HDWAVE/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/HDWAVE/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/HDWAVE/dump.c"
+#define PR_TOOLS "PROBLEMS/HDWAVE/tools.c"
+
+#endif
 
 #if(PROBLEM==49)
 

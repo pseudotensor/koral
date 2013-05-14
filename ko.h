@@ -128,6 +128,7 @@ struct evolve_fluxes_2_param
 };
 
 //misc.c
+int calc_scalars(ldouble*,ldouble);
 ldouble calc_mdotEdd();
 ldouble calc_lumEdd();
 int calc_radialprofiles(ldouble profiles[][NX]);

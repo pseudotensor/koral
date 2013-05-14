@@ -97,7 +97,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 /*********************************************/
 /* calculates scalars - total mass, accretion rate etc. */
 /*********************************************/
-int calc_scalars(ldouble *scalars)
+int calc_scalars(ldouble *scalars,ldouble t)
 {
   //adjust NSCALARS in problem.h
 
@@ -109,6 +109,22 @@ int calc_scalars(ldouble *scalars)
 
   //luminosity (4)
   scalars[2]=calc_lum()/calc_lumEdd();
+
+  //temporarily here: L1 error for HDWAVE
+  ldouble L1=0;
+  int i;
+  for(i=0;i<NX;i++)
+    {
+      ldouble xx=get_x(i,0);
+      ldouble om=1./CC*2.*Pi;
+      ldouble myrho=RHOZERO*(1.+AAA*cos(KK*xx-om*t));
+      ldouble myuint=UINT*(1.+GAMMA*AAA*cos(KK*xx-om*t));
+      ldouble mycs=1./CC;
+      ldouble myvx=AAA*cos(KK*xx-om*t)*mycs;
+      //L1 in rho:
+      L1+=fabs(get_u(p,0,i,0,0)-myrho);
+    }
+  scalars[0]=L1/(ldouble)NX;
 
   return 0;
 }
