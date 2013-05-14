@@ -133,6 +133,7 @@
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
+#define FLUXMETHOD HLL_FLUX
 
 #define NODONUT 0
 #define INFLOWING 0

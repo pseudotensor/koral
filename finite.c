@@ -949,7 +949,8 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   fill_geometry(ix,iy,iz,&geom);
   
   ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3],dx;
-  ldouble a0[2],am1[2],ap1[2],am2[2],ap2[2],al,ar,amax,cmin,cmax,csLl[2],csLr[2],csRl[2],csRr[2];
+  ldouble a0[2],am1[2],ap1[2],am2[2],ap2[2],ag,al,ar,amax,cmin,cmax,csLl[2],csLr[2],csRl[2],csRr[2];
+  ldouble am1l[2],am1r[2],ap1l[2],ap1r[2];
   ldouble fd_u0[NV],fd_up1[NV],fd_up2[NV],fd_um1[NV],fd_um2[NV],fd_r0[NV],fd_rm1[NV],fd_rp1[NV];
   ldouble fd_uLr[NV],fd_uLl[NV],fd_uRl[NV],fd_uRr[NV],fd_fstarl[NV],fd_fstarr[NV],fd_dul[3*NV],fd_dur[3*NV],fd_pdiffl[NV],fd_pdiffr[NV];
   ldouble gdet,gg[4][5],GG[4][5],eup[4][4],elo[4][4];
@@ -987,9 +988,17 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 #ifdef WAVESPEEDSATFACES
   ldouble aaa[12];
   calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+  am1l[0]=aaa[0];
+  am1r[0]=aaa[1];
+  am1l[1]=aaa[6];
+  am1r[1]=aaa[7];
   am1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
   am1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
   calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+  ap1l[0]=aaa[0];
+  ap1r[0]=aaa[1];
+  ap1l[1]=aaa[6];
+  ap1r[1]=aaa[7];
   ap1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
   ap1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
 #endif
@@ -1012,24 +1021,37 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 #ifdef RADIATION
       if(i<NVHD)      
 	{
-	  //	  al=my_max(my_max(ap1[0],am1[0]),my_max(ap2[0],am2[0])); 
-	  al=my_max(ap1[0],am1[0]);
+	  ag=my_max(ap1[0],am1[0]);
+	  al=my_min(ap1l[0],am1l[0]);
+	  ar=my_max(ap1r[0],am1r[0]);
 	}
       else
 	{
-	  //	  al=my_max(my_max(ap1[1],am1[1]),my_max(ap2[1],am2[1])); 
-	  al=my_max(ap1[1],am1[1]); 
+	  ag=my_max(ap1[1],am1[1]); 
+	  al=my_min(ap1l[1],am1l[1]);
+	  ar=my_max(ap1r[1],am1r[1]);
 	}
 #else
-      al=my_max(ap1[0],am1[0]); 
+      ag=my_max(ap1[0],am1[0]); 
+      al=my_min(ap1l[0],am1l[0]);
+      ar=my_max(ap1r[0],am1r[0]);
 #endif
 
 #ifdef FULLDISSIPATION
-      al=max_ws[0];
+      ag=max_ws[0];
 #endif
 
-      //Lax-Friedrich
-      fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - al * (fd_uRl[i] - fd_uLl[i]));
+      if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
+	fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
+      if (FLUXMETHOD==HLL_FLUX) //HLL
+	{
+	  if(al>0.) 
+	    fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
+	  else if(ar<0.)
+	    fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
+	  else
+	    fd_fstarl[i] = (-al*get_ub(flRx,i,ix,iy,iz,0) + ar*get_ub(flLx,i,ix,iy,iz,0) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
+	}
 
       set_ubx(flbx,i,ix,iy,iz,fd_fstarl[i]);
     }
@@ -1055,11 +1077,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	  fd_uRl[i]=get_ub(pbRy,i,ix,iy,iz,1);
 	}
 
-       /*
-       //FFF
-       if(fabs(fd_uRl[5])<SMALL) my_err("zero");
-       */
-
+       
       pick_gb(ix,iy,iz,1,gg);
       pick_Gb(ix,iy,iz,1,GG);
 
@@ -1067,24 +1085,23 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 #ifdef WAVESPEEDSATFACES
       ldouble aaa[12];
       calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+      am1l[0]=aaa[2];
+      am1r[0]=aaa[3];
+      am1l[1]=aaa[8];
+      am1r[1]=aaa[9];
       am1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
       am1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
       calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+      ap1l[0]=aaa[2];
+      ap1r[0]=aaa[3];
+      ap1l[1]=aaa[8];
+      ap1r[1]=aaa[9];
       ap1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
       ap1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
 #endif
  	    
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
-
-      /*
-      //FFF
-      if(isinf(fd_uRl[5])){ print_Nvector(fd_uRl,NV);  for(i=0;i<NV;i++)
-	{
-	  fd_uLl[i]=get_ub(pbLy,i,ix,iy,iz,1);
-	  fd_uRl[i]=get_ub(pbRy,i,ix,iy,iz,1);
-	}printf(">> %e\n",get_ub(pbRy,5,ix,iy,iz,1)); print_Nvector(fd_uRl,NV);}
-      */
 
       for(i=0;i<NV;i++)
 	{
@@ -1097,34 +1114,39 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 #ifdef RADIATION
 	  if(i<NVHD)      
 	    {
-	      //	  al=my_max(my_max(ap1[0],am1[0]),my_max(ap2[0],am2[0])); 
-	      al=my_max(ap1[0],am1[0]);
+	      ag=my_max(ap1[0],am1[0]);
+	      al=my_min(ap1l[0],am1l[0]);
+	      ar=my_max(ap1r[0],am1r[0]);
 	    }
 	  else
 	    {
-	      //	  al=my_max(my_max(ap1[1],am1[1]),my_max(ap2[1],am2[1])); 
-	      al=my_max(ap1[1],am1[1]); 
+	      ag=my_max(ap1[1],am1[1]); 
+	      al=my_min(ap1l[1],am1l[1]);
+	      ar=my_max(ap1r[1],am1r[1]);
 	    }
 #else
-	  al=my_max(ap1[0],am1[0]); 
+	  ag=my_max(ap1[0],am1[0]); 
+	  al=my_min(ap1l[0],am1l[0]);
+	  ar=my_max(ap1r[0],am1r[0]);
 #endif
 
 
 #ifdef FULLDISSIPATION
-      al=max_ws[1];
+	  ag=max_ws[1];
 #endif
 	  
-	  fd_fstarl[i] = .5*(get_ub(flRy,i,ix,iy,iz,1) + get_ub(flLy,i,ix,iy,iz,1) - al * (fd_uRl[i] - fd_uLl[i]));
-      
-	  /*
-	  //FFF
-	  if(isinf(fd_fstarl[i]))
+	  if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
+	    fd_fstarl[i] = .5*(get_ub(flRy,i,ix,iy,iz,1) + get_ub(flLy,i,ix,iy,iz,1) - ag * (fd_uRl[i] - fd_uLl[i]));
+	  if (FLUXMETHOD==HLL_FLUX) //HLL
 	    {
-	      printf(">%e %e %e %e %e\n",get_ub(flRy,i,ix,iy,iz,1) , get_ub(flLy,i,ix,iy,iz,1), al , fd_uRl[i] , fd_uLl[i]);
-	      getchar();
+	      if(al>0.) 
+		fd_fstarl[i] = get_ub(flLy,i,ix,iy,iz,1);
+	      else if(ar<0.)
+		fd_fstarl[i] = get_ub(flLy,i,ix,iy,iz,1);
+	      else
+		fd_fstarl[i] = (-al*get_ub(flRy,i,ix,iy,iz,1) + ar*get_ub(flLy,i,ix,iy,iz,1) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
 	    }
-	  */
-
+      
 	  set_uby(flby,i,ix,iy,iz,fd_fstarl[i]);
  	}
     }
@@ -1155,13 +1177,21 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
 
 #ifdef WAVESPEEDSATFACES
-  ldouble aaa[12];
-  calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
-  am1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
-  am1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
-  calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
-  ap1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
-  ap1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
+      ldouble aaa[12];
+      calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+      am1l[0]=aaa[4];
+      am1r[0]=aaa[5];
+      am1l[1]=aaa[10];
+      am1r[1]=aaa[11];
+      am1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
+      am1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
+      calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+      ap1l[0]=aaa[4];
+      ap1r[0]=aaa[5];
+      ap1l[1]=aaa[10];
+      ap1r[1]=aaa[11];
+      ap1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
+      ap1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
 #endif
 
       p2u(fd_uLl,fd_uLl,&geom);
@@ -1178,26 +1208,38 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 #ifdef RADIATION
 	  if(i<NVHD)      
 	    {
-	      //	  al=my_max(my_max(ap1[0],am1[0]),my_max(ap2[0],am2[0])); 
-	      al=my_max(ap1[0],am1[0]);
+	      ag=my_max(ap1[0],am1[0]);
+	      al=my_min(ap1l[0],am1l[0]);
+	      ar=my_max(ap1r[0],am1r[0]);
 	    }
 	  else
 	    {
-	      //	  al=my_max(my_max(ap1[1],am1[1]),my_max(ap2[1],am2[1])); 
-	      al=my_max(ap1[1],am1[1]); 
+	      ag=my_max(ap1[1],am1[1]);
+	      al=my_min(ap1l[1],am1l[1]);
+	      ar=my_max(ap1r[1],am1r[1]);
 	    }
 #else
-	  al=my_max(ap1[0],am1[0]); 
+	  ag=my_max(ap1[0],am1[0]); 
+	  al=my_min(ap1l[0],am1l[0]);
+	  ar=my_max(ap1r[0],am1r[0]);
 #endif
-
 
 #ifdef FULLDISSIPATION
-	  al=max_ws[2];
+	  ag=max_ws[2];
 #endif
 
-
-	  fd_fstarl[i] = .5*(get_ub(flRz,i,ix,iy,iz,2) + get_ub(flLz,i,ix,iy,iz,2) - al * (fd_uRl[i] - fd_uLl[i]));
-	        
+	  if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
+	    fd_fstarl[i] = .5*(get_ub(flRz,i,ix,iy,iz,2) + get_ub(flLz,i,ix,iy,iz,2) - ag * (fd_uRl[i] - fd_uLl[i]));
+	  if (FLUXMETHOD==HLL_FLUX) //HLL
+	    {
+	      if(al>0.) 
+		fd_fstarl[i] = get_ub(flLz,i,ix,iy,iz,2);
+	      else if(ar<0.)
+		fd_fstarl[i] = get_ub(flLz,i,ix,iy,iz,2);
+	      else
+		fd_fstarl[i] = (-al*get_ub(flRz,i,ix,iy,iz,2) + ar*get_ub(flLz,i,ix,iy,iz,2) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
+	    }
+  	        
 	  set_ubz(flbz,i,ix,iy,iz,fd_fstarl[i]);
  	}
 

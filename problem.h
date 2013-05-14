@@ -1004,6 +1004,10 @@
 #define GAMMASMALLLIMIT (1.0-1E-10) // at what point above which assume gamma^2=1.0
 #endif
 
+#ifndef FLUXMETHOD
+#define FLUXMETHOD LAXF_FLUX
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/
