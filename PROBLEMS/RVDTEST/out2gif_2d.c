@@ -165,7 +165,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set cblabel \"\"\n"
 	  "set title \"rho\" offset 0,-1\n"
-	  //	  "set cbrange [1e-3:1]\n"
+	  "set cbrange [1e-3:1000]\n"
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
@@ -200,7 +200,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
-	  //	  "set cbrange [1.e-8:0.0001]\n"
+	  "set cbrange [1.e-5:100]\n"
 	  //"set autoscale cb\n"
 
 #ifdef RADIATION	  

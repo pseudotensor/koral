@@ -9,7 +9,6 @@
 #define ALLOWCOLDU2P 0
 #define FIXUPAFTERENTROPY 0
 #define DOFIXUPS 0
-#define WAVESPEEDSATFACES
 //#define AVERAGEONLYUINT
 //#define FULLDISSIPATION
 #define UURHORATIOMIN 1.e-20
@@ -121,8 +120,8 @@
 #define URIN 0.
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  1.e-2
-#define UINTATMMIN 1.e-4
+#define RHOATMMIN  1.e-4
+#define UINTATMMIN 1.e-6
 #define DTOUT1 1.e1
 
 #endif
@@ -134,6 +133,8 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define FLUXMETHOD HLL_FLUX
+//#define WAVESPEEDSATFACES
+
 
 #define NODONUT 0
 #define INFLOWING 0

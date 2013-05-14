@@ -964,15 +964,25 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //x 'sweep'
  
   //characteristic wave speeds for calculating the flux on both sides of a face
+  ap1l[0]=get_u_scalar(ahdxl,ix,iy,iz);
+  ap1r[0]=get_u_scalar(ahdxr,ix,iy,iz);
+  ap1l[1]=get_u_scalar(aradxl,ix,iy,iz);
+  ap1r[1]=get_u_scalar(aradxr,ix,iy,iz);
   ap1[0]=get_u_scalar(ahdx,ix,iy,iz);
   ap1[1]=get_u_scalar(aradx,ix,iy,iz);
+  am1l[0]=get_u_scalar(ahdxl,ix-1,iy,iz);
+  am1r[0]=get_u_scalar(ahdxr,ix-1,iy,iz);
+  am1l[1]=get_u_scalar(aradxl,ix-1,iy,iz);
+  am1r[1]=get_u_scalar(aradxr,ix-1,iy,iz);
   am1[0]=get_u_scalar(ahdx,ix-1,iy,iz);
   am1[1]=get_u_scalar(aradx,ix-1,iy,iz);
 
+  /*
   ap2[0]=get_u_scalar(ahdx,ix+1,iy,iz);
   ap2[1]=get_u_scalar(aradx,ix+1,iy,iz);
   am2[0]=get_u_scalar(ahdx,ix-2,iy,iz);
   am2[1]=get_u_scalar(aradx,ix-2,iy,iz);
+  */
 
   //primitives at faces
   for(i=0;i<NV;i++)
@@ -1062,14 +1072,19 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //y 'sweep'
   if(NY>1 )
     {
+      ap1l[0]=get_u_scalar(ahdyl,ix,iy,iz);
+      ap1r[0]=get_u_scalar(ahdyr,ix,iy,iz);
+      ap1l[1]=get_u_scalar(aradyl,ix,iy,iz);
+      ap1r[1]=get_u_scalar(aradyr,ix,iy,iz);
       ap1[0]=get_u_scalar(ahdy,ix,iy,iz);
       ap1[1]=get_u_scalar(arady,ix,iy,iz);
+
+      am1l[0]=get_u_scalar(ahdyl,ix,iy-1,iz);
+      am1r[0]=get_u_scalar(ahdyr,ix,iy-1,iz);
+      am1l[1]=get_u_scalar(aradyl,ix,iy-1,iz);
+      am1r[1]=get_u_scalar(aradyr,ix,iy-1,iz);
       am1[0]=get_u_scalar(ahdy,ix,iy-1,iz);
       am1[1]=get_u_scalar(arady,ix,iy-1,iz);
-      ap2[0]=get_u_scalar(ahdx,ix,iy+1,iz);
-      ap2[1]=get_u_scalar(aradx,ix,iy+1,iz);
-      am2[0]=get_u_scalar(ahdx,ix,iy-1,iz);
-      am2[1]=get_u_scalar(aradx,ix,iy-1,iz);
 
        for(i=0;i<NV;i++)
 	{
@@ -1157,14 +1172,19 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //z 'sweep'
   if(NZ>1)
     {
+      ap1l[0]=get_u_scalar(ahdzl,ix,iy,iz);
+      ap1r[0]=get_u_scalar(ahdzr,ix,iy,iz);
+      ap1l[1]=get_u_scalar(aradzl,ix,iy,iz);
+      ap1r[1]=get_u_scalar(aradzr,ix,iy,iz);
       ap1[0]=get_u_scalar(ahdz,ix,iy,iz);
       ap1[1]=get_u_scalar(aradz,ix,iy,iz);
+
+      am1l[0]=get_u_scalar(ahdzl,ix,iy,iz-1);
+      am1r[0]=get_u_scalar(ahdzr,ix,iy,iz-1);
+      am1l[1]=get_u_scalar(aradzl,ix,iy,iz-1);
+      am1r[1]=get_u_scalar(aradzr,ix,iy,iz-1);
       am1[0]=get_u_scalar(ahdz,ix,iy,iz-1);
       am1[1]=get_u_scalar(aradz,ix,iy,iz-1);
-      ap2[0]=get_u_scalar(ahdz,ix,iy,iz+1);
-      ap2[1]=get_u_scalar(aradz,ix,iy,iz+1);
-      am2[0]=get_u_scalar(ahdz,ix,iy,iz-2);
-      am2[1]=get_u_scalar(aradz,ix,iy,iz-2);
  
       for(i=0;i<NV;i++)
 	{
