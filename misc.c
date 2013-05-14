@@ -110,6 +110,9 @@ int calc_scalars(ldouble *scalars,ldouble t)
   //luminosity (4)
   scalars[2]=calc_lum()/calc_lumEdd();
 
+  //L1 ERRRORS
+
+#ifdef CALCL1_HDWAVE
   //temporarily here: L1 error for HDWAVE
   ldouble L1=0;
   int i;
@@ -125,6 +128,23 @@ int calc_scalars(ldouble *scalars,ldouble t)
       L1+=fabs(get_u(p,0,i,0,0)-myrho);
     }
   scalars[0]=L1/(ldouble)NX;
+#endif
+
+#ifdef CALCL1_HUBBLE
+  //temporarily here: L1 error for HDWAVE
+  ldouble L1=0;
+  int i;
+  for(i=0;i<NX;i++)
+    {
+      ldouble xx=get_x(i,0);      
+      ldouble myrho=RHO0 / (1.+VPRIME*t);
+      ldouble myuint=UINT0 / pow(1.+VPRIME*t,GAMMA);
+      ldouble myvx=VPRIME*xx / (1.+VPRIME*t);
+      //L1 in rho:
+      L1+=fabs(get_u(p,0,i,0,0)-myrho);
+    }
+  scalars[0]=L1/(ldouble)NX;
+#endif
 
   return 0;
 }

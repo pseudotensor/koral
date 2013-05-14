@@ -54,8 +54,23 @@
 //48* RVDTEST - testing the entropy near the axis
 //49* RVRING - 1d donut ring
 //50* HDWAVE - hydro wave for testing entropy
+//51* HUBBLE - hubble-type test as in the WHAM paper
 
-#define PROBLEM 50
+#define PROBLEM 51
+
+#if(PROBLEM==51)
+
+#define PR_DEFINE "PROBLEMS/HUBBLE/define.h"
+#define PR_BC "PROBLEMS/HUBBLE/bc.c"
+#define PR_INIT "PROBLEMS/HUBBLE/init.c"
+#define PR_KAPPA "PROBLEMS/HUBBLE/kappa.c"
+#define PR_KAPPAES "PROBLEMS/HUBBLE/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/HUBBLE/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/HUBBLE/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/HUBBLE/dump.c"
+#define PR_TOOLS "PROBLEMS/HUBBLE/tools.c"
+
+#endif
 
 #if(PROBLEM==50)
 
@@ -70,6 +85,7 @@
 #define PR_TOOLS "PROBLEMS/HDWAVE/tools.c"
 
 #endif
+
 
 #if(PROBLEM==49)
 

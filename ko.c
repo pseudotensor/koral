@@ -100,6 +100,8 @@ solve_all_problems_5(ldouble tstart)
   //main time loop
   while (t < t1 && nfout1<NOUTSTOP && i1<NSTEPSTOP)
     {    
+
+      
      //initial time mark
 #ifndef SKIP_CLOCK
       clock_gettime(CLOCK_REALTIME,&temp_clock);
@@ -125,6 +127,7 @@ solve_all_problems_5(ldouble tstart)
 #endif
 
       dt=TSTEPLIM*1./tstepden;
+      if(t+dt>t1) {dt=t1-t;i1=NSTEPSTOP;}
 
       //reseting wavespeeds
       max_ws[0]=-1.;
@@ -266,7 +269,7 @@ solve_all_problems_5(ldouble tstart)
 
 
       //output to a file
-      if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT)
+      if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
 	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f|%10.4f|%10.4f|%10.4f) mass: %e znps: %f\n",nfout1,t,dt,max_ws[0],
 		 cons_time-start_time-imp_time1-imp_time2,imp_time1+imp_time2,end_time-cons_time,end_time-start_time,totalmass,znps);
