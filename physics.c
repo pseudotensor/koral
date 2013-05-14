@@ -841,15 +841,16 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 ldouble
 calc_ufromS(ldouble S,ldouble rho)
 {  
-  //return exp(S/rho)*pow(rho,GAMMA)/GAMMAM1;
   return pow((pow(rho,1./(GAMMAM1)+1.)*exp(S/rho)),GAMMAM1)/(GAMMA-1.);
 }
 
 ldouble
 calc_Sfromu(ldouble rho,ldouble u)
 {
-  //eturn rho*log((GAMMAM1)*u/pow(rho,GAMMA));
-  return rho*log(pow((GAMMAM1*u/rho),1./GAMMAM1)/rho);
+  ldouble indexn=1.0/GAMMAM1;
+  return rho*log(pow(GAMMAM1*u,indexn)/pow(rho,indexn+1.0));
+
+  //return rho*log(pow((GAMMAM1*u/rho),1./GAMMAM1)/rho);
   
   //HARM - gives the same result
   //ldouble indexn=1.0/GAMMAM1;
@@ -890,6 +891,8 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
       set_u(p,5,ix,iy,iz,S);
       set_u(u,5,ix,iy,iz,S*ut); 
     }
+
+  /*
   //u2p_hot didn't work
   //keeping Sut, updating pp[5]
   else
@@ -898,27 +901,10 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
       S=Sut/ut;
 
       //ldouble uint=calc_ufromS(S,rho);
-      /*
-      if(uint/rho > 1.) 
-	{
-	  printf("damping freeely evolving entropy to u/rho=1\n");
-	  S=calc_Sfromu(rho,rho);
-	  Sut=S*ut;
-	  set_u(u,5,ix,iy,iz,Sut);	  
-	}
-      */
-      /*
-      if(S > 0.) 
-	{
-	  printf("damping freeely evolving entropy to u/rho=1\n");
-	  S=0.;
-	  Sut=0.;
-	  set_u(u,5,ix,iy,iz,Sut);	  
-	}
-      */
 
-      set_u(p,5,ix,iy,iz,S);
+
+      //      set_u(p,5,ix,iy,iz,S);
     }
-  
+  */
   return 0;
 }

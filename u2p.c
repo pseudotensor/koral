@@ -37,7 +37,7 @@ calc_primitives(int ix,int iy,int iz)
   //should I skip this when going to fixup - if averagin primitives this will have no effect?
   if(corrected[0]!=0 || corrected[1]!=0)
     {
-      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);}//getchar();}
+      //      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);getchar();}
       p2u(pp,uu,&geom);
       for(iv=0;iv<NV;iv++)
 	{
@@ -125,6 +125,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   u2pret=u2p_hot(uu,pp,ggg);  
   //************************************
 
+  //test: to enforce entropy
+  u2pret=-1;
 
   if(u2pret<0) 
     {
