@@ -138,75 +138,80 @@ solve_all_problems_5(ldouble tstart)
       //**********************************************************************
       //**********************************************************************
       
-#ifdef RK2STEPPING
-      //******************************* RK2 **********************************
-      //1st
-      f_timeder (t,dt,1.,u,1,ut0); 
-      copy_u(1.,u,ut1);
-      //2nd
-      f_timeder (t,dt,1.,u,1,ut2); 
-      add_u(1.,u,-1.,ut2,ut2);     
-      //together     
-      t+=dt;    
-      add_u(.5,ut0,.5,ut1,u);
-      add_u(1.,u,.5,ut2,u);      
+      if(TIMESTEPPING==RK2)
+	{
+	  //******************************* RK2 **********************************
+	  //1st
+	  f_timeder (t,dt,ut0); 
+	  copy_u(1.,u,ut1);
+	  //2nd
+	  f_timeder (t,dt,ut2);
+ 
+	  add_u(1.,u,-1.,ut2,ut2);     
+	  //together     
+	  t+=dt;    
+	  add_u(.5,ut0,.5,ut1,u);
+	  add_u(1.,u,.5,ut2,u);      
+	  //************************** end of RK2 **********************************
+	}
 
-     //************************** end of RK2 **********************************
-#endif
+      if(TIMESTEPPING==RK2K2)
+	{
+	  //******************************* RK2 **********************************
+	  //1st
+	  f_timeder (t,.5*dt,ut0); //updates u
+	  copy_u(1.,u,ut1); //in ut1 midpoint
+	  //2nd
+	  f_timeder (t,dt,ut1); 
+	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
+	  //together     
+	  t+=dt;    
+	  add_u(1.,ut0,1.,ut2,u);
+	  //************************** end of RK2 **********************************
+	}
 
-#ifdef RK3STEPPING
-      //******************************* RK3 **********************************
-      //TODO : clean up, think it over
-      //1st
-      copy_u(1.,u,ut0);
-      f_timeder (t,dt,1.,u,0,ut0);  
-      copy_u(1.,u,ut1);
-      //2nd
-      copy_u(1.,u,ut2);       
-      f_timeder (t,dt,1.,u,0,ut2); 
-      add_u(1.,u,-1.,ut2,ut2);   
-      add_u(.75,ut0,.25,ut1,u);
-      add_u(1.,u,.25,ut2,u);      
-      //3rd
-      copy_u(1.,u,ut2);
-      f_timeder (t,dt,1.,u,0,ut2); 
-      add_u(1.,u,-1.,ut2,ut3);   
-      //together     
-      t+=dt;    
-      add_u(1./3.,ut0,2./3.,ut2,u);
-      add_u(1.,u,2./3.,ut3,u);      
-     //************************** end of RK3 **********************************
-#endif
+      if(TIMESTEPPING==RK2K1K2)
+	{
+	  //******************************* RK2 **********************************
+	  //1st
+	  //copy_u(1.,u,ut0);//in ut0 original u,
+	  f_timeder (t,dt,ut0); //updates u
+	  add_u(1.,u,-1.,ut0,ut1); //k1 in ut1
+	  //midpoint
+	  add_u(1.,ut0,.5,ut1,u);
+	  //copy_u(1.,u,ut2);
+	  //2nd
+	  t+=.5*dt;
+	  f_timeder (t,dt,ut2); 
+	  add_u(1.,u,-1.,ut2,ut2); //k2 in ut2
+	  //together     
+	  t+=.5*dt;    
+	  add_u(1.,ut0,.5,ut1,u);
+	  add_u(1.,u,.5,ut2,u);
+	  //************************** end of RK2 **********************************
+	}
 
-#ifdef RK4STEPPING
-      //******************************* RK4 **********************************
-      //1st
-      f_timeder (t,dt,1.,u,1,ut0);  
-      add_u(1.,u,-1.,ut0,ut1);
-      add_u(1.,ut0,.5,ut1,u);
-      //2nd
-      t+=.5*dt;     
-      f_timeder (t,dt,1.,u,1,ut2); 
-      add_u(1.,u,-1.,ut2,ut2);     
-      add_u(1.,ut0,.5,ut2,u);
-      //3rd
-      f_timeder (t,dt,1.,u,1,ut3); 
-      add_u(1.,u,-1.,ut3,ut3);     
-      add_u(1.,ut0,1.,ut3,u);
-      //4th
-      t+=.5*dt;     
-      f_timeder (t,dt,1.,u,1,ut4);     
-      add_u(1.,u,-1.,ut4,ut4);
-      //together     
-      add_u(1.,ut0,1./6.,ut1,u);
-      add_u(1.,u,2./6.,ut2,u);
-      add_u(1.,u,2./6.,ut3,u);
-      add_u(1.,u,1./6.,ut4,u);
+      if(TIMESTEPPING==RK3)
+	{
+	  //******************************* RK3 **********************************
+	  //1st
+	  f_timeder (t,dt,ut0);  
+	  copy_u(1.,u,ut1);
+	  //2nd
+	  f_timeder (t,dt,ut2); 
+	  add_u(1.,u,-1.,ut2,ut2);   
+	  add_u(.75,ut0,.25,ut1,u);
+	  add_u(1.,u,.25,ut2,u);      
+	  //3rd
+	  f_timeder (t,dt,ut2); 
+	  add_u(1.,u,-1.,ut2,ut3);   
+	  //together     
+	  t+=dt;    
+	  add_u(1./3.,ut0,2./3.,ut2,u);
+	  add_u(1.,u,2./3.,ut3,u);      
+	  //************************** end of RK3 **********************************/
+	}
 
-     //************************** end of RK4 **********************************
-     
-#endif
-      
       //**********************************************************************
       //************************* finger  ************************************
       //**********************************************************************

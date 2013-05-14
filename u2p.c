@@ -126,7 +126,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
 
   //test: to enforce entropy
-  //u2pret=-1;
+  u2pret=-1;
 
   if(u2pret<0) 
     {

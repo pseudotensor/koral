@@ -320,7 +320,7 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 /* main time derivative routine, AIO ***********/
 /**********************************************/
 int
-f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, ldouble* ucopy) 
+f_timeder (ldouble t, ldouble dt,ldouble *ubase) 
 {
   int ix,iy,iz,iv,ii;
 
@@ -464,11 +464,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
       for(i=0;i<NV;i++)
 	{
 	  //parasite
-	  //copies
-	  if(ifcopy==1)
-	    {
-	      set_u(ucopy,i,ix,iy,iz,get_u(ubase,i,ix,iy,iz));
-	    }
+	  set_u(ubase,i,ix,iy,iz,get_u(u,i,ix,iy,iz));
 	  //end of parasite
 
 	  //resetting derivatives
@@ -733,7 +729,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
 
 
-		  val=get_u(u,iv,ix,iy,iz)+tfactor*t_der[iv]*dt;
+		  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
 
 		  if(isnan(val) || isinf(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 						       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
@@ -826,7 +822,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		  
 	      for(iv=0;iv<NV;iv++)
 		{
-		  val=get_u(u,iv,ix,iy,iz)+tfactor*ms[iv]*dt;
+		  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
 		  set_u(u,iv,ix,iy,iz,val);	
 		  uu[iv]=val;
 		} 
@@ -853,8 +849,8 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      ldouble del4[4]; 
 	      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
 		{
-		  if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
-		    implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
+		    implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
 		  else
 		    {
 		      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
@@ -862,15 +858,15 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 		    }
 		}
 	      else
-		implicit_lab_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
 #endif
 
 #ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
-	      explicit_substep_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG);
+	      explicit_substep_rad_source_term(ix,iy,iz,dt,gg,GG);
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE
-	      explicit_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG);
+	      explicit_rad_source_term(ix,iy,iz,dt,gg,GG);
 #endif
 
 #ifdef IMPLICIT_FF_RAD_SOURCE
@@ -879,10 +875,10 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      ldouble del4[4]; 
 	      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
 		{
-		  if(test_if_rad_implicit(ix,iy,iz,tfactor*dt,gg,GG,del4))
+		  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
 		    {
 		      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
-		      implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		      implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
 		    }
 		  else
 		    {
@@ -893,7 +889,7 @@ f_timeder (ldouble t, ldouble dt, ldouble tfactor, ldouble* ubase, int ifcopy, l
 	      else
 		{
 		      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
-		      implicit_ff_rad_source_term(ix,iy,iz,tfactor*dt,gg,GG,tlo,tup,pp);
+		      implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
 		}
 #endif
 

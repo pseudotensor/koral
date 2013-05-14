@@ -120,20 +120,20 @@
 #define URIN 0.
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  1.e-4
-#define UINTATMMIN 1.e-6
+#define RHOATMMIN  1.e-6
+#define UINTATMMIN 1.e-8
 #define DTOUT1 1.e1
 
 #endif
 
 
 #define INT_ORDER 1
-#define RK2_STEPPING
-#define TSTEPLIM .6
+#define TIMESTEPPING RK3
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
-#define FLUXMETHOD HLL_FLUX
-//#define WAVESPEEDSATFACES
+#define MINMOD_THETA 1.5
+#define FLUXMETHOD LAXF_FLUX
+#define WAVESPEEDSATFACES
 
 
 #define NODONUT 0

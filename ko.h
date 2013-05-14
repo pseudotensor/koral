@@ -155,7 +155,7 @@ int dosthelse(void);
 //finite.c
 int cell_fixup();
 ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz);
-int f_timeder (ldouble t, ldouble dt,ldouble, ldouble*, int ifcopy2u0, ldouble*);
+int f_timeder (ldouble t, ldouble dt,ldouble *);
 int set_grid(ldouble*, ldouble*, ldouble*,ldouble*);
 int print_grid(ldouble,ldouble,ldouble);
 ldouble fd_flux_limiter(ldouble r);

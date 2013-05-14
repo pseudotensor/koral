@@ -890,12 +890,8 @@
 #define INT_ORDER 1 //reconstruction order
 #endif
 
-#ifndef RK2STEPPING
-#ifndef RK3STEPPING
-#ifndef RK4STEPPING
-#define RK2STEPPING //time stepping
-#endif
-#endif
+#ifndef TIMESTEPPING
+#define TIMESTEPPING RK2 //time stepping
 #endif
 
 #ifndef NG
