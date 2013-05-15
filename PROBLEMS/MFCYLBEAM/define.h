@@ -6,28 +6,30 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-//#define myMCYL1COORDS
+
 
 //#define EDDINGTON_APR
 //#define LABRADFLUXES
 
 #define MULTIRADFLUID
 //#define MFCORRECTPHI
-#define MFSKEW 15.
-#define MFFRACMETHOD 1
-#define MFFRACSKEW 1.
-#define MFFRAC 1.
-#define MFMAXCOSANGLE .95
+//#define MFSKEW 15.
+//#define MFFRACMETHOD 1
+//#define MFFRACSKEW 1.
+//#define MFFRAC 1.
+//#define MFMAXCOSANGLE .95
 
-#define MFREDISTRIBUTEMETHOD 2
-#define MORERADFLUIDS
-#define NRF 6
+#define MFREDISTRIBUTEMETHOD 3
+#define MFWEDGESTYPE 1
+#define NRF 8
 
 //#define RADVISCOSITY
 #define SIMPLERADVISCOSITY
 #define ALPHARADVISC 0.05
 
-#define OMSCALE 0.
+#define OMSCALE 1.
+
+//#define myMCYL1COORDS
 
 #ifdef myMCYL1COORDS
 #define MYCOORDS MCYL1COORDS
@@ -49,20 +51,20 @@
 
 
 #ifdef myMCYL1COORDS
-#define MKS1R0 -1.
-#define MINX (log(0.001-MKS1R0))
+#define MKS1R0 -2.
+#define MINX (log(0.1-MKS1R0))
 
 #define MAXX (log(10.-MKS1R0))
-#define NX 50
+#define NX 30
 #else
-#define MINX  1.
+#define MINX  .3
 #define MAXX 10.
-#define NX 50
+#define NX 100
 #endif
 
 
 #define NY 1
-#define NZ 5
+#define NZ 30
 #define YZXDUMP
 
 
@@ -72,7 +74,7 @@
 
 #define MINZ 0.
 
-//#define FULLPHI
+#define FULLPHI
 
 #ifdef FULLPHI
 #define MAXZ 2.*Pi
@@ -92,7 +94,7 @@
 
 #define INT_ORDER 1
 #define RK2_STEPPING
-#define TSTEPLIM .06
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 

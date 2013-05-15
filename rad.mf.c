@@ -630,15 +630,16 @@ redistribute_radfluids(ldouble *pp, ldouble *uu, void* ggg)
 int
 redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
 {
-  int ndim=2;
   int verbose=0,ii,jj,irf;
   ldouble A[NRF][NRF],uu1[NV];
+
 
   struct geometry *geom
    = (struct geometry *) ggg;
 
   //(geom->ix==IXDOT1-1 && geom->iy==IYDOT1-1) verbose=1;
-
+  //if(geom->ix==NX-1) verbose=1;
+  
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
   GG=geom->GG;
@@ -670,7 +671,8 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
       //f=|F|/cE
       f=sqrt(flux[0]*flux[0]+flux[1]*flux[1]+flux[2]*flux[2]);
 
-      //      if(f>0.1) verbose=1;
+      //to cartesian
+      coco_3vector(flux,flux,MYCOORDS,MINKCOORDS,ggg);
 
       if(f<1.e-8 || ppon[EE(irf)]<SMALL)
 	{
@@ -707,13 +709,12 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
 	    getchar();*/
 
 	  //to get rid of zeros
-	  ldouble MINMIX=0.e-12;
+	  ldouble MINMIX=1.e-5;
 	  if(Atrans>(1.-MINMIX)) Atrans=(1.-MINMIX);
 
 
 	  if(verbose) 
 	    {
-	      print_Nvector(flux,3);
 	      printf("=== coeff %d ===\n\n",irf);
 	      print_Nvector(Avec,NRF);
 	      printf("Atrans: %e\n",Atrans);

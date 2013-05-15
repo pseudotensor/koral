@@ -116,7 +116,7 @@ getchar();
       
     pp[5]=calc_Sfromu(pp[0],pp[1]);
     
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //    check_floors_hd(pp,VELPRIM,gg,GG);
 
     p2u(pp,uu,&geom);
 
@@ -139,7 +139,7 @@ getchar();
   }
  else if(ix<0) //cylindrical axis - reflection or transmissive
    {
-#ifdef FULLPHI
+#ifdef SKIP_FULLPHI
      iix=-ix-1;
      iiz=iz+NZ/2;
      if(iiz>=NZ) iiz-=NZ;
@@ -150,20 +150,23 @@ getchar();
      iiy=iy;
 #endif
 
+     iix=0;
+
       for(iv=0;iv<NV;iv++)
        {
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
 
 	 int irf;
+	 /*
 	 for(irf=0;irf<NRF;irf++)
 	   if(iv==FX(irf))
 	     //radial component
 	     pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-
+	 */
        }
    
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+      //    check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
     
     p2u(pp,uu,&geom);
@@ -204,7 +207,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //testing if interpolated primitives make sense
-check_floors_hd(pp,VELPRIM,gg,GG);
+//check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
  
 return 0;

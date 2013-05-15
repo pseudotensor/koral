@@ -1644,6 +1644,63 @@ indices_21(ldouble A1[4],ldouble A2[4],ldouble gg[][5])
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
+// transforms spatial 3-vectors between coordinates
+int
+coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  ldouble xxx[4]={0.,geom->xx,geom->yy,geom->zz};
+
+  int i1,i2;
+  if(CO1==CO2) 
+    {
+      for(i1=0;i1<3;i1++)
+	A2[i1]=A1[i1];
+      return 0;
+    }
+  else if(CO1==CYLCOORDS && CO2==MINKCOORDS)
+    {
+      ldouble ph=geom->zz;
+      ldouble At[3];
+
+      At[0]=A1[0]*cos(ph) - A1[2]*sin(ph);  //x
+      At[2]=A1[0]*sin(ph) + A1[2]*cos(ph); //y
+      At[1]=A1[1]; //z-component
+      for(i1=0;i1<3;i1++)
+	A2[i1]=At[i1];
+
+      return 0;
+    }
+  else if(CO1==MCYL1COORDS && CO2==MINKCOORDS)
+    {
+      //MCYL1 modifies only radius and A1[] is in ortonormal basis so the same approach should work
+      ldouble ph=geom->zz;
+      ldouble At[3];
+
+      At[0]=A1[0]*cos(ph) - A1[2]*sin(ph);  //x
+      At[2]=A1[0]*sin(ph) + A1[2]*cos(ph); //y
+      At[1]=A1[1]; //z-component
+      for(i1=0;i1<3;i1++)
+	A2[i1]=At[i1];
+
+      return 0;
+    }
+  else
+    my_err("transformation not implemented in coco_3vector\n");
+  
+  return -1;
+}
+
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
 // A_i -> A^_j
 int
 indices_12(ldouble A1[4],ldouble A2[4],ldouble GG[][5])

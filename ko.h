@@ -401,6 +401,7 @@ int trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2);
 int trans2_coco(ldouble *xx,ldouble *,ldouble *,int CO1, int CO2);
 int trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble*, ldouble gg[][5], ldouble GG[][5], ldouble gg2[][5], ldouble GG2[][5]);
 int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5]);
+int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 
 
 //rad.mf.c

@@ -127,7 +127,7 @@ solve_all_problems_5(ldouble tstart)
 #endif
 
       dt=TSTEPLIM*1./tstepden;
-      if(t+dt>t1) {dt=t1-t;i1=NSTEPSTOP;}
+      if(t+dt>t1) {dt=t1-t;}
 
       //reseting wavespeeds
       max_ws[0]=-1.;

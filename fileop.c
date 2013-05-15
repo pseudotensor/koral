@@ -279,14 +279,16 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  pick_T(emuup,ix,iy,iz,eup);
 						  pick_T(emulo,ix,iy,iz,elo);
 						  //to transform primitives between coordinates if necessary
+						  ldouble ggout[4][5],GGout[4][5];
+						  struct geometry geomout;
+						  calc_g_arb(xxvecout,ggout,OUTCOORDS);
+						  calc_G_arb(xxvecout,GGout,OUTCOORDS);
+						  fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
+
+
 						  if(MYCOORDS!=OUTCOORDS)
 						    {
-						      ldouble ggout[4][5],GGout[4][5];
-						      struct geometry geomout;
-						      calc_g_arb(xxvecout,ggout,OUTCOORDS);
-						      calc_G_arb(xxvecout,GGout,OUTCOORDS);
-						      fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
-
+						      
 #ifdef RADIATION
 						      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,gg,GG,ggout,GGout);
 #endif
@@ -323,7 +325,9 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 #ifdef RADOUTPUTINFF
 						  prad_lab2ff(pp,pp,&geom);
 #elif defined(RADOUTPUTINZAMO) //to print  radiation primitives in ZAMO
-						  prad_lab2on(pp,pp,&geom);
+						  //prad_lab2on(pp,pp,&geom);
+						  prad_lab2ff(pp,pp,&geom);
+						  //prad_ff2zamo(pp,pp,geomout.gg,geomout.GG,geomout.eup);
 #endif
 #endif
 #endif
@@ -345,7 +349,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  for(irf=0;irf<NRF;irf++)
 						    {
 
-						      //						      irf=3;
+						      //						      irf=0;
 						      E+=pp[EE(irf)];
 						      Fx+=pp[FX(irf)];
 						      Fy+=pp[FY(irf)];

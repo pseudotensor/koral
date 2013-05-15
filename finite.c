@@ -799,7 +799,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	      //**********************************************************************
 	      //redistributing radiative fluids
 #ifdef MULTIRADFLUID
-	      //calc_primitives(ix,iy,iz);
+	      calc_primitives(ix,iy,iz);
 	      redistribute_radfluids_at_cell(ix,iy,iz);
 #ifdef MFCORRECTPHI
 	      mf_correct_in_azimuth_at_cell(ix,iy,iz,dt);
