@@ -541,6 +541,77 @@ assign_wedge_discrete_m2(ldouble flux[], ldouble Avec[NRF])
   return 0;
 }
 
+//***********************************************************************************
+//******* assignes no. of wedge for discrete mixing basing on flux direction **********
+//******* flux falls only into one wedge, works on cartesian flux **********************
+//***********************************************************************************
+int
+assign_wedge_discrete_m3(ldouble F[], ldouble Avec[NRF])
+{
+  int irf;
+
+  if(MFWEDGESTYPE==1) //four fluids, only for 2D problems
+    {
+
+      ldouble phi,n0,n1,n,r,p;
+      ldouble nrf=(ldouble)NRF;
+      
+      if(NZ==1)
+	phi=atan2(F[1],F[0]);
+      else if(NY==1)
+	phi=atan2(F[2],F[0]);
+      else my_err("assign_wedge_discrete_m1() not working for this setup\n");
+
+      if(phi<0.) phi+=2.*M_PI;
+      n0=(phi-2.*M_PI/2./nrf)/(2.*M_PI/nrf);
+      n1=floor(n0);
+      r=n0-n1;
+
+      //exponent based smoothed step function
+      r-=0.5;
+      ldouble factor=40.;
+      p=my_sign(r)*0.5*(exp(factor*fabs(r))-1.)/(exp(0.5*factor)-1.);
+      n=n1+p+1.;
+
+      //      n=n0;
+
+      //mixing coefficients
+      for(irf=0;irf<NRF;irf++)
+	Avec[irf]=0.;
+
+
+
+      /*
+	if(n<0.) n+=nrf;
+	int i1=floor(n);
+       Avec[i1]=1.;
+      */
+      
+      
+      int i1,i2;
+      i1=(int)floor(n);
+      i2=(int)floor(n)+1;
+
+      if(i1>NRF-1) i1-=NRF;
+      if(i2>NRF-1) i2-=NRF;
+
+      Avec[i1]=1.-(n-floor(n));
+      Avec[i2]=(n-floor(n));
+      
+
+      /*         
+      print_Nvector(F,3);
+      printf("%f %f %f %f %d\n",phi,n0,n1,n,i1);      
+      print_Nvector(Avec,NRF);
+      getchar();
+      */
+     
+    }
+
+  return 0;
+}
+
+
 int
 redistribute_radfluids(ldouble *pp, ldouble *uu, void* ggg)
 {
@@ -599,7 +670,9 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
       //f=|F|/cE
       f=sqrt(flux[0]*flux[0]+flux[1]*flux[1]+flux[2]*flux[2]);
 
-      if(f<1.e-8)
+      //      if(f>0.1) verbose=1;
+
+      if(f<1.e-8 || ppon[EE(irf)]<SMALL)
 	{
 	  for(ii=0;ii<NRF;ii++)
 	    A[irf][ii]=1./(ldouble)NRF;
@@ -608,7 +681,8 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
 	{      
 	  //coefficients telling where irf fluid should be moved
 	  ldouble Avec[NRF];
-	  assign_wedge_discrete_m1(flux,Avec);
+
+	  assign_wedge_discrete_m3(flux,Avec);
 
 	  /*
 	  ldouble phi;	  
@@ -617,18 +691,25 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
 	    flux[0]=1.*cos(phi);
 	    flux[1]=1.*sin(phi);
 	    flux[2]=0.;
-	    assign_wedge_discrete_m2(flux,Avec);getchar();
+	    assign_wedge_discrete_m3(flux,Avec);getchar();
 	    }
 	  */
 	    
 
 	  //transition from opticaly thin to thick
-	  ldouble ftrans=0.1;
-	  ldouble Atrans=step_function(f-ftrans,ftrans/10.);
+	  ldouble ftrans=0.0001;
+	  ldouble Atrans=step_function(f-ftrans,ftrans/10.);	
+
+	  //test
+	  /*ldouble ft=0.;
+	  for(ft=0.;ft<=.01;ft+=0.0001)
+	    printf("%e %e\n",ft,step_function(ft-ftrans,ftrans/10.));
+	    getchar();*/
 
 	  //to get rid of zeros
-	  ldouble MINMIX=1.e-8;
+	  ldouble MINMIX=0.e-12;
 	  if(Atrans>(1.-MINMIX)) Atrans=(1.-MINMIX);
+
 
 	  if(verbose) 
 	    {
@@ -740,7 +821,7 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
     for(jj=0;jj<NRF;jj++)
       A[ii][jj]=0.;
 
-  ldouble MINVEL=1.e-3;
+  ldouble MINVEL=MFMINVEL;
 
   for(irf=0;irf<NRF;irf++)
     {

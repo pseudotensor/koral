@@ -2,9 +2,13 @@
 #define RADIATION
 
 //#define EDDINGTON_APR
-//#define MULTIRADFLUID
-//#define MORERADFLUIDS
-//#define NRF 8
+#define MULTIRADFLUID
+#define MFSKEW 20.
+#define MFMINVEL 1.e-3
+#define MFREDISTRIBUTEMETHOD 3
+
+#define MFWEDGESTYPE 1
+#define NRF 4
 
 //#define FORGETDOTS
 
@@ -47,14 +51,14 @@
 
 
 #define IXDOT1 10
-#define IYDOT1 10//10//20
+#define IYDOT1 20//10//10//20
 #define IZDOT1 0
 #define FXDOT1 0.
 #define FYDOT1 0.
 #define FZDOT1 0.
 
 #define IXDOT2 30
-#define IYDOT2 30//30//20
+#define IYDOT2 20//30//20
 #define IZDOT2 0
 #define FXDOT2 0.
 #define FYDOT2 0.

@@ -56,7 +56,7 @@
 //50* HDWAVE - hydro wave for testing entropy
 //51* HUBBLE - hubble-type test as in the WHAM paper
 
-#define PROBLEM 51
+#define PROBLEM 36
 
 #if(PROBLEM==51)
 
@@ -813,11 +813,11 @@
 #endif
 
 #ifndef EERHORATIOMIN
-#define EERHORATIOMIN 1.e-7
+#define EERHORATIOMIN 1.e-20
 #endif
 
 #ifndef EERHORATIOMAX 
-#define EERHORATIOMAX 1.e3
+#define EERHORATIOMAX 1.e10
 #endif
 
 
@@ -835,7 +835,7 @@
 /*********************/
 
 //default number of radiative fluids
-#ifndef MORERADFLUIDS
+#ifndef NRF
 #define NRF 6
 #endif
 

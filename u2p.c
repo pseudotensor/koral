@@ -309,15 +309,23 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   if(pp[0]<RHORHOMAXRATIOMIN*rhomax) {pp[0]=RHORHOMAXRATIOMIN*rhomax; ret=-1; if(verbose) printf("hd_floors CASE 5\n");}
 
 
-  //entropy too small
-
 #ifdef RADIATION
   //EE/rho ratios
   ldouble pp2[NV];
   prad_lab2ff(pp, pp2, ggg);
-  
+
+#ifndef MULTIRADFLUID  
   if(pp[6]<EERHORATIOMIN*pp[0]) {pp[6]=EERHORATIOMIN*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
   if(pp[6]>EERHORATIOMAX*pp[0]) {pp[0]=1./EERHORATIOMAX*pp[6];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
+#else
+  int irf;
+  for(irf=0;irf<NRF;irf++)
+    {
+      //skip so far
+      //if(pp[EE(irf)]<EERHORATIOMIN*pp[0]) {pp[EE(irf)]=EERHORATIOMIN*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
+      //if(pp[EE(irf)]>EERHORATIOMAX*pp[0]) {pp[0]=1./EERHORATIOMAX*pp[EE(irf)];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
+    }
+#endif
 
   prad_ff2lab(pp2, pp, ggg);
 #endif

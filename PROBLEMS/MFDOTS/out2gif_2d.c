@@ -50,7 +50,7 @@
 	  "set yrange [%f:%f]\n"
 	  "set log cb\n"
 #ifndef FORGETDOTS
-	  "set cbrange [1.e-13:1.e-9]\n"
+	  "set cbrange [3.e-12:1.e-10]\n"
 #else
 	  //	  "set cbrange [0.001:.01]\n"
 #endif

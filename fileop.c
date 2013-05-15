@@ -343,13 +343,14 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  int irf;
 						  E=Fx=Fy=Fz=0.;
 						  for(irf=0;irf<NRF;irf++)
-						  
 						    {
-						      //E+=-uu[EE(irf)];
+
+						      //						      irf=3;
 						      E+=pp[EE(irf)];
 						      Fx+=pp[FX(irf)];
 						      Fy+=pp[FY(irf)];
 						      Fz+=pp[FZ(irf)];
+						      //						      break;
 						    }
 #ifdef LABRADFLUXES
 						  E*=-1.;
