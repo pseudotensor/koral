@@ -139,7 +139,7 @@ getchar();
   }
  else if(ix<0) //cylindrical axis - reflection or transmissive
    {
-#ifdef SKIP_FULLPHI
+#ifdef FULLPHI
      iix=-ix-1;
      iiz=iz+NZ/2;
      if(iiz>=NZ) iiz-=NZ;
@@ -150,19 +150,19 @@ getchar();
      iiy=iy;
 #endif
 
-     iix=0;
+     //     iix=0;
 
       for(iv=0;iv<NV;iv++)
        {
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
 
 	 int irf;
-	 /*
+	 
 	 for(irf=0;irf<NRF;irf++)
 	   if(iv==FX(irf))
 	     //radial component
 	     pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	 */
+	
        }
    
     //testing if interpolated primitives make sense

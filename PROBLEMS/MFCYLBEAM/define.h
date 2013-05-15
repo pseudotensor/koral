@@ -21,7 +21,7 @@
 
 #define MFREDISTRIBUTEMETHOD 3
 #define MFWEDGESTYPE 1
-#define NRF 8
+#define NRF 4
 
 //#define RADVISCOSITY
 #define SIMPLERADVISCOSITY
