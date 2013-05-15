@@ -126,7 +126,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
 
   //test: to enforce entropy
-  //u2pret=-1;
+#ifdef ENFORCEENTROPY
+  u2pret=-1;
+#endif
 
   if(u2pret<0) 
     {
@@ -2375,7 +2377,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   ldouble wmrho0 = w - rho0; //u+p
 
   //1d Newton solver
-  ldouble CONV=1.e-8;
+  ldouble CONV=1.e-6;
   ldouble EPS=1.e-6;
   ldouble Wpprev=Wp,Wpprev2=Wp;
   ldouble f0,f1,dfdWp,Wpnew,v2,ut2;

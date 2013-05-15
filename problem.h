@@ -56,7 +56,7 @@
 //50* HDWAVE - hydro wave for testing entropy
 //51* HUBBLE - hubble-type test as in the WHAM paper
 
-#define PROBLEM 37
+#define PROBLEM 51
 
 #if(PROBLEM==51)
 
@@ -1033,6 +1033,10 @@
 
 #ifndef FLUXMETHOD
 #define FLUXMETHOD LAXF_FLUX
+#endif
+
+#ifndef MFWEDGESTYPE
+#define MFWEDGESTYPE 1
 #endif
 
 #define NUMEPSILON DBL_EPSILON
