@@ -122,13 +122,12 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
   //hot hydro - conserving energy
   ret=0;
-  u2pret=u2p_hot(uu,pp,ggg);  
-  //************************************
-
-  //test: to enforce entropy
 #ifdef ENFORCEENTROPY
-  u2pret=-1;
+  u2pret=u2p_entropy_harm(uu,pp,ggg);
+#else
+  u2pret=u2p_hot(uu,pp,ggg);  
 #endif
+  //************************************
 
   if(u2pret<0) 
     {

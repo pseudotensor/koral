@@ -56,7 +56,7 @@
 //50* HDWAVE - hydro wave for testing entropy
 //51* HUBBLE - hubble-type test as in the WHAM paper
 
-#define PROBLEM 51
+#define PROBLEM 25
 
 #if(PROBLEM==51)
 
