@@ -1039,6 +1039,10 @@
 #define MFWEDGESTYPE 1
 #endif
 
+#ifndef MODYFIKUJKRZYSIE
+#define MODYFIKUJKRZYSIE 0
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/
