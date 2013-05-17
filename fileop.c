@@ -152,7 +152,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
   fprintf(fout_totmass,"%e ",t);
   for(iv=0;iv<nscalars;iv++)
     fprintf(fout_totmass,"%e ",scalars[iv]);
-  fprintf(fout_totmass,"\n",scalars[iv]);
+  fprintf(fout_totmass,"\n");
   fflush(fout_totmass);
 
   if(MYCOORDS == BLCOORDS || MYCOORDS == KSCOORDS || MYCOORDS == MKS1COORDS)
@@ -170,7 +170,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 	  fprintf(fout_radprofiles,"%e ",xxout[1]);
 	  for(iv=0;iv<NRADPROFILES;iv++)
 	    fprintf(fout_radprofiles,"%e ",profiles[iv][ix]);
-	  fprintf(fout_radprofiles,"\n",xxout[1]);
+	  fprintf(fout_radprofiles,"\n");
 	}
       fflush(fout_radprofiles);
     }

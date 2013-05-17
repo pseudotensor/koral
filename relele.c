@@ -201,7 +201,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
   if(verbose)
     {
       print_4vector(u2);      
-      printf("conv_vels done\n",which1,which2);
+      printf("conv_vels done %d %d\n",which1,which2);
     }
   
   return 0;

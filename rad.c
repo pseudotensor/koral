@@ -101,6 +101,7 @@ print_state_implicit_lab (int iter, ldouble *x, ldouble *f)
 	  "f(x) = % .13e % .13e % .13e % .13e\n",
 	  iter,
 	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
+  return 0;
 }
 
 int

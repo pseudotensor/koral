@@ -26,9 +26,9 @@ donut_analytical_solution(ldouble *pp,ldouble *xxvecBL,ldouble ggBL[][5],ldouble
 
   //4-velocity in BL
 
-  pp[2]=ucon[1]; 
-  pp[3]=ucon[2];
-  pp[4]=ucon[3];
+  pp[2]=0.; 
+  pp[3]=0.;
+  pp[4]=0.;
   pp[0]=rho;
   pp[1]=uint;
 

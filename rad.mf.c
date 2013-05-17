@@ -423,6 +423,14 @@ assign_wedge_discrete_m1(ldouble F[], ldouble Avec[NRF])
   return 0;
 }
 
+int wno(int n)
+{
+  while(n<0) n+=NRF;
+  while(n>=NRF) n-=NRF;
+  return n;
+}
+
+ 
 //***********************************************************************************
 //******* assignes no. of wedge for discrete mixing basing on flux direction *******
 //******* flux distributed basing on Lorentz boost of isotropic 1/3 along urf
@@ -492,14 +500,7 @@ assign_wedge_discrete_m2(ldouble flux[], ldouble Avec[NRF])
 
       //printf("phi in wedges : %d %d\n",phiedge[1],phiedge[2]);
 
-      int wno(int n)
-      {
-	while(n<0) n+=NRF;
-	while(n>=NRF) n-=NRF;
-	return n;
-      }
-
-      if(phiedge[2]-phiedge[1]>=2)
+     if(phiedge[2]-phiedge[1]>=2)
 	{
 	  for(irf=phiedge[1]+1;irf<=phiedge[2]-1;irf++)
 	    Avec[wno(irf)]=1.;
@@ -1079,14 +1080,15 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
 //******* redistributes radiation fluids ***********************************************
 //******* basing on velocities along axes **********************************************
 //***********************************************************************************
+ldouble expskew(ldouble vel, ldouble skew) 
+{
+  return (exp(skew*vel)-1.0)/(exp(skew)-1.0);
+}
+
 int
 redistribute_with_velocities(ldouble avals[6],ldouble A[NRF],ldouble skew,ldouble MINVEL)
 {
-  ldouble expskew(ldouble vel, ldouble skew) 
-  {
-    return (exp(skew*vel)-1.0)/(exp(skew)-1.0);
-  }
-
+ 
   ldouble vxl,vxr,vyl,vyr,vzl,vzr,sumvel;
 
   vxl=fabs(my_min(avals[0],-MINVEL));
@@ -1324,6 +1326,9 @@ calc_Rij_mf(ldouble *pp0, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4][4])
 
   return 0;
 #endif
+  
+  return 0;
+
 }
 
 /************************************************************************/
@@ -1446,6 +1451,9 @@ calc_rad_wavespeeds_mf_total(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble
 
   return 0;
 #endif
+
+  return 0;
+
 }
 
 /************************************************************************/
@@ -1580,6 +1588,9 @@ calc_rad_wavespeeds_pure_mf_each(ldouble *pp,void *ggg,ldouble aval[][6])
 
   return 0;
 #endif
+
+  return 0;
+
 }
 
 //**********************************************************************
@@ -1648,8 +1659,8 @@ calc_Rij_ff_mf(ldouble *pp, ldouble Rij[][4][4])
 
     }
 
-  return 0;
 #endif
+return 0;
 }
 
 

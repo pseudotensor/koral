@@ -29,14 +29,14 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 48
+#define NX 64
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 30.
 #define NX 70
 #endif
 
-#define NY 24
+#define NY 48
 #define NZ 1
 
 
@@ -59,11 +59,11 @@
 #define INT_ORDER 2
 #define TIMESTEPPING RK2
 
-//#define ENFORCEENTROPY
+#define ENFORCEENTROPY
 //#define FLUXMETHOD HLL_FLUX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.75
+#define MINMOD_THETA 1.5
 
 #define NODONUT 0
 #define INFLOWING 0

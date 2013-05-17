@@ -846,7 +846,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   ldouble fvalmin[2]={0.,-1.};
   ldouble absfval;
 
-  ldouble ftest[50][3];
+  ldouble ftest[50][4];
 
   do{
     iter++;
@@ -1989,6 +1989,7 @@ print_state_u2prad_num (int iter, ldouble *x, ldouble *f)
 	  "f(x) = % .3e % .3e % .3e % .3e\n",
 	  iter,
 	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
+  return 0;
 }
 
 int

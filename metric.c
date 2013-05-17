@@ -53,7 +53,7 @@ if(coords==SCHWCOORDS) {
 
 if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
@@ -61,13 +61,14 @@ if(coords==MKS1COORDS) {
  } 
 
 if(coords==MCYL1COORDS) {
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
   return Sqrt(Power(exp(1.0),2*x1)*Power(Power(exp(1.0),x1) + R0,2));
  } 
 
+ return 0.;
 }
 
 //**********************************************************************
@@ -130,7 +131,7 @@ if(coords==SCHWCOORDS) {
 
 if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
@@ -141,7 +142,7 @@ if(coords==MKS1COORDS) {
  }
 
 if(coords==MCYL1COORDS) {
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
@@ -151,7 +152,7 @@ if(coords==MCYL1COORDS) {
 ;
  }
 
-
+ return 0;
 
 }
 
@@ -375,7 +376,7 @@ calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
   ldouble x3=xx[3];
 
   if(coords==MCYL1COORDS) {
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
@@ -401,7 +402,7 @@ calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
 
   if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
@@ -576,7 +577,7 @@ calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int coords)
 
 
   if(coords==MCYL1COORDS) {
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
@@ -1582,7 +1583,7 @@ coco_MCYL12CYL(ldouble *xMCYL1, ldouble *xCYL)
   ldouble x1=xMCYL1[1];
   ldouble x2=xMCYL1[2];
   ldouble x3=xMCYL1[3];
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
@@ -1615,7 +1616,7 @@ coco_CYL2MCYL1(ldouble *xCYL, ldouble *xMCYL1)
   ldouble CYLx1=xCYL[1];
   ldouble CYLx2=xCYL[2];
   ldouble CYLx3=xCYL[3];
-  ldouble R0;
+  ldouble R0=0.;
 
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
@@ -1816,7 +1817,7 @@ dxdx_KS2MKS1(ldouble *xx, ldouble dxdx[][4])
   ldouble KSx1=xx[1];
   ldouble KSx2=xx[2];
   ldouble KSx3=xx[3];
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
@@ -1843,7 +1844,7 @@ dxdx_MKS12KS(ldouble *xx, ldouble dxdx[][4])
   ldouble x1=xx[1];
   ldouble x2=xx[2];
   ldouble x3=xx[3];
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif
@@ -1870,7 +1871,7 @@ dxdx_CYL2MCYL1(ldouble *xx, ldouble dxdx[][4])
   ldouble CYLx1=xx[1];
   ldouble CYLx2=xx[2];
   ldouble CYLx3=xx[3];
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif
@@ -1897,7 +1898,7 @@ dxdx_MCYL12CYL(ldouble *xx, ldouble dxdx[][4])
   ldouble x1=xx[1];
   ldouble x2=xx[2];
   ldouble x3=xx[3];
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
   R0=MKS1R0;
 #endif

@@ -107,7 +107,7 @@ solve_all_problems_5(ldouble tstart)
       clock_gettime(CLOCK_REALTIME,&temp_clock);
 #endif
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
-      ldouble imp_time1,imp_time2,tstepden;
+      ldouble imp_time1=0.,imp_time2=0.,tstepden;
 
 #ifndef RADIATION //pure hydro
       if(NZ>1)
