@@ -375,7 +375,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(l=1;l<4;l++)
     {
       //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
-      ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
+      //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
       ss[2]+=-dlgdet[l-1]*(T[l][1]);
       ss[3]+=-dlgdet[l-1]*(T[l][2]);
       ss[4]+=-dlgdet[l-1]*(T[l][3]);
@@ -418,7 +418,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(l=1;l<4;l++)
     {
       //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
-      ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
+      //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
       ss[2]+=-dlgdet[l-1]*(T[l][1]);
       ss[3]+=-dlgdet[l-1]*(T[l][2]);
       ss[4]+=-dlgdet[l-1]*(T[l][3]);
@@ -455,7 +455,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(l=1;l<4;l++)
     {
       //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
-      ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
+      //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
       ss[2]+=-dlgdet[l-1]*(T[l][1]);
       ss[3]+=-dlgdet[l-1]*(T[l][2]);
       ss[4]+=-dlgdet[l-1]*(T[l][3]);
@@ -547,7 +547,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     {
       ff[0]= gdet*rho*u1;
 
-      ff[1]= (T[1][0]+rho*u1);
+      ff[1]= gdet*(T[1][0]+rho*u1);
 
       ff[2]= (T[1][1]);
 
@@ -579,7 +579,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     {
       ff[0]= gdet*rho*u2;
 
-      ff[1]= (T[2][0]+rho*u2);
+      ff[1]= gdet*(T[2][0]+rho*u2);
 
       ff[2]= (T[2][1]);
 
@@ -611,7 +611,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     {
       ff[0]= gdet*rho*u3;
 
-      ff[1]= (T[3][0]+rho*u3);
+      ff[1]= gdet*(T[3][0]+rho*u3);
  
       ff[2]= (T[3][1]);
 
@@ -646,7 +646,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     {
       ff[0]= gdet*rho*u1;
 
-      ff[1]= (T[1][0]+rho*u1);
+      ff[1]= gdet*(T[1][0]+rho*u1);
 
       ff[2]= (T[1][1]);
 
@@ -660,7 +660,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     {
       ff[0]= gdet*rho*u2;
 
-      ff[1]= (T[2][0]+rho*u2);
+      ff[1]= gdet*(T[2][0]+rho*u2);
 
       ff[2]= (T[2][1]);
 
@@ -674,7 +674,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     {
       ff[0]= gdet*rho*u3;
 
-      ff[1]= (T[3][0]+rho*u3);
+      ff[1]= gdet*(T[3][0]+rho*u3);
  
       ff[2]= (T[3][1]);
 

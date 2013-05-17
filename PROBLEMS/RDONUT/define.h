@@ -29,14 +29,14 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 64
+#define NX 48
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 30.
 #define NX 70
 #endif
 
-#define NY 48
+#define NY 24
 #define NZ 1
 
 
@@ -56,14 +56,14 @@
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(1.e8))
 
-#define INT_ORDER 1
+#define INT_ORDER 2
 #define TIMESTEPPING RK2
 
-#define ENFORCEENTROPY
+//#define ENFORCEENTROPY
 //#define FLUXMETHOD HLL_FLUX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.75
 
 #define NODONUT 0
 #define INFLOWING 0

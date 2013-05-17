@@ -102,7 +102,7 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble Ttph =w*ucon[0]*ucov[3];
    
   u[0]=gdet*rhout;
-  u[1]=Tttt;
+  u[1]=gdet*Tttt;
   u[2]=Ttr;
   u[3]=Ttth;
   u[4]=Ttph;

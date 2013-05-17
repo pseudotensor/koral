@@ -581,7 +581,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   D=uu[0]/gdet*alpha; //uu[0]=gdet rho ut
 
   //Q_mu
-  Qcov[0]=(uu[1]-uu[0]/gdet)*alpha;
+  Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
   Qcov[1]=uu[2]*alpha;
   Qcov[2]=uu[3]*alpha;
   Qcov[3]=uu[4]*alpha;
@@ -2312,7 +2312,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   D=uu[0]/gdet*alpha;
 
   //Q_mu
-  Qcov[0]=(uu[1]-uu[0]/gdet)*alpha;
+  Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
   Qcov[1]=uu[2]*alpha;
   Qcov[2]=uu[3]*alpha;
   Qcov[3]=uu[4]*alpha;
@@ -2651,7 +2651,7 @@ u2p_cold_myharm(ldouble *uu, ldouble *pp, void *ggg)
   D=uu[0]/gdet*alpha;
 
   //Q_mu
-  Qcov[0]=(uu[1]-uu[0]/gdet)*alpha;
+  Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
   Qcov[1]=uu[2]*alpha;
   Qcov[2]=uu[3]*alpha;
   Qcov[3]=uu[4]*alpha;
