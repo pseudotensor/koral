@@ -560,9 +560,10 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
    struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5];
+   ldouble (*gg)[5],(*GG)[5],gdet;
   gg=geom->gg;
   GG=geom->GG;
+  gdet=geom->gdet;
 
   int verbose=0;
   int i,j,k;
@@ -577,10 +578,10 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   alpha=sqrt(-1./GG[0][0]);
 
   //D
-  D=uu[0]*alpha;
+  D=uu[0]/gdet*alpha; //uu[0]=gdet rho ut
 
   //Q_mu
-  Qcov[0]=(uu[1]-uu[0])*alpha;
+  Qcov[0]=(uu[1]-uu[0]/gdet)*alpha;
   Qcov[1]=uu[2]*alpha;
   Qcov[2]=uu[3]*alpha;
   Qcov[3]=uu[4]*alpha;
@@ -788,9 +789,10 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*g)[5],(*G)[5];
+  ldouble (*g)[5],(*G)[5],gdet;
   g=geom->gg;
   G=geom->GG;
+  gdet=geom->gdet;
 
   ldouble gtt=g[0][0];
   ldouble gtr=g[0][1];
@@ -812,12 +814,12 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   ldouble gphth=g[3][2];
   ldouble gphph=g[3][3];
 
-  ldouble rhout=uuu[0];
+  ldouble rhout=uuu[0]/gdet;
   ldouble Tttt=uuu[1]; //this one unused
   ldouble Ttr=uuu[2];
   ldouble Ttth=uuu[3];
   ldouble Ttph=uuu[4];
-  ldouble Sut=uuu[5];
+  ldouble Sut=uuu[5]/gdet;
 
  
   conv_velsinprims(p,VELPRIM,VEL3,g,G);
@@ -1038,12 +1040,14 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble gphth=g[3][2];
   ldouble gphph=g[3][3];
 
-  ldouble rhout=uuu[0];
+  ldouble gdet=g[3][4];
+
+  ldouble rhout=uuu[0]/gdet;
   ldouble Tttt=uuu[1]; 
   ldouble Ttr=uuu[2];
   ldouble Ttth=uuu[3];
   ldouble Ttph=uuu[4];
-  ldouble Sut=uuu[5];
+  ldouble Sut=uuu[5]/gdet;
   ldouble Ttt=Tttt+rhout;
 
   //  conv_velsinprims(p,VELPRIM,VEL3,g,G);
@@ -2272,9 +2276,10 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet;
   gg=geom->gg;
   GG=geom->GG;
+  gdet=geom->gdet;
 
   int verbose=0;
   int superverbose=0;
@@ -2300,14 +2305,14 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   //alpha
   alpha=sqrt(-1./GG[0][0]);
   
-  //conserved entopy "S u^t"
-  Sc=uu[5]*alpha; //alpha?
+  //conserved entropy "S u^t"
+  Sc=uu[5]/gdet*alpha; 
 
   //D
-  D=uu[0]*alpha;
+  D=uu[0]/gdet*alpha;
 
   //Q_mu
-  Qcov[0]=(uu[1]-uu[0])*alpha;
+  Qcov[0]=(uu[1]-uu[0]/gdet)*alpha;
   Qcov[1]=uu[2]*alpha;
   Qcov[2]=uu[3]*alpha;
   Qcov[3]=uu[4]*alpha;
@@ -2610,9 +2615,10 @@ u2p_cold_myharm(ldouble *uu, ldouble *pp, void *ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet;
   gg=geom->gg;
   GG=geom->GG;
+  gdet=geom->gdet;
 
   int verbose=2;
   int superverbose=1;
@@ -2639,13 +2645,13 @@ u2p_cold_myharm(ldouble *uu, ldouble *pp, void *ggg)
   alpha=sqrt(-1./GG[0][0]);
   
   //conserved entopy "S u^t"
-  Sc=uu[5]*alpha; //alpha?
+  Sc=uu[5]/gdet*alpha; //alpha?
 
   //D
-  D=uu[0]*alpha;
+  D=uu[0]/gdet*alpha;
 
   //Q_mu
-  Qcov[0]=(uu[1]-uu[0])*alpha;
+  Qcov[0]=(uu[1]-uu[0]/gdet)*alpha;
   Qcov[1]=uu[2]*alpha;
   Qcov[2]=uu[3]*alpha;
   Qcov[3]=uu[4]*alpha;

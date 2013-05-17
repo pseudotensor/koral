@@ -374,12 +374,12 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   //terms with dloggdet
   for(l=1;l<4;l++)
     {
-      ss[0]+=-dlgdet[l-1]*rho*ucon[l];
+      //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
       ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
       ss[2]+=-dlgdet[l-1]*(T[l][1]);
       ss[3]+=-dlgdet[l-1]*(T[l][2]);
       ss[4]+=-dlgdet[l-1]*(T[l][3]);
-      ss[5]+=-dlgdet[l-1]*S*ucon[l];
+      //ss[5]+=-dlgdet[l-1]*S*ucon[l];
       ss[6]+=-dlgdet[l-1]*(Rij[l][0]);
       ss[7]+=-dlgdet[l-1]*(Rij[l][1]);
       ss[8]+=-dlgdet[l-1]*(Rij[l][2]);
@@ -417,12 +417,12 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   //hydro first
   for(l=1;l<4;l++)
     {
-      ss[0]+=-dlgdet[l-1]*rho*ucon[l];
+      //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
       ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
       ss[2]+=-dlgdet[l-1]*(T[l][1]);
       ss[3]+=-dlgdet[l-1]*(T[l][2]);
       ss[4]+=-dlgdet[l-1]*(T[l][3]);
-      ss[5]+=-dlgdet[l-1]*S*ucon[l];
+      //ss[5]+=-dlgdet[l-1]*S*ucon[l];
     }
 
   //rad now
@@ -438,7 +438,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 #endif
 
   /***************************************************/
-#else
+#else //pure hydro
   /***************************************************/
 
   //terms with Christoffels
@@ -454,12 +454,12 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   //terms with dloggdet  
   for(l=1;l<4;l++)
     {
-      ss[0]+=-dlgdet[l-1]*rho*ucon[l];
+      //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
       ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
       ss[2]+=-dlgdet[l-1]*(T[l][1]);
       ss[3]+=-dlgdet[l-1]*(T[l][2]);
       ss[4]+=-dlgdet[l-1]*(T[l][3]);
-      ss[5]+=-dlgdet[l-1]*S*ucon[l];
+      //ss[5]+=-dlgdet[l-1]*S*ucon[l];
     }   
 
   /***************************************************/
@@ -482,12 +482,11 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   struct geometry geom;
   fill_geometry_face(ix,iy,iz,idim,&geom);
  
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet;
   gg=geom.gg;
   GG=geom.GG;
+  gdet=geom.gdet;
 
-  ldouble gdet=gg[3][4];
-  
   //calculating Tij
   ldouble T[4][4];
 
@@ -546,7 +545,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
    if(idim==0) //x
     {
-      ff[0]= rho*u1;
+      ff[0]= gdet*rho*u1;
 
       ff[1]= (T[1][0]+rho*u1);
 
@@ -556,7 +555,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
  
       ff[4]= (T[1][3]);
 
-      ff[5]= S*u1;
+      ff[5]= gdet*S*u1;
 
 #ifndef MULTIRADFLUID
       ff[6]= Rij[1][0];
@@ -578,7 +577,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     }  
   if(idim==1) //y
     {
-      ff[0]= rho*u2;
+      ff[0]= gdet*rho*u2;
 
       ff[1]= (T[2][0]+rho*u2);
 
@@ -588,7 +587,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[4]= (T[2][3]);
 
-      ff[5]= S*u2;
+      ff[5]= gdet*S*u2;
  
 #ifndef MULTIRADFLUID
       ff[6]= Rij[2][0];
@@ -610,7 +609,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     }  
   if(idim==2) //z
     {
-      ff[0]= rho*u3;
+      ff[0]= gdet*rho*u3;
 
       ff[1]= (T[3][0]+rho*u3);
  
@@ -620,7 +619,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
  
       ff[4]= (T[3][3]);
 
-      ff[5]= S*u3;
+      ff[5]= gdet*S*u3;
  
 #ifndef MULTIRADFLUID
       ff[6]= Rij[3][0];
@@ -645,7 +644,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
   if(idim==0) //x
     {
-      ff[0]= rho*u1;
+      ff[0]= gdet*rho*u1;
 
       ff[1]= (T[1][0]+rho*u1);
 
@@ -655,11 +654,11 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
  
       ff[4]= (T[1][3]);
 
-      ff[5]= S*u1;
+      ff[5]= gdet*S*u1;
     }  
   if(idim==1) //y
     {
-      ff[0]= rho*u2;
+      ff[0]= gdet*rho*u2;
 
       ff[1]= (T[2][0]+rho*u2);
 
@@ -669,11 +668,11 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[4]= (T[2][3]);
 
-      ff[5]= S*u2;
+      ff[5]= gdet*S*u2;
     }  
   if(idim==2) //z
     {
-      ff[0]= rho*u3;
+      ff[0]= gdet*rho*u3;
 
       ff[1]= (T[3][0]+rho*u3);
  
@@ -683,7 +682,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
  
       ff[4]= (T[3][3]);
 
-      ff[5]= S*u3;
+      ff[5]= gdet*S*u3;
     } 
 
 #endif
@@ -869,6 +868,7 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
   ldouble gg[4][5],GG[4][5];
   pick_G(ix,iy,iz,GG);
   pick_g(ix,iy,iz,gg);
+  ldouble gdet=gg[3][4];
 
   ldouble ucon[4],ut,S,Sut,rho,uu;
   int iv;
@@ -889,7 +889,7 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
     {
       S=calc_Sfromu(rho,uu);      
       set_u(p,5,ix,iy,iz,S);
-      set_u(u,5,ix,iy,iz,S*ut); 
+      set_u(u,5,ix,iy,iz,S*ut*gdet); 
     }
 
   /*

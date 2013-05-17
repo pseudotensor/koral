@@ -316,7 +316,8 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  vz=vrel[3];
 						  ldouble S=pp[5];
 						  ldouble p=(GAMMA-1.)*uint;
-						  ldouble ut=uu[0]/rho;
+						  gdet=gg[3][4];
+						  ldouble ut=uu[0]/gdet/rho;
 						  Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
 
 #ifdef RADIATION

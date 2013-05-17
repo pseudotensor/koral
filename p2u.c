@@ -43,8 +43,9 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet;
   gg=geom->gg;
+  gdet=geom->gdet;
   GG=geom->GG;
 
   ldouble rho=p[0];
@@ -100,12 +101,12 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble Ttth =w*ucon[0]*ucov[2];
   ldouble Ttph =w*ucon[0]*ucov[3];
    
-  u[0]=rhout;
+  u[0]=gdet*rhout;
   u[1]=Tttt;
   u[2]=Ttr;
   u[3]=Ttth;
   u[4]=Ttph;
-  u[5]=Sut;
+  u[5]=gdet*Sut;
 
   return 0.;
 }

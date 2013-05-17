@@ -1217,7 +1217,7 @@ apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
 {
   ldouble delapl[NV];
 
-  delapl[0]=0.;
+  delapl[0]=0.; //zeros go to density and entropy so don't bother about the gdet there
   delapl[1]=-del4[0];
   delapl[2]=-del4[1];
   delapl[3]=-del4[2];
