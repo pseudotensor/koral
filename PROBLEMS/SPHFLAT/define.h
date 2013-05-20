@@ -4,8 +4,8 @@
 
 #define TIME_STEPPING RK2
 #define INT_ORDER 1
-#define NX 20
-#define NY 20
+#define NX 30
+#define NY 30
 #define NZ 1
 
 #define TSTEPLIM .5

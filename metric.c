@@ -596,16 +596,23 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
   //modifying \Gamma ^mu_mu_k
 
   int kappa,mu;
-  ldouble Sk,Wk[4],dS[4],gdet[3],D[4],dxk;
+  ldouble Sk,Wk[4],dS[4],gdet[3],D[4],dxk,Ck;
   for(kappa=1;kappa<=3;kappa++)
     {
+      Ck=Krzys_org[0][kappa][0]
+	+ Krzys_org[1][kappa][1]
+	+ Krzys_org[2][kappa][2]
+	+ Krzys_org[3][kappa][3];
+ 
       Sk=1.e-300 + fabs(Krzys_org[0][kappa][0])
 	+ fabs(Krzys_org[1][kappa][1])
 	+ fabs(Krzys_org[2][kappa][2])
 	+ fabs(Krzys_org[3][kappa][3]);
+
       for(mu=0;mu<4;mu++)
 	Wk[mu]=fabs(Krzys_org[mu][kappa][mu])/Sk;
-      
+
+     
       //center
       xx[0]=0.;
       xx[1]=get_x(ix,0);
@@ -642,7 +649,15 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
       //correcting Krzysie
       for(mu=0;mu<4;mu++)
 	{
-	  Krzys[mu][kappa][mu]+=(D[kappa]-Krzys_org[mu][kappa][mu])*Wk[mu];
+	  Krzys[mu][kappa][mu]+=(D[kappa]-Ck)*Wk[mu];
+	  Krzys[mu][mu][kappa]=Krzys[mu][kappa][mu];
+
+	  /*
+	  printf("%f %f > %d %d >  %e %e %e | %e -> %e\n",get_x(ix,0),get_x(iy,1),
+		 kappa,mu,
+		 D[kappa],Ck,Wk[mu],Krzys_org[mu][kappa][mu],Krzys[mu][kappa][mu]); getchar();
+	  */
+	  
 	}
     }
 

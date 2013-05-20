@@ -372,7 +372,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
       }
 
   //terms with dloggdet
-#if (GDETIN==1)
+#if (GDETIN==0)
   for(l=1;l<4;l++)
     {
       ss[0]+=-dlgdet[l-1]*rho*ucon[l];
@@ -417,7 +417,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 	}
 
   //terms with dloggdet
-#if (GDETIN==1)
+#if (GDETIN==0)
   //hydro first
   for(l=1;l<4;l++)
     {
@@ -457,7 +457,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
       }
 
   //terms with dloggdet  
-#if (GDETIN==1)
+#if (GDETIN==0)
   for(l=1;l<4;l++)
     {
       ss[0]+=-dlgdet[l-1]*rho*ucon[l];
@@ -489,10 +489,13 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   struct geometry geom;
   fill_geometry_face(ix,iy,iz,idim,&geom);
  
-  ldouble (*gg)[5],(*GG)[5],gdet;
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom.gg;
   GG=geom.GG;
-  gdet=geom.gdet;
+  gdet=geom.gdet;gdetu=gdet;
+#if (GDETIN==0) //no metric determinant inside derivatives
+  gdetu=1.;
+#endif
 
   //calculating Tij
   ldouble T[4][4];
@@ -548,104 +551,101 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
  #endif
 
   //to move gdet in/out derivative:
-  //here, up in metric source terms, in u2p and p2u, as well as in finite.c with del4[]
-#if (GDETIN==0) //no metric determinant inside derivatives
-  gdet=1.;
-#endif
+  //here, up in metric source terms, in u2p and p2u, as well as in finite.c with del4[], and below in calc_entropy
 
    if(idim==0) //x
     {
-      ff[0]= gdet*rho*u1;
+      ff[0]= gdetu*rho*u1;
 
-      ff[1]= gdet*(T[1][0]+rho*u1);
+      ff[1]= gdetu*(T[1][0]+rho*u1);
 
-      ff[2]= gdet*(T[1][1]);
+      ff[2]= gdetu*(T[1][1]);
 
-      ff[3]= gdet*(T[1][2]);
+      ff[3]= gdetu*(T[1][2]);
  
-      ff[4]= gdet*(T[1][3]);
+      ff[4]= gdetu*(T[1][3]);
 
-      ff[5]= gdet*S*u1;
+      ff[5]= gdetu*S*u1;
 
 #ifndef MULTIRADFLUID
-      ff[6]= gdet*Rij[1][0];
+      ff[6]= gdetu*Rij[1][0];
       
-      ff[7]= gdet*Rij[1][1];
+      ff[7]= gdetu*Rij[1][1];
       
-      ff[8]= gdet*Rij[1][2];
+      ff[8]= gdetu*Rij[1][2];
       
-      ff[9]= gdet*Rij[1][3];
+      ff[9]= gdetu*Rij[1][3];
 #else
       for(irf=0;irf<NRF;irf++)
 	{
-	  ff[EE(irf)]=gdet*Rij[irf][1][0];
-	  ff[FX(irf)]=gdet*Rij[irf][1][1];
-	  ff[FY(irf)]=gdet*Rij[irf][1][2];
-	  ff[FZ(irf)]=gdet*Rij[irf][1][3];
+	  ff[EE(irf)]=gdetu*Rij[irf][1][0];
+	  ff[FX(irf)]=gdetu*Rij[irf][1][1];
+	  ff[FY(irf)]=gdetu*Rij[irf][1][2];
+	  ff[FZ(irf)]=gdetu*Rij[irf][1][3];
 	}
 #endif
     }  
   if(idim==1) //y
     {
-      ff[0]= gdet*rho*u2;
+      ff[0]= gdetu*rho*u2;
 
-      ff[1]= gdet*(T[2][0]+rho*u2);
+      ff[1]= gdetu*(T[2][0]+rho*u2);
 
-      ff[2]= gdet*(T[2][1]);
+      ff[2]= gdetu*(T[2][1]);
 
-      ff[3]= gdet*(T[2][2]);
+      ff[3]= gdetu*(T[2][2]);
 
-      ff[4]= gdet*(T[2][3]);
+      ff[4]= gdetu*(T[2][3]);
 
-      ff[5]= gdet*S*u2;
+      ff[5]= gdetu*S*u2;
  
 #ifndef MULTIRADFLUID
-      ff[6]= gdet*Rij[2][0];
+      ff[6]= gdetu*Rij[2][0];
       
-      ff[7]= gdet*Rij[2][1];
+      ff[7]= gdetu*Rij[2][1];
       
-      ff[8]= gdet*Rij[2][2];
+      ff[8]= gdetu*Rij[2][2];
       
-      ff[9]= gdet*Rij[2][3];
+      ff[9]= gdetu*Rij[2][3];
 #else
       for(irf=0;irf<NRF;irf++)
 	{
-	  ff[EE(irf)]=gdet*Rij[irf][2][0];
-	  ff[FX(irf)]=gdet*Rij[irf][2][1];
-	  ff[FY(irf)]=gdet*Rij[irf][2][2];
-	  ff[FZ(irf)]=gdet*Rij[irf][2][3];
+	  ff[EE(irf)]=gdetu*Rij[irf][2][0];
+	  ff[FX(irf)]=gdetu*Rij[irf][2][1];
+	  ff[FY(irf)]=gdetu*Rij[irf][2][2];
+	  ff[FZ(irf)]=gdetu*Rij[irf][2][3];
 	}
 #endif
     }  
   if(idim==2) //z
     {
-      ff[0]= gdet*rho*u3;
+      ff[0]= gdetu*rho*u3;
 
-      ff[1]= gdet*(T[3][0]+rho*u3);
+      ff[1]= gdetu*(T[3][0]+rho*u3);
  
-      ff[2]= gdet*(T[3][1]);
+      ff[2]= gdetu*(T[3][1]);
 
-      ff[3]= gdet*(T[3][2]);
+      ff[3]= gdetu*(T[3][2]);
  
-      ff[4]= gdet*(T[3][3]);
+      ff[4]= gdetu*(T[3][3]);
 
-      ff[5]= gdet*S*u3;
+      ff[5]= gdetu*S*u3;
  
 #ifndef MULTIRADFLUID
-      ff[6]= gdet*Rij[3][0];
+      ff[6]= gdetu*Rij[3][0];
       
-      ff[7]= gdet*Rij[3][1];
+      ff[7]= gdetu*Rij[3][1];
       
-      ff[8]= gdet*Rij[3][2];
+      ff[8]= gdetu*Rij[3][2];
        
-      ff[9]= gdet*Rij[3][3];
+      ff[9]= gdetu*Rij[3][3];
 #else
       for(irf=0;irf<NRF;irf++)
 	{
-	  ff[EE(irf)]=gdet*Rij[irf][3][0];
-	  ff[FX(irf)]=gdet*Rij[irf][3][1];
-	  ff[FY(irf)]=gdet*Rij[irf][3][2];
-	  ff[FZ(irf)]=gdet*Rij[irf][3][3];
+	  ff[EE(irf)]=gdetu*Rij[irf][3][0];
+	  ff[FX(irf)]=gdetu*Rij[irf][3][1];
+	  ff[FY(irf)]=gdetu*Rij[irf][3][2];
+	  ff[FZ(irf)]=gdetu*Rij[irf][3][3];
 	}
 #endif
     } 
@@ -654,45 +654,45 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
   if(idim==0) //x
     {
-      ff[0]= gdet*rho*u1;
+      ff[0]= gdetu*rho*u1;
 
-      ff[1]= gdet*(T[1][0]+rho*u1);
+      ff[1]= gdetu*(T[1][0]+rho*u1);
 
-      ff[2]= gdet*(T[1][1]);
+      ff[2]= gdetu*(T[1][1]);
 
-      ff[3]= gdet*(T[1][2]);
+      ff[3]= gdetu*(T[1][2]);
  
-      ff[4]= gdet*(T[1][3]);
+      ff[4]= gdetu*(T[1][3]);
 
-      ff[5]= gdet*S*u1;
+      ff[5]= gdetu*S*u1;
     }  
   if(idim==1) //y
     {
-      ff[0]= gdet*rho*u2;
+      ff[0]= gdetu*rho*u2;
 
-      ff[1]= gdet*(T[2][0]+rho*u2);
+      ff[1]= gdetu*(T[2][0]+rho*u2);
 
-      ff[2]= gdet*(T[2][1]);
+      ff[2]= gdetu*(T[2][1]);
 
-      ff[3]= gdet*(T[2][2]);
+      ff[3]= gdetu*(T[2][2]);
 
-      ff[4]= gdet*(T[2][3]);
+      ff[4]= gdetu*(T[2][3]);
 
-      ff[5]= gdet*S*u2;
+      ff[5]= gdetu*S*u2;
     }  
   if(idim==2) //z
     {
-      ff[0]= gdet*rho*u3;
+      ff[0]= gdetu*rho*u3;
 
-      ff[1]= gdet*(T[3][0]+rho*u3);
+      ff[1]= gdetu*(T[3][0]+rho*u3);
  
-      ff[2]= gdet*(T[3][1]);
+      ff[2]= gdetu*(T[3][1]);
 
-      ff[3]= gdet*(T[3][2]);
+      ff[3]= gdetu*(T[3][2]);
  
-      ff[4]= gdet*(T[3][3]);
+      ff[4]= gdetu*(T[3][3]);
 
-      ff[5]= gdet*S*u3;
+      ff[5]= gdetu*S*u3;
     } 
 
 #endif
@@ -878,7 +878,10 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
   ldouble gg[4][5],GG[4][5];
   pick_G(ix,iy,iz,GG);
   pick_g(ix,iy,iz,gg);
-  ldouble gdet=gg[3][4];
+  ldouble gdet=gg[3][4],gdetu=gdet;;
+#if (GDETIN==0) //no metric determinant inside derivatives
+  gdetu=1.;
+#endif
 
   ldouble ucon[4],ut,S,Sut,rho,uu;
   int iv;
@@ -899,7 +902,7 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
     {
       S=calc_Sfromu(rho,uu);      
       set_u(p,5,ix,iy,iz,S);
-      set_u(u,5,ix,iy,iz,S*ut*gdet); 
+      set_u(u,5,ix,iy,iz,S*ut*gdetu); 
     }
 
   /*
