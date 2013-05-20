@@ -304,12 +304,15 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
  
   gg=geom.gg;
   GG=geom.GG;
+  gdet=geom.gdet;gdetu=gdet;
+#if (GDETIN==0) //no metric determinant inside derivatives
+  gdetu=1.;
+#endif
 
-  ldouble gdet=gg[3][4]; 
   ldouble dlgdet[3];
   dlgdet[0]=gg[0][4]; //D[gdet,x1]/gdet
   dlgdet[1]=gg[1][4]; //D[gdet,x2]/gdet
@@ -361,14 +364,14 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(k=0;k<4;k++)
     for(l=0;l<4;l++)
       {
-	ss[1]+=T[k][l]*get_gKr(l,0,k,ix,iy,iz);
-	ss[2]+=T[k][l]*get_gKr(l,1,k,ix,iy,iz);
-	ss[3]+=T[k][l]*get_gKr(l,2,k,ix,iy,iz);
-	ss[4]+=T[k][l]*get_gKr(l,3,k,ix,iy,iz);
-	ss[6]+=Rij[k][l]*get_gKr(l,0,k,ix,iy,iz);
-	ss[7]+=Rij[k][l]*get_gKr(l,1,k,ix,iy,iz);
-	ss[8]+=Rij[k][l]*get_gKr(l,2,k,ix,iy,iz);
-	ss[9]+=Rij[k][l]*get_gKr(l,3,k,ix,iy,iz);
+	ss[1]+=gdetu*T[k][l]*get_gKr(l,0,k,ix,iy,iz);
+	ss[2]+=gdetu*T[k][l]*get_gKr(l,1,k,ix,iy,iz);
+	ss[3]+=gdetu*T[k][l]*get_gKr(l,2,k,ix,iy,iz);
+	ss[4]+=gdetu*T[k][l]*get_gKr(l,3,k,ix,iy,iz);
+	ss[6]+=gdetu*Rij[k][l]*get_gKr(l,0,k,ix,iy,iz);
+	ss[7]+=gdetu*Rij[k][l]*get_gKr(l,1,k,ix,iy,iz);
+	ss[8]+=gdetu*Rij[k][l]*get_gKr(l,2,k,ix,iy,iz);
+	ss[9]+=gdetu*Rij[k][l]*get_gKr(l,3,k,ix,iy,iz);
       }
 
   //terms with dloggdet
@@ -400,20 +403,20 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(k=0;k<4;k++)
     for(l=0;l<4;l++)
       {
-	ss[1]+=T[k][l]*get_gKr(l,0,k,ix,iy,iz);
-	ss[2]+=T[k][l]*get_gKr(l,1,k,ix,iy,iz);
-	ss[3]+=T[k][l]*get_gKr(l,2,k,ix,iy,iz);
-	ss[4]+=T[k][l]*get_gKr(l,3,k,ix,iy,iz);	 
+	ss[1]+=gdetu*T[k][l]*get_gKr(l,0,k,ix,iy,iz);
+	ss[2]+=gdetu*T[k][l]*get_gKr(l,1,k,ix,iy,iz);
+	ss[3]+=gdetu*T[k][l]*get_gKr(l,2,k,ix,iy,iz);
+	ss[4]+=gdetu*T[k][l]*get_gKr(l,3,k,ix,iy,iz);	 
       }
   //now radiation
   for(irf=0;irf<NRF;irf++)
     for(k=0;k<4;k++)
       for(l=0;l<4;l++)
 	{
-	  ss[EE(irf)]+=Rij[irf][k][l]*get_gKr(l,0,k,ix,iy,iz);
-	  ss[FX(irf)]+=Rij[irf][k][l]*get_gKr(l,1,k,ix,iy,iz);
-	  ss[FY(irf)]+=Rij[irf][k][l]*get_gKr(l,2,k,ix,iy,iz);
-	  ss[FZ(irf)]+=Rij[irf][k][l]*get_gKr(l,3,k,ix,iy,iz);
+	  ss[EE(irf)]+=gdetu*Rij[irf][k][l]*get_gKr(l,0,k,ix,iy,iz);
+	  ss[FX(irf)]+=gdetu*Rij[irf][k][l]*get_gKr(l,1,k,ix,iy,iz);
+	  ss[FY(irf)]+=gdetu*Rij[irf][k][l]*get_gKr(l,2,k,ix,iy,iz);
+	  ss[FZ(irf)]+=gdetu*Rij[irf][k][l]*get_gKr(l,3,k,ix,iy,iz);
 	}
 
   //terms with dloggdet
@@ -450,10 +453,10 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(k=0;k<4;k++)
     for(l=0;l<4;l++)
       {
-	ss[1]+=T[k][l]*get_gKr(l,0,k,ix,iy,iz);
-	ss[2]+=T[k][l]*get_gKr(l,1,k,ix,iy,iz);
-	ss[3]+=T[k][l]*get_gKr(l,2,k,ix,iy,iz);
-	ss[4]+=T[k][l]*get_gKr(l,3,k,ix,iy,iz);
+	ss[1]+=gdetu*T[k][l]*get_gKr(l,0,k,ix,iy,iz);
+	ss[2]+=gdetu*T[k][l]*get_gKr(l,1,k,ix,iy,iz);
+	ss[3]+=gdetu*T[k][l]*get_gKr(l,2,k,ix,iy,iz);
+	ss[4]+=gdetu*T[k][l]*get_gKr(l,3,k,ix,iy,iz);
       }
 
   //terms with dloggdet  
