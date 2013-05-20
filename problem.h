@@ -55,8 +55,23 @@
 //49* RVRING - 1d donut ring
 //50* HDWAVE - hydro wave for testing entropy
 //51* HUBBLE - hubble-type test as in the WHAM paper
+//52* SPHFLAT - spherical flat to test Christoffels
 
-#define PROBLEM 25
+#define PROBLEM 52
+
+#if(PROBLEM==52)
+
+#define PR_DEFINE "PROBLEMS/SPHFLAT/define.h"
+#define PR_BC "PROBLEMS/SPHFLAT/bc.c"
+#define PR_INIT "PROBLEMS/SPHFLAT/init.c"
+#define PR_KAPPA "PROBLEMS/SPHFLAT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/SPHFLAT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/SPHFLAT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/SPHFLAT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/SPHFLAT/dump.c"
+#define PR_TOOLS "PROBLEMS/SPHFLAT/tools.c"
+
+#endif
 
 #if(PROBLEM==51)
 
