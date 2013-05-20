@@ -376,14 +376,14 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
     {
       //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
       //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
-      ss[2]+=-dlgdet[l-1]*(T[l][1]);
-      ss[3]+=-dlgdet[l-1]*(T[l][2]);
-      ss[4]+=-dlgdet[l-1]*(T[l][3]);
+      //ss[2]+=-dlgdet[l-1]*(T[l][1]);
+      //ss[3]+=-dlgdet[l-1]*(T[l][2]);
+      //ss[4]+=-dlgdet[l-1]*(T[l][3]);
       //ss[5]+=-dlgdet[l-1]*S*ucon[l];
-      ss[6]+=-dlgdet[l-1]*(Rij[l][0]);
-      ss[7]+=-dlgdet[l-1]*(Rij[l][1]);
-      ss[8]+=-dlgdet[l-1]*(Rij[l][2]);
-      ss[9]+=-dlgdet[l-1]*(Rij[l][3]);
+      //ss[6]+=-dlgdet[l-1]*(Rij[l][0]);
+      //ss[7]+=-dlgdet[l-1]*(Rij[l][1]);
+      //ss[8]+=-dlgdet[l-1]*(Rij[l][2]);
+      //ss[9]+=-dlgdet[l-1]*(Rij[l][3]);
     }
 #else
   int irf;
@@ -419,9 +419,9 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
     {
       //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
       //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
-      ss[2]+=-dlgdet[l-1]*(T[l][1]);
-      ss[3]+=-dlgdet[l-1]*(T[l][2]);
-      ss[4]+=-dlgdet[l-1]*(T[l][3]);
+      //ss[2]+=-dlgdet[l-1]*(T[l][1]);
+      //ss[3]+=-dlgdet[l-1]*(T[l][2]);
+      //ss[4]+=-dlgdet[l-1]*(T[l][3]);
       //ss[5]+=-dlgdet[l-1]*S*ucon[l];
     }
 
@@ -429,10 +429,10 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   for(irf=0;irf<NRF;irf++)
     for(l=1;l<4;l++)
       {
-	ss[EE(irf)]+=-dlgdet[l-1]*(Rij[irf][l][0]);
-	ss[FX(irf)]+=-dlgdet[l-1]*(Rij[irf][l][1]);
-	ss[FY(irf)]+=-dlgdet[l-1]*(Rij[irf][l][2]);
-	ss[FZ(irf)]+=-dlgdet[l-1]*(Rij[irf][l][3]);
+	//ss[EE(irf)]+=-dlgdet[l-1]*(Rij[irf][l][0]);
+	//ss[FX(irf)]+=-dlgdet[l-1]*(Rij[irf][l][1]);
+	//ss[FY(irf)]+=-dlgdet[l-1]*(Rij[irf][l][2]);
+	//ss[FZ(irf)]+=-dlgdet[l-1]*(Rij[irf][l][3]);
       }
 
 #endif
@@ -456,9 +456,9 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
     {
       //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
       //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
-      ss[2]+=-dlgdet[l-1]*(T[l][1]);
-      ss[3]+=-dlgdet[l-1]*(T[l][2]);
-      ss[4]+=-dlgdet[l-1]*(T[l][3]);
+      //ss[2]+=-dlgdet[l-1]*(T[l][1]);
+      //ss[3]+=-dlgdet[l-1]*(T[l][2]);
+      //ss[4]+=-dlgdet[l-1]*(T[l][3]);
       //ss[5]+=-dlgdet[l-1]*S*ucon[l];
     }   
 
@@ -549,29 +549,29 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[1]= gdet*(T[1][0]+rho*u1);
 
-      ff[2]= (T[1][1]);
+      ff[2]= gdet*(T[1][1]);
 
-      ff[3]= (T[1][2]);
+      ff[3]= gdet*(T[1][2]);
  
-      ff[4]= (T[1][3]);
+      ff[4]= gdet*(T[1][3]);
 
       ff[5]= gdet*S*u1;
 
 #ifndef MULTIRADFLUID
-      ff[6]= Rij[1][0];
+      ff[6]= gdet*Rij[1][0];
       
-      ff[7]= Rij[1][1];
+      ff[7]= gdet*Rij[1][1];
       
-      ff[8]= Rij[1][2];
+      ff[8]= gdet*Rij[1][2];
       
-      ff[9]= Rij[1][3];
+      ff[9]= gdet*Rij[1][3];
 #else
       for(irf=0;irf<NRF;irf++)
 	{
-	  ff[EE(irf)]=Rij[irf][1][0];
-	  ff[FX(irf)]=Rij[irf][1][1];
-	  ff[FY(irf)]=Rij[irf][1][2];
-	  ff[FZ(irf)]=Rij[irf][1][3];
+	  ff[EE(irf)]=gdet*Rij[irf][1][0];
+	  ff[FX(irf)]=gdet*Rij[irf][1][1];
+	  ff[FY(irf)]=gdet*Rij[irf][1][2];
+	  ff[FZ(irf)]=gdet*Rij[irf][1][3];
 	}
 #endif
     }  
@@ -581,29 +581,29 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[1]= gdet*(T[2][0]+rho*u2);
 
-      ff[2]= (T[2][1]);
+      ff[2]= gdet*(T[2][1]);
 
-      ff[3]= (T[2][2]);
+      ff[3]= gdet*(T[2][2]);
 
-      ff[4]= (T[2][3]);
+      ff[4]= gdet*(T[2][3]);
 
       ff[5]= gdet*S*u2;
  
 #ifndef MULTIRADFLUID
-      ff[6]= Rij[2][0];
+      ff[6]= gdet*Rij[2][0];
       
-      ff[7]= Rij[2][1];
+      ff[7]= gdet*Rij[2][1];
       
-      ff[8]= Rij[2][2];
+      ff[8]= gdet*Rij[2][2];
       
-      ff[9]= Rij[2][3];
+      ff[9]= gdet*Rij[2][3];
 #else
       for(irf=0;irf<NRF;irf++)
 	{
-	  ff[EE(irf)]=Rij[irf][2][0];
-	  ff[FX(irf)]=Rij[irf][2][1];
-	  ff[FY(irf)]=Rij[irf][2][2];
-	  ff[FZ(irf)]=Rij[irf][2][3];
+	  ff[EE(irf)]=gdet*Rij[irf][2][0];
+	  ff[FX(irf)]=gdet*Rij[irf][2][1];
+	  ff[FY(irf)]=gdet*Rij[irf][2][2];
+	  ff[FZ(irf)]=gdet*Rij[irf][2][3];
 	}
 #endif
     }  
@@ -613,29 +613,29 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[1]= gdet*(T[3][0]+rho*u3);
  
-      ff[2]= (T[3][1]);
+      ff[2]= gdet*(T[3][1]);
 
-      ff[3]= (T[3][2]);
+      ff[3]= gdet*(T[3][2]);
  
-      ff[4]= (T[3][3]);
+      ff[4]= gdet*(T[3][3]);
 
       ff[5]= gdet*S*u3;
  
 #ifndef MULTIRADFLUID
-      ff[6]= Rij[3][0];
+      ff[6]= gdet*Rij[3][0];
       
-      ff[7]= Rij[3][1];
+      ff[7]= gdet*Rij[3][1];
       
-      ff[8]= Rij[3][2];
+      ff[8]= gdet*Rij[3][2];
        
-      ff[9]= Rij[3][3];
+      ff[9]= gdet*Rij[3][3];
 #else
       for(irf=0;irf<NRF;irf++)
 	{
-	  ff[EE(irf)]=Rij[irf][3][0];
-	  ff[FX(irf)]=Rij[irf][3][1];
-	  ff[FY(irf)]=Rij[irf][3][2];
-	  ff[FZ(irf)]=Rij[irf][3][3];
+	  ff[EE(irf)]=gdet*Rij[irf][3][0];
+	  ff[FX(irf)]=gdet*Rij[irf][3][1];
+	  ff[FY(irf)]=gdet*Rij[irf][3][2];
+	  ff[FZ(irf)]=gdet*Rij[irf][3][3];
 	}
 #endif
     } 
@@ -648,11 +648,11 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[1]= gdet*(T[1][0]+rho*u1);
 
-      ff[2]= (T[1][1]);
+      ff[2]= gdet*(T[1][1]);
 
-      ff[3]= (T[1][2]);
+      ff[3]= gdet*(T[1][2]);
  
-      ff[4]= (T[1][3]);
+      ff[4]= gdet*(T[1][3]);
 
       ff[5]= gdet*S*u1;
     }  
@@ -662,11 +662,11 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[1]= gdet*(T[2][0]+rho*u2);
 
-      ff[2]= (T[2][1]);
+      ff[2]= gdet*(T[2][1]);
 
-      ff[3]= (T[2][2]);
+      ff[3]= gdet*(T[2][2]);
 
-      ff[4]= (T[2][3]);
+      ff[4]= gdet*(T[2][3]);
 
       ff[5]= gdet*S*u2;
     }  
@@ -676,11 +676,11 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
       ff[1]= gdet*(T[3][0]+rho*u3);
  
-      ff[2]= (T[3][1]);
+      ff[2]= gdet*(T[3][1]);
 
-      ff[3]= (T[3][2]);
+      ff[3]= gdet*(T[3][2]);
  
-      ff[4]= (T[3][3]);
+      ff[4]= gdet*(T[3][3]);
 
       ff[5]= gdet*S*u3;
     } 

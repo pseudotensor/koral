@@ -582,9 +582,9 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
 
   //Q_mu
   Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
-  Qcov[1]=uu[2]*alpha;
-  Qcov[2]=uu[3]*alpha;
-  Qcov[3]=uu[4]*alpha;
+  Qcov[1]=uu[2]/gdet*alpha;
+  Qcov[2]=uu[3]/gdet*alpha;
+  Qcov[3]=uu[4]/gdet*alpha;
 
   //Q^mu
   indices_12(Qcov,Qcon,GG);
@@ -815,10 +815,10 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   ldouble gphph=g[3][3];
 
   ldouble rhout=uuu[0]/gdet;
-  ldouble Tttt=uuu[1]; //this one unused
-  ldouble Ttr=uuu[2];
-  ldouble Ttth=uuu[3];
-  ldouble Ttph=uuu[4];
+  ldouble Tttt=uuu[1]/gdet; //this one unused
+  ldouble Ttr=uuu[2]/gdet;
+  ldouble Ttth=uuu[3]/gdet;
+  ldouble Ttph=uuu[4]/gdet;
   ldouble Sut=uuu[5]/gdet;
 
  
@@ -1043,10 +1043,10 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble gdet=g[3][4];
 
   ldouble rhout=uuu[0]/gdet;
-  ldouble Tttt=uuu[1]; 
-  ldouble Ttr=uuu[2];
-  ldouble Ttth=uuu[3];
-  ldouble Ttph=uuu[4];
+  ldouble Tttt=uuu[1]/gdet; 
+  ldouble Ttr=uuu[2]/gdet;
+  ldouble Ttth=uuu[3]/gdet;
+  ldouble Ttph=uuu[4]/gdet;
   ldouble Sut=uuu[5]/gdet;
   ldouble Ttt=Tttt+rhout;
 
@@ -1463,11 +1463,12 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   struct geometry *geom
     = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdet;
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
+  gdet=geom->gdet;
 
   int irf,verbose=0;
 
@@ -1480,7 +1481,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       ldouble Rij[4][4];
       ldouble urfcon[4],urfcov[4],Erf;
       //conserved - R^t_mu
-      ldouble Avcov[4]={uu[EE(irf)],uu[FX(irf)],uu[FY(irf)],uu[FZ(irf)]};
+      ldouble Avcov[4]={uu[EE(irf)]/gdet,uu[FX(irf)]/gdet,uu[FY(irf)]/gdet,uu[FZ(irf)]/gdet};
       ldouble Avcon[4];
       //indices up - R^tmu
       indices_12(Avcov,Avcon,GG);
@@ -1523,11 +1524,12 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   struct geometry *geom
     = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdet;
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
+  gdet=geom->gdet;
 
   int irf;
 
@@ -1544,7 +1546,7 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       ldouble urfcon[4],urfcov[4],Erf;
       ldouble alpha = sqrt(-1./GG[0][0]);
       //conserved - R^t_mu
-      ldouble Av[4]={uu[EE(irf)],uu[FX(irf)],uu[FY(irf)],uu[FZ(irf)]};
+      ldouble Av[4]={uu[EE(irf)]/gdet,uu[FX(irf)]/gdet,uu[FY(irf)]/gdet,uu[FZ(irf)]/gdet};
       //indices up - R^tmu
       indices_12(Av,Av,GG);
 
@@ -1909,7 +1911,7 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
   W=gdet*ucon[0];
-  ldouble Rcon[4],Rcov[4]={uu[6]*gdet, uu[7]*gdet, uu[8]*gdet, uu[9]*gdet};
+  ldouble Rcon[4],Rcov[4]={uu[6], uu[7], uu[8], uu[9]};
   indices_12(Rcov,Rcon,GG);
   ldouble EE, Fcon[4],Fcov[4];
 
@@ -2314,9 +2316,9 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   //Q_mu
   Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
-  Qcov[1]=uu[2]*alpha;
-  Qcov[2]=uu[3]*alpha;
-  Qcov[3]=uu[4]*alpha;
+  Qcov[1]=uu[2]/gdet*alpha;
+  Qcov[2]=uu[3]/gdet*alpha;
+  Qcov[3]=uu[4]/gdet*alpha;
 
   //Q^mu
   indices_12(Qcov,Qcon,GG);
@@ -2653,9 +2655,9 @@ u2p_cold_myharm(ldouble *uu, ldouble *pp, void *ggg)
 
   //Q_mu
   Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
-  Qcov[1]=uu[2]*alpha;
-  Qcov[2]=uu[3]*alpha;
-  Qcov[3]=uu[4]*alpha;
+  Qcov[1]=uu[2]/gdet*alpha;
+  Qcov[2]=uu[3]/gdet*alpha;
+  Qcov[3]=uu[4]/gdet*alpha;
 
   //Q^mu
   indices_12(Qcov,Qcon,GG);
