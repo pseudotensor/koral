@@ -36,12 +36,12 @@
 #define NX 70
 #endif
 
-#define NY 48
+#define NY 1
 #define NZ 1
 
 
-#define MINY (0.005*Pi/4.)
-#define MAXY Pi/2.
+#define MINY (Pi/2.-0.005*Pi/4.)
+#define MAXY (Pi/2.+0.005*Pi/4.)
 #define MINZ -1.
 #define MAXZ 1.
 
@@ -61,11 +61,12 @@
 
 #define GDETIN 1
 
-//#define ENFORCEENTROPY
-//#define FLUXMETHOD HLL_FLUX
+#define ENFORCEENTROPY
+#define WAVESPEEDSATFACES
+#define FLUXMETHOD HLL_FLUX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 2.
 
 #define NODONUT 0
 #define INFLOWING 0

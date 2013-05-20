@@ -2406,7 +2406,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   ldouble wmrho0 = w - rho0; //u+p
 
   //1d Newton solver
-  ldouble CONV=1.e-6;
+  ldouble CONV=1.e-8;
   ldouble EPS=1.e-6;
   ldouble Wpprev=Wp,Wpprev2=Wp;
   ldouble f0,f1,dfdWp,Wpnew,v2,ut2;
@@ -2525,7 +2525,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
     }
   //  while(( fabs((Wp-Wpprev)/Wpprev)>CONV || u<0. || rho<0.) && iter<50);
   while(( fabs((Wp-Wpprev)/Wpprev)>CONV) && iter<50);
-
+  
   if(iter>=50)
     {
       if(verbose>0 || 1) printf("iter exceeded in u2p_entropy_harm at %d %d %d\n",geom->ix,geom->iy,geom->iz);

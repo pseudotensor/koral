@@ -1048,7 +1048,9 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 #endif
 
       if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
-	fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
+	{
+	  fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
+	}
       if (FLUXMETHOD==HLL_FLUX) //HLL
 	{
 	  if(al>0.) 

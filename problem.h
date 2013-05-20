@@ -56,8 +56,23 @@
 //50* HDWAVE - hydro wave for testing entropy
 //51* HUBBLE - hubble-type test as in the WHAM paper
 //52* SPHFLAT - spherical flat to test Christoffels
+//53* 1DDONUT - 1d donut equatorial plane structure
 
-#define PROBLEM 52
+#define PROBLEM 53
+
+#if(PROBLEM==53)
+
+#define PR_DEFINE "PROBLEMS/1DDONUT/define.h"
+#define PR_BC "PROBLEMS/1DDONUT/bc.c"
+#define PR_INIT "PROBLEMS/1DDONUT/init.c"
+#define PR_KAPPA "PROBLEMS/1DDONUT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/1DDONUT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/1DDONUT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/1DDONUT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/1DDONUT/dump.c"
+#define PR_TOOLS "PROBLEMS/1DDONUT/tools.c"
+
+#endif
 
 #if(PROBLEM==52)
 
