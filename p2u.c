@@ -101,6 +101,11 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble Ttth =w*ucon[0]*ucov[2];
   ldouble Ttph =w*ucon[0]*ucov[3];
    
+#if (GDETIN==0) //gdet out of derivatives
+  gdet=1.;
+#endif
+
+
   u[0]=gdet*rhout;
   u[1]=gdet*Tttt;
   u[2]=gdet*Ttr;
@@ -128,7 +133,11 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   tlo=geom->tlo;
   tup=geom->tup;
   gdet=geom->gdet;
-  
+
+#if (GDETIN==0) //gdet out of derivatives
+  gdet=1.;
+#endif
+ 
 #ifdef LABRADFLUXES
   
   u[6]=gdet*p[6]; //R^t_t

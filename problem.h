@@ -1054,8 +1054,16 @@
 #define MFWEDGESTYPE 1
 #endif
 
+#ifndef GDETIN
+#define GDETIN 1
+#endif
+
 #ifndef MODYFIKUJKRZYSIE
+#if (GDETIN==1)
+#define MODYFIKUJKRZYSIE 1
+#else
 #define MODYFIKUJKRZYSIE 0
+#endif
 #endif
 
 #define NUMEPSILON DBL_EPSILON

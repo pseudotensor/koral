@@ -560,10 +560,13 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
    struct geometry *geom
    = (struct geometry *) ggg;
 
-   ldouble (*gg)[5],(*GG)[5],gdet;
+   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
-  gdet=geom->gdet;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   int verbose=0;
   int i,j,k;
@@ -578,13 +581,13 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   alpha=sqrt(-1./GG[0][0]);
 
   //D
-  D=uu[0]/gdet*alpha; //uu[0]=gdet rho ut
+  D=uu[0]/gdetu*alpha; //uu[0]=gdetu rho ut
 
   //Q_mu
-  Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
-  Qcov[1]=uu[2]/gdet*alpha;
-  Qcov[2]=uu[3]/gdet*alpha;
-  Qcov[3]=uu[4]/gdet*alpha;
+  Qcov[0]=(uu[1]/gdetu-uu[0]/gdetu)*alpha;
+  Qcov[1]=uu[2]/gdetu*alpha;
+  Qcov[2]=uu[3]/gdetu*alpha;
+  Qcov[3]=uu[4]/gdetu*alpha;
 
   //Q^mu
   indices_12(Qcov,Qcon,GG);
@@ -789,10 +792,13 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*g)[5],(*G)[5],gdet;
+  ldouble (*g)[5],(*G)[5],gdet,gdetu;
   g=geom->gg;
   G=geom->GG;
-  gdet=geom->gdet;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   ldouble gtt=g[0][0];
   ldouble gtr=g[0][1];
@@ -814,12 +820,12 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   ldouble gphth=g[3][2];
   ldouble gphph=g[3][3];
 
-  ldouble rhout=uuu[0]/gdet;
-  ldouble Tttt=uuu[1]/gdet; //this one unused
-  ldouble Ttr=uuu[2]/gdet;
-  ldouble Ttth=uuu[3]/gdet;
-  ldouble Ttph=uuu[4]/gdet;
-  ldouble Sut=uuu[5]/gdet;
+  ldouble rhout=uuu[0]/gdetu;
+  ldouble Tttt=uuu[1]/gdetu; //this one unused
+  ldouble Ttr=uuu[2]/gdetu;
+  ldouble Ttth=uuu[3]/gdetu;
+  ldouble Ttph=uuu[4]/gdetu;
+  ldouble Sut=uuu[5]/gdetu;
 
  
   conv_velsinprims(p,VELPRIM,VEL3,g,G);
@@ -1041,13 +1047,17 @@ u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
   ldouble gphph=g[3][3];
 
   ldouble gdet=g[3][4];
+  ldouble gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
-  ldouble rhout=uuu[0]/gdet;
-  ldouble Tttt=uuu[1]/gdet; 
-  ldouble Ttr=uuu[2]/gdet;
-  ldouble Ttth=uuu[3]/gdet;
-  ldouble Ttph=uuu[4]/gdet;
-  ldouble Sut=uuu[5]/gdet;
+  ldouble rhout=uuu[0]/gdetu;
+  ldouble Tttt=uuu[1]/gdetu; 
+  ldouble Ttr=uuu[2]/gdetu;
+  ldouble Ttth=uuu[3]/gdetu;
+  ldouble Ttph=uuu[4]/gdetu;
+  ldouble Sut=uuu[5]/gdetu;
   ldouble Ttt=Tttt+rhout;
 
   //  conv_velsinprims(p,VELPRIM,VEL3,g,G);
@@ -1463,12 +1473,15 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   struct geometry *geom
     = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdet;
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
-  gdet=geom->gdet;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   int irf,verbose=0;
 
@@ -1481,7 +1494,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       ldouble Rij[4][4];
       ldouble urfcon[4],urfcov[4],Erf;
       //conserved - R^t_mu
-      ldouble Avcov[4]={uu[EE(irf)]/gdet,uu[FX(irf)]/gdet,uu[FY(irf)]/gdet,uu[FZ(irf)]/gdet};
+      ldouble Avcov[4]={uu[EE(irf)]/gdetu,uu[FX(irf)]/gdetu,uu[FY(irf)]/gdetu,uu[FZ(irf)]/gdetu};
       ldouble Avcon[4];
       //indices up - R^tmu
       indices_12(Avcov,Avcon,GG);
@@ -1524,12 +1537,15 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   struct geometry *geom
     = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdet;
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
-  gdet=geom->gdet;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   int irf;
 
@@ -1546,7 +1562,7 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       ldouble urfcon[4],urfcov[4],Erf;
       ldouble alpha = sqrt(-1./GG[0][0]);
       //conserved - R^t_mu
-      ldouble Av[4]={uu[EE(irf)]/gdet,uu[FX(irf)]/gdet,uu[FY(irf)]/gdet,uu[FZ(irf)]/gdet};
+      ldouble Av[4]={uu[EE(irf)]/gdetu,uu[FX(irf)]/gdetu,uu[FY(irf)]/gdetu,uu[FZ(irf)]/gdetu};
       //indices up - R^tmu
       indices_12(Av,Av,GG);
 
@@ -1902,16 +1918,19 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   struct geometry *geom
     = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],gdet,W;
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu,W;
   gg=geom->gg;
   GG=geom->GG;
-  gdet=geom->gdet;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
   W=gdet*ucon[0];
-  ldouble Rcon[4],Rcov[4]={uu[6], uu[7], uu[8], uu[9]};
+  ldouble Rcon[4],Rcov[4]={uu[6]/gdetu*gdet, uu[7]/gdetu*gdet, uu[8]/gdetu*gdet, uu[9]/gdetu*gdet};
   indices_12(Rcov,Rcon,GG);
   ldouble EE, Fcon[4],Fcov[4];
 
@@ -2279,10 +2298,13 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],gdet;
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
-  gdet=geom->gdet;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   int verbose=0;
   int superverbose=0;
@@ -2309,16 +2331,16 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   alpha=sqrt(-1./GG[0][0]);
   
   //conserved entropy "S u^t"
-  Sc=uu[5]/gdet*alpha; 
+  Sc=uu[5]/gdetu*alpha; 
 
   //D
-  D=uu[0]/gdet*alpha;
+  D=uu[0]/gdetu*alpha;
 
   //Q_mu
-  Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
-  Qcov[1]=uu[2]/gdet*alpha;
-  Qcov[2]=uu[3]/gdet*alpha;
-  Qcov[3]=uu[4]/gdet*alpha;
+  Qcov[0]=(uu[1]/gdetu-uu[0]/gdetu)*alpha;
+  Qcov[1]=uu[2]/gdetu*alpha;
+  Qcov[2]=uu[3]/gdetu*alpha;
+  Qcov[3]=uu[4]/gdetu*alpha;
 
   //Q^mu
   indices_12(Qcov,Qcon,GG);
@@ -2618,10 +2640,13 @@ u2p_cold_myharm(ldouble *uu, ldouble *pp, void *ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],gdet;
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
-  gdet=geom->gdet;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   int verbose=2;
   int superverbose=1;
@@ -2648,16 +2673,16 @@ u2p_cold_myharm(ldouble *uu, ldouble *pp, void *ggg)
   alpha=sqrt(-1./GG[0][0]);
   
   //conserved entopy "S u^t"
-  Sc=uu[5]/gdet*alpha; //alpha?
+  Sc=uu[5]/gdetu*alpha; //alpha?
 
   //D
-  D=uu[0]/gdet*alpha;
+  D=uu[0]/gdetu*alpha;
 
   //Q_mu
-  Qcov[0]=(uu[1]/gdet-uu[0]/gdet)*alpha;
-  Qcov[1]=uu[2]/gdet*alpha;
-  Qcov[2]=uu[3]/gdet*alpha;
-  Qcov[3]=uu[4]/gdet*alpha;
+  Qcov[0]=(uu[1]/gdetu-uu[0]/gdetu)*alpha;
+  Qcov[1]=uu[2]/gdetu*alpha;
+  Qcov[2]=uu[3]/gdetu*alpha;
+  Qcov[3]=uu[4]/gdetu*alpha;
 
   //Q^mu
   indices_12(Qcov,Qcon,GG);

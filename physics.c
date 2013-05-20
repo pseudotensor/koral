@@ -372,19 +372,22 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
       }
 
   //terms with dloggdet
+#if (GDETIN==1)
   for(l=1;l<4;l++)
     {
-      //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
-      //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
-      //ss[2]+=-dlgdet[l-1]*(T[l][1]);
-      //ss[3]+=-dlgdet[l-1]*(T[l][2]);
-      //ss[4]+=-dlgdet[l-1]*(T[l][3]);
-      //ss[5]+=-dlgdet[l-1]*S*ucon[l];
-      //ss[6]+=-dlgdet[l-1]*(Rij[l][0]);
-      //ss[7]+=-dlgdet[l-1]*(Rij[l][1]);
-      //ss[8]+=-dlgdet[l-1]*(Rij[l][2]);
-      //ss[9]+=-dlgdet[l-1]*(Rij[l][3]);
+      ss[0]+=-dlgdet[l-1]*rho*ucon[l];
+      ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
+      ss[2]+=-dlgdet[l-1]*(T[l][1]);
+      ss[3]+=-dlgdet[l-1]*(T[l][2]);
+      ss[4]+=-dlgdet[l-1]*(T[l][3]);
+      ss[5]+=-dlgdet[l-1]*S*ucon[l];
+      ss[6]+=-dlgdet[l-1]*(Rij[l][0]);
+      ss[7]+=-dlgdet[l-1]*(Rij[l][1]);
+      ss[8]+=-dlgdet[l-1]*(Rij[l][2]);
+      ss[9]+=-dlgdet[l-1]*(Rij[l][3]);
     }
+#endif
+
 #else
   int irf;
   ldouble Rij[NRF][4][4];
@@ -414,26 +417,28 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 	}
 
   //terms with dloggdet
+#if (GDETIN==1)
   //hydro first
   for(l=1;l<4;l++)
     {
-      //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
-      //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
-      //ss[2]+=-dlgdet[l-1]*(T[l][1]);
-      //ss[3]+=-dlgdet[l-1]*(T[l][2]);
-      //ss[4]+=-dlgdet[l-1]*(T[l][3]);
-      //ss[5]+=-dlgdet[l-1]*S*ucon[l];
+      ss[0]+=-dlgdet[l-1]*rho*ucon[l];
+      ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
+      ss[2]+=-dlgdet[l-1]*(T[l][1]);
+      ss[3]+=-dlgdet[l-1]*(T[l][2]);
+      ss[4]+=-dlgdet[l-1]*(T[l][3]);
+      ss[5]+=-dlgdet[l-1]*S*ucon[l];
     }
 
   //rad now
   for(irf=0;irf<NRF;irf++)
     for(l=1;l<4;l++)
       {
-	//ss[EE(irf)]+=-dlgdet[l-1]*(Rij[irf][l][0]);
-	//ss[FX(irf)]+=-dlgdet[l-1]*(Rij[irf][l][1]);
-	//ss[FY(irf)]+=-dlgdet[l-1]*(Rij[irf][l][2]);
-	//ss[FZ(irf)]+=-dlgdet[l-1]*(Rij[irf][l][3]);
+	ss[EE(irf)]+=-dlgdet[l-1]*(Rij[irf][l][0]);
+	ss[FX(irf)]+=-dlgdet[l-1]*(Rij[irf][l][1]);
+	ss[FY(irf)]+=-dlgdet[l-1]*(Rij[irf][l][2]);
+	ss[FZ(irf)]+=-dlgdet[l-1]*(Rij[irf][l][3]);
       }
+#endif
 
 #endif
 
@@ -452,15 +457,17 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
       }
 
   //terms with dloggdet  
+#if (GDETIN==1)
   for(l=1;l<4;l++)
     {
-      //ss[0]+=-dlgdet[l-1]*rho*ucon[l];
-      //ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
-      //ss[2]+=-dlgdet[l-1]*(T[l][1]);
-      //ss[3]+=-dlgdet[l-1]*(T[l][2]);
-      //ss[4]+=-dlgdet[l-1]*(T[l][3]);
-      //ss[5]+=-dlgdet[l-1]*S*ucon[l];
+      ss[0]+=-dlgdet[l-1]*rho*ucon[l];
+      ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
+      ss[2]+=-dlgdet[l-1]*(T[l][1]);
+      ss[3]+=-dlgdet[l-1]*(T[l][2]);
+      ss[4]+=-dlgdet[l-1]*(T[l][3]);
+      ss[5]+=-dlgdet[l-1]*S*ucon[l];
     }   
+#endif
 
   /***************************************************/
 #endif
@@ -542,6 +549,9 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
   //to move gdet in/out derivative:
   //here, up in metric source terms, in u2p and p2u, as well as in finite.c with del4[]
+#if (GDETIN==0) //no metric determinant inside derivatives
+  gdet=1.;
+#endif
 
    if(idim==0) //x
     {

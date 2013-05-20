@@ -11,7 +11,6 @@
 #define TSTEPLIM .5
 #define NOUTSTOP 30
 
-#define SPECIFIC_BC
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define DTOUT1 5.e0
