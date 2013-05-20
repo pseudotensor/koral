@@ -127,23 +127,23 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
    struct geometry *geom
    = (struct geometry *) ggg;
 
-   ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdet;
+   ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
-  gdet=geom->gdet;
+  gdet=geom->gdet;gdetu=gdet;
 
 #if (GDETIN==0) //gdet out of derivatives
-  gdet=1.;
+  gdetu=1.;
 #endif
  
 #ifdef LABRADFLUXES
   
-  u[6]=gdet*p[6]; //R^t_t
-  u[7]=gdet*p[7]; //R^t_i
-  u[8]=gdet*p[8];
-  u[9]=gdet*p[9];
+  u[6]=gdetu*p[6]; //R^t_t
+  u[7]=gdetu*p[7]; //R^t_i
+  u[8]=gdetu*p[8];
+  u[9]=gdetu*p[9];
   return 0;
  
 #endif
@@ -171,10 +171,10 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   //  print_4vector(ucon);
   //  print_4vector(Fcon);
       
-  u[6]=gdet*Rij[0][0];
-  u[7]=gdet*Rij[0][1];
-  u[8]=gdet*Rij[0][2];
-  u[9]=gdet*Rij[0][3];
+  u[6]=gdetu*Rij[0][0];
+  u[7]=gdetu*Rij[0][1];
+  u[8]=gdetu*Rij[0][2];
+  u[9]=gdetu*Rij[0][3];
 
   return 0;
 #endif
@@ -202,10 +202,10 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
 
       indices_21(Rtop,Rtop,gg); //R^t_mu
 
-      u[EE(irf)]=gdet*Rtop[0]; //R^t_t
-      u[FX(irf)]=gdet*Rtop[1]; //R^t_i
-      u[FY(irf)]=gdet*Rtop[2];
-      u[FZ(irf)]=gdet*Rtop[3];
+      u[EE(irf)]=gdetu*Rtop[0]; //R^t_t
+      u[FX(irf)]=gdetu*Rtop[1]; //R^t_i
+      u[FY(irf)]=gdetu*Rtop[2];
+      u[FZ(irf)]=gdetu*Rtop[3];
     }
 
   return 0;

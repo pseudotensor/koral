@@ -15,17 +15,20 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define RK2_STEPPING
+#define TIMESTEPPING RK2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
-
+#define MINMOD_THETA 1.5
+#define FLUXMETHOD HLL_FLUX
+//#define WAVESPEEDSATFACES //not working for radiation yet!
+#define GDETIN 0 //1 does not work with radiation for some reason
+ 
 /************************************/
 //hd floors
 /************************************/
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e3
-#define EERHORATIOMIN 1.e-7
+#define EERHORATIOMIN 1.e-15
 #define EERHORATIOMAX 1.e3
 
 /************************************/
@@ -50,9 +53,8 @@
 #define MYCOORDS MKS1COORDS
 #define MKS1R0 -2.
 #define MINX (log(1.25-MKS1R0))
-//#define MAXX (log(15.3-MKS1R0))
-#define NX 80
-#define NY 40
+#define NX 40
+#define NY 20
 #define NZ 1
 #else //Scharzschild
 #define MYCOORDS SCHWCOORDS
@@ -91,7 +93,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 2
+#define NDONUT 3
 
 /************************************/
 #if (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
@@ -235,10 +237,10 @@
 /************************************/
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
-#undef NX
-#define NX 120
-#undef NY
-#define NY 100
+//#undef NX
+//#define NX 120
+//#undef NY
+//#define NY 100
 #define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
@@ -246,8 +248,8 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e1
-#define RHOATMMIN  1.e-23
+#define DTOUT1 5.e0
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
 

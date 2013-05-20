@@ -59,9 +59,14 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldo
   struct geometry *geom
     = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
+  gdet=geom->gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
 
   ldouble Rij[4][4];
   ldouble pp2[NV];
@@ -86,10 +91,10 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldo
 
   //printf("Gi: ");print_4vector(Gi);
  
-  f[0] = uu[6] - uu0[6] + dt * Gi[0];
-  f[1] = uu[7] - uu0[7] + dt * Gi[1];
-  f[2] = uu[8] - uu0[8] + dt * Gi[2];
-  f[3] = uu[9] - uu0[9] + dt * Gi[3];
+  f[0] = uu[6] - uu0[6] + dt * gdetu * Gi[0];
+  f[1] = uu[7] - uu0[7] + dt * gdetu * Gi[1];
+  f[2] = uu[8] - uu0[8] + dt * gdetu * Gi[2];
+  f[3] = uu[9] - uu0[9] + dt * gdetu * Gi[3];
  
   return 0;
 } 
@@ -437,16 +442,19 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 {
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom.gg;
   GG=geom.GG;
+  gdet=geom.gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   int i1,i2,i3,iv;
   ldouble pp[NV];
   ldouble eup[4][4],elo[4][4];
   pick_T(emuup,ix,iy,iz,eup);
   pick_T(emulo,ix,iy,iz,elo);
-  ldouble gdet=gg[3][4];
 
   for(iv=0;iv<NV;iv++)
     {
@@ -456,10 +464,10 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   ldouble Gi[4];
   calc_Gi(pp,&geom,Gi);
   
-  deltas[0]=-Gi[0]*dt;
-  deltas[1]=-Gi[1]*dt;
-  deltas[2]=-Gi[2]*dt;
-  deltas[3]=-Gi[3]*dt;
+  deltas[0]=-Gi[0]*dt*gdetu;
+  deltas[1]=-Gi[1]*dt*gdetu;
+  deltas[2]=-Gi[2]*dt*gdetu;
+  deltas[3]=-Gi[3]*dt*gdetu;
 
 
   return 0;

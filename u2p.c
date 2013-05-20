@@ -275,7 +275,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
-  int verbose=1;
+  int verbose=0;
   int ret=0;
 
   struct geometry *geom
@@ -305,9 +305,9 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
     }
 
   //rho relative to rho max
-//TODO: calculate rho max
-  ldouble rhomax=100.;
-  if(pp[0]<RHORHOMAXRATIOMIN*rhomax) {pp[0]=RHORHOMAXRATIOMIN*rhomax; ret=-1; if(verbose) printf("hd_floors CASE 5\n");}
+  //TODO: calculate rho max
+  //ldouble rhomax=100.;
+  //if(pp[0]<RHORHOMAXRATIOMIN*rhomax) {pp[0]=RHORHOMAXRATIOMIN*rhomax; ret=-1; if(verbose) printf("hd_floors CASE 5\n");}
 
 
 #ifdef RADIATION
@@ -561,8 +561,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
    = (struct geometry *) ggg;
 
    ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
-  gg=geom->gg;
-  GG=geom->GG;
+  gg=geom->gg;  GG=geom->GG;
   gdet=geom->gdet;gdetu=gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
