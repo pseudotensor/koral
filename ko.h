@@ -305,6 +305,7 @@ int dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4]);
 int calc_g(ldouble*,ldouble[][5]);
 int calc_G(ldouble*,ldouble[][5]);
 int calc_Krzysie(ldouble*,ldouble[][4][4]);
+int calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4]);
 int calc_g_arb(ldouble*,ldouble[][5],int);
 int calc_G_arb(ldouble*,ldouble[][5],int);
 int calc_Krzysie_arb(ldouble*,ldouble[][4][4],int);

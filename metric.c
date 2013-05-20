@@ -581,6 +581,7 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
   calc_Krzysie_arb(xx,Krzys,MYCOORDS);
 #else
   ldouble xx[4];
+  ldouble Krzys_org[4][4][4];
 
   //analytical at center
 
@@ -589,10 +590,62 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
   xx[2]=get_x(iy,1);
   xx[3]=get_x(iz,2);
 
+  calc_Krzysie_arb(xx,Krzys_org,MYCOORDS);
   calc_Krzysie_arb(xx,Krzys,MYCOORDS);
 
   //modifying \Gamma ^mu_mu_k
-  //TODO
+
+  int kappa,mu;
+  ldouble Sk,Wk[4],dS[4],gdet[3],D[4],dxk;
+  for(kappa=1;kappa<=3;kappa++)
+    {
+      Sk=1.e-300 + fabs(Krzys_org[0][kappa][0])
+	+ fabs(Krzys_org[1][kappa][1])
+	+ fabs(Krzys_org[2][kappa][2])
+	+ fabs(Krzys_org[3][kappa][3]);
+      for(mu=0;mu<4;mu++)
+	Wk[mu]=fabs(Krzys_org[mu][kappa][mu])/Sk;
+      
+      //center
+      xx[0]=0.;
+      xx[1]=get_x(ix,0);
+      xx[2]=get_x(iy,1);
+      xx[3]=get_x(iz,2);
+      gdet[0]=calc_gdet_arb(xx,MYCOORDS);
+
+      //upper face
+      xx[0]=0.;
+      xx[1]=get_x(ix,0);
+      xx[2]=get_x(iy,1);
+      xx[3]=get_x(iz,2);
+      if(kappa==1) xx[1]=get_xb(ix+1,0);
+      if(kappa==2) xx[2]=get_xb(iy+1,1);
+      if(kappa==3) xx[3]=get_xb(iz+1,2);
+      gdet[1]=calc_gdet_arb(xx,MYCOORDS);
+
+      //lower face
+      xx[0]=0.;
+      xx[1]=get_x(ix,0);
+      xx[2]=get_x(iy,1);
+      xx[3]=get_x(iz,2);
+      if(kappa==1) xx[1]=get_xb(ix,0);
+      if(kappa==2) xx[2]=get_xb(iy,1);
+      if(kappa==3) xx[3]=get_xb(iz,2);
+      gdet[2]=calc_gdet_arb(xx,MYCOORDS);
+
+      //numerical differencing
+      if(kappa==1) dxk=get_size_x(ix,0);
+      if(kappa==2) dxk=get_size_x(iy,1);
+      if(kappa==3) dxk=get_size_x(iz,2);
+      D[kappa]=(gdet[1]-gdet[2])/(dxk*gdet[0]);
+
+      //correcting Krzysie
+      for(mu=0;mu<4;mu++)
+	{
+	  Krzys[mu][kappa][mu]+=(D[kappa]-Krzys_org[mu][kappa][mu])*Wk[mu];
+	}
+    }
+
 #endif
   return 0;
 }
@@ -2064,7 +2117,7 @@ calc_metric()
 		for(j=0;j<4;j++)
 		    set_g(G,i,j,ix,iy,iz,gloc[i][j]);
 	      
-	      calc_Krzysie(xx,Kr);
+	      calc_Krzysie_at_center(ix,iy,iz,Kr);
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  for(k=0;k<4;k++)
