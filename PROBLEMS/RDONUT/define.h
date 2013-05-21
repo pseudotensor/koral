@@ -19,7 +19,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 1.e1
+#define DTOUT1 5.e0
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -29,14 +29,14 @@
 #define MKS1R0 -2.
 #define MINX (log(1.5-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 64
+#define NX 48
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 30.
 #define NX 70
 #endif
 
-#define NY 48
+#define NY 32
 #define NZ 1
 
 
@@ -58,14 +58,14 @@
 
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
+#define FLUXLIMITER 0
 
 #define GDETIN 1
-
-//#define ENFORCEENTROPY
-//#define FLUXMETHOD HLL_FLUX
+#define ENFORCEENTROPY
+#define FLUXMETHOD HLL_FLUX
+//efine WAVESPEEDSATFACES
 #define TSTEPLIM .6
-#define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.8
 
 #define NODONUT 0
 #define INFLOWING 0
