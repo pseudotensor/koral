@@ -13,8 +13,8 @@
 
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define DTOUT1 5.e0
-#define ALLSTEPSOUTPUT 1
+#define DTOUT1 5.e3
+#define ALLSTEPSOUTPUT 0
 
 #define GAMMA (ldouble)(5./3.)
 #define COPY_XBC

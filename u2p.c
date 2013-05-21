@@ -2448,7 +2448,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  wmrho0 = w - rho0;
 	  f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
 	    
-	  if(verbose>1 || 1) 
+	  if(verbose>1) 
 	    {
 	      printf("alala %e %e %e %e %e %e\n",W,Wp,wmrho0,f0,compute_specificentropy_wmrho0_idealgas(rho0,wmrho0),cons[3]);
 	    }

@@ -1,4 +1,4 @@
-//#define RADIATION
+#define RADIATION
 
 //#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
@@ -60,12 +60,13 @@
 #define TIMESTEPPING RK2
 #define FLUXLIMITER 0
 
-#define GDETIN 1
+#define GDETIN 0
 #define ENFORCEENTROPY
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES
 #define TSTEPLIM .6
-#define MINMOD_THETA 1.8
+#define MINMOD_THETA 2.
+//#define METRICIMPLICIT
 
 #define NODONUT 0
 #define INFLOWING 0

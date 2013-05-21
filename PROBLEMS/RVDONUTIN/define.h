@@ -18,10 +18,11 @@
 #define TIMESTEPPING RK2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
-#define FLUXMETHOD HLL_FLUX
-//#define WAVESPEEDSATFACES //not working for radiation yet!
-#define GDETIN 0 //1 does not work with radiation for some reason
+#define MINMOD_THETA 1.
+//#define FLUXMETHOD HLL_FLUX
+//#define WAVESPEEDSATFACES 
+#define GDETIN 0 
+#define SKIPRADSOURCE
  
 /************************************/
 //hd floors
@@ -248,7 +249,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e0
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

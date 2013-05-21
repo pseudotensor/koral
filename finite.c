@@ -298,11 +298,11 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   //TODO: correlate threads
   
 #ifdef RADIATION
-  //#pragma omp critical
+  //  #pragma omp critical
   if(my_max(aaaxhd,aaaxrad)>max_ws[0]) max_ws[0]=my_max(aaaxhd,aaaxrad);
-  //#pragma omp critical
+  //  #pragma omp critical
   if(my_max(aaayhd,aaayrad)>max_ws[1]) max_ws[1]=my_max(aaayhd,aaayrad);
-  //#pragma omp critical
+  //  #pragma omp critical
   if(my_max(aaazhd,aaazrad)>max_ws[2]) max_ws[2]=my_max(aaazhd,aaazrad);
 #else 
   #pragma omp critical
@@ -815,24 +815,42 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	      ldouble ms[NV],val;
 
 
-	      //calc_primitives(ix,iy,iz);
 		  
 	      //metric source terms
+
+#ifdef METRICIMPLICIT
+	      calc_primitives(ix,iy,iz);
+	      if(solve_implicit_metric(ix,iy,iz,dt,u) < 0)
+		{
+
+		  f_metric_source_term(ix,iy,iz,ms);
+		  
+		  for(iv=0;iv<NV;iv++)
+		    {
+		      //if(fabs(ms[iv])*dt>fabs(0.1*get_u(ubase,iv,ix,iy,iz)))
+		      //printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(ubase,iv,ix,iy,iz),ms[iv]*dt,fabs(ms[iv]*dt/get_u(ubase,iv,ix,iy,iz)));
+		      val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
+		      set_u(u,iv,ix,iy,iz,val);	
+		      uu[iv]=val;
+		    } 
+		}
+#else
 	      f_metric_source_term(ix,iy,iz,ms);
 		  
 	      for(iv=0;iv<NV;iv++)
 		{
-		  if(ms[iv]*dt>0.1*get_u(u,iv,ix,iy,iz))
-		    printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(u,iv,ix,iy,iz),ms[iv]*dt,(ms[iv]*dt/get_u(u,iv,ix,iy,iz)));
+		  //if(fabs(ms[iv])*dt>fabs(0.1*get_u(ubase,iv,ix,iy,iz)))
+		  //printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(ubase,iv,ix,iy,iz),ms[iv]*dt,fabs(ms[iv]*dt/get_u(ubase,iv,ix,iy,iz)));
 		  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
 		  set_u(u,iv,ix,iy,iz,val);	
 		  uu[iv]=val;
 		} 
+#endif
 
 	      /************************************************************************/
 	      /************************************************************************/
 	      /************************************************************************/
-
+#ifndef SKIPRADSOURCE
 #ifdef RADIATION
 	      calc_primitives(ix,iy,iz);
 	      for(iv=0;iv<NV;iv++)
@@ -913,6 +931,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	      
 #endif //MULTIRADFLUID
 #endif //RADIATION
+#endif //SKIPRADSOURCE
 
 	      /************************************************************************/
 	      /************************************************************************/
@@ -944,18 +963,13 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 {
   int i;
   struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
-  
-  ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3],dx;
+   
   ldouble a0[2],am1[2],ap1[2],am2[2],ap2[2],ag,al,ar,amax,cmin,cmax,csLl[2],csLr[2],csRl[2],csRr[2];
   ldouble am1l[2],am1r[2],ap1l[2],ap1r[2];
   ldouble fd_u0[NV],fd_up1[NV],fd_up2[NV],fd_um1[NV],fd_um2[NV],fd_r0[NV],fd_rm1[NV],fd_rp1[NV];
   ldouble fd_uLr[NV],fd_uLl[NV],fd_uRl[NV],fd_uRr[NV],fd_fstarl[NV],fd_fstarr[NV],fd_dul[3*NV],fd_dur[3*NV],fd_pdiffl[NV],fd_pdiffr[NV];
   ldouble gdet,gg[4][5],GG[4][5],eup[4][4],elo[4][4];
 
-  x0[0]=get_x(ix,0);
-  x0[1]=get_x(iy,1);
-  x0[2]=get_x(iz,2);
 
   //**********************************************************************
   //**********************************************************************
@@ -990,19 +1004,18 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
     }
 
   //converting interpolated primitives to conserved
-  pick_gb(ix,iy,iz,0,gg);
-  pick_Gb(ix,iy,iz,0,GG);
+  fill_geometry_face(ix,iy,iz,0,&geom);
 
 #ifdef WAVESPEEDSATFACES
   ldouble aaa[12];
-  calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+  calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
   am1l[0]=aaa[0];
   am1r[0]=aaa[1];
   am1l[1]=aaa[6];
   am1r[1]=aaa[7];
   am1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
   am1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
-  calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+  calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
   ap1l[0]=aaa[0];
   ap1r[0]=aaa[1];
   ap1l[1]=aaa[6];
@@ -1086,27 +1099,24 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       am1[0]=get_u_scalar(ahdy,ix,iy-1,iz);
       am1[1]=get_u_scalar(arady,ix,iy-1,iz);
 
-       for(i=0;i<NV;i++)
+      for(i=0;i<NV;i++)
 	{
 	  fd_uLl[i]=get_ub(pbLy,i,ix,iy,iz,1);
 	  fd_uRl[i]=get_ub(pbRy,i,ix,iy,iz,1);
 	}
 
-       
-      pick_gb(ix,iy,iz,1,gg);
-      pick_Gb(ix,iy,iz,1,GG);
-
-
+      fill_geometry_face(ix,iy,iz,1,&geom);
+ 
 #ifdef WAVESPEEDSATFACES
       ldouble aaa[12];
-      calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+      calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
       am1l[0]=aaa[2];
       am1r[0]=aaa[3];
       am1l[1]=aaa[8];
       am1r[1]=aaa[9];
       am1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
       am1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
-      calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+      calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
       ap1l[0]=aaa[2];
       ap1r[0]=aaa[3];
       ap1l[1]=aaa[8];
@@ -1192,20 +1202,18 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 	  fd_uRl[i]=get_ub(pbRz,i,ix,iy,iz,2);
 	}
 
-      pick_gb(ix,iy,iz,2,gg);
-      pick_Gb(ix,iy,iz,2,GG);
-
+      fill_geometry_face(ix,iy,iz,2,&geom);
 
 #ifdef WAVESPEEDSATFACES
       ldouble aaa[12];
-      calc_wavespeeds_lr_pure(fd_uLl,gg,GG,ix,iy,iz,aaa);
+      calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
       am1l[0]=aaa[4];
       am1r[0]=aaa[5];
       am1l[1]=aaa[10];
       am1r[1]=aaa[11];
       am1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
       am1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
-      calc_wavespeeds_lr_pure(fd_uRl,gg,GG,ix,iy,iz,aaa);
+      calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
       ap1l[0]=aaa[4];
       ap1r[0]=aaa[5];
       ap1l[1]=aaa[10];
@@ -2021,4 +2029,187 @@ cell_fixup()
   copy_u(1.,p_bak,p);
 
   return 0;
+}
+
+
+//**********************************************************************
+//******* solves implicitidly four-force source terms *********************
+//******* in the lab frame, returns ultimate deltas ***********************
+//******* the fiducial approach *****************************************
+//**********************************************************************
+
+struct f_implicit_metric_params
+{
+  void* ggg;
+  ldouble *uu0;
+  ldouble dt;
+  int n;
+};
+     
+int f_implicit_metric(const gsl_vector * x, void *paramsp,
+	      gsl_vector * f)
+//(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldouble *f)
+{
+
+ struct f_implicit_metric_params *params 
+   = (struct f_implicit_metric_params *) paramsp;
+
+  struct geometry *geom
+    = (struct geometry *) params->ggg;
+
+  ldouble dt=params->dt;
+  
+  ldouble *uu0=params->uu0;
+
+  int n=params->n;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+
+  ldouble pp[NV],uu[NV];
+  int iv;
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=gsl_vector_get (x, iv);
+      if(isnan(pp[iv])) return -1;
+    }
+  //  print_Nvector(pp,NV);
+  
+ //calculating conserved
+  int corr,fixup[2];
+  p2u(pp,uu,geom);
+
+   ldouble ms[NV],fval[NV];
+  //metric source terms
+   //  print_Nvector(uu,NV);
+   //  print_Nvector(uu0,NV);
+  
+  f_metric_source_term_arb(pp,geom,ms);
+
+  for(iv=0;iv<n;iv++)
+    {      
+      fval[iv]=uu[iv] - uu0[iv] - ms[iv]*dt;
+      gsl_vector_set (f, iv, fval[iv]);
+    }
+
+  //  print_Nvector(ms,NV);
+  //  print_Nvector(fval,NV);
+  //  getchar();
+
+  return GSL_SUCCESS;
+} 
+
+int
+print_state_metric (int iter, gsl_multiroot_fsolver * s)
+{
+  printf ("iter = %3u x = % .5e % .5e % .5e % .5e % .5e  % .5e "
+	  "f(x) = % .3e % .3e % .3e % .3e % .3e % .3e\n",
+	  iter,
+	  gsl_vector_get (s->x, 0),
+	  gsl_vector_get (s->x, 1),
+	  gsl_vector_get (s->x, 2),
+	  gsl_vector_get (s->x, 3),
+	  gsl_vector_get (s->x, 4),
+	  gsl_vector_get (s->x, 5),
+
+	  gsl_vector_get (s->f, 0),
+	  gsl_vector_get (s->f, 1),
+	  gsl_vector_get (s->f, 2),
+	  gsl_vector_get (s->f, 3),
+	  gsl_vector_get (s->f, 4),
+	  gsl_vector_get (s->f, 5));
+}
+
+
+int
+solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
+{
+  int i1,i2,i3,iv,i,j;
+
+  int verbose=0;
+
+  ldouble pp[NV],uu[NV],uu0[NV],uu00[NV],uup[NV]; 
+
+  ldouble (*gg)[5],(*GG)[5];
+
+  //  verbose=1;
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  //temporary using local arrays
+  gg=geom.gg;
+  GG=geom.GG;
+
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=get_u(p,iv,ix,iy,iz);      
+      uu[iv]=get_u(ubase,iv,ix,iy,iz);  
+      uu00[iv]=uu[iv];
+      uu0[iv]=uu[iv];
+   }
+
+  const gsl_multiroot_fsolver_type *T;
+  gsl_multiroot_fsolver *s;
+     
+  int status;
+  int iter = 0;
+     
+  const size_t n = NV;
+  struct f_implicit_metric_params par = {&geom,uu0,dt,n};
+  gsl_multiroot_function f = {&f_implicit_metric, n, &par};
+
+  gsl_vector *x = gsl_vector_alloc (n);
+     
+
+  double x_init[NV];
+  for (iv=0;iv<n;iv++)
+    {
+      x_init[iv]=1.*pp[iv];     
+      gsl_vector_set (x, iv, x_init[iv]);
+    }
+     
+  T = gsl_multiroot_fsolver_hybrids;
+  s = gsl_multiroot_fsolver_alloc (T, n);
+  gsl_multiroot_fsolver_set (s, &f, x);
+
+  //  print_state_metric (iter, s);  
+  
+  do
+    {
+      iter++;
+      status = gsl_multiroot_fsolver_iterate (s);
+
+      if (status)   /* check if solver is stuck */
+	break;
+      //print_state_metric (iter, s);
+    
+      status =gsl_multiroot_test_residual (s->f, 1e-5);
+
+      status = gsl_multiroot_test_delta (s->dx, s->x,
+					1e-4, 1e-4);
+    }
+  while (status == GSL_CONTINUE && iter < 1000);
+     
+  //printf ("status = %s\n", gsl_strerror (status)); getchar();
+  if(status!=GSL_SUCCESS) {if(verbose) printf("complain : %s\n",gsl_strerror (status));return -1;}
+
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=gsl_vector_get (s->x, iv);
+    }
+
+  p2u(pp,uu,&geom);
+
+  for(iv=0;iv<NV;iv++)
+    {
+      set_u(p,iv,ix,iy,iz,pp[iv]);      
+      set_u(u,iv,ix,iy,iz,uu[iv]);      
+    }
+     
+  gsl_multiroot_fsolver_free (s);
+  gsl_vector_free (x);
+  return 0;
+
 }

@@ -1134,7 +1134,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
 #endif
 
-
+  
 
   //square of radiative wavespeed in radiative rest frame
   ldouble rv2rad = 1./3.;
@@ -1204,15 +1204,6 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       aval[dim*2+0]=axl;
       aval[dim*2+1]=axr;
     }
-
-  /*
-  if(fabs(pp[7])>1.e-3 || 1)
-    {
-      print_Nvector(pp,NV);
-      print_Nvector(&aval[0],NV);
-      getchar();
-    }
-  */
 
   return 0;
 }

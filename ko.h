@@ -154,6 +154,9 @@ int getch(void);
 int dosthelse(void);
 
 //finite.c
+
+int
+solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase);
 int cell_fixup();
 ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz);
 int f_timeder (ldouble t, ldouble dt,ldouble *);
@@ -241,7 +244,7 @@ struct rad_parameters
 };
 
 int 
-calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int,int,int,ldouble *aaa);
+calc_wavespeeds_lr_pure(ldouble *pp,void*,ldouble *aaa);
 int calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4]);
 int calc_Tij( ldouble *p, void*, ldouble T[][4]);
 ldouble max_eigen_Jac(ldouble *,ldouble*,int,void*);

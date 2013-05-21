@@ -6,8 +6,15 @@
 //calculates left and right wave speeds at cell center
 //*************************************************
 int
-calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int iy,int iz,ldouble *aaa)
+calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 {
+  struct geometry *geom
+    = (struct geometry *) ggg;
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+
+  gg=geom->gg;
+  GG=geom->GG;
+
   int iv;
   
   ldouble axhdl,axhdr,ayhdl,ayhdr,azhdl,azhdr;
@@ -170,8 +177,6 @@ calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int 
   //**********************************************************************
   //***** radiation: characteristic wave speed ***************************
   //**********************************************************************
- struct geometry geom;
- fill_geometry(ix,iy,iz,&geom);
 
   ldouble aval[6];
   int verbose=0;
@@ -179,16 +184,16 @@ calc_wavespeeds_lr_pure(ldouble *pp,ldouble gg[][5], ldouble GG[][5],int ix,int 
   //physical size of the cell
   ldouble dx[3];
   ldouble xx[4];
-  get_xx(ix,iy,iz,xx);
-
-  dx[0]=get_size_x(ix,0)*sqrt(gg[1][1]);
-  dx[1]=get_size_x(iy,1)*sqrt(gg[2][2]);
-  dx[2]=get_size_x(iz,2)*sqrt(gg[3][3]);
+  
+  //ix,iy,iz has the indices of the face, so the depth taken from left/right
+  dx[0]=my_max(get_size_x(geom->ix,0)*sqrt(gg[1][1]),get_size_x(geom->ix+1,0)*sqrt(gg[1][1]));
+  dx[1]=my_max(get_size_x(geom->iy,1)*sqrt(gg[2][2]),get_size_x(geom->iy+1,1)*sqrt(gg[2][2]));
+  dx[2]=my_max(get_size_x(geom->iz,2)*sqrt(gg[3][3]),get_size_x(geom->iz+1,2)*sqrt(gg[3][3]));
   ldouble tautot[3];
   calc_tautot(pp,xx,dx,tautot);
   
 #ifndef MULTIRADFLUID
-  calc_rad_wavespeeds(pp,&geom,tautot,aval,verbose);
+  calc_rad_wavespeeds(pp,geom,tautot,aval,verbose);
 
 #ifdef FULLRADWAVESPEEDS
   aval[0]=aval[1]=1./sqrt(gg[1][1]);
@@ -265,7 +270,7 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
   for(iv=0;iv<NV;iv++)
     pp[iv]=get_u(p,iv,ix,iy,iz);
 
-  calc_wavespeeds_lr_pure(pp,gg,GG,ix,iy,iz,aaa);
+  calc_wavespeeds_lr_pure(pp,&geom,aaa);
 
   /*
   conv_velsinprims(pp,VELPRIM,VEL3,gg,GG);
@@ -294,21 +299,22 @@ int f_source_term(int ix, int iy, int iz,ldouble *ss)
 //***************************************
 //returns geometrical source terms for all conserved quantities
 //***************************************
-int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
+int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 {
   int i;
-  ldouble pp[NV];  
 
-  for(i=0;i<NV;i++)
-    pp[i]=get_u(p,i,ix,iy,iz);  
-
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
+  struct geometry *geom
+    = (struct geometry *) ggg;
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+
+  int ix,iy,iz;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
  
-  gg=geom.gg;
-  GG=geom.GG;
-  gdet=geom.gdet;gdetu=gdet;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet;gdetu=gdet;
 #if (GDETIN==0) //no metric determinant inside derivatives
   gdetu=1.;
 #endif
@@ -322,7 +328,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   ldouble T[4][4];
 
   //calculating stress energy tensor components
-  calc_Tij(pp,&geom,T);
+  calc_Tij(pp,geom,T);
   indices_2221(T,T,gg);
 
   int ii, jj;
@@ -357,7 +363,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
-  calc_Rij(pp,&geom,Rij); //R^ij
+  calc_Rij(pp,geom,Rij); //R^ij
   indices_2221(Rij,Rij,gg); //R^i_j
 
   //terms with Christoffels
@@ -475,6 +481,25 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   /***************************************************/
 #endif
   /***************************************************/
+
+  return 0;
+}
+
+//***************************************
+//returns geometrical source terms for all conserved quantities
+//***************************************
+int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
+{
+  int i;
+  ldouble pp[NV];  
+
+  for(i=0;i<NV;i++)
+    pp[i]=get_u(p,i,ix,iy,iz);  
+  
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+  f_metric_source_term_arb(pp,&geom,ss);
 
   return 0;
 }

@@ -89,10 +89,14 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble rhout = rho*ut;
   ldouble Sut;
 
-  if(uu<0. || rho<0.)
+  /*
+  if(uu<0. || rho<0. || 1)
     Sut=S*ut;
   else
     Sut=calc_Sfromu(rho,uu)*ut;
+  */
+
+  Sut=S*ut;
 
   ldouble pre=(GAMMA-1.)*uu;
   ldouble w=rho+uu+pre;
