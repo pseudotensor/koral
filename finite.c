@@ -822,6 +822,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 		  
 	      for(iv=0;iv<NV;iv++)
 		{
+		  if(ms[iv]*dt>0.1*get_u(u,iv,ix,iy,iz))
+		    printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(u,iv,ix,iy,iz),ms[iv]*dt,(ms[iv]*dt/get_u(u,iv,ix,iy,iz)));
 		  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
 		  set_u(u,iv,ix,iy,iz,val);	
 		  uu[iv]=val;
