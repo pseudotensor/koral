@@ -78,11 +78,11 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
     pp[4]=ucon[3];
     pp[0]=my_max(rho,ppback[0]); 
 
-    pp[0]=ppback[0];
+    //    pp[0]=ppback[0];
 
     pp[1]=my_max(uint,ppback[1]);
 
-#ifdef RADIATION
+
     ldouble P,aaa,bbb;
     P=GAMMAM1*uint;
     //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
@@ -96,10 +96,14 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
     uint=calc_PEQ_ufromTrho(T4,rho);
 
     pp[1]=my_max(uint,ppback[1]);
+
+#ifdef RADIATION
     pp[6]=my_max(E,ppback[6]);
+
     pp[7]=Fx;
     pp[8]=Fy;
     pp[9]=Fz;
+
 
  
     //now estimating flux in r,theta plane: F = -1/chi E,i in lab coordinates
@@ -192,14 +196,15 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
      pp[9]=0.;
 #endif
 
+
      //if(ix==NX-1 && iy==NY-1){print_Nvector(pp,NV);}
 
      //transforming from BL lab radiative primitives to code non-ortonormal primitives
      prad_ff2lab(pp,pp,&geomBL);
-
+#endif
      //if(ix==NX-1 && iy==NY-1){print_Nvector(pp,NV);getchar();}
      
-#endif
+
      //transforming primitives from BL to MYCOORDS
      trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
    }

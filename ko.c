@@ -109,13 +109,14 @@ solve_all_problems_5(ldouble tstart)
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
 
-#ifndef RADIATION //pure hydro
+      //#ifndef RADIATION //pure hydro
       if(NZ>1)
 	tstepden=max_ws[0]/min_dx + max_ws[1]/min_dy + max_ws[2]/min_dz;
       else if(NY>1)
 	tstepden=max_ws[0]/min_dx + max_ws[1]/min_dy;
       else
 	tstepden=max_ws[0]/min_dx;            
+      /*
 #else //radiation included
       //TODO: what is below assumes wavespeed=1 but for thick flows the real characterstic speed may be lower and time step larger
       if(NZ>1)
@@ -125,6 +126,7 @@ solve_all_problems_5(ldouble tstart)
       else 
 	tstepden=(1./min_dx);          
 #endif
+      */
 
       dt=TSTEPLIM*1./tstepden;
       if(t+dt>t1) {dt=t1-t;}

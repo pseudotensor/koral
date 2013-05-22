@@ -113,7 +113,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	pp[4]=ucon[3];
 	pp[0]=rho; pp[1]=uint; 
 
-#ifdef RADIATION
+
     ldouble P,aaa,bbb;
     P=GAMMAM1*uint;
     //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
@@ -129,6 +129,8 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
     uint=calc_PEQ_ufromTrho(T4,rho);
 
     pp[1]=uint;
+
+#ifdef RADIATION
     pp[6]=E;
     pp[7]=Fx;
     pp[8]=Fy;

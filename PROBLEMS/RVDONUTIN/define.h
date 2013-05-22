@@ -21,9 +21,9 @@
 #define MINMOD_THETA 1.
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
-#define GDETIN 1
+#define GDETIN 0
 #define SKIPRADSOURCE
-#define SKIPRADWAVESPEEDLIMITER
+//#define SKIPRADWAVESPEEDLIMITER
  
 /************************************/
 //hd floors
@@ -42,7 +42,7 @@
 /************************************/
 //simple viscosity
 /************************************/
-#define VISCOSITY
+//#define VISCOSITY
 #define SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
 #define RMINVISC 2.

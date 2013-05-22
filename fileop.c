@@ -310,7 +310,10 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  ldouble vz=pp[4];
 						  ldouble vrel[4]={0,vx,vy,vz};
 						  
-						  conv_vels(vrel,vrel,VELPRIM,OUTVEL,gg,GG);
+						  conv_vels(vrel,vrel,VELPRIM,VEL4,gg,GG);
+						  
+						  trans2_cc2on(vrel,vrel,tup);
+						  //outvel - ortonormal VEL4
 						  vx=vrel[1];
 						  vy=vrel[2];
 						  vz=vrel[3];
