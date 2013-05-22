@@ -62,7 +62,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldo
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
-  gdet=geom->gdet;
+  gdet=geom->gdet; gdetu=gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
@@ -445,7 +445,7 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom.gg;
   GG=geom.GG;
-  gdet=geom.gdet;
+  gdet=geom.gdet; gdetu=gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
