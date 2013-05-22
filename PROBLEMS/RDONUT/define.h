@@ -19,7 +19,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 5.e0
+#define DTOUT1 5.e-1
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -61,11 +61,11 @@
 #define FLUXLIMITER 0
 
 #define GDETIN 0
-#define ENFORCEENTROPY
+//#define ENFORCEENTROPY
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES
 #define TSTEPLIM .6
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.
 //#define METRICIMPLICIT
 
 #define NODONUT 0

@@ -15,7 +15,7 @@
 
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 2.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (4./3.)
 #define EXPLICIT_RAD_SOURCE
@@ -35,10 +35,10 @@
 #define BEAMR .6
 #define DTOUT1 .05 //dt for basic output
 
-#define EDDINGTON_APR
+//#define EDDINGTON_APR
 
 //#define RADBEAMFLAT_FRATIO 0.99
-#define RADBEAMFLAT_FRATIO 0.995
+#define RADBEAMFLAT_FRATIO 0.99999
 #define RADBEAMFLAT_ERAD 1.
 #define RADBEAMFLAT_RHO 1.
 #define RADBEAMFLAT_UU 0.1
