@@ -55,7 +55,7 @@
 #define MYCOORDS MKS1COORDS
 #define MKS1R0 -2.
 #define MINX (log(1.25-MKS1R0))
-#define NX 40
+#define NX 20
 #define NY 20
 #define NZ 1
 #else //Scharzschild
@@ -239,8 +239,8 @@
 /************************************/
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
-#undef NX
-#define NX 120
+//#undef NX
+//#define NX 120
 //#undef NY
 //#define NY 100
 #define MAXX (log(15.3-MKS1R0))

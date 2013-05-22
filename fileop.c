@@ -329,8 +329,8 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 #ifdef RADOUTPUTINFF
 						  prad_lab2ff(pp,pp,&geom);
 #elif defined(RADOUTPUTINZAMO) //to print  radiation primitives in ZAMO
-						  //prad_lab2on(pp,pp,&geom);
-						  prad_lab2ff(pp,pp,&geom);
+						  prad_lab2on(pp,pp,&geom);
+						  //prad_lab2ff(pp,pp,&geom);
 						  //prad_ff2zamo(pp,pp,geomout.gg,geomout.GG,geomout.eup);
 #endif
 #endif

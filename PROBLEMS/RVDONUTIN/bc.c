@@ -247,12 +247,22 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
      iiy=iy;
      iiz=iz;
 
+     //gc
      ldouble r=xxvecBL[1];
+
+     //iix=0
      ldouble xxout[4]={0.,get_x(iix,0),get_x(iiy,1),get_x(iiz,2)};
      coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
-     ldouble r0=xxout[1];      
+     ldouble r0=xxout[1];   
      
-
+     //iix=1
+     iix=1;
+     xxout[1]=get_x(iix,0);
+     coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
+     ldouble r1=xxout[1];   
+     
+     
+     /*
      //copying YLCOORDS quantities
      for(iv=0;iv<NV;iv++)
        { 
@@ -267,10 +277,16 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	 pp[2]=-10.;
        }
      else
-
        {
 	 pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
 	 pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
+       }
+     */
+
+     //linear extrapolation
+      for(iv=0;iv<NV;iv++)
+       {
+	 pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
        }
  
      //atmosphere
