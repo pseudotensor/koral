@@ -191,6 +191,10 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   dx[2]=my_max(get_size_x(geom->iz,2)*sqrt(gg[3][3]),get_size_x(geom->iz+1,2)*sqrt(gg[3][3]));
   ldouble tautot[3];
   calc_tautot(pp,xx,dx,tautot);
+
+#ifdef SKIPRADWAVESPEEDLIMITER
+  tautot[0]=tautot[1]=tautot[2]=0.;
+#endif
   
 #ifndef MULTIRADFLUID
   calc_rad_wavespeeds(pp,geom,tautot,aval,verbose);

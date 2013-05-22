@@ -3,7 +3,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define RK3_STEPPING
+#define TIMESTEPPING RK2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.

@@ -114,11 +114,15 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdetu;
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
+  gdetu=geom->gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
@@ -135,10 +139,10 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
     pp2[i]=pp1[i];
 
   //temporarily store conserved in pp2[]
-  pp2[6]=Rij[0][0];
-  pp2[7]=Rij[0][1];
-  pp2[8]=Rij[0][2];
-  pp2[9]=Rij[0][3];
+  pp2[6]=gdetu*Rij[0][0];
+  pp2[7]=gdetu*Rij[0][1];
+  pp2[8]=gdetu*Rij[0][2];
+  pp2[9]=gdetu*Rij[0][3];
 
   //convert to real primitives
   int corrected;
@@ -156,10 +160,10 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
       boost22_ff2lab(Rij[irf],Rij[irf],pp1,gg,GG); 
       indices_2221(Rij[irf],Rij[irf],gg);  
       //temporarily store conserved in pp2[]
-      pp2[EE(irf)]=Rij[irf][0][0];
-      pp2[FX(irf)]=Rij[irf][0][1];
-      pp2[FY(irf)]=Rij[irf][0][2];
-      pp2[FZ(irf)]=Rij[irf][0][3];
+      pp2[EE(irf)]=gdetu*Rij[irf][0][0];
+      pp2[FX(irf)]=gdetu*Rij[irf][0][1];
+      pp2[FY(irf)]=gdetu*Rij[irf][0][2];
+      pp2[FZ(irf)]=gdetu*Rij[irf][0][3];
     }
 
   //hydro
@@ -237,11 +241,15 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdetu;
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
+  gdetu=geom->gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
@@ -257,10 +265,10 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
     pp2[i]=pp1[i];
 
   //temporarily store conserved in pp2[]
-  pp2[6]=Rij[0][0];
-  pp2[7]=Rij[0][1];
-  pp2[8]=Rij[0][2];
-  pp2[9]=Rij[0][3];
+  pp2[6]=gdetu*Rij[0][0];
+  pp2[7]=gdetu*Rij[0][1];
+  pp2[8]=gdetu*Rij[0][2];
+  pp2[9]=gdetu*Rij[0][3];
 
   //convert to real primitives
   int corrected;
@@ -277,10 +285,10 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
       trans22_on2cc(Rij[irf],Rij[irf],tlo);  
       indices_2221(Rij[irf],Rij[irf],gg);  
       //temporarily store conserved in pp2[]
-      pp2[EE(irf)]=Rij[irf][0][0];
-      pp2[FX(irf)]=Rij[irf][0][1];
-      pp2[FY(irf)]=Rij[irf][0][2];
-      pp2[FZ(irf)]=Rij[irf][0][3];
+      pp2[EE(irf)]=gdetu*Rij[irf][0][0];
+      pp2[FX(irf)]=gdetu*Rij[irf][0][1];
+      pp2[FY(irf)]=gdetu*Rij[irf][0][2];
+      pp2[FZ(irf)]=gdetu*Rij[irf][0][3];
     }
 
   //hydro

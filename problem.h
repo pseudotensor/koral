@@ -58,7 +58,7 @@
 //52* SPHFLAT - spherical flat to test Christoffels
 //53* 1DDONUT - 1d donut equatorial plane structure
 
-#define PROBLEM 43
+#define PROBLEM 6
 
 #if(PROBLEM==53)
 

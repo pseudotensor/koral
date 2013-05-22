@@ -21,8 +21,9 @@
 #define MINMOD_THETA 1.
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
-#define GDETIN 0 
+#define GDETIN 1
 #define SKIPRADSOURCE
+#define SKIPRADWAVESPEEDLIMITER
  
 /************************************/
 //hd floors

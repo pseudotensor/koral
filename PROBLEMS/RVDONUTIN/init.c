@@ -77,6 +77,9 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
     pp[3]=ucon[2];
     pp[4]=ucon[3];
     pp[0]=my_max(rho,ppback[0]); 
+
+    pp[0]=ppback[0];
+
     pp[1]=my_max(uint,ppback[1]);
 
 #ifdef RADIATION

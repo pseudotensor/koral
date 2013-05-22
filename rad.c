@@ -1167,6 +1167,9 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       else
 	rv2=rv2rad;
       
+      //test
+      rv2=1.;
+
       Acov[0]=0.;
       Acov[1]=0.;
       Acov[2]=0.;
