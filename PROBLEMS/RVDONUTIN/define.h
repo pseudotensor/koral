@@ -16,13 +16,13 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
-#define TSTEPLIM .6
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 //#define FLUXMETHOD HLL_FLUX
-//#define WAVESPEEDSATFACES 
-#define GDETIN 0
-#define SKIPRADSOURCE
+#define WAVESPEEDSATFACES 
+#define GDETIN 1
+//#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
  
 /************************************/
@@ -44,7 +44,7 @@
 /************************************/
 //#define VISCOSITY
 #define SIMPLEVISCOSITY
-#define ALPHATOTALPRESSURE
+//#define ALPHATOTALPRESSURE
 #define RMINVISC 2.
 
 /************************************/
@@ -239,8 +239,8 @@
 /************************************/
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
-//#undef NX
-//#define NX 120
+#undef NX
+#define NX 120
 //#undef NY
 //#define NY 100
 #define MAXX (log(15.3-MKS1R0))

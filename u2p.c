@@ -316,8 +316,8 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   prad_lab2ff(pp, pp2, ggg);
 
 #ifndef MULTIRADFLUID  
-  if(pp[6]<EERHORATIOMIN*pp[0]) {pp[6]=EERHORATIOMIN*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
-  if(pp[6]>EERHORATIOMAX*pp[0]) {pp[0]=1./EERHORATIOMAX*pp[6];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
+  if(pp2[6]<EERHORATIOMIN*pp2[0]) {pp2[6]=EERHORATIOMIN*pp2[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
+  if(pp2[6]>EERHORATIOMAX*pp2[0]) {pp2[0]=1./EERHORATIOMAX*pp2[6];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
 #else
   int irf;
   for(irf=0;irf<NRF;irf++)
