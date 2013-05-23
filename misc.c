@@ -915,3 +915,31 @@ getch()
 }
 
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+/* Arrange the N elements of ARRAY in random order.
+   Only effective if N is much smaller than RAND_MAX;
+   if this may not be the case, use a better random
+   number generator. 
+
+http://benpfaff.org/writings/clc/shuffle.html
+
+*/
+
+void shuffle_loop(int **array, size_t n)
+{
+    if (n > 1) {
+        size_t i;
+	for (i = 0; i < n - 1; i++) {
+	  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+	  int t[3] = {array[j][0],array[j][1],array[j][2]};
+	  array[j][0] = array[i][0];
+	  array[j][1] = array[i][1];
+	  array[j][2] = array[i][2];
+	  array[i][0] = t[0];
+	  array[i][1] = t[1];
+	  array[i][2] = t[2];
+	}
+    }
+}

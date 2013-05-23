@@ -1328,8 +1328,12 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   *mindy=mdy;
   *mindz=mdz;
   *maxdtfac=maxdt;
-
+  
+  //**********************************************************************
+  //**********************************************************************
   //auxiliary arrays to speed up parallel for loops
+  //**********************************************************************
+  //**********************************************************************
 
   //inside + ghost cells - number depending on the order of reconstruction
   Nloop_0=0;
@@ -1353,6 +1357,9 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	    }
 	}
     }
+
+  //shuffling:
+  shuffle_loop(loop_0,Nloop_0);
 
   //inside + ghost cells - number depending on the order of reconstruction
   int xlim,ylim,zlim;
@@ -1390,6 +1397,9 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	}
     }
 
+  //shuffling:
+  shuffle_loop(loop_1,Nloop_1);
+
   //only ghost cells
   if(NX>1) xlim=NG; else xlim=0;  
   if(NY>1) ylim=NG; else ylim=0;
@@ -1420,7 +1430,12 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	      loop_2[Nloop_2]=(int *)malloc(3*sizeof(int));
 	    }
 	}
-    }	      
+    }	
+  
+  //shuffling:
+  shuffle_loop(loop_2,Nloop_2);
+
+      
 
   return 0;
 }

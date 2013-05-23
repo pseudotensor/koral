@@ -128,6 +128,7 @@ struct evolve_fluxes_2_param
 };
 
 //misc.c
+void shuffle_loop(int **array, size_t n);
 int calc_scalars(ldouble*,ldouble);
 ldouble calc_mdotEdd();
 ldouble calc_lumEdd();
