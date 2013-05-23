@@ -835,7 +835,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble diag[3]={Rij[1][1],Rij[2][2],Rij[3][3]};
   ldouble maxdiag=my_max(diag[0],my_max(diag[1],diag[2]))/Rij[0][0];
   
-  ldouble THINSUPPPARAM = 0.001; //prad=0 for maxdiag=0.4
+  ldouble THINSUPPPARAM = 0.00001; //prad=0 for maxdiag=0.4
   ldouble prad=1./3.*Rij[0][0]*exp(-(maxdiag-1./3.)*(maxdiag-1./3.)/THINSUPPPARAM);
 
   /*

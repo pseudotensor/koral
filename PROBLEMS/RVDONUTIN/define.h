@@ -16,9 +16,9 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
-#define TSTEPLIM .5
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
 #define GDETIN 0
@@ -45,7 +45,8 @@
 #define VISCOSITY
 #define SIMPLEVISCOSITY
 //#define ALPHATOTALPRESSURE
-#define RMINVISC 2.
+//#define ENFORCERADWAVESPEEDS
+#define RMINVISC 0.
 
 /************************************/
 //coordinates / resolution
@@ -241,18 +242,18 @@
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
 //333
-//#undef NX
-//#define NX 100
-//#undef NY
-//#define NY 60
+#undef NX
+#define NX 80
+#undef NY
+#define NY 50
 #define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
-#define ALPHAVISC .1
+#define ALPHAVISC .3
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e0
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
