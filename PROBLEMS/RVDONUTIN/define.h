@@ -20,8 +20,8 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 //#define FLUXMETHOD HLL_FLUX
-#define WAVESPEEDSATFACES 
-#define GDETIN 1
+//#define WAVESPEEDSATFACES 
+#define GDETIN 0
 //#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
  
@@ -31,7 +31,7 @@
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e3
 #define EERHORATIOMIN 1.e-15
-#define EERHORATIOMAX 1.e3
+#define EERHORATIOMAX 1.e6
 
 /************************************/
 //blackhole
@@ -58,7 +58,7 @@
 #define NX 20
 #define NY 20
 #define NZ 1
-#else //Scharzschild
+#else //Schwarzschild
 #define MYCOORDS SCHWCOORDS
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 16.
@@ -81,6 +81,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define RADOUTPUTINZAMO
+//#define RADOUTPUTINFF
 #define CGSOUTPUT
 //#define PRINTXGC_LEFT
 //#define PRINTGC_RIGHT
@@ -239,10 +240,11 @@
 /************************************/
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
-#undef NX
-#define NX 100
-#undef NY
-#define NY 60
+//333
+//#undef NX
+//#define NX 100
+//#undef NY
+//#define NY 60
 #define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
@@ -250,7 +252,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

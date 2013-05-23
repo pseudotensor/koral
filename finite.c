@@ -347,16 +347,14 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
  
   //calculates the primitives
-#pragma omp parallel for private(iy,iz,iv) schedule (guided)
-  for(ix=0;ix<NX;ix++)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+  for(ii=0;ii<Nloop_0;ii++) //domain only
     {
-      for(iy=0;iy<NY;iy++)
-	{
-	  for(iz=0;iz<NZ;iz++)
-	    {	      
-	      calc_primitives(ix,iy,iz);
-	    }
-	}
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+      
+      calc_primitives(ix,iy,iz);
     }
 
  
@@ -381,16 +379,9 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   int superverbose=0;
 
   ldouble pp[NV];
-  if(superverbose)
-    {
-      ix=10;iy=1;iz=0;
-      for(iv=0;iv<NVHD;iv++)
-	pp[iv]=get_u(p,iv,ix,iy,iz);
-      print_Nvector(pp,NV);
-    }
-      
+     
   //calculates and saves wavespeeds
-#pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (guided)
+#pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (dynamic)
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -406,7 +397,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //interpolation and flux-calculation
-#pragma omp parallel for private(iy,iz,iv,ix)  schedule (guided) 
+#pragma omp parallel for private(iy,iz,iv,ix)  schedule (dynamic) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -650,7 +641,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-#pragma omp parallel for private(iy,iz,ix)  schedule (guided) 
+#pragma omp parallel for private(iy,iz,ix)  schedule (dynamic) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -666,78 +657,76 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //calculating the derivatives
-#pragma omp parallel for private(iy,iz,iv) schedule (guided)
-  for(ix=0;ix<NX;ix++)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+  for(ii=0;ii<Nloop_0;ii++) //domain 
     {
-      for(iy=0;iy<NY;iy++)
-	{
-	  for(iz=0;iz<NZ;iz++)
-	    {	      
-	      ldouble fd_der[NV],t_der[NV],val,ms_der[NV],ss_der[NV],rho,uint,pp[NV],uu[NV],uuold[NV],duu[NV];
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+      
+      ldouble fd_der[NV],t_der[NV],val,ms_der[NV],ss_der[NV],rho,uint,pp[NV],uu[NV],uuold[NV],duu[NV];
 	      
-	      ldouble gg[4][5],GG[4][5];
-	      ldouble tup[4][4],tlo[4][4];
-	      pick_T(tmuup,ix,iy,iz,tup);
-	      pick_T(tmulo,ix,iy,iz,tlo);
-	      pick_g(ix,iy,iz,gg);
-	      pick_G(ix,iy,iz,GG);
-	      ldouble gdet=gg[3][4];
+      ldouble gg[4][5],GG[4][5];
+      ldouble tup[4][4],tlo[4][4];
+      pick_T(tmuup,ix,iy,iz,tup);
+      pick_T(tmulo,ix,iy,iz,tlo);
+      pick_g(ix,iy,iz,gg);
+      pick_G(ix,iy,iz,GG);
+      ldouble gdet=gg[3][4];
 	      	      
-	      //updating u - fluxes
-	      for(iv=0;iv<NV;iv++)
+      //updating u - fluxes
+      for(iv=0;iv<NV;iv++)
+	{
+	  ldouble flxr,flyr,flzr,flxl,flyl,flzl;
+
+	  ldouble dx=get_size_x(ix,0);
+	  ldouble dy=get_size_x(iy,1);
+	  ldouble dz=get_size_x(iz,2);
+
+	  if(INT_ORDER==1 || INT_ORDER==2) //linear or parabolic
+	    {
+	      flxl=get_ub(flbx,iv,ix,iy,iz,0);
+	      flxr=get_ub(flbx,iv,ix+1,iy,iz,0);
+	      flyl=get_ub(flby,iv,ix,iy,iz,1);
+	      flyr=get_ub(flby,iv,ix,iy+1,iz,1);
+	      flzl=get_ub(flbz,iv,ix,iy,iz,2);
+	      flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
+	    }
+	  if(INT_ORDER==4) //MP5
+	    {
+	      if(1)
 		{
-		  ldouble flxr,flyr,flzr,flxl,flyl,flzl;
-
-		  ldouble dx=get_size_x(ix,0);
-		  ldouble dy=get_size_x(iy,1);
-		  ldouble dz=get_size_x(iz,2);
-
-		  if(INT_ORDER==1 || INT_ORDER==2) //linear or parabolic
-		    {
-		      flxl=get_ub(flbx,iv,ix,iy,iz,0);
-		      flxr=get_ub(flbx,iv,ix+1,iy,iz,0);
-		      flyl=get_ub(flby,iv,ix,iy,iz,1);
-		      flyr=get_ub(flby,iv,ix,iy+1,iz,1);
-		      flzl=get_ub(flbz,iv,ix,iy,iz,2);
-		      flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
-		    }
-		  if(INT_ORDER==4) //MP5
-		    {
-		      if(1)
-			{
-			  //flux reconstruction based on 3-point stencil near the boundaries
-			  flxr=13./12*get_ub(flbx,iv,ix+1,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
-			  flxl=13./12*get_ub(flbx,iv,ix,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0));
-			  flyr=13./12*get_ub(flby,iv,ix,iy+1,iz,1) -1./24. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
-			  flyl=13./12*get_ub(flby,iv,ix,iy,iz,1) -1./24. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1));
-			  flzr=13./12*get_ub(flbz,iv,ix,iy,iz+1,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
-			  flzl=13./12*get_ub(flbz,iv,ix,iy,iz,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2));
-			}
-		      else
-			{
-			  //flux reconstruction based on 5-point stencil 			  
-			  flxr=1067./960.*get_ub(flbx,iv,ix+1,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0)) +3./640. *(get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+3,iy,iz,0));
-			  flxl=1067./960.*get_ub(flbx,iv,ix,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0))+3./640. *(get_ub(flbx,iv,ix-2,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
-			  flyr=1067./960.*get_ub(flby,iv,ix,iy+1,iz,1) -29./480. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+3,iz,1));
-			  flyl=1067./960.*get_ub(flby,iv,ix,iy,iz,1) -29./480. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-2,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
-			  flzr=1067./960.*get_ub(flbz,iv,ix,iy,iz+1,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+3,2));
-			  flzl=1067./960.*get_ub(flbz,iv,ix,iy,iz,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-2,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
-			}
-		    }
-		  
-		  //unsplit scheme
-		  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
-
-
-		  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
-
-		  if(isnan(val) || isinf(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
-						       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
-
-		  set_u(u,iv,ix,iy,iz,val);	
-		  
+		  //flux reconstruction based on 3-point stencil near the boundaries
+		  flxr=13./12*get_ub(flbx,iv,ix+1,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
+		  flxl=13./12*get_ub(flbx,iv,ix,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0));
+		  flyr=13./12*get_ub(flby,iv,ix,iy+1,iz,1) -1./24. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
+		  flyl=13./12*get_ub(flby,iv,ix,iy,iz,1) -1./24. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1));
+		  flzr=13./12*get_ub(flbz,iv,ix,iy,iz+1,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
+		  flzl=13./12*get_ub(flbz,iv,ix,iy,iz,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2));
+		}
+	      else
+		{
+		  //flux reconstruction based on 5-point stencil 			  
+		  flxr=1067./960.*get_ub(flbx,iv,ix+1,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0)) +3./640. *(get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+3,iy,iz,0));
+		  flxl=1067./960.*get_ub(flbx,iv,ix,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0))+3./640. *(get_ub(flbx,iv,ix-2,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
+		  flyr=1067./960.*get_ub(flby,iv,ix,iy+1,iz,1) -29./480. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+3,iz,1));
+		  flyl=1067./960.*get_ub(flby,iv,ix,iy,iz,1) -29./480. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-2,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
+		  flzr=1067./960.*get_ub(flbz,iv,ix,iy,iz+1,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+3,2));
+		  flzl=1067./960.*get_ub(flbz,iv,ix,iy,iz,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-2,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
 		}
 	    }
+		  
+	  //unsplit scheme
+	  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
+
+
+	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
+
+	  if(isnan(val) || isinf(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
+					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
+
+	  set_u(u,iv,ix,iy,iz,val);	
+
 	}
     }
 
@@ -745,18 +734,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-  //calculates the primitives
-#pragma omp parallel for private(iy,iz,iv) schedule (guided)
-  for(ix=0;ix<NX;ix++)
-    {
-      for(iy=0;iy<NY;iy++)
-	{
-	  for(iz=0;iz<NZ;iz++)
-	    {	      
-	      //	      calc_primitives(ix,iy,iz);
-	    }
-	}
-    }	      
+  //do not update the primitives
+
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -767,165 +746,155 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-
-  if(superverbose)
+  //again over cells - source terms
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
-      ix=10;iy=1;iz=0;
-      for(iv=0;iv<NVHD;iv++)
-	pp[iv]=get_u(p,iv,ix,iy,iz);
-      print_Nvector(pp,NV);
-      getchar();
-    }
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2];  
 
-  //again over cells
-#pragma omp parallel for private(iy,iz,iv) schedule (guided)
-  for(ix=0;ix<NX;ix++)
-    {
-      for(iy=0;iy<NY;iy++)
-	{
-	  for(iz=0;iz<NZ;iz++)
-	    {	      
-	      ldouble gg[4][5],GG[4][5];
-	      ldouble tup[4][4],tlo[4][4];
-	      pick_T(tmuup,ix,iy,iz,tup);
-	      pick_T(tmulo,ix,iy,iz,tlo);
-	      pick_g(ix,iy,iz,gg);
-	      pick_G(ix,iy,iz,GG);
-	      ldouble gdet=gg[3][4];
-	      ldouble pp[NV],uu[NV];
+      ldouble gg[4][5],GG[4][5];
+      ldouble tup[4][4],tlo[4][4];
+      pick_T(tmuup,ix,iy,iz,tup);
+      pick_T(tmulo,ix,iy,iz,tlo);
+      pick_g(ix,iy,iz,gg);
+      pick_G(ix,iy,iz,GG);
+      ldouble gdet=gg[3][4];
+      ldouble pp[NV],uu[NV];
 	      	      
-	      //**********************************************************************
-	      //**********************************************************************
-	      //**********************************************************************
-	      //redistributing radiative fluids
+      //**********************************************************************
+      //**********************************************************************
+      //**********************************************************************
+      //redistributing radiative fluids
 #ifdef MULTIRADFLUID
-	      calc_primitives(ix,iy,iz);
-	      redistribute_radfluids_at_cell(ix,iy,iz);
+      calc_primitives(ix,iy,iz);
+      redistribute_radfluids_at_cell(ix,iy,iz);
 #ifdef MFCORRECTPHI
-	      mf_correct_in_azimuth_at_cell(ix,iy,iz,dt);
-	      //	      redistribute_radfluids_at_cell(ix,iy,iz);
+      mf_correct_in_azimuth_at_cell(ix,iy,iz,dt);
+      //	      redistribute_radfluids_at_cell(ix,iy,iz);
 #endif	      
 	      
 #endif
 
-	      //**********************************************************************
-	      //**********************************************************************
-	      //**********************************************************************
-	      //updating u - geometrical source terms
-	      ldouble ms[NV],val;
+      //**********************************************************************
+      //**********************************************************************
+      //**********************************************************************
+      //updating u - geometrical source terms
+      ldouble ms[NV],val;
 
 
 		  
-	      //metric source terms
+      //metric source terms
 
 #ifdef METRICIMPLICIT
-	      calc_primitives(ix,iy,iz);
-	      if(solve_implicit_metric(ix,iy,iz,dt,u) < 0)
-		{
+      calc_primitives(ix,iy,iz);
+      if(solve_implicit_metric(ix,iy,iz,dt,u) < 0)
+	{
 
-		  f_metric_source_term(ix,iy,iz,ms);
+	  f_metric_source_term(ix,iy,iz,ms);
 		  
-		  for(iv=0;iv<NV;iv++)
-		    {
-		      //if(fabs(ms[iv])*dt>fabs(0.1*get_u(ubase,iv,ix,iy,iz)))
-		      //printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(ubase,iv,ix,iy,iz),ms[iv]*dt,fabs(ms[iv]*dt/get_u(ubase,iv,ix,iy,iz)));
-		      val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
-		      set_u(u,iv,ix,iy,iz,val);	
-		      uu[iv]=val;
-		    } 
-		}
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      //if(fabs(ms[iv])*dt>fabs(0.1*get_u(ubase,iv,ix,iy,iz)))
+	      //printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(ubase,iv,ix,iy,iz),ms[iv]*dt,fabs(ms[iv]*dt/get_u(ubase,iv,ix,iy,iz)));
+	      val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
+	      set_u(u,iv,ix,iy,iz,val);	
+	      uu[iv]=val;
+	    } 
+	}
 #else
-	      f_metric_source_term(ix,iy,iz,ms);
+      f_metric_source_term(ix,iy,iz,ms);
 		  
-	      for(iv=0;iv<NV;iv++)
-		{
-		  //if(fabs(ms[iv])*dt>fabs(0.1*get_u(ubase,iv,ix,iy,iz)))
-		  //printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(ubase,iv,ix,iy,iz),ms[iv]*dt,fabs(ms[iv]*dt/get_u(ubase,iv,ix,iy,iz)));
-		  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
-		  set_u(u,iv,ix,iy,iz,val);	
-		  uu[iv]=val;
-		} 
+      for(iv=0;iv<NV;iv++)
+	{
+	  //if(fabs(ms[iv])*dt>fabs(0.1*get_u(ubase,iv,ix,iy,iz)))
+	  //printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(ubase,iv,ix,iy,iz),ms[iv]*dt,fabs(ms[iv]*dt/get_u(ubase,iv,ix,iy,iz)));
+	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
+	  set_u(u,iv,ix,iy,iz,val);	
+	  uu[iv]=val;
+	} 
 #endif
 
-	      /************************************************************************/
-	      /************************************************************************/
-	      /************************************************************************/
+      /************************************************************************/
+      /************************************************************************/
+      /************************************************************************/
 #ifndef SKIPRADSOURCE
 #ifdef RADIATION
-	      calc_primitives(ix,iy,iz);
-	      for(iv=0;iv<NV;iv++)
-		{
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
-		  uu[iv]=get_u(u,iv,ix,iy,iz);
-		} 
+      calc_primitives(ix,iy,iz);
+      for(iv=0;iv<NV;iv++)
+	{
+	  pp[iv]=get_u(p,iv,ix,iy,iz);
+	  uu[iv]=get_u(u,iv,ix,iy,iz);
+	} 
 
 
 
 #ifndef MULTIRADFLUID
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
- 	      //implicit in lab frame in four dimensions - fiducial 
-	      //test if implicit necessary
-	      ldouble del4[4]; 
-	      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
-		{
-		  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
-		    implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
-		  else
-		    {
-		      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
-		      apply_rad_source_del4(ix,iy,iz,del4);	      
-		    }
-		}
-	      else
-		implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
+      //implicit in lab frame in four dimensions - fiducial 
+      //test if implicit necessary
+      ldouble del4[4]; 
+      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
+	{
+	  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
+	    implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
+	  else
+	    {
+	      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
+	      apply_rad_source_del4(ix,iy,iz,del4);	      
+	    }
+	}
+      else
+	implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
 #endif
 
 #ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
-	      explicit_substep_rad_source_term(ix,iy,iz,dt,gg,GG);
+      explicit_substep_rad_source_term(ix,iy,iz,dt,gg,GG);
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE
-	      explicit_rad_source_term(ix,iy,iz,dt,gg,GG);
+      explicit_rad_source_term(ix,iy,iz,dt,gg,GG);
 #endif
 
 #ifdef IMPLICIT_FF_RAD_SOURCE
-	      //implicit in ff frame - backup
-	      //test if implicit necessary
-	      ldouble del4[4]; 
-	      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
-		{
-		  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
-		    {
-		      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
-		      implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
-		    }
-		  else
-		    {
-		      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
-		      apply_rad_source_del4(ix,iy,iz,del4);	      
-		    }
-		}
-	      else
-		{
-		      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
-		      implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
-		}
+      //implicit in ff frame - backup
+      //test if implicit necessary
+      ldouble del4[4]; 
+      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
+	{
+	  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
+	    {
+	      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
+	      implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
+	    }
+	  else
+	    {
+	      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
+	      apply_rad_source_del4(ix,iy,iz,del4);	      
+	    }
+	}
+      else
+	{
+	  for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
+	  implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
+	}
 #endif
 
 
-	      //************************************
-	      //************************************
+      //************************************
+      //************************************
 
 	     
-	      if(get_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz)<0)
-		{
-		   set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
-		   set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
-		}
+      if(get_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz)<0)
+	{
+	  set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
+	  set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
+	}
 
-	      //************************************
-	      //************************************
+      //************************************
+      //************************************
 
 
 	      
@@ -933,13 +902,11 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 #endif //RADIATION
 #endif //SKIPRADSOURCE
 
-	      /************************************************************************/
-	      /************************************************************************/
-	      /************************************************************************/
+      /************************************************************************/
+      /************************************************************************/
+      /************************************************************************/
 
-	    }	      
-	}
-    }
+    }	      
 
   //**********************************************************************
   //**********************************************************************
@@ -1363,6 +1330,29 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   *maxdtfac=maxdt;
 
   //auxiliary arrays to speed up parallel for loops
+
+  //inside + ghost cells - number depending on the order of reconstruction
+  Nloop_0=0;
+  loop_0=(int **)malloc(sizeof(int*));
+  loop_0[0]=(int *)malloc(3*sizeof(int));
+
+  for(ix=0;ix<NX;ix++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {	
+	      loop_0[Nloop_0][0]=ix;
+	      loop_0[Nloop_0][1]=iy;
+	      loop_0[Nloop_0][2]=iz;
+
+	      Nloop_0++;
+	      
+	      loop_0=(int **)realloc(loop_0,(Nloop_0+1)*sizeof(int*));
+	      loop_0[Nloop_0]=(int *)malloc(3*sizeof(int));	      
+	    }
+	}
+    }
 
   //inside + ghost cells - number depending on the order of reconstruction
   int xlim,ylim,zlim;
@@ -1820,7 +1810,7 @@ int set_bc(ldouble t)
 {
   int ix,iy,iz,ii;
  
-#pragma omp parallel for private(ix,iy,iz) schedule (static)
+#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only
     {
       ix=loop_2[ii][0];
@@ -1923,7 +1913,7 @@ cell_fixup()
 
   ldouble ppn[6][NV],pp[NV],uu[NV];
   //calculates the primitives
-#pragma omp parallel for private(iy,iz,iv) schedule (guided)
+#pragma omp parallel for private(iy,iz,iv) schedule (dynamic)
   for(ix=0;ix<NX;ix++)
     {
       for(iy=0;iy<NY;iy++)
