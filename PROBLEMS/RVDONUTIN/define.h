@@ -249,7 +249,7 @@
 #define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
-#define ALPHAVISC .3
+#define ALPHAVISC .1
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
