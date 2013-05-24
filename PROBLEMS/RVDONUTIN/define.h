@@ -31,7 +31,7 @@
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e3
 #define EERHORATIOMIN 1.e-15
-#define EERHORATIOMAX 1.e6
+#define EERHORATIOMAX 1.e4
 
 /************************************/
 //blackhole
@@ -43,9 +43,9 @@
 //simple viscosity
 /************************************/
 #define VISCOSITY
+#define ENFORCERADWAVESPEEDS
 #define SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
-#define ENFORCERADWAVESPEEDS
 #define RMINVISC 4.
 
 /************************************/
@@ -56,7 +56,7 @@
 #define MYCOORDS MKS1COORDS
 #define MKS1R0 -2.
 #define MINX (log(1.-MKS1R0))
-#define NX 40
+#define NX 20
 #define NY 20
 #define NZ 1
 #else //Schwarzschild

@@ -247,18 +247,20 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
      iiy=iy;
      iiz=iz;
 
+     //extrapolating along MYCOORDS
+
      //gc
-     ldouble r=xxvecBL[1];
+     ldouble r=xxvec[1];
 
      //iix=0
      ldouble xxout[4]={0.,get_x(iix,0),get_x(iiy,1),get_x(iiz,2)};
-     coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
+     //     coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
      ldouble r0=xxout[1];   
      
      //iix=1
      iix=1;
      xxout[1]=get_x(iix,0);
-     coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
+     //     coco_N(xxout,xxout,MYCOORDS,BLCOORDS);
      ldouble r1=xxout[1];   
      
      
@@ -307,7 +309,9 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
      //pp[6]=get_u(p,6,iix,iiy,iiz);
 
      //copying with scalings
-     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
+     iix=0;
+
+     pp[6]=get_u(p,6,iix,iiy,iiz);//*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
     
      //this works only for Kerr

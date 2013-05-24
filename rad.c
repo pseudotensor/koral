@@ -115,7 +115,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],uu[NV],uu0[NV],uu00[NV],uup[NV]; 
-  ldouble f1[4],f2[4],f3[4],xxx[4];
+  ldouble f1[4],f2[4],f3hd[4],f3rad[4],xxx[4];
 
   ldouble (*gg)[5],(*GG)[5];
 
@@ -137,7 +137,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
    }
 
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6; 
+  ldouble CONV = 1.e-10; 
   ldouble DAMP = 0.5;
 
   ldouble frdt = 1.0;
@@ -230,7 +230,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  if(inverse_44matrix(J,iJ)<0)
 	    {
 	      failed=1;
-	      if(verbose) getchar();
+	      //	      if(verbose) getchar();
 	      break;
 	    }
 
@@ -257,23 +257,25 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      uu[i+6]=xxx[i];
 	    }
   
+	   //opposite changes in gas quantities
+	  uu[1] = uu0[1] - (uu[6]-uu0[6]);
+	  uu[2] = uu0[2] - (uu[7]-uu0[7]);
+	  uu[3] = uu0[3] - (uu[8]-uu0[8]);
+	  uu[4] = uu0[4] - (uu[9]-uu0[9]);
+
 	  //test convergence
 	  for(i=0;i<4;i++)
 	    {
-	      f3[i]=(uu[i+6]-uup[i+6]);
+	      f3rad[i]=(uu[i+6]-uup[i+6]);
+	      f3hd[i]=(uu[i]-uup[i]);
 	      
-	      /*
-	      if(i>0 && fabs(uup[i+6])<EPS)
-		f3[i]=fabs(f3[i]/EPS);
-	      else
-		f3[i]=fabs(f3[i]/uup[i+6]);
-	      */
-
-	      f3[i]=fabs(f3[i]/uup[6]);
-	      //f3[i]=fabs(f3[i]/my_max(uup[6],uup[1]));
+	      f3rad[i]=fabs(f3rad[i]/uup[6]);
+	      f3hd[i]=fabs(f3hd[i]/my_max(uup[1],uup[0]));
 	    }
 
-	  if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
+	  if(f3rad[0]<CONV && f3rad[1]<CONV && f3rad[2]<CONV && f3rad[3]<CONV)
+	    //	     && f3hd[0]<CONV && f3hd[1]<CONV && f3hd[2]<CONV && f3hd[3]<CONV)
+
 	    {
 	      if(verbose) printf("success ===\n");
 	      break;

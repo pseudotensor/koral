@@ -221,22 +221,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
 
 
-  //************************************
-  //************************************
-  //checking on hd floors
-  
-  int floorret;
-  floorret=check_floors_hd(pp,VELPRIM,ggg);
-
-  if(floorret<0.)
-    {
-      hdcorr=1;
-      fixups[0]=1;
-    }
-
-  //************************************
-  //************************************
-
 
 
   //************************************
@@ -258,7 +242,25 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
     fixups[1]=1;
   else
     fixups[1]=0;
+
   //************************************
+  //************************************
+  //checking on rhd floors
+  
+  int floorret;
+  floorret=check_floors_hd(pp,VELPRIM,ggg);
+
+  if(floorret<0.)
+    {
+      hdcorr=1;
+      radcorr=1;
+      fixups[0]=1;
+    }
+
+  //************************************
+  //************************************
+  
+//************************************
   //************************************
 
   if(hdcorr>0) corrected[0]=1;

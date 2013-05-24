@@ -851,6 +851,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
   
   ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
+  if(xxvecBL[1]<r_horizon_BL(BHSPIN)) fdampr=0.;
   ldouble pgas=(GAMMA-1.)*pp[UU];
 
 #ifdef RADIATION

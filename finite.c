@@ -783,8 +783,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //updating u - geometrical source terms
       ldouble ms[NV],val;
-
-
 		  
       //metric source terms
 
@@ -792,7 +790,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       calc_primitives(ix,iy,iz);
       if(solve_implicit_metric(ix,iy,iz,dt,u) < 0)
 	{
-
 	  f_metric_source_term(ix,iy,iz,ms);
 		  
 	  for(iv=0;iv<NV;iv++)
@@ -816,6 +813,22 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  uu[iv]=val;
 	} 
 #endif
+
+      /************************************************************************/
+      /************************************************************************/
+      /************************************************************************/
+      //entropy source term
+
+      /*
+      f_other_source_term(ix,iy,iz,ms);
+		  
+      for(iv=0;iv<NV;iv++)
+	{
+	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
+	  set_u(u,iv,ix,iy,iz,val);	
+	  uu[iv]=val;
+	}
+      */ 
 
       /************************************************************************/
       /************************************************************************/
