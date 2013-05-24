@@ -1,7 +1,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define ALLOW_EXPLICIT_RAD_SOURCE 0
+#define ALLOW_EXPLICIT_RAD_SOURCE 1
 #define GAMMAMAXRAD 1000.
 
 /************************************/
@@ -18,11 +18,11 @@
 #define TIMESTEPPING RK2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
-//#define FLUXMETHOD HLL_FLUX
+#define MINMOD_THETA 1.8
+#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
 #define GDETIN 0
-//#define SKIPRADSOURCE
+#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
  
 /************************************/
@@ -56,7 +56,7 @@
 #define MYCOORDS MKS1COORDS
 #define MKS1R0 -2.
 #define MINX (log(1.-MKS1R0))
-#define NX 20
+#define NX 40
 #define NY 20
 #define NZ 1
 #else //Schwarzschild
@@ -76,16 +76,17 @@
 /************************************/
 //output
 /************************************/
-#define OUTCOORDS KERRCOORDS
+//#define OUTCOORDS KERRCOORD                                                                        S
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define RADOUTPUTINZAMO
+///#define RADOUTPUTINZAMO
+#define PRINTINSIDEBH
 //#define RADOUTPUTINFF
 #define CGSOUTPUT
-//#define PRINTXGC_LEFT
-//#define PRINTGC_RIGHT
+#define PRINTXGC_LEFT
+//                                                                                                                                                                                                                                                                                                                                                                                               #define PRINTGC_RIGHT
 
 /************************************/
 //common physics / atmosphere

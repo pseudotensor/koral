@@ -248,7 +248,9 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  yy=xxvecout[2];
 						  zz=xxvecout[3];
 
+#ifndef PRINTINSIDEBH						  
 						  if((OUTCOORDS==KERRCOORDS || OUTCOORDS==BLCOORDS) && xx<r_horizon_BL(BHSPIN)) continue;
+#endif
 
 						  xxx[0]=t;
 						  xxx[1]=xx;
