@@ -183,7 +183,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 
   //physical size of the cell
   ldouble dx[3];
-  ldouble xx[4];
+  ldouble xx[4]={0.,geom->xx,geom->yy,geom->zz};
   
   //ix,iy,iz has the indices of the face, so the depth taken from left/right
   dx[0]=my_max(get_size_x(geom->ix,0)*sqrt(gg[1][1]),get_size_x(geom->ix+1,0)*sqrt(gg[1][1]));
@@ -221,6 +221,36 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //**********************************************************************
   //**********************************************************************
     
+  //combining rad and hydro velocities when SIMPLEVISCOSITY with total pressure
+#ifdef ENFORCERADWAVESPEEDS
+
+ //based on local opacities
+  ldouble xxvecBL[4];
+  coco_N(xx,xxvecBL,MYCOORDS,BLCOORDS);
+  //damping in radius
+  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
+
+  dx[0]=1.;dx[1]=1.;dx[2]=1;//opt depth per Rg
+  calc_tautot(pp,xx,dx,tautot);
+  ldouble Rij[4][4];
+  calc_Rij(pp,ggg,Rij);
+  // skip boosts what reasonable when gas v<<1
+  // boost22_lab2ff(Rij,Rij,pp,gg,GG);
+  // trans22_cc2on(Rij,Rij,tup);
+  tautot[0]+=1.e-50;
+  ldouble PARAM=10.;
+  ldouble fdamptau=exp(-10./tautot[0]/tautot[0]);
+  ldouble fdamp=fdamptau*fdampr;
+
+  axhdl -= axl*fdamp;
+  axhdr += axr*fdamp;
+  ayhdl -= ayl*fdamp;
+  ayhdr += ayr*fdamp;
+  azhdl -= azl*fdamp;
+  azhdr += azr*fdamp;
+  
+#endif
+
   //zeroing 'co-going' velocities
   if(axhdl>0.) axhdl=0.;
   if(axhdr<0.) axhdr=0.;
@@ -820,25 +850,23 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble xxvecBL[4];
   coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
   
-  if(xxvecBL[1]<RMINVISC) return 0;
-
+  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
   ldouble pgas=(GAMMA-1.)*pp[UU];
 
 #ifdef RADIATION
 #ifdef ALPHATOTALPRESSURE
 
-  //currently suppressing radiation pressure by looking at diagonal fluid-frame rad.pressure components
+
+  /*
+  //suppressing radiation pressure by looking at diagonal fluid-frame rad.pressure components  
   ldouble Rij[4][4];
   calc_Rij(pp,ggg,Rij);
   boost22_lab2ff(Rij,Rij,pp,gg,GG);
   trans22_cc2on(Rij,Rij,tup);
   ldouble diag[3]={Rij[1][1],Rij[2][2],Rij[3][3]};
   ldouble maxdiag=my_max(diag[0],my_max(diag[1],diag[2]))/Rij[0][0];
-  
   ldouble THINSUPPPARAM = 0.00001; //prad=0 for maxdiag=0.4
-  ldouble prad=1./3.*Rij[0][0]*exp(-(maxdiag-1./3.)*(maxdiag-1./3.)/THINSUPPPARAM);
-
-  /*
+  ldouble prad=1./3.*Rij[0][0]*exp(-(maxdiag-1./3.)*(maxdiag-1./3.)/THINSUPPPARAM);  
   if(geom->ix==NX-1)
     {
       printf("ix: %d %d\n",geom->ix,geom->iy);
@@ -850,6 +878,35 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       getchar();
     }
   */
+
+  //based on local opacities
+  ldouble xx[4]={0.,geom->xx,geom->yy,geom->zz};
+  ldouble dx[3]={1.,1.,1.}; //opt depth per Rg
+  ldouble tautot[3];
+  calc_tautot(pp,xx,dx,tautot);
+
+  ldouble Rij[4][4];
+  calc_Rij(pp,ggg,Rij);
+  // skip boosts what reasonable when gas v<<1
+  // boost22_lab2ff(Rij,Rij,pp,gg,GG);
+  // trans22_cc2on(Rij,Rij,tup);
+  
+  tautot[0]+=1.e-50;
+
+  ldouble PARAM=10.;
+  ldouble fdamptau=exp(-10./tautot[0]/tautot[0]);
+  ldouble prad=1./3.*Rij[0][0]*fdamptau*fdampr;
+
+  /*
+ if(geom->iy==NY-1)
+    {
+      printf("ix: %d %d r: %f\n",geom->ix,geom->iy,xxvecBL[1]);
+      print_tensor(Rij);
+      printf("(%f) fdamps: %e %e\n",tautot[0],fdamptau,fdampr);
+      getchar();
+    }
+  */
+  
 
   ldouble p=pgas+prad;
 #else

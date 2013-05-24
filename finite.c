@@ -255,14 +255,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 {
   ldouble aaaxhd,aaaxrad,aaayhd,aaayrad,aaazhd,aaazrad;
 
-#ifdef ENFORCERADWAVESPEEDS
-  aaa[0]=aaa[6];
-  aaa[1]=aaa[7];
-  aaa[2]=aaa[8];
-  aaa[3]=aaa[9];
-  aaa[4]=aaa[10];  
-  aaa[5]=aaa[11];
-#endif
 	      
   set_u_scalar(ahdxl,ix,iy,iz,aaa[0]);
   set_u_scalar(ahdxr,ix,iy,iz,aaa[1]);

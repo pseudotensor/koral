@@ -18,7 +18,7 @@
 #define TIMESTEPPING RK2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
 #define GDETIN 0
@@ -44,9 +44,9 @@
 /************************************/
 #define VISCOSITY
 #define SIMPLEVISCOSITY
-//#define ALPHATOTALPRESSURE
-//#define ENFORCERADWAVESPEEDS
-#define RMINVISC 0.
+#define ALPHATOTALPRESSURE
+#define ENFORCERADWAVESPEEDS
+#define RMINVISC 4.
 
 /************************************/
 //coordinates / resolution
@@ -55,8 +55,8 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MKS1R0 -2.
-#define MINX (log(1.25-MKS1R0))
-#define NX 20
+#define MINX (log(1.-MKS1R0))
+#define NX 40
 #define NY 20
 #define NZ 1
 #else //Schwarzschild
@@ -242,10 +242,10 @@
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
 //333
-#undef NX
-#define NX 80
-#undef NY
-#define NY 50
+//#undef NX
+//#define NX 80
+//#undef NY
+//#define NY 50
 #define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
@@ -253,7 +253,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e1
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
