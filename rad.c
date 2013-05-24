@@ -136,8 +136,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       uu0[iv]=uu[iv];
    }
 
-  ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-10; 
+  ldouble EPS = 1.e-6;
+  ldouble CONV = 1.e-6; 
   ldouble DAMP = 0.5;
 
   ldouble frdt = 1.0;
@@ -465,12 +465,12 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 
   ldouble Gi[4];
   calc_Gi(pp,&geom,Gi);
+  indices_21(Gi,Gi,geom.gg);
   
   deltas[0]=-Gi[0]*dt*gdetu;
   deltas[1]=-Gi[1]*dt*gdetu;
   deltas[2]=-Gi[2]*dt*gdetu;
   deltas[3]=-Gi[3]*dt*gdetu;
-
 
   return 0;
 

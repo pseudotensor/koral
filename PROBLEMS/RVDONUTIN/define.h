@@ -31,7 +31,7 @@
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e3
 #define EERHORATIOMIN 1.e-15
-#define EERHORATIOMAX 1.e4
+#define EERHORATIOMAX 1.e6
 
 /************************************/
 //blackhole
@@ -42,8 +42,8 @@
 /************************************/
 //simple viscosity
 /************************************/
-#define VISCOSITY
-#define ENFORCERADWAVESPEEDS
+//#define VISCOSITY
+//#define ENFORCERADWAVESPEEDS
 #define SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
 #define RMINVISC 4.

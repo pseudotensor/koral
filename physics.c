@@ -319,13 +319,68 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 }
 
 //***************************************
-//returns external source terms
+//returns othersource terms for all conserved quantities
 //***************************************
-int f_source_term(int ix, int iy, int iz,ldouble *ss)
+int f_other_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 {
-  int iv;
-  for(iv=0;iv<NV;iv++)
-    ss[iv]=0.;
+  int i;
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+
+  int ix,iy,iz;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+ 
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //no metric determinant inside derivatives
+  gdetu=1.;
+#endif
+
+  ldouble rho=pp[RHO];
+  ldouble u=pp[1];  
+  ldouble E=pp[6];  
+  ldouble pr=(GAMMA-1.)*(u);
+  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  
+  ldouble Gi[4];
+  calc_Gi(pp,ggg,Gi);
+
+  ldouble ucon[4]={0.,pp[2],pp[3],pp[4]},ucov[4];
+  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+   indices_21(ucon,ucov,geom->gg);
+
+  ldouble entropy_source= -1./T*dot(ucov,Gi);
+
+  for(i=0;i<NV;i++)
+    ss[i]=0.;
+  
+  //  ss[5]=entropy_source;
+
+
+  return 0;
+}
+
+
+//***************************************
+//returns geometrical source terms for all conserved quantities
+//***************************************
+int f_other_source_term(int ix, int iy, int iz,ldouble *ss)
+{
+  int i;
+  ldouble pp[NV];  
+
+  for(i=0;i<NV;i++)
+    pp[i]=get_u(p,i,ix,iy,iz);  
+  
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+  f_other_source_term_arb(pp,&geom,ss);
 
   return 0;
 }

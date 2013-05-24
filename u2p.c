@@ -220,7 +220,18 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
   //************************************
 
+  //************************************
+  //************************************
+  //checking on hd floors
+  
+  int floorret;
+  floorret=check_floors_hd(pp,VELPRIM,ggg);
 
+  if(floorret<0.)
+    {
+      hdcorr=1;
+      fixups[0]=1;
+    }
 
 
   //************************************
@@ -245,18 +256,16 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   //************************************
   //************************************
-  //checking on rhd floors
+  //checking on rad floors
   
-  int floorret;
-  floorret=check_floors_hd(pp,VELPRIM,ggg);
-
+  
+  floorret=check_floors_rad(pp,VELPRIMRAD,ggg);
   if(floorret<0.)
     {
-      hdcorr=1;
       radcorr=1;
-      fixups[0]=1;
+      fixups[1]=1;
     }
-
+  
   //************************************
   //************************************
   
@@ -311,15 +320,45 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   //ldouble rhomax=100.;
   //if(pp[0]<RHORHOMAXRATIOMIN*rhomax) {pp[0]=RHORHOMAXRATIOMIN*rhomax; ret=-1; if(verbose) printf("hd_floors CASE 5\n");}
 
+  return ret;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//checks if rad primitives make sense
+int
+check_floors_rad(ldouble *pp, int whichvel,void *ggg)
+{
+  //skip floors for some time
+  return 0;
+
+  int verbose=1;
+  int ret=0;
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
 
 #ifdef RADIATION
   //EE/rho ratios
   ldouble pp2[NV];
-  prad_lab2ff(pp, pp2, ggg);
+  int iv;
+  for(iv=0;iv<NV;iv++)
+    pp2[iv]=pp[iv];
 
+  ldouble Rij[4][4];
+  //calc_Rij(pp2,ggg,Rij);
+  //prad_lab2ff(pp, pp2, ggg);
+
+  //currently comparing Erf with rho - inconsistent
 #ifndef MULTIRADFLUID  
-  if(pp2[6]<EERHORATIOMIN*pp2[0]) {pp2[6]=EERHORATIOMIN*pp2[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
-  if(pp2[6]>EERHORATIOMAX*pp2[0]) {pp2[0]=1./EERHORATIOMAX*pp2[6];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
+  if(pp2[6]<EERHORATIOMIN*pp2[0]) {pp2[6]=EERHORATIOMIN*pp2[0];ret=-1;if(verbose) printf("hd_floors CASE R2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
+  if(pp2[6]>EERHORATIOMAX*pp2[0]) {pp2[0]=1./EERHORATIOMAX*pp2[6];ret=-1;if(verbose) printf("hd_floors CASE R3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
 #else
   int irf;
   for(irf=0;irf<NRF;irf++)
@@ -329,10 +368,13 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       //if(pp[EE(irf)]>EERHORATIOMAX*pp[0]) {pp[0]=1./EERHORATIOMAX*pp[EE(irf)];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
     }
 #endif
-
-  prad_ff2lab(pp2, pp, ggg);
+  for(iv=0;iv<NV;iv++)
+    pp[iv]=pp2[iv];
+  //prad_ff2lab(pp2, pp, ggg);
 #endif
  
+
+  return ret;
   //velocities
 
   int i,j,k,correct;

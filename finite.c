@@ -427,6 +427,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       ldouble ffl[NV],ffr[NV];
       ldouble gloc[4][5],gl[4][5],gr[4][5],Gl[4][5],Gr[4][5];
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
+      struct geometry geom;
       int i;
 	      
       pick_g(ix,iy,iz,gloc);
@@ -474,13 +475,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
       //testing if interpolated primitives make sense
-      pick_gb(ix,iy,iz,0,gl);
-      pick_Gb(ix,iy,iz,0,Gl);
-      pick_gb(ix+1,iy,iz,0,gr);
-      pick_Gb(ix+1,iy,iz,0,Gr);
-
-      //check_floors_hd(fd_pl,VELPRIM,gl,Gl);
-      //check_floors_hd(fd_pr,VELPRIM,gr,Gr);
+      fill_geometry_face(ix,iy,iz,0,&geom);
+      check_floors_hd(fd_pl,VELPRIM,&geom);
+      fill_geometry_face(ix+1,iy,iz,0,&geom);
+      check_floors_hd(fd_pr,VELPRIM,&geom);
       //end of floor section
 
       f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
@@ -552,14 +550,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  */
 
 	  //testing if interpolated primitives make sense
-	  pick_gb(ix,iy,iz,1,gl);
-	  pick_Gb(ix,iy,iz,1,Gl);
-	  pick_gb(ix,iy+1,iz,1,gr);
-	  pick_Gb(ix,iy+1,iz,1,Gr);
-
-	  //check_floors_hd(fd_pl,VELPRIM,gl,Gl);
-	  //check_floors_hd(fd_pr,VELPRIM,gr,Gr);
-	  //end of floor section
+	  fill_geometry_face(ix,iy,iz,1,&geom);
+	  check_floors_hd(fd_pl,VELPRIM,&geom);
+	  fill_geometry_face(ix,iy+1,iz,1,&geom);
+	  check_floors_hd(fd_pr,VELPRIM,&geom);
 
 	  f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
 	  f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
@@ -611,13 +605,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
 	  //testing if interpolated primitives make sense
-	  pick_gb(ix,iy,iz,2,gl);
-	  pick_Gb(ix,iy,iz,2,Gl);
-	  pick_gb(ix,iy,iz+1,2,gr);
-	  pick_Gb(ix,iy,iz+1,2,Gr);
-
-	  //check_floors_hd(fd_pl,VELPRIM,gl,Gl);
-	  //check_floors_hd(fd_pr,VELPRIM,gr,Gr);
+	  fill_geometry_face(ix,iy,iz,2,&geom);
+	  check_floors_hd(fd_pl,VELPRIM,&geom);
+	  fill_geometry_face(ix,iy,iz+1,2,&geom);
+	  check_floors_hd(fd_pr,VELPRIM,&geom);
 	  //end of floor section
 
 	  f_flux_prime(fd_pl,2,ix,iy,iz,ffl);
@@ -819,7 +810,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       /************************************************************************/
       //entropy source term
 
-      /*
+      
       f_other_source_term(ix,iy,iz,ms);
 		  
       for(iv=0;iv<NV;iv++)
@@ -828,7 +819,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	}
-      */ 
+      
 
       /************************************************************************/
       /************************************************************************/
