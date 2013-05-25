@@ -1457,7 +1457,7 @@ static int get_m1closure_urfconrel(int verbose,
     get_m1closure_gammarel2_cold(verbose,ggg,Avconfast,Avcovfast,&gammarel2fast,&delta,&numerator,&divisor,&Erffast,urfconrelfast);
 
     int usingfast=1;
-    // choose by which Avcov[0] is closest to original
+    // choose by which Avcov[0] is closest to original&&
     if( fabs(Avcovslow[0]-Avcov[0])>fabs(Avcovfast[0]-Avcov[0])){
       usingfast=1;
       for(jj=0;jj<4;jj++)
@@ -1873,6 +1873,8 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	      urfcon[1]=0.;
 	      urfcon[2]=0.;
 	      urfcon[3]=0.;
+
+	      *corrected=1;
 	      if(verbose) {printf("nocapbad: gammarel2=%g\n",gammarel2);}
 	    }	
 	  else

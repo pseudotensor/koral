@@ -6,7 +6,7 @@
 
 ldouble minx,miny,maxx,maxy;
 
-#ifdef myMKS1COORDS
+#if (OUTCOORDS==KERRCOORDS)
 minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
 maxx= 1.06*(exp(get_xb(NX,0))+MKS1R0);
 miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);

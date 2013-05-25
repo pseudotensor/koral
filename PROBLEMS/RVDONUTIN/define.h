@@ -18,11 +18,11 @@
 #define TIMESTEPPING RK2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.8
-#define FLUXMETHOD HLL_FLUX
+#define MINMOD_THETA 1.5
+//#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
 #define GDETIN 0
-#define SKIPRADSOURCE
+//#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
  
 /************************************/
@@ -42,8 +42,8 @@
 /************************************/
 //simple viscosity
 /************************************/
-//#define VISCOSITY
-//#define ENFORCERADWAVESPEEDS
+#define VISCOSITY
+#define ENFORCERADWAVESPEEDS
 #define SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
 #define RMINVISC 4.
@@ -57,7 +57,7 @@
 #define MKS1R0 -2.
 #define MINX (log(1.-MKS1R0))
 #define NX 40
-#define NY 20
+#define NY 40
 #define NZ 1
 #else //Schwarzschild
 #define MYCOORDS SCHWCOORDS
@@ -67,7 +67,7 @@
 #define NY 32
 #define NZ 1
 #endif
-#define MINY (0.005*Pi/2.)
+#define MINY (0.05*Pi/2.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.
@@ -76,17 +76,16 @@
 /************************************/
 //output
 /************************************/
-//#define OUTCOORDS KERRCOORD                                                                        S
+#define OUTCOORDS KERRCOORDS                                                                    
+#define RADOUTPUTINZAMO
+//#define PRINTINSIDEBH
+#define PRINTXGC_LEFT
+
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-///#define RADOUTPUTINZAMO
-#define PRINTINSIDEBH
-//#define RADOUTPUTINFF
 #define CGSOUTPUT
-#define PRINTXGC_LEFT
-//                                                                                                                                                                                                                                                                                                                                                                                               #define PRINTGC_RIGHT
 
 /************************************/
 //common physics / atmosphere

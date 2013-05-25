@@ -1926,7 +1926,7 @@ cell_fixup()
 
   int ix,iy,iz,iv;
   int in,ii;
-  int verbose=0;
+  int verbose=1;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);

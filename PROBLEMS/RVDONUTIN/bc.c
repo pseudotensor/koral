@@ -311,7 +311,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
      //copying with scalings
      iix=0;
 
-     pp[6]=get_u(p,6,iix,iiy,iiz);//*pow(r/r0,-2.5);
+     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
     
      //this works only for Kerr
