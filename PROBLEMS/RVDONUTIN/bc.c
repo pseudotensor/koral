@@ -292,9 +292,9 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
        }
  
      //atmosphere
-     //set_radatmosphere(pp,xxvec,gg,GG,0);
+     set_radatmosphere(pp,xxvec,gg,GG,0);
 
-#ifdef RADIATION
+#ifdef SKIP_RADIATION
      //imposing inflowing velocity of the normal observer
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);

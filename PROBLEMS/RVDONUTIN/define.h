@@ -16,13 +16,15 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
-#define TSTEPLIM .6
+#define TSTEPLIM .16
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
-#define GDETIN 0
-//#define SKIPRADSOURCE
+#define GDETIN 1
+#define SKIPRADSOURCE
+//#define PUREAXISOUTFLOW
+
 //#define SKIPRADWAVESPEEDLIMITER
  
 /************************************/
@@ -42,8 +44,8 @@
 /************************************/
 //simple viscosity
 /************************************/
-#define VISCOSITY
-#define ENFORCERADWAVESPEEDS
+//#define VISCOSITY
+//#define ENFORCERADWAVESPEEDS
 #define SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
 #define RMINVISC 4.
@@ -56,8 +58,8 @@
 #define MYCOORDS MKS1COORDS
 #define MKS1R0 -2.
 #define MINX (log(1.-MKS1R0))
-#define NX 40
-#define NY 40
+#define NX 20
+#define NY 10
 #define NZ 1
 #else //Schwarzschild
 #define MYCOORDS SCHWCOORDS
@@ -67,7 +69,7 @@
 #define NY 32
 #define NZ 1
 #endif
-#define MINY (0.05*Pi/2.)
+#define MINY (0.001*Pi/2.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.
@@ -76,9 +78,9 @@
 /************************************/
 //output
 /************************************/
-#define OUTCOORDS KERRCOORDS                                                                    
-#define RADOUTPUTINZAMO
-//#define PRINTINSIDEBH
+//#define OUTCOORDS KERRCOORDS                                                                    
+//#define RADOUTPUTINZAMO
+#define PRINTINSIDEBH
 #define PRINTXGC_LEFT
 
 #define OUTVEL VEL4
