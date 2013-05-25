@@ -1,6 +1,8 @@
-//#define RADIATION
+#define RADIATION
+#define GDETIN 0
+#define SKIPRADSOURCE
+#define SKIPRADWAVESPEEDLIMITER
 
-//#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 //#define ALLOW_EXPLICIT_RAD_SOURCE 1
@@ -17,31 +19,33 @@
 #define MYCOORDS KSCOORDS
 #endif
 
-#define OUTCOORDS KERRCOORDS
+//#define OUTCOORDS KERRCOORDS                                                                    
+//#define RADOUTPUTINZAMO
+#define PRINTINSIDEBH
+#define PRINTXGC_LEFT
 #define OUTVEL VEL4
 #define DTOUT1 1.e1
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
-#define RADOUTPUTINZAMO
 
 #ifdef myMKS1COORDS
 #define MKS1R0 -2.
-#define MINX (log(1.5-MKS1R0))
+#define MINX (log(1.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 64
+#define NX 20
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 30.
 #define NX 70
 #endif
 
-#define NY 1
+#define NY 3
 #define NZ 1
 
 
-#define MINY (Pi/2.-0.005*Pi/4.)
-#define MAXY (Pi/2.+0.005*Pi/4.)
+#define MINY (Pi/2.-0.5*Pi/4.)
+#define MAXY (Pi/2.+0.5*Pi/4.)
 #define MINZ -1.
 #define MAXZ 1.
 
@@ -59,14 +63,12 @@
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
 
-#define GDETIN 1
-
-#define ENFORCEENTROPY
-#define WAVESPEEDSATFACES
-#define FLUXMETHOD HLL_FLUX
+//#define ENFORCEENTROPY
+//#define WAVESPEEDSATFACES
+//#define FLUXMETHOD HLL_FLUX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.5
 
 #define NODONUT 0
 #define INFLOWING 0

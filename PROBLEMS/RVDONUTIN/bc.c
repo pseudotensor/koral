@@ -289,12 +289,13 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
       for(iv=0;iv<NV;iv++)
        {
 	 pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
+	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
  
      //atmosphere
-     set_radatmosphere(pp,xxvec,gg,GG,0);
+      //set_radatmosphere(pp,xxvec,gg,GG,0);
 
-#ifdef SKIP_RADIATION
+#ifdef RADIATION
      //imposing inflowing velocity of the normal observer
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);
@@ -306,12 +307,14 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
        pp[7]=-100.;
 
      //pure copy
-     //pp[6]=get_u(p,6,iix,iiy,iiz);
+  
+   iix=0;
+   pp[6]=get_u(p,6,iix,iiy,iiz);
 
      //copying with scalings
-     iix=0;
+  
 
-     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
+     //pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
     
      //this works only for Kerr

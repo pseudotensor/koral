@@ -37,7 +37,6 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //test
   //cs2*=4.;
 
-  //if(cs2>=1.0) cs2=0.99999;
   if(cs2<0.) cs2=0.;
 
   //**********************************************************************
@@ -192,10 +191,6 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   ldouble tautot[3];
   calc_tautot(pp,xx,dx,tautot);
 
-#ifdef SKIPRADWAVESPEEDLIMITER
-  tautot[0]=tautot[1]=tautot[2]=0.;
-#endif
-  
 #ifndef MULTIRADFLUID
   calc_rad_wavespeeds(pp,geom,tautot,aval,verbose);
 

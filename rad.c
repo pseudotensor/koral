@@ -1095,22 +1095,6 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   GG=geom->GG;
 
   int i,j;
-  
-  //metric
-  ldouble g00=gg[0][0];
-  ldouble g03=gg[0][3];
-  ldouble g30=g03;
-  ldouble g11=gg[1][1];
-  ldouble g22=gg[2][2];
-  ldouble g33=gg[3][3];
-
-  //inversed metric
-  ldouble G00=GG[0][0];
-  ldouble G03=GG[0][3];
-  ldouble G11=GG[1][1];
-  ldouble G22=GG[2][2];
-  ldouble G33=GG[3][3];
-  ldouble G30=G03;
 
 #ifdef LABRADFLUXES
   //artificially puts pp=uu and converts them to urf and Erf using the regular converter
@@ -1140,10 +1124,6 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 
   //square of radiative wavespeed in radiative rest frame
   ldouble rv2rad = 1./3.;
-  
-  //test
-  //rv2rad = 1.;
-
   ldouble rv2,rv2tau;
 
   //**********************************************************************
@@ -1169,8 +1149,12 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       else
 	rv2=rv2rad;
       
+#ifdef SKIPRADWAVESPEEDLIMITER
+      rv2=rv2rad;
+#endif
+
       //test
-      rv2=1.;
+      //rv2=1.;
 
       Acov[0]=0.;
       Acov[1]=0.;

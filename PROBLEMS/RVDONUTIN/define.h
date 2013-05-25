@@ -1,7 +1,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define ALLOW_EXPLICIT_RAD_SOURCE 1
+#define ALLOW_EXPLICIT_RAD_SOURCE 0
 #define GAMMAMAXRAD 1000.
 
 /************************************/
@@ -16,19 +16,19 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
-#define TSTEPLIM .16
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
-#define GDETIN 1
+#define GDETIN 0
 #define SKIPRADSOURCE
+#define SKIPRADWAVESPEEDLIMITER
 //#define PUREAXISOUTFLOW
 
-//#define SKIPRADWAVESPEEDLIMITER
  
 /************************************/
-//hd floors
+//rhd floors
 /************************************/
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e3
@@ -54,17 +54,17 @@
 //coordinates / resolution
 /************************************/
 #define myMKS1COORDS
+#define MKS1R0 -2.
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MKS1R0 -2.
 #define MINX (log(1.-MKS1R0))
-#define NX 20
-#define NY 10
+#define NX 40
+#define NY 30
 #define NZ 1
 #else //Schwarzschild
 #define MYCOORDS SCHWCOORDS
 #define MINX (1.5*r_horizon_BL(BHSPIN))
-#define MAXX 16.
+//#define MAXX 16.
 #define NX 48
 #define NY 32
 #define NZ 1
@@ -78,9 +78,9 @@
 /************************************/
 //output
 /************************************/
-//#define OUTCOORDS KERRCOORDS                                                                    
-//#define RADOUTPUTINZAMO
-#define PRINTINSIDEBH
+#define OUTCOORDS KERRCOORDS                                                                    
+#define RADOUTPUTINZAMO
+//#define PRINTINSIDEBH
 #define PRINTXGC_LEFT
 
 #define OUTVEL VEL4

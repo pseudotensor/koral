@@ -271,7 +271,7 @@ if(iz<0 || iz>=NZ)
       }
   }
 
-if(iy<0 || iz>=NY)
+if(iy<0 || iy>=NY)
   {
     iiz=iz;
     iiy=iy;
