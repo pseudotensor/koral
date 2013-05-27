@@ -28,10 +28,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  iz=0;
 	  for(iy=0;iy<NY;iy++)
 	    {
-	      calc_primitives(ix,iy,iz);
-
-	      for(iv=0;iv<NVHD;iv++)
-		pp[iv]=get_u(p,iv,ix,iy,iz);
+	      calc_primitives_local(ix,iy,iz,pp);
 
 	      get_xx(ix,iy,iz,xx);
 	      dx[0]=get_size_x(ix,0);

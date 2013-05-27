@@ -350,6 +350,7 @@ int update_entropy(int ix,int iy,int iz,int u2pflag);
 int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 
 //u2p.c
+int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
 int calc_primitives(int,int,int);
 int check_floors_hd(ldouble *uu, int,void*);
 int check_floors_rad(ldouble *uu, int,void*);

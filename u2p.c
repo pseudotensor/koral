@@ -54,9 +54,9 @@ calc_primitives(int ix,int iy,int iz)
     set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
 
   if(fixups[1]>0)
-     set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
+    set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
   else
-     set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
+    set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
 
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
    if(corrected[0]!=0)
@@ -78,6 +78,41 @@ calc_primitives(int ix,int iy,int iz)
   // ldouble u2=get_u(u,5,ix,iy,iz);
   // printf("%e %e %d\n",get_u(u,5,ix,iy,iz),get_u(p,5,ix,iy,iz),get_cflag(ENTROPYFLAG,ix,iy,iz));
   //     if(fabs((u1-u2)/u2)>1.e-5 && get_cflag(ENTROPYFLAG,ix,iy,iz)==0)   getchar();
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates primitives in given cell basing on global array u[]
+//does not update global arrays, ignores returns 
+//returns primitives from ix,iy,iz
+int
+calc_primitives_local(int ix,int iy,int iz,ldouble *pp)
+{
+  int verbose=0;
+  int iv,u2pret,u2pretav;
+  ldouble uu[NV],uuav[NV],ppav[NV];
+  ldouble tlo[4][4],tup[4][4];
+  ldouble (*gg)[5],(*GG)[5];
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  //temporary using local arrays
+  gg=geom.gg;
+  GG=geom.GG;
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uu[iv]=get_u(u,iv,ix,iy,iz);
+      pp[iv]=get_u(p,iv,ix,iy,iz);
+    }
+
+  //converting to primitives
+  int corrected[2], fixups[2];
+  u2p(uu,pp,&geom,corrected,fixups);
 
   return 0;
 }

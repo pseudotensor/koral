@@ -1154,7 +1154,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 #endif
 
       //test
-      //rv2=1.;
+      rv2=1.;
 
       Acov[0]=0.;
       Acov[1]=0.;
@@ -1238,7 +1238,9 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], 
   int iv;
 
   //new primitives before the source operator
-  calc_primitives(ix,iy,iz);
+  //skipped - there is one common call in finite.c
+  //calc_primitives(ix,iy,iz);
+
   //applied explicitly directly in lab frame
   solve_explicit_lab(ix,iy,iz,dt,del4);
   indices_21(del4,del4,gg);
@@ -1260,7 +1262,8 @@ int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5
   ldouble del4[4],delapl[NV];
   int iv;
 
-  calc_primitives(ix,iy,iz);
+  //skipped - there is one common call in finite.c
+  //calc_primitives(ix,iy,iz);
   
   if(solve_implicit_ff(ix,iy,iz,dt,del4)<0) 
     {

@@ -1,5 +1,5 @@
 #define RADIATION
-#define RADSOURCEOFF
+#define SKIPRADSOURCE
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
@@ -9,7 +9,7 @@
 
 #define myMKS1COORDS
 
-#define OMSCALE 0.
+#define OMSCALE 1.
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -40,14 +40,14 @@
 #define MKS1R0 0.
 #define MINX (log(1.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 20
+#define NX 40
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define NX 80
 #endif
 
-#define NY 20
+#define NY 40
 #define NZ 1
 
 
