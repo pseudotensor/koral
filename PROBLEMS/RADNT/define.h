@@ -7,9 +7,9 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 1000.
 
-//#define myMKS1COORDS
+#define myMKS1COORDS
 
-#define OMSCALE 0.
+#define OMSCALE 1.
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -36,16 +36,16 @@
 
 #ifdef myMKS1COORDS
 #define MKS1R0 0.
-#define MINX (log(1.9-MKS1R0))
+#define MINX (log(1.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 30
+#define NX 20
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define NX 80
 #endif
 
-#define NY 30
+#define NY 20
 #define NZ 1
 
 
