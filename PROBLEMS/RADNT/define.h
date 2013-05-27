@@ -1,5 +1,5 @@
 #define RADIATION
-//#define RADSOURCEOFF
+#define RADSOURCEOFF
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
@@ -9,7 +9,7 @@
 
 #define myMKS1COORDS
 
-#define OMSCALE 1.
+#define OMSCALE 0.
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
@@ -28,9 +28,10 @@
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
 //#define CGSOUTPUT
-//#define RADOUTPUTINZAMO
+#define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
-#define RADOUTPUTVELS
+//#define RADOUTPUTVELS
+#define SKIPRADWAVESPEEDLIMITER
 //#define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
 //#define PRINTYGC_LEFT

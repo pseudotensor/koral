@@ -12,13 +12,15 @@
 #define RK3STEPPING
 
 //#define RADOUTPUTINZAMO
+#define RADOUTPUTVELS
 
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
 #define MINMOD_THETA 2.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (4./3.)
-#define EXPLICIT_RAD_SOURCE
+#define SKIPRADSOURCE
+//#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 #define IFBEAM 1
 //#define GASRADOFF
@@ -35,7 +37,8 @@
 #define BEAMR .6
 #define DTOUT1 .05 //dt for basic output
 
-//#define EDDINGTON_APR
+//#define EDDINGTON_AP
+#define GAMMAMAXRAD 1000.
 
 //#define RADBEAMFLAT_FRATIO 0.99
 #define RADBEAMFLAT_FRATIO 0.99999

@@ -1386,7 +1386,7 @@ static int get_m1closure_urfconrel(int verbose,
   ldouble alpha=geom->alpha;
 
   ldouble Erf=*Erfreturn; // get initial Erf
-  ldouble gammamax=GAMMAMAXRAD;
+  ldouble gammamax=GAMMAMAXRAD; 
   int ii,jj,kk;
 
   //////////////////////

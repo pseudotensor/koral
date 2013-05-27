@@ -25,7 +25,7 @@ fill_geometry(ix,iy,iz,&geom);
       iiz=0;
      
 
-      E= 100.*RADBEAMFLAT_ERAD;
+      E= 500.*RADBEAMFLAT_ERAD;
 
       uint=get_u(p,1,iix,iiy,iiz);
       rho=get_u(p,0,iix,iiy,iiz);
