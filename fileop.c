@@ -312,8 +312,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  ldouble vz=pp[4];
 						  ldouble vrel[4]={0,vx,vy,vz};
 						  
-						  conv_vels(vrel,vrel,VELPRIM,VEL4,gg,GG);
-						  
+						  conv_vels(vrel,vrel,VELPRIM,VEL4,gg,GG);						  
 						  trans2_cc2on(vrel,vrel,tup);
 						  //outvel - ortonormal VEL4
 						  vx=vrel[1];
@@ -328,13 +327,27 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 #ifdef RADIATION
 #ifndef LABRADFLUXES
 #ifndef EDDINGTON_APR						
+
 #ifdef RADOUTPUTINFF
 						  prad_lab2ff(pp,pp,&geom);
-#elif defined(RADOUTPUTINZAMO) //to print  radiation primitives in ZAMO
+#endif
+
+#ifdef RADOUTPUTINZAMO //to print  radiation primitives in ZAMO
 						  prad_lab2on(pp,pp,&geom);
 						  //prad_lab2ff(pp,pp,&geom);
 						  //prad_ff2zamo(pp,pp,geomout.gg,geomout.GG,geomout.eup);
 #endif
+
+#ifdef RADOUTPUTVELS
+						  ldouble vrelrad[4]={0,pp[7],pp[8],pp[9]};
+						  conv_vels(vrelrad,vrelrad,VELPRIMRAD,VEL4,gg,GG);						  
+						  trans2_cc2on(vrelrad,vrelrad,tup);
+						  //rad outvel - ortonormal VEL4
+						  pp[7]=vrelrad[1];
+						  pp[8]=vrelrad[2];
+						  pp[9]=vrelrad[3];	  
+#endif
+
 #endif
 #endif
 #endif
