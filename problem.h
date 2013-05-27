@@ -952,7 +952,7 @@
 #endif
 
 #ifndef TIMESTEPPING
-#define TIMESTEPPING RK2 //time stepping
+#define TIMESTEPPING RK2K1K2 //time stepping
 #endif
 
 #ifndef NG

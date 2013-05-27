@@ -5,7 +5,7 @@
 
 #define MASS 10.
 #define BHSPIN 0.
-#define GAMMAMAXRAD 1000.
+#define GAMMAMAXRAD 20.
 
 #define myMKS1COORDS
 
@@ -17,16 +17,13 @@
 #define MYCOORDS SPHCOORDS//KSCOORDS//SPHCOORDS//KERRCOORDS
 #endif
 
-//#define WIDENPRESSURE
-#define WIDENPRESSUREPOWER 5.
-
 #define IMAGETYPE "jpg"
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
 #define DTOUT1 1.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
-#define NOUTSTOP 1000.
+#define NOUTSTOP 50.
 //#define CGSOUTPUT
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
@@ -40,14 +37,14 @@
 #define MKS1R0 0.
 #define MINX (log(1.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 40
+#define NX 20
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define NX 80
 #endif
 
-#define NY 40
+#define NY 20
 #define NZ 1
 
 
@@ -67,10 +64,11 @@
 #define ERADATMMIN  (calc_LTE_EfromT(1.e9))
 
 #define INT_ORDER 1
-#define RK2_STEPPING
+#define TIMESTEPPING RK2K2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
+
 
 #define NODONUT 0
 #define INFLOWING 0

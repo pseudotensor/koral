@@ -131,13 +131,13 @@ if(ix>=NX) //analytical solution at rout only
      //imposing inflowing velocity of the normal observer
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);
-     pp[7]=ucon[1];
+     //pp[7]=ucon[1];
 
      if(MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS)
        pp[7]=-10.;
 
      //copying with scalings
-     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
+     //     pp[6]=get_u(p,6,iix,iiy,iiz)*pow(r/r0,-2.5);
      //pp[7]=get_u(p,7,iix,iiy,iiz)*pow(r/r0, 1.);
        
      //testing if interpolated primitives make sense

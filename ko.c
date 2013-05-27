@@ -165,9 +165,9 @@ solve_all_problems_5(ldouble tstart)
 	  //******************************* RK2 **********************************
 	  //1st
 	  f_timeder (t,.5*dt,ut0); //updates u
-	  copy_u(1.,u,ut1); //in ut1 midpoint
+	  //copy_u(1.,u,ut1); 
 	  //2nd
-	  f_timeder (t,dt,ut1); 
+	  f_timeder (t,dt,ut1); //in ut1 midpoint
 	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
 	  //together     
 	  t+=dt;    
@@ -179,12 +179,10 @@ solve_all_problems_5(ldouble tstart)
 	{
 	  //******************************* RK2 **********************************
 	  //1st
-	  //copy_u(1.,u,ut0);//in ut0 original u,
 	  f_timeder (t,dt,ut0); //updates u
 	  add_u(1.,u,-1.,ut0,ut1); //k1 in ut1
 	  //midpoint
 	  add_u(1.,ut0,.5,ut1,u);
-	  //copy_u(1.,u,ut2);
 	  //2nd
 	  t+=.5*dt;
 	  f_timeder (t,dt,ut2); 
