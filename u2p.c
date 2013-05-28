@@ -368,7 +368,7 @@ int
 check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 {
   //skip floors for some time
-  return 0;
+  //return 0;
 
   int verbose=1;
   int ret=0;
@@ -383,10 +383,11 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 
 #ifdef RADIATION
   //absolute EE:
-  if(pp[6]<1.e-8) {pp[6]=1.e-8;ret=-1;if(verbose) printf("hd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
+  //TEST
+  if(pp[6]<ERADLIMIT) {pp[6]=ERADLIMIT;ret=-1;if(verbose) printf("hd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
  
 
-
+  /*
   //EE/rho ratios
   ldouble pp2[NV];
   int iv;
@@ -397,6 +398,7 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   //calc_Rij(pp2,ggg,Rij);
   //prad_lab2ff(pp, pp2, ggg);
 
+  
   //currently comparing Erf with rho - inconsistent
 #ifndef MULTIRADFLUID  
   if(pp2[6]<EERHORATIOMIN*pp2[0]) {pp2[6]=EERHORATIOMIN*pp2[0];ret=-1;if(verbose) printf("hd_floors CASE R2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
@@ -413,6 +415,8 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   for(iv=0;iv<NV;iv++)
     pp[iv]=pp2[iv];
   //prad_ff2lab(pp2, pp, ggg);
+
+  */
 #endif
  
 

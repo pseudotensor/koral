@@ -6,7 +6,7 @@
 
 #define MASS 10.
 #define BHSPIN 0.
-#define GAMMAMAXRAD 1000.
+#define GAMMAMAXRAD 20.
 
 #define myMKS1COORDS
 
@@ -21,19 +21,20 @@
 #define IMAGETYPE "gif"
 
 #define OUTVEL VEL4
-#define DTOUT1 1.
-#define ALLSTEPSOUTPUT 1
+#define DTOUT1 10.
+#define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 2250.
 #define GDETIN 0
 //#define CGSOUTPUT
-//#define OUTCOORDS KERRCOORDS
-#define PRINTINSIDEBH 
-//#define RADOUTPUTINZAMO
+#define OUTCOORDS KERRCOORDS
+//#define PRINTINSIDEBH 
+#define ERADLIMIT 1.e-20
+#define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 //#define RADOUTPUTVELS
 #define SKIPRADWAVESPEEDLIMITER
-//#define FULLRADFRAMEWAVESPEED
+#define FULLRADFRAMEWAVESPEED
 #define PRINTGC_LEFT
 //#define PRINTGC_RIGHT
 //#define PRINTYGC_LEFT
@@ -42,7 +43,7 @@
 #define MKS1R0 0.
 #define MINX (log(2.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 40
+#define NX 20
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8

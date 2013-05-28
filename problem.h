@@ -58,7 +58,7 @@
 //52* SPHFLAT - spherical flat to test Christoffels
 //53* 1DDONUT - 1d donut equatorial plane structure
 
-#define PROBLEM 32
+#define PROBLEM 30
 
 #if(PROBLEM==53)
 
@@ -851,8 +851,9 @@
 #endif
 
 
-
+#ifndef ERADLIMIT
 #define ERADLIMIT (10.*SMALL)
+#endif
 
 /*********************/
 /*********************/
