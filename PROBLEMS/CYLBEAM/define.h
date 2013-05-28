@@ -29,13 +29,13 @@
 #define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 
-#define GAMMAMAXRAD 1000.
+#define GAMMAMAXRAD 10.
 
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
 #define MINX (log(0.1-MKS1R0))
 #define MAXX (log(10.-MKS1R0))
-#define NX 50
+#define NX 150
 #else
 #define MINX  .5
 #define MAXX 20.
