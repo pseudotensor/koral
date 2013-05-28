@@ -2,7 +2,6 @@
 //radiation choices
 /************************************/
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
-#define GAMMAMAXRAD 1000.
 
 /************************************/
 //hydro choices
@@ -22,9 +21,10 @@
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
 #define GDETIN 0
-#define SKIPRADSOURCE
-#define SKIPRADWAVESPEEDLIMITER
-#define GAMMAMAXRAD 20.
+//#define SKIPRADSOURCE
+//#define SKIPRADWAVESPEEDLIMITER
+#define GAMMAMAXRAD 50.
+#define ERADLIMIT 1.e-40
 //#define PUREAXISOUTFLOW
 
  
@@ -45,11 +45,11 @@
 /************************************/
 //simple viscosity
 /************************************/
-//#define VISCOSITY
-//#define ENFORCERADWAVESPEEDS
+#define VISCOSITY
+#define ENFORCERADWAVESPEEDS
 #define SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
-#define RMINVISC 4.
+#define RMINVISC 2.
 
 /************************************/
 //coordinates / resolution
@@ -59,8 +59,8 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.-MKS1R0))
-#define NX 40
-#define NY 30
+#define NX 20
+#define NY 20
 #define NZ 1
 #else //Schwarzschild
 #define MYCOORDS SCHWCOORDS
@@ -256,7 +256,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e0
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

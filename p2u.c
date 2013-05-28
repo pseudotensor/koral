@@ -98,6 +98,9 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 
   Sut=S*ut;
 
+  //TEST
+  //Sut=calc_Sfromu(rho,uu)*ut;
+
   ldouble pre=(GAMMA-1.)*uu;
   ldouble w=rho+uu+pre;
   ldouble Tttt=rhout + w*ucon[0]*ucov[0] + pre;

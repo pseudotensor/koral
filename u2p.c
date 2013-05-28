@@ -2606,7 +2606,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
       do
 	{
 	  idump++;
-	  W*=1.001;
+	  W*=1.0001;
 	  Wp=W-D;
 	  v2 = Qt2/W/W;
 	  gamma2 = 1./(1.-v2);
@@ -2623,7 +2623,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
 	  if(idump>50)
 	    {
-	      printf("%e %e %e %e %e %e\n",W,Wp,wmrho0,f0,compute_specificentropy_wmrho0_idealgas(rho0,wmrho0),cons[3]);
+	      printf("%e %e %e %e %e %e %e\n",W,Wp,D,rho0,wmrho0,f0,compute_specificentropy_wmrho0_idealgas(rho0,wmrho0),cons[3]);
 	      printf("idump exceeded before cons: %e %e %e %e\n",cons[0],cons[1],cons[2],cons[3]);
 	      return -1;//getchar();
 	    }
