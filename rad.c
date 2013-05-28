@@ -1153,8 +1153,9 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       rv2=rv2rad;
 #endif
 
-      //test
-      //rv2=1.;
+#ifdef FULLRADFRAMEWAVESPEED
+      rv2=1.;
+#endif
 
       Acov[0]=0.;
       Acov[1]=0.;

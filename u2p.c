@@ -35,6 +35,7 @@ calc_primitives(int ix,int iy,int iz)
 
   //update conserved to follow corrections on primitives
   //should I skip this when going to fixup - if averagin primitives this will have no effect?
+  //test
   if(corrected[0]!=0 || corrected[1]!=0)
     {
       //      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);getchar();}
@@ -133,6 +134,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   GG=geom->GG;
 
   corrected[0]=corrected[1]=0;
+  fixups[0]=fixups[1]=0;
   int verbose=1;
   int hdcorr=0;
   int radcorr=0;
@@ -278,13 +280,13 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
 
 #ifdef RADIATION
-  int radcor;
-  u2p_rad(uu,pp,geom,&radcorr);
+  int radcor,radret;
+  radret=u2p_rad(uu,pp,geom,&radcorr);
 #endif
   
   //************************************
   //************************************
-  if(radcorr>0)
+  if(radret<0)
     fixups[1]=1;
   else
     fixups[1]=0;
@@ -1351,6 +1353,12 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
     gamma2=gamma2a;
   }
 
+  //  if(isnan(gamma2a) && !isnan(gamma2b))
+  //    gamma2=gamma2b;
+
+  //  if(!isnan(gamma2a) && isnan(gamma2b))
+  //    gamma2=gamma2a;
+
   ////////////////////////
   //
   //cap on u^t
@@ -1362,11 +1370,28 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
   // get relative 4-velocity, that is always >=1 even in GR
   gammarel2 = gamma2*alpha*alpha;
 
+  //to consider it a failure - leads to instability
+  //if(isnan(gammarel2)) return -1;
+  
   // check for machine error away from 1.0 that happens sometimes
-  if(gammarel2>GAMMASMALLLIMIT && gammarel2<1.0){
+  if(isnan(gammarel2) || (gammarel2>GAMMASMALLLIMIT && gammarel2<1.0))
+    //if((gammarel2>GAMMASMALLLIMIT && gammarel2<1.0))
+  {
     if(verbose) printf("Hit machine error of gammarel2=%27.20g fixed to be 1.0\n",gammarel2);
+
     gammarel2=1.0;
   }
+
+  /*
+  if(isnan(gammarel2))
+    {
+      printf("nan in get_m1closure_gammarel2\n");
+      printf("%e %e %e\n",gamma2,gamma2a,gamma2b);
+      print_4vector(Avcon);
+      print_4vector(Avcov);
+      //      getchar();
+    }
+  */
 
   *gammarel2return=gammarel2; 
   *deltareturn=delta=0;
@@ -1392,7 +1417,14 @@ static int get_m1closure_Erf(void *ggg, ldouble *Avcon, ldouble gammarel2, ldoub
   ////////////
   *Erfreturn = 3.*Avcon[0]*alpha*alpha/(4.*gammarel2-1.0);  // JCM
 
-  //  printf("ee %d %d %d %e\n",geom->ix,geom->iy,geom->iz,*Erfreturn);
+  /*
+  if(isnan(*Erfreturn)) 
+    {
+      printf("nan in get_m1closure_Erf\n %d %d %d %e %e\n",geom->ix,geom->iy,geom->iz,*Erfreturn,gammarel2);
+      print_4vector(Avcon);
+      getchar();
+    }
+  */
 
   return(0);
 }
@@ -1421,6 +1453,7 @@ static int get_m1closure_urfconrel(int verbose,
   ldouble alpha=geom->alpha;
 
   ldouble Erf=*Erfreturn; // get initial Erf
+  ldouble Erfslow,Erffast;
   ldouble gammamax=GAMMAMAXRAD; 
   int ii,jj,kk;
 
@@ -1467,11 +1500,11 @@ static int get_m1closure_urfconrel(int verbose,
 	printf("%e %e %e\n",Erf,gammarel2,Avcov[0]);
 	print_4vector(Avcon);
 	print_4vector(Avcov);
-	//	getchar();
+	if(isnan(Erf))	getchar();
       }
     // get \gammarel=1 case
     ldouble gammarel2slow=pow(1.0+10.0*NUMEPSILON,2.0);
-    ldouble Avconslow[4],Avcovslow[4],Erfslow,urfconrelslow[4];
+    ldouble Avconslow[4],Avcovslow[4],urfconrelslow[4];
     for(jj=0;jj<4;jj++)
       {
 	Avconslow[jj]=Avcon[jj];
@@ -1482,7 +1515,7 @@ static int get_m1closure_urfconrel(int verbose,
 
     // get \gammarel=gammamax case
     ldouble gammarel2fast=gammamax*gammamax;
-    ldouble Avconfast[4],Avcovfast[4],Erffast,urfconrelfast[4];
+    ldouble Avconfast[4],Avcovfast[4],urfconrelfast[4];
     for(jj=0;jj<4;jj++)
       {
 	Avconfast[jj]=Avcon[jj];
@@ -1493,6 +1526,7 @@ static int get_m1closure_urfconrel(int verbose,
 
     int usingfast=1;
     // choose by which Avcov[0] is closest to original&&
+    //    if( fabs(Avcovslow[0]-Avcov[0])>fabs(Avcovfast[0]-Avcov[0])){
     if( fabs(Avcovslow[0]-Avcov[0])>fabs(Avcovfast[0]-Avcov[0])){
       usingfast=1;
       for(jj=0;jj<4;jj++)
@@ -1523,6 +1557,11 @@ static int get_m1closure_urfconrel(int verbose,
 
 
   *Erfreturn=Erf; // pass back new Erf to pointer
+
+  if(verbose) 
+      {
+	printf("end: %e %e %e %e\n",Erf,*Erfreturn,Erfslow,Erffast);
+      }
 
   if(isinf(Erf) || isinf(gammarel2) || isinf(urfconrel[0])|| isinf(urfconrel[1])|| isinf(urfconrel[2])|| isinf(urfconrel[3]) )
     {
@@ -1580,15 +1619,54 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       ldouble gammarel2,delta,numerator,divisor;
 
       // get \gamma^2 for relative 4-velocity
-      get_m1closure_gammarel2(verbose,ggg,Avcon,Avcov,&gammarel2,&delta,&numerator,&divisor);
+      if(get_m1closure_gammarel2(verbose,ggg,Avcon,Avcov,&gammarel2,&delta,&numerator,&divisor)<0)
+	{
+	  printf("get_m1closure_gammarel2 failed\n");
+	  
+	  /*
+	  // compute old \gammarel using pp[]
+	  urfcon[0]=0.;
+	  urfcon[1]=pp[7]; //single fluid only!
+	  urfcon[2]=pp[8]; 
+	  urfcon[3]=pp[9];
+	  conv_vels(urfcon,urfcon,VELPRIMRAD,VELR,gg,GG);
+	  ldouble qsq=0.;
+	  int i,j;
+	  for(i=1;i<4;i++)
+	    for(j=1;j<4;j++)
+	      qsq+=urfcon[i]*urfcon[j]*gg[i][j];
+	  ldouble gammaprev=sqrt(1.+qsq);
+
+	  printf("correcting g2: %e -> %e\n",gammarel2,gammaprev);
+
+	  gammarel2 = gammaprev*gammaprev;
+	  */
+	  return -1;
+	}
 
       // get E in radiation frame
       get_m1closure_Erf(ggg,Avcon,gammarel2,&Erf);
 
+      //if(verbose) printf("erf init: %e\n",Erf);
+
       // get relative 4-velocity
       if(get_m1closure_urfconrel(verbose,ggg,pp,Avcon,Avcov,gammarel2,delta,numerator,divisor,&Erf,urfcon,corrected)<0)
-	return -1;
+	{
+	  printf("get_m1closure_urfconrel failed\n");
+	  return -1;
+	}
 
+      /*
+      if(Erf/pp[EE(irf)]>1.e3 && Erf>1.e-8) 
+	{
+	  print_4vector(Avcon);
+	  print_4vector(Avcov);
+	  printf("%d %d %d\n",geom->ix,geom->iy,geom->iz);
+	  printf("erf: %d %e->%e %e\n",*corrected,pp[6],Erf,urfcon[0]);
+	  getchar();	  
+	}
+      */
+      
       //new primitives
       pp[EE(irf)]=Erf;
       pp[FX(irf)]=urfcon[1];
@@ -2045,8 +2123,8 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
 #endif
   
   //M1
-  u2p_rad_urf(uu,pp,ggg,corrected);
-  return 0;
+  return u2p_rad_urf(uu,pp,ggg,corrected);
+  //  return 0;
 }
 
 

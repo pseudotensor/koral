@@ -13,9 +13,9 @@ miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
 maxy= .3*(exp(get_xb(NX,0))+MKS1R0);
 #else
 minx= -.02*get_xb(NX,0);
-maxx= .3*get_xb(NX,0);
+maxx= 1.*get_xb(NX,0);
 miny= -.02*get_xb(NX,0);
-maxy= .3*get_xb(NX,0);
+maxy= 1.*get_xb(NX,0);
 #endif
 /*
 #ifndef RADIATION
@@ -230,7 +230,12 @@ maxy= .3*get_xb(NX,0);
 	  fname,
 	  fname,
 #ifdef RADIATION
+#if(OUTCOORDS==KERRCOORDS)
 	  fname,1.,1.,NX/21+1,NY/21+1
+#else
+	  fname,0.,0.,NX/21+1,NY/21+1
+#endif
+
 #else
 	  fname,3.,3.,NX/21+1,NY/21+1
 #endif

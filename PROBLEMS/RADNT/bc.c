@@ -131,7 +131,10 @@ if(ix>=NX) //analytical solution at rout only
      //imposing inflowing velocity of the normal observer
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);
-     //pp[7]=ucon[1];
+     conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
+     pp[7]=ucon[1];
+     pp[8]=ucon[2];
+     pp[9]=ucon[3];
 
      if(MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS)
        pp[7]=-10.;
