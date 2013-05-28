@@ -35,7 +35,7 @@ calc_primitives(int ix,int iy,int iz)
 
   //update conserved to follow corrections on primitives
   //should I skip this when going to fixup - if averagin primitives this will have no effect?
-  //test
+
   if(corrected[0]!=0 || corrected[1]!=0)
     {
       //      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);getchar();}
@@ -281,12 +281,12 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
 #ifdef RADIATION
   int radcor,radret;
-  radret=u2p_rad(uu,pp,geom,&radcorr);
+  u2p_rad(uu,pp,geom,&radcorr);
 #endif
   
   //************************************
   //************************************
-  if(radret<0)
+  if(radcorr>0)     
     fixups[1]=1;
   else
     fixups[1]=0;
@@ -382,6 +382,11 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 
 
 #ifdef RADIATION
+  //absolute EE:
+  if(pp[6]<1.e-8) {pp[6]=1.e-8;ret=-1;if(verbose) printf("hd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
+ 
+
+
   //EE/rho ratios
   ldouble pp2[NV];
   int iv;

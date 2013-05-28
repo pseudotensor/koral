@@ -61,8 +61,8 @@ miny=-maxx;
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
 	  "set log cb\n"
-	  "set cbrange [0.01:1.]\n"
-	  "set cbrange [0.1:10.]\n"
+	  //	  "set cbrange [0.01:1.]\n"
+	  //	  "set cbrange [0.1:10.]\n"
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
@@ -88,7 +88,7 @@ miny=-maxx;
 	  "plot \"%s\" u (($1)*cos($3)):(($1)*sin($3)):(($21*cos($3)-($23)*sin($3))*%f)"
 	  ":(($23*cos($3)+($21)*sin($3))*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  ,fname,fname2,minx,maxx,miny,maxy,fname,fname,
-	  1.,1.,(int)(NX/15),(int)(NZ/20));
+	  1.,1.,(int)(NX/15),(int)(NZ/5));
 	    
 	    
 

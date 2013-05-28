@@ -137,9 +137,9 @@ getchar();
       
     pp[5]=calc_Sfromu(pp[0],pp[1]);
     
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //    check_floors_hd(pp,VELPRIM,gg,GG);
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     return 0.;
   }
@@ -168,14 +168,14 @@ getchar();
        }
    
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+     //    check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
     
     //    printf("bc %d > %d",ix,iix);
     //    print_4vector(&get_u(p,6,iix,iiy,iiz));
     //print_Nvector(pp,NV); 
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     return 0;
   }
@@ -198,7 +198,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //testing if interpolated primitives make sense
-check_floors_hd(pp,VELPRIM,gg,GG);
+//check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
  
 return 0;

@@ -39,4 +39,4 @@ v3=f;
 
 				  ldouble RR[4][4];
 				  calc_Rij_ff(pp,RR);
-				  v4=RR[3][3];
+				  //				  v4=RR[3][3];

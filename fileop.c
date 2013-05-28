@@ -148,6 +148,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
   gcrz=1;
 #endif
 
+  
   //printing scalars
   fprintf(fout_totmass,"%e ",t);
   for(iv=0;iv<nscalars;iv++)
@@ -175,7 +176,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
       fflush(fout_radprofiles);
     }
   fclose(fout_radprofiles);
-
+  
   /**************************/  
 
 #ifdef YZXDUMP

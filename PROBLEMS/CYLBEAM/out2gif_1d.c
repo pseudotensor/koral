@@ -87,9 +87,9 @@ fprintf(fgnu,
 	"set format y \"%%.1e\"\n" 
 	"set xlabel \"\"\n"
 	"set ylabel \"\"\n"
-	//	  "set log y\n"
-	"plot \"%s\" u 1:15 w lp ls 3 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:20 w lp ls 7 pt 7 ps .5 ti \"E_rad\"\n"
-	//	  "unset log y\n"
+	"set log y\n"
+	"plot \"%s\" u 1:20 w lp ls 7 pt 7 ps .5 ti \"E_rad\"\n"
+	"unset log y\n"
 
 	"set lmargin at screen 0.40\n"
 	"set rmargin at screen 0.66\n"
@@ -110,7 +110,7 @@ fprintf(fgnu,
 	"set xlabel \"\"\n"
 	"set ylabel \"\"\n"
 	"plot \"%s\" u 1:($23) w lp ls 4 pt 7 ti \"Fph\""
-	,fname2,t,t/CCC,minx,maxx,fname,fname,fname,fname,fname,fname,fname);
+	,fname2,t,t/CCC,minx,maxx,fname,fname,fname,fname,fname,fname);
 
 /****************************************/
 /****************************************/
