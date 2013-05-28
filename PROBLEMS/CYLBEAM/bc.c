@@ -161,9 +161,9 @@ getchar();
      for(iv=0;iv<NV;iv++)
        {
 	 //radial component
-	 //if(iv==9)
-	 //pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	 //else
+	 if(iv==7)
+	 pp[iv]=-get_u(p,iv,iix,iiy,iiz);
+	 else
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
    

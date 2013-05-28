@@ -35,7 +35,7 @@
 #define MKS1R0 -1.
 #define MINX (log(0.1-MKS1R0))
 #define MAXX (log(10.-MKS1R0))
-#define NX 150
+#define NX 50
 #else
 #define MINX  .5
 #define MAXX 20.
