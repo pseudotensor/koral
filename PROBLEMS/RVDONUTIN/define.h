@@ -49,7 +49,7 @@
 #define ENFORCERADWAVESPEEDS
 #define SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
-#define RMINVISC 2.
+#define RMINVISC 4.
 
 /************************************/
 //coordinates / resolution
@@ -252,7 +252,7 @@
 #define MAXX (log(15.3-MKS1R0))
 #define RADIATION
 #define ELL 4.5
-#define ALPHAVISC .1
+#define ALPHAVISC .01
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983

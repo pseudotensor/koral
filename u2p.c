@@ -23,14 +23,23 @@ calc_primitives(int ix,int iy,int iz)
   gg=geom.gg;
   GG=geom.GG;
 
+  int corrected[2]={0,0}, fixups[2]={0,0};
+
+
   for(iv=0;iv<NV;iv++)
     {
       uu[iv]=get_u(u,iv,ix,iy,iz);
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
+  if(uu[0]<SMALL) 
+    {
+      my_err("neg uu[0] - imposing RHOFLOOR\n");
+      uu[0]=RHOFLOOR;
+      corrected[0]=1;
+    }
+
   //converting to primitives
-  int corrected[2], fixups[2];
   u2p(uu,pp,&geom,corrected,fixups);
 
   //update conserved to follow corrections on primitives
@@ -133,8 +142,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   gg=geom->gg;
   GG=geom->GG;
 
-  corrected[0]=corrected[1]=0;
-  fixups[0]=fixups[1]=0;
   int verbose=1;
   int hdcorr=0;
   int radcorr=0;

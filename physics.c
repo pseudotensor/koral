@@ -233,8 +233,8 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   // boost22_lab2ff(Rij,Rij,pp,gg,GG);
   // trans22_cc2on(Rij,Rij,tup);
   tautot[0]+=1.e-50;
-  ldouble PARAM=10.;
-  ldouble fdamptau=exp(-10./tautot[0]/tautot[0]);
+  ldouble PARAM=100.;
+  ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
   ldouble fdamp=fdamptau*fdampr;
 
   axhdl -= axl*fdamp;
@@ -901,7 +901,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
   
   ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
-  if(xxvecBL[1]<r_horizon_BL(BHSPIN)) fdampr=0.;
+  //  if(xxvecBL[1]<RMINVISC)) fdampr=0.;
   ldouble pgas=(GAMMA-1.)*pp[UU];
 
 #ifdef RADIATION
@@ -944,8 +944,8 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   
   tautot[0]+=1.e-50;
 
-  ldouble PARAM=10.;
-  ldouble fdamptau=exp(-10./tautot[0]/tautot[0]);
+  ldouble PARAM=100.;
+  ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
   ldouble prad=1./3.*Rij[0][0]*fdamptau*fdampr;
 
   /*

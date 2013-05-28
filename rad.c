@@ -136,8 +136,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       uu0[iv]=uu[iv];
    }
 
-  ldouble EPS = 1.e-6;
-  ldouble CONV = 1.e-8; 
+  ldouble EPS = 1.e-8;
+  ldouble CONV = 1.e-6; 
   ldouble DAMP = 0.5;
 
   ldouble frdt = 1.0;
