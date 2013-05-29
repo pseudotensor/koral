@@ -10,7 +10,11 @@ ldouble maxx=get_x(NX,0);
 ldouble maxy=maxx;
 
 #ifdef myMCYL1COORDS
-maxx= 1.1*(exp(get_xb(NX,0))+MKS1R0);
+#ifdef PRINTXGC_RIGHT
+maxx= 1.01*(exp(get_xb(NX+NG,0))+MKS1R0);
+#else
+maxx= 1.01*(exp(get_xb(NX,0))+MKS1R0);
+#endif
 maxy= maxx;
 #endif
 

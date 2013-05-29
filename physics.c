@@ -218,6 +218,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
     
   //combining rad and hydro velocities when SIMPLEVISCOSITY with total pressure
 #ifdef ENFORCERADWAVESPEEDS
+#ifdef SIMPLEHDVISCOSITY
 
  //based on local opacities
   ldouble xxvecBL[4];
@@ -244,6 +245,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   azhdl -= azl*fdamp;
   azhdr += azr*fdamp;
   
+#endif
 #endif
 
   //zeroing 'co-going' velocities
@@ -859,7 +861,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
     for(j=0;j<4;j++)
       T[i][j]=w*ucon[i]*ucon[j]+p*GG[i][j];
 
-#ifdef VISCOSITY
+#ifdef SIMPLEHDVISCOSITY
   ldouble Tvisc[4][4];
   calc_visc_Tij(pp,ggg,Tvisc);
   //  if(geom->ix>20 && geom->iy==NY-1) {print_tensor(T);print_tensor(Tvisc);getchar();}
@@ -879,6 +881,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 int
 calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 {
+#ifdef SIMPLEHDVISCOSITY
   int i,j;
 
   struct geometry *geom
@@ -895,7 +898,6 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
     for(j=0;j<4;j++)
       T[i][j]=0.;
   
-#ifdef SIMPLEVISCOSITY
   ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
   ldouble xxvecBL[4];
   coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
@@ -967,16 +969,15 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 #else //RADIATION
 
   ldouble p=pgas;
-#endif
-  
 
   T[1][3]=ALPHAVISC*p;
   T[3][1]=ALPHAVISC*p;
 
   trans22_on2cc(T,T,tlo);
   boost22_ff2lab(T,T,pp,gg,GG); 
-#endif
 
+#endif
+#endif //SIMPLEHDVISCOSITY
   return 0;
 
 }

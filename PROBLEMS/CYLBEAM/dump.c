@@ -32,7 +32,19 @@ ldouble nx,ny,nz,nlen,f;
 
 
 				  v2=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);
-				  v3=get_cflag(HDFIXUPFLAG,ix,iy,iz);
+
+				  //Omega or rad rest frame
+				  ldouble ucon[4];
+				  ucon[1]=pp[7];  ucon[2]=pp[8];  ucon[3]=pp[9];
+				  conv_vels(ucon,ucon,VELPRIMRAD,VEL4,gg,GG);  
+
+				  //v3=get_cflag(HDFIXUPFLAG,ix,iy,iz);
+				  v2=ucon[3];
+
+
+
+
+
 				   v4=get_cflag(RADFIXUPFLAG,ix,iy,iz);
 
 v3=f;

@@ -1,5 +1,7 @@
 #define RADIATION
 #define SKIPRADSOURCE
+#define SIMPLERADVISCOSITY
+#define ALPHARADVISC 0.
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
 
@@ -21,25 +23,26 @@
 
 #define IMAGETYPE "gif"
 #define OUTVEL VELPRIMRAD
-#define DTOUT1 5.
+#define DTOUT1 10.
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
-#define NOUTSTOP 60
+#define NOUTSTOP 1000
 #define RADOUTPUTINZAMO
+//#define RADOUTPUTVELS
 #define PRINTXGC_LEFT
-//#define PRINTXGC_RIGHT
+#define PRINTXGC_RIGHT
 
 #define GAMMAMAXRAD 10.
 
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
-#define MINX (log(0.1-MKS1R0))
+#define MINX (log(0.01-MKS1R0))
 #define MAXX (log(10.-MKS1R0))
-#define NX 50
+#define NX 100
 #else
-#define MINX  .5
-#define MAXX 20.
-#define NX 40
+#define MINX  .0001
+#define MAXX 10.
+#define NX 200
 #endif
 
 
@@ -80,7 +83,7 @@
 #define RK2_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 
 #define NODONUT 0
 #define INFLOWING 0

@@ -12,10 +12,10 @@
 
 ldouble minx,maxx,miny,maxy;
 #ifdef myMCYL1COORDS
-minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxx= 1.02*(exp(get_xb(NX,0))+MKS1R0);
-miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxy= 1.02*(exp(get_xb(NX,0))+MKS1R0);
+minx= 1.02*(exp(get_xb(-NG,0))+MKS1R0);
+maxx= 1.02*(exp(get_xb(NX+NG,0))+MKS1R0);
+miny= 1.02*(exp(get_xb(-NG,0))+MKS1R0);
+maxy= 1.02*(exp(get_xb(NX+NG,0))+MKS1R0);
 #else
 minx= -.02*get_xb(NX,0);
 maxx= 1.02*get_xb(NX,0);
@@ -65,7 +65,7 @@ fprintf(fgnu,
 	"set xlabel \"\"\n"
 	"set ylabel \"\"\n"
 	//	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
-	"plot \"%s\" u 1:20 w lp ls 2 pt 7 ps .5  ti \"E_rad\"\n"
+	"plot \"%s\" u 1:25 w lp ls 2 pt 7 ps .5  ti \"urf^phi\"\n"
 
 	"set lmargin at screen 0.73\n"
 	"set rmargin at screen 0.99\n"

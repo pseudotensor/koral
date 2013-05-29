@@ -325,6 +325,14 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  ldouble ut=uu[0]/gdet/rho;
 						  Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
 
+
+						  /******************/
+						  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
+
+                                                  #include PR_DUMP
+						  /******************/
+
+
 #ifdef RADIATION
 #ifndef LABRADFLUXES
 #ifndef EDDINGTON_APR						
@@ -352,12 +360,6 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 #endif
 #endif
 #endif
-
-						  /******************/
-						  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
-
-                                                  #include PR_DUMP
-						  /******************/
 						  
 						  //**********************************************************************
 						  //**********************************************************************
