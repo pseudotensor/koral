@@ -420,6 +420,9 @@ initialize_arrays()
 
   //primitives at cell centers
   p=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  //primitives at cell centers in previous time steps
+  ptm1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  ptm2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
   //temporary
   pt0=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
   //primitives at cell centers after reconstruction
@@ -649,6 +652,8 @@ free_arrays()
   free(x);
   free(xb);
   free(p);
+  free(ptm1);
+  free(ptm2);
   free(pt0);
   free(px);
   free(py);

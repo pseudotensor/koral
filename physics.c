@@ -1062,3 +1062,176 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
   */
   return 0;
 }
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates shear tensor sigma_ij
+//whichvel == 0 -> using gas velocity
+//whichvel == 1 -> using radiative velocity
+int
+calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
+{
+  int i,j,iv;
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+  //let's start with derivatives
+  ldouble du[4][4]; //du_i,j
+
+  //time derivatives
+  ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucontm1[4];
+
+  int istart,whichvel;
+  if(hdorrad==0)
+    {
+      whichvel=VELPRIM;
+      istart=VX;
+    }
+  else if(hdorrad==1)
+    {
+      whichvel=VELPRIMRAD;
+      istart=FX(0);
+    }
+
+  ucontm1[0]=ucontm2[0]=0.; //time component will be calculated
+  ucontm1[1]=get_u(ptm1,istart,ix,iy,iz);
+  ucontm1[2]=get_u(ptm1,istart+1,ix,iy,iz);
+  ucontm1[3]=get_u(ptm1,istart+2,ix,iy,iz);
+  ucontm1[1]=get_u(ptm2,istart,ix,iy,iz);
+  ucontm1[2]=get_u(ptm2,istart+1,ix,iy,iz);
+  ucontm1[3]=get_u(ptm2,istart+2,ix,iy,iz);
+
+  conv_vels(ucontm1,ucontm1,whichvel,VEL4,gg,GG);
+  conv_vels(ucontm2,ucontm2,whichvel,VEL4,gg,GG);
+
+  indices_21(ucontm1,ucovtm1,gg);
+  indices_21(ucontm2,ucovtm2,gg);
+  
+  for(i=0;i<4;i++)
+    du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
+
+  //spatial derivatives
+
+  //not to go out of bounds - ghost cell should not use this anyway
+  if(ix<=-NG) ix++;
+  if(iy<=-NG) iy++;
+  if(iz<=-NG) iz++;
+  if(ix>=NX+NG-1) ix--;
+  if(iy>=NY+NG-1) iy--;
+  if(iz>=NZ+NG-1) iz--; 
+
+  ldouble ppm1[NV],ppp1[NV],pp[NV];
+  ldouble ggm1[4][5],GGm1[4][5];
+  ldouble ggp1[4][5],GGp1[4][5];
+  ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
+  ldouble uconm1[4],uconp1[4],ucon[4];
+  ldouble ucovm1[4],ucovp1[4],ucov[4];
+  int idim;
+
+  //four-velocity at cell
+  get_xx(ix,iy,iz,xxvec);
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=get_u(p,iv,ix,iy,iz);
+    }
+  ucon[1]=pp[istart];  ucon[2]=pp[istart+1];  ucon[3]=pp[istart+2];
+  conv_vels(ucon,ucon,whichvel,VEL4,gg,GG);  
+  indices_21(ucon,ucov,gg);
+   
+  //detivatives
+  for(idim=1;idim<4;idim++)
+    {
+      
+      if(idim==1)
+	{
+	  get_xx(ix-1,iy,iz,xxvecm1);
+	  get_xx(ix+1,iy,iz,xxvecp1);
+
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
+	      ppp1[iv]=get_u(p,iv,ix+1,iy,iz);
+	    }
+
+	  pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
+	  pick_g(ix+1,iy,iz,ggp1);  pick_G(ix+1,iy,iz,GGp1);
+	}
+
+      if(idim==2)
+	{
+	  get_xx(ix,iy-1,iz,xxvecm1);
+	  get_xx(ix,iy+1,iz,xxvecp1);
+
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
+	      ppp1[iv]=get_u(p,iv,ix,iy+1,iz);
+	    }
+
+	  pick_g(ix,iy-1,iz,ggm1);  pick_G(ix,iy-1,iz,GGm1);
+	  pick_g(ix,iy+1,iz,ggp1);  pick_G(ix,iy+1,iz,GGp1);
+	}
+
+     if(idim==3)
+	{
+	  get_xx(ix,iy,iz-1,xxvecm1);
+	  get_xx(ix,iy,iz+1,xxvecp1);
+
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
+	      ppp1[iv]=get_u(p,iv,ix,iy,iz+1);
+	    }
+
+	  pick_g(ix,iy,iz-1,ggm1);  pick_G(ix,iy,iz-1,GGm1);
+	  pick_g(ix,iy,iz+1,ggp1);  pick_G(ix,iy,iz+1,GGp1);
+	}
+
+     //calculating four velocity
+
+     uconm1[1]=ppm1[istart];  uconm1[2]=ppm1[istart+1];  uconm1[3]=ppm1[istart+2];
+     uconp1[1]=ppp1[istart];  uconp1[2]=ppp1[istart+1];  uconp1[3]=ppp1[istart+2];
+
+     conv_vels(uconm1,uconm1,whichvel,VEL4,ggm1,GGm1);
+     conv_vels(uconp1,uconp1,whichvel,VEL4,ggp1,GGp1);
+
+     indices_21(uconm1,ucovm1,ggm1);
+     indices_21(uconp1,ucovp1,ggp1);
+  
+     for(i=0;i<4;i++)
+       du[i][idim]=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+    }
+
+  //TODO:
+  //covariant derivative tensor
+
+  //projection tensor
+
+  //the shear tensor
+
+  /*
+    this needed only for viscosity
+  //density/rad.energy density
+  ldouble density;
+
+  if(hdorrad==0)
+    density=pp[0];
+  if(hdorrad==1)
+    density=pp[6];
+  */
+
+  return 0;
+}
+    
+   
+
+  
+

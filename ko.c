@@ -97,12 +97,28 @@ solve_all_problems_5(ldouble tstart)
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=1.;
 
+  //copy primitives to hold previous time steps
+  copy_u(1.,p,ptm1); ttm1=t;
+  copy_u(1.,p,ptm2); ttm2=t;
+
   //main time loop
   while (t < t1 && nfout1<NOUTSTOP && i1<NSTEPSTOP)
     {    
-
+      //calculates the primitives
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+      for(ii=0;ii<Nloop_0;ii++) //domain only
+	{
+	  ix=loop_0[ii][0];
+	  iy=loop_0[ii][1];
+	  iz=loop_0[ii][2]; 
       
-     //initial time mark
+	  calc_primitives(ix,iy,iz);
+	}
+      //holds in previous time steps
+      copy_u(1.,ptm1,ptm2); ttm2=ttm1;
+      copy_u(1.,p,ptm1); ttm1=t;       
+      
+      //initial time mark
 #ifndef SKIP_CLOCK
       clock_gettime(CLOCK_REALTIME,&temp_clock);
 #endif
@@ -143,29 +159,11 @@ solve_all_problems_5(ldouble tstart)
       //**********************************************************************
       //**********************************************************************
       
-      if(TIMESTEPPING==RK2)
-	{
-	  //******************************* RK2 **********************************
-	  //1st
-	  f_timeder (t,dt,ut0); 
-	  copy_u(1.,u,ut1);
-	  //2nd
-	  f_timeder (t,dt,ut2);
- 
-	  add_u(1.,u,-1.,ut2,ut2);     
-	  //together     
-	  t+=dt;    
-	  add_u(.5,ut0,.5,ut1,u);
-	  add_u(1.,u,.5,ut2,u);      
-	  //************************** end of RK2 **********************************
-	}
-
-      if(TIMESTEPPING==RK2K2)
+     if(TIMESTEPPING==RK2K2)
 	{
 	  //******************************* RK2 **********************************
 	  //1st
 	  f_timeder (t,.5*dt,ut0); //updates u
-	  //copy_u(1.,u,ut1); 
 	  //2nd
 	  f_timeder (t,dt,ut1); //in ut1 midpoint
 	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
@@ -174,8 +172,7 @@ solve_all_problems_5(ldouble tstart)
 	  add_u(1.,ut0,1.,ut2,u);
 	  //************************** end of RK2 **********************************
 	}
-
-      if(TIMESTEPPING==RK2K1K2)
+     else if(TIMESTEPPING==RK2K1K2)
 	{
 	  //******************************* RK2 **********************************
 	  //1st
@@ -193,8 +190,7 @@ solve_all_problems_5(ldouble tstart)
 	  add_u(1.,u,.5,ut2,u);
 	  //************************** end of RK2 **********************************
 	}
-
-      if(TIMESTEPPING==RK3)
+     else if(TIMESTEPPING==RK3)
 	{
 	  //******************************* RK3 **********************************
 	  //1st
@@ -214,6 +210,8 @@ solve_all_problems_5(ldouble tstart)
 	  add_u(1.,u,2./3.,ut3,u);      
 	  //************************** end of RK3 **********************************/
 	}
+     else 
+       my_err("wrong time stepping specified\n");
 
       //**********************************************************************
       //************************* finger  ************************************
@@ -221,13 +219,6 @@ solve_all_problems_5(ldouble tstart)
 
       my_finger(t);
 
-#ifndef SKIP_CLOCK
-      //time mark
-      clock_gettime(CLOCK_REALTIME,&temp_clock);    
-#endif
-      ldouble cons_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
-
-      
       //**********************************************************************
       //************************* outputs ************************************
       //**********************************************************************
@@ -246,8 +237,8 @@ solve_all_problems_5(ldouble tstart)
       //output to a file
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
-	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f|%10.4f|%10.4f|%10.4f) mass: %e znps: %f\n",nfout1,t,dt,max_ws[0],
-		 cons_time-start_time-imp_time1-imp_time2,imp_time1+imp_time2,end_time-cons_time,end_time-start_time,totalmass,znps);
+	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) mass: %e znps: %f\n"
+		 ,nfout1,t,dt,max_ws[0],end_time-start_time,totalmass,znps);
 	  
 	  //projects primitives onto ghost cells
 	  set_bc(t);
@@ -262,8 +253,8 @@ solve_all_problems_5(ldouble tstart)
       //or performance to screen only every second
       else if(end_time-fprintf_time>1.) 
 	{
-	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f|%10.4f|%10.4f|%10.4f) mass: %e znps: %f\n",i1,t,dt,max_ws[0],
-		 cons_time-start_time-imp_time1-imp_time2,imp_time1+imp_time2,end_time-cons_time,end_time-start_time,totalmass,znps);
+	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) mass: %e znps: %f\n"
+		  ,nfout1,t,dt,max_ws[0],end_time-start_time,totalmass,znps);
 	  fprintf_time=end_time;
 	  i2=i1;
 	}
