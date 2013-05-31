@@ -64,3 +64,8 @@
 #define RK2K1K2 3
 #define RK3 4
 #define RK4 5
+
+//types of hd/rad viscosity
+#define NOVISCOSITY 0
+#define SIMPLEVISCOSITY 1
+#define SHEARVISCOSITY 2

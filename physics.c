@@ -861,7 +861,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
     for(j=0;j<4;j++)
       T[i][j]=w*ucon[i]*ucon[j]+p*GG[i][j];
 
-#ifdef SIMPLEHDVISCOSITY
+#if (HDVISCOSITY!=NOVISCOSITY)
   ldouble Tvisc[4][4];
   calc_visc_Tij(pp,ggg,Tvisc);
   //  if(geom->ix>20 && geom->iy==NY-1) {print_tensor(T);print_tensor(Tvisc);getchar();}
@@ -881,9 +881,13 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 int
 calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 {
-#ifdef SIMPLEHDVISCOSITY
   int i,j;
 
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      T[i][j]=0.;
+
+#if (HDVISCOSITY==SIMPLEVISCOSITY)
   struct geometry *geom
    = (struct geometry *) ggg;
 
@@ -892,11 +896,6 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
-
-  //fluid frame
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      T[i][j]=0.;
   
   ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
   ldouble xxvecBL[4];
@@ -977,7 +976,8 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   boost22_ff2lab(T,T,pp,gg,GG); 
 
 #endif
-#endif //SIMPLEHDVISCOSITY
+#endif //SIMPLEVISCOSITY
+
   return 0;
 
 }
@@ -1072,22 +1072,22 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
 int
 calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 {
-  int i,j,iv;
+  int i,j,k,iv;
 
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
 
   ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
-  gg=geom->gg;
-  GG=geom->GG;
-  tlo=geom->tlo;
-  tup=geom->tup;
+  gg=geom.gg;
+  GG=geom.GG;
+  tlo=geom.tlo;
+  tup=geom.tup;
 
   //let's start with derivatives
   ldouble du[4][4]; //du_i,j
 
   //time derivatives
-  ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucontm1[4];
+  ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucovtm2[4];
 
   int istart,whichvel;
   if(hdorrad==0)
@@ -1210,23 +1210,47 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
        du[i][idim]=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
     }
 
-  //TODO:
-  //covariant derivative tensor
+  //covariant derivative tensor du_i;j
+  ldouble dcu[4][4];
+  
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	ldouble Krsum=0.;
+	for(k=0;k<4;k++)
+	  Krsum+=get_gKr(k,i,j,ix,iy,iz)*ucov[k];
 
-  //projection tensor
+	dcu[i][j] = du[i][j] - Krsum;
+      }
 
-  //the shear tensor
+  //expansion
+  ldouble theta=0.;
+  for(i=0;i<4;i++)
+    theta+=dcu[i][i];
 
-  /*
-    this needed only for viscosity
-  //density/rad.energy density
-  ldouble density;
+  //projection tensors P11=P_ij, P21=P^i_j
+  ldouble P11[4][4],P21[4][4];
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	P11[i][j] = gg[i][j] + ucov[i]*ucov[j];
+	P21[i][j] = delta(i,j) + ucon[i]*ucov[j];
+      }
 
-  if(hdorrad==0)
-    density=pp[0];
-  if(hdorrad==1)
-    density=pp[6];
-  */
+  //the shear tensor sigma_ij
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	ldouble sum1,sum2;
+	sum1=sum2=0.;
+	for(k=0;k<4;k++)
+	  {
+	    sum1+=dcu[i][k]*P21[k][j];
+	    sum2+=dcu[j][k]*P21[k][i];
+	  }
+	
+	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
+      }
 
   return 0;
 }

@@ -105,6 +105,7 @@ solve_all_problems_5(ldouble tstart)
   while (t < t1 && nfout1<NOUTSTOP && i1<NSTEPSTOP)
     {    
       //calculates the primitives
+      int ii;
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
       for(ii=0;ii<Nloop_0;ii++) //domain only
 	{

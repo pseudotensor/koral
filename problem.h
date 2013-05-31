@@ -1082,6 +1082,14 @@
 #endif
 #endif
 
+#ifndef HDVISCOSITY
+#define HDVISCOSITY NOVISCOSITY
+#endif
+
+#ifndef RADVISCOSITY
+#define RADVISCOSITY NOVISCOSITY
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/

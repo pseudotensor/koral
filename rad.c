@@ -843,7 +843,7 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 #endif
 
 
-#ifdef SIMPLERADVISCOSITY
+#if (RADVISCOSITY!=NOVISCOSITY)
   ldouble Tvisc[4][4];
   calc_visc_Rij(pp,ggg,Tvisc,Rij);
   for(i=0;i<4;i++)
@@ -861,7 +861,7 @@ int
 calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 {
   int i,j;
-#ifdef SIMPLERADVISCOSITY
+#if (RADVISCOSITY==SIMPLEVISCOSITY)
 
   struct geometry *geom
    = (struct geometry *) ggg;
