@@ -861,10 +861,31 @@ int
 calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 {
   int i,j;
-#if (RADVISCOSITY==SIMPLEVISCOSITY)
-
   struct geometry *geom
    = (struct geometry *) ggg;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Tvisc[i][j]=0.;
+      }
+
+//**********************************************************************
+//**********************************************************************
+#if (RADVISCOSITY==SHEARVISCOSITY)
+
+  ldouble shear[4][4];
+  calc_shear(geom->ix,geom->iy,geom->iz,shear,1);
+  if(geom->ix==NX-5)
+    {
+      printf("%d %d %d\n",geom->ix,geom->iy,geom->iz);
+      print_tensor(shear); getchar();
+    }
+
+#endif
+
+//**********************************************************************
+//**********************************************************************
+#if (RADVISCOSITY==SIMPLEVISCOSITY)
 
 #if(PROBLEM == 32) //CYLBEAM
  
@@ -874,7 +895,6 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
     for(j=0;j<4;j++)
       {
 	Rij0[i][j]=Rij[i][j];
-	Tvisc[i][j]=0.;
       }
 
   int ix=geom->ix,iy=geom->iy,iz=geom->iz;

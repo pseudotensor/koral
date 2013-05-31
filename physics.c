@@ -1105,18 +1105,21 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   ucontm1[1]=get_u(ptm1,istart,ix,iy,iz);
   ucontm1[2]=get_u(ptm1,istart+1,ix,iy,iz);
   ucontm1[3]=get_u(ptm1,istart+2,ix,iy,iz);
-  ucontm1[1]=get_u(ptm2,istart,ix,iy,iz);
-  ucontm1[2]=get_u(ptm2,istart+1,ix,iy,iz);
-  ucontm1[3]=get_u(ptm2,istart+2,ix,iy,iz);
+  ucontm2[1]=get_u(ptm2,istart,ix,iy,iz);
+  ucontm2[2]=get_u(ptm2,istart+1,ix,iy,iz);
+  ucontm2[3]=get_u(ptm2,istart+2,ix,iy,iz);
 
   conv_vels(ucontm1,ucontm1,whichvel,VEL4,gg,GG);
   conv_vels(ucontm2,ucontm2,whichvel,VEL4,gg,GG);
 
   indices_21(ucontm1,ucovtm1,gg);
   indices_21(ucontm2,ucovtm2,gg);
-  
+
   for(i=0;i<4;i++)
-    du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
+    if(fabs(ttm1-ttm2) < SMALL)
+      du[i][0] = 0.;
+    else
+      du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
 
   //spatial derivatives
 

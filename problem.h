@@ -1090,6 +1090,10 @@
 #define RADVISCOSITY NOVISCOSITY
 #endif
 
+#ifndef SHUFFLELOOPS
+#define SHUFFLELOOPS 1
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/

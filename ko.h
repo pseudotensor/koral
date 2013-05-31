@@ -392,6 +392,8 @@ int trans22_on2cc(ldouble T1[][4],ldouble T2[][4],ldouble tlo[][4]);
 int trans2_cc2on(ldouble *u1,ldouble *u2,ldouble t[][4]);
 int trans2_on2cc(ldouble *u1,ldouble *u2,ldouble t[][4]);
 int indices_2221(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5]);
+int indices_2122(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5]);
+int indices_1122(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5]);
 int indices_21(ldouble A1[4],ldouble A2[4],ldouble gg[][5]);
 int indices_12(ldouble A1[4],ldouble A2[4],ldouble GG[][5]);
 int print_tensor(ldouble T[][4]);

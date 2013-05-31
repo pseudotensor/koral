@@ -1559,11 +1559,11 @@ trans2_on2cc(ldouble *u1,ldouble *u2,ldouble tlo[][4])
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
-// T^ij -> T^i_j
+// T_ij -> T^ij
 int
-indices_2221(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5])
+indices_1122(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5])
 {
-  int i,j,k;
+  int i,j,k,l;
   ldouble Tt[4][4];
 
   for(i=0;i<4;i++)
@@ -1573,8 +1573,11 @@ indices_2221(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5])
 	  Tt[i][j]=0.;
 	  for(k=0;k<4;k++)
 	    {
-	      Tt[i][j]+=T1[i][k]*gg[k][j];
-	    }	  
+	      for(l=0;l<4;l++)
+		{
+		  Tt[i][j]+=T1[k][l]*GG[i][k]*GG[j][l];
+		}	  
+	    }
 	}
     }
 
