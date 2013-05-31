@@ -916,7 +916,7 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   else if(NY==1) mindx = my_min(dx[0],dx[2]);
   else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
 
-  if(mfp>mindx) mfp=mindx;
+  if(mfp>mindx || chi<SMALL) mfp=mindx;
 
   //TODO - ALPHARADVISC temporary
   ldouble eta = ALPHARADVISC * 1./3. * mfp * Erf;
@@ -926,30 +926,32 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 	Tvisc[i][j]= -2. * eta * shear[i][j];
 
 
-  if(geom->ix==NX-5 && 1)
+  if(geom->ix==NX-5 && 0)
     {
       printf("%d %d %d\n",geom->ix,geom->iy,geom->iz);
       print_tensor(shear); 
       print_Nvector(dx,3);
       printf("%e %e %e %e\n",mindx,mfp,eta,Erf);
       print_tensor(Tvisc);
-      print_tensor(Rij);
 
-      //to compare with old one
+      ldouble new=Tvisc[1][3];
+      //print_tensor(Rij);
+
+      //to compare with SIMPLEVISCOSTY below
       ldouble ppm1[NV],ppp1[NV];
-ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
- int iv;
- int ix=geom->ix;
+      ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
+      int iv;
+      int ix=geom->ix;
       int iy=geom->iy;
       int iz=geom->iz;
       ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
 
-  get_xx(geom->ix-1,geom->iy,geom->iz,xxvecm1);
-  get_xx(geom->ix,geom->iy,geom->iz,xxvec);
-  get_xx(geom->ix+1,geom->iy,geom->iz,xxvecp1);
+      get_xx(geom->ix-1,geom->iy,geom->iz,xxvecm1);
+      get_xx(geom->ix,geom->iy,geom->iz,xxvec);
+      get_xx(geom->ix+1,geom->iy,geom->iz,xxvecp1);
 
 
-           for(iv=0;iv<NV;iv++)
+      for(iv=0;iv<NV;iv++)
 	{
 	  ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
 	  ppp1[iv]=get_u(p,iv,ix+1,iy,iz);
@@ -984,10 +986,15 @@ ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
       trans22_cc2on(Rij0,Rij0,tup);
   
       ldouble Ehat=Rij0[0][0];
+
   
       ldouble dx = get_size_x(ix,0);
 
-      Tvisc[1][3] = - ALPHARADVISC * xxvec[1] * dx * dOmdr * Ehat;
+      //to be consistent
+      Ehat=pp[6];
+      dx = mindx;
+
+      Tvisc[1][3] = - ALPHARADVISC * 1./3 * xxvec[1] * dx * dOmdr * Ehat;
       Tvisc[3][1] = Tvisc[1][3];
 
       //printf("%d %e %e %e %e %e\n",ix,ALPHARADVISC , xxvec[1] , dx , dOmdr , Ehat);
@@ -995,10 +1002,22 @@ ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
       //to cc lab frame
       trans22_on2cc(Tvisc,Tvisc,tlo);
 
+      ldouble old=Tvisc[1][3];
+
       print_tensor(Tvisc);
+
+      printf("ratio: %f %f\n",new/old,xxvec[1]);
       getchar();
     }
-
+  /*
+  //test
+ for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Tvisc[i][j]=0.;
+	Rij0[i][j]=Rij[i][j];
+      }
+  */
 #endif
 
 //**********************************************************************

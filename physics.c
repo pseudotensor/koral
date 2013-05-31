@@ -1085,6 +1085,7 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 
   //let's start with derivatives
   ldouble du[4][4]; //du_i,j
+  ldouble du2[4][4]; //du^i,j
 
   //time derivatives
   ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucovtm2[4];
@@ -1116,10 +1117,19 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   indices_21(ucontm2,ucovtm2,gg);
 
   for(i=0;i<4;i++)
+    //test
     if(fabs(ttm1-ttm2) < SMALL)
-      du[i][0] = 0.;
+      {
+	du[i][0] = 0.;
+	du2[i][0] = 0.;
+      }
     else
-      du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
+      {
+	du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
+	du2[i][0]=(ucontm1[i]-ucontm2[i])/(ttm1-ttm2);
+      }
+
+  //  if(ix==NX-5) {print_4vector(ucontm1);print_4vector(ucontm2);printf("du/dt: %e %e %e %e\n",du2[0][0],du2[1][0],du2[2][0],du2[3][0]);getchar();}
 
   //spatial derivatives
 
@@ -1210,26 +1220,41 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
      indices_21(uconp1,ucovp1,ggp1);
   
      for(i=0;i<4;i++)
-       du[i][idim]=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+       {
+	 du[i][idim]=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 du2[i][idim]=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+       }
     }
 
   //covariant derivative tensor du_i;j
   ldouble dcu[4][4];
-  
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      {
-	ldouble Krsum=0.;
-	for(k=0;k<4;k++)
-	  Krsum+=get_gKr(k,i,j,ix,iy,iz)*ucov[k];
+  //covariant derivative tensor du^i;j - only for expansion
+  ldouble dcu2[4][4];
+  ldouble Krsum;
 
-	dcu[i][j] = du[i][j] - Krsum;
-      }
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Krsum=0.;
+	  for(k=0;k<4;k++)
+	    Krsum+=get_gKr(k,i,j,ix,iy,iz)*ucov[k];
+
+	  dcu[i][j] = du[i][j] - Krsum;
+	}
+    
+      //only diagonal terms for expansion
+      Krsum=0.;
+      for(k=0;k<4;k++)
+	Krsum+=get_gKr(i,i,k,ix,iy,iz)*ucon[k];
+    
+      dcu2[i][i] = du2[i][i] + Krsum; 
+    }
 
   //expansion
   ldouble theta=0.;
   for(i=0;i<4;i++)
-    theta+=dcu[i][i];
+    theta+=dcu2[i][i];
 
   //projection tensors P11=P_ij, P21=P^i_j
   ldouble P11[4][4],P21[4][4];
@@ -1252,10 +1277,10 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 	    sum2+=dcu[j][k]*P21[k][i];
 	  }
 	//test
-	if((i==1&&j==3) || (i==3&&j==1))
+	//	if((i==1&&j==3) || (i==3&&j==1))
 	  S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
-	else
-	  S[i][j]=0.;
+	  //	else
+	  //	  S[i][j]=0.;
       }
 
   return 0;

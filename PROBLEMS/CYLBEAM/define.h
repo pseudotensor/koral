@@ -81,7 +81,7 @@
 
 #define INT_ORDER 1
 #define RK2_STEPPING
-#define TSTEPLIM .6
+#define TSTEPLIM .06
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 
