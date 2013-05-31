@@ -1117,8 +1117,8 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   indices_21(ucontm2,ucovtm2,gg);
 
   for(i=0;i<4;i++)
-    //test
-    if(fabs(ttm1-ttm2) < SMALL)
+    //test - switches of time derivative
+    if(fabs(ttm1-ttm2) < SMALL || 1)
       {
 	du[i][0] = 0.;
 	du2[i][0] = 0.;
@@ -1129,7 +1129,7 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 	du2[i][0]=(ucontm1[i]-ucontm2[i])/(ttm1-ttm2);
       }
 
-  //  if(ix==NX-5) {print_4vector(ucontm1);print_4vector(ucontm2);printf("du/dt: %e %e %e %e\n",du2[0][0],du2[1][0],du2[2][0],du2[3][0]);getchar();}
+  //  if(ix==NX-5) {print_4vector(ucontm1);print_4vector(ucontm2);printf("du/dt: %e %e %e %e t12: %e %e\n",du2[0][0],du2[1][0],du2[2][0],du2[3][0],ttm2,ttm1);getchar();}
 
   //spatial derivatives
 

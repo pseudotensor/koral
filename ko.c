@@ -146,6 +146,7 @@ solve_all_problems_5(ldouble tstart)
       */
 
       dt=TSTEPLIM*1./tstepden;
+
       if(t+dt>t1) {dt=t1-t;}
 
       //reseting wavespeeds
