@@ -3,6 +3,23 @@
 
 #include "ko.h"
 
+//*********************************************************************
+//******* calculates total opacity over dx[] ***************************
+//**********************************************************************
+ldouble
+calc_chi(ldouble *pp, ldouble *xx)
+{
+  ldouble rho=pp[RHO];
+  ldouble u=pp[UU];  
+  ldouble pr=(GAMMA-1.)*(u);
+  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+
+  //xx[0] holds time
+  ldouble kappa=calc_kappa(rho,T,xx[1],xx[2],xx[3]);
+  ldouble chi=kappa+calc_kappaes(rho,T,xx[1],xx[2],xx[3]);
+
+  return chi;
+}
 
 //*********************************************************************
 //******* calculates total opacity over dx[] ***************************
@@ -861,12 +878,14 @@ int
 calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 {
   int i,j;
+  ldouble Rij0[4][4];
   struct geometry *geom
    = (struct geometry *) ggg;
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
 	Tvisc[i][j]=0.;
+	Rij0[i][j]=Rij[i][j];
       }
 
 //**********************************************************************
@@ -875,10 +894,109 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 
   ldouble shear[4][4];
   calc_shear(geom->ix,geom->iy,geom->iz,shear,1);
-  if(geom->ix==NX-5)
+  indices_1122(shear,shear,geom->GG);
+ 
+  ldouble Erf=pp[6];
+
+  ldouble xx[4]={0.,geom->xx,geom->yy,geom->zz};
+
+  ldouble chi=calc_chi(pp,xx);
+
+  //mean free path
+  ldouble mfp = 1./chi;
+
+  //limiter
+  //here gg can be face or cell, get_size_x always refers to cell
+  ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),
+		 get_size_x(geom->iy,1)*sqrt(geom->gg[2][2]),
+		 get_size_x(geom->iz,2)*sqrt(geom->gg[3][3])};
+  ldouble mindx;
+  if(NY==1 && NZ==1) mindx = dx[0];
+  else if(NZ==1) mindx = my_min(dx[0],dx[1]);
+  else if(NY==1) mindx = my_min(dx[0],dx[2]);
+  else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
+
+  if(mfp>mindx) mfp=mindx;
+
+  //TODO - ALPHARADVISC temporary
+  ldouble eta = ALPHARADVISC * 1./3. * mfp * Erf;
+
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+	Tvisc[i][j]= -2. * eta * shear[i][j];
+
+
+  if(geom->ix==NX-5 && 1)
     {
       printf("%d %d %d\n",geom->ix,geom->iy,geom->iz);
-      print_tensor(shear); getchar();
+      print_tensor(shear); 
+      print_Nvector(dx,3);
+      printf("%e %e %e %e\n",mindx,mfp,eta,Erf);
+      print_tensor(Tvisc);
+      print_tensor(Rij);
+
+      //to compare with old one
+      ldouble ppm1[NV],ppp1[NV];
+ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
+ int iv;
+ int ix=geom->ix;
+      int iy=geom->iy;
+      int iz=geom->iz;
+      ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+
+  get_xx(geom->ix-1,geom->iy,geom->iz,xxvecm1);
+  get_xx(geom->ix,geom->iy,geom->iz,xxvec);
+  get_xx(geom->ix+1,geom->iy,geom->iz,xxvecp1);
+
+
+           for(iv=0;iv<NV;iv++)
+	{
+	  ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
+	  ppp1[iv]=get_u(p,iv,ix+1,iy,iz);
+	}
+     
+      gg=geom->gg;
+      GG=geom->GG;
+      tlo=geom->tlo;
+      tup=geom->tup;
+
+      ldouble ggm1[4][5],GGm1[4][5];
+      ldouble ggp1[4][5],GGp1[4][5];
+
+      pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
+      pick_g(ix+1,iy,iz,ggp1);  pick_G(ix+1,iy,iz,GGp1);
+
+      //calculating four velocity
+      ldouble uconm1[4],uconp1[4],ucon[4];
+      uconm1[1]=ppm1[7];  uconm1[2]=ppm1[8];  uconm1[3]=ppm1[9];
+      ucon[1]=pp[7];  ucon[2]=pp[8];  ucon[3]=pp[9];
+      uconp1[1]=ppp1[7];  uconp1[2]=ppp1[8];  uconp1[3]=ppp1[9];
+
+      conv_vels(uconm1,uconm1,VELPRIMRAD,VEL4,ggm1,GGm1);
+      conv_vels(ucon,ucon,VELPRIMRAD,VEL4,gg,GG);  
+      conv_vels(uconp1,uconp1,VELPRIMRAD,VEL4,ggp1,GGp1);
+
+      ldouble Omrf[3]={uconm1[3],ucon[3],uconp1[3]};
+
+      ldouble dOmdr = (Omrf[2] - Omrf[0]) / (xxvecp1[1] - xxvecm1[1]);
+
+      //to ortonormal lab frame
+      trans22_cc2on(Rij0,Rij0,tup);
+  
+      ldouble Ehat=Rij0[0][0];
+  
+      ldouble dx = get_size_x(ix,0);
+
+      Tvisc[1][3] = - ALPHARADVISC * xxvec[1] * dx * dOmdr * Ehat;
+      Tvisc[3][1] = Tvisc[1][3];
+
+      //printf("%d %e %e %e %e %e\n",ix,ALPHARADVISC , xxvec[1] , dx , dOmdr , Ehat);
+
+      //to cc lab frame
+      trans22_on2cc(Tvisc,Tvisc,tlo);
+
+      print_tensor(Tvisc);
+      getchar();
     }
 
 #endif
@@ -889,14 +1007,6 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 
 #if(PROBLEM == 32) //CYLBEAM
  
-  ldouble Rij0[4][4];
-  //viscous component
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      {
-	Rij0[i][j]=Rij[i][j];
-      }
-
   int ix=geom->ix,iy=geom->iy,iz=geom->iz;
   if(if_indomain(ix,iy,iz)==0) return 0;
 
@@ -947,6 +1057,7 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   trans22_cc2on(Rij0,Rij0,tup);
   
   ldouble Ehat=Rij0[0][0];
+  
   ldouble dx = get_size_x(ix,0);
 
   Tvisc[1][3] = - ALPHARADVISC * xxvec[1] * dx * dOmdr * Ehat;

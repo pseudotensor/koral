@@ -272,7 +272,6 @@ int initialize_problem();
 int calc_maxgravspeed(int ix, int iy, int iz, ldouble dt);
 int calc_maxwavespeed_obsolete(int ix, int iy, int iz,void*);
 int calc_maxwavespeed_osbolete_cs(int ix, int iy, int iz,void*);
-ldouble calc_chi(ldouble rho, ldouble T);
 int rad_fld_factors(int ix,int iy, int iz,ldouble *,void *rad_param,int);
 int rad_fld_factors_arb(int ix,int iy, int iz,ldouble*,void *rad_param);
 
@@ -453,6 +452,7 @@ int solve_LTE_ff(int ix,int iy,int iz,ldouble dt);
 int solve_LTE(int ix,int iy,int iz,ldouble dt);
 int solve_radforce_ff(int ix,int iy,int iz,ldouble dt);
 int solve_radforce(int ix,int iy,int iz,ldouble dt);
+ldouble calc_chi(ldouble *pp, ldouble *xx);
 int calc_tautot(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tautot);
 int calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tauabs);
 int calc_Gi_ff(ldouble *pp, ldouble Gi[4]);

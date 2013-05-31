@@ -1124,12 +1124,12 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   //spatial derivatives
 
   //not to go out of bounds - ghost cell should not use this anyway
-  if(ix<=-NG) ix++;
-  if(iy<=-NG) iy++;
-  if(iz<=-NG) iz++;
-  if(ix>=NX+NG-1) ix--;
-  if(iy>=NY+NG-1) iy--;
-  if(iz>=NZ+NG-1) iz--; 
+  while(ix<=-NG) ix++;
+  while(iy<=-NG) iy++;
+  while(iz<=-NG) iz++;
+  while(ix>=NX+NG-1) ix--;
+  while(iy>=NY+NG-1) iy--;
+  while(iz>=NZ+NG-1) iz--; 
 
   ldouble ppm1[NV],ppp1[NV],pp[NV];
   ldouble ggm1[4][5],GGm1[4][5];
@@ -1251,8 +1251,11 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 	    sum1+=dcu[i][k]*P21[k][j];
 	    sum2+=dcu[j][k]*P21[k][i];
 	  }
-	
-	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
+	//test
+	if((i==1&&j==3) || (i==3&&j==1))
+	  S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
+	else
+	  S[i][j]=0.;
       }
 
   return 0;
