@@ -59,7 +59,9 @@ if(ix>=NX) //analytical solution at rout only
 	ldouble ppatm[NV];
 	ldouble urf[4];
        
-	
+	set_radatmosphere(pp,xxvec,gg,GG,0);
+
+	/*	
 	//atmosphere
 	set_radatmosphere(ppatm,xxvec,gg,GG,2);
 
@@ -86,7 +88,7 @@ if(ix>=NX) //analytical solution at rout only
 	  }
 	else
 	  pp[6]=get_u(p,6,iix,iiy,iiz);	
-
+	*/
 
 	
 

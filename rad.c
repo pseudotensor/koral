@@ -926,7 +926,7 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
       {
 	Tvisc[i][j]= -2. * eta * shear[i][j];
 	//test
-	if(fabs(Tvisc[i][j])>.5*Erf) Tvisc[i][j] = .5*Erf*my_sign(Tvisc[i][j]);
+	//if(fabs(Tvisc[i][j])>.5*Erf) Tvisc[i][j] = .5*Erf*my_sign(Tvisc[i][j]);
       }
 
 

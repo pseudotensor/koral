@@ -183,7 +183,7 @@ maxy= 1.*get_xb(NX,0);
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
-	  //	  "set cbrange [1.e-8:0.0001]\n"
+	  "set cbrange [1.e-15:1.e-11]\n"
 	  //"set autoscale cb\n"
 
 #ifdef RADIATION	  

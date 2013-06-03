@@ -1165,7 +1165,7 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   conv_vels(ucon,ucon,whichvel,VEL4,gg,GG);  
   indices_21(ucon,ucov,gg);
    
-  //detivatives
+  //derivatives
   for(idim=1;idim<4;idim++)
     {
       
@@ -1282,11 +1282,7 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 	    sum1+=dcu[i][k]*P21[k][j];
 	    sum2+=dcu[j][k]*P21[k][i];
 	  }
-	//test
-	//	if((i==1&&j==3) || (i==3&&j==1))
-	  S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
-	  //	else
-	  //	  S[i][j]=0.;
+	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
       }
 
   return 0;
