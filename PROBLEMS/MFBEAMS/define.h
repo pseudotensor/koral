@@ -5,11 +5,15 @@
 #define MYCOORDS MINKCOORDS
 
 #define RADIATION
-#define MULTIRADFLUID
-#define REFLECT
-#define MFREDISTRIBUTEMETHOD 2
+//#define MULTIRADFLUID
+//#define REFLECT
+//#define MFREDISTRIBUTEMETHOD 2
 
-#define RK2STEPPING
+//#define RADVISCOSITY SHEARVISCOSITY
+#define ALPHARADVISC 1.
+#define ZEROTIMEINSHEAR
+
+#define TIMESTEPPING RK2
 #define INT_ORDER 1
 #define NX 201
 #define NY 1
@@ -37,7 +41,7 @@
 #define RHO_AMB 1.e0
 #define T_AMB 1.e6
 
-#define EEAMB 1.e-4
+#define EEAMB 1.e-1
 #define EEBEAM1 1.
 #define EEBEAM2 1.
 #define FRATIO1 .99
@@ -47,6 +51,7 @@
 #define KAPPA 0.
 #define KAPPAES 0.
 
+#define SKIPRADSOURCE
 #define EXPLICIT_RAD_SOURCE
 
 //#define IMPLICIT_FF_RAD_SOURCE

@@ -59,7 +59,7 @@
 #define HLL_FLUX 1
 
 //timestepping
-#define RK2 1
+#define RK2 2
 #define RK2K2 2
 #define RK2K1K2 3
 #define RK3 4

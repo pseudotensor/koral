@@ -56,7 +56,7 @@ if(ix<0 )
 #endif
 
     prad_ff2lab(pp,pp,&geom);
-    p2u(pp,uu,gg,GG);	 
+    p2u(pp,uu,&geom);	 
 
 #ifdef MULTIRADFLUID
 
@@ -83,10 +83,10 @@ int irf;
       }
    
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //check_floors_hd(pp,VELPRIM,gg,GG);
    
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
 #ifdef MULTIRADFLUID
 
@@ -136,7 +136,7 @@ if(ix>=NX)
 #endif
 
     prad_ff2lab(pp,pp,&geom);
-    p2u(pp,uu,gg,GG);	 
+    p2u(pp,uu,&geom);	 
 
 #ifdef MULTIRADFLUID
 
@@ -160,7 +160,7 @@ if(ix>=NX)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);      
       }
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
   
     return 0;

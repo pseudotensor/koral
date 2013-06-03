@@ -1117,17 +1117,23 @@ calc_shear(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   indices_21(ucontm2,ucovtm2,gg);
 
   for(i=0;i<4;i++)
-    //test - switches of time derivative
-    if(fabs(ttm1-ttm2) < SMALL || 1)
-      {
-	du[i][0] = 0.;
-	du2[i][0] = 0.;
-      }
-    else
-      {
-	du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
-	du2[i][0]=(ucontm1[i]-ucontm2[i])/(ttm1-ttm2);
-      }
+    {
+#ifndef ZEROTIMEINSHEAR
+      if(fabs(ttm1-ttm2) < SMALL)
+	{
+	  du[i][0] = 0.;
+	  du2[i][0] = 0.;
+	}
+      else
+	{
+	  du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
+	  du2[i][0]=(ucontm1[i]-ucontm2[i])/(ttm1-ttm2);
+	}
+#else //force d/dt = 0 in shear
+      du[i][0] = 0.;
+      du2[i][0] = 0.;
+#endif
+    }
 
   //  if(ix==NX-5) {print_4vector(ucontm1);print_4vector(ucontm2);printf("du/dt: %e %e %e %e t12: %e %e\n",du2[0][0],du2[1][0],du2[2][0],du2[3][0],ttm2,ttm1);getchar();}
 
