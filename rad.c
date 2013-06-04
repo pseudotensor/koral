@@ -892,10 +892,15 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 //**********************************************************************
 #if (RADVISCOSITY==SHEARVISCOSITY)
 
-  ldouble shear[4][4];
-  calc_shear(geom->ix,geom->iy,geom->iz,shear,1);
+  //calculating shear
+  ldouble shear[4][4],shearon[4][4];
+  calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,1);
   indices_1122(shear,shear,geom->GG);
- 
+  
+  //to ortonormal
+  trans22_cc2on(shear,shearon,geom->tup);
+
+  //calculating the viscosity coefficient 
   ldouble Erf=pp[6];
 
   ldouble xx[4]={0.,geom->xx,geom->yy,geom->zz};
@@ -921,6 +926,26 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   //TODO - ALPHARADVISC temporary
   ldouble eta = ALPHARADVISC * 1./3. * mfp * Erf;
 
+  //limiting
+  ldouble maxspatial=-1.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      {
+	if(fabs(shearon[i][j])>maxspatial)
+	  maxspatial=fabs(shearon[i][j]);
+      }
+
+  ldouble param=0.1;
+  if(2.*eta*maxspatial > param)
+    {
+      printf("limiting eta: %e->%e\n",2.*eta*maxspatial,0.1);
+      eta = param/2./maxspatial;
+    }
+
+  //to lab frame
+  boost22_rf2lab(shear,shear,pp,geom->gg,geom->GG);
+
+  //multiply by viscosity to get viscous tensor
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {

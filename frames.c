@@ -766,6 +766,84 @@ boost22_rf2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldou
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
+//T^ij Lorentz boost from lab frame to radiation rest frame
+int
+boost22_lab2rf(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5])
+{ 
+#ifdef LABRADFLUXES
+  my_err("boost22_lab2rf() not working for LABRADFLUXES\n");
+#endif
+
+
+  int i,j,k,l;
+  ldouble Tt[4][4];
+  ldouble pp[NV];
+  for(i=0;i<NV;i++)
+    pp[i]=pp0[i];
+
+  int verbose=0;
+
+  if(verbose>0) print_tensor(T1);
+
+  //artificial and temporary substitution
+  ldouble urf[4]={0.,pp[FX(0)],pp[FY(0)],pp[FZ(0)]};
+  conv_vels(urf,urf,VELPRIMRAD,VELPRIM,gg,GG);
+  pp[2]=urf[1];
+  pp[3]=urf[2];
+  pp[4]=urf[3];
+
+  //Lorentz transformation matrix
+  ldouble L[4][4];
+  calc_Lorentz_lab2ff(pp,gg,GG,L);
+
+  //multiplying by lapse to express T1 in ZAMO
+  ldouble alpha=sqrt(-1./GG[0][0]);  
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Tt[i][j]=T1[i][j]*alpha;
+	}
+    }
+
+  //copying
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Tt[i][j]=T1[i][j];
+	}
+    }
+   
+  if(verbose>0) print_tensor(L);
+
+  //boosting
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  T2[i][j]=0.;
+	  for(k=0;k<4;k++)
+	    {
+	      for(l=0;l<4;l++)
+		{
+		  T2[i][j]+=L[i][k]*L[j][l]*Tt[k][l];
+		}
+	    }
+	}
+    } 
+
+  if(verbose>0) print_tensor(T2);
+
+  if(verbose>0) getchar();
+
+  return 0;
+}
+
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
 //A^i Lorentz boost from lab to fluid frame
 int
 boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG[][5])
@@ -774,6 +852,63 @@ boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
   ldouble At[4]   ;
 
   int verbose=0;
+
+  if(verbose>0) print_4vector(A1);
+
+  //Lorentz transformation matrix
+  ldouble L[4][4];
+  calc_Lorentz_lab2ff(pp,gg,GG,L);
+
+  //copying and multiplying by lapse to express A1 in ZAMO
+  ldouble alpha=sqrt(-1./GG[0][0]);  
+  for(i=0;i<4;i++)
+    {
+      At[i]=A1[i]*alpha;
+    }
+  
+  if(verbose>0) print_tensor(L);
+
+  //boosting
+  for(i=0;i<4;i++)
+    {
+      A2[i]=0.;
+      for(k=0;k<4;k++)
+	{
+	  A2[i]+=L[i][k]*At[k];
+	}
+    }
+
+  if(verbose>0) print_4vector(A2);
+
+  if(verbose>0) getchar();
+
+  return 0; 
+}
+
+/*****************************************************************/
+/*****************************************************************/
+/*****************************************************************/
+//A^i Lorentz boost from lab to radiation rest frame
+int
+boost2_lab2rf(ldouble A1[4],ldouble A2[4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5])
+{ 
+#ifdef LABRADFLUXES
+  my_err("boost2_lab2rf() not working for LABRADFLUXES\n");
+#endif
+  int i,j,k,l;
+  ldouble At[4]   ;
+  ldouble pp[NV];
+  for(i=0;i<NV;i++)
+    pp[i]=pp0[i];
+
+  int verbose=0;
+
+  //artificial and temporary substitution
+  ldouble urf[4]={0.,pp[FX(0)],pp[FY(0)],pp[FZ(0)]};
+  conv_vels(urf,urf,VELPRIMRAD,VELPRIM,gg,GG);
+  pp[2]=urf[1];
+  pp[3]=urf[2];
+  pp[4]=urf[3];
 
   if(verbose>0) print_4vector(A1);
 

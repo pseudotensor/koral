@@ -82,7 +82,7 @@ for(irf=1;irf<NRF;irf++)
 #endif
 
 prad_ff2lab(pp,pp,&geom);
-p2u(pp,uu,gg,GG);	 
+p2u(pp,uu,&geom);	 
 
 //print_Nvector(pp,NV);
 #ifdef MULTIRADFLUID

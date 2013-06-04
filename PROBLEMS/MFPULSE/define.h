@@ -1,10 +1,15 @@
+#define RADVISCOSITY SHEARVISCOSITY
+#define ALPHARADVISC 1.
+//#define ZEROTIMEINSHEAR
+
+
+
 #define U2PPREC 1.e-5
 #define U2PRADPREC 1.e-5
 #define RADFORCEPREC 1.e-5
 #define VERBOSE0 0
 #define MYCOORDS MINKCOORDS
 
-#define RK2STEPPING
 #define INT_ORDER 1
 #define NX 201
 #define NY 1
@@ -33,12 +38,13 @@
 
 #define EFLOOR 1.e-50
 #define BLOBP 100.
-#define BLOBW 1.
+#define BLOBW 10.
 
-#define BLOBX1 (-50.)
-#define BLOBX2 (50.)
+#define BLOBX1 (-0.)
+#define BLOBX2 (0.)
 
 #define RADIATION
+#define SKIPRADSOURCE
 //#define MULTIRADFLUID
 
 #define KAPPA 0.

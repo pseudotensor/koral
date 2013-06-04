@@ -244,9 +244,10 @@ struct rad_parameters
   ldouble f;
   ldouble x,y,z;
 };
+int calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
+int calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
 
-int 
-calc_wavespeeds_lr_pure(ldouble *pp,void*,ldouble *aaa);
+int calc_wavespeeds_lr_pure(ldouble *pp,void*,ldouble *aaa);
 int calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4]);
 int calc_Tij( ldouble *p, void*, ldouble T[][4]);
 ldouble max_eigen_Jac(ldouble *,ldouble*,int,void*);
@@ -373,9 +374,11 @@ int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
 int p2u_rad(ldouble *p,ldouble *u,void*);
 
 //frames.c
+int boost2_lab2rf(ldouble A1[4],ldouble A2[4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5]);
 int boost22_rf2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5]);
 int boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
 int boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
+int boost22_lab2rf(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5]);
 int boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
 int boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
 int boost22_ff2zamo(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble eup[][4]);
