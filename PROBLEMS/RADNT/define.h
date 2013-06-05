@@ -11,7 +11,7 @@
 
 #define MASS 10.
 #define BHSPIN 0.
-#define GAMMAMAXRAD 20.
+#define GAMMAMAXRAD 100.
 
 #define myMKS1COORDS
 
@@ -41,8 +41,7 @@
 #define SKIPRADWAVESPEEDLIMITER
 //#define FULLRADFRAMEWAVESPEED
 //#define PRINTGC_LEFT
-//#define PRINTGC_RIGHT
-//#define PRINTYGC_LEFT
+#define PRINTGC_RIGHT
 
 #ifdef myMKS1COORDS
 #define MKS1R0 0.

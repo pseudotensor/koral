@@ -1200,7 +1200,7 @@ calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
      indices_21(uconm1,ucovm1,ggm1);
      indices_21(uconp1,ucovp1,ggp1);
   
-     for(i=0;i<4;i++)
+     for(i=0;i<4;i++) //second order (ucon=0)
        {
 	 du[i][idim]=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
 	 du2[i][idim]=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
