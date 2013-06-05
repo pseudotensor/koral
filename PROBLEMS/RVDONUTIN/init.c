@@ -95,9 +95,12 @@ if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
     Fx=Fy=Fz=0.;
     uint=calc_PEQ_ufromTrho(T4,rho);
 
+#ifdef HDDONUTASWITHRAD
     pp[1]=my_max(uint,ppback[1]);
+#endif
 
 #ifdef RADIATION
+    pp[1]=my_max(uint,ppback[1]);
     pp[6]=my_max(E,ppback[6]);
 
     pp[7]=Fx;

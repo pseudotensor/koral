@@ -128,9 +128,12 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
     Fx=Fy=Fz=0.;
     uint=calc_PEQ_ufromTrho(T4,rho);
 
+#ifdef HDDONUTASWITHRAD
     pp[1]=uint;
+#endif
 
 #ifdef RADIATION
+    pp[1]=uint;
     pp[6]=E;
     pp[7]=Fx;
     pp[8]=Fy;

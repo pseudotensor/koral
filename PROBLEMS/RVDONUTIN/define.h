@@ -1,6 +1,7 @@
 /************************************/
 //radiation choices
 /************************************/
+//#define RADIATION
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 
 /************************************/
@@ -27,7 +28,15 @@
 #define ERADLIMIT 1.e-40
 //#define PUREAXISOUTFLOW
 
- 
+/************************************/
+//viscosity choices
+/************************************/
+//#define HDVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
+//#define ENFORCERADWAVESPEEDS
+//#define ALPHATOTALPRESSURE
+//#define RMINVISC 4.
+
 /************************************/
 //rhd floors
 /************************************/
@@ -41,15 +50,6 @@
 /************************************/
 #define MASS 10.
 #define BHSPIN 0.
-
-/************************************/
-//simple viscosity
-/************************************/
-#define VISCOSITY
-#define ENFORCERADWAVESPEEDS
-#define SIMPLEVISCOSITY
-#define ALPHATOTALPRESSURE
-#define RMINVISC 4.
 
 /************************************/
 //coordinates / resolution
@@ -108,7 +108,6 @@
 #define MAXX (log(30.-MKS1R0))
 #undef NY
 #define NY 80
-#define RADIATION
 #define ELL 5.868
 #define ALPHAVISC .1
 #define URIN (4.e6/CCC)
@@ -123,7 +122,6 @@
 #elif (NDONUT==11) //mdot = 0.5, alpha = 0.1, r=50
 /************************************/
 #define MAXX (log(50.-MKS1R0))
-#define RADIATION
 #define ELL 7.3657
 #define ALPHAVISC .1
 #define URIN (1.6e6/CCC)
@@ -138,7 +136,6 @@
 #elif (NDONUT==10) //mdot = 100, alpha = 0.1, r=30
 /************************************/
 #define MAXX (log(30.-MKS1R0))
-#define RADIATION
 #define ELL 5.868
 #define ALPHAVISC .1
 #define URIN (7.29e8/CCC)
@@ -153,7 +150,6 @@
 #elif (NDONUT==9) //mdot = 100, alpha = 0.01
 /************************************/
 #define MAXX (log(50.-MKS1R0))
-#define RADIATION
 #define ELL 7.3657
 #define ALPHAVISC .01
 #define URIN (4.00e7/CCC)
@@ -168,7 +164,6 @@
 #elif (NDONUT==8) //mdot = 100, alpha = 0.1
 /************************************/
 #define MAXX (log(50.-MKS1R0))
-#define RADIATION
 #define ELL 7.3657
 #define ALPHAVISC .1
 #define URIN (4.00e8/CCC)
@@ -183,7 +178,6 @@
 #elif (NDONUT==7) //mdot = 10, alpha = 0.1
 /************************************/
 #define MAXX (log(50.-MKS1R0))
-#define RADIATION
 #define ELL 7.3657
 #define ALPHAVISC .1
 #define URIN (8.00e7/CCC)
@@ -198,7 +192,6 @@
 #elif (NDONUT==6) //mdot = 1, alpha = 0.1
 /************************************/
 #define MAXX (log(50.-MKS1R0))
-#define RADIATION
 #define ELL 7.3657
 #define ALPHAVISC .1
 #define URIN (4.80e6/CCC)
@@ -214,7 +207,6 @@
 #elif (NDONUT==5) //mdot = 100, alpha = 0.1, r=15 (and below)
 /************************************/
 #define MAXX (log(15.3-MKS1R0))
-#define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .1
 #define URIN (1.57e9/CCC)
@@ -230,7 +222,6 @@
 #elif (NDONUT==4) //mdot = 10, alpha = 0.01
 /************************************/
 #define MAXX (log(15.3-MKS1R0))
-#define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .01
 #define URIN (3.92e7/CCC)
@@ -250,7 +241,6 @@
 //#undef NY
 //#define NY 50
 #define MAXX (log(15.3-MKS1R0))
-#define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .01
 #define URIN (3.92e8/CCC)
@@ -265,7 +255,6 @@
 #elif (NDONUT==2) //mdot = 1, alpha = 0.1
 /************************************/
 #define MAXX (log(15.3-MKS1R0))
-#define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .1
 #define URIN (5.23e7/CCC)
@@ -280,7 +269,6 @@
 #elif (NDONUT==1) //mdot = 0.5, alpha = 0.1
 /************************************/
 #define MAXX (log(15.3-MKS1R0))
-#define RADIATION
 #define ELL 4.5
 #define ALPHAVISC .1
 #define URIN (1.57e7/CCC)
@@ -298,6 +286,7 @@
 #elif (NDONUT==0) //pure hd
 /************************************/
 #define MAXX (log(15.3-MKS1R0))
+#undef RADIATION
 #define ALPHAVISC .1
 #define URIN 0.5
 #define KKK 9.e-4//1.e-4

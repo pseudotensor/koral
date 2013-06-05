@@ -882,21 +882,68 @@ int
 calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 {
   int i,j;
-
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      T[i][j]=0.;
-
-#if (HDVISCOSITY==SIMPLEVISCOSITY)
   struct geometry *geom
-   = (struct geometry *) ggg;
+    = (struct geometry *) ggg;
 
   ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
   gg=geom->gg;
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
+
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      T[i][j]=0.;
+
+#if (HDVISCOSITY==SHEARVISCOSITY)
+  //calculating shear
+  ldouble shear[4][4],shearon[4][4];
+  calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,0);
+  indices_1122(shear,shear,geom->GG);
   
+  //to ortonormal
+  trans22_cc2on(shear,shearon,geom->tup);
+
+  //calculating the viscosity coefficient 
+  ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
+  ldouble xxvecBL[4];
+  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+  
+  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
+  ldouble pgas=(GAMMA-1.)*pp[UU];
+
+  ldouble eta;
+  //TODO
+  eta = ALPHAHDVISC * pgas;
+
+//limiting
+  ldouble maxspatial=-1.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      {
+	if(fabs(shearon[i][j])>maxspatial)
+	  maxspatial=fabs(shearon[i][j]);
+      }
+
+  ldouble param=1./3.;
+  if(2.*eta*maxspatial > param)
+    {
+      printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz);
+      eta = param/2./maxspatial;
+    }
+
+  //to lab frame
+  boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);
+
+  //multiply by viscosity to get viscous tensor
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	T[i][j]= -2. * eta * shear[i][j];
+      }
+#endif 
+
+#if (HDVISCOSITY==SIMPLEVISCOSITY)  
   ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
   ldouble xxvecBL[4];
   coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);

@@ -924,7 +924,6 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   if(mfp>mindx || chi<SMALL) mfp=mindx;
 
   ldouble eta;
-  //TODO - ALPHARADVISC temporary
   eta = ALPHARADVISC * 1./3. * mfp * Erf;
   
   
@@ -944,7 +943,7 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   ldouble param=1./3.;
   if(2.*eta*maxspatial > param)
     {
-      printf("limiting eta: %e->%e at (%d %d %d)\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz);
+      printf("limiting rad eta: %e->%e at (%d %d %d)\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz);
       eta = param/2./maxspatial;
     }
 
@@ -956,8 +955,6 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
     for(j=0;j<4;j++)
       {
 	Tvisc[i][j]= -2. * eta * shear[i][j];
-	//test
-	//if(fabs(Tvisc[i][j])>.5*Erf) Tvisc[i][j] = .5*Erf*my_sign(Tvisc[i][j]);
       }
 
  
