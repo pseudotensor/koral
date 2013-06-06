@@ -1,7 +1,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 
 /************************************/
@@ -18,7 +18,7 @@
 #define TIMESTEPPING RK2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
 #define GDETIN 0
@@ -31,15 +31,15 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define HDVISCOSITY SIMPLEVISCOSITY
+//#define HDVISCOSITY SIMPLEVISCOSITY
 //#define HDVISCOSITY SHEARVISCOSITY
 //#define SHEARVISCOSITYONLYRPHI
-#define MAXVISCCHANGE 0.01
-#define ALPHAHDVISC 0.1
-#define RMINVISC 4.
+#define ALPHAHDVISC .1
+#define RMINVISC 3.
 //#define ZEROTIMEINSHEAR
-//#define RADVISCOSITY SHEARVISCOSITY
-#define ALPHARADVISC 1.0
+#define RADVISCOSITY SHEARVISCOSITY
+#define TAUSUPPRESSPARAM 100.
+#define ALPHARADVISC 1.
 //#define ENFORCERADWAVESPEEDS
 #define ALPHATOTALPRESSURE
 
@@ -62,7 +62,7 @@
 //coordinates / resolution
 /************************************/
 #define myMKS1COORDS
-#define MKS1R0 -2.
+#define MKS1R0 0.
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.-MKS1R0))
@@ -228,7 +228,7 @@
 /************************************/
 #elif (NDONUT==4) //mdot = 10, alpha = 0.01
 /************************************/
-#define MAXX (log(15.3-MKS1R0))
+#define MAXX (log(55.3-MKS1R0))
 #define ELL 4.5
 #define ALPHAVISC .01
 #define URIN (3.92e7/CCC)
@@ -243,17 +243,17 @@
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
 //333
-//#undef NX
-//#define NX 80
-//#undef NY
-//#define NY 50
+#undef NX
+#define NX 80
+#undef NY
+#define NY 50
 #define MAXX (log(55.3-MKS1R0))
 #define ELL 4.5
-#define ALPHAVISC .01
+//#define ALPHAVISC .1
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e0
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

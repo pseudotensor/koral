@@ -1674,7 +1674,7 @@ trans22_cc2on(ldouble T1[][4],ldouble T2[][4],ldouble tup[][4])
 int
 trans2_cc2on(ldouble *u1,ldouble *u2,ldouble tup[][4])
 {
-  multiply2(u1,u1,tup);
+  multiply2(u1,u2,tup);
 
   return 0;
 }

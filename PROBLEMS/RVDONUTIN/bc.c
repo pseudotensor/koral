@@ -292,7 +292,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
       for(iv=0;iv<NV;iv++)
        {
 	 pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
-	 pp[iv]=get_u(p,iv,0,iiy,iiz);
+	 //pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
  
      //atmosphere
@@ -302,17 +302,17 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
      //imposing inflowing velocity of the normal observer
      ldouble ucon[4];
      calc_normalobs_4vel(GG,ucon);
-     pp[7]=ucon[1];
-     pp[8]=ucon[2];
-     pp[9]=ucon[3];
+     //pp[7]=ucon[1];
+     //pp[8]=ucon[2];
+     //pp[9]=ucon[3];
 
      if(MYCOORDS==KERRCOORDS)
        pp[7]=-100.;
 
      //pure copy
   
-   iix=0;
-   pp[6]=get_u(p,6,iix,iiy,iiz);
+     iix=0;
+     //pp[6]=get_u(p,6,iix,iiy,iiz);
 
      //copying with scalings
   

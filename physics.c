@@ -36,7 +36,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 
   //test
   //cs2*=4.;
-
+  
   if(cs2<0.) cs2=0.;
 
   //**********************************************************************
@@ -224,7 +224,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   ldouble xxvecBL[4];
   coco_N(xx,xxvecBL,MYCOORDS,BLCOORDS);
   //damping in radius
-  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
+  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/5.);
 
   dx[0]=1.;dx[1]=1.;dx[2]=1;//opt depth per Rg
   calc_tautot(pp,xx,dx,tautot);
@@ -234,7 +234,9 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   // boost22_lab2ff(Rij,Rij,pp,gg,GG);
   // trans22_cc2on(Rij,Rij,tup);
   tautot[0]+=1.e-50;
-  ldouble PARAM=100.;
+  ldouble PARAM=TAUSUPPRESSPARAM;
+  //to damp less than add pressure
+  //PARAM/=10.;
   ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
   ldouble fdamp=fdamptau*fdampr;
 
@@ -866,6 +868,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   calc_visc_Tij(pp,ggg,Tvisc);
 
   //test
+  /*
   //limitting maximal allowed viscous change
   ldouble maxviscchange=MAXVISCCHANGE,change=-1.,viscdamp;
 
@@ -882,18 +885,15 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 	ldouble d1=fabs(Tvisc[i][j])/maxspatial;
 	if(d1>change) 
 	  change=d1;
-	/*
-	if(d1>maxviscchange)
-	  {
-	    printf("maxvisc %f at %d %d %d at %d %d\n",d1,geom->ix,geom->iy,geom->iz,i,j);
-	  }
-	*/
       }
 
   if(change>maxviscchange) 
     viscdamp=maxviscchange/change;
   else
     viscdamp=1.;
+  */
+
+  ldouble viscdamp=1.0;
 	
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -955,7 +955,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   
   //damping in radius
   eta*=fdampr;
-
+  
   /*
   if(PROBLEM==30 || PROBLEM==42) //RADNT & RVDONUTIC to overcome huge gradients near rout
     if(geom->ix>=NX-2)
@@ -1031,7 +1031,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble xxvecBL[4];
   coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
   
-  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
+  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/5.);
   //  if(xxvecBL[1]<RMINVISC)) fdampr=0.;
   ldouble pgas=(GAMMA-1.)*pp[UU];
 
@@ -1070,14 +1070,14 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble Rij[4][4];
   calc_Rij(pp,ggg,Rij);
   // skip boosts what reasonable when gas v<<1
-  // boost22_lab2ff(Rij,Rij,pp,gg,GG);
-  // trans22_cc2on(Rij,Rij,tup);
+  boost22_lab2ff(Rij,Rij,pp,gg,GG);
+  trans22_cc2on(Rij,Rij,tup);
   
   tautot[0]+=1.e-50;
 
-  ldouble PARAM=100.;
+  ldouble PARAM=TAUSUPPRESSPARAM;
   ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
-  ldouble prad=1./3.*Rij[0][0]*fdamptau*fdampr;
+  ldouble prad=1./3.*Rij[0][0]*fdamptau;
 
   /*
  if(geom->iy==NY-1)
@@ -1098,6 +1098,9 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 #else //RADIATION
 
   ldouble p=pgas;
+  
+  //damping radially
+  p*=fdampr;
 
   T[1][3]=ALPHAHDVISC*p;
   T[3][1]=ALPHAHDVISC*p;

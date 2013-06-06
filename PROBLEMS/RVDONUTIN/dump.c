@@ -23,7 +23,19 @@ v2=tautot[0];
 ldouble prad=calc_LTE_EfromT(Trad)/3.;
 				  ldouble pgas=GAMMAM1*calc_PEQ_ufromTrho(Tgas,rho);
 				  v3=prad/(prad+pgas);
-				  
+				  ldouble PARAM=1.;
+				  ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
+				  ldouble Rij[4][4];
+				  calc_Rij(pp,&geom,Rij);
+				  // skip boosts what reasonable when gas v<<1
+				  boost22_lab2ff(Rij,Rij,pp,gg,GG);
+				  trans22_cc2on(Rij,Rij,tup);
+
+				  ldouble prad2=1./3.*Rij[0][0];//*fdamptau;
+				  v4=prad2/prad;
+				  v4=fdamptau;
+
+
 				  ldouble nx,ny,nz,nlen,f;
 
 				  nx=Fx/E;
@@ -34,9 +46,9 @@ ldouble prad=calc_LTE_EfromT(Trad)/3.;
   
  
 				  f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
+				  
 
-
-				  v4=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);
+				  //				  v4=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);
 				  v5=get_cflag(HDFIXUPFLAG,ix,iy,iz);
 				  v6=get_cflag(RADFIXUPFLAG,ix,iy,iz);
 				  v1=get_cflag(ENTROPYFLAG,ix,iy,iz);

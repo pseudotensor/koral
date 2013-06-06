@@ -268,10 +268,12 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 
 						  //						  calc_primitives(ix,iy,iz);
 
+						  ldouble pporg[NV];
 						  for(iv=0;iv<NV;iv++)
 						    {
 						      uu[iv]=get_u(u,iv,ix,iy,iz);
 						      pp[iv]=get_u(p,iv,ix,iy,iz);
+						      pporg[iv]=get_u(p,iv,ix,iy,iz);
 						    }	 
 
 						  
@@ -288,6 +290,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  calc_G_arb(xxvecout,GGout,OUTCOORDS);
 						  fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
 
+						  
 
 						  if(MYCOORDS!=OUTCOORDS)
 						    {
@@ -308,23 +311,23 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						    }
 						  ldouble rho=pp[0];
 						  ldouble uint=pp[1];
-						  ldouble vx=pp[2];
-						  ldouble vy=pp[3];
-						  ldouble vz=pp[4];
-						  ldouble vrel[4]={0,vx,vy,vz};
 						  
-						  conv_vels(vrel,vrel,VELPRIM,VEL4,gg,GG);						  
-						  trans2_cc2on(vrel,vrel,tup);
-						  //outvel - ortonormal VEL4
-						  vx=vrel[1];
-						  vy=vrel[2];
-						  vz=vrel[3];
 						  ldouble S=pp[5];
 						  ldouble p=(GAMMA-1.)*uint;
 						  gdet=gg[3][4];
 						  ldouble ut=uu[0]/gdet/rho;
 						  Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
 
+						  ldouble vx=pp[2];
+						  ldouble vy=pp[3];
+						  ldouble vz=pp[4];
+						  ldouble vrel[4]={0,vx,vy,vz};						  
+						  conv_vels(vrel,vrel,VELPRIM,VEL4,gg,GG);						  
+						  trans2_cc2on(vrel,vrel,tup);
+						   //outvel - ortonormal VEL4
+						  vx=vrel[1];
+						  vy=vrel[2];
+						  vz=vrel[3];
 
 						  /******************/
 						  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
