@@ -34,7 +34,7 @@ calc_primitives(int ix,int iy,int iz)
 
   if(uu[0]<SMALL) 
     {
-      my_err("neg uu[0] - imposing RHOFLOOR\n");
+      printf("at %d %d %d neg uu[0] - imposing RHOFLOOR\n",ix,iy,iz);
       uu[0]=RHOFLOOR;
       corrected[0]=1;
     }

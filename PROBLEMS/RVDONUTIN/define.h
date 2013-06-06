@@ -31,11 +31,18 @@
 /************************************/
 //viscosity choices
 /************************************/
+#define HDVISCOSITY SIMPLEVISCOSITY
 //#define HDVISCOSITY SHEARVISCOSITY
+//#define SHEARVISCOSITYONLYRPHI
+#define MAXVISCCHANGE 0.01
+#define ALPHAHDVISC 0.1
+#define RMINVISC 4.
+//#define ZEROTIMEINSHEAR
 //#define RADVISCOSITY SHEARVISCOSITY
+#define ALPHARADVISC 1.0
 //#define ENFORCERADWAVESPEEDS
-//#define ALPHATOTALPRESSURE
-//#define RMINVISC 4.
+#define ALPHATOTALPRESSURE
+
 
 /************************************/
 //rhd floors
@@ -59,7 +66,7 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.-MKS1R0))
-#define NX 20
+#define NX 40
 #define NY 20
 #define NZ 1
 #else //Schwarzschild
@@ -240,7 +247,7 @@
 //#define NX 80
 //#undef NY
 //#define NY 50
-#define MAXX (log(15.3-MKS1R0))
+#define MAXX (log(55.3-MKS1R0))
 #define ELL 4.5
 #define ALPHAVISC .01
 #define URIN (3.92e8/CCC)

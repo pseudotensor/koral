@@ -92,8 +92,6 @@ solve_all_problems_5(ldouble tstart)
   fprint_profiles(t,scalars,NSCALARS);				
 #endif
 
-  //  return 0;
-
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=1.;
 
@@ -102,8 +100,10 @@ solve_all_problems_5(ldouble tstart)
   copy_u(1.,p,ptm2); ttm2=t;
 
   //main time loop
+  int nstep=0;
   while (t < t1 && nfout1<NOUTSTOP && i1<NSTEPSTOP)
     {    
+      nstep++;
       //calculates the primitives
       int ii;
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
@@ -256,7 +256,7 @@ solve_all_problems_5(ldouble tstart)
       else if(end_time-fprintf_time>1.) 
 	{
 	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) mass: %e znps: %f\n"
-		  ,nfout1,t,dt,max_ws[0],end_time-start_time,totalmass,znps);
+		  ,nstep,t,dt,max_ws[0],end_time-start_time,totalmass,znps);
 	  fprintf_time=end_time;
 	  i2=i1;
 	}

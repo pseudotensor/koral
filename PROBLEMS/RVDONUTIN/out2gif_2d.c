@@ -11,6 +11,10 @@ minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
 maxx= 1.06*(exp(get_xb(NX,0))+MKS1R0);
 miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
 maxy= 1.06*(exp(get_xb(NX,0))+MKS1R0);
+minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
+maxx= 10.;
+miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
+maxy= 10.;
 #else
 minx= -.02*get_xb(NX,0);
 maxx= 1.02*get_xb(NX,0);
@@ -201,7 +205,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
-	  //	  "set cbrange [1.e-8:0.0001]\n"
+	  "set cbrange [1.e-26:1.e-22]\n"
 	  //"set autoscale cb\n"
 
 #ifdef RADIATION	  

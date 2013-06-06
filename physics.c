@@ -864,10 +864,43 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 #if (HDVISCOSITY!=NOVISCOSITY)
   ldouble Tvisc[4][4];
   calc_visc_Tij(pp,ggg,Tvisc);
-  //  if(geom->ix>20 && geom->iy==NY-1) {print_tensor(T);print_tensor(Tvisc);getchar();}
+
+  //test
+  //limitting maximal allowed viscous change
+  ldouble maxviscchange=MAXVISCCHANGE,change=-1.,viscdamp;
+
+  ldouble maxspatial=-1.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      {
+	if(fabs(T[i][j])>maxspatial) maxspatial=fabs(T[i][j]);
+      }
+
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      {
+	ldouble d1=fabs(Tvisc[i][j])/maxspatial;
+	if(d1>change) 
+	  change=d1;
+	/*
+	if(d1>maxviscchange)
+	  {
+	    printf("maxvisc %f at %d %d %d at %d %d\n",d1,geom->ix,geom->iy,geom->iz,i,j);
+	  }
+	*/
+      }
+
+  if(change>maxviscchange) 
+    viscdamp=maxviscchange/change;
+  else
+    viscdamp=1.;
+	
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      T[i][j]+=Tvisc[i][j];
+      {	
+	T[i][j]+=viscdamp*Tvisc[i][j];
+      }
+
 #endif  
 
   return 0;
@@ -899,11 +932,13 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   //calculating shear
   ldouble shear[4][4],shearon[4][4];
   calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,0);
+  //calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);
   indices_1122(shear,shear,geom->GG);
   
   //to ortonormal
   trans22_cc2on(shear,shearon,geom->tup);
 
+ 
   //calculating the viscosity coefficient 
   ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
   ldouble xxvecBL[4];
@@ -913,10 +948,21 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble pgas=(GAMMA-1.)*pp[UU];
 
   ldouble eta;
-  //TODO
-  eta = ALPHAHDVISC * pgas;
+  ldouble Omk = 1./sqrt(xxvecBL[1]*xxvecBL[1]*xxvecBL[1]);
 
-//limiting
+  //kind of alpha p
+  eta = ALPHAHDVISC * pgas / Omk;
+  
+  //damping in radius
+  eta*=fdampr;
+
+  /*
+  if(PROBLEM==30 || PROBLEM==42) //RADNT & RVDONUTIC to overcome huge gradients near rout
+    if(geom->ix>=NX-2)
+      eta = 0.;  
+  */
+
+  //limiting
   ldouble maxspatial=-1.;
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
@@ -932,7 +978,20 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       eta = param/2./maxspatial;
     }
 
-  //to lab frame
+  //test  
+#ifdef SHEARVISCOSITYONLYRPHI
+  //zeroing not rphi components
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	if((i==1 && j==3) || (i==3 && j==1)) 
+	  ;
+	else
+	  shear[i][j]=0.;
+      }
+#endif
+
+  //to lab frame - only if comoving shear
   boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);
 
   //multiply by viscosity to get viscous tensor
@@ -941,6 +1000,30 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       {
 	T[i][j]= -2. * eta * shear[i][j];
       }
+
+  /*
+  //comparing with SIMPLEVISC
+  print_tensor(T);
+
+  ldouble Ttemp[4][4];
+
+  //test
+  for(i=0;i<4;i++)
+  for(j=0;j<4;j++)
+  {
+  Ttemp[i][j]=0.;
+  }
+  
+  Ttemp[1][3]=ALPHAHDVISC*pgas*3.;
+  Ttemp[3][1]=ALPHAHDVISC*pgas*3.;
+
+  trans22_on2cc(Ttemp,Ttemp,tlo);
+  boost22_ff2lab(Ttemp,Ttemp,pp,gg,GG); 
+ 
+  print_tensor(Ttemp);
+  if((xxvecBL[1]>20. && xxvecBL[1]<22.) && geom->iy==NY-1)getchar();
+  */
+
 #endif 
 
 #if (HDVISCOSITY==SIMPLEVISCOSITY)  
@@ -1016,8 +1099,8 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
   ldouble p=pgas;
 
-  T[1][3]=ALPHAVISC*p;
-  T[3][1]=ALPHAVISC*p;
+  T[1][3]=ALPHAHDVISC*p;
+  T[3][1]=ALPHAHDVISC*p;
 
   trans22_on2cc(T,T,tlo);
   boost22_ff2lab(T,T,pp,gg,GG); 
