@@ -38,7 +38,7 @@
 #define RMINVISC 3.
 //#define ZEROTIMEINSHEAR
 #define RADVISCOSITY SHEARVISCOSITY
-#define TAUSUPPRESSPARAM 100.
+#define TAUSUPPRESSPARAM 100. //the larger the less prad
 #define ALPHARADVISC 1.
 //#define ENFORCERADWAVESPEEDS
 #define ALPHATOTALPRESSURE
@@ -66,7 +66,7 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.-MKS1R0))
-#define NX 40
+#define NX 30
 #define NY 20
 #define NZ 1
 #else //Schwarzschild
@@ -89,7 +89,8 @@
 #define OUTCOORDS KERRCOORDS                                                                    
 #define RADOUTPUTINZAMO
 //#define PRINTINSIDEBH
-#define PRINTXGC_LEFT
+//#define PRINTXGC_LEFT
+#define PRINTXGC_RIGHT
 
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
@@ -253,7 +254,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e1
+#define DTOUT1 5.e0
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

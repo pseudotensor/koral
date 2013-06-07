@@ -226,7 +226,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //damping in radius
   ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/5.);
 
-  dx[0]=1.;dx[1]=1.;dx[2]=1;//opt depth per Rg
+  dx[0]=1.;dx[1]=1.;dx[2]=1.;//opt depth per Rg
   calc_tautot(pp,xx,dx,tautot);
   ldouble Rij[4][4];
   calc_Rij(pp,ggg,Rij);
@@ -1093,12 +1093,13 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble p=pgas+prad;
 #else
   ldouble p=pgas;
-#endif
-
+#endif //ALPHATOTALPRESSURE
 #else //RADIATION
 
   ldouble p=pgas;
   
+#endif //RADIATION
+
   //damping radially
   p*=fdampr;
 
@@ -1108,7 +1109,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   trans22_on2cc(T,T,tlo);
   boost22_ff2lab(T,T,pp,gg,GG); 
 
-#endif
+
 #endif //SIMPLEVISCOSITY
 
   return 0;
