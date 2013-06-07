@@ -31,7 +31,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define HDVISCOSITY SIMPLEVISCOSITY
+#define HDVISCOSITY SIMPLEVISCOSITY
 //#define HDVISCOSITY SHEARVISCOSITY
 //#define SHEARVISCOSITYONLYRPHI
 #define ALPHAHDVISC .1
@@ -244,9 +244,9 @@
 /************************************/
 //333
 #undef NX
-#define NX 80
+#define NX 70
 #undef NY
-#define NY 50
+#define NY 40
 #define MAXX (log(55.3-MKS1R0))
 #define ELL 4.5
 //#define ALPHAVISC .1
