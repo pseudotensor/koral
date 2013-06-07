@@ -927,8 +927,8 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   eta = ALPHARADVISC * 1./3. * mfp * Erf;
   
   
-  if(PROBLEM==30 || PROBLEM==42) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
-    if(geom->ix>=NX-2)
+  if(PROBLEM==30 || PROBLEM==43) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
+    if(geom->ix>=NX-1)
       eta = 0.;  
   
  //limiting
