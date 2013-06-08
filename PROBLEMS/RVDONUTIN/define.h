@@ -32,6 +32,7 @@
 //viscosity choices
 /************************************/
 #define HDVISCOSITY SIMPLEVISCOSITY
+#define ALPHATOTALPRESSURE
 //#define HDVISCOSITY SHEARVISCOSITY
 //#define SHEARVISCOSITYONLYRPHI
 #define ALPHAHDVISC .1
@@ -41,8 +42,6 @@
 #define TAUSUPPRESSPARAM 100. //the larger the less prad
 #define ALPHARADVISC 1.
 //#define ENFORCERADWAVESPEEDS
-#define ALPHATOTALPRESSURE
-
 
 /************************************/
 //rhd floors
@@ -62,12 +61,12 @@
 //coordinates / resolution
 /************************************/
 #define myMKS1COORDS
-#define MKS1R0 0.
+#define MKS1R0 -2.
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.-MKS1R0))
-#define NX 30
-#define NY 20
+#define MINX (log(1.1-MKS1R0))
+#define NX 72
+#define NY 48
 #define NZ 1
 #else //Schwarzschild
 #define MYCOORDS SCHWCOORDS
@@ -88,9 +87,9 @@
 /************************************/
 #define OUTCOORDS KERRCOORDS                                                                    
 #define RADOUTPUTINZAMO
-//#define PRINTINSIDEBH
+#define PRINTINSIDEBH
 //#define PRINTXGC_LEFT
-#define PRINTXGC_RIGHT
+//#define PRINTXGC_RIGHT
 
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
@@ -108,7 +107,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 88
 
 /************************************/
 #if (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
@@ -117,12 +116,11 @@
 #undef NY
 #define NY 80
 #define ELL 5.868
-#define ALPHAVISC .1
 #define URIN (4.e6/CCC)
 #define KKK 131.859
 #define UTPOT 0.98424
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-21
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -131,12 +129,11 @@
 /************************************/
 #define MAXX (log(50.-MKS1R0))
 #define ELL 7.3657
-#define ALPHAVISC .1
 #define URIN (1.6e6/CCC)
 #define KKK 23.41
 #define UTPOT 0.99025
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-21
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -145,12 +142,11 @@
 /************************************/
 #define MAXX (log(30.-MKS1R0))
 #define ELL 5.868
-#define ALPHAVISC .1
 #define URIN (7.29e8/CCC)
 #define KKK 18455.
 #define UTPOT 1.015//.9974
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-21
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -159,12 +155,13 @@
 /************************************/
 #define MAXX (log(50.-MKS1R0))
 #define ELL 7.3657
-#define ALPHAVISC .01
+#undef ALPHAHDVISC
+#define ALPHAHDVISC .01
 #define URIN (4.00e7/CCC)
 #define KKK 5548.
 #define UTPOT 1.008//.9980
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-20
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -178,7 +175,35 @@
 #define KKK 11954.//4676.
 #define UTPOT 1.008//.9980
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-21
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+
+/************************************/
+#elif (NDONUT==88) //mdot = 100, alpha = 0.1, a bit thinner
+/************************************/
+#define MAXX (log(50.-MKS1R0))
+#define ELL 7.3657
+#define ALPHAVISC .1
+#define URIN (4.00e8/CCC)
+#define KKK 4676.//11954.//4676.
+#define UTPOT .9980//1.008//.9980
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+
+/************************************/
+#elif (NDONUT==77) //mdot = 10, alpha = 0.1, full torus - no injection
+/************************************/
+#define MAXX (log(150.-MKS1R0))
+#define ELL 7.3657
+#define ALPHAVISC .1
+#define URIN (8.00e7/CCC)
+#define KKK 2381.
+#define UTPOT .9937
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -192,7 +217,7 @@
 #define KKK 2381.
 #define UTPOT .9937
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-21
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -206,7 +231,7 @@
 #define KKK 490.
 #define UTPOT .9912
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-21
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
@@ -221,7 +246,7 @@
 #define KKK 9713.
 #define UTPOT .9925
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
 
@@ -229,14 +254,14 @@
 /************************************/
 #elif (NDONUT==4) //mdot = 10, alpha = 0.01
 /************************************/
-#define MAXX (log(55.3-MKS1R0))
+#define MAXX (log(15.3-MKS1R0))
 #define ELL 4.5
 #define ALPHAVISC .01
 #define URIN (3.92e7/CCC)
 #define KKK 3300.
 #define UTPOT .983
 #define DTOUT1 5.e1
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
 
@@ -254,7 +279,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e0
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
