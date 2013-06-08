@@ -16,7 +16,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
-#define TSTEPLIM .6
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 //#define FLUXMETHOD HLL_FLUX
@@ -25,7 +25,7 @@
 //#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
 #define GAMMAMAXRAD 50.
-#define ERADLIMIT 1.e-40
+#define ERADLIMIT 1.e-50
 //#define PUREAXISOUTFLOW
 
 /************************************/
@@ -76,7 +76,7 @@
 #define NY 32
 #define NZ 1
 #endif
-#define MINY (0.001*Pi/2.)
+#define MINY (0.01*Pi/2.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.
@@ -87,7 +87,7 @@
 /************************************/
 #define OUTCOORDS KERRCOORDS                                                                    
 #define RADOUTPUTINZAMO
-#define PRINTINSIDEBH
+//#define PRINTINSIDEBH
 //#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 
@@ -107,7 +107,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 88
+#define NDONUT 33
 
 /************************************/
 #if (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
@@ -170,7 +170,6 @@
 /************************************/
 #define MAXX (log(50.-MKS1R0))
 #define ELL 7.3657
-#define ALPHAVISC .1
 #define URIN (4.00e8/CCC)
 #define KKK 11954.//4676.
 #define UTPOT 1.008//.9980
@@ -184,7 +183,6 @@
 /************************************/
 #define MAXX (log(50.-MKS1R0))
 #define ELL 7.3657
-#define ALPHAVISC .1
 #define URIN (4.00e8/CCC)
 #define KKK 4676.//11954.//4676.
 #define UTPOT .9980//1.008//.9980
@@ -198,7 +196,6 @@
 /************************************/
 #define MAXX (log(150.-MKS1R0))
 #define ELL 7.3657
-#define ALPHAVISC .1
 #define URIN (8.00e7/CCC)
 #define KKK 2381.
 #define UTPOT .9937
@@ -212,7 +209,6 @@
 /************************************/
 #define MAXX (log(50.-MKS1R0))
 #define ELL 7.3657
-#define ALPHAVISC .1
 #define URIN (8.00e7/CCC)
 #define KKK 2381.
 #define UTPOT .9937
@@ -226,7 +222,6 @@
 /************************************/
 #define MAXX (log(50.-MKS1R0))
 #define ELL 7.3657
-#define ALPHAVISC .1
 #define URIN (4.80e6/CCC)
 #define KKK 490.
 #define UTPOT .9912
@@ -241,7 +236,6 @@
 /************************************/
 #define MAXX (log(15.3-MKS1R0))
 #define ELL 4.5
-#define ALPHAVISC .1
 #define URIN (1.57e9/CCC)
 #define KKK 9713.
 #define UTPOT .9925
@@ -256,7 +250,8 @@
 /************************************/
 #define MAXX (log(15.3-MKS1R0))
 #define ELL 4.5
-#define ALPHAVISC .01
+#undef ALPHAHDVISC
+#define ALPHAHDVISC .01
 #define URIN (3.92e7/CCC)
 #define KKK 3300.
 #define UTPOT .983
@@ -264,6 +259,24 @@
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6))
+
+/************************************/
+#elif (NDONUT==33) //mdot = 10, alpha = 0.1, full torus
+/************************************/
+//333
+//#undef NX
+//#define NX 80
+//#undef NY
+//#define NY 50
+#define MAXX (log(55.3-MKS1R0))
+#define ELL 4.5
+#define URIN (3.92e8/CCC)
+#define KKK 7127.
+#define UTPOT .983
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
 
 /************************************/
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
@@ -275,14 +288,14 @@
 //#define NY 50
 #define MAXX (log(15.3-MKS1R0))
 #define ELL 4.5
-//#define ALPHAVISC .1
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+
 
 /************************************/
 #elif (NDONUT==2) //mdot = 1, alpha = 0.1

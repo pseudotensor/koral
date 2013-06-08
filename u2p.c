@@ -34,7 +34,7 @@ calc_primitives(int ix,int iy,int iz)
 
   if(uu[0]<SMALL) 
     {
-      printf("at %d %d %d neg uu[0] - imposing RHOFLOOR\n",ix,iy,iz);
+      printf("at %d %d %d neg uu[0] - imposing old uu[0]\n",ix,iy,iz);
       uu[0]=RHOFLOOR;
       corrected[0]=1;
     }
@@ -219,7 +219,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	  {
 	    if(verbose>0)
 	      {
-		printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+		my_err("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+		//		printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 		//		getchar();
 	      }
 	  }
@@ -391,7 +392,7 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 #ifdef RADIATION
   //absolute EE:
   //TEST
-  if(pp[6]<ERADLIMIT) {pp[6]=ERADLIMIT;ret=-1;if(verbose) printf("hd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
+  if(pp[6]<ERADLIMIT) {pp[6]=ERADLIMIT;ret=-1;if(verbose) printf("rhd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
  
 
   /*
