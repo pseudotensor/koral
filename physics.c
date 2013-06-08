@@ -236,7 +236,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   tautot[0]+=1.e-50;
   ldouble PARAM=TAUSUPPRESSPARAM;
   //to damp less than add pressure
-  //PARAM/=10.;
+  PARAM/=10.;
   ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
   ldouble fdamp=fdamptau*fdampr;
 

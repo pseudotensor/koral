@@ -8,12 +8,12 @@ ldouble minx,miny,maxx,maxy;
 
 #if (OUTCOORDS==KERRCOORDS)
 minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxx= 1.06*(exp(get_xb(NX,0))+MKS1R0);
+maxx= 1.01*(exp(get_xb(NX,0))+MKS1R0);
 miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxy= 1.06*(exp(get_xb(NX,0))+MKS1R0);
+maxy= 1.01*(exp(get_xb(NX,0))+MKS1R0);
 
-maxx= 25.;
-maxy= 25.;
+//maxx= 25.;
+//maxy= 25.;
 #else
 minx= -.02*get_xb(NX,0);
 maxx= 1.02*get_xb(NX,0);
@@ -156,7 +156,7 @@ maxy= 1.02*get_xb(NX,0);
 	  miny,
 	  maxy,
 	  fname,
-	  fname,3.,3.,NX/21+1,NY/21+1,
+	  fname,5.,5.,NX/21+1,NY/21+1,
 	  fname,
 #ifdef RADIATION
 	  fname,1.,1.,NX/21+1,NY/21+1
