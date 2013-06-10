@@ -159,7 +159,8 @@ int dosthelse(void);
 
 int
 solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase);
-int cell_fixup();
+int cell_fixup_rad();
+int cell_fixup_hd();
 ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz);
 int f_timeder (ldouble t, ldouble dt,ldouble *);
 int set_grid(ldouble*, ldouble*, ldouble*,ldouble*);

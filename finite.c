@@ -364,7 +364,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //fixup here after invetrsions
-  cell_fixup();
+  cell_fixup_hd();
   
   //**********************************************************************
   //**********************************************************************
@@ -732,12 +732,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-  //  cell_fixup();
-
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
-
   //again over cells - source terms
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
    for(ii=0;ii<Nloop_0;ii++) //domain 
@@ -916,14 +910,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
-
-  //fixup here after rad source term and metric
-   //cell_fixup();
-  
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
-
 
   return GSL_SUCCESS;
 }
@@ -1923,14 +1909,10 @@ int set_bc(ldouble t)
 }
 
 int
-cell_fixup()
+cell_fixup_hd()
 {
-  //rad only! so far
-
   if(DOFIXUPS==0)
     return 0;
-
-  //there must be a bug somewhere - does not work with RADTUBE
 
   int ix,iy,iz,iv;
   int in,ii;
@@ -1940,7 +1922,7 @@ cell_fixup()
   copy_u(1.,p,p_bak);
 
   ldouble ppn[6][NV],pp[NV],uu[NV];
-  //calculates the primitives
+  //gets the neiboring the primitives
 #pragma omp parallel for private(iy,iz,iv) schedule (dynamic)
   for(ix=0;ix<NX;ix++)
     {
@@ -1948,7 +1930,7 @@ cell_fixup()
 	{
 	  for(iz=0;iz<NZ;iz++)
 	    {	      
-	      if(get_cflag(RADFIXUPFLAG,ix,iy,iz)==1)
+	      if(get_cflag(HDFIXUPFLAG,ix,iy,iz)==1)
 		{
 		  //total fixups  
 		  struct geometry geom;
@@ -2016,8 +1998,10 @@ cell_fixup()
 			{
 			  printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
 			   for(ii=0;ii<in;ii++)
-			     printf("%e ",ppn[ii][6]);
-			   printf(" -> %e\n",pp[6]);
+			     print_Nvector(ppn[ii],NV);
+			   printf(" -> \n");
+			   print_Nvector(pp,NV);
+			   getchar();
 			}
 
 		      //save to updated arrays memory

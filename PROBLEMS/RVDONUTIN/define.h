@@ -8,7 +8,6 @@
 //hydro choices
 /************************************/
 #define ALLOWENTROPYU2P 1
-#define FIXUPAFTERENTROPY 0
 #define DOFIXUPS 0
 
 /************************************/
@@ -112,7 +111,7 @@
 /************************************/
 #if (NDONUT==100) //high injection to break it
 /************************************/
-#define RHOFLOOR 1.e-27
+#define RHOFLOOR 1.e-50
 #define ENFORCEENTROPY
 #undef OUTCOORDS
 //#define OUTCOORDS KERRCOORDS                                                                    
@@ -126,15 +125,15 @@
 #undef RADIATION
 #define CBAUTOSCALE
 #undef NX
-#define NX 40
+#define NX 30
 #undef NY
-#define NY 20
+#define NY 10
 #define MAXX (log(10.-MKS1R0))
 #define ELL 4.
 #define URIN (1.e10/CCC)
 #define KKK 131.859
 #define UTPOT 0.97
-#define DTOUT1 5.e-1
+#define DTOUT1 10.
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)

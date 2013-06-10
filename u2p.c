@@ -10,7 +10,7 @@
 int
 calc_primitives(int ix,int iy,int iz)
 {
-  int verbose=1;
+  int verbose=0;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
   ldouble tlo[4][4],tup[4][4];
@@ -257,7 +257,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   //************************************
   //************************************
-  if((ret<-1 && FIXUPAFTERENTROPY==0) || (ret<0 && FIXUPAFTERENTROPY==1))
+  if(ret<-1) //request fixup when entropy failed
     fixups[0]=1;
   else
     fixups[0]=0;
@@ -330,7 +330,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
-  int verbose=1;
+  int verbose=0;
   int ret=0;
 
   struct geometry *geom
@@ -2479,7 +2479,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   gdetu=1.;
 #endif
 
-  int verbose=0;
+  int verbose=1;
   int superverbose=0;
 
   if(superverbose)
@@ -2592,7 +2592,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
   if(isnan(f0)|| isnan(dfdWp) || isinf(f0) || isinf(dfdWp))
     {
-      W=1.01*sqrt(D*D+Qt2);
+      W=1.000001*sqrt(D*D+Qt2);
       Wp=W-D;
       v2 = Qt2/W/W;
       gamma2 = 1./(1.-v2);
@@ -2692,7 +2692,34 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	}
 
       //      if(fabs(dfdWp)<SMALL ) {if(verbose) printf("derivative zero. asssuming found solution\n"); return -1;getchar(); break;}
-      if(fabs(Wp)>BIG) {if(verbose) printf("Wp has gone out of bounds\n"); return -1;getchar(); break;}
+      if(fabs(Wp)>BIG) 
+	{
+	  printf("Wp has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
+
+	  /*
+	  print_Nvector(uu,NV);	  
+	  ldouble ddd;
+	  for(ddd=1.00001;ddd<30000.;ddd=1.+(ddd-1.)*2.)
+	    {
+	      
+	      W=ddd*sqrt(D*D+Qt2);
+	      Wp=W-D;
+	      v2 = Qt2/W/W;
+	      gamma2 = 1./(1.-v2);
+	      gamma = sqrt(gamma2);
+	      w = W/gamma2;
+	      rho0 = D/gamma;
+	      wmrho0 = w - rho0;
+	      ldouble Ssofchi=compute_specificentropy_wmrho0_idealgas(rho0,wmrho0);
+
+	      f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+	      printf("%f %e %e %e %e %e %e -> %e %e -> %e %e\n",ddd,W,Wp,gamma,wmrho0,rho0,alpha,f0,dfdWp,D*Ssofchi,Sc);
+	    }
+	  getchar();
+	  */
+
+	  return -1;
+	}
 
       if(isnan(Wp) || isinf(Wp)) {printf("nan/inf Wp: %e %e %e %e\n",Wp,f0,dfdWp,W);  return -1;getchar();}
     }

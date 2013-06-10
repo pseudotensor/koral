@@ -96,6 +96,7 @@ p2u(ldouble *p, ldouble *u, void *ggg)
     Sut=calc_Sfromu(rho,uu)*ut;
   */
 
+  //S=pp[5] updated in u2p_hot or u2p_entropy
   Sut=S*ut;
 
   //TEST
