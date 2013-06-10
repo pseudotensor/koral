@@ -89,18 +89,8 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble rhout = rho*ut;
   ldouble Sut;
 
-  /*
-  if(uu<0. || rho<0. || 1)
-    Sut=S*ut;
-  else
-    Sut=calc_Sfromu(rho,uu)*ut;
-  */
-
-  //S=pp[5] updated in u2p_hot or u2p_entropy
+  //S=pp[5] updated appropriately in u2p_hot, u2p_entropy and floors
   Sut=S*ut;
-
-  //TEST
-  //Sut=calc_Sfromu(rho,uu)*ut;
 
   ldouble pre=(GAMMA-1.)*uu;
   ldouble w=rho+uu+pre;

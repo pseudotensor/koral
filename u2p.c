@@ -43,19 +43,15 @@ calc_primitives(int ix,int iy,int iz)
   u2p(uu,pp,&geom,corrected,fixups);
 
   //update conserved to follow corrections on primitives
-  //should I skip this when going to fixup - if averagin primitives this will have no effect?
+  //or to be sane
+  //if(corrected[0]!=0 || corrected[1]!=0)
 
-  if(corrected[0]!=0 || corrected[1]!=0)
+  p2u(pp,uu,&geom);
+  for(iv=0;iv<NV;iv++)
     {
-      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);}
-      p2u(pp,uu,&geom);
-      for(iv=0;iv<NV;iv++)
-	{
-	  if(iv==5) continue; //not to overwrite the original entropy
-	  set_u(u,iv,ix,iy,iz,uu[iv]);
-	}
+      set_u(u,iv,ix,iy,iz,uu[iv]);
+      set_u(p,iv,ix,iy,iz,pp[iv]);
     }
-    
 
   //sets the flags for fixups of unsuccessful cells
   if(fixups[0]>0)
@@ -68,6 +64,7 @@ calc_primitives(int ix,int iy,int iz)
   else
     set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
 
+  /*
   //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
    if(corrected[0]!=0)
      {
@@ -75,19 +72,10 @@ calc_primitives(int ix,int iy,int iz)
      }
    else 
      set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
-  
-  for(iv=0;iv<NV;iv++)    
-    set_u(p,iv,ix,iy,iz,pp[iv]);
-
-  //  ldouble u1=get_u(u,5,ix,iy,iz);
-  //  printf("%e %e\n",get_u(u,5,ix,iy,iz),get_u(p,5,ix,iy,iz));
-
+   
   //updates u[5]=Sut(rho,u) when u2p_hot() succeded or calculates p[5]=S from previous Sut if the other case
   update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz)); 
-
-  // ldouble u2=get_u(u,5,ix,iy,iz);
-  // printf("%e %e %d\n",get_u(u,5,ix,iy,iz),get_u(p,5,ix,iy,iz),get_cflag(ENTROPYFLAG,ix,iy,iz));
-  //     if(fabs((u1-u2)/u2)>1.e-5 && get_cflag(ENTROPYFLAG,ix,iy,iz)==0)   getchar();
+  */
 
   return 0;
 }
@@ -326,7 +314,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 //**********************************************************************
 //**********************************************************************
 //checks if hydro primitives make sense
-//TODO: incorporate structure of state here?
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
@@ -358,10 +345,14 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       ret=-1;      
       if(verbose) printf("hd_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);
     }
+
   //Rho to rho max
   //TODO: calculate rho max
   //ldouble rhomax=100.;
   //if(pp[0]<RHORHOMAXRATIOMIN*rhomax) {pp[0]=RHORHOMAXRATIOMIN*rhomax; ret=-1; if(verbose) printf("hd_floors CASE 5\n");}
+
+  //updates entropy after floor corrections
+  pp[5]=calc_Sfromu(pp[0],pp[1]);
 
   return ret;
 }
@@ -829,11 +820,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   pp[3]=utcon[2];
   pp[4]=utcon[3];
 
-  //entropy
-  //  ldouble Sut=uu[5];
-  //  ldouble ut=uu[0]/pp[0]; //rhout/rho
-  //  pp[5]=Sut/ut;
-
+  //entropy based on UU[1]
   pp[5]=calc_Sfromu(rho,u);
 
   ldouble uu2[NV];
@@ -2767,11 +2754,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   pp[3]=utcon[2];
   pp[4]=utcon[3];
 
-  //entropy
-  //  ldouble Sut=uu[5];
-  //  ldouble ut=uu[0]/pp[0]; //rhout/rho
-  //  pp[5]=Sut/ut;
-
+  //entropy based on UU[5]
   pp[5]=calc_Sfromu(rho,u);
 
   ldouble uu2[NV];
