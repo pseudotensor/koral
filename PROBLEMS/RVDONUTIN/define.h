@@ -15,10 +15,10 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2K1K2
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 //#define FLUXMETHOD HLL_FLUX
 //#define WAVESPEEDSATFACES 
 #define GDETIN 0
@@ -32,7 +32,7 @@
 //viscosity choices
 /************************************/
 #define HDVISCOSITY SIMPLEVISCOSITY
-#define ALPHATOTALPRESSURE
+#define ALPHATOTALPRESSUREATIO
 //#define HDVISCOSITY SHEARVISCOSITY
 //#define SHEARVISCOSITYONLYRPHI
 #define ALPHAHDVISC .1
@@ -47,7 +47,7 @@
 //rhd floors
 /************************************/
 #define UURHORATIOMIN 1.e-15
-#define UURHORATIOMAX 1.e3
+#define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-15
 #define EERHORATIOMAX 1.e6
 
@@ -107,10 +107,40 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 100
 
 /************************************/
-#if (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
+#if (NDONUT==100) //high injection to break it
+/************************************/
+#define RHOFLOOR 1.e-27
+#define ENFORCEENTROPY
+#undef OUTCOORDS
+//#define OUTCOORDS KERRCOORDS                                                                    
+//#define RADOUTPUTINZAMO
+#define PRINTINSIDEBH
+#define PRINTXGC_LEFT
+#undef HDVISCOSITY
+#define HDVISCOSITY NOVISCOSITY
+#undef RADVISCOSITY
+#define RADVISCOSITY NOVISCOSITY
+#undef RADIATION
+#define CBAUTOSCALE
+#undef NX
+#define NX 40
+#undef NY
+#define NY 20
+#define MAXX (log(10.-MKS1R0))
+#define ELL 4.
+#define URIN (1.e10/CCC)
+#define KKK 131.859
+#define UTPOT 0.97
+#define DTOUT1 5.e-1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+
+/************************************/
+#elif (NDONUT==12) //mdot = 0.5, alpha = 0.1, r=30
 /************************************/
 #define MAXX (log(30.-MKS1R0))
 #undef NY

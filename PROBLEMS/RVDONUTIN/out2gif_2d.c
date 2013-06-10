@@ -75,7 +75,9 @@ maxy= 1.02*get_xb(NX,0);
 	  "set cblabel \"\"\n"
 	  "set title \"rho\" offset 0,-1\n"
 	  "set format cb \"%%.1e\"\n"
+#ifndef CBAUTOSCALE
 	  "set cbrange [1e-26:1e-19]\n"
+#endif
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
@@ -110,7 +112,9 @@ maxy= 1.02*get_xb(NX,0);
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
+#ifndef CBAUTOSCALE
 	  "set cbrange [1.e-26:1.e-22]\n"
+#endif
 	  //"set autoscale cb\n"
 
 #ifdef RADIATION	  

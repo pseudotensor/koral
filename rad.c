@@ -799,6 +799,7 @@ calc_Gi_ff(ldouble *pp, ldouble Gi[4])
 int
 calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 {
+#ifdef RADIATION
   struct geometry *geom
    = (struct geometry *) ggg;
 
@@ -867,6 +868,8 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
     for(j=0;j<4;j++)
       Rij[i][j]+=Tvisc[i][j];
 #endif  
+
+#endif //RADIATION
 
   return 0;
 }

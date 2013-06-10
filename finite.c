@@ -475,10 +475,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
       //testing if interpolated primitives make sense
-      fill_geometry_face(ix,iy,iz,0,&geom);
-      check_floors_hd(fd_pl,VELPRIM,&geom);
-      fill_geometry_face(ix+1,iy,iz,0,&geom);
-      check_floors_hd(fd_pr,VELPRIM,&geom);
+      //fill_geometry_face(ix,iy,iz,0,&geom);
+      //      check_floors_hd(fd_pl,VELPRIM,&geom);
+      //fill_geometry_face(ix+1,iy,iz,0,&geom);
+      //      check_floors_hd(fd_pr,VELPRIM,&geom);
       //end of floor section
 
       f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
@@ -550,10 +550,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  */
 
 	  //testing if interpolated primitives make sense
-	  fill_geometry_face(ix,iy,iz,1,&geom);
-	  check_floors_hd(fd_pl,VELPRIM,&geom);
-	  fill_geometry_face(ix,iy+1,iz,1,&geom);
-	  check_floors_hd(fd_pr,VELPRIM,&geom);
+	  //fill_geometry_face(ix,iy,iz,1,&geom);
+	  //	  check_floors_hd(fd_pl,VELPRIM,&geom);
+	  //fill_geometry_face(ix,iy+1,iz,1,&geom);
+	  //	  check_floors_hd(fd_pr,VELPRIM,&geom);
 
 	  f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
 	  f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
@@ -605,10 +605,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
 	  //testing if interpolated primitives make sense
-	  fill_geometry_face(ix,iy,iz,2,&geom);
-	  check_floors_hd(fd_pl,VELPRIM,&geom);
-	  fill_geometry_face(ix,iy,iz+1,2,&geom);
-	  check_floors_hd(fd_pr,VELPRIM,&geom);
+	  //fill_geometry_face(ix,iy,iz,2,&geom);
+	  //	  check_floors_hd(fd_pl,VELPRIM,&geom);
+	  //fill_geometry_face(ix,iy,iz+1,2,&geom);
+	  //	  check_floors_hd(fd_pr,VELPRIM,&geom);
 	  //end of floor section
 
 	  f_flux_prime(fd_pl,2,ix,iy,iz,ffl);

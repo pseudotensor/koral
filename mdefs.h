@@ -11,29 +11,29 @@
 
 
 
-#define Power(x, y)	(powl((ldouble)(x), (ldouble)(y)))
-#define Sqrt(x)		(sqrtl((ldouble)(x)))
-#define Sqrtl(x)        (sqrtl((ldouble)(x)))
+#define Power(x, y)	(pow((ldouble)(x), (ldouble)(y)))
+#define Sqrt(x)		(sqrt((ldouble)(x)))
+#define Sqrtl(x)        (sqrt((ldouble)(x)))
 
-#define Abs(x)		(fabsl((ldouble)(x)))
+#define Abs(x)		(fabs((ldouble)(x)))
 
-#define Exp(x)		(expl((ldouble)(x)))
-#define Log(x)		(logl((ldouble)(x)))
+#define Exp(x)		(exp((ldouble)(x)))
+#define Log(x)		(log((ldouble)(x)))
 
-#define Sin(x)		(sinl((ldouble)(x)))
-#define Cos(x)		(cosl((ldouble)(x)))
-#define Tan(x)		(tanl((ldouble)(x)))
+#define Sin(x)		(sin((ldouble)(x)))
+#define Cos(x)		(cos((ldouble)(x)))
+#define Tan(x)		(tan((ldouble)(x)))
 
-#define ArcSin(x)       (asinl((ldouble)(x)))
-#define ArcCos(x)       (acosl((ldouble)(x)))
-#define ArcTan(x)       (atanl((ldouble)(x)))
+#define ArcSin(x)       (asin((ldouble)(x)))
+#define ArcCos(x)       (acos((ldouble)(x)))
+#define ArcTan(x)       (atan((ldouble)(x)))
 
-#define Sinh(x)          (sinhl((ldouble)(x)))
-#define Cosh(x)          (coshl((ldouble)(x)))
-#define Tanh(x)          (tanhl((ldouble)(x)))
+#define Sinh(x)          (sinh((ldouble)(x)))
+#define Cosh(x)          (cosh((ldouble)(x)))
+#define Tanh(x)          (tanh((ldouble)(x)))
 
-#define Cot(x)          (1./tanl((ldouble)(x)))
-#define Csc(x)          (1./sinl((ldouble)(x)))
+#define Cot(x)          (1./tan((ldouble)(x)))
+#define Csc(x)          (1./sin((ldouble)(x)))
 
 
 

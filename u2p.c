@@ -10,7 +10,7 @@
 int
 calc_primitives(int ix,int iy,int iz)
 {
-  int verbose=0;
+  int verbose=1;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
   ldouble tlo[4][4],tup[4][4];
@@ -32,7 +32,7 @@ calc_primitives(int ix,int iy,int iz)
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
-  if(uu[0]<SMALL) 
+  if(uu[0]<RHOFLOOR) 
     {
       printf("at %d %d %d neg uu[0] - imposing old uu[0]\n",ix,iy,iz);
       uu[0]=RHOFLOOR;
@@ -47,7 +47,7 @@ calc_primitives(int ix,int iy,int iz)
 
   if(corrected[0]!=0 || corrected[1]!=0)
     {
-      //      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);getchar();}
+      if(verbose) {printf("correcting conserved at %d %d %d\n",ix,iy,iz);}
       p2u(pp,uu,&geom);
       for(iv=0;iv<NV;iv++)
 	{
@@ -330,7 +330,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
-  int verbose=0;
+  int verbose=1;
   int ret=0;
 
   struct geometry *geom
@@ -356,10 +356,9 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
     {
       pp[1]=UURHORATIOMAX*pp[0];
       ret=-1;      
-      if(verbose) printf("hd_floors CASE 3\n");
+      if(verbose) printf("hd_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);
     }
-
-  //rho relative to rho max
+  //Rho to rho max
   //TODO: calculate rho max
   //ldouble rhomax=100.;
   //if(pp[0]<RHORHOMAXRATIOMIN*rhomax) {pp[0]=RHORHOMAXRATIOMIN*rhomax; ret=-1; if(verbose) printf("hd_floors CASE 5\n");}

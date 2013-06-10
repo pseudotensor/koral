@@ -38,7 +38,7 @@ ut/=UTPOT; //rescales rin
 ldouble Vphi,Vr;
 ldouble D,W,eps,uT,uphi,uPhi;
 
-if(ut<-1 || podpierd<0. || xx<3. || NODONUT || INFLOWING) //outside donut
+if(ut<-1 || podpierd<0. || xx<4. || NODONUT || INFLOWING) //outside donut
   {
     //ambient
     set_hdatmosphere(pp,xxvec,gg,GG,0);
