@@ -8,9 +8,9 @@ ldouble minx,miny,maxx,maxy;
 
 #if (OUTCOORDS==KERRCOORDS)
 minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxx= .3*(exp(get_xb(NX,0))+MKS1R0);
+maxx= .63*(exp(get_xb(NX,0))+MKS1R0);
 miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxy= .3*(exp(get_xb(NX,0))+MKS1R0);
+maxy= .63*(exp(get_xb(NX,0))+MKS1R0);
 #else
 minx= -.02*get_xb(NX,0);
 maxx= 1.*get_xb(NX,0);
@@ -19,6 +19,20 @@ maxy= 1.*get_xb(NX,0);
 #endif
 
   fprintf(fgnu,
+          "set table \"table.gp\"\n"
+	  "set contour base\n"
+	  "unset surface\n"
+	  "set log cb\n"
+	  "set log z\n"
+	  "set cbrange [1.e-15:1.e-11]\n"
+	  "set cntrparam levels 40\n"
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($20) w l\n"
+	  "unset dgrid3d\n"
+	  "unset log z\n"
+	  "unset table\n"
+	  "unset contour\n"
+	  "unset surface\n"
+
 	  "set term gif large size 1100,500\n"
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
@@ -60,7 +74,7 @@ maxy= 1.*get_xb(NX,0);
 	  "set cblabel \"\"\n"
 	  "set title \"radiative corrections\" offset 0,-1\n"
 	  "set format cb \"%%.1e\"\n"
-	  //	  "set cbrange [1e-3:1]\n"
+	  "set autoscale cb\n"
 	  "unset log cb\n"
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($27) ti \"\" w l ls 1\n"
 
@@ -128,7 +142,7 @@ maxy= 1.*get_xb(NX,0);
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"
- 	  ,fname2,
+ 	  ,fname,fname2,
 	  minx,
 	  maxx,
 	  miny,

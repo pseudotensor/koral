@@ -43,7 +43,7 @@ for(ix=IXDOTMIN;ix<=IXDOTMAX;ix++)
 
 	prad_ff2lab(pp,pp,&geom);
 
-	p2u(pp,uu,gg,GG);
+	p2u(pp,uu,&geom);
 
 	/**************************/
 

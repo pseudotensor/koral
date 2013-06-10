@@ -91,7 +91,7 @@
 //#define PRINTXGC_RIGHT
 
 #define OUTVEL VEL4
-#define ALLSTEPSOUTPUT 1
+#define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
@@ -106,7 +106,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 100
+#define NDONUT 7
 
 /************************************/
 #if (NDONUT==100) //high injection to break it
@@ -311,10 +311,10 @@
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
 //333
-#undef NX
-#define NX 70
-#undef NY
-#define NY 40
+//#undef NX
+//#define NX 70
+//#undef NY
+//#define NY 40
 #define MAXX (log(55.3-MKS1R0))
 #define ELL 4.5
 #define URIN (3.92e8/CCC)

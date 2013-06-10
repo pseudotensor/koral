@@ -14,7 +14,7 @@ calc_primitives(int ix,int iy,int iz)
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
   ldouble tlo[4][4],tup[4][4];
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
@@ -22,6 +22,10 @@ calc_primitives(int ix,int iy,int iz)
   //temporary using local arrays
   gg=geom.gg;
   GG=geom.GG;
+  gdet=geom.gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   int corrected[2]={0,0}, fixups[2]={0,0};
 
@@ -32,10 +36,28 @@ calc_primitives(int ix,int iy,int iz)
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
-  if(uu[0]<RHOFLOOR) 
+  if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
     {
-      printf("at %d %d %d neg uu[0] - imposing old uu[0]\n",ix,iy,iz);
-      uu[0]=RHOFLOOR;
+      //printf("at %d %d %d neg uu[0] - imposing RHOFLOOR and other floors\n",ix,iy,iz);
+      
+      //using old state to estimate the update of uu[0] & uu[1]
+
+      //print_Nvector(uu,NV);
+      //print_Nvector(pp,NV);
+
+      pp[0]=RHOFLOOR;
+      //print_Nvector(pp,NV);
+      check_floors_hd(pp,VELPRIM,&geom);
+      //print_Nvector(pp,NV);
+      
+      //updating entropy
+      pp[5]=calc_Sfromu(pp[0],pp[1]);
+      //print_Nvector(pp,NV);
+      
+      p2u(pp,uu,&geom);
+      //print_Nvector(uu,NV);
+
+      //getchar();
       corrected[0]=1;
     }
 
@@ -207,8 +229,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	  {
 	    if(verbose>0)
 	      {
-		printf("u2p_entr err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-		getchar();
+		printf("u2p_entr err > %e %e %e > %e %e > %d %d %d\n",uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+		//getchar();
 	      }
 	  }
 	
@@ -2467,6 +2489,8 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 #endif
 
   int verbose=1;
+  
+  //if(uu[0]<1.e-49) verbose=2;
   int superverbose=0;
 
   if(superverbose)
@@ -2577,6 +2601,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   //testing if initial guess works
   f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+  //test
   if(isnan(f0)|| isnan(dfdWp) || isinf(f0) || isinf(dfdWp))
     {
       W=1.000001*sqrt(D*D+Qt2);
@@ -2616,6 +2641,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
 	  if(idump>50)
 	    {
+	      print_Nvector(uu,NV);
 	      printf("%e %e %e %e %e %e %e\n",W,Wp,D,rho0,wmrho0,f0,compute_specificentropy_wmrho0_idealgas(rho0,wmrho0),cons[3]);
 	      printf("idump exceeded before cons: %e %e %e %e\n",cons[0],cons[1],cons[2],cons[3]);
 	      return -1;//getchar();
@@ -2981,6 +3007,7 @@ u2p_cold_myharm(ldouble *uu, ldouble *pp, void *ggg)
 
 	  if(idump>50)
 	    {
+	      print_Nvector(uu,NV);
 	      printf("%e %e %e %e %e %e\n",W,Wp,wmrho0,f0,compute_specificentropy_wmrho0_idealgas(rho0,wmrho0),cons[3]);
 	      printf("idump exceeded before cons: %e %e %e %e\n",cons[0],cons[1],cons[2],cons[3]);
 	      return -1;//getchar();

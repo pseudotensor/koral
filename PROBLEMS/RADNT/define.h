@@ -2,7 +2,7 @@
 #define DOFIXUPS 0
 #define SKIPRADSOURCE
 
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define ALPHARADVISC 1.
 #define ZEROTIMEINSHEAR
 
@@ -11,7 +11,7 @@
 
 #define MASS 10.
 #define BHSPIN 0.
-#define GAMMAMAXRAD 100.
+#define GAMMAMAXRAD 20.
 
 #define myMKS1COORDS
 
@@ -45,16 +45,16 @@
 
 #ifdef myMKS1COORDS
 #define MKS1R0 0.
-#define MINX (log(2.-MKS1R0))
+#define MINX (log(1.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 20
+#define NX 60
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define NX 80
 #endif
 
-#define NY 20
+#define NY 40
 #define NZ 1
 
 

@@ -250,7 +250,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  zz=xxvecout[3];
 
 #ifndef PRINTINSIDEBH						  
-						  if((OUTCOORDS==KERRCOORDS || OUTCOORDS==BLCOORDS) && xx<r_horizon_BL(BHSPIN)) continue;
+						  if((OUTCOORDS==KERRCOORDS || OUTCOORDS==BLCOORDS) && xx<1.*r_horizon_BL(BHSPIN)) continue;
 #endif
 
 						  xxx[0]=t;

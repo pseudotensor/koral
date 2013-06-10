@@ -1,5 +1,6 @@
 #define TMAX 1.e10
 #define RADIATION
+#define SKIPRADSOURCE
 
 //#define LABRADFLUXES
 
@@ -11,14 +12,17 @@
 
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
-#define RK3STEPPING
+
+//#define RADVISCOSITY SHEARVISCOSITY
+#define ALPHARADVISC 1.
+#define ZEROTIMEINSHEAR
 
 #define RADOUTPUTINZAMO
 
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define ALLSTEPSOUTPUT 0
-#define DTOUT1 .2
+#define DTOUT1 .05
 #define GAMMA (4./3.)
 #define NOUTSTOP 100
 //#define EXPLICIT_RAD_SOURCE

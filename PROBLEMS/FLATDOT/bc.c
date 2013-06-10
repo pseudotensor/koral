@@ -45,7 +45,7 @@ if(ix>=NX )
     for(iv=0;iv<NV;iv++)
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     return 0.;
 }
@@ -63,7 +63,7 @@ if(ix<0)
 	  pp[iv]*=-1.;
       }
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     return 0.;
 }
@@ -77,7 +77,7 @@ if(iy>=NY)
     for(iv=0;iv<NV;iv++)
       pp[iv]=get_u(p,iv,iix,iiy,iiz);     
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     return 0.;
 }
@@ -97,7 +97,7 @@ if(iy<0)
     pp[8]=0.;
 
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     return 0.;
 #else
@@ -115,7 +115,7 @@ if(iy<0)
 	pp[8]=0.;
 
 
-	p2u(pp,uu,gg,GG);
+	p2u(pp,uu,&geom);
 
 	return 0.;
     
@@ -143,7 +143,7 @@ if(iy<0)
 	pp[9]=FZDOT*pp[6];
 	prad_ff2lab(pp,pp,&geom);
 
-	p2u(pp,uu,gg,GG);
+	p2u(pp,uu,&geom);
 
 	return 0;
       }
@@ -166,7 +166,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //testing if interpolated primitives make sense
-check_floors_hd(pp,VELPRIM,gg,GG);
+//check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
  
 return 0;
