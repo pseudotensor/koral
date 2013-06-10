@@ -91,7 +91,7 @@
 //#define PRINTXGC_RIGHT
 
 #define OUTVEL VEL4
-#define ALLSTEPSOUTPUT 0
+#define ALLSTEPSOUTPUT 1
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
