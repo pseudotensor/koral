@@ -106,11 +106,13 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 7
+#define NDONUT 100
 
 /************************************/
 #if (NDONUT==100) //high injection to break it
 /************************************/
+#undef ALLSTEPSOUTPUT
+#define ALLSTEPSOUTPUT 0
 #define RHOFLOOR 1.e-50
 #define ENFORCEENTROPY
 #undef OUTCOORDS
@@ -130,7 +132,7 @@
 #define NY 10
 #define MAXX (log(10.-MKS1R0))
 #define ELL 4.
-#define URIN (1.e10/CCC)
+#define URIN (1.e9/CCC)
 #define KKK 131.859
 #define UTPOT 0.97
 #define DTOUT1 10.

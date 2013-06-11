@@ -1133,13 +1133,6 @@ calc_Sfromu(ldouble rho,ldouble u)
 {
   ldouble indexn=1.0/GAMMAM1;
   return rho*log(pow(GAMMAM1*u,indexn)/pow(rho,indexn+1.0));
-
-  //return rho*log(pow((GAMMAM1*u/rho),1./GAMMAM1)/rho);
-  
-  //HARM - gives the same result
-  //ldouble indexn=1.0/GAMMAM1;
-  //printf("entr: %e %e\n",ret,rho*log(pow(GAMMAM1*u,indexn)/pow(rho,indexn+1.0)));getchar();
-
 }
 
 

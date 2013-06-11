@@ -174,49 +174,36 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   
 
   //************************************
+  //************************************
+  //************************************
   //hot hydro - conserving energy
   ret=0;
 #ifdef ENFORCEENTROPY
-  u2pret=u2p_entropy_harm(uu,pp,ggg);
+  u2pret=-1;//u2p_entropy_harm(uu,pp,ggg);
 #else
   u2pret=u2p_hot(uu,pp,ggg);  
-#endif
   //************************************
-
   if(u2pret<0) 
     {
       if(verbose>1)
 	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
       ret=-1;
     }
-  /*
-  else
-    {
-      if((pp[1]/pp[0])/(ppbak[1]/ppbak[0])>1.e1 && pp[1]>pp[0])
-	{
-	  printf("jump in u2p_hot at %d %d %d\n",geom->ix,geom->iy,geom->iz);
-	  print_Nvector(uu,NV);
-	  print_Nvector(ppbak,NV);
-	  print_Nvector(pp,NV);
-	  //	  getchar();
-	  u2pret=-1;
-	}
-    }
-  */
+#endif
+
   if(ALLOWENTROPYU2P)
     if(u2pret<0)
       {
+	//************************************
+	//************************************
 	//************************************
 	//entropy solver - conserving entropy
 	ret=-1;
 	//print_Nvector(uu,NV);
 	//      print_Nvector(ppbak,NV);
 	//      print_Nvector(pp,NV);
-	ldouble pp22[NV];int iv;
-	for(iv=0;iv<NV;iv++) pp22[iv]=ppbak[iv];
 	//u2pret=u2p_entropy(uu,pp,ggg);
 	u2pret=u2p_entropy_harm(uu,pp,ggg);
-
 	
 	//************************************
 
@@ -229,11 +216,23 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	  {
 	    if(verbose>0)
 	      {
-		printf("u2p_entr err > %e %e %e > %e %e > %d %d %d\n",uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-		//getchar();
+		printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 	      }
-	  }
-	
+
+	    if(u2pret==-103) 
+	      //solver went rho->D meaning entropy too large 
+	      //imposing URHOLIMIT and using old state
+	      {		
+		pp[1]=UURHORATIOMAX*pp[0];
+		check_floors_hd(pp,VELPRIM,&geom);
+		pp[5]=calc_Sfromu(pp[0],pp[1]);
+		p2u(pp,uu,&geom);
+
+		//no need for another entropy solver - p2u does its job
+		//u2pret=u2p_entropy_harm(uu,pp,ggg);
+		u2pret=0;
+	      }
+	  }	
       }
 
   if(ALLOWCOLDU2P)
@@ -356,14 +355,15 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   if(pp[1]<UURHORATIOMIN*pp[0]) 
     {
       if(verbose) {printf("hd_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);}//getchar();}
-      pp[1]=UURHORATIOMIN*pp[0];
+      pp[1]=UURHORATIOMIN*pp[0]; //increasing uint
       ret=-1;
 
     }
 
   if(pp[1]>UURHORATIOMAX*pp[0]) 
     {
-      pp[1]=UURHORATIOMAX*pp[0];
+      pp[1]=UURHORATIOMAX*pp[0]; //decreasing uint
+      //pp[0]=pp[1]/UURHORATIOMAX; //increasing rho
       ret=-1;      
       if(verbose) printf("hd_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);
     }
@@ -2644,7 +2644,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	      print_Nvector(uu,NV);
 	      printf("%e %e %e %e %e %e %e\n",W,Wp,D,rho0,wmrho0,f0,compute_specificentropy_wmrho0_idealgas(rho0,wmrho0),cons[3]);
 	      printf("idump exceeded before cons: %e %e %e %e\n",cons[0],cons[1],cons[2],cons[3]);
-	      return -1;//getchar();
+	      return -101;//getchar();
 	    }
 	}
       while(isnan(f0)|| isnan(dfdWp) || isinf(f0) || isinf(dfdWp));
@@ -2687,7 +2687,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	}
       while(u<0. || isnan(f0temp) || isinf(f0temp) || isnan(dfdWptemp) || isinf(dfdWptemp));
 
-      if(dampfac<1.e-7) {printf("damping unsuccesful at entropy_harm\n");return -1; getchar(); }
+      if(dampfac<1.e-7) {printf("damping unsuccesful at entropy_harm\n");return -102; getchar(); }
       else  if(verbose>1) {printf("damping succesful\n"); }
 
       if(verbose>1) 
@@ -2704,10 +2704,14 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  printf("%d %e %e %e -> wmrho %e\n",iter,Wp,f0,dfdWp,u);
 	}
 
-      //      if(fabs(dfdWp)<SMALL ) {if(verbose) printf("derivative zero. asssuming found solution\n"); return -1;getchar(); break;}
       if(fabs(Wp)>BIG) 
 	{
 	  printf("Wp has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
+
+	  //means that entropy to big
+	  //imposing uint/rho = URHOMAXRATIO
+
+	  return -103;
 
 	  /*
 	  print_Nvector(uu,NV);	  
@@ -2731,19 +2735,18 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  getchar();
 	  */
 
-	  return -1;
 	}
 
-      if(isnan(Wp) || isinf(Wp)) {printf("nan/inf Wp: %e %e %e %e\n",Wp,f0,dfdWp,W);  return -1;getchar();}
+      if(isnan(Wp) || isinf(Wp)) {printf("nan/inf Wp: %e %e %e %e\n",Wp,f0,dfdWp,W);  return -104;getchar();}
     }
   //  while(( fabs((Wp-Wpprev)/Wpprev)>CONV || u<0. || rho<0.) && iter<50);
   while(( fabs((Wp-Wpprev)/Wpprev)>CONV) && iter<50);
   
   if(iter>=50)
     {
-      if(verbose>0 || 1) printf("iter exceeded in u2p_entropy_harm at %d %d %d\n",geom->ix,geom->iy,geom->iz);
+      printf("iter exceeded in u2p_entropy_harm at %d %d %d\n",geom->ix,geom->iy,geom->iz);
       //getchar();
-      return -1;
+      return -105;
     }
   
 
@@ -2765,9 +2768,9 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(rho<0. || u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
     {
-      if(verbose>0 || 1) printf("neg u rho in u2p_entropy_harm %e %e %e %e\n",rho,u,gamma2,W);
+      printf("neg u rho in u2p_entropy_harm %e %e %e %e\n",rho,u,gamma2,W);
       //getchar();
-      return -1;
+      return -106;
     }
 
   //converting to VELPRIM
@@ -2807,7 +2810,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(verbose>1 && !superverbose) {print_Nvector(pp,NV); }//getchar();}
 
-  return 0;
+  return 0; //ok!
 
 }
 
