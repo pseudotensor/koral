@@ -15,7 +15,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2K1K2
-#define TSTEPLIM .5
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 //#define FLUXMETHOD HLL_FLUX
@@ -31,7 +31,7 @@
 //viscosity choices
 /************************************/
 #define HDVISCOSITY SIMPLEVISCOSITY
-#define ALPHATOTALPRESSUREATIO
+#define ALPHATOTALPRESSURE
 //#define HDVISCOSITY SHEARVISCOSITY
 //#define SHEARVISCOSITYONLYRPHI
 #define ALPHAHDVISC .1
