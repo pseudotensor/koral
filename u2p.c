@@ -2837,6 +2837,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   for(iv=0;iv<NVHD;iv++)
     {
       if(iv==1) continue;
+      if(iv==2 || iv==3 || iv==4) continue; //do not check momenta which could be zero
       if(fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3 && fabs(uu[iv])>SMALL) lostprecision=1;
     }
      

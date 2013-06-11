@@ -116,7 +116,7 @@
 #undef ALLSTEPSOUTPUT
 #define ALLSTEPSOUTPUT 0
 #define RHOFLOOR 1.e-50
-//#define ENFORCEENTROPY
+#define ENFORCEENTROPY
 #undef OUTCOORDS
 #define OUTCOORDS KERRCOORDS                                                                    
 #define RADOUTPUTINZAMO
