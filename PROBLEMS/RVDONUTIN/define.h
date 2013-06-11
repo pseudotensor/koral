@@ -57,7 +57,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -109,7 +109,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 333
 
 /************************************/
 #if (NDONUT==100) //high injection to break it
@@ -206,19 +206,6 @@
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 
 /************************************/
-#elif (NDONUT==8) //mdot = 100, alpha = 0.1
-/************************************/
-#define MAXX (log(50.-MKS1R0))
-#define ELL 7.3657
-#define URIN (4.00e8/CCC)
-#define KKK 11954.//4676.
-#define UTPOT 1.008//.9980
-#define DTOUT1 5.e1
-#define RHOATMMIN  1.e-25
-#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
-
-/************************************/
 #elif (NDONUT==88) //mdot = 100, alpha = 0.1, a bit thinner
 /************************************/
 #define MAXX (log(50.-MKS1R0))
@@ -226,6 +213,20 @@
 #define URIN (4.00e8/CCC)
 #define KKK 4676.//11954.//4676.
 #define UTPOT .9980//1.008//.9980
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+
+
+/************************************/
+#elif (NDONUT==8) //mdot = 100, alpha = 0.1
+/************************************/
+#define MAXX (log(50.-MKS1R0))
+#define ELL 7.3657
+#define URIN (4.00e8/CCC)
+#define KKK 11954.//4676.
+#define UTPOT 1.008//.9980
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
@@ -314,6 +315,32 @@
 #define UTPOT .983
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+
+/************************************/
+#elif (NDONUT==333) //mdot = 10, alpha = 0.1, spin=0.9375
+/************************************/
+//333
+#undef EEUURATIOMAX
+#define EEUURATIOMAX 1.e4
+//#undef RADVISCOSITY
+//#define RADVISCOSITY NOVISCOSITY
+#undef BHSPIN
+#define BHSPIN 0.9375
+#undef MINX
+#define MINX (log(.7-MKS1R0))
+//#undef NX
+//#define NX 30
+//#undef NY
+//#define NY 20
+#define MAXX (log(15.3-MKS1R0))
+#define ELL 4.5
+#define URIN (3.92e8/CCC)
+#define KKK 7127.
+#define UTPOT .983
+#define DTOUT1 5.e0
+#define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
 

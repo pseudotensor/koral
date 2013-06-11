@@ -1729,12 +1729,13 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
       if(verbose) 
 	{
 	  printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\ntrying imp_ff... ",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
-
-	  solve_implicit_lab(ix,iy,iz,dt,del4,1);
-	  getchar();
+	  //solve_implicit_lab(ix,iy,iz,dt,del4,1);
+	  //getchar();
 	}
       //use the explicit-implicit backup method
-      if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)
+      
+      //test
+      if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0 || 1)
 	{
 	  if(verbose) printf("imp_ff didn't work either. requesting fixup.\n");
 	  //this one failed too - failure
