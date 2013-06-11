@@ -1916,7 +1916,7 @@ cell_fixup_hd()
 
   int ix,iy,iz,iv;
   int in,ii;
-  int verbose=1;
+  int verbose=0;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
@@ -2036,7 +2036,7 @@ cell_fixup_old()
 
   int ix,iy,iz,iv;
   int in,ii;
-  int verbose=1;
+  int verbose=0;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);

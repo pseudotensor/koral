@@ -111,13 +111,15 @@
 /************************************/
 #if (NDONUT==100) //high injection to break it
 /************************************/
+#undef DOFIXUPS
+#define DOFIXUPS 1
 #undef ALLSTEPSOUTPUT
 #define ALLSTEPSOUTPUT 0
 #define RHOFLOOR 1.e-50
-#define ENFORCEENTROPY
+//#define ENFORCEENTROPY
 #undef OUTCOORDS
-//#define OUTCOORDS KERRCOORDS                                                                    
-//#define RADOUTPUTINZAMO
+#define OUTCOORDS KERRCOORDS                                                                    
+#define RADOUTPUTINZAMO
 #define PRINTINSIDEBH
 #define PRINTXGC_LEFT
 #undef HDVISCOSITY
