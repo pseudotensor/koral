@@ -329,7 +329,7 @@
 #undef BHSPIN
 #define BHSPIN 0.9375
 #undef MINX
-#define MINX (log(.7-MKS1R0))
+#define MINX (log(.5-MKS1R0))
 //#undef NX
 //#define NX 30
 //#undef NY
