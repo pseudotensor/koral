@@ -846,6 +846,13 @@
 #define EERHORATIOMAX 1.e10
 #endif
 
+#ifndef EEUURATIOMIN
+#define EEUURATIOMIN 1.e-20
+#endif
+
+#ifndef EEUURATIOMAX 
+#define EEUURATIOMAX 1.e10
+#endif
 
 #ifndef ERADLIMIT
 #define ERADLIMIT (10.*SMALL)

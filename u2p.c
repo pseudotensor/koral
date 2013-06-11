@@ -423,7 +423,7 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   //skip floors for some time
   //return 0;
 
-  int verbose=1;
+  int verbose=0;
   int ret=0;
 
   struct geometry *geom
@@ -434,47 +434,68 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   GG=geom->GG;
 
 
-#ifdef RADIATION
-  //absolute EE:
-  //TEST
-  if(pp[6]<ERADLIMIT) {pp[6]=ERADLIMIT;ret=-1;if(verbose) printf("rhd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
- 
-
-  /*
-  //EE/rho ratios
+#ifdef RADIATION  
+#ifndef MULTIRADFLUID  
   ldouble pp2[NV];
   int iv;
   for(iv=0;iv<NV;iv++)
     pp2[iv]=pp[iv];
+  //  ldouble Rij[4][4];
+  //  calc_Rij(pp2,ggg,Rij);
 
-  ldouble Rij[4][4];
-  //calc_Rij(pp2,ggg,Rij);
-  //prad_lab2ff(pp, pp2, ggg);
+  //to fluid frame to compare with gas
+  //prad_lab2ff(pp, pp2, ggg); does not work
 
-  
-  //currently comparing Erf with rho - inconsistent
-#ifndef MULTIRADFLUID  
-  if(pp2[6]<EERHORATIOMIN*pp2[0]) {pp2[6]=EERHORATIOMIN*pp2[0];ret=-1;if(verbose) printf("hd_floors CASE R2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
-  if(pp2[6]>EERHORATIOMAX*pp2[0]) {pp2[0]=1./EERHORATIOMAX*pp2[6];ret=-1;if(verbose) printf("hd_floors CASE R3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[6]);}
-#else
-  int irf;
-  for(irf=0;irf<NRF;irf++)
+  //absolute EE:
+  if(pp2[6]<ERADLIMIT) 
     {
-      //skip so far
-      //if(pp[EE(irf)]<EERHORATIOMIN*pp[0]) {pp[EE(irf)]=EERHORATIOMIN*pp[0];ret=-1;if(verbose) printf("hd_floors CASE R2\n");}
-      //if(pp[EE(irf)]>EERHORATIOMAX*pp[0]) {pp[0]=1./EERHORATIOMAX*pp[EE(irf)];ret=-1;if(verbose) printf("hd_floors CASE R3\n");}
+      if(verbose) printf("rhd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[0],pp2[6]);
+      pp2[6]=ERADLIMIT;
+      ret=-1;
+     }
+
+   //Erf/rho ratios (inconsistent?)
+  if(pp2[6]<EERHORATIOMIN*pp2[0]) 
+    {
+      if(verbose) printf("hd_floors CASE R2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[0],pp2[6]);
+      pp2[6]=EERHORATIOMIN*pp2[0];
+      ret=-1;
     }
-#endif
+
+  if(pp2[6]>EERHORATIOMAX*pp2[0]) 
+    {
+      if(verbose) printf("hd_floors CASE R3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[0],pp2[6]);
+      pp2[0]=1./EERHORATIOMAX*pp2[6];
+      ret=-1;
+    }
+  
+  //EE/uint ratios  
+  if(pp2[6]<EEUURATIOMIN*pp2[1]) 
+    {
+      if(verbose) printf("hd_floors CASE R4 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[1],pp2[6]);
+      pp2[6]=EEUURATIOMIN*pp2[1];
+      ret=-1;
+    }
+
+  if(pp2[6]>EEUURATIOMAX*pp2[1]) 
+    {
+      if(verbose) printf("hd_floors CASE R5 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[1],pp2[6]);
+      pp2[1]=1./EEUURATIOMAX*pp2[6];
+      ret=-1;
+    }
+ 
+ 
   for(iv=0;iv<NV;iv++)
     pp[iv]=pp2[iv];
-  //prad_ff2lab(pp2, pp, ggg);
 
-  */
+  //prad_ff2lab(pp2, pp, ggg);  
+#endif
 #endif
  
 
   return ret;
-  //velocities
+
+  //skip checking velocities - primitives should work fine
 
   int i,j,k,correct;
   //velocities
@@ -895,14 +916,14 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   for(iv=0;iv<NVHD;iv++)
     {
       if(iv==5) continue;
-      if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6) ||
-      	 ((iv>1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6 && fabs(uu[iv])>1.e-6))
+      if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3))
+	//|| ((iv>1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6 && fabs(uu[iv])>1.e-6))
 	lostprecision=1;
     }     
 
   if(lostprecision)
     {
-      printf("u2p_hot lost precision:\n");
+      if(verbose>0) printf("u2p_hot lost precision:\n");
       //print_Nvector(uu,NV);
       //print_Nvector(uu2,NV);  
       return -106;
@@ -2687,7 +2708,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  if(idump>50)
 	    {
 	      print_Nvector(uu,NV);
-	      printf("%e %e %e %e %e %e %e\n",W,Wp,D,rho0,wmrho0,f0,compute_specificentropy_wmrho0_idealgas(rho0,wmrho0),cons[3]);
+	      printf("%e %e %e %e %e %e %e %e\n",W,Wp,D,rho0,wmrho0,f0,compute_specificentropy_wmrho0_idealgas(rho0,wmrho0),cons[3]);
 	      printf("idump exceeded before cons: %e %e %e %e\n",cons[0],cons[1],cons[2],cons[3]);
 	      return -101;//getchar();
 	    }

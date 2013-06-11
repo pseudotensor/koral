@@ -328,13 +328,14 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 						  vx=vrel[1];
 						  vy=vrel[2];
 						  vz=vrel[3];
+						  
+						  
 
 						  /******************/
 						  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
 
                                                   #include PR_DUMP
 						  /******************/
-
 
 #ifdef RADIATION
 #ifndef LABRADFLUXES
@@ -386,7 +387,6 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars)
 #endif
 
 						  Trad=calc_LTE_TfromE(fabs(E));
-
 						  if(E<EEFLOOR || isnan(E)) E=EEFLOOR;
 
 						  fprintf(fout1,"%.4e %.4e %.4e "

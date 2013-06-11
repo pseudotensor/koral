@@ -2,6 +2,21 @@
 //..
 //v7 - 30
 
+//summing up multifluids
+int irft;
+E=Fx=Fy=Fz=0.;
+for(irft=0;irft<NRF;irft++)
+  {
+
+    //						      irf=0;
+    E+=pp[EE(irft)];
+    Fx+=pp[FX(irft)];
+    Fy+=pp[FY(irft)];
+    Fz+=pp[FZ(irft)];
+    //						      break;
+  }
+Trad=calc_LTE_TfromE(fabs(E));
+
 ldouble podpierd=-(GG[0][0]-2.*ELL*GG[0][3]+ELL*ELL*GG[3][3]);
 ldouble ulowert=-1./sqrt(podpierd);
 if(ulowert<-1. || podpierd<0.)
@@ -41,7 +56,7 @@ ldouble prad=calc_LTE_EfromT(Trad)/3.;
 				  nx=Fx/E;
 				  ny=Fy/E;
 				  nz=Fz/E;
-
+				  
 				  nlen=sqrt(nx*nx+ny*ny+nz*nz);
   
  

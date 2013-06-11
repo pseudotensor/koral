@@ -99,7 +99,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp,ldouble dt,void* ggg,ldo
 
   //calculating primitives  
   int corr,fixup[2];
-  if(u2p(uu,pp2,ggg,&corr,fixup)<-1) return -1;
+  if(u2p(uu,pp2,ggg,&corr,fixup)<-1) return -1; //if step goes out of physical/entropy cone
 
   //radiative four-force
   ldouble Gi[4];
@@ -193,6 +193,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
       do
 	{
+	 
 	  iter++;
       
 	  for(i=0;i<NV;i++)
@@ -201,7 +202,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	    }
 
 	  //values at zero state
-	  if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f1)<-1) 
+	  if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f1)<0) 
 	    {
 	      failed=1;
 	      break;
@@ -217,7 +218,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
 	      uu[j+6]=uup[j+6]-del;
 
-	      if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f2)<-1) 
+	      if(f_implicit_lab(uu0,uu,pp,frdt*(1.-dttot)*dt,&geom,f2)<0) 
 		{
 		  failed=1;
 		}
@@ -241,8 +242,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
 	  if(failed!=0) break;
 	  
-	  //	  if(verbose)	    print_tensor(J);
-
+	  //if(verbose)	    print_tensor(J);
+	  
 	  //inversion
 	  if(inverse_44matrix(J,iJ)<0)
 	    {
@@ -1728,9 +1729,9 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
       if(verbose) 
 	{
 	  printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\ntrying imp_ff... ",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
-	  //
-	  //	  solve_implicit_lab(ix,iy,iz,dt,del4,1);
-	  //	  getchar();
+
+	  solve_implicit_lab(ix,iy,iz,dt,del4,1);
+	  getchar();
 	}
       //use the explicit-implicit backup method
       if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)

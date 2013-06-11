@@ -8,7 +8,7 @@
 //hydro choices
 /************************************/
 #define ALLOWENTROPYU2P 1
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 
 /************************************/
 //reconstruction / Courant
@@ -23,8 +23,6 @@
 #define GDETIN 0
 //#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
-#define GAMMAMAXRAD 50.
-#define ERADLIMIT 1.e-50
 //#define PUREAXISOUTFLOW
 
 /************************************/
@@ -49,6 +47,11 @@
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-15
 #define EERHORATIOMAX 1.e6
+#define EEUURATIOMIN 1.e-15
+#define EEUURATIOMAX 1.e6
+#define ERADLIMIT 1.e-50
+#define RHOFLOOR 1.e-50
+#define GAMMAMAXRAD 50.
 
 /************************************/
 //blackhole
@@ -106,7 +109,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 100
+#define NDONUT 3
 
 /************************************/
 #if (NDONUT==100) //high injection to break it
@@ -116,14 +119,18 @@
 #undef ALLSTEPSOUTPUT
 #define ALLSTEPSOUTPUT 0
 #define RHOFLOOR 1.e-50
-#define ENFORCEENTROPY
+//#define ENFORCEENTROPY
 #undef OUTCOORDS
 #define OUTCOORDS KERRCOORDS                                                                    
 #define RADOUTPUTINZAMO
 #define PRINTINSIDEBH
 #define PRINTXGC_LEFT
 #undef HDVISCOSITY
-#define HDVISCOSITY NOVISCOSITY
+#define HDVISCOSITY SIMPLEVISCOSITY
+#undef ALPHAHDVISC
+#define ALPHAHDVISC 0.1
+#undef RMINVISC
+#define RMINVISC 3.
 #undef RADVISCOSITY
 #define RADVISCOSITY NOVISCOSITY
 #undef RADIATION
@@ -134,9 +141,9 @@
 #define NY 10
 #define MAXX (log(10.-MKS1R0))
 #define ELL 4.
-#define URIN (1.e9/CCC)
+#define URIN (1.e1/CCC)
 #define KKK 131.859
-#define UTPOT 0.97
+#define UTPOT 0.99
 #define DTOUT1 10.
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
@@ -296,7 +303,6 @@
 /************************************/
 #elif (NDONUT==33) //mdot = 10, alpha = 0.1, full torus
 /************************************/
-//333
 //#undef NX
 //#define NX 80
 //#undef NY
@@ -315,17 +321,17 @@
 #elif (NDONUT==3) //mdot = 10, alpha = 0.1
 /************************************/
 //333
-//#undef NX
-//#define NX 70
-//#undef NY
-//#define NY 40
-#define MAXX (log(55.3-MKS1R0))
+#undef NX
+#define NX 30
+#undef NY
+#define NY 20
+#define MAXX (log(15.3-MKS1R0))
 #define ELL 4.5
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e1
-#define RHOATMMIN  1.e-25
+#define DTOUT1 5.e0
+#define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
 
