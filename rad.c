@@ -1722,6 +1722,9 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
+  //test
+  //if(ix<5) return 0;
+
   if(solve_implicit_lab(ix,iy,iz,dt,del4,0)<0)
       {
       set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1);
@@ -1735,7 +1738,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
       //use the explicit-implicit backup method
       
       //test
-      if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0 || 1)
+      if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)// || 1)
 	{
 	  if(verbose) printf("imp_ff didn't work either. requesting fixup.\n");
 	  //this one failed too - failure

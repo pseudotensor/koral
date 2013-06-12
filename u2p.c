@@ -867,7 +867,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
       return -102;
     }
   
-  if(isnan(W) || isinf(W)) {printf("nan/inf W: %e\n",W); return -103;}
+  if(isnan(W) || isinf(W)) {printf("nan/inf W: %e\n",W); exit(0);return -103;}
   if(verbose>1) {printf("the end: %e\n",W); }
 
   //W found, let's calculate v2 and the rest

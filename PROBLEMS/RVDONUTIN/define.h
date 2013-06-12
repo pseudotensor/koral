@@ -8,7 +8,7 @@
 //hydro choices
 /************************************/
 #define ALLOWENTROPYU2P 1
-#define DOFIXUPS 1
+#define DOFIXUPS 0
 
 /************************************/
 //reconstruction / Courant
@@ -323,15 +323,17 @@
 /************************************/
 //333
 #undef EEUURATIOMAX
-#define EEUURATIOMAX 1.e4
+#define EEUURATIOMAX 1.e6
 //#undef RADVISCOSITY
 //#define RADVISCOSITY NOVISCOSITY
+#undef MKS1R0
+#define MKS1R0 -1.
 #undef BHSPIN
-#define BHSPIN 0.9375
+#define BHSPIN 0.9
 #undef MINX
-#define MINX (log(.5-MKS1R0))
+#define MINX (log(.8-MKS1R0))
 //#undef NX
-//#define NX 30
+//#define NX 50
 //#undef NY
 //#define NY 20
 #define MAXX (log(15.3-MKS1R0))
@@ -339,7 +341,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e0
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
