@@ -8,7 +8,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-#define SKIPRADSOURCE
+//#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 
@@ -33,11 +33,11 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define HDVISCOSITY SIMPLEVISCOSITY
+#define HDVISCOSITY SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
 #define ALPHAHDVISC .1
-#define RMINVISC 3.
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RMINVISC 2.
+#define RADVISCOSITY SHEARVISCOSITY
 #define TAUSUPPRESSPARAM 100. //the larger the less prad
 #define ALPHARADVISC 1.
 //#define ENFORCERADWAVESPEEDS
@@ -107,7 +107,7 @@
 #define NX 70
 #define NY 50
 #define NZ 1
-#define DTOUT1 5.e1
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
