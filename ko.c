@@ -71,7 +71,7 @@ main(int argc, char **argv)
 #endif
 
   //prepares files
-  fprint_openfiles();
+  fprint_openfiles("dumps");
 
   //sets bc
   set_bc(tstart);
@@ -105,7 +105,7 @@ solve_all_problems_5(ldouble tstart)
 
   //prints initial profiles to out0000.dat
 #ifndef RESTART
-  fprint_profiles(t,scalars,NSCALARS,1);			
+  fprint_profiles(t,scalars,NSCALARS,1,"dumps");			
 #endif
 
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
@@ -264,7 +264,7 @@ solve_all_problems_5(ldouble tstart)
 	  //calculate scalars
 	  calc_scalars(scalars,t);
 
-	  fprint_profiles(t,scalars,NSCALARS,1);
+	  fprint_profiles(t,scalars,NSCALARS,1,"dumps");
 	  lasttout=t;
 	  lasttout_floor=floor(t/dtout);	 
 	}

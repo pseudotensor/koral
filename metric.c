@@ -1253,9 +1253,13 @@ fill_geometry(int ix,int iy,int iz,void *geom)
   pick_T(emulo,ix,iy,iz,ggg->elo);
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
-  ggg->xx=get_x(ix,0);
-  ggg->yy=get_x(iy,1);
-  ggg->zz=get_x(iz,2);
+  ggg->xxvec[0]=0.;
+  ggg->xxvec[1]=get_x(ix,0);
+  ggg->xxvec[2]=get_x(iy,1);
+  ggg->xxvec[3]=get_x(iz,2);
+  ggg->xx=ggg->xxvec[1];
+  ggg->yy=ggg->xxvec[2];
+  ggg->zz=ggg->xxvec[3];
   ggg->gdet=ggg->gg[3][4];
 
   return 0;
@@ -1279,6 +1283,9 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
       pick_Tb(tmulobx,ix,iy,iz,idim,ggg->tlo);
       pick_Tb(emuupbx,ix,iy,iz,idim,ggg->eup);
       pick_Tb(emulobx,ix,iy,iz,idim,ggg->elo);
+      ggg->xxvec[1]=get_xb(ix,0);
+      ggg->xxvec[2]=get_x(iy,1);
+      ggg->xxvec[3]=get_x(iz,2);
     }
   if(idim==1)
     {
@@ -1286,6 +1293,9 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
       pick_Tb(tmuloby,ix,iy,iz,idim,ggg->tlo);
       pick_Tb(emuupby,ix,iy,iz,idim,ggg->eup);
       pick_Tb(emuloby,ix,iy,iz,idim,ggg->elo);
+      ggg->xxvec[1]=get_x(ix,0);
+      ggg->xxvec[2]=get_xb(iy,1);
+      ggg->xxvec[3]=get_x(iz,2);
     }
   if(idim==2)
     {
@@ -1293,12 +1303,17 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
       pick_Tb(tmulobz,ix,iy,iz,idim,ggg->tlo);
       pick_Tb(emuupbz,ix,iy,iz,idim,ggg->eup);
       pick_Tb(emulobz,ix,iy,iz,idim,ggg->elo);
+      ggg->xxvec[1]=get_x(ix,0);
+      ggg->xxvec[2]=get_x(iy,1);
+      ggg->xxvec[3]=get_xb(iz,2);
     }
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
-  ggg->xx=get_xb(ix,0);
-  ggg->yy=get_xb(iy,1);
-  ggg->zz=get_xb(iz,2);
+
+  ggg->xxvec[0]=0.;
+  ggg->xx=ggg->xxvec[1];
+  ggg->yy=ggg->xxvec[2];
+  ggg->zz=ggg->xxvec[3];
 
   ggg->gdet=ggg->gg[3][4];
 
@@ -1328,9 +1343,15 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
 
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
-  ggg->xx=get_x(ix,0);
-  ggg->yy=get_x(iy,1);
-  ggg->zz=get_x(iz,2);
+
+  ggg->xxvec[0]=0.;
+  ggg->xxvec[1]=xxvecBL[1];
+  ggg->xxvec[2]=xxvecBL[2];
+  ggg->xxvec[3]=xxvecBL[3];  
+
+  ggg->xx=xxvecBL[1];
+  ggg->yy=xxvecBL[2];
+  ggg->zz=xxvecBL[3];
   
   ggg->gdet=ggg->gg[3][4];
 

@@ -57,8 +57,23 @@
 //51* HUBBLE - hubble-type test as in the WHAM paper
 //52* SPHFLAT - spherical flat to test Christoffels
 //53* 1DDONUT - 1d donut equatorial plane structure
+//54* 1DDONUT - 1d donut equatorial plane structure
 
-#define PROBLEM 43
+#define PROBLEM 54
+
+#if(PROBLEM==54)
+
+#define PR_DEFINE "PROBLEMS/RVDISK/define.h"
+#define PR_BC "PROBLEMS/RVDISK/bc.c"
+#define PR_INIT "PROBLEMS/RVDISK/init.c"
+#define PR_KAPPA "PROBLEMS/RVDISK/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RVDISK/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RVDISK/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RVDISK/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RVDISK/dump.c"
+#define PR_TOOLS "PROBLEMS/RVDISK/tools.c"
+
+#endif
 
 #if(PROBLEM==53)
 

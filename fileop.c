@@ -7,16 +7,17 @@
 /* opens files etc. */
 /*********************************************/
 int 
-fprint_openfiles()
+fprint_openfiles(char* folder)
 {
 #ifndef RESTART
   char bufor[100];
-  sprintf(bufor,"rm dumps/*dat gifs/*");
+  sprintf(bufor,"rm %s/*",folder);
   int i=system(bufor);
   nfout1=0;
 #endif
 
-  fout_totmass=fopen("dumps/scalars.dat","w");
+  sprintf(bufor,"%s/scalars.dat",folder);
+  fout_scalars=fopen(bufor,"w");
 
   return 0;
 }
@@ -28,7 +29,7 @@ fprint_openfiles()
 int 
 fprint_closefiles()
 {
-  fclose(fout_totmass);
+  fclose(fout_scalars);
   return 0;
 }
 
@@ -42,21 +43,20 @@ fprint_closefiles()
 /*********************************************/
 /*********************************************/
 int
-fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim)
+fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* folder)
 {
   char bufor[50],bufor2[50];
-  sprintf(bufor,"dumps/rad%04d.dat",nfout1);
+  sprintf(bufor,"%s/rad%04d.dat",folder,nfout1);
   fout_radprofiles=fopen(bufor,"w");
 
-  sprintf(bufor,"dumps/out%04d.dat",nfout1);
+  sprintf(bufor,"%s/out%04d.dat",folder,nfout1);
   fout1=fopen(bufor,"w");
   
   //header
   //## nout time problem NX NY NZ
   fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
 
-  sprintf(bufor2,"gifs/out%04d.%s",nfout1,IMAGETYPE);  
-
+  sprintf(bufor2,"%s/out%04d.%s",folder,nfout1,IMAGETYPE);  
   int ix,iy,iz,iv;
   int gclx,gcrx,gcly,gcry,gclz,gcrz;
 
@@ -90,15 +90,15 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim)
 #ifdef PRINTZONEMORE
   gcrz=1;
 #endif
-
+  
   
   //printing scalars
-  fprintf(fout_totmass,"%e ",t);
+  fprintf(fout_scalars,"%e ",t);
   for(iv=0;iv<nscalars;iv++)
-    fprintf(fout_totmass,"%e ",scalars[iv]);
-  fprintf(fout_totmass,"\n");
-  fflush(fout_totmass);
-
+    fprintf(fout_scalars,"%e ",scalars[iv]);
+  fprintf(fout_scalars,"\n");
+  fflush(fout_scalars);
+  
   if(MYCOORDS == BLCOORDS || MYCOORDS == KSCOORDS || MYCOORDS == MKS1COORDS)
     {
       //calculating radial profiles
@@ -123,7 +123,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim)
   /**************************/  
   /** writing order *********/  
   /**************************/  
-
+ 
 #ifdef YZXDUMP
   for(iy=0;iy<NY;iy++)
     {

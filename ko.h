@@ -92,7 +92,7 @@ int **gcidx;
 
 ldouble max_ws[3],max_dt,ttm1,ttm2;
 ldouble min_dx,min_dy,min_dz;
-FILE *fout1,*fout_totmass,*fout_radprofiles;
+FILE *fout1,*fout_scalars,*fout_radprofiles;
 int nfout1;
 
 //some macros
@@ -102,6 +102,7 @@ int nfout1;
 struct geometry
 {
   int ix,iy,iz;
+  ldouble xxvec[4];
   ldouble xx,yy,zz;
   ldouble gg[4][5];
   ldouble GG[4][5];
@@ -225,9 +226,9 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 
 //fileop.c
 int fread_restartfile(ldouble*);
-int fprint_openfiles();
+int fprint_openfiles(char *);
 int fprint_closefiles();
-int fprint_profiles(ldouble,ldouble*,int,int);
+int fprint_profiles(ldouble,ldouble*,int,int,char*);
 int print_profiles();
 
 //physics.c
