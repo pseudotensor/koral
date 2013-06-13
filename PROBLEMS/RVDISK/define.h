@@ -1,13 +1,13 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 0
+#define RESTART
+#define RESTARTNUM 5
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
 #define ALLOW_EXPLICIT_RAD_SOURCE 0

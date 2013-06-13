@@ -55,6 +55,7 @@ main(int argc, char **argv)
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
       fread_dumpfile(ifile,&t);
+      nfout1--; //correcting index
   
       //sets bc
       set_bc(tstart);
