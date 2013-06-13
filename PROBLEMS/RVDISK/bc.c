@@ -15,12 +15,13 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 if(ix>=NX) //analytical solution within the torus and atmosphere outside
   {
     ldouble theta=geomBL.yy;
-    if(theta<INJTHETA)
+    if(theta<INJTHETA) // atmosphere
       {
-	for(iv=0;iv<NV;iv++)
-	  {
-	    pp[iv]=get_u(p,iv,NX-1,iy,iz);
-	  }
+	set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,4);
+	//rad atmosphere
+#ifdef RADIATION
+	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+#endif
  
 	//testing if interpolated primitives make sense
 	check_floors_hd(pp,VELPRIM,&geom);
@@ -42,7 +43,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	if(thetat>1.) thetat=1.;
 	ldouble rho = rho0 * pow(1. - thetat*thetat,3.);
 	rho = rhoCGS2GU(rho);
-	ldouble uint = 0.001*rho;
+	ldouble uint = 0.0001*rho;
 	pp[0]=rho;
 	pp[1]=uint;
 
@@ -56,9 +57,16 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	pp[2]=ucon[1];
 	pp[3]=ucon[2];
 	pp[4]=ucon[3];
+
+#ifdef RADIATION
+	pp[6]=1.*uint;
+	pp[7]=0.;
+	pp[8]=0.;
+	pp[9]=0.;
 	
-	//transforming primitives from BL to MYCOORDS
-	//trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,geomBL.gg,geomBL.GG,geom.gg,geom.GG);
+	//transforming rad primitives from BL to MYCOORDS
+	trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,geomBL.gg,geomBL.GG,geom.gg,geom.GG);
+#endif 
 
 	p2u(pp,uu,&geom);
       }

@@ -7,8 +7,8 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
-//#define SKIPRADSOURCE
+#define RADIATION
+#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 
@@ -33,7 +33,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define HDVISCOSITY SIMPLEVISCOSITY
+//#define HDVISCOSITY SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
 #define ALPHAHDVISC .1
 #define RMINVISC 3.
@@ -100,14 +100,14 @@
 #define MKS1R0 -2.
 #define MDOT 10.
 #define RKEP 15.
-#define ROUT 20.
-#define INJTHETA (0.4*M_PI)
+#define ROUT 25.
+#define INJTHETA ((1.-0.3)*M_PI/2.)
 #define MINX (log(1.1-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
-#define NX 30
-#define NY 20
+#define NX 70
+#define NY 50
 #define NZ 1
-#define DTOUT1 1.e1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
