@@ -12,8 +12,8 @@ maxx= 1.01*(exp(get_xb(NX,0))+MKS1R0);
 miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
 maxy= 1.01*(exp(get_xb(NX,0))+MKS1R0);
 
-//maxx= 25.;
-//maxy= 25.;
+//maxx= 40.;
+//maxy= 40.;
 #else
 minx= -.02*get_xb(NX,0);
 maxx= 1.02*get_xb(NX,0);
@@ -75,9 +75,9 @@ maxy= 1.02*get_xb(NX,0);
 	  "set cblabel \"\"\n"
 	  "set title \"rho\" offset 0,-1\n"
 	  "set format cb \"%%.1e\"\n"
-#ifndef CBAUTOSCALE
-	  "set cbrange [1e-26:1e-19]\n"
-#endif
+
+	  "set autoscale cb\n"
+	  //	  "set cbrange [1e-26:1e-19]\n"
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
@@ -112,10 +112,9 @@ maxy= 1.02*get_xb(NX,0);
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
-#ifndef CBAUTOSCALE
-	  "set cbrange [1.e-26:1.e-22]\n"
-#endif
-	  //"set autoscale cb\n"
+
+	  "set autoscale cb\n"
+	  //"set cbrange [1.e-26:1.e-22]\n"
 
 #ifdef RADIATION	  
 	  "set title \"E\" offset 0,-1\n"

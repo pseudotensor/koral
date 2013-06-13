@@ -1,13 +1,13 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 5
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 //#define SKIPRADWAVESPEEDLIMITER
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
@@ -37,7 +37,7 @@
 #define ALPHATOTALPRESSURE
 #define ALPHAHDVISC .1
 #define RMINVISC 3.
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define TAUSUPPRESSPARAM 100. //the larger the less prad
 #define ALPHARADVISC 1.
 //#define ENFORCERADWAVESPEEDS
@@ -98,15 +98,16 @@
 #if (NDISK==100) //mdot = 10, alpha=0.1
 /************************************/
 #define MKS1R0 -2.
+#define MDOT 10.
 #define RKEP 15.
-#define ROUT 30.
-#define INJTHETA (0.45*M_PI)
+#define ROUT 20.
+#define INJTHETA (0.4*M_PI)
 #define MINX (log(1.1-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
-#define NX 40
+#define NX 30
 #define NY 20
 #define NZ 1
-#define DTOUT1 5.e0
+#define DTOUT1 1.e1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)

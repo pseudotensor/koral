@@ -14,14 +14,54 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 /***********************************************/
 if(ix>=NX) //analytical solution within the torus and atmosphere outside
   {
-    //hydro atmosphere
-    set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+    ldouble theta=geomBL.yy;
+    if(theta<INJTHETA)
+      {
+	for(iv=0;iv<NV;iv++)
+	  {
+	    pp[iv]=get_u(p,iv,NX-1,iy,iz);
+	  }
+ 
+	//testing if interpolated primitives make sense
+	check_floors_hd(pp,VELPRIM,&geom);
+	//end of floor section
 
-    //rad atmosphere
-#ifdef RADIATION
-    set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
-#endif
-    p2u(pp,uu,&geom);
+	p2u(pp,uu,&geom);
+      }
+    else //injection region
+      {
+	ldouble R=geomBL.xx;						
+	ldouble Rt=R/2.;
+	ldouble vr=-7.6e8 * ALPHAHDVISC * (MDOT*16.)*(MDOT*16.) * sqrt(1./Rt/Rt/Rt/Rt/Rt) * (1.-sqrt(3/Rt));
+	ldouble MdotEdd = 2.23e18*MASS; //g/s
+	ldouble Mdot = MDOT * MdotEdd;
+	ldouble Rcgs = lenGU2CGS(R);
+	ldouble Sigma = -Mdot / (2.*M_PI*vr*Rcgs);	
+	ldouble rho0 = 35./16. * Sigma / ((M_PI/2. - INJTHETA) * lenGU2CGS(ROUT)) / 2.; 
+	ldouble thetat = 1. - (theta - INJTHETA) / (M_PI/2. - INJTHETA);
+	if(thetat>1.) thetat=1.;
+	ldouble rho = rho0 * pow(1. - thetat*thetat,3.);
+	rho = rhoCGS2GU(rho);
+	ldouble uint = 0.001*rho;
+	pp[0]=rho;
+	pp[1]=uint;
+
+	ldouble uphi=(RKEP*RKEP/(sqrt(RKEP*(RKEP*RKEP-3.*RKEP)))); 
+	ldouble ucon[4]={0.,velCGS2GU(vr),0.,uphi/R/R};
+	conv_vels(ucon,ucon,VEL3,VEL4,geomBL.gg,geomBL.GG);
+	trans2_coco(geomBL.xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
+	conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+
+	
+	pp[2]=ucon[1];
+	pp[3]=ucon[2];
+	pp[4]=ucon[3];
+	
+	//transforming primitives from BL to MYCOORDS
+	//trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,geomBL.gg,geomBL.GG,geom.gg,geom.GG);
+
+	p2u(pp,uu,&geom);
+      }
     return 0;
   }
  

@@ -110,6 +110,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   //accretion rate through horizon (3)
   scalars[1]=calc_mdot(r_horizon_BL(BHSPIN))/calc_mdotEdd();
+  //scalars[1]=calc_mdot(.9*ROUT)/calc_mdotEdd();
 
   //luminosity (4) at 0.6*rmax
   ldouble xx[4],xxBL[4];
@@ -196,7 +197,7 @@ calc_totalmass()
 ldouble
 calc_mdotEdd()
 {
-  ldouble mcgs=2.23e18*MASS; //g/cm
+  ldouble mcgs=2.23e18*MASS; //g/s
 
 #ifdef CGSOUTPUT
   return mcgs;
