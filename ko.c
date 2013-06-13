@@ -40,14 +40,27 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
-  //read restart file
-  //TODO: restarting does not work
+
 #ifdef RESTART
-  fread_restartfile(&tstart);
+  fread_dumpfile(RESTARTNUM,&tstart);
+  /*
+  int iv;
+  ldouble pp[NV],uu[NV];
+  int ix=71;
+  int iy=47;
+  int iz=0;
+  for(iv=0;iv<NV;iv++)
+    {
+      uu[iv]=get_u(u,iv,ix,iy,iz);
+      pp[iv]=get_u(p,iv,ix,iy,iz);
+    }
+  print_Nvector(uu,NV);
+  print_Nvector(pp,NV);
+  getchar();
+  */
 #else
   //or initialize new problem
   initialize_problem();
-  fprint_openfiles();
   tstart=0.;
 #endif
 
@@ -56,6 +69,9 @@ main(int argc, char **argv)
   set_initial_profile();
   my_finger(0.);
 #endif
+
+  //prepares files
+  fprint_openfiles();
 
   //sets bc
   set_bc(tstart);
@@ -89,7 +105,7 @@ solve_all_problems_5(ldouble tstart)
 
   //prints initial profiles to out0000.dat
 #ifndef RESTART
-  fprint_profiles(t,scalars,NSCALARS);				
+  fprint_profiles(t,scalars,NSCALARS,1);			
 #endif
 
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
@@ -248,7 +264,7 @@ solve_all_problems_5(ldouble tstart)
 	  //calculate scalars
 	  calc_scalars(scalars,t);
 
-	  fprint_profiles(t,scalars,NSCALARS);
+	  fprint_profiles(t,scalars,NSCALARS,1);
 	  lasttout=t;
 	  lasttout_floor=floor(t/dtout);	 
 	}

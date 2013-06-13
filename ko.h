@@ -128,17 +128,19 @@ struct evolve_fluxes_2_param
   struct rad_parameters *rp;
 };
 
-//misc.c
-void shuffle_loop(int **array, size_t n);
+//postproc.c
 int calc_scalars(ldouble*,ldouble);
 ldouble calc_mdotEdd();
 ldouble calc_lumEdd();
 int calc_radialprofiles(ldouble profiles[][NX]);
-ldouble step_function(ldouble x,ldouble k);
-int calc_stationary1d_solution()  ;
 ldouble calc_totalmass();
 ldouble calc_mdot(ldouble radius);
-ldouble calc_lum();
+ldouble calc_lum(ldouble radius);
+
+//misc.c
+void shuffle_loop(int **array, size_t n);
+ldouble step_function(ldouble x,ldouble k);
+int calc_stationary1d_solution()  ;
 int initialize_arrays();
 int free_arrays();
 ldouble my_min(ldouble a, ldouble b);
@@ -225,7 +227,7 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 int fread_restartfile(ldouble*);
 int fprint_openfiles();
 int fprint_closefiles();
-int fprint_profiles(ldouble,ldouble*,int);
+int fprint_profiles(ldouble,ldouble*,int,int);
 int print_profiles();
 
 //physics.c
