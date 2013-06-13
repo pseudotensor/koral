@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 30
 
 /************************************/
@@ -100,7 +100,7 @@
 //#define PRINTXGC_RIGHT
 
 #define OUTVEL VEL4
-#define ALLSTEPSOUTPUT 1
+#define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
@@ -115,7 +115,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 333
+#define NDONUT 3
 
 /************************************/
 #if (NDONUT==100) //high injection to break it
@@ -327,7 +327,6 @@
 /************************************/
 #elif (NDONUT==333) //mdot = 10, alpha = 0.1, spin=0.9375
 /************************************/
-//333
 #undef EEUURATIOMAX
 #define EEUURATIOMAX 1.e6
 //#undef RADVISCOSITY
