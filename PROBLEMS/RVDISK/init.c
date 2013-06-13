@@ -13,7 +13,6 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 /***********************************************/
 //hydro atmosphere
 set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
-
 //rad atmosphere
 #ifdef RADIATION
 set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);

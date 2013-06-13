@@ -43,24 +43,9 @@ main(int argc, char **argv)
 
 #ifdef RESTART
   fread_dumpfile(RESTARTNUM,&tstart);
-  /*
-  int iv;
-  ldouble pp[NV],uu[NV];
-  int ix=71;
-  int iy=47;
-  int iz=0;
-  for(iv=0;iv<NV;iv++)
-    {
-      uu[iv]=get_u(u,iv,ix,iy,iz);
-      pp[iv]=get_u(p,iv,ix,iy,iz);
-    }
-  print_Nvector(uu,NV);
-  print_Nvector(pp,NV);
-  getchar();
-  */
 #else
   //or initialize new problem
-  initialize_problem();
+  set_initial_profile();
   my_finger(0.);
   tstart=0.;
 #endif
