@@ -3,17 +3,15 @@ CFLAGS=-O3 -fopenmp -fnested-functions
 LIBS=-lm -lgsl -lgslcblas
 RM=/bin/rm
 
-EXECS = ko
-OBJS = postproc.o ko.o fileop.o misc.o physics.o finite.o zsolve_quartic.o problem.o metric.o relele.o rad.o rad.mf.o u2p.o frames.o p2u.o
+OBJS = postproc.o fileop.o misc.o physics.o finite.o zsolve_quartic.o problem.o metric.o relele.o rad.o rad.mf.o u2p.o frames.o p2u.o
 
-all: $(EXECS)
+all: ko ana
 
-$(EXECS): $(OBJS) Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
-	$(CC) $(CFLAGS) -o $(EXECS) $(OBJS) $(LIBS)
+ko: ko.o $(OBJS) Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
+	$(CC) $(CFLAGS) -o ko ko.o $(OBJS) $(LIBS)
 
-$(OBJS): Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
+ana: ana.o $(OBJS)  Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
+	$(CC) $(CFLAGS) -o ana ana.o $(OBJS) $(LIBS)
 
-.c.o:
-	$(CC) $(CFLAGS) -o $*.o -c $*.c
 clean:
-	$(RM) -f $(EXECS) $(OBJS) *~ *.o *.oo
+	$(RM) -f ko ana $(OBJS) *~ *.o *.oo
