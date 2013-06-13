@@ -61,13 +61,8 @@ main(int argc, char **argv)
 #else
   //or initialize new problem
   initialize_problem();
-  tstart=0.;
-#endif
-
-  //sets initial profile of primitives
-#ifndef RESTART
-  set_initial_profile();
   my_finger(0.);
+  tstart=0.;
 #endif
 
   //prepares files

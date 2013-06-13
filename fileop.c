@@ -9,15 +9,16 @@
 int 
 fprint_openfiles(char* folder)
 {
-#ifndef RESTART
   char bufor[100];
+
+#ifndef RESTART
   sprintf(bufor,"rm %s/*",folder);
   int i=system(bufor);
   nfout1=0;
 #endif
 
   sprintf(bufor,"%s/scalars.dat",folder);
-  fout_scalars=fopen(bufor,"w");
+  fout_scalars=fopen(bufor,"a");
 
   return 0;
 }
@@ -429,7 +430,7 @@ fread_dumpfile(int nout1, ldouble *t)
   int i,ret;
   char fname[40];
   sprintf(fname,"dumps/out%04d.dat",nout1);
-  nfout1=nout1; //global file no.
+  nfout1=nout1+1; //global file no.
   FILE *fdump=fopen(fname,"r");
 
   //reading parameters, mostly time
@@ -544,16 +545,23 @@ fread_dumpfile(int nout1, ldouble *t)
 									  /**************************/  
 									  /**************************/  
 									  /**************************/  
-									  ldouble uu[NV],pp[NV];
+									  ldouble uu[NV],pp[NV],ftemp;
 									  char c;
 	      
 									  //reading conserved and primitives from file
 									  ret=fscanf(fdump,"%*f %*f %*f ");
 									  
-									  for(i=0;i<NV;i++)
-									      ret=fscanf(fdump,"%lf ",&uu[i]);
-									  for(i=0;i<NV;i++)
-									      ret=fscanf(fdump,"%lf ",&pp[i]);
+									  //10 hardcoded here
+									  for(i=0;i<10;i++)
+									    {
+									      ret=fscanf(fdump,"%lf ",&ftemp);
+									      if(i<NV) uu[i]=ftemp;
+									    }
+									  for(i=0;i<10;i++)
+									    {
+									      ret=fscanf(fdump,"%lf ",&ftemp);
+									      if(i<NV) pp[i]=ftemp;
+									    }
 
 									  //rest of line
 									  do
