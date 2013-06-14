@@ -1025,7 +1025,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 6
+#define NRADPROFILES 10
 #endif
 
 #ifndef OUTVEL

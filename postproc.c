@@ -74,7 +74,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      dx[2]=lenGU2CGS(dx[2]); //dph
 #endif
 
-	      //surface density (2)
+	      //surface density (2nd column)
 	      profiles[0][ix]+=rho*dx[1];
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rho*ucon[1]*dx[1]*dx[2];
@@ -91,6 +91,16 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
 	  profiles[4][ix]=(r*r/(sqrt(r*(r*r-3.*r))));  
+	  //location of the photosphere (7)
+	  profiles[5][ix]=calc_photloc(ix);
+	  //net accretion rate at given radius (8)
+	  profiles[6][ix]=calc_mdot(xxBL[1],0)/calc_mdotEdd();
+	  //inflow accretion rate at given radius (9)
+	  profiles[7][ix]=calc_mdot(xxBL[1],1)/calc_mdotEdd();
+	  //outflow accretion rate at given radius (10)
+	  profiles[8][ix]=calc_mdot(xxBL[1],2)/calc_mdotEdd();
+	  //luminosity at given radius (11)
+	  profiles[9][ix]=calc_lum(xxBL[1])/calc_lumEdd();
 	}
     }
 
@@ -105,12 +115,11 @@ int calc_scalars(ldouble *scalars,ldouble t)
   //adjust NSCALARS in problem.h
 
 
-  //total mass inside the domain (2)
+  //total mass inside the domain (2nd column)
   scalars[0]=calc_totalmass();
 
   //accretion rate through horizon (3)
-  scalars[1]=calc_mdot(r_horizon_BL(BHSPIN))/calc_mdotEdd();
-  //scalars[1]=calc_mdot(.9*ROUT)/calc_mdotEdd();
+  scalars[1]=calc_mdot(r_horizon_BL(BHSPIN),0)/calc_mdotEdd();
 
   //luminosity (4) at 0.6*rmax
   ldouble xx[4],xxBL[4];
@@ -182,7 +191,7 @@ calc_totalmass()
 	      dx[1]=get_size_x(iy,1);
 	      dx[2]=get_size_x(iz,2);
 	      gdet=calc_gdet(xx);
-	      rho=get_u(u,0,ix,iy,iz);
+	      rho=get_u(p,0,ix,iy,iz);
 	      mass+=rho*dx[0]*dx[1]*dx[2]*gdet;
 	    }
 	}
@@ -225,8 +234,8 @@ calc_lumEdd()
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//calculates luminosity by integrating positive flux over outer boundary
-//normalized to total sphere, taken at radius
+//calculates luminosity by integrating positive flux from the axis up to tau=1 surface
+//normalized to total sphere, taken at radius radius
 ldouble
 calc_lum(ldouble radius)
 {
@@ -234,7 +243,7 @@ calc_lum(ldouble radius)
     return -1.; //no BH
 
   int ix,iy,iz,iv;
-  ldouble xx[4],xxBL[4],dx[3],pp[NV],ggBL[4][5],GGBL[4][5],Fr;
+  ldouble xx[4],xxBL[4],dx[3],pp[NV],Fr;
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -244,41 +253,43 @@ calc_lum(ldouble radius)
       if(xxBL[1]>radius) break;
     }
 
-  ldouble lum=0.;
+  ldouble lum=0.,tau=0.;
 
   if(NZ==1) //phi-symmetry
     {
-      iz=0; ix=NX-1;
+      iz=0; 
       for(iy=0;iy<NY;iy++)
 	{
 	  for(iv=0;iv<NV;iv++)
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 
-	  ldouble (*gg)[5],(*GG)[5];
+	  ldouble tautot[3];
 
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 	  struct geometry geom;
 	  fill_geometry(ix,iy,iz,&geom);
+	  
 
 	  get_xx(ix,iy,iz,xx);
 	  dx[0]=get_size_x(ix,0);
 	  dx[1]=get_size_x(iy,1);
 	  dx[2]=get_size_x(iz,2);
-	
+	  dx[0]=dx[0]*sqrt(geom.gg[1][1]);
+	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
+	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
+
 	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  calc_tautot(pp,xxBL,dx,tautot);
 
-	  calc_g_arb(xxBL,ggBL,KERRCOORDS);
-	  calc_G_arb(xxBL,GGBL,KERRCOORDS);
-
+	  tau+=tautot[1];
+	  if(tau>1.) break;
+	  
 	  trans_prad_coco(pp,pp,MYCOORDS,KERRCOORDS,xx,geom.gg,geom.GG,geomBL.gg,geomBL.GG);
 	  prad_lab2on(pp,pp,&geomBL);
 
 	  Fr=pp[FX(0)];	
 	  if(Fr<0.) Fr=0.;
-
-	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
-	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
 
 #ifdef CGSOUTPUT
 	  Fr=fluxGU2CGS(Fr);
@@ -298,10 +309,60 @@ calc_lum(ldouble radius)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//calculates theta corresponding to integrated tau from the axis
+ldouble
+calc_photloc(int ix)
+{
+  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS)
+    return -1.; //no BH
+
+  ldouble tau=0.,pp[NV],xx[4],xxBL[4],dx[3];
+
+  int iz=0; int iy,iv; 
+
+  if(NZ==1)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iv=0;iv<NV;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  ldouble tautot[3];
+
+	  struct geometry geomBL;
+	  fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+
+	  get_xx(ix,iy,iz,xx);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=get_size_x(iz,2);
+	  dx[0]=dx[0]*sqrt(geom.gg[1][1]);
+	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
+	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
+
+	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  calc_tautot(pp,xxBL,dx,tautot);
+	  tau+=tautot[1];
+	  if(tau>1.) break;
+	}
+      return xxBL[2];
+    }
+  else
+    return -1;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //calculates rest mass flux through r=radius within range of thetas
 //normalized to 2pi in phi
+//type == 0 (net)
+//type == 1 (inflow only)
+//type == 2 (outflow only)
 ldouble
-calc_mdot(ldouble radius)
+calc_mdot(ldouble radius,int type)
 {
   if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS)
     return -1.; //no BH
@@ -359,11 +420,12 @@ calc_mdot(ldouble radius)
 	  dx[2]=lenGU2CGS(dx[2]);
 #endif
 
-	  mdot+=rho*ucon[1]*dx[1]*dx[2];
+	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
+	    mdot+=rho*ucon[1]*dx[1]*dx[2];
 	}
     }
   else
     return -1;
 
-  return -mdot*2.;
+  return mdot*2.;
 }

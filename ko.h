@@ -135,8 +135,9 @@ ldouble calc_mdotEdd();
 ldouble calc_lumEdd();
 int calc_radialprofiles(ldouble profiles[][NX]);
 ldouble calc_totalmass();
-ldouble calc_mdot(ldouble radius);
+ldouble calc_mdot(ldouble radius,int);
 ldouble calc_lum(ldouble radius);
+ldouble calc_photloc(int ix);
 
 //misc.c
 void shuffle_loop(int **array, size_t n);

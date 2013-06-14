@@ -99,13 +99,13 @@
 #define MKS1R0 -4.
 #define MDOT 50.
 #define RKEP 15.
-#define ROUT 25.
+#define ROUT 50.
 #define INJTHETA ((1.-0.3)*M_PI/2.)
 #define MINX (log(.8-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
 #define MINY (0.01*Pi/2.)
-#define NX 70//50
-#define NY 50//30
+#define NX 50
+#define NY 30
 #define NZ 1
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25

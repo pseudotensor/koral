@@ -12,8 +12,8 @@ maxx= 1.01*(exp(get_xb(NX,0))+MKS1R0);
 miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
 maxy= 1.01*(exp(get_xb(NX,0))+MKS1R0);
 
-//maxx= 40.;
-//maxy= 40.;
+maxx= 20.;
+maxy= 20.;
 #else
 minx= -.02*get_xb(NX,0);
 maxx= 1.02*get_xb(NX,0);
@@ -77,7 +77,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set format cb \"%%.1e\"\n"
 
 	  "set autoscale cb\n"
-	  //"set cbrange [0:1e-20]\n"
+	  "set cbrange [0:3e-20]\n"
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
@@ -89,9 +89,12 @@ maxy= 1.02*get_xb(NX,0);
 	  "unset border\n"
 	  "unset log cb\n"
 
+	  //	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
+	  //	  "(($16*sin($2)+$17*cos($2))*%f):"
+	  //	  "((-$17*sin($2)+$16*cos($2))*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
-	  "(($16*sin($2)+$17*cos($2))*%f):"
-	  "((-$17*sin($2)+$16*cos($2))*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "(($16*sin($2)+$17*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5*%f):"
+	  "((-$17*sin($2)+$16*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
 	  "unset tics\n"
 	  "unset border\n"
@@ -114,7 +117,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set cblabel \"\"\n"
 
 	  "set autoscale cb\n"
-	  //"set cbrange [0:1.e-24]\n"
+	  "set cbrange [0:5.e-21]\n"
 
 #ifdef RADIATION	  
 	  "set title \"E\" offset 0,-1\n"
@@ -159,7 +162,7 @@ maxy= 1.02*get_xb(NX,0);
 	  miny,
 	  maxy,
 	  fname,
-	  fname,5.,5.,NX/21+1,NY/21+1,
+	  fname,.95,.95,NX/21+1,NY/21+1,
 	  fname,
 #ifdef RADIATION
 	  fname,1.,1.,NX/21+1,NY/21+1
