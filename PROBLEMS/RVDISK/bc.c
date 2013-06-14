@@ -43,7 +43,9 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	if(thetat>1.) thetat=1.;
 	ldouble rho = rho0 * pow(1. - thetat*thetat,3.);
 	rho = rhoCGS2GU(rho);
-	ldouble uint = 0.0001*rho;
+	ldouble temp = 4.9e7 * sqrt(sqrt(ALPHAHDVISC*MASS)) * sqrt(sqrt(sqrt(1./(Rt*Rt*Rt))));
+
+	ldouble uint = calc_PEQ_ufromTrho(temp,rho);
 	pp[0]=rho;
 	pp[1]=uint;
 
@@ -52,14 +54,13 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	conv_vels(ucon,ucon,VEL3,VEL4,geomBL.gg,geomBL.GG);
 	trans2_coco(geomBL.xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
 	conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
-
 	
 	pp[2]=ucon[1];
 	pp[3]=ucon[2];
 	pp[4]=ucon[3];
 
 #ifdef RADIATION
-	pp[6]=1.*uint;
+	pp[6]=calc_LTE_Efromurho(uint,rho);
 	pp[7]=0.;
 	pp[8]=0.;
 	pp[9]=0.;

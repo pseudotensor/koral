@@ -65,7 +65,6 @@
 //coordinates / resolution
 /************************************/
 #define MYCOORDS MKS1COORDS
-#define MINY (0.01*Pi/2.)
 #define MAXY Pi/2.
 #define MINZ -1.
 #define MAXZ 1.
@@ -97,15 +96,16 @@
 /************************************/
 #if (NDISK==100) //mdot = 10, alpha=0.1
 /************************************/
-#define MKS1R0 -2.
-#define MDOT 10.
+#define MKS1R0 -4.
+#define MDOT 50.
 #define RKEP 15.
 #define ROUT 25.
 #define INJTHETA ((1.-0.3)*M_PI/2.)
-#define MINX (log(1.1-MKS1R0))
+#define MINX (log(.8-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
-#define NX 70
-#define NY 50
+#define MINY (0.01*Pi/2.)
+#define NX 70//50
+#define NY 50//30
 #define NZ 1
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25

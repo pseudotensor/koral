@@ -39,7 +39,7 @@ fprint_closefiles()
 /*********************************************/
 /* prints dumps to files and calls gnuplot */
 /* codeprim == 1 - prints out code primitives, only coordinates converted to OUTCOORDS */
-/* codeprim == 0 - prints ZAMO frame etc primitives */
+/* codeprim == 0 - prints ZAMO frame etc primitives - post processing, called by ana.c */
 /*********************************************/
 /*********************************************/
 /*********************************************/
@@ -111,7 +111,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 	  ldouble xx[4],xxout[4];
 	  get_xx(ix,0,0,xx);
 	  coco_N(xx,xxout,MYCOORDS,BLCOORDS); 
-	  if(xxout[1]<r_horizon_BL(BHSPIN)) continue;
+	  if(xxout[1]<r_horizon_BL(BHSPIN) && codeprim==0) continue;
 	  fprintf(fout_radprofiles,"%e ",xxout[1]);
 	  for(iv=0;iv<NRADPROFILES;iv++)
 	    fprintf(fout_radprofiles,"%e ",profiles[iv][ix]);

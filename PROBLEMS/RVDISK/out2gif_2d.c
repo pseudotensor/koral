@@ -69,7 +69,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set rmargin at screen 0.41\n"
 	  "set bmargin at screen .10\n"
 	  "set tmargin at screen .95\n"
-	  "set log cb\n"
+	  //"set log cb\n"
 	  "set ylabel \"z\"\n"
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set cblabel \"\"\n"
@@ -77,7 +77,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set format cb \"%%.1e\"\n"
 
 	  "set autoscale cb\n"
-	  //	  "set cbrange [1e-26:1e-19]\n"
+	  //"set cbrange [0:1e-20]\n"
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
@@ -108,13 +108,13 @@ maxy= 1.02*get_xb(NX,0);
 	  "set rmargin at screen 0.90\n"
 	  "set bmargin at screen .10\n"
 	  "set tmargin at screen .95\n"
-	  "set log cb\n"
+	  //"set log cb\n"
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
 
 	  "set autoscale cb\n"
-	  //"set cbrange [1.e-26:1.e-22]\n"
+	  //"set cbrange [0:1.e-24]\n"
 
 #ifdef RADIATION	  
 	  "set title \"E\" offset 0,-1\n"
