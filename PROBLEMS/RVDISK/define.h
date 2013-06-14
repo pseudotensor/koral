@@ -35,7 +35,6 @@
 /************************************/
 #define HDVISCOSITY SIMPLEVISCOSITY
 #define ALPHATOTALPRESSURE
-#define ALPHAHDVISC .1
 #define RMINVISC 2.
 #define RADVISCOSITY SHEARVISCOSITY
 #define TAUSUPPRESSPARAM 100. //the larger the less prad
@@ -59,7 +58,6 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -91,13 +89,15 @@
 /************************************/
 //model choice
 /************************************/
-#define NDISK 100
+#define NDISK 106
 
 /************************************/
-#if (NDISK==100) //mdot = 10, alpha=0.1
+#if (NDISK==100) //mdot = 10, r=15/50 alpha=0.1
 /************************************/
+#define ALPHAHDVISC .1
+#define BHSPIN 0.0
 #define MKS1R0 -4.
-#define MDOT 50.
+#define MDOTOUT 50.
 #define RKEP 15.
 #define ROUT 50.
 #define INJTHETA ((1.-0.3)*M_PI/2.)
@@ -106,6 +106,138 @@
 #define MINY (0.01*Pi/2.)
 #define NX 50
 #define NY 30
+#define NZ 1
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+#endif
+
+/************************************/
+#if (NDISK==101) //mdot = 10, r=50/100, alpha=0.1
+/************************************/
+#define ALPHAHDVISC .1
+#define BHSPIN 0.0
+#define MKS1R0 -4.
+#define MDOTOUT 50.
+#define RKEP 50.
+#define ROUT 100.
+#define INJTHETA ((1.-0.3)*M_PI/2.)
+#define MINX (log(.8-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.01*Pi/2.)
+#define NX 70
+#define NY 40
+#define NZ 1
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+#endif
+
+/************************************/
+#if (NDISK==102) //mdot = 10, r=50/100, alpha=0.02
+/************************************/
+#define ALPHAHDVISC .02
+#define BHSPIN 0.0
+#define MKS1R0 -4.
+#define MDOTOUT 50.
+#define RKEP 50.
+#define ROUT 100.
+#define INJTHETA ((1.-0.3)*M_PI/2.)
+#define MINX (log(.8-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.01*Pi/2.)
+#define NX 70
+#define NY 40
+#define NZ 1
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+#endif
+
+/************************************/
+#if (NDISK==103) //mdot = 1, r=50/100, alpha=0.1
+/************************************/
+#define ALPHAHDVISC .1
+#define BHSPIN 0.0
+#define MKS1R0 -4.
+#define MDOTOUT 10.
+#define RKEP 50.
+#define ROUT 100.
+#define INJTHETA ((1.-0.2)*M_PI/2.)
+#define MINX (log(.8-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.01*Pi/2.)
+#define NX 70
+#define NY 40
+#define NZ 1
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+#endif
+
+/************************************/
+#if (NDISK==104) //mdot = 50, r=50/100, alpha=0.1
+/************************************/
+#define ALPHAHDVISC .1
+#define BHSPIN 0.0
+#define MKS1R0 -4.
+#define MDOTOUT 200.
+#define RKEP 50.
+#define ROUT 100.
+#define INJTHETA ((1.-0.4)*M_PI/2.)
+#define MINX (log(.8-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.01*Pi/2.)
+#define NX 70
+#define NY 40
+#define NZ 1
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+#endif
+
+/************************************/
+#if (NDISK==105) //mdot = 10, r=50/100, alpha=0.1, spin=0.9
+/************************************/
+#define ALPHAHDVISC .1
+#define BHSPIN 0.9
+#define MKS1R0 -3.
+#define MDOTOUT 50.
+#define RKEP 50.
+#define ROUT 100.
+#define INJTHETA ((1.-0.3)*M_PI/2.)
+#define MINX (log(.6-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.01*Pi/2.)
+#define NX 70
+#define NY 40
+#define NZ 1
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+#endif
+
+/************************************/
+#if (NDISK==106) //mdot = 10, r=100/200, alpha=0.1
+/************************************/
+#define ALPHAHDVISC .1
+#define BHSPIN 0.0
+#define MKS1R0 -4.
+#define MDOTOUT 50.
+#define RKEP 100.
+#define ROUT 200.
+#define INJTHETA ((1.-0.3)*M_PI/2.)
+#define MINX (log(.8-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.01*Pi/2.)
+#define NX 80
+#define NY 50
 #define NZ 1
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
