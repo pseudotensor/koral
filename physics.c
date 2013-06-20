@@ -86,7 +86,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
   discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
 
-  if(discr<0.) {printf("x discr in wavespeeds lt 0\n"); discr=0.;}
+  if(discr<0.) {printf("x discr in wavespeeds lt 0 at %d %d %d\n",geom->ix,geom->iy,geom->iz); discr=0.;}
   discr = sqrt(discr);
   cst1 = -(-B + discr) / (2. * A);
   cst2 = -(-B - discr) / (2. * A);  
@@ -122,7 +122,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
   A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
   discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("x discr in wavespeeds lt 0\n"); discr=0.;}
+  if(discr<0.) {printf("y discr in wavespeeds lt 0 at %d %d %d\n",geom->ix,geom->iy,geom->iz); discr=0.;}
   discr = sqrt(discr);
   cst1 = -(-B + discr) / (2. * A);
   cst2 = -(-B - discr) / (2. * A);  
@@ -159,7 +159,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
   A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
   discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("y discr in wavespeeds lt 0\n"); discr=0.;}
+  if(discr<0.) {printf("z discr in wavespeeds lt 0 at %d %d %d\n",geom->ix,geom->iy,geom->iz); discr=0.;}
   discr = sqrt(discr);
   cst1 = -(-B + discr) / (2. * A);
   cst2 = -(-B - discr) / (2. * A);  

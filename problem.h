@@ -57,9 +57,24 @@
 //51* HUBBLE - hubble-type test as in the WHAM paper
 //52* SPHFLAT - spherical flat to test Christoffels
 //53* 1DDONUT - 1d donut equatorial plane structure
-//54* 1DDONUT - 1d donut equatorial plane structure
+//54* RVDISK - viscous rad. disk damped from larger radius
+//55* G2STATIC - cloud through static atmosphere
 
-#define PROBLEM 54
+#define PROBLEM 55
+
+#if(PROBLEM==55)
+
+#define PR_DEFINE "PROBLEMS/G2STATIC/define.h"
+#define PR_BC "PROBLEMS/G2STATIC/bc.c"
+#define PR_INIT "PROBLEMS/G2STATIC/init.c"
+#define PR_KAPPA "PROBLEMS/G2STATIC/kappa.c"
+#define PR_KAPPAES "PROBLEMS/G2STATIC/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/G2STATIC/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/G2STATIC/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/G2STATIC/dump.c"
+#define PR_TOOLS "PROBLEMS/G2STATIC/tools.c"
+
+#endif
 
 #if(PROBLEM==54)
 

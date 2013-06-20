@@ -1757,6 +1757,25 @@ coco_CYL2MCYL1(ldouble *xCYL, ldouble *xMCYL1)
   return 0;
 }
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for CYL -> MCYL1
+int
+coco_SPH2MINK(ldouble *xSPH, ldouble *xMINK)
+{
+  ldouble r=xSPH[1];
+  ldouble th=xSPH[2];
+  ldouble ph=xSPH[3];
+  
+  xMINK[0]=xSPH[0];
+  xMINK[1]=r*sin(th)*cos(ph);
+  xMINK[2]=r*sin(th)*sin(ph);
+  xMINK[3]=r*cos(th);
+
+  return 0;
+}
 
 
 //**********************************************************************
@@ -1860,6 +1879,16 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     {
       coco_BL2KS(x1,x2);
       coco_KS2MKS1(x2,x2);
+    }
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MINKCOORDS)
+    {
+      coco_SPH2MINK(x1,x2);
+    }
+  else if (CO1==MKS1COORDS & CO2==MINKCOORDS)
+    {
+      coco_MKS12KS(x1,x2);
+      coco_KS2BL(x2,x2);
+      coco_SPH2MINK(x2,x2);
     }
   else
     {

@@ -89,7 +89,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDISK 106
+#define NDISK 107
 
 /************************************/
 #if (NDISK==100) //mdot = 10, r=15/50 alpha=0.1
@@ -244,3 +244,28 @@
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
 #endif
+
+/************************************/
+#if (NDISK==107) //mdot = 10, r=50/100, alpha=0.1, TAUSUP=10
+/************************************/
+#undef TAUSUPPRESSPARAM
+#define TAUSUPPRESSPARAM 10. //the larger the less prad
+#define ALPHAHDVISC .1
+#define BHSPIN 0.0
+#define MKS1R0 -4.
+#define MDOTOUT 50.
+#define RKEP 50.
+#define ROUT 100.
+#define INJTHETA ((1.-0.3)*M_PI/2.)
+#define MINX (log(.8-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.01*Pi/2.)
+#define NX 70
+#define NY 40
+#define NZ 1
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+#endif
+

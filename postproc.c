@@ -125,7 +125,9 @@ int calc_scalars(ldouble *scalars,ldouble t)
   ldouble xx[4],xxBL[4];
   get_xx(NX-1,0,0,xx);
   coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-  scalars[2]=calc_lum(RKEP)/calc_lumEdd();
+
+  scalars[2]=calc_lum(xxBL[1]/2.)/calc_lumEdd();
+
 
   /*********************************************/
   //L1 ERRRORS for some problems
