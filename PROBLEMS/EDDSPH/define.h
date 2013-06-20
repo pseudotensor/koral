@@ -67,7 +67,7 @@
 #define MAXY (1.5*Pi/2.)
 #define MINZ 0.
 #define MAXZ (2.*Pi)
-#define NX 200
+#define NX 100
 #define NY 1
 #define NZ 1
 #define SPECIFIC_BC
@@ -77,7 +77,7 @@
 /************************************/
 #define OUTCOORDS KERRCOORDS                                                                    
 #define RADOUTPUTINZAMO
-//#define PRINTXGC_LEFT
+#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
