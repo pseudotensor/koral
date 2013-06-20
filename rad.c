@@ -1120,20 +1120,34 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
       pp[7]=ucon[1]; 
       pp[8]=ucon[2];
       pp[9]=ucon[3];
+
     }
-  if(atmtype==1) //optically thin atmosphere, photon flying radially 
+  if(atmtype==1) //fixed Erf, urf 0 in lab frame
     {
       ldouble ucon[4];
-      calc_photonrad_4vel(gg,GG,ucon);
-      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
+      ldouble xx2[4];
+      ldouble GGBL[4][5];
 
-      pp[6]=ERADATMMIN; 
-      pp[7]=ucon[1]; 
+      // BL coords
+      coco_N(xx,xx2,MYCOORDS,BLCOORDS);
+      calc_G_arb(xx2,GGBL,BLCOORDS);
+
+      // normal observer in BL = stationary observer
+      calc_normalobs_4vel(GGBL,ucon);
+     
+      // to MYCOORDS
+      trans2_coco(xx2,ucon,ucon,BLCOORDS,MYCOORDS);
+     
+      // to VELPRIMRAD
+      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
+     
+      pp[7]=ucon[1];
       pp[8]=ucon[2];
       pp[9]=ucon[3];
 
-      //printf("%g > ",xx[1]);  print_4vector(&pp[6]); getchar();
-    }
+      //    print_4vector(ucon); getchar();
+      pp[6]=ERADATMMIN; 
+     }
   if(atmtype==2) //optically thin atmosphere, scalings from numerical solution of radiall influx
     {
       ldouble gammamax=10.;

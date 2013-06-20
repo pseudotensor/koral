@@ -59,8 +59,23 @@
 //53* 1DDONUT - 1d donut equatorial plane structure
 //54* RVDISK - viscous rad. disk damped from larger radius
 //55* G2STATIC - cloud through static atmosphere
+//56* EDDSPH - 1d Edd Sphere
 
-#define PROBLEM 55
+#define PROBLEM 56
+
+#if(PROBLEM==56)
+
+#define PR_DEFINE "PROBLEMS/EDDSPH/define.h"
+#define PR_BC "PROBLEMS/EDDSPH/bc.c"
+#define PR_INIT "PROBLEMS/EDDSPH/init.c"
+#define PR_KAPPA "PROBLEMS/EDDSPH/kappa.c"
+#define PR_KAPPAES "PROBLEMS/EDDSPH/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/EDDSPH/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/EDDSPH/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/EDDSPH/dump.c"
+#define PR_TOOLS "PROBLEMS/EDDSPH/tools.c"
+
+#endif
 
 #if(PROBLEM==55)
 

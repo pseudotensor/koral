@@ -1870,7 +1870,7 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     coco_MCYL12CYL(x1,x2);
   else if (CO1==CYLCOORDS && CO2==MCYL1COORDS)
     coco_CYL2MCYL1(x1,x2);  
-  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       coco_MKS12KS(x1,x2);
       coco_KS2BL(x2,x2);
