@@ -46,8 +46,10 @@ if(ix<0) //outflow near
        }
 
      pp[6]=10000.*ERADATMMIN;
-     pp[7]=.1;
+     pp[7]=pp[6]/2.;
      pp[8]=pp[9]=0.;
+     
+     prad_on2lab(pp,pp,&geom);
  
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,&geom);

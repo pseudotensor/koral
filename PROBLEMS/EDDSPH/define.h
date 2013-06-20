@@ -83,7 +83,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 20.
+#define DTOUT1 2000.
 
 /************************************/
 //common physics 
