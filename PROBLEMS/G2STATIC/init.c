@@ -12,7 +12,10 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 /***********************************************/
 //hydro atmosphere
-set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
+//set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
+
+//Sgr A* atmosphere
+set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
 
 /***********************************************/
 //cloud
@@ -36,7 +39,7 @@ ldouble dist = sqrt((xxmink[1]-clxxmink[1])*(xxmink[1]-clxxmink[1])+
 
 
 //increase rho
-ldouble mag=100.;
+ldouble mag=0.;
 ldouble factor=(1.+mag*exp(-dist/500.));
 pp[0]*=factor;
 

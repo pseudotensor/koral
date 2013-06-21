@@ -73,7 +73,7 @@
 #define MAXZ (2.*Pi)
 #define NX 40
 #define NY 40
-#define NZ 40
+#define NZ 10
 #define SPECIFIC_BC
 
 /************************************/
@@ -82,8 +82,8 @@
 #define OUTCOORDS KERRCOORDS                                                                    
 //#define RADOUTPUTINZAMO
 //#define PRINTINSIDEBH
-//#define PRINTXGC_LEFT
-//#define PRINTXGC_RIGHT
+#define PRINTXGC_LEFT
+#define PRINTXGC_RIGHT
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000

@@ -1280,6 +1280,8 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
   if(idim==0)
     {
       /*
+      //if these tetrads required at some point then they should be calculated on the go here
+	
       pick_Tb(tmuupbx,ix,iy,iz,idim,ggg->tup);
       pick_Tb(tmulobx,ix,iy,iz,idim,ggg->tlo);
       pick_Tb(emuupbx,ix,iy,iz,idim,ggg->eup);

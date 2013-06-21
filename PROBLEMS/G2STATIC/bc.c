@@ -12,9 +12,12 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 /***********************************************/
 /***********************************************/
-if(ix>=NX) //analytical solution within the torus and atmosphere outside
+if(ix>=NX || ix<0) //Sgr A* atmosphere
   {
-    set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
+    //flat atmosphere
+    //set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
+    //Sgr A* atmosphere
+    set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
   
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,&geom);

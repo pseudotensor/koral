@@ -69,6 +69,10 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_multiroots.h>
 
+#ifdef PR_DEFS
+#include PR_DEFS
+#endif
+
 #define ldouble double
 #define FTYPE ldouble
 #define gSIZE 20 //size of metric arrays = 16 + 1 (gdet) + 3 (dlgdet)
