@@ -12,6 +12,7 @@
 #define VY 3
 #define VZ 4
 #define ENTR 5
+#define TRA (NV-1)
 
 //multi rad-fluid macros
 #define FX(nf) (7+nf*4)

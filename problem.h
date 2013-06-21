@@ -1023,17 +1023,30 @@
 #endif
 
 #ifdef RADIATION
-
 #ifdef MULTIRADFLUID
+#ifndef TRACER
 #define NV (6+4*NRF)
 #else
+#define NV ((6+4*NRF)+1)
+#endif
+
+#else
+#ifndef TRACER
 #define NV 10 //number of variables
+#else
+#define NV 11
+#endif
+
 #undef NRF
 #define NRF 1
 #endif
 
 #else
+#ifndef TRACER
 #define NV 6
+#else
+#define NV (6+1)
+#endif
 #endif
 
 #define NVHD 6 //number of hydro variables

@@ -45,6 +45,11 @@ ldouble atmrho = pp[0];
 ldouble clrho = (factor-1.)*atmrho;
 pp[0] =atmrho+clrho;
 
+#ifdef TRACER
+//tracer : fraction of cloud gas 
+pp[TRA]=clrho/pp[0];
+#endif
+
 //velocity
 ldouble OmKep = 1./sqrt(geomBL.xx*geomBL.xx*geomBL.xx);
 

@@ -908,6 +908,12 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   //entropy based on UU[1]
   pp[5]=calc_Sfromu(rho,u);
 
+#ifdef TRACER
+  ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
+  pp[TRA]=Dtr/gamma;
+#endif
+
+
   // test the inversion
   ldouble uu2[NV];
   int iv;
@@ -2850,6 +2856,11 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   //entropy corresponding to UU[5]
   pp[5]=calc_Sfromu(rho,u);
 
+#ifdef TRACER
+  ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
+  pp[TRA]=Dtr/gamma;
+#endif
+
   //precision test
   ldouble uu2[NV];
   int iv;
@@ -3199,6 +3210,10 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
   pp[3]=utcon[2];
   pp[4]=utcon[3];
   pp[5]=calc_Sfromu(rho,u);
+#ifdef TRACER
+  ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
+  pp[TRA]=Dtr/gamma;
+#endif
 
   ldouble uu2[NV];
   int iv;
@@ -3542,6 +3557,11 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
   pp[3]=utcon[2];
   pp[4]=utcon[3];
   pp[5]=calc_Sfromu(rho,u);
+
+#ifdef TRACER
+  ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
+  pp[TRA]=Dtr/gamma;
+#endif
 
   ldouble uu2[NV];
   int iv;

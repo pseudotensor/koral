@@ -111,6 +111,14 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   u[4]=gdet*Ttph;
   u[5]=gdet*Sut;
 
+
+#ifdef TRACER
+  ldouble tracerut=p[TRA]*ut;
+  u[TRA]= gdet*tracerut;
+  //if(u[TRA]>0.1) printf("u[TRA] %e %d %d\n",u[TRA],TRA,NV);
+#endif
+
+
   return 0.;
 }
 

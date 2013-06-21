@@ -620,6 +620,9 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   indices_2221(T,T,gg);
 
   //primitives
+#ifdef TRACER
+  ldouble tracer=pp[TRA];
+#endif
   ldouble rho=pp[RHO];
   ldouble u=pp[UU];
   ldouble vcon[4],ucon[4];
@@ -700,6 +703,10 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 	  ff[FZ(irf)]=gdetu*Rij[irf][1][3];
 	}
 #endif
+
+#ifdef TRACER
+      ff[TRA]= gdetu*tracer*u1; 
+#endif
     }  
   if(idim==1) //y
     {
@@ -731,6 +738,10 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 	  ff[FY(irf)]=gdetu*Rij[irf][2][2];
 	  ff[FZ(irf)]=gdetu*Rij[irf][2][3];
 	}
+#endif
+
+#ifdef TRACER
+      ff[TRA]= gdetu*tracer*u2; 
 #endif
     }  
   if(idim==2) //z
@@ -764,6 +775,10 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 	  ff[FZ(irf)]=gdetu*Rij[irf][3][3];
 	}
 #endif
+
+#ifdef TRACER
+      ff[TRA]= gdetu*tracer*u3; 
+#endif
     } 
 
 #else //pure hydro
@@ -781,6 +796,10 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[4]= gdetu*(T[1][3]);
 
       ff[5]= gdetu*S*u1;
+
+#ifdef TRACER
+      ff[TRA]= gdetu*tracer*u1; 
+#endif
     }  
   if(idim==1) //y
     {
@@ -795,6 +814,10 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[4]= gdetu*(T[2][3]);
 
       ff[5]= gdetu*S*u2;
+
+#ifdef TRACER
+      ff[TRA]= gdetu*tracer*u2; 
+#endif
     }  
   if(idim==2) //z
     {
@@ -809,6 +832,10 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
       ff[4]= gdetu*(T[3][3]);
 
       ff[5]= gdetu*S*u3;
+
+#ifdef TRACER
+      ff[TRA]= gdetu*tracer*u3; 
+#endif
     } 
 
 #endif

@@ -97,3 +97,4 @@
 #define GAMMA (5./3.)
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
+#define TRACER

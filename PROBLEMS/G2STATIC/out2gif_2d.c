@@ -69,9 +69,14 @@ maxy= 1.1*get_xb(NX,0);
 	  "unset log cb\n"
 
 	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
+	  "(($16*sin($2)+$17*cos($2)))*%f:"
+	  "((-$17*sin($2)+$16*cos($2)))*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+
+	  /*
+	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
 	  "(($16*sin($2)+$17*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f:"
 	  "((-$17*sin($2)+$16*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
-
+	  */
 	 
  	  ,fname2,
 	  minx,
@@ -79,7 +84,13 @@ maxy= 1.1*get_xb(NX,0);
 	  miny,
 	  maxy,
 	  fname,
-	  fname,maxx/21/2,maxx/21/2,NX/21+1,NY/21+1
+	  fname,
+
+	  maxx/21.*200000.,maxx/21.*200000.,
+	  //	  maxx/21/2,maxx/21/2,
+
+
+	  NX/21+1,NY/21+1
 	 
 	  );  
 //#endif	    

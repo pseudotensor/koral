@@ -18,7 +18,11 @@ if(ix>=NX) //Sgr A* atmosphere
     //set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
     //Sgr A* atmosphere
     set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
-  
+
+#ifdef TRACER
+    pp[TRA]=get_u(p,TRA,NX-1,iy,iz);
+#endif
+
     //testing if interpolated primitives make sense
     check_floors_hd(pp,VELPRIM,&geom);
     //end of floor section
