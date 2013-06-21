@@ -20,9 +20,14 @@ set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
 /***********************************************/
 //cloud
 ldouble clix,cliy,cliz;
+/*
 clix=NX*0.66;
 cliy=NY*0.3;
 cliz=NZ;
+*/
+clix=NX*0.8;
+cliy=NY/2;
+cliz=NZ*.8;
 
 ldouble clxx[4];
 get_xx(clix,cliy,cliz,clxx);
@@ -39,8 +44,8 @@ ldouble dist = sqrt((xxmink[1]-clxxmink[1])*(xxmink[1]-clxxmink[1])+
 
 
 //increase rho
-ldouble mag=10.;
-ldouble factor=(1.+mag*exp(-dist*dist/400./400.));
+ldouble mag=CLMAG;
+ldouble factor=(1.+mag*exp(-dist*dist/CLWIDTH/CLWIDTH));
 ldouble atmrho = pp[0];
 ldouble clrho = (factor-1.)*atmrho;
 pp[0] =atmrho+clrho;
@@ -53,8 +58,8 @@ pp[TRA]=clrho/pp[0];
 //velocity
 ldouble OmKep = 1./sqrt(geomBL.xx*geomBL.xx*geomBL.xx);
 
-ldouble ucon[4]={0.,0,+OmKep,0.};
-//ldouble ucon[4]={0.,0,0,OmKep};
+//ldouble ucon[4]={0.,0,+OmKep,0.};
+ldouble ucon[4]={0.,0,0,-OmKep};
 
 conv_vels(ucon,ucon,VEL3,VEL4,geomBL.gg,geomBL.GG);
 trans2_coco(geomBL.xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);

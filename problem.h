@@ -89,7 +89,7 @@
 #define PR_DUMP "PROBLEMS/G2STATIC/dump.c"
 #define PR_TOOLS "PROBLEMS/G2STATIC/tools.c"
 #define PR_DEFS "PROBLEMS/G2STATIC/defs.h"
-
+#define PR_FINGER "PROBLEMS/G2STATIC/finger.c"
 #endif
 
 #if(PROBLEM==54)

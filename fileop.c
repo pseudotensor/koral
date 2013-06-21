@@ -142,7 +142,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 #elif defined(YSLICE)
 			  for(iy=YSLICE;iy<YSLICE+1;iy++)
 			    {
-			      for(iz=0;iz<NZ;iz++)
+			      for(iz=0;iz<NZ+gcrz*NG;iz++)
 				{
 				  for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
 				    {

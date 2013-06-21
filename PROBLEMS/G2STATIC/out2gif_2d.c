@@ -7,12 +7,11 @@
 ldouble minx,miny,maxx,maxy;
 
 #if (OUTCOORDS==KERRCOORDS)
-minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxx= 1.01*(exp(get_xb(NX,0))+MKS1R0);
-miny= -1.01*(exp(get_xb(NX,0))+MKS1R0);
-maxy= 1.01*(exp(get_xb(NX,0))+MKS1R0);
+minx= -0.1*(exp(get_xb(NX,0))+MKS1R0);
+maxx= 1.1*(exp(get_xb(NX,0))+MKS1R0);
+miny= -1.1*(exp(get_xb(NX,0))+MKS1R0);
+maxy= 1.1*(exp(get_xb(NX,0))+MKS1R0);
 #else
-
 minx= -.02*get_xb(NX,0);
 maxx= 1.02*get_xb(NX,0);
 miny= -1.1*get_xb(NX,0);
@@ -20,6 +19,20 @@ maxy= 1.1*get_xb(NX,0);
 #endif
 
   fprintf(fgnu,
+	  "set table \"table.gp\"\n"
+	  "set contour base\n"
+	  "unset surface\n"
+	  "set log z\n"
+	  "set cntrparam levels discrete %f \n"
+	  "splot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):24 w l\n"
+	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):24 w l\n"
+	  "unset dgrid3d\n"
+	  "unset log z\n"
+	  "unset table\n"
+	  "unset contour\n"
+	  "unset surface\n"
+
+	  //"set term gif large size 700,600\n"
 	  "set term gif large size 600,900\n"
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
@@ -54,11 +67,12 @@ maxy= 1.1*get_xb(NX,0);
 	  "set title \"rho\" offset 0,-1\n"
 	  "set format cb \"%%.1e\"\n"
 
-	  "set log cb\n"
+	  //"set log cb\n"
 	  "set autoscale cb\n"
-	  "set cbrange [1.e-13:1e-11]\n"
+	  //"set cbrange [1.e-13:1e-11]\n"
 	  
-	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
+	  "splot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):($14) ti \"\" w l ls 1\n"
+	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
 	  "set isosam 10,10\n"
 	  "set ylabel \"\"\n"
@@ -68,17 +82,36 @@ maxy= 1.1*get_xb(NX,0);
 	  "unset border\n"
 	  "unset log cb\n"
 
+	  "plot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):"
+	  "(($16*sin($3)+$18*cos($3)))*%f:"
+	  "((-$18*sin($3)+$16*cos($3)))*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+
+	  /*
 	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
 	  "(($16*sin($2)+$17*cos($2)))*%f:"
 	  "((-$17*sin($2)+$16*cos($2)))*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  */
 
 	  /*
 	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
 	  "(($16*sin($2)+$17*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f:"
 	  "((-$17*sin($2)+$16*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  */
+
+	  "unset tics\n"
+	  "unset border\n"
+	  "unset pm3d\n"
+	  "unset surface\n"
+	  "plot \"table.gp\" w l ls 1\n"
+	  "set pm3d\n"
+	  "set tics\n"
+	  "set border\n"
+
 	 
- 	  ,fname2,
+ 	  ,
+	  MINTRACE,
+	  fname,
+	  fname2,
 	  minx,
 	  maxx,
 	  miny,
@@ -86,11 +119,12 @@ maxy= 1.1*get_xb(NX,0);
 	  fname,
 	  fname,
 
-	  maxx/21.*200.,maxx/21.*200.,
+	  maxx/21.*100.,maxx/21.*100.,
 	  //	  maxx/21/2,maxx/21/2,
 
 
-	  NX/21+1,NY/21+1
+	  //	  NX/21+1,NY/21+1
+	  NX/21+1,NZ/21+1
 	 
 	  );  
 //#endif	    

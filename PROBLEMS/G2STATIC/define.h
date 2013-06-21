@@ -67,13 +67,13 @@
 #define BHSPIN 0.0
 #define MINX (log(1000.-MKS1R0))
 #define MAXX (log(6000.-MKS1R0))
-#define MINY (0.05*Pi)
-#define MAXY (.95*Pi)
+#define MINY (0.35*Pi)
+#define MAXY (.65*Pi)
 #define MINZ 0.
-#define MAXZ (2.*Pi)
-#define NX 40
-#define NY 40
-#define NZ 10
+#define MAXZ (1.*Pi)
+#define NX 30
+#define NY 20
+#define NZ 60
 #define SPECIFIC_BC
 
 /************************************/
@@ -82,14 +82,15 @@
 #define OUTCOORDS KERRCOORDS                                                                    
 //#define RADOUTPUTINZAMO
 //#define PRINTINSIDEBH
-#define PRINTXGC_LEFT
-#define PRINTXGC_RIGHT
+//#define PRINTXGC_LEFT
+//#define PRINTXGC_RIGHT
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
 #define DTOUT1 5.e3
-#define ZSLICE 0
+#define YSLICE NY/2
+//#define PRINTZONEMORE
 
 /************************************/
 //common physics 
@@ -98,3 +99,6 @@
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
 #define TRACER
+#define MINTRACE 0.01
+#define CLMAG 100.
+#define CLWIDTH 400.
