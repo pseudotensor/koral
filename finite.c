@@ -488,7 +488,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //saving to memory
       for(i=0;i<NV;i++)
 	{
-	  set_u(px,i,ix,iy,iz,fd_p0[i]);
+	  //set_u(px,i,ix,iy,iz,fd_p0[i]);
 	  
 	  set_ubx(pbRx,i,ix,iy,iz,fd_pl[i]);
 	  set_ubx(pbLx,i,ix+1,iy,iz,fd_pr[i]);
@@ -562,7 +562,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  //saving to memory
 	  for(i=0;i<NV;i++)
 	    {
-	      set_u(py,i,ix,iy,iz,fd_p0[i]);
+	      //set_u(py,i,ix,iy,iz,fd_p0[i]);
 	  
 	      set_uby(pbRy,i,ix,iy,iz,fd_pl[i]);
 	      set_uby(pbLy,i,ix,iy+1,iz,fd_pr[i]);
@@ -618,7 +618,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  //saving to memory
 	  for(i=0;i<NV;i++)
 	    {
-	      set_u(pz,i,ix,iy,iz,fd_p0[i]);
+	      //set_u(pz,i,ix,iy,iz,fd_p0[i]);
 	  
 	      set_ubz(pbRz,i,ix,iy,iz,fd_pl[i]);
 	      set_ubz(pbLz,i,ix,iy,iz+1,fd_pr[i]);
@@ -998,11 +998,13 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
 
   //save calculated conserved basing on primitives on faces
+  /*
   for(i=0;i<NV;i++)
     {
       set_ubx(ubLx,i,ix,iy,iz,fd_uLr[i]);
       set_ubx(ubRx,i,ix,iy,iz,fd_uRr[i]);
     }
+  */
   
   //variable loop
   for(i=0;i<NV;i++)
@@ -1097,11 +1099,13 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
 
+      /*
       for(i=0;i<NV;i++)
 	{
 	  set_uby(ubLy,i,ix,iy,iz,fd_uLr[i]);
 	  set_uby(ubRy,i,ix,iy,iz,fd_uRr[i]);
 	}
+      */
 
       for(i=0;i<NV;i++)
 	{
@@ -1194,11 +1198,13 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
 
+      /*
       for(i=0;i<NV;i++)
 	{
 	  set_ubz(ubLz,i,ix,iy,iz,fd_uLr[i]);
 	  set_ubz(ubRz,i,ix,iy,iz,fd_uRr[i]);
 	}
+      */
 
       for(i=0;i<NV;i++)
 	{

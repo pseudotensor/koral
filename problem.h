@@ -61,7 +61,7 @@
 //55* G2STATIC - cloud through static atmosphere
 //56* EDDSPH - 1d Edd Sphere
 
-#define PROBLEM 56
+#define PROBLEM 55
 
 #if(PROBLEM==56)
 

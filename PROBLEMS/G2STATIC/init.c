@@ -43,7 +43,7 @@ pp[0]*=factor;
 //velocity
 ldouble OmKep = 1./sqrt(geomBL.xx*geomBL.xx*geomBL.xx);
 
-ldouble ucon[4]={0.,0,-OmKep,0.};
+ldouble ucon[4]={0.,0,+OmKep,0.};
 //ldouble ucon[4]={0.,0,0,OmKep};
 
 conv_vels(ucon,ucon,VEL3,VEL4,geomBL.gg,geomBL.GG);

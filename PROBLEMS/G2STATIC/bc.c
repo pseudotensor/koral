@@ -76,7 +76,7 @@ if(iy<0.)
 
     for(iv=0;iv<NV;iv++)
       {
-	//phi vector components
+	//reflect theta, conserve phi - handles rotation properly
 	if(iv==3)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
@@ -100,7 +100,7 @@ if(iy>NY-1)
 
     for(iv=0;iv<NV;iv++)
       {
-	//theta vector components
+	//reflect theta, conserve phi - handles rotation properly
 	if(iv==3)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else

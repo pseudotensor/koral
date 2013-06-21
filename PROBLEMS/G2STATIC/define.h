@@ -67,13 +67,13 @@
 #define BHSPIN 0.0
 #define MINX (log(1000.-MKS1R0))
 #define MAXX (log(6000.-MKS1R0))
-#define MINY (0.01*Pi)
-#define MAXY (.5*Pi)
+#define MINY (0.05*Pi)
+#define MAXY (.95*Pi)
 #define MINZ 0.
 #define MAXZ (2.*Pi)
-#define NX 20
-#define NY 20
-#define NZ 20
+#define NX 60
+#define NY 60
+#define NZ 60
 #define SPECIFIC_BC
 
 /************************************/

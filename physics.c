@@ -1435,6 +1435,7 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
     }
 
   ucontm1[0]=ucontm2[0]=0.; //time component will be calculated
+  //ptm1 switched off!!!
   ucontm1[1]=get_u(ptm1,istart,ix,iy,iz);
   ucontm1[2]=get_u(ptm1,istart+1,ix,iy,iz);
   ucontm1[3]=get_u(ptm1,istart+2,ix,iy,iz);
