@@ -12,7 +12,7 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 /***********************************************/
 /***********************************************/
-if(ix>=NX || ix<0) //Sgr A* atmosphere
+if(ix>=NX) //Sgr A* atmosphere
   {
     //flat atmosphere
     //set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
@@ -30,15 +30,19 @@ if(ix>=NX || ix<0) //Sgr A* atmosphere
  
 /***********************************************/
 /***********************************************/
-if(ix<0) //outflow near BH
+if(ix<0) //outflow at inner edge / fixed atmosphere
    {
-     //extrapolating along MYCOORDS
+     //Sgr A* atmosphere
+     //set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
+
+    //extrapolating along MYCOORDS
      //gc radialcoordinate
      ldouble r=get_x(ix,0);
      //iix=0
      ldouble r0=get_x(0,0);
      ldouble r1=get_x(1,0);     
 
+     //for velocities or for everything
      for(iv=0;iv<NV;iv++)
        {
 	 //linear extrapolation
@@ -50,7 +54,7 @@ if(ix<0) //outflow near BH
      //no inflow 
      ldouble ucon[4]={0.,pp[2],pp[3],pp[4]};
      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-     if(ucon[1]>0.) 
+     if(ucon[1]>0.)
        {
 	 ucon[1]=0.;
 	 conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);

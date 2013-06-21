@@ -48,15 +48,15 @@ maxy= 1.1*get_xb(NX,0);
 	  "set rmargin at screen 0.81\n"
 	  "set bmargin at screen .10\n"
 	  "set tmargin at screen .95\n"
-	  //"set log cb\n"
 	  "set ylabel \"z\"\n"
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set cblabel \"\"\n"
 	  "set title \"rho\" offset 0,-1\n"
 	  "set format cb \"%%.1e\"\n"
 
+	  "set log cb\n"
 	  "set autoscale cb\n"
-	  //"set cbrange [0:3e-20]\n"
+	  "set cbrange [1.e-13:1e-11]\n"
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
@@ -68,14 +68,10 @@ maxy= 1.1*get_xb(NX,0);
 	  "unset border\n"
 	  "unset log cb\n"
 
-	  //	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
-	  //	  "(($16*sin($2)+$17*cos($2))*%f):"
-	  //	  "((-$17*sin($2)+$16*cos($2))*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
-	  "(($16*sin($2)+$17*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5*%f):"
-	  "((-$17*sin($2)+$16*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5*%f) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  "(($16*sin($2)+$17*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f:"
+	  "((-$17*sin($2)+$16*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
-	 
 	 
  	  ,fname2,
 	  minx,
@@ -83,7 +79,7 @@ maxy= 1.1*get_xb(NX,0);
 	  miny,
 	  maxy,
 	  fname,
-	  fname,.95,.95,NX/21+1,NY/21+1
+	  fname,maxx/21/2,maxx/21/2,NX/21+1,NY/21+1
 	 
 	  );  
 //#endif	    

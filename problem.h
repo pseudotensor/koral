@@ -74,7 +74,6 @@
 #define PR_OUT2GIF_1D "PROBLEMS/EDDSPH/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/EDDSPH/dump.c"
 #define PR_TOOLS "PROBLEMS/EDDSPH/tools.c"
-#define PR_DEFS "PROBLEMS/EDDSPH/defs.h"
 
 #endif
 
@@ -89,6 +88,7 @@
 #define PR_OUT2GIF_1D "PROBLEMS/G2STATIC/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/G2STATIC/dump.c"
 #define PR_TOOLS "PROBLEMS/G2STATIC/tools.c"
+#define PR_DEFS "PROBLEMS/G2STATIC/defs.h"
 
 #endif
 

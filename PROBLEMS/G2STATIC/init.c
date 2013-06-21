@@ -39,9 +39,11 @@ ldouble dist = sqrt((xxmink[1]-clxxmink[1])*(xxmink[1]-clxxmink[1])+
 
 
 //increase rho
-ldouble mag=0.;
-ldouble factor=(1.+mag*exp(-dist/500.));
-pp[0]*=factor;
+ldouble mag=10.;
+ldouble factor=(1.+mag*exp(-dist*dist/400./400.));
+ldouble atmrho = pp[0];
+ldouble clrho = (factor-1.)*atmrho;
+pp[0] =atmrho+clrho;
 
 //velocity
 ldouble OmKep = 1./sqrt(geomBL.xx*geomBL.xx*geomBL.xx);
@@ -53,12 +55,9 @@ conv_vels(ucon,ucon,VEL3,VEL4,geomBL.gg,geomBL.GG);
 trans2_coco(geomBL.xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
 conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
-if(factor>1.1)
-  {
-    pp[2]=ucon[1];
-    pp[3]=ucon[2];
-    pp[4]=ucon[3];
-  }
+pp[2]=(pp[2]*atmrho + ucon[1]*clrho ) / (atmrho + clrho);
+pp[3]=(pp[3]*atmrho + ucon[2]*clrho ) / (atmrho + clrho);
+pp[4]=(pp[4]*atmrho + ucon[3]*clrho ) / (atmrho + clrho);    
 
 
 /***********************************************/
