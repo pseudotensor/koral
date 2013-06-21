@@ -71,9 +71,9 @@
 #define MAXY (.95*Pi)
 #define MINZ 0.
 #define MAXZ (2.*Pi)
-#define NX 60
-#define NY 60
-#define NZ 60
+#define NX 40
+#define NY 40
+#define NZ 40
 #define SPECIFIC_BC
 
 /************************************/

@@ -1279,30 +1279,36 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
   pick_Gb(ix,iy,iz,idim,ggg->GG);
   if(idim==0)
     {
+      /*
       pick_Tb(tmuupbx,ix,iy,iz,idim,ggg->tup);
       pick_Tb(tmulobx,ix,iy,iz,idim,ggg->tlo);
       pick_Tb(emuupbx,ix,iy,iz,idim,ggg->eup);
       pick_Tb(emulobx,ix,iy,iz,idim,ggg->elo);
+      */
       ggg->xxvec[1]=get_xb(ix,0);
       ggg->xxvec[2]=get_x(iy,1);
       ggg->xxvec[3]=get_x(iz,2);
     }
   if(idim==1)
     {
+      /*
       pick_Tb(tmuupby,ix,iy,iz,idim,ggg->tup);
       pick_Tb(tmuloby,ix,iy,iz,idim,ggg->tlo);
       pick_Tb(emuupby,ix,iy,iz,idim,ggg->eup);
       pick_Tb(emuloby,ix,iy,iz,idim,ggg->elo);
+      */
       ggg->xxvec[1]=get_x(ix,0);
       ggg->xxvec[2]=get_xb(iy,1);
       ggg->xxvec[3]=get_x(iz,2);
     }
   if(idim==2)
     {
+      /*
       pick_Tb(tmuupbz,ix,iy,iz,idim,ggg->tup);
       pick_Tb(tmulobz,ix,iy,iz,idim,ggg->tlo);
       pick_Tb(emuupbz,ix,iy,iz,idim,ggg->eup);
       pick_Tb(emulobz,ix,iy,iz,idim,ggg->elo);
+      */
       ggg->xxvec[1]=get_x(ix,0);
       ggg->xxvec[2]=get_x(iy,1);
       ggg->xxvec[3]=get_xb(iz,2);
@@ -2206,10 +2212,12 @@ calc_metric()
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      {
+			/*
 			set_Tb(emuupbx,i,j,ix,iy,iz,eup[i][j],0);
 			set_Tb(emulobx,i,j,ix,iy,iz,elo[i][j],0);
 			set_Tb(tmuupbx,i,j,ix,iy,iz,tup[i][j],0);
 			set_Tb(tmulobx,i,j,ix,iy,iz,tlo[i][j],0);
+			*/
 		      }	      
 
 
@@ -2246,10 +2254,12 @@ calc_metric()
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
+		    /*
 		    set_Tb(emuupbx,i,j,ix+1,iy,iz,eup[i][j],0);
 		    set_Tb(emulobx,i,j,ix+1,iy,iz,elo[i][j],0);
 		    set_Tb(tmuupbx,i,j,ix+1,iy,iz,tup[i][j],0);
 		    set_Tb(tmulobx,i,j,ix+1,iy,iz,tlo[i][j],0);
+		    */
 		  }	      
 
 	      calc_G(xx,gloc);
@@ -2287,10 +2297,12 @@ calc_metric()
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      {
+			/*
 			set_Tb(emuupby,i,j,ix,iy,iz,eup[i][j],1);
 			set_Tb(emuloby,i,j,ix,iy,iz,elo[i][j],1);
 			set_Tb(tmuupby,i,j,ix,iy,iz,tup[i][j],1);
 			set_Tb(tmuloby,i,j,ix,iy,iz,tlo[i][j],1);
+			*/
 		      }	      
 
 		  calc_G(xx,gloc);
@@ -2325,10 +2337,12 @@ calc_metric()
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
+		    /*
 		    set_Tb(emuupby,i,j,ix,iy+1,iz,eup[i][j],1);
 		    set_Tb(emuloby,i,j,ix,iy+1,iz,elo[i][j],1);
 		    set_Tb(tmuupby,i,j,ix,iy+1,iz,tup[i][j],1);
 		    set_Tb(tmuloby,i,j,ix,iy+1,iz,tlo[i][j],1);
+		    */
 		  }	      
 
 	      calc_G(xx,gloc);
@@ -2365,10 +2379,12 @@ calc_metric()
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      {
+			/*
 			set_Tb(emuupbz,i,j,ix,iy,iz,eup[i][j],2);
 			set_Tb(emulobz,i,j,ix,iy,iz,elo[i][j],2);
 			set_Tb(tmuupbz,i,j,ix,iy,iz,tup[i][j],2);
 			set_Tb(tmulobz,i,j,ix,iy,iz,tlo[i][j],2);
+			*/
 		      }	      
 
 		  calc_G(xx,gloc);
@@ -2403,10 +2419,12 @@ calc_metric()
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  {
+		    /*
 		    set_Tb(emuupbz,i,j,ix,iy,iz+1,eup[i][j],2);
 		    set_Tb(emulobz,i,j,ix,iy,iz+1,elo[i][j],2);
 		    set_Tb(tmuupbz,i,j,ix,iy,iz+1,tup[i][j],2);
 		    set_Tb(tmulobz,i,j,ix,iy,iz+1,tlo[i][j],2);
+		    */
 		  }	      
 
 	      calc_G(xx,gloc);
