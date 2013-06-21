@@ -86,7 +86,7 @@ maxy= 1.1*get_xb(NX,0);
 	  fname,
 	  fname,
 
-	  maxx/21.*200000.,maxx/21.*200000.,
+	  maxx/21.*200.,maxx/21.*200.,
 	  //	  maxx/21/2,maxx/21/2,
 
 

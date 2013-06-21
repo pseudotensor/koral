@@ -230,7 +230,9 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 #define delta(i,j) (i==j ? 1 : 0)
 
 //fileop.c
-int fread_restartfile(ldouble*);
+int fread_restartfile(int,ldouble*);
+int fread_dumpfile(int,ldouble*);
+int fread_dumpfile(int,ldouble*);
 int fprint_openfiles(char *);
 int fprint_closefiles();
 int fprint_profiles(ldouble,ldouble*,int,int,char*);

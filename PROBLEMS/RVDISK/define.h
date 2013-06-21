@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 5
+#define RESTART
+#define RESTARTNUM 1
 
 /************************************/
 //radiation choices
@@ -89,7 +89,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDISK 107
+#define NDISK 100
 
 /************************************/
 #if (NDISK==100) //mdot = 10, r=15/50 alpha=0.1
@@ -107,7 +107,7 @@
 #define NX 50
 #define NY 30
 #define NZ 1
-#define DTOUT1 5.e1
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)

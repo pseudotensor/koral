@@ -42,7 +42,7 @@ main(int argc, char **argv)
 
 
 #ifdef RESTART
-  fread_dumpfile(RESTARTNUM,&tstart);
+  fread_restartfile(RESTARTNUM,&tstart);
 #else
   //or initialize new problem
   set_initial_profile();
@@ -85,7 +85,9 @@ solve_all_problems_5(ldouble tstart)
 
   //prints initial profiles to out0000.dat
 #ifndef RESTART
-  fprint_profiles(t,scalars,NSCALARS,1,"dumps");			
+  fprint_restartfile(t,"dumps");			
+  fprint_profiles(t,scalars,NSCALARS,0,"dumps");			
+  nfout1++;
 #endif
 
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
@@ -246,7 +248,11 @@ solve_all_problems_5(ldouble tstart)
 	  //calculate scalars
 	  calc_scalars(scalars,t);
 
-	  fprint_profiles(t,scalars,NSCALARS,1,"dumps");
+	  //print to files
+	  fprint_restartfile(t,"dumps");
+	  fprint_profiles(t,scalars,NSCALARS,0,"dumps");
+	  nfout1++;
+
 	  lasttout=t;
 	  lasttout_floor=floor(t/dtout);	 
 	}

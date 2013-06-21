@@ -37,7 +37,7 @@ fprint_closefiles()
 /*********************************************/
 /*********************************************/
 /*********************************************/
-/* prints dumps to files and calls gnuplot */
+/* prints dumps to files .dat and calls gnuplot */
 /* codeprim == 1 - prints out code primitives, only coordinates converted to OUTCOORDS */
 /* codeprim == 0 - prints ZAMO frame etc primitives - post processing, called by ana.c */
 /*********************************************/
@@ -409,11 +409,142 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 								convert_out2gif_1d(bufor,bufor2,nfout1,t);
 #endif
   
-							      nfout1++;
+							      
 							      return 0;
 
 							    }
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints restart files */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int
+fprint_restartfile(ldouble t, char* folder)
+{
+  char bufor[50],bufor2[50];
+  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+  fout1=fopen(bufor,"w");
+  
+  //header
+  //## nout time problem NX NY NZ
+  fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
+
+  /***********************************/  
+  /** writing order is fixed  ********/  
+  /***********************************/  
+ 
+  int ix,iy,iz,iv;
+  ldouble pp[NV],uu[NV];
+  for(iz=0;iz<NZ;iz++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(ix=0;ix<NX;ix++)
+	    {
+	      fprintf(fout1,"%d %d %d ",ix,iy,iz);
+	      for(iv=0;iv<NV;iv++)
+		{
+		  uu[iv]=get_u(u,iv,ix,iy,iz);
+		  pp[iv]=get_u(p,iv,ix,iy,iz);
+		}	 
+	      for(iv=0;iv<NV;iv++)
+		fprintf(fout1,"%.5e ",uu[iv]);
+	      for(iv=0;iv<NV;iv++)
+		fprintf(fout1,"%.5e ",pp[iv]);
+	      fprintf(fout1,"\n");
+	    }
+	}
+    }
+
+  fflush(fout1);
+  fclose(fout1);
+
+  return 0;
+}
 							  
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* reads dump file */
+/* puts conserved into the memory */
+/* converts them to primitives */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int 
+fread_restartfile(int nout1, ldouble *t)
+{
+  //opening dump file
+  int i,ret;
+  char fname[40];
+  sprintf(fname,"dumps/res%04d.dat",nout1);
+  nfout1=nout1+1; //global file no.
+  FILE *fdump=fopen(fname,"r");
+
+  //reading parameters, mostly time
+  int intpar[5];
+  ret=fscanf(fdump,"## %d %lf %d %d %d %d\n",&intpar[0],t,&intpar[1],&intpar[2],&intpar[3],&intpar[4]);
+  printf("dump file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
+	 fname,intpar[0],*t,intpar[1],intpar[2],intpar[3],intpar[4]); 
+
+
+  int ix,iy,iz,iv;
+  //reading conserved
+  int gclx,gcrx,gcly,gcry,gclz,gcrz;
+  for(iz=0;iz<NZ;iz++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(ix=0;ix<NX;ix++)
+	    {
+	      ret=fscanf(fdump,"%*f %*f %*f ");
+									  
+	      struct geometry geom;
+	      fill_geometry(ix,iy,iz,&geom);
+
+	      ldouble xxvec[4],xxvecout[4];
+
+	      /**************************/  
+	      /**************************/  
+	      /**************************/  
+	      ldouble uu[NV],pp[NV],ftemp;
+	      char c;
+	      
+	      //reading conserved and primitives from file
+	      for(i=0;i<NV;i++)
+		{
+		  ret=fscanf(fdump,"%lf ",&uu[i]);
+		}
+	      for(i=0;i<NV;i++)
+		{
+		  ret=fscanf(fdump,"%lf ",&pp[i]);
+		}
+
+	      /*
+	      printf("%d %d %d\n",ix,iy,iz);
+	      print_Nvector(uu,NV);
+	      print_Nvector(pp,NV);
+	      //getchar();
+	      */
+
+	      //saving primitives
+	      for(iv=0;iv<NV;iv++)    
+		{
+		  set_u(u,iv,ix,iy,iz,uu[iv]);
+		  set_u(p,iv,ix,iy,iz,pp[iv]);
+		}
+
+	      //sanity check using pp as initial guess
+	      calc_primitives(ix,iy,iz);									  
+	    }
+	}
+    }
+
+    return 0;
+}
+
 /*********************************************/
 /*********************************************/
 /*********************************************/
