@@ -1343,7 +1343,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //**********************************************************************
   //**********************************************************************
 
-  //inside + ghost cells - number depending on the order of reconstruction
+  //inside domain only
   Nloop_0=0;
   loop_0=(int **)malloc(sizeof(int*));
   loop_0[0]=(int *)malloc(3*sizeof(int));

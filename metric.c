@@ -2145,12 +2145,11 @@ r_photon_BL(ldouble a)
 int
 calc_metric()
 {
-  ldouble xx[4];
-  int ix,iy,iz,i,j,k;
+  int ix,iy,iz;
 
   printf("Precalculating metrics... ");
   
-#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
+  #pragma omp parallel for private(iy,iz) schedule (dynamic)
   for(ix=-NG;ix<NX+NG;ix++)
     {
       for(iy=-NG;iy<NY+NG;iy++)
@@ -2161,7 +2160,8 @@ calc_metric()
 	      ldouble Kr[4][4][4];
 	      ldouble eup[4][4],elo[4][4];
 	      ldouble tup[4][4],tlo[4][4];
-
+	      ldouble xx[4];
+	      int i,j,k;
 	      //cell centers
 	      xx[0]=0.;
 	      xx[1]=get_x(ix,0);

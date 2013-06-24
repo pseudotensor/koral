@@ -99,6 +99,6 @@
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
 #define TRACER
-#define MINTRACE 1.e-50//0.0001
+#define MINTRACE 0.0001
 #define CLMAG 100.
 #define CLWIDTH 800.
