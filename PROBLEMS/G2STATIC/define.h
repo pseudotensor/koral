@@ -67,13 +67,13 @@
 #define BHSPIN 0.0
 #define MINX (log(1000.-MKS1R0))
 #define MAXX (log(6000.-MKS1R0))
-#define MINY (0.35*Pi)
-#define MAXY (.65*Pi)
+#define MINY (0.2*Pi)
+#define MAXY (.8*Pi)
 #define MINZ 0.
 #define MAXZ (1.*Pi)
-#define NX 30
-#define NY 20
-#define NZ 60
+#define NX 80
+#define NY 40
+#define NZ 120
 #define SPECIFIC_BC
 
 /************************************/
@@ -99,6 +99,6 @@
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
 #define TRACER
-#define MINTRACE 0.01
+#define MINTRACE 1.e-50//0.0001
 #define CLMAG 100.
-#define CLWIDTH 400.
+#define CLWIDTH 800.

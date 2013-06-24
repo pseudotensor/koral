@@ -523,10 +523,13 @@ fread_restartfile(int nout1, ldouble *t)
 		}
 
 	      /*
-	      printf("%d %d %d\n",ix,iy,iz);
-	      print_Nvector(uu,NV);
-	      print_Nvector(pp,NV);
-	      //getchar();
+	      if(iy==NY/2)
+		{
+		  printf("%d %d %d\n",ix,iy,iz);
+		  print_Nvector(uu,NV);
+		  print_Nvector(pp,NV);
+		  getchar();
+		}
 	      */
 
 	      //saving primitives
@@ -537,7 +540,8 @@ fread_restartfile(int nout1, ldouble *t)
 		}
 
 	      //sanity check using pp as initial guess
-	      calc_primitives(ix,iy,iz);									  
+	      //messes things up, something not initiated right
+	      //calc_primitives(ix,iy,iz);									  
 	    }
 	}
     }

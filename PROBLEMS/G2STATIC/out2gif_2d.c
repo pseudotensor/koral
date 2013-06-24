@@ -23,7 +23,7 @@ maxy= 1.1*get_xb(NX,0);
 	  "set contour base\n"
 	  "unset surface\n"
 	  "set log z\n"
-	  "set cntrparam levels discrete %f \n"
+	  "set cntrparam levels discrete %f,.1\n"
 	  "splot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):24 w l\n"
 	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):24 w l\n"
 	  "unset dgrid3d\n"
@@ -67,9 +67,9 @@ maxy= 1.1*get_xb(NX,0);
 	  "set title \"rho\" offset 0,-1\n"
 	  "set format cb \"%%.1e\"\n"
 
-	  //"set log cb\n"
+	  "set log cb\n"
 	  "set autoscale cb\n"
-	  //"set cbrange [1.e-13:1e-11]\n"
+	  "set cbrange [1.e-12:1e-10]\n"
 	  
 	  "splot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):($14) ti \"\" w l ls 1\n"
 	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
@@ -82,11 +82,13 @@ maxy= 1.1*get_xb(NX,0);
 	  "unset border\n"
 	  "unset log cb\n"
 
+	  /*
 	  "plot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):"
 	  "(($16*sin($3)+$18*cos($3)))*%f:"
 	  "((-$18*sin($3)+$16*cos($3)))*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+	  */
 
-	  /*
+	  /*	    
 	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
 	  "(($16*sin($2)+$17*cos($2)))*%f:"
 	  "((-$17*sin($2)+$16*cos($2)))*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
@@ -97,6 +99,10 @@ maxy= 1.1*get_xb(NX,0);
 	  "(($16*sin($2)+$17*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f:"
 	  "((-$17*sin($2)+$16*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  */
+
+	  "plot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):"
+	  "(($16*sin($3)+$18*cos($3))/(($16*sin($3)+$18*cos($3))**2+(-$18*sin($3)+$16*cos($3))**2)**.5)*%f:"
+	  "((-$18*sin($3)+$16*cos($3))/(($16*sin($3)+$18*cos($3))**2+(-$18*sin($3)+$16*cos($3))**2)**.5)*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
 	  "unset tics\n"
 	  "unset border\n"
@@ -119,8 +125,8 @@ maxy= 1.1*get_xb(NX,0);
 	  fname,
 	  fname,
 
-	  maxx/21.*100.,maxx/21.*100.,
-	  //	  maxx/21/2,maxx/21/2,
+	  //maxx/21.*100.,maxx/21.*100.,
+	  maxx/21/2,maxx/21/2,
 
 
 	  //	  NX/21+1,NY/21+1

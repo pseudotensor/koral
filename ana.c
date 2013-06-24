@@ -54,7 +54,9 @@ main(int argc, char **argv)
   ldouble t; ldouble scalars[NSCALARS];
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
-      fread_dumpfile(ifile,&t);
+      //fread_dumpfile(ifile,&t);
+      fread_restartfile(ifile,&t);
+
       nfout1--; //correcting index
   
       //sets bc

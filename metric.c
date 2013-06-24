@@ -2147,19 +2147,21 @@ calc_metric()
 {
   ldouble xx[4];
   int ix,iy,iz,i,j,k;
-  ldouble gloc[4][5];
-  ldouble Kr[4][4][4];
-  ldouble eup[4][4],elo[4][4];
-  ldouble tup[4][4],tlo[4][4];
 
   printf("Precalculating metrics... ");
   
+#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
   for(ix=-NG;ix<NX+NG;ix++)
     {
       for(iy=-NG;iy<NY+NG;iy++)
 	{
 	  for(iz=-NG;iz<NZ+NG;iz++)
 	    {
+	      ldouble gloc[4][5];
+	      ldouble Kr[4][4][4];
+	      ldouble eup[4][4],elo[4][4];
+	      ldouble tup[4][4],tlo[4][4];
+
 	      //cell centers
 	      xx[0]=0.;
 	      xx[1]=get_x(ix,0);
