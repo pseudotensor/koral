@@ -6,16 +6,17 @@
 
 ldouble minx,miny,maxx,maxy;
 
-#if (OUTCOORDS==KERRCOORDS)
+#ifdef EQPLANEOUTPUT
+minx= -1.1*(exp(get_xb(NX,0))+MKS1R0);
+maxx= 1.1*(exp(get_xb(NX,0))+MKS1R0);
+miny= -1.1*(exp(get_xb(NX,0))+MKS1R0);
+maxy= 1.1*(exp(get_xb(NX,0))+MKS1R0);
+#endif
+#ifdef VERTPLANEOUTPUT
 minx= -0.1*(exp(get_xb(NX,0))+MKS1R0);
 maxx= 1.1*(exp(get_xb(NX,0))+MKS1R0);
 miny= -1.1*(exp(get_xb(NX,0))+MKS1R0);
 maxy= 1.1*(exp(get_xb(NX,0))+MKS1R0);
-#else
-minx= -.02*get_xb(NX,0);
-maxx= 1.02*get_xb(NX,0);
-miny= -1.1*get_xb(NX,0);
-maxy= 1.1*get_xb(NX,0);
 #endif
 
   fprintf(fgnu,
@@ -24,16 +25,24 @@ maxy= 1.1*get_xb(NX,0);
 	  "unset surface\n"
 	  "set log z\n"
 	  "set cntrparam levels discrete %f,.1\n"
+#ifdef EQPLANEOUTPUT
 	  "splot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):24 w l\n"
-	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):24 w l\n"
+#endif
+#ifdef VERTPLANEOUTPUT
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):24 w l\n"
+#endif
 	  "unset dgrid3d\n"
 	  "unset log z\n"
 	  "unset table\n"
 	  "unset contour\n"
 	  "unset surface\n"
 
-	  //"set term gif large size 700,600\n"
+#ifdef EQPLANEOUTPUT
+	  "set term gif large size 700,600\n"
+#endif
+#ifdef VERTPLANEOUTPUT
 	  "set term gif large size 600,900\n"
+#endif
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
 	  "set origin 0,0\n"
@@ -71,8 +80,12 @@ maxy= 1.1*get_xb(NX,0);
 	  "set autoscale cb\n"
 	  "set cbrange [1.e-12:1e-10]\n"
 	  
+#ifdef EQPLANEOUTPUT
 	  "splot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):($14) ti \"\" w l ls 1\n"
-	  //	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
+#endif
+#ifdef VERTPLANEOUTPUT
+	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
+#endif
 
 	  "set isosam 10,10\n"
 	  "set ylabel \"\"\n"
@@ -94,15 +107,16 @@ maxy= 1.1*get_xb(NX,0);
 	  "((-$17*sin($2)+$16*cos($2)))*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 	  */
 
-	  /*
+#ifdef VERTPLANEOUTPUT
 	  "plot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):"
 	  "(($16*sin($2)+$17*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f:"
 	  "((-$17*sin($2)+$16*cos($2))/(($16*sin($2)+$17*cos($2))**2+(-$17*sin($2)+$16*cos($2))**2)**.5)*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
-	  */
-
+#endif
+#ifdef EQPLANEOUTPUT
 	  "plot \"%s\" u (($1)*sin($3)):(($1)*cos($3)):"
 	  "(($16*sin($3)+$18*cos($3))/(($16*sin($3)+$18*cos($3))**2+(-$18*sin($3)+$16*cos($3))**2)**.5)*%f:"
 	  "((-$18*sin($3)+$16*cos($3))/(($16*sin($3)+$18*cos($3))**2+(-$18*sin($3)+$16*cos($3))**2)**.5)*%f every %d:%d w vectors arrowstyle 1 ti \"\"\n"
+#endif
 
 	  "unset tics\n"
 	  "unset border\n"
@@ -129,8 +143,12 @@ maxy= 1.1*get_xb(NX,0);
 	  maxx/21/2,maxx/21/2,
 
 
-	  //	  NX/21+1,NY/21+1
+#ifdef VERTPLANEOUTPUT
+	  NX/21+1,NY/21+1
+#endif
+#ifdef EQPLANEOUTPUT
 	  NX/21+1,NZ/21+1
+#endif
 	 
 	  );  
 //#endif	    

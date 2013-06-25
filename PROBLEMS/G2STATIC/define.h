@@ -65,15 +65,15 @@
 #define MYCOORDS MKS1COORDS
 #define MKS1R0 -8.
 #define BHSPIN 0.0
-#define MINX (log(1000.-MKS1R0))
+#define MINX (log(500.-MKS1R0))
 #define MAXX (log(6000.-MKS1R0))
-#define MINY (0.2*Pi)
-#define MAXY (.8*Pi)
+#define MINY (0.05*Pi)
+#define MAXY (.95*Pi)
 #define MINZ 0.
-#define MAXZ (1.*Pi)
-#define NX 80
-#define NY 40
+#define MAXZ (2.*Pi)
 #define NZ 120
+#define NX (NZ/3)//NZ/Pi
+#define NY (NZ/2+1)
 #define SPECIFIC_BC
 
 /************************************/
@@ -89,8 +89,18 @@
 #define NOUTSTOP 5000
 #define CGSOUTPUT
 #define DTOUT1 5.e3
+
+//#define EQPLANEOUTPUT
+#define VERTPLANEOUTPUT
+
+#ifdef VERTPLANEOUTPUT
+#define ZSLICE (NZ*0.1)
+#endif
+
+#ifdef EQPLANEOUTPUT
 #define YSLICE NY/2
-//#define PRINTZONEMORE
+#define PRINTZONEMORE
+#endif
 
 /************************************/
 //common physics 
@@ -99,6 +109,7 @@
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
 #define TRACER
-#define MINTRACE 0.0001
+#define MINTRACE 1.e-4
 #define CLMAG 100.
 #define CLWIDTH 800.
+#define SHUFFLELOOPS 0

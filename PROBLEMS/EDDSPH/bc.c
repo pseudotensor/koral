@@ -45,10 +45,12 @@ if(ix<0) //outflow near
 	 pp[iv]=get_u(p,iv,0,iy,iz);
        }
 
-     pp[6]=10000.*ERADATMMIN;
-     pp[7]=pp[6]/2.;
-     pp[8]=pp[9]=0.;
+     //ortho-normal
+     pp[6]=1.; //R^tt
+     pp[7]=pp[6]/2.; //R^tr
+     pp[8]=pp[9]=0.; //R^tinne
      
+     //converts upper row (R^tmu) from orthormal to coord. basis
      prad_on2lab(pp,pp,&geom);
  
      //testing if interpolated primitives make sense

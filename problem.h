@@ -1153,7 +1153,7 @@
 #endif
 
 #ifndef SHUFFLELOOPS
-#define SHUFFLELOOPS 1
+#define SHUFFLELOOPS 0
 #endif
 
 #define NUMEPSILON DBL_EPSILON

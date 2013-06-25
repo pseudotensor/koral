@@ -307,11 +307,11 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   //  #pragma omp critical
   if(my_max(aaazhd,aaazrad)>max_ws[2]) max_ws[2]=my_max(aaazhd,aaazrad);
 #else 
-  #pragma omp critical
+  //#pragma omp critical
   if(aaaxhd>max_ws[0]) max_ws[0]=aaaxhd;  
-  #pragma omp critical
+  //#pragma omp critical
   if(aaayhd>max_ws[1]) max_ws[1]=aaayhd;
-  #pragma omp critical
+  //#pragma omp critical
   if(aaazhd>max_ws[2]) max_ws[2]=aaazhd;
 #endif 
 
@@ -349,7 +349,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
  
   //calculates the primitives
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -383,7 +383,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   ldouble pp[NV];
      
   //calculates and saves wavespeeds
-#pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (static)
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -399,7 +399,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //interpolation and flux-calculation
-#pragma omp parallel for private(iy,iz,iv,ix)  schedule (dynamic) 
+#pragma omp parallel for private(iy,iz,iv,ix)  schedule (static) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -634,7 +634,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-#pragma omp parallel for private(iy,iz,ix)  schedule (dynamic) 
+#pragma omp parallel for private(iy,iz,ix)  schedule (static) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -650,7 +650,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //calculating the derivatives
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -734,7 +734,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //again over cells - source terms
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
    for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -1839,7 +1839,7 @@ int set_bc(ldouble t)
 {
   int ix,iy,iz,ii;
  
-#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz) schedule (static)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only
     {
       ix=loop_2[ii][0];
@@ -1940,7 +1940,7 @@ cell_fixup_hd()
 
   ldouble ppn[6][NV],pp[NV],uu[NV];
   //gets the neiboring the primitives
-#pragma omp parallel for private(iy,iz,iv) schedule (dynamic)
+#pragma omp parallel for private(iy,iz,iv) schedule (static)
   for(ix=0;ix<NX;ix++)
     {
       for(iy=0;iy<NY;iy++)
@@ -2059,7 +2059,7 @@ cell_fixup_rad()
 
   ldouble ppn[6][NV],pp[NV],uu[NV];
   //gets the neiboring the primitives
-#pragma omp parallel for private(iy,iz,iv) schedule (dynamic)
+#pragma omp parallel for private(iy,iz,iv) schedule (static)
   for(ix=0;ix<NX;ix++)
     {
       for(iy=0;iy<NY;iy++)

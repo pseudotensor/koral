@@ -4,8 +4,10 @@
 //  FILE *fgnu=fopen("plot.gp","w");
 //  char bufor[50];
 ldouble minx,maxx;
-minx= .9*(exp(get_xb(-NG,0))+MKS1R0);
-maxx= 1.01*(exp(get_xb(NX,0))+MKS1R0);
+//minx= .9*(exp(get_xb(-NG,0))+MKS1R0);
+//maxx= 1.01*(exp(get_xb(NX,0))+MKS1R0);
+minx= get_xb(-NG,0);
+maxx= get_xb(NX,0);
 
 /****************************************/
 /****************************************/

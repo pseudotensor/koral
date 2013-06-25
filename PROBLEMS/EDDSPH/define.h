@@ -58,16 +58,16 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define MYCOORDS MKS1COORDS
+#define MYCOORDS KERRCOORDS//MKS1COORDS
 #define MKS1R0 -10.
 #define BHSPIN 0.0
-#define MINX (log(10.-MKS1R0))
-#define MAXX (log(100.-MKS1R0))
+#define MINX 10.//(log(10.-MKS1R0))
+#define MAXX 100.//(log(100.-MKS1R0))
 #define MINY (.5*Pi/2.)
 #define MAXY (1.5*Pi/2.)
 #define MINZ 0.
 #define MAXZ (2.*Pi)
-#define NX 100
+#define NX 200
 #define NY 1
 #define NZ 1
 #define SPECIFIC_BC
@@ -83,7 +83,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 2000.
+#define DTOUT1 1.e3
 
 /************************************/
 //common physics 

@@ -27,7 +27,7 @@ cliz=NZ;
 */
 clix=NX*0.8;
 cliy=NY/2;
-cliz=NZ*.8;
+cliz=NZ*.25;
 
 ldouble clxx[4];
 get_xx(clix,cliy,cliz,clxx);
