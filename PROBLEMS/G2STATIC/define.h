@@ -106,11 +106,11 @@
 /************************************/
 //common physics 
 /************************************/
-#define GAMMA (5./3.)
+#define GAMMA 2.//(5./3.)
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
 //#define TRACER
-#define MINTRACE 1.e-4
+#define MINTRACE 1.e-40
 #define CLMAG 0.//100.
 #define CLWIDTH 800.
 #define SHUFFLELOOPS 0
