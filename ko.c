@@ -56,9 +56,6 @@ main(int argc, char **argv)
   //sets bc
   set_bc(tstart);
 
-  fprint_silofile(0.,10,"dumps");
-  return 0;
-
   //evolves
   solve_all_problems_5(tstart);
 
@@ -90,6 +87,7 @@ solve_all_problems_5(ldouble tstart)
 #ifndef RESTART
   fprint_restartfile(t,"dumps");			
   fprint_profiles(t,scalars,NSCALARS,0,"dumps");			
+  fprint_silofile(t,nfout1,"dumps");
   nfout1++;
 #endif
 
@@ -254,6 +252,7 @@ solve_all_problems_5(ldouble tstart)
 	  //print to files
 	  fprint_restartfile(t,"dumps");
 	  fprint_profiles(t,scalars,NSCALARS,0,"dumps");
+	  fprint_silofile(t,nfout1,"dumps");
 	  nfout1++;
 
 	  lasttout=t;

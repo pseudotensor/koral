@@ -37,22 +37,38 @@ if(ix>=NX) //Sgr A* atmosphere
 if(ix<0) //outflow at inner edge / fixed atmosphere
    {
      //Sgr A* atmosphere
-     //set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
+     set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
 
+     
     //extrapolating along MYCOORDS
      //gc radialcoordinate
-     ldouble r=get_x(ix,0);
+     ldouble r=geomBL.xx;
      //iix=0
-     ldouble r0=get_x(0,0);
-     ldouble r1=get_x(1,0);     
-
+     struct geometry geomBL0;
+     fill_geometry_arb(0,iy,iz,&geomBL0,KERRCOORDS);     
+     ldouble r0=geomBL0.xx;
+     
      //for velocities or for everything
      for(iv=0;iv<NV;iv++)
        {
 	 //linear extrapolation
 	 //pp[iv]=get_u(p,iv,0,iy,iz)+(get_u(p,iv,1,iy,iz)-get_u(p,iv,0,iy,iz))*(r-r0)/(r1-r0);
+
+	 if(iv==0)
+	   {
+	     pp[0]=get_u(p,iv,0,iy,iz)*r0/r;
+	   }
+	 else if(iv==1)
+	   {
+	     pp[1]=get_u(p,iv,0,iy,iz)*r0*r0/r/r;
+	   }
+	 else if(iv==4)
+	   {
+	     pp[4]=get_u(p,iv,0,iy,iz)*sqrt(r0*r0*r0/r/r/r);
+	   }
+	 else
 	 //constant
-	 pp[iv]=get_u(p,iv,0,iy,iz);
+	   pp[iv]=get_u(p,iv,0,iy,iz);
        }
 
      //no inflow 
@@ -70,7 +86,7 @@ if(ix<0) //outflow at inner edge / fixed atmosphere
      //testing if interpolated primitives make sense
      check_floors_hd(pp,VELPRIM,&geom);
      //end of floor section
-
+    
      p2u(pp,uu,&geom);
      return 0;
    }

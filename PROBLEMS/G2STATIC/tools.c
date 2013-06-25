@@ -19,12 +19,23 @@ set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
 
   //rotation here?
 
+  //entropy = fixed at rin
+  ldouble xxin[4]={0,get_x(0,0),get_x(NY/2,1),get_x(0,2)};
+  coco_N(xxin,xxin,MYCOORDS,BLCOORDS);
+  ldouble rin=xxin[1];
+  ldouble rhoin = 2.02e5*pow(1.-pow((th-M_PI/2.)/(M_PI/2.),2.),1.69) * (150./rin);
+  ldouble tempin = pow(10.,9.95+0.24*pow(fabs(th-M_PI/2.),2.93)) * (150./rin);
+  //to code units
+  rhoin = rhoCGS2GU(rhoin);
+  tempin = tempCGS2GU(tempin);
+  ldouble uin = calc_PEQ_ufromTrho(tempin,rhoin);
+  ldouble K = (GAMMA-1.)*uin / pow(rhoin,GAMMA); //p = K rho^GAMMA
+
   //empirical fit in cgs
   ldouble rho = 2.02e5*pow(1.-pow((th-M_PI/2.)/(M_PI/2.),2.),1.69) * (150./r);
   ldouble temp = pow(10.,9.95+0.24*pow(fabs(th-M_PI/2.),2.93)) * (150./r);
   ldouble vphi = pow(10.,9.15-0.24*pow(fabs(th-M_PI/2.),2.04)) * sqrt(150./r);
   ldouble chi = 0.1 + 0.31*pow(fabs(th-M_PI/2.),3.89); //pmag/pgas
-		    
 
   //to code units
   rho = rhoCGS2GU(rho);
@@ -32,13 +43,18 @@ set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
   vphi = velCGS2GU(vphi);
   chi = chi;
 
+  //temp following constant entropy: - actually should be satisfied already for GAMMA=2
+  //ldouble u = K * pow(rho,GAMMA) / (GAMMA-1.);
+  //temp = calc_PEQ_Tfromurho(u,rho); 
+ 
   pp[0] = rho;
   pp[1] = calc_PEQ_ufromTrho(temp,rho);
 
   //to add extra magn-related pressure
-  pp[1] *= 1.+chi;
+  //pp[1] *= 1.+chi;
 
   ldouble ucon[4]={0.,0.,0.,vphi/r};
+
   conv_vels(ucon,ucon,VEL3,VEL4,geomBL->gg,geomBL->GG);
   trans2_coco(geomBL->xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
   conv_vels(ucon,ucon,VEL4,VELPRIM,geom->gg,geom->GG);

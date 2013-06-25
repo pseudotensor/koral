@@ -2,7 +2,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 1
+#define RESTARTNUM 15
 
 /************************************/
 //radiation choices
@@ -72,7 +72,7 @@
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
-#define NZ 120
+#define NZ 80
 #define NX (NZ/3)//NZ/Pi
 #define NY (NZ/2+1)
 #define SPECIFIC_BC
@@ -89,7 +89,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 5.e3
+#define DTOUT1 5.e2
 
 //#define EQPLANEOUTPUT
 #define VERTPLANEOUTPUT
@@ -109,8 +109,8 @@
 #define GAMMA (5./3.)
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
-#define TRACER
+//#define TRACER
 #define MINTRACE 1.e-4
-#define CLMAG 100.
+#define CLMAG 0.//100.
 #define CLWIDTH 800.
 #define SHUFFLELOOPS 0
