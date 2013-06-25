@@ -71,6 +71,7 @@
 #define MAXY (.95*Pi)
 #define MINZ 0.
 #define MAXZ (2.*Pi)
+#define FULLPHI //for output - to print extra cell in phi
 #define NZ 120
 #define NX (NZ/3)//NZ/Pi
 #define NY (NZ/2+1)

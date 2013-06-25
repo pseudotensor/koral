@@ -56,6 +56,9 @@ main(int argc, char **argv)
   //sets bc
   set_bc(tstart);
 
+  fprint_silofile(0.,10,"dumps");
+  return 0;
+
   //evolves
   solve_all_problems_5(tstart);
 
