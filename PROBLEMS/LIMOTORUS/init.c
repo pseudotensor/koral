@@ -35,15 +35,20 @@ if(anret<0) //atmosphere
   {
    //ambient
     set_hdatmosphere(pp,xxvec,gg,GG,0);
+    //    pp[0]=1.e-4;
+    //    pp[1]=1.e-8;
   }
  else
    {
      //transforming primitives from BL to MYCOORDS
      trans_phd_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+     
    }
 
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
+
+
 //hd floors
 check_floors_hd(pp,VELPRIM,&geom);
 //to conserved

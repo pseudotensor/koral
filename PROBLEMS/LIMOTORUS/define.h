@@ -70,10 +70,10 @@
 /************************************/
 #define MKS1R0 -2.
 #define MYCOORDS MKS1COORDS
-#define MINX (log(5.1-MKS1R0))
-#define MAXX (log(155.3-MKS1R0))
+#define MINX (log(500.1-MKS1R0))
+#define MAXX (log(5555.3-MKS1R0))
 #define NX 60
-#define NY 20
+#define NY 30
 #define NZ 1
 #define MINY (0.05*Pi/2.)
 #define MAXY Pi/2.
@@ -86,7 +86,7 @@
 /************************************/
 #define OUTCOORDS KERRCOORDS                                                                    
 //#define PRINTINSIDEBH
-//#define PRINTXGC_LEFT
+#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
@@ -103,11 +103,14 @@
 #define URIN 0.5
 #define KKK 9.e-4//1.e-4
 #define UTPOT .99
-#define RHOATMMIN  3.e-3
+#define RHOATMMIN  1.e-10
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e9,RHOATMMIN))
-#define DTOUT1 10.e1
+#define DTOUT1 10.e2
 
-
-
-
+#define IMPOSEDRHO
+#define TORUSRIN 10.
+#define TORUSKAPPA 0.01
+#define TORUSXI 0.708
+#define TORUSRBREAK1 45.
+#define TORUSRBREAK2 100000.
 

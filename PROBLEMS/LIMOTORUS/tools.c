@@ -4,12 +4,104 @@
 #include <gsl/gsl_integration.h>
 
 
-FTYPE    gam = 5./3.;
-FTYPE    rin = 10.;
-FTYPE    kappa = .01;  // AKMARK: entropy constant that appears in EOS
-FTYPE    xi = 0.708;   // AKMARK: omega is set to this fraction of Keplerian omega
-FTYPE    rbreak1 = 42.;   // AKMARK: locations of breaks in torus angular momentum profile
-FTYPE    rbreak2 = 1000.;
+ldouble
+get_rho(ldouble r,ldouble th)
+{
+  ldouble rin=150.;
+  ldouble rhoin = 2.02e5*pow(1.-pow((th-M_PI/2.)/(M_PI/2.),2.),1.69) * (150./rin);
+  ldouble rho = rhoin * (rin/r);
+
+  return rhoCGS2GU(rho);
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//sets rho, uint and velocities according to disk model from Sadowski+2012
+int
+set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  struct geometry *geomBL
+    = (struct geometry *) gggBL;
+
+  // spherical coordinates
+  ldouble xx2[4];
+  coco_N(xx,xx2,MYCOORDS,BLCOORDS);
+  ldouble r=xx2[1];
+  ldouble th=xx2[2];
+
+  //rotation here?
+
+  //entropy = fixed at rin
+  ldouble xxin[4]={0,get_x(0,0),get_x(NY/2,1),get_x(0,2)};
+  coco_N(xxin,xxin,MYCOORDS,BLCOORDS);
+  ldouble rin=xxin[1];
+
+  rin=150.;
+  ldouble rhoin = 2.02e5*pow(1.-pow((th-M_PI/2.)/(M_PI/2.),2.),1.69) * (150./rin);
+  ldouble tempin = pow(10.,9.95+0.24*pow(fabs(th-M_PI/2.),2.93)) * (150./rin);
+  //to code units
+  rhoin = rhoCGS2GU(rhoin);
+  tempin = tempCGS2GU(tempin);
+  ldouble uin = calc_PEQ_ufromTrho(tempin,rhoin);
+  ldouble K = (GAMMA-1.)*uin / pow(rhoin,GAMMA); //p = K rho^GAMMA
+
+  //empirical fit in cgs
+  ldouble rho = rhoin * (rin/r);
+
+  //polytrope G=2
+  rho = 1./2./K * 0.7 / r;
+
+  ldouble temp = tempin * (150./r);
+  ldouble vphi = pow(10.,9.15-0.24*pow(fabs(th-M_PI/2.),2.04)) * sqrt(150./r);
+
+  //const.fraction of Keplerian:
+  vphi=0.7*sqrt(1./r/r/r);
+
+  ldouble chi = 0.1 + 0.31*pow(fabs(th-M_PI/2.),3.89); //pmag/pgas
+
+
+  //to code units
+  //rho = rhoCGS2GU(rho);
+  temp = tempCGS2GU(temp);
+  vphi = velCGS2GU(vphi);
+  chi = chi;
+
+  //temp following constant entropy: - actually should be satisfied already for GAMMA=2
+  ldouble u = K * pow(rho,GAMMA) / (GAMMA-1.);
+  temp = calc_PEQ_Tfromurho(u,rho); 
+ 
+  pp[0] = rho;
+  pp[1] = u;//calc_PEQ_ufromTrho(temp,rho);
+
+  //to add extra magn-related pressure
+  //pp[1] *= 1.+chi;
+
+  ldouble ucon[4]={0.,0.,0.,vphi/r};
+
+  conv_vels(ucon,ucon,VEL3,VEL4,geomBL->gg,geomBL->GG);
+  trans2_coco(geomBL->xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
+  conv_vels(ucon,ucon,VEL4,VELPRIM,geom->gg,geom->GG);
+
+  pp[2]=ucon[1];
+  pp[3]=ucon[2];
+  pp[4]=ucon[3];
+
+  return 0;
+
+}
+
+
+FTYPE    gam = GAMMA;
+FTYPE    rin = TORUSRIN;
+FTYPE    kappa = TORUSKAPPA;  // AKMARK: entropy constant that appears in EOS
+FTYPE    xi = TORUSXI;   // AKMARK: omega is set to this fraction of Keplerian omega
+FTYPE    rbreak1 = TORUSRBREAK1;   // AKMARK: locations of breaks in torus angular momentum profile
+FTYPE    rbreak2 = TORUSRBREAK2;
+
 
 
 void compute_gd( FTYPE r, FTYPE th, FTYPE a, FTYPE *gdtt, FTYPE *gdtp, FTYPE *gdpp ) {
@@ -288,18 +380,27 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
    //hh = w = FA / (FA)_in
    hh = f3d*Agrav / (f3din*Agravin);
 
-#if(0)
+#ifdef IMPOSEDRHO
    //rho fixed
-   rho = 1.;
-
    //uint/rho
-   if(hh<1.) *uuout = 0.;
+   if(hh<1.) 
+     {
+       *uuout = 0.;
+       rho= 0.;
+     }
    else
-     *uuout = 1./gam/(gam-1.)*(pow(hh,gam/(gam-1.))-1.);    
+     {
+       rho = get_rho(r,th);
+       eps = (-1 + hh)*pow(gam,-1);
+       *uuout = rho * eps;
+       //*uuout = rho * 1./gam/(gam-1.)*(pow(hh,gam/(gam-1.))-1.);    
+     }
+
    *rhoout = rho;
    *ell=l;
    *omret=om;
 #else
+   //entropy constant
    eps = (-1 + hh)*pow(gam,-1);
 
    if (eps < 0) rho = 0; else rho = pow((-1 + gam)*eps*pow(kappa,-1),pow(-1 + gam,-1));
@@ -316,53 +417,6 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
 
 
 
-int main_akshay() {
-
-   int nr = 32, nth = 16;
-   FTYPE Rin = 10., Rout = 20000.;   // a = 0
-   //FTYPE Rin = 1.364, Rout = 2000.;   // a = 0.9
-   FTYPE th1 = 0., th2 = M_PI_2;
-   FTYPE dr = (Rout - Rin) / nr, dth = (th2 - th1) / nth;
-   FTYPE factor;
-   FTYPE r, th, rho, uu, ell,om;
-   int i, j;
-   FILE*outfile;
-
-//    FTYPE R0 = 1.05, startx1 = -0.6736, dx1 = 0.0372985;
-
-   FTYPE a = 0.;
-   factor = log(Rout/Rin);
-
-   outfile = fopen("slice.dat", "w");
-//    fprintf(outfile, "variables = x, z, rho\n");
-//    fprintf(outfile, "zone t=rho, i=%i, j=%i, F=POINT\n", nr+1, nth+1);
-   for (j=0; j<=nth; j++) {
-      th = th1 + j*dth;
-      //th = 1.;
-      for (i=0; i<=nr; i++) {
-//          r = Rin + i*dr;
-         r = Rin*exp((FTYPE)i/nr*factor);
-//          r = R0 + exp(startx1 + (i+0.5)*dx1);
-//          r = 70.;
-         init_dsandvels_limotorus(r, th, a, &rho, &uu, &ell,&om);
-//          fprintf(outfile, "%g\t%g\t%g\n", r*sin(th), r*cos(th), rho);
-         fprintf(outfile, "%g\t%g\t%g\t%g\t%g\n", r, th, rho, uu,ell,om);
-      }
-   }
-   fclose(outfile);
-
-//    th = M_PI_2*0.3;
-//    r = 350.;
-//    init_dsandvels_limotorus(r, th, a, &rho);
-//    printf("%f\n", rho);
-
-   return(0);
-
-}
-
-//    intstatus = gsl_integration_qag(&integrand, lamin, lam, 1.e-7, 1.e-7, worksize, GSL_INTEG_GAUSS61, intwork, &lnf3d, &lnferr);
-
-
 int
 donut_analytical_solution(ldouble *pp, ldouble *xxvecBL,ldouble ggBL[][5],ldouble GGBL[][5] )
 {
@@ -372,7 +426,9 @@ donut_analytical_solution(ldouble *pp, ldouble *xxvecBL,ldouble ggBL[][5],ldoubl
   ldouble rho,uu,ell,om;
   init_dsandvels_limotorus(r, th, BHSPIN, &rho, &uu, &ell,&om);
  
+
   if(rho<=0.) return -1.; //outside torus
+  //printf("%e %e %e\n",rho,uu,uu/pow(rho,gam)); getchar();
 
   //3-velocity in BL 
   ldouble ucon[4]={0.,0.,0.,om};

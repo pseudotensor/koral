@@ -36,7 +36,7 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 /**********************/
 
 //radius
-if(ix>=NX) //analytical solution within the torus and atmosphere outside
+if(ix>=NX || ix<0) //analytical solution within the torus and atmosphere outside
   {
     if(ifinit==0)
       {
@@ -51,7 +51,10 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	if(anret<0) //atmosphere
 	  {
 	    //ambient
-	    set_hdatmosphere(pp,xxvec,gg,GG,0);
+	    set_hdatmosphere(pp,xxvec,gg,GG,0);    
+	    //pp[0]=1.e-4;
+	    //pp[1]=1.e-8;
+
 	  }
 	else
 	  {
@@ -96,8 +99,8 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
      //linear extrapolation
       for(iv=0;iv<NV;iv++)
        {
-	 pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
-	 //pp[iv]=get_u(p,iv,0,iiy,iiz);
+	 //pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
+	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
  
      //atmosphere

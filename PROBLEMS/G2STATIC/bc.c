@@ -17,7 +17,24 @@ if(ix>=NX) //Sgr A* atmosphere
     //flat atmosphere
     //set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
     //Sgr A* atmosphere
-    set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
+#ifdef DONUT
+int anret=donut_analytical_solution(pp,geomBL.xxvec,geomBL.gg,geomBL.GG);
+if(anret<0) //atmosphere
+  {
+   //ambient
+    set_hdatmosphere(pp,xxvec,gg,GG,0);
+    //    pp[0]=1.e-4;
+    //    pp[1]=1.e-8;
+  }
+ else
+   {
+     //transforming primitives from BL to MYCOORDS
+     trans_phd_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+     
+   }
+#else
+ set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
+#endif
 
 #ifdef TRACER
     pp[TRA]=get_u(p,TRA,NX-1,iy,iz);
@@ -54,6 +71,7 @@ if(ix<0) //outflow at inner edge / fixed atmosphere
 	 //linear extrapolation
 	 //pp[iv]=get_u(p,iv,0,iy,iz)+(get_u(p,iv,1,iy,iz)-get_u(p,iv,0,iy,iz))*(r-r0)/(r1-r0);
 
+	 /*
 	 if(iv==0)
 	   {
 	     pp[0]=get_u(p,iv,0,iy,iz)*r0/r;
@@ -67,16 +85,19 @@ if(ix<0) //outflow at inner edge / fixed atmosphere
 	     pp[4]=get_u(p,iv,0,iy,iz)*sqrt(r0*r0*r0/r/r/r);
 	   }
 	 else
+	 */
 	 //constant
-	   pp[iv]=get_u(p,iv,0,iy,iz);
+	 pp[iv]=get_u(p,iv,0,iy,iz);
        }
 
      //no inflow 
      ldouble ucon[4]={0.,pp[2],pp[3],pp[4]};
      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+     trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,KERRCOORDS);
      if(ucon[1]>0.)
        {
 	 ucon[1]=0.;
+	 trans2_coco(geom.xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
 	 conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 	 pp[2]=ucon[1];
 	 pp[3]=ucon[2];

@@ -72,7 +72,7 @@
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
-#define NZ 80
+#define NZ 60
 #define NX (NZ/3)//NZ/Pi
 #define NY (NZ/2+1)
 #define SPECIFIC_BC
@@ -83,13 +83,13 @@
 #define OUTCOORDS KERRCOORDS                                                                    
 //#define RADOUTPUTINZAMO
 //#define PRINTINSIDEBH
-//#define PRINTXGC_LEFT
+#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 5.e2
+#define DTOUT1 5.e1
 
 //#define EQPLANEOUTPUT
 #define VERTPLANEOUTPUT
@@ -106,11 +106,12 @@
 /************************************/
 //common physics 
 /************************************/
-#define GAMMA 2.//(5./3.)
+//#define VELPRIM VEL4
+#define GAMMA (5./3.)
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
-//#define TRACER
+#define TRACER
 #define MINTRACE 1.e-40
-#define CLMAG 0.//100.
+#define CLMAG 20.
 #define CLWIDTH 800.
 #define SHUFFLELOOPS 0
