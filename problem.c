@@ -113,7 +113,9 @@ calc_bc(int ix,int iy,int iz,ldouble t,ldouble *uu,ldouble *pp,int ifinit)
 int
 set_initial_profile()
 {
+  printf("Initializing problem... ");
   int ix,iy,iz;
+#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
   for(iz=0;iz<NZ;iz++)
     {
       for(iy=0;iy<NY;iy++)
@@ -126,6 +128,7 @@ set_initial_profile()
 	    }
 	}
     }
+  printf("done!\n");
 
   return 0;
 }

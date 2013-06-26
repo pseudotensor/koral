@@ -14,35 +14,43 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 /***********************************************/
 if(ix>=NX) //Sgr A* atmosphere
   {
-    //flat atmosphere
-    //set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
-    //Sgr A* atmosphere
+    if(ifinit==0)
+      {
+	for(iv=0;iv<NV;iv++)
+	  {
+	    pp[iv]=get_u(pinit,iv,ix,iy,iz);	
+	  }
+      }
+    else
+      {
+	//flat atmosphere
+	//set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
+	//Sgr A* atmosphere
 #ifdef DONUT
-int anret=donut_analytical_solution(pp,geomBL.xxvec,geomBL.gg,geomBL.GG);
-if(anret<0) //atmosphere
-  {
-   //ambient
-    set_hdatmosphere(pp,xxvec,gg,GG,0);
-    //    pp[0]=1.e-4;
-    //    pp[1]=1.e-8;
-  }
- else
-   {
-     //transforming primitives from BL to MYCOORDS
-     trans_phd_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+	int anret=donut_analytical_solution(pp,geomBL.xxvec,geomBL.gg,geomBL.GG);
+	if(anret<0) //atmosphere
+	  {
+	    //ambient
+	    set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+	  }
+	else
+	  {
+	    //transforming primitives from BL to MYCOORDS
+	    trans_phd_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,geomBL.gg,geomBL.GG,geom.gg,geom.GG);
      
-   }
+	  }
 #else
- set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
+	set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
 #endif
 
 #ifdef TRACER
-    pp[TRA]=get_u(p,TRA,NX-1,iy,iz);
+	pp[TRA]=get_u(p,TRA,NX-1,iy,iz);
 #endif
 
-    //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,&geom);
-    //end of floor section
+	//testing if interpolated primitives make sense
+	check_floors_hd(pp,VELPRIM,&geom);
+	//end of floor section
+      }
 
     p2u(pp,uu,&geom);
  

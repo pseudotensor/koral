@@ -46,7 +46,6 @@ main(int argc, char **argv)
 #else
   //or initialize new problem
   set_initial_profile();
-  my_finger(0.);
   tstart=0.;
 #endif
 

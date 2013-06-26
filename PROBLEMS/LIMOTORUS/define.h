@@ -68,12 +68,12 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define MKS1R0 -2.
+#define MKS1R0 -20.
 #define MYCOORDS MKS1COORDS
 #define MINX (log(500.1-MKS1R0))
-#define MAXX (log(5555.3-MKS1R0))
-#define NX 60
-#define NY 30
+#define MAXX (log(6000.-MKS1R0))
+#define NX 10
+#define NY 8
 #define NZ 1
 #define MINY (0.05*Pi/2.)
 #define MAXY Pi/2.

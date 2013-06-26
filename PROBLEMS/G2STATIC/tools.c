@@ -14,7 +14,7 @@ get_rho(ldouble r,ldouble th)
 }
 
 int
-set_sgradisk_model(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
+set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
 {
   struct geometry *geom
     = (struct geometry *) ggg;
@@ -38,30 +38,26 @@ set_sgradisk_model(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
   rin=150.;
   ldouble rhoin = get_rho(rin,th);
   ldouble tempin = pow(10.,9.95+0.24*pow(fabs(th-M_PI/2.),2.93)) * (150./rin);
-  //to code units
-  rhoin = rhoCGS2GU(rhoin);
-  tempin = tempCGS2GU(tempin);
-
+ 
   //empirical fit in cgs
   ldouble rho = rhoin * (rin/r);
   ldouble temp = tempin * (150./r);
-
   ldouble vphi = pow(10.,9.15-0.24*pow(fabs(th-M_PI/2.),2.04)) * sqrt(150./r);
 
   ldouble chi = 0.1 + 0.31*pow(fabs(th-M_PI/2.),3.89); //pmag/pgas
+
+  //to code units
+  rhoin = rhoCGS2GU(rhoin);
+  tempin = tempCGS2GU(tempin);
 
   //to code units
   //rho = rhoCGS2GU(rho);
   temp = tempCGS2GU(temp);
   vphi = velCGS2GU(vphi);
   chi = chi;
-
-  //temp following constant entropy: - actually should be satisfied already for GAMMA=2
-  ldouble u = K * pow(rho,GAMMA) / (GAMMA-1.);
-  temp = calc_PEQ_Tfromurho(u,rho); 
- 
+  
   pp[0] = rho;
-  pp[1] = u;//calc_PEQ_ufromTrho(temp,rho);
+  pp[1] = calc_PEQ_ufromTrho(temp,rho);
 
   //to add extra magn-related pressure
   pp[1] *= 1.+chi;

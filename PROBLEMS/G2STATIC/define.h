@@ -63,7 +63,7 @@
 //coordinates / resolution
 /************************************/
 #define MYCOORDS MKS1COORDS
-#define MKS1R0 -8.
+#define MKS1R0 -20.
 #define BHSPIN 0.0
 #define MINX (log(500.-MKS1R0))
 #define MAXX (log(6000.-MKS1R0))
@@ -72,7 +72,7 @@
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
-#define NZ 60
+#define NZ 30
 #define NX (NZ/3)//NZ/Pi
 #define NY (NZ/2+1)
 #define SPECIFIC_BC
@@ -111,7 +111,15 @@
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
 #define TRACER
-#define MINTRACE 1.e-40
+#define MINTRACE 1.e-4
 #define CLMAG 20.
 #define CLWIDTH 800.
 #define SHUFFLELOOPS 0
+
+#define DONUT
+#define IMPOSEDRHO
+#define TORUSRIN 10.
+#define TORUSKAPPA 0.01
+#define TORUSXI 0.708
+#define TORUSRBREAK1 45.
+#define TORUSRBREAK2 100000.
