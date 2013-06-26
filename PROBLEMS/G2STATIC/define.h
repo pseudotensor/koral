@@ -83,7 +83,7 @@
 #define OUTCOORDS KERRCOORDS                                                                    
 //#define RADOUTPUTINZAMO
 //#define PRINTINSIDEBH
-#define PRINTXGC_LEFT
+//#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10

@@ -10,7 +10,7 @@ get_rho(ldouble r,ldouble th)
   ldouble rhoin = 2.02e5*pow(1.-pow((th-M_PI/2.)/(M_PI/2.),2.),1.69) * (150./rin);
   ldouble rho = rhoin * (rin/r);
 
-  return rhoCGS2GU(rho);
+  return rho;
 }
 
 int
