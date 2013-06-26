@@ -87,7 +87,9 @@ solve_all_problems_5(ldouble tstart)
 #ifndef RESTART
   fprint_restartfile(t,"dumps");			
   fprint_profiles(t,scalars,NSCALARS,0,"dumps");			
+  #ifdef SILOOUTPUT
   fprint_silofile(t,nfout1,"dumps");
+  #endif
   nfout1++;
 #endif
 
@@ -252,7 +254,9 @@ solve_all_problems_5(ldouble tstart)
 	  //print to files
 	  fprint_restartfile(t,"dumps");
 	  fprint_profiles(t,scalars,NSCALARS,0,"dumps");
+          #ifdef SILOOUTPUT
 	  fprint_silofile(t,nfout1,"dumps");
+	  #endif
 	  nfout1++;
 
 	  lasttout=t;
