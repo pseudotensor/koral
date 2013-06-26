@@ -54,7 +54,10 @@ main(int argc, char **argv)
   fprint_openfiles("dumps");
 
   //sets bc
-  set_bc(tstart);
+  set_bc(tstart,1);
+
+  //copies initial primitives to pinit
+  copy_u(1.,p,pinit);
 
   //evolves
   solve_all_problems_5(tstart);
@@ -246,7 +249,7 @@ solve_all_problems_5(ldouble tstart)
 		 ,nfout1,t,dt,max_ws[0],end_time-start_time,totalmass,znps);
 	  
 	  //projects primitives onto ghost cells
-	  set_bc(t);
+	  set_bc(t,0);
 
 	  //calculate scalars
 	  calc_scalars(scalars,t);

@@ -38,22 +38,33 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 //radius
 if(ix>=NX) //analytical solution within the torus and atmosphere outside
   {
-    int anret=donut_analytical_solution(pp,geomBL.xxvec,geomBL.gg,geomBL.GG);
-    if(anret<0) //atmosphere
+    if(ifinit==0)
       {
-	//ambient
-	set_hdatmosphere(pp,xxvec,gg,GG,0);
+	for(iv=0;iv<NV;iv++)
+	  {
+	    pp[iv]=get_u(pinit,iv,ix,iy,iz);	
+	  }
       }
     else
       {
-	//transforming primitives from BL to MYCOORDS
-	trans_phd_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+	int anret=donut_analytical_solution(pp,geomBL.xxvec,geomBL.gg,geomBL.GG);
+	if(anret<0) //atmosphere
+	  {
+	    //ambient
+	    set_hdatmosphere(pp,xxvec,gg,GG,0);
+	  }
+	else
+	  {
+	    //transforming primitives from BL to MYCOORDS
+	    trans_phd_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+	  }
+	
+	//entropy
+	pp[5]=calc_Sfromu(pp[0],pp[1]);
+	//hd floors
+	check_floors_hd(pp,VELPRIM,&geom);
       }
 
-    //entropy
-    pp[5]=calc_Sfromu(pp[0],pp[1]);
-    //hd floors
-    check_floors_hd(pp,VELPRIM,&geom);
     //to conserved
     p2u(pp,uu,&geom);
   

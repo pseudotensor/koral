@@ -60,7 +60,7 @@ main(int argc, char **argv)
       nfout1--; //correcting index
   
       //sets bc
-      set_bc(tstart);
+      set_bc(tstart,1);
      
       //calculate scalars
       calc_scalars(scalars,t);

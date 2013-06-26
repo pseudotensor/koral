@@ -105,7 +105,7 @@
 #define UTPOT .99
 #define RHOATMMIN  3.e-3
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e9,RHOATMMIN))
-#define DTOUT1 10.e-1
+#define DTOUT1 10.e1
 
 
 

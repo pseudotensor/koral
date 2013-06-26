@@ -98,7 +98,7 @@ calc_xb(int i,int idim)
 /* returns problem specific BC defined in PROBLEMS/XXX/bc.c */
 /*********************************************/
 int
-calc_bc(int ix,int iy,int iz,ldouble t,ldouble *uu,ldouble *pp)
+calc_bc(int ix,int iy,int iz,ldouble t,ldouble *uu,ldouble *pp,int ifinit)
 {
 
 #include PR_BC

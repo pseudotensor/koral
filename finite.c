@@ -372,7 +372,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //projects primitives onto ghost cells
-  set_bc(t);
+  set_bc(t,0);
 
   //**********************************************************************
   //**********************************************************************
@@ -1835,7 +1835,7 @@ if_outsidegc(int ix,int iy,int iz)
 //**********************************************************************
 
 //boundary conditions - sets conserved in the ghost cells
-int set_bc(ldouble t)
+int set_bc(ldouble t,int ifinit)
 {
   int ix,iy,iz,ii;
  
@@ -1857,7 +1857,7 @@ int set_bc(ldouble t)
 
           
 #ifdef SPECIFIC_BC  //BC specific for given problem
-      calc_bc(ix,iy,iz,t,uval,pval);
+      calc_bc(ix,iy,iz,t,uval,pval,ifinit);
       for(iv=0;iv<NV;iv++)
 	{
 	  set_u(u,iv,ix,iy,iz,uval[iv]);
