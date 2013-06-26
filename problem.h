@@ -60,8 +60,23 @@
 //54* RVDISK - viscous rad. disk damped from larger radius
 //55* G2STATIC - cloud through static atmosphere
 //56* EDDSPH - 1d Edd Sphere
+//57* LIMOTORUS - torus from Bob's/Akshay's paper
 
-#define PROBLEM 55
+#define PROBLEM 57
+
+#if(PROBLEM==57)
+
+#define PR_DEFINE "PROBLEMS/LIMOTORUS/define.h"
+#define PR_BC "PROBLEMS/LIMOTORUS/bc.c"
+#define PR_INIT "PROBLEMS/LIMOTORUS/init.c"
+#define PR_KAPPA "PROBLEMS/LIMOTORUS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/LIMOTORUS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/LIMOTORUS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/LIMOTORUS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/LIMOTORUS/dump.c"
+#define PR_TOOLS "PROBLEMS/LIMOTORUS/tools.c"
+
+#endif
 
 #if(PROBLEM==56)
 
