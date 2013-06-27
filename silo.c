@@ -101,7 +101,6 @@ int fprint_silofile(ldouble time, int num, char* folder)
 	      rho[nodalindex]=pp[RHO];
 	      #else
 	      rho[nodalindex]=rhoGU2CGS(pp[RHO]);
-	      temp[nodalindex]=endenGU2CGS(pp[UU]);
 	      #endif
 	      temp[nodalindex]=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 	      
