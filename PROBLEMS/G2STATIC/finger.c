@@ -2,7 +2,6 @@
 //imposes initial condition where cloud is not
 
 #ifdef TRACER
-//skipping finger because I am not evolving cells (SKIP_CELLS)
 
 int ix,iy,iz,ii,iv;
 ldouble trace,rhoorg;
@@ -32,6 +31,7 @@ for(ii=0;ii<Nloop_0;ii++) //domain only
 	p2u(pp,uu,&geom);
 	for(iv=0;iv<NV;iv++)
 	  {
+	    if(iv==TRA) continue;
 	    set_u(u,iv,ix,iy,iz,uu[iv]);
 	    set_u(p,iv,ix,iy,iz,pp[iv]);
 	  }

@@ -121,7 +121,7 @@
 #define GAMMA (5./3.)
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
-#define SKIPCELLS
+//#define SKIPCELLS
 #define TRACER
 #define MINTRACE 1.e-4 //edge for enforcing stationary atmosphere
 #define CLMAG 20.
