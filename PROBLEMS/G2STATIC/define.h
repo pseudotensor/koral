@@ -72,7 +72,7 @@
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
-#define NZ 30
+#define NZ 50
 #define NX (NZ/3)//NZ/Pi
 #define NY (NZ/2+1)
 #define SPECIFIC_BC
@@ -80,6 +80,7 @@
 /************************************/
 //output
 /************************************/
+#define SILOOUTPUT
 #define OUTCOORDS KERRCOORDS                                                                    
 //#define RADOUTPUTINZAMO
 //#define PRINTINSIDEBH
@@ -91,8 +92,8 @@
 #define CGSOUTPUT
 #define DTOUT1 5.e1
 
-//#define EQPLANEOUTPUT
-#define VERTPLANEOUTPUT
+#define EQPLANEOUTPUT
+//#define VERTPLANEOUTPUT
 
 #ifdef VERTPLANEOUTPUT
 #define ZSLICE (NZ*0.1)
@@ -110,13 +111,14 @@
 #define GAMMA (5./3.)
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
+#define SKIPCELLS
 #define TRACER
-#define MINTRACE 1.e-4
+#define MINTRACE 1.e-4 //edge for enforcing stationary atmosphere
 #define CLMAG 20.
 #define CLWIDTH 800.
 #define SHUFFLELOOPS 0
 
-#define DONUT
+//#define DONUT
 #define IMPOSEDRHO
 #define TORUSRIN 10.
 #define TORUSKAPPA 0.01

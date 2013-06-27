@@ -1,6 +1,24 @@
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//tells if cell evolved
+int
+whetherskipcell(int ix,int iy,int iz)
+{
+#ifdef TRACER
+  if(get_u(p,TRA,ix,iy,iz)<MINTRACE) return 1;
+  else
+    return 0;
+#else
+  return 0;
+#endif
+
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //sets rho, uint and velocities according to disk model from Sadowski+2012
 
 ldouble
@@ -38,7 +56,10 @@ set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
   rin=150.;
   ldouble rhoin = get_rho(rin,th);
   ldouble tempin = pow(10.,9.95+0.24*pow(fabs(th-M_PI/2.),2.93)) * (150./rin);
- 
+  //to code units
+  rhoin = rhoCGS2GU(rhoin);
+  tempin = tempCGS2GU(tempin);
+
   //empirical fit in cgs
   ldouble rho = rhoin * (rin/r);
   ldouble temp = tempin * (150./r);
@@ -47,12 +68,6 @@ set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
   ldouble chi = 0.1 + 0.31*pow(fabs(th-M_PI/2.),3.89); //pmag/pgas
 
   //to code units
-  rhoin = rhoCGS2GU(rhoin);
-  tempin = tempCGS2GU(tempin);
-
-  //to code units
-  //rho = rhoCGS2GU(rho);
-  temp = tempCGS2GU(temp);
   vphi = velCGS2GU(vphi);
   chi = chi;
   
@@ -375,6 +390,7 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
    else
      {
        rho = get_rho(r,th);
+       rho = rhoCGS2GU(rho);
        eps = (-1 + hh)*pow(gam,-1);
        *uuout = rho * eps;
        //*uuout = rho * 1./gam/(gam-1.)*(pow(hh,gam/(gam-1.))-1.);    

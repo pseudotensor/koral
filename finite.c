@@ -356,6 +356,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
       
+#ifdef SKIPCELLS
+      if(whetherskipcell(ix,iy,iz)==1) continue;
+#endif
+
       calc_primitives(ix,iy,iz);
     }
 
@@ -406,7 +410,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
-      
+      #ifdef SKIPCELLS
+      if(whetherskipcell(ix,iy,iz)==1) continue;
+      #endif
+
       
       //parasite to update of entropy
       //      update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz));
@@ -640,6 +647,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       ix=loop_1[ii][0];
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
+      #ifdef SKIPCELLS
+      if(whetherskipcell(ix,iy,iz)==1) continue;
+      #endif
+
       //combines right - left fluxes
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
@@ -656,6 +667,11 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
+
+      #ifdef SKIPCELLS
+      if(whetherskipcell(ix,iy,iz)==1) continue;
+      #endif
+
       
       ldouble fd_der[NV],t_der[NV],val,ms_der[NV],ss_der[NV],rho,uint,pp[NV],uu[NV],uuold[NV],duu[NV];
 	      
@@ -739,7 +755,12 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
     {
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
-      iz=loop_0[ii][2];  
+      iz=loop_0[ii][2]; 
+
+      #ifdef SKIPCELLS
+      if(whetherskipcell(ix,iy,iz)==1) continue;
+      #endif
+       
 
       ldouble gg[4][5],GG[4][5];
       ldouble tup[4][4],tlo[4][4];
@@ -817,7 +838,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       
 
       /************************************************************************/
-      /************************************************************************/
+      /********************** RADIATION ***************************************/
       /************************************************************************/
 #ifndef SKIPRADSOURCE
 #ifdef RADIATION
@@ -911,7 +932,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       /************************************************************************/
       /************************************************************************/
 
-    }
+    } //source terms
 
    
 
