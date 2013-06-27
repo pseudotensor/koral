@@ -62,17 +62,27 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define MYCOORDS MKS1COORDS
+#define USEMKS1COORDS
+#ifdef USEKSCOORDS
+#define MYCOORDS KSCOORDS
+#define MINX 500.
+#define MAXX 6000.
 #define MKS1R0 -20.
-#define BHSPIN 0.0
+#endif
+#ifdef USEMKS1COORDS
+#define MYCOORDS MKS1COORDS
 #define MINX (log(500.-MKS1R0))
 #define MAXX (log(6000.-MKS1R0))
+#define MKS1R0 -1000.
+#endif
+
+#define BHSPIN 0.0
 #define MINY (0.05*Pi)
 #define MAXY (.95*Pi)
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
-#define NZ 50
+#define NZ 40
 #define NX (NZ/3)//NZ/Pi
 #define NY (NZ/2+1)
 #define SPECIFIC_BC
@@ -90,7 +100,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 5.e1
+#define DTOUT1 5.e2
 
 #define EQPLANEOUTPUT
 //#define VERTPLANEOUTPUT

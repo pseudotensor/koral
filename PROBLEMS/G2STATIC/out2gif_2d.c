@@ -6,6 +6,7 @@
 
 ldouble minx,miny,maxx,maxy;
 
+#if(MYCOORDS==MKS1COORDS)
 #ifdef EQPLANEOUTPUT
 minx= -1.1*(exp(get_xb(NX,0))+MKS1R0);
 maxx= 1.1*(exp(get_xb(NX,0))+MKS1R0);
@@ -18,6 +19,24 @@ maxx= 1.1*(exp(get_xb(NX,0))+MKS1R0);
 miny= -1.1*(exp(get_xb(NX,0))+MKS1R0);
 maxy= 1.1*(exp(get_xb(NX,0))+MKS1R0);
 #endif
+#endif
+
+#if(MYCOORDS==KSCOORDS)
+#ifdef EQPLANEOUTPUT
+minx= -1.1*get_xb(NX,0);
+maxx= 1.1*get_xb(NX,0);
+miny= -1.1*get_xb(NX,0);
+maxy= 1.1*get_xb(NX,0);
+#endif
+#ifdef VERTPLANEOUTPUT
+minx= -0.1*get_xb(NX,0);
+maxx= 1.1*get_xb(NX,0);
+miny= -1.1*get_xb(NX,0);
+maxy= 1.1*get_xb(NX,0);
+#endif
+#endif
+
+
 
   fprintf(fgnu,
 	  "set table \"table.gp\"\n"

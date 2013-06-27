@@ -3,12 +3,34 @@
 //**********************************************************************
 //tells if cell evolved
 int
-whetherskipcell(int ix,int iy,int iz)
+whetherskipcell(int ix,int iy,int iz,int type)
 {
 #ifdef TRACER
-  if(get_u(p,TRA,ix,iy,iz)<MINTRACE) return 1;
-  else
-    return 0;
+  if(type == 1) //updating primitives
+    {
+      if(get_u(p,TRA,ix,iy,iz)<MINTRACE) return 1;
+      else
+	return 0;
+    }
+  if(type == 2) //for calculating fluxes
+    {
+      if(get_u(p,TRA,ix,iy,iz)<MINTRACE &&
+	 get_u(p,TRA,ix-1,iy,iz)<MINTRACE &&
+	 get_u(p,TRA,ix+1,iy,iz)<MINTRACE &&
+	 get_u(p,TRA,ix,iy-1,iz)<MINTRACE &&
+	 get_u(p,TRA,ix,iy+1,iz)<MINTRACE &&
+	 get_u(p,TRA,ix,iy,iz-1)<MINTRACE &&
+	 get_u(p,TRA,ix,iy,iz+1)<MINTRACE &&
+	 get_u(p,TRA,ix-2,iy,iz)<MINTRACE &&
+	 get_u(p,TRA,ix+2,iy,iz)<MINTRACE &&
+	 get_u(p,TRA,ix,iy-2,iz)<MINTRACE &&
+	 get_u(p,TRA,ix,iy+2,iz)<MINTRACE &&
+	 get_u(p,TRA,ix,iy,iz-2)<MINTRACE &&
+	 get_u(p,TRA,ix,iy,iz+2)<MINTRACE)
+	return 1;
+      else
+	return 0;
+    }
 #else
   return 0;
 #endif
