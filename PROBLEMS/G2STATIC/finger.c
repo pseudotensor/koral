@@ -27,9 +27,9 @@ for(ii=0;ii<Nloop_0;ii++) //domain only
 	    ppinit[iv]=get_u(pinit,iv,ix,iy,iz);	
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 
-	    if(f<0. || f>1.) {printf("wrong f %e %e %e\n",f,trace,MINTRACE);getchar();}
 	    pp[iv]=ppinit[iv]*(1.-f) + pp[iv]*f;
 	  }
+
 	//hd floors
 	check_floors_hd(pp,VELPRIM,&geom);
 	p2u(pp,uu,&geom);

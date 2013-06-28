@@ -382,6 +382,10 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   gg=geom->gg;
   GG=geom->GG;
 
+#ifdef TRACER
+  if(pp[TRA]<0.) {pp[0]=0.; ret=-1; if(verbose) printf("hd_floors CASE TRA 1\n");}
+#endif
+
   //absolute rho
   if(pp[0]<RHOFLOOR) {pp[0]=RHOFLOOR; ret=-1; if(verbose) printf("hd_floors CASE 1\n");}
 
