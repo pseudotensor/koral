@@ -115,16 +115,14 @@
 #endif
 
 /************************************/
-//common physics 
+//problem params
 /************************************/
-//#define VELPRIM VEL4
 #define GAMMA (5./3.)
 #define RHOATMMIN 1.
 #define UINTATMMIN 1.e-4
-//#define SKIPCELLS
 #define TRACER
 #define MINTRACE 1.e-4 //edge for enforcing stationary atmosphere
-#define CLMAG 20.
+#define CLRHO 1.e-9
 #define CLWIDTH 800.
 #define SHUFFLELOOPS 0
 

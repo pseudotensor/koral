@@ -32,57 +32,25 @@ set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
 #endif
 
 /***********************************************/
-//cloud
-ldouble clix,cliy,cliz;
-/*
-clix=NX*0.66;
-cliy=NY*0.3;
-cliz=NZ;
-*/
-clix=NX*0.8;
-cliy=NY/2;
-cliz=NZ*.25;
+//imposing cloud in rho and velocities
 
-ldouble clxx[4];
-get_xx(clix,cliy,cliz,clxx);
+ldouble ucon[4];
+ucon[1]=get_u(pproblem,VX,ix,iy,iz);
+ucon[2]=get_u(pproblem,VY,ix,iy,iz);
+ucon[3]=get_u(pproblem,VZ,ix,iy,iz);
+ldouble atmrho=pp[0];
+ldouble clrho=get_u(pproblem,RHO,ix,iy,iz);
+pp[0]=atmrho+clrho;
 
-//to cartesian
-ldouble xxmink[4],clxxmink[4];
-coco_N(geom.xxvec,xxmink,MYCOORDS,MINKCOORDS);
-coco_N(clxx,clxxmink,MYCOORDS,MINKCOORDS);
-
-//distance from the center
-ldouble dist = sqrt((xxmink[1]-clxxmink[1])*(xxmink[1]-clxxmink[1])+
-		    (xxmink[2]-clxxmink[2])*(xxmink[2]-clxxmink[2])+
-		    (xxmink[3]-clxxmink[3])*(xxmink[3]-clxxmink[3]));
-
-
-//increase rho
-ldouble mag=CLMAG;
-ldouble factor=(1.+mag*exp(-dist*dist/CLWIDTH/CLWIDTH));
-ldouble atmrho = pp[0];
-ldouble clrho = (factor-1.)*atmrho;
-pp[0] =atmrho+clrho;
-
+pp[2]=(pp[2]*atmrho + ucon[1]*clrho ) / (atmrho + clrho);
+pp[3]=(pp[3]*atmrho + ucon[2]*clrho ) / (atmrho + clrho);
+pp[4]=(pp[4]*atmrho + ucon[3]*clrho ) / (atmrho + clrho);  
+  
 #ifdef TRACER
 //tracer : fraction of cloud gas 
 pp[TRA]=clrho/pp[0];
 #endif
-
-//velocity
-ldouble OmKep = 1./sqrt(geomBL.xx*geomBL.xx*geomBL.xx);
-
-//ldouble ucon[4]={0.,0,+OmKep,0.};
-ldouble ucon[4]={0.,0,0,-OmKep};
-
-conv_vels(ucon,ucon,VEL3,VEL4,geomBL.gg,geomBL.GG);
-trans2_coco(geomBL.xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
-conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
-
-pp[2]=(pp[2]*atmrho + ucon[1]*clrho ) / (atmrho + clrho);
-pp[3]=(pp[3]*atmrho + ucon[2]*clrho ) / (atmrho + clrho);
-pp[4]=(pp[4]*atmrho + ucon[3]*clrho ) / (atmrho + clrho);    
-
+/***********************************************/
 
 /***********************************************/
 //entropy

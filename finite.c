@@ -380,6 +380,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
+  //TODO: combine set_bc with the loop above / below
+
   //projects primitives onto ghost cells
   set_bc(t,0);
 

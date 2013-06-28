@@ -94,6 +94,7 @@
 
 #if(PROBLEM==55)
 
+#define PR_PREPINIT "PROBLEMS/G2STATIC/prepinit.c"
 #define PR_DEFINE "PROBLEMS/G2STATIC/define.h"
 #define PR_BC "PROBLEMS/G2STATIC/bc.c"
 #define PR_INIT "PROBLEMS/G2STATIC/init.c"
