@@ -1769,7 +1769,7 @@ coco_CYL2MCYL1(ldouble *xCYL, ldouble *xMCYL1)
 //**********************************************************************
 //**********************************************************************
 //converts coordinates
-//for CYL -> MCYL1
+//for SPH -> CARTESIAN
 int
 coco_SPH2MINK(ldouble *xSPH, ldouble *xMINK)
 {
@@ -1781,6 +1781,26 @@ coco_SPH2MINK(ldouble *xSPH, ldouble *xMINK)
   xMINK[1]=r*sin(th)*cos(ph);
   xMINK[2]=r*sin(th)*sin(ph);
   xMINK[3]=r*cos(th);
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for MINK -> SPH
+int
+coco_MINK2SPH(ldouble *xMINK, ldouble *xSPH)
+{
+  ldouble x=xMINK[1];
+  ldouble y=xMINK[2];
+  ldouble z=xMINK[3];
+  
+  xSPH[0]=xMINK[0];
+  xSPH[1]=sqrt(x*x+y*y+z*z);
+  xSPH[2]=acos(z/xSPH[1]);
+  xSPH[3]=my_atan2(y,x);
 
   return 0;
 }
@@ -1892,7 +1912,17 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     {
       coco_SPH2MINK(x1,x2);
     }
-  else if (CO1==KSCOORDS & CO2==MINKCOORDS)
+  else if (CO1==MINKCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
+    {
+      coco_MINK2SPH(x1,x2);
+    }
+  else if (CO1==MINKCOORDS && CO2==MKS1COORDS)
+    {
+      coco_MINK2SPH(x1,x2);
+      coco_BL2KS(x2,x2);
+      coco_KS2MKS1(x2,x2);
+    }
+ else if (CO1==KSCOORDS & CO2==MINKCOORDS)
     {      
       coco_KS2BL(x1,x2);
       coco_SPH2MINK(x2,x2);

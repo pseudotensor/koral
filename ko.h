@@ -144,6 +144,7 @@ ldouble calc_lum(ldouble radius);
 ldouble calc_photloc(int ix);
 
 //misc.c
+ldouble my_atan2(ldouble y, ldouble x);
 void shuffle_loop(int **array, size_t n);
 ldouble step_function(ldouble x,ldouble k);
 int calc_stationary1d_solution()  ;

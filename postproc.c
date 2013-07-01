@@ -174,7 +174,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//integrates mass in the domain, assumes flat spacetime and uniform mesh
+//integrates mass in the domain
 ldouble
 calc_totalmass()
 {
