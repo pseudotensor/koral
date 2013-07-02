@@ -19,20 +19,21 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 int anret=donut_analytical_solution(pp,geomBL.xxvec,geomBL.gg,geomBL.GG);
 if(anret<0) //atmosphere
   {
-   //ambient
+    //ambient
     set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);   
   }
  else
-   {
-     //transforming primitives from BL to MYCOORDS
-     trans_phd_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,geomBL.gg,geomBL.GG,geom.gg,geom.GG);     
-   }
+  {
+    //transforming primitives from BL to MYCOORDS
+    trans_phd_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,geomBL.gg,geomBL.GG,geom.gg,geom.GG);     
+  }
 #else
 set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
 #endif
 
 /***********************************************/
 //imposing cloud in rho and velocities
+//cloud set up in prepinit.c and saved to pproblem
 
 ldouble ucon[4];
 ucon[1]=get_u(pproblem,VX,ix,iy,iz);

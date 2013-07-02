@@ -126,6 +126,8 @@
 //#define SPHCLOUD
 #define G2CLOUD
 
+#define IANGLE (Pi-Pi/3.)
+#define OMANGLE 0.
 #define MASSCLOUD 10.
 #define RMINFORPART 7000.
 #define KERNELWIDTH 2000.

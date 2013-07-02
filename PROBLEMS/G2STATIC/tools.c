@@ -62,20 +62,33 @@ set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
   struct geometry *geomBL
     = (struct geometry *) gggBL;
 
-  // spherical coordinates
-  ldouble xx2[4];
-  coco_N(xx,xx2,MYCOORDS,BLCOORDS);
-  ldouble r=xx2[1];
-  ldouble th=xx2[2];
+  // cartesian coordinates 
+  ldouble xxcart[4];
+  coco_N(xx,xxcart,MYCOORDS,MINKCOORDS);
+  ldouble x=xxcart[1];
+  ldouble y=xxcart[2];
+  ldouble z=xxcart[3];
+  ldouble vec[3]={x,y,z},vec2[3];
+  ldouble th;
 
-  //rotation here?
+  //rotation
+  //argument of periapsis
+  //inclination
+  th=-IANGLE;
+  vec[0]=cos(th)*x + sin(th)*z;
+  vec[1]=y;
+  vec[2]=-sin(th)*x + cos(th)*z;
+  th=-OMANGLE;
+  x=cos(th)*vec[0] - sin(th)*vec[1];
+  y=sin(th)*vec[0] + cos(th)*vec[1];
+  z=vec[2];
+  //to spherical
+  ldouble r=sqrt(x*x+y*y+z*z);
+  th=acos(z/r);
+  ldouble ph=my_atan2(y,x);
 
-  //entropy = fixed at rin
-  ldouble xxin[4]={0,get_x(0,0),get_x(NY/2,1),get_x(0,2)};
-  coco_N(xxin,xxin,MYCOORDS,BLCOORDS);
-  ldouble rin=xxin[1];
-
-  rin=150.;
+  //disk model
+  ldouble rin=150.;
   ldouble rhoin = get_rho(rin,th);
   ldouble tempin = pow(10.,9.95+0.24*pow(fabs(th-M_PI/2.),2.93)) * (150./rin);
   //to code units
@@ -86,11 +99,63 @@ set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
   ldouble rho = rhoin * (rin/r);
   ldouble temp = tempin * (150./r);
   ldouble vphi = pow(10.,9.15-0.24*pow(fabs(th-M_PI/2.),2.04)) * sqrt(150./r);
+  //to code units
+  vphi = velCGS2GU(vphi);
+
+  //velocity to cartesian
+  ldouble vx,vy,vz;
+  vx = sin(th)*cos(ph)*0
+    + cos(th)*cos(ph)*0
+    - sin(ph)*vphi;
+
+  vy = sin(th)*sin(ph)*0
+    + cos(th)*sin(ph)*0
+    + cos(ph)*vphi;
+
+  vz = cos(th)*0 
+    - sin(th)*0;
+
+  //printf("> %e %e %e\n",r,th,ph);
+
+  //inverse rotation on velocity
+ //inclination
+  th=OMANGLE;
+  vec[0]=cos(th)*vx - sin(th)*vy;
+  vec[1]=sin(th)*vx + cos(th)*vy;
+  vec[2]=vz;
+  th=IANGLE;
+  vx=cos(th)*vec[0] + sin(th)*vec[2];
+  vy=vec[1];
+  vz=-sin(th)*vec[0] + cos(th)*vec[2];
+
+  //to spherical
+  ldouble xxsph[4];
+  coco_N(xx,xxsph,MYCOORDS,KERRCOORDS);
+  r=xxsph[1];
+  th=xxsph[2];
+  ph=xxsph[3];
+  //ldouble ucon[4]={0.,0.,0.,vphi/r};
+  ldouble ucon[4];
+  ucon[1]=cos(ph)*sin(th)*vx + sin(ph)*sin(th)*vy + cos(th)*vz;
+  ucon[2]=cos(ph)*cos(th)*vx + sin(ph)*cos(th)*vy - sin(th)*vz;
+  ucon[3]=-sin(ph)*vx + cos(ph)*vy;
+
+  //printf("> %e %e %e\n",r,th,ph);
+  //printf("%e %e %e | %e\n",ucon[1],ucon[2],ucon[3],vphi);getch();
+
+  
+  ucon[2]/=r;
+  ucon[3]/=r*sin(th);
+
+  //  printf("%e %e %e\n%e %e %e\n",vx,vy,vz,ucon[1],ucon[2],ucon[3]);getch();
+  
+  conv_vels(ucon,ucon,VEL3,VEL4,geomBL->gg,geomBL->GG);
+  trans2_coco(geomBL->xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
+  conv_vels(ucon,ucon,VEL4,VELPRIM,geom->gg,geom->GG);
+
 
   ldouble chi = 0.1 + 0.31*pow(fabs(th-M_PI/2.),3.89); //pmag/pgas
 
-  //to code units
-  vphi = velCGS2GU(vphi);
   chi = chi;
   
   pp[0] = rho;
@@ -99,11 +164,7 @@ set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
   //to add extra magn-related pressure
   pp[1] *= 1.+chi;
 
-  ldouble ucon[4]={0.,0.,0.,vphi/r};
-
-  conv_vels(ucon,ucon,VEL3,VEL4,geomBL->gg,geomBL->GG);
-  trans2_coco(geomBL->xxvec,ucon,ucon,KERRCOORDS,MYCOORDS);
-  conv_vels(ucon,ucon,VEL4,VELPRIM,geom->gg,geom->GG);
+  
 
   pp[2]=ucon[1];
   pp[3]=ucon[2];
