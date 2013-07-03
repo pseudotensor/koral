@@ -1071,7 +1071,6 @@
 #define GAMMA (5./3.) //gamma
 #endif
 
-
 #ifndef MASS
 #define MASS 1./MSUNCM //default mass of the BH used to calibrate radiation constant, Solar mass units
 #endif

@@ -57,7 +57,8 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 10.
+#define BHSPIN 0.0
+#define MASS 4.3e6
 
 /************************************/
 //coordinates / resolution
@@ -76,14 +77,14 @@
 #define MKS1R0 -3000.
 #endif
 
-#define BHSPIN 0.0
+
 #define MINY (0.05*Pi)
 #define MAXY (.95*Pi)
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
 #define NZ 80
-#define NX (NZ/3)//NZ/Pi
+#define NX (NZ/2)//NZ/Pi
 #define NY (NZ/2+1)
 #define SPECIFIC_BC
 
@@ -100,7 +101,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 5.e2
+#define DTOUT1 5.e4
 
 #define EQPLANEOUTPUT
 //#define VERTPLANEOUTPUT
@@ -128,7 +129,8 @@
 
 #define IANGLE (Pi-Pi/3.)
 #define OMANGLE 0.
-#define MASSCLOUD 10.
+#define EARTHMASS (5.97219e27)
+#define MASSCLOUD (3.*EARTHMASS)
 #define RMINFORPART 7000.
 #define KERNELWIDTH 2000.
 #define CLRHO 1.e-9

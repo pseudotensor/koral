@@ -244,12 +244,14 @@ int ii;
 	      dx[2]=get_size_x(iz,2);
 	      gdet=calc_gdet(xx);
 	      rho=get_u(pproblem,0,ix,iy,iz);
-	      mass+=rho*dx[0]*dx[1]*dx[2]*gdet;
+	      //mass in cgs:
+	      mass+=rhoGU2CGS(rho)*lenGU2CGS(lenGU2CGS(lenGU2CGS(dx[0]*dx[1]*dx[2]*gdet)));
 	    }
 	}
     }
 
 //normalizing cloud
+//printf("MASSCLIUD: %e %e\n",MASSCLOUD,mass); getch();
 ldouble scale=MASSCLOUD/mass;
 for(iz=0;iz<NZ;iz++)
   for(iy=0;iy<NY;iy++)
