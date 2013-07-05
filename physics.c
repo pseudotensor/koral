@@ -218,7 +218,10 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
     
   //combining rad and hydro velocities when SIMPLEVISCOSITY with total pressure
 #ifdef RADIATION
-#ifdef (HDVISCOSITY==SIMPLEVISCOSITY)
+  if (HDVISCOSITY==SIMPLEVISCOSITY)
+    {
+
+#ifdef ALPHATOTALPRESSURE
 
  //based on local opacities
   ldouble xxvecBL[4];
@@ -251,6 +254,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   azhdr += azr*fdamp;
   
 #endif
+    }
 #endif
 
   //zeroing 'co-going' velocities
@@ -953,7 +957,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   eta*=fdampr;
   
   
-  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIC to overcome huge gradients near rout
+  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIN & RVDISK to overcome huge gradients near rout
     if(geom->ix>=NX-2)
       eta = 0.;  
   
@@ -967,12 +971,22 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 	  maxspatial=fabs(shearon[i][j]);
       }
 
+  /*
+  ldouble ev[4],evmax;
+  evmax=calc_eigen_4x4(shearon,ev);
+
   ldouble param=1./3.;
   if(2.*eta*maxspatial > param)
     {
-      printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz);
+        print_tensor(shear);
+        print_tensor(shearon);
+            printf("limiting hd eta: %e->%e at (%d %d %d) --- %.20e %.20e\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz,maxspatial,evmax); getchar();
       eta = param/2./maxspatial;
+
+      //test
+      eta = param/2./evmax;
     }
+  */
 
   //test  
 #ifdef SHEARVISCOSITYONLYRPHI

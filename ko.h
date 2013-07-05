@@ -144,6 +144,8 @@ ldouble calc_lum(ldouble radius);
 ldouble calc_photloc(int ix);
 
 //misc.c
+ldouble
+calc_eigen_4x4(ldouble g[][4], ldouble *ev);
 ldouble my_atan2(ldouble y, ldouble x);
 void shuffle_loop(int **array, size_t n);
 ldouble step_function(ldouble x,ldouble k);

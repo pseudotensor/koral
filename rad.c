@@ -899,6 +899,7 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   //calculating shear
   ldouble shear[4][4],shearon[4][4];
   calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,1);
+  //calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,1);
   indices_1122(shear,shear,geom->GG);
   
   //to ortonormal
@@ -931,11 +932,12 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   eta = ALPHARADVISC * 1./3. * mfp * Erf;
   
   
-  if(PROBLEM==30 || PROBLEM==43) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
-    if(geom->ix>=NX-1)
+  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
+    if(geom->ix>=NX-2)
       eta = 0.;  
   
  //limiting
+  /*
   ldouble maxspatial=-1.;
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
@@ -947,9 +949,10 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   ldouble param=1./3.;
   if(2.*eta*maxspatial > param)
     {
-      printf("limiting rad eta: %e->%e at (%d %d %d)\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz);
+      //    printf("limiting rad eta: %e->%e at (%d %d %d)\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz);
       eta = param/2./maxspatial;
     }
+  */
 
   //to lab frame
   boost22_rf2lab(shear,shear,pp,geom->gg,geom->GG);

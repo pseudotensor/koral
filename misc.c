@@ -83,8 +83,8 @@ initialize_arrays()
   //primitives at cell centers at initial state - may be used for initializing problem
   pproblem=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
   //primitives at cell centers in previous time steps
-  //ptm1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //ptm2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  ptm1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  ptm2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
 
   //primitives at cell centers after reconstruction
   //px=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
@@ -267,8 +267,8 @@ free_arrays()
   free(p);
   free(pinit);
   free(pproblem);
-  //  free(ptm1);
-  //  free(ptm2);
+  free(ptm1);
+  free(ptm2);
   free(px);
   free(py);
   free(pz);
@@ -543,4 +543,40 @@ void shuffle_loop(int **array, size_t n)
 	  array[i][2] = t[2];
 	}
     }
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates eigen values of 4x4 matrix
+ldouble
+calc_eigen_4x4(ldouble g[][4], ldouble *ev)
+{
+  int verbose=0;
+  double matrix[]={g[0][0],g[0][1],g[0][2],g[0][3],
+		   g[1][0],g[1][1],g[1][2],g[1][3],
+		   g[2][0],g[2][1],g[2][2],g[2][3],
+		   g[3][0],g[3][1],g[3][2],g[3][3]};		       
+
+  gsl_matrix_view m = gsl_matrix_view_array (matrix, 4, 4);     
+  gsl_vector *eval = gsl_vector_alloc (4);
+  gsl_matrix *evec = gsl_matrix_alloc (4, 4);     
+  gsl_eigen_symmv_workspace * w = gsl_eigen_symmv_alloc (4);       
+  gsl_eigen_symmv (&m.matrix, eval, evec, w);     
+  gsl_eigen_symmv_free (w);
+       
+  int i,j;
+     
+  for (i = 0; i < 4; i++)
+    {
+      double eval_i 
+	= gsl_vector_get (eval, i);
+
+      ev[i]=eval_i;
+    }
+
+  gsl_vector_free (eval);
+  gsl_matrix_free (evec);
+
+  return my_max(my_max(fabs(ev[0]),fabs(ev[1])),my_max(fabs(ev[2]),fabs(ev[3])));
 }

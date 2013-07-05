@@ -77,7 +77,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set format cb \"%%.1e\"\n"
 
 	  "set autoscale cb\n"
-	  "set cbrange [0:3e-20]\n"
+	  //"set cbrange [0:3e-20]\n"
 	  
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($14) ti \"\" w l ls 1\n"
 
@@ -117,7 +117,7 @@ maxy= 1.02*get_xb(NX,0);
 	  "set cblabel \"\"\n"
 
 	  "set autoscale cb\n"
-	  "set cbrange [0:5.e-21]\n"
+	  //"set cbrange [0:5.e-21]\n"
 
 #ifdef RADIATION	  
 	  "set title \"E\" offset 0,-1\n"

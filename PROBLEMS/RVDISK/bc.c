@@ -33,7 +33,17 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
       {
 	ldouble R=geomBL.xx;						
 	ldouble Rt=R/2.;
-	ldouble vr=-7.6e8 * ALPHAHDVISC * (MDOTOUT*16.)*(MDOTOUT*16.) * sqrt(1./Rt/Rt/Rt/Rt/Rt) * (1.-sqrt(3/Rt));
+	ldouble alp;
+	if(ALPHAHDVISC>1.e-10)
+	  alp=ALPHAHDVISC;
+	else
+	  alp=0.1;
+
+	//test
+	alp=0.1;
+
+	ldouble vr=-7.6e8 * alp * (MDOTOUT*16.)*(MDOTOUT*16.) * sqrt(1./Rt/Rt/Rt/Rt/Rt) * (1.-sqrt(3/Rt));
+		  
 
 	
 	ldouble MdotEdd = 2.23e18*MASS; //g/s
@@ -45,7 +55,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	if(thetat>1.) thetat=1.;
 	ldouble rho = rho0 * pow(1. - thetat*thetat,3.);
 	rho = rhoCGS2GU(rho);
-	ldouble temp = 4.9e7 * sqrt(sqrt(ALPHAHDVISC*MASS)) * sqrt(sqrt(sqrt(1./(Rt*Rt*Rt))));
+	ldouble temp = 4.9e7 * sqrt(sqrt(alp*MASS)) * sqrt(sqrt(sqrt(1./(Rt*Rt*Rt))));
 
 	ldouble uint = calc_PEQ_ufromTrho(temp,rho);
 	pp[0]=rho;

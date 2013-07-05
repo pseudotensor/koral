@@ -94,13 +94,13 @@
 /************************************/
 #if (NDISK==990) //mdot = 10, r=15/50 alpha=0.1
 /************************************/
-#undef RADIATION
+//#undef RADIATION
 #undef ALPHATOTALPRESSURE
 #undef HDVISCOSITY 
-#define HDVISCOSITY SIMPLEVISCOSITY
+#define HDVISCOSITY NOVISCOSITY
 #undef RADVISCOSITY 
-#define RADVISCOSITY NOVISCOSITY
-#define ALPHAHDVISC .1
+#define RADVISCOSITY SHEARVISCOSITY
+#define ALPHAHDVISC 0.1
 #define BHSPIN 0.0
 #define MKS1R0 -4.
 #define MDOTOUT 50.
@@ -109,11 +109,18 @@
 #define INJTHETA ((1.-0.3)*M_PI/2.)
 #define MINX (log(.8-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
+
+//#undef MYCOORDS
+//#define MYCOORDS KERRCOORDS
+//#define MINX 4.
+//#define MAXX ROUT
+
+
 #define MINY (0.01*Pi/2.)
-#define NX 50
-#define NY 30
+#define NX 40
+#define NY 10
 #define NZ 1
-#define DTOUT1 5.e1
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
