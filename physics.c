@@ -882,13 +882,6 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble w=rho+GAMMA*uu;
   ldouble p=(GAMMA-1.)*uu;
 
-  /*
-  //this old mixed formulation worked even at the polar axis but provides wrong Tij there
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      T[i][j]=w*ucon[i]*ucov[j]+p*delta(i,j);
-  */
-
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       T[i][j]=w*ucon[i]*ucon[j]+p*GG[i][j];
