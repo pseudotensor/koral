@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 1
 
 /************************************/
@@ -89,7 +89,35 @@
 /************************************/
 //model choice
 /************************************/
-#define NDISK 100
+#define NDISK 990
+
+/************************************/
+#if (NDISK==990) //mdot = 10, r=15/50 alpha=0.1
+/************************************/
+#undef RADIATION
+#undef ALPHATOTALPRESSURE
+#undef HDVISCOSITY 
+#define HDVISCOSITY SIMPLEVISCOSITY
+#undef RADVISCOSITY 
+#define RADVISCOSITY SIMPLEVISCOSITY
+#define ALPHAHDVISC 0.
+#define BHSPIN 0.0
+#define MKS1R0 -4.
+#define MDOTOUT 50.
+#define RKEP 30.
+#define ROUT 50.
+#define INJTHETA ((1.-0.3)*M_PI/2.)
+#define MINX (log(.8-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.01*Pi/2.)
+#define NX 40
+#define NY 20
+#define NZ 1
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-25
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
+#endif
 
 /************************************/
 #if (NDISK==100) //mdot = 10, r=15/50 alpha=0.1

@@ -99,8 +99,8 @@ solve_all_problems_5(ldouble tstart)
   max_ws[0]=max_ws[1]=max_ws[2]=1.;
 
   //copy primitives to hold previous time steps
-  //copy_u(1.,p,ptm1); ttm1=t;
-  //copy_u(1.,p,ptm2); ttm2=t;
+  copy_u(1.,p,ptm1); ttm1=t;
+  copy_u(1.,p,ptm2); ttm2=t;
 
   //main time loop
   int nstep=0;
@@ -108,7 +108,7 @@ solve_all_problems_5(ldouble tstart)
     {    
       nstep++;
       //calculates the primitives to copy to previous time steps
-      /*
+      
       int ii;
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
       for(ii=0;ii<Nloop_0;ii++) //domain only
@@ -122,8 +122,7 @@ solve_all_problems_5(ldouble tstart)
       //holds in previous time steps
       copy_u(1.,ptm1,ptm2); ttm2=ttm1;
       copy_u(1.,p,ptm1); ttm1=t;       
-      */
-      
+            
       //initial time mark
 #ifndef SKIP_CLOCK
       clock_gettime(CLOCK_REALTIME,&temp_clock);

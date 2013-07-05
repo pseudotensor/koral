@@ -34,6 +34,9 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	ldouble R=geomBL.xx;						
 	ldouble Rt=R/2.;
 	ldouble vr=-7.6e8 * ALPHAHDVISC * (MDOTOUT*16.)*(MDOTOUT*16.) * sqrt(1./Rt/Rt/Rt/Rt/Rt) * (1.-sqrt(3/Rt));
+
+	vr/=5.;
+
 	ldouble MdotEdd = 2.23e18*MASS; //g/s
 	ldouble Mdot = MDOTOUT * MdotEdd;
 	ldouble Rcgs = lenGU2CGS(R);

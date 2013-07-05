@@ -217,8 +217,8 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //**********************************************************************
     
   //combining rad and hydro velocities when SIMPLEVISCOSITY with total pressure
-#ifdef ENFORCERADWAVESPEEDS
-#ifdef SIMPLEHDVISCOSITY
+#ifdef RADIATION
+#ifdef (HDVISCOSITY==SIMPLEVISCOSITY)
 
  //based on local opacities
   ldouble xxvecBL[4];
@@ -239,6 +239,9 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   PARAM/=10.;
   ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
   ldouble fdamp=fdamptau*fdampr;
+#ifdef ENFORCERADWAVESPEEDS
+  fdamp=1.0;
+#endif
 
   axhdl -= axl*fdamp;
   axhdr += axr*fdamp;
@@ -894,38 +897,10 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble Tvisc[4][4];
   calc_visc_Tij(pp,ggg,Tvisc);
 
-  //test
-  /*
-  //limitting maximal allowed viscous change
-  ldouble maxviscchange=MAXVISCCHANGE,change=-1.,viscdamp;
-
-  ldouble maxspatial=-1.;
-  for(i=1;i<4;i++)
-    for(j=1;j<4;j++)
-      {
-	if(fabs(T[i][j])>maxspatial) maxspatial=fabs(T[i][j]);
-      }
-
-  for(i=1;i<4;i++)
-    for(j=1;j<4;j++)
-      {
-	ldouble d1=fabs(Tvisc[i][j])/maxspatial;
-	if(d1>change) 
-	  change=d1;
-      }
-
-  if(change>maxviscchange) 
-    viscdamp=maxviscchange/change;
-  else
-    viscdamp=1.;
-  */
-
-  ldouble viscdamp=1.0;
-	
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {	
-	T[i][j]+=viscdamp*Tvisc[i][j];
+	T[i][j]+=Tvisc[i][j];
       }
 
 #endif  
@@ -958,8 +933,9 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 #if (HDVISCOSITY==SHEARVISCOSITY)
   //calculating shear
   ldouble shear[4][4],shearon[4][4];
-  calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,0);
-  //calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);
+  //calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,0);
+  calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);
+
   indices_1122(shear,shear,geom->GG);
   
   //to ortonormal
@@ -983,11 +959,11 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   //damping in radius
   eta*=fdampr;
   
-  /*
-  if(PROBLEM==30 || PROBLEM==42) //RADNT & RVDONUTIC to overcome huge gradients near rout
+  
+  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIC to overcome huge gradients near rout
     if(geom->ix>=NX-2)
       eta = 0.;  
-  */
+  
 
   //limiting
   ldouble maxspatial=-1.;
@@ -1019,12 +995,13 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 #endif
 
   //to lab frame - only if comoving shear
-  boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);
+  //boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);
 
   //multiply by viscosity to get viscous tensor
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
+	if(isnan(shear[i][j])){print_tensor(shear);getch();}
 	T[i][j]= -2. * eta * shear[i][j];
       }
 
@@ -1124,7 +1101,6 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 #else //RADIATION
 
   ldouble p=pgas;
-  
 #endif //RADIATION
 
   //damping radially
@@ -1462,7 +1438,7 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
     }
 
   ucontm1[0]=ucontm2[0]=0.; //time component will be calculated
-  //ptm1 switched off!!!
+
   ucontm1[1]=get_u(ptm1,istart,ix,iy,iz);
   ucontm1[2]=get_u(ptm1,istart+1,ix,iy,iz);
   ucontm1[3]=get_u(ptm1,istart+2,ix,iy,iz);
@@ -1631,9 +1607,9 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 	P21[i][j] = delta(i,j) + ucon[i]*ucov[j];
       }
 
-  //the shear tensor sigma_ij
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
+  //the shear tensor sigma_ij - only spatial components
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
       {
 	ldouble sum1,sum2;
 	sum1=sum2=0.;
@@ -1645,6 +1621,16 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
       }
 
+  //filling the time component from u^mu sigma_munu = 0 (zero time derivatives in the comoving frame - no need for separate comoving routine)
+  for(i=1;i<4;i++)
+    S[i][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][i]+ucon[2]*S[2][i]+ucon[3]*S[3][i]);
+  S[0][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
+
+  for(i=0;i<4;i++)
+    S[i][0]=S[0][i]=0.;
+
+  //  print_tensor(S); getch();
+  
   return 0;
 }
     

@@ -62,7 +62,7 @@
 //56* EDDSPH - 1d Edd Sphere
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
 
-#define PROBLEM 55
+#define PROBLEM 54
 
 #if(PROBLEM==57)
 
