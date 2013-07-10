@@ -49,7 +49,7 @@ if(iy>NY-1)
        }
    
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
     p2u(pp,uu,&geom);
@@ -70,7 +70,7 @@ if(ix>NX-1)
        }
    
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
     p2u(pp,uu,&geom);
@@ -94,7 +94,7 @@ if(ix<0.) //spin axis
        }
    
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
     p2u(pp,uu,&geom);
@@ -158,7 +158,7 @@ if(iy<0) //equatorial plane
     
 
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
     
     p2u(pp,uu,&geom); 
@@ -179,7 +179,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //testing if interpolated primitives make sense
-check_floors_hd(pp,VELPRIM,gg,GG);
+//check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
  
 return 0;

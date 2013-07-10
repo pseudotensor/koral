@@ -19,9 +19,23 @@ miny= -.02*get_xb(NX,0);
 maxy= 1.02*get_xb(NX,0);
 #endif
 
+
   fprintf(fgnu,
-	  //	  "set term gif large size 1000,1000\n"
-	  "set term jpeg large size 1000,1000\n"
+          "set table \"table.gp\"\n"
+	  "set contour base\n"
+	  "unset surface\n"
+	  "set log cb\n"
+	  "set log z\n"
+	  //	  "set cbrange [1.e-15:1.e-11]\n"
+	  "set cntrparam levels discrete 1.e-15,3.e-15,1.e-14,3.e-14,6.e-14,1.e-13,3.e-13,6.e-13,1.e-12,3.e-12,6.e-12,1.e-11\n"
+	  "splot \"%s\" u 1:2:($20) w l\n"
+	  "unset dgrid3d\n"
+	  "unset log z\n"
+	  "unset table\n"
+	  "unset contour\n"
+	  "unset surface\n"
+
+	  "set term gif large size 1100,500\n"
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
 	  "set origin 0,0\n"
@@ -37,95 +51,107 @@ maxy= 1.02*get_xb(NX,0);
 	  "set style line 3 lt 1 lw 2 lc 2\n"
 	  "set style line 21 lt 3 lw 1 lc -1\n"
 	 
-	  "set style arrow 1 ls 1\n"
+	  "set style arrow 1 ls 2\n"
 	  
 	  "set palette model RGB rgbformulae 7,5,15\n"
+	  /*
 	  "set palette model RGB rgbformulae 30,31,32\n"
 	  "set palette model RGB rgbformulae 21,22,23\n"
 	  "set palette model RGB rgbformulae 23,28,3\n"
 	  "set palette model RGB rgbformulae 7,8,9\n"
-	  "set palette model RGB rgbformulae 35,3,9\n"
-	  "set palette model RGB rgbformulae 6,3,21\n"
-	 
+	  //"set palette model RGB rgbformulae 35,3,9\n"
+	  //	  "set palette model RGB rgbformulae 6,3,21\n"
+	  */
 	  "set autoscale\n"
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
 
-	  "set lmargin at screen 0.08\n"
-	  "set rmargin at screen 0.43\n"
-	  "set bmargin at screen .55\n"
+	  "set lmargin at screen 0.04\n"
+	  "set rmargin at screen 0.41\n"
+	  "set bmargin at screen .10\n"
 	  "set tmargin at screen .95\n"
-	  "unset log cb\n"
-	  "set ylabel \"z\"\n"
-	  "set cblabel \"\"\n"
-	  
-	  //	  "set title \"v2\"\n"
-	  //	  "splot \"%s\" u 1:2:($25) ti \"\" w l ls 1\n"
-
-	  "set title \"F_phi\"\n"
 	  "set log cb\n"
-	  //	  "set cbrange [1e-6:1]\n"
-	  "splot \"%s\" u 1:2:23 ti \"\" w l ls 1\n"
-	  "set autoscale cb\n"
-
-	  "set lmargin at screen 0.08\n"
-	  "set rmargin at screen 0.43\n"
-	  "set bmargin at screen .05\n"
-	  "set tmargin at screen .45\n"
-	  "unset log cb\n"
 	  "set ylabel \"z\"\n"
+	  "set xlabel \"x\" offset 0,1\n"
 	  "set cblabel \"\"\n"
-	  "set title \"v4\"\n"
-	  
-	  "set palette model RGB rgbformulae 23,28,3\n"
+	  "set title \"radiative corrections\" offset 0,-1\n"
+	  "set format cb \"%%.1e\"\n"
+	  "set autoscale cb\n"
+	  "unset log cb\n"
 	  "splot \"%s\" u 1:2:($27) ti \"\" w l ls 1\n"
 
-	  "set lmargin at screen 0.55\n"
-	  "set rmargin at screen 0.90\n"
-	  "set bmargin at screen .05\n"
-	  "set tmargin at screen .45\n"
-	  "set log cb\n"
-	  "set ylabel \"z\"\n"
-	  "set cblabel \"\"\n"
-	  "set title \"f\"\n"
-	  
-	  //	  "splot \"%s\" u 1:2:($21**2+$22**2+$23**2)**.5 ti \"\" w l ls 1\n"
-	  "set palette model RGB rgbformulae 6,3,21\n"
-	  "splot \"%s\" u 1:2:($26) ti \"\" w l ls 1\n"
-
-	  "set lmargin at screen 0.55\n"
-	  "set rmargin at screen 0.9\n"
-	  "set bmargin at screen .55\n"
-	  "set tmargin at screen .95\n"
-	  "set cblabel \"\"\n"
-	  "set ylabel \"y\"\n"
-	  "set title \"radiative E / flux\"\n"
-	  "unset log cb\n"
-	  "set log cb\n"
-	  
-	  "set palette model RGB rgbformulae 7,5,15\n"	 
-	  "splot \"%s\" u 1:2:($20) ti \"\" w l ls 1\n"
-
-          "set isosam 10,10\n"
+	  "set isosam 10,10\n"
 	  "set ylabel \"\"\n"
+	  "set xlabel \"\"\n"
 	  "unset tics\n"
+	  "unset title\n"
 	  "unset border\n"
 	  "unset log cb\n"
+
+	  "unset border\n"
+	  "unset pm3d\n"
+	  "unset surface\n"
+	  "set pm3d\n"
+	  "set tics\n"
+	  "set border\n"
+
+	  "set border\n"
+	  "set tics\n"
+	  "set lmargin at screen 0.53\n"
+	  "set rmargin at screen 0.90\n"
+	  "set bmargin at screen .10\n"
+	  "set tmargin at screen .95\n"
+	  "set log cb\n"
+	  "set xlabel \"x\" offset 0,1\n"
+	  "set ylabel \"z\"\n"
+	  "set cblabel \"\"\n"
+	  "set cbrange [1.e-15:1.e-11]\n"
+	  //"set autoscale cb\n"
+
+#ifdef RADIATION	  
+	  "set title \"E\" offset 0,-1\n"
+	  "splot \"%s\" u 1:2:($20) ti \"\" w l ls 1\n"
+#else
+	  "set title \"u_int\" offset 0,-1\n"
+	  "splot \"%s\" u 1:2:($15) ti \"\" w l ls 1\n"
+#endif
+
+	  "set isosam 10,10\n"
+	  "set ylabel \"\"\n"
+	  "set xlabel \"\"\n"
+	  "unset tics\n"
+	  "unset title\n"
+	  "unset border\n"
+	  "unset log cb\n"
+
 	  "plot \"%s\" u 1:2:(($21)/(($21*$21+$22*$22)**.5/%f*2)):(($22)/(($21*$21+$22*$22)**.5/%f*2)) every %d:%d w vectors arrowstyle 1 ti \"\"\n"
-
-
-	  ,fname2,
+	  "unset tics\n"
+	  "unset border\n"
+	  "unset pm3d\n"
+	  "unset surface\n"
+	  "plot \"table.gp\" w l ls 1\n"
+	  "set pm3d\n"
+	  "set tics\n"
+	  "set border\n"
+ 	  ,fname,fname2,
 	  minx,
 	  maxx,
 	  miny,
 	  maxy,
 	  fname,
-	  fname, 
 	  fname,
-	  fname,
+#ifdef RADIATION
+#if(OUTCOORDS==KERRCOORDS)
+	  fname,1.,1.,NX/21+1,NY/21+1
+#else
+	  fname,1.,1.,NX/21+1,NY/21+1
+#endif
+
+#else
 	  fname,3.,3.,NX/21+1,NY/21+1
+#endif
 	  );  
-	    
+//#endif	    
 
 /*
   fprintf(fgnu,"\n");

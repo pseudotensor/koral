@@ -1631,10 +1631,7 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   //filling the time component from u^mu sigma_munu = 0 (zero time derivatives in the comoving frame - no need for separate comoving routine)
   for(i=1;i<4;i++)
     S[i][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][i]+ucon[2]*S[2][i]+ucon[3]*S[3][i]);
-  S[0][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
-
-  for(i=0;i<4;i++)
-    S[i][0]=S[0][i]=0.;
+  S[0][0]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
 
   //  print_tensor(S); getch();
   

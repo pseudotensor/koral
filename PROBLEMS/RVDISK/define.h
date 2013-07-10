@@ -115,12 +115,11 @@
 //#define MINX 4.
 //#define MAXX ROUT
 
-
 #define MINY (0.01*Pi/2.)
 #define NX 40
 #define NY 10
 #define NZ 1
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e0
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
