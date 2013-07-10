@@ -39,12 +39,12 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 	else
 	  alp=0.1;
 
-	//test
-	alp=0.1;
+	
 
 	ldouble vr=-7.6e8 * alp * (MDOTOUT*16.)*(MDOTOUT*16.) * sqrt(1./Rt/Rt/Rt/Rt/Rt) * (1.-sqrt(3/Rt));
-		  
-
+	
+	//test
+	vr/=5.;
 	
 	ldouble MdotEdd = 2.23e18*MASS; //g/s
 	ldouble Mdot = MDOTOUT * MdotEdd;

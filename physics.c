@@ -934,10 +934,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);
 
   indices_1122(shear,shear,geom->GG);
-  
-  //to ortonormal
   trans22_cc2on(shear,shearon,geom->tup);
-
  
   //calculating the viscosity coefficient 
   ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
@@ -945,6 +942,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
   
   ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
+  ldouble rho=pp[RHO];
   ldouble pgas=(GAMMA-1.)*pp[UU];
 
   ldouble eta;
@@ -961,7 +959,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
     if(geom->ix>=NX-2)
       eta = 0.;  
   
-
+  /*
   //limiting
   ldouble maxspatial=-1.;
   for(i=1;i<4;i++)
@@ -970,23 +968,20 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 	if(fabs(shearon[i][j])>maxspatial)
 	  maxspatial=fabs(shearon[i][j]);
       }
+  */
 
-  /*
+  
   ldouble ev[4],evmax;
   evmax=calc_eigen_4x4(shearon,ev);
+  //evmax=1000.;
 
   ldouble param=1./3.;
-  if(2.*eta*maxspatial > param)
+  if(2.*eta*evmax/rho > param)
     {
-        print_tensor(shear);
-        print_tensor(shearon);
-            printf("limiting hd eta: %e->%e at (%d %d %d) --- %.20e %.20e\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz,maxspatial,evmax); getchar();
-      eta = param/2./maxspatial;
-
-      //test
-      eta = param/2./evmax;
+      //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
+      eta = param/2./evmax*rho;
     }
-  */
+  
 
   //test  
 #ifdef SHEARVISCOSITYONLYRPHI

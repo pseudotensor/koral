@@ -94,6 +94,7 @@
 /************************************/
 #if (NDISK==990) //mdot = 10, r=15/50 alpha=0.1
 /************************************/
+
 //#undef RADIATION
 #undef ALPHATOTALPRESSURE
 #undef HDVISCOSITY 
