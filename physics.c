@@ -1478,7 +1478,7 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 #endif
     }
 
-  //  if(ix==NX-5) {print_4vector(ucontm1);print_4vector(ucontm2);printf("du/dt: %e %e %e %e t12: %e %e\n",du2[0][0],du2[1][0],du2[2][0],du2[3][0],ttm2,ttm1);getchar();}
+  //if(ix==NX/2 && iy==2) {print_4vector(ucontm1);print_4vector(ucontm2);printf("du/dt: %e %e %e %e t12: %e %e\n",du2[0][0],du2[1][0],du2[2][0],du2[3][0],ttm2,ttm1);getchar();}
 
   //spatial derivatives
 

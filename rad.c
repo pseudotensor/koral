@@ -960,13 +960,14 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
     if(geom->ix>=NX-2)
       eta = 0.; 
 
-  
+  /*
   if(PROBLEM==44) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
     if(geom->iy<=1)
       eta = 0.;  
-
+  */
  //limiting
   
+  /*
   ldouble maxspatial=-1.;
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
@@ -974,14 +975,24 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 	if(fabs(shearon[i][j])>maxspatial)
 	  maxspatial=fabs(shearon[i][j]);
       }
-
-  ldouble param=1./3.;
+      ldouble param=1./3.;
   if(2.*eta*maxspatial > param)
     {
       printf("limiting rad eta: %e->%e at (%d %d %d)\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz);
       eta = param/2./maxspatial;
     }
-
+  */
+  
+  
+  ldouble ev[4],evmax;
+  evmax=calc_eigen_4x4(shearon,ev);
+  ldouble param=1./3.;
+  if(2.*eta*evmax/Erf > param) //nu shear has dimension of vel**2, nu=eta/rho
+    {
+      //printf("limiting rad eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/Erf,param,geom->ix,geom->iy,geom->iz);
+      eta = param/2./evmax*Erf;
+    }
+  
   //multiply by viscosity to get viscous tensor
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)

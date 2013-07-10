@@ -108,8 +108,7 @@ solve_all_problems_5(ldouble tstart)
     {    
       nstep++;
       //calculates the primitives to copy to previous time steps
-      
-      
+
       int ii;
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
       for(ii=0;ii<Nloop_0;ii++) //domain only
@@ -120,9 +119,12 @@ solve_all_problems_5(ldouble tstart)
       
 	  calc_primitives(ix,iy,iz);
 	}
-      //holds in previous time steps
+      
+
+      //holds previous time steps
       copy_u(1.,ptm1,ptm2); ttm2=ttm1;
       copy_u(1.,p,ptm1); ttm1=t;       
+      
       
       //initial time mark
 #ifndef SKIP_CLOCK
