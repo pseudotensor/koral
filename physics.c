@@ -51,7 +51,6 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 
   //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
-  //TODO IMMEDIATELY: generalize! ???
   //**********************************************************************
 
   ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
@@ -930,6 +929,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 #if (HDVISCOSITY==SHEARVISCOSITY)
   //calculating shear
   ldouble shear[4][4],shearon[4][4];
+
   //calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,0);
   calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);
 
@@ -952,15 +952,14 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   eta = ALPHAHDVISC * pgas / Omk;
   
   //damping in radius
-  eta*=fdampr;
-  
+  eta*=fdampr;  
   
   if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIN & RVDISK to overcome huge gradients near rout
     if(geom->ix>=NX-2)
       eta = 0.;  
   
   /*
-  //limiting
+  //limiting basing on maximal spatial component
   ldouble maxspatial=-1.;
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
@@ -970,7 +969,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       }
   */
 
-  
+  //limiting basing on maximal eigen value
   ldouble ev[4],evmax;
   evmax=calc_eigen_4x4(shearon,ev);
   //evmax=1000.;
@@ -1007,29 +1006,6 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 	T[i][j]= -2. * eta * shear[i][j];
       }
 
-  /*
-  //comparing with SIMPLEVISC
-  print_tensor(T);
-
-  ldouble Ttemp[4][4];
-
-  //test
-  for(i=0;i<4;i++)
-  for(j=0;j<4;j++)
-  {
-  Ttemp[i][j]=0.;
-  }
-  
-  Ttemp[1][3]=ALPHAHDVISC*pgas*3.;
-  Ttemp[3][1]=ALPHAHDVISC*pgas*3.;
-
-  trans22_on2cc(Ttemp,Ttemp,tlo);
-  boost22_ff2lab(Ttemp,Ttemp,pp,gg,GG); 
- 
-  print_tensor(Ttemp);
-  if((xxvecBL[1]>20. && xxvecBL[1]<22.) && geom->iy==NY-1)getchar();
-  */
-
 #endif 
 
 #if (HDVISCOSITY==SIMPLEVISCOSITY)  
@@ -1043,29 +1019,6 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
 #ifdef RADIATION
 #ifdef ALPHATOTALPRESSURE
-
-
-  /*
-  //suppressing radiation pressure by looking at diagonal fluid-frame rad.pressure components  
-  ldouble Rij[4][4];
-  calc_Rij(pp,ggg,Rij);
-  boost22_lab2ff(Rij,Rij,pp,gg,GG);
-  trans22_cc2on(Rij,Rij,tup);
-  ldouble diag[3]={Rij[1][1],Rij[2][2],Rij[3][3]};
-  ldouble maxdiag=my_max(diag[0],my_max(diag[1],diag[2]))/Rij[0][0];
-  ldouble THINSUPPPARAM = 0.00001; //prad=0 for maxdiag=0.4
-  ldouble prad=1./3.*Rij[0][0]*exp(-(maxdiag-1./3.)*(maxdiag-1./3.)/THINSUPPPARAM);  
-  if(geom->ix==NX-1)
-    {
-      printf("ix: %d %d\n",geom->ix,geom->iy);
-      print_Nvector(pp,NV);
-      print_tensor(Rij);
-      printf("%f\n",maxdiag);
-      printf("prad: %e -> %e\n",1./3.*Rij[0][0],
-	     1./3.*Rij[0][0]*exp(-(maxdiag-1./3.)*(maxdiag-1./3.)/THINSUPPPARAM));
-      getchar();
-    }
-  */
 
   //based on local opacities
   ldouble xx[4]={0.,geom->xx,geom->yy,geom->zz};
@@ -1085,17 +1038,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
   ldouble prad=1./3.*Rij[0][0]*fdamptau;
 
-  /*
- if(geom->iy==NY-1)
-    {
-      printf("ix: %d %d r: %f\n",geom->ix,geom->iy,xxvecBL[1]);
-      print_tensor(Rij);
-      printf("(%f) fdamps: %e %e\n",tautot[0],fdamptau,fdampr);
-      getchar();
-    }
-  */
   
-
   ldouble p=pgas+prad;
 #else
   ldouble p=pgas;
@@ -1473,7 +1416,6 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 #endif
     }
 
-  //if(ix==NX/2 && iy==2) {print_4vector(ucontm1);print_4vector(ucontm2);printf("du/dt: %e %e %e %e t12: %e %e\n",du2[0][0],du2[1][0],du2[2][0],du2[3][0],ttm2,ttm1);getchar();}
 
   //spatial derivatives
 
@@ -1626,6 +1568,7 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   //filling the time component from u^mu sigma_munu = 0 (zero time derivatives in the comoving frame - no need for separate comoving routine)
   for(i=1;i<4;i++)
     S[i][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][i]+ucon[2]*S[2][i]+ucon[3]*S[3][i]);
+
   S[0][0]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
 
   //  print_tensor(S); getch();
