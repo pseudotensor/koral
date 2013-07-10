@@ -234,6 +234,7 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 
 //fileop.c
 int fread_restartfile(int,ldouble*);
+int fprint_gridfile(char* folder);
 int fread_dumpfile(int,ldouble*);
 int fread_dumpfile(int,ldouble*);
 int fprint_openfiles(char *);

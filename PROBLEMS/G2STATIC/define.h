@@ -2,7 +2,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 15
+#define RESTARTNUM 11
 
 /************************************/
 //radiation choices
@@ -83,8 +83,8 @@
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
-#define NZ 80
-#define NX (NZ/2)//NZ/Pi
+#define NZ 150
+#define NX (NZ/2)
 #define NY (NZ/2+1)
 #define SPECIFIC_BC
 
@@ -101,7 +101,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 5.e4
+#define DTOUT1 1.e5
 
 #define EQPLANEOUTPUT
 //#define VERTPLANEOUTPUT
@@ -127,7 +127,7 @@
 //#define SPHCLOUD
 #define G2CLOUD
 
-#define IANGLE (Pi-Pi/3.)
+#define IANGLE (0.)
 #define OMANGLE 0.
 #define EARTHMASS (5.97219e27)
 #define MASSCLOUD (3.*EARTHMASS)

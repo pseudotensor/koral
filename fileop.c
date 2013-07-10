@@ -37,6 +37,44 @@ fprint_closefiles()
 /*********************************************/
 /*********************************************/
 /*********************************************/
+int
+fprint_gridfile(char* folder)
+{
+  FILE* out;
+  char bufor[50];
+  sprintf(bufor,"%s/grid.dat",folder);
+  out=fopen(bufor,"w");
+
+  int ix,iy,iz,iv;
+  ldouble pp[NV],uu[NV];
+  for(iz=0;iz<NZ;iz++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(ix=0;ix<NX;ix++)
+	    {
+	      struct geometry geom;
+	      fill_geometry(ix,iy,iz,&geom);
+
+	      ldouble xxcar[4],xxsph[4];
+
+	      coco_N(geom.xxvec,xxcar,MYCOORDS,MINKCOORDS); 
+	      coco_N(geom.xxvec,xxsph,MYCOORDS,KERRCOORDS); 
+
+	      fprintf(out,"%d %d %d %f %f %f %f %f %f %f %f %f\n",
+		      ix,iy,iz, geom.xxvec[1],geom.xxvec[2],geom.xxvec[3], xxcar[1],xxcar[2],xxcar[3],xxsph[1],xxsph[2],xxsph[3]);
+
+	    }
+	}
+    }
+
+  fclose(out);
+
+  return 0;
+}
+/*********************************************/
+/*********************************************/
+/*********************************************/
 /* prints dumps to files .dat and calls gnuplot */
 /* codeprim == 1 - prints out code primitives, only coordinates converted to OUTCOORDS */
 /* codeprim == 0 - prints ZAMO frame etc primitives - post processing, called by ana.c */
