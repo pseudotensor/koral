@@ -107,8 +107,8 @@ solve_all_problems_5(ldouble tstart)
   while (t < t1 && nfout1<NOUTSTOP && i1<NSTEPSTOP)
     {    
       nstep++;
-      //calculates the primitives to copy to previous time steps
 
+      //calculates the primitives to copy to previous time steps
       int ii;
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
       for(ii=0;ii<Nloop_0;ii++) //domain only
@@ -117,14 +117,12 @@ solve_all_problems_5(ldouble tstart)
 	  iy=loop_0[ii][1];
 	  iz=loop_0[ii][2]; 
       
-	  calc_primitives(ix,iy,iz);
+	  calc_primitives(ix,iy,iz); 
 	}
-      
 
       //holds previous time steps
       copy_u(1.,ptm1,ptm2); ttm2=ttm1;
-      copy_u(1.,p,ptm1); ttm1=t;       
-      
+      copy_u(1.,p,ptm1); ttm1=t;             
       
       //initial time mark
 #ifndef SKIP_CLOCK
@@ -133,24 +131,12 @@ solve_all_problems_5(ldouble tstart)
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
 
-      //#ifndef RADIATION //pure hydro
       if(NZ>1)
 	tstepden=max_ws[0]/min_dx + max_ws[1]/min_dy + max_ws[2]/min_dz;
       else if(NY>1)
 	tstepden=max_ws[0]/min_dx + max_ws[1]/min_dy;
       else
 	tstepden=max_ws[0]/min_dx;            
-      /*
-#else //radiation included
-      //TODO: what is below assumes wavespeed=1 but for thick flows the real characterstic speed may be lower and time step larger
-      if(NZ>1)
-	tstepden=(1./min_dx + 1./min_dy + 1./min_dz);
-      else if(NY>1)
-	tstepden=(1./min_dx + 1./min_dy);
-      else 
-	tstepden=(1./min_dx);          
-#endif
-      */
 
       dt=TSTEPLIM*1./tstepden;
 
