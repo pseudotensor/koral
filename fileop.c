@@ -758,3 +758,92 @@ fread_dumpfile(int nout1, ldouble *t)
 
     return 0;
 }
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints in ASCII indices, cart coordinates,*/
+/* primitives, velocities in cartesian       */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int
+fprint_simplecart(ldouble t, char* folder)
+{
+  if(PROBLEM==55) //G2STATIC
+    {
+      char bufor[50];
+      sprintf(bufor,"%s/sim%04d.dat",folder,nfout1);
+      fout1=fopen(bufor,"w");
+  
+      //header
+      //## nout time problem NX NY NZ
+      fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
+
+      /***********************************/  
+      /** writing order is fixed  ********/  
+      /***********************************/  
+ 
+      int ix,iy,iz,iv;
+      ldouble pp[NV];
+      for(iz=0;iz<NZ;iz++)
+	{
+	  for(iy=0;iy<NY;iy++)
+	    {
+	      for(ix=0;ix<NX;ix++)
+		{
+		  for(iv=0;iv<NV;iv++)
+		    {
+		      pp[iv]=get_u(p,iv,ix,iy,iz);
+		    }
+		  struct geometry geom,geomcart,geomout,geomsph;
+		  fill_geometry(ix,iy,iz,&geom);
+		  fill_geometry_arb(ix,iy,iz,&geomcart,MINKCOORDS);
+		  fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
+		  fill_geometry_arb(ix,iy,iz,&geomsph,SPHCOORDS);
+		  trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,geom.gg,geom.GG,geomout.gg,geomout.GG);
+		  ldouble rho=rhoGU2CGS(pp[RHO]);
+		  ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+		  ldouble tracer=pp[TRA];
+		  ldouble vel[4]={0,pp[VX],pp[VY],pp[VZ]};	
+		  ldouble vx,vy,vz;
+		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
+		  trans2_cc2on(vel,vel,geomout.tup);
+		  //transform to cartesian
+		  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
+		    {
+		      ldouble r=geomsph.xx;
+		      ldouble th=geomsph.yy;
+		      ldouble ph=geomsph.zz;
+
+		      vx = sin(th)*cos(ph)*vel[1] 
+			+ cos(th)*cos(ph)*vel[2]
+			- sin(ph)*vel[3];
+
+		      vy = sin(th)*sin(ph)*vel[1] 
+			+ cos(th)*sin(ph)*vel[2]
+			+ cos(ph)*vel[3];
+
+		      vz = cos(th)*vel[1] 
+			- sin(th)*vel[2];
+		    }
+	     
+		  fprintf(fout1,"%d %d %d ",ix,iy,iz);
+
+		  fprintf(fout1,"%.5e %.5e %.5e ",geomcart.xx,geomcart.yy,geomcart.zz);
+
+		  fprintf(fout1,"%.5e %.5e %.5e ",rho,temp,tracer);
+
+		  fprintf(fout1,"%.5e %.5e %.5e ",vx,vy,vz);
+
+		  fprintf(fout1,"\n");
+		}
+	    }
+	}
+
+      fflush(fout1);
+      fclose(fout1);
+    }
+
+  return 0;
+}

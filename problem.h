@@ -1171,6 +1171,7 @@
 #define SHUFFLELOOPS 0
 #endif
 
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/

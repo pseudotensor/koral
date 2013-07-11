@@ -233,6 +233,7 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 #define delta(i,j) (i==j ? 1 : 0)
 
 //fileop.c
+int fprint_simplecart(ldouble t, char* folder);
 int fread_restartfile(int,ldouble*);
 int fprint_gridfile(char* folder);
 int fread_dumpfile(int,ldouble*);
