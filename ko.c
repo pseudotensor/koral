@@ -76,7 +76,7 @@ main(int argc, char **argv)
 int
 solve_all_problems_5(ldouble tstart)
 {
-  ldouble t = tstart, t1 = TMAX, dt, dtsource, taim;
+  ldouble t = tstart, t1 = TMAX, dtsource, taim;
   ldouble totalmass=0.;
   ldouble dtout = DTOUT1, lasttout = -1.,fprintf_time = 0.;
   int i1,i2,i3,lasttout_floor,ix,iy,iz,iv;

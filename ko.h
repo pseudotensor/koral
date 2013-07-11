@@ -96,6 +96,7 @@ int **gcidx;
 
 ldouble max_ws[3],max_dt,ttm1,ttm2;
 ldouble min_dx,min_dy,min_dz;
+ldouble dt;
 FILE *fout1,*fout_scalars,*fout_radprofiles;
 int nfout1;
 

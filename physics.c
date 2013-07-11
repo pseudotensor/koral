@@ -969,7 +969,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       }
   */
 
-  
+  /*
   //limiting basing on maximal eigen value
   ldouble ev[4],evmax;
   evmax=calc_eigen_4x4(shearon,ev);
@@ -980,10 +980,17 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
       eta = param/2./evmax*rho;
     }
-  
+  */
 
-  //TODO: try the timestep cirterion instead of eigen values
-
+  //limiting assuming maximal eigen value 1/dt
+  ldouble nu=eta/rho;  
+  ldouble param=1./3.;
+  if(2.*nu/dt > param)
+    {
+      //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
+      eta = param/2.*dt*rho;
+    }
+    
   //test  
 #ifdef SHEARVISCOSITYONLYRPHI
   //zeroing not rphi components

@@ -298,21 +298,47 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 
   //passing up the characteristic wavespeeds
   //TODO: correlate threads
+
+  ldouble dx=get_size_x(ix,0);
+  ldouble dy=get_size_x(iy,1);
+  ldouble dz=get_size_x(iz,2);
+
+  ldouble wsx,wsy,wsz;
+
+  #ifdef RADIATION
+  wsx=my_max(aaaxhd,aaaxrad);
+  wsy=my_max(aaayhd,aaayrad);
+  wsz=my_max(aaazhd,aaazrad);
+#else
+  wsx=aaaxhd;
+  wsy=aaayhd;
+  wsz=aaazhd;
+  #endif
+
+  ldouble tstepden;
+  if(NZ>1 && NY>1)
+    tstepden=max_ws[0]/dx + max_ws[1]/dy + max_ws[2]/dz;
+  else if(NZ==1 && NY>1)
+    tstepden=max_ws[0]/dx + max_ws[1]/dy;
+  else if(NY==1 && NZ>1)
+    tstepden=max_ws[0]/dx + max_ws[2]/dz;
+  else
+    tstepden=max_ws[0]/dx;            
   
 #ifdef RADIATION
   //  #pragma omp critical
-  if(my_max(aaaxhd,aaaxrad)>max_ws[0]) max_ws[0]=my_max(aaaxhd,aaaxrad);
+  if(my_max(aaaxhd,aaaxrad)>max_ws[0]) max_ws[0]=wsx;
   //  #pragma omp critical
-  if(my_max(aaayhd,aaayrad)>max_ws[1]) max_ws[1]=my_max(aaayhd,aaayrad);
+  if(my_max(aaayhd,aaayrad)>max_ws[1]) max_ws[1]=wsy;
   //  #pragma omp critical
-  if(my_max(aaazhd,aaazrad)>max_ws[2]) max_ws[2]=my_max(aaazhd,aaazrad);
+  if(my_max(aaazhd,aaazrad)>max_ws[2]) max_ws[2]=wsz;
 #else 
   //#pragma omp critical
-  if(aaaxhd>max_ws[0]) max_ws[0]=aaaxhd;  
+  if(aaaxhd>max_ws[0]) max_ws[0]=wsx;
   //#pragma omp critical
-  if(aaayhd>max_ws[1]) max_ws[1]=aaayhd;
+  if(aaayhd>max_ws[1]) max_ws[1]=wsy;
   //#pragma omp critical
-  if(aaazhd>max_ws[2]) max_ws[2]=aaazhd;
+  if(aaazhd>max_ws[2]) max_ws[2]=wsz;
 #endif 
 
   return 0;

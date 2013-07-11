@@ -119,8 +119,8 @@
 //#define MAXX ROUT
 
 #define MINY (0.2*Pi/2.)
-#define NX 50
-#define NY 30
+#define NX 40
+#define NY 20
 #define NZ 1
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
