@@ -323,23 +323,17 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   else if(NY==1 && NZ>1)
     tstepden=max_ws[0]/dx + max_ws[2]/dz;
   else
-    tstepden=max_ws[0]/dx;            
+    tstepden=max_ws[0]/dx;   
+
+  //#pragma omp critical
+  if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
   
-#ifdef RADIATION
-  //  #pragma omp critical
-  if(my_max(aaaxhd,aaaxrad)>max_ws[0]) max_ws[0]=wsx;
-  //  #pragma omp critical
-  if(my_max(aaayhd,aaayrad)>max_ws[1]) max_ws[1]=wsy;
-  //  #pragma omp critical
-  if(my_max(aaazhd,aaazrad)>max_ws[2]) max_ws[2]=wsz;
-#else 
   //#pragma omp critical
-  if(aaaxhd>max_ws[0]) max_ws[0]=wsx;
+  if(wsx>max_ws[0]) max_ws[0]=wsx;
   //#pragma omp critical
-  if(aaayhd>max_ws[1]) max_ws[1]=wsy;
+  if(wsy>max_ws[1]) max_ws[1]=wsy;
   //#pragma omp critical
-  if(aaazhd>max_ws[2]) max_ws[2]=wsz;
-#endif 
+  if(wsz>max_ws[2]) max_ws[2]=wsz;
 
   return 0;
 }

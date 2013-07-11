@@ -96,7 +96,7 @@ int **gcidx;
 
 ldouble max_ws[3],max_dt,ttm1,ttm2;
 ldouble min_dx,min_dy,min_dz;
-ldouble dt;
+ldouble dt,tstepdenmax;
 FILE *fout1,*fout_scalars,*fout_radprofiles;
 int nfout1;
 
@@ -261,6 +261,7 @@ struct rad_parameters
   ldouble f;
   ldouble x,y,z;
 };
+ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble S[][4]);
 int calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
 int calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
 

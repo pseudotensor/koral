@@ -2,6 +2,59 @@
 //some problem independent physics
 
 #include "ko.h"
+
+//*************************************************
+//calculates left and right wave speeds at cell center
+//*************************************************
+int
+calc_wavespeeds_lr_core(ldouble *ucon,ldouble GG[][5],ldouble *aret,ldouble wspeed2,int idim)
+{
+  ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,cst1,cst2;
+  
+  Acov[0]=0.;
+  Acov[1]=0.;
+  Acov[2]=0.;
+  Acov[3]=0.;
+
+  Acov[idim+1]=1.;
+
+  indices_12(Acov,Acon,GG);
+   
+  Bcov[0]=1.;
+  Bcov[1]=0.;
+  Bcov[2]=0.;
+  Bcov[3]=0.;
+  indices_12(Bcov,Bcon,GG);
+
+  Asq = dot(Acon,Acov);
+  Bsq = dot(Bcon,Bcov);
+  Au = dot(Acov, ucon);
+  Bu = dot(Bcov, ucon);
+  AB = dot(Acon, Bcov);
+  Au2 = Au * Au;
+  Bu2 = Bu * Bu;
+  AuBu = Au * Bu;
+
+  //wspeed2=cs2;
+  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
+  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
+  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
+
+  if(discr<0.) {printf("discr in wavespeeds lt 0\n"); discr=0.;}
+  discr = sqrt(discr);
+  cst1 = -(-B + discr) / (2. * A);
+  cst2 = -(-B - discr) / (2. * A);  
+  if(cst2>cst1)
+    {
+      aret[0]=cst1;  aret[1]=cst2;
+    }
+  else
+    {
+      aret[0]=cst1;  aret[1]=cst2;
+    }
+  return 0;
+}
+
 //*************************************************
 //calculates left and right wave speeds at cell center
 //*************************************************
@@ -34,9 +87,6 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   ldouble pre=(GAMMA-1.)*uu;
   ldouble cs2=GAMMA*pre/(rho+uu+pre);
 
-  //test
-  //cs2*=4.;
-  
   if(cs2<0.) cs2=0.;
 
   //**********************************************************************
@@ -53,124 +103,19 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
   //**********************************************************************
 
-  ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
-
-  //**********************************************************************
-  //**********************************************************************
-  //x
-  Acov[0]=0.;
-  Acov[1]=1.;
-  Acov[2]=0.;
-  Acov[3]=0.;
-  indices_12(Acov,Acon,GG);
-   
-  Bcov[0]=1.;
-  Bcov[1]=0.;
-  Bcov[2]=0.;
-  Bcov[3]=0.;
-  indices_12(Bcov,Bcon,GG);
-
-  Asq = dot(Acon,Acov);
-  Bsq = dot(Bcon,Bcov);
-  Au = dot(Acov, ucon);
-  Bu = dot(Bcov, ucon);
-  AB = dot(Acon, Bcov);
-  Au2 = Au * Au;
-  Bu2 = Bu * Bu;
-  AuBu = Au * Bu;
-
-  //hydro
-  wspeed2=cs2;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-
-  if(discr<0.) {printf("x discr in wavespeeds lt 0 at %d %d %d\n",geom->ix,geom->iy,geom->iz); discr=0.;}
-  discr = sqrt(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-  if(cst2>cst1)
-    {
-      axhdl=cst1;  axhdr=cst2;
-    }
-  else
-    {
-      axhdr=cst1;  axhdl=cst2;
-    }
-
-  //**********************************************************************
-  //**********************************************************************
-  //y
-  Acov[0]=0.;
-  Acov[1]=0.;
-  Acov[2]=1.;
-  Acov[3]=0.;
-  indices_12(Acov,Acon,GG);
+  ldouble aret[2];
+  calc_wavespeeds_lr_core(ucon,GG,aret,cs2,0);
+  axhdl=aret[0];
+  axhdr=aret[1];
   
-  Asq = dot(Acon,Acov);
-  Bsq = dot(Bcon,Bcov);
-  Au = dot(Acov, ucon);
-  Bu = dot(Bcov, ucon);
-  AB = dot(Acon, Bcov);
-  Au2 = Au * Au;
-  Bu2 = Bu * Bu;
-  AuBu = Au * Bu;
-
-  //hydro
-  wspeed2=cs2;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("y discr in wavespeeds lt 0 at %d %d %d\n",geom->ix,geom->iy,geom->iz); discr=0.;}
-  discr = sqrt(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-  if(cst2>cst1)
-    {
-      ayhdl=cst1;  ayhdr=cst2;
-    }
-  else
-    {
-      ayhdr=cst1;  ayhdl=cst2;
-    }
+  calc_wavespeeds_lr_core(ucon,GG,aret,cs2,1);
+  ayhdl=aret[0];
+  ayhdr=aret[1];
+  
+  calc_wavespeeds_lr_core(ucon,GG,aret,cs2,2);
+  azhdl=aret[0];
+  azhdr=aret[1];
  
-       
-  //**********************************************************************
-  //**********************************************************************
-  //z
-  Acov[0]=0.;
-  Acov[1]=0.;
-  Acov[2]=0.;
-  Acov[3]=1.;
-  indices_12(Acov,Acon,GG);
-   
-  Asq = dot(Acon,Acov);
-  Bsq = dot(Bcon,Bcov);
-  Au = dot(Acov, ucon);
-  Bu = dot(Bcov, ucon);
-  AB = dot(Acon, Bcov);
-  Au2 = Au * Au;
-  Bu2 = Bu * Bu;
-  AuBu = Au * Bu;
-
-  //hydro
-  wspeed2=cs2;
-  B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-  A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-  discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-  if(discr<0.) {printf("z discr in wavespeeds lt 0 at %d %d %d\n",geom->ix,geom->iy,geom->iz); discr=0.;}
-  discr = sqrt(discr);
-  cst1 = -(-B + discr) / (2. * A);
-  cst2 = -(-B - discr) / (2. * A);  
-  if(cst2>cst1)
-    {
-      azhdl=cst1;  azhdr=cst2;
-    }
-  else
-    {
-      azhdr=cst1;  azhdl=cst2;
-    }
-
 #ifdef RADIATION
   //**********************************************************************
   //***** radiation: characteristic wave speed ***************************
@@ -213,8 +158,41 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 #endif
 
   //**********************************************************************
+  //**********************************************************************    
+  //combining regular and viscous velocities when SHEARVISCOSITY
+  if (HDVISCOSITY==SHEARVISCOSITY)
+    {
+      ldouble shear[4][4];
+      ldouble nu=calc_nu_shearviscosity(pp,geom,shear);
+
+      ldouble vdiff2 = (2.*nu/dt);
+
+      ldouble wsl,wsr;
+      calc_wavespeeds_lr_core(ucon,GG,aret,vdiff2,0);
+      wsl=aret[0];
+      wsr=aret[1];
+      if(geom->ix==NX-2 && geom->iy==NY-1) 
+	{print_4vector(ucon);printf("cs: %f vdiff: %f | %e %e | %e %e\n",sqrt(cs2),sqrt(vdiff2),axhdl,axhdr,wsl,wsr);getchar();}
+      if(wsl<0.) axhdl += wsl;
+      if(wsr>0.) axhdr += wsr;
+
+      calc_wavespeeds_lr_core(ucon,GG,aret,vdiff2,1);
+      wsl=aret[0];
+      wsr=aret[1];
+      if(wsl<0.) ayhdl += wsl;
+      if(wsr>0.) ayhdr += wsr;
+
+      calc_wavespeeds_lr_core(ucon,GG,aret,vdiff2,2);
+      wsl=aret[0];
+      wsr=aret[1];
+      if(wsl<0.) azhdl += wsl;
+      if(wsr>0.) azhdr += wsr;
+
+    }
+
+
   //**********************************************************************
-    
+  //**********************************************************************    
   //combining rad and hydro velocities when SIMPLEVISCOSITY with total pressure
 #ifdef RADIATION
   if (HDVISCOSITY==SIMPLEVISCOSITY)
@@ -927,94 +905,17 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       T[i][j]=0.;
 
 #if (HDVISCOSITY==SHEARVISCOSITY)
-  //calculating shear
-  ldouble shear[4][4],shearon[4][4];
-
-  //calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,0);
-  calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);
-
-  indices_1122(shear,shear,geom->GG);
-  trans22_cc2on(shear,shearon,geom->tup);
- 
-  //calculating the viscosity coefficient 
-  ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
-  ldouble xxvecBL[4];
-  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
-  
-  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
+  ldouble shear[4][4];
+  ldouble nu=calc_nu_shearviscosity(pp,geom,shear);
   ldouble rho=pp[RHO];
-  ldouble pgas=(GAMMA-1.)*pp[UU];
-
-  ldouble eta;
-  ldouble Omk = 1./sqrt(xxvecBL[1]*xxvecBL[1]*xxvecBL[1]);
-
-  //kind of alpha p
-  eta = ALPHAHDVISC * pgas / Omk;
-  
-  //damping in radius
-  eta*=fdampr;  
-  
-  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIN & RVDISK to overcome huge gradients near rout
-    if(geom->ix>=NX-2)
-      eta = 0.;  
-  
-  /*
-  //limiting basing on maximal spatial component
-  ldouble maxspatial=-1.;
-  for(i=1;i<4;i++)
-    for(j=1;j<4;j++)
-      {
-	if(fabs(shearon[i][j])>maxspatial)
-	  maxspatial=fabs(shearon[i][j]);
-      }
-  */
-
-  /*
-  //limiting basing on maximal eigen value
-  ldouble ev[4],evmax;
-  evmax=calc_eigen_4x4(shearon,ev);
-
-  ldouble param=1./3.;
-  if(2.*eta*evmax/rho > param)
-    {
-      //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
-      eta = param/2./evmax*rho;
-    }
-  */
-
-  //limiting assuming maximal eigen value 1/dt
-  ldouble nu=eta/rho;  
-  ldouble param=1./3.;
-  if(2.*nu/dt > param)
-    {
-      //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
-      eta = param/2.*dt*rho;
-    }
-    
-  //test  
-#ifdef SHEARVISCOSITYONLYRPHI
-  //zeroing not rphi components
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      {
-	if((i==1 && j==3) || (i==3 && j==1)) 
-	  ;
-	else
-	  shear[i][j]=0.;
-      }
-#endif
-
-  //to lab frame - only if comoving shear
-  //boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);
 
   //multiply by viscosity to get viscous tensor
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
 	if(isnan(shear[i][j])){print_tensor(shear);getch();}
-	T[i][j]= -2. * eta * shear[i][j];
+	T[i][j]= -2. * nu * rho * shear[i][j];
       }
-
 #endif 
 
 #if (HDVISCOSITY==SIMPLEVISCOSITY)  
@@ -1071,6 +972,75 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
   return 0;
 
+}
+
+ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4])
+{  
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  //calculating shear
+  calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);  
+  indices_1122(shear,shear,geom->GG);
+
+  //calculating the viscosity coefficient 
+  ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
+  ldouble xxvecBL[4];
+  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
+  ldouble rho=pp[RHO];
+  ldouble pgas=(GAMMA-1.)*pp[UU];
+
+  ldouble eta;
+  ldouble Omk = 1./sqrt(xxvecBL[1]*xxvecBL[1]*xxvecBL[1]);
+
+  //kind of alpha p
+  eta = ALPHAHDVISC * pgas / Omk;
+  
+  //damping in radius
+  eta*=fdampr;  
+  
+  //if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIN & RVDISK to overcome huge gradients near rout
+  //if(geom->ix>=NX-2)
+  //eta = 0.;  
+  
+  /*
+  //limiting basing on maximal spatial component
+  ldouble maxspatial=-1.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      {
+	if(fabs(shearon[i][j])>maxspatial)
+	  maxspatial=fabs(shearon[i][j]);
+      }
+  */
+
+  /*
+  //limiting basing on maximal eigen value
+  ldouble ev[4],evmax;
+  evmax=calc_eigen_4x4(shearon,ev);
+
+  ldouble param=1./3.;
+  if(2.*eta*evmax/rho > param)
+    {
+      //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
+      eta = param/2./evmax*rho;
+    }
+  */
+
+  //limiting assuming maximal eigen value 1/dt
+  ldouble nu=eta/rho;  
+  ldouble param=1./3.;
+  if(2.*nu/dt > param)
+    {
+      //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
+      eta = param/2.*dt*rho;
+    }
+
+  //to lab frame - only if comoving shear
+  //boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);
+
+  return nu;
 }
 
 

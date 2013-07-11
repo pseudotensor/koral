@@ -100,6 +100,12 @@ solve_all_problems_5(ldouble tstart)
 
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=1.;
+  if(NZ>1)
+    tstepdenmax=max_ws[0]/min_dx + max_ws[1]/min_dy + max_ws[2]/min_dz;
+  else if(NY>1)
+    tstepdenmax=max_ws[0]/min_dx + max_ws[1]/min_dy;
+  else
+    tstepdenmax=max_ws[0]/min_dx;            
 
   //copy primitives to hold previous time steps
   copy_u(1.,p,ptm1); ttm1=t;
@@ -134,14 +140,7 @@ solve_all_problems_5(ldouble tstart)
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
 
-      if(NZ>1)
-	tstepden=max_ws[0]/min_dx + max_ws[1]/min_dy + max_ws[2]/min_dz;
-      else if(NY>1)
-	tstepden=max_ws[0]/min_dx + max_ws[1]/min_dy;
-      else
-	tstepden=max_ws[0]/min_dx;            
-
-      dt=TSTEPLIM*1./tstepden;
+      dt=TSTEPLIM*1./tstepdenmax;
 
       if(t+dt>t1) {dt=t1-t;}
 
@@ -149,6 +148,7 @@ solve_all_problems_5(ldouble tstart)
       max_ws[0]=-1.;
       max_ws[1]=-1.;
       max_ws[2]=-1.;
+      tstepdenmax=1.;
 
       //iteration counter
       i1++;
