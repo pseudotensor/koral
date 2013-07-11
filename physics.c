@@ -977,6 +977,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
 ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4])
 {  
+#if(HDVISCOSITY==SHEARVISCOSITY)
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -1043,6 +1044,7 @@ ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4])
   //boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);
 
   return nu;
+#endif
 }
 
 

@@ -8,7 +8,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-#define SKIPRADSOURCE
+//#define SKIPRADSOURCE
 
 /************************************/
 //hydro choices
@@ -53,7 +53,7 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 1.
+#define MASS 1.5
 
 /************************************/
 //coordinates / resolution
@@ -61,13 +61,14 @@
 #define MYCOORDS KERRCOORDS//MKS1COORDS
 #define MKS1R0 -10.
 #define BHSPIN 0.0
-#define MINX 10.//(log(10.-MKS1R0))
-#define MAXX 100.//(log(100.-MKS1R0))
+#define RSTAR 10.
+#define MINX RSTAR//(log(10.-MKS1R0))
+#define MAXX 50.//(log(100.-MKS1R0))
 #define MINY (.5*Pi/2.)
 #define MAXY (1.5*Pi/2.)
 #define MINZ 0.
 #define MAXZ (2.*Pi)
-#define NX 200
+#define NX 100
 #define NY 1
 #define NZ 1
 #define SPECIFIC_BC
@@ -83,15 +84,13 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 1.e3
+#define DTOUT1 1.e2
 
 /************************************/
 //common physics 
 /************************************/
 #define GAMMA (5./3.)
-#define RHOATMMIN 1.
-#define UINTATMMIN 1.e-3
-#define ERADATMMIN 1.e-14//(1.e-10*calc_LTE_EfromT(calc_PEQ_Tfromurho(UINTATMMIN, RHOATMMIN)))
-#define BLOBR 60.
-#define BLOBW 10.
-#define BLOBP 0.
+#define RHOSTAR rhoCGS2GU(1.e-10)
+#define TEMPSTAR tempCGS2GU(5.5e11)
+#define FLUXBETA .9
+

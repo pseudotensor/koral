@@ -28,7 +28,7 @@ maxx= get_xb(NX,0);
 	  "set origin 0,0\n"
 	  "set multiplot\n"
 	  "set autoscale\n" 
-	   //	   "set log \n"
+	   "set log \n"
 	  "set label \"t=%.2e (%.2e s)\" at screen .48, .98\n"
 
 	  "set lmargin at screen 0.07\n"
@@ -54,7 +54,8 @@ maxx= get_xb(NX,0);
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
-	  "plot \"%s\" u 1:($20+1.e-40) w lp ls 2 pt 7 ps .5  ti \"E_rad\"\n"
+	   //"plot \"%s\" u 1:($28) w lp ls 2 pt 7 ps .5  ti \"temp\"\n"
+	   "plot \"%s\" u 1:($30) w lp ls 2 pt 7 ps .5  ti \"pre\"\n"
 
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -78,7 +79,7 @@ maxx= get_xb(NX,0);
 	  "set ylabel \"\"\n"
 	  //	  "set log y\n"
 	  "plot \"%s\" u 1:($25+1.e-80) w lp ls 3 pt 7 ps .5 ti \"R[0][1]\"\n"
-	  //	  "unset log y\n"
+	   "unset log y\n"
 
 	  "set lmargin at screen 0.40\n"
 	  "set rmargin at screen 0.66\n"
@@ -88,7 +89,7 @@ maxx= get_xb(NX,0);
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($26+1.e-80) w p ls 4 pt 7 ti \"R[1][1]\"\n"
+	  "plot \"%s\" u 1:($16) w p ls 4 pt 7 ti \"vr\"\n"
 
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -98,7 +99,7 @@ maxx= get_xb(NX,0);
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($27+1.e-80) w lp ls 4 pt 7 ti \"R[2][2]\""
+	  "plot \"%s\" u 1:($29) w lp ls 4 pt 7 ti \"diagnostic\""
 	   ,fname2,t,t/CCC,minx,maxx,fname,fname,fname,fname,fname,fname);
 
 
