@@ -67,7 +67,7 @@ main(int argc, char **argv)
 
       fprint_profiles(t,scalars,NSCALARS,0,folder);
 
-      fprint_simplecart(folder);
+      fprint_simplecart(t,folder);
     }
 
   fclose(fout_scalars);
