@@ -160,34 +160,35 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //**********************************************************************
   //**********************************************************************    
   //combining regular and viscous velocities when SHEARVISCOSITY
-  if (HDVISCOSITY==SHEARVISCOSITY)
+  if (HDVISCOSITY==SHEARVISCOSITY && 1)
     {
       ldouble shear[4][4];
       ldouble nu=calc_nu_shearviscosity(pp,geom,shear);
 
       ldouble vdiff2 = (2.*nu/dt);
 
+      ldouble vtot2= sqrt(vdiff2)+sqrt(cs2);
+      //TODO: limit?
+      vtot2*=vtot2;
+
       ldouble wsl,wsr;
-      calc_wavespeeds_lr_core(ucon,GG,aret,vdiff2,0);
-      wsl=aret[0];
-      wsr=aret[1];
-      if(geom->ix==NX-2 && geom->iy==NY-1) 
-	{print_4vector(ucon);printf("cs: %f vdiff: %f | %e %e | %e %e\n",sqrt(cs2),sqrt(vdiff2),axhdl,axhdr,wsl,wsr);getchar();}
-      if(wsl<0.) axhdl += wsl;
-      if(wsr>0.) axhdr += wsr;
+      calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,0);
+      axhdl=aret[0];
+      axhdr=aret[1];
 
-      calc_wavespeeds_lr_core(ucon,GG,aret,vdiff2,1);
-      wsl=aret[0];
-      wsr=aret[1];
-      if(wsl<0.) ayhdl += wsl;
-      if(wsr>0.) ayhdr += wsr;
+      calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,1);
+      ayhdl=aret[0];
+      ayhdr=aret[1];
 
-      calc_wavespeeds_lr_core(ucon,GG,aret,vdiff2,2);
-      wsl=aret[0];
-      wsr=aret[1];
-      if(wsl<0.) azhdl += wsl;
-      if(wsr>0.) azhdr += wsr;
+      calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,2);
+      azhdl=aret[0];
+      azhdr=aret[1];
 
+     
+      //if(geom->ix==NX-2 && geom->iy==NY-1) 
+      //	{print_4vector(ucon);printf("cs: %f vdiff: %f vtot: %f | %e %e | %e %e\n",sqrt(cs2),sqrt(vdiff2),sqrt(vtot2),axhdl,axhdr,wsl,wsr);getchar();}
+     
+  
     }
 
 
@@ -1030,11 +1031,12 @@ ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4])
 
   //limiting assuming maximal eigen value 1/dt
   ldouble nu=eta/rho;  
-  ldouble param=1./3.;
+  ldouble param=1./3.; //max allowed vdiff**2 
+
   if(2.*nu/dt > param)
     {
       //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
-      eta = param/2.*dt*rho;
+      nu = param/2.*dt;
     }
 
   //to lab frame - only if comoving shear

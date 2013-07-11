@@ -316,6 +316,13 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   #endif
 
   ldouble tstepden;
+  //#pragma omp critical
+  if(wsx>max_ws[0]) max_ws[0]=wsx;
+  //#pragma omp critical
+  if(wsy>max_ws[1]) max_ws[1]=wsy;
+  //#pragma omp critical
+  if(wsz>max_ws[2]) max_ws[2]=wsz;
+
   if(NZ>1 && NY>1)
     tstepden=max_ws[0]/dx + max_ws[1]/dy + max_ws[2]/dz;
   else if(NZ==1 && NY>1)
@@ -328,13 +335,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   //#pragma omp critical
   if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
   
-  //#pragma omp critical
-  if(wsx>max_ws[0]) max_ws[0]=wsx;
-  //#pragma omp critical
-  if(wsy>max_ws[1]) max_ws[1]=wsy;
-  //#pragma omp critical
-  if(wsz>max_ws[2]) max_ws[2]=wsz;
-
   return 0;
 }
 
