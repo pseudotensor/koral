@@ -801,6 +801,13 @@ fprint_simplecart(ldouble t, char* folder)
 		  fill_geometry_arb(ix,iy,iz,&geomcart,MINKCOORDS);
 		  fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
 		  fill_geometry_arb(ix,iy,iz,&geomsph,SPHCOORDS);
+
+		  ldouble dx[3];
+		  dx[0]=get_size_x(ix,0);
+		  dx[1]=get_size_x(iy,1);
+		  dx[2]=get_size_x(iz,2);
+		  ldouble gdet=geom.gdet;
+		  ldouble volume=dx[0]*dx[1]*dx[2]*gdet;
 		  trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,geom.gg,geom.GG,geomout.gg,geomout.GG);
 		  ldouble rho=rhoGU2CGS(pp[RHO]);
 		  ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
@@ -836,7 +843,7 @@ fprint_simplecart(ldouble t, char* folder)
 
 		  fprintf(fout1,"%.5e %.5e %.5e ",vx,vy,vz);
 
-		  fprintf(fout1,"\n");
+		  fprintf(fout1,"%.5e \n",volume);
 		}
 	    }
 	}
