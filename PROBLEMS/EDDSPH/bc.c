@@ -31,7 +31,40 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
        }
 
     //zero radial velocity
-    if(pp[VX]<0.) pp[VX]=0.;
+    if(pp[VX]<0. || 1) 
+      {
+	//pp[VX]=0.;
+	int iix=NX+(NX-ix)-1;
+	  pp[VX]=-get_u(p,VX,iix,iy,iz);	
+      }
+
+    ldouble ALPHAP=(1.-FLUXBETA)/2.;
+    ldouble PSTAR=calc_PEQ_ufromTrho(TEMPSTAR,RHOSTAR)*GAMMAM1;
+    ldouble KKK = PSTAR / pow(RHOSTAR,GAMMA);
+    ldouble C0 = (GAMMA/GAMMAM1*PSTAR/RHOSTAR+1.)*pow(1.-2./RSTAR,ALPHAP);
+    ldouble pre = pow(KKK,-1./GAMMAM1)*pow(GAMMAM1/GAMMA*(C0*pow(rsph/(rsph-2.),ALPHAP)-1.),GAMMA/GAMMAM1);
+
+    ldouble rho = pow(pre/KKK,1./GAMMA);
+    ldouble temp=calc_PEQ_Tfromurho(pre/GAMMAM1,rho);
+
+    //pp[RHO]=rho;
+    //pp[UU]=calc_PEQ_ufromTrho(temp,pp[RHO]);//density
+
+    //Abramowicz solution
+     ldouble alpha = asin(RSTAR/rsph*sqrt((1.-2./rsph)/(1.-2./RSTAR)));
+     ldouble I=FLUXBETA / KAPPA_ES_COEFF * pow((1.-2./RSTAR)/(1.-2./rsph),2.);
+     //ldouble Rtr = FLUXBETA / KAPPA_ES_COEFF / rsph / (rsph-2.);
+     ldouble Rtr = I/ RSTAR / (RSTAR-2.)*pow(sin(alpha),2.);
+     ldouble Rtt = 2.*I/ RSTAR / (RSTAR-2.)*(1.-cos(alpha));
+
+     //ortho-normal
+     pp[7]=Rtr; ////R^tr
+     pp[6]=Rtt; //R^tt
+     pp[8]=pp[9]=0.; //R^tinne
+
+     //converts upper row (R^tmu) from orthormal to coord. basis
+     prad_on2lab(pp,pp,&geom);
+
     //pp[RHO]=0.;
     
     //testing if interpolated primitives make sense
@@ -52,10 +85,12 @@ if(ix<0) //star surface
 	 pp[iv]=get_u(p,iv,0,iy,iz);
        }
 
+     ldouble ALPHAP=(1.-FLUXBETA)/2.;
      ldouble PSTAR=calc_PEQ_ufromTrho(TEMPSTAR,RHOSTAR)*GAMMAM1;
      ldouble KKK = PSTAR / pow(RHOSTAR,GAMMA);
-     ldouble C0 = (GAMMA/GAMMAM1*PSTAR/RHOSTAR+1.)*sqrt(1.-2./RSTAR);
-     ldouble pre = pow(KKK,-1./GAMMAM1)*pow(GAMMAM1/GAMMA*(C0*sqrt(rsph/(rsph-2.))-1.),GAMMA/GAMMAM1);
+     ldouble C0 = (GAMMA/GAMMAM1*PSTAR/RHOSTAR+1.)*pow(1.-2./RSTAR,ALPHAP);
+     ldouble pre = pow(KKK,-1./GAMMAM1)*pow(GAMMAM1/GAMMA*(C0*pow(rsph/(rsph-2.),ALPHAP)-1.),GAMMA/GAMMAM1);
+
      ldouble rho = pow(pre/KKK,1./GAMMA);
      ldouble temp=calc_PEQ_Tfromurho(pre/GAMMAM1,rho);
 
@@ -64,15 +99,26 @@ if(ix<0) //star surface
     
      pp[VX]=pp[VY]=pp[VZ]=0.;
 
-     //flux
-     ldouble Fr = FLUXBETA / KAPPA_ES_COEFF / RSTAR / (RSTAR-2.);
+     //reflection in VR
+     int iix=-ix+1;
+     //pp[VX]=-get_u(p,VX,iix,iy,iz);
+
+     
+
+     //Abramowicz solution
+     rsph=RSTAR;
+     ldouble alpha = asin(RSTAR/rsph*sqrt((1.-2./rsph)/(1.-2./RSTAR)));
+     ldouble I=FLUXBETA / KAPPA_ES_COEFF * pow((1.-2./RSTAR)/(1.-2./rsph),2.);
+     //ldouble Rtr = FLUXBETA / KAPPA_ES_COEFF / rsph / (rsph-2.);
+     ldouble Rtr = I/ RSTAR / (RSTAR-2.)*pow(sin(alpha),2.);
+     ldouble Rtt = 2.*I/ RSTAR / (RSTAR-2.)*(1.-cos(alpha));
 
      //ortho-normal
-     pp[7]=Fr; ////R^tr
-     pp[6]=2.*Fr; //R^tt
+     pp[7]=Rtr; ////R^tr
+     pp[6]=Rtt;//Rtr*1.1; //R^tt
      pp[8]=pp[9]=0.; //R^tinne
 
-     //     ldouble Rijlab[4][4];
+     //ldouble Rijlab[4][4];
      //     calc_Rij_ff(pp,Rijlab);  
      //     trans22_on2cc(Rijlab,Rijlab,geom.tlo);  
 
@@ -84,7 +130,7 @@ if(ix<0) //star surface
      //end of floor section
 
      
-     //     printf("%d | rho %e | pre %e | R(tr) %e | R(tt) %e | Rtr %e | Rtt %e | kes %e\n",ix,pp[RHO],GAMMAM1*pp[UU],Fr,2.*Fr,Rijlab[0][1],Rijlab[1][1],KAPPA_ES_COEFF); getchar();
+     //printf("%d | rho %e | pre %e | R(tr) %e | R(tt) %e | Rtr %e | Rtt %e | kes %e\n",ix,pp[RHO],GAMMAM1*pp[UU],Fr,2.*Fr,Rijlab[0][1],Rijlab[1][1],KAPPA_ES_COEFF); getchar();
 
      p2u(pp,uu,&geom);
      return 0;

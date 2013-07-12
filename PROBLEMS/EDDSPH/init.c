@@ -23,25 +23,32 @@ ldouble rsph=xxsph[1];
 /***********************************************/
 //hydro atmosphere
 //set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,2);
+ldouble ALPHAP=(1.-FLUXBETA)/2.;
 ldouble PSTAR=calc_PEQ_ufromTrho(TEMPSTAR,RHOSTAR)*GAMMAM1;
-						  ldouble KKK = PSTAR / pow(RHOSTAR,GAMMA);
-						  ldouble C0 = (GAMMA/GAMMAM1*PSTAR/RHOSTAR+1.)*sqrt(1.-2./RSTAR);
-ldouble pre = pow(KKK,-1./GAMMAM1)*pow(GAMMAM1/GAMMA*(C0*sqrt(rsph/(rsph-2.))-1.),GAMMA/GAMMAM1);
-						  ldouble rho = pow(pre/KKK,1./GAMMA);
-						  ldouble temp=calc_PEQ_Tfromurho(pre/GAMMAM1,rho);
+ldouble KKK = PSTAR / pow(RHOSTAR,GAMMA);
+ldouble C0 = (GAMMA/GAMMAM1*PSTAR/RHOSTAR+1.)*pow(1.-2./RSTAR,ALPHAP);
+ldouble pre = pow(KKK,-1./GAMMAM1)*pow(GAMMAM1/GAMMA*(C0*pow(rsph/(rsph-2.),ALPHAP)-1.),GAMMA/GAMMAM1);
+ldouble rho = pow(pre/KKK,1./GAMMA);
+ldouble temp=calc_PEQ_Tfromurho(pre/GAMMAM1,rho);
 
-						  pp[RHO]=rho;
+pp[RHO]=rho;
 pp[UU]=calc_PEQ_ufromTrho(temp,pp[RHO]);
 pp[VX]=pp[VY]=pp[VZ]=0.;
 
 //rad atmosphere
 #ifdef RADIATION
-//flux
-ldouble Fr = FLUXBETA / KAPPA_ES_COEFF / rsph / (rsph-2.);
-//ortho-normal
-pp[7]=Fr; ////R^tr
-pp[6]=2.*Fr; //R^tt
-pp[8]=pp[9]=0.; //R^tinne
+//Abramowicz solution
+     ldouble alpha = asin(RSTAR/rsph*sqrt((1.-2./rsph)/(1.-2./RSTAR)));
+     ldouble I=FLUXBETA / KAPPA_ES_COEFF * pow((1.-2./RSTAR)/(1.-2./rsph),2.);
+ //ldouble Fr = FLUXBETA / KAPPA_ES_COEFF / rsph / (rsph-2.);
+      ldouble Rtr = I/ RSTAR / (RSTAR-2.)*pow(sin(alpha),2.);
+     ldouble Rtt = 2.*I/ RSTAR / (RSTAR-2.)*(1.-cos(alpha));
+
+     //ortho-normal
+     pp[7]=Rtr; ////R^tr
+     pp[6]=Rtt; //R^tt
+     pp[8]=pp[9]=0.; //R^tinne
+
 
 //converts upper row (R^tmu) from orthormal to coord. basis
 prad_on2lab(pp,pp,&geom);
