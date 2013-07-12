@@ -38,6 +38,7 @@
 #define SPHCOORDS 6
 #define MKS1COORDS 7
 #define MCYL1COORDS 8
+#define MKER1COORDS 9
 
 //cell flags
 #define NFLAGS 5
