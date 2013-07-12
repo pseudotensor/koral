@@ -61,8 +61,23 @@
 //55* G2STATIC - cloud through static atmosphere
 //56* EDDSPH - 1d Edd Sphere
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
+//58* LUKE
 
-#define PROBLEM 56
+#define PROBLEM 58
+
+#if(PROBLEM==58)
+
+#define PR_DEFINE "PROBLEMS/LUKE/define.h"
+#define PR_BC "PROBLEMS/LUKE/bc.c"
+#define PR_INIT "PROBLEMS/LUKE/init.c"
+#define PR_KAPPA "PROBLEMS/LUKE/kappa.c"
+#define PR_KAPPAES "PROBLEMS/LUKE/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/LUKE/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/LUKE/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/LUKE/dump.c"
+#define PR_TOOLS "PROBLEMS/LUKE/tools.c"
+
+#endif
 
 #if(PROBLEM==57)
 
