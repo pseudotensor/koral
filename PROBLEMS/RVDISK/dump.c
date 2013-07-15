@@ -24,6 +24,7 @@ evmax=calc_eigen_4x4(shearon,ev);
 //xxvec[4]={0.,geom.xx,geom.yy,geom.zz};
 ldouble xxvecBL[4];
 coco_N(geom.xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+//?
 v1=evmax/pow(xxvecBL[1],-.5);
 
 rho=pp[RHO];

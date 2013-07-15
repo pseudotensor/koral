@@ -46,10 +46,17 @@ pp[0]=atmrho+clrho;
 pp[2]=(pp[2]*atmrho + ucon[1]*clrho ) / (atmrho + clrho);
 pp[3]=(pp[3]*atmrho + ucon[2]*clrho ) / (atmrho + clrho);
 pp[4]=(pp[4]*atmrho + ucon[3]*clrho ) / (atmrho + clrho);  
-  
+
 #ifdef TRACER
-//tracer : fraction of cloud gas 
+//tracer : fraction of cloud gas //test
 pp[TRA]=clrho/pp[0];
+
+if(pp[TRA]>MINTRACE)
+  {
+    pp[2]=ucon[1];
+    pp[3]=ucon[2];
+    pp[4]=ucon[3];    
+  }
 #endif
 /***********************************************/
 

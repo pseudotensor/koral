@@ -1019,10 +1019,11 @@ int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
   //damping in radius
   eta*=fdampr;  
   
+  /*
   if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIN & RVDISK to overcome huge gradients near rout
     if(geom->ix>=NX-2)
       eta = 0.;  
-  
+  */
   /*
   //limiting basing on maximal spatial component
   ldouble maxspatial=-1.;
@@ -1038,13 +1039,9 @@ int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
   
   //limiting basing on maximal eigen value
   
+  /*
   ldouble ev[4],evmax;
   evmax=calc_eigen_4x4(shearon,ev);
-
-  //  if(geom->ix==NX-3 && geom->iy==NY-1) {printf("%e %e\n",evmax,Omk);getchar();}
-
-  //test
-  //  evmax=Omk;
 
   nu=eta/rho;  
   ldouble param=1./3.; //max allowed vdiff**2 
@@ -1055,8 +1052,9 @@ int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
       nu = param/2./evmax;
     }
   vdiff2=2.*nu*evmax;
+  */
   
-  /*
+  
   //limiting assuming maximal eigen value 1/dt
   ldouble param=1./3.; //max allowed vdiff**2 
 
@@ -1066,7 +1064,7 @@ int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
       nu = param/2.*dt;
     }
     vdiff2=2.*nu/dt;
-  */
+  
 
   //to lab frame - only if comoving shear
   //boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);

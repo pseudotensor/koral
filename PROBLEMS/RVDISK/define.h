@@ -113,16 +113,18 @@
 #define MINX (log(.8-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
 
+/*
 #undef MYCOORDS
 #define MYCOORDS KERRCOORDS
 #undef MINX
-#define MINX 3.5
+#define MINX 4.
 #undef MAXX
 #define MAXX ROUT
+*/
 
 #define MINY (0.05*Pi/2.)
-#define NX 60
-#define NY 60
+#define NX 50
+#define NY 30
 #define NZ 1
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-25
