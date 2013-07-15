@@ -180,7 +180,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
       vtot2*=vtot2;
      
       //limit
-      if(vtot2>0.9) vtot2=0.9;
+      if(vtot2>1.) vtot2=1.;
 
       //force high
       //if(cs2<.9) vtot2=.9;
@@ -1009,6 +1009,7 @@ int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
   ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/10.);
   ldouble rho=pp[RHO];
   ldouble pgas=(GAMMA-1.)*pp[UU];
+  ldouble cs2=GAMMA*pgas/(rho+pp[UU]+pgas);
 
   ldouble eta;
   ldouble Omk = 1./sqrt(xxvecBL[1]*xxvecBL[1]*xxvecBL[1]);
@@ -1056,14 +1057,28 @@ int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
   
   
   //limiting assuming maximal eigen value 1/dt
-  ldouble param=1./3.; //max allowed vdiff**2 
+  ldouble MAXDIFFVEL=0.5; //max allowed vdiff**2 
 
-  if(2.*nu/dt > param)
+  if(2.*nu/dt > MAXDIFFVEL*MAXDIFFVEL)
     {
       //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
-      nu = param/2.*dt;
+      nu = MAXDIFFVEL*MAXDIFFVEL/2.*dt;
     }
-    vdiff2=2.*nu/dt;
+  vdiff2=2.*nu/dt;
+
+  //checking if vdiff+cs > 1
+  ldouble MAXTOTVEL = 0.75;
+  if(cs2>MAXTOTVEL*MAXTOTVEL)
+    {
+      nu=0.;
+      vdiff2=0.;
+    }
+  else if(sqrt(cs2)+sqrt(vdiff2)>MAXTOTVEL)
+    {
+      vdiff2=MAXTOTVEL-sqrt(cs2);
+      vdiff2*=vdiff2;
+      nu=vdiff2*dt/2.;
+    }
   
 
   //to lab frame - only if comoving shear
