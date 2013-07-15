@@ -116,7 +116,7 @@
 #undef MYCOORDS
 #define MYCOORDS KERRCOORDS
 #undef MINX
-#define MINX 3.
+#define MINX 3.5
 #undef MAXX
 #define MAXX ROUT
 
