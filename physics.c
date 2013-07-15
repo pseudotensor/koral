@@ -160,8 +160,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //**********************************************************************
   //**********************************************************************    
   //combining regular and viscous velocities when SHEARVISCOSITY
-  //test
-  if (HDVISCOSITY==SHEARVISCOSITY || 1)
+  if (HDVISCOSITY==SHEARVISCOSITY)
     {
       ldouble shear[4][4];
       ldouble vdiff2,nu;
@@ -169,10 +168,21 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 
       ldouble vtot2;
 
+      //bigger
+      /*
       if(cs2>vdiff2) vtot2=cs2;
       else
 	vtot2=vdiff2;
+      */
+
+      //sum
+      vtot2=sqrt(vdiff2)+sqrt(cs2);
+      vtot2*=vtot2;
      
+      //limit
+      if(vtot2>0.9) vtot2=0.9;
+
+      //force high
       //if(cs2<.9) vtot2=.9;
 
       ldouble wsl,wsr;
@@ -1009,9 +1019,9 @@ int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
   //damping in radius
   eta*=fdampr;  
   
-  //if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIN & RVDISK to overcome huge gradients near rout
-  //if(geom->ix>=NX-2)
-  //eta = 0.;  
+  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT & RVDONUTIN & RVDISK to overcome huge gradients near rout
+    if(geom->ix>=NX-2)
+      eta = 0.;  
   
   /*
   //limiting basing on maximal spatial component
