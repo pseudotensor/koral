@@ -261,7 +261,7 @@ struct rad_parameters
   ldouble f;
   ldouble x,y,z;
 };
-ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble S[][4]);
+int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble S[][4],ldouble*,ldouble*);
 int calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
 int calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
 

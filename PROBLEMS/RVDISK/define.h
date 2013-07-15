@@ -107,18 +107,20 @@
 #define BHSPIN 0.0
 #define MKS1R0 -10.
 #define MDOTOUT 50.
-#define RKEP 30.
-#define ROUT 50.
+#define RKEP 15.
+#define ROUT 30.
 #define INJTHETA ((1.-0.3)*M_PI/2.)
 #define MINX (log(.8-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
 
-//#undef MYCOORDS
-//#define MYCOORDS KERRCOORDS
-//#define MINX 4.
-//#define MAXX ROUT
+#undef MYCOORDS
+#define MYCOORDS KERRCOORDS
+#undef MINX
+#define MINX 4.
+#undef MAXX
+#define MAXX ROUT
 
-#define MINY (0.2*Pi/2.)
+#define MINY (0.05*Pi/2.)
 #define NX 40
 #define NY 20
 #define NZ 1

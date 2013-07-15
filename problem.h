@@ -61,9 +61,9 @@
 //55* G2STATIC - cloud through static atmosphere
 //56* EDDSPH - 1d Edd Sphere
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
-//58* LUKE
+//58* LUKE - beam hitting a net gas flow
 
-#define PROBLEM 58
+#define PROBLEM 54
 
 #if(PROBLEM==58)
 

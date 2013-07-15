@@ -160,16 +160,20 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //**********************************************************************
   //**********************************************************************    
   //combining regular and viscous velocities when SHEARVISCOSITY
-  if (HDVISCOSITY==SHEARVISCOSITY && 1)
+  //test
+  if (HDVISCOSITY==SHEARVISCOSITY || 1)
     {
       ldouble shear[4][4];
-      ldouble nu=calc_nu_shearviscosity(pp,geom,shear);
+      ldouble vdiff2,nu;
+      calc_nu_shearviscosity(pp,geom,shear,&nu,&vdiff2);
 
-      ldouble vdiff2 = (2.*nu/dt);
+      ldouble vtot2;
 
-      ldouble vtot2= sqrt(vdiff2)+sqrt(cs2);
-      //TODO: limit?
-      vtot2*=vtot2;
+      if(cs2>vdiff2) vtot2=cs2;
+      else
+	vtot2=vdiff2;
+     
+      //if(cs2<.9) vtot2=.9;
 
       ldouble wsl,wsr;
       calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,0);
@@ -907,7 +911,8 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
 #if (HDVISCOSITY==SHEARVISCOSITY)
   ldouble shear[4][4];
-  ldouble nu=calc_nu_shearviscosity(pp,geom,shear);
+  ldouble nu,vdiff2;
+  calc_nu_shearviscosity(pp,geom,shear,&nu,&vdiff2);
   ldouble rho=pp[RHO];
 
   //multiply by viscosity to get viscous tensor
@@ -975,7 +980,7 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
 }
 
-ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4])
+int calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret)
 {  
 #if(HDVISCOSITY==SHEARVISCOSITY)
   struct geometry *geom
@@ -984,6 +989,8 @@ ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4])
   //calculating shear
   calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);  
   indices_1122(shear,shear,geom->GG);
+  ldouble shearon[4][4];
+  trans22_cc2on(shear,shearon,geom->tup);
 
   //calculating the viscosity coefficient 
   ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
@@ -1017,21 +1024,30 @@ ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4])
       }
   */
 
-  /*
+  ldouble nu=eta/rho,vdiff2;  
+  
   //limiting basing on maximal eigen value
+  
   ldouble ev[4],evmax;
   evmax=calc_eigen_4x4(shearon,ev);
 
-  ldouble param=1./3.;
-  if(2.*eta*evmax/rho > param)
-    {
-      //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
-      eta = param/2./evmax*rho;
-    }
-  */
+  //  if(geom->ix==NX-3 && geom->iy==NY-1) {printf("%e %e\n",evmax,Omk);getchar();}
 
+  //test
+  //  evmax=Omk;
+
+  nu=eta/rho;  
+  ldouble param=1./3.; //max allowed vdiff**2 
+  if(2.*nu*evmax > param)
+    {
+      //print_tensor(shearon);
+      //      printf("limiting hd eta: %e->%e at (%d %d %d) %e vs %e\n",2.*nu*evmax,param,geom->ix,geom->iy,geom->iz,evmax,Omk); getchar();
+      nu = param/2./evmax;
+    }
+  vdiff2=2.*nu*evmax;
+  
+  /*
   //limiting assuming maximal eigen value 1/dt
-  ldouble nu=eta/rho;  
   ldouble param=1./3.; //max allowed vdiff**2 
 
   if(2.*nu/dt > param)
@@ -1039,11 +1055,16 @@ ldouble calc_nu_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4])
       //printf("limiting hd eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/rho,param,geom->ix,geom->iy,geom->iz); getchar();
       nu = param/2.*dt;
     }
+    vdiff2=2.*nu/dt;
+  */
 
   //to lab frame - only if comoving shear
   //boost22_ff2lab(shear,shear,pp,geom->gg,geom->GG);
 
-  return nu;
+  *nuret=nu;
+  *vdiff2ret=vdiff2;
+   
+  return 0;
 #endif
 }
 
