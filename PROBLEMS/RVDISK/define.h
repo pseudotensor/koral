@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 268
 
 /************************************/
@@ -123,8 +123,8 @@
 */
 
 #define MINY (0.05*Pi/2.)
-#define NX 80
-#define NY 70
+#define NX 50
+#define NY 40
 #define NZ 1
 #define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-25

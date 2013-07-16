@@ -63,7 +63,7 @@
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
 //58* LUKE - beam hitting a net gas flow
 
-#define PROBLEM 56
+#define PROBLEM 44
 
 #if(PROBLEM==58)
 
@@ -946,6 +946,7 @@
 /*********************/
 
 //default number of radiative fluids
+//redefined later if single fluid
 #ifndef NRF
 #define NRF 6
 #endif
@@ -1053,39 +1054,39 @@
 #define NUM_INPUTARG 0 //number of input arguments in the command line
 #endif
 
+//number of hydro variables
+#define NVHD (6)
+
+//number of magneto-hydro variables
+#ifdef MAGNFIELDS
+#define NVMHD (NVHD+4)
+#else
+#define NVMHD (NVHD)
+#endif
+
+//number of total variables
 #ifdef RADIATION
-#ifdef MULTIRADFLUID
+
+#ifndef MULTIRADFLUID
+#undef NRF
+#define NRF 1
+#endif
+
 #ifndef TRACER
 #define NV (NVMHD+4*NRF)
 #else
 #define NV ((NVMHD+4*NRF)+1)
 #endif
 
-#else
+#else //no RADIATION
 #ifndef TRACER
-#define NV NVMHD //number of variables
+#define NV NVMHD
 #else
 #define NV (NVMHD+1)
 #endif
-
-#undef NRF
-#define NRF 1
 #endif
 
-#else
-#ifndef TRACER
-#define NV 6
-#else
-#define NV (6+1)
-#endif
-#endif
 
-//number of magneto-hydro variables
-#ifdef MAGNFIELDS
-#define NVHD 10
-#else
-#define NVHD 6
-#endif
 
 #ifndef GAMMA
 #define GAMMA (5./3.) //gamma

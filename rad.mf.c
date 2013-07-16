@@ -134,13 +134,13 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
   //if(geom->iy==0 &&  fabs(Fon[0]/Eon)>1.e-2) verbose=1;
   //if(geom->iy==NY-2 && radius>4. && radius<4.5 && fabs(Fon[0]/Eon)>1.e-5) verbose=1;
 
-  for(ii=0;ii<NVHD;ii++)
+  for(ii=0;ii<NVMHD;ii++)
     {
       ppon2[ii]=ppon[ii];
       pptemp[ii]=ppon[ii];
     }
 
-  for(ii=NVHD;ii<NV;ii++)
+  for(ii=NVMHD;ii<NV;ii++)
     ppon2[ii]=0.;
 
   if(verbose)
@@ -728,9 +728,9 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
     }
 
   
-  for(ii=0;ii<NVHD;ii++)
+  for(ii=0;ii<NVMHD;ii++)
     uu1[ii]=uu0[ii];
-  for(ii=NVHD;ii<NV;ii++)
+  for(ii=NVMHD;ii<NV;ii++)
     uu1[ii]=0.;
 
   if(verbose) 
@@ -757,7 +757,7 @@ redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg)
       getchar();
     }
 
-  for(ii=NVHD;ii<NV;ii++)
+  for(ii=NVMHD;ii<NV;ii++)
     uu0[ii]=uu1[ii];
 
   return 0;
@@ -1041,9 +1041,9 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
 	}
     }  
 
-  for(ii=0;ii<NVHD;ii++)
+  for(ii=0;ii<NVMHD;ii++)
     uu1[ii]=uu0[ii];
-  for(ii=NVHD;ii<NV;ii++)
+  for(ii=NVMHD;ii<NV;ii++)
     uu1[ii]=0.;
 
   if(verbose) 
@@ -1070,7 +1070,7 @@ redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg)
       getchar();
     }
 
-  for(ii=NVHD;ii<NV;ii++)
+  for(ii=NVMHD;ii<NV;ii++)
     uu0[ii]=uu1[ii];
   
   return 0;
@@ -1243,9 +1243,9 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
 	A[irf][ii]=Avec[ii];
     }
  
-  for(ii=0;ii<NVHD;ii++)
+  for(ii=0;ii<NVMHD;ii++)
     uu1[ii]=uu0[ii];
-  for(ii=NVHD;ii<NV;ii++)
+  for(ii=NVMHD;ii<NV;ii++)
     uu1[ii]=0.;
 
   if(verbose) 
@@ -1272,7 +1272,7 @@ redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg)
       getchar();
     }
 
-  for(ii=NVHD;ii<NV;ii++)
+  for(ii=NVMHD;ii<NV;ii++)
     uu0[ii]=uu1[ii];
   
 #endif

@@ -1032,7 +1032,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
     {
       //choosing the proper characteristic speed - radiation decoupled from hydro
 #ifdef RADIATION
-      if(i<NVHD)      
+      if(i<NVMHD)      
 	{
 	  ag=my_max(ap1[0],am1[0]);
 	  al=my_min(ap1l[0],am1l[0]);
@@ -1131,7 +1131,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       for(i=0;i<NV;i++)
 	{
 #ifdef RADIATION
-	  if(i<NVHD)      
+	  if(i<NVMHD)      
 	    {
 	      ag=my_max(ap1[0],am1[0]);
 	      al=my_min(ap1l[0],am1l[0]);
@@ -1230,7 +1230,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       for(i=0;i<NV;i++)
 	{
 #ifdef RADIATION
-	  if(i<NVHD)      
+	  if(i<NVMHD)      
 	    {
 	      ag=my_max(ap1[0],am1[0]);
 	      al=my_min(ap1l[0],am1l[0]);
@@ -2043,7 +2043,7 @@ cell_fixup_hd()
 			}
 
 		      //save to updated arrays memory
-		      for(iv=NVHD;iv<NV;iv++)
+		      for(iv=NVMHD;iv<NV;iv++)
 			{
 			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
 			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
@@ -2162,7 +2162,7 @@ cell_fixup_rad()
 			}
 
 		      //save to updated arrays memory
-		      for(iv=NVHD;iv<NV;iv++)
+		      for(iv=NVMHD;iv<NV;iv++)
 			{
 			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
 			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);

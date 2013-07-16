@@ -924,7 +924,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   int iv;
   int lostprecision=0;
   p2u(pp,uu2,ggg);
-  for(iv=0;iv<NVHD;iv++)
+  for(iv=0;iv<NVMHD;iv++)
     {
       if(iv==5) continue;
       if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3))
@@ -1166,7 +1166,7 @@ u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
   int iv;
   int lostprecision=0;
   p2u(p,uuu2,ggg);
-  for(iv=0;iv<NVHD;iv++)
+  for(iv=0;iv<NVMHD;iv++)
     {
       if(iv==1) continue;
       //      if(((iv==0 || iv==5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6) ||
@@ -2871,7 +2871,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   int iv;
   int lostprecision=0;
   p2u(pp,uu2,ggg);
-  for(iv=0;iv<NVHD;iv++)
+  for(iv=0;iv<NVMHD;iv++)
     {
       if(iv==1) continue;
       if(iv==2 || iv==3 || iv==4) continue; //do not check momenta which could be zero
@@ -3224,7 +3224,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
   int iv;
   int lostprecision=0;
   p2u(pp,uu2,ggg);
-  for(iv=0;iv<NVHD;iv++)
+  for(iv=0;iv<NVMHD;iv++)
     {
       if(iv==1) continue;
       //      if(fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3 && fabs(uu[iv])>SMALL) lostprecision;
@@ -3572,7 +3572,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
   int iv;
   int lostprecision=0;
   p2u(pp,uu2,ggg);
-  for(iv=0;iv<NVHD;iv++)
+  for(iv=0;iv<NVMHD;iv++)
     {
       if(iv==1) continue;
       //      if(fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3 && fabs(uu[iv])>SMALL) lostprecision;

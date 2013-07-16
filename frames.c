@@ -24,7 +24,7 @@ int
 trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
 {
   int i;
-  for(i=NVHD;i<NV;i++)
+  for(i=NVMHD;i<NV;i++)
     pp2[i]=pp1[i];
      
   if(CO1==CO2)
@@ -68,7 +68,7 @@ int
 trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
 {
   int i;
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   if(CO1==CO2)
@@ -135,7 +135,7 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
   indices_2221(Rij,Rij,gg);  
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   //temporarily store conserved in pp2[]
@@ -167,7 +167,7 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
     }
 
   //hydro
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   //convert to real primitives
@@ -201,7 +201,7 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
   boost22_lab2ff(Rij,Rij,pp1,gg,GG);
   trans22_cc2on(Rij,Rij,tup);
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   //E,F^i
@@ -225,7 +225,7 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
       pp2[FZ(irf)]=Rij[irf][0][3];
     }
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
   
 #endif
@@ -261,7 +261,7 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   trans22_on2cc(Rij,Rij,tlo);  
   indices_2221(Rij,Rij,gg);  
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   //temporarily store conserved in pp2[]
@@ -292,7 +292,7 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
     }
 
   //hydro
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   //convert to real primitives
@@ -325,7 +325,7 @@ int prad_lab2on(ldouble *pp1, ldouble *pp2, void *ggg)
   calc_Rij(pp1,ggg,Rij);
   trans22_cc2on(Rij,Rij,tup);
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   //E,F^i
@@ -348,7 +348,7 @@ int prad_lab2on(ldouble *pp1, ldouble *pp2, void *ggg)
       pp2[FZ(irf)]=Rij[irf][0][3];
     }
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
   
 #endif
@@ -368,7 +368,7 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   calc_Rij_ff(pp1,Rij);
   boost22_ff2zamo(Rij,Rij,pp1,gg,GG,eup);
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   //(E,F^i)_ZAMO
@@ -382,7 +382,7 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
 
   calc_Rij_ff_mf(pp1,Rij);
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   for(irf=0;irf<NRF;irf++)
@@ -413,7 +413,7 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   calc_Rij_ff(pp1,Rij);
   boost22_zamo2ff(Rij,Rij,pp1,gg,GG,eup);
 
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
   //(E,F^i)_ff
@@ -439,7 +439,7 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
       pp2[FZ(irf)]=Rij[irf][0][3];
     }
   
-  for(i=0;i<NVHD;i++)
+  for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
 #endif
@@ -2025,7 +2025,7 @@ print_Nvector(ldouble v[4],int N)
     }
   else
     {
-      for(i=0;i<NVHD;i++)
+      for(i=0;i<NVMHD;i++)
 	printf("%10.7e ",v[i]);
       for(i=0;i<NRF;i++)
 	printf("\n%10.7e %10.7e %10.7e %10.7e",v[EE(i)],v[FX(i)],v[FY(i)],v[FZ(i)]);

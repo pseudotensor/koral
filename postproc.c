@@ -387,7 +387,7 @@ calc_mdot(ldouble radius,int type)
       iz=0;
       for(iy=0;iy<NY;iy++)
 	{
-	  for(iv=0;iv<NVHD;iv++)
+	  for(iv=0;iv<NVMHD;iv++)
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 
 	  get_xx(ix,iy,iz,xx);
