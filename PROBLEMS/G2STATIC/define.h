@@ -83,7 +83,7 @@
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
-#define NZ 150
+#define NZ 100
 #define NX (NZ/2)
 #define NY (NZ/2+1)
 #define SPECIFIC_BC
@@ -127,12 +127,15 @@
 //#define SPHCLOUD
 #define G2CLOUD
 
-#define IANGLE (0.)
+#define IANGLE (M_PI)
 #define OMANGLE 0.
 #define EARTHMASS (5.97219e27)
 #define MASSCLOUD (3.*EARTHMASS)
-#define RMINFORPART 7000.
+#define RMINFORPART 5000.
 #define KERNELWIDTH 2000.
+#define DISKDAMPPAR1 0.5
+#define DISKDAMPPAR2 0.1
+
 #define CLRHO 1.e-9
 #define CLWIDTH 800.
 

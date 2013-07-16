@@ -189,7 +189,7 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
       int iv;
       ldouble alpha=4.;
       ldouble epsm=1.e-10;
-      ldouble B2=1.3333333;
+      ldouble BB2=1.3333333;
 
       for(iv=0;iv<NV;iv++)
 	{
@@ -211,7 +211,7 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	      VUL=u0[iv]+alpha*(u0[iv]-um1[iv]);
 	      VAV=0.5*(u0[iv]+up1[iv]);
 	      VMD=VAV-0.5*DM4JPH;
-	      VLC=u0[iv]+0.5*(u0[iv]-um1[iv])+B2*DM4JMH;
+	      VLC=u0[iv]+0.5*(u0[iv]-um1[iv])+BB2*DM4JMH;
 	      VMIN=my_max(my_min(u0[iv],my_min(up1[iv],VMD)),my_min(u0[iv],my_min(VUL,VLC)));
 	      VMAX=my_min(my_max(u0[iv],my_max(up1[iv],VMD)),my_max(u0[iv],my_max(VUL,VLC)));
 	      VL=VOR+DMM(VMIN-VOR,VMAX-VOR);	      	      
@@ -234,7 +234,7 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	      VUL=u0[iv]+alpha*(u0[iv]-up1[iv]);
 	      VAV=0.5*(u0[iv]+um1[iv]);
 	      VMD=VAV-0.5*DM4JPH;
-	      VLC=u0[iv]+0.5*(u0[iv]-up1[iv])+B2*DM4JMH;
+	      VLC=u0[iv]+0.5*(u0[iv]-up1[iv])+BB2*DM4JMH;
 	      VMIN=my_max(my_min(u0[iv],my_min(um1[iv],VMD)),my_min(u0[iv],my_min(VUL,VLC)));
 	      VMAX=my_min(my_max(u0[iv],my_max(um1[iv],VMD)),my_max(u0[iv],my_max(VUL,VLC)));
 	      VL=VOR+DMM(VMIN-VOR,VMAX-VOR);	      	      

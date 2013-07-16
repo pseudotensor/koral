@@ -555,7 +555,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 #endif
   ldouble rho=pp[RHO];
   ldouble u=pp[UU];
-  ldouble vcon[4],ucon[4];
+  ldouble vcon[4],ucon[4],ucov[4];
   vcon[1]=pp[2];
   vcon[2]=pp[3];
   vcon[3]=pp[4];
@@ -564,12 +564,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   //converting to 4-velocity
   //TODO: introduce structure of state
   conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
-
-  //4-velocity
-  ldouble u1=ucon[1];
-  ldouble u2=ucon[2];
-  ldouble u3=ucon[3];
-  ldouble gam=GAMMA;
+  indices_21(ucon,ucov,gg);
 
   int ii, jj, irf;
   for(ii=0;ii<4;ii++)
@@ -582,6 +577,11 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 	    my_err("nan in flux_prime\n");
 	  }
       }
+
+#ifdef MAGNFIELD
+  ldouble bcon[4];
+  bcon_calc(pp,ucon,ucov,bcon);
+#endif
  
 #ifdef RADIATION
 
@@ -597,185 +597,57 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
     {
       indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
     }
- #endif
+#endif
 
-  //to move gdet in/out derivative:
-  //here, up in metric source terms, in u2p and p2u, as well as in finite.c with del4[], and below in calc_entropy
+#endif
 
-   if(idim==0) //x
-    {
-      ff[0]= gdetu*rho*u1;
+  //fluxes
 
-      ff[1]= gdetu*(T[1][0]+rho*u1);
+  //hydro
+  ff[0]= gdetu*rho*ucon[idim+1];
 
-      ff[2]= gdetu*(T[1][1]);
+  ff[1]= gdetu*(T[idim+1][0]+rho*ucon[idim+1]);
 
-      ff[3]= gdetu*(T[1][2]);
+  ff[2]= gdetu*(T[idim+1][1]);
+
+  ff[3]= gdetu*(T[idim+1][2]);
  
-      ff[4]= gdetu*(T[1][3]);
+  ff[4]= gdetu*(T[idim+1][3]);
 
-      ff[5]= gdetu*S*u1;
+  ff[5]= gdetu*S*ucon[idim+1];
 
+#ifdef TRACER
+  ff[TRA]= gdetu*tracer*ucon[idim+1]; 
+#endif
+
+#ifdef MAGNFIELD
+  //magnetic
+  ff[B1]=gdetu*(bcon[1]*ucon[idim+1] - bcon[idim+1]*ucon[1]);
+  ff[B2]=gdetu*(bcon[2]*ucon[idim+1] - bcon[idim+1]*ucon[2]);
+  ff[B3]=gdetu*(bcon[3]*ucon[idim+1] - bcon[idim+1]*ucon[3]);
+#endif
+
+  //radiation
+#ifdef RADIATION
 #ifndef MULTIRADFLUID
-      ff[6]= gdetu*Rij[1][0];
+  ff[EE0]= gdetu*Rij[idim+1][0];
       
-      ff[7]= gdetu*Rij[1][1];
+  ff[FX0]= gdetu*Rij[idim+1][1];
       
-      ff[8]= gdetu*Rij[1][2];
+  ff[FY0]= gdetu*Rij[idim+1][2];
       
-      ff[9]= gdetu*Rij[1][3];
+  ff[FZ0]= gdetu*Rij[idim+1][3];
 #else
-      for(irf=0;irf<NRF;irf++)
-	{
-	  ff[EE(irf)]=gdetu*Rij[irf][1][0];
-	  ff[FX(irf)]=gdetu*Rij[irf][1][1];
-	  ff[FY(irf)]=gdetu*Rij[irf][1][2];
-	  ff[FZ(irf)]=gdetu*Rij[irf][1][3];
-	}
-#endif
-
-#ifdef TRACER
-      ff[TRA]= gdetu*tracer*u1; 
-#endif
-    }  
-  if(idim==1) //y
+  for(irf=0;irf<NRF;irf++)
     {
-      ff[0]= gdetu*rho*u2;
-
-      ff[1]= gdetu*(T[2][0]+rho*u2);
-
-      ff[2]= gdetu*(T[2][1]);
-
-      ff[3]= gdetu*(T[2][2]);
-
-      ff[4]= gdetu*(T[2][3]);
-
-      ff[5]= gdetu*S*u2;
- 
-#ifndef MULTIRADFLUID
-      ff[6]= gdetu*Rij[2][0];
-      
-      ff[7]= gdetu*Rij[2][1];
-      
-      ff[8]= gdetu*Rij[2][2];
-      
-      ff[9]= gdetu*Rij[2][3];
-#else
-      for(irf=0;irf<NRF;irf++)
-	{
-	  ff[EE(irf)]=gdetu*Rij[irf][2][0];
-	  ff[FX(irf)]=gdetu*Rij[irf][2][1];
-	  ff[FY(irf)]=gdetu*Rij[irf][2][2];
-	  ff[FZ(irf)]=gdetu*Rij[irf][2][3];
-	}
-#endif
-
-#ifdef TRACER
-      ff[TRA]= gdetu*tracer*u2; 
-#endif
-    }  
-  if(idim==2) //z
-    {
-      ff[0]= gdetu*rho*u3;
-
-      ff[1]= gdetu*(T[3][0]+rho*u3);
- 
-      ff[2]= gdetu*(T[3][1]);
-
-      ff[3]= gdetu*(T[3][2]);
- 
-      ff[4]= gdetu*(T[3][3]);
-
-      ff[5]= gdetu*S*u3;
- 
-#ifndef MULTIRADFLUID
-      ff[6]= gdetu*Rij[3][0];
-      
-      ff[7]= gdetu*Rij[3][1];
-      
-      ff[8]= gdetu*Rij[3][2];
-       
-      ff[9]= gdetu*Rij[3][3];
-#else
-      for(irf=0;irf<NRF;irf++)
-	{
-	  ff[EE(irf)]=gdetu*Rij[irf][3][0];
-	  ff[FX(irf)]=gdetu*Rij[irf][3][1];
-	  ff[FY(irf)]=gdetu*Rij[irf][3][2];
-	  ff[FZ(irf)]=gdetu*Rij[irf][3][3];
-	}
-#endif
-
-#ifdef TRACER
-      ff[TRA]= gdetu*tracer*u3; 
-#endif
-    } 
-
-#else //pure hydro
-
-  if(idim==0) //x
-    {
-      ff[0]= gdetu*rho*u1;
-
-      ff[1]= gdetu*(T[1][0]+rho*u1);
-
-      ff[2]= gdetu*(T[1][1]);
-
-      ff[3]= gdetu*(T[1][2]);
- 
-      ff[4]= gdetu*(T[1][3]);
-
-      ff[5]= gdetu*S*u1;
-
-#ifdef TRACER
-      ff[TRA]= gdetu*tracer*u1; 
-#endif
-    }  
-  if(idim==1) //y
-    {
-      ff[0]= gdetu*rho*u2;
-
-      ff[1]= gdetu*(T[2][0]+rho*u2);
-
-      ff[2]= gdetu*(T[2][1]);
-
-      ff[3]= gdetu*(T[2][2]);
-
-      ff[4]= gdetu*(T[2][3]);
-
-      ff[5]= gdetu*S*u2;
-
-#ifdef TRACER
-      ff[TRA]= gdetu*tracer*u2; 
-#endif
-    }  
-  if(idim==2) //z
-    {
-      ff[0]= gdetu*rho*u3;
-
-      ff[1]= gdetu*(T[3][0]+rho*u3);
- 
-      ff[2]= gdetu*(T[3][1]);
-
-      ff[3]= gdetu*(T[3][2]);
- 
-      ff[4]= gdetu*(T[3][3]);
-
-      ff[5]= gdetu*S*u3;
-
-#ifdef TRACER
-      ff[TRA]= gdetu*tracer*u3; 
-#endif
-    } 
-
-#endif
-  /*
-
-  if(isinf(ff[5]))
-    {
-      printf("%e %e %e \n",S,u1,u2); getchar();
+      ff[EE(irf)]=gdetu*Rij[irf][idim+1][0];
+      ff[FX(irf)]=gdetu*Rij[irf][idim+1][1];
+      ff[FY(irf)]=gdetu*Rij[irf][idim+1][2];
+      ff[FZ(irf)]=gdetu*Rij[irf][idim+1][3];
     }
-  */
+#endif
+#endif
+
   return 0.;
 }
 

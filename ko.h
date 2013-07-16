@@ -486,6 +486,10 @@ int calc_rad_wavespeeds(ldouble *pp,void*,ldouble tautot[3],ldouble *aval,int ve
 int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval);
 int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose);
 
+//magn.c
+void bcon_calc(double *pr, double *ucon, double *ucov, double *bcon); 
+
+
 #include "mnemonics.h"
 
 /*********************/

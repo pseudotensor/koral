@@ -39,25 +39,27 @@ ldouble ucon[4];
 ucon[1]=get_u(pproblem,VX,ix,iy,iz);
 ucon[2]=get_u(pproblem,VY,ix,iy,iz);
 ucon[3]=get_u(pproblem,VZ,ix,iy,iz);
-ldouble atmrho=pp[0];
+ldouble diskrho=pp[0];
 ldouble clrho=get_u(pproblem,RHO,ix,iy,iz);
-pp[0]=atmrho+clrho;
+pp[0]=diskrho+clrho;
 
-pp[2]=(pp[2]*atmrho + ucon[1]*clrho ) / (atmrho + clrho);
-pp[3]=(pp[3]*atmrho + ucon[2]*clrho ) / (atmrho + clrho);
-pp[4]=(pp[4]*atmrho + ucon[3]*clrho ) / (atmrho + clrho);  
 
 #ifdef TRACER
 //tracer : fraction of cloud gas //test
-pp[TRA]=clrho/pp[0];
+ldouble tracer=clrho/(diskrho+clrho);
 
-if(pp[TRA]>MINTRACE)
-  {
-    pp[2]=ucon[1];
-    pp[3]=ucon[2];
-    pp[4]=ucon[3];    
-  }
+diskrho*=1.-step_function(tracer-DISKDAMPPAR1,DISKDAMPPAR2);
+
+pp[0]=diskrho+clrho;
+tracer=clrho/(diskrho+clrho);
+pp[TRA]=tracer;
+
 #endif
+
+pp[2]=(pp[2]*diskrho + ucon[1]*clrho ) / (diskrho + clrho);
+pp[3]=(pp[3]*diskrho + ucon[2]*clrho ) / (diskrho + clrho);
+pp[4]=(pp[4]*diskrho + ucon[3]*clrho ) / (diskrho + clrho);  
+
 /***********************************************/
 
 /***********************************************/

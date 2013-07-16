@@ -63,7 +63,7 @@
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
 //58* LUKE - beam hitting a net gas flow
 
-#define PROBLEM 44
+#define PROBLEM 55
 
 #if(PROBLEM==58)
 
@@ -1055,7 +1055,11 @@
 #endif
 
 //number of hydro variables
+#ifndef TRACER
 #define NVHD (6)
+#else
+#define NVHD (6+1)
+#endif
 
 //number of magneto-hydro variables
 #ifdef MAGNFIELDS
@@ -1072,21 +1076,12 @@
 #define NRF 1
 #endif
 
-#ifndef TRACER
 #define NV (NVMHD+4*NRF)
-#else
-#define NV ((NVMHD+4*NRF)+1)
-#endif
 
 #else //no RADIATION
-#ifndef TRACER
-#define NV NVMHD
-#else
-#define NV (NVMHD+1)
-#endif
-#endif
 
-
+#define NV (NVMHD)
+#endif
 
 #ifndef GAMMA
 #define GAMMA (5./3.) //gamma

@@ -9,9 +9,7 @@ main(int argc, char **argv)
   ldouble tstart;
   int i;
 
-  printf("%d %d %d\n",NVHD,NVMHD,NV);
-
-  //currently gsl is not used
+  //gsl errors off
   gsl_set_error_handler_off();
   
   //random number gen. initialization

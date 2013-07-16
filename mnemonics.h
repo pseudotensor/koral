@@ -12,13 +12,17 @@
 #define VY 3
 #define VZ 4
 #define ENTR 5
-#define TRA (NV-1)
+#define TRA (NVHD-1)
+
+#define B1 (NVHD+0)
+#define B2 (NVHD+1)
+#define B3 (NVHD+2)
 
 //multi rad-fluid macros
-#define FX(nf) (7+nf*4)
-#define FY(nf) (8+nf*4)
-#define FZ(nf) (9+nf*4)
-#define EE(nf) (6+nf*4)
+#define EE(nf) (NVMHD+nf*4)
+#define FX(nf) (NVMHD+nf*4)
+#define FY(nf) (NVMHD+nf*4)
+#define FZ(nf) (NVMHD+nf*4)
 
 //single fluid macros
 #define EE0 EE(0)
