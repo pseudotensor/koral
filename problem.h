@@ -1056,16 +1056,16 @@
 #ifdef RADIATION
 #ifdef MULTIRADFLUID
 #ifndef TRACER
-#define NV (6+4*NRF)
+#define NV (NVMHD+4*NRF)
 #else
-#define NV ((6+4*NRF)+1)
+#define NV ((NVMHD+4*NRF)+1)
 #endif
 
 #else
 #ifndef TRACER
-#define NV 10 //number of variables
+#define NV NVMHD //number of variables
 #else
-#define NV 11
+#define NV (NVMHD+1)
 #endif
 
 #undef NRF
@@ -1080,7 +1080,12 @@
 #endif
 #endif
 
-#define NVHD 6 //number of hydro variables
+//number of magneto-hydro variables
+#ifdef MAGNFIELDS
+#define NVHD 10
+#else
+#define NVHD 6
+#endif
 
 #ifndef GAMMA
 #define GAMMA (5./3.) //gamma

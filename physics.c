@@ -180,50 +180,6 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 
 #endif
 
-
-  //**********************************************************************
-  //**********************************************************************    
-  //combining rad and hydro velocities when SIMPLEVISCOSITY with total pressure
-#ifdef RADIATION
-  if (HDVISCOSITY==SIMPLEVISCOSITY)
-    {
-
-#ifdef ALPHATOTALPRESSURE
-
- //based on local opacities
-  ldouble xxvecBL[4];
-  coco_N(xx,xxvecBL,MYCOORDS,BLCOORDS);
-  //damping in radius
-  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/5.);
-
-  dx[0]=1.;dx[1]=1.;dx[2]=1.;//opt depth per Rg
-  calc_tautot(pp,xx,dx,tautot);
-  ldouble Rij[4][4];
-  calc_Rij(pp,ggg,Rij);
-  // skip boosts what reasonable when gas v<<1
-  // boost22_lab2ff(Rij,Rij,pp,gg,GG);
-  // trans22_cc2on(Rij,Rij,tup);
-  tautot[0]+=1.e-50;
-  ldouble PARAM=TAUSUPPRESSPARAM;
-  //to damp less than add pressure
-  PARAM/=10.;
-  ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
-  ldouble fdamp=fdamptau*fdampr;
-#ifdef ENFORCERADWAVESPEEDS
-  fdamp=1.0;
-#endif
-
-  axhdl -= axl*fdamp;
-  axhdr += axr*fdamp;
-  ayhdl -= ayl*fdamp;
-  ayhdr += ayr*fdamp;
-  azhdl -= azl*fdamp;
-  azhdr += azr*fdamp;
-  
-#endif
-    }
-#endif
-
   //zeroing 'co-going' velocities
   if(axhdl>0.) axhdl=0.;
   if(axhdr<0.) axhdr=0.;
@@ -907,58 +863,6 @@ calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 	T[i][j]= -2. * nu * rho * shear[i][j];
       }
 #endif 
-
-#if (HDVISCOSITY==SIMPLEVISCOSITY)  
-  ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
-  ldouble xxvecBL[4];
-  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
-  
-  ldouble fdampr=step_function(xxvecBL[1]-RMINVISC,RMINVISC/5.);
-  //  if(xxvecBL[1]<RMINVISC)) fdampr=0.;
-  ldouble pgas=(GAMMA-1.)*pp[UU];
-
-#ifdef RADIATION
-#ifdef ALPHATOTALPRESSURE
-
-  //based on local opacities
-  ldouble xx[4]={0.,geom->xx,geom->yy,geom->zz};
-  ldouble dx[3]={1.,1.,1.}; //opt depth per Rg
-  ldouble tautot[3];
-  calc_tautot(pp,xx,dx,tautot);
-
-  ldouble Rij[4][4];
-  calc_Rij(pp,ggg,Rij);
-  // skip boosts what reasonable when gas v<<1
-  boost22_lab2ff(Rij,Rij,pp,gg,GG);
-  trans22_cc2on(Rij,Rij,tup);
-  
-  tautot[0]+=1.e-50;
-
-  ldouble PARAM=TAUSUPPRESSPARAM;
-  ldouble fdamptau=exp(-PARAM/tautot[0]/tautot[0]);
-  ldouble prad=1./3.*Rij[0][0]*fdamptau;
-
-  
-  ldouble p=pgas+prad;
-#else
-  ldouble p=pgas;
-#endif //ALPHATOTALPRESSURE
-#else //RADIATION
-
-  ldouble p=pgas;
-#endif //RADIATION
-
-  //damping radially
-  p*=fdampr;
-
-  T[1][3]=ALPHAHDVISC*p;
-  T[3][1]=ALPHAHDVISC*p;
-
-  trans22_on2cc(T,T,tlo);
-  boost22_ff2lab(T,T,pp,gg,GG); 
-
-
-#endif //SIMPLEVISCOSITY
 
   return 0;
 
