@@ -469,7 +469,7 @@ inverse_44matrix(ldouble a[][4], ldouble ia[][4])
 //**********************************************************************
 //Heavyside step function around 0
 //1       /-------
-//         | 
+//       | 
 //0 ____/0
 //x9 determines the sharpness and says where step function equals 0.9
 ldouble

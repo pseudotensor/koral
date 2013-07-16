@@ -115,7 +115,6 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 #ifdef TRACER
   ldouble tracerut=p[TRA]*ut;
   u[TRA]= gdet*tracerut;
-  //if(u[TRA]>0.1) printf("u[TRA] %e %d %d\n",u[TRA],TRA,NV);
 #endif
 
   //************************************
@@ -126,6 +125,11 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   //************************************
   //************************************
  
+#ifdef MAGNFIELD
+  u[B1]=gdet*p[B1];
+  u[B2]=gdet*p[B2];
+  u[B3]=gdet*p[B3];
+#endif
   
  
 
