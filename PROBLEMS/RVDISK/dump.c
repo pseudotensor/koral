@@ -17,7 +17,7 @@ v6=get_cflag(RADFIXUPFLAG,ix,iy,iz);
 
 ldouble shear[4][4],shearon[4][4];
 ldouble vdiff2,nu;
-calc_nu_shearviscosity(pp,&geom,shear,&nu,&vdiff2);
+calc_hd_shearviscosity(pp,&geom,shear,&nu,&vdiff2);
 ldouble ev[4],evmax;
 trans22_cc2on(shear,shearon,geom.tup);
 evmax=calc_eigen_4x4(shearon,ev);
@@ -26,6 +26,8 @@ ldouble xxvecBL[4];
 coco_N(geom.xxvec,xxvecBL,MYCOORDS,BLCOORDS);
 //?
 v1=evmax/pow(xxvecBL[1],-.5);
+v3=evmax;
+v4=evmax/dt;
 
 rho=pp[RHO];
 ldouble uint2=pp[UU];

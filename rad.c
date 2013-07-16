@@ -892,87 +892,21 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 	Rij0[i][j]=Rij[i][j];
       }
 
-//**********************************************************************
-//**********************************************************************
 #if (RADVISCOSITY==SHEARVISCOSITY)
+  ldouble shear[4][4];
+  ldouble nu,vdiff2;
+  calc_rad_shearviscosity(pp,geom,shear,&nu,&vdiff2);
+  ldouble Erf=pp[EE0];
 
-  //calculating shear
-  ldouble shear[4][4],shearon[4][4];
-
-  
-  //calc_shear_comoving(geom->ix,geom->iy,geom->iz,shear,1); 
-  calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,1);
-
-  indices_1122(shear,shear,geom->GG);
-  trans22_cc2on(shear,shearon,geom->tup);
-
-  //calculating the viscosity coefficient 
-  ldouble Erf=pp[6];
-
-  ldouble xx[4]={0.,geom->xx,geom->yy,geom->zz};
-
-  ldouble chi=calc_chi(pp,xx);
-
-  //mean free path
-  ldouble mfp = 1./chi;
-
-  //limiter
-  //here gg can be face or cell, get_size_x always refers to cell
-  ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),
-		 get_size_x(geom->iy,1)*sqrt(geom->gg[2][2]),
-		 get_size_x(geom->iz,2)*sqrt(geom->gg[3][3])};
-  ldouble mindx;
-  if(NY==1 && NZ==1) mindx = dx[0];
-  else if(NZ==1) mindx = my_min(dx[0],dx[1]);
-  else if(NY==1) mindx = my_min(dx[0],dx[2]);
-  else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
-
-  if(mfp>mindx || chi<SMALL) mfp=mindx;
-
-  ldouble eta;
-  eta = ALPHARADVISC * 1./3. * mfp * Erf;
-  
-  
-  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
-    if(geom->ix>=NX-2)
-      eta = 0.; 
-
-  //limiting using the maximal spatial value
-  /*
-  ldouble maxspatial=-1.;
-  for(i=1;i<4;i++)
-    for(j=1;j<4;j++)
-      {
-	if(fabs(shearon[i][j])>maxspatial)
-	  maxspatial=fabs(shearon[i][j]);
-      }
-      ldouble param=1./3.;
-  if(2.*eta*maxspatial > param)
-    {
-      printf("limiting rad eta: %e->%e at (%d %d %d)\n",2.*eta*maxspatial,param,geom->ix,geom->iy,geom->iz);
-      eta = param/2./maxspatial;
-    }
-  */
-  
-  //limiting using the maximal eigen value
-  ldouble ev[4],evmax;
-  evmax=calc_eigen_4x4(shearon,ev);
-  ldouble param=1./3.;
-  if(2.*eta*evmax/Erf > param) //nu shear has dimension of vel**2, nu=eta/rho
-    {
-      //printf("limiting rad eta: %e->%e at (%d %d %d)\n",2.*eta*evmax/Erf,param,geom->ix,geom->iy,geom->iz);
-      eta = param/2./evmax*Erf;
-    }
-  
   //multiply by viscosity to get viscous tensor
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
-	Tvisc[i][j]= -2. * eta * shear[i][j];
+	Tvisc[i][j]= -2. * nu * Erf * shear[i][j];
       }
+#endif 
 
- 
-#endif
+
 
 //**********************************************************************
 //**********************************************************************
@@ -1833,4 +1767,91 @@ int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
   return 0;
 } 
 
-//*
+/***************************************/
+/***************************************/
+/***************************************/
+int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret)
+{  
+#if(RADVISCOSITY==SHEARVISCOSITY) //full shear tensor
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  //calculating shear
+  calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,1);  
+  indices_1122(shear,shear,geom->GG);
+
+  //transforming to ortonormal
+  ldouble shearon[4][4];
+  trans22_cc2on(shear,shearon,geom->tup);
+
+  //calculating the viscosity coefficient 
+
+  //radiative energy density - so far in the radiative frame!
+  ldouble Erf=pp[EE0];
+  //mean free path
+  ldouble chi=calc_chi(pp,geom->xxvec);
+  ldouble mfp = 1./chi;
+
+  //limiting in opt.thin region
+  ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),   //here gg can be face or cell, get_size_x always refers to cell
+		 get_size_x(geom->iy,1)*sqrt(geom->gg[2][2]),
+		 get_size_x(geom->iz,2)*sqrt(geom->gg[3][3])};
+  ldouble mindx;
+  if(NY==1 && NZ==1) mindx = dx[0];
+  else if(NZ==1) mindx = my_min(dx[0],dx[1]);
+  else if(NY==1) mindx = my_min(dx[0],dx[2]);
+  else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
+  if(mfp>mindx || chi<SMALL) mfp=mindx;
+
+  ldouble ev[4],evmax,eta,nu,vdiff2;
+  nu = ALPHARADVISC * 1./3. * mfp;
+  
+  //no longer necessary?
+  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
+    if(geom->ix>=NX-2)
+      nu = 0.; 
+
+  //limiting basing on diffusive wavespeed
+  ldouble MAXDIFFVEL=0.5; //max allowed vdiff
+  ldouble MAXTOTVEL=0.75; //max allowed vdiff + vrad
+
+  //limiting basing on maximal eigen value - slower and issues with tetrad  
+  evmax=calc_eigen_4x4(shearon,ev);
+
+  //limiting assuming maximal eigen value 1/dt
+  //evmax=1./dt;
+
+  //square of characteristic velocity for diffusion
+  vdiff2=2.*nu*evmax;
+
+  //checking if vdiff too large
+  if(vdiff2 > MAXDIFFVEL*MAXDIFFVEL)
+    {
+      nu = MAXDIFFVEL*MAXDIFFVEL/2./evmax;
+    }
+  vdiff2=2.*nu*evmax;
+
+  /*
+  //checking if vdiff+vrad > 1
+  if(vrad>MAXTOTVEL*MAXTOTVEL)
+    {
+      nu=0.;
+      vdiff2=0.;
+    }
+  else if(sqrt(vrad)+sqrt(vdiff2)>MAXTOTVEL)
+    {
+      vdiff2=MAXTOTVEL-sqrt(vrad);
+      vdiff2*=vdiff2;
+      nu=vdiff2/2./evmax;
+    }
+  */
+  
+  *nuret=nu;
+  *vdiff2ret=vdiff2;
+
+  return 0;
+#endif
+  
+}
+
+ 
