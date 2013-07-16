@@ -120,8 +120,13 @@ if(ix<0) //star surface
      ldouble C0 = (GAMMA/GAMMAM1*PSTAR/RHOSTAR+1.)*pow(1.-2./RSTAR,ALPHAP);
      ldouble pre = pow(KKK,-1./GAMMAM1)*pow(GAMMAM1/GAMMA*(C0*pow(rsph/(rsph-2.),ALPHAP)-1.),GAMMA/GAMMAM1);
 
+     /*
      ldouble rho = pow(pre/KKK,1./GAMMA);
      ldouble temp=calc_PEQ_Tfromurho(pre/GAMMAM1,rho);
+     */
+
+     ldouble rho=RHOSTAR;
+     ldouble temp=TEMPSTAR;
 #endif
 
 #ifdef OPTTHICK

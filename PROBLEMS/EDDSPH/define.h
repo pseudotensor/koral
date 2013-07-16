@@ -83,15 +83,15 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 1.e2
+#define DTOUT1 1.e3
 
 /************************************/
 //common physics 
 /************************************/
 #define GAMMA (5./3.)
-#define RHOSTAR rhoCGS2GU(1.e-5)
-#define TEMPSTAR tempCGS2GU(1.e11)
+#define RHOSTAR rhoCGS2GU(1.e-10)
+#define TEMPSTAR tempCGS2GU(1.e10)
 //#define OPTTHICK
 #define OPTTHIN
-#define FLUXBETA 1.
+#define FLUXBETA .95
 

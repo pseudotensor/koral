@@ -26,6 +26,7 @@ ldouble rsph=xxsph[1];
 
 #ifdef OPTTHIN
 ldouble ALPHAP=(1.-FLUXBETA)/2.;
+ALPHAP=0.;
 ldouble PSTAR=calc_PEQ_ufromTrho(TEMPSTAR,RHOSTAR)*GAMMAM1;
 ldouble KKK = PSTAR / pow(RHOSTAR,GAMMA);
 ldouble C0 = (GAMMA/GAMMAM1*PSTAR/RHOSTAR+1.)*pow(1.-2./RSTAR,ALPHAP);
