@@ -458,6 +458,7 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
       ret=-1;
      }
 
+  #ifndef SKIPRADSOURCE
    //Erf/rho ratios (inconsistent?)
   if(pp2[6]<EERHORATIOMIN*pp2[0]) 
     {
@@ -487,7 +488,7 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
       pp2[1]=1./EEUURATIOMAX*pp2[6];
       ret=-1;
     }
- 
+ #endif
  
   for(iv=0;iv<NV;iv++)
     pp[iv]=pp2[iv];

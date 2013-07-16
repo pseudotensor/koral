@@ -59,9 +59,8 @@ if(MYCOORDS==MKER1COORDS)
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
-	   //"plot \"%s\" u 1:($28) w lp ls 2 pt 7 ps .5  ti \"temp\"\n"
-	   "plot \"%s\" u 1:($30) w lp ls 2 pt 7 ps .5  ti \"pre\"\n"
+	  "plot \"%s\" u 1:26 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:27 w lp ls 3 pt 7 ps .5  ti \"tau_sca\"\n"
+	  
 
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -105,8 +104,8 @@ if(MYCOORDS==MKER1COORDS)
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($29) w lp ls 4 pt 7 ti \"diagnostic\""
-	   ,fname2,t,t/CCC,minx,maxx,fname,fname,fname,fname,fname,fname);
+	  "plot \"%s\" u 1:($28) w lp ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:($29) w lp ls 3 pt 7 ti \"Trad\""
+	   ,fname2,t,t/CCC,minx,maxx,fname,fname,fname,fname,fname,fname,fname,fname);
 
 
 
