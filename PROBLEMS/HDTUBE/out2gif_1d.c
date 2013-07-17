@@ -25,7 +25,7 @@
 	  "set size .5,.5\n"
 
 	  "set origin 0,.5\n"
-	  "set xrange [%Lf:%Lf]\n"
+	  "set xrange [%f:%f]\n"
 	  //	  "set yrange [0.:1.1]\n"
 	  "set xlabel \"x\"\n"
 	  "unset log y\n"

@@ -63,7 +63,7 @@
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
 //58* LUKE - beam hitting a net gas flow
 
-#define PROBLEM 42
+#define PROBLEM 8
 
 #if(PROBLEM==58)
 

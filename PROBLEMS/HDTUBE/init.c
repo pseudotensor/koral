@@ -11,6 +11,9 @@ set_initial_profile()
 	  for(ix=0;ix<NX;ix++)
 	    {
 */
+/***********************************************/
+struct geometry geom;
+fill_geometry(ix,iy,iz,&geom);
 
 	      ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
 	      ldouble xx,yy,zz;
@@ -22,7 +25,6 @@ set_initial_profile()
 	      ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
 	      pick_g(ix,iy,iz,gg);
 	      pick_G(ix,iy,iz,GG);
-	      calc_LNRFes(gg,eup,elo);
 
 	      ldouble pp[NV],T;
 
@@ -49,8 +51,7 @@ set_initial_profile()
 //converting from 3vel to relative velocity
 conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
 
-	      if(ix>=-1) //conserved required for ix=-1 only
-		p2u(pp,uu,gg,GG);	 
+p2u(pp,uu,&geom);	 
 
 //print_Nvector(pp,NV);
 //print_Nvector(uu,NV);getchar();
