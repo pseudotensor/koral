@@ -694,7 +694,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   ldouble rho=pp[RHO];
   ldouble uu=pp[UU];
   ldouble ucon[4],ucov[4];  
-  ldouble bcon[4]={0.,0.,0.,0.},bcov[4]={0.,0.,0.,0.},bsq=0.;
+  ldouble bcon[4],bcov[4],bsq=0.;
   
   //converts to 4-velocity
   for(iv=1;iv<4;iv++)
@@ -707,8 +707,10 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   bcon_calc(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
   bsq = dot(bcon,bcov);
+#else
+  bcon[0]=bcon[1]=bcon[2]=bcon[3]=0.;
+  bsq=0.;
 #endif
-
   
   ldouble p=(GAMMA-1.)*uu; 
   ldouble w=rho+uu+p;

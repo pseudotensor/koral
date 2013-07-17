@@ -729,6 +729,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   ldouble rho,u,p,w,W,alpha,D;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
+  ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
   
   if(verbose>1) {printf("********************\n");print_Nvector(uu,NV);}
   if(verbose>1) {print_Nvector(pp,NV);}
@@ -748,6 +749,26 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   //Q^mu
   indices_12(Qcov,Qcon,GG);
 
+#ifdef MAGNFIELD
+  //B^mu
+  Bcon[0]=0.;
+  Bcon[1]=uu[B1]/gdet*alpha;
+  Bcon[2]=uu[B2]/gdet*alpha;
+  Bcon[3]=uu[B3]/gdet*alpha;
+
+  //B_mu
+  indices_21(Bcon,Bcov,gg);
+
+  Bsq = dot(Bcon,Bcov);
+
+  QdotB = dot(Qcov,Bcon);
+
+  QdotBsq = QdotB*QdotB;
+#else
+  Bsq=QdotB=QdotBsq=0.;
+#endif
+  
+
   //n_mu = (-alpha, 0, 0, 0)
   ncov[0]=-alpha;
   ncov[1]=ncov[2]=ncov[3]=0.;
@@ -757,7 +778,6 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
 
   //Q_mu n^mu = Q^mu n_mu = -alpha*Q^t
   Qn=Qcon[0] * ncov[0];
-  //Qn = dot(Qcov,ncon);
 
   //j^mu_nu=delta^mu_nu +n^mu n_nu
   for(i=0;i<4;i++)
