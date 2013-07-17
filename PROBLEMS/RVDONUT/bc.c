@@ -188,10 +188,10 @@ if(ix>=NX) //analytical solution at rout only
     pp[5]=calc_Sfromu(pp[0],pp[1]);
     
     //testing if primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
 
     return 0.;
   }
@@ -245,10 +245,10 @@ if(ix>=NX) //analytical solution at rout only
 #endif
      
      //testing if interpolated primitives make sense
-     check_floors_hd(pp,VELPRIM,gg,GG);
+     //check_floors_hd(pp,VELPRIM,gg,GG);
      //end of floor section
 
-     p2u(pp,uu,gg,GG);
+     p2u(pp,uu,&geom);
      return 0;
    }
 
@@ -282,10 +282,10 @@ if(iy<0.) //spin axis
       }
     
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG);
+    p2u(pp,uu,&geom);
     return 0;
   }
 if(iy>=NY) //equatorial plane
@@ -308,10 +308,10 @@ if(iy>=NY) //equatorial plane
  
 
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,gg,GG);
+    //check_floors_hd(pp,VELPRIM,gg,GG);
     //end of floor section
 
-    p2u(pp,uu,gg,GG); 
+    p2u(pp,uu,&geom); 
     return 0; 
   }
    
@@ -329,7 +329,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //testing if interpolated primitives make sense
-check_floors_hd(pp,VELPRIM,gg,GG);
+//check_floors_hd(pp,VELPRIM,gg,GG);
 //end of floor section
  
 return 0;

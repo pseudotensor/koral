@@ -663,7 +663,7 @@ f_u2p_hot(ldouble W, ldouble* cons,ldouble *f,ldouble *df)
   ldouble D=cons[2];
   ldouble QdotBsq=cons[3];
   ldouble Bsq=cons[4];
-
+ 
   FTYPE W3,X3,Ssq,Wsq,X,X2; 
   FTYPE Qtsq = Qt2;
   X = Bsq + W;
@@ -731,7 +731,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
 
   int verbose=0;
   int i,j,k;
-  ldouble rho,u,p,w,W,alpha,D;
+  ldouble rho,u,p,w,W,alpha,D,Sc;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
   ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
@@ -744,6 +744,9 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
 
   //D
   D=uu[0]/gdetu*alpha; //uu[0]=gdetu rho ut
+
+  //conserved entropy "S u^t"
+  Sc=uu[5]/gdetu*alpha; 
 
   //Q_mu
   Qcov[0]=(uu[1]/gdetu-uu[0]/gdetu)*alpha;
@@ -837,7 +840,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
-  ldouble cons[5]={Qn,Qt2,D,QdotBsq,Bsq};
+  ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
   if(verbose>1) printf("in:%e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
 
   int iter=0;
