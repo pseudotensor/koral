@@ -148,7 +148,7 @@ solve_all_problems_5(ldouble tstart)
       max_ws[0]=-1.;
       max_ws[1]=-1.;
       max_ws[2]=-1.;
-      tstepdenmax=1.;
+      tstepdenmax=-1.;
 
       //iteration counter
       i1++;
