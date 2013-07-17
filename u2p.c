@@ -1997,3 +1997,305 @@ u2p_hotmax(ldouble *uu, ldouble *pp, void *ggg)
   return 0;
 
 }
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//Newton-Rapshon solver 
+//Etype == 0 -> hot inversion (uses D,Ttt,Tti)
+//TODO:
+//Etype == 1 -> entropy inversion (uses D,S,Tti)
+//Etype == 2 -> hotmax inversion (uses D,Tti,u over rho max ratio)
+//Etype == 3 -> cold inversion (uses D,Tti,u over rho min ratio)
+
+int
+u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
+{
+  int verbose=0;
+  int i,j,k;
+  ldouble rho,u,p,w,W,alpha,D,Sc;
+  ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
+  ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
+  ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
+
+  /****************************/
+  //prepare geometry
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;  GG=geom->GG;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+  /****************************/
+  
+  if(verbose>1) {printf("********************\n");print_Nvector(uu,NV);}
+  if(verbose>1) {print_Nvector(pp,NV);}
+
+  /****************************/
+  //conserved quantities etc
+  
+  //alpha
+  alpha=sqrt(-1./GG[0][0]);
+
+  //D
+  D=uu[0]/gdetu*alpha; //uu[0]=gdetu rho ut
+
+  //conserved entropy "S u^t"
+  Sc=uu[5]/gdetu*alpha; 
+
+  //Q_mu
+  Qcov[0]=(uu[1]/gdetu-uu[0]/gdetu)*alpha;
+  Qcov[1]=uu[2]/gdetu*alpha;
+  Qcov[2]=uu[3]/gdetu*alpha;
+  Qcov[3]=uu[4]/gdetu*alpha;
+
+  //Q^mu
+  indices_12(Qcov,Qcon,GG);
+
+#ifdef MAGNFIELD
+  //B^mu
+  Bcon[0]=0.;
+  Bcon[1]=uu[B1]/gdet*alpha;
+  Bcon[2]=uu[B2]/gdet*alpha;
+  Bcon[3]=uu[B3]/gdet*alpha;
+
+  //B_mu
+  indices_21(Bcon,Bcov,gg);
+
+  Bsq = dot(Bcon,Bcov);
+
+  QdotB = dot(Qcov,Bcon);
+
+  QdotBsq = QdotB*QdotB;
+#else
+  Bsq=QdotB=QdotBsq=0.;
+#endif  
+
+  //n_mu = (-alpha, 0, 0, 0)
+  ncov[0]=-alpha;
+  ncov[1]=ncov[2]=ncov[3]=0.;
+  
+  //n^mu
+  indices_12(ncov,ncon,GG);
+
+  //Q_mu n^mu = Q^mu n_mu = -alpha*Q^t
+  Qn=Qcon[0] * ncov[0];
+
+  //j^mu_nu=delta^mu_nu +n^mu n_nu
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      jmunu[i][j] = delta(i,j) + ncon[i]*ncov[j];
+
+  //Qtilda^nu = j^nu_mu Q^mu
+  for(i=0;i<4;i++)
+    {
+      Qtcon[i]=0.;
+      for(j=0;j<4;j++)
+	Qtcon[i]+=jmunu[i][j]*Qcon[j];
+    }
+
+  //Qtilda_nu
+  indices_21(Qtcon,Qtcov,gg);
+
+  //Qt2=Qtilda^mu Qtilda_mu
+  Qt2=dot(Qtcon,Qtcov);
+  FTYPE Qtsq = Qt2;
+
+  /****************************/
+  
+  //initial guess for W = w gamma**2 based on primitives
+  rho=pp[0];
+  u=pp[1];
+  utcon[0]=0.;
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  //conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);
+  conv_vels(utcon,utcon,VELPRIM,VELR,gg,GG);
+
+  /*
+  ldouble bcon[4],bcov[4],bsq;
+#ifdef MAGNFIELD
+  bcon_calc(pp,ucon,ucov,bcon);
+  indices_21(bcon,bcov,gg); 
+  bsq = dot(bcon,bcov);
+#else
+  bcon[0]=bcon[1]=bcon[2]=bcon[3]=0.;
+  bsq=0.;
+#endif
+  */
+
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=utcon[i]*utcon[j]*gg[i][j];
+  ldouble gamma2=1.+qsq;
+  ldouble gamma=sqrt(gamma2);
+
+  //W
+  W=(rho+GAMMA*u)*gamma2;
+
+  if(verbose>1) printf("initial W:%e\n",W);
+ 
+  //test if does not provide reasonable gamma2
+  /*
+  if(W*W<Qt2)
+    {
+      W=1.001*sqrt(Qt2);
+      if(verbose>1) printf("corrected W:%e\n",W);
+    }
+  */
+
+  // Make sure that W is large enough so that v^2 < 1 : 
+  int i_increase = 0;
+  while( (( W*W*W * ( W + 2.*Bsq ) 
+	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
+	 && (i_increase < 10) ) {
+    W *= 10.;
+    i_increase++;
+  }
+
+  //1d Newton solver
+  ldouble CONV=1.e-8;
+  ldouble EPS=1.e-4;
+  ldouble Wprev=W;
+  ldouble f0,f1,dfdW;
+  ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
+  if(verbose>1) printf("in:%e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
+
+  int iter=0,fu2pret;
+  do
+    {
+      Wprev=W;
+      iter++;
+
+      if(Etype==0) 
+	fu2pret=f_u2p_hot(W,cons,&f0,&dfdW);
+
+      //f_u2p_hot(W*(1.+EPS),cons,&f1,&dfdW);
+      //dfdW=(f1-f0)/(EPS*W);
+
+      if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,f1,dfdW);
+
+      if(dfdW==0.) {W*=1.1; continue;}
+
+      ldouble Wnew=W-f0/dfdW;
+
+      //test if goes out of bounds and damp solution if so
+      //if(Wnew*Wnew<Qt2 || isnan(Wnew))
+      if((( W*W*W * ( W + 2.*Bsq ) 
+	      - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq)) 
+	   || isnan(Wnew)
+	   || fu2pret<0)
+	{
+	  int idump=0;
+	  ldouble dumpfac=1.;
+	  do
+	    {
+	      idump++;
+	      dumpfac/=2.;
+	      Wnew=W-dumpfac*f0/dfdW;
+	    }
+	  while((( W*W*W * ( W + 2.*Bsq ) 
+		   - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
+		&& idump<100);
+	  
+	  if(idump>=100) {if(verbose>0) printf("damped unsuccessfuly\n");return -101;}
+
+	  if(verbose>0) printf("damped successfuly\n");
+	}
+
+      W=Wnew; 
+    }
+  while(fabs((W-Wprev)/Wprev)>CONV && iter<50);
+
+  if(iter>=50)
+    {
+      if(verbose>0) printf("iter exceeded in u2p_hot\n"); //getchar();
+      return -102;
+    }
+  
+  if(isnan(W) || isinf(W)) {printf("nan/inf W: %e\n",W); exit(0);return -103;}
+  if(verbose>1) {printf("the end: %e\n",W); }
+
+  //W found, let's calculate v2 and the rest
+  //ldouble v2=Qt2/W/W;
+
+  ldouble Wsq,Xsq,v2;
+	
+  Wsq = W*W ;
+  Xsq = (Bsq + W) * (Bsq + W);  
+  v2 = ( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
+
+  gamma2=1./(1.-v2);
+  ldouble ut2 = Qt2/(W*W - Qt2);
+  gamma2=1. + ut2;
+  gamma=sqrt(gamma2);
+  rho=D/gamma;
+  u=1./GAMMA*(W/gamma2-rho);
+  utcon[0]=0.;
+  utcon[1]=gamma/W*Qtcon[1];
+  utcon[2]=gamma/W*Qtcon[2];
+  utcon[3]=gamma/W*Qtcon[3];
+
+  if(u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
+    {
+      if(verbose>0) printf("neg u in u2p_hot %e %e %e %e\n",rho,u,gamma2,W);//getchar();
+      return -104;
+    }
+
+  if(rho<0.) 
+    {
+      if(verbose>0) printf("neg rho in u2p_hot %e %e %e %e\n",rho,u,gamma2,W);//getchar();
+      return -105;
+    }
+
+  //converting to VELPRIM
+  conv_vels(utcon,utcon,VELR,VELPRIM,gg,GG);
+  
+  //returning new primitives
+  pp[0]=rho;
+  pp[1]=u;
+  pp[2]=utcon[1];
+  pp[3]=utcon[2];
+  pp[4]=utcon[3];
+
+  //entropy based on UU[1]
+  pp[5]=calc_Sfromu(rho,u);
+
+#ifdef TRACER
+  ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
+  pp[TRA]=Dtr/gamma;
+#endif
+
+
+  // test the inversion
+  ldouble uu2[NV];
+  int iv;
+  int lostprecision=0;
+  p2u(pp,uu2,ggg);
+  for(iv=0;iv<NVMHD;iv++)
+    {
+      if(iv==5) continue;
+      if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3))
+	//|| ((iv>1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6 && fabs(uu[iv])>1.e-6))
+	lostprecision=1;
+    }     
+
+  if(lostprecision)
+    {
+      if(verbose>0) printf("u2p_hot lost precision:\n");
+      //print_Nvector(uu,NV);
+      //print_Nvector(uu2,NV);  
+      return -106;
+      //getchar();
+    }
+
+  if(verbose>1) {print_Nvector(pp,NV); getchar();}
+
+  return 0; //ok
+
+}
