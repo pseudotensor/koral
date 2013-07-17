@@ -228,7 +228,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		  //solver went rho->D meaning entropy too large 
 		  //imposing URHOLIMIT 
 		  {		
-		    u2pret=u2p_hotmax(uu,pp,ggg);
+		    //u2pret=u2p_hotmax(uu,pp,ggg);
+		    u2pret=u2p_solver(uu,pp,ggg,U2P_HOTMAX);
 		    if(u2pret<0)
 		      {
 			if(verbose>0)
@@ -256,7 +257,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	//***********************************
 	//cold RHD - assuming u=SMALL
 	ret=-2;
-	u2pret=u2p_cold(uu,pp,ggg);
+	//u2pret=u2p_cold(uu,pp,ggg);
+	u2pret=u2p_solver(uu,pp,ggg,U2P_COLD);
 	//************************************
 
 	if(u2pret<0)
@@ -434,14 +436,17 @@ FTYPE compute_idrho0dp(FTYPE wmrho0)
 
 
 int
-f_u2p_hot(ldouble W, ldouble* cons,ldouble *f,ldouble *df)
+f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df)
 {
+
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
   ldouble D=cons[2];
   ldouble QdotBsq=cons[3];
   ldouble Bsq=cons[4];
- 
+  
+  ldouble W=Wp+D;
+
   FTYPE W3,X3,Ssq,Wsq,X,X2; 
   FTYPE Qtsq = Qt2;
   X = Bsq + W;
@@ -452,8 +457,6 @@ f_u2p_hot(ldouble W, ldouble* cons,ldouble *f,ldouble *df)
   //  return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrt(1.-Qt2/W/W);   
 
   //a bit more clear
-
-  ldouble Wp=W-D;
 
   ldouble v2 = Qt2/W/W;
   ldouble vsq=v2;
@@ -720,7 +723,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   for(iv=0;iv<NVMHD;iv++)
     {
       if(iv==5) continue;
-      if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3))
+       if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3))
 	//|| ((iv>1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6 && fabs(uu[iv])>1.e-6))
 	lostprecision=1;
     }     
@@ -2030,6 +2033,20 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   gdetu=1.;
 #endif
   /****************************/
+
+  /****************************/
+  //equations choice
+  int (*f_u2p)(ldouble,ldouble*,ldouble*,ldouble*);
+ if(Etype==U2P_HOT) 
+   f_u2p=&f_u2p_hot;
+ if(Etype==U2P_ENTROPY) 
+   f_u2p=&f_u2p_entropy;
+ if(Etype==U2P_HOTMAX) 
+   f_u2p=&f_u2p_hotmax;
+ if(Etype==U2P_COLD) 
+   f_u2p=&f_u2p_cold;
+  /****************************/
+ 
   
   if(verbose>1) {printf("********************\n");print_Nvector(uu,NV);}
   if(verbose>1) {print_Nvector(pp,NV);}
@@ -2146,19 +2163,32 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   //test if does not provide reasonable gamma2
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
-  while( (( W*W*W * ( W + 2.*Bsq ) 
-	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
-	 && (i_increase < 10) ) {
-    W *= 10.;
-    i_increase++;
-  }
-
-  //1d Newton solver
+  ldouble f0,f1,dfdW;
   ldouble CONV=1.e-8;
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
-  ldouble f0,f1,dfdW;
   ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
+ 
+  do
+    {
+      (*f_u2p)(W-D,cons,&f0,&dfdW);
+      
+      if( ((( W*W*W * ( W + 2.*Bsq ) 
+	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
+	  || isinf(f0) || isnan(f0)
+	  || isinf(dfdW) || isnan(dfdW))
+	  && (i_increase < 10))
+	{
+	  W *= 10.;
+	  i_increase++;
+	  continue;
+	}
+      else
+	break;    
+    }
+  while(1);
+
+  //1d Newton solver
   if(verbose>1) printf("in:%e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
 
   int iter=0,fu2pret;
@@ -2166,50 +2196,52 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
     {
       Wprev=W;
       iter++;
-
-      if(Etype==U2P_HOT) 
-	fu2pret=f_u2p_hot(W,cons,&f0,&dfdW);
-      if(Etype==U2P_ENTROPY) 
-	fu2pret=f_u2p_entropy(W,cons,&f0,&dfdW);
-      if(Etype==U2P_HOTMAX) 
-	fu2pret=f_u2p_hotmax(W,cons,&f0,&dfdW);
-      if(Etype==U2P_COLD) 
-	fu2pret=f_u2p_cold(W,cons,&f0,&dfdW);
-
-      //f_u2p_hot(W*(1.+EPS),cons,&f1,&dfdW);
-      //dfdW=(f1-f0)/(EPS*W);
-
+     
+      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW);
+     
       if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,f1,dfdW);
 
       if(dfdW==0.) {W*=1.1; continue;}
 
       ldouble Wnew=W-f0/dfdW;
+      int idump=0;
+      ldouble dumpfac=1.;
 
       //test if goes out of bounds and damp solution if so
       //if(Wnew*Wnew<Qt2 || isnan(Wnew))
-      if((( W*W*W * ( W + 2.*Bsq ) 
-	      - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq)) 
-	   || isnan(Wnew)
-	   || fu2pret<0)
+      
+      do
 	{
-	  int idump=0;
-	  ldouble dumpfac=1.;
-	  do
+	  ldouble f0tmp,dfdWtmp;
+	  (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp);
+
+	  if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
+		  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))
+	       || isinf(f0tmp) || isnan(f0tmp)
+	       || isinf(dfdWtmp) || isnan(dfdWtmp))
+	      && (idump<100))
 	    {
 	      idump++;
 	      dumpfac/=2.;
 	      Wnew=W-dumpfac*f0/dfdW;
+	      continue;
 	    }
-	  while((( W*W*W * ( W + 2.*Bsq ) 
-		   - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
-		&& idump<100);
-	  
-	  if(idump>=100) {if(verbose>0) printf("damped unsuccessfuly\n");return -101;}
-
-	  if(verbose>0) printf("damped successfuly\n");
+	  else
+	    break;
 	}
+      while(1);
+	  
+      if(idump>=100) {if(verbose>0) printf("damped unsuccessfuly\n");return -101;}
 
+      if(verbose>0) printf("damped successfuly\n");
+	
       W=Wnew; 
+
+      if(fabs(W)>BIG) 
+	{
+	  if(verbose>1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
+	  return -103;
+	}
     }
   while(fabs((W-Wprev)/Wprev)>CONV && iter<50);
 
@@ -2280,7 +2312,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   p2u(pp,uu2,ggg);
   for(iv=0;iv<NVMHD;iv++)
     {
-      if(iv==5) continue;
+      if(Etype==U2P_HOT) if(iv==5) continue;
+      if(Etype==U2P_ENTROPY) if(iv==1) continue;
+      if(Etype==U2P_COLD || Etype==U2P_HOTMAX) if(iv==1 || iv==5) continue;
       if(((iv==0 || iv==1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3))
 	//|| ((iv>1) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv])>1.e-6 && fabs(uu[iv])>1.e-6))
 	lostprecision=1;
