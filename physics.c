@@ -75,22 +75,12 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   axl=axr=ayl=ayr=azl=azr=1.;
   
   ldouble ucon[4],ucov[4],cst1,cst2,cst3,cst4;
-  
+  ldouble bcon[4],bcov[4],bsq;
+  ldouble cs2,va2,EF,EE; 
+  ldouble rho,uu,pre;
 
   //**********************************************************************
-  //***** hydro: speed of sound ******************************************
-  //**********************************************************************
-	      
-  ldouble rho=pp[RHO];
-  ldouble uu=pp[UU];
- 
-  ldouble pre=(GAMMA-1.)*uu;
-  ldouble cs2=GAMMA*pre/(rho+uu+pre);
-
-  if(cs2<0.) cs2=0.;
-
-  //**********************************************************************
-  //***** other stuff ****************************************************
+  //***** four velocity **************************************************
   //**********************************************************************
 
   for(iv=1;iv<4;iv++)
@@ -100,11 +90,41 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   indices_21(ucon,ucov,gg);
 
   //**********************************************************************
-  //algorithm from HARM to transform the fluid frame wavespeed into lab frame
+  //***** hydro: speed of sound ******************************************
+  //**********************************************************************
+	      
+  rho=pp[RHO];
+  uu=pp[UU];
+ 
+  pre=(GAMMA-1.)*uu;
+  cs2=GAMMA*pre/(rho+uu+pre);
+
+  //**********************************************************************
+  //***** magn: alvenic speed ****** *************************************
+  //**********************************************************************
+	      
+  va2=0.;
+
+#ifdef MAGNFIELD
+  bcon_calc(pp,ucon,ucov,bcon);
+  indices_21(bcon,bcov,gg); 
+  bsq = dot(bcon,bcov);
+  EF = rho + gam*uu;
+  EE = bsq + EF ;
+  va2 = bsq/EE ;
+
+  if(cs2<0.) cs2=0.;
+#endif
+
+  //**********************************************************************
+  //***** mhd: fast magnetosonic speed ***********************************
   //**********************************************************************
 
-  ldouble vtot2; //characteristic velocity
-  vtot2=cs2; //by default speed of sound  
+  ldouble vtot2; //total characteristic velocity
+  vtot2=cs2 + va2 - cs2*va2;
+
+  if(vtot2<0.) vtot2=0.;
+  if(vtot2>1.) vtot2=1.;
 
   //**********************************************************************
   //**********************************************************************    
@@ -122,6 +142,10 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
       //should be already limited in calc_hd_nu_shearnuviscosity
       if(vtot2>1.) vtot2=1.;
     }
+
+  //**********************************************************************
+  //algorithm from HARM to transform the fluid frame wavespeed into lab frame
+  //**********************************************************************
 
   ldouble aret[2];
   calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,0);
@@ -169,7 +193,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 #endif
 
   //TODO:
-  //include rad diffusive wavespeed here?
+  //include rad diffusive wavespeed here!
 
   axl=aval[0];
   axr=aval[1];
@@ -669,21 +693,32 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   int iv,i,j;
   ldouble rho=pp[RHO];
   ldouble uu=pp[UU];
-  ldouble ucon[4],ucov[4];
+  ldouble ucon[4],ucov[4];  
+  ldouble bcon[4]={0.,0.,0.,0.},bcov[4]={0.,0.,0.,0.},bsq=0.;
   
   //converts to 4-velocity
   for(iv=1;iv<4;iv++)
     ucon[iv]=pp[1+iv];
   ucon[0]=0.;
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  //indices_21(ucon,ucov,gg);
+  indices_21(ucon,ucov,gg);
 
-  ldouble w=rho+GAMMA*uu;
-  ldouble p=(GAMMA-1.)*uu;
+#ifdef MAGNFIELD
+  bcon_calc(pp,ucon,ucov,bcon);
+  indices_21(bcon,bcov,gg); 
+  bsq = dot(bcon,bcov);
+#endif
 
+  
+  ldouble p=(GAMMA-1.)*uu; 
+  ldouble w=rho+uu+p;
+  ldouble eta=w+bsq;
+  ldouble ptot=p+0.5*bsq;
+  
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      T[i][j]=w*ucon[i]*ucon[j]+p*GG[i][j];
+      T[i][j]=eta*ucon[i]*ucon[j] + ptot*GG[i][j] - bcon[i]*bcon[j];
+
 
 #if (HDVISCOSITY!=NOVISCOSITY)
   ldouble Tvisc[4][4];
@@ -694,7 +729,6 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       {	
 	T[i][j]+=Tvisc[i][j];
       }
-
 #endif  
 
   return 0;

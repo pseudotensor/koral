@@ -51,6 +51,7 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble rho=p[0];
   ldouble uu=p[1];
   ldouble vcon[4],ucon[4],ucov[4];
+  ldouble bcon[4]={0.,0.,0.,0.},bcov[4]={0.,0.,0.,0.},bsq=0.;
   vcon[1]=p[2];
   vcon[2]=p[3];
   vcon[3]=p[4];
@@ -61,6 +62,11 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 
   conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
+#ifdef MAGNFIELD
+  bcon_calc(pp,ucon,ucov,bcon);
+  indices_21(bcon,bcov,gg); 
+  bsq = dot(bcon,bcov);
+#endif
 
   //************************************
   //************************************
@@ -92,12 +98,16 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   //S=pp[5] updated appropriately in u2p_hot, u2p_entropy and floors
   Sut=S*ut;
 
-  ldouble pre=(GAMMA-1.)*uu;
+  ldouble pre=(GAMMA-1.)*uu; 
   ldouble w=rho+uu+pre;
-  ldouble Tttt=rhout + w*ucon[0]*ucov[0] + pre;
-  ldouble Ttr =w*ucon[0]*ucov[1];
-  ldouble Ttth =w*ucon[0]*ucov[2];
-  ldouble Ttph =w*ucon[0]*ucov[3];
+  ldouble eta=w+bsq;
+  ldouble ptot=pre+0.5*bsq;
+
+  //~T^i_j 
+  ldouble Tttt=rhout + eta*ucon[0]*ucov[0] + ptot - bcon[0]*bcov[0];
+  ldouble Ttr =eta*ucon[0]*ucov[1] - bcon[0]*bcov[1];
+  ldouble Ttth =eta*ucon[0]*ucov[2] - bcon[0]*bcov[2];
+  ldouble Ttph =eta*ucon[0]*ucov[3] - bcon[0]*bcov[3];
    
 #if (GDETIN==0) //gdet out of derivatives
   gdet=1.;
