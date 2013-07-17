@@ -61,19 +61,6 @@ calc_primitives(int ix,int iy,int iz)
   else
     set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
 
-  /*
-  //sets the flag to mark if hot conversion did not succeed - the entropy will not be updated
-   if(corrected[0]!=0)
-     {
-       set_cflag(ENTROPYFLAG,ix,iy,iz,-1); 
-     }
-   else 
-     set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
-   
-  //updates u[5]=Sut(rho,u) when u2p_hot() succeded or calculates p[5]=S from previous Sut if the other case
-  update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz)); 
-  */
-
   return 0;
 }
 
@@ -140,13 +127,12 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
   //************************************
   //************************************
-  //hydro part
+  //magneto-hydro part
   //************************************
   //************************************
   //************************************
 
-  ldouble u0=pp[1];
-  
+  ldouble u0=pp[1];  
 
   //************************************
   //************************************
@@ -154,7 +140,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //hot hydro - conserving energy
   ret=0;
 #ifdef ENFORCEENTROPY
-  u2pret=-1;//u2p_entropy_harm(uu,pp,ggg);
+  u2pret=-1;//u2p_entropy(uu,pp,ggg);
 #else
   u2pret=u2p_hot(uu,pp,ggg);  
   //************************************
@@ -213,7 +199,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	    //************************************
 	    //************************************
 	    //entropy solver - conserving entropy
-	    u2pret=u2p_entropy_harm(uu,pp,ggg);
+	    u2pret=u2p_entropy(uu,pp,ggg);
 	
 	    //************************************
 
@@ -240,7 +226,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		  //solver went rho->D meaning entropy too large 
 		  //imposing URHOLIMIT 
 		  {		
-		    u2pret=u2p_hotmax_harm(uu,pp,ggg);
+		    u2pret=u2p_hotmax(uu,pp,ggg);
 		    if(u2pret<0)
 		      {
 			if(verbose>0)
@@ -268,7 +254,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	//***********************************
 	//cold RHD - assuming u=SMALL
 	ret=-2;
-	u2pret=u2p_cold_harm(uu,pp,ggg);
+	u2pret=u2p_cold(uu,pp,ggg);
 	//************************************
 
 	if(u2pret<0)
@@ -945,341 +931,6 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
 
   return 0; //ok
 
-}
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//auxiliary solver based on the entropy conservation
-//works for general metric in four velocities
-int
-u2p_entropy(ldouble *uuu, ldouble *p, void* ggg)
-{
-  int verbose=0;
-  int superverbose=0;
-
-  if(superverbose)
-    {
-      printf("start of u2p_entropy()\n");
-      printf("in:\n");
-      print_Nvector(p,NV);
-      print_Nvector(uuu,NV);
-
-    }
-
-  struct geometry *geom
-   = (struct geometry *) ggg;
-
-  ldouble (*g)[5],(*G)[5],gdet,gdetu;
-  g=geom->gg;
-  G=geom->GG;
-  gdet=geom->gdet;gdetu=gdet;
-#if (GDETIN==0) //gdet out of derivatives
-  gdetu=1.;
-#endif
-
-  ldouble gtt=g[0][0];
-  ldouble gtr=g[0][1];
-  ldouble gtth=g[0][2];
-  ldouble gtph=g[0][3];
-
-  ldouble grt=g[1][0];
-  ldouble grr=g[1][1];
-  ldouble grth=g[1][2];
-  ldouble grph=g[1][3];
-
-  ldouble gtht=g[2][0];
-  ldouble gthr=g[2][1];
-  ldouble gthth=g[2][2];
-  ldouble gthph=g[2][3];
-
-  ldouble gpht=g[3][0];
-  ldouble gphr=g[3][1];
-  ldouble gphth=g[3][2];
-  ldouble gphph=g[3][3];
-
-  ldouble rhout=uuu[0]/gdetu;
-  ldouble Tttt=uuu[1]/gdetu; //this one unused
-  ldouble Ttr=uuu[2]/gdetu;
-  ldouble Ttth=uuu[3]/gdetu;
-  ldouble Ttph=uuu[4]/gdetu;
-  ldouble Sut=uuu[5]/gdetu;
-
- 
-  conv_velsinprims(p,VELPRIM,VEL3,g,G);
- 
-  ldouble rho=p[0]; //initial guess
-  ldouble rho0=p[0]; //initial guess
-  ldouble uu=p[1];
-  ldouble vr=p[2];
-  ldouble vth=p[3];
-  ldouble vph=p[4];
-  ldouble S=p[5];
-
-  ldouble ut2;
-  
-  ldouble rhop1=rho;
-  ldouble rhom1=rho;  
-
-  int iter=0;
-  ldouble err,W,fval,dfval,fval1,fval2,diffrho,ut;
-  ldouble dudrho,dWdrho,dvphdrho,dvrdrho,dvthdrho;
-
-  ldouble conv=1.e-8;
-  int itmax=30;
-  ldouble fvalmin[2]={0.,-1.};
-  ldouble absfval;
-
-  ldouble ftest[50][4];
-
-  do{
-    iter++;
-    rho=rhop1;
-
-    ut=rhout/rho;
-    ut2=ut*ut;
-    S=Sut/ut;
-   
-    uu=(ldouble)pow((pow(rho,1./GAMMAM1+1.)*exp(Sut/rhout)),GAMMAM1)/GAMMAM1;
-
-    W=ut2*(uu*GAMMA + rho);  
-
-    vr=-((gphth*gthr*Ttph - gphr*gthth*Ttph - gphth*gthph*Ttr + gphph*gthth*Ttr + gphr*gthph*Ttth - gphph*gthr*Ttth - gphth*gthr*gtph*W + gphr*gthth*gtph*W + gphth*gthph*gtr*W - gphph*gthth*gtr*W - gphr*gthph*gtth*W + gphph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W));
-    vth=-((gphth*grr*Ttph - gphr*grth*Ttph - gphth*grph*Ttr + gphph*grth*Ttr + gphr*grph*Ttth - gphph*grr*Ttth - gphth*grr*gtph*W + gphr*grth*gtph*W + gphth*grph*gtr*W - gphph*grth*gtr*W - gphr*grph*gtth*W + gphph*grr*gtth*W)/((-(gphth*grr*gthph) + gphr*grth*gthph + gphth*grph*gthr - gphph*grth*gthr - gphr*grph*gthth + gphph*grr*gthth)*W));
-    vph=(grth*gthr*Ttph - grr*gthth*Ttph - grth*gthph*Ttr + grph*gthth*Ttr + grr*gthph*Ttth - grph*gthr*Ttth - grth*gthr*gtph*W + grr*gthth*gtph*W + grth*gthph*gtr*W - grph*gthth*gtr*W - grr*gthph*gtth*W + grph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W);
-
-    fval=1./ut2 + gtt + grr*vr*vr + gthth*vth*vth + gphph*vph*vph + 2.*gtph*vph + 2.*gtr*vr + 2.*gtth*vth +
-      2.*grph*vr*vph + 2.*grth*vr*vth + 2.*gphth*vph*vth;
-
-    dudrho=(ldouble)GAMMA/GAMMAM1*exp(Sut/rhout)*pow(rho,1./GAMMAM1)*pow(exp(Sut/rhout)*pow(rho,GAMMA/GAMMAM1),GAMMA-2.);
-    dWdrho=(rhout*rhout*(rho*(GAMMA*dudrho-1.)-2.*GAMMA*uu))/rho/rho/rho;
-
-    dvrdrho=((gphth*gthr*Ttph - gphr*gthth*Ttph - gphth*gthph*Ttr + gphph*gthth*Ttr + gphr*gthph*Ttth - gphph*gthr*Ttth - gphth*gthr*gtph*W + gphr*gthth*gtph*W + gphth*gthph*gtr*W - gphph*gthth*gtr*W - gphr*gthph*gtth*W + gphph*gthr*gtth*W)*dWdrho)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*Power(W,2)) - (-(gphth*gthr*gtph*dWdrho) + gphr*gthth*gtph*dWdrho + gphth*gthph*gtr*dWdrho - gphph*gthth*gtr*dWdrho - gphr*gthph*gtth*dWdrho + gphph*gthr*gtth*dWdrho)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W);
-    dvthdrho=((gphth*grr*Ttph - gphr*grth*Ttph - gphth*grph*Ttr + gphph*grth*Ttr + gphr*grph*Ttth - gphph*grr*Ttth - gphth*grr*gtph*W + gphr*grth*gtph*W + gphth*grph*gtr*W - gphph*grth*gtr*W - gphr*grph*gtth*W + gphph*grr*gtth*W)*dWdrho)/((-(gphth*grr*gthph) + gphr*grth*gthph + gphth*grph*gthr - gphph*grth*gthr - gphr*grph*gthth + gphph*grr*gthth)*Power(W,2)) - (-(gphth*grr*gtph*dWdrho) + gphr*grth*gtph*dWdrho + gphth*grph*gtr*dWdrho - gphph*grth*gtr*dWdrho - gphr*grph*gtth*dWdrho + gphph*grr*gtth*dWdrho)/((-(gphth*grr*gthph) + gphr*grth*gthph + gphth*grph*gthr - gphph*grth*gthr - gphr*grph*gthth + gphph*grr*gthth)*W);
-    dvphdrho=-(((grth*gthr*Ttph - grr*gthth*Ttph - grth*gthph*Ttr + grph*gthth*Ttr + grr*gthph*Ttth - grph*gthr*Ttth - grth*gthr*gtph*W + grr*gthth*gtph*W + grth*gthph*gtr*W - grph*gthth*gtr*W - grr*gthph*gtth*W + grph*gthr*gtth*W)*dWdrho)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*Power(W,2))) + (-(grth*gthr*gtph*dWdrho) + grr*gthth*gtph*dWdrho + grth*gthph*gtr*dWdrho - grph*gthth*gtr*dWdrho - grr*gthph*gtth*dWdrho + grph*gthr*gtth*dWdrho)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W);
-
-    fval=1./ut2 + gtt + grr*vr*vr + gthth*vth*vth + gphph*vph*vph + 2.*gtph*vph + 2.*gtr*vr + 2.*gtth*vth +
-      2.*grph*vr*vph + 2.*grth*vr*vth + 2.*gphth*vph*vth;
-    dfval=2.*rho/rhout/rhout + 
-      2.*grr*vr*dvrdrho + 2.*gthth*vth*dvthdrho + 2.*gphph*vph*dvphdrho + 
-      2.*gtph*dvphdrho + 2.*gtr*dvrdrho + 2.*gtth*dvthdrho + 
-      2.*grph*dvrdrho*vph + 2.*grph*vr*dvphdrho + 
-      2.*grth*dvrdrho*vth + 2.*grth*vr*dvthdrho + 
-      2.*gphth*dvphdrho*vth + 2.*gphth*vph*dvthdrho;
-
-    //absolute error
-    absfval=fabs(fval);
-
-    //putting best value of u to memory
-    if(absfval<fvalmin[1] || fvalmin[1]<0.)
-      {
-	fvalmin[0]=ut;
-	fvalmin[1]=absfval;
-      }
-
-    //Newton
-    rhop1=rho-fval/dfval;   
-
-    if(isnan(rhop1)) {if(verbose) {print_Nvector(uuu,NV); printf("nan rhop1: %e %e %e %e %e %e %e %e\n",rho,fval,dfval,ut,uu,
-						    Sut,rhout,
-						 exp(Sut/rhout))
-							    ;}return -1;}
-
-    if(rhop1<RHOFLOOR) rhop1=rho/2.;
-
-    if(verbose) printf("%d %e %e %e\n",iter,rhop1,rho,fval);
-
-    diffrho=rhop1-rho;
-    
-    ftest[iter][0]=rho;
-    ftest[iter][1]=uu;
-    ftest[iter][2]=fval;
-    ftest[iter][3]=dfval;
-
-    err =fabs(diffrho/rho);
-
-    //  if(err<conv && fabs(fval)>1.e-5) my_err("entropy problem?\n");
- 
-    if(iter>itmax && err>conv) 
-      {
-	if(verbose || 1) printf("iter exceeded in u2p_entr \n");
-	if(verbose ) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
-	if(verbose ) print_Nvector(p,NV);
-	if(verbose ) print_Nvector(uuu,NV);
-
-	getchar();
-	return -1;
-      }
-
-    rhom1=rho;
-
-  } while(err>conv);
-  
-  if(verbose) {printf("success %d %e %e %e\n",iter,rhop1,rho,fval);
-    //    getchar();
-  }
-
-  rho=rhop1;
-  ut=rhout/rho;
-  ut2=ut*ut;
-  S=Sut/ut;
-  uu=(ldouble)pow((pow(rho,1./GAMMAM1+1.)*exp(Sut/rhout)),GAMMAM1)/GAMMAM1;
-  W=ut2*(uu*GAMMA + rho);
-  
-  vr=-((gphth*gthr*Ttph - gphr*gthth*Ttph - gphth*gthph*Ttr + gphph*gthth*Ttr + gphr*gthph*Ttth - gphph*gthr*Ttth - gphth*gthr*gtph*W + gphr*gthth*gtph*W + gphth*gthph*gtr*W - gphph*gthth*gtr*W - gphr*gthph*gtth*W + gphph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W));
-  vth=-((gphth*grr*Ttph - gphr*grth*Ttph - gphth*grph*Ttr + gphph*grth*Ttr + gphr*grph*Ttth - gphph*grr*Ttth - gphth*grr*gtph*W + gphr*grth*gtph*W + gphth*grph*gtr*W - gphph*grth*gtr*W - gphr*grph*gtth*W + gphph*grr*gtth*W)/((-(gphth*grr*gthph) + gphr*grth*gthph + gphth*grph*gthr - gphph*grth*gthr - gphr*grph*gthth + gphph*grr*gthth)*W));
-  vph=(grth*gthr*Ttph - grr*gthth*Ttph - grth*gthph*Ttr + grph*gthth*Ttr + grr*gthph*Ttth - grph*gthr*Ttth - grth*gthr*gtph*W + grr*gthth*gtph*W + grth*gthph*gtr*W - grph*gthth*gtr*W - grr*gthph*gtth*W + grph*gthr*gtth*W)/((gphth*grr*gthph - gphr*grth*gthph - gphth*grph*gthr + gphph*grth*gthr + gphr*grph*gthth - gphph*grr*gthth)*W);
-
-  if(uu<0. || rho<0. || isnan(rho))
-    {
-      if(verbose || 1) printf("iter didn't work in u2p_entr \n");
-      if(verbose ) printf(" entr  iter %d> %e [%e] %e >%e< %e\n",iter,rho,rhop1,diffrho/rho,fval,err);
-      if(verbose ) print_Nvector(p,NV);
-      if(verbose ) print_Nvector(uuu,NV);
-      //      getchar();
-      return -1;
-    }
-
-  p[0]=rho;
-  p[1]=uu;
-  p[2]=vr;
-  p[3]=vth;
-  p[4]=vph;
-  p[5]=S;
- 
-  if(conv_velsinprims(p,VEL3,VELPRIM,g,G)!=0) 
-    {
-      print_Nvector(p,NV);
-      if(verbose || 1) printf("conv vels in _entropy failed %e ut\n",ut);
-      getchar();
-      return -1;
-    }
- 
-  //************************************
-  //************************************
-  //checking on hd floors
-  //check_floors_hd(p,VELPRIM,g,G);
-  //************************************
-  //************************************
-
-  ldouble uuu2[NV];
-  int iv;
-  int lostprecision=0;
-  p2u(p,uuu2,ggg);
-  for(iv=0;iv<NVMHD;iv++)
-    {
-      if(iv==1) continue;
-      //      if(((iv==0 || iv==5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6) ||
-      //	 ((iv>2 && iv<5) && fabs(uuu2[iv]-uuu[iv])/fabs(uuu[iv])>1.e-6 && fabs(uuu[iv])>1.e-6))
-      //	lostprecision=1;
-     }    
-
-  if(superverbose)
-    {
-      printf("superverbose in u2p_entropy:\n");
-      print_Nvector(p,NV);
-      print_Nvector(uuu,NV);
-      print_Nvector(uuu2,NV);    
-      getchar();
-    }
-
-  if(lostprecision)
-    {
-      printf("u2p_entropy lost precision:\n");
-      print_Nvector(uuu,NV);
-      print_Nvector(uuu2,NV);          
-    }
-
-  return 0;
-}
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//auxiliary solver assuming u=0
-int
-u2p_cold(ldouble *uuu, ldouble *p, ldouble g[][5], ldouble G[][5])
-{
-  int verbose=1;
-
-  my_err("cold");
-
-  ldouble gtt=g[0][0];
-  ldouble gtr=g[0][1];
-  ldouble gtth=g[0][2];
-  ldouble gtph=g[0][3];
-
-  ldouble grt=g[1][0];
-  ldouble grr=g[1][1];
-  ldouble grth=g[1][2];
-  ldouble grph=g[1][3];
-
-  ldouble gtht=g[2][0];
-  ldouble gthr=g[2][1];
-  ldouble gthth=g[2][2];
-  ldouble gthph=g[2][3];
-
-  ldouble gpht=g[3][0];
-  ldouble gphr=g[3][1];
-  ldouble gphth=g[3][2];
-  ldouble gphph=g[3][3];
-
-  ldouble gdet=g[3][4];
-  ldouble gdetu=gdet;
-#if (GDETIN==0) //gdet out of derivatives
-  gdetu=1.;
-#endif
-
-  ldouble rhout=uuu[0]/gdetu;
-  ldouble Tttt=uuu[1]/gdetu; 
-  ldouble Ttr=uuu[2]/gdetu;
-  ldouble Ttth=uuu[3]/gdetu;
-  ldouble Ttph=uuu[4]/gdetu;
-  ldouble Sut=uuu[5]/gdetu;
-  ldouble Ttt=Tttt+rhout;
-
-  //  conv_velsinprims(p,VELPRIM,VEL3,g,G);
-
-
-  ldouble rho,uu,vr,vth,vph,S,fff,ut;
-  
-  fff=(Ttt - Ttph*gtph/gphph)/(gtt - gtph*gtph/gphph);
-  ut=fff/rhout;
-					       
-  rho=rhout/ut;
-  uu=UUFLOOR;
-  vr=Ttr/grr/fff;
-  vph=Ttph/gphph/fff - gtph/gphph;
-  vth=Ttth/gthth/fff;
-  S=Sut/ut;
-
-  if(rho<0.)
-    {
-      rho=RHOFLOOR;
-   }
-
-  p[0]=rho;
-  p[1]=uu;
-  p[2]=vr;
-  p[3]=vth;
-  p[4]=vph;
-  p[5]=S;
-
-  //************************************
-  //************************************
-  //checking on hd floors
-  //check_floors_hd(p,VEL3,g,G);
-  //************************************
-  //***********************************
-
-  /*
- if(verbose) print_Nvector(uuu,NV);
- if(verbose) print_Nvector(p,NV);
- if(verbose) getchar();
-  */
-  conv_velsinprims(p,VEL3,VELPRIM,g,G);
-
-  return 0;
 }
 
 
@@ -2490,7 +2141,7 @@ static FTYPE dvsq_dW(FTYPE W, FTYPE *wglobal,FTYPE Bsq,FTYPE QdotB,FTYPE QdotBsq
 //**********************************************************************
 //**********************************************************************
 int
-f_u2p_entropy_harm(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
+f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 {
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
@@ -2549,7 +2200,7 @@ f_u2p_entropy_harm(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 }
 
 int
-u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
+u2p_entropy(ldouble *uu, ldouble *pp, void *ggg)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -2569,7 +2220,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(superverbose)
     {
-      printf("start of u2p_entropy_harm()\n");
+      printf("start of u2p_entropy()\n");
       printf("in:\n");
       print_Nvector(pp,NV);
       print_Nvector(uu,NV);
@@ -2674,7 +2325,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
   int iter=0;
 
   //testing if initial guess works
-  f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+  f_u2p_entropy(Wp,cons,&f0,&dfdWp);
 
   //initial guess wrong - leading to negative pressure
   //arbitrary look up
@@ -2689,7 +2340,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
       rho0 = D/gamma;
       wmrho0 = w - rho0;
 
-      f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+      f_u2p_entropy(Wp,cons,&f0,&dfdWp);
       if(verbose>1) printf(">>> %e %e\n",f0,wmrho0);      
     }
   
@@ -2709,7 +2360,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  w = W/gamma2;
 	  rho0 = D/gamma;
 	  wmrho0 = w - rho0;
-	  f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+	  f_u2p_entropy(Wp,cons,&f0,&dfdWp);
 	    
 	  if(verbose>1) 
 	    {
@@ -2737,7 +2388,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
       iter++;
       dampfac=1.;
 
-      f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+      f_u2p_entropy(Wp,cons,&f0,&dfdWp);
 
       do
 	{
@@ -2752,7 +2403,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  wmrho0 = w - rho0;
 	  u = wmrho0 / GAMMA;
 
-	  f_u2p_entropy_harm(Wp,cons,&f0temp,&dfdWptemp);
+	  f_u2p_entropy(Wp,cons,&f0temp,&dfdWptemp);
 
 	  if(verbose>1) printf("substep: %f %e %e %e %e\n",dampfac,Wp,f0temp,dfdWptemp,u);
 	  dampfac/=2.;
@@ -2761,7 +2412,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	}
       while(u<0. || isnan(f0temp) || isinf(f0temp) || isnan(dfdWptemp) || isinf(dfdWptemp));
 
-      if(dampfac<1.e-7) {printf("damping unsuccesful at entropy_harm\n");return -102; getchar(); }
+      if(dampfac<1.e-7) {printf("damping unsuccesful at entropy\n");return -102; getchar(); }
       else  if(verbose>1) {printf("damping succesful\n"); }
 
       if(verbose>1) 
@@ -2803,7 +2454,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 	      wmrho0 = w - rho0;
 	      ldouble Ssofchi=compute_specificentropy_wmrho0_idealgas(rho0,wmrho0);
 
-	      f_u2p_entropy_harm(Wp,cons,&f0,&dfdWp);
+	      f_u2p_entropy(Wp,cons,&f0,&dfdWp);
 	      printf("%f %e %e %e %e %e %e -> %e %e -> %e %e\n",ddd,W,Wp,gamma,wmrho0,rho0,alpha,f0,dfdWp,D*Ssofchi,Sc);
 	    }
 	  getchar();
@@ -2820,7 +2471,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
     { 
       if(fabs(1.-gamma)<1.e-10) //going out of bounds
 	return -103; 
-      printf("iter exceeded in u2p_entropy_harm at %d %d %d\n",geom->ix,geom->iy,geom->iz);
+      printf("iter exceeded in u2p_entropy at %d %d %d\n",geom->ix,geom->iy,geom->iz);
       return -105;
     }
   
@@ -2843,7 +2494,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(rho<0. || u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
     {
-      printf("neg u rho in u2p_entropy_harm %e %e %e %e\n",rho,u,gamma2,W);
+      printf("neg u rho in u2p_entropy %e %e %e %e\n",rho,u,gamma2,W);
       //getchar();
       return -106;
     }
@@ -2880,7 +2531,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
      
   if(lostprecision)
     {
-      //printf("u2p_entropy_harm lost precision at %d %d %d:\n",geom->ix,geom->iy,geom->iz);
+      //printf("u2p_entropy lost precision at %d %d %d:\n",geom->ix,geom->iy,geom->iz);
       return -107;
       print_Nvector(pp,NV);
       print_Nvector(uu,NV);
@@ -2890,7 +2541,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(superverbose)
     {
-      printf("superverbose in u2p_entropy_harm:\n");
+      printf("superverbose in u2p_entropy:\n");
       print_Nvector(pp,NV);
       print_Nvector(uu,NV);
       print_Nvector(uu2,NV);  
@@ -2907,7 +2558,7 @@ u2p_entropy_harm(ldouble *uu, ldouble *pp, void *ggg)
 //**********************************************************************
 //**********************************************************************
 int
-f_u2p_cold_harm(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
+f_u2p_cold(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 {
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
@@ -2941,7 +2592,7 @@ f_u2p_cold_harm(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 }
 
 int
-u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
+u2p_cold(ldouble *uu, ldouble *pp, void *ggg)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -2959,7 +2610,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(superverbose)
     {
-      printf("start of u2p_cold_harm()\n");
+      printf("start of u2p_cold()\n");
       printf("in:\n");
       print_Nvector(pp,NV);
       print_Nvector(uu,NV);
@@ -3064,7 +2715,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
   int iter=0;
 
   //testing if initial guess works
-  f_u2p_cold_harm(Wp,cons,&f0,&dfdWp);
+  f_u2p_cold(Wp,cons,&f0,&dfdWp);
   if(isnan(f0)|| isnan(dfdWp) || isinf(f0) || isinf(dfdWp))
     {
       W=1.01*sqrt(D*D+Qt2);
@@ -3076,7 +2727,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
       rho0 = D/gamma;
       wmrho0 = w - rho0;
 
-      f_u2p_cold_harm(Wp,cons,&f0,&dfdWp);
+      f_u2p_cold(Wp,cons,&f0,&dfdWp);
       if(verbose>1) printf(">>> %e %e\n",f0,wmrho0);      
     }
   
@@ -3095,7 +2746,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  w = W/gamma2;
 	  rho0 = D/gamma;
 	  wmrho0 = w - rho0;
-	  f_u2p_cold_harm(Wp,cons,&f0,&dfdWp);
+	  f_u2p_cold(Wp,cons,&f0,&dfdWp);
 	    
 	  if(verbose>1 || 1) 
 	    {
@@ -3123,8 +2774,8 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
       iter++;
       dampfac=1.;
 
-      f_u2p_cold_harm(Wp,cons,&f0,&dfdWp);
-      //f_u2p_cold_harm(Wp*(1.+EPS),cons,&f1,&dfdWp);
+      f_u2p_cold(Wp,cons,&f0,&dfdWp);
+      //f_u2p_cold(Wp*(1.+EPS),cons,&f1,&dfdWp);
       //dfdWp=(f1-f0)/(EPS*Wp);
 
       do
@@ -3140,7 +2791,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  wmrho0 = w - rho0;
 	  u = wmrho0 / GAMMA;
 
-	  f_u2p_cold_harm(Wp,cons,&f0temp,&dfdWptemp);
+	  f_u2p_cold(Wp,cons,&f0temp,&dfdWptemp);
 
 	  if(verbose>1) printf("substep: %f %e %e %e %e\n",dampfac,Wp,f0temp,dfdWptemp,u);
 	  dampfac/=2.;
@@ -3149,7 +2800,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
 	}
       while(u<0. || isnan(f0temp) || isinf(f0temp) || isnan(dfdWptemp) || isinf(dfdWptemp));
 
-      if(dampfac<1.e-7) {printf("damping unsuccesful at entropy_harm\n");return -1; getchar(); }
+      if(dampfac<1.e-7) {printf("damping unsuccesful at entropy\n");return -1; getchar(); }
       else  if(verbose>1) {printf("damping succesful\n"); }
 
       if(verbose>1) 
@@ -3176,7 +2827,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(iter>=50)
     {
-      if(verbose>0 || 1) printf("iter exceeded in u2p_cold_harm at %d %d %d\n",geom->ix,geom->iy,geom->iz);
+      if(verbose>0 || 1) printf("iter exceeded in u2p_cold at %d %d %d\n",geom->ix,geom->iy,geom->iz);
       //getchar();
       return -1;
     }
@@ -3200,7 +2851,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(rho<0. || u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
     {
-      if(verbose>0 || 1) printf("neg u rho in u2p_cold_harm %e %e %e %e\n",rho,u,gamma2,W);
+      if(verbose>0 || 1) printf("neg u rho in u2p_cold %e %e %e %e\n",rho,u,gamma2,W);
       //getchar();
       return -1;
     }
@@ -3233,7 +2884,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(superverbose)
     {
-      printf("superverbose or u2p_cold_harm lost precision:\n");
+      printf("superverbose or u2p_cold lost precision:\n");
       print_Nvector(pp,NV);
       print_Nvector(uu,NV);
       print_Nvector(uu2,NV);  
@@ -3251,7 +2902,7 @@ u2p_cold_harm(ldouble *uu, ldouble *pp, void *ggg)
 //**********************************************************************
 //uses D,T^t_i to get solution with u=UURHORATIOMAX*rho
 int
-f_u2p_hotmax_harm(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
+f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 {
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
@@ -3286,7 +2937,7 @@ f_u2p_hotmax_harm(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 }
 
 int
-u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
+u2p_hotmax(ldouble *uu, ldouble *pp, void *ggg)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -3304,7 +2955,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(superverbose)
     {
-      printf("start of u2p_hotmax_harm()\n");
+      printf("start of u2p_hotmax()\n");
       printf("in:\n");
       print_Nvector(pp,NV);
       print_Nvector(uu,NV);
@@ -3409,7 +3060,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
   int iter=0;
 
   //testing if initial guess works
-  f_u2p_hotmax_harm(Wp,cons,&f0,&dfdWp);
+  f_u2p_hotmax(Wp,cons,&f0,&dfdWp);
   if(isnan(f0)|| isnan(dfdWp) || isinf(f0) || isinf(dfdWp))
     {
       W=1.01*sqrt(D*D+Qt2);
@@ -3421,7 +3072,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
       rho0 = D/gamma;
       wmrho0 = w - rho0;
 
-      f_u2p_hotmax_harm(Wp,cons,&f0,&dfdWp);
+      f_u2p_hotmax(Wp,cons,&f0,&dfdWp);
       if(verbose>1) printf(">>> %e %e\n",f0,wmrho0);      
     }
   
@@ -3440,7 +3091,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  w = W/gamma2;
 	  rho0 = D/gamma;
 	  wmrho0 = w - rho0;
-	  f_u2p_hotmax_harm(Wp,cons,&f0,&dfdWp);
+	  f_u2p_hotmax(Wp,cons,&f0,&dfdWp);
 	    
 	  if(verbose>1 || 1) 
 	    {
@@ -3468,8 +3119,8 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
       iter++;
       dampfac=1.;
 
-      f_u2p_hotmax_harm(Wp,cons,&f0,&dfdWp);
-      f_u2p_hotmax_harm(Wp*(1.+EPS),cons,&f1,&dfdWp);
+      f_u2p_hotmax(Wp,cons,&f0,&dfdWp);
+      f_u2p_hotmax(Wp*(1.+EPS),cons,&f1,&dfdWp);
       //printf("%e %e\n",dfdWp,(f1-f0)/(EPS*Wp));getchar();
       //dfdWp=(f1-f0)/(EPS*Wp);
 
@@ -3487,7 +3138,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
 	  wmrho0 = w - rho0;
 	  u = wmrho0 / GAMMA;
 
-	  f_u2p_hotmax_harm(Wp,cons,&f0temp,&dfdWptemp);
+	  f_u2p_hotmax(Wp,cons,&f0temp,&dfdWptemp);
 
 	  if(verbose>1) printf("substep: %f %e %e %e %e\n",dampfac,Wp,f0temp,dfdWptemp,u);
 	  dampfac/=2.;
@@ -3496,7 +3147,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
 	}
       while(u<0. || isnan(f0temp) || isinf(f0temp) || isnan(dfdWptemp) || isinf(dfdWptemp));
 
-      if(dampfac<1.e-7) {printf("damping unsuccesful at hotmax_harm\n");return -1; getchar(); }
+      if(dampfac<1.e-7) {printf("damping unsuccesful at hotmax\n");return -1; getchar(); }
       else  if(verbose>1) {printf("damping succesful\n"); }
 
       if(verbose>1) 
@@ -3523,7 +3174,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(iter>=50)
     {
-      printf("iter exceeded in u2p_hotmax_harm at %d %d %d\n",geom->ix,geom->iy,geom->iz);
+      printf("iter exceeded in u2p_hotmax at %d %d %d\n",geom->ix,geom->iy,geom->iz);
       //getchar();
       return -1;
     }
@@ -3547,7 +3198,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(rho<0. || u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
     {
-      if(verbose>0 || 1) printf("neg u rho in u2p_hotmax_harm %e %e %e %e\n",rho,u,gamma2,W);
+      if(verbose>0 || 1) printf("neg u rho in u2p_hotmax %e %e %e %e\n",rho,u,gamma2,W);
       //getchar();
       return -1;
     }
@@ -3581,7 +3232,7 @@ u2p_hotmax_harm(ldouble *uu, ldouble *pp, void *ggg)
 
   if(superverbose)
     {
-      printf("superverbose or u2p_hotmax_harm lost precision:\n");
+      printf("superverbose or u2p_hotmax lost precision:\n");
       print_Nvector(pp,NV);
       print_Nvector(uu,NV);
       print_Nvector(uu2,NV);  

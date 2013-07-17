@@ -428,9 +428,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
-      //parasite to update of entropy
-      //      update_entropy(ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz));
-
       //interpolating conserved quantities
       ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
       ldouble fd_r0[NV],fd_rm1[NV],fd_rp1[NV];
