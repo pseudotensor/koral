@@ -661,15 +661,16 @@ f_u2p_hot(ldouble W, ldouble* cons,ldouble *f,ldouble *df)
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
   ldouble D=cons[2];
+  ldouble QdotBsq=cons[3];
+  ldouble Bsq=cons[4];
 
-  FTYPE W3,X3,Ssq,Wsq,X; 
-  FTYPE Bsq = 0.;
-  FTYPE QdotBsq = 0.;
+  FTYPE W3,X3,Ssq,Wsq,X,X2; 
   FTYPE Qtsq = Qt2;
   X = Bsq + W;
   Wsq = W*W;
   W3 = Wsq*W ;
-  X3 = X*X*X;
+  X2 = X*X;
+  X3 = X2*X;
   //  return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrt(1.-Qt2/W/W);   
 
   //a bit more clear
@@ -687,8 +688,12 @@ f_u2p_hot(ldouble W, ldouble* cons,ldouble *f,ldouble *df)
   ldouble u = (w - rho0) / GAMMA;
   ldouble p = (GAMMA-1)*u;
 
-  *f= Qn + W - p;
+  //*f= Qn + W - p;
 
+  *f = Qn + W - p + 0.5*Bsq*(1.+vsq) - QdotBsq/2./Wsq;
+
+  // dp/dW = dp/dW + dP/dv^2 dv^2/dW
+    
   ldouble dvsq=(-2.0/X3 * ( Qtsq  +  QdotBsq * (3.0*W*X + Bsq*Bsq)/W3));
   ldouble dp1 = dpdWp_calc_vsq(Wp, D, vsq ); // vsq can be unphysical
 
@@ -702,7 +707,7 @@ f_u2p_hot(ldouble W, ldouble* cons,ldouble *f,ldouble *df)
 
   ldouble dpdW = dp1  + dp2*dvsq; // dp/dW = dp/dWp
 
-  *df=1.-dpdW;
+  *df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
 
   return 0;  
 }
@@ -820,6 +825,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   if(verbose>1) printf("initial W:%e\n",W);
  
   //test if does not provide reasonable gamma2
+  //TODO!
   if(W*W<Qt2)
     {
       W=1.001*sqrt(Qt2);
@@ -831,8 +837,8 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble f0,f1,dfdW;
-  ldouble cons[3]={Qn,Qt2,D};
-  if(verbose>1) printf("in:%e %e %e\n",Qn,Qt2,D);
+  ldouble cons[5]={Qn,Qt2,D,QdotBsq,Bsq};
+  if(verbose>1) printf("in:%e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
 
   int iter=0;
   do
@@ -2166,8 +2172,10 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
   ldouble D=cons[2];
-  ldouble Sc=cons[3];
-
+  ldouble QdotBsq=cons[3];
+  ldouble Bsq=cons[4];
+  ldouble Sc=cons[5];
+ 
   ldouble W=Wp+D;
 
   ldouble v2 = Qt2/W/W;
@@ -2197,8 +2205,6 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
   drho0dvsq = -D*gamma*0.5; // because \rho=D/\gamma and holding Wp fixed
 
   FTYPE W3,X3,Ssq,Wsq,X; 
-  FTYPE Bsq = 0.;
-  FTYPE QdotBsq = 0.;
   FTYPE Qtsq = Qt2;
   X = Bsq + W;
   Wsq = W*W;
@@ -2251,7 +2257,8 @@ u2p_entropy(ldouble *uu, ldouble *pp, void *ggg)
   ldouble rho,u,p,w,W,Wp,alpha,D,Sc;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
-  
+  ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
+ 
   if(verbose>1 && !superverbose) {printf("********************\n");print_Nvector(uu,NV);}
   if(verbose>1 && !superverbose) {print_Nvector(pp,NV);}
 
@@ -2273,6 +2280,25 @@ u2p_entropy(ldouble *uu, ldouble *pp, void *ggg)
 
   //Q^mu
   indices_12(Qcov,Qcon,GG);
+
+#ifdef MAGNFIELD
+  //B^mu
+  Bcon[0]=0.;
+  Bcon[1]=uu[B1]/gdet*alpha;
+  Bcon[2]=uu[B2]/gdet*alpha;
+  Bcon[3]=uu[B3]/gdet*alpha;
+
+  //B_mu
+  indices_21(Bcon,Bcov,gg);
+
+  Bsq = dot(Bcon,Bcov);
+
+  QdotB = dot(Qcov,Bcon);
+
+  QdotBsq = QdotB*QdotB;
+#else
+  Bsq=QdotB=QdotBsq=0.;
+#endif
 
   //n_mu = (-alpha, 0, 0, 0)
   ncov[0]=-alpha;
@@ -2339,14 +2365,14 @@ u2p_entropy(ldouble *uu, ldouble *pp, void *ggg)
   ldouble EPS=1.e-6;
   ldouble Wpprev=Wp,Wpprev2=Wp;
   ldouble f0,f1,dfdWp,Wpnew,v2,ut2;
-  ldouble cons[4]={Qn,Qt2,D,Sc};
+  ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
   //if(verbose>1) printf("in:%e %e %e\n",Qn,Qt2,D);
   int idump;
   int iter=0;
 
   //testing if initial guess works
   f_u2p_entropy(Wp,cons,&f0,&dfdWp);
-
+  
   //initial guess wrong - leading to negative pressure
   //arbitrary look up
   if(isnan(f0)|| isnan(dfdWp) || isinf(f0) || isinf(dfdWp))
@@ -2363,7 +2389,7 @@ u2p_entropy(ldouble *uu, ldouble *pp, void *ggg)
       f_u2p_entropy(Wp,cons,&f0,&dfdWp);
       if(verbose>1) printf(">>> %e %e\n",f0,wmrho0);      
     }
-  
+    
   //still not enough, iterating
   idump=0;  
   if(isnan(f0)|| isnan(dfdWp) || isinf(f0) || isinf(dfdWp))
@@ -2641,7 +2667,8 @@ u2p_cold(ldouble *uu, ldouble *pp, void *ggg)
   ldouble rho,u,p,w,W,Wp,alpha,D,Sc;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
-  
+  ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
+ 
   if(verbose>1 && !superverbose) {printf("********************\n");print_Nvector(uu,NV);}
   if(verbose>1 && !superverbose) {print_Nvector(pp,NV);}
 
@@ -2663,6 +2690,25 @@ u2p_cold(ldouble *uu, ldouble *pp, void *ggg)
 
   //Q^mu
   indices_12(Qcov,Qcon,GG);
+
+#ifdef MAGNFIELD
+  //B^mu
+  Bcon[0]=0.;
+  Bcon[1]=uu[B1]/gdet*alpha;
+  Bcon[2]=uu[B2]/gdet*alpha;
+  Bcon[3]=uu[B3]/gdet*alpha;
+
+  //B_mu
+  indices_21(Bcon,Bcov,gg);
+
+  Bsq = dot(Bcon,Bcov);
+
+  QdotB = dot(Qcov,Bcon);
+
+  QdotBsq = QdotB*QdotB;
+#else
+  Bsq=QdotB=QdotBsq=0.;
+#endif
 
   //n_mu = (-alpha, 0, 0, 0)
   ncov[0]=-alpha;
@@ -2927,7 +2973,6 @@ f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
   ldouble D=cons[2];
-  ldouble Sc=cons[3];
 
   ldouble W=Wp+D;
 
@@ -2986,7 +3031,8 @@ u2p_hotmax(ldouble *uu, ldouble *pp, void *ggg)
   ldouble rho,u,p,w,W,Wp,alpha,D,Sc;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
-  
+  ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
+   
   if(verbose>1 && !superverbose) {printf("********************\n");print_Nvector(uu,NV);}
   if(verbose>1 && !superverbose) {print_Nvector(pp,NV);}
 
@@ -3009,7 +3055,26 @@ u2p_hotmax(ldouble *uu, ldouble *pp, void *ggg)
   //Q^mu
   indices_12(Qcov,Qcon,GG);
 
-  //n_mu = (-alpha, 0, 0, 0)
+ #ifdef MAGNFIELD
+  //B^mu
+  Bcon[0]=0.;
+  Bcon[1]=uu[B1]/gdet*alpha;
+  Bcon[2]=uu[B2]/gdet*alpha;
+  Bcon[3]=uu[B3]/gdet*alpha;
+
+  //B_mu
+  indices_21(Bcon,Bcov,gg);
+
+  Bsq = dot(Bcon,Bcov);
+
+  QdotB = dot(Qcov,Bcon);
+
+  QdotBsq = QdotB*QdotB;
+#else
+  Bsq=QdotB=QdotBsq=0.;
+#endif
+
+ //n_mu = (-alpha, 0, 0, 0)
   ncov[0]=-alpha;
   ncov[1]=ncov[2]=ncov[3]=0.;
   
