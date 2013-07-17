@@ -143,7 +143,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   u2pret=-1;//u2p_entropy(uu,pp,ggg);
 #else
   //u2pret=u2p_hot(uu,pp,ggg);  
-  u2pret=u2p_solver(uu,pp,ggg,0);  
+  u2pret=u2p_solver(uu,pp,ggg,U2P_HOT);  
   //************************************
   if(u2pret<0) 
     {
@@ -200,8 +200,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	    //************************************
 	    //************************************
 	    //entropy solver - conserving entropy
-	    u2pret=u2p_entropy(uu,pp,ggg);
-	
+	    //u2pret=u2p_entropy(uu,pp,ggg);
+	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY);  
+
 	    //************************************
 
 	    if(verbose>1)
