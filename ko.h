@@ -372,12 +372,14 @@ int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldou
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
 int calc_primitives(int,int,int);
 int check_floors_hd(ldouble *uu, int,void*);
-int check_floors_rad(ldouble *uu, int,void*);
 int u2p(ldouble *uu, ldouble *pp, void*,int*,int*);
 int u2p_hot(ldouble*,ldouble*,void*);
 int u2p_entropy(ldouble*,ldouble*,void*);
 int u2p_cold(ldouble*,ldouble*,void*);
 int u2p_hotmax(ldouble*,ldouble*,void*);
+
+//u2prad.c
+int check_floors_rad(ldouble *uu, int,void*);
 int u2p_rad(ldouble *uu, ldouble *pp, void*,int*);
 int u2p_rad_onff(ldouble *uu, ldouble *pp, void*,int*);
 int u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected);
