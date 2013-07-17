@@ -11,6 +11,8 @@
   for(ix=0;ix<NX;ix++)
   {
 */
+struct geometry geom;
+fill_geometry(ix,iy,iz,&geom);
 
 ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
@@ -67,7 +69,7 @@ pp[5]=calc_Sfromu(pp[0],pp[1]);
 conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
 	      
 if(ix>=-1) //conserved required for ix=-1 only
-  p2u(pp,uu,gg,GG);	 
+  p2u(pp,uu,&geom);	 
 
 
 /***********************************************/

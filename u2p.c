@@ -142,7 +142,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 #ifdef ENFORCEENTROPY
   u2pret=-1;//u2p_entropy(uu,pp,ggg);
 #else
-  u2pret=u2p_hot(uu,pp,ggg);  
+  //u2pret=u2p_hot(uu,pp,ggg);  
+  u2pret=u2p_solver(uu,pp,ggg,0);  
   //************************************
   if(u2pret<0) 
     {
@@ -2002,7 +2003,6 @@ u2p_hotmax(ldouble *uu, ldouble *pp, void *ggg)
 //**********************************************************************
 //Newton-Rapshon solver 
 //Etype == 0 -> hot inversion (uses D,Ttt,Tti)
-//TODO:
 //Etype == 1 -> entropy inversion (uses D,S,Tti)
 //Etype == 2 -> hotmax inversion (uses D,Tti,u over rho max ratio)
 //Etype == 3 -> cold inversion (uses D,Tti,u over rho min ratio)
@@ -2139,16 +2139,10 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   W=(rho+GAMMA*u)*gamma2;
 
   if(verbose>1) printf("initial W:%e\n",W);
- 
-  //test if does not provide reasonable gamma2
-  /*
-  if(W*W<Qt2)
-    {
-      W=1.001*sqrt(Qt2);
-      if(verbose>1) printf("corrected W:%e\n",W);
-    }
-  */
 
+  /****************************/
+  
+  //test if does not provide reasonable gamma2
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
   while( (( W*W*W * ( W + 2.*Bsq ) 
@@ -2172,8 +2166,14 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       Wprev=W;
       iter++;
 
-      if(Etype==0) 
+      if(Etype==U2P_HOT) 
 	fu2pret=f_u2p_hot(W,cons,&f0,&dfdW);
+      if(Etype==U2P_ENTROPY) 
+	fu2pret=f_u2p_entropy(W,cons,&f0,&dfdW);
+      if(Etype==U2P_HOTMAX) 
+	fu2pret=f_u2p_hotmax(W,cons,&f0,&dfdW);
+      if(Etype==U2P_COLD) 
+	fu2pret=f_u2p_cold(W,cons,&f0,&dfdW);
 
       //f_u2p_hot(W*(1.+EPS),cons,&f1,&dfdW);
       //dfdW=(f1-f0)/(EPS*W);

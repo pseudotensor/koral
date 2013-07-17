@@ -30,6 +30,11 @@
 #define FY0 FY(0)
 #define FZ0 FZ(0)
 
+//u2p inversion types
+#define U2P_HOT 0
+#define U2P_ENTROPY 1
+#define U2P_HOTMAX 2
+#define U2P_COLD 3
 
 //coordinates/metric
 #define BLCOORDS 1

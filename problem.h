@@ -7,13 +7,13 @@
 //(if you need more, email me :)
 
 //1* RADBEAM2D - beam of light 
-//2 RADINFALL - radial inflow
+//2* RADINFALL - radial inflow
 //3* DONUT - 2d Polish donut
 //4 GEODESICINFALL - geodesic infall with blobs or not
 //5 EDDINFALL - infall with flux from inside
 //6* RADTUBE- radiative shock tubes as in Farris et al 09 - assumes Edd.approximation which is currently not handled
 //7* BONDI - like in Fragile's paper
-//8 HDTUBE - relativistic shock tube
+//8* HDTUBE - relativistic shock tube
 //9 HDTUBE2D - in 2d
 //10* RADPULSE - radiative blob spreading around
 //11* RADSHADOW - radiative shadow
@@ -63,7 +63,7 @@
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
 //58* LUKE - beam hitting a net gas flow
 
-#define PROBLEM 8
+#define PROBLEM 2
 
 #if(PROBLEM==58)
 

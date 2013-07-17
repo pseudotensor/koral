@@ -1,13 +1,6 @@
-#define U2PPREC 1.e-5
-#define U2PRADPREC 1.e-5
-#define RADFORCEPREC 1.e-5
-#define VERBOSE0 0
 #define BHSPIN 0.
 #define MYCOORDS SCHWCOORDS
-//#define SPHERICAL
-//#define MINKOWSKI
 #define ANAL_PROFILE
-#define RK3STEPPING
 #define INT_ORDER 1
 #define NX 100
 #define NY 1
@@ -35,10 +28,10 @@
 #define RHOFLOOR 1.e-20
 #define UFLOOR 1.e-15
 #define PAR_D 1.e0
-#define PAR_E 1.e-4
+#define PAR_E 1.e-2
 
 #define RHO_AMB 1.e-3
-#define U_AMB 1.e-7
+#define U_AMB 1.e-4
 #define EFLOOR 1.e-40
 //#define LOGXGRIDREF
 //#define LOGPAR1 2.5

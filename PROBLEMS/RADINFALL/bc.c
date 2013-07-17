@@ -4,6 +4,9 @@
 ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
 
+struct geometry geom;
+fill_geometry(ix,iy,iz,&geom);
+
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 gdet_src=get_g(g,3,4,iix,iiy,iiz);
 ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4],GG[4][5];
@@ -48,7 +51,7 @@ ldouble xx=get_x(ix,0);
       //converting from 3vel to VELPRIM
       conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
 
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
 
       return 0.;
     }
@@ -149,7 +152,7 @@ ldouble xx=get_x(ix,0);
       pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.;
       */
       
-	p2u(pp,uu,gg,GG);
+	p2u(pp,uu,&geom);
       return 0;
     }
 
@@ -172,7 +175,7 @@ ldouble xx=get_x(ix,0);
 	  else
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      p2u(pp,uu,gg,GG);
+      p2u(pp,uu,&geom);
       return 0;
      }
   if(iy>=NY) //equatorial plane
@@ -194,7 +197,7 @@ ldouble xx=get_x(ix,0);
 	    else
 	      pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	  }
-      p2u(pp,uu,gg,GG); 
+      p2u(pp,uu,&geom); 
       return 0; 
     }
    
