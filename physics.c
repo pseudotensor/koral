@@ -109,7 +109,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   bcon_calc(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
   bsq = dot(bcon,bcov);
-  EF = rho + gam*uu;
+  EF = rho + GAMMA*uu;
   EE = bsq + EF ;
   va2 = bsq/EE ;
 

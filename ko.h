@@ -79,7 +79,7 @@
 
 //global variables
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
-  *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pinit,*pproblem,
+  *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pinit,*pproblem,*emf,
   *ptm1,*ptm2,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,
   *pbLx,*pbRx,*pbLy,*pbRy,*pbLz,*pbRz,*sbLx,*sbRx,*sbLy,*sbRy,*sbLz,*sbRz,*ubLx,*ubRx,*ubLy,*ubRy,*ubLz,*ubRz,
   *flbx,*flby,*flbz,*flLx,*flRx,*flLy,*flRy,*flLz,*flRz,*gKr,*gKrbx,*gKrby,*gKrbz,*G,
@@ -87,7 +87,7 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*
   *emuup2,*emulo2,*emuupbx2,*emulobx2,*emuupby2,*emuloby2,*emuupbz2,*emulobz2,
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
-int *cellflag,**loop_0,**loop_1,**loop_2,Nloop_0,Nloop_1,Nloop_2;
+int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,Nloop_0,Nloop_1,Nloop_2,Nloop_3;
 
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
 
@@ -193,8 +193,10 @@ int set_xb(int,int,ldouble);
 #define get_cflag(iflag,ix,iy,iz) (cellflag[iflag + (ix+NG)*NFLAGS + (iy+NG)*(NX+2*NG)*NFLAGS + (iz+NG)*(NY+2*NG)*(NX+2*NG)*NFLAGS])
 #define set_cflag(iflag,ix,iy,iz,val) cellflag[iflag + (ix+NG)*NFLAGS + (iy+NG)*(NX+2*NG)*NFLAGS + (iz+NG)*(NY+2*NG)*(NX+2*NG)*NFLAGS]=val
 #define get_u(uarr,iv,ix,iy,iz) (uarr[iv + (ix+NG)*NV + (iy+NG)*(NX+2*NG)*NV + (iz+NG)*(NY+2*NG)*(NX+2*NG)*NV])
+#define get_emf(iv,ix,iy,iz) (emf[iv-1 + (ix+NG)*3 + (iy+NG)*(NX+2*NG)*3 + (iz+NG)*(NY+2*NG)*(NX+2*NG)*3])
 //int set_u(ldouble*,int,int,int,int,ldouble);
 #define set_u(uarr,iv,ix,iy,iz,val) uarr[iv + (ix+NG)*NV + (iy+NG)*(NX+2*NG)*NV + (iz+NG)*(NY+2*NG)*(NX+2*NG)*NV]=val
+#define set_emf(iv,ix,iy,iz,val) emf[iv-1 + (ix+NG)*3 + (iy+NG)*(NX+2*NG)*3 + (iz+NG)*(NY+2*NG)*(NX+2*NG)*3]=val
 ldouble get_u_scalar(ldouble*,int,int,int);
 //int set_u_scalar(ldouble*,int,int,int,ldouble);
 #define set_u_scalar(uarr,ix,iy,iz,val) uarr[ix+NG + (iy+NG)*(NX+2*NG) + (iz+NG)*(NY+2*NG)*(NX+2*NG)] = val

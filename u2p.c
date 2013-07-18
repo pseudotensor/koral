@@ -901,7 +901,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
  
   do
     {
-      (*f_u2p)(W-D,cons,&f0,&dfdW);
+      f0=dfdW=0.;
+      if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
+	(*f_u2p)(W-D,cons,&f0,&dfdW);
       
       if( ((( W*W*W * ( W + 2.*Bsq ) 
 	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
@@ -909,7 +911,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 	  || isinf(dfdW) || isnan(dfdW))
 	  && (i_increase < 10))
 	{
-	  W *= 10.;
+	  W *= 1.1;
 	  i_increase++;
 	  continue;
 	}
@@ -943,7 +945,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       do
 	{
 	  ldouble f0tmp,dfdWtmp;
-	  (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp);
+	  f0tmp=dfdWtmp=0.;
+	  if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
+	    (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp);
 
 	  if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
 		  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))

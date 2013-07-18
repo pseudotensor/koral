@@ -86,6 +86,11 @@ initialize_arrays()
   ptm1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
   ptm2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
 
+#ifdef MAGNFIELD
+  //electromotive force at corners
+  pproblem=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*3*sizeof(ldouble));
+#endif
+
   //primitives at cell centers after reconstruction
   //px=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
   //py=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
@@ -267,6 +272,11 @@ free_arrays()
   free(p);
   free(pinit);
   free(pproblem);
+
+#ifdef MAGNFIELD
+  free(emf);
+#endif
+
   free(ptm1);
   free(ptm2);
   free(px);

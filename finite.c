@@ -662,6 +662,17 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
 
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+#ifdef MAGNFIELD
+  flux_ct();
+#endif
+
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
 
   //**********************************************************************
   //**********************************************************************
@@ -1389,6 +1400,8 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   shuffle_loop(loop_0,Nloop_0);
 #endif
 
+  //**********************************************************************
+  //**********************************************************************
   //inside + ghost cells - number depending on the order of reconstruction
   int xlim,ylim,zlim;
   int lim;
@@ -1430,6 +1443,9 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   shuffle_loop(loop_1,Nloop_1);
 #endif
 
+
+   //**********************************************************************
+  //**********************************************************************
   //only ghost cells
   if(NX>1) xlim=NG; else xlim=0;  
   if(NY>1) ylim=NG; else ylim=0;
@@ -1467,6 +1483,37 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   shuffle_loop(loop_2,Nloop_2);
 #endif
 
+
+  //**********************************************************************
+  //**********************************************************************
+  //3d corners (ix=0 to NX) etc.
+ 
+  Nloop_3=0;
+  loop_3=(int **)malloc(sizeof(int*));
+  loop_3[0]=(int *)malloc(3*sizeof(int));
+
+  for(ix=0;ix<=NX;ix++)
+    {
+      for(iy=0;iy<=NY;iy++)
+	{
+	  for(iz=0;iz<=NZ;iz++)
+	    {	
+	      loop_3[Nloop_3][0]=ix;
+	      loop_3[Nloop_3][1]=iy;
+	      loop_3[Nloop_3][2]=iz;
+
+	      Nloop_3++;
+	      
+	      loop_3=(int **)realloc(loop_3,(Nloop_3+1)*sizeof(int*));
+	      loop_3[Nloop_3]=(int *)malloc(3*sizeof(int));	      
+	    }
+	}
+    }
+
+  //shuffling:
+#if (SHUFFLELOOPS)
+  shuffle_loop(loop_3,Nloop_3);
+#endif
       
 
   return 0;
