@@ -20,9 +20,9 @@
 
 //multi rad-fluid macros
 #define EE(nf) (NVMHD+nf*4)
-#define FX(nf) (NVMHD+nf*4)
-#define FY(nf) (NVMHD+nf*4)
-#define FZ(nf) (NVMHD+nf*4)
+#define FX(nf) (NVMHD+nf*4+1)
+#define FY(nf) (NVMHD+nf*4+2)
+#define FZ(nf) (NVMHD+nf*4+3)
 
 //single fluid macros
 #define EE0 EE(0)

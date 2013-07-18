@@ -2,12 +2,12 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 11
+#define RESTARTNUM 1
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -42,10 +42,10 @@
 /************************************/
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e2
-#define EERHORATIOMIN 1.e-15
-#define EERHORATIOMAX 1.e6
-#define EEUURATIOMIN 1.e-15
-#define EEUURATIOMAX 1.e6
+#define EERHORATIOMIN 1.e-50
+#define EERHORATIOMAX 1.e50
+#define EEUURATIOMIN 1.e-50
+#define EEUURATIOMAX 1.e50
 #define ERADLIMIT 1.e-50
 #define RHOFLOOR 1.e-50
 #define GAMMAMAXRAD 50.
@@ -88,21 +88,22 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define DTOUT1 .5
+#define DTOUT1 .05
+#define RADOUTPUTINZAMO
 
 /************************************/
 //problem params
 /************************************/
 #define RRR
 #define GAMMA (5./3.)
-#define RHOZERO 1.
-#define BLOBMAG1 1.e2
-#define BLOBMAG2 1.e2
+#define RHOZERO 0.01
+#define BLOBMAG1 1.e4
+#define BLOBMAG2 1.e4
 #define TEMPZERO 1.e7
 #define TEMPBLOB1 1.e7
 #define TEMPBLOB2 1.e7
-#define VELXBLOB1 .1
-#define VELXBLOB2 -.1
+#define VELXBLOB1 0.1
+#define VELXBLOB2 -0.1
 #define VELYBLOB1 (VELXBLOB1*0.25)
 #define VELYBLOB2 (VELXBLOB2*0.)
 #define XBLOB1 -.5

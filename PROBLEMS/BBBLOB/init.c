@@ -37,6 +37,13 @@ if(w1>0.01 && w2>0.01) pp[VY]=.5*(VELYBLOB1+VELYBLOB2);
  else if(w1>0.01) pp[VY]=VELYBLOB1;
  else if(w2>0.01) pp[VY]=VELYBLOB2;
 
+#ifdef RADIATION
+ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+
+pp[6]=calc_LTE_EfromT(temp);
+pp[FX0]=pp[FY0]=pp[FZ0]=0.;
+#endif
+
 /***********************************************/
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
@@ -53,6 +60,7 @@ for(iv=0;iv<NV;iv++)
     set_u(u,iv,ix,iy,iz,uu[iv]);
     set_u(p,iv,ix,iy,iz,pp[iv]);
   }
+
 
 //entropy
 update_entropy(ix,iy,iz,0);

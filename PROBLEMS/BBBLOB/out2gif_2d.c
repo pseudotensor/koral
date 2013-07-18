@@ -93,7 +93,7 @@
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
 	  "set title \"rad\" offset 0,-1\n"
-	  "splot \"%s\" u 1:2:($24) w l ti \"\"\n"
+	  "splot \"%s\" u 1:2:($25) w l ti \"\"\n"
 	 
 	  "unset pm3d\n"
 	  "set isosam 10,10\n"
@@ -102,9 +102,9 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "set title \"\" offset 0,-1\n"
-	  "plot \"%s\" u 1:2:(($16)"
-	  "/((($16)*($16)+($17)*($17))**.5)/%f):"
-	  "(($17)/((($16)*($16)+($17)*($17))**.5)/%f)"
+	  "plot \"%s\" u 1:2:(($21)"
+	  "/((($21)*($21)+($22)*($22))**.5)/%f):"
+	  "(($22)/((($21)*($21)+($22)*($22))**.5)/%f)"
 	  "every %d:%d w vectors arrowstyle 1 ti \"\"\n"
 
 	  "unset tics\n"

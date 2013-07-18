@@ -52,6 +52,7 @@ main(int argc, char **argv)
   tstart=0.;
 #endif
 
+ 
   //prepares files
   fprint_openfiles("dumps");
 
@@ -91,6 +92,7 @@ solve_all_problems_5(ldouble tstart)
   //prints initial profiles to out0000.dat
 #ifndef RESTART
   fprint_restartfile(t,"dumps");			
+  //why this different for radiation?
   fprint_profiles(t,scalars,NSCALARS,0,"dumps");			
   #ifdef SILOOUTPUT
   fprint_silofile(t,nfout1,"dumps");
@@ -113,6 +115,7 @@ solve_all_problems_5(ldouble tstart)
 
   //main time loop
   int nstep=0;
+
   while (t < t1 && nfout1<NOUTSTOP && i1<NSTEPSTOP)
     {    
       nstep++;
@@ -128,6 +131,7 @@ solve_all_problems_5(ldouble tstart)
       
 	  calc_primitives(ix,iy,iz); 
 	}
+ 
 
       //holds previous time steps
       copy_u(1.,ptm1,ptm2); ttm2=ttm1;
@@ -235,8 +239,8 @@ solve_all_problems_5(ldouble tstart)
       //output to a file
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
-	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) mass: %e znps: %f\n"
-		 ,nfout1,t,dt,max_ws[0],end_time-start_time,totalmass,znps);
+	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %f\n"
+		 ,nfout1,t,dt,max_ws[0],end_time-start_time,znps);
 	  
 	  //projects primitives onto ghost cells
 	  set_bc(t,0);
@@ -258,8 +262,8 @@ solve_all_problems_5(ldouble tstart)
       //or performance to screen only every second
       else if(end_time-fprintf_time>1.) 
 	{
-	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) mass: %e znps: %f\n"
-		  ,nstep,t,dt,max_ws[0],end_time-start_time,totalmass,znps);
+	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %f\n"
+		  ,nstep,t,dt,max_ws[0],end_time-start_time,znps);
 	  fprintf_time=end_time;
 	  i2=i1;
 	}
