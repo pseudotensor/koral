@@ -2,7 +2,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 11
+#define RESTARTNUM 0
 
 /************************************/
 //radiation choices
@@ -83,7 +83,7 @@
 #define MINZ 0.
 #define MAXZ (2.*Pi)
 #define FULLPHI //for output - to print extra cell in phi
-#define NZ 80
+#define NZ 60
 #define NX (NZ/2)
 #define NY (NZ/2+1)
 #define SPECIFIC_BC

@@ -95,15 +95,15 @@
 //problem params
 /************************************/
 #define RRR
-#define GAMMA (5./3.)
+#define GAMMA (4./3.)
 #define RHOZERO 0.01
 #define BLOBMAG1 1.e4
 #define BLOBMAG2 1.e4
 #define TEMPZERO 1.e7
 #define TEMPBLOB1 1.e7
 #define TEMPBLOB2 1.e7
-#define VELXBLOB1 0.1
-#define VELXBLOB2 -0.1
+#define VELXBLOB1 0.
+#define VELXBLOB2 -0.
 #define VELYBLOB1 (VELXBLOB1*0.25)
 #define VELYBLOB2 (VELXBLOB2*0.)
 #define XBLOB1 -.5

@@ -40,7 +40,8 @@ if(w1>0.01 && w2>0.01) pp[VY]=.5*(VELYBLOB1+VELYBLOB2);
 #ifdef RADIATION
 ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 
-pp[6]=calc_LTE_EfromT(temp);
+//pp[6]=EEFLOOR*1.e5;
+pp[6]=calc_LTE_EfromT(temp)/1000.;
 pp[FX0]=pp[FY0]=pp[FZ0]=0.;
 #endif
 
