@@ -9,8 +9,6 @@
 /************************************/
 //#define RADIATION
 //#define SKIPRADSOURCE
-//#define SKIPRADWAVESPEEDLIMITER
-#define ALLOW_EXPLICIT_RAD_SOURCE 0
 
 /************************************/
 //hydro choices
@@ -26,8 +24,6 @@
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
-//#define FLUXMETHOD HLL_FLUX
-//#define WAVESPEEDSATFACES 
 #define GDETIN 0
 
 /************************************/
@@ -58,91 +54,59 @@
 //blackhole
 /************************************/
 #define BHSPIN 0.0
-#define MASS 4.3e6
+#define MASS 1.
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define USEMKS1COORDS
-#ifdef USEKSCOORDS
-#define MYCOORDS KSCOORDS
-#define MINX 500.
-#define MAXX 6000.
-#define MKS1R0 -20.
-#endif
-#ifdef USEMKS1COORDS
-#define MYCOORDS MKS1COORDS
-#define MINX (log(1000.-MKS1R0))
-#define MAXX (log(55000.-MKS1R0))
-#define MKS1R0 -3000.
-#endif
 
+#define MYCOORDS MINKCOORDS
+#define MINX -1.
+#define MAXX 1. 
+#define MINY -1.
+#define MAXY 1.
+#define MINZ -1.
+#define MAXZ 1. 
+#define NX 60 
+#define NY 60
+#define NZ 1
 
-#define MINY (0.05*Pi)
-#define MAXY (.95*Pi)
-#define MINZ 0.
-#define MAXZ (2.*Pi)
-#define FULLPHI //for output - to print extra cell in phi
-#define NZ 80
-#define NX (NZ/2)
-#define NY (NZ/2+1)
-#define SPECIFIC_BC
+//#define SPECIFIC_BC
+#define COPY_XBC
+#define COPY_YBC
+#define COPY_ZBC
 
 /************************************/
 //output
 /************************************/
-#define SILOOUTPUT
-#define OUTCOORDS KERRCOORDS                                                                    
-//#define RADOUTPUTINZAMO
-//#define PRINTINSIDEBH
+//#define SILOOUTPUT
 //#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
+//#define PRINTYGC_LEFT
+//#define PRINTYGC_RIGHT
+
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define CGSOUTPUT
-#define DTOUT1 1.e5
-
-#define EQPLANEOUTPUT
-//#define VERTPLANEOUTPUT
-
-#ifdef VERTPLANEOUTPUT
-#define ZSLICE (NZ*0.1)
-#endif
-
-#ifdef EQPLANEOUTPUT
-#define YSLICE NY/2
-#define PRINTZONEMORE
-#endif
+#define DTOUT1 .5
 
 /************************************/
 //problem params
 /************************************/
+#define RRR
 #define GAMMA (5./3.)
-#define RHOATMMIN 1.
-#define UINTATMMIN 1.e-4
-#define TRACER
-#define MINTRACE 1.e-4 //edge for enforcing stationary atmosphere
+#define RHOZERO 1.
+#define BLOBMAG1 1.e2
+#define BLOBMAG2 1.e2
+#define TEMPZERO 1.e7
+#define TEMPBLOB1 1.e7
+#define TEMPBLOB2 1.e7
+#define VELXBLOB1 .1
+#define VELXBLOB2 -.1
+#define VELYBLOB1 (VELXBLOB1*0.25)
+#define VELYBLOB2 (VELXBLOB2*0.)
+#define XBLOB1 -.5
+#define XBLOB2 .5
+#define SIZEBLOB1 .1
+#define SIZEBLOB2 .1
 
-//#define SPHCLOUD
-#define G2CLOUD
-
-#define IANGLE (M_PI)
-#define OMANGLE 0.
-#define EARTHMASS (5.97219e27)
-#define MASSCLOUD (3.*EARTHMASS)
-#define RMINFORPART 5000.
-#define KERNELWIDTH 2000.
-#define DISKDAMPPAR1 0.5
-#define DISKDAMPPAR2 0.1
-
-#define CLRHO 1.e-9
-#define CLWIDTH 800.
-
-//#define DONUT
-#define IMPOSEDRHO
-#define TORUSRIN 10.
-#define TORUSKAPPA 0.01
-#define TORUSXI 0.708
-#define TORUSRBREAK1 45.
-#define TORUSRBREAK2 100000.

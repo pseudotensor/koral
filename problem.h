@@ -62,8 +62,23 @@
 //56* EDDSPH - 1d Edd Sphere
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
 //58* LUKE - beam hitting a net gas flow
+//59* BBBLOB - rad blobs
 
-#define PROBLEM 55
+#define PROBLEM 59
+
+#if(PROBLEM==59)
+
+#define PR_DEFINE "PROBLEMS/BBBLOB/define.h"
+#define PR_BC "PROBLEMS/BBBLOB/bc.c"
+#define PR_INIT "PROBLEMS/BBBLOB/init.c"
+#define PR_KAPPA "PROBLEMS/BBBLOB/kappa.c"
+#define PR_KAPPAES "PROBLEMS/BBBLOB/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/BBBLOB/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/BBBLOB/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/BBBLOB/dump.c"
+#define PR_TOOLS "PROBLEMS/BBBLOB/tools.c"
+
+#endif
 
 #if(PROBLEM==58)
 
