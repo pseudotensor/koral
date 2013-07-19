@@ -1444,12 +1444,24 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 #endif
 
 
-   //**********************************************************************
+  //**********************************************************************
   //**********************************************************************
   //only ghost cells
+
+  //reduction of size basing on the dimension
+  //when using the mangetic flux constrained transport one should keep all three dimensions in ghost cells
+  //but one does not have to project onto the 3rd dimension
+  //it is enough to copy the fluxes onto the 3rd dimension after comining them and before constrained transport
+
+#ifndef MAGNFIELD_TEST
   if(NX>1) xlim=NG; else xlim=0;  
   if(NY>1) ylim=NG; else ylim=0;
   if(NZ>1) zlim=NG; else zlim=0;
+#else
+  xlim=NG;
+  ylim=NG;
+  zlim=NG;
+#endif
 
   Nloop_2=0;
   loop_2=(int **)malloc(sizeof(int*));
@@ -1463,6 +1475,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	    {	 
 	      //within domain:
 	      if(if_indomain(ix,iy,iz)==1) continue;
+
 	      //at the corners
 	      if(if_outsidegc(ix,iy,iz)==1) continue;
 
@@ -1486,18 +1499,36 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //3d corners (ix=0 to NX) etc.
- 
+  //1-cell deep surfaces of 3d corners 
+  xlim=NG;
+  ylim=NG;
+  zlim=NG;
+
   Nloop_3=0;
   loop_3=(int **)malloc(sizeof(int*));
   loop_3[0]=(int *)malloc(3*sizeof(int));
 
-  for(ix=0;ix<=NX;ix++)
+  for(ix=-xlim;ix<NX+xlim;ix++)
     {
-      for(iy=0;iy<=NY;iy++)
+      for(iy=-ylim;iy<NY+ylim;iy++)
 	{
-	  for(iz=0;iz<=NZ;iz++)
-	    {	
+	  for(iz=-zlim;iz<NZ+zlim;iz++)
+	    {	  
+	      //if outside the corners skip
+	      if(if_outsidegc(ix,iy,iz)==0) continue;
+
+	      //now check if in the surface layer of a corner
+	      int dix,diy,diz;
+	      if(ix<0) dix=-ix;
+	      else dix=ix-NX+1;
+	      if(iy<0) diy=-iy;
+	      else diy=iy-NY+1;
+	      if(iz<0) diz=-iz;
+	      else diz=iz-NZ+1;	      
+	      if(dix!=1 && diy!=1 && diz!=1) continue;
+
+	      //printf("%d %d %d %d %d %d\n",ix,iy,iz,dix,diy,diz);
+	      
 	      loop_3[Nloop_3][0]=ix;
 	      loop_3[Nloop_3][1]=iy;
 	      loop_3[Nloop_3][2]=iz;
@@ -1509,7 +1540,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	    }
 	}
     }
-
+  getchar();
   //shuffling:
 #if (SHUFFLELOOPS)
   shuffle_loop(loop_3,Nloop_3);
@@ -1882,7 +1913,7 @@ if_indomain(int ix,int iy,int iz)
   else return 0;
 }
 
-//checks if cell outside both domain and ghostcells
+//checks if cell outside both domain and ghostcells, i.e. if cells in corners
 int 
 if_outsidegc(int ix,int iy,int iz)
 {  
@@ -1916,7 +1947,6 @@ int set_bc_core(int ix,int iy,int iz,double t,int ifinit,int BCtype)
       set_u(p,iv,ix,iy,iz,pval[iv]);	      
     }
 #else  
-
   //standard BC         
 #ifdef PERIODIC_XBC
   iix=ix;
@@ -2006,6 +2036,24 @@ int set_bc(ldouble t,int ifinit)
  
       set_bc_core(ix,iy,iz,t,ifinit,BCtype);
     }
+
+  //now fill the first cells in corners if necessary
+#ifdef MAGNFIELD_TEST
+#pragma omp parallel for private(ix,iy,iz) schedule (static)
+  for(ii=0;ii<Nloop_3;ii++) //surface layers of corners
+    {
+      ix=loop_3[ii][0];
+      iy=loop_3[ii][1];
+      iz=loop_3[ii][2];
+
+  //set up loop_3
+  //basing on ix,iy,iz determine BCtype for each dimension
+  //calculate fractional impact of each dimension
+  //for each point do three calc_bc and sum them up with weights
+  //...
+    }
+
+  #endif
 
   return 0;
 }

@@ -7,7 +7,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -67,8 +67,8 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define NX 60 
-#define NY 60
+#define NX 10 
+#define NY 10
 #define NZ 1
 
 //#define SPECIFIC_BC
@@ -102,12 +102,14 @@
 #define TEMPZERO 1.e7
 #define TEMPBLOB1 1.e7
 #define TEMPBLOB2 1.e7
-#define VELXBLOB1 0.
-#define VELXBLOB2 -0.
+#define VELXBLOB1 0.1
+#define VELXBLOB2 -0.1
 #define VELYBLOB1 (VELXBLOB1*0.25)
 #define VELYBLOB2 (VELXBLOB2*0.)
 #define XBLOB1 -.5
 #define XBLOB2 .5
 #define SIZEBLOB1 .1
 #define SIZEBLOB2 .1
+
+#define MAGNFIELD_TEST
 
