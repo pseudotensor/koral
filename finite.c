@@ -1900,81 +1900,72 @@ if_outsidegc(int ix,int iy,int iz)
 //**********************************************************************
 
 //boundary conditions - sets conserved in the ghost cells
-int set_bc(ldouble t,int ifinit)
+int set_bc_core(int ix,int iy,int iz,double t,int ifinit,int BCtype)
 {
-  int ix,iy,iz,ii;
- 
-#pragma omp parallel for private(ix,iy,iz) schedule (static)
-  for(ii=0;ii<Nloop_2;ii++) //ghost cells only
-    {
-      ix=loop_2[ii][0];
-      iy=loop_2[ii][1];
-      iz=loop_2[ii][2];
-
-      struct geometry geom;
-      fill_geometry(ix,iy,iz,&geom);
- 
-      ldouble uval[NV],pval[NV];	  
-      int iix,iiy,iiz,iv;
-      iix=ix;
-      iiy=iy;
-      iiz=iz;
-
+  ldouble uval[NV],pval[NV];	  
+  int iix,iiy,iiz,iv;
+  iix=ix;
+  iiy=iy;
+  iiz=iz;
           
 #ifdef SPECIFIC_BC  //BC specific for given problem
-      calc_bc(ix,iy,iz,t,uval,pval,ifinit);
-      for(iv=0;iv<NV;iv++)
-	{
-	  set_u(u,iv,ix,iy,iz,uval[iv]);
-	  set_u(p,iv,ix,iy,iz,pval[iv]);	      
-	}
+  calc_bc(ix,iy,iz,t,uval,pval,ifinit,BCtype);
+  for(iv=0;iv<NV;iv++)
+    {
+      set_u(u,iv,ix,iy,iz,uval[iv]);
+      set_u(p,iv,ix,iy,iz,pval[iv]);	      
+    }
 #else  
-//standard BC         
+
+  //standard BC         
 #ifdef PERIODIC_XBC
-      iix=ix;
-      if(ix<0) iix=ix+NX;
-      if(ix>NX-1) iix=ix-NX;
+  iix=ix;
+  if(ix<0) iix=ix+NX;
+  if(ix>NX-1) iix=ix-NX;
 #endif
 #ifdef PERIODIC_YBC
-      iiy=iy;
-      if(iy<0) iiy=iy+NY;
-      if(iy>NY-1) iiy=iy-NY;
-      if(NY<NG) iiy=0;
+  iiy=iy;
+  if(iy<0) iiy=iy+NY;
+  if(iy>NY-1) iiy=iy-NY;
+  if(NY<NG) iiy=0;
 #endif
 #ifdef PERIODIC_ZBC
-      iiz=iz;
-      if(iz<0) iiz=iz+NZ;
-      if(iz>NZ-1) iiz=iz-NZ;
-      if(NZ<NG) iiz=0;
+  iiz=iz;
+  if(iz<0) iiz=iz+NZ;
+  if(iz>NZ-1) iiz=iz-NZ;
+  if(NZ<NG) iiz=0;
 #endif
 #ifdef COPY_XBC
-      iix=ix;
-      if(ix<0) iix=0;
-      if(ix>NX-1) iix=NX-1;
+  iix=ix;
+  if(ix<0) iix=0;
+  if(ix>NX-1) iix=NX-1;
 #endif
 #ifdef COPY_YBC
-      iiy=iy;
-      if(iy<0) iiy=0;
-      if(iy>NY-1) iiy=NY-1;
+  iiy=iy;
+  if(iy<0) iiy=0;
+  if(iy>NY-1) iiy=NY-1;
 #endif
 #ifdef COPY_ZBC
-      iiz=iz;
-      if(iz<0) iiz=0;
-      if(iz>NZ-1) iiz=NZ-1;
+  iiz=iz;
+  if(iz<0) iiz=0;
+  if(iz>NZ-1) iiz=NZ-1;
 #endif   
 
-      //copying primitives
-      ldouble gdet_gc=get_g(g,3,4,ix,iy,iz);  
-      ldouble gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-      ldouble r_gc=get_x(ix,0);
-      ldouble r_src=get_x(ix,0);
-      ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
-      pick_g(ix,iy,iz,gg);
-      pick_G(ix,iy,iz,GG);
+  //copying primitives
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+  ldouble gdet_gc=get_g(g,3,4,ix,iy,iz);  
+  ldouble gdet_src=get_g(g,3,4,iix,iiy,iiz);  
+  ldouble r_gc=get_x(ix,0);
+  ldouble r_src=get_x(ix,0);
+  ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
+  pick_g(ix,iy,iz,gg);
+  pick_G(ix,iy,iz,GG);
      
-      for(iv=0;iv<NV;iv++)
-	{
-	  pval[iv]=get_u(p,iv,iix,iiy,iiz);
+  for(iv=0;iv<NV;iv++)
+    {
+      pval[iv]=get_u(p,iv,iix,iiy,iiz);
 	  set_u(p,iv,ix,iy,iz,pval[iv]);
 	}
 
@@ -1984,7 +1975,36 @@ int set_bc(ldouble t,int ifinit)
 	{
 	  set_u(u,iv,ix,iy,iz,uval[iv]);
 	}	  
-#endif 	    
+#endif //SPECIFIC_BC   
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+
+//boundary conditions - sets conserved in the ghost cells
+int set_bc(ldouble t,int ifinit)
+{
+  int ix,iy,iz,ii;
+ 
+  //first fill the GC with no corners
+#pragma omp parallel for private(ix,iy,iz) schedule (static)
+  for(ii=0;ii<Nloop_2;ii++) //ghost cells only, no corners
+    {
+      ix=loop_2[ii][0];
+      iy=loop_2[ii][1];
+      iz=loop_2[ii][2];
+
+      //type of BC
+      int BCtype;
+      if(ix<0) BCtype=XBCLO;
+      if(ix>0) BCtype=XBCHI;
+      if(iy<0) BCtype=YBCLO;
+      if(iy>0) BCtype=YBCHI;
+      if(iz<0) BCtype=ZBCLO;
+      if(iz>0) BCtype=ZBCHI;
+ 
+      set_bc_core(ix,iy,iz,t,ifinit,BCtype);
     }
 
   return 0;

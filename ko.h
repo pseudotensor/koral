@@ -313,7 +313,7 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 
 //problem.c
 ldouble calc_xb(int i,int idim);
-int calc_bc(int,int,int,ldouble,ldouble*, ldouble*,int);
+int calc_bc(int,int,int,ldouble,ldouble*, ldouble*,int,int);
 int pr_tophat_inside(ldouble x,ldouble y,ldouble z);
 int my_finger(ldouble);
 int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,ldouble *vv);

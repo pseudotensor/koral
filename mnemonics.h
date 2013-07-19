@@ -49,6 +49,14 @@
 #define MCYL1COORDS 8
 #define MKER1COORDS 9
 
+//type of boundary
+#define XBCLO 1
+#define XBCHI 2
+#define YBCLO 3
+#define YBCHI 4
+#define ZBCLO 5
+#define ZBCHI 6
+
 //cell flags
 #define NFLAGS 5
 
