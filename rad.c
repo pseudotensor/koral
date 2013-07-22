@@ -97,7 +97,14 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ld
 
   //calculating primitives  
   int corr[2],fixup[2],u2pret;
+  //  print_Nvector(uu,NV);
+  //  u2p_rad(uu,pp,ggg,&corr[1]);
+  //  printf("%d \n",corr[1]);
+  //print_Nvector(pp,NV);getchar();
+
   u2pret=u2p(uu,pp,ggg,corr,fixup);
+  //printf("%d %d\n",corr[0],corr[1]);
+  //print_Nvector(pp,NV);getchar();
 
   //if(corr[0]!=0 || corr[1]!=0) return -1; //does not allow for entropy inversion
   if(u2pret<-1) 
@@ -160,8 +167,10 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ld
   ldouble dtau=dt/ucon[0];
   ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
 
+  //printf("%.20e %.20e %.20e \n",uu[6],Gi[0],uu[6] - uu0[6] + dt * gdetu * Gi[0]);
+  //printf("%.20e %.20e %.20e %.20e %.20e %.20e \n",uu[6],Rij[0][0],pp[6],Rtt,Ehat-4.*Pi*B,Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau);
   f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
-
+  
   return 0;
 } 
 
@@ -171,7 +180,8 @@ print_state_implicit_lab (int iter, ldouble *x, ldouble *f)
   printf ("iter = %3d x = % .13e % .13e % .13e % .3e "
 	  "f(x) = % .13e % .13e % .13e % .13e\n",
 	  iter,
-	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
+	  //	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
+	  x[0],x[1],x[2],x[3],f[0],f[1],f[2],f[3]);
   return 0;
 }
 
@@ -205,7 +215,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   u2p(uu0,pp0,&geom,corr,fixup);
   p2u(pp0,uu0,&geom);
 
-  ldouble EPS = 1.e-6;
+  ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6; 
   ldouble DAMP = 0.5;
 
@@ -264,17 +274,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	    }
 
 
-	  //values at zero state
+	  //values at base state
 	  if(f_implicit_lab(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f1)<0) 
 	    {
 	      failed=1;
-	      if(verbose>0)
-		{ 
-		  print_Nvector(uu0,NV);
-		  print_Nvector(uu,NV);
-		  print_Nvector(pp0,NV);
-		  printf("rbeaking\n");
-		}
 		  
 	      break;
 	    }
@@ -287,6 +290,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      del=EPS*uup[6]; 
 
 	      uu[j+6]=uup[j+6]-del;
+	      
+	      int fret=f_implicit_lab(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f2);  
 
 	      if(verbose>0)
 		{
@@ -294,24 +299,16 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 		    {
 		      xxx[i]=uu[i+6];
 		    }
-		  int ret=f_implicit_lab(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f1);
-		  print_state_implicit_lab (iter-1,xxx,f1); 
-		  printf("sub f_lab ret: %d\n",ret);
+		  print_state_implicit_lab (iter-1,xxx,f2); 
+		  printf("sub (%d) f_lab ret: %d\n",j,fret);
 		}
 
-	      
-
-	      if(f_implicit_lab(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f2)<0) 
+	      if(fret<0) 
 		{
-		  failed=1;
+		  failed=1;	     		 
 		}
   
-	      if(verbose>0)
-		{
-		  //		  printf("j :  %d\n",j);
-		  //		  print_Nvector(uu,NV);
-		}
-
+	      //Jacobian matrix component
 	      for(i=0;i<4;i++)
     	        {
 		  J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
@@ -330,7 +327,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  if(inverse_44matrix(J,iJ)<0)
 	    {
 	      failed=1;
-	      //	      if(verbose) getchar();
+	      if(verbose) 
+		{
+		  print_tensor(J);
+		  printf("Jacobian inversion failed\n");
+		}
 	      break;
 	    }
 
@@ -448,7 +449,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  uu[iv]=uu0[iv];
 	}
       
-      if(frdt<0.00001 || 1)  //avoid substepping?
+      if(frdt<0.00001)  //avoid substepping?
 	{
 	  if(verbose) 
 	    {
