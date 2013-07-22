@@ -7,7 +7,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -67,8 +67,8 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define NX 10 
-#define NY 10
+#define NX 60 
+#define NY 60
 #define NZ 1
 
 //#define SPECIFIC_BC

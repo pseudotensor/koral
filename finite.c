@@ -850,14 +850,9 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       /************************************************************************/
 #ifndef SKIPRADSOURCE
 #ifdef RADIATION
+
+      //update primitives / correct conserved
       calc_primitives(ix,iy,iz);
-      for(iv=0;iv<NV;iv++)
-	{
-	  pp[iv]=get_u(p,iv,ix,iy,iz);
-	  uu[iv]=get_u(u,iv,ix,iy,iz);
-	} 
-
-
 
 #ifndef MULTIRADFLUID
 
@@ -1452,16 +1447,11 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //when using the mangetic flux constrained transport one should keep all three dimensions in ghost cells
   //but one does not have to project onto the 3rd dimension
   //it is enough to copy the fluxes onto the 3rd dimension after comining them and before constrained transport
+  //or even better create a wrapper not to have to copy them
 
-#ifndef MAGNFIELD_TEST
   if(NX>1) xlim=NG; else xlim=0;  
   if(NY>1) ylim=NG; else ylim=0;
   if(NZ>1) zlim=NG; else zlim=0;
-#else
-  xlim=NG;
-  ylim=NG;
-  zlim=NG;
-#endif
 
   Nloop_2=0;
   loop_2=(int **)malloc(sizeof(int*));
@@ -1500,9 +1490,9 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //**********************************************************************
   //**********************************************************************
   //1-cell deep surfaces of 3d corners 
-  xlim=NG;
-  ylim=NG;
-  zlim=NG;
+  if(NX>1) xlim=NG; else xlim=0;  
+  if(NY>1) ylim=NG; else ylim=0;
+  if(NZ>1) zlim=NG; else zlim=0;
 
   Nloop_3=0;
   loop_3=(int **)malloc(sizeof(int*));
@@ -1540,7 +1530,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	    }
 	}
     }
-  getchar();
+
   //shuffling:
 #if (SHUFFLELOOPS)
   shuffle_loop(loop_3,Nloop_3);
