@@ -1,7 +1,7 @@
 #define TMAX 1.e10
 #define RADIATION
 
-#define LABRADFLUXES
+//#define LABRADFLUXES
 
 #define MYCOORDS MINKCOORDS
 #define NX 31
@@ -9,7 +9,6 @@
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
-#define RK3STEPPING
 
 #define RADOUTPUTINZAMO
 
@@ -34,7 +33,7 @@
 #define URFX 0.
 
 #define KAPPA .1
-#define KAPPAES 1.
+#define KAPPAES 0.
 #define PERIODIC_XBC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC

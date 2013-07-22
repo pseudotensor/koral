@@ -100,7 +100,11 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ld
   u2pret=u2p(uu,pp,ggg,corr,fixup);
 
   //if(corr[0]!=0 || corr[1]!=0) return -1; //does not allow for entropy inversion
-  if(u2pret<-1) return -1; //allows for entropy but does not update conserved 
+  if(u2pret<-1) 
+    {
+      printf("implicit sub-sub-step failed\n");
+      return -1; //allows for entropy but does not update conserved 
+    }
 
   //radiative four-force
   ldouble Gi[4];
@@ -124,12 +128,12 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ld
   Rtt0=0.;
   for(i1=0;i1<4;i1++)
     for(i2=0;i2<4;i2++)
-      Rtt0+=Rij0[i1][i2]*ucon0[i2]*ucov0[i1];
+      Rtt0+=-Rij0[i1][i2]*ucon0[i2]*ucov0[i1];
 
   /*
   boost22_lab2ff(Rij0,Rij0,pp0,gg,GG);
   trans22_cc2on(Rij0,Rij0,geom->tup);
-  Rtt0=-Rij0[0][0];
+  Rtt0=Rij0[0][0];
   */
 
   //new state
@@ -142,21 +146,22 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ld
   Rtt=0.;
   for(i1=0;i1<4;i1++)
     for(i2=0;i2<4;i2++)
-      Rtt+=Rij[i1][i2]*ucon[i2]*ucov[i1];
+      Rtt+=-Rij[i1][i2]*ucon[i2]*ucov[i1];
 
   /*
   boost22_lab2ff(Rij,Rij,pp,gg,GG);
   trans22_cc2on(Rij,Rij,geom->tup);
-  Rtt=-Rij[0][0];
+  Rtt=Rij[0][0];
   */
 
   ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
   ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+  ldouble Ehat = -Rtt;
   ldouble dtau=dt/ucon[0];
   ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
 
-  // if(geom->ix==NX/2) {printf("%e vs %e\n",f[0],Rtt - Rtt0 - kappaabs*(-Rtt-4.*Pi*B)*dtau);getchar();}
-  //f[0]=Rtt - Rtt0 - kappaabs*(-Rtt-4.*Pi*B)*dtau;
+  f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
+
   return 0;
 } 
 
@@ -200,7 +205,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   u2p(uu0,pp0,&geom,corr,fixup);
   p2u(pp0,uu0,&geom);
 
-  ldouble EPS = 1.e-8;
+  ldouble EPS = 1.e-6;
   ldouble CONV = 1.e-6; 
   ldouble DAMP = 0.5;
 
@@ -1699,7 +1704,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
       //use the explicit-implicit backup method
       
       //test
-      if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)// || 1)
+      if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)
 	{
 	  if(verbose) printf("imp_ff didn't work either. requesting fixup.\n");
 	  //this one failed too - failure

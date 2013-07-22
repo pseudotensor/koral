@@ -50,7 +50,7 @@ pp[9]=0.;
 
 prad_ff2lab(pp,pp,&geom);
 
-p2u(pp,uu,gg,GG);
+p2u(pp,uu,&geom);
 
 
 
