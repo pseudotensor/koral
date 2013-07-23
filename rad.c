@@ -501,7 +501,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   p2u(pp,uu,geom);
  
   //opposite changes in the other quantities and inversion
-  if(whichprim==1)
+  if(whichprim==RAD)
     {
       uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
       uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
@@ -510,7 +510,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 
       u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
     }
-  if(whichprim==0)
+  if(whichprim==MHD)
     {
       uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
       uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
@@ -585,7 +585,7 @@ print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
 }
 
 int
-solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *params,int verbose)
+solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
@@ -597,9 +597,6 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
 
-  int whichprim=params[0];
-  int whicheq=params[1];
-  
   //temporary using local arrays
   gg=geom.gg;
   GG=geom.GG;
@@ -625,6 +622,23 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
   Tgas00=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
   Trad00=calc_LTE_TfromE(-Rtt00);
 
+  //choice of primitives to evolve
+  int params[2];
+  if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
+    params[0]=RAD;
+  else
+    params[0]=MHD;  
+
+  //override
+  params[0]=MHD;
+
+  int whichprim=params[0];
+
+  //choice of equation to solve
+  int LABEQ=0;
+  int FFEQ=1;
+  params[1]=FFEQ;
+
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
     my_err("implicit solver assumes VELPRIM == VELPRIMRAD\n");
@@ -642,7 +656,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
   ldouble DAMP = 0.5;
   int sh;
 
-  if(whichprim==0) 
+  if(whichprim==MHD) 
     sh=UU; //solving in hydro primitives
   else
     sh=EE0; //solving in rad primitives
@@ -817,10 +831,14 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
 	  Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 	  Trad=calc_LTE_TfromE(-Rtt);
   
-	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs((Tgas-Trad)/my_min(Tgas00,Trad00))>1.e-8) ||
-	     ((pp[VX]-pp[FX0])*(pp00[VX]-pp00[FX0])<0.) ||
-	     ((pp[VY]-pp[FY0])*(pp00[VY]-pp00[FY0])<0.) ||
-	     ((pp[VZ]-pp[FZ0])*(pp00[VZ]-pp00[FZ0])<0.))
+	  //checking in overshooted significantly
+	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-4) ||
+	     ((pp[VX]-pp[FX0])*(pp00[VX]-pp00[FX0])<0. && 
+	      fabs(my_max(fabs(pp[VX]-pp00[VX]),fabs(pp[FX0]-pp00[FX0]))/my_max(1.e-8,my_min(pp00[VX],pp00[FX0])))>1.e-4) ||
+	     ((pp[VY]-pp[FY0])*(pp00[VY]-pp00[FY0])<0. && 
+	      fabs(my_max(fabs(pp[VY]-pp00[VY]),fabs(pp[FY0]-pp00[FY0]))/my_max(1.e-8,my_min(pp00[VY],pp00[FY0])))>1.e-4) ||
+	     ((pp[VZ]-pp[FZ0])*(pp00[VZ]-pp00[FZ0])<0. && 
+	      fabs(my_max(fabs(pp[VZ]-pp00[VZ]),fabs(pp[FZ0]-pp00[FZ0]))/my_max(1.e-8,my_min(pp00[VZ],pp00[FZ0])))>1.e-4))
 	    overshoot=1;
 
 	  if(overshoot==1)
@@ -835,6 +853,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
 	      ximpl = my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
 
 	      printf("overshooted: gas: %.20e -> %.20e vs rad: %.20e -> %.20e\n",Tgas00,Tgas,Trad00,Trad);
+	      printf("overshooted: v1: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VX],pp[VX],pp00[FX0],pp[FX0]);
+	      printf("overshooted: v2: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VY],pp[VY],pp00[FY0],pp[FY0]);
+	      printf("overshooted: v3: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VZ],pp[VZ],pp00[FZ0],pp[FZ0]);
 	      print_4vector(xi);
 	      printf("xi: %e fraction: %f -> %f\n",ximpl,fraction,fraction*ximpl);
 	      getchar();
@@ -897,14 +918,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
 int
 solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
-  int HDPRIM=0;
-  int RADPRIM=1;
-  int LABEQ=0;
-  int FFEQ=1;
-
-  int params[2] = {HDPRIM, FFEQ};
-
-  return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,params,verbose);
+  return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,verbose);
   
   //return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
 }
