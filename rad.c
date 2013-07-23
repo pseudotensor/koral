@@ -478,7 +478,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 //******* rad or hydro (whichprim) **************************************
 //**********************************************************************
 
-int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int whichprim)
+int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params)
 {
   struct geometry *geom
     = (struct geometry *) ggg;
@@ -490,6 +490,9 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
+
+  int whichprim=params[0];
+  int whicheq=params[1];
 
   ldouble uu[NV];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
@@ -549,43 +552,42 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
     }
 
   //fluid frame version below
+  if(whicheq==1)
+    {
+      
+      //zero - state 
+      ldouble ucon0[4]={0.,pp0[VX],pp0[VY],pp0[VZ]},ucov0[4];
+      conv_vels(ucon0,ucon0,VELPRIM,VEL4,gg,GG);
+      indices_21(ucon0,ucov0,gg);
+      ldouble Rij0[4][4],Rtt0;
+      calc_Rij(pp0,ggg,Rij0);
+      indices_2221(Rij0,Rij0,gg);
+      Rtt0=0.;
+      for(i1=0;i1<4;i1++)
+	for(i2=0;i2<4;i2++)
+	  Rtt0+=-Rij0[i1][i2]*ucon0[i2]*ucov0[i1];
 
-  //zero - state 
-  ldouble ucon0[4]={0.,pp0[VX],pp0[VY],pp0[VZ]},ucov0[4];
-  conv_vels(ucon0,ucon0,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon0,ucov0,gg);
-  ldouble Rij0[4][4],Rtt0;
-  calc_Rij(pp0,ggg,Rij0);
-  indices_2221(Rij0,Rij0,gg);
-  Rtt0=0.;
-  for(i1=0;i1<4;i1++)
-    for(i2=0;i2<4;i2++)
-      Rtt0+=-Rij0[i1][i2]*ucon0[i2]*ucov0[i1];
+      //new state
+      ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]},ucov[4];
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+      indices_21(ucon,ucov,gg);
+      ldouble Rij[4][4],Rtt;
+      calc_Rij(pp,ggg,Rij);
+      indices_2221(Rij,Rij,gg);
+      Rtt=0.;
+      for(i1=0;i1<4;i1++)
+	for(i2=0;i2<4;i2++)
+	  Rtt+=-Rij[i1][i2]*ucon[i2]*ucov[i1];
 
-  //new state
-  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]},ucov[4];
-  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
-  ldouble Rij[4][4],Rtt;
-  calc_Rij(pp,ggg,Rij);
-  indices_2221(Rij,Rij,gg);
-  Rtt=0.;
-  for(i1=0;i1<4;i1++)
-    for(i2=0;i2<4;i2++)
-      Rtt+=-Rij[i1][i2]*ucon[i2]*ucov[i1];
+      ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+      ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+      ldouble Ehat = -Rtt;
+      ldouble dtau=dt/ucon[0];
+      ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
 
-  ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
-  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
-  ldouble Ehat = -Rtt;
-  ldouble dtau=dt/ucon[0];
-  ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
-
-  //printf("%.20e %.20e %.20e \n",uu[6],Gi[0],uu[6] - uu0[6] + dt * gdetu * Gi[0]);
-  //printf("%.20e %.20e %.20e %.20e %.20e %.20e \n",uu[6],Rij[0][0],pp[6],Rtt,Ehat-4.*Pi*B,Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau);
-
-
-  //fluid frame energy equation:
-  //f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
+      //fluid frame energy equation:
+      f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
+    }
   
   return 0;
 } 
@@ -602,7 +604,7 @@ print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
 }
 
 int
-solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int whichprim,int verbose)
+solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *params,int verbose)
 {
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
@@ -613,6 +615,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int wh
 
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
+
+  int whichprim=params[0];
+  int whicheq=params[1];
   
   //temporary using local arrays
   gg=geom.gg;
@@ -694,14 +699,14 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int wh
 	      //print_Nvector(pp0,NV);
 	      //print_Nvector(pp,NV);
 
-	      int ret=f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f1,whichprim);
+	      int ret=f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f1,params);
 	      print_state_implicit_lab_4dprim (iter-1,xxx,f1); 
 	      printf("f_lab_4dprim ret: %d\n",ret);
 	    }
 
 
 	  //values at base state
-	  if(f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f1,whichprim)<0) 
+	  if(f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f1,params)<0) 
 	    {
 	      failed=1;
 		  
@@ -721,7 +726,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int wh
 	      pp[j+sh]=ppp[j+sh]-del;
 
 	      
-	      int fret=f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f2,whichprim);  
+	      int fret=f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f2,params);  
 
 	      if(verbose>0 && 0)
 		{
@@ -928,10 +933,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   int RADPRIM=1;
   int HDPRIM=0;
+  int LABEQ=0;
+  int FFEQ=1;
 
-  return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,RADPRIM,verbose);
+  int params[2] = {RADPRIM, LABEQ};
 
-  return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
+  return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,params,verbose);
+  
+  //return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
 }
 
 
