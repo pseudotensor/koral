@@ -171,7 +171,7 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
 
   //printf("%.20e %.20e %.20e \n",uu[6],Gi[0],uu[6] - uu0[6] + dt * gdetu * Gi[0]);
   //printf("%.20e %.20e %.20e %.20e %.20e %.20e \n",uu[6],Rij[0][0],pp[6],Rtt,Ehat-4.*Pi*B,Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau);
-  f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
+  //f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
   
   return 0;
 } 
@@ -219,6 +219,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6; 
+  int MAXITER=50;
   ldouble DAMP = 0.5;
 
   ldouble frdt = 1.0;
@@ -382,7 +383,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	      break;
 	    }
 
-	  if(iter>10)
+	  if(iter>MAXITER)
 	    {
 	      //return -1;
 	      if(verbose) 
@@ -451,7 +452,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	  uu[iv]=uu0[iv];
 	}
       
-      if(frdt<0.00001 || 1)  //avoid substepping?
+      if(frdt<0.00001)  //avoid substepping?
 	{
 	  if(verbose) 
 	    {
@@ -629,15 +630,12 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   else
     params[0]=MHD;  
 
-  //override
-  params[0]=MHD;
-
   int whichprim=params[0];
 
   //choice of equation to solve
   int LABEQ=0;
   int FFEQ=1;
-  params[1]=FFEQ;
+  params[1]=LABEQ;
 
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
@@ -653,7 +651,8 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
  
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6; 
-  ldouble DAMP = 0.5;
+  ldouble MAXITER = 50;
+
   int sh;
 
   if(whichprim==MHD) 
@@ -782,10 +781,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	}
 
       ldouble fraction=1.;
-      int overshoot;
+      int overshoot=0,overcnt=0;
       do
 	{
-	  overshoot=0;
 
 	  for(i=0;i<4;i++)
 	    {
@@ -795,7 +793,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		}
 	    }
 
-	  if(verbose>0)    print_state_implicit_lab_4dprim (iter,xxx,f1); 
+	  if(verbose>0) print_state_implicit_lab_4dprim (iter,xxx,f1); 
+
+	  overshoot=0;
 
 	  for(i=0;i<4;i++)
 	    {
@@ -852,28 +852,39 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
 	      ximpl = my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
 
-	      printf("overshooted: gas: %.20e -> %.20e vs rad: %.20e -> %.20e\n",Tgas00,Tgas,Trad00,Trad);
-	      printf("overshooted: v1: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VX],pp[VX],pp00[FX0],pp[FX0]);
-	      printf("overshooted: v2: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VY],pp[VY],pp00[FY0],pp[FY0]);
-	      printf("overshooted: v3: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VZ],pp[VZ],pp00[FZ0],pp[FZ0]);
-	      print_4vector(xi);
-	      printf("xi: %e fraction: %f -> %f\n",ximpl,fraction,fraction*ximpl);
-	      getchar();
-
-	      //restoring initial primitives and decreasing step
-	      for(i=0;i<4;i++)
+	      if(ximpl>0.9) //skip if correction small or if fraction already small
+		overshoot=0;
+	      else
 		{
-		  xxx[i]=ppp[i+sh];
+		  if(verbose)
+		    {
+		      printf("overshooted: gas: %.20e -> %.20e vs rad: %.20e -> %.20e\n",Tgas00,Tgas,Trad00,Trad);
+		      printf("overshooted: v1: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VX],pp[VX],pp00[FX0],pp[FX0]);
+		      printf("overshooted: v2: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VY],pp[VY],pp00[FY0],pp[FY0]);
+		      printf("overshooted: v3: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VZ],pp[VZ],pp00[FZ0],pp[FZ0]);
+		      print_4vector(xi);
+		      printf("xi: %e fraction: %f -> %f\n",ximpl,fraction,fraction*ximpl);
+		      getchar();
+		    }
+
+		  //restoring initial primitives and decreasing step
+		  for(i=0;i<4;i++)
+		    {
+		      xxx[i]=ppp[i+sh];
+		    }		  	  
+
+		  ximpl/=2.; //to be generous when damping step
+
+		  fraction*=ximpl;
 		}
-	      fraction*=ximpl;
-	      
+
+	      overcnt++;
+
 	    }
 	}
-      while(overshoot==1);
+      while(overshoot==1); //overshooting loop
 
- 
-	  
-   
+      if(verbose && overcnt>0) printf("over cnt: %d\n",overcnt);	    
 
       //test convergence
       for(i=0;i<4;i++)
@@ -885,13 +896,13 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(pp[i+sh])));
 	}
 	  
-      if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
+      if(overshoot==0 && f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	{
 	  if(verbose) printf("success ===\n");
 	  break;
 	}
 	  
-      if(iter>40)
+      if(iter>MAXITER)
 	{
 	  if(verbose) 
 	    {

@@ -234,8 +234,10 @@ print_tensor(tloBL);print_tensor(geomBL.tlo);getchar();
 
      //boosting to lab
      //transforming BL ZAMO radiative primitives to code non-ortonormal primitives
-     prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
-     prad_ff2lab(pp,pp,&geomBL);
+     if(pp[RHO]>.1) prad_zamo2ff(pp,pp,ggBL,GGBL,eupBL);
+     print_Nvector(pp,NV);
+     if(pp[RHO]>.1) {prad_ff2lab(pp,pp,&geomBL);getchar();}
+     print_Nvector(pp,NV);
      //transforming radiative primitives from BL to MYCOORDS
      trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
      

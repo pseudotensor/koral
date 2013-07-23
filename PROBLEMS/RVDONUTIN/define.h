@@ -51,10 +51,10 @@
 /************************************/
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e2
-#define EERHORATIOMIN 1.e-15
-#define EERHORATIOMAX 1.e6
-#define EEUURATIOMIN 1.e-15
-#define EEUURATIOMAX 1.e6
+#define EERHORATIOMIN 1.e-20
+#define EERHORATIOMAX 1.e20
+#define EEUURATIOMIN 1.e-20
+#define EEUURATIOMAX 1.e20
 #define ERADLIMIT 1.e-50
 #define RHOFLOOR 1.e-50
 #define GAMMAMAXRAD 50.
@@ -121,7 +121,7 @@
 #if (NDONUT==100) //high injection to break it
 /************************************/
 #undef DOFIXUPS
-#define DOFIXUPS 1
+#define DOFIXUPS 0
 #undef ALLSTEPSOUTPUT
 #define ALLSTEPSOUTPUT 0
 #define RHOFLOOR 1.e-50
@@ -364,7 +364,7 @@
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .983
-#define DTOUT1 5.e0
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

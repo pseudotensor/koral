@@ -109,6 +109,8 @@ solve_all_problems_5(ldouble tstart)
   else
     tstepdenmax=max_ws[0]/min_dx;            
 
+  tstepdenmax*=10.;
+
   //copy primitives to hold previous time steps
   copy_u(1.,p,ptm1); ttm1=t;
   copy_u(1.,p,ptm2); ttm2=t;

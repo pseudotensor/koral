@@ -850,7 +850,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       /************************************************************************/
 #ifndef SKIPRADSOURCE
 #ifdef RADIATION
-
       //update primitives / correct conserved
       calc_primitives(ix,iy,iz);
 

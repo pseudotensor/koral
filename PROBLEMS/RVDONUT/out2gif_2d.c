@@ -200,13 +200,13 @@ maxy= 1.02*get_xb(NX,0);
 	  "set xlabel \"x\" offset 0,1\n"
 	  "set ylabel \"z\"\n"
 	  "set cblabel \"\"\n"
-	  "set cbrange [1.e-8:0.0001]\n"
-	  //"set autoscale cb\n"
 
 #ifdef RADIATION	  
+	  "set autoscale cb\n"
 	  "set title \"E\" offset 0,-1\n"
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($20) ti \"\" w l ls 1\n"
 #else
+	  "set cbrange [1.e-8:0.0001]\n"
 	  "set title \"u_int\" offset 0,-1\n"
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($15) ti \"\" w l ls 1\n"
 #endif

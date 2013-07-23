@@ -911,10 +911,10 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       if( ((( W*W*W * ( W + 2.*Bsq ) 
 	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
 	  || isinf(f0) || isnan(f0)
-	  || isinf(dfdW) || isnan(dfdW))
-	  && (i_increase < 10))
+	  || isinf(dfdW) || isnan(dfdW))	  
+	  && (i_increase < 10)) //if not enough will complain later returnin negative number
 	{
-	  W *= 1.1;
+	  W *= 10.;
 	  i_increase++;
 	  continue;
 	}
@@ -922,6 +922,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 	break;    
     }
   while(1);
+
 
   //1d Newton solver
   if(verbose>1) printf("in:%e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
@@ -988,7 +989,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       return -102;
     }
   
-  if(isnan(W) || isinf(W)) {printf("nan/inf W: %e\n",W); exit(0);return -103;}
+  if(isnan(W) || isinf(W)) {if(verbose) printf("nan/inf W in u2p_solver with Etype: %d\n",Etype); return -103;}
   if(verbose>1) {printf("the end: %e\n",W); }
 
   //W found, let's calculate v2 and the rest
@@ -1254,7 +1255,7 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
       return -102;
     }
   
-  if(isnan(W) || isinf(W)) {printf("nan/inf W: %e\n",W); exit(0);return -103;}
+  if(isnan(W) || isinf(W)) {printf("nan/inf W in u2p_hot: %e\n",W); exit(0);return -103;}
   if(verbose>1) {printf("the end: %e\n",W); }
 
   //W found, let's calculate v2 and the rest

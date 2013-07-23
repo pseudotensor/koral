@@ -1,9 +1,9 @@
-//#define RADIATION
+#define RADIATION
 
-//#define RADSOURCEOFF
+#define SKIPRADSOURCE
 //#define EXPLICIT_RAD_SOURCE
 //#define IMPLICIT_FF_RAD_SOURCE
-#define ALLOW_EXPLICIT_RAD_SOURCE 1
+//#define ALLOW_EXPLICIT_RAD_SOURCE 1
 
 #define MASS 10.
 #define BHSPIN 0.
@@ -23,7 +23,7 @@
 
 #define OUTCOORDS KERRCOORDS
 #define OUTVEL VEL4
-#define DTOUT1 20.e0
+#define DTOUT1 2.e-1
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 1000.
@@ -65,7 +65,6 @@
 #define ERADATMMIN  (calc_LTE_EfromT(1.e8))
 
 #define INT_ORDER 1
-#define RK2_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
