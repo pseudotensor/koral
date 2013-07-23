@@ -1,5 +1,9 @@
 //mnemonical definitions
 
+//rad vs hydro
+#define RAD 1
+#define MHD 2 
+
 //velocities
 #define VEL4 1 //lab four-velocity u^i
 #define VEL3 2 //lab three-velocity u^i/u^t

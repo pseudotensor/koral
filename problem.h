@@ -64,7 +64,7 @@
 //58* LUKE - beam hitting a net gas flow
 //59* BBBLOB - rad blobs
 
-#define PROBLEM 6
+#define PROBLEM 27
 
 #if(PROBLEM==59)
 

@@ -29,10 +29,10 @@
 
 #define MASSCM 1.e5
 
-#define LTEFACTOR 2.
+#define LTEFACTOR 200.
 #define URFX 0.
 
-#define KAPPA .1
+#define KAPPA 1000.
 #define KAPPAES 0.
 #define PERIODIC_XBC
 #define PERIODIC_YBC

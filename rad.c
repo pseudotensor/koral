@@ -554,31 +554,12 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   //fluid frame version below
   if(whicheq==1)
     {
-      
+      ldouble ucon[4],Rtt0,Rtt;
       //zero - state 
-      ldouble ucon0[4]={0.,pp0[VX],pp0[VY],pp0[VZ]},ucov0[4];
-      conv_vels(ucon0,ucon0,VELPRIM,VEL4,gg,GG);
-      indices_21(ucon0,ucov0,gg);
-      ldouble Rij0[4][4],Rtt0;
-      calc_Rij(pp0,ggg,Rij0);
-      indices_2221(Rij0,Rij0,gg);
-      Rtt0=0.;
-      for(i1=0;i1<4;i1++)
-	for(i2=0;i2<4;i2++)
-	  Rtt0+=-Rij0[i1][i2]*ucon0[i2]*ucov0[i1];
-
+      calc_ff_Rtt(pp0,&Rtt0,ucon,geom);
       //new state
-      ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]},ucov[4];
-      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-      indices_21(ucon,ucov,gg);
-      ldouble Rij[4][4],Rtt;
-      calc_Rij(pp,ggg,Rij);
-      indices_2221(Rij,Rij,gg);
-      Rtt=0.;
-      for(i1=0;i1<4;i1++)
-	for(i2=0;i2<4;i2++)
-	  Rtt+=-Rij[i1][i2]*ucon[i2]*ucov[i1];
-
+      calc_ff_Rtt(pp,&Rtt,ucon,geom);
+      
       ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
       ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
       ldouble Ehat = -Rtt;
@@ -632,6 +613,21 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
   int corr[2],fixup[2];
   u2p(uu00,pp00,&geom,corr,fixup);
   p2u(pp00,uu00,&geom);
+  
+  //comparing energy densities
+  ldouble urad00[4],Rtt00,Tgas00,Trad00;
+  int dominates;
+  calc_ff_Rtt(pp00,&Rtt00,urad00,&geom);
+  if(-Rtt00>pp00[UU]) 
+    dominates = RAD;
+  else
+    dominates = MHD;
+  Tgas00=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
+  Trad00=calc_LTE_TfromE(-Rtt00);
+
+  //check if one can compare gas & rad velocities
+  if(VELPRIM!=VELPRIMRAD) 
+    my_err("implicit solver assumes VELPRIM == VELPRIMRAD\n");
 
   for(iv=0;iv<NV;iv++)
     {
@@ -641,10 +637,11 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
       pp[iv]=pp0[iv];     
     }
  
-  ldouble EPS = 1.e-6;
+  ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6; 
   ldouble DAMP = 0.5;
   int sh;
+
   if(whichprim==0) 
     sh=UU; //solving in hydro primitives
   else
@@ -690,9 +687,6 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
 	    {
 	      xxx[i]=ppp[i+sh];
 	    }  
-	  //print_Nvector(uu0,NV);
-	  //print_Nvector(pp0,NV);
-	  //print_Nvector(pp,NV);
 
 	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params);
 	  print_state_implicit_lab_4dprim (iter-1,xxx,f1); 
@@ -713,13 +707,21 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
 	{
 	  ldouble del;
 
-	  if(j==0) 
-	    del=EPS*ppp[sh]; //eps in energy density
-	  else
-	    del=EPS; //eps in velocities
+	  //one-way derivatives
+	  if(j==0)
+	    if(dominates==RAD)
+	      del=EPS*ppp[EE0]; 
+	    else
+	      del=EPS*ppp[UU];
+	  else //decreasing velocity
+	    {
+	      if(ppp[j+sh]>=0.)
+		del=-EPS; 
+	      else
+		del=EPS;
+	    }
 
-	  pp[j+sh]=ppp[j+sh]-del;
-
+	  pp[j+sh]=ppp[j+sh]+del;
 	      
 	  int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f2,params);  
 
@@ -765,43 +767,92 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
 	  xxx[i]=ppp[i+sh];
 	}
 
-      for(i=0;i<4;i++)
+      ldouble fraction=1.;
+      int overshoot;
+      do
 	{
-	  for(j=0;j<4;j++)
+	  overshoot=0;
+
+	  for(i=0;i<4;i++)
 	    {
-	      xxx[i]-=iJ[i][j]*f1[j];
+	      for(j=0;j<4;j++)
+		{
+		  xxx[i]-=fraction*iJ[i][j]*f1[j];
+		}
+	    }
+
+	  if(verbose>0)    print_state_implicit_lab_4dprim (iter,xxx,f1); 
+
+	  for(i=0;i<4;i++)
+	    {
+	      pp[i+sh]=xxx[i];
+	    }
+
+	  //updating the other set of quantities
+	  //total inversion, but only whichprim part matters
+	  p2u(pp,uu,&geom);
+	  //opposite changes in the other quantities and inversion
+	  if(whichprim==1)
+	    {
+	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+	      u2p(uu,pp,&geom,corr,fixup); //total inversion (I should separate hydro from rad)
+	    }
+	  if(whichprim==0)
+	    {
+	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+	      u2p_rad(uu,pp,&geom,corr);
+	    }     
+
+	  //overshooting check
+
+	  //comparing temperatures
+	  ldouble ucon[4],Rtt,Tgas,Trad;
+	  calc_ff_Rtt(pp,&Rtt,ucon,&geom);
+	  Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+	  Trad=calc_LTE_TfromE(-Rtt);
+  
+	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs((Tgas-Trad)/my_min(Tgas00,Trad00))>1.e-8) ||
+	     ((pp[VX]-pp[FX0])*(pp00[VX]-pp00[FX0])<0.) ||
+	     ((pp[VY]-pp[FY0])*(pp00[VY]-pp00[FY0])<0.) ||
+	     ((pp[VZ]-pp[FZ0])*(pp00[VZ]-pp00[FZ0])<0.))
+	    overshoot=1;
+
+	  if(overshoot==1)
+	    {
+	      ldouble xi[4]={1.,1.,1.,1.},ximpl;
+	      if((Tgas-Trad)*(Tgas00-Trad00)<0.)
+		xi[0] = fabs(Trad00-Tgas00)/(fabs(Trad-Trad00)+fabs(Tgas-Tgas00));
+	      for(i1=0;i1<3;i1++)
+		if((pp[VX+i1]-pp[FX0+i1])*(pp00[VX+i1]-pp00[FX0+i1])<0.)
+		  xi[1+i1] = fabs(pp00[FX0+i1]-pp00[VX+i1])/(fabs(pp[FX0+i1]-pp00[FX0+i1])+fabs(pp[VX+i1]-pp00[VX+i1]));
+
+	      ximpl = my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
+
+	      printf("overshooted: gas: %.20e -> %.20e vs rad: %.20e -> %.20e\n",Tgas00,Tgas,Trad00,Trad);
+	      print_4vector(xi);
+	      printf("xi: %e fraction: %f -> %f\n",ximpl,fraction,fraction*ximpl);
+	      getchar();
+
+	      //restoring initial primitives and decreasing step
+	      for(i=0;i<4;i++)
+		{
+		  xxx[i]=ppp[i+sh];
+		}
+	      fraction*=ximpl;
+	      
 	    }
 	}
+      while(overshoot==1);
 
-      if(verbose>0)    print_state_implicit_lab_4dprim (iter,xxx,f1); 
-
-      for(i=0;i<4;i++)
-	{
-	  pp[i+sh]=xxx[i];
-	}
-
-      //implement overshooting check here
-      //should not matter that before convergence check
+ 
 	  
-      //total inversion, but only whichprim part matters
-      p2u(pp,uu,&geom);
-      //opposite changes in the other quantities and inversion
-      if(whichprim==1)
-	{
-	  uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-	  uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
-	  uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
-	  uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
-	  u2p(uu,pp,&geom,corr,fixup); //total inversion (I should separate hydro from rad)
-	}
-      if(whichprim==0)
-	{
-	  uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
-	  uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
-	  uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
-	  uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
-	  u2p_rad(uu,pp,&geom,corr);
-	}     
+   
 
       //test convergence
       for(i=0;i<4;i++)
@@ -846,12 +897,12 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int *p
 int
 solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
-  int RADPRIM=1;
   int HDPRIM=0;
+  int RADPRIM=1;
   int LABEQ=0;
   int FFEQ=1;
 
-  int params[2] = {RADPRIM, LABEQ};
+  int params[2] = {HDPRIM, FFEQ};
 
   return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,params,verbose);
   
@@ -2256,3 +2307,32 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
 }
 
  
+//calculates fluid frame radiative energy density
+//and lab-frame four-velocity of gas
+int
+calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ucon[0]=0.;
+  ucon[1]=pp[VX];
+  ucon[2]=pp[VY];
+  ucon[3]=pp[VZ];
+  ldouble ucov[4];
+  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+  indices_21(ucon,ucov,geom->gg);
+  ldouble Rij[4][4],Rtt;
+  calc_Rij(pp,ggg,Rij);
+  indices_2221(Rij,Rij,geom->gg);
+  Rtt=0.;
+  int i1,i2;
+  for(i1=0;i1<4;i1++)
+    for(i2=0;i2<4;i2++)
+      Rtt+=-Rij[i1][i2]*ucon[i2]*ucov[i1];
+
+  *Rttret = Rtt;
+
+  return 0;
+
+}
