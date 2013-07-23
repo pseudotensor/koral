@@ -42,13 +42,13 @@
 /************************************/
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e2
-#define EERHORATIOMIN 1.e-6 
-#define EERHORATIOMAX 1.e6 
-#define EEUURATIOMIN 1.e-6 
-#define EEUURATIOMAX 1.e6 
+#define EERHORATIOMIN 1.e-20
+#define EERHORATIOMAX 1.e20
+#define EEUURATIOMIN 1.e-20
+#define EEUURATIOMAX 1.e20
 #define ERADLIMIT 1.e-50
 #define RHOFLOOR 1.e-50
-#define GAMMAMAXRAD 10.
+#define GAMMAMAXRAD 100.
 
 /************************************/
 //blackhole

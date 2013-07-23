@@ -27,7 +27,7 @@
 #define MINZ 0
 #define MAXZ 1
 
-#define MASSCM 1.
+#define MASSCM 1.e5
 
 #define LTEFACTOR 2.
 #define URFX 0.

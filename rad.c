@@ -71,7 +71,7 @@ calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
 //******* the fiducial approach *****************************************
 //**********************************************************************
 
-int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ldouble *f)
+int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ldouble *f)
 {
   struct geometry *geom
     = (struct geometry *) ggg;
@@ -106,7 +106,9 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ld
   //printf("%d %d\n",corr[0],corr[1]);
   //print_Nvector(pp,NV);getchar();
 
-  //if(corr[0]!=0 || corr[1]!=0) return -1; //does not allow for entropy inversion
+  //if(corr[0]!=0 || corr[1]!=0) 
+  //printf("corr: %d %d\n",corr[0],corr[1]);
+
   if(u2pret<-1) 
     {
       printf("implicit sub-sub-step failed\n");
@@ -175,7 +177,7 @@ int f_implicit_lab(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* ggg,ld
 } 
 
 int
-print_state_implicit_lab (int iter, ldouble *x, ldouble *f)
+print_state_implicit_lab_4dcon (int iter, ldouble *x, ldouble *f)
 {
   printf ("iter = %3d x = % .13e % .13e % .13e % .3e "
 	  "f(x) = % .13e % .13e % .13e % .13e\n",
@@ -186,7 +188,7 @@ print_state_implicit_lab (int iter, ldouble *x, ldouble *f)
 }
 
 int
-solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
+solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
@@ -268,14 +270,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      print_Nvector(uu,NV);
 	      print_Nvector(pp0,NV);
 
-	      int ret=f_implicit_lab(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f1);
-	      print_state_implicit_lab (iter-1,xxx,f1); 
-	      printf("f_lab ret: %d\n",ret);
+	      int ret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f1);
+	      print_state_implicit_lab_4dcon (iter-1,xxx,f1); 
+	      printf("f_lab_4dcon ret: %d\n",ret);
 	    }
 
 
 	  //values at base state
-	  if(f_implicit_lab(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f1)<0) 
+	  if(f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f1)<0) 
 	    {
 	      failed=1;
 		  
@@ -291,7 +293,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
 	      uu[j+6]=uup[j+6]-del;
 	      
-	      int fret=f_implicit_lab(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f2);  
+	      int fret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f2);  
 
 	      if(verbose>0)
 		{
@@ -299,8 +301,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 		    {
 		      xxx[i]=uu[i+6];
 		    }
-		  print_state_implicit_lab (iter-1,xxx,f2); 
-		  printf("sub (%d) f_lab ret: %d\n",j,fret);
+		  print_state_implicit_lab_4dcon (iter-1,xxx,f2); 
+		  printf("sub (%d) f_lab_4dcon ret: %d\n",j,fret);
 		}
 
 	      if(fret<0) 
@@ -351,7 +353,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 		}
 	    }
 
-	  if(verbose>0)    print_state_implicit_lab (iter,xxx,f1); 
+	  if(verbose>0)    print_state_implicit_lab_4dcon (iter,xxx,f1); 
 
 	  for(i=0;i<4;i++)
 	    {
@@ -385,7 +387,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      //return -1;
 	      if(verbose) 
 		{
-		  printf("iter exceeded in solve_implicit_lab() for frdt=%f | %f\n",frdt,dttot);	  
+		  printf("iter exceeded in solve_implicit_lab_4dcon() for frdt=%f | %f\n",frdt,dttot);	  
 		}
 	      failed=1;
 	      break;
@@ -449,11 +451,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  uu[iv]=uu0[iv];
 	}
       
-      if(frdt<0.00001)  //avoid substepping?
+      if(frdt<0.00001 || 1)  //avoid substepping?
 	{
 	  if(verbose) 
 	    {
-	      printf("time step too small - aborting implicit_lab() ===\n");
+	      printf("time step too small - aborting implicit_lab_4dcon() ===\n");
 	    }
 	  return -1;
 	}
@@ -468,6 +470,468 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   deltas[3]=uu[9]-uu00[9];
   
   return 0;
+}
+
+//**********************************************************************
+//******* solves implicitidly four-force source terms *********************
+//******* in the lab frame  working on primitives    ***********************
+//******* rad or hydro (whichprim) **************************************
+//**********************************************************************
+
+int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int whichprim)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  ldouble uu[NV];
+  int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
+
+  //total inversion, but only whichprim part matters
+  p2u(pp,uu,geom);
+ 
+  //opposite changes in the other quantities and inversion
+  if(whichprim==1)
+    {
+      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
+
+      u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+    }
+  if(whichprim==0)
+    {
+      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+
+      u2pret=u2p_rad(uu,pp,geom,corr);
+    }     
+
+  //print_Nvector(uu,NV);getchar();
+
+  //  if(corr[0]!=0 || corr[1]!=0) 
+  //printf("corr: %d %d\n",corr[0],corr[1]);
+
+  if(u2pret<-1) 
+    {
+      printf("implicit sub-sub-step failed\n");
+      return -1; //allows for entropy but does not update conserved 
+    }
+
+  //radiative four-force
+  ldouble Gi[4];
+  calc_Gi(pp,ggg,Gi); 
+  indices_21(Gi,Gi,gg);
+
+  if(whichprim==1) //rad-primitives
+    {
+      f[0] = uu[6] - uu0[6] + dt * gdetu * Gi[0];
+      f[1] = uu[7] - uu0[7] + dt * gdetu * Gi[1];
+      f[2] = uu[8] - uu0[8] + dt * gdetu * Gi[2];
+      f[3] = uu[9] - uu0[9] + dt * gdetu * Gi[3];
+    }
+  if(whichprim==0) //hydro-primitives
+    {
+      f[0] = uu[1] - uu0[1] - dt * gdetu * Gi[0];
+      f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
+      f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2];
+      f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3];
+    }
+
+  //fluid frame version below
+
+  //zero - state 
+  ldouble ucon0[4]={0.,pp0[VX],pp0[VY],pp0[VZ]},ucov0[4];
+  conv_vels(ucon0,ucon0,VELPRIM,VEL4,gg,GG);
+  indices_21(ucon0,ucov0,gg);
+  ldouble Rij0[4][4],Rtt0;
+  calc_Rij(pp0,ggg,Rij0);
+  indices_2221(Rij0,Rij0,gg);
+  Rtt0=0.;
+  for(i1=0;i1<4;i1++)
+    for(i2=0;i2<4;i2++)
+      Rtt0+=-Rij0[i1][i2]*ucon0[i2]*ucov0[i1];
+
+  //new state
+  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]},ucov[4];
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+  indices_21(ucon,ucov,gg);
+  ldouble Rij[4][4],Rtt;
+  calc_Rij(pp,ggg,Rij);
+  indices_2221(Rij,Rij,gg);
+  Rtt=0.;
+  for(i1=0;i1<4;i1++)
+    for(i2=0;i2<4;i2++)
+      Rtt+=-Rij[i1][i2]*ucon[i2]*ucov[i1];
+
+  ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+  ldouble Ehat = -Rtt;
+  ldouble dtau=dt/ucon[0];
+  ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
+
+  //printf("%.20e %.20e %.20e \n",uu[6],Gi[0],uu[6] - uu0[6] + dt * gdetu * Gi[0]);
+  //printf("%.20e %.20e %.20e %.20e %.20e %.20e \n",uu[6],Rij[0][0],pp[6],Rtt,Ehat-4.*Pi*B,Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau);
+
+
+  //fluid frame energy equation:
+  //f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
+  
+  return 0;
+} 
+
+int
+print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
+{
+  printf ("iter = %3d x = % .13e % .13e % .13e % .3e "
+	  "f(x) = % .13e % .13e % .13e % .13e\n",
+	  iter,
+	  //	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
+	  x[0],x[1],x[2],x[3],f[0],f[1],f[2],f[3]);
+  return 0;
+}
+
+int
+solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int whichprim,int verbose)
+{
+  int i1,i2,i3,iv,i,j;
+  ldouble J[4][4],iJ[4][4];
+  ldouble pp[NV],pp0[NV],pp00[NV],ppp[NV],uu[NV],uu0[NV],uu00[NV],uup[NV]; 
+  ldouble f1[4],f2[4],f3[4],xxx[4];
+
+  ldouble (*gg)[5],(*GG)[5];
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  //temporary using local arrays
+  gg=geom.gg;
+  GG=geom.GG;
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uu00[iv]=get_u(u,iv,ix,iy,iz); //total zero-state    
+      pp00[iv]=get_u(p,iv,ix,iy,iz); //only initial guess for u2p
+    }
+  
+  int corr[2],fixup[2];
+  u2p(uu00,pp00,&geom,corr,fixup);
+  p2u(pp00,uu00,&geom);
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uu0[iv]=uu00[iv]; //zero state for substepping
+      pp0[iv]=pp00[iv]; 
+      uu[iv]=uu0[iv]; 
+      pp[iv]=pp0[iv];     
+    }
+ 
+  ldouble EPS = 1.e-6;
+  ldouble CONV = 1.e-6; 
+  ldouble DAMP = 0.5;
+  int sh;
+  if(whichprim==0) 
+    sh=UU; //solving in hydro primitives
+  else
+    sh=EE0; //solving in rad primitives
+
+  ldouble frdt = 1.0;
+  ldouble dttot = 0.;
+
+  int iter=0;
+  int failed=0;
+
+  if(verbose) 
+    {
+      ldouble xx,yy,zz;
+      xx=get_x(ix,0);
+      yy=get_x(iy,1);
+      zz=get_x(iz,2);
+      printf("=== i: %d %d %d\n=== x: %e %e %e\n",ix,iy,iz,xx,yy,zz);
+      print_Nvector(pp,NV);
+      print_Nvector(uu,NV);
+      print_metric(gg);
+    }
+
+  //loop in dt
+  do 
+    {
+
+      if(verbose) 
+	{
+	  printf("====\n===\n Trying imp lab 4d prim with frdt | dttot : %f | %f\n",frdt,dttot);
+	}
+
+      failed=0;
+      iter=0;
+
+      do //main sub-step solver loop
+	{	 
+	  iter++;
+      
+	  for(i=0;i<NV;i++)
+	    {
+	      ppp[i]=pp[i];
+	    }	
+
+	  if(verbose>0)
+	    {
+	      for(i=0;i<4;i++)
+		{
+		  xxx[i]=ppp[i+sh];
+		}  
+	      //print_Nvector(uu0,NV);
+	      //print_Nvector(pp0,NV);
+	      //print_Nvector(pp,NV);
+
+	      int ret=f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f1,whichprim);
+	      print_state_implicit_lab_4dprim (iter-1,xxx,f1); 
+	      printf("f_lab_4dprim ret: %d\n",ret);
+	    }
+
+
+	  //values at base state
+	  if(f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f1,whichprim)<0) 
+	    {
+	      failed=1;
+		  
+	      break;
+	    }
+
+	  //calculating approximate Jacobian
+	  for(j=0;j<4;j++)
+	    {
+	      ldouble del;
+
+	      if(j==0) 
+		del=EPS*ppp[sh]; //eps in energy density
+	      else
+		del=EPS; //eps in velocities
+
+	      pp[j+sh]=ppp[j+sh]-del;
+
+	      
+	      int fret=f_implicit_lab_4dprim(pp,uu0,pp0,frdt*(1.-dttot)*dt,&geom,f2,whichprim);  
+
+	      if(verbose>0 && 0)
+		{
+		  for(i=0;i<4;i++)
+		    {
+		      xxx[i]=pp[i+sh];
+		    }
+		  print_state_implicit_lab_4dprim (iter-1,xxx,f2); 
+		  printf("sub (%d) f_lab_4dprim ret: %d\n",j,fret);
+		}
+
+	      if(fret<0) 
+		{
+		  failed=1;	     		 
+		}
+  
+	      //Jacobian matrix component
+	      for(i=0;i<4;i++)
+    	        {
+		  J[i][j]=(f2[i] - f1[i])/(pp[j+sh]-ppp[j+sh]);
+		}
+
+	      pp[j+sh]=ppp[j+sh];
+
+	      if(failed!=0) break;
+	    }
+
+	  if(failed!=0) break;
+	  
+	  //inversion
+	  if(inverse_44matrix(J,iJ)<0)
+	    {
+	      failed=1;
+	      if(verbose) 
+		{
+		  print_tensor(J);
+		  printf("Jacobian inversion failed\n");
+		}
+	      break;
+	    }
+
+	  //updating x
+	  for(i=0;i<4;i++)
+	    {
+	      xxx[i]=ppp[i+sh];
+	    }
+
+	  for(i=0;i<4;i++)
+	    {
+	      for(j=0;j<4;j++)
+		{
+		  xxx[i]-=iJ[i][j]*f1[j];
+		}
+	    }
+
+	  if(verbose>0)    print_state_implicit_lab_4dprim (iter,xxx,f1); 
+
+	  for(i=0;i<4;i++)
+	    {
+	      pp[i+sh]=xxx[i];
+	    }
+
+	  //test convergence
+	  for(i=0;i<4;i++)
+	    {
+	      f3[i]=(pp[i+sh]-ppp[i+sh]);
+	      if(i==0)
+		f3[i]=fabs(f3[i]/ppp[sh]);
+	      else
+		f3[i]=fabs(f3[i]/my_max(EPS,fabs(pp[i+sh])));
+	    }
+	  
+	  if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
+	    {
+	      if(verbose) printf("success ===\n");
+	      break;
+	    }
+	  
+	  if(iter>40)
+	    {
+	      //return -1;
+	      if(verbose) 
+		{
+		  printf("iter exceeded in solve_implicit_lab_4dprim() for frdt=%f | %f\n",frdt,dttot);	  
+		}
+	      failed=1;
+	      break;	      
+	    }
+	  
+	  //total inversion, but only whichprim part matters
+	  p2u(pp,uu,&geom);
+	  //opposite changes in the other quantities and inversion
+	  if(whichprim==1)
+	    {
+	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+	      u2p(uu,pp,&geom,corr,fixup); //total inversion (I should separate hydro from rad)
+	    }
+	  if(whichprim==0)
+	    {
+	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+	      u2p_rad(uu,pp,&geom,corr);
+	    }     
+	}
+      while(1); //main sub-step solver loop
+
+      if(failed==0) //success of a sub-step
+	{
+	  if(verbose)
+	    {
+	      printf("output:\n");
+	      print_Nvector(uu0,NV);
+	      print_Nvector(uu,NV);
+	    }
+	  
+	  //total inversion, but only whichprim part matters
+	  p2u(pp,uu,&geom);
+	  //opposite changes in the other quantities and inversion
+	  if(whichprim==1)
+	    {
+	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+	      u2p(uu,pp,&geom,corr,fixup); //total inversion (I should separate hydro from rad)
+	    }
+	  if(whichprim==0)
+	    {
+	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+	      u2p_rad(uu,pp,&geom,corr);
+	    }     
+
+	  //saving basis for next iteration if necessary
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      pp0[iv]=pp[iv];
+	    }
+
+	  if(frdt>=1.) //sub-steps made full time step
+	    {
+	      if(verbose) {
+		printf("worked!frdt=%f | %f===\n",frdt,dttot);
+		if(dttot>0.) getchar();}
+	      break;
+	    }
+	  else //more substeps necessary
+	    {
+	      if(verbose) 
+		{
+		  printf("worked but not the end! frdt=%f | %f===\n",frdt,dttot);		  
+		}
+	      dttot+=frdt*(1.-dttot);
+	      frdt*=2.; 
+	      if(frdt>1.) frdt=1.;
+	    }
+
+	  continue;
+	}
+      
+      //didn't work - decreasing time step
+      frdt *= DAMP;
+
+      for(iv=0;iv<NV;iv++)
+	{
+	  pp[iv]=pp0[iv]; //starting over
+	}
+      
+      if(frdt<0.00001 || 1)  //|| 1 if avoid substepping?
+	{
+	  if(verbose) 
+	    {
+	      printf("time step too small - aborting implicit_lab_4dprim() ===\n");
+	    }
+	  return -1;
+	}
+    }
+  while(1);
+  
+  //  if(verbose) getchar();
+
+  //returns corrections to radiative primitives
+  deltas[0]=uu[EE0]-uu00[EE0];
+  deltas[1]=uu[FX0]-uu00[FX0];
+  deltas[2]=uu[FY0]-uu00[FY0];
+  deltas[3]=uu[FZ0]-uu00[FZ0];
+  
+  return 0;
+}
+
+//**********************************************************************
+//* wrapper ************************************************************
+//**********************************************************************
+
+int
+solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
+{
+  int RADPRIM=1;
+  int HDPRIM=0;
+
+  return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,RADPRIM,verbose);
+
+  return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
 }
 
 

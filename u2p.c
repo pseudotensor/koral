@@ -145,6 +145,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   int verbose=1;
   int hdcorr=0;
   int radcorr=0;
+  corrected[0]=corrected[1]=0;
+  fixups[0]=fixups[1]=0;
 
   int u2pret,ret;
   ldouble ppbak[NV];
