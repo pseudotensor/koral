@@ -629,11 +629,14 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
   if(verbose) 
     {
-      ldouble Gi[4];
-      calc_Gi(pp00,&geom,Gi); 
-      boost2_lab2ff(Gi,Gi,pp00,geom.gg,geom.GG);
-      print_4vector(Gi);
-      printf("%e | %e\n",Gi[0]*dt/pp00[UU],Gi[0]*dt/(-Rtt00));
+      ldouble kappa=calc_kappa(pp00[RHO],Tgas00,0.,0.,0.);
+      ldouble chi=kappa+calc_kappaes(pp00[RHO],Tgas00,0.,0.,0.);
+      ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas00,4.)/pp00[UU]);
+      ldouble xi2=chi*dt*(1.+(-Rtt00)/(pp00[RHO]+GAMMA*pp00[UU]));
+      printf("xi1: %e xi2: %e\n",xi1,xi2);
+
+      ldouble ppLTE[NV];
+      calc_LTE_state(pp00,ppLTE,&geom);
     }
 
   //choice of primitives to evolve
@@ -649,7 +652,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   int LABEQ=0;
   int FFEQ=1;
 
-  params[1]=LABEQ;
+  params[1]=FFEQ;
 
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
@@ -743,7 +746,11 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	      else
 		del=EPS*ppp[UU];	   
 	      
-	      //del=EPS*ppp[sh];
+	      //EPS of the iterated quantity
+	      del=EPS*ppp[sh];
+
+	      //EPS of the geometrical mean
+	      del=EPS*sqrt(ppp[EE0]*ppp[UU]);
 	    }
 	  else //decreasing velocity
 	    {
@@ -811,14 +818,8 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	      if(xxx[0]>0.) break;
 
 	      //negative en.density 
-	      
-	      //print_Nvector(pp,NV);
-	      //print_state_implicit_lab_4dprim (iter,xxx,f1); 
 	      fneg = ppp[sh] / (ppp[sh]-xxx[0]);
 	      fneg/=1.5; //to be generous
-	      //printf("NEG ENDEN: uint: %e erf: %e whichprim: %d fra: %e\n",pp00[UU],-Rtt00,whichprim,fneg);
-	      //getchar();
-	      
 	    }
 	  while(1); //neg.energy
 
@@ -872,7 +873,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    overshoot=1;
 
 	  //override
-	  overshoot=0;
+	  //overshoot=0;
 
 	  if(overshoot==1)
 	    {
@@ -903,6 +904,8 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		    }
 		  
 		  minxi/=1.5; //to be generous when damping step
+
+		  //minxi=0.5; //override step
 		  xiapp*=minxi;
 		}
 
@@ -912,7 +915,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	}
       while(overshoot==1); //overshooting loop
 
-      if(overcnt>10) printf("over cnt: %d\n",overcnt);	    
+      //if(overcnt>10) printf("over cnt: %d\n",overcnt);	    
 
       //test convergence
       for(i=0;i<4;i++)
@@ -927,7 +930,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	    
 	}
 	  
-      if(overshoot==0 && f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
+      if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	{
 	  if(verbose) printf("success ===\n");
 	  break;
@@ -2392,3 +2395,56 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   return 0;
 
 }
+
+//calculates LTE state
+int
+calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
+{
+  ldouble Rtt,Eff,ucon[4],ugas;
+  
+  calc_ff_Rtt(pp,&Rtt,ucon,ggg);
+  Eff=-Rtt; //en.density of radiation in the fluid frame
+  ugas=pp[UU];
+  
+  ldouble C = -(Eff + ugas);
+  ldouble kt = K_BOLTZ/MU_GAS/M_PROTON;
+  ldouble A = 4.*SIGMA_RAD*pow(GAMMAM1/pp[RHO]/kt,4.);
+
+  /*
+  gsl_complex z0,z1,z2,z3;
+  gsl_poly_complex_solve_quartic (0.,0.,1./A,C/A,
+				  &z0,&z1,&z2,&z3);
+
+  printf("%e + %e i\n%e + %e i\n%e + %e i\n%e + %e i\n",
+	 GSL_REAL(z0),GSL_IMAG(z0),
+	 GSL_REAL(z1),GSL_IMAG(z1),
+	 GSL_REAL(z2),GSL_IMAG(z2),
+	 GSL_REAL(z3),GSL_IMAG(z3));
+  */
+  
+  ldouble cbrtnaw=cbrt(9.*A + Sqrt(3.)*Sqrt(27.*Power(A,2.) - 256.*Power(A,3.)*Power(C,3.)));
+  ldouble ugasLTE=-Sqrt((4*cbrt(2./3.)*C)/
+		  cbrtnaw +  cbrtnaw/
+		   (cbrt(2.*3.*3.)*A))/2. +
+    Sqrt((-4*cbrt(2./3.)*C)/cbrtnaw - cbrtnaw/(cbrt(2.*3.*3.)*A) +
+	 2./(A*Sqrt((4*cbrt(2./3.)*C)/cbrtnaw + cbrtnaw/(cbrt(2.*3.*3.)*A))))/2.;
+
+  if(isnan(ugasLTE)) 
+    my_err("calc_LTE_state() provided nan\n");
+
+  ldouble EffLTE = -C - ugasLTE;
+  ldouble TradLTE=calc_LTE_TfromE(EffLTE);
+  ldouble Trad=calc_LTE_TfromE(Eff);
+  ldouble TgasLTE=calc_PEQ_Tfromurho(ugasLTE,pp[RHO]);
+  ldouble Tgas=calc_PEQ_Tfromurho(ugas,pp[RHO]);
+
+  printf("Trad: %e -> %e\nTgas: %e -> %e\nurad: %e -> %e\nugas: %e -> %e\n\n",
+	 Trad,TradLTE,Tgas,TgasLTE,
+	 Eff,EffLTE,ugas,ugasLTE)
+    ;getchar();
+
+  return 0;
+
+  
+}
+ 
