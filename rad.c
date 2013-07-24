@@ -537,14 +537,14 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   calc_Gi(pp,ggg,Gi); 
   indices_21(Gi,Gi,gg);
 
-  if(whichprim==1) //rad-primitives
+  if(whichprim==RAD) //rad-primitives
     {
       f[0] = uu[6] - uu0[6] + dt * gdetu * Gi[0];
       f[1] = uu[7] - uu0[7] + dt * gdetu * Gi[1];
       f[2] = uu[8] - uu0[8] + dt * gdetu * Gi[2];
       f[3] = uu[9] - uu0[9] + dt * gdetu * Gi[3];
     }
-  if(whichprim==0) //hydro-primitives
+  if(whichprim==MHD) //hydro-primitives
     {
       f[0] = uu[1] - uu0[1] - dt * gdetu * Gi[0];
       f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
@@ -592,8 +592,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],pp0[NV],pp00[NV],ppp[NV],uu[NV],uu0[NV],uu00[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3[4],xxx[4];
-
   ldouble (*gg)[5],(*GG)[5];
+
+  //verbose=1;
 
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
@@ -624,17 +625,20 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   Trad00=calc_LTE_TfromE(-Rtt00);
 
   //choice of primitives to evolve
-  int params[2];
+  int params[2],whichprim;
   if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
-    params[0]=RAD;
+    whichprim=RAD;
   else
-    params[0]=MHD;  
+    whichprim=MHD; 
+ 
+  //override:
 
-  int whichprim=params[0];
+  params[0]=whichprim;
 
   //choice of equation to solve
   int LABEQ=0;
   int FFEQ=1;
+
   params[1]=LABEQ;
 
   //check if one can compare gas & rad velocities
@@ -650,7 +654,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
     }
  
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6; 
+  ldouble CONV = 1.e-8; 
   ldouble MAXITER = 50;
 
   int sh;
@@ -725,7 +729,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    if(dominates==RAD)
 	      del=EPS*ppp[EE0]; 
 	    else
-	      del=EPS*ppp[UU];
+	      del=EPS*ppp[UU];	   
 	  else //decreasing velocity
 	    {
 	      if(ppp[j+sh]>=0.)
@@ -806,7 +810,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	  //total inversion, but only whichprim part matters
 	  p2u(pp,uu,&geom);
 	  //opposite changes in the other quantities and inversion
-	  if(whichprim==1)
+	  if(whichprim==RAD)
 	    {
 	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
 	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
@@ -814,7 +818,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
 	      u2p(uu,pp,&geom,corr,fixup); //total inversion (I should separate hydro from rad)
 	    }
-	  if(whichprim==0)
+	  if(whichprim==MHD)
 	    {
 	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
 	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
@@ -840,6 +844,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	     ((pp[VZ]-pp[FZ0])*(pp00[VZ]-pp00[FZ0])<0. && 
 	      fabs(my_max(fabs(pp[VZ]-pp00[VZ]),fabs(pp[FZ0]-pp00[FZ0]))/my_max(1.e-8,my_min(pp00[VZ],pp00[FZ0])))>1.e-4))
 	    overshoot=1;
+
+	  //override
+	  overshoot=0;
 
 	  if(overshoot==1)
 	    {

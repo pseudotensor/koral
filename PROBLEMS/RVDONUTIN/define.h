@@ -34,14 +34,14 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define HDVISCOSITY SIMPLEVISCOSITY
+#define HDVISCOSITY NOVISCOSITY
 #define ALPHATOTALPRESSURE
 //#define HDVISCOSITY SHEARVISCOSITY
 //#define SHEARVISCOSITYONLYRPHI
 #define ALPHAHDVISC .1
 #define RMINVISC 3.
 //#define ZEROTIMEINSHEAR
-#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY NOVISCOSITY
 #define TAUSUPPRESSPARAM 100. //the larger the less prad
 #define ALPHARADVISC 1.
 //#define ENFORCERADWAVESPEEDS
@@ -72,7 +72,7 @@
 #define MKS1R0 -2.
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.1-MKS1R0))
+#define MINX (log(3.1-MKS1R0))
 #define NX 72
 #define NY 48
 #define NZ 1
@@ -145,12 +145,12 @@
 #define NX 30
 #undef NY
 #define NY 10
-#define MAXX (log(10.-MKS1R0))
+#define MAXX (log(30.-MKS1R0))
 #define ELL 4.
-#define URIN (1.e1/CCC)
+#define URIN (0.e1/CCC)
 #define KKK 131.859
 #define UTPOT 0.99
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define RHOATMMIN  1.e-25
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10.)
@@ -356,15 +356,15 @@
 /************************************/
 //333
 #undef NX
-#define NX 30
+#define NX 40
 #undef NY
 #define NY 20
-#define MAXX (log(15.3-MKS1R0))
+#define MAXX (log(25.3-MKS1R0))
 #define ELL 4.5
 #define URIN (3.92e8/CCC)
 #define KKK 7127.
-#define UTPOT .983
-#define DTOUT1 5.e-1
+#define UTPOT .979
+#define DTOUT1 5.e0
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
