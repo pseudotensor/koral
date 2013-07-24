@@ -731,7 +731,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    else
 	      del=EPS*ppp[UU];	   
 	    
-	    //del=EPS*ppp[sh];
+	  //del=EPS*ppp[sh];
 	  else //decreasing velocity
 	    {
 	      if(ppp[j+sh]>=0.)
@@ -770,37 +770,44 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	  break;
 	}
 
-      //updating x
-      for(i=0;i<4;i++)
-	{
-	  xxx[i]=ppp[i+sh];
-	}
-
+      
       int overshoot=0,overcnt=0;	      
       ldouble xi[4]={1.,1.,1.,1.}; //fraction of the Jacobian-implied step to apply
-      ldouble xiapp;
-      do
+      ldouble xiapp=1.,fneg;
+      do //overshooting
 	{
-	  xiapp=my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
+	  fneg=1.;
 
-	  for(i=0;i<4;i++)
-	    {
-	      for(j=0;j<4;j++)
+	  do //negative energy density
+	    {	    
+	      //original x
+	      for(i=0;i<4;i++)
 		{
-		  xxx[i]-=xiapp*iJ[i][j]*f1[j];
+		  xxx[i]=ppp[i+sh];
 		}
-	    }
 
-	  //negative en.density check:
-	  if(xxx[0]<0.)
-	    {
-	      print_Nvector(pp00,NV);
-	      print_Nvector(ppp,NV);
-	      print_Nvector(pp,NV);
-	      print_state_implicit_lab_4dprim (iter,xxx,f1); 
-	      printf("uint: %e erf: %e\n",pp00[UU],-Rtt00);
-	      getchar();
+	      //updating x
+	      for(i=0;i<4;i++)
+		{
+		  for(j=0;j<4;j++)
+		    {
+		      xxx[i]-=fneg*xiapp*iJ[i][j]*f1[j];
+		    }
+		}
+
+	      if(xxx[0]>0.) break;
+
+	      //negative en.density 
+	      
+	      //print_Nvector(pp,NV);
+	      //print_state_implicit_lab_4dprim (iter,xxx,f1); 
+	      fneg = ppp[sh] / (ppp[sh]-xxx[0]);
+	      fneg/=1.5; //to be generous
+	      //printf("NEG ENDEN: uint: %e erf: %e whichprim: %d fra: %e\n",pp00[UU],-Rtt00,whichprim,fneg);
+	      //getchar();
+	      
 	    }
+	  while(1); //neg.energy
 
 	  if(verbose>0) print_state_implicit_lab_4dprim (iter,xxx,f1); 
 
@@ -856,7 +863,6 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
 	  if(overshoot==1)
 	    {
-	      verbose=1;
 	      xi[0]=xi[1]=xi[2]=xi[3]=1.;
 	      if((Tgas-Trad)*(Tgas00-Trad00)<0.)
 		xi[0] = fabs(Trad00-Tgas00)/(fabs(Trad-Trad00)+fabs(Tgas-Tgas00));
@@ -870,8 +876,11 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		overshoot=0;
 	      else
 		{
+		  //verbose=1;
+	      
 		  if(verbose)
 		    {
+		      printf("cnt: %d\n",overcnt);
 		      printf("overshooted: gas: %.20e -> %.20e vs rad: %.20e -> %.20e\n",Tgas00,Tgas,Trad00,Trad);
 		      printf("overshooted: v1: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VX],pp[VX],pp00[FX0],pp[FX0]);
 		      printf("overshooted: v2: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VY],pp[VY],pp00[FY0],pp[FY0]);
@@ -879,14 +888,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		      print_4vector(xi);
 		      getchar();
 		    }
-
-		  //restoring initial primitives and decreasing step
-		  for(i=0;i<4;i++)
-		    {
-		      xxx[i]=ppp[i+sh];
-		      if(xi[i]<maxxi)
-			xi[i]/=1.5; //to be generous when damping step
-		    }
+		  
+		  minxi/=4.5; //to be generous when damping step
+		  xiapp*=minxi;
 		}
 
 	      overcnt++;
@@ -895,7 +899,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	}
       while(overshoot==1); //overshooting loop
 
-      if(verbose && overcnt>0) printf("over cnt: %d\n",overcnt);	    
+      if(overcnt>10) printf("over cnt: %d\n",overcnt);	    
 
       //test convergence
       for(i=0;i<4;i++)
@@ -942,7 +946,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,verbose);
   
-  return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
+  //return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
 }
 
 
