@@ -495,7 +495,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   int whichprim=params[0];
   int whicheq=params[1];
 
-  ldouble uu[NV];
+  ldouble uu[NV],pp2[NV];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
   //total inversion, but only whichprim part matters
@@ -577,7 +577,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 int
 print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
 {
-  printf ("iter = %3d x = % .13e % .13e % .13e % .3e "
+  printf ("iter = %3d x = % .13e % .13e % .13e % .13e "
 	  "f(x) = % .13e % .13e % .13e % .13e\n",
 	  iter,
 	  //	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
@@ -631,8 +631,6 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   else
     whichprim=MHD; 
  
-  //override:
-
   params[0]=whichprim;
 
   //choice of equation to solve
@@ -726,10 +724,14 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
 	  //one-way derivatives
 	  if(j==0)
+	    //uses EPS of the dominating quantity
+	    
 	    if(dominates==RAD)
 	      del=EPS*ppp[EE0]; 
 	    else
 	      del=EPS*ppp[UU];	   
+	    
+	    //del=EPS*ppp[sh];
 	  else //decreasing velocity
 	    {
 	      if(ppp[j+sh]>=0.)
@@ -741,16 +743,6 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	  pp[j+sh]=ppp[j+sh]+del;
 	      
 	  int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f2,params);  
-
-	  if(verbose>0 && 0)
-	    {
-	      for(i=0;i<4;i++)
-		{
-		  xxx[i]=pp[i+sh];
-		}
-	      print_state_implicit_lab_4dprim (iter-1,xxx,f2); 
-	      printf("sub (%d) f_lab_4dprim ret: %d\n",j,fret);
-	    }
 
 	  if(fret<0) 
 	    {
@@ -784,17 +776,30 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	  xxx[i]=ppp[i+sh];
 	}
 
-      ldouble fraction=1.;
-      int overshoot=0,overcnt=0;
+      int overshoot=0,overcnt=0;	      
+      ldouble xi[4]={1.,1.,1.,1.}; //fraction of the Jacobian-implied step to apply
+      ldouble xiapp;
       do
 	{
+	  xiapp=my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
 
 	  for(i=0;i<4;i++)
 	    {
 	      for(j=0;j<4;j++)
 		{
-		  xxx[i]-=fraction*iJ[i][j]*f1[j];
+		  xxx[i]-=xiapp*iJ[i][j]*f1[j];
 		}
+	    }
+
+	  //negative en.density check:
+	  if(xxx[0]<0.)
+	    {
+	      print_Nvector(pp00,NV);
+	      print_Nvector(ppp,NV);
+	      print_Nvector(pp,NV);
+	      print_state_implicit_lab_4dprim (iter,xxx,f1); 
+	      printf("uint: %e erf: %e\n",pp00[UU],-Rtt00);
+	      getchar();
 	    }
 
 	  if(verbose>0) print_state_implicit_lab_4dprim (iter,xxx,f1); 
@@ -828,38 +833,40 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    }     
 
 	  //overshooting check
+	  ldouble ucon[4],Rtt,Tgas,Trad;
 
 	  //comparing temperatures
-	  ldouble ucon[4],Rtt,Tgas,Trad;
 	  calc_ff_Rtt(pp,&Rtt,ucon,&geom);
 	  Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 	  Trad=calc_LTE_TfromE(-Rtt);
-  
-	  //checking in overshooted significantly
+
+	  //checking if overshooted significantly
 	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-4) ||
 	     ((pp[VX]-pp[FX0])*(pp00[VX]-pp00[FX0])<0. && 
 	      fabs(my_max(fabs(pp[VX]-pp00[VX]),fabs(pp[FX0]-pp00[FX0]))/my_max(1.e-8,my_min(pp00[VX],pp00[FX0])))>1.e-4) ||
 	     ((pp[VY]-pp[FY0])*(pp00[VY]-pp00[FY0])<0. && 
 	      fabs(my_max(fabs(pp[VY]-pp00[VY]),fabs(pp[FY0]-pp00[FY0]))/my_max(1.e-8,my_min(pp00[VY],pp00[FY0])))>1.e-4) ||
 	     ((pp[VZ]-pp[FZ0])*(pp00[VZ]-pp00[FZ0])<0. && 
-	      fabs(my_max(fabs(pp[VZ]-pp00[VZ]),fabs(pp[FZ0]-pp00[FZ0]))/my_max(1.e-8,my_min(pp00[VZ],pp00[FZ0])))>1.e-4))
+	      fabs(my_max(fabs(pp[VZ]-pp00[VZ]),fabs(pp[FZ0]-pp00[FZ0]))/my_max(1.e-8,my_min(pp00[VZ],pp00[FZ0])))>1.e-4)
+	     )
 	    overshoot=1;
 
 	  //override
-	  overshoot=0;
+	  //overshoot=0;
 
 	  if(overshoot==1)
 	    {
-	      ldouble xi[4]={1.,1.,1.,1.},ximpl;
+	      verbose=1;
+	      xi[0]=xi[1]=xi[2]=xi[3]=1.;
 	      if((Tgas-Trad)*(Tgas00-Trad00)<0.)
 		xi[0] = fabs(Trad00-Tgas00)/(fabs(Trad-Trad00)+fabs(Tgas-Tgas00));
 	      for(i1=0;i1<3;i1++)
 		if((pp[VX+i1]-pp[FX0+i1])*(pp00[VX+i1]-pp00[FX0+i1])<0.)
 		  xi[1+i1] = fabs(pp00[FX0+i1]-pp00[VX+i1])/(fabs(pp[FX0+i1]-pp00[FX0+i1])+fabs(pp[VX+i1]-pp00[VX+i1]));
 
-	      ximpl = my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
-
-	      if(ximpl>0.9) //skip if correction small or if fraction already small
+	      ldouble minxi = my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
+	      ldouble maxxi=0.99;
+	      if(minxi>maxxi) //skip if correction small or if fraction already small
 		overshoot=0;
 	      else
 		{
@@ -870,7 +877,6 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		      printf("overshooted: v2: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VY],pp[VY],pp00[FY0],pp[FY0]);
 		      printf("overshooted: v3: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VZ],pp[VZ],pp00[FZ0],pp[FZ0]);
 		      print_4vector(xi);
-		      printf("xi: %e fraction: %f -> %f\n",ximpl,fraction,fraction*ximpl);
 		      getchar();
 		    }
 
@@ -878,11 +884,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		  for(i=0;i<4;i++)
 		    {
 		      xxx[i]=ppp[i+sh];
-		    }		  	  
-
-		  ximpl/=2.; //to be generous when damping step
-
-		  fraction*=ximpl;
+		      if(xi[i]<maxxi)
+			xi[i]/=1.5; //to be generous when damping step
+		    }
 		}
 
 	      overcnt++;
@@ -938,7 +942,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,verbose);
   
-  //return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
+  return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
 }
 
 
