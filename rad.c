@@ -627,18 +627,32 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   Tgas00=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
   Trad00=calc_LTE_TfromE(-Rtt00);
 
+  ldouble kappa=calc_kappa(pp00[RHO],Tgas00,0.,0.,0.);
+  ldouble chi=kappa+calc_kappaes(pp00[RHO],Tgas00,0.,0.,0.);
+  ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas00,4.)/pp00[UU]);
+  ldouble xi2=chi*dt*(1.+(-Rtt00)/(pp00[RHO]+GAMMA*pp00[UU]));
+     
   if(verbose) 
     {
-      ldouble kappa=calc_kappa(pp00[RHO],Tgas00,0.,0.,0.);
-      ldouble chi=kappa+calc_kappaes(pp00[RHO],Tgas00,0.,0.,0.);
-      ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas00,4.)/pp00[UU]);
-      ldouble xi2=chi*dt*(1.+(-Rtt00)/(pp00[RHO]+GAMMA*pp00[UU]));
       printf("xi1: %e xi2: %e\n",xi1,xi2);
-
-      ldouble ppLTE[NV];
-      calc_LTE_state(pp00,ppLTE,&geom);
     }
 
+  /*
+  if(xi1 > 0.1)
+    {
+      //corrects initial guess towards LTE
+      ldouble ppLTE[NV],uuLTE[NV];
+      calc_LTE_state(pp00,ppLTE,&geom);  //returns LTE ugas
+      p2u(ppLTE,uuLTE,&geom);
+      uuLTE[EE0] = uu00[EE0] - (uuLTE[1]-uu00[1]);
+      uuLTE[FX0] = uu00[FX0] - (uuLTE[2]-uu00[2]);
+      uuLTE[FY0] = uu00[FY0] - (uuLTE[3]-uu00[3]);
+      uuLTE[FZ0] = uu00[FZ0] - (uuLTE[4]-uu00[4]);
+      u2p_rad(uuLTE,pp00,&geom,corr);
+      p2u(pp00,uu00,&geom);
+    }
+  */
+  
   //choice of primitives to evolve
   int params[2],whichprim;
   if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
@@ -652,7 +666,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   int LABEQ=0;
   int FFEQ=1;
 
-  params[1]=FFEQ;
+  params[1]=LABEQ;
 
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
@@ -2400,6 +2414,10 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
 int
 calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
 {
+  int i,j;
+  for(i=0;i<NV;i++)
+    ppLTE[i]=pp[i];
+
   ldouble Rtt,Eff,ucon[4],ugas;
   
   calc_ff_Rtt(pp,&Rtt,ucon,ggg);
@@ -2438,10 +2456,15 @@ calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
   ldouble TgasLTE=calc_PEQ_Tfromurho(ugasLTE,pp[RHO]);
   ldouble Tgas=calc_PEQ_Tfromurho(ugas,pp[RHO]);
 
+  /*
   printf("Trad: %e -> %e\nTgas: %e -> %e\nurad: %e -> %e\nugas: %e -> %e\n\n",
 	 Trad,TradLTE,Tgas,TgasLTE,
 	 Eff,EffLTE,ugas,ugasLTE)
     ;getchar();
+  */
+
+  //updates only uint gas
+  ppLTE[UU]=ugasLTE;
 
   return 0;
 
