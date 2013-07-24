@@ -481,6 +481,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 
 int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params)
 {
+  int ret=0;
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -523,7 +524,8 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 
   //print_Nvector(uu,NV);getchar();
 
-  //  if(corr[0]!=0 || corr[1]!=0) 
+  if(corr[0]!=0 || corr[1]!=0) 
+    ret=1;
   //printf("corr: %d %d\n",corr[0],corr[1]);
 
   if(u2pret<-1) 
@@ -571,7 +573,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
     }
   
-  return 0;
+  return ret;
 } 
 
 int
@@ -612,7 +614,8 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   int corr[2],fixup[2];
   u2p(uu00,pp00,&geom,corr,fixup);
   p2u(pp00,uu00,&geom);
-  
+
+   
   //comparing energy densities
   ldouble urad00[4],Rtt00,Tgas00,Trad00;
   int dominates;
@@ -623,6 +626,15 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
     dominates = MHD;
   Tgas00=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
   Trad00=calc_LTE_TfromE(-Rtt00);
+
+  if(verbose) 
+    {
+      ldouble Gi[4];
+      calc_Gi(pp00,&geom,Gi); 
+      boost2_lab2ff(Gi,Gi,pp00,geom.gg,geom.GG);
+      print_4vector(Gi);
+      printf("%e | %e\n",Gi[0]*dt/pp00[UU],Gi[0]*dt/(-Rtt00));
+    }
 
   //choice of primitives to evolve
   int params[2],whichprim;
@@ -652,7 +664,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
     }
  
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-8; 
+  ldouble CONV = 1.e-6; 
   ldouble MAXITER = 50;
 
   int sh;
@@ -724,14 +736,15 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
 	  //one-way derivatives
 	  if(j==0)
-	    //uses EPS of the dominating quantity
-	    
-	    if(dominates==RAD)
-	      del=EPS*ppp[EE0]; 
-	    else
-	      del=EPS*ppp[UU];	   
-	    
-	  //del=EPS*ppp[sh];
+	    {
+	      //uses EPS of the dominating quantity
+	      if(dominates==RAD)
+		del=EPS*ppp[EE0]; 
+	      else
+		del=EPS*ppp[UU];	   
+	      
+	      //del=EPS*ppp[sh];
+	    }
 	  else //decreasing velocity
 	    {
 	      if(ppp[j+sh]>=0.)
@@ -859,7 +872,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    overshoot=1;
 
 	  //override
-	  //overshoot=0;
+	  overshoot=0;
 
 	  if(overshoot==1)
 	    {
@@ -889,7 +902,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		      getchar();
 		    }
 		  
-		  minxi/=4.5; //to be generous when damping step
+		  minxi/=1.5; //to be generous when damping step
 		  xiapp*=minxi;
 		}
 
@@ -906,9 +919,12 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	{
 	  f3[i]=(pp[i+sh]-ppp[i+sh]);
 	  if(i==0)
-	    f3[i]=fabs(f3[i]/ppp[sh]);
+	    if(dominates==RAD)
+	      f3[i]=fabs(f3[i]/ppp[EE0]);
+	    else
+	      f3[i]=fabs(f3[i]/ppp[UU]);
 	  else
-	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(pp[i+sh])));
+	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	    
 	}
 	  
       if(overshoot==0 && f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
