@@ -481,7 +481,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 //******* rad or hydro (whichprim) **************************************
 //**********************************************************************
 
-int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params)
+int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params,int verbose)
 {
   int ret=0,i;
   struct geometry *geom
@@ -512,8 +512,13 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   ucon[0]=0.;
   //converting to 4-velocity
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-  ldouble rho = uu0[RHO]/gdet/ucon[0];
+  ldouble rho = uu0[RHO]/gdetu/ucon[0];
   pp2[RHO]=rho;
+
+  if(verbose) {
+    printf("ut: %f\n",ucon[0]);
+    print_Nvector(pp2,NV);
+  }
 
   //total inversion, but only whichprim part matters 
   p2u(pp2,uu,geom);
@@ -828,7 +833,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	      xxx[i]=ppp[i+sh];
 	    }  
 
-	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params);
+	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params,0);
 	  if(verbose && iter==1)
 	    {
 	      print_state_implicit_lab_4dprim (iter-1,xxx,f1);	  
@@ -843,7 +848,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
 
       //values at base state
-      if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params)<0) 
+      if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params,0)<0) 
 	{
 	  failed=1;
 		  
@@ -881,7 +886,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
 	  pp[j+sh]=ppp[j+sh]+del;
 	      
-	  int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f2,params);  
+	  int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f2,params,0);  
 
 	  if(fret<0) 
 	    {
@@ -911,7 +916,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
       if(verbose)	    print_tensor(J);
       if(verbose)	    print_tensor(iJ);
-
+      if(verbose) getchar();
       int overshoot=0,overcnt=0;	      
       ldouble xi[4]={1.,1.,1.,1.}; //fraction of the Jacobian-implied step to apply
       ldouble xiapp=1.,fneg;
@@ -954,7 +959,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
 	  if(verbose>0) 
 	    {
-	      f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params);
+	      f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params,1);
 	      print_state_implicit_lab_4dprim (iter,xxx,f1); 
 	    }
 
@@ -1013,7 +1018,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    overshoot=1;
 
 	  //override
-	  //overshoot=0;
+	  overshoot=0;
 
 	  if(overshoot==1)
 	    {
