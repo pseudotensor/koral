@@ -103,6 +103,7 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
   //print_Nvector(pp,NV);getchar();
 
   u2pret=u2p(uu,pp,ggg,corr,fixup);
+  p2u(pp,uu,ggg);
   //printf("%d %d\n",corr[0],corr[1]);
   //print_Nvector(pp,NV);getchar();
 
@@ -294,7 +295,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 
 	      uu[j+6]=uup[j+6]-del;
 	      
-	      int fret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f2);  
+	      int fret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f2); //may change uu due to floors
 
 	      if(verbose>0)
 		{
@@ -317,7 +318,8 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 		  J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
 		}
 
-	      uu[j+6]=uup[j+6];
+	      for(i=0;i<NV;i++)
+		uu[i]=uup[i];
 
 	      if(failed!=0) break;
 	    }
@@ -481,7 +483,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 
 int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params)
 {
-  int ret=0;
+  int ret=0,i;
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -497,9 +499,11 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   int whicheq=params[1];
 
   ldouble uu[NV],pp2[NV];
+  for(i=0;i<NV;i++) pp2[i]=pp[i];
+  
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
-  //total inversion, but only whichprim part matters
+  //total inversion, but only whichprim part matters 
   p2u(pp,uu,geom);
  
   //opposite changes in the other quantities and inversion
@@ -510,7 +514,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
       uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
 
-      u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+      u2pret=u2p(uu,pp2,geom,corr,fixup); //total inversion (I should separate hydro from rad)
     }
   if(whichprim==MHD)
     {
@@ -519,8 +523,11 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
       uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 
-      u2pret=u2p_rad(uu,pp,geom,corr);
+      u2pret=u2p_rad(uu,pp2,geom,corr);
     }     
+
+  //making sure uu consistent - in case floors have been applied
+  p2u(pp2,uu,geom);
 
   //print_Nvector(uu,NV);getchar();
 
@@ -536,7 +543,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 
   //radiative four-force
   ldouble Gi[4];
-  calc_Gi(pp,ggg,Gi); 
+  calc_Gi(pp2,ggg,Gi); 
   indices_21(Gi,Gi,gg);
 
   if(whichprim==RAD) //rad-primitives
@@ -561,13 +568,13 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       //zero - state 
       calc_ff_Rtt(pp0,&Rtt0,ucon,geom);
       //new state
-      calc_ff_Rtt(pp,&Rtt,ucon,geom);
+      calc_ff_Rtt(pp2,&Rtt,ucon,geom);
       
-      ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+      ldouble T=calc_PEQ_Tfromurho(pp2[UU],pp2[RHO]);
       ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
       ldouble Ehat = -Rtt;
       ldouble dtau=dt/ucon[0];
-      ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
+      ldouble kappaabs=calc_kappa(pp2[RHO],T,geom->xx,geom->yy,geom->zz);
 
       //fluid frame energy equation:
       f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
@@ -614,7 +621,6 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   int corr[2],fixup[2];
   u2p(uu00,pp00,&geom,corr,fixup);
   p2u(pp00,uu00,&geom);
-
    
   //comparing energy densities
   ldouble urad00[4],Rtt00,Tgas00,Trad00;
@@ -637,10 +643,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
       printf("xi1: %e xi2: %e\n",xi1,xi2);
     }
 
-  /*
-  if(xi1 > 0.1)
+  /****************************************
+  if(xi1 > 0.1 && 0) //corrects initial guess towards LTE (so far only temperature)
     {
-      //corrects initial guess towards LTE
       ldouble ppLTE[NV],uuLTE[NV];
       calc_LTE_state(pp00,ppLTE,&geom);  //returns LTE ugas
       p2u(ppLTE,uuLTE,&geom);
@@ -648,25 +653,87 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
       uuLTE[FX0] = uu00[FX0] - (uuLTE[2]-uu00[2]);
       uuLTE[FY0] = uu00[FY0] - (uuLTE[3]-uu00[3]);
       uuLTE[FZ0] = uu00[FZ0] - (uuLTE[4]-uu00[4]);
-      u2p_rad(uuLTE,pp00,&geom,corr);
-      p2u(pp00,uu00,&geom);
+      u2p(uuLTE,pp00,&geom,corr,fixup);
+      
+      if(verbose)
+	{
+	  printf("correction towards LTE:\n");
+	  print_Nvector(ppLTE,NV);
+	  print_Nvector(pp00,NV);
+	  
+	  //comparing temperatures
+	  ldouble RttLTE,ucon[4];
+	  calc_ff_Rtt(pp00,&RttLTE,ucon,&geom);
+	  ldouble TgasLTE=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
+	  ldouble TradLTE=calc_LTE_TfromE(-RttLTE);
+	  printf("Tgas/Trad: %e %e\n",TgasLTE,TradLTE);
+	}
     }
-  */
+  ***************************************
+  if(xi1 > 0.5 || xi2 > 0.5) //corrects initial guess using the backup method - what if it does overshoot?
+    {
+      //the backup LTE-like method
+      ldouble del4[4];
+      solve_implicit_ff(ix,iy,iz,dt,del4);
+      trans2_on2cc(del4,del4,geom.tlo);
+      boost2_ff2lab(del4,del4,pp00,geom.gg,geom.GG);
+      indices_21(del4,del4,geom.gg);
+      ldouble delapl[NV];
+
+      delapl[0]=0.; //zeros go to density and entropy so don't bother about the gdet there
+      delapl[1]=-del4[0];
+      delapl[2]=-del4[1];
+      delapl[3]=-del4[2];
+      delapl[4]=-del4[3];
+      delapl[5]=0.;
+      delapl[6]=del4[0];
+      delapl[7]=del4[1];
+      delapl[8]=del4[2];
+      delapl[9]=del4[3];
+
+      int iv;
+      ldouble ppLTE[NV],uuLTE[NV];
+      
+      for(iv=0;iv<NV;iv++)
+	{
+	  uuLTE[iv]=uu00[iv]+delapl[iv];
+	}
+
+      u2p(uuLTE,pp00,&geom,corr,fixup);
+      
+      if(verbose)
+	{
+	  printf("correction towards LTE:\n");
+	  print_Nvector(pp00,NV);
+	  
+	  //comparing temperatures
+	  ldouble RttLTE,ucon[4];
+	  calc_ff_Rtt(pp00,&RttLTE,ucon,&geom);
+	  ldouble TgasLTE=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
+	  ldouble TradLTE=calc_LTE_TfromE(-RttLTE);
+	  printf("Tgas/Trad: %e %e\n",TgasLTE,TradLTE);
+	}
+      //p2u(pp00,uu00,&geom); we don't want to update the conserved!
+    }
+  ***************************************/
   
-  //choice of primitives to evolve
+   //choice of primitives to evolve
   int params[2],whichprim;
   if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
     whichprim=RAD;
   else
     whichprim=MHD; 
  
+  //override
+  //whichprim=RAD;
+
   params[0]=whichprim;
 
   //choice of equation to solve
   int LABEQ=0;
   int FFEQ=1;
 
-  params[1]=LABEQ;
+  params[1]=FFEQ;
 
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
@@ -681,7 +748,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
     }
  
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6; 
+  ldouble CONV = 1.e-5; 
   ldouble MAXITER = 50;
 
   int sh;
@@ -833,7 +900,8 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
 	      //negative en.density 
 	      fneg = ppp[sh] / (ppp[sh]-xxx[0]);
-	      fneg/=1.5; //to be generous
+	      fneg/=2.; //to be generous
+	      if(fneg<1.e-10) my_err("f neg dead looped\n");
 	    }
 	  while(1); //neg.energy
 
@@ -887,7 +955,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    overshoot=1;
 
 	  //override
-	  //overshoot=0;
+	  overshoot=0;
 
 	  if(overshoot==1)
 	    {
@@ -904,7 +972,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		overshoot=0;
 	      else
 		{
-		  //verbose=1;
+		  verbose=1;
 	      
 		  if(verbose)
 		    {
@@ -937,11 +1005,15 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	  f3[i]=(pp[i+sh]-ppp[i+sh]);
 	  if(i==0)
 	    if(dominates==RAD)
-	      f3[i]=fabs(f3[i]/ppp[EE0]);
+	      {
+		f3[i]=fabs(f3[i]/ppp[EE0]);
+		f3[i]=fabs(f3[i]/my_min(EPS*ppp[EE0]/ppp[UU],1.e-2));	    
+	      }
 	    else
-	      f3[i]=fabs(f3[i]/ppp[UU]);
-	  else
-	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	    
+	      {
+		f3[i]=fabs(f3[i]/ppp[UU]);
+		f3[i]=fabs(f3[i]/my_min(EPS*ppp[UU]/ppp[EE0],1.e-2));	    
+	      }
 	}
 	  
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
@@ -979,7 +1051,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,verbose);
   
-  //return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
+  return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
 }
 
 
@@ -1044,6 +1116,8 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     return -1;
 
   deltas[0]=E-pp[6];
+
+  //put gdet in deltas?
 
   return 0;
 
@@ -2456,12 +2530,12 @@ calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
   ldouble TgasLTE=calc_PEQ_Tfromurho(ugasLTE,pp[RHO]);
   ldouble Tgas=calc_PEQ_Tfromurho(ugas,pp[RHO]);
 
-  /*
+  
   printf("Trad: %e -> %e\nTgas: %e -> %e\nurad: %e -> %e\nugas: %e -> %e\n\n",
 	 Trad,TradLTE,Tgas,TgasLTE,
-	 Eff,EffLTE,ugas,ugasLTE)
-    ;getchar();
-  */
+	 Eff,EffLTE,ugas,ugasLTE);
+  //;getchar();
+  
 
   //updates only uint gas
   ppLTE[UU]=ugasLTE;
