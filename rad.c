@@ -340,7 +340,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	      break;
 	    }
 
-	  //if(verbose)	    print_tensor(iJ);
+	  if(verbose)	    print_tensor(iJ);
 
 	  //updating x
 	  for(i=0;i<4;i++)
@@ -499,12 +499,24 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   int whicheq=params[1];
 
   ldouble uu[NV],pp2[NV];
-  for(i=0;i<NV;i++) pp2[i]=pp[i];
   
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
+  //rho inconsistent on input
+  //correct rho
+  for(i=0;i<NV;i++) pp2[i]=pp[i];
+  ldouble ucon[4];
+  ucon[1]=p[2];
+  ucon[2]=p[3];
+  ucon[3]=p[4];
+  ucon[0]=0.;
+  //converting to 4-velocity
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+  ldouble rho = uu0[RHO]/gdet/ucon[0];
+  pp2[RHO]=rho;
+
   //total inversion, but only whichprim part matters 
-  p2u(pp,uu,geom);
+  p2u(pp2,uu,geom);
  
   //opposite changes in the other quantities and inversion
   if(whichprim==RAD)
@@ -586,8 +598,8 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 int
 print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
 {
-  printf ("iter = %3d x = % .13e % .13e % .13e % .13e "
-	  "f(x) = % .13e % .13e % .13e % .13e\n",
+  printf ("\n>>>> iter = %3d x = % .10e % .10e % .10e % .10e "
+	  "f(x) = % .10e % .10e % .10e % .10e\n\n",
 	  iter,
 	  //	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
 	  x[0],x[1],x[2],x[3],f[0],f[1],f[2],f[3]);
@@ -640,7 +652,30 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
      
   if(verbose) 
     {
-      printf("xi1: %e xi2: %e\n",xi1,xi2);
+      printf("\n===========\n\nxi1: %e xi2: %e\n",xi1,xi2);
+      double Rtt,ucon[4];
+      calc_ff_Rtt(pp00,&Rtt,ucon,&geom);
+      printf("gamma gaS: %e\n",ucon[0]);
+      ldouble Gi00[4],Gihat00[4];
+      calc_Gi(pp00, &geom,Gi00);
+      boost2_lab2ff(Gi00,Gihat00,pp00,geom.gg,geom.GG);
+      indices_21(Gi00,Gi00,geom.gg);
+      for(iv=0;iv<4;iv++)
+	Gi00[iv]*=dt;
+      print_4vector(Gi00);
+      //print_4vector(Gihat00);
+
+      ldouble Trad=calc_LTE_TfromE(-Rtt);
+      ldouble Tgas=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
+      ldouble rho=pp00[RHO];
+      ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+      ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);  
+      printf("\n===========\n\nkappa rho: %e chi rho: %e\n\n===========\n",kappa,kappa+kappaes);
+      printf("Tgas: %e Trad: %e \n\nLTE:\n",Tgas,Trad);
+      ldouble ppLTE[NV];
+      calc_LTE_state(pp00,ppLTE,&geom);  //returns LTE ugas
+      ldouble TgasLTE=calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]);
+      
     }
 
   /****************************************
@@ -733,7 +768,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
   int LABEQ=0;
   int FFEQ=1;
 
-  params[1]=FFEQ;
+  params[1]=LABEQ;
 
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
@@ -765,19 +800,13 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 
   if(verbose) 
     {
-      ldouble xx,yy,zz;
-      xx=get_x(ix,0);
-      yy=get_x(iy,1);
-      zz=get_x(iz,2);
-      printf("=== i: %d %d %d\n=== x: %e %e %e\n",ix,iy,iz,xx,yy,zz);
-      print_Nvector(pp,NV);
-      print_Nvector(uu,NV);
-      print_metric(gg);
-    }
+      if(whichprim==RAD && params[1]==LABEQ) printf("Working on RAD primitives with LAB energy equation\n\n");
+      if(whichprim==RAD && params[1]==FFEQ) printf("Working on RAD primitives with FF energy equation\n\n");
+      if(whichprim==MHD && params[1]==LABEQ) printf("Working on MHD primitives with LAB energy equation\n\n");
+      if(whichprim==MHD && params[1]==FFEQ) printf("Working on MHD primitives with FF energy equation\n\n");
 
-  if(verbose) 
-    {
-      printf("====\n===\n Trying imp lab 4d prim with dt : %f \n",dt);
+      print_Nvector(pp,NV);
+      print_Nvector(uu,NV);      
     }
 
   failed=0;
@@ -800,8 +829,16 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    }  
 
 	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params);
-	  print_state_implicit_lab_4dprim (iter-1,xxx,f1); 
-	  printf("f_lab_4dprim ret: %d\n",ret);
+	  if(verbose && iter==1)
+	    {
+	      print_state_implicit_lab_4dprim (iter-1,xxx,f1);	  
+	      printf(">> Tgas: %.10e vs Trad: %.10e\n",Tgas00,Trad00);
+	      printf(">> v1: %.10e vs rad: %.10e\n",pp00[VX],pp00[FX0]);
+	      printf(">> v2: %.10e vs rad: %.10e\n",pp00[VY],pp00[FY0]);
+	      printf(">> v3: %.10e vs rad: %.10e\n",pp00[VZ],pp00[FZ0]);
+	    }
+ 
+	  if(ret!=0) printf("f_lab_4dprim ret: %d\n",ret);
 	}
 
 
@@ -835,6 +872,7 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    }
 	  else //decreasing velocity
 	    {
+	      //TODO: play with this
 	      if(ppp[j+sh]>=0.)
 		del=-EPS; 
 	      else
@@ -871,7 +909,9 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	  break;
 	}
 
-      
+      if(verbose)	    print_tensor(J);
+      if(verbose)	    print_tensor(iJ);
+
       int overshoot=0,overcnt=0;	      
       ldouble xi[4]={1.,1.,1.,1.}; //fraction of the Jacobian-implied step to apply
       ldouble xiapp=1.,fneg;
@@ -905,14 +945,19 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	    }
 	  while(1); //neg.energy
 
-	  if(verbose>0) print_state_implicit_lab_4dprim (iter,xxx,f1); 
-
 	  overshoot=0;
 
 	  for(i=0;i<4;i++)
 	    {
 	      pp[i+sh]=xxx[i];
 	    }
+
+	  if(verbose>0) 
+	    {
+	      f_implicit_lab_4dprim(pp,uu0,pp0,dt,&geom,f1,params);
+	      print_state_implicit_lab_4dprim (iter,xxx,f1); 
+	    }
+
 
 	  //updating the other set of quantities
 	  //total inversion, but only whichprim part matters
@@ -933,8 +978,8 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
 	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 	      u2p_rad(uu,pp,&geom,corr);
-	    }     
-
+	    }   
+  
 	  //overshooting check
 	  ldouble ucon[4],Rtt,Tgas,Trad;
 
@@ -943,19 +988,32 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 	  Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 	  Trad=calc_LTE_TfromE(-Rtt);
 
+	  if(verbose)
+	    {
+	      printf(">> Tgas: %.10e vs Trad: %.10e\n",Tgas,Trad);
+	      printf(">> v1: %.10e vs rad: %.10e\n",pp[VX],pp[FX0]);
+	      printf(">> v2: %.10e vs rad: %.10e\n",pp[VY],pp[FY0]);
+	      printf(">> v3: %.10e vs rad: %.10e\n",pp[VZ],pp[FZ0]);
+	    }
+
 	  //checking if overshooted significantly
-	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-4) ||
+	  /*
+	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-5) ||
 	     ((pp[VX]-pp[FX0])*(pp00[VX]-pp00[FX0])<0. && 
-	      fabs(my_max(fabs(pp[VX]-pp00[VX]),fabs(pp[FX0]-pp00[FX0]))/my_max(1.e-8,my_min(pp00[VX],pp00[FX0])))>1.e-4) ||
+	      fabs(my_max(fabs(pp[VX]-pp00[VX]),fabs(pp[FX0]-pp00[FX0]))/my_max(1.e-8,my_min(pp00[VX],pp00[FX0])))>1.e-5) ||
 	     ((pp[VY]-pp[FY0])*(pp00[VY]-pp00[FY0])<0. && 
-	      fabs(my_max(fabs(pp[VY]-pp00[VY]),fabs(pp[FY0]-pp00[FY0]))/my_max(1.e-8,my_min(pp00[VY],pp00[FY0])))>1.e-4) ||
+	      fabs(my_max(fabs(pp[VY]-pp00[VY]),fabs(pp[FY0]-pp00[FY0]))/my_max(1.e-8,my_min(pp00[VY],pp00[FY0])))>1.e-5) ||
 	     ((pp[VZ]-pp[FZ0])*(pp00[VZ]-pp00[FZ0])<0. && 
-	      fabs(my_max(fabs(pp[VZ]-pp00[VZ]),fabs(pp[FZ0]-pp00[FZ0]))/my_max(1.e-8,my_min(pp00[VZ],pp00[FZ0])))>1.e-4)
+	      fabs(my_max(fabs(pp[VZ]-pp00[VZ]),fabs(pp[FZ0]-pp00[FZ0]))/my_max(1.e-8,my_min(pp00[VZ],pp00[FZ0])))>1.e-5)
 	     )
+	  */
+	    
+	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-5))
+	    
 	    overshoot=1;
 
 	  //override
-	  overshoot=0;
+	  //overshoot=0;
 
 	  if(overshoot==1)
 	    {
@@ -967,21 +1025,28 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
 		  xi[1+i1] = fabs(pp00[FX0+i1]-pp00[VX+i1])/(fabs(pp[FX0+i1]-pp00[FX0+i1])+fabs(pp[VX+i1]-pp00[VX+i1]));
 
 	      ldouble minxi = my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
+
+	      //force only temp control:
+	      minxi=xi[0];
+
 	      ldouble maxxi=0.99;
 	      if(minxi>maxxi) //skip if correction small or if fraction already small
 		overshoot=0;
 	      else
 		{
-		  verbose=1;
+		  //verbose=1;
 	      
 		  if(verbose)
 		    {
-		      printf("cnt: %d\n",overcnt);
+		      printf("\n!!! overshot !!! (count: %d)\n",overcnt);
+		      print_4vector(xi);
+		      /*
 		      printf("overshooted: gas: %.20e -> %.20e vs rad: %.20e -> %.20e\n",Tgas00,Tgas,Trad00,Trad);
 		      printf("overshooted: v1: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VX],pp[VX],pp00[FX0],pp[FX0]);
 		      printf("overshooted: v2: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VY],pp[VY],pp00[FY0],pp[FY0]);
 		      printf("overshooted: v3: %.20e -> %.20e vs rad: %.20e -> %.20e\n",pp00[VZ],pp[VZ],pp00[FZ0],pp[FZ0]);
 		      print_4vector(xi);
+		      */
 		      getchar();
 		    }
 		  
@@ -1003,17 +1068,16 @@ solve_implicit_lab_4dprim(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ve
       for(i=0;i<4;i++)
 	{
 	  f3[i]=(pp[i+sh]-ppp[i+sh]);
-	  if(i==0)
-	    if(dominates==RAD)
-	      {
-		f3[i]=fabs(f3[i]/ppp[EE0]);
-		f3[i]=fabs(f3[i]/my_min(EPS*ppp[EE0]/ppp[UU],1.e-2));	    
-	      }
-	    else
-	      {
-		f3[i]=fabs(f3[i]/ppp[UU]);
-		f3[i]=fabs(f3[i]/my_min(EPS*ppp[UU]/ppp[EE0],1.e-2));	    
-	      }
+	  if(dominates==RAD)
+	    {
+	      if(i==0) f3[i]=fabs(f3[i]/ppp[EE0]);
+	      if(i>0) f3[i]=fabs(f3[i]/my_min(EPS*ppp[EE0]/ppp[UU],1.e-2));	    
+	    }
+	  else
+	    {
+	      if(i==0) 	f3[i]=fabs(f3[i]/ppp[UU]);
+	      if(i>0) 	f3[i]=fabs(f3[i]/my_min(EPS*ppp[UU]/ppp[EE0],1.e-2));	    
+	    }
 	}
 	  
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
@@ -1051,7 +1115,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   return solve_implicit_lab_4dprim(ix,iy,iz,dt,deltas,verbose);
   
-  return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
+  //return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
 }
 
 

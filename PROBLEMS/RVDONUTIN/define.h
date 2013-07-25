@@ -80,7 +80,7 @@
 #define MYCOORDS SCHWCOORDS
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 //#define MAXX 16.
-#define NX 48
+#define NX 64
 #define NY 32
 #define NZ 1
 #endif
