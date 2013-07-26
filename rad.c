@@ -499,8 +499,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   ldouble uu[NV],pp2[NV];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
-  //rho inconsistent on input
-  //correct rho
+  //rho may be inconsistent on input if iterating MHD primitives
   for(i=0;i<NV;i++) pp2[i]=pp[i];
   ldouble ucon[4];
   ucon[1]=pp2[2];
@@ -607,7 +606,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3[4],xxx[4];
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   int retval=0;
 
@@ -623,6 +622,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //temporary using local arrays
   gg=geom->gg;
   GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
   int corr[2],fixup[2];
 
   u2p(uu00,pp00,geom,corr,fixup);
@@ -666,16 +669,21 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     dominates = MHD;
   Tgas00=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
   Trad00=calc_LTE_TfromE(-Rtt00);
- 
+
+  ldouble ppLTE[NV],uuLTE[NV];
+  calc_LTE_state(pp00,ppLTE,geom);
+  ldouble TLTE=calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]);
+
   ldouble kappa=calc_kappa(pp00[RHO],Tgas00,0.,0.,0.);
   ldouble chi=kappa+calc_kappaes(pp00[RHO],Tgas00,0.,0.,0.);
   ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas00,4.)/pp00[UU]);
   ldouble xi2=chi*dt*(1.+(-Rtt00)/(pp00[RHO]+GAMMA*pp00[UU]));
-     
+  ldouble ucon[4];
+
   if(verbose) 
     {
       printf("\n===========\n\nxi1: %e xi2: %e\n",xi1,xi2);
-      double Rtt,ucon[4];
+      ldouble Rtt;
       calc_ff_Rtt(pp00,&Rtt,ucon,geom);
       printf("gamma gas: %e\n",ucon[0]);
       ldouble Gi00[4],Gihat00[4];
@@ -694,11 +702,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);  
       printf("\n===========\n\nkappa: %e chi: %e\n\n===========\n",kappa,kappa+kappaes);
       printf("\nxi1: %e xi2: %e\n",xi1,xi2);
-      ldouble ppLTE[NV],uuLTE[NV];
-      calc_LTE_state(pp00,ppLTE,geom);
+      
       printf("gas temp: %e\n",Tgas00);      
-      printf("rad temp: %e\n",Trad00);      
-      printf("LTE temp: %e\n\n",calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]));      
+      printf("rad temp: %e\n",Trad00); 
+      printf("LTE temp: %e\n\n",TLTE) ;      
     }
 
   /*
@@ -744,8 +751,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       pp[iv]=pp0[iv];     
     }
  
-  ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6; 
+  ldouble EPS = 1.e-6;
+  ldouble CONV = 1.e-10;
   ldouble MAXITER = 50;
 
   int sh;
@@ -906,6 +913,16 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      pp[i+sh]=xxx[i];
 	    }
 
+	  //correct rho to follow new velocity (only for MHD primitives)
+	  ucon[1]=pp[2];
+	  ucon[2]=pp[3];
+	  ucon[3]=pp[4];
+	  ucon[0]=0.;
+	  //converting to 4-velocity
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+	  ldouble rho = uu00[RHO]/gdetu/ucon[0];
+	  pp[RHO]=rho;
+
 	  //updating the other set of quantities
 	  //total inversion, but only whichprim part matters
 	  p2u(pp,uu,geom);
@@ -934,7 +951,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  calc_ff_Rtt(pp,&Rtt,ucon,geom);
 	  Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 	  Trad=calc_LTE_TfromE(-Rtt);
-
+	  calc_LTE_state(pp,ppLTE,geom);  
+	  TLTE=calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]);
+	  printf("Tgas: %.20e Trad: %.20e TLTE: %.20e\n",Tgas,Trad,TLTE);
+		  
 	  //checking if overshooted significantly
 	  /*
 	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-4) ||
@@ -948,18 +968,80 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    overshoot=1;
 	  */
 	  //temperature only
+
+	  /* //order only
 	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-4))
 	    {
 	      overshoot=1;
-
 	      //return -1;
 	    }
+	  */
+
+	  //control over initial and LTE values
+	  ldouble OSEPS=1.e-5;
+
+	  if(Tgas00 > Trad00)
+	    if(Tgas>(1.+OSEPS)*Tgas00 || Tgas<(1.-OSEPS)*TLTE || Trad<(1.-OSEPS)*Trad00 || Trad>(1.+OSEPS)*TLTE)
+	      overshoot=1;
+	  if(Tgas00 < Trad00)
+	    if(Trad>(1.+OSEPS)*Trad00 || Trad<(1.-OSEPS)*TLTE || Tgas<(1.-OSEPS)*Tgas00 || Tgas>(1.+OSEPS)*TLTE)
+	      overshoot=1;
+
+	  //if(overshoot==1) return -1;
+
 
 	  //override
 	  //overshoot=0;
 	  
 	  if(overshoot==1)
 	    {
+	      ldouble Tgasnew=Tgas;
+	      ldouble Tradnew=Trad;
+	      //making crossing temperature LTE or give it bndr value
+	      if(Tgas00 > Trad00)
+		{
+		  if(Tgas>(1.+OSEPS)*Tgas00)
+		    Tgasnew=Tgas00;
+		  if(Tgas<(1.-OSEPS)*TLTE)
+		    Tgasnew=TLTE;
+		  if(Trad<(1.-OSEPS)*Trad00)
+		    Tradnew=Trad00;
+		  if(Trad>(1.+OSEPS)*TLTE)
+		    Tradnew=TLTE;
+		}
+	      else
+		{
+		  if(Trad>(1.+OSEPS)*Trad00)
+		    Tradnew=Trad00;
+		  if(Trad<(1.-OSEPS)*TLTE)
+		    Tradnew=TLTE;
+		  if(Tgas<(1.-OSEPS)*Tgas00)
+		    Tgasnew=Trad00;
+		  if(Tgas>(1.+OSEPS)*TLTE)
+		    Tgasnew=TLTE;
+		}
+	      
+	      if(verbose)
+		{
+		  printf("cnt: %d\n",overcnt);
+		  printf("overshooted: gas: %.20e -> %.20e -> %.20e\n",Tgas00,Tgas,Tgasnew);
+		  printf("overshooted: rad: %.20e -> %.20e -> %.20e\n",Trad00,Trad,Tradnew);
+		      
+		  getchar();
+		}
+
+
+	      //correct primitives:
+	      pp[UU] = calc_PEQ_ufromTrho(Tgasnew,pp[RHO]);
+	      pp[EE0] = calc_LTE_EfromT(Tradnew);
+	      overshoot=0; //to go directly to the new step
+	     
+	      
+	    
+
+	      /*
+	      //damping the correction approach
+
 	      xi[0]=xi[1]=xi[2]=xi[3]=1.;
 	      if((Tgas-Trad)*(Tgas00-Trad00)<0.)
 		xi[0] = fabs(Trad00-Tgas00)/(fabs(Trad-Trad00)+fabs(Tgas-Tgas00));
@@ -993,6 +1075,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		  //minxi=0.5; //override step
 		  xiapp*=minxi;
 		}
+	      */
 
 	      overcnt++;
 
@@ -2581,6 +2664,7 @@ calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
 	 Eff,EffLTE,ugas,ugasLTE)
     ;getchar();
   */
+  
 
   //updates only uint gas
   ppLTE[UU]=ugasLTE;
