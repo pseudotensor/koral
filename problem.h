@@ -63,8 +63,23 @@
 //57* LIMOTORUS - torus from Bob's/Akshay's paper
 //58* LUKE - beam hitting a net gas flow
 //59* BBBLOB - rad blobs
+//60* JONTESTS - testing jon's fails.dat
 
-#define PROBLEM 43
+#define PROBLEM 60
+
+#if(PROBLEM==60)
+
+#define PR_DEFINE "PROBLEMS/JONTESTS/define.h"
+#define PR_BC "PROBLEMS/JONTESTS/bc.c"
+#define PR_INIT "PROBLEMS/JONTESTS/init.c"
+#define PR_KAPPA "PROBLEMS/JONTESTS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/JONTESTS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/JONTESTS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/JONTESTS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/JONTESTS/dump.c"
+#define PR_TOOLS "PROBLEMS/JONTESTS/tools.c"
+
+#endif
 
 #if(PROBLEM==59)
 

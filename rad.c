@@ -801,7 +801,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params);
 	  print_state_implicit_lab_4dprim (iter-1,xxx,f1); 
-	  printf("f_lab_4dprim ret: %d\n",ret);
+	  if(ret<0) printf("f_lab_4dprim ret: %d\n",ret);
 	}
 
 
@@ -904,7 +904,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	  while(1); //neg.energy
 
-	  if(verbose>0) print_state_implicit_lab_4dprim (iter,xxx,f1); 
+	  //if(verbose>0) print_state_implicit_lab_4dprim (iter,xxx,f1); 
 
 	  overshoot=0;
 
@@ -955,7 +955,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //TLTE=calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]);
 	  TLTE=calc_LTE_temp(pp,geom);
 
-	  if(verbose) printf("Tgas: %.20e Trad: %.20e TLTE: %.20e\n",Tgas,Trad,TLTE);
+	  if(verbose) 
+	    {
+	      printf("\nTgas: %.20e Trad: %.20e TLTE: %.20e\n",Tgas,Trad,TLTE);
+	      printf("ug1:  %.20e ur1:  %.20e\n",pp[VX],pp[FX0]);
+	      printf("ug2:  %.20e ur2:  %.20e\n",pp[VY],pp[FY0]);
+	      printf("ug3:  %.20e ur3:  %.20e\n\n",pp[VZ],pp[FZ0]);
+	    }
 		  
 	  //checking if overshooted significantly
 	  /*
@@ -1110,7 +1116,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    else
 	      f3[i]=fabs(f3[i]/ppp[UU]);
 	  else
-	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	    
+	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	\
+	  
+	  //override
+	  //f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
 	}
 	  
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
@@ -1203,6 +1212,73 @@ test_solve_implicit_lab()
  
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
 }
+
+///**********************************************************************
+//* Jon test wrapper ************************************************************
+//**********************************************************************
+
+int
+test_jon_solve_implicit_lab()
+{
+  //NOGDET
+
+  FILE *in = fopen("problem.jon","r");
+  int i1,i2,iv;
+  ldouble uu[NV],pp[NV],dt;
+  struct geometry geom;
+
+  for (i1=0;i1<NV;i1++)
+    iv=fscanf(in,"%lf",&uu[i1]);
+  for (i1=0;i1<NV;i1++)
+    iv=fscanf(in,"%lf",&pp[i1]);
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<5;i2++)
+      iv=fscanf(in,"%lf ",&geom.gg[i1][i2]);
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<5;i2++)
+      iv=fscanf(in,"%lf ",&geom.GG[i1][i2]);
+  iv=fscanf(in,"%lf ",&dt);
+  iv=fscanf(in,"%lf ",&geom.alpha);
+  iv=fscanf(in,"%lf ",&geom.gdet);
+  fclose(in);
+
+ 
+  //fill missing parts
+  ldouble ucon[4];
+  ucon[1]=pp[VX];
+  ucon[2]=pp[VY];
+  ucon[3]=pp[VZ];
+  conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
+
+
+  geom.alpha=sqrt(-1./geom.GG[0][0]);
+  pp[5]=calc_Sfromu(pp[0],pp[1]);
+  uu[5]=pp[5]*ucon[0];
+
+  print_Nvector(uu,NV);
+  print_Nvector(pp,NV);
+  //print_metric(geom.gg);
+  //print_metric(geom.GG);
+  //printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
+  //  printf("ut: %e\n",ucon[0]);
+
+  printf("trying to invert...\n");
+  int corr[2],fixup[2],u2pret;
+  u2pret=u2p(uu,pp,&geom,corr,fixup);
+  printf("u2pret: %d\n",u2pret);
+  //print_Nvector(uu,NV);
+  print_Nvector(pp,NV);
+  p2u(pp,uu,&geom);
+  //print_Nvector(uu,NV);
+
+  getchar();
+   
+  ldouble deltas[4];
+  int verbose=1;
+ 
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+}
+
 
 
 //**********************************************************************
