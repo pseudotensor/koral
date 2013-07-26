@@ -481,7 +481,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 
 int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params)
 {
-  int ret=0;
+  int ret=0,i;
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -499,8 +499,21 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   ldouble uu[NV],pp2[NV];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
+  //rho inconsistent on input
+  //correct rho
+  for(i=0;i<NV;i++) pp2[i]=pp[i];
+  ldouble ucon[4];
+  ucon[1]=pp2[2];
+  ucon[2]=pp2[3];
+  ucon[3]=pp2[4];
+  ucon[0]=0.;
+  //converting to 4-velocity
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+  ldouble rho = uu0[RHO]/gdetu/ucon[0];
+  pp2[RHO]=rho;
+
   //total inversion, but only whichprim part matters
-  p2u(pp,uu,geom);
+  p2u(pp2,uu,geom);
  
   //opposite changes in the other quantities and inversion
   if(whichprim==RAD)
@@ -510,7 +523,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
       uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
 
-      u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+      u2pret=u2p(uu,pp2,geom,corr,fixup); //total inversion (I should separate hydro from rad)
     }
   if(whichprim==MHD)
     {
@@ -519,7 +532,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
       uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 
-      u2pret=u2p_rad(uu,pp,geom,corr);
+      u2pret=u2p_rad(uu,pp2,geom,corr);
     }     
 
   //print_Nvector(uu,NV);getchar();
@@ -536,7 +549,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 
   //radiative four-force
   ldouble Gi[4];
-  calc_Gi(pp,ggg,Gi); 
+  calc_Gi(pp2,ggg,Gi); 
   indices_21(Gi,Gi,gg);
 
   if(whichprim==RAD) //rad-primitives
@@ -561,13 +574,13 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       //zero - state 
       calc_ff_Rtt(pp0,&Rtt0,ucon,geom);
       //new state
-      calc_ff_Rtt(pp,&Rtt,ucon,geom);
+      calc_ff_Rtt(pp2,&Rtt,ucon,geom);
       
-      ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+      ldouble T=calc_PEQ_Tfromurho(pp2[UU],pp2[RHO]);
       ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
       ldouble Ehat = -Rtt;
       ldouble dtau=dt/ucon[0];
-      ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
+      ldouble kappaabs=calc_kappa(pp2[RHO],T,geom->xx,geom->yy,geom->zz);
 
       //fluid frame energy equation:
       f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
@@ -658,6 +671,25 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
      
   if(verbose) 
     {
+      printf("\n===========\n\nxi1: %e xi2: %e\n",xi1,xi2);
+      double Rtt,ucon[4];
+      calc_ff_Rtt(pp00,&Rtt,ucon,&geom);
+      printf("gamma gas: %e\n",ucon[0]);
+      ldouble Gi00[4],Gihat00[4];
+      calc_Gi(pp00, geom,Gi00);
+      boost2_lab2ff(Gi00,Gihat00,pp00,geom->gg,geom->GG);
+      indices_21(Gi00,Gi00,geom->gg);
+      for(iv=0;iv<4;iv++)
+	Gi00[iv]*=dt;
+      print_4vector(Gi00);
+      //print_4vector(Gihat00);
+
+      ldouble Trad=calc_LTE_TfromE(-Rtt);
+      ldouble Tgas=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
+      ldouble rho=pp00[RHO];
+      ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+      ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);  
+      printf("\n===========\n\nkappa: %e chi: %e\n\n===========\n",kappa,kappa+kappaes);
       printf("\nxi1: %e xi2: %e\n",xi1,xi2);
       ldouble ppLTE[NV],uuLTE[NV];
       calc_LTE_state(pp00,ppLTE,geom);
