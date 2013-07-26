@@ -8,7 +8,7 @@ main(int argc, char **argv)
 {  
   //test
   //requires no rad. viscosity!
-  test_solve_implicit_lab();getchar();
+  //test_solve_implicit_lab();getchar();
 
   ldouble tstart;
   int i;

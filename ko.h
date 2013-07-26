@@ -459,6 +459,7 @@ int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);
 
 
 //rad.c
+ldouble calc_LTE_temp(ldouble *pp,void *ggg);
 int test_solve_implicit_lab();
 int calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg);
 int calc_ff_Rtt(ldouble *pp,ldouble *Rtt, ldouble* ucon,void* ggg);
