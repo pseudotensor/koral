@@ -607,23 +607,50 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //temporary using local arrays
   gg=geom->gg;
   GG=geom->GG;
-
   int corr[2],fixup[2];
+
   u2p(uu00,pp00,geom,corr,fixup);
   p2u(pp00,uu00,geom);
 
-   
+  if(verbose) //dump the problematic case to file
+    {
+      /*
+      print_Nvector(uu00,NV);
+      print_Nvector(pp00,NV);
+      print_metric(gg);
+      print_metric(GG);
+      printf("%e %e %e\n",dt,geom->alpha,geom->gdet);
+      */
+      FILE *out = fopen("problem.dat","w");
+      for (i1=0;i1<NV;i1++)
+	fprintf(out,"%e ",uu00[i1]);
+      for (i1=0;i1<NV;i1++)
+	fprintf(out,"%e ",pp00[i1]);
+      for (i1=0;i1<4;i1++)
+	for (i2=0;i2<5;i2++)
+	  fprintf(out,"%e ",gg[i1][i2]);
+      for (i1=0;i1<4;i1++)
+	for (i2=0;i2<5;i2++)
+	  fprintf(out,"%e ",GG[i1][i2]);
+      fprintf(out,"%e \n",dt);
+      fprintf(out,"%e \n",geom->alpha);
+      fprintf(out,"%e \n",geom->gdet);
+      fprintf(out,"\n");
+      fclose(out);
+      printf("dumped problematic case to problem.dat\n");
+    }
+
   //comparing energy densities
   ldouble urad00[4],Rtt00,Tgas00,Trad00;
   int dominates;
   calc_ff_Rtt(pp00,&Rtt00,urad00,geom);
-  if(-Rtt00>pp00[UU]) 
+   if(-Rtt00>pp00[UU]) 
     dominates = RAD;
   else
     dominates = MHD;
   Tgas00=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
   Trad00=calc_LTE_TfromE(-Rtt00);
-
+ 
   ldouble kappa=calc_kappa(pp00[RHO],Tgas00,0.,0.,0.);
   ldouble chi=kappa+calc_kappaes(pp00[RHO],Tgas00,0.,0.,0.);
   ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas00,4.)/pp00[UU]);
@@ -631,7 +658,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
      
   if(verbose) 
     {
-      printf("xi1: %e xi2: %e\n",xi1,xi2);
+      printf("\nxi1: %e xi2: %e\n",xi1,xi2);
+      ldouble ppLTE[NV],uuLTE[NV];
+      calc_LTE_state(pp00,ppLTE,geom);
+      printf("gas temp: %e\n",Tgas00);      
+      printf("rad temp: %e\n",Trad00);      
+      printf("LTE temp: %e\n\n",calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]));      
     }
 
   /*
@@ -695,14 +727,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   if(verbose) 
     {
-      ldouble xx,yy,zz;
-      xx=get_x(ix,0);
-      yy=get_x(iy,1);
-      zz=get_x(iz,2);
-      printf("=== i: %d %d %d\n=== x: %e %e %e\n",ix,iy,iz,xx,yy,zz);
+      printf("=== i: %d %d %d\n\n",ix,iy,iz);
       print_Nvector(pp,NV);
       print_Nvector(uu,NV);
-      print_metric(gg);
+      //print_metric(gg);
     }
 
   if(verbose) 
@@ -884,7 +912,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    overshoot=1;
 
 	  //override
-	  overshoot=0;
+	  //overshoot=0;
 
 	  if(overshoot==1)
 	    {
@@ -987,6 +1015,49 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
   
   //return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
+}
+
+
+///**********************************************************************
+//* test wrapper ************************************************************
+//**********************************************************************
+
+int
+test_solve_implicit_lab()
+{
+  FILE *in = fopen("problem.1","r");
+  int i1,i2,iv;
+  ldouble uu[NV],pp[NV],dt;
+  struct geometry geom;
+
+  for (i1=0;i1<NV;i1++)
+    iv=fscanf(in,"%lf",&uu[i1]);
+  for (i1=0;i1<NV;i1++)
+    iv=fscanf(in,"%lf",&pp[i1]);
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<5;i2++)
+      iv=fscanf(in,"%lf ",&geom.gg[i1][i2]);
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<5;i2++)
+      iv=fscanf(in,"%lf ",&geom.GG[i1][i2]);
+  iv=fscanf(in,"%lf ",&dt);
+  iv=fscanf(in,"%lf ",&geom.alpha);
+  iv=fscanf(in,"%lf ",&geom.gdet);
+  fclose(in);
+
+  /*
+  print_Nvector(uu,NV);
+  print_Nvector(pp,NV);
+  print_metric(geom.gg);
+  print_metric(geom.GG);
+  printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
+  getchar();
+  */
+ 
+  ldouble deltas[4];
+  int verbose=1;
+ 
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
 }
 
 
@@ -1411,10 +1482,6 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   gg=geom->gg;
   GG=geom->GG;
   
-  ldouble (*tup)[4],(*tlo)[4];
-  tup=geom->tup;
-  tlo=geom->tlo;
-
   ldouble pp[NV],Erf;
   int verbose=0;
   int i,j;
@@ -1433,7 +1500,6 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 #ifndef EDDINGTON_APR //M1 here
   //radiative energy density in the radiation rest frame
   Erf=pp[6];
-
   urfcon[0]=0.;
   urfcon[1]=pp[7];
   urfcon[2]=pp[8];
@@ -1444,7 +1510,6 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
-
 #else //Eddington
 
   ldouble h[4][4];
@@ -2394,7 +2459,7 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
 {
   struct geometry *geom
     = (struct geometry *) ggg;
-
+  //print_Nvector(pp,NV);getchar();
   ucon[0]=0.;
   ucon[1]=pp[VX];
   ucon[2]=pp[VY];
@@ -2404,6 +2469,7 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   indices_21(ucon,ucov,geom->gg);
   ldouble Rij[4][4],Rtt;
   calc_Rij(pp,ggg,Rij);
+ 
   indices_2221(Rij,Rij,geom->gg);
   Rtt=0.;
   int i1,i2;
@@ -2477,4 +2543,5 @@ calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
 
   
 }
+
  

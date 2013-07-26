@@ -6,6 +6,10 @@
 int 
 main(int argc, char **argv)
 {  
+  //test
+  //requires no rad. viscosity!
+  test_solve_implicit_lab();
+
   ldouble tstart;
   int i;
 
