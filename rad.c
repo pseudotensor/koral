@@ -609,7 +609,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   ldouble f1[4],f2[4],f3[4],xxx[4];
   ldouble (*gg)[5],(*GG)[5];
 
-  //verbose=1;
+  int retval=0;
+
+  verbose=1;
+
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -636,18 +639,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       */
       FILE *out = fopen("problem.dat","w");
       for (i1=0;i1<NV;i1++)
-	fprintf(out,"%e ",uu00[i1]);
+	fprintf(out,"%.15e ",uu00[i1]);
       for (i1=0;i1<NV;i1++)
-	fprintf(out,"%e ",pp00[i1]);
+	fprintf(out,"%.15e ",pp00[i1]);
       for (i1=0;i1<4;i1++)
 	for (i2=0;i2<5;i2++)
-	  fprintf(out,"%e ",gg[i1][i2]);
+	  fprintf(out,"%.15e ",gg[i1][i2]);
       for (i1=0;i1<4;i1++)
 	for (i2=0;i2<5;i2++)
-	  fprintf(out,"%e ",GG[i1][i2]);
-      fprintf(out,"%e \n",dt);
-      fprintf(out,"%e \n",geom->alpha);
-      fprintf(out,"%e \n",geom->gdet);
+	  fprintf(out,"%.15e ",GG[i1][i2]);
+      fprintf(out,"%.15e \n",dt);
+      fprintf(out,"%.15e \n",geom->alpha);
+      fprintf(out,"%.15e \n",geom->gdet);
       fprintf(out,"\n");
       fclose(out);
       printf("dumped problematic case to problem.dat\n");
@@ -673,7 +676,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     {
       printf("\n===========\n\nxi1: %e xi2: %e\n",xi1,xi2);
       double Rtt,ucon[4];
-      calc_ff_Rtt(pp00,&Rtt,ucon,&geom);
+      calc_ff_Rtt(pp00,&Rtt,ucon,geom);
       printf("gamma gas: %e\n",ucon[0]);
       ldouble Gi00[4],Gihat00[4];
       calc_Gi(pp00, geom,Gi00);
@@ -933,6 +936,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  Trad=calc_LTE_TfromE(-Rtt);
 
 	  //checking if overshooted significantly
+	  /*
 	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-4) ||
 	     ((pp[VX]-pp[FX0])*(pp00[VX]-pp00[FX0])<0. && 
 	      fabs(my_max(fabs(pp[VX]-pp00[VX]),fabs(pp[FX0]-pp00[FX0]))/my_max(1.e-8,my_min(pp00[VX],pp00[FX0])))>1.e-4) ||
@@ -942,10 +946,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      fabs(my_max(fabs(pp[VZ]-pp00[VZ]),fabs(pp[FZ0]-pp00[FZ0]))/my_max(1.e-8,my_min(pp00[VZ],pp00[FZ0])))>1.e-4)
 	     )
 	    overshoot=1;
+	  */
+	  //temperature only
+	  if(((Tgas-Trad)*(Tgas00-Trad00)<0. && fabs(my_max(Tgas-Tgas00,Trad-Trad00)/my_min(Tgas00,Trad00))>1.e-4))
+	    {
+	      overshoot=1;
+
+	      //return -1;
+	    }
 
 	  //override
 	  //overshoot=0;
-
+	  
 	  if(overshoot==1)
 	    {
 	      xi[0]=xi[1]=xi[2]=xi[3]=1.;
@@ -955,7 +967,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		if((pp[VX+i1]-pp[FX0+i1])*(pp00[VX+i1]-pp00[FX0+i1])<0.)
 		  xi[1+i1] = fabs(pp00[FX0+i1]-pp00[VX+i1])/(fabs(pp[FX0+i1]-pp00[FX0+i1])+fabs(pp[VX+i1]-pp00[VX+i1]));
 
-	      ldouble minxi = my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
+	      //ldouble minxi = my_min(my_min(xi[0],xi[1]),my_min(xi[2],xi[3]));
+	      ldouble minxi=xi[0]; //temperature only
+
 	      ldouble maxxi=0.99;
 	      if(minxi>maxxi) //skip if correction small or if fraction already small
 		overshoot=0;
@@ -1057,7 +1071,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 int
 test_solve_implicit_lab()
 {
-  FILE *in = fopen("problem.1","r");
+  FILE *in = fopen("problem.0","r");
   int i1,i2,iv;
   ldouble uu[NV],pp[NV],dt;
   struct geometry geom;

@@ -1199,7 +1199,7 @@
 #endif
 
 #ifndef SHUFFLELOOPS
-#define SHUFFLELOOPS 0
+#define SHUFFLELOOPS 1
 #endif
 
 
