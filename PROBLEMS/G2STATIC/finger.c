@@ -15,9 +15,9 @@ for(ii=0;ii<Nloop_0;ii++) //domain only
     ix=loop_0[ii][0];
     iy=loop_0[ii][1];
     iz=loop_0[ii][2]; 
- 
-    trace=get_u(p,TRA,ix,iy,iz);
-
+  
+    trace=get_u(p,TRA,ix,iy,iz)/(get_u(p,TRA,ix,iy,iz)+get_u(p,RHO,ix,iy,iz));
+  
     if(trace<MINTRACE)
       {
 	fill_geometry(ix,iy,iz,&geom);

@@ -52,7 +52,8 @@ diskrho*=1.-step_function(tracer-DISKDAMPPAR1,DISKDAMPPAR2);
 
 pp[0]=diskrho+clrho;
 tracer=clrho/(diskrho+clrho);
-pp[TRA]=tracer;
+//pp[TRA]=tracer;
+pp[TRA]=clrho;
 
 #endif
 
