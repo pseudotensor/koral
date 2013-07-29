@@ -980,8 +980,8 @@
 #endif
 
 //min absolute Erad
-#ifndef ERADLIMIT
-#define ERADLIMIT (10.*SMALL)
+#ifndef ERADFLOOR
+#define ERADFLOOR (10.*SMALL)
 #endif
 
 //min B^2 over uint
@@ -1205,7 +1205,7 @@
 #endif
 
 #ifndef GAMMAMAXRAD
-#define GAMMAMAXRAD 1000.
+#define GAMMAMAXRAD 100.
 #endif
 
 #ifndef MASSCM

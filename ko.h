@@ -145,8 +145,12 @@ ldouble calc_lum(ldouble radius);
 ldouble calc_photloc(int ix);
 
 //misc.c
-ldouble
-calc_eigen_4x4(ldouble g[][4], ldouble *ev);
+int print_NVvector(ldouble v[4]);
+int print_tensor(ldouble T[][4]);
+int print_metric(ldouble T[][5]);
+int print_4vector(ldouble v[4]);
+int print_Nvector(ldouble v[4],int);
+ldouble calc_eigen_4x4(ldouble g[][4], ldouble *ev);
 ldouble my_atan2(ldouble y, ldouble x);
 void shuffle_loop(int **array, size_t n);
 ldouble step_function(ldouble x,ldouble k);
@@ -418,10 +422,6 @@ int indices_2211(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5]);
 int indices_1122(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5]);
 int indices_21(ldouble A1[4],ldouble A2[4],ldouble gg[][5]);
 int indices_12(ldouble A1[4],ldouble A2[4],ldouble GG[][5]);
-int print_tensor(ldouble T[][4]);
-int print_metric(ldouble T[][5]);
-int print_4vector(ldouble v[4]);
-int print_Nvector(ldouble v[4],int);
 int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg);
 int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg);
 int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg);
