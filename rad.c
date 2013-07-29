@@ -177,7 +177,7 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
 } 
 
 int
-print_state_implicit_lab_4dcon (int iter, ldouble *x, ldouble *f)
+print_state_implicit_lab_4dcon(int iter, ldouble *x, ldouble *f)
 {
   printf ("iter = %3d x = % .13e % .13e % .13e % .3e "
 	  "f(x) = % .13e % .13e % .13e % .13e\n",
@@ -188,34 +188,37 @@ print_state_implicit_lab_4dcon (int iter, ldouble *x, ldouble *f)
 }
 
 int
-solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
+solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose)
 {
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
-  ldouble pp[NV],pp0[NV],uu[NV],uu0[NV],uu00[NV],uup[NV]; 
+  ldouble pp[NV],pp0[NV],uu[NV],uu0[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3hd[4],f3rad[4],xxx[4];
 
   ldouble (*gg)[5],(*GG)[5];
 
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
-  
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  int ix=geom->ix;
+  int iy=geom->iy;
+  int iz=geom->iz;
+
   //temporary using local arrays
-  gg=geom.gg;
-  GG=geom.GG;
+  gg=geom->gg;
+  GG=geom->GG;
+
+  int corr[2],fixup[2];
+  u2p(uu00,pp00,geom,corr,fixup);
+  p2u(pp00,uu00,geom);
 
   for(iv=0;iv<NV;iv++)
     {
-      pp[iv]=get_u(p,iv,ix,iy,iz); //primitives corresponding to zero-state  
-      uu[iv]=get_u(u,iv,ix,iy,iz);  
-      uu00[iv]=uu[iv]; //total zero state
-      uu0[iv]=uu[iv]; //zero state for substepping
-      pp0[iv]=pp[iv]; //primitives
-   }
-  
-  int corr[2],fixup[2];
-  u2p(uu0,pp0,&geom,corr,fixup);
-  p2u(pp0,uu0,&geom);
+      uu0[iv]=uu00[iv]; 
+      pp0[iv]=pp00[iv]; 
+      uu[iv]=uu0[iv]; 
+      pp[iv]=pp0[iv];     
+    }
 
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6; 
@@ -228,19 +231,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
   int iter=0;
   int failed=0;
 
-  //loop in dt
-  if(verbose) 
-    {
-      ldouble xx,yy,zz;
-      xx=get_x(ix,0);
-      yy=get_x(iy,1);
-      zz=get_x(iz,2);
-      printf("=== i: %d %d %d\n=== x: %e %e %e\n",ix,iy,iz,xx,yy,zz);
-      print_Nvector(pp,NV);
-      print_Nvector(uu,NV);
-      print_metric(gg);
-    }
-
+ 
   do 
     {
 
@@ -271,14 +262,14 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	      print_Nvector(uu,NV);
 	      print_Nvector(pp0,NV);
 
-	      int ret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f1);
+	      int ret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,geom,f1);
 	      print_state_implicit_lab_4dcon (iter-1,xxx,f1); 
 	      printf("f_lab_4dcon ret: %d\n",ret);
 	    }
 
 
 	  //values at base state
-	  if(f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f1)<0) 
+	  if(f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,geom,f1)<0) 
 	    {
 	      failed=1;
 		  
@@ -294,7 +285,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 
 	      uu[j+EE0]=uup[j+EE0]-del;
 	      
-	      int fret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f2);  
+	      int fret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,geom,f2);  
 
 	      if(verbose>0)
 		{
@@ -439,8 +430,8 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	    }
 
 	  //update primitives corresponding to uu0
-	  u2p(uu0,pp0,&geom,corr,fixup);
-	  p2u(pp0,uu0,&geom);
+	  u2p(uu0,pp0,geom,corr,fixup);
+	  p2u(pp0,uu0,geom);
 	  continue;
 	}
       
@@ -469,6 +460,8 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
   deltas[1]=uu[FX0]-uu00[FX0];
   deltas[2]=uu[FY0]-uu00[FY0];
   deltas[3]=uu[FZ0]-uu00[FZ0];
+
+  if(verbose) print_4vector(deltas);
   
   return 0;
 }
@@ -1162,6 +1155,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   deltas[2]=uu[FY0]-uu00[FY0];
   deltas[3]=uu[FZ0]-uu00[FZ0];
 
+  if(verbose) print_4vector(deltas);
+
   return 0;
 }
 
@@ -1182,9 +1177,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       uu[iv]=get_u(u,iv,ix,iy,iz);  
    }
 
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+  //  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+  return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
   
-  //return solve_implicit_lab_4dcon(ix,iy,iz,dt,deltas,verbose);
+
 }
 
 
@@ -1326,7 +1322,8 @@ test_jon_solve_implicit_lab()
       int verbose=1;
       
       solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
-
+      //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+ 
       getchar();
     }
 
