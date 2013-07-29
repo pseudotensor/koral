@@ -457,21 +457,20 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df)
   
   ldouble W=Wp+D;
 
-  FTYPE W3,X3,Ssq,Wsq,X,X2; 
+  FTYPE W3,X3,Ssq,Wsq,X,X2,Xsq; 
   FTYPE Qtsq = Qt2;
   X = Bsq + W;
   Wsq = W*W;
   W3 = Wsq*W ;
   X2 = X*X;
+  Xsq = X2;
   X3 = X2*X;
   //  return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrt(1.-Qt2/W/W);   
 
   //a bit more clear
 
-  ldouble v2 = Qt2/W/W;
-  ldouble vsq=v2;
+  ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
   ldouble gamma2 = 1./(1.-v2);
-  ldouble gammasq=gamma2;
   ldouble gamma = sqrt(gamma2);
   ldouble w = W/gamma2;
   ldouble rho0 = D/gamma;
@@ -481,12 +480,12 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df)
 
   //*f= Qn + W - p;
 
-  *f = Qn + W - p + 0.5*Bsq*(1.+vsq) - QdotBsq/2./Wsq;
+  *f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
 
   // dp/dW = dp/dW + dP/dv^2 dv^2/dW
     
   ldouble dvsq=(-2.0/X3 * ( Qtsq  +  QdotBsq * (3.0*W*X + Bsq*Bsq)/W3));
-  ldouble dp1 = dpdWp_calc_vsq(Wp, D, vsq ); // vsq can be unphysical
+  ldouble dp1 = dpdWp_calc_vsq(Wp, D, v2 ); // vsq can be unphysical
 
   ldouble idwmrho0dp=compute_idwmrho0dp(wmrho0);
   ldouble dwmrho0dvsq = (D*(gamma*0.5-1.0) - Wp);
@@ -747,7 +746,7 @@ f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 {
-  int verbose=0;
+  int verbose=2;
   int i,j,k;
   ldouble rho,u,p,w,W,alpha,D,Sc;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
@@ -796,7 +795,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   //conserved entropy "S u^t"
   Sc=uu[5]/gdetu*alpha; 
 
-  //Q_mu
+  //Q_mu=alpha T^t_mu
   Qcov[0]=(uu[1]/gdetu-uu[0]/gdetu)*alpha;
   Qcov[1]=uu[2]/gdetu*alpha;
   Qcov[2]=uu[3]/gdetu*alpha;
@@ -806,11 +805,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   indices_12(Qcov,Qcon,GG);
 
 #ifdef MAGNFIELD
-  //B^mu
+  //curly B^mu
   Bcon[0]=0.;
-  Bcon[1]=uu[B1]/gdet*alpha;
-  Bcon[2]=uu[B2]/gdet*alpha;
-  Bcon[3]=uu[B3]/gdet*alpha;
+  Bcon[1]=uu[B1]/gdetu*alpha;
+  Bcon[2]=uu[B2]/gdetu*alpha;
+  Bcon[3]=uu[B3]/gdetu*alpha;
 
   //B_mu
   indices_21(Bcon,Bcov,gg);
@@ -897,7 +896,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
   ldouble f0,f1,dfdW;
-  ldouble CONV=1.e-8;
+  ldouble CONV=1.e-10;
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
@@ -925,7 +924,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 
 
   //1d Newton solver
-  if(verbose>1) printf("in:%e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
+  if(verbose>1) printf("in: %e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
 
   int iter=0,fu2pret;
   do
@@ -934,7 +933,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       iter++;
      
       fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW);
-     
+
+      fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW);
+      
+      //dfdW=(f1-f0)/(EPS*W);
+
       if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,f1,dfdW);
 
       if(dfdW==0.) {W*=1.1; continue;}
@@ -944,8 +947,6 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       ldouble dumpfac=1.;
 
       //test if goes out of bounds and damp solution if so
-      //if(Wnew*Wnew<Qt2 || isnan(Wnew))
-      
       do
 	{
 	  ldouble f0tmp,dfdWtmp;
@@ -970,8 +971,6 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       while(1);
 	  
       if(idump>=100) {if(verbose>0) printf("damped unsuccessfuly\n");return -101;}
-
-      if(verbose>0) printf("damped successfuly\n");
 	
       W=Wnew; 
 
@@ -983,14 +982,21 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
     }
   while(fabs((W-Wprev)/Wprev)>CONV && iter<50);
 
+ 
   if(iter>=50)
     {
       if(verbose>0) printf("iter exceeded in u2p_hot\n"); //getchar();
       return -102;
     }
-  
+
+
   if(isnan(W) || isinf(W)) {if(verbose) printf("nan/inf W in u2p_solver with Etype: %d\n",Etype); return -103;}
-  if(verbose>1) {printf("the end: %e\n",W); }
+ 
+  if(verbose>1) 
+    {
+      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW);
+      printf("end: %d %e %e %e %e\n",iter,W,f0,f1,dfdW);
+    }
 
   //W found, let's calculate v2 and the rest
   //ldouble v2=Qt2/W/W;
@@ -1002,15 +1008,14 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   v2 = ( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
 
   gamma2=1./(1.-v2);
-  ldouble ut2 = Qt2/(W*W - Qt2);
-  gamma2=1. + ut2;
   gamma=sqrt(gamma2);
   rho=D/gamma;
   u=1./GAMMA*(W/gamma2-rho);
   utcon[0]=0.;
-  utcon[1]=gamma/W*Qtcon[1];
-  utcon[2]=gamma/W*Qtcon[2];
-  utcon[3]=gamma/W*Qtcon[3];
+  utcon[1]=gamma/(W+Bsq)*(Qtcon[1]+QdotB*Bcon[1]/W);
+  utcon[2]=gamma/(W+Bsq)*(Qtcon[2]+QdotB*Bcon[2]/W);
+  utcon[3]=gamma/(W+Bsq)*(Qtcon[3]+QdotB*Bcon[3]/W);
+
 
   if(u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
     {

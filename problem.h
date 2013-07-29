@@ -1131,8 +1131,8 @@
 #endif
 
 //number of magneto-hydro variables
-#ifdef MAGNFIELDS
-#define NVMHD (NVHD+4)
+#ifdef MAGNFIELD
+#define NVMHD (NVHD+3)
 #else
 #define NVMHD (NVHD)
 #endif
@@ -1254,6 +1254,10 @@
 
 #ifndef SHUFFLELOOPS
 #define SHUFFLELOOPS 1
+#endif
+
+#ifndef MKS1R0
+#define MKS1R0 0.
 #endif
 
 

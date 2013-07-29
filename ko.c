@@ -59,7 +59,10 @@ main(int argc, char **argv)
   tstart=0.;
 #endif
 
- 
+  //test
+  test_maginv();
+  exit(0);
+
   //prepares files
   fprint_openfiles("dumps");
 
@@ -272,11 +275,54 @@ solve_all_problems_5(ldouble tstart)
       else if(end_time-fprintf_time>1.) 
 	{
 	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %f\n"
-		  ,nstep,t,dt,max_ws[0],end_time-start_time,znps);
+		 ,nstep,t,dt,max_ws[0],end_time-start_time,znps);
 	  fprintf_time=end_time;
 	  i2=i1;
 	}
-     }
+    }
   return 0;
 }
 
+int
+test_maginv()
+{
+  ldouble uu[NV];
+  ldouble pp[NV];
+
+  //geometries
+  struct geometry geom;
+  fill_geometry(0,0,0,&geom);
+
+  print_metric(geom.gg);
+
+  pp[RHO]=1.;
+  pp[UU]=0.001;
+  pp[VX]=pp[VY]=pp[VZ]=0.;
+
+  pp[VX]=0.1;
+  pp[VY]=0.01;
+  pp[VZ]=0.01;
+
+#ifdef MAGNFIELD
+  pp[B1]=pp[B2]=pp[B3]=0.;
+
+  pp[B1]=1.e-2;
+  pp[B2]=1.e-4;
+  pp[B3]=1.e-4;
+#endif
+
+  //entropy
+  pp[5]=calc_Sfromu(pp[RHO],pp[UU]);
+
+  print_NVvector(pp);
+  p2u(pp,uu,&geom);
+  print_NVvector(uu);
+
+  int aa[2],bb[2],ret;
+  //  pp[UU]*=1.1;
+  ret=u2p(uu,pp,&geom,aa,bb);
+  printf("u2p ret: %d\n",ret);
+  print_NVvector(pp);
+
+  return 0;
+}
