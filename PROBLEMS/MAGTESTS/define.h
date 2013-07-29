@@ -1,11 +1,3 @@
-//new physical constants
-#undef SIGMA_RAD
-#define SIGMA_RAD (4.*118316261947818976.)
-#undef K_BOLTZ
-#define K_BOLTZ 1.
-#undef M_PROTON
-#define M_PROTON 1.
-
 /************************************/
 //restart
 /************************************/
@@ -13,46 +5,29 @@
 #define RESTARTNUM 30
 
 /************************************/
-//radiation choices
+//radiation
 /************************************/
-#define RADIATION
-#define ALLOW_EXPLICIT_RAD_SOURCE 0
+//#define RADIATION
+//#define SKIPRADSOURCE
 
 /************************************/
-//hydro choices
+//magn. field
 /************************************/
-#define ALLOWENTROPYU2P 1
-#define DOFIXUPS 0
+#define MAGNFIELD
 
 /************************************/
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2K1K2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
-//#define FLUXMETHOD HLL_FLUX
-//#define WAVESPEEDSATFACES 
-#define GDETIN 0
-//#define SKIPRADSOURCE
-//#define SKIPRADWAVESPEEDLIMITER
-//#define PUREAXISOUTFLOW
 
 /************************************/
 //viscosity choices
 /************************************/
-#define HDVISCOSITY NOVISCOSITY
-#define ALPHATOTALPRESSURE
-//#define HDVISCOSITY SHEARVISCOSITY
-//#define SHEARVISCOSITYONLYRPHI
-#define ALPHAHDVISC .1
-#define RMINVISC 3.
-//#define ZEROTIMEINSHEAR
-#define RADVISCOSITY NOVISCOSITY
-#define TAUSUPPRESSPARAM 100. //the larger the less prad
-#define ALPHARADVISC 1.
-//#define ENFORCERADWAVESPEEDS
+//#define HDVISCOSITY NOVISCOSITY
+//#define RADVISCOSITY NOVISCOSITY
 
 /************************************/
 //rhd floors

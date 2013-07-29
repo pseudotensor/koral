@@ -752,7 +752,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
  
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6;
+  ldouble CONV = 1.e-8;
   ldouble MAXITER = 50;
 
   int sh;
@@ -1118,8 +1118,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  else
 	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	\
 	  
-	  //override
-	  //f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
+	  //override (convergence with respect to smaller quantity)
+	  f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
 	}
 	  
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
@@ -1145,6 +1145,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   deltas[2]=uu[FY0]-uu00[FY0];
   deltas[3]=uu[FZ0]-uu00[FZ0];
   
+  if(geom->ix==NX-10)				
+    {
+      //printf("iter: %d\n",iter);
+
+      //getchar();
+    }
+
   return 0;
 }
 
@@ -1265,7 +1272,7 @@ test_jon_solve_implicit_lab()
   printf("trying to invert...\n");
   int corr[2],fixup[2],u2pret;
   u2pret=u2p(uu,pp,&geom,corr,fixup);
-  printf("u2pret: %d\n",u2pret);
+  printf("u2pret: %d (%d %d)\n",u2pret,corr[0],corr[1]);
   //print_Nvector(uu,NV);
   print_Nvector(pp,NV);
   p2u(pp,uu,&geom);

@@ -64,8 +64,23 @@
 //58* LUKE - beam hitting a net gas flow
 //59* BBBLOB - rad blobs
 //60* JONTESTS - testing jon's fails.dat
+//61* MAGTESTS - testing jon's fails.dat
 
-#define PROBLEM 60
+#define PROBLEM 61
+
+#if(PROBLEM==61)
+
+#define PR_DEFINE "PROBLEMS/MAGTESTS/define.h"
+#define PR_BC "PROBLEMS/MAGTESTS/bc.c"
+#define PR_INIT "PROBLEMS/MAGTESTS/init.c"
+#define PR_KAPPA "PROBLEMS/MAGTESTS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MAGTESTS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MAGTESTS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MAGTESTS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MAGTESTS/dump.c"
+#define PR_TOOLS "PROBLEMS/MAGTESTS/tools.c"
+
+#endif
 
 #if(PROBLEM==60)
 
@@ -929,40 +944,64 @@
 #define SMALL 1.e-50 //small number 
 #define BIG (1./SMALL) //big number
 
+//min uint over rho 
 #ifndef UURHORATIOMIN
-#define UURHORATIOMIN 0.
+#define UURHORATIOMIN 1.e-50
 #endif
 
-#ifndef RHORHOMAXRATIOMIN
-#define RHORHOMAXRATIOMIN 1.e-20
-#endif
-
+//uint over rho for u2p_cold
 #ifndef UURHORATIOU2PCOLD
 #define UURHORATIOU2PCOLD 1.e-10
 #endif
 
+//max uint over rho
 #ifndef UURHORATIOMAX 
 #define UURHORATIOMAX 1.e2
 #endif
 
+//min Erad over rho
 #ifndef EERHORATIOMIN
 #define EERHORATIOMIN 1.e-20
 #endif
 
+//max Erad over rho
 #ifndef EERHORATIOMAX 
-#define EERHORATIOMAX 1.e10
+#define EERHORATIOMAX 1.e20
 #endif
 
+//min Erad over uint
 #ifndef EEUURATIOMIN
 #define EEUURATIOMIN 1.e-20
 #endif
 
+//max Erad over uint
 #ifndef EEUURATIOMAX 
-#define EEUURATIOMAX 1.e10
+#define EEUURATIOMAX 1.e20
 #endif
 
+//min absolute Erad
 #ifndef ERADLIMIT
 #define ERADLIMIT (10.*SMALL)
+#endif
+
+//min B^2 over uint
+#ifndef B2UURATIOMIN 
+#define B2UURATIOMIN 0.
+#endif
+
+//max B^2 over uint
+#ifndef B2UURATIOMAX 
+#define B2UURATIOMAX 100.
+#endif
+
+//min B^2 over rho 
+#ifndef B2RHORATIOMIN 
+#define B2RHORATIOMIN 0.
+#endif
+
+//max B^2 over rho 
+#ifndef B2RHORATIOMAX 
+#define B2RHORATIOMAX 100.
 #endif
 
 /*********************/

@@ -6,12 +6,13 @@
 int 
 main(int argc, char **argv)
 {  
-  //test
+  //tests
   //requires no rad. viscosity!
-  test_jon_solve_implicit_lab();
-  exit(0);
+  //test_jon_solve_implicit_lab();
+  //exit(0);
+  //test_solve_implicit_lab();
+  //exit(0);
 
-  
   ldouble tstart;
   int i;
 
@@ -69,7 +70,7 @@ main(int argc, char **argv)
   copy_u(1.,p,pinit);
 
   //evolves
-  solve_all_problems_5(tstart);
+  //solve_all_problems_5(tstart);
 
   //free_arrays();
   fprint_closefiles();
