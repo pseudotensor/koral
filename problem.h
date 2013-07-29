@@ -66,7 +66,7 @@
 //60* JONTESTS - testing jon's fails.dat
 //61* MAGTESTS - testing jon's fails.dat
 
-#define PROBLEM 61
+#define PROBLEM 60
 
 #if(PROBLEM==61)
 

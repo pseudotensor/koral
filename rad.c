@@ -638,7 +638,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       print_metric(GG);
       printf("%e %e %e\n",dt,geom->alpha,geom->gdet);
       */
-      FILE *out = fopen("problem.dat","w");
+      FILE *out = fopen("imp.problem.dat","w");
       for (i1=0;i1<NV;i1++)
 	fprintf(out,"%.15e ",uu00[i1]);
       for (i1=0;i1<NV;i1++)
@@ -654,7 +654,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       fprintf(out,"%.15e \n",geom->gdet);
       fprintf(out,"\n");
       fclose(out);
-      printf("dumped problematic case to problem.dat\n");
+      printf("dumped problematic case to imp.problem.dat\n");
     }
 
   //comparing energy densities
@@ -1009,10 +1009,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  
 	  //to dump a case which worked but overshot
 	  //if(overshoot==1) return -1;
-
-
+	  
+	  //**************
 	  //override
-	  overshoot=0;
+	  //overshoot=0;
+	  //**************
 	  
 	  if(overshoot==1)
 	    {
@@ -1044,11 +1045,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      
 	      if(verbose)
 		{
-		  printf("cnt: %d\n",overcnt);
 		  printf("overshooted: gas: %.20e -> %.20e -> %.20e\n",Tgas00,Tgas,Tgasnew);
-		  printf("overshooted: rad: %.20e -> %.20e -> %.20e\n",Trad00,Trad,Tradnew);
+		  printf("overshooted: rad: %.20e -> %.20e -> %.20e\n\n",Trad00,Trad,Tradnew);
 		      
-		  getchar();
+		  //getchar();
 		}
 
 
@@ -1185,7 +1185,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 int
 test_solve_implicit_lab()
 {
-  FILE *in = fopen("problem.0","r");
+  FILE *in = fopen("imp.problem.0","r");
   int i1,i2,iv;
   ldouble uu[NV],pp[NV],dt;
   struct geometry geom;
@@ -1227,9 +1227,9 @@ test_solve_implicit_lab()
 int
 test_jon_solve_implicit_lab()
 {
-  //NOGDET
+  //NOGDET please
 
-  FILE *in = fopen("problem.jon","r");
+  FILE *in = fopen("jon.problem.pre","r");
   int i1,i2,iv;
   ldouble uu[NV],pp[NV],dt;
   struct geometry geom;
@@ -1248,35 +1248,59 @@ test_jon_solve_implicit_lab()
   iv=fscanf(in,"%lf ",&geom.alpha);
   iv=fscanf(in,"%lf ",&geom.gdet);
   fclose(in);
-
- 
   //fill missing parts
   ldouble ucon[4];
   ucon[1]=pp[VX];
   ucon[2]=pp[VY];
   ucon[3]=pp[VZ];
   conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
-
-
   geom.alpha=sqrt(-1./geom.GG[0][0]);
   pp[5]=calc_Sfromu(pp[0],pp[1]);
-  uu[5]=pp[5]*ucon[0];
+  //uu[5]=pp[5]*ucon[0];
 
+  printf("\n==========================\nJon's input:\n\n");
   print_Nvector(uu,NV);
   print_Nvector(pp,NV);
   //print_metric(geom.gg);
   //print_metric(geom.GG);
   //printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
-  //  printf("ut: %e\n",ucon[0]);
+  //printf("ut: %e\n",ucon[0]);
 
-  printf("trying to invert...\n");
-  int corr[2],fixup[2],u2pret;
-  u2pret=u2p(uu,pp,&geom,corr,fixup);
-  printf("u2pret: %d (%d %d)\n",u2pret,corr[0],corr[1]);
-  //print_Nvector(uu,NV);
+  printf("inverting...\n");
+  int corr[2],fixup[2],u2pret,radcor;
+  u2pret=u2p_solver(uu,pp,&geom,U2P_HOT); //hd
+  u2p_rad(uu,pp,&geom,&radcor); //rad
+  printf("u2pret: (%d %d)\n",u2pret,radcor);
+  printf("\n==========================\nafter u2p_HOT:\n\n");
+  print_Nvector(uu,NV);
   print_Nvector(pp,NV);
+
+  //compare change in entropy
+  ucon[1]=pp[VX];
+  ucon[2]=pp[VY];
+  ucon[3]=pp[VZ];
+  conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
+  ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
+  ldouble s2=exp(pp[ENTR]/pp[RHO]);
+
+  printf("\n==========================\nchange in entropy:\n\n");
+  printf("s1 | s2: %e | %e\n",s1,s2); 
+
+  if(s2/s1 < 0.9)
+    { 
+      printf("\n PROBLEM DETECTED IN ENTROPY!:\n\n");
+      u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY); //hd
+      printf("u2pret: (%d %d)\n",u2pret,radcor);
+      printf("\n==========================\nafter u2p_ENTROPY:\n\n");
+      print_Nvector(uu,NV);
+      print_Nvector(pp,NV);
+    }
+ 
+  printf("\n==========================\nafter p2u:\n\n");
   p2u(pp,uu,&geom);
-  //print_Nvector(uu,NV);
+  print_Nvector(uu,NV);
+  print_Nvector(pp,NV);
+
 
   getchar();
    

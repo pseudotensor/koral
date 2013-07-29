@@ -144,7 +144,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   int verbose=1;
   int hdcorr=0;
-  int radcorr=0;
   corrected[0]=corrected[1]=0;
   fixups[0]=fixups[1]=0;
 
@@ -337,12 +336,12 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
 #ifdef RADIATION
   int radcor,radret;
-  u2p_rad(uu,pp,geom,&radcorr);
+  u2p_rad(uu,pp,geom,&radcor);
 #endif
   
   //************************************
   //************************************
-  if(radcorr>0)     
+  if(radcor>0)     
     fixups[1]=1;
   else
     fixups[1]=0;
@@ -353,7 +352,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
 
   if(hdcorr>0) corrected[0]=1;
-  if(radcorr>0) corrected[1]=1;
+  if(radcor>0) corrected[1]=1;
 
   return ret;
 }
@@ -610,7 +609,16 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
  
   ldouble W=Wp+D;
 
-  ldouble v2 = Qt2/W/W;
+  FTYPE W3,X3,Ssq,Wsq,X,X2,Xsq; 
+  FTYPE Qtsq = Qt2;
+  X = Bsq + W;
+  Wsq = W*W;
+  W3 = Wsq*W ;
+  X2 = X*X;
+  Xsq = X2;
+  X3 = X2*X;
+ 
+  ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
   ldouble gamma2 = 1./(1.-v2);
   ldouble gammasq = gamma2;
   ldouble gamma = sqrt(gamma2);
@@ -636,13 +644,6 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
   dwmrho0dvsq = (D*(gamma*0.5-1.0) - Wp); // holding Wp fixed
   drho0dvsq = -D*gamma*0.5; // because \rho=D/\gamma and holding Wp fixed
 
-  FTYPE W3,X3,Ssq,Wsq,X; 
-  FTYPE Qtsq = Qt2;
-  X = Bsq + W;
-  Wsq = W*W;
-  W3 = Wsq*W ;
-  X3 = X*X*X;
-
   dvsq=(-2.0/X3 * ( Qtsq  +  QdotBsq * (3.0*W*X + Bsq*Bsq)/W3));
 
   dSsdW =   drho0dW   *dSsdrho +   dwmrho0dW   *dSsdchi; // dSs/dW' holding utsq fixed
@@ -664,15 +665,28 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 int
 f_u2p_cold(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 {
+  my_err("Think f_u2p_cold over in terms of mhd\n");
+
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
   ldouble D=cons[2];
-  ldouble Sc=cons[3];
-
+  ldouble QdotBsq=cons[3];
+  ldouble Bsq=cons[4];
+  ldouble Sc=cons[5];
+ 
   ldouble W=Wp+D;
 
-  ldouble v2 = Qt2/W/W;
-  ldouble gamma2 = 1./(1.-v2);
+  FTYPE W3,X3,Ssq,Wsq,X,X2,Xsq; 
+  FTYPE Qtsq = Qt2;
+  X = Bsq + W;
+  Wsq = W*W;
+  W3 = Wsq*W ;
+  X2 = X*X;
+  Xsq = X2;
+  X3 = X2*X;
+ 
+  ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
+   ldouble gamma2 = 1./(1.-v2);
   ldouble gammasq = gamma2;
   ldouble gamma = sqrt(gamma2);
   ldouble w = W/gamma2;
@@ -703,13 +717,27 @@ f_u2p_cold(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 int
 f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 {
+  my_err("Think f_u2p_hotmax over in terms of mhd\n");
+
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
   ldouble D=cons[2];
+  ldouble QdotBsq=cons[3];
+  ldouble Bsq=cons[4];
+  ldouble Sc=cons[5];
 
   ldouble W=Wp+D;
 
-  ldouble v2 = Qt2/W/W;
+  FTYPE W3,X3,Ssq,Wsq,X,X2,Xsq; 
+  FTYPE Qtsq = Qt2;
+  X = Bsq + W;
+  Wsq = W*W;
+  W3 = Wsq*W ;
+  X2 = X*X;
+  Xsq = X2;
+  X3 = X2*X; 
+
+  ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
   ldouble gamma2 = 1./(1.-v2);
   ldouble gammasq = gamma2;
   ldouble gamma = sqrt(gamma2);
@@ -746,7 +774,7 @@ f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 {
-  int verbose=2;
+  int verbose=0;
   int i,j,k;
   ldouble rho,u,p,w,W,alpha,D,Sc;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
@@ -924,7 +952,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 
 
   //1d Newton solver
-  if(verbose>1) printf("in: %e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
+  //if(verbose>1) printf("in: %e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
 
   int iter=0,fu2pret;
   do
@@ -934,11 +962,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
      
       fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW);
 
-      fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW);
-      
+      //numerical derivative
+      //fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW);
       //dfdW=(f1-f0)/(EPS*W);
 
-      if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,f1,dfdW);
+      if(verbose>1) printf("%d %e %e %e\n",iter,W,f0,dfdW);
 
       if(dfdW==0.) {W*=1.1; continue;}
 
@@ -995,7 +1023,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   if(verbose>1) 
     {
       fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW);
-      printf("end: %d %e %e %e %e\n",iter,W,f0,f1,dfdW);
+      printf("end: %d %e %e %e\n",iter,W,f0,dfdW);
     }
 
   //W found, let's calculate v2 and the rest
@@ -1042,6 +1070,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   //entropy based on UU[1]
   pp[5]=calc_Sfromu(rho,u);
 
+  //printf(">> %e %e\n",pp[5],pp[5]*utcon[0]);
+
 #ifdef TRACER
   ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
   pp[TRA]=Dtr/gamma;
@@ -1072,7 +1102,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       //getchar();
     }
 
-  if(verbose>1) {print_Nvector(pp,NV); getchar();}
+  if(verbose>1) {print_Nvector(pp,NV); }
 
   return 0; //ok
 

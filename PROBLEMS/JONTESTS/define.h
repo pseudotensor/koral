@@ -6,6 +6,9 @@
 #undef M_PROTON
 #define M_PROTON 1.
 
+#define VELPRIM VEL4
+#define VELPRIMRAD VEL4
+
 /************************************/
 //restart
 /************************************/
@@ -21,6 +24,7 @@
 /************************************/
 //hydro choices
 /************************************/
+#define MAGNFIELD
 #define ALLOWENTROPYU2P 1
 #define DOFIXUPS 0
 

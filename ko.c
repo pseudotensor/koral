@@ -8,8 +8,8 @@ main(int argc, char **argv)
 {  
   //tests
   //requires no rad. viscosity!
-  //test_jon_solve_implicit_lab();
-  //exit(0);
+  test_jon_solve_implicit_lab();
+  exit(0);
   //test_solve_implicit_lab();
   //exit(0);
 
@@ -24,7 +24,6 @@ main(int argc, char **argv)
 
   //preparing arrays
   initialize_arrays();
-
 
   if(argc!=NUM_INPUTARG+1)
     {
@@ -60,8 +59,8 @@ main(int argc, char **argv)
 #endif
 
   //test
-  test_maginv();
-  exit(0);
+  //test_maginv();
+  //exit(0);
 
   //prepares files
   fprint_openfiles("dumps");
@@ -299,16 +298,16 @@ test_maginv()
   pp[UU]=0.001;
   pp[VX]=pp[VY]=pp[VZ]=0.;
 
-  pp[VX]=0.1;
-  pp[VY]=0.01;
-  pp[VZ]=0.01;
+  pp[VX]=0.0;
+  pp[VY]=0.0;
+  pp[VZ]=0.0;
 
 #ifdef MAGNFIELD
   pp[B1]=pp[B2]=pp[B3]=0.;
 
-  pp[B1]=1.e-2;
-  pp[B2]=1.e-4;
-  pp[B3]=1.e-4;
+  pp[B1]=0.e-2;
+  pp[B2]=0.e-4;
+  pp[B3]=1.e-0;
 #endif
 
   //entropy
@@ -319,7 +318,7 @@ test_maginv()
   print_NVvector(uu);
 
   int aa[2],bb[2],ret;
-  //  pp[UU]*=1.1;
+  pp[UU]*=1.1;
   ret=u2p(uu,pp,&geom,aa,bb);
   printf("u2p ret: %d\n",ret);
   print_NVvector(pp);
