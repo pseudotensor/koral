@@ -79,11 +79,17 @@ pp[1]=uint;
     pp[4]=ucon[3]; 
 
 pp[5]=calc_Sfromu(rho,uint);
+
+#ifdef MAGNFIELD
+pp[B1]=pp[B2]=pp[B3]=0.;
+#endif
+
+
 #ifdef RADIATION
-pp[6]=E;
-pp[7]=Fx;
-pp[8]=Fy;
-pp[9]=Fz; 
+pp[EE0]=E;
+pp[FX0]=Fx;
+pp[FY0]=Fy;
+pp[FZ0]=Fz; 
 
 #ifdef EDDINGTON_APR
 //prad_m12edd(pp,pp,&geom);

@@ -173,11 +173,13 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //hot hydro - conserving energy
   ret=0;
 #ifdef ENFORCEENTROPY
-  u2pret=-1;//u2p_entropy(uu,pp,ggg);
+  u2pret=-1;
 #else
-  //u2pret=u2p_hot(uu,pp,ggg);  
-  u2pret=u2p_solver(uu,pp,ggg,U2P_HOT);  
+  u2pret=u2p_solver(uu,pp,ggg,U2P_HOT); 
+
   //************************************
+  
+  /*
   if(u2pret==0)
     {
       //check if u2p_hot faild by making entropy decrease
@@ -187,12 +189,14 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
       ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
       ldouble s2=exp(pp[ENTR]/pp[RHO]);
       if(s2/s1 < 0.9)
-	{  
-	  //set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
-	  //printf("\n PROBLEM DETECTED IN ENTROPY AT %d %d - %e!\n",geom->ix,geom->iy,s2/s1);getchar();
-	  //u2pret=-1;
-	}
+      {  
+	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
+	//printf("\n PROBLEM DETECTED IN ENTROPY AT %d %d - %e!\n",geom->ix,geom->iy,s2/s1);getchar();
+	u2pret=-1;
+      }
     }
+  */
+  
   //************************************
   if(u2pret<0) 
     {
@@ -1182,9 +1186,9 @@ u2p_hot(ldouble *uu, ldouble *pp, void *ggg)
 #ifdef MAGNFIELD
   //B^mu
   Bcon[0]=0.;
-  Bcon[1]=uu[B1]/gdet*alpha;
-  Bcon[2]=uu[B2]/gdet*alpha;
-  Bcon[3]=uu[B3]/gdet*alpha;
+  Bcon[1]=uu[B1]/gdetu*alpha;
+  Bcon[2]=uu[B2]/gdetu*alpha;
+  Bcon[3]=uu[B3]/gdetu*alpha;
 
   //B_mu
   indices_21(Bcon,Bcov,gg);
@@ -1443,9 +1447,9 @@ u2p_entropy(ldouble *uu, ldouble *pp, void *ggg)
 #ifdef MAGNFIELD
   //B^mu
   Bcon[0]=0.;
-  Bcon[1]=uu[B1]/gdet*alpha;
-  Bcon[2]=uu[B2]/gdet*alpha;
-  Bcon[3]=uu[B3]/gdet*alpha;
+  Bcon[1]=uu[B1]/gdetu*alpha;
+  Bcon[2]=uu[B2]/gdetu*alpha;
+  Bcon[3]=uu[B3]/gdetu*alpha;
 
   //B_mu
   indices_21(Bcon,Bcov,gg);
@@ -1815,9 +1819,9 @@ u2p_cold(ldouble *uu, ldouble *pp, void *ggg)
 #ifdef MAGNFIELD
   //B^mu
   Bcon[0]=0.;
-  Bcon[1]=uu[B1]/gdet*alpha;
-  Bcon[2]=uu[B2]/gdet*alpha;
-  Bcon[3]=uu[B3]/gdet*alpha;
+  Bcon[1]=uu[B1]/gdetu*alpha;
+  Bcon[2]=uu[B2]/gdetu*alpha;
+  Bcon[3]=uu[B3]/gdetu*alpha;
 
   //B_mu
   indices_21(Bcon,Bcov,gg);
@@ -2141,9 +2145,9 @@ u2p_hotmax(ldouble *uu, ldouble *pp, void *ggg)
  #ifdef MAGNFIELD
   //B^mu
   Bcon[0]=0.;
-  Bcon[1]=uu[B1]/gdet*alpha;
-  Bcon[2]=uu[B2]/gdet*alpha;
-  Bcon[3]=uu[B3]/gdet*alpha;
+  Bcon[1]=uu[B1]/gdetu*alpha;
+  Bcon[2]=uu[B2]/gdetu*alpha;
+  Bcon[3]=uu[B3]/gdetu*alpha;
 
   //B_mu
   indices_21(Bcon,Bcov,gg);

@@ -6,10 +6,13 @@
 int 
 main(int argc, char **argv)
 {  
+
   //tests
   //requires no rad. viscosity!
+#if(PROBLEM==60)
   test_jon_solve_implicit_lab();
   exit(0);
+#endif
   //test_solve_implicit_lab();
   //exit(0);
 

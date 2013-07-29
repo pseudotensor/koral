@@ -740,7 +740,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     whichprim=MHD; 
 
   //override
-  whichprim=RAD;
+  //whichprim=RAD;
  
   params[0]=whichprim;
 
@@ -937,7 +937,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      ldouble rho = uu00[RHO]/gdetu/ucon[0];
 	      pp[RHO]=rho;
 
-	      printf("rho: %e\n",rho);
+	      if(verbose) printf("rho: %e\n",rho);
 	    }
 
 	  //updating the other set of quantities
@@ -1272,7 +1272,9 @@ test_jon_solve_implicit_lab()
       conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
       geom.alpha=sqrt(-1./geom.GG[0][0]);
       pp[5]=calc_Sfromu(pp[0],pp[1]);
-      //uu[5]=pp[5]*ucon[0];
+
+      //destroy magn field
+      //uu[B1]=uu[B2]=uu[B3]=pp[B1]=pp[B2]=pp[B3]=0.;
 
       printf("\n...........................\nJon's input:\n\n");
       print_Nvector(uu,NV);
@@ -2873,6 +2875,7 @@ calc_LTE_temp(ldouble *pp,void *ggg)
 	  ccc=fabs((Ehat-Ehat0)/Ehat0);
 	}
       while(ccc>1.e-8);
+      ugas = C - Ehat;
     }
   
   //TODO: when comparable solve quartic
@@ -2880,15 +2883,15 @@ calc_LTE_temp(ldouble *pp,void *ggg)
   TradLTE=calc_LTE_TfromE(Ehat);
   TgasLTE=calc_PEQ_Tfromurho(ugas,rho);
   
+  
   /*
-  printf("Trad: %e -> %e\nTgas: %e -> %e\n\n",
+    printf("Trad: %e -> %e\nTgas: %e -> %e\n\n",
 	 Trad,TradLTE,Tgas,TgasLTE)
     ;getchar();
   */
-
-  return TradLTE;
-
   
+
+  return TradLTE;  
 }
 
  

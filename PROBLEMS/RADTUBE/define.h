@@ -1,3 +1,5 @@
+//#define MAGNFIELD 
+
 
 /************************************/
 //reconstruction / Courant
