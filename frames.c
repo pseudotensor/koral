@@ -73,22 +73,20 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
 
   if(CO1==CO2)
     {
-      pp2[6]=pp1[6];
-      pp2[7]=pp1[7];
-      pp2[8]=pp1[8];
-      pp2[9]=pp1[9];
-    }
+      for(i=0;i<4;i++)
+	pp2[EE0+i]=pp1[EE0+i];
+     }
   else
     {
       //Erf unchanged
-      pp2[6]=pp1[6];
+      pp2[EE0]=pp1[EE0];
 
       //velocity in CO1
       ldouble ucon[4];
       ucon[0]=0;
-      ucon[1]=pp1[7];
-      ucon[2]=pp1[8];
-      ucon[3]=pp1[9];
+      ucon[1]=pp1[FX0];
+      ucon[2]=pp1[FY0];
+      ucon[3]=pp1[FZ0];
 
       conv_vels(ucon,ucon,VELPRIMRAD,VEL4,gg1,GG1);
       //converting to CO2
@@ -96,9 +94,9 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
       //to VELPRIM
       conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg2,GG2);
 
-      pp2[7]=ucon[1]; 
-      pp2[8]=ucon[2];
-      pp2[9]=ucon[3];
+      pp2[FX0]=ucon[1]; 
+      pp2[FY0]=ucon[2];
+      pp2[FZ0]=ucon[3];
 
    }
   
@@ -139,10 +137,10 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
     pp2[i]=pp1[i];
 
   //temporarily store conserved in pp2[]
-  pp2[6]=gdetu*Rij[0][0];
-  pp2[7]=gdetu*Rij[0][1];
-  pp2[8]=gdetu*Rij[0][2];
-  pp2[9]=gdetu*Rij[0][3];
+  pp2[EE0]=gdetu*Rij[0][0];
+  pp2[FX0]=gdetu*Rij[0][1];
+  pp2[FY0]=gdetu*Rij[0][2];
+  pp2[FZ0]=gdetu*Rij[0][3];
 
   //convert to real primitives
   int corrected;
@@ -205,10 +203,10 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
     pp2[i]=pp1[i];
 
   //E,F^i
-  pp2[6]=Rij[0][0];
-  pp2[7]=Rij[0][1];
-  pp2[8]=Rij[0][2];
-  pp2[9]=Rij[0][3];
+  pp2[EE0]=Rij[0][0];
+  pp2[FX0]=Rij[0][1];
+  pp2[FY0]=Rij[0][2];
+  pp2[FZ0]=Rij[0][3];
 #else
   ldouble Rij[NRF][4][4];
   int i,j,irf;  
@@ -265,10 +263,10 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
     pp2[i]=pp1[i];
 
   //temporarily store conserved in pp2[]
-  pp2[6]=gdetu*Rij[0][0];
-  pp2[7]=gdetu*Rij[0][1];
-  pp2[8]=gdetu*Rij[0][2];
-  pp2[9]=gdetu*Rij[0][3];
+  pp2[EE0]=gdetu*Rij[0][0];
+  pp2[FX0]=gdetu*Rij[0][1];
+  pp2[FY0]=gdetu*Rij[0][2];
+  pp2[FZ0]=gdetu*Rij[0][3];
 
   //convert to real primitives
   int corrected;
@@ -329,10 +327,10 @@ int prad_lab2on(ldouble *pp1, ldouble *pp2, void *ggg)
     pp2[i]=pp1[i];
 
   //E,F^i
-  pp2[6]=Rij[0][0];
-  pp2[7]=Rij[0][1];
-  pp2[8]=Rij[0][2];
-  pp2[9]=Rij[0][3];
+  pp2[EE0]=Rij[0][0];
+  pp2[FX0]=Rij[0][1];
+  pp2[FY0]=Rij[0][2];
+  pp2[FZ0]=Rij[0][3];
 #else
   ldouble Rij[NRF][4][4];
   int i,j,irf;  
@@ -372,10 +370,10 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
     pp2[i]=pp1[i];
 
   //(E,F^i)_ZAMO
-  pp2[6]=Rij[0][0];
-  pp2[7]=Rij[0][1];
-  pp2[8]=Rij[0][2];
-  pp2[9]=Rij[0][3];
+  pp2[EE0]=Rij[0][0];
+  pp2[FX0]=Rij[0][1];
+  pp2[FY0]=Rij[0][2];
+  pp2[FZ0]=Rij[0][3];
 #else
   ldouble Rij[NRF][4][4];
   int i,j,irf;
@@ -417,10 +415,10 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
     pp2[i]=pp1[i];
 
   //(E,F^i)_ff
-  pp2[6]=Rij[0][0];
-  pp2[7]=Rij[0][1];
-  pp2[8]=Rij[0][2];
-  pp2[9]=Rij[0][3];
+  pp2[EE0]=Rij[0][0];
+  pp2[FX0]=Rij[0][1];
+  pp2[FY0]=Rij[0][2];
+  pp2[FZ0]=Rij[0][3];
 #else
   ldouble Rij[NRF][4][4];
   int i,j,irf;

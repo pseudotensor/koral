@@ -90,10 +90,10 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
     pp[iv]=pp0[iv];
 
   //opposite changes in gas quantities
-  uu[1] = uu0[1] - (uu[6]-uu0[6]);
-  uu[2] = uu0[2] - (uu[7]-uu0[7]);
-  uu[3] = uu0[3] - (uu[8]-uu0[8]);
-  uu[4] = uu0[4] - (uu[9]-uu0[9]);
+  uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+  uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+  uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+  uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
 
   //calculating primitives  
   int corr[2],fixup[2],u2pret;
@@ -120,10 +120,10 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
   calc_Gi(pp,ggg,Gi); 
   indices_21(Gi,Gi,gg);
 
-  f[0] = uu[6] - uu0[6] + dt * gdetu * Gi[0];
-  f[1] = uu[7] - uu0[7] + dt * gdetu * Gi[1];
-  f[2] = uu[8] - uu0[8] + dt * gdetu * Gi[2];
-  f[3] = uu[9] - uu0[9] + dt * gdetu * Gi[3];
+  f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+  f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
+  f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
+  f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
 
   //fluid frame version for testing
 
@@ -169,8 +169,8 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
   ldouble dtau=dt/ucon[0];
   ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
 
-  //printf("%.20e %.20e %.20e \n",uu[6],Gi[0],uu[6] - uu0[6] + dt * gdetu * Gi[0]);
-  //printf("%.20e %.20e %.20e %.20e %.20e %.20e \n",uu[6],Rij[0][0],pp[6],Rtt,Ehat-4.*Pi*B,Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau);
+  //printf("%.20e %.20e %.20e \n",uu[EE0],Gi[0],uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0]);
+  //printf("%.20e %.20e %.20e %.20e %.20e %.20e \n",uu[EE0],Rij[0][0],pp[EE0],Rtt,Ehat-4.*Pi*B,Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau);
   //f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
   
   return 0;
@@ -265,7 +265,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	    {
 	      for(i=0;i<4;i++)
 		{
-		  xxx[i]=uup[i+6];
+		  xxx[i]=uup[i+EE0];
 		}  
 	      print_Nvector(uu0,NV);
 	      print_Nvector(uu,NV);
@@ -290,9 +290,9 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	    {
 	      ldouble del;
 
-	      del=EPS*uup[6]; 
+	      del=EPS*uup[EE0]; 
 
-	      uu[j+6]=uup[j+6]-del;
+	      uu[j+EE0]=uup[j+EE0]-del;
 	      
 	      int fret=f_implicit_lab_4dcon(uu0,uu,pp0,frdt*(1.-dttot)*dt,&geom,f2);  
 
@@ -300,7 +300,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 		{
 		  for(i=0;i<4;i++)
 		    {
-		      xxx[i]=uu[i+6];
+		      xxx[i]=uu[i+EE0];
 		    }
 		  print_state_implicit_lab_4dcon (iter-1,xxx,f2); 
 		  printf("sub (%d) f_lab_4dcon ret: %d\n",j,fret);
@@ -314,10 +314,10 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	      //Jacobian matrix component
 	      for(i=0;i<4;i++)
     	        {
-		  J[i][j]=(f2[i] - f1[i])/(uu[j+6]-uup[j+6]);
+		  J[i][j]=(f2[i] - f1[i])/(uu[j+EE0]-uup[j+EE0]);
 		}
 
-	      uu[j+6]=uup[j+6];
+	      uu[j+EE0]=uup[j+EE0];
 
 	      if(failed!=0) break;
 	    }
@@ -343,7 +343,7 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	  //updating x
 	  for(i=0;i<4;i++)
 	    {
-	      xxx[i]=uup[i+6];
+	      xxx[i]=uup[i+EE0];
 	    }
 
 	  for(i=0;i<4;i++)
@@ -358,22 +358,22 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 
 	  for(i=0;i<4;i++)
 	    {
-	      uu[i+6]=xxx[i];
+	      uu[i+EE0]=xxx[i];
 	    }
   
 	   //opposite changes in gas quantities
-	  uu[1] = uu0[1] - (uu[6]-uu0[6]);
-	  uu[2] = uu0[2] - (uu[7]-uu0[7]);
-	  uu[3] = uu0[3] - (uu[8]-uu0[8]);
-	  uu[4] = uu0[4] - (uu[9]-uu0[9]);
+	  uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	  uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	  uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	  uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
 
 	  //test convergence
 	  for(i=0;i<4;i++)
 	    {
-	      f3rad[i]=(uu[i+6]-uup[i+6]);
+	      f3rad[i]=(uu[i+EE0]-uup[i+EE0]);
 	      f3hd[i]=(uu[i]-uup[i]);
 	      
-	      f3rad[i]=fabs(f3rad[i]/my_max(fabs(uup[6]),fabs(uup[i])));
+	      f3rad[i]=fabs(f3rad[i]/my_max(fabs(uup[EE0]),fabs(uup[i])));
 	      f3hd[i]=fabs(f3hd[i]/my_max(fabs(uup[1]),fabs(uup[0])));
 	    }
 
@@ -409,10 +409,10 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
 	    }
 
 	  //opposite changes in gas quantities
-	  uu[1] = uu0[1] - (uu[6]-uu0[6]);
-	  uu[2] = uu0[2] - (uu[7]-uu0[7]);
-	  uu[3] = uu0[3] - (uu[8]-uu0[8]);
-	  uu[4] = uu0[4] - (uu[9]-uu0[9]);
+	  uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	  uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	  uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	  uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
 
 	  //saving basis for next iteration if necessary
 	  for(iv=0;iv<NV;iv++)
@@ -465,10 +465,10 @@ solve_implicit_lab_4dcon(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int ver
   
   //  if(verbose) getchar();
 
-  deltas[0]=uu[6]-uu00[6];
-  deltas[1]=uu[7]-uu00[7];
-  deltas[2]=uu[8]-uu00[8];
-  deltas[3]=uu[9]-uu00[9];
+  deltas[0]=uu[EE0]-uu00[EE0];
+  deltas[1]=uu[FX0]-uu00[FX0];
+  deltas[2]=uu[FY0]-uu00[FY0];
+  deltas[3]=uu[FZ0]-uu00[FZ0];
   
   return 0;
 }
@@ -499,17 +499,21 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   ldouble uu[NV],pp2[NV];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
-  //rho may be inconsistent on input if iterating MHD primitives
   for(i=0;i<NV;i++) pp2[i]=pp[i];
-  ldouble ucon[4];
-  ucon[1]=pp2[2];
-  ucon[2]=pp2[3];
-  ucon[3]=pp2[4];
-  ucon[0]=0.;
-  //converting to 4-velocity
-  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-  ldouble rho = uu0[RHO]/gdetu/ucon[0];
-  pp2[RHO]=rho;
+  
+  //rho may be inconsistent on input if iterating MHD primitives
+  if(whichprim==MHD)
+    {
+      ldouble ucon[4];
+      ucon[1]=pp2[2];
+      ucon[2]=pp2[3];
+      ucon[3]=pp2[4];
+      ucon[0]=0.;
+      //converting to 4-velocity
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+      ldouble rho = uu0[RHO]/gdetu/ucon[0];
+      pp2[RHO]=rho;
+    }
 
   //total inversion, but only whichprim part matters
   p2u(pp2,uu,geom);
@@ -553,10 +557,10 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 
   if(whichprim==RAD) //rad-primitives
     {
-      f[0] = uu[6] - uu0[6] + dt * gdetu * Gi[0];
-      f[1] = uu[7] - uu0[7] + dt * gdetu * Gi[1];
-      f[2] = uu[8] - uu0[8] + dt * gdetu * Gi[2];
-      f[3] = uu[9] - uu0[9] + dt * gdetu * Gi[3];
+      f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+      f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
+      f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
+      f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
     }
   if(whichprim==MHD) //hydro-primitives
     {
@@ -734,8 +738,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     whichprim=RAD;
   else
     whichprim=MHD; 
+
+  //override
+  whichprim=RAD;
  
   params[0]=whichprim;
+
 
   //choice of equation to solve
   int LABEQ=0;
@@ -755,7 +763,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       pp[iv]=pp0[iv];     
     }
  
-  ldouble EPS = 1.e-8;
+  ldouble EPS = 1.e-6;
   ldouble CONV = 1.e-8;
   ldouble MAXITER = 50;
 
@@ -917,15 +925,20 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      pp[i+sh]=xxx[i];
 	    }
 
-	  //correct rho to follow new velocity (only for MHD primitives)
-	  ucon[1]=pp[2];
-	  ucon[2]=pp[3];
-	  ucon[3]=pp[4];
-	  ucon[0]=0.;
-	  //converting to 4-velocity
-	  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-	  ldouble rho = uu00[RHO]/gdetu/ucon[0];
-	  pp[RHO]=rho;
+	  if(whichprim==MHD)
+	    {
+	      //correct rho to follow new velocity (only for MHD primitives)
+	      ucon[1]=pp[2];
+	      ucon[2]=pp[3];
+	      ucon[3]=pp[4];
+	      ucon[0]=0.;
+	      //converting to 4-velocity
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+	      ldouble rho = uu00[RHO]/gdetu/ucon[0];
+	      pp[RHO]=rho;
+
+	      printf("rho: %e\n",rho);
+	    }
 
 	  //updating the other set of quantities
 	  //total inversion, but only whichprim part matters
@@ -1016,7 +1029,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  
 	  //**************
 	  //override
-	  //overshoot=0;
+	  overshoot=0;
 	  //**************
 	  
 	  if(overshoot==1)
@@ -1282,12 +1295,12 @@ test_jon_solve_implicit_lab()
       ucon[1]=pp[VX];
       ucon[2]=pp[VY];
       ucon[3]=pp[VZ];
-      conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
       ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
       ldouble s2=exp(pp[ENTR]/pp[RHO]);
 
       printf("\n..........................\nchange in entropy:\n\n");
-      printf("s(inv) | s(adv): %e | %e\n",s1,s2); 
+      printf("s(adv) | s(inv): %e | %e\n",s1,s2); 
       
       
       if(s2/s1 < 0.9 | u2pret<0.)
@@ -1298,7 +1311,7 @@ test_jon_solve_implicit_lab()
 	  printf("\n..........................\nafter u2p_ENTROPY:\n\n");
 	  print_Nvector(pp,NV);
 	}
- 
+      
       printf("\n..........................\nafter p2u:\n\n");
       p2u(pp,uu,&geom);
       print_Nvector(uu,NV);
@@ -1358,7 +1371,7 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   //implicit flux:
   ldouble rho=pp[RHO];
   ldouble u=pp[1];  
-  ldouble E=pp[6];  
+  ldouble E=pp[EE0];  
   ldouble pr=(GAMMA-1.)*(u);
   ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble xx=get_x(ix,0);
@@ -1368,7 +1381,7 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   ldouble chi=kappa+calc_kappaes(rho,T,xx,yy,zz);  
   ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
 
-  ldouble Fold[3]={pp[7],pp[8],pp[9]};
+  ldouble Fold[3]={pp[FX0],pp[FY0],pp[FZ0]};
   ldouble Fnew[3];
   Fnew[0]=Fold[0]/(1.+dt*chi); 
   Fnew[1]=Fold[1]/(1.+dt*chi);
@@ -1382,7 +1395,7 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   if(calc_LTE_ff(rho,&u,&E,dt,0)<0) 
     return -1;
 
-  deltas[0]=E-pp[6];
+  deltas[0]=E-pp[EE0];
 
   return 0;
 
@@ -1679,8 +1692,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
-  ldouble EE=pp[6];
-  ldouble Fcon[4]={0.,pp[7],pp[8],pp[9]};
+  ldouble EE=pp[EE0];
+  ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
  
   ldouble p= (GAMMA-1.)*u;
@@ -1709,8 +1722,8 @@ calc_Gi_ff(ldouble *pp, ldouble Gi[4])
 {
   ldouble rho=pp[RHO];
   ldouble u=pp[1];
-  ldouble E=pp[6];
-  ldouble F[3]={pp[7],pp[8],pp[9]};
+  ldouble E=pp[EE0];
+  ldouble F[3]={pp[FX0],pp[FY0],pp[FZ0]};
 
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble T = p*MU_GAS*M_PROTON/K_BOLTZ/rho;
@@ -1760,11 +1773,11 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
 #ifndef EDDINGTON_APR //M1 here
   //radiative energy density in the radiation rest frame
-  Erf=pp[6];
+  Erf=pp[EE0];
   urfcon[0]=0.;
-  urfcon[1]=pp[7];
-  urfcon[2]=pp[8];
-  urfcon[3]=pp[9];
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
   //lab frame stress energy tensor:
@@ -1777,8 +1790,8 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
-  ldouble EE=pp[6];
-  ldouble Fcon[4]={0.,pp[7],pp[8],pp[9]};
+  ldouble EE=pp[EE0];
+  ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
   //projection tensor
   for(i=0;i<4;i++)
@@ -1911,13 +1924,13 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
 #ifdef RADIATION  
   if(atmtype==0) //fixed Erf, urf of normal observer
     {
-      pp[6]=ERADATMMIN; 
+      pp[EE0]=ERADATMMIN; 
       ldouble ucon[4];
       calc_normalobs_4vel(GG,ucon);
       conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
-      pp[7]=ucon[1]; 
-      pp[8]=ucon[2];
-      pp[9]=ucon[3];
+      pp[FX0]=ucon[1]; 
+      pp[FY0]=ucon[2];
+      pp[FZ0]=ucon[3];
 
     }
   if(atmtype==1) //fixed Erf, urf 0 in lab frame
@@ -1939,12 +1952,12 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
       // to VELPRIMRAD
       conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
      
-      pp[7]=ucon[1];
-      pp[8]=ucon[2];
-      pp[9]=ucon[3];
+      pp[FX0]=ucon[1];
+      pp[FY0]=ucon[2];
+      pp[FZ0]=ucon[3];
 
       //    print_4vector(ucon); getchar();
-      pp[6]=ERADATMMIN; 
+      pp[EE0]=ERADATMMIN; 
      }
   if(atmtype==2) //optically thin atmosphere, scalings from numerical solution of radiall influx
     {
@@ -1959,7 +1972,7 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
       coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
       ldouble r=xxBL[1];
      
-      pp[6]=ERADATMMIN*(rout/r)*(rout/r)*(rout/r)*(rout/r);
+      pp[EE0]=ERADATMMIN*(rout/r)*(rout/r)*(rout/r)*(rout/r);
 
       ldouble ut[4]={0.,-gammamax*pow(r/rout,1.),0.,0.};
 
@@ -1973,9 +1986,9 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
 
       conv_vels(ut,ut,VEL4,VELPRIM,gg,GG);
       
-      pp[7]=ut[1];      
-      pp[8]=ut[2];      
-      pp[9]=ut[3];
+      pp[FX0]=ut[1];      
+      pp[FY0]=ut[2];      
+      pp[FZ0]=ut[3];
 
     }
 #endif
@@ -2052,9 +2065,9 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   conv_vels(urfcon,urfcon,VELPRIM,VEL4,gg,GG);
 #else 
   urfcon[0]=0.;
-  urfcon[1]=pp[7];
-  urfcon[2]=pp[8];
-  urfcon[3]=pp[9];
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
 #endif
@@ -2146,18 +2159,19 @@ apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
 {
   ldouble delapl[NV];
 
-  delapl[0]=0.; //zeros go to density and entropy so don't bother about the gdet there
+  int iv;
+  for(iv=0;iv<NV;iv++)
+    delapl[iv]=0.;
+
   delapl[1]=-del4[0];
   delapl[2]=-del4[1];
   delapl[3]=-del4[2];
   delapl[4]=-del4[3];
-  delapl[5]=0.;
-  delapl[6]=del4[0];
-  delapl[7]=del4[1];
-  delapl[8]=del4[2];
-  delapl[9]=del4[3];
+  delapl[EE0]=del4[0];
+  delapl[FX0]=del4[1];
+  delapl[FY0]=del4[2];
+  delapl[FZ0]=del4[3];
 
-  int iv;
   for(iv=0;iv<NV;iv++)
     {
       set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
@@ -2231,7 +2245,9 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 {
   int iv;
   ldouble delapl[NV],uu[NV],pp[NV],uu0[NV];
- 
+  for(iv=0;iv<NV;iv++)
+    delapl[iv]=0.;
+
   int method=0;
   
   if(method==0) //checks if inversion succesful and then max of du/u < DULIMIT
@@ -2244,16 +2260,14 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
       //del4[] will be passed up
       indices_21(del4,del4,gg); 
       //changes to conserved
-      delapl[0]=0.;
       delapl[1]=-del4[0];
       delapl[2]=-del4[1];
       delapl[3]=-del4[2];
       delapl[4]=-del4[3];
-      delapl[5]=0.;
-      delapl[6]=del4[0];
-      delapl[7]=del4[1];
-      delapl[8]=del4[2];
-      delapl[9]=del4[3];
+      delapl[EE0]=del4[0];
+      delapl[FX0]=del4[1];
+      delapl[FY0]=del4[2];
+      delapl[FZ0]=del4[3];
 
       //gettin' pp & uu
       for(iv=0;iv<NV;iv++)
@@ -2341,19 +2355,18 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 	{
 	  uu[iv]=get_u(u,iv,ix,iy,iz);
 	  pp[iv]=get_u(p,iv,ix,iy,iz);
+	  delapl[iv]=0.;
 	}
 
       //changes to conserved
-      delapl[0]=0.;
       delapl[1]=-del4[0];
       delapl[2]=-del4[1];
       delapl[3]=-del4[2];
       delapl[4]=-del4[3];
-      delapl[5]=0.;
-      delapl[6]=del4[0];
-      delapl[7]=del4[1];
-      delapl[8]=del4[2];
-      delapl[9]=del4[3];
+      delapl[EE0]=del4[0];
+      delapl[FX0]=del4[1];
+      delapl[FY0]=del4[2];
+      delapl[FZ0]=del4[3];
   
       //comparing with conserved to get the largest change
       ldouble maxdu=-1., uval;
@@ -2424,22 +2437,21 @@ int explicit_substep_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble g
 	{
 	  uu[iv]=get_u(u,iv,ix,iy,iz);
 	  pp[iv]=get_u(p,iv,ix,iy,iz);
+	  delapl[iv]=0.;
 	}
 
       //vector of changes of conserved assuming original dt which only multiplies source terms
       solve_explicit_lab(ix,iy,iz,dt,del4);
       indices_21(del4,del4,gg);
       //changes to conserved
-      delapl[0]=0.;
       delapl[1]=-del4[0];
       delapl[2]=-del4[1];
       delapl[3]=-del4[2];
       delapl[4]=-del4[3];
-      delapl[5]=0.;
-      delapl[6]=del4[0];
-      delapl[7]=del4[1];
-      delapl[8]=del4[2];
-      delapl[9]=del4[3];
+      delapl[EE0]=del4[0];
+      delapl[FX0]=del4[1];
+      delapl[FY0]=del4[2];
+      delapl[FZ0]=del4[3];
 		
 #if(0) //my old dtsub esitmation based on single dimension
       //comparing with conserved to get the largest change
@@ -2474,7 +2486,7 @@ int explicit_substep_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble g
       for(iv=0;iv<4;iv++)
 	{
 	  Umhd+=uu[1+iv]*uu[1+iv]*GG[iv][iv]; //GG?
-	  Urad+=uu[6+iv]*uu[6+iv]*GG[iv][iv]; //GG?
+	  Urad+=uu[EE0+iv]*uu[EE0+iv]*GG[iv][iv]; //GG?
 	  Gtot+=del4[iv]*del4[iv]*GG[iv][iv]; //GG?
 	}
 
@@ -2598,10 +2610,10 @@ int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
   print_Nvector(pp1,NV);
   //now set 1/3 on the diagonal and move back to lab frame and do u2p_rad()
 
-  Rij[0][0]=pp1[6];
-  Rij[0][1]=Rij[1][0]=pp1[7];
-  Rij[0][2]=Rij[2][0]=pp1[8];
-  Rij[0][3]=Rij[3][0]=pp1[9];
+  Rij[0][0]=pp1[EE0];
+  Rij[0][1]=Rij[1][0]=pp1[FX0];
+  Rij[0][2]=Rij[2][0]=pp1[FY0];
+  Rij[0][3]=Rij[3][0]=pp1[FZ0];
   Rij[1][1]=Rij[2][2]=Rij[3][3]=1./3.*Rij[0][0];
   Rij[1][2]=Rij[2][1]=Rij[1][3]=Rij[3][1]=Rij[2][3]=Rij[3][2]=0.;
 
@@ -2609,10 +2621,10 @@ int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
   boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
   indices_2221(Rij,Rij,gg);  
 
-  uufake[6]=Rij[0][0];
-  uufake[7]=Rij[0][1];
-  uufake[8]=Rij[0][2];
-  uufake[9]=Rij[0][3];
+  uufake[EE0]=Rij[0][0];
+  uufake[FX0]=Rij[0][1];
+  uufake[FY0]=Rij[0][2];
+  uufake[FZ0]=Rij[0][3];
 
   //  print_Nvector(uufake,NV);
   //  getchar();

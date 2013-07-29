@@ -295,8 +295,8 @@ int f_other_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 #endif
 
   ldouble rho=pp[RHO];
-  ldouble u=pp[1];  
-  ldouble E=pp[6];  
+  ldouble u=pp[UU];  
+  ldouble E=pp[EE0];  
   ldouble pr=(GAMMA-1.)*(u);
   ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
   
@@ -416,10 +416,10 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 	ss[2]+=gdetu*T[k][l]*get_gKr(l,1,k,ix,iy,iz);
 	ss[3]+=gdetu*T[k][l]*get_gKr(l,2,k,ix,iy,iz);
 	ss[4]+=gdetu*T[k][l]*get_gKr(l,3,k,ix,iy,iz);
-	ss[6]+=gdetu*Rij[k][l]*get_gKr(l,0,k,ix,iy,iz);
-	ss[7]+=gdetu*Rij[k][l]*get_gKr(l,1,k,ix,iy,iz);
-	ss[8]+=gdetu*Rij[k][l]*get_gKr(l,2,k,ix,iy,iz);
-	ss[9]+=gdetu*Rij[k][l]*get_gKr(l,3,k,ix,iy,iz);
+	ss[EE0]+=gdetu*Rij[k][l]*get_gKr(l,0,k,ix,iy,iz);
+	ss[FX0]+=gdetu*Rij[k][l]*get_gKr(l,1,k,ix,iy,iz);
+	ss[FY0]+=gdetu*Rij[k][l]*get_gKr(l,2,k,ix,iy,iz);
+	ss[FZ0]+=gdetu*Rij[k][l]*get_gKr(l,3,k,ix,iy,iz);
       }
 
   //terms with dloggdet
@@ -432,10 +432,10 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
       ss[3]+=-dlgdet[l-1]*(T[l][2]);
       ss[4]+=-dlgdet[l-1]*(T[l][3]);
       ss[5]+=-dlgdet[l-1]*S*ucon[l];
-      ss[6]+=-dlgdet[l-1]*(Rij[l][0]);
-      ss[7]+=-dlgdet[l-1]*(Rij[l][1]);
-      ss[8]+=-dlgdet[l-1]*(Rij[l][2]);
-      ss[9]+=-dlgdet[l-1]*(Rij[l][3]);
+      ss[EE0]+=-dlgdet[l-1]*(Rij[l][0]);
+      ss[FX0]+=-dlgdet[l-1]*(Rij[l][1]);
+      ss[FY0]+=-dlgdet[l-1]*(Rij[l][2]);
+      ss[FZ0]+=-dlgdet[l-1]*(Rij[l][3]);
     }
 #endif
 

@@ -36,6 +36,9 @@ calc_primitives(int ix,int iy,int iz)
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
+  //aux
+  //set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
+
   //converting to primitives
   u2p(uu,pp,&geom,corrected,fixups);
 
@@ -144,6 +147,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   int verbose=1;
   int hdcorr=0;
+  int radcor=0;
   corrected[0]=corrected[1]=0;
   fixups[0]=fixups[1]=0;
 
@@ -173,6 +177,22 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 #else
   //u2pret=u2p_hot(uu,pp,ggg);  
   u2pret=u2p_solver(uu,pp,ggg,U2P_HOT);  
+  //************************************
+  if(u2pret==0)
+    {
+      //check if u2p_hot faild by making entropy decrease
+      //by comparing the Lagrangian uu[ENTR] value and the one grom u2p_hot
+      ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+      ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
+      ldouble s2=exp(pp[ENTR]/pp[RHO]);
+      if(s2/s1 < 0.9)
+	{  
+	  //set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
+	  //printf("\n PROBLEM DETECTED IN ENTROPY AT %d %d - %e!\n",geom->ix,geom->iy,s2/s1);getchar();
+	  //u2pret=-1;
+	}
+    }
   //************************************
   if(u2pret<0) 
     {
@@ -335,7 +355,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   //************************************
 
 #ifdef RADIATION
-  int radcor,radret;
   u2p_rad(uu,pp,geom,&radcor);
 #endif
   

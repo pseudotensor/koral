@@ -669,7 +669,7 @@ print_p(ldouble *p)
 {
   printf("rho:   %10e\nuu:    %10e\nvr:    %10e\nvth:   %10e\nvph:   %10e\nS:     %10e\n",p[0],p[1],p[2],p[3],p[4],p[5]);
 #ifdef RADIATION
-  printf("E:     %10e\nFx:    %10e\nFy:    %10e\nFz:    %10e\n\n",p[6],p[7],p[8],p[9]);
+  printf("E:     %10e\nFx:    %10e\nFy:    %10e\nFz:    %10e\n\n",p[EE0],p[FX0],p[FY0],p[FZ0]);
 #endif
   return 0;
 }
@@ -680,7 +680,7 @@ print_u(ldouble *u)
 {
   printf("rhout: %10e\nTtt:   %10e\nTtr:   %10e\nTtth:  %10e\nTtph:  %10e\nSut:   %10e\n",u[0],u[1]-u[0],u[2],u[3],u[4],u[5]);
 #ifdef RADIATION
-  printf("Rtt:   %10e\nRt1:   %10e\nRt2:   %10e\nRt3:   %10e\n\n",u[6],u[7],u[8],u[9]);
+  printf("Rtt:   %10e\nRt1:   %10e\nRt2:   %10e\nRt3:   %10e\n\n",u[EE0],u[FX0],u[FY0],u[FZ0]);
 #endif
   return 0;
 }

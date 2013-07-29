@@ -72,7 +72,7 @@ main(int argc, char **argv)
   copy_u(1.,p,pinit);
 
   //evolves
-  //solve_all_problems_5(tstart);
+  solve_all_problems_5(tstart);
 
   //free_arrays();
   fprint_closefiles();

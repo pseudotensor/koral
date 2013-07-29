@@ -170,10 +170,10 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
  
 #ifdef LABRADFLUXES
   
-  u[6]=gdetu*p[6]; //R^t_t
-  u[7]=gdetu*p[7]; //R^t_i
-  u[8]=gdetu*p[8];
-  u[9]=gdetu*p[9];
+  u[EE0]=gdetu*p[EE0]; //R^t_t
+  u[FX0]=gdetu*p[FX0]; //R^t_i
+  u[FY0]=gdetu*p[FY0];
+  u[FZ0]=gdetu*p[FZ0];
   return 0;
  
 #endif
@@ -184,8 +184,8 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   ldouble ucov[4],ucon[4]={0,p[2],p[3],p[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
-  ldouble EE=p[6];
-  ldouble Fcon[4]={0.,p[7],p[8],p[9]};
+  ldouble EE=p[EE0];
+  ldouble Fcon[4]={0.,p[FX0],p[FY0],p[FZ0]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
   //projection tensor
   for(ii=0;ii<4;ii++)
@@ -201,10 +201,10 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   //  print_4vector(ucon);
   //  print_4vector(Fcon);
       
-  u[6]=gdetu*Rij[0][0];
-  u[7]=gdetu*Rij[0][1];
-  u[8]=gdetu*Rij[0][2];
-  u[9]=gdetu*Rij[0][3];
+  u[EE0]=gdetu*Rij[0][0];
+  u[FX0]=gdetu*Rij[0][1];
+  u[FY0]=gdetu*Rij[0][2];
+  u[FZ0]=gdetu*Rij[0][3];
 
   return 0;
 #endif

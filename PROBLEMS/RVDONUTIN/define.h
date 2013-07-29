@@ -7,7 +7,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 
 /************************************/

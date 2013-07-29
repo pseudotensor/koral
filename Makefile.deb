@@ -1,5 +1,5 @@
 CC=gcc 
-CFLAGS=-O3 -fopenmp
+CFLAGS=-g -DSKIP_CLOCK
 LIBS=-lm -lgsl -lgslcblas -lsilo
 RM=/bin/rm
 
