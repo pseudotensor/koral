@@ -1526,7 +1526,6 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	    }
 	}
     }
-  getchar();
 
   //shuffling:
 #if (SHUFFLELOOPS)

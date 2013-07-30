@@ -463,6 +463,7 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
     {
       u2p(uu,pp0,geom,corr,fixup);
       print_4vector(deltas);
+      print_NVvector(uu);
       ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
       printf("Tgas: %e\n",T);
     }
@@ -789,7 +790,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
  
   ldouble EPS = 1.e-6;
-  ldouble CONV = 1.e-8;
+  ldouble CONV = 1.e-10;
   ldouble MAXITER = 50;
 
   int sh;
@@ -1003,6 +1004,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      printf("ug1:  %.20e ur1:  %.20e\n",pp[VX],pp[FX0]);
 	      printf("ug2:  %.20e ur2:  %.20e\n",pp[VY],pp[FY0]);
 	      printf("ug3:  %.20e ur3:  %.20e\n\n",pp[VZ],pp[FZ0]);
+	      print_NVvector(uu);
 	    }
 		  
 	  //checking if overshooted significantly
@@ -1369,7 +1371,7 @@ test_jon_solve_implicit_lab()
       solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
       solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
       //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
- 
+
       getchar();
     }
 

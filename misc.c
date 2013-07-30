@@ -651,7 +651,7 @@ print_Nvector(ldouble v[4],int N)
   int i;
   printf("============\n");
   for(i=0;i<N;i++)
-  printf("%10.7e ",v[i]);
+  printf("%10.10e ",v[i]);
   printf("\n============\n");
   return 0;  
 #else
@@ -660,14 +660,14 @@ print_Nvector(ldouble v[4],int N)
   if(N!=NV)
     {
       for(i=0;i<N;i++)
-	printf("%10.7e ",v[i]);
+	printf("%10.10e ",v[i]);
     }
   else
     {
       for(i=0;i<NVMHD;i++)
-	printf("%10.7e ",v[i]);
+	printf("%10.10e ",v[i]);
       for(i=0;i<NRF;i++)
-	printf("\n%10.7e %10.7e %10.7e %10.7e",v[EE(i)],v[FX(i)],v[FY(i)],v[FZ(i)]);
+	printf("\n%10.10e %10.10e %10.10e %10.10e",v[EE(i)],v[FX(i)],v[FY(i)],v[FZ(i)]);
       printf("\n");
     }
   printf("\n============\n");

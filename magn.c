@@ -21,7 +21,7 @@ void bcon_calc(double *pr, double *ucon, double *ucov, double *bcon)
 int
 flux_ct()
 {
-#ifdef MAGNFIELD
+#ifdef MAGNFIELD_TEST
   //TOTH algorithm from HARM's fluxct.c
   ldouble coefemf[4];
 
