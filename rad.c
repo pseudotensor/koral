@@ -1334,8 +1334,8 @@ test_jon_solve_implicit_lab()
       ldouble deltas[4];
       int verbose=1;
       
-      //solve_explicit_lab(uu,pp,&geom,dt,deltas,verbose);
-      solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+      solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+      //solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
       //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
  
       getchar();
@@ -1442,6 +1442,40 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
   deltas[2]=-Gi[2]*dt*gdetu;
   deltas[3]=-Gi[3]*dt*gdetu;
 
+  if(verbose)
+    {
+      ldouble delapl[NV];
+      ldouble uu0[NV],pp0[NV];
+      
+      int iv;
+      for(iv=0;iv<NV;iv++)
+	{
+	  delapl[iv]=0.;
+	  uu0[iv]=uu[iv];
+	  pp0[iv]=pp[iv];
+	}
+      
+      delapl[1]=-deltas[0];
+      delapl[2]=-deltas[1];
+      delapl[3]=-deltas[2];
+      delapl[4]=-deltas[3];
+      delapl[EE0]=deltas[0];
+      delapl[FX0]=deltas[1];
+      delapl[FY0]=deltas[2];
+      delapl[FZ0]=deltas[3];
+
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu0[iv]+=delapl[iv];
+	}
+
+      int corr[2],fixup[2];
+      u2p(uu0,pp0,&geom,corr,fixup);
+      print_4vector(deltas);
+      ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
+      printf("Tgas: %e\n",T);
+    }
+  
   return 0;
 
 }
@@ -1466,33 +1500,6 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret= solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
 
-  if(verbose) 
-    {
-      ldouble delapl[NV];
-
-      int iv;
-      for(iv=0;iv<NV;iv++)
-	delapl[iv]=0.;
-
-      delapl[1]=-del4[0];
-      delapl[2]=-del4[1];
-      delapl[3]=-del4[2];
-      delapl[4]=-del4[3];
-      delapl[EE0]=del4[0];
-      delapl[FX0]=del4[1];
-      delapl[FY0]=del4[2];
-      delapl[FZ0]=del4[3];
-
-      for(iv=0;iv<NV;iv++)
-	{
-	  uu[iv]+=delapl[iv];
-	}
-      int corr[2],fixup[2];
-      u2p(uu,pp,&geom,corr,fixup);
-      print_4vector(deltas);
-      ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
-      printf("Tgas: %e\n",T);
-    }
   return ret;
 }
 
