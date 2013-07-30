@@ -454,14 +454,18 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
     }
   while(1);
   
-  //  if(verbose) getchar();
-
   deltas[0]=uu[EE0]-uu00[EE0];
   deltas[1]=uu[FX0]-uu00[FX0];
   deltas[2]=uu[FY0]-uu00[FY0];
   deltas[3]=uu[FZ0]-uu00[FZ0];
 
-  if(verbose) print_4vector(deltas);
+  if(verbose) 
+    {
+      u2p(uu,pp0,geom,corr,fixup);
+      print_4vector(deltas);
+      ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
+      printf("Tgas: %e\n",T);
+    }
   
   return 0;
 }
@@ -546,6 +550,13 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   //radiative four-force
   ldouble Gi[4];
   calc_Gi(pp2,ggg,Gi); 
+ 
+  //test
+  //ldouble Gihat[4];
+  //boost2_lab2ff(Gi,Gihat,pp2,gg,GG); //indeed 0 for time component in ff when kappa = 0
+  //print_4vector(Gi);
+  //print_4vector(Gihat);
+
   indices_21(Gi,Gi,gg);
 
   if(whichprim==RAD) //rad-primitives
@@ -659,9 +670,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
 
   //comparing energy densities
-  ldouble urad00[4],Rtt00,Tgas00,Trad00;
+  ldouble ugas00[4],Rtt00,Tgas00,Trad00;
   int dominates;
-  calc_ff_Rtt(pp00,&Rtt00,urad00,geom);
+  calc_ff_Rtt(pp00,&Rtt00,ugas00,geom);
    if(-Rtt00>pp00[UU]) 
     dominates = RAD;
   else
@@ -694,7 +705,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       for(iv=0;iv<4;iv++)
 	Gi00[iv]*=dt;
       print_4vector(Gi00);
-      //print_4vector(Gihat00);
+      print_4vector(Gihat00);
 
       ldouble Trad=calc_LTE_TfromE(-Rtt);
       ldouble Tgas=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
@@ -909,7 +920,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	  while(1); //neg.energy
 
-	  //if(verbose>0) print_state_implicit_lab_4dprim (iter,xxx,f1); 
+	  if(verbose>0) print_state_implicit_lab_4dprim (iter,xxx,f1); 
 
 	  overshoot=0;
 
@@ -1177,8 +1188,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       uu[iv]=get_u(u,iv,ix,iy,iz);  
    }
 
-  //  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
-  return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
   
 
 }
@@ -1260,6 +1271,8 @@ test_jon_solve_implicit_lab()
       iv=fscanf(in,"%lf ",&geom.alpha);
       iv=fscanf(in,"%lf ",&geom.gdet);
 
+      uu[EE0]/=1000.;
+
       //fill missing parts
       ldouble ucon[4];
       ucon[1]=pp[VX];
@@ -1321,6 +1334,7 @@ test_jon_solve_implicit_lab()
       ldouble deltas[4];
       int verbose=1;
       
+      //solve_explicit_lab(uu,pp,&geom,dt,deltas,verbose);
       solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
       //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
  
@@ -1400,37 +1414,28 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 
 }
 
+
 //**********************************************************************
 //******* solves explicitly gas - radiation interaction  *******************
 //******* in the lab frame, returns vector of deltas **********************
 //**********************************************************************
 int
-solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
+solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* deltas,int verbose)
 {
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
-  gg=geom.gg;
-  GG=geom.GG;
-  gdet=geom.gdet; gdetu=gdet;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
 
-  int i1,i2,i3,iv;
-  ldouble pp[NV];
-  ldouble eup[4][4],elo[4][4];
-  pick_T(emuup,ix,iy,iz,eup);
-  pick_T(emulo,ix,iy,iz,elo);
-
-  for(iv=0;iv<NV;iv++)
-    {
-      pp[iv]=get_u(p,iv,ix,iy,iz);      
-    }
-
   ldouble Gi[4];
-  calc_Gi(pp,&geom,Gi);
-  indices_21(Gi,Gi,geom.gg);
+  calc_Gi(pp,geom,Gi);
+  indices_21(Gi,Gi,geom->gg);
   
   deltas[0]=-Gi[0]*dt*gdetu;
   deltas[1]=-Gi[1]*dt*gdetu;
@@ -1439,6 +1444,56 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
 
   return 0;
 
+}
+
+
+//**********************************************************************
+//******* solves explicitly gas - wrapper  *******************
+//**********************************************************************
+int
+solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
+{
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  int iv,ret;
+  ldouble pp[NV],uu[NV];
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=get_u(p,iv,ix,iy,iz); //primitives corresponding to zero-state  
+      uu[iv]=get_u(u,iv,ix,iy,iz);  
+    }
+
+  ret= solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+
+  if(verbose) 
+    {
+      ldouble delapl[NV];
+
+      int iv;
+      for(iv=0;iv<NV;iv++)
+	delapl[iv]=0.;
+
+      delapl[1]=-del4[0];
+      delapl[2]=-del4[1];
+      delapl[3]=-del4[2];
+      delapl[4]=-del4[3];
+      delapl[EE0]=del4[0];
+      delapl[FX0]=del4[1];
+      delapl[FY0]=del4[2];
+      delapl[FZ0]=del4[3];
+
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu[iv]+=delapl[iv];
+	}
+      int corr[2],fixup[2];
+      u2p(uu,pp,&geom,corr,fixup);
+      print_4vector(deltas);
+      ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+      printf("Tgas: %e\n",T);
+    }
+  return ret;
 }
 
 //**********************************************************************
@@ -2195,7 +2250,7 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], 
   //calc_primitives(ix,iy,iz);
 
   //applied explicitly directly in lab frame
-  solve_explicit_lab(ix,iy,iz,dt,del4);
+  solve_explicit_lab(ix,iy,iz,dt,del4,0);
   indices_21(del4,del4,gg);
 
   apply_rad_source_del4(ix,iy,iz,del4);
@@ -2255,7 +2310,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
       //new primitives
       calc_primitives(ix,iy,iz);
       //rad-for-force
-      solve_explicit_lab(ix,iy,iz,dt,del4);
+      solve_explicit_lab(ix,iy,iz,dt,del4,0);
       //del4[] will be passed up
       indices_21(del4,del4,gg); 
       //changes to conserved
@@ -2343,7 +2398,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
       //new primitives
       calc_primitives(ix,iy,iz);
       //rad-for-force
-      solve_explicit_lab(ix,iy,iz,dt,del4);
+      solve_explicit_lab(ix,iy,iz,dt,del4,0);
       //del4[] will be passed up
       indices_21(del4,del4,gg); 
 
@@ -2440,7 +2495,7 @@ int explicit_substep_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble g
 	}
 
       //vector of changes of conserved assuming original dt which only multiplies source terms
-      solve_explicit_lab(ix,iy,iz,dt,del4);
+      solve_explicit_lab(ix,iy,iz,dt,del4,0);
       indices_21(del4,del4,gg);
       //changes to conserved
       delapl[1]=-del4[0];

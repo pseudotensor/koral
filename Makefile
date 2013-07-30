@@ -1,5 +1,5 @@
-CC=gcc 
-CFLAGS=-g -DSKIP_CLOCK
+CC=cc -D SKIP_CLOCK
+CFLAGS=-O3 -fopenmp -fnested-functions
 LIBS=-lm -lgsl -lgslcblas -lsilo
 RM=/bin/rm
 
