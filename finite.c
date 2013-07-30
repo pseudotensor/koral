@@ -1443,10 +1443,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //only ghost cells
 
   //reduction of size basing on the dimension
-  //when using the mangetic flux constrained transport one should keep all three dimensions in ghost cells
-  //but one does not have to project onto the 3rd dimension
-  //it is enough to copy the fluxes onto the 3rd dimension after comining them and before constrained transport
-  //or even better create a wrapper not to have to copy them
+  //for constrained transport fluxes copied onto missing dimensions
 
   if(NX>1) xlim=NG; else xlim=0;  
   if(NY>1) ylim=NG; else ylim=0;
@@ -1488,7 +1485,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //1-cell deep surfaces of 3d corners 
+  //1-cell deep surfaces on corners 
   if(NX>1) xlim=NG; else xlim=0;  
   if(NY>1) ylim=NG; else ylim=0;
   if(NZ>1) zlim=NG; else zlim=0;
@@ -1529,6 +1526,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	    }
 	}
     }
+  getchar();
 
   //shuffling:
 #if (SHUFFLELOOPS)
@@ -1920,9 +1918,8 @@ if_outsidegc(int ix,int iy,int iz)
 //**********************************************************************
 
 //boundary conditions - sets conserved in the ghost cells
-int set_bc_core(int ix,int iy,int iz,double t,int ifinit,int BCtype)
+int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int ifinit,int BCtype)
 {
-  ldouble uval[NV],pval[NV];	  
   int iix,iiy,iiz,iv;
   iix=ix;
   iiy=iy;
@@ -1970,30 +1967,16 @@ int set_bc_core(int ix,int iy,int iz,double t,int ifinit,int BCtype)
   if(iz>NZ-1) iiz=NZ-1;
 #endif   
 
-  //copying primitives
+  for(iv=0;iv<NV;iv++)
+    pval[iv]=get_u(p,iv,iix,iiy,iiz);
+
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
-
-  ldouble gdet_gc=get_g(g,3,4,ix,iy,iz);  
-  ldouble gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-  ldouble r_gc=get_x(ix,0);
-  ldouble r_src=get_x(ix,0);
-  ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4];
-  pick_g(ix,iy,iz,gg);
-  pick_G(ix,iy,iz,GG);
-     
-  for(iv=0;iv<NV;iv++)
-    {
-      pval[iv]=get_u(p,iv,iix,iiy,iiz);
-	  set_u(p,iv,ix,iy,iz,pval[iv]);
-	}
-
-      p2u(pval,uval,&geom);
+  p2u(pval,uval,&geom);
       
-      for(iv=0;iv<NV;iv++)
-	{
-	  set_u(u,iv,ix,iy,iz,uval[iv]);
-	}	  
+  for(iv=0;iv<NV;iv++)
+    set_u(u,iv,ix,iy,iz,uval[iv]);
+
 #endif //SPECIFIC_BC   
 }
 
@@ -2004,7 +1987,8 @@ int set_bc_core(int ix,int iy,int iz,double t,int ifinit,int BCtype)
 //boundary conditions - sets conserved in the ghost cells
 int set_bc(ldouble t,int ifinit)
 {
-  int ix,iy,iz,ii;
+  int ix,iy,iz,ii,iv;
+  ldouble uval[NV],pval[NV];
  
   //first fill the GC with no corners
 #pragma omp parallel for private(ix,iy,iz) schedule (static)
@@ -2023,7 +2007,13 @@ int set_bc(ldouble t,int ifinit)
       if(iz<0) BCtype=ZBCLO;
       if(iz>0) BCtype=ZBCHI;
  
-      set_bc_core(ix,iy,iz,t,ifinit,BCtype);
+      set_bc_core(ix,iy,iz,t,uval,pval,ifinit,BCtype);
+
+      for(iv=0;iv<NV;iv++)
+	{
+	  set_u(u,iv,ix,iy,iz,uval[iv]);
+	  set_u(p,iv,ix,iy,iz,pval[iv]);	      
+	}
     }
 
   //now fill the first cells in corners if necessary
@@ -2035,11 +2025,27 @@ int set_bc(ldouble t,int ifinit)
       iy=loop_3[ii][1];
       iz=loop_3[ii][2];
 
-  //set up loop_3
-  //basing on ix,iy,iz determine BCtype for each dimension
-  //calculate fractional impact of each dimension
-  //for each point do three calc_bc and sum them up with weights
-  //...
+      //basing on ix,iy,iz determine BCtype for each dimension
+      //calculate fractional impact of each dimension
+      //for each point do three calc_bc and sum them up with weights
+      ldouble w1,w2,w3;
+      int d1,d2,d3;
+
+	if(NZ==1 && NY==1)
+	  {
+	    //loop_3 empty
+	  }
+
+      if(NZ==1)
+	{
+	  if(ix<0 && iy<0)
+	    {
+	      d1=-ix;
+	      d2=-iy;
+	      
+	    }
+	}
+
     }
 
   #endif

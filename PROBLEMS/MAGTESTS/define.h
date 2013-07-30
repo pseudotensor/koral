@@ -51,8 +51,8 @@
 #define MYCOORDS KERRCOORDS
 #define MINX 6.
 #define MAXX 10.
-#define NX 200
-#define NY 1
+#define NX 10
+#define NY 10
 #define NZ 1
 #define MINY (0.95*Pi/2.)
 #define MAXY (1.05*Pi/2.)
