@@ -150,7 +150,7 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 /**** converts radiative primitives xs************************/
 /********************************************************/
 /********************************************************/
-int p2u_rad(ldouble *p,ldouble *u,void *ggg)
+int p2u_rad(ldouble *pp,ldouble *uu,void *ggg)
 {
   int i,j,irf;
 
@@ -170,10 +170,10 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
  
 #ifdef LABRADFLUXES
   
-  u[EE0]=gdetu*p[EE0]; //R^t_t
-  u[FX0]=gdetu*p[FX0]; //R^t_i
-  u[FY0]=gdetu*p[FY0];
-  u[FZ0]=gdetu*p[FZ0];
+  uu[EE0]=gdetu*pp[EE0]; //R^t_t
+  uu[FX0]=gdetu*pp[FX0]; //R^t_i
+  uu[FY0]=gdetu*pp[FY0];
+  uu[FZ0]=gdetu*pp[FZ0];
   return 0;
  
 #endif
@@ -181,11 +181,11 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
 #ifdef EDDINGTON_APR
   int ii,jj;
   ldouble Rij[4][4],h[4][4];
-  ldouble ucov[4],ucon[4]={0,p[2],p[3],p[4]};
+  ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
-  ldouble EE=p[EE0];
-  ldouble Fcon[4]={0.,p[FX0],p[FY0],p[FZ0]};
+  ldouble EE=pp[EE0];
+  ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
   //projection tensor
   for(ii=0;ii<4;ii++)
@@ -201,10 +201,10 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   //  print_4vector(ucon);
   //  print_4vector(Fcon);
       
-  u[EE0]=gdetu*Rij[0][0];
-  u[FX0]=gdetu*Rij[0][1];
-  u[FY0]=gdetu*Rij[0][2];
-  u[FZ0]=gdetu*Rij[0][3];
+  uu[EE0]=gdetu*Rij[0][0];
+  uu[FX0]=gdetu*Rij[0][1];
+  uu[FY0]=gdetu*Rij[0][2];
+  uu[FZ0]=gdetu*Rij[0][3];
 
   return 0;
 #endif
@@ -212,30 +212,30 @@ int p2u_rad(ldouble *p,ldouble *u,void *ggg)
   //M1
   for(irf=0;irf<NRF;irf++)
     {
-      ldouble Erf=p[EE(irf)];
+      ldouble Erf=pp[EE(irf)];
 
       //relative four-velocity
       ldouble urf[4];
       urf[0]=0.;
-      urf[1]=p[FX(irf)];
-      urf[2]=p[FY(irf)];
-      urf[3]=p[FZ(irf)];
+      urf[1]=pp[FX(irf)];
+      urf[2]=pp[FY(irf)];
+      urf[3]=pp[FZ(irf)];
 
       //converting to lab four-velocity
       conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
   
-      ldouble Rtop[4];
-      Rtop[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^t_t
-      Rtop[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*GG[0][1];
-      Rtop[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*GG[0][2];
-      Rtop[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*GG[0][3];
+      ldouble Rtopp[4];
+      Rtopp[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^t_t
+      Rtopp[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*GG[0][1];
+      Rtopp[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*GG[0][2];
+      Rtopp[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*GG[0][3];
 
-      indices_21(Rtop,Rtop,gg); //R^t_mu
+      indices_21(Rtopp,Rtopp,gg); //R^t_mu
 
-      u[EE(irf)]=gdetu*Rtop[0]; //R^t_t
-      u[FX(irf)]=gdetu*Rtop[1]; //R^t_i
-      u[FY(irf)]=gdetu*Rtop[2];
-      u[FZ(irf)]=gdetu*Rtop[3];
+      uu[EE(irf)]=gdetu*Rtopp[0]; //R^t_t
+      uu[FX(irf)]=gdetu*Rtopp[1]; //R^t_i
+      uu[FY(irf)]=gdetu*Rtopp[2];
+      uu[FZ(irf)]=gdetu*Rtopp[3];
     }
 
   return 0;

@@ -413,7 +413,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
-   gdet=geom->gdet;gdetu=gdet;
+  gdet=geom->gdet;gdetu=gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
@@ -485,6 +485,8 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	}
       */
       
+      conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
+
       //new primitives
       pp[EE(irf)]=Erf;
       pp[FX(irf)]=urfcon[1];
