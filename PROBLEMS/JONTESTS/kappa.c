@@ -8,5 +8,5 @@ ldouble temp=T;
 //printf("arad: %e\n",SIGMA_RAD/4.);getchar();
 //printf("%e %e | %e\n",rho,temp,3.46764e-17 * rho * rho / pow(temp,4.)*sqrt(temp)); getchar();
 
-return 0.*3.46764e-17 * rho * rho / pow(temp,4.)*sqrt(temp);
+return 3.46764e-17 * rho * rho / pow(temp,4.)*sqrt(temp);
 

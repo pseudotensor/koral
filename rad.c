@@ -710,10 +710,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       calc_ff_Rtt(pp00,&Rtt,ucon,geom);
       printf("gamma gas: %e\n\n",ucon[0]);
       ldouble Gi00[4],Gihat00[4];
-      print_Nvector(pp00,NV);
+      //      print_Nvector(pp00,NV);
       calc_Gi(pp00, geom,Gi00);
-      print_4vector(Gi00);
-      getchar();
+      //print_4vector(Gi00);
+      //getchar();
       
       indices_21(Gi00,Gi00,geom->gg);
 
@@ -723,9 +723,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  Gi00[iv]*=dt*gdetu;
 	  Gihat00[iv]*=dt*gdetu;
 	}
-      print_4vector(Gi00);
-      print_4vector(Gihat00);
-      getchar();
+      //print_4vector(Gi00);
+      //print_4vector(Gihat00);
+      //getchar();
  
 
       ldouble Trad=calc_LTE_TfromE(-Rtt);
@@ -1313,16 +1313,17 @@ test_jon_solve_implicit_lab()
       //print_metric(geom.GG);
       //printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
       //printf("ut: %e\n",ucon[0]);
- int corr[2],fixup[2],u2pret,radcor;
+      int corr[2],fixup[2],u2pret,radcor;
      
       //test
+      /*
       u2p_rad(uu,pp,&geom,&radcor);
       printf("radcor: %d\n",radcor);
       print_Nvector(pp,NV);
       p2u_rad(pp,uu,&geom);
-     print_Nvector(uu,NV);
-     getchar();
-
+      print_Nvector(uu,NV);
+      getchar();
+      */
 
       //printf("inverting...\n");
       u2pret=u2p_solver(uu,pp,&geom,U2P_HOT); //hd
@@ -1506,21 +1507,21 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
       printf("\n@@@@@@@@ EXPLICIT @@@@@@@@@@@@");
       printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
   
-      print_metric(geom->gg);
-      print_metric(geom->GG);
-      printf("%e\n",geom->alpha);
-      printf("%e\n",geom->gdet);
-      print_Nvector(uu0,NV);
-      print_Nvector(pp,NV);
+      //print_metric(geom->gg);
+      //print_metric(geom->GG);
+      //printf("%e\n",geom->alpha);
+      //printf("%e\n",geom->gdet);
+      //print_Nvector(uu0,NV);
+      //print_Nvector(pp,NV);
       
-      u2p(uu,pp,geom,corr,fixup);
-      printf("%d %d\n",corr[0],corr[1]);
-      print_Nvector(pp,NV);
-      calc_Gi(pp,geom,Gi);
+      //u2p(uu,pp,geom,corr,fixup);
+      //printf("%d %d\n",corr[0],corr[1]);
+      //print_Nvector(pp,NV);
+      //calc_Gi(pp,geom,Gi);
       
-      print_4vector(Gi);
-      getchar();
-      indices_21(Gi,Gi,geom->gg);
+      //print_4vector(Gi);
+      //getchar();
+      //indices_21(Gi,Gi,geom->gg);
 
       print_4vector(deltas);
       ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
