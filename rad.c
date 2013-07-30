@@ -634,7 +634,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 #endif
   int corr[2],fixup[2];
 
+  //print_NVvector(uu00);
+  //print_NVvector(pp00);
+
+  //print_metric(geom->gg);
+  //print_metric(geom->GG);
+  //printf("%e\n",geom->alpha);
+  //printf("%e\n",geom->gdet);
   u2p(uu00,pp00,geom,corr,fixup);
+  //printf("%d %d\n",corr[0],corr[1]);
+
+  //print_NVvector(pp00);
+
   p2u(pp00,uu00,geom);
 
   if(verbose) //dump the problematic case to file
@@ -699,13 +710,23 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       calc_ff_Rtt(pp00,&Rtt,ucon,geom);
       printf("gamma gas: %e\n\n",ucon[0]);
       ldouble Gi00[4],Gihat00[4];
+      print_Nvector(pp00,NV);
       calc_Gi(pp00, geom,Gi00);
-      boost2_lab2ff(Gi00,Gihat00,pp00,geom->gg,geom->GG);
+      print_4vector(Gi00);
+      getchar();
+      
       indices_21(Gi00,Gi00,geom->gg);
+
+      boost2_lab2ff(Gi00,Gihat00,pp00,geom->gg,geom->GG);
       for(iv=0;iv<4;iv++)
-	Gi00[iv]*=dt;
+	{
+	  Gi00[iv]*=dt*gdetu;
+	  Gihat00[iv]*=dt*gdetu;
+	}
       print_4vector(Gi00);
       print_4vector(Gihat00);
+      getchar();
+ 
 
       ldouble Trad=calc_LTE_TfromE(-Rtt);
       ldouble Tgas=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
@@ -1248,7 +1269,7 @@ test_jon_solve_implicit_lab()
 
   FILE *in = fopen("jon.problem.pre","r");
   int i1,i2,iv,ifile;
-  ldouble uu[NV],pp[NV],dt;
+  ldouble uu[NV],pp[NV],pp0[NV],dt;
   struct geometry geom;
 
   for(ifile=1;ifile<=165;ifile++)
@@ -1271,7 +1292,7 @@ test_jon_solve_implicit_lab()
       iv=fscanf(in,"%lf ",&geom.alpha);
       iv=fscanf(in,"%lf ",&geom.gdet);
 
-      uu[EE0]/=1000.;
+      //      uu[EE0]/=1000.;
 
       //fill missing parts
       ldouble ucon[4];
@@ -1292,9 +1313,18 @@ test_jon_solve_implicit_lab()
       //print_metric(geom.GG);
       //printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
       //printf("ut: %e\n",ucon[0]);
+ int corr[2],fixup[2],u2pret,radcor;
+     
+      //test
+      u2p_rad(uu,pp,&geom,&radcor);
+      printf("radcor: %d\n",radcor);
+      print_Nvector(pp,NV);
+      p2u_rad(pp,uu,&geom);
+     print_Nvector(uu,NV);
+     getchar();
+
 
       //printf("inverting...\n");
-      int corr[2],fixup[2],u2pret,radcor;
       u2pret=u2p_solver(uu,pp,&geom,U2P_HOT); //hd
       if(u2pret<0) printf("u2pret mhd: (%d)\n",u2pret);
       u2p_rad(uu,pp,&geom,&radcor); //rad
@@ -1312,8 +1342,7 @@ test_jon_solve_implicit_lab()
 
       printf("\n..........................\nchange in entropy:\n\n");
       printf("s(adv) | s(inv): %e | %e\n",s1,s2); 
-      
-      
+     
       if(s2/s1 < 0.9 | u2pret<0.)
 	{ 
 	  printf("\n PROBLEM DETECTED IN ENTROPY OR U2P_HOT DID NOT SUCCEED!\n");
@@ -1321,10 +1350,12 @@ test_jon_solve_implicit_lab()
 	  if(u2pret<0) printf("u2pret mhd: (%d)\n",u2pret);
 	  printf("\n..........................\nafter u2p_ENTROPY:\n\n");
 	  print_Nvector(pp,NV);
-	}
+	}      
       
       printf("\n..........................\nafter p2u:\n\n");
       p2u(pp,uu,&geom);
+      for (i1=0;i1<NV;i1++)
+	pp0[i1]=pp[i1];
       print_Nvector(uu,NV);
       print_Nvector(pp,NV);
 
@@ -1335,7 +1366,7 @@ test_jon_solve_implicit_lab()
       int verbose=1;
       
       solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
-      //solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+      solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
       //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
  
       getchar();
@@ -1470,7 +1501,27 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
 	}
 
       int corr[2],fixup[2];
-      u2p(uu0,pp0,&geom,corr,fixup);
+
+      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      printf("\n@@@@@@@@ EXPLICIT @@@@@@@@@@@@");
+      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
+  
+      print_metric(geom->gg);
+      print_metric(geom->GG);
+      printf("%e\n",geom->alpha);
+      printf("%e\n",geom->gdet);
+      print_Nvector(uu0,NV);
+      print_Nvector(pp,NV);
+      
+      u2p(uu,pp,geom,corr,fixup);
+      printf("%d %d\n",corr[0],corr[1]);
+      print_Nvector(pp,NV);
+      calc_Gi(pp,geom,Gi);
+      
+      print_4vector(Gi);
+      getchar();
+      indices_21(Gi,Gi,geom->gg);
+
       print_4vector(deltas);
       ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
       printf("Tgas: %e\n",T);

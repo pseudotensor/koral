@@ -6,6 +6,21 @@
 int 
 main(int argc, char **argv)
 {  
+  printf("%d ",RHO);
+  printf("%d ",UU);
+  printf("%d ",VX);
+  printf("%d ",VY);
+  printf("%d ",VZ);
+  printf("%d ",ENTR);
+  printf("%d ",B1);
+  printf("%d ",B2);
+  printf("%d ",B3);
+  printf("%d ",EE0);
+ printf("%d ",FX0);
+ printf("%d ",FY0);
+ printf("%d ",FZ0);
+ printf("%d ",NVMHD);
+ printf("%d ",NV);
 
   //tests
   //requires no rad. viscosity!
