@@ -5,8 +5,11 @@
 
 ldouble temp=T;
 
-//printf("arad: %e\n",SIGMA_RAD/4.);getchar();
-//printf("%e %e | %e\n",rho,temp,3.46764e-17 * rho * rho / pow(temp,4.)*sqrt(temp)); getchar();
-
+/*
+printf("arad: %e\n",SIGMA_RAD/4.);
+printf("%e %e | %e\n",rho,temp,3.46764e-17 * rho * rho / pow(temp,4.)*sqrt(temp)); 
+printf("KB: %e %e %e\n",K_BOLTZ,M_PROTON,MU_GAS);
+getchar();
+*/
 return 3.46764e-17 * rho * rho / pow(temp,4.)*sqrt(temp);
 

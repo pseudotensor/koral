@@ -500,15 +500,16 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   for(i=0;i<NV;i++) pp2[i]=pp[i];
   
   //rho may be inconsistent on input if iterating MHD primitives
+  ldouble ucon[4];
+  ucon[1]=pp2[2];
+  ucon[2]=pp2[3];
+  ucon[3]=pp2[4];
+  ucon[0]=0.;
+  //converting to 4-velocity
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+
   if(whichprim==MHD)
     {
-      ldouble ucon[4];
-      ucon[1]=pp2[2];
-      ucon[2]=pp2[3];
-      ucon[3]=pp2[4];
-      ucon[0]=0.;
-      //converting to 4-velocity
-      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
       ldouble rho = uu0[RHO]/gdetu/ucon[0];
       pp2[RHO]=rho;
     }
@@ -739,7 +740,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       
       printf("gas temp: %e\n",Tgas00);      
       printf("rad temp: %e\n",Trad00); 
-      printf("LTE temp: %e\n\n",TLTE) ;      
+      printf("LTE temp: %e\n\n",TLTE) ;  
     }
 
   /*
@@ -789,7 +790,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       pp[iv]=pp0[iv];     
     }
  
-  ldouble EPS = 1.e-6;
+  ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-10;
   ldouble MAXITER = 50;
 
@@ -1791,6 +1792,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
     for(j=0;j<4;j++)
       Ruu+=Rij[i][j]*ucov[i]*ucov[j];
 
+
   ldouble Ru;
   for(i=0;i<4;i++)
     {
@@ -1799,6 +1801,22 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 	Ru+=Rij[i][j]*ucov[j];
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
     }
+
+  /*
+  //as in Ramesh's code
+  ldouble Ehat=0.;
+  indices_2221(Rij,Rij,gg);
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Ehat+=Rij[i][j]*ucov[i]*ucon[j];
+
+  for(i=0;i<4;i++)
+    {
+      Gi[i]= - (kappaes*Ehat + kappa*4.*Pi*B)*ucon[i];
+      for(j=0;j<4;j++)
+	Gi[i]-=(chi)*Rij[i][j]*ucon[j];
+    }
+  */
 
 #else //Eddington apr. here
 

@@ -1,6 +1,6 @@
 //new physical constants
 #undef SIGMA_RAD
-#define SIGMA_RAD (4.*118316261947818976.)
+#define SIGMA_RAD (1.18316261947818976e17/4.)
 #undef K_BOLTZ
 #define K_BOLTZ 1.
 #undef M_PROTON
