@@ -649,6 +649,17 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ff[B1]=gdetu*(bcon[1]*ucon[idim+1] - bcon[idim+1]*ucon[1]);
   ff[B2]=gdetu*(bcon[2]*ucon[idim+1] - bcon[idim+1]*ucon[2]);
   ff[B3]=gdetu*(bcon[3]*ucon[idim+1] - bcon[idim+1]*ucon[3]);
+
+  /*
+  if(idim==0 && ix==NX/3)
+    {
+      print_4vector(bcon);
+      print_4vector(ucon);
+      printf("ff: %e %e %e\n",ff[B1],ff[B2],ff[B3]);
+      getchar();
+    }
+  */
+  
 #endif
 
   //radiation

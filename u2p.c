@@ -1093,6 +1093,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   //entropy based on UU[1]
   pp[5]=calc_Sfromu(rho,u);
 
+  //magnetic conserved=primitives
+  pp[B1]=uu[B1]/gdetu;
+  pp[B2]=uu[B2]/gdetu;
+  pp[B3]=uu[B3]/gdetu;
+
   //printf(">> %e %e\n",pp[5],pp[5]*utcon[0]);
 
 #ifdef TRACER

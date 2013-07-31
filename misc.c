@@ -88,7 +88,7 @@ initialize_arrays()
 
 #ifdef MAGNFIELD
   //electromotive force at corners
-  pproblem=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*3*sizeof(ldouble));
+  emf=(ldouble*)malloc((NX+1)*(NY+1)*(NZ+1)*3*sizeof(ldouble));
 #endif
 
   //primitives at cell centers after reconstruction

@@ -48,11 +48,11 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define MYCOORDS KERRCOORDS
+#define MYCOORDS MINKCOORDS//KERRCOORDS
 #define MINX 6.
 #define MAXX 10.
-#define NX 10
-#define NY 10
+#define NX 50
+#define NY 1
 #define NZ 1
 #define MINY (0.95*Pi/2.)
 #define MAXY (1.05*Pi/2.)
@@ -67,7 +67,7 @@
 /************************************/
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
-#define NOUTSTOP 5000
+#define NOUTSTOP 50
 #define DTOUT1 1.
 
 /************************************/

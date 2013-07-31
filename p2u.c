@@ -43,10 +43,16 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],gdet;
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   gdet=geom->gdet;
   GG=geom->GG;
+  gdetu=gdet;
+
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
 
   ldouble rho=p[0];
   ldouble uu=p[1];
@@ -109,22 +115,18 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble Ttth =eta*ucon[0]*ucov[2] - bcon[0]*bcov[2];
   ldouble Ttph =eta*ucon[0]*ucov[3] - bcon[0]*bcov[3];
    
-#if (GDETIN==0) //gdet out of derivatives
-  gdet=1.;
-#endif
 
-
-  u[0]=gdet*rhout;
-  u[1]=gdet*Tttt;
-  u[2]=gdet*Ttr;
-  u[3]=gdet*Ttth;
-  u[4]=gdet*Ttph;
-  u[5]=gdet*Sut;
+  u[0]=gdetu*rhout;
+  u[1]=gdetu*Tttt;
+  u[2]=gdetu*Ttr;
+  u[3]=gdetu*Ttth;
+  u[4]=gdetu*Ttph;
+  u[5]=gdetu*Sut;
 
 
 #ifdef TRACER
   ldouble tracerut=p[TRA]*ut;
-  u[TRA]= gdet*tracerut;
+  u[TRA]= gdetu*tracerut;
 #endif
 
   //************************************
@@ -136,9 +138,9 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   //************************************
  
 #ifdef MAGNFIELD
-  u[B1]=gdet*p[B1];
-  u[B2]=gdet*p[B2];
-  u[B3]=gdet*p[B3];
+  u[B1]=gdetu*p[B1];
+  u[B2]=gdetu*p[B2];
+  u[B3]=gdetu*p[B3];
 #endif
   
  
