@@ -87,7 +87,7 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*
   *emuup2,*emulo2,*emuupbx2,*emulobx2,*emuupby2,*emuloby2,*emuupbz2,*emulobz2,
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
-int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,Nloop_0,Nloop_1,Nloop_2,Nloop_3;
+int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,Nloop_0,Nloop_1,Nloop_2,Nloop_3,Nloop_4;
 
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
 
@@ -507,6 +507,8 @@ void bcon_calc(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon);
 /*********************/
 /*********************/
 
+/* loop over all primitives */
+#define PLOOP(j) for(j=0;j<NV;j++)
 /* loop over all Dimensions; second rank loop */
 #define DLOOP(j,k) for(j=0;j<NDIM;j++)for(k=0;k<NDIM;k++)
 /* loop over all Dimensions; first rank loop */

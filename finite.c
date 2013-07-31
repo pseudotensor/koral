@@ -1485,7 +1485,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //1-cell deep surfaces on corners 
+  //1-deep surfaces on corners only
   if(NX>1) xlim=NG; else xlim=0;  
   if(NY>1) ylim=NG; else ylim=0;
   if(NZ>1) zlim=NG; else zlim=0;
@@ -1530,6 +1530,36 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //shuffling:
 #if (SHUFFLELOOPS)
   shuffle_loop(loop_3,Nloop_3);
+#endif
+
+  //**********************************************************************
+  //**********************************************************************
+  //corners of the domain
+  Nloop_4=0;
+  loop_4=(int **)malloc(sizeof(int*));
+  loop_4[0]=(int *)malloc(3*sizeof(int));
+
+  for(ix=0;ix<=NX;ix++)
+    {
+      for(iy=0;iy<=NY;iy++)
+	{
+	  for(iz=0;iz<=NZ;iz++)
+	    {	
+	      loop_4[Nloop_4][0]=ix;
+	      loop_4[Nloop_4][1]=iy;
+	      loop_4[Nloop_4][2]=iz;
+
+	      Nloop_4++;
+	      
+	      loop_4=(int **)realloc(loop_4,(Nloop_4+1)*sizeof(int*));
+	      loop_4[Nloop_4]=(int *)malloc(3*sizeof(int));	      
+	    }
+	}
+    }
+
+  //shuffling:
+#if (SHUFFLELOOPS)
+  shuffle_loop(loop_0,Nloop_0);
 #endif
       
 
@@ -2029,11 +2059,12 @@ int set_bc(ldouble t,int ifinit)
       //for each point do three calc_bc and sum them up with weights
       ldouble w1,w2,w3;
       int d1,d2,d3;
+      ldouble p1[NV],p2[NV],p3[NV];
 
-	if(NZ==1 && NY==1)
-	  {
-	    //loop_3 empty
-	  }
+      if(NZ==1 && NY==1)
+	{
+	  //loop_3 empty
+	}
 
       if(NZ==1)
 	{
@@ -2041,10 +2072,59 @@ int set_bc(ldouble t,int ifinit)
 	    {
 	      d1=-ix;
 	      d2=-iy;
-	      
+	      w1=d1/(d1+d2);
+	      w2=d2/(d1+d2);
+	      set_bc_core(ix,iy,iz,t,uval,p1,ifinit,XBCLO);
+	      set_bc_core(ix,iy,iz,t,uval,p2,ifinit,YBCLO);
 	    }
+
+	  if(ix<0 && iy>NY-1)
+	    {
+	      d1=-ix;
+	      d2=iy-NY+1;
+	      w1=d1/(d1+d2);
+	      w2=d2/(d1+d2);
+	      set_bc_core(ix,iy,iz,t,uval,p1,ifinit,XBCLO);
+	      set_bc_core(ix,iy,iz,t,uval,p2,ifinit,YBCHI);
+	    }
+
+	  if(ix>NX-1 && iy>NY-1)
+	    {
+	      d1=ix-NX+1;
+	      d2=iy-NY+1;
+	      w1=d1/(d1+d2);
+	      w2=d2/(d1+d2);
+	      set_bc_core(ix,iy,iz,t,uval,p1,ifinit,XBCHI);
+	      set_bc_core(ix,iy,iz,t,uval,p2,ifinit,YBCHI);
+	    }
+
+	  if(ix>NX-1 && iy<0)
+	    {
+	      d1=ix-NX+1;
+	      d2=-iy;
+	      w1=d1/(d1+d2);
+	      w2=d2/(d1+d2);
+	      set_bc_core(ix,iy,iz,t,uval,p1,ifinit,XBCHI);
+	      set_bc_core(ix,iy,iz,t,uval,p2,ifinit,YBCLO);
+	    }
+
+	  PLOOP(iv)
+	    pval[iv]=w1*p1[iv]+w2*p2[iv];     
 	}
 
+      //TODO: etc
+      //but would it work fine?
+      //hopefully yes     
+
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+      p2u(pval,uval,&geom);
+      
+      PLOOP(iv)
+      {
+	set_u(u,iv,ix,iy,iz,uval[iv]);
+	set_u(p,iv,ix,iy,iz,pval[iv]);
+      }
     }
 
   #endif

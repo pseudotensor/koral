@@ -7,13 +7,11 @@ int
 main(int argc, char **argv)
 {  
   //tests
-  //requires no rad. viscosity!
 #if(PROBLEM==60)
+  //requires no rad. viscosity!
   test_jon_solve_implicit_lab();
   exit(0);
 #endif
-  //test_solve_implicit_lab();
-  //exit(0);
 
   ldouble tstart;
   int i;

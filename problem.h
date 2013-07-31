@@ -64,9 +64,9 @@
 //58* LUKE - beam hitting a net gas flow
 //59* BBBLOB - rad blobs
 //60* JONTESTS - testing jon's fails.dat
-//61* MAGTESTS - testing jon's fails.dat
+//61* MAGTESTS - simple mag tests
 
-#define PROBLEM 60
+#define PROBLEM 61
 
 #if(PROBLEM==61)
 
