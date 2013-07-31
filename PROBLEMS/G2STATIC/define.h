@@ -73,7 +73,7 @@
 #ifdef USEMKS1COORDS
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1000.-MKS1R0))
-#define MAXX (log(55000.-MKS1R0))
+#define MAXX (log(50000.-MKS1R0))
 #define MKS1R0 -3000.
 #endif
 
@@ -85,7 +85,7 @@
 #define FULLPHI //for output - to print extra cell in phi
 #define NZ 160
 #define NX (NZ/2)
-#define NY 10//(NZ/2+1)
+#define NY (NZ/2+1)
 #define SPECIFIC_BC
 
 /************************************/
@@ -101,7 +101,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define CGSOUTPUT
-#define DTOUT1 1.e3
+#define DTOUT1 1.e5
 
 #define EQPLANEOUTPUT
 //#define VERTPLANEOUTPUT
