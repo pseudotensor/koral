@@ -81,7 +81,9 @@ initialize_arrays()
   pinit=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
  
   //primitives at cell centers at initial state - may be used for initializing problem
-  pproblem=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  pproblem1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  pproblem2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+
   //primitives at cell centers in previous time steps
   ptm1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
   ptm2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
@@ -271,7 +273,8 @@ free_arrays()
   free(xb);
   free(p);
   free(pinit);
-  free(pproblem);
+  free(pproblem1);
+  free(pproblem2);
 
 #ifdef MAGNFIELD
   free(emf);

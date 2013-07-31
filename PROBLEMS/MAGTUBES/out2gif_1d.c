@@ -48,7 +48,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($20) w lp ls 2 pt 7 ps .5  ti \"B^y\"\n"
+	  "plot \"%s\" u 1:($21) w lp ls 2 pt 7 ps .5  ti \"B^y\"\n"
 
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -59,7 +59,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($21) w lp ls 2 pt 7 ps .5  ti \"B^z\"\n"
+	  "plot \"%s\" u 1:($22) w lp ls 2 pt 7 ps .5  ti \"B^z\"\n"
 
 	  "set lmargin at screen 0.07\n"
 	  "set rmargin at screen 0.33\n"

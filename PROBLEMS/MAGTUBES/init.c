@@ -16,7 +16,7 @@ if(geom.xx<0.)
     pp[VZ]=VZL;
 
 #ifdef MAGNFIELD
-    pp[B1]=0.;
+    pp[B1]=BX;
     pp[B2]=BYL;
     pp[B3]=BZL;
 #endif
@@ -30,7 +30,7 @@ if(geom.xx<0.)
     pp[VZ]=VZR;
     
 #ifdef MAGNFIELD
-    pp[B1]=0.;
+    pp[B1]=BX;
     pp[B2]=BYR;
     pp[B3]=BZR;
 #endif

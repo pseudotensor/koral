@@ -51,7 +51,7 @@
 #define MYCOORDS MINKCOORDS//KERRCOORDS
 #define MINX -0.5
 #define MAXX 0.5
-#define NX 100
+#define NX 800
 #define NY 1
 #define NZ 1
 #define MINY (0.95*Pi/2.)
@@ -68,17 +68,18 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 50
-#define DTOUT1 0.05
+#define DTOUT1 0.02
 
 /************************************/
 //common physics / atmosphere
 /************************************/
-#define GAMMA (1.4)
 
 
-#define TUBE 1
+#define TUBE 4
 
 #if(TUBE==1) //Sod
+#define GAMMA (1.4)
+#define BX 0.
 #define RHOL 1.
 #define VXL 0.
 #define VYL 0.
@@ -93,5 +94,23 @@
 #define PR 0.1
 #define BYR 0.
 #define BZR 0.
+#endif
 
+#if(TUBE==4) //Brio & Wu
+#define GAMMA (2.)
+#define BX 0.75
+#define RHOL 1.
+#define VXL 0.
+#define VYL 0.
+#define VZL 0.
+#define PL 1.0
+#define BYL 1.
+#define BZL 0.
+#define RHOR 0.125
+#define VXR 0.
+#define VYR 0.
+#define VZR 0.
+#define PR 0.1
+#define BYR -1.
+#define BZR 0.
 #endif

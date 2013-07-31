@@ -10,13 +10,13 @@ int ix,iy,iz,ii,iv;
 for(ii=0;ii<Nloop_0;ii++) //domain only
   {
     ldouble trace,f;
-    ldouble pp[NV],ppinit[NV],uu[NV];
+    ldouble pp[NV],ppdisk[NV],uu[NV];
     struct geometry geom;
     ix=loop_0[ii][0];
     iy=loop_0[ii][1];
     iz=loop_0[ii][2]; 
   
-    trace=get_u(p,TRA,ix,iy,iz)/(get_u(p,TRA,ix,iy,iz)+get_u(p,RHO,ix,iy,iz));
+    trace=get_u(p,TRA,ix,iy,iz);
   
     if(trace<MINTRACE)
       {
@@ -24,10 +24,10 @@ for(ii=0;ii<Nloop_0;ii++) //domain only
 	f = trace / MINTRACE;
 	for(iv=0;iv<NV;iv++)
 	  {
-	    ppinit[iv]=get_u(pinit,iv,ix,iy,iz);	
+	    ppdisk[iv]=get_u(pproblem2,iv,ix,iy,iz);	
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 
-	    pp[iv]=ppinit[iv]*(1.-f) + pp[iv]*f;
+	    pp[iv]=ppdisk[iv]*(1.-f) + pp[iv]*f;
 	  }
 
 	//hd floors

@@ -33,14 +33,14 @@ set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
 
 /***********************************************/
 //imposing cloud in rho and velocities
-//cloud set up in prepinit.c and saved to pproblem
+//cloud set up in prepinit.c and saved to pproblem1
 
 ldouble ucon[4];
-ucon[1]=get_u(pproblem,VX,ix,iy,iz);
-ucon[2]=get_u(pproblem,VY,ix,iy,iz);
-ucon[3]=get_u(pproblem,VZ,ix,iy,iz);
+ucon[1]=get_u(pproblem1,VX,ix,iy,iz);
+ucon[2]=get_u(pproblem1,VY,ix,iy,iz);
+ucon[3]=get_u(pproblem1,VZ,ix,iy,iz);
 ldouble diskrho=pp[0];
-ldouble clrho=get_u(pproblem,RHO,ix,iy,iz);
+ldouble clrho=get_u(pproblem1,RHO,ix,iy,iz);
 pp[0]=diskrho+clrho;
 
 
@@ -52,8 +52,8 @@ diskrho*=1.-step_function(tracer-DISKDAMPPAR1,DISKDAMPPAR2);
 
 pp[0]=diskrho+clrho;
 tracer=clrho/(diskrho+clrho);
-//pp[TRA]=tracer;
-pp[TRA]=clrho;
+pp[TRA]=tracer;
+//pp[TRA]=clrho;
 
 #endif
 

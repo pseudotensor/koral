@@ -139,14 +139,7 @@ set_initial_profile()
   return 0;
 }
 
-/*********************************************/
-/* may be useful some day */
-/*********************************************/
-int
-initialize_problem()
-{
-  return 0;
-}
+
 
 /*********************************************/
 /* the humanoidal finger */

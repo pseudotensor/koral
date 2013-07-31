@@ -1,4 +1,4 @@
-//reads cloud from the file / creates it and asigns densities / velocities to pproblem[]
+//reads cloud from the file / creates it and asigns densities / velocities to pproblem1[]
 
 /***********************************************/
 /***********************************************/
@@ -114,10 +114,13 @@ while(fscanf(cloud,"%lf %lf %lf %lf %lf %lf\n",&x[1],&x[2],&x[3],&v[1],&v[2],&v[
 
 //cloud read, now going through cells and applying smoothing kernel
 
+//also saving the disk initial state into problem2
+
 int ii;
 #pragma omp parallel for private(ix,iy,iz) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
+      int iv;
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
@@ -133,10 +136,16 @@ int ii;
       y=geomXYZ.yy;
       z=geomXYZ.zz;
 
-      set_u(pproblem,0,ix,iy,iz,0.);
-      set_u(pproblem,2,ix,iy,iz,0.);
-      set_u(pproblem,3,ix,iy,iz,0.);
-      set_u(pproblem,4,ix,iy,iz,0.);
+      //bakcground disk saved to pproblem2
+      ldouble pp[NV];
+      set_sgradisk(pp,geom.xxvec,&geom,&geomBL);
+      PLOOP(iv)
+	set_u(pproblem2,iv,ix,iy,iz,pp[iv]);
+
+      set_u(pproblem1,0,ix,iy,iz,0.);
+      set_u(pproblem1,2,ix,iy,iz,0.);
+      set_u(pproblem1,3,ix,iy,iz,0.);
+      set_u(pproblem1,4,ix,iy,iz,0.);
 
       int icl;
       //over cloud particles
@@ -148,36 +157,36 @@ int ii;
 	  ldouble kern=
 	    exp(-dist*dist / KERNELWIDTH / KERNELWIDTH);
 
-	  set_u(pproblem,0,ix,iy,iz,
-		get_u(pproblem,0,ix,iy,iz)+kern); //assumes equal weights of particles
+	  set_u(pproblem1,0,ix,iy,iz,
+		get_u(pproblem1,0,ix,iy,iz)+kern); //assumes equal weights of particles
 
-	  set_u(pproblem,2,ix,iy,iz,
-		get_u(pproblem,2,ix,iy,iz)+kern*clpar[icl][3]); //x-momentum
+	  set_u(pproblem1,2,ix,iy,iz,
+		get_u(pproblem1,2,ix,iy,iz)+kern*clpar[icl][3]); //x-momentum
 	  
-	  set_u(pproblem,3,ix,iy,iz,
-		get_u(pproblem,3,ix,iy,iz)+kern*clpar[icl][4]); //y-momentum
+	  set_u(pproblem1,3,ix,iy,iz,
+		get_u(pproblem1,3,ix,iy,iz)+kern*clpar[icl][4]); //y-momentum
 	  
-	  set_u(pproblem,4,ix,iy,iz,
-		get_u(pproblem,4,ix,iy,iz)+kern*clpar[icl][5]); //z-momentum
+	  set_u(pproblem1,4,ix,iy,iz,
+		get_u(pproblem1,4,ix,iy,iz)+kern*clpar[icl][5]); //z-momentum
 
 	}
       //if(ix==13 && iy==10 && iz==21) getchar();
       //momentum -> velocity
 
-      if(get_u(pproblem,0,ix,iy,iz)>SMALL)
+      if(get_u(pproblem1,0,ix,iy,iz)>SMALL)
 	{
-	  set_u(pproblem,2,ix,iy,iz,
-		get_u(pproblem,2,ix,iy,iz)/get_u(pproblem,0,ix,iy,iz));
-	  set_u(pproblem,3,ix,iy,iz,
-		get_u(pproblem,3,ix,iy,iz)/get_u(pproblem,0,ix,iy,iz));
-	  set_u(pproblem,4,ix,iy,iz,
-		get_u(pproblem,4,ix,iy,iz)/get_u(pproblem,0,ix,iy,iz));
+	  set_u(pproblem1,2,ix,iy,iz,
+		get_u(pproblem1,2,ix,iy,iz)/get_u(pproblem1,0,ix,iy,iz));
+	  set_u(pproblem1,3,ix,iy,iz,
+		get_u(pproblem1,3,ix,iy,iz)/get_u(pproblem1,0,ix,iy,iz));
+	  set_u(pproblem1,4,ix,iy,iz,
+		get_u(pproblem1,4,ix,iy,iz)/get_u(pproblem1,0,ix,iy,iz));
 	}
       else
 	{
-	  set_u(pproblem,2,ix,iy,iz,0.);
-	  set_u(pproblem,3,ix,iy,iz,0.);
-	  set_u(pproblem,4,ix,iy,iz,0.);
+	  set_u(pproblem1,2,ix,iy,iz,0.);
+	  set_u(pproblem1,3,ix,iy,iz,0.);
+	  set_u(pproblem1,4,ix,iy,iz,0.);
 	}
 	  
       
@@ -185,15 +194,15 @@ int ii;
       if(iy==NY/2 && ix==NX/2)
 	{
 	  printf("1 %d %d %d-> %e | %e %e %e\n",ix,iy,iz
-		 ,get_u(pproblem,0,ix,iy,iz)
-		 ,get_u(pproblem,2,ix,iy,iz)
-		 ,get_u(pproblem,3,ix,iy,iz)
-		 ,get_u(pproblem,4,ix,iy,iz));
+		 ,get_u(pproblem1,0,ix,iy,iz)
+		 ,get_u(pproblem1,2,ix,iy,iz)
+		 ,get_u(pproblem1,3,ix,iy,iz)
+		 ,get_u(pproblem1,4,ix,iy,iz));
 	}
       */
        
       //converting velocitities to spherical
-      ldouble v[4]={0.,get_u(pproblem,2,ix,iy,iz),get_u(pproblem,3,ix,iy,iz),get_u(pproblem,4,ix,iy,iz)};
+      ldouble v[4]={0.,get_u(pproblem1,2,ix,iy,iz),get_u(pproblem1,3,ix,iy,iz),get_u(pproblem1,4,ix,iy,iz)};
       ldouble ucon[4];
       ldouble r=geomBL.xx;
       ldouble th=geomBL.yy;
@@ -209,19 +218,19 @@ int ii;
       trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
       conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
-      //saving to pproblem
-      set_u(pproblem,2,ix,iy,iz,ucon[1]);
-      set_u(pproblem,3,ix,iy,iz,ucon[2]);
-      set_u(pproblem,4,ix,iy,iz,ucon[3]);
+      //saving to pproblem1
+      set_u(pproblem1,2,ix,iy,iz,ucon[1]);
+      set_u(pproblem1,3,ix,iy,iz,ucon[2]);
+      set_u(pproblem1,4,ix,iy,iz,ucon[3]);
 
       /*
       if(iy==NY/2 && ix==NX/2)
 	{
 	  printf("2 %d %d %d-> %e | %e %e %e\n",ix,iy,iz
-		 ,get_u(pproblem,0,ix,iy,iz)
-		 ,get_u(pproblem,2,ix,iy,iz)
-		 ,get_u(pproblem,3,ix,iy,iz)
-		 ,get_u(pproblem,4,ix,iy,iz));
+		 ,get_u(pproblem1,0,ix,iy,iz)
+		 ,get_u(pproblem1,2,ix,iy,iz)
+		 ,get_u(pproblem1,3,ix,iy,iz)
+		 ,get_u(pproblem1,4,ix,iy,iz));
 	  getchar();
 	}
       */
@@ -229,7 +238,7 @@ int ii;
       //density normalized later
     }
 
-  //calculating total mass in pproblem
+  //calculating total mass in pproblem1
   ldouble xx[4],dx[3],mass,rho,gdet;
   mass=0.;
   for(iz=0;iz<NZ;iz++)
@@ -243,7 +252,7 @@ int ii;
 	      dx[1]=get_size_x(iy,1);
 	      dx[2]=get_size_x(iz,2);
 	      gdet=calc_gdet(xx);
-	      rho=get_u(pproblem,0,ix,iy,iz);
+	      rho=get_u(pproblem1,0,ix,iy,iz);
 	      //mass in cgs:
 	      mass+=rhoGU2CGS(rho)*lenGU2CGS(lenGU2CGS(lenGU2CGS(dx[0]*dx[1]*dx[2]*gdet)));
 	    }
@@ -256,7 +265,7 @@ ldouble scale=MASSCLOUD/mass;
 for(iz=0;iz<NZ;iz++)
   for(iy=0;iy<NY;iy++)
     for(ix=0;ix<NX;ix++)
-      set_u(pproblem,0,ix,iy,iz,get_u(pproblem,0,ix,iy,iz)*scale);
+      set_u(pproblem1,0,ix,iy,iz,get_u(pproblem1,0,ix,iy,iz)*scale);
 	    
 #endif
 
@@ -279,7 +288,6 @@ for(iz=0;iz<NZ;iz++)
 	    fill_geometry(ix,iy,iz,&geom);
 	    struct geometry geomBL;
 	    fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
-
 
 	    //faked cloud
 	    ldouble clix,cliy,cliz;
@@ -328,7 +336,7 @@ for(iz=0;iz<NZ;iz++)
 
 	    for(iv=0;iv<NV;iv++)
 	      {
-		set_u(pproblem,iv,ix,iy,iz,pp[iv]);
+		set_u(pproblem1,iv,ix,iy,iz,pp[iv]);
 	      }
 
 	    //uint & tr & entropy not used
