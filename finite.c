@@ -1955,11 +1955,7 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
           
 #ifdef SPECIFIC_BC  //BC specific for given problem
   calc_bc(ix,iy,iz,t,uval,pval,ifinit,BCtype);
-  for(iv=0;iv<NV;iv++)
-    {
-      set_u(u,iv,ix,iy,iz,uval[iv]);
-      set_u(p,iv,ix,iy,iz,pval[iv]);	      
-    }
+
 #else  
   //standard BC         
 #ifdef PERIODIC_XBC
@@ -2001,10 +1997,7 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
   p2u(pval,uval,&geom);
-      
-  for(iv=0;iv<NV;iv++)
-    set_u(u,iv,ix,iy,iz,uval[iv]);
-
+     
 #endif //SPECIFIC_BC   
 }
 
@@ -2016,10 +2009,10 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
 int set_bc(ldouble t,int ifinit)
 {
   int ix,iy,iz,ii,iv;
-  ldouble uval[NV],pval[NV];
+  
  
   //first fill the GC with no corners
-#pragma omp parallel for private(ix,iy,iz) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only, no corners
     {
       ix=loop_2[ii][0];
@@ -2034,7 +2027,8 @@ int set_bc(ldouble t,int ifinit)
       if(iy>0) BCtype=YBCHI;
       if(iz<0) BCtype=ZBCLO;
       if(iz>0) BCtype=ZBCHI;
- 
+      
+      ldouble uval[NV],pval[NV];
       set_bc_core(ix,iy,iz,t,uval,pval,ifinit,BCtype);
 
       for(iv=0;iv<NV;iv++)

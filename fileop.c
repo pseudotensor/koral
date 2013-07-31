@@ -411,10 +411,17 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 										  vy,     //17
 										  vz,     //18
 										  S,      //19
+#ifdef MAGNFIELD
+										  pp[B1],
+										  pp[B2],
+										  pp[B3],
+										  0.
+#else
 										  E,
 										  Fx,
 										  Fy,
 										  Fz
+#endif
 										  );
 
 

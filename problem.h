@@ -65,8 +65,23 @@
 //59* BBBLOB - rad blobs
 //60* JONTESTS - testing jon's fails.dat
 //61* MAGTESTS - simple mag tests
+//62* MAGTUBES - magnetic tubes
 
-#define PROBLEM 61
+#define PROBLEM 43
+
+#if(PROBLEM==62)
+
+#define PR_DEFINE "PROBLEMS/MAGTUBES/define.h"
+#define PR_BC "PROBLEMS/MAGTUBES/bc.c"
+#define PR_INIT "PROBLEMS/MAGTUBES/init.c"
+#define PR_KAPPA "PROBLEMS/MAGTUBES/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MAGTUBES/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MAGTUBES/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MAGTUBES/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MAGTUBES/dump.c"
+#define PR_TOOLS "PROBLEMS/MAGTUBES/tools.c"
+
+#endif
 
 #if(PROBLEM==61)
 
