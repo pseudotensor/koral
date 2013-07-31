@@ -592,7 +592,17 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       ldouble kappaabs=calc_kappa(pp2[RHO],T,geom->xx,geom->yy,geom->zz);
 
       //fluid frame energy equation:
-      f[0]=Rtt - Rtt0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
+      //check signs!
+      if(whichprim==RAD) //rad-primitives
+	{
+	  f[0]=Rtt - Rtt0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
+	}
+      if(whichprim==MHD) //mhd-
+	{
+	  f[0]=pp2[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	}
+
+      //printf(">>> %.10e %.10e %e\n",Rtt, Rtt0, kappaabs*(Ehat-4.*Pi*B)*dtau);getchar();
     }
   
   return ret;
@@ -776,7 +786,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   int LABEQ=0;
   int FFEQ=1;
 
-  params[1]=LABEQ;
+  params[1]=FFEQ;
 
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
