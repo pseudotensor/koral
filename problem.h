@@ -66,8 +66,23 @@
 //60* JONTESTS - testing jon's fails.dat
 //61* MAGTESTS - simple mag tests
 //62* MAGTUBES - magnetic tubes
+//63* ORSZAG - Orszag-Tang vortex
 
-#define PROBLEM 55
+#define PROBLEM 63
+
+#if(PROBLEM==63)
+
+#define PR_DEFINE "PROBLEMS/ORSZAG/define.h"
+#define PR_BC "PROBLEMS/ORSZAG/bc.c"
+#define PR_INIT "PROBLEMS/ORSZAG/init.c"
+#define PR_KAPPA "PROBLEMS/ORSZAG/kappa.c"
+#define PR_KAPPAES "PROBLEMS/ORSZAG/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/ORSZAG/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/ORSZAG/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/ORSZAG/dump.c"
+#define PR_TOOLS "PROBLEMS/ORSZAG/tools.c"
+
+#endif
 
 #if(PROBLEM==62)
 

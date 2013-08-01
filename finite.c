@@ -2009,7 +2009,6 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
 int set_bc(ldouble t,int ifinit)
 {
   int ix,iy,iz,ii,iv;
-  
  
   //first fill the GC with no corners
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
