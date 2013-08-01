@@ -67,7 +67,7 @@
 //61* MAGTESTS - simple mag tests
 //62* MAGTUBES - magnetic tubes
 
-#define PROBLEM 62
+#define PROBLEM 55
 
 #if(PROBLEM==62)
 
