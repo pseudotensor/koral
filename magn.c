@@ -22,38 +22,81 @@ void bcon_calc(double *pr, double *ucon, double *ucov, double *bcon)
 /***********************************************************************************************/
 /***********************************************************************************************
 /* wrappers for missing cells / dimensions */
-int flx_x(int i)
-{ return i;}
-int flx_y(int i)
+int fl_x(int i)
+{ if(NX==1) return 0;
+  if(i<0) {
+    #ifdef PERIODIC_XBC
+    return NX+i;
+    #else
+    return 0;
+    #endif 
+  }
+  if(i>=NX) {
+    #ifdef PERIODIC_XBC
+    return i-NX;
+    #else
+    return NX-1;
+    #endif 
+  }
+  return i; }
+
+int fl_y(int i)
 { if(NY==1) return 0;
-  if(i<0) return 0;
-  if(i>=NY) return NY-1; }
-int flx_z(int i)
+  if(i<0) {
+    #ifdef PERIODIC_YBC
+    return NY+i;
+    #else
+    return 0;
+    #endif 
+  }
+  if(i>=NY) {
+    #ifdef PERIODIC_YBC
+    return i-NY;
+    #else
+    return NY-1;
+    #endif 
+  }
+  return i; }
+
+int fl_z(int i)
 { if(NZ==1) return 0;
-  if(i<0) return 0;
-  if(i>=NZ) return NZ-1; }
+  if(i<0) {
+    #ifdef PERIODIC_ZBC
+    return NZ+i;
+    #else
+    return 0;
+    #endif 
+  }
+  if(i>=NZ) {
+    #ifdef PERIODIC_ZBC
+    return i-NZ;
+    #else
+    return NZ-1;
+    #endif 
+  }
+  return i; }
+
+int flx_x(int i)
+{ return i; }
+int flx_y(int i)
+{ return fl_y(i); }
+int flx_z(int i)
+{ return fl_z(i); }
 
 int fly_x(int i)
-{ if(NX==1) return 0;
-  if(i<0) return 0;
-  if(i>=NX) return NX-1; }
+{ return fl_x(i); }
 int fly_y(int i)
-{ return i;}
+{ return i; }
 int fly_z(int i)
-{ if(NZ==1) return 0;
-  if(i<0) return 0;
-  if(i>=NZ) return NZ-1; }
+{ return fl_z(i); }
 
 int flz_x(int i)
-{ if(NX==1) return 0;
-  if(i<0) return 0;
-  if(i>=NX) return NX-1; }
+{ return fl_x(i); }
 int flz_y(int i)
-{ if(NY==1) return 0;
-  if(i<0) return 0;
-  if(i>=NY) return NY-1; }
+{ return fl_y(i); }
 int flz_z(int i)
-{ return i;}
+{ return i; }
+
 
 /***********************************************************************************************/
 /***********************************************************************************************
@@ -71,7 +114,7 @@ flux_ct()
   else coefemf[2]=0.5; 
   if((NX>1)&&(NY>1)) coefemf[3]=0.25;
   else coefemf[3]=0.5; 
-
+  
   int ix,iy,iz,iv,ii;
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   //calculating EMF at corners
@@ -84,8 +127,9 @@ flux_ct()
       ////////////////////
       // EMF1
       ////////////////////
-
+      
 #if((NY>1)||(NZ>1))
+      //TODO: debug here
       set_emf(1,ix,iy,iz,
 	      coefemf[1] * (
                             #if(NY>1)
@@ -100,8 +144,7 @@ flux_ct()
 #else  // end if doing EMF1
       set_emf(1,ix,iy,iz,0.); // not really 0, but differences in emf will be 0, and that's all that matters
 #endif // end if not doing EMF1
-
-
+      
 	////////////////////
 	// EMF2
 	////////////////////
@@ -138,9 +181,9 @@ flux_ct()
 			    ));
 #else  
       set_emf(3,ix,iy,iz,0.);
-#endif 
+#endif
     }
-
+  
   //reset certain emfs at the boundaries to ensure stationarity
   adjust_fluxcttoth_emfs();
 
@@ -189,7 +232,7 @@ flux_ct()
 	}
 #endif
     }
-
+  
 #endif //MAGNFIELD
       return 0;
 }

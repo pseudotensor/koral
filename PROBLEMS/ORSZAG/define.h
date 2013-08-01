@@ -59,9 +59,9 @@
 #define NX 64
 #define NY 64
 #define NZ 1
-#define COPY_XBC
-#define COPY_YBC
-#define COPY_ZBC
+#define PERIODIC_XBC
+#define PERIODIC_YBC
+#define PERIODIC_ZBC
 
 /************************************/
 //output
