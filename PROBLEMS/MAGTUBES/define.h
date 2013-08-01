@@ -21,7 +21,10 @@
 #define INT_ORDER 1
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 2.
+#define FLUXMETHOD LAXF_FLUX
+//#define WAVESPEEDSATFACES
+#define TIMESTEPPING RK2 //time stepping
 
 /************************************/
 //viscosity choices
@@ -49,12 +52,12 @@
 //coordinates / resolution
 /************************************/
 #define MYCOORDS MINKCOORDS//KERRCOORDS
-#define MINX -0.5
-#define MAXX 0.5
-#define NX 800
+#define MINX 0.
+#define MAXX 1.
 #define NY 1
 #define NZ 1
 #define MINY (0.95*Pi/2.)
+#define NX 512
 #define MAXY (1.05*Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
@@ -68,16 +71,16 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 50
-#define DTOUT1 0.02
 
 /************************************/
 //common physics / atmosphere
 /************************************/
 
 
-#define TUBE 4
+#define TUBE 3
 
 #if(TUBE==1) //Sod
+#define DTOUT1 0.02
 #define GAMMA (1.4)
 #define BX 0.
 #define RHOL 1.
@@ -96,21 +99,45 @@
 #define BZR 0.
 #endif
 
-#if(TUBE==4) //Brio & Wu
-#define GAMMA (2.)
-#define BX 0.75
+#if(TUBE==2) //Brio & Wu, RJ 5a
+#define CSCALE 100.
+#define DTOUT1 0.5
+#define GAMMA (5./3.)
+#define BX (0.75/CSCALE)
 #define RHOL 1.
 #define VXL 0.
 #define VYL 0.
 #define VZL 0.
-#define PL 1.0
-#define BYL 1.
+#define PL (1.0/CSCALE/CSCALE)
+#define BYL (1./CSCALE)
 #define BZL 0.
 #define RHOR 0.125
 #define VXR 0.
 #define VYR 0.
 #define VZR 0.
-#define PR 0.1
-#define BYR -1.
+#define PR (0.1/CSCALE/CSCALE)
+#define BYR (-1./CSCALE)
 #define BZR 0.
+#endif
+
+#if(TUBE==3) //Brio & Wu, RJ 2a
+#define CSCALE 100.
+#define FAC sqrt(4.*M_PI)
+#define DTOUT1 0.5
+#define GAMMA (5./3.)
+#define BX (2./FAC/CSCALE)
+#define RHOL 1.08
+#define VXL (1.2/CSCALE)
+#define VYL (0.01/CSCALE)
+#define VZL (0.5/CSCALE)
+#define PL (0.95/CSCALE/CSCALE)
+#define BYL (3.6/FAC/CSCALE)
+#define BZL (2./FAC/CSCALE)
+#define RHOR 1.
+#define VXR 0.
+#define VYR 0.
+#define VZR 0.
+#define PR (1./CSCALE/CSCALE)
+#define BYR (4./FAC/CSCALE)
+#define BZR (2./FAC/CSCALE)
 #endif

@@ -7,7 +7,7 @@ struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
 /***********************************************/
-if(geom.xx<0.)
+if(geom.xx<0.5)
   {
     pp[RHO]=RHOL;
     pp[UU]=PL/GAMMAM1;
