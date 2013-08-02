@@ -11,6 +11,9 @@ fill_geometry(ix,iy,iz,&geom);
 ldouble x=geom.xx;
 ldouble y=geom.yy;
 
+//x=geom.yy;
+//y=geom.xx;
+
 pp[RHO]=25./(36.*M_PI);
 pp[UU]=(5./12/M_PI)/GAMMAM1/CSCALE/CSCALE;
 pp[VX]=-sin(2.*M_PI*y)/CSCALE;

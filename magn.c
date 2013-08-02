@@ -133,12 +133,12 @@ flux_ct()
       set_emf(1,ix,iy,iz,
 	      coefemf[1] * (
                             #if(NY>1)
-			    + get_ub(flby,fly_x(ix),fly_y(iy),fly_z(iz),B3,1) 
-			    + get_ub(flby,fly_x(ix),fly_y(iy),fly_z(iz-1),B3,1)
+			    + get_ub(flby,B3,fly_x(ix),fly_y(iy),fly_z(iz),1) 
+			    + get_ub(flby,B3,fly_x(ix),fly_y(iy),fly_z(iz-1),1)
                             #endif
                             #if(NZ>1)
-			    - get_ub(flbz,flz_x(ix),flz_y(iy),flz_z(iz),B2,2) 
-			    - get_ub(flbz,flz_x(ix),flz_y(iy-1),flz_z(iz),B2,2)
+			    - get_ub(flbz,B2,flz_x(ix),flz_y(iy),flz_z(iz),2) 
+			    - get_ub(flbz,B2,flz_x(ix),flz_y(iy-1),flz_z(iz),2)
                             #endif
 			    ));
 #else  // end if doing EMF1
@@ -152,12 +152,12 @@ flux_ct()
       set_emf(2,ix,iy,iz,
 	      coefemf[2] * (
                             #if(NZ>1)
-			    + get_ub(flbz,flz_x(ix),flz_y(iy),flz_z(iz),B1,2) 
-			    + get_ub(flbz,flz_x(ix-1),flz_y(iy),flz_z(iz),B1,2)
+			    + get_ub(flbz,B1,flz_x(ix),flz_y(iy),flz_z(iz),2) 
+			    + get_ub(flbz,B1,flz_x(ix-1),flz_y(iy),flz_z(iz),2)
                             #endif
                             #if(NX>1)
-			    - get_ub(flbx,flx_x(ix),flx_y(iy),flx_z(iz),B3,0) 
-			    - get_ub(flbx,flx_x(ix),flx_y(iy),flx_z(iz-1),B3,0)
+			    - get_ub(flbx,B3,flx_x(ix),flx_y(iy),flx_z(iz),0) 
+			    - get_ub(flbx,B3,flx_x(ix),flx_y(iy),flx_z(iz-1),0)
                             #endif
 			    ));
 #else  
@@ -171,12 +171,12 @@ flux_ct()
       set_emf(3,ix,iy,iz,
 	      coefemf[3] * (
                             #if(NX>1)
-			    + get_ub(flbx,flx_x(ix),flx_y(iy),flx_z(iz),B2,0) 
-			    + get_ub(flbx,flx_x(ix),flx_y(iy-1),flx_z(iz),B2,0)
+			    + get_ub(flbx,B2,flx_x(ix),flx_y(iy),flx_z(iz),0) 
+			    + get_ub(flbx,B2,flx_x(ix),flx_y(iy-1),flx_z(iz),0)
                             #endif
                             #if(NY>1)
-			    - get_ub(flby,fly_x(ix),fly_y(iy),fly_z(iz),B1,1) 
-			    - get_ub(flby,fly_x(ix-1),fly_y(iy),fly_z(iz),B1,1)
+			    - get_ub(flby,B1,fly_x(ix),fly_y(iy),fly_z(iz),1) 
+			    - get_ub(flby,B1,fly_x(ix-1),fly_y(iy),fly_z(iz),1)
                             #endif
 			    ));
 #else  
@@ -190,8 +190,6 @@ flux_ct()
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   for(ii=0;ii<Nloop_4;ii++) // 0...NX
     {
-      //TODO: check if this is the right loop
-
       ix=loop_4[ii][0];
       iy=loop_4[ii][1];
       iz=loop_4[ii][2]; 
@@ -200,11 +198,11 @@ flux_ct()
       // F1
       ////////////////////////////////////
 #if(NX>1)
-      if(iy<NY && iz<NZ) //no need to fill x-face fluxes for iy=NY
+      if(iy<NY && iz<NZ) //no need to fill x-face fluxes for iy=NY etc.
 	{
-	  set_ubx(flbx,ix,iy,iz,B1,0.);
-	  set_ubx(flbx,ix,iy,iz,B2,0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix,iy+1,iz)));
-	  set_ubx(flbx,ix,iy,iz,B3,-0.5 * (get_emf(2,ix,iy,iz) + get_emf(2,ix,iy,iz+1)));
+	  set_ubx(flbx,B1,ix,iy,iz,0.);
+	  set_ubx(flbx,B2,ix,iy,iz,0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix,iy+1,iz)));
+	  set_ubx(flbx,B3,ix,iy,iz,-0.5 * (get_emf(2,ix,iy,iz) + get_emf(2,ix,iy,iz+1)));
 	}
 #endif
 
@@ -212,11 +210,11 @@ flux_ct()
       // F2
       ////////////////////////////////////
 #if(NY>1)
-      if(ix<NX && iz<NZ)	
+      if(ix<NX && iz<NZ && 1)	
 	{
-	  set_uby(flby,ix,iy,iz,B1,-0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix+1,iy,iz)));
-	  set_uby(flby,ix,iy,iz,B2,0.);
-	  set_uby(flby,ix,iy,iz,B3,0.5 * (get_emf(1,ix,iy,iz) + get_emf(1,ix,iy,iz+1)));
+	  set_uby(flby,B1,ix,iy,iz,-0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix+1,iy,iz)));
+	  set_uby(flby,B2,ix,iy,iz,0.);
+	  set_uby(flby,B3,ix,iy,iz,0.5 * (get_emf(1,ix,iy,iz) + get_emf(1,ix,iy,iz+1)));
 	}
 #endif
 
@@ -226,9 +224,9 @@ flux_ct()
 #if(NZ>1)
       if(ix<NX && iy<NY)	
 	{
-	  set_ubz(flbz,ix,iy,iz,B1,0.5 * (get_emf(2,ix,iy,iz) + get_emf(2,ix+1,iy,iz)));
-	  set_ubz(flbz,ix,iy,iz,B2,-0.5 * (get_emf(1,ix,iy,iz) + get_emf(1,ix,iy+1,iz)));
-	  set_ubz(flbz,ix,iy,iz,B3,0.);
+	  set_ubz(flbz,B1,ix,iy,iz,0.5 * (get_emf(2,ix,iy,iz) + get_emf(2,ix+1,iy,iz)));
+	  set_ubz(flbz,B2,ix,iy,iz,-0.5 * (get_emf(1,ix,iy,iz) + get_emf(1,ix,iy+1,iz)));
+	  set_ubz(flbz,B3,ix,iy,iz,0.);
 	}
 #endif
     }

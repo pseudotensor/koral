@@ -1553,7 +1553,8 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //corners of the domain
+  //all corners of the domain
+  
   Nloop_4=0;
   loop_4=(int **)malloc(sizeof(int*));
   loop_4[0]=(int *)malloc(3*sizeof(int));

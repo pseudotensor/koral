@@ -303,10 +303,10 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 									  ldouble rho=pp[0];
 									  ldouble uint=pp[1];
 									  ldouble S=pp[5];
-									  ldouble p=(GAMMA-1.)*uint;
+									  ldouble pre=(GAMMA-1.)*uint;
 									  gdet=gg[3][4];
 									  ldouble ut=uu[0]/gdet/rho;
-									  Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+									  Tgas=pre*MU_GAS*M_PROTON/K_BOLTZ/rho;
 
 									  ldouble vx=pp[2];
 									  ldouble vy=pp[3];

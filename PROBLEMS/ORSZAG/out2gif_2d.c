@@ -23,7 +23,7 @@
 #ifndef MAGNFIELD
 	  "set term gif large size 800,700\n"
 #else
-	  "set term gif large size 1600,700\n"
+	  "set term gif large size 1600,450\n"
 #endif
 	  "set output \"%s\"\n"
 	  "set view map\n"
@@ -48,8 +48,8 @@
 	  "set lmargin at screen 0.07\n"
 	  "set rmargin at screen 0.85\n"
 #else
-	  "set lmargin at screen 0.05\n"
-	  "set rmargin at screen 0.425\n"
+	  "set lmargin at screen 0.025\n"
+	  "set rmargin at screen 0.275\n"
 #endif
 	  "set bmargin at screen .12\n"
 	  "set tmargin at screen .95\n"
@@ -60,9 +60,10 @@
 	  //"set log cb\n"
 
 	  "set xlabel \"x\"\n"
-	  "set ylabel \"y\"\n"
+	  "set ylabel \"\"\n"
 	  "set cblabel \"\"\n"
 	  "set title \"hydro\" offset 0,-1\n"
+	  //	  "splot \"%s\" u 1:2:($14) w l ti \"\"\n"
 	  "splot \"%s\" u 1:2:($14) w l ti \"\"\n"
 	 
 	  "unset pm3d\n"
@@ -87,8 +88,8 @@
 	  "set border\n"
 
 #ifdef MAGNFIELD
-	  "set lmargin at screen 0.525\n"
-	  "set rmargin at screen 0.90\n"
+	  "set lmargin at screen 0.35\n"
+	  "set rmargin at screen 0.6\n"
 	  "set bmargin at screen .12\n"
 	  "set tmargin at screen .95\n"
 	  "set autoscale \n"
@@ -102,7 +103,7 @@
 	  "set cblabel \"\"\n"
 	  "set format x \"%%.1f\"\n"
 	  "set format y \"%%.1f\"\n" 
-	  "set title \"mag\" offset 0,-1\n"
+	  "set title \"Bsq\" offset 0,-1\n"
 	  "splot \"%s\" u 1:2:($20**2+$21**2+$22**2) w l ti \"\"\n"
 	 
 	  "unset pm3d\n"
@@ -125,7 +126,24 @@
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"
-	  "set label 1 \"time: %f\" at screen .5, .51\n"
+	  
+	  "set lmargin at screen 0.700\n"
+	  "set rmargin at screen 0.95\n"
+	  "set bmargin at screen .12\n"
+	  "set tmargin at screen .95\n"
+	  "set autoscale \n"
+	  "set cbrange [-0.005:0.005]\n"
+	  //"set log cb\n"
+
+	  "set xlabel \"x\"\n"
+	  "set ylabel \"\"\n"
+	  "set cblabel \"\"\n"
+	  "set format x \"%%.1f\"\n"
+	  "set format y \"%%.1f\"\n" 
+	  "set title \"div B\" offset 0,-1\n"
+	  "splot \"%s\" u 1:2:($24) w l ti \"\"\n"
+
+
 #endif
 
 	  ,fname,fname,fname2,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1)
@@ -133,7 +151,7 @@
 #ifdef MAGNFIELD
 	  ,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1)
 	  ,fname,fname,50./(get_xb(NX,0)-get_xb(0,0)),50./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NY/20),
-	  t
+	  fname
 #endif
 );
 	    
