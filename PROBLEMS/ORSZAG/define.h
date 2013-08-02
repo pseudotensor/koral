@@ -56,8 +56,8 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1.
-#define NX 92
-#define NY 92
+#define NX 640
+#define NY 640
 #define NZ 1
 #define PERIODIC_XBC
 #define PERIODIC_YBC

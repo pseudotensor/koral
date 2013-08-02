@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTNUM 0
 
 /************************************/
@@ -85,7 +85,7 @@
 #define FULLPHI //for output - to print extra cell in phi
 #define NZ 60
 #define NX (NZ/2)
-#define NY (NZ/2+1)
+#define NY (NZ/4+1)//(NZ/2+1)
 #define SPECIFIC_BC
 
 /************************************/
