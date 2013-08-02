@@ -1396,6 +1396,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //**********************************************************************
   //**********************************************************************
   //inside + ghost cells - number depending on the order of reconstruction
+  //used to indicate where calculate fluxes
   int xlim,ylim,zlim;
   int lim;
 
@@ -1481,6 +1482,25 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   shuffle_loop(loop_2,Nloop_2);
 #endif
 
+  //**********************************************************************
+  //**********************************************************************
+  //domain and all ghost cells
+  Nloop_02=Nloop_0+Nloop_2;
+  loop_02=(int **)malloc(Nloop_02*sizeof(int*));
+  for(ix=0;ix<Nloop_0;ix++)
+    {
+      loop_02[ix]=(int *)malloc(3*sizeof(int));
+      loop_02[ix][0]=loop_0[ix][0];
+      loop_02[ix][1]=loop_0[ix][1];
+      loop_02[ix][2]=loop_0[ix][2];
+    }
+  for(ix=0;ix<Nloop_2;ix++)
+    {
+      loop_02[ix+Nloop_0]=(int *)malloc(3*sizeof(int));
+      loop_02[ix+Nloop_0][0]=loop_2[ix][0];
+      loop_02[ix+Nloop_0][1]=loop_2[ix][1];
+      loop_02[ix+Nloop_0][2]=loop_2[ix][2];
+    }
 
   //**********************************************************************
   //**********************************************************************

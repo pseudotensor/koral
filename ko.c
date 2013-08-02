@@ -52,27 +52,25 @@ main(int argc, char **argv)
 
 #ifdef RESTART
   fread_restartfile(RESTARTNUM,&tstart);
+  set_bc(tstart,1);
 #else
   //or initialize new problem
   set_initial_profile();
   tstart=0.;
+  set_bc(tstart,1);
+  #ifdef VECPOTGIVEN
+  calc_BfromA();
+  #endif
 #endif
-
-  //test
-  //test_maginv();
-  //exit(0);
 
   //prepares files
   fprint_openfiles("dumps");
-
-  //sets bc
-  set_bc(tstart,1);
-
+  
   //copies initial primitives to pinit
   copy_u(1.,p,pinit);
 
   //evolves
-  solve_all_problems_5(tstart);
+  solve_the_problem(tstart);
 
   //free_arrays();
   fprint_closefiles();
@@ -84,7 +82,7 @@ main(int argc, char **argv)
 /******************************************************/
 
 int
-solve_all_problems_5(ldouble tstart)
+solve_the_problem(ldouble tstart)
 {
   ldouble t = tstart, t1 = TMAX, dtsource, taim;
   ldouble totalmass=0.;

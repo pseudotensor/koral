@@ -244,3 +244,137 @@ int adjust_fluxcttoth_emfs()
   //don't know what to do here
   return 0;
 }
+
+/***********************************************************************************************/
+/** calculates B-field from A given in B1-B3 primitives ****************************************/
+/** uses pinit as a temporary holder ***********************************************************/
+/** assumes set_bc already done ****************************************************************/
+/***********************************************************************************************/
+int
+calc_BfromA()
+{
+  #ifdef MAGNFIELD
+
+  int ix,iy,iz,iv,ii;
+  //A_mu converted to code coordinates in init.c
+  
+  #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
+    {
+      ix=loop_02[ii][0];
+      iy=loop_02[ii][1];
+      iz=loop_02[ii][2]; 
+
+      ldouble B[4];
+      ldouble dA[4][4];
+
+      dA[1][1]=dA[2][2]=dA[3][3]=0.;
+
+      //d_1 A_2
+      if(NX==1)
+	dA[1][2]=0.;
+      else
+	{
+	  if(ix>-NG && ix<NX+NG-1)
+	    dA[1][2]=(get_u(p,B2,ix+1,iy,iz)-get_u(p,B2,ix-1,iy,iz))/(get_x(ix+1,0)-get_x(ix-1,0));
+	  if(ix==-NG)
+	    dA[1][2]=(-3.*get_u(p,B2,ix,iy,iz)+4.*get_u(p,B2,ix+1,iy,iz)-get_u(p,B2,ix,iy,iz+2))/(get_x(ix+2,0)-get_x(ix,0));
+	  if(ix==NX+NG-1)
+	    dA[1][2]=(3.*get_u(p,B2,ix,iy,iz)-4.*get_u(p,B2,ix-1,iy,iz)+get_u(p,B2,ix-2,iy,iz))/(get_x(ix,0)-get_x(ix-2,0));
+	}
+
+      //d_1 A_3
+      if(NX==1)
+	dA[1][3]=0.;
+      else
+	{
+	  if(ix>-NG && ix<NX+NG-1)
+	    dA[1][3]=(get_u(p,B3,ix+1,iy,iz)-get_u(p,B3,ix-1,iy,iz))/(get_x(ix+1,0)-get_x(ix-1,0));
+	  if(ix==-NG)
+	    dA[1][3]=(-3.*get_u(p,B3,ix,iy,iz)+4.*get_u(p,B3,ix+1,iy,iz)-get_u(p,B3,ix,iy,iz+2))/(get_x(ix+2,0)-get_x(ix,0));
+	  if(ix==NX+NG-1)
+	    dA[1][3]=(3.*get_u(p,B3,ix,iy,iz)-4.*get_u(p,B3,ix-1,iy,iz)+get_u(p,B3,ix-2,iy,iz))/(get_x(ix,0)-get_x(ix-2,0));
+	}
+
+      //d_2 A_3
+      if(NY==1)
+	dA[2][3]=0.;
+      else
+	{
+	  if(iy>-NG && iy<NY+NG-1)
+	    dA[2][3]=(get_u(p,B3,ix,iy+1,iz)-get_u(p,B3,ix,iy-1,iz))/(get_x(iy+1,1)-get_x(iy-1,1));
+	  if(iy==-NG)
+	    dA[2][3]=(-3.*get_u(p,B3,ix,iy,iz)+4.*get_u(p,B3,ix,iy+1,iz)-get_u(p,B3,ix,iy+2,iz))/(get_x(iy+2,1)-get_x(iy,1));
+	  if(iy==NY+NG-1)
+	    dA[2][3]=(3.*get_u(p,B3,ix,iy,iz)-4.*get_u(p,B3,ix,iy-1,iz)+get_u(p,B3,ix,iy-2,iz))/(get_x(iy,1)-get_x(iy-2,1));
+	}
+
+      //d_2 A_1
+      if(NY==1)
+	dA[2][1]=0.;
+      else
+	{
+	  if(iy>-NG && iy<NY+NG-1)
+	    dA[2][1]=(get_u(p,B1,ix,iy+1,iz)-get_u(p,B1,ix,iy-1,iz))/(get_x(iy+1,1)-get_x(iy-1,1));
+	  if(iy==-NG)
+	    dA[2][1]=(-3.*get_u(p,B1,ix,iy,iz)+4.*get_u(p,B1,ix,iy+1,iz)-get_u(p,B1,ix,iy+2,iz))/(get_x(iy+2,1)-get_x(iy,1));
+	  if(iy==NY+NG-1)
+	    dA[2][1]=(3.*get_u(p,B1,ix,iy,iz)-4.*get_u(p,B1,ix,iy-1,iz)+get_u(p,B1,ix,iy-2,iz))/(get_x(iy,1)-get_x(iy-2,1));
+	}
+
+      //d_3 A_2
+      if(NZ==1)
+	dA[3][2]=0.;
+      else
+	{
+	  if(iz>-NG && iz<NZ+NG-1)
+	    dA[3][2]=(get_u(p,B2,ix,iy,iz+1)-get_u(p,B2,ix,iy,iz-1))/(get_x(iz+1,2)-get_x(iz-1,2));
+	  if(iz==-NG)
+	    dA[3][2]=(-3.*get_u(p,B2,ix,iy,iz)+4.*get_u(p,B2,ix,iy,iz+1)-get_u(p,B2,ix,iy,iz+2))/(get_x(iz+2,2)-get_x(iz,2));
+	  if(iz==NZ+NG-1)
+	    dA[3][2]=(3.*get_u(p,B2,ix,iy,iz)-4.*get_u(p,B2,ix,iy,iz-1)+get_u(p,B2,ix,iy,iz-2))/(get_x(iz,2)-get_x(iz-2,2));
+	}
+
+       //d_3 A_1
+      if(NZ==1)
+	dA[3][1]=0.;
+      else
+	{
+	  if(iz>-NG && iz<NZ+NG-1)
+	    dA[3][1]=(get_u(p,B1,ix,iy,iz+1)-get_u(p,B1,ix,iy,iz-1))/(get_x(iz+1,2)-get_x(iz-1,2));
+	  if(iz==-NG)
+	    dA[3][1]=(-3.*get_u(p,B1,ix,iy,iz)+4.*get_u(p,B1,ix,iy,iz+1)-get_u(p,B1,ix,iy,iz+2))/(get_x(iz+2,2)-get_x(iz,2));
+	  if(iz==NZ+NG-1)
+	    dA[3][1]=(3.*get_u(p,B1,ix,iy,iz)-4.*get_u(p,B1,ix,iy,iz-1)+get_u(p,B1,ix,iy,iz-2))/(get_x(iz,2)-get_x(iz-2,2));
+	}
+
+      //B^i = d_j A_k eps^ijk
+      //saving temporarily to pinit
+
+      B[1]=dA[2][3] - dA[3][2];
+      B[2]=dA[3][1] - dA[1][3];
+      B[3]=dA[1][2] - dA[2][1];
+
+      set_u(pinit,B1,ix,iy,iz,B[1]);
+      set_u(pinit,B2,ix,iy,iz,B[2]);
+      set_u(pinit,B3,ix,iy,iz,B[3]);
+     
+    } //cell loop
+
+  //overwriting vector potential with magnetic fields
+  #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
+    {
+      ix=loop_02[ii][0];
+      iy=loop_02[ii][1];
+      iz=loop_02[ii][2]; 
+
+      set_u(p,B1,ix,iy,iz,get_u(pinit,B1,ix,iy,iz));
+      set_u(p,B2,ix,iy,iz,get_u(pinit,B2,ix,iy,iz));
+      set_u(p,B3,ix,iy,iz,get_u(pinit,B3,ix,iy,iz));      
+    }
+  
+#endif //MAGNFIELD
+
+  return 0;
+}

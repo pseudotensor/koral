@@ -87,7 +87,7 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*
   *emuup2,*emulo2,*emuupbx2,*emulobx2,*emuupby2,*emuloby2,*emuupbz2,*emulobz2,
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
-int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,Nloop_0,Nloop_1,Nloop_2,Nloop_3,Nloop_4;
+int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,**loop_02,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4;
 
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
 
@@ -120,8 +120,8 @@ struct geometry
 };
 
 //main.c
-int solve_all_problems_5(ldouble);
-int solve_all_problems_6(ldouble);
+int solve_the_problem(ldouble);
+
 gsl_odeiv2_step **odeiv2_step_1;
 gsl_odeiv2_step **odeiv2_step_2;
 struct evolve_fluxes_1_param
@@ -493,6 +493,7 @@ int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbo
 
 //magn.c
 void bcon_calc(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon); 
+int calc_BfromA();
 
 
 #include "mnemonics.h"
