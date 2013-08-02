@@ -369,9 +369,24 @@ calc_BfromA()
       iy=loop_02[ii][1];
       iz=loop_02[ii][2]; 
 
-      set_u(p,B1,ix,iy,iz,get_u(pinit,B1,ix,iy,iz));
-      set_u(p,B2,ix,iy,iz,get_u(pinit,B2,ix,iy,iz));
-      set_u(p,B3,ix,iy,iz,get_u(pinit,B3,ix,iy,iz));      
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+      
+      ldouble pp[NV],uu[NV];
+      PLOOP(iv)
+	pp[iv]=get_u(p,B1,ix,iy,iz);
+      pp[B1]=get_u(pinit,B1,ix,iy,iz);
+      pp[B2]=get_u(pinit,B2,ix,iy,iz);
+      pp[B3]=get_u(pinit,B3,ix,iy,iz);
+
+      p2u(pp,uu,&geom);
+
+      set_u(p,B1,ix,iy,iz,pp[B1]);
+      set_u(p,B2,ix,iy,iz,pp[B2]);
+      set_u(p,B3,ix,iy,iz,pp[B3]);
+      set_u(u,B1,ix,iy,iz,uu[B1]);
+      set_u(u,B2,ix,iy,iz,uu[B2]);
+      set_u(u,B3,ix,iy,iz,uu[B3]);     
     }
   
 #endif //MAGNFIELD

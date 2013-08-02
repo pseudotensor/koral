@@ -56,8 +56,8 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1.
-#define NX 64
-#define NY 64
+#define NX 192
+#define NY 192
 #define NZ 1
 #define PERIODIC_XBC
 #define PERIODIC_YBC
@@ -76,5 +76,6 @@
 
 #define GAMMA (4./3.)
 #define CSCALE 100.
-#define DTOUT1 0.05
+#define DTOUT1 1.
 #define BZERO (1./sqrt(4.*M_PI))
+#define VECPOTGIVEN

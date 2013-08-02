@@ -49,6 +49,10 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+  //precalculating problem related numbers
+#ifdef PR_PREPINIT
+#include PR_PREPINIT
+#endif
 
 #ifdef RESTART
   fread_restartfile(RESTARTNUM,&tstart);
@@ -125,7 +129,7 @@ solve_the_problem(ldouble tstart)
   //main time loop
   int nstep=0;
 
-  while (t < t1 && nfout1<NOUTSTOP && i1<NSTEPSTOP)
+  while (t < t1 && nfout1<=NOUTSTOP && i1<NSTEPSTOP)
     {    
       nstep++;
 

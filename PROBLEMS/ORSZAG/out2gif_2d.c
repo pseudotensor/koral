@@ -1,11 +1,19 @@
   fprintf(fgnu,
           
-	  "set table \"table.gp\"\n"
+	  "set table \"table.den.gp\"\n"
 	  "set contour base\n"
 	  "unset surface\n"
 	  "set log z\n"
-	  "set cntrparam levels discrete 1.1,3,6,10,30,60,100 \n"
+	  "set cntrparam levels 30 \n"
 	  "splot \"%s\" u 1:2:14 w l\n"
+
+	  "set table \"table.magpre.gp\"\n"
+	  "set contour base\n"
+	  "unset surface\n"
+	  "set log z\n"
+	  "set cntrparam levels 30 \n"
+	  "splot \"%s\" u 1:2:($20**2+$21**2+$22**2) w l\n"
+
 	  "unset dgrid3d\n"
 	  "unset log z\n"
 	  "unset table\n"
@@ -73,7 +81,7 @@
 	  "unset border\n"
 	  "unset pm3d\n"
 	  "unset surface\n"
-	  "plot \"table.gp\" w l ls 2\n"
+	  "plot \"table.den.gp\" w l ls 2\n"
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"
@@ -92,8 +100,10 @@
 	  "set xlabel \"x\"\n"
 	  "set ylabel \"y\"\n"
 	  "set cblabel \"\"\n"
+	  "set format x \"%%.1f\"\n"
+	  "set format y \"%%.1f\"\n" 
 	  "set title \"mag\" offset 0,-1\n"
-	  "splot \"%s\" u 1:2:($20**2+$21**2+$22**2)**.5 w l ti \"\"\n"
+	  "splot \"%s\" u 1:2:($20**2+$21**2+$22**2) w l ti \"\"\n"
 	 
 	  "unset pm3d\n"
 	  "set isosam 10,10\n"
@@ -111,17 +121,19 @@
 	  "unset border\n"
 	  "unset pm3d\n"
 	  "unset surface\n"
-	  "plot \"table.gp\" w l ls 2\n"
+	  "plot \"table.magpre.gp\" w l ls 2\n"
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"
+	  "set label 1 \"time: %f\" at screen .5, .51\n"
 #endif
 
-	  ,fname,fname2,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1)
+	  ,fname,fname,fname2,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1)
 	  ,fname,fname,50./(get_xb(NX,0)-get_xb(0,0)),50./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NY/20)
 #ifdef MAGNFIELD
 	  ,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1)
-	  ,fname,fname,50./(get_xb(NX,0)-get_xb(0,0)),50./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NY/20)
+	  ,fname,fname,50./(get_xb(NX,0)-get_xb(0,0)),50./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NY/20),
+	  t
 #endif
 );
 	    

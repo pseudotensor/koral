@@ -116,10 +116,6 @@ set_initial_profile()
   printf("Initializing problem... ");
   int ix,iy,iz;
 
-#ifdef PR_PREPINIT
-#include PR_PREPINIT
-#endif
-
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
   for(iz=0;iz<NZ;iz++)

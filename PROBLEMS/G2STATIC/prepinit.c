@@ -1,4 +1,5 @@
 //reads cloud from the file / creates it and asigns densities / velocities to pproblem1[]
+int ix,iy,iz;
 
 /***********************************************/
 /***********************************************/
