@@ -68,195 +68,132 @@ int
 initialize_arrays()
 {
   int i,j,k;
-
   
   //grid 
   x=(ldouble*)malloc((NX+NY+NZ+6*NG)*sizeof(ldouble));
   xb=(ldouble*)malloc((NX+1+NY+1+NZ+1+6*NG)*sizeof(ldouble));
 
   //primitives at cell centers
-  p=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  p=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //primitives at cell centers at initial state - used for fixed boundary conditions
-  pinit=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  pinit=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
  
   //primitives at cell centers at initial state - may be used for initializing problem
-  pproblem1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  pproblem2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  pproblem1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  pproblem2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //primitives at cell centers in previous time steps
-  ptm1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  ptm2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  ptm2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
 #ifdef MAGNFIELD
   //electromotive force at corners
   emf=(ldouble*)malloc((NX+1)*(NY+1)*(NZ+1)*3*sizeof(ldouble));
 #endif
 
-  //primitives at cell centers after reconstruction
-  //px=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //py=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //pz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-
   //conserved averages
-  u=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //source terms at cell centers
-  //s=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  u=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //flags at cell centers
-  cellflag=(int*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NFLAGS*sizeof(int));
+  cellflag=(int*)malloc((SX)*(SY)*(SZ)*NFLAGS*sizeof(int));
  
   //metric at cell centers
-  g=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*gSIZE*sizeof(ldouble));
+  g=(ldouble*)malloc((SX)*(SY)*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell centers
-  G=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*gSIZE*sizeof(ldouble));
+  G=(ldouble*)malloc((SX)*(SY)*(SZ)*gSIZE*sizeof(ldouble));
   //Kristofels at cell centers
-  gKr=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*64*sizeof(ldouble));
+  gKr=(ldouble*)malloc((SX)*(SY)*(SZ)*64*sizeof(ldouble));
 
   //LNRF basis one-forms
-  emuup=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  emuup=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
   //LNRF basis vectors
-  emulo=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
-  //LNRF basis one-forms bx
-  //emuupbx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
-  //LNRF basis vectors bx
-  //emulobx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
-  //LNRF basis one-forms by
-  //emuupby=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*16*sizeof(ldouble));
-  //LNRF basis vectors by
-  //emuloby=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*16*sizeof(ldouble));
-  //LNRF basis one-forms bz
-  //emuupbz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
-  //LNRF basis vectors bz
-  //emulobz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
+  emulo=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
 
   //ortonormal tetrad one-forms
-  tmuup=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
+  tmuup=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
   //ortonormal tetrad vectors
-  tmulo=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
-  //ortonormal tetrad one-forms bx
-  //tmuupbx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
-  //ortonormal tetrad vectors bx
-  //tmulobx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*16*sizeof(ldouble));
-  //ortonormal tetrad one-forms by
-  //tmuupby=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*16*sizeof(ldouble));
-  //ortonormal tetrad vectors by
-  //tmuloby=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*16*sizeof(ldouble));
-  //ortonormal tetrad one-forms bz
-  //tmuupbz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
-  //ortonormal tetrad vectors bz
-  //tmulobz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*16*sizeof(ldouble));
+  tmulo=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
 
   //left-interpolated primitives at cell x-faces
-  pbLx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG )*(NZ+2*NG)*NV*sizeof(ldouble));
+  pbLx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble));
   //right-interpolated primitives at cell x-faces
-  pbRx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  pbRx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble));
   //left-interpolated primitives at cell y-faces
-  pbLy=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*NV*sizeof(ldouble));
+  pbLy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
   //right-interpolated primitives at cell y-faces
-  pbRy=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*NV*sizeof(ldouble));
+  pbRy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
   //left-interpolated primitives at cell z-faces
-  pbLz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*NV*sizeof(ldouble));
+  pbLz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
   //right-interpolated primitives at cell z-faces
-  pbRz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*NV*sizeof(ldouble));
+  pbRz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
 
-  //left-interpolated conserved at cell x-faces - unused
-  //ubLx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG )*(NZ+2*NG)*NV*sizeof(ldouble));
-  //right-interpolated conserved at cell x-faces
-  //ubRx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //left-interpolated conserved at cell y-faces
-  //ubLy=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //right-interpolated conserved at cell y-faces
-  //ubRy=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //left-interpolated conserved at cell z-faces
-  //ubLz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*NV*sizeof(ldouble));
-  //right-interpolated conserved at cell z-faces
-  //ubRz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*NV*sizeof(ldouble));
 
   //corrected flux at x faces
-  flbx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG )*(NZ+2*NG)*NV*sizeof(ldouble));
+  flbx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble));
   //corrected flux at x faces
-  flby=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1 )*(NZ+2*NG)*NV*sizeof(ldouble));
+  flby=(ldouble*)malloc((SX)*(SY+1 )*(SZ)*NV*sizeof(ldouble));
   //corrected flux at x faces
-  flbz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG )*(NZ+2*NG+1)*NV*sizeof(ldouble));
+  flbz=(ldouble*)malloc((SX)*(SY )*(SZ+1)*NV*sizeof(ldouble));
   //flux based on left-interpolated conserved at cell x-faces
-  flLx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG )*(NZ+2*NG)*NV*sizeof(ldouble));
+  flLx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble));
   //flux based on right-interpolated conserved at cell x-faces
-  flRx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  flRx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble));
   //flux based on left-interpolated conserved at cell y-faces
-  flLy=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*NV*sizeof(ldouble));
+  flLy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
   //flux based on right-interpolated conserved at cell y-faces
-  flRy=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*NV*sizeof(ldouble));
+  flRy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
   //flux based on left-interpolated conserved at cell z-faces
-  flLz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*NV*sizeof(ldouble));
+  flLz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
   //flux based on right-interpolated conserved at cell z-faces
-  flRz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*NV*sizeof(ldouble));
+  flRz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
 
-
-  //Krzysie at cell x-faces
-  //gKrbx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG )*(NZ+2*NG)*64*sizeof(ldouble));
-  //Krzysie at cell x-faces
-  //gKrby=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1 )*(NZ+2*NG)*64*sizeof(ldouble));
-  //Krzysie at cell x-faces
-  //gKrbz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG )*(NZ+2*NG+1)*64*sizeof(ldouble));
 
   //metric at cell x-faces
-  gbx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG )*(NZ+2*NG)*gSIZE*sizeof(ldouble));
+  gbx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell y-faces
-  gby=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*gSIZE*sizeof(ldouble));
+  gby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell z-faces
-  gbz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*gSIZE*sizeof(ldouble));
+  gbz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*gSIZE*sizeof(ldouble));
   //metric at cell x-faces
-  Gbx=(ldouble*)malloc((NX+2*NG+1)*(NY+2*NG )*(NZ+2*NG)*gSIZE*sizeof(ldouble));
+  Gbx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell y-faces
-  Gby=(ldouble*)malloc((NX+2*NG)*(NY+2*NG+1)*(NZ+2*NG)*gSIZE*sizeof(ldouble));
+  Gby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell z-faces
-  Gbz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG+1)*gSIZE*sizeof(ldouble));
+  Gbz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*gSIZE*sizeof(ldouble));
 
-
-  //indices of the ghost cells
-  //gcidx=(int**)malloc(3*sizeof(int*));
-  //gcidx[0]=(int*)malloc(2*NG*sizeof(int));
-  //gcidx[1]=(int*)malloc(2*NG*sizeof(int));
-  //gcidx[2]=(int*)malloc(2*NG*sizeof(int));
 
   //auxiliary primitive arrays
-  ut0=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  ut1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  ut2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  ut3=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //ut4=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //du=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  u_bak=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  p_bak=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //u_step1=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //u_step2=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //u_step3=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
-  //u_step4=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV*sizeof(ldouble));
+  ut0=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  ut1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  ut2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  ut3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  u_bak=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  p_bak=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //wavespeeds hd and rad - max(al,ar)
-  ahdx=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  ahdy=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  ahdz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  aradx=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  arady=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  aradz=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
+  ahdx=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  ahdy=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  ahdz=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  aradx=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  arady=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  aradz=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
 
   //wavespeeds hd and rad - leftgoing
-  ahdxl=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  ahdyl=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  ahdzl=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  aradxl=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  aradyl=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  aradzl=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
+  ahdxl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  ahdyl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  ahdzl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  aradxl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  aradyl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  aradzl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
 
   //wavespeeds hd and rad - lrightgoing
-  ahdxr=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  ahdyr=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  ahdzr=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  aradxr=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  aradyr=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
-  aradzr=(ldouble*)malloc((NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*sizeof(ldouble));
+  ahdxr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  ahdyr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  ahdzr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  aradxr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  aradyr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  aradzr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
 
   return 0;
 }

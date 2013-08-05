@@ -1634,27 +1634,9 @@ get_xx(int ix,int iy,int iz,ldouble *xx)
   return 0;
 }
 
-/*
-//returns cell centers
-ldouble get_x(int ic, int idim)
-{
-  if(ic<-NG || (idim==0 && ic>NX-1+NG) || (idim==1 && ic>NY-1+NG) || (idim==2 && ic>NZ-1+NG)) my_err("blont w get_x - index ouf of range");
-
-  if(idim==0)
-    return x[ic+NG];
-  if(idim==1)
-    return x[ic+NG + NX+2*NG];
-  if(idim==2)
-    return x[ic+NG + NX+2*NG + NY+2*NG ];
-
-  return -1.;
-}
-*/
-
 //sets cell center location
 int set_x(int ic, int idim,ldouble val)
 {  
-  if(ic<-NG || (idim==0 && ic>NX-1+NG) || (idim==1 && ic>NY-1+NG) || (idim==2 && ic>NZ-1+NG)) my_err("blont w set_x - index ouf of range");
   if(idim==0)
     x[ic+NG]=val;
   if(idim==1)
@@ -1733,7 +1715,7 @@ int set_g(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value)
 {
   if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_g - index ouf of range");
   
-  uarr[i*5+j + (ix+NG)*gSIZE + (iy+NG)*(NX+2*NG)*gSIZE + (iz+NG)*(NY+2*NG)*(NX+2*NG)*gSIZE] = value;
+  uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX)*gSIZE] = value;
   return 0;
 }
 
@@ -1742,7 +1724,7 @@ int set_T(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value)
 {
   if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_T - index ouf of range");
   
-  uarr[i*4+j + (ix+NG)*16 + (iy+NG)*(NX+2*NG)*16 + (iz+NG)*(NY+2*NG)*(NX+2*NG)*16] = value;
+  uarr[i*4+j + (ix+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16] = value;
   return 0;
 }
 
@@ -1752,18 +1734,15 @@ int set_ub(ldouble* uarr,int iv,int ix,int iy,int iz,ldouble value,int idim)
 {
   if(idim==0)
     {
-      if(ix<-NG || ix>NX+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_ub x - index ouf of range");  
-      uarr[iv + (ix+NG)*NV + (iy+NG)*(NX+2*NG+1)*NV + (iz+NG)*(NY+2*NG)*(NX+2*NG+1)*NV] = value;
+      uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX+1)*NV + (iZ(iz)+NGCZ)*(SY)*(SX+1)*NV] = value;
     }
   if(idim==1)
     {
-      if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_ub y - index ouf of range");  
-      uarr[iv + (ix+NG)*NV + (iy+NG)*(NX+2*NG)*NV + (iz+NG)*(NY+2*NG+1)*(NX+2*NG)*NV] = value;
+      uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY+1)*(SX)*NV] = value;
     }
   if(idim==2)
     {
-      if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ+NG) my_err("blont w set_ub z - index ouf of range");  
-      uarr[iv + (ix+NG)*NV + (iy+NG)*(NX+2*NG)*NV + (iz+NG)*(NY+2*NG)*(NX+2*NG)*NV] = value;
+      uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV] = value;
     }
   return 0;
 }
@@ -1796,19 +1775,15 @@ int set_gKrb(int i,int j,int k,int ix,int iy,int iz,ldouble val,int idim)
 {
   if(idim==0)
     {
-      if(ix<-NG || ix>NX+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_Krb x - index ouf of range");  
-      gKrbx[i*4*4+j*4+k + (ix+NG)*64 + (iy+NG)*(NX+2*NG+1)*64 + (iz+NG)*(NY+2*NG)*(NX+2*NG+1)*64]=val;
-
+      gKrbx[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX+1)*64 + (iZ(iz)+NGCZ)*(SY)*(SX+1)*64]=val;
     }
   if(idim==1)
     {
-      if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_Krb y - index ouf of range");  
-      gKrby[i*4*4+j*4+k + (ix+NG)*64 + (iy+NG)*(NX+2*NG)*64 + (iz+NG)*(NY+2*NG+1)*(NX+2*NG)*64]=val;
+      gKrby[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZ(iz)+NGCZ)*(SY+1)*(SX)*64]=val;
     }
   if(idim==2)
     {
-      if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ+NG) my_err("blont w set_Krb z - index ouf of range");  
-      gKrbz[i*4*4+j*4+k + (ix+NG)*64 + (iy+NG)*(NX+2*NG)*64 + (iz+NG)*(NY+2*NG)*(NX+2*NG)*64]=val;
+      gKrbz[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZ(iz)+NGCZ)*(SY)*(SX)*64]=val;
     }
   return 0;
 }
@@ -1819,18 +1794,15 @@ int set_gb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim
 {
   if(idim==0)
     {
-      if(ix<-NG || ix>NX+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_gb x - index ouf of range");  
-      uarr[i*5+j + (ix+NG)*gSIZE + (iy+NG)*(NX+2*NG+1)*gSIZE + (iz+NG)*(NY+2*NG)*(NX+2*NG+1)*gSIZE] = value;
+      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX+1)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX+1)*gSIZE] = value;
     }
   if(idim==1)
     {
-      if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_gb y - index ouf of range");  
-      uarr[i*5+j + (ix+NG)*gSIZE + (iy+NG)*(NX+2*NG)*gSIZE + (iz+NG)*(NY+2*NG+1)*(NX+2*NG)*gSIZE] = value;
+      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY+1)*(SX)*gSIZE] = value;
     }
   if(idim==2)
     {
-      if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ+NG) my_err("blont w set_gb z - index ouf of range");  
-      uarr[i*5+j + (ix+NG)*gSIZE + (iy+NG)*(NX+2*NG)*gSIZE + (iz+NG)*(NY+2*NG)*(NX+2*NG)*gSIZE] = value;
+      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX)*gSIZE] = value;
     }
   return 0;
 }
@@ -1840,18 +1812,15 @@ int set_Tb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim
 {
   if(idim==0)
     {
-      if(ix<-NG || ix>NX+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_gb x - index ouf of range");  
-      uarr[i*4+j + (ix+NG)*16 + (iy+NG)*(NX+2*NG+1)*16 + (iz+NG)*(NY+2*NG)*(NX+2*NG+1)*16] = value;
+      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX+1)*16 + (iZ(iz)+NGCZ)*(SY)*(SX+1)*16] = value;
     }
   if(idim==1)
     {
-      if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_gb y - index ouf of range");  
-      uarr[i*4+j + (ix+NG)*16 + (iy+NG)*(NX+2*NG)*16 + (iz+NG)*(NY+2*NG+1)*(NX+2*NG)*16] = value;
+      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY+1)*(SX)*16] = value;
     }
   if(idim==2)
     {
-      if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ+NG) my_err("blont w set_gb z - index ouf of range");  
-      uarr[i*4+j + (ix+NG)*16 + (iy+NG)*(NX+2*NG)*16 + (iz+NG)*(NY+2*NG)*(NX+2*NG)*16] = value;
+      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16] = value;
     }
   return 0;
 }
@@ -1890,6 +1859,7 @@ int set_u_scalar(ldouble* uarr,int ix,int iy,int iz,ldouble value)
 */
 
 //deals with arrays [NX+NG x NY+NG x NZ+NG x NV] - cell centers 
+ /*
 ldouble get_u_scalar(ldouble* uarr,int ix,int iy,int iz)
 {
   if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w get_u_scalar - index ouf of range");
@@ -1898,17 +1868,10 @@ ldouble get_u_scalar(ldouble* uarr,int ix,int iy,int iz)
   //as it is easier due to extrapolation of primitives quantities 
 
   //printf("%d %d %d\n",ix,iy,iz); getchar();
-  /*
-  if(ix<0) ix=0;
-  if(ix>=NX) ix=NX-1;
-  if(iy<0) iy=0;
-  if(iy>=NY) iy=NY-1;
-  if(iz<0) iz=0;
-  if(iz>=NZ) iz=NZ-1;
-  */
+  
   return uarr[ix+NG + (iy+NG)*(NX+2*NG) + (iz+NG)*(NY+2*NG)*(NX+2*NG)];
 }
-
+*/
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
@@ -1920,7 +1883,7 @@ copy_u(ldouble factor,ldouble *uu1,ldouble* uu2 )
 {
   int i;
 #pragma omp parallel for
-  for (i=0;i<(NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV;i++)
+  for (i=0;i<SX*SY*SZ*NV;i++)
     uu2[i]=uu1[i]*factor;
   return 0;
 }
@@ -1932,7 +1895,7 @@ add_u(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3)
 {
   int i;
 #pragma omp parallel for
-  for (i=0;i<(NX+2*NG)*(NY+2*NG)*(NZ+2*NG)*NV;i++)
+  for (i=0;i<SX*SY*SZ*NV;i++)
     uu3[i]=uu1[i]*f1+uu2[i]*f2;
   return 0;
 }

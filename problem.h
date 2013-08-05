@@ -68,7 +68,7 @@
 //62* MAGTUBES - magnetic tubes
 //63* ORSZAG - Orszag-Tang vortex
 
-#define PROBLEM 63
+#define PROBLEM 8
 
 #if(PROBLEM==63)
 
@@ -1147,6 +1147,7 @@
 #define NG 4
 #endif
 #endif
+
 
 
 #ifndef NUM_INPUTARG
