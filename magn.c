@@ -116,7 +116,7 @@ flux_ct()
   else coefemf[3]=0.5; 
   
   int ix,iy,iz,iv,ii;
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   //calculating EMF at corners
   for(ii=0;ii<Nloop_4;ii++) 
     {
@@ -187,7 +187,7 @@ flux_ct()
   //reset certain emfs at the boundaries to ensure stationarity
   adjust_fluxcttoth_emfs();
 
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_4;ii++) // 0...NX
     {
       ix=loop_4[ii][0];
@@ -256,7 +256,7 @@ calc_BfromA()
   int ix,iy,iz,iv,ii;
   //A_mu converted to code coordinates in init.c
   
-  #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
     {
       ix=loop_02[ii][0];
@@ -360,7 +360,7 @@ calc_BfromA()
     } //cell loop
 
   //overwriting vector potential with magnetic fields
-  #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
     {
       ix=loop_02[ii][0];

@@ -67,8 +67,23 @@
 //61* MAGTESTS - simple mag tests
 //62* MAGTUBES - magnetic tubes
 //63* ORSZAG - Orszag-Tang vortex
+//64* MAGDONUT - HD donut with poloidal magnetic fields
 
-#define PROBLEM 55
+#define PROBLEM 64
+
+#if(PROBLEM==64)
+
+#define PR_DEFINE "PROBLEMS/MAGDONUT/define.h"
+#define PR_BC "PROBLEMS/MAGDONUT/bc.c"
+#define PR_INIT "PROBLEMS/MAGDONUT/init.c"
+#define PR_KAPPA "PROBLEMS/MAGDONUT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MAGDONUT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MAGDONUT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MAGDONUT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MAGDONUT/dump.c"
+#define PR_TOOLS "PROBLEMS/MAGDONUT/tools.c"
+
+#endif
 
 #if(PROBLEM==63)
 

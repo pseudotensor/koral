@@ -135,7 +135,7 @@ solve_the_problem(ldouble tstart)
 
       //calculates the primitives to copy to previous time steps
       int ii;
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+#pragma omp parallel for private(ii,ix,iy,iz,iv) schedule (dynamic)
       for(ii=0;ii<Nloop_0;ii++) //domain only
 	{
 	  ix=loop_0[ii][0];

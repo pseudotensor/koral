@@ -21,7 +21,6 @@ pp[VY]=sin(2.*M_PI*x)/CSCALE;
 pp[VZ]=0.;
 
 #ifdef MAGNFIELD
-//TODO: put A_z here and convert to B's lateron
 pp[B1]=0.;
 pp[B2]=0.;
 pp[B3]=(BZERO/4./M_PI)*cos(4.*M_PI*x)+(BZERO/2./M_PI)*cos(2.*M_PI*y);

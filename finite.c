@@ -369,7 +369,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
  
   //calculates the primitives
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -405,7 +405,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   ldouble pp[NV];
      
   //calculates and saves wavespeeds
-#pragma omp parallel for private(ix,iy,iz,iv,max_lws) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,max_lws,ii) schedule (static)
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -421,7 +421,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //interpolation and flux-calculation
-#pragma omp parallel for private(iy,iz,iv,ix)  schedule (static) 
+#pragma omp parallel for private(iy,iz,iv,ix,ii)  schedule (static) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -654,7 +654,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-#pragma omp parallel for private(iy,iz,ix)  schedule (static) 
+#pragma omp parallel for private(iy,iz,ix,ii)  schedule (static) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -682,7 +682,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //calculating the derivatives
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -765,7 +765,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //again over cells - source terms
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
    for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -1893,7 +1893,7 @@ int
 copy_u(ldouble factor,ldouble *uu1,ldouble* uu2 )
 {
   int i;
-#pragma omp parallel for
+#pragma omp parallel for private (i) 
   for (i=0;i<SX*SY*SZ*NV;i++)
     uu2[i]=uu1[i]*factor;
   return 0;
@@ -1905,7 +1905,7 @@ int
 add_u(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3)
 {
   int i;
-#pragma omp parallel for
+#pragma omp parallel for private (i) 
   for (i=0;i<SX*SY*SZ*NV;i++)
     uu3[i]=uu1[i]*f1+uu2[i]*f2;
   return 0;
@@ -2006,7 +2006,7 @@ int set_bc(ldouble t,int ifinit)
   int ix,iy,iz,ii,iv;
  
   //first fill the GC with no corners
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only, no corners
     {
       ix=loop_2[ii][0];
@@ -2034,7 +2034,7 @@ int set_bc(ldouble t,int ifinit)
 
   //now fill the first cells in corners if necessary
 #ifdef MAGNFIELD_TEST
-#pragma omp parallel for private(ix,iy,iz) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
   for(ii=0;ii<Nloop_3;ii++) //surface layers of corners
     {
       ix=loop_3[ii][0];
@@ -2134,7 +2134,7 @@ cell_fixup_hd()
 
   ldouble ppn[6][NV],pp[NV],uu[NV];
   //gets the neiboring the primitives
-#pragma omp parallel for private(iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   for(ix=0;ix<NX;ix++)
     {
       for(iy=0;iy<NY;iy++)
@@ -2253,7 +2253,7 @@ cell_fixup_rad()
 
   ldouble ppn[6][NV],pp[NV],uu[NV];
   //gets the neiboring the primitives
-#pragma omp parallel for private(iy,iz,iv) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   for(ix=0;ix<NX;ix++)
     {
       for(iy=0;iy<NY;iy++)
