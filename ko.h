@@ -239,11 +239,11 @@ int set_xb(int,int,ldouble);
 #define set_cflag(iflag,ix,iy,iz,val) cellflag[iflag + (iX(ix)+NG)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS]=val
 #define get_u(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV])
 //int set_u(ldouble*,int,int,int,int,ldouble);
-#define set_u(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SZ)*NV]=val
+#define set_u(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV]=val
 #define get_u_scalar(uarr,ix,iy,iz) (uarr[(iX(ix)+NGCX) + (iY(iy)+NGCY)*(SX) + (iZ(iz)+NGCZ)*(SY)*(SX)])
 //ldouble get_u_scalar(ldouble*,int,int,int);
 //int set_u_scalar(ldouble*,int,int,int,ldouble);
-#define set_u_scalar(uarr,ix,iy,iz,val) uarr[iX(ix)+NG + (iY(iy)+NGCY)*(SX) + (iZ(iz)+NGCZ)*(SY)*(SX)] = val
+#define set_u_scalar(uarr,ix,iy,iz,val) uarr[iX(ix)+NGCX + (iY(iy)+NGCY)*(SX) + (iZ(iz)+NGCZ)*(SY)*(SX)] = val
 int set_ub(ldouble* uarr,int iv,int ix,int iy,int iz,ldouble value,int idim);
 //#define set_ub(uarr,iv,ix,iy,iz,idim,val) (idim==0 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX+1)*NV + (iZ(iz)+NGCZ)*(SY)*(SX+1)*NV]=val : (idim==1 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY+1)*(SX)*NV]=val : (idim==2 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV]=val : 0.)))
 #define set_ubx(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX+1)*NV + (iZ(iz)+NGCZ)*(SY)*(SX+1)*NV]=val

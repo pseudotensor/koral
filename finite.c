@@ -1508,6 +1508,11 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
       loop_02[ix+Nloop_0][2]=loop_2[ix][2];
     }
 
+  //shuffling:
+#if (SHUFFLELOOPS)
+  shuffle_loop(loop_02,Nloop_02);
+#endif
+
   //**********************************************************************
   //**********************************************************************
   //1-deep surfaces on corners only
@@ -1585,7 +1590,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //shuffling:
 #if (SHUFFLELOOPS)
-  shuffle_loop(loop_0,Nloop_0);
+  shuffle_loop(loop_4,Nloop_4);
 #endif
       
 
@@ -2041,7 +2046,7 @@ int set_bc(ldouble t,int ifinit)
       //for each point do three calc_bc and sum them up with weights
       ldouble w1,w2,w3;
       int d1,d2,d3;
-      ldouble p1[NV],p2[NV],p3[NV];
+      ldouble p1[NV],p2[NV],p3[NV],uval[NV],pval[NV];
 
       if(NZ==1 && NY==1)
 	{

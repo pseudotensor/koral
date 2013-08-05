@@ -494,7 +494,7 @@ fprint_restartfile(ldouble t, char* folder)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 		}	 
 	      for(iv=0;iv<NV;iv++)
-		fprintf(fout1,"%.5e ",uu[iv]);
+		fprintf(fout1,"%.10e ",uu[iv]);
 	      for(iv=0;iv<NV;iv++)
 		fprintf(fout1,"%.5e ",pp[iv]);
 	      fprintf(fout1,"\n");

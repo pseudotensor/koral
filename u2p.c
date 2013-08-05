@@ -268,6 +268,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		if(verbose>0 && u2pret!=-103 && u2pret!=-107)
 		  {
 		    printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+		    exit(0);
 		  }
 
 		if(u2pret==-107)

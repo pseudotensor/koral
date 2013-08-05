@@ -68,7 +68,7 @@
 //62* MAGTUBES - magnetic tubes
 //63* ORSZAG - Orszag-Tang vortex
 
-#define PROBLEM 63
+#define PROBLEM 55
 
 #if(PROBLEM==63)
 
@@ -1284,7 +1284,7 @@
 #endif
 
 #ifndef SHUFFLELOOPS
-#define SHUFFLELOOPS 1
+#define SHUFFLELOOPS 0
 #endif
 
 #ifndef MKS1R0

@@ -2455,7 +2455,7 @@ calc_metric()
 
   printf("Precalculating metrics... ");
   
-#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,ii) schedule (dynamic)
   for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
     {
       ix=loop_02[ii][0];

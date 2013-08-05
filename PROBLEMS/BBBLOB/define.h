@@ -111,5 +111,5 @@
 #define SIZEBLOB1 .1
 #define SIZEBLOB2 .1
 
-#define MAGNFIELD_TEST
+
 
