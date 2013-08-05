@@ -232,6 +232,7 @@ int set_xb(int,int,ldouble);
 
 #define get_emf(iv,ix,iy,iz) (emf[iv-1 + (ix)*3 + (iy)*(NX+1)*3 + (iz)*(NY+1)*(NX+1)*3])
 #define set_emf(iv,ix,iy,iz,val) emf[iv-1 + (ix)*3 + (iy)*(NX+1)*3 + (iz)*(NY+1)*(NX+1)*3]=val
+//end of emf
 
 //ldouble get_u(ldouble*,int,int,int,int);
 #define get_cflag(iflag,ix,iy,iz) (cellflag[iflag + (iX(ix)+NG)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS])

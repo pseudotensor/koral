@@ -454,71 +454,74 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //x 'sweep'
 
-      x0[0]=get_x(ix,0);
-
-      x0l[0]=get_xb(ix,0);
-      xm1[0]=get_x(ix-1,0);
-      x0l[1]=xm1[1]=get_x(iy,1); 
-      x0l[2]=xm1[2]=get_x(iz,2);
-
-      x0r[0]=get_xb(ix+1,0);
-      xp1[0]=get_x(ix+1,0);
-      x0r[1]=xp1[1]=get_x(iy,1);
-      x0r[2]=xp1[2]=get_x(iz,2);
-
-      dx0=get_size_x(ix,0);    
-      dxm1=get_size_x(ix-1,0);    
-      dxm2=get_size_x(ix-2,0);    
-      dxp1=get_size_x(ix+1,0);    
-      dxp2=get_size_x(ix+2,0);    
-
-      for(i=0;i<NV;i++)
+      if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
 	{
-	  //parasite
-	  set_u(ubase,i,ix,iy,iz,get_u(u,i,ix,iy,iz));
-	  //end of parasite
+	  x0[0]=get_x(ix,0);
 
-	  //resetting derivatives
-	  fd_der[i]=0.;
+	  x0l[0]=get_xb(ix,0);
+	  xm1[0]=get_x(ix-1,0);
+	  x0l[1]=xm1[1]=get_x(iy,1); 
+	  x0l[2]=xm1[2]=get_x(iz,2);
 
-	  //primitives - to be interpolated
-	  fd_p0[i]=get_u(p,i,ix,iy,iz);
-	  fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
-	  fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
-	  fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
-	  fd_pm2[i]=get_u(p,i,ix-2,iy,iz);
+	  x0r[0]=get_xb(ix+1,0);
+	  xp1[0]=get_x(ix+1,0);
+	  x0r[1]=xp1[1]=get_x(iy,1);
+	  x0r[2]=xp1[2]=get_x(iz,2);
 
-	}
+	  dx0=get_size_x(ix,0);    
+	  dxm1=get_size_x(ix-1,0);    
+	  dxm2=get_size_x(ix-2,0);    
+	  dxp1=get_size_x(ix+1,0);    
+	  dxp2=get_size_x(ix+2,0);    
+
+	  for(i=0;i<NV;i++)
+	    {
+	      //parasite
+	      set_u(ubase,i,ix,iy,iz,get_u(u,i,ix,iy,iz));
+	      //end of parasite
+
+	      //resetting derivatives
+	      fd_der[i]=0.;
+
+	      //primitives - to be interpolated
+	      fd_p0[i]=get_u(p,i,ix,iy,iz);
+	      fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
+	      fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
+	      fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
+	      fd_pm2[i]=get_u(p,i,ix-2,iy,iz);
+
+	    }
 	 		
-      avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
-      //testing if interpolated primitives make sense
-      fill_geometry_face(ix,iy,iz,0,&geom);
-      check_floors_hd(fd_pl,VELPRIM,&geom);
-      fill_geometry_face(ix+1,iy,iz,0,&geom);
-      check_floors_hd(fd_pr,VELPRIM,&geom);
-      //end of floor section
+	  //testing if interpolated primitives make sense
+	  fill_geometry_face(ix,iy,iz,0,&geom);
+	  check_floors_hd(fd_pl,VELPRIM,&geom);
+	  fill_geometry_face(ix+1,iy,iz,0,&geom);
+	  check_floors_hd(fd_pr,VELPRIM,&geom);
+	  //end of floor section
 
-      f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
-      f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr);   	  
+	  f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
+	  f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr);   	  
 
-      //saving to memory
-      for(i=0;i<NV;i++)
-	{
-	  //set_u(px,i,ix,iy,iz,fd_p0[i]);
+	  //saving to memory
+	  for(i=0;i<NV;i++)
+	    {
+	      //set_u(px,i,ix,iy,iz,fd_p0[i]);
 	  
-	  set_ubx(pbRx,i,ix,iy,iz,fd_pl[i]);
-	  set_ubx(pbLx,i,ix+1,iy,iz,fd_pr[i]);
+	      set_ubx(pbRx,i,ix,iy,iz,fd_pl[i]);
+	      set_ubx(pbLx,i,ix+1,iy,iz,fd_pr[i]);
 
-	  set_ubx(flRx,i,ix,iy,iz,ffl[i]);
-	  set_ubx(flLx,i,ix+1,iy,iz,ffr[i]);		  
+	      set_ubx(flRx,i,ix,iy,iz,ffl[i]);
+	      set_ubx(flLx,i,ix+1,iy,iz,ffr[i]);		  
+	    }
 	}
 
       //**********************************************************************
       //**********************************************************************
       //y 'sweep'
 
-      if(NY>1 )
+      if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
 	{
 	  x0l[1]=get_xb(iy,1);
 	  xm1[1]=get_x(iy-1,1);
@@ -593,7 +596,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //z 'sweep'	      
 
-      if(NZ>1)
+      if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
 	{
 	  x0l[2]=get_xb(iz,2);
 	  xm1[2]=get_x(iz-1,2);
@@ -966,117 +969,120 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //**********************************************************************
   //x 'sweep'
  
-  //characteristic wave speeds for calculating the flux on both sides of a face
-  ap1l[0]=get_u_scalar(ahdxl,ix,iy,iz);
-  ap1r[0]=get_u_scalar(ahdxr,ix,iy,iz);
-  ap1l[1]=get_u_scalar(aradxl,ix,iy,iz);
-  ap1r[1]=get_u_scalar(aradxr,ix,iy,iz);
-  ap1[0]=get_u_scalar(ahdx,ix,iy,iz);
-  ap1[1]=get_u_scalar(aradx,ix,iy,iz);
-  am1l[0]=get_u_scalar(ahdxl,ix-1,iy,iz);
-  am1r[0]=get_u_scalar(ahdxr,ix-1,iy,iz);
-  am1l[1]=get_u_scalar(aradxl,ix-1,iy,iz);
-  am1r[1]=get_u_scalar(aradxr,ix-1,iy,iz);
-  am1[0]=get_u_scalar(ahdx,ix-1,iy,iz);
-  am1[1]=get_u_scalar(aradx,ix-1,iy,iz);
-
-  /*
-  ap2[0]=get_u_scalar(ahdx,ix+1,iy,iz);
-  ap2[1]=get_u_scalar(aradx,ix+1,iy,iz);
-  am2[0]=get_u_scalar(ahdx,ix-2,iy,iz);
-  am2[1]=get_u_scalar(aradx,ix-2,iy,iz);
-  */
-
-  //primitives at faces
-  for(i=0;i<NV;i++)
+  if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
     {
-      fd_uLl[i]=get_ub(pbLx,i,ix,iy,iz,0);
-      fd_uRl[i]=get_ub(pbRx,i,ix,iy,iz,0);
-    }
+      //characteristic wave speeds for calculating the flux on both sides of a face
+      ap1l[0]=get_u_scalar(ahdxl,ix,iy,iz);
+      ap1r[0]=get_u_scalar(ahdxr,ix,iy,iz);
+      ap1l[1]=get_u_scalar(aradxl,ix,iy,iz);
+      ap1r[1]=get_u_scalar(aradxr,ix,iy,iz);
+      ap1[0]=get_u_scalar(ahdx,ix,iy,iz);
+      ap1[1]=get_u_scalar(aradx,ix,iy,iz);
+      am1l[0]=get_u_scalar(ahdxl,ix-1,iy,iz);
+      am1r[0]=get_u_scalar(ahdxr,ix-1,iy,iz);
+      am1l[1]=get_u_scalar(aradxl,ix-1,iy,iz);
+      am1r[1]=get_u_scalar(aradxr,ix-1,iy,iz);
+      am1[0]=get_u_scalar(ahdx,ix-1,iy,iz);
+      am1[1]=get_u_scalar(aradx,ix-1,iy,iz);
 
-  //converting interpolated primitives to conserved
-  fill_geometry_face(ix,iy,iz,0,&geom);
+      /*
+	ap2[0]=get_u_scalar(ahdx,ix+1,iy,iz);
+	ap2[1]=get_u_scalar(aradx,ix+1,iy,iz);
+	am2[0]=get_u_scalar(ahdx,ix-2,iy,iz);
+	am2[1]=get_u_scalar(aradx,ix-2,iy,iz);
+      */
+
+      //primitives at faces
+      for(i=0;i<NV;i++)
+	{
+	  fd_uLl[i]=get_ub(pbLx,i,ix,iy,iz,0);
+	  fd_uRl[i]=get_ub(pbRx,i,ix,iy,iz,0);
+	}
+
+      //converting interpolated primitives to conserved
+      fill_geometry_face(ix,iy,iz,0,&geom);
 
 #ifdef WAVESPEEDSATFACES
-  ldouble aaa[12];
-  calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
-  am1l[0]=aaa[0];
-  am1r[0]=aaa[1];
-  am1l[1]=aaa[6];
-  am1r[1]=aaa[7];
-  am1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
-  am1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
-  calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
-  ap1l[0]=aaa[0];
-  ap1r[0]=aaa[1];
-  ap1l[1]=aaa[6];
-  ap1r[1]=aaa[7];
-  ap1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
-  ap1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
+      ldouble aaa[12];
+      calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
+      am1l[0]=aaa[0];
+      am1r[0]=aaa[1];
+      am1l[1]=aaa[6];
+      am1r[1]=aaa[7];
+      am1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
+      am1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
+      calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
+      ap1l[0]=aaa[0];
+      ap1r[0]=aaa[1];
+      ap1l[1]=aaa[6];
+      ap1r[1]=aaa[7];
+      ap1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
+      ap1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
 #endif
    
-  p2u(fd_uLl,fd_uLl,&geom);
-  p2u(fd_uRl,fd_uRl,&geom);
+      p2u(fd_uLl,fd_uLl,&geom);
+      p2u(fd_uRl,fd_uRl,&geom);
 
 
-  //save calculated conserved basing on primitives on faces
-  /*
-  for(i=0;i<NV;i++)
-    {
-      set_ubx(ubLx,i,ix,iy,iz,fd_uLr[i]);
-      set_ubx(ubRx,i,ix,iy,iz,fd_uRr[i]);
-    }
-  */
-  
-  //variable loop
-  for(i=0;i<NV;i++)
-    {
-      //choosing the proper characteristic speed - radiation decoupled from hydro
-#ifdef RADIATION
-      if(i<NVMHD)      
+      //save calculated conserved basing on primitives on faces
+      /*
+	for(i=0;i<NV;i++)
 	{
-	  ag=my_max(ap1[0],am1[0]);
+	set_ubx(ubLx,i,ix,iy,iz,fd_uLr[i]);
+	set_ubx(ubRx,i,ix,iy,iz,fd_uRr[i]);
+	}
+      */
+  
+      //variable loop
+      for(i=0;i<NV;i++)
+	{
+	  //choosing the proper characteristic speed - radiation decoupled from hydro
+#ifdef RADIATION
+	  if(i<NVMHD)      
+	    {
+	      ag=my_max(ap1[0],am1[0]);
+	      al=my_min(ap1l[0],am1l[0]);
+	      ar=my_max(ap1r[0],am1r[0]);
+	    }
+	  else
+	    {
+	      ag=my_max(ap1[1],am1[1]); 
+	      al=my_min(ap1l[1],am1l[1]);
+	      ar=my_max(ap1r[1],am1r[1]);
+	    }
+#else
+	  ag=my_max(ap1[0],am1[0]); 
 	  al=my_min(ap1l[0],am1l[0]);
 	  ar=my_max(ap1r[0],am1r[0]);
-	}
-      else
-	{
-	  ag=my_max(ap1[1],am1[1]); 
-	  al=my_min(ap1l[1],am1l[1]);
-	  ar=my_max(ap1r[1],am1r[1]);
-	}
-#else
-      ag=my_max(ap1[0],am1[0]); 
-      al=my_min(ap1l[0],am1l[0]);
-      ar=my_max(ap1r[0],am1r[0]);
 #endif
 
 #ifdef FULLDISSIPATION
-      ag=max_ws[0];
+	  ag=max_ws[0];
 #endif
 
-      if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
-	{
-	  fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
-	}
-      if (FLUXMETHOD==HLL_FLUX) //HLL
-	{
-	  if(al>0.) 
-	    fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
-	  else if(ar<0.)
-	    fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
-	  else
-	    fd_fstarl[i] = (-al*get_ub(flRx,i,ix,iy,iz,0) + ar*get_ub(flLx,i,ix,iy,iz,0) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
-	}
+	  if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
+	    {
+	      fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
+	    }
+	  if (FLUXMETHOD==HLL_FLUX) //HLL
+	    {
+	      if(al>0.) 
+		fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
+	      else if(ar<0.)
+		fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
+	      else
+		fd_fstarl[i] = (-al*get_ub(flRx,i,ix,iy,iz,0) + ar*get_ub(flLx,i,ix,iy,iz,0) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
+	    }
 
-      set_ubx(flbx,i,ix,iy,iz,fd_fstarl[i]);
+	  set_ubx(flbx,i,ix,iy,iz,fd_fstarl[i]);
+	}
     }
 
 
   //**********************************************************************
   //**********************************************************************
   //y 'sweep'
-  if(NY>1 )
+  if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
     {
       ap1l[0]=get_u_scalar(ahdyl,ix,iy,iz);
       ap1r[0]=get_u_scalar(ahdyr,ix,iy,iz);
@@ -1175,7 +1181,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //**********************************************************************
   //**********************************************************************
   //z 'sweep'
-  if(NZ>1)
+  if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
     {
       ap1l[0]=get_u_scalar(ahdzl,ix,iy,iz);
       ap1r[0]=get_u_scalar(ahdzr,ix,iy,iz);

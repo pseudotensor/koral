@@ -54,11 +54,11 @@
 #define MYCOORDS MINKCOORDS//KERRCOORDS
 #define MINX 0.
 #define MAXX 1.
+#define NX 512
 #define NY 1
 #define NZ 1
-#define MINY (0.95*Pi/2.)
-#define NX 512
-#define MAXY (1.05*Pi/2.)
+#define MINY -1.
+#define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1.
 #define COPY_XBC
@@ -77,7 +77,7 @@
 /************************************/
 
 
-#define TUBE 3
+#define TUBE 2
 
 #if(TUBE==1) //Sod
 #define DTOUT1 0.02

@@ -130,11 +130,12 @@ initialize_arrays()
 
 
   //corrected flux at x faces
-  flbx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble));
+  flbx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble));
   //corrected flux at x faces
-  flby=(ldouble*)malloc((SX)*(SY+1 )*(SZ)*NV*sizeof(ldouble));
+  flby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
   //corrected flux at x faces
-  flbz=(ldouble*)malloc((SX)*(SY )*(SZ+1)*NV*sizeof(ldouble));
+  flbz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
+
   //flux based on left-interpolated conserved at cell x-faces
   flLx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble));
   //flux based on right-interpolated conserved at cell x-faces
@@ -150,13 +151,13 @@ initialize_arrays()
 
 
   //metric at cell x-faces
-  gbx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*gSIZE*sizeof(ldouble));
+  gbx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell y-faces
   gby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell z-faces
   gbz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*gSIZE*sizeof(ldouble));
   //metric at cell x-faces
-  Gbx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*gSIZE*sizeof(ldouble));
+  Gbx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell y-faces
   Gby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*gSIZE*sizeof(ldouble));
   //metric at cell z-faces
