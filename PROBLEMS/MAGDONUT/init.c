@@ -73,7 +73,7 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
     //vector potential
     ldouble Acov[4];
     Acov[0]=Acov[1]=Acov[2]=0.;
-    Acov[3]=my_max(pp[RHO]/4.e-20-0.2,0.)*sqrt(1.e-26);
+    Acov[3]=my_max(pp[RHO]/4.e-20-0.02,0.)*sqrt(1.e-26);
 
     pp[B1]=0.;
     pp[B2]=0.;

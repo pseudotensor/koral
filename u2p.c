@@ -406,6 +406,8 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   if(pp[0]<RHOFLOOR) {pp[0]=RHOFLOOR; ret=-1; if(verbose) printf("hd_floors CASE 1\n");}
 
   //uint/rho ratios  
+
+  //too cold
   if(pp[1]<UURHORATIOMIN*pp[0]) 
     {
       if(verbose) {printf("hd_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);}//getchar();}
@@ -414,6 +416,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 
     }
 
+  //to hot
   if(pp[1]>UURHORATIOMAX*pp[0]) 
     {
       pp[1]=UURHORATIOMAX*pp[0]; //decreasing uint
@@ -422,10 +425,31 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       if(verbose) printf("hd_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);
     }
 
-  //Rho to rho max
-  //TODO: calculate rho max
-  //ldouble rhomax=100.;
-  //if(pp[0]<RHORHOMAXRATIOMIN*rhomax) {pp[0]=RHORHOMAXRATIOMIN*rhomax; ret=-1; if(verbose) printf("hd_floors CASE 5\n");}
+  //too magnetized
+#ifdef MAGNFIELD
+  ldouble ucond[4],ucovd[4];
+  ldouble bcond[4],bcovd[4],magpre;  
+  int iv;
+  for(iv=1;iv<4;iv++)
+    ucond[iv]=pp[1+iv];
+  conv_vels(ucond,ucond,VELPRIM,VEL4,gg,GG);
+  indices_21(ucond,ucovd,gg);
+  bcon_calc(pp,ucond,ucovd,bcond);
+  indices_21(bcond,bcovd,gg); 
+  magpre = dot(bcond,bcovd)/2.;
+  
+  if(magpre>B2UURATIOMAX*pp[UU]) 
+    {
+      ldouble fd=sqrt(B2UURATIOMAX*pp[UU]/magpre);
+      pp[B1]*=fd;
+      pp[B2]*=fd;
+      pp[B3]*=fd;
+      
+      ret=-1;      
+      if(verbose) printf("mag_floors CASE 1 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[1],magpre);
+    }
+#endif
+
 
   //updates entropy after floor corrections
   pp[5]=calc_Sfromu(pp[0],pp[1]);
