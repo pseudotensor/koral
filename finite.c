@@ -743,7 +743,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 		  
 	  //unsplit scheme
 	  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
-	  
+
 	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
 
 	  if(isnan(val) || isinf(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,

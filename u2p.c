@@ -1118,24 +1118,30 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   //entropy based on UU[1]
   pp[5]=calc_Sfromu(rho,u);
 
+#ifdef MAGNFIELD
   //magnetic conserved=primitives
   pp[B1]=uu[B1]/gdetu;
   pp[B2]=uu[B2]/gdetu;
   pp[B3]=uu[B3]/gdetu;
-
-  //printf(">> %e %e\n",pp[5],pp[5]*utcon[0]);
+#endif
 
 #ifdef TRACER
   ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
   pp[TRA]=Dtr/gamma;
 #endif
 
+  if(verbose) print_NVvector(pp);
 
   // test the inversion
   ldouble uu2[NV];
   int iv;
   int lostprecision=0;
   p2u(pp,uu2,ggg);
+
+  if(verbose) print_NVvector(uu2);
+  if(verbose) print_NVvector(uu);
+  if(verbose) printf("NVMHD: %d\n",NVMHD);
+
   for(iv=0;iv<NVMHD;iv++)
     {
       if(Etype==U2P_HOT) if(iv==5) continue;
@@ -1148,11 +1154,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 
   if(lostprecision)
     {
-      if(verbose>0) printf("u2p_hot lost precision:\n");
+      if(verbose>0) {printf("u2p_hot lost precision:\n");      getchar();}
       //print_Nvector(uu,NV);
       //print_Nvector(uu2,NV);  
       return -106;
-      //getchar();
+
     }
 
   if(verbose>1) {print_Nvector(pp,NV); }
