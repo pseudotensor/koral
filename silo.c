@@ -45,7 +45,7 @@ int fprint_silofile(ldouble time, int num, char* folder)
 
   nodex=(ldouble *)malloc(nx*ny*nz*sizeof(ldouble));
   nodey=(ldouble *)malloc(nx*ny*nz*sizeof(ldouble));
-  nodez=(ldouble *)malloc(nz*ny*nz*sizeof(ldouble));
+  nodez=(ldouble *)malloc(nx*ny*nz*sizeof(ldouble));
 
   /* get the primitives */
   ldouble *rho = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -139,7 +139,13 @@ int fprint_silofile(ldouble time, int num, char* folder)
 		    - sin(th)*vel[2];
 		}
 	  
-	      //	      printf("%d %d %d %e %e %e\n",ix,iy,iz,temp[nodalindex],vy[nodalindex],vz[nodalindex]);getchar();
+	      /*
+	      printf("%d %d %d | %e %e %e | %e %e %e | %e %e | %e %e %e\n",ix,iy,iz,
+		     xxvec[1],xxvec[2],xxvec[3],
+		     xxveccar[1],xxveccar[2],xxveccar[3],
+		     rho[nodalindex],temp[nodalindex],
+		     vx[nodalindex],vy[nodalindex],vz[nodalindex]);getchar();
+	      */
 	    }
 	}
     }
@@ -161,6 +167,9 @@ int fprint_silofile(ldouble time, int num, char* folder)
 
       coordinates[0] = nodex;
       coordinates[1] = nodey;
+#ifdef SILO2D_XZPLANE
+      coordinates[1] = nodez;
+#endif
     }
   else if(ny==1) //2d, switch order
     {

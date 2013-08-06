@@ -62,8 +62,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.1-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 120
-#define NY 80
+#define NX 60
+#define NY 40
 #define NZ 1
 
 #else //Schwarzschild
@@ -89,8 +89,8 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define CGSOUTPUT
-//define SILOOUTPUT //does not work in 2d!
+#define SILOOUTPUT 
+#define SILO2D_XZPLANE
 
 /************************************/
 //common physics / atmosphere
@@ -102,7 +102,7 @@
 #define URIN (0.)
 #define KKK 7127.
 #define UTPOT .979
-#define DTOUT1 5.e1
+#define DTOUT1 5.e0
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
