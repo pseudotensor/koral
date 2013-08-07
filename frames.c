@@ -39,6 +39,7 @@ trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldou
     {
       pp2[0]=pp1[0];
       pp2[1]=pp1[1];
+
       //velocity in CO1
       ldouble ucon[4];
       ucon[0]=0;
@@ -55,8 +56,30 @@ trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldou
       pp2[2]=ucon[1]; 
       pp2[3]=ucon[2];
       pp2[4]=ucon[3];
+
+      #ifdef MAGNFIELD_TEST
+
+      //TODO: it properly 
+      //magnetic flux vector
+      ldouble ucon[4];
+      ucon[0]=0;
+      ucon[1]=pp1[B1];
+      ucon[2]=pp1[B2];
+      ucon[3]=pp1[B3];
+
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg1,GG1);
+      //converting to CO2
+      trans2_coco(xxvec,ucon,ucon,CO1,CO2);
+      //to VELPRIM
+      conv_vels(ucon,ucon,VEL4,VELPRIM,gg2,GG2);
+
+      pp2[2]=ucon[1]; 
+      pp2[3]=ucon[2];
+      pp2[4]=ucon[3];   
+      #endif
     }
-  
+
+ 
   return 0;
 }
  

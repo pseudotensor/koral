@@ -14,7 +14,7 @@
 //magnetic choices
 /************************************/
 #define MAGNFIELD
-//#define VECPOTGIVEN
+#define VECPOTGIVEN
 
 /************************************/
 //reconstruction / Courant

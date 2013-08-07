@@ -388,6 +388,7 @@ int conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble 
 #define dot(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2]+A[3]*B[3])
 #define dot3(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2])
 #define kron(i,j) (i == j ? 1. : 0.)
+ldouble pick_gdet(int ix,int iy,int iz);
 int pick_g(int ix,int iy,int iz,ldouble gg[][5]);
 int pick_G(int ix,int iy,int iz,ldouble gg[][5]);
 int pick_gb(int ix,int iy,int iz,int,ldouble gg[][5]);
@@ -525,6 +526,7 @@ int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbo
 //magn.c
 void bcon_calc(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon); 
 int calc_BfromA();
+ldouble calc_divB(int ix,int iy,int iz);
 
 
 #include "mnemonics.h"

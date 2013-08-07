@@ -58,6 +58,12 @@ int fprint_silofile(ldouble time, int num, char* folder)
   ldouble *vy = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *vz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 
+  #ifdef MAGNFIELD
+  ldouble *Bx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *By = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Bz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  #endif
+
   for(iz=0;iz<nz;iz++)
     {
       for(iy=0;iy<ny;iy++)
@@ -138,6 +144,43 @@ int fprint_silofile(ldouble time, int num, char* folder)
 		  vz[nodalindex] = cos(th)*vel[1] 
 		    - sin(th)*vel[2];
 		}
+	  
+	      #ifdef MAGNFIELD
+	      //magnetic field
+	      vel[0]=0.;
+	      vel[1]=pp[B1];
+	      vel[2]=pp[B2];
+	      vel[3]=pp[B3];
+
+	      //TODO: calc b^mu here first
+
+	      //to ortonormal	      
+	      trans2_cc2on(vel,vel,geomout.tup);
+
+	      Bx[nodalindex]=vel[1];
+	      By[nodalindex]=vel[2];
+	      Bz[nodalindex]=vel[3];
+
+	      //transform to cartesian
+	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
+		{
+		  coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
+		  ldouble r=xxvecsph[1];
+		  ldouble th=xxvecsph[2];
+		  ldouble ph=xxvecsph[3];
+
+		  Bx[nodalindex] = sin(th)*cos(ph)*vel[1] 
+		    + cos(th)*cos(ph)*vel[2]
+		    - sin(ph)*vel[3];
+
+		  By[nodalindex] = sin(th)*sin(ph)*vel[1] 
+		    + cos(th)*sin(ph)*vel[2]
+		    + cos(ph)*vel[3];
+
+		  Bz[nodalindex] = cos(th)*vel[1] 
+		    - sin(th)*vel[2];
+		}
+	      #endif
 	  
 	      /*
 	      printf("%d %d %d | %e %e %e | %e %e %e | %e %e | %e %e %e\n",ix,iy,iz,
@@ -222,14 +265,31 @@ int fprint_silofile(ldouble time, int num, char* folder)
   optList = DBMakeOptlist(1);
   DBAddOption(optList, DBOPT_DTIME, (void*)&time);
   char *names[3];  
+  ldouble *vels[3];
+
+  //velocity
+  vels[0]=vx;
+  vels[1]=vy;
+  vels[2]=vz;
   names[0] = strdup("vel1");
   names[1] = strdup("vel2");
   names[2] = strdup("vel3");
-  ldouble *vels[3]={vx,vy,vz};
   DBPutQuadvar(file, "velocity","mesh1", 3, names, vels, 
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 
+  #ifdef MAGNFIELD
+  //magn field
+  vels[0]=Bx;
+  vels[1]=By;
+  vels[2]=Bz;
+  names[0] = strdup("B1");
+  names[1] = strdup("B2");
+  names[2] = strdup("B3");
+  DBPutQuadvar(file, "magn.field","mesh1", 3, names, vels, 
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  #endif
   
   /* Close the Silo file */
   DBClose(file);

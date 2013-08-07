@@ -394,3 +394,26 @@ calc_BfromA()
 
   return 0;
 }
+
+
+/***********************************************************************************************/
+/** calculates div B for given cell *****************************************************/
+/***********************************************************************************************/
+ldouble
+calc_divB(int ix,int iy,int iz)
+{
+  //within domain:
+  if(!if_indomain(ix,iy,iz)) return 0.; //do not calculate in ghost cells
+  
+  ldouble divB;
+  
+  //TODO: so far 2d only
+  divB = (pick_gdet(ix,iy,iz)*get_u(p,B1,ix,iy,iz) + pick_gdet(ix,iy-1,iz)*get_u(p,B1,ix,iy-1,iz) 
+	  - pick_gdet(ix-1,iy,iz)*get_u(p,B1,ix-1,iy,iz) - pick_gdet(ix-1,iy-1,iz)*get_u(p,B1,ix-1,iy-1,iz))/(2.*(get_x(ix+1,0)-get_x(ix,0)))
+    + (pick_gdet(ix,iy,iz)*get_u(p,B2,ix,iy,iz) + pick_gdet(ix-1,iy,iz)*get_u(p,B2,ix-1,iy,iz) 
+       - pick_gdet(ix,iy-1,iz)*get_u(p,B2,ix,iy-1,iz) - pick_gdet(ix-1,iy-1,iz)*get_u(p,B2,ix-1,iy-1,iz))/(2.*(get_x(iy+1,1)-get_x(iy,1)));
+
+  divB/=pick_gdet(ix,iy,iz);
+
+  return divB;  
+}
