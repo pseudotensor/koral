@@ -480,7 +480,7 @@ fprint_restartfile(ldouble t, char* folder)
   /***********************************/  
  
   int ix,iy,iz,iv;
-  ldouble pp[NV],uu[NV];
+  ldouble pp[NV];
   for(iz=0;iz<NZ;iz++)
     {
       for(iy=0;iy<NY;iy++)
@@ -490,11 +490,9 @@ fprint_restartfile(ldouble t, char* folder)
 	      fprintf(fout1,"%d %d %d ",ix,iy,iz);
 	      for(iv=0;iv<NV;iv++)
 		{
-		  uu[iv]=get_u(u,iv,ix,iy,iz);
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 		}	 
-	      for(iv=0;iv<NV;iv++)
-		fprintf(fout1,"%.10e ",uu[iv]);
+	     
 	      for(iv=0;iv<NV;iv++)
 		fprintf(fout1,"%.5e ",pp[iv]);
 	      fprintf(fout1,"\n");
@@ -556,25 +554,13 @@ fread_restartfile(int nout1, ldouble *t)
 	      ldouble uu[NV],pp[NV],ftemp;
 	      char c;
 	      
-	      //reading conserved and primitives from file
-	      for(i=0;i<NV;i++)
-		{
-		  ret=fscanf(fdump,"%lf ",&uu[i]);
-		}
+	      //reading primitives from file
 	      for(i=0;i<NV;i++)
 		{
 		  ret=fscanf(fdump,"%lf ",&pp[i]);
 		}
-
-	      /*
-	      if(iy==NY/2)
-		{
-		  printf("%d %d %d\n",ix,iy,iz);
-		  print_Nvector(uu,NV);
-		  print_Nvector(pp,NV);
-		  getchar();
-		}
-	      */
+	      
+	      p2u(pp,uu,&geom);
 
 	      //saving primitives
 	      for(iv=0;iv<NV;iv++)    
@@ -582,10 +568,7 @@ fread_restartfile(int nout1, ldouble *t)
 		  set_u(u,iv,ix,iy,iz,uu[iv]);
 		  set_u(p,iv,ix,iy,iz,pp[iv]);
 		}
-
-	      //sanity check using pp as initial guess
-	      //messes things up, something not initiated right
-	      //calc_primitives(ix,iy,iz);									  
+	    								  
 	    }
 	}
     }
