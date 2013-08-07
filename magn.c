@@ -32,11 +32,8 @@ void calc_bcon_prim(double *pp, double *bcon, void* ggg)
   conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
   indices_21(ucon,ucov,geom->gg);
 
-  bcon[0] = pp[B1]*ucov[1] + pp[B2]*ucov[2] + pp[B3]*ucov[3] ;
-  for(j=1;j<4;j++)
-    {
-      bcon[j] = (pp[B1-1+j] + bcon[0]*ucon[j])/ucon[0] ;
-    }
+  calc_bcon_4vel(pp,ucon,ucov,bcon);
+
   return;
 }
 

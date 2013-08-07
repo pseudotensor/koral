@@ -47,7 +47,7 @@
 #define BHSPIN 0.6
 
 /************************************/
-//coordinates / resolution
+//coordinates / resolutio
 /************************************/
 #define MYCOORDS MINKCOORDS
 #define MINX 0.

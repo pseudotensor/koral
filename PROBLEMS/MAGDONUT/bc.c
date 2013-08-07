@@ -72,8 +72,8 @@ if(ix>=NX) //outflow
      //linear extrapolation
       for(iv=0;iv<NV;iv++)
        {
-	 pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
-	 //pp[iv]=get_u(p,iv,0,iiy,iiz);
+	 //pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
+	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
  
 

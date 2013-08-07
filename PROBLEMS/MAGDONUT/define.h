@@ -13,8 +13,9 @@
 /************************************/
 //magnetic choices
 /************************************/
-#define MAGNFIELD
+//#define MAGNFIELD
 #define VECPOTGIVEN
+#define MAXBETA 0.01 //close to the target pmag/pgas
 
 /************************************/
 //reconstruction / Courant
@@ -41,9 +42,9 @@
 #define EEUURATIOMIN 1.e-20
 #define EEUURATIOMAX 1.e20
 #define B2UURATIOMIN 0.
-#define B2UURATIOMAX 100.
+#define B2UURATIOMAX 1000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 100.
+#define B2RHORATIOMAX 1000.
 #define GAMMAMAXRAD 50.
 
 /************************************/
@@ -62,8 +63,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.1-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 100
-#define NY 60
+#define NX 60
+#define NY 40
 #define NZ 1
 
 #else //Schwarzschild
