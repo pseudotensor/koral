@@ -465,7 +465,7 @@ int multiply2(ldouble *u1,ldouble *u2,ldouble A[][4]);
 int trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2);
 int trans2_coco(ldouble *xx,ldouble *,ldouble *,int CO1, int CO2);
 int trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble*, void*,void*);
-int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void*,void*);
+int trans_mhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void*,void*);
 int trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1, void* ggg2);
 int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 

@@ -51,7 +51,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      struct geometry geomBL;
 	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 	      
-	      trans_phd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 
 	      rho=pp[0];
 
@@ -408,7 +408,7 @@ calc_mdot(ldouble radius,int type)
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
-	  trans_phd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 
 	  rho=pp[0];
 

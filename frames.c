@@ -9,7 +9,7 @@
 int 
 trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1, void* ggg2)
 {
-  trans_phd_coco(pp1, pp2, CO1,CO2,xxvec,ggg1,ggg2);
+  trans_pmhd_coco(pp1, pp2, CO1,CO2,xxvec,ggg1,ggg2);
 #ifdef RADIATION
   trans_prad_coco(pp1, pp2, CO1,CO2,xxvec,ggg1,ggg2);
 #endif
@@ -21,7 +21,7 @@ trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
 /********** does not touch radiative primitives ***********************/
 /*****************************************************************/
 int 
-trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1,void* ggg2)
+trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1,void* ggg2)
 {
   struct geometry *geom1
    = (struct geometry *) ggg1;

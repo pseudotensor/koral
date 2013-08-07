@@ -69,7 +69,7 @@
 //63* ORSZAG - Orszag-Tang vortex
 //64* MAGDONUT - HD donut with poloidal magnetic fields
 
-#define PROBLEM 63
+#define PROBLEM 55
 
 #if(PROBLEM==64)
 
@@ -82,6 +82,7 @@
 #define PR_OUT2GIF_1D "PROBLEMS/MAGDONUT/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/MAGDONUT/dump.c"
 #define PR_TOOLS "PROBLEMS/MAGDONUT/tools.c"
+//#define PR_POSTINIT "PROBLEMS/G2STATIC/postinit.c"
 
 #endif
 

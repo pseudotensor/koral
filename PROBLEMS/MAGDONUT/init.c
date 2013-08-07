@@ -68,9 +68,14 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
     pp[3]=ucon[2];
     pp[4]=ucon[3];
 
-#ifdef MAGNFIELD
+#ifdef MAGNFIELD//setting them zero not to break the following coordinate transformation
+    pp[B1]=pp[B2]=pp[B3]=0.; 
+#endif
 
-    //vector potential
+    //transforming primitives from BL to MYCOORDS
+    trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,&geomBL,&geom);
+    
+#ifdef MAGNFIELD //MYCOORDS vector potential to calculate B's
     ldouble Acov[4];
     Acov[0]=Acov[1]=Acov[2]=0.;
     Acov[3]=my_max(pp[RHO]/4.e-20-0.02,0.)*sqrt(1.e-23);
@@ -80,10 +85,7 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
     pp[B3]=Acov[3];
 #endif
 
-
-    //transforming primitives from BL to MYCOORDS
-    trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,&geomBL,&geom);
-   }
+  }
 
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);

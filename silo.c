@@ -100,7 +100,7 @@ int fprint_silofile(ldouble time, int num, char* folder)
               #ifdef RADIATION
 	      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
               #endif
-	      trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
+	      trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 
 	      //scalars
 	      #ifndef CGSOUTPUT
@@ -267,6 +267,10 @@ int fprint_silofile(ldouble time, int num, char* folder)
   vels[0]=vx;
   vels[1]=vy;
   vels[2]=vz;
+#ifdef SILO2D_XZPLANE
+  vels[1]=vz;
+#endif
+
   names[0] = strdup("vel1");
   names[1] = strdup("vel2");
   names[2] = strdup("vel3");
@@ -279,6 +283,9 @@ int fprint_silofile(ldouble time, int num, char* folder)
   vels[0]=Bx;
   vels[1]=By;
   vels[2]=Bz;
+#ifdef SILO2D_XZPLANE
+  vels[1]=Bz;
+#endif
   names[0] = strdup("B1");
   names[1] = strdup("B2");
   names[2] = strdup("B3");

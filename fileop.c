@@ -288,7 +288,7 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 #ifdef RADIATION
 									      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 #endif
-									      trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
+									      trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 
 									      //from now on geom,gg, GG, tup, etc. defined in OUTCOORDS!
 									      fill_geometry_arb(ix,iy,iz,&geom,OUTCOORDS);
@@ -798,7 +798,7 @@ fprint_simplecart(ldouble t, char* folder)
 		  dx[2]=get_size_x(iz,2);
 		  ldouble gdet=geom.gdet;
 		  ldouble volume=dx[0]*dx[1]*dx[2]*gdet;
-		  trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,&geom,&geomout);
+		  trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,&geom,&geomout);
 		  ldouble rho=rhoGU2CGS(pp[RHO]);
 		  ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 		  ldouble tracer=pp[TRA];

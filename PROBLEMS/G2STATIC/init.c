@@ -53,7 +53,9 @@ diskrho*=1.-step_function(tracer-DISKDAMPPAR1,DISKDAMPPAR2);
 pp[0]=diskrho+clrho;
 tracer=clrho/(diskrho+clrho);
 pp[TRA]=tracer;
-//pp[TRA]=clrho;
+
+//to decrease cloud temperature
+//pp[UU]= pp[UU]*(1. - tracer/(1/0.9));
 
 #endif
 
@@ -78,18 +80,6 @@ int iv;
 for(iv=0;iv<NV;iv++)
   {
     set_u(u,iv,ix,iy,iz,uu[iv]);
-
-    int d1=(iX(ix)+NGCX);
-    int d2=(iY(iy)+NGCY);
-    int d3=(iZ(iz)+NGCZ);
-    
-    int d4=SX;
-    int d5=SY;
-    int d6=SZ;
-
-    int d7=iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SZ)*NV;
-    int d8=SX*SY*SZ*NV;
-
     set_u(p,iv,ix,iy,iz,pp[iv]);
   }
 

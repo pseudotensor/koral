@@ -67,6 +67,10 @@ main(int argc, char **argv)
   #endif
 #endif
 
+#ifdef PR_POSTINIT
+#include PR_POSTINIT
+#endif
+
   //prepares files
   fprint_openfiles("dumps");
   
