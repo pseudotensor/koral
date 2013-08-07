@@ -982,14 +982,20 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       f0=dfdW=0.;
       if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
 	(*f_u2p)(W-D,cons,&f0,&dfdW);
+
+      /*      
+      printf("test (%d): %e %e %e %e\n",Etype,( W*W*W * ( W + 2.*Bsq ) 
+					- QdotBsq*(2.*W + Bsq)),
+	     W*W*(Qtsq-Bsq*Bsq),f0,dfdW);
+      */
       
       if( ((( W*W*W * ( W + 2.*Bsq ) 
 	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
 	  || isinf(f0) || isnan(f0)
 	  || isinf(dfdW) || isnan(dfdW))	  
-	  && (i_increase < 10)) //if not enough will complain later returnin negative number
+	  && (i_increase < 50)) 
 	{
-	  W *= 10.;
+	  W *= 100.;
 	  i_increase++;
 	  continue;
 	}
@@ -998,10 +1004,10 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
     }
   while(1);
 
+  if(i_increase>=50)
+    printf("failed to find initial W for Etype: %d\n",Etype);
 
   //1d Newton solver
-  //if(verbose>1) printf("in: %e %e %e %e %e\n",Qn,Qt2,D,QdotBsq,Bsq);
-
   int iter=0,fu2pret;
   do
     {
@@ -1009,6 +1015,13 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
       iter++;
      
       fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW);
+
+      /*
+      if(isnan(f0))
+	{
+	  printf("1 err: %d %e %e\n",i_increase,W-D,W);
+	}
+      */
 
       //numerical derivative
       //fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW);
@@ -1046,7 +1059,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 	}
       while(1);
 	  
-      if(idump>=100) {if(verbose>0) printf("damped unsuccessfuly\n");return -101;}
+      if(idump>=100) 
+	{
+	  if(verbose>0) printf("damped unsuccessfuly\n");
+	  return -101;
+	}
 	
       W=Wnew; 
 

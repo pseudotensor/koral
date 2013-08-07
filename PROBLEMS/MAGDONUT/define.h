@@ -14,7 +14,7 @@
 //magnetic choices
 /************************************/
 #define MAGNFIELD
-#define VECPOTGIVEN
+//#define VECPOTGIVEN
 
 /************************************/
 //reconstruction / Courant
@@ -62,8 +62,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.1-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 120
-#define NY 80
+#define NX 80
+#define NY 40
 #define NZ 1
 
 #else //Schwarzschild

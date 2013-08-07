@@ -77,8 +77,9 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
 
     pp[B1]=0.;
     pp[B2]=0.;
-    pp[B3]=Acov[3];
+    pp[B3]=0.;//Acov[3];
 #endif
+
 
     //transforming primitives from BL to MYCOORDS
     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);

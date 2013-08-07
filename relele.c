@@ -328,6 +328,10 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
 
       pp[0] = RHOATMMIN*pow(r/rout,-1.5);
       pp[1] = UINTATMMIN*pow(r/rout,-2.5);
+
+      #ifdef MAGNFIELD
+      pp[B1]=pp[B2]=pp[B3]=0.;
+      #endif
   
       return 0;
     }
@@ -350,6 +354,10 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
 
       pp[0] = RHOATMMIN*pow(r/rout,-2.0);
       pp[1] = UINTATMMIN*pow(r/rout,-2.5);
+
+      #ifdef MAGNFIELD
+      pp[B1]=pp[B2]=pp[B3]=0.;
+      #endif
   
       return 0;
     }
@@ -365,7 +373,11 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       pp[4]=ucon[3];
       pp[0] = RHOATMMIN;
       pp[1] = UINTATMMIN;
-  
+
+      #ifdef MAGNFIELD
+      pp[B1]=pp[B2]=pp[B3]=0.;
+      #endif
+
       return 0;
     }
   if(atmtype==3)
@@ -389,6 +401,10 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.; 
       conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
   
+      #ifdef MAGNFIELD
+      pp[B1]=pp[B2]=pp[B3]=0.;
+      #endif
+
       return 0;
     }
   if(atmtype==4) //zero BL velocity
@@ -423,6 +439,10 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       pp[0] = RHOATMMIN*pow(r/rout,-1.5);
       pp[1] = UINTATMMIN*pow(r/rout,-2.5);
   
+      #ifdef MAGNFIELD
+      pp[B1]=pp[B2]=pp[B3]=0.;
+      #endif
+
       return 0;
     }
  
