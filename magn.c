@@ -3,8 +3,8 @@
 
 #include "ko.h"
 
-/* calculate magnetic field four-vector */
-void bcon_calc(double *pr, double *ucon, double *ucov, double *bcon) 
+/* calculate magnetic field four-vector knowing gas four-velocity */
+void calc_bcon_4vel(double *pr, double *ucon, double *ucov, double *bcon) 
 {
   int j ;
 
@@ -12,9 +12,57 @@ void bcon_calc(double *pr, double *ucon, double *ucov, double *bcon)
   for(j=1;j<4;j++)
     {
       bcon[j] = (pr[B1-1+j] + bcon[0]*ucon[j])/ucon[0] ;
-      //printf("> %d %e %e %e %e\n",j,bcon[j],pr[B1-1+j],bcon[0]*ucon[j],ucon[j]);
     }
   return ;
+}
+
+/* calculate magnetic field four-vector from primitives */
+void calc_bcon_prim(double *pp, double *bcon, void* ggg) 
+{
+  int j;
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble ucon[4],ucov[4];
+  ucon[0]=0;
+  ucon[1]=pp[2];
+  ucon[2]=pp[3];
+  ucon[3]=pp[4];
+
+  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+  indices_21(ucon,ucov,geom->gg);
+
+  bcon[0] = pp[B1]*ucov[1] + pp[B2]*ucov[2] + pp[B3]*ucov[3] ;
+  for(j=1;j<4;j++)
+    {
+      bcon[j] = (pp[B1-1+j] + bcon[0]*ucon[j])/ucon[0] ;
+    }
+  return;
+}
+
+/* calculate B^i from bcon and primitives */
+void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg) 
+{
+  int j;
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble ucon[4],ucov[4];
+  ucon[0]=0;
+  ucon[1]=pp[2];
+  ucon[2]=pp[3];
+  ucon[3]=pp[4];
+
+  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+  indices_21(ucon,ucov,geom->gg);
+
+  Bcon[0]=0.;
+
+  for(j=1;j<4;j++)
+    {
+      Bcon[j] = bcon[j]*ucon[0] - bcon[0]*ucon[j];
+    }
+  return;
 }
 
 /***********************************************************************************************/

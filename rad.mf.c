@@ -112,7 +112,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
       fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geomBL,BLCOORDS);
      
       //to BLCOORDS
-      trans_prad_coco(pp,pp,MYCOORDS,BLCOORDS,xxvec,gg,GG,ggBL,GGBL);
+      trans_prad_coco(pp,pp,MYCOORDS,BLCOORDS,xxvec,geom,&geomBL);
       //to ortonormal basis in BLCOORDS
       prad_lab2on(pp,ppon,&geomBL);
     }
@@ -346,7 +346,7 @@ mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg, ldouble dt)
     {
       prad_on2lab(ppon2,pp,&geomBL);
       //convert back to MYCOORDS     
-      trans_prad_coco(pp,pp,BLCOORDS,MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+      trans_prad_coco(pp,pp,BLCOORDS,MYCOORDS,xxvecBL,&geomBL,geom);
     }
   else //already in MYCOORDS
     prad_on2lab(ppon2,pp,ggg);

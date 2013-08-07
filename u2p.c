@@ -434,7 +434,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
     ucond[iv]=pp[1+iv];
   conv_vels(ucond,ucond,VELPRIM,VEL4,gg,GG);
   indices_21(ucond,ucovd,gg);
-  bcon_calc(pp,ucond,ucovd,bcond);
+  calc_bcon_4vel(pp,ucond,ucovd,bcond);
   indices_21(bcond,bcovd,gg); 
   magpre = dot(bcond,bcovd)/2.;
   
@@ -945,7 +945,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   /*
   ldouble bcon[4],bcov[4],bsq;
 #ifdef MAGNFIELD
-  bcon_calc(pp,ucon,ucov,bcon);
+  calc_bcon_4vel(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
   bsq = dot(bcon,bcov);
 #else

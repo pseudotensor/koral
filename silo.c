@@ -98,9 +98,9 @@ int fprint_silofile(ldouble time, int num, char* folder)
 
 	      //primitives to OUTCOORDS
               #ifdef RADIATION
-	      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,geom.gg,geom.GG,geomout.gg,geomout.GG);
+	      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
               #endif
-	      trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,geom.gg,geom.GG,geomout.gg,geomout.GG);
+	      trans_phd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 
 	      //scalars
 	      #ifndef CGSOUTPUT
@@ -147,19 +147,15 @@ int fprint_silofile(ldouble time, int num, char* folder)
 	  
 	      #ifdef MAGNFIELD
 	      //magnetic field
-	      vel[0]=0.;
-	      vel[1]=pp[B1];
-	      vel[2]=pp[B2];
-	      vel[3]=pp[B3];
-
-	      //TODO: calc b^mu here first
-
+	      ldouble bcon[4];
+	      calc_bcon_prim(pp,bcon,&geomout);
+	      
 	      //to ortonormal	      
-	      trans2_cc2on(vel,vel,geomout.tup);
+	      trans2_cc2on(bcon,bcon,geomout.tup);
 
-	      Bx[nodalindex]=vel[1];
-	      By[nodalindex]=vel[2];
-	      Bz[nodalindex]=vel[3];
+	      Bx[nodalindex]=bcon[1];
+	      By[nodalindex]=bcon[2];
+	      Bz[nodalindex]=bcon[3];
 
 	      //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
@@ -169,16 +165,16 @@ int fprint_silofile(ldouble time, int num, char* folder)
 		  ldouble th=xxvecsph[2];
 		  ldouble ph=xxvecsph[3];
 
-		  Bx[nodalindex] = sin(th)*cos(ph)*vel[1] 
-		    + cos(th)*cos(ph)*vel[2]
-		    - sin(ph)*vel[3];
+		  Bx[nodalindex] = sin(th)*cos(ph)*bcon[1] 
+		    + cos(th)*cos(ph)*bcon[2]
+		    - sin(ph)*bcon[3];
 
-		  By[nodalindex] = sin(th)*sin(ph)*vel[1] 
-		    + cos(th)*sin(ph)*vel[2]
-		    + cos(ph)*vel[3];
+		  By[nodalindex] = sin(th)*sin(ph)*bcon[1] 
+		    + cos(th)*sin(ph)*bcon[2]
+		    + cos(ph)*bcon[3];
 
-		  Bz[nodalindex] = cos(th)*vel[1] 
-		    - sin(th)*vel[2];
+		  Bz[nodalindex] = cos(th)*bcon[1] 
+		    - sin(th)*bcon[2];
 		}
 	      #endif
 	  
@@ -286,7 +282,7 @@ int fprint_silofile(ldouble time, int num, char* folder)
   names[0] = strdup("B1");
   names[1] = strdup("B2");
   names[2] = strdup("B3");
-  DBPutQuadvar(file, "magn.field","mesh1", 3, names, vels, 
+  DBPutQuadvar(file, "magn_field","mesh1", 3, names, vels, 
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   #endif

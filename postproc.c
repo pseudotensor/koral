@@ -45,10 +45,13 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
-	      calc_g_arb(xxBL,ggBL,KERRCOORDS);
-	      calc_G_arb(xxBL,GGBL,KERRCOORDS);
+	      struct geometry geom;
+	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
-	      trans_phd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,gg,GG,ggBL,GGBL);
+	      struct geometry geomBL;
+	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	      
+	      trans_phd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 
 	      rho=pp[0];
 
@@ -56,14 +59,14 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      ucon[2]=pp[3];
 	      ucon[3]=pp[4];
 
-	      conv_vels(ucon,ucon3,VELPRIM,VEL3,ggBL,GGBL);
-	      conv_vels(ucon,ucon,VELPRIM,VEL4,ggBL,GGBL);
+	      conv_vels(ucon,ucon3,VELPRIM,VEL3,geomBL.gg,geomBL.GG);
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 	     
-	      indices_21(ucon,ucov,ggBL);
+	      indices_21(ucon,ucov,geomBL.gg);
 
-	      dx[0]=dx[0]*sqrt(ggBL[0][0]);
-	      dx[1]=dx[1]*sqrt(ggBL[2][2]);
-	      dx[2]=2.*M_PI*sqrt(ggBL[3][3]);
+	      dx[0]=dx[0]*sqrt(geomBL.gg[0][0]);
+	      dx[1]=dx[1]*sqrt(geomBL.gg[2][2]);
+	      dx[2]=2.*M_PI*sqrt(geomBL.gg[3][3]);
 
 	      calc_tautot(pp,xxBL,dx,tautot);
 
@@ -287,7 +290,7 @@ calc_lum(ldouble radius)
 	  tau+=tautot[1];
 	  if(tau>1.) break;
 	  
-	  trans_prad_coco(pp,pp,MYCOORDS,KERRCOORDS,xx,geom.gg,geom.GG,geomBL.gg,geomBL.GG);
+	  trans_prad_coco(pp,pp,MYCOORDS,KERRCOORDS,xx,&geom,&geomBL);
 	  prad_lab2on(pp,pp,&geomBL);
 
 	  Fr=pp[FX(0)];	
@@ -399,10 +402,13 @@ calc_mdot(ldouble radius,int type)
 
 	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
-	  calc_g_arb(xxBL,ggBL,KERRCOORDS);
-	  calc_G_arb(xxBL,GGBL,KERRCOORDS);
+	  struct geometry geom;
+	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
-	  trans_phd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,gg,GG,ggBL,GGBL);
+	  struct geometry geomBL;
+	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+	  trans_phd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 
 	  rho=pp[0];
 
@@ -410,7 +416,7 @@ calc_mdot(ldouble radius,int type)
 	  ucon[2]=pp[3];
 	  ucon[3]=pp[4];
 
-	  conv_vels(ucon,ucon,VELPRIM,VEL4,ggBL,GGBL);
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 
 	  dx[1]=dx[1]*sqrt(gg[2][2]);
 	  dx[2]=2.*M_PI*sqrt(gg[3][3]);

@@ -7,11 +7,11 @@
 /********** all primitives between coordinates  ***************/
 /*****************************************************************/
 int 
-trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
+trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1, void* ggg2)
 {
-  trans_phd_coco(pp1, pp2, CO1,CO2,xxvec,gg1,GG1,gg2,GG2);
+  trans_phd_coco(pp1, pp2, CO1,CO2,xxvec,ggg1,ggg2);
 #ifdef RADIATION
-  trans_prad_coco(pp1, pp2, CO1,CO2,xxvec,gg1,GG1,gg2,GG2);
+  trans_prad_coco(pp1, pp2, CO1,CO2,xxvec,ggg1,ggg2);
 #endif
   return 0;
 }
@@ -21,8 +21,13 @@ trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
 /********** does not touch radiative primitives ***********************/
 /*****************************************************************/
 int 
-trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
+trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1,void* ggg2)
 {
+  struct geometry *geom1
+   = (struct geometry *) ggg1;
+  struct geometry *geom2
+   = (struct geometry *) ggg2;
+
   int i;
   for(i=NVMHD;i<NV;i++)
     pp2[i]=pp1[i];
@@ -40,42 +45,35 @@ trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldou
       pp2[0]=pp1[0];
       pp2[1]=pp1[1];
 
-      //velocity in CO1
+      //bcon in CO1
       ldouble ucon[4];
       ucon[0]=0;
       ucon[1]=pp1[2];
       ucon[2]=pp1[3];
       ucon[3]=pp1[4];
 
-      conv_vels(ucon,ucon,VELPRIM,VEL4,gg1,GG1);
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom1->gg,geom1->GG);
       //converting to CO2
       trans2_coco(xxvec,ucon,ucon,CO1,CO2);
       //to VELPRIM
-      conv_vels(ucon,ucon,VEL4,VELPRIM,gg2,GG2);
+      conv_vels(ucon,ucon,VEL4,VELPRIM,geom2->gg,geom2->GG);
 
       pp2[2]=ucon[1]; 
       pp2[3]=ucon[2];
       pp2[4]=ucon[3];
 
       #ifdef MAGNFIELD_TEST
-
-      //TODO: it properly 
-      //magnetic flux vector
-      ldouble ucon[4];
-      ucon[0]=0;
-      ucon[1]=pp1[B1];
-      ucon[2]=pp1[B2];
-      ucon[3]=pp1[B3];
-
-      conv_vels(ucon,ucon,VELPRIM,VEL4,gg1,GG1);
+      //magnetic field 4-vector
+      ldouble bcon[4],Bcon[4];
+      calc_bcon_prim(pp,bcon,geom1);
       //converting to CO2
       trans2_coco(xxvec,ucon,ucon,CO1,CO2);
-      //to VELPRIM
-      conv_vels(ucon,ucon,VEL4,VELPRIM,gg2,GG2);
-
-      pp2[2]=ucon[1]; 
-      pp2[3]=ucon[2];
-      pp2[4]=ucon[3];   
+      //coming back to primitive B^i
+      calc_Bcon_prim(pp,bcon,Bcon,geom2);
+      
+      pp2[B1]=Bcon[1]; 
+      pp2[B2]=Bcon[2];
+      pp2[B3]=Bcon[3];   
       #endif
     }
 
@@ -88,9 +86,15 @@ trans_phd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldou
 /********** does not touch hydro primitives ***********************/
 /*****************************************************************/
 int 
-trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5])
+trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1, void* ggg2)
 {
+  struct geometry *geom1
+    = (struct geometry *) ggg1;
+  struct geometry *geom2
+    = (struct geometry *) ggg2;
+
   int i;
+  
   for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
@@ -111,11 +115,11 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldo
       ucon[2]=pp1[FY0];
       ucon[3]=pp1[FZ0];
 
-      conv_vels(ucon,ucon,VELPRIMRAD,VEL4,gg1,GG1);
+      conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom1->gg,geom1->GG);
       //converting to CO2
       trans2_coco(xxvec,ucon,ucon,CO1,CO2);
       //to VELPRIM
-      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg2,GG2);
+      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom2->gg,geom2->GG);
 
       pp2[FX0]=ucon[1]; 
       pp2[FY0]=ucon[2];

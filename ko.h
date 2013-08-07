@@ -464,8 +464,9 @@ int multiply22(ldouble T1[][4],ldouble T2[][4],ldouble A[][4]);
 int multiply2(ldouble *u1,ldouble *u2,ldouble A[][4]);
 int trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2);
 int trans2_coco(ldouble *xx,ldouble *,ldouble *,int CO1, int CO2);
-int trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble*, ldouble gg[][5], ldouble GG[][5], ldouble gg2[][5], ldouble GG2[][5]);
-int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, ldouble gg1[][5], ldouble GG1[][5], ldouble gg2[][5], ldouble GG2[][5]);
+int trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble*, void*,void*);
+int trans_hd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void*,void*);
+int trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1, void* ggg2);
 int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 
 
@@ -524,9 +525,11 @@ int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble
 int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose);
 
 //magn.c
-void bcon_calc(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon); 
+void calc_bcon_4vel(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon); 
 int calc_BfromA();
 ldouble calc_divB(int ix,int iy,int iz);
+void calc_bcon_prim(double *pp, double *bcon, void* ggg);
+void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg);
 
 
 #include "mnemonics.h"

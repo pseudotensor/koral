@@ -69,7 +69,7 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
   indices_21(ucon,ucov,gg);
 #ifdef MAGNFIELD
-  bcon_calc(p,ucon,ucov,bcon);
+  calc_bcon_4vel(p,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
   bsq = dot(bcon,bcov);
 #endif

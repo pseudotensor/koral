@@ -106,7 +106,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   va2=0.;
 
 #ifdef MAGNFIELD
-  bcon_calc(pp,ucon,ucov,bcon);
+  calc_bcon_4vel(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
   bsq = dot(bcon,bcov);
   EF = rho + GAMMA*uu;
@@ -604,7 +604,7 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
 #ifdef MAGNFIELD
   ldouble bcon[4];
-  bcon_calc(pp,ucon,ucov,bcon);
+  calc_bcon_4vel(pp,ucon,ucov,bcon);
 #endif
  
 #ifdef RADIATION
@@ -715,7 +715,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   indices_21(ucon,ucov,gg);
 
 #ifdef MAGNFIELD
-  bcon_calc(pp,ucon,ucov,bcon);
+  calc_bcon_4vel(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
   bsq = dot(bcon,bcov);
 #else
