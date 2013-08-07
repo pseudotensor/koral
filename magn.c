@@ -263,6 +263,9 @@ calc_BfromA()
       iy=loop_02[ii][1];
       iz=loop_02[ii][2]; 
 
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+
       ldouble B[4];
       ldouble dA[4][4];
 
@@ -346,12 +349,12 @@ calc_BfromA()
 	    dA[3][1]=(3.*get_u(p,B1,ix,iy,iz)-4.*get_u(p,B1,ix,iy,iz-1)+get_u(p,B1,ix,iy,iz-2))/(get_x(iz,2)-get_x(iz-2,2));
 	}
 
-      //B^i = d_j A_k eps^ijk
+      //gdet B^i = d_j A_k eps^ijk
       //saving temporarily to pinit
 
-      B[1]=dA[2][3] - dA[3][2];
-      B[2]=dA[3][1] - dA[1][3];
-      B[3]=dA[1][2] - dA[2][1];
+      B[1]=(dA[2][3] - dA[3][2])/geom.gdet;
+      B[2]=(dA[3][1] - dA[1][3])/geom.gdet;
+      B[3]=(dA[1][2] - dA[2][1])/geom.gdet;
 
       set_u(pinit,B1,ix,iy,iz,B[1]);
       set_u(pinit,B2,ix,iy,iz,B[2]);
