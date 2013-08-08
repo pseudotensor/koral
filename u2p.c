@@ -226,10 +226,10 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	  
 	  if(1)
 	    {
-	      printf("neg rho: %e (%d) at %d %d\n",pp[0],u2pret,geom->ix,geom->iy);
-	      print_Nvector(uu,NV);
+	      printf("neg rho after entropy: %e (%d) at %d %d\n",pp[0],u2pret,geom->ix,geom->iy);
+	      //print_Nvector(uu,NV);
 	      print_Nvector(pp,NV);
-	      getchar();
+	      //getchar();
 	    }
 	  
 	  pp[0]=RHOFLOOR; 
@@ -248,12 +248,12 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	//u2p_entropy cannot handle negative rhos - correcting
 	if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
 	  {
-	    
+	    /*
 	    printf("at %d %d %d neg uu[0] - imposing RHOFLOOR and other floors\n",geom->ix,geom->iy,geom->iz);
 	    u2pret=u2p_hot(uu,pp,geom);
 	    printf("u2p_hot out at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
 	    getchar();
-	    
+	    */
 
 	    //using old state to estimate the correction
 	    pp[0]=RHOFLOOR;
@@ -295,7 +295,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		    ret=-2;
 		  }
 
-		if(u2pret==-103) 
+		if(u2pret==-103 && 0)  //TODO: work out hotmax
 		  //solver went rho->D meaning entropy too large 
 		  //imposing URHOLIMIT 
 		  {		
@@ -1144,13 +1144,13 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   if(u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
     {
-      if(verbose>0) printf("neg u in u2p_hot %e %e %e %e\n",rho,u,gamma2,W);//getchar();
+      if(verbose>0) printf("neg u in u2p_solver %e %e %e %e\n",rho,u,gamma2,W);//getchar();
       return -104;
     }
 
   if(rho<0.) 
     {
-      if(verbose>0) printf("neg rho in u2p_hot %e %e %e %e\n",rho,u,gamma2,W);//getchar();
+      if(verbose>0) printf("neg rho in u2p_solver %e %e %e %e\n",rho,u,gamma2,W);//getchar();
       return -105;
     }
 
