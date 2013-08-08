@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 30
+#define RESTART
+#define RESTARTNUM 44
 
 /************************************/
 //radiation choices
@@ -103,7 +103,7 @@
 #define URIN (0.)
 #define KKK 7127.
 #define UTPOT .965
-#define DTOUT1 5.e1
+#define DTOUT1 5.e0
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

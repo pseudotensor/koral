@@ -415,6 +415,7 @@ int u2p_hot(ldouble*,ldouble*,void*);
 int u2p_entropy(ldouble*,ldouble*,void*);
 int u2p_cold(ldouble*,ldouble*,void*);
 int u2p_hotmax(ldouble*,ldouble*,void*);
+int u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
 
 //u2prad.c
 int check_floors_rad(ldouble *uu, int,void*);

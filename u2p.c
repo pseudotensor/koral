@@ -175,10 +175,27 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 #ifdef ENFORCEENTROPY
   u2pret=-1;
 #else
-  u2pret=u2p_solver(uu,pp,ggg,U2P_HOT); 
+  
+  //test
+  ldouble ppold[NV];
+  int iv;
+  PLOOP(iv)
+    ppold[iv]=pp[iv];
+
+  u2pret=u2p_solver(uu,pp,ggg,U2P_HOT,0); 
 
   //************************************
-  
+  if(pp[RHO]<1e-70) 
+    {
+      printf("test 100 (%d )\n",u2pret);
+      print_NVvector(pp);
+      print_NVvector(ppold);
+      print_NVvector(uu);
+      u2p_solver(uu,ppold,ggg,U2P_HOT,2); 
+      print_NVvector(ppold);
+      
+    }
+
   
   if(u2pret==0)
     {
@@ -254,7 +271,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	    //************************************
 	    //entropy solver - conserving entropy
 	    //u2pret=u2p_entropy(uu,pp,ggg);
-	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY);  
+	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,0);  
 
 	    //************************************
 
@@ -283,7 +300,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		  //imposing URHOLIMIT 
 		  {		
 		    //u2pret=u2p_hotmax(uu,pp,ggg);
-		    u2pret=u2p_solver(uu,pp,ggg,U2P_HOTMAX);
+		    u2pret=u2p_solver(uu,pp,ggg,U2P_HOTMAX,0);
 		    if(u2pret<0)
 		      {
 			if(verbose>0)
@@ -312,7 +329,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	//cold RHD - assuming u=SMALL
 	ret=-2;
 	//u2pret=u2p_cold(uu,pp,ggg);
-	u2pret=u2p_solver(uu,pp,ggg,U2P_COLD);
+	u2pret=u2p_solver(uu,pp,ggg,U2P_COLD,0);
 	//************************************
 
 	if(u2pret<0)
@@ -834,9 +851,8 @@ f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 //Etype == 3 -> cold inversion (uses D,Tti,u over rho min ratio)
 
 int
-u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
+u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
-  int verbose=0;
   int i,j,k;
   ldouble rho,u,p,w,W,alpha,D,Sc;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
@@ -994,7 +1010,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
   do
     {
       f0=dfdW=0.;
-      if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
+
+      //all solvers:
+      //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
 	(*f_u2p)(W-D,cons,&f0,&dfdW);
 
       /*      
@@ -1054,9 +1072,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype)
 	{
 	  ldouble f0tmp,dfdWtmp;
 	  f0tmp=dfdWtmp=0.;
-	  if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
-	    (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp);
-
+	  //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
+	      (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp);
+	  if(verbose>1) printf("sub (%d) :%d %e %e %e\n",idump,iter,W,f0,dfdW);
 	  if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
 		  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))
 	       || isinf(f0tmp) || isnan(f0tmp)

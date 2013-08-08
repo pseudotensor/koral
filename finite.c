@@ -496,8 +496,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,0,&geom);
+	  if(fd_pl[RHO]<1.e-70) printf("test 1\n");
 	  check_floors_hd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix+1,iy,iz,0,&geom);
+	  if(fd_pr[RHO]<1.e-70) printf("test 2\n");
 	  check_floors_hd(fd_pr,VELPRIM,&geom);
 	  //end of floor section
 
@@ -572,8 +574,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,1,&geom);
+	  if(fd_pl[RHO]<1.e-70) printf("test 3\n");
 	  check_floors_hd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix,iy+1,iz,1,&geom);
+	  if(fd_pr[RHO]<1.e-70) printf("test 4\n");
 	  check_floors_hd(fd_pr,VELPRIM,&geom);
 
 	  f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
@@ -627,8 +631,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,2,&geom);
+	  if(fd_pl[RHO]<1.e-70) printf("test 5\n");
 	  check_floors_hd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix,iy,iz+1,2,&geom);
+	  if(fd_pr[RHO]<1.e-70) printf("test 6\n");
 	  check_floors_hd(fd_pr,VELPRIM,&geom);
 	  //end of floor section
 
