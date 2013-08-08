@@ -78,17 +78,6 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	    {	  
 	      ur[i]=u0[i]+.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
 	      ul[i]=u0[i]-.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
-	      /*
-	      //FFF
-	      if(i<2 &&( ur[i]==0. || ul[i]==0.))
-		{
-		  printf("ur: %e %e %e %e %e\n",u0[i],.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i])),
-			 MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
-		  printf("ul: %e %e %e %e %e\n",u0[i],-.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i])),
-			 MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
-		  getchar();
-		}
-	      */
 	    }
 	  else
 	    {
@@ -175,7 +164,13 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	      ur[iv]=3.*u0[iv]-2.*ul[iv];
 	    }
 	      
-	  //	  if((u0[iv]-ul[iv])*(ul[iv]-um1[iv])<0. || (u0[iv]-ur[iv])*(ur[iv]-up1[iv])<0.) {	      printf("non-mon parabola: %e | %e || %e || %e | %e\n",um1[iv],ul[iv],u0[iv],ur[iv],up1[iv]);getchar();}
+	  /*
+	    if((u0[iv]-ul[iv])*(ul[iv]-um1[iv])<0. || (u0[iv]-ur[iv])*(ur[iv]-up1[iv])<0.) 
+	    {
+	    printf("non-mon parabola: %e | %e || %e || %e | %e\n",um1[iv],ul[iv],u0[iv],ur[iv],up1[iv]);
+	    getchar();
+	    }
+	  */
 
 	  //pass up reconstructed value at center - only if reconstructing average -> center
 	  //check consistency!
@@ -496,10 +491,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,0,&geom);
-	  if(fd_pl[RHO]<1.e-70) printf("test 1\n");
 	  check_floors_hd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix+1,iy,iz,0,&geom);
-	  if(fd_pr[RHO]<1.e-70) printf("test 2\n");
 	  check_floors_hd(fd_pr,VELPRIM,&geom);
 	  //end of floor section
 
@@ -509,8 +502,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  //saving to memory
 	  for(i=0;i<NV;i++)
 	    {
-	      //set_u(px,i,ix,iy,iz,fd_p0[i]);
-	  
 	      set_ubx(pbRx,i,ix,iy,iz,fd_pl[i]);
 	      set_ubx(pbLx,i,ix+1,iy,iz,fd_pr[i]);
 
@@ -552,32 +543,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
-	  /*
-	  //FFF
-	  if(fd_pl[1]==0.) 
-	    {
-
-	      printf("==\n");
-	      print_Nvector(fd_p0,NV);
-	      print_Nvector(fd_pp1,NV);
-	      print_Nvector(fd_pp2,NV);
-	      print_Nvector(fd_pm1,NV);
-	      print_Nvector(fd_pm2,NV);
-
-	      printf("==\n");
-	      print_Nvector(fd_pl,NV);
-	      print_Nvector(fd_pr,NV);
-	     
-	      my_err("zero!");
-	    }
-	  */
-
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,1,&geom);
-	  if(fd_pl[RHO]<1.e-70) printf("test 3\n");
 	  check_floors_hd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix,iy+1,iz,1,&geom);
-	  if(fd_pr[RHO]<1.e-70) printf("test 4\n");
 	  check_floors_hd(fd_pr,VELPRIM,&geom);
 
 	  f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
@@ -586,8 +555,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  //saving to memory
 	  for(i=0;i<NV;i++)
 	    {
-	      //set_u(py,i,ix,iy,iz,fd_p0[i]);
-	  
 	      set_uby(pbRy,i,ix,iy,iz,fd_pl[i]);
 	      set_uby(pbLy,i,ix,iy+1,iz,fd_pr[i]);
 
@@ -631,10 +598,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,2,&geom);
-	  if(fd_pl[RHO]<1.e-70) printf("test 5\n");
 	  check_floors_hd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix,iy,iz+1,2,&geom);
-	  if(fd_pr[RHO]<1.e-70) printf("test 6\n");
 	  check_floors_hd(fd_pr,VELPRIM,&geom);
 	  //end of floor section
 
@@ -644,8 +609,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  //saving to memory
 	  for(i=0;i<NV;i++)
 	    {
-	      //set_u(pz,i,ix,iy,iz,fd_p0[i]);
-	  
 	      set_ubz(pbRz,i,ix,iy,iz,fd_pl[i]);
 	      set_ubz(pbLz,i,ix,iy,iz+1,fd_pr[i]);
 
@@ -676,7 +639,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
 #ifdef MAGNFIELD
-  flux_ct();
+  flux_ct(); //constrained transport to preserve div.B=0
 #endif
 
   //**********************************************************************
@@ -817,8 +780,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 		  
 	  for(iv=0;iv<NV;iv++)
 	    {
-	      //if(fabs(ms[iv])*dt>fabs(0.1*get_u(ubase,iv,ix,iy,iz)))
-	      //printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(ubase,iv,ix,iy,iz),ms[iv]*dt,fabs(ms[iv]*dt/get_u(ubase,iv,ix,iy,iz)));
 	      val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
 	      set_u(u,iv,ix,iy,iz,val);	
 	      uu[iv]=val;
@@ -829,8 +790,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 		  
       for(iv=0;iv<NV;iv++)
 	{
-	  //if(fabs(ms[iv])*dt>fabs(0.1*get_u(ubase,iv,ix,iy,iz)))
-	  //printf("%d %d | %d | %e %e | %f\n",ix,iy,iv,get_u(ubase,iv,ix,iy,iz),ms[iv]*dt,fabs(ms[iv]*dt/get_u(ubase,iv,ix,iy,iz)));
 	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
@@ -1028,16 +987,6 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
    
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
-
-
-      //save calculated conserved basing on primitives on faces
-      /*
-	for(i=0;i<NV;i++)
-	{
-	set_ubx(ubLx,i,ix,iy,iz,fd_uLr[i]);
-	set_ubx(ubRx,i,ix,iy,iz,fd_uRr[i]);
-	}
-      */
   
       //variable loop
       for(i=0;i<NV;i++)
@@ -1133,13 +1082,6 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
 
-      /*
-      for(i=0;i<NV;i++)
-	{
-	  set_uby(ubLy,i,ix,iy,iz,fd_uLr[i]);
-	  set_uby(ubRy,i,ix,iy,iz,fd_uRr[i]);
-	}
-      */
 
       for(i=0;i<NV;i++)
 	{
@@ -1231,14 +1173,6 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 
       p2u(fd_uLl,fd_uLl,&geom);
       p2u(fd_uRl,fd_uRl,&geom);
-
-      /*
-      for(i=0;i<NV;i++)
-	{
-	  set_ubz(ubLz,i,ix,iy,iz,fd_uLr[i]);
-	  set_ubz(ubRz,i,ix,iy,iz,fd_uRr[i]);
-	}
-      */
 
       for(i=0;i<NV;i++)
 	{
