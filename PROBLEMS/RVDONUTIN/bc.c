@@ -230,7 +230,7 @@ if(ix>=NX) //analytical solution within the torus and atmosphere outside
 
 #endif
       //transforming all primitives from BL to MYCOORDS
-     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,&geomBL,&geom);
       }     
     
    

@@ -73,8 +73,8 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(3.1-MKS1R0))
-#define NX 72
-#define NY 48
+#define NX 60
+#define NY 40
 #define NZ 1
 #else //Schwarzschild
 #define MYCOORDS SCHWCOORDS
@@ -93,6 +93,8 @@
 /************************************/
 //output
 /************************************/
+#define SILOOUTPUT
+#define SILO2D_XZPLANE
 #define OUTCOORDS KERRCOORDS                                                                    
 #define RADOUTPUTINZAMO
 //#define PRINTINSIDEBH
@@ -103,7 +105,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define CGSOUTPUT
+//#define CGSOUTPUT
 
 /************************************/
 //common physics / atmosphere
@@ -115,7 +117,7 @@
 /************************************/
 //model choice
 /************************************/
-#define NDONUT 3
+#define NDONUT 993
 
 /************************************/
 #if (NDONUT==100) //high injection to break it
@@ -356,15 +358,39 @@
 /************************************/
 //333
 #undef NX
-#define NX 40
+#define NX 60
 #undef NY
-#define NY 20
+#define NY 40
 #define MAXX (log(25.3-MKS1R0))
 #define ELL 4.5
-#define URIN (3.92e8/CCC)
+#define URIN 0.//(3.92e8/CCC)
 #define KKK 7127.
 #define UTPOT .979
-#define DTOUT1 5.e0
+#define DTOUT1 5.e1
+#define RHOATMMIN  1.e-24
+#define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+
+/************************************/
+#elif (NDONUT==993) //to comapre with MAGDONUT
+/************************************/
+//333
+#undef NX
+#define NX 60
+#undef NY
+#define NY 40
+#undef MINY
+#define MINY (0.1*Pi/2.)
+#undef MAXY
+#define MAXY (Pi-0.1*Pi/2.)
+#undef MINX
+#define MINX (log(1.1-MKS1R0))
+#define MAXX (log(50.-MKS1R0))
+#define ELL 4.5
+#define URIN (0.)
+#define KKK 7127.
+#define UTPOT .979
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

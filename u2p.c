@@ -179,11 +179,11 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 
   //************************************
   
-  /*
+  
   if(u2pret==0)
     {
       //check if u2p_hot faild by making entropy decrease
-      //by comparing the Lagrangian uu[ENTR] value and the one grom u2p_hot
+      //by comparing the Lagrangian uu[ENTR] value and the one from u2p_hot
       ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
       conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
       ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
@@ -195,7 +195,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	u2pret=-1;
       }
     }
-  */
+  
   
   //************************************
   if(u2pret<0) 
@@ -206,15 +206,15 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
       if(u2pret==-105) 
 	//negative rho but everything else right (u2pret==-105)
 	{
-	  /*
+	  
 	  if(1)
 	    {
-	      printf("neg rho: %e (%d)\n",pp[0],u2pret);
+	      printf("neg rho: %e (%d) at %d %d\n",pp[0],u2pret,geom->ix,geom->iy);
 	      print_Nvector(uu,NV);
 	      print_Nvector(pp,NV);
 	      getchar();
 	    }
-	  */
+	  
 	  pp[0]=RHOFLOOR; 
 	  ret=-1; //to ask for conserved update
 	  u2pret=0;
@@ -231,12 +231,12 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	//u2p_entropy cannot handle negative rhos - correcting
 	if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
 	  {
-	    /*
+	    
 	    printf("at %d %d %d neg uu[0] - imposing RHOFLOOR and other floors\n",geom->ix,geom->iy,geom->iz);
 	    u2pret=u2p_hot(uu,pp,geom);
 	    printf("u2p_hot out at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
 	    getchar();
-	    */
+	    
 
 	    //using old state to estimate the correction
 	    pp[0]=RHOFLOOR;
@@ -403,7 +403,11 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 #endif
 
   //absolute rho
-  if(pp[0]<RHOFLOOR) {pp[0]=RHOFLOOR; ret=-1; if(verbose) printf("hd_floors CASE 1\n");}
+  if(pp[0]<RHOFLOOR) 
+    {
+      if(verbose || 1) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix,geom->iy,pp[0]);
+      pp[0]=RHOFLOOR; ret=-1; 
+    }
 
   //uint/rho ratios  
 
@@ -438,16 +442,26 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   indices_21(bcond,bcovd,gg); 
   magpre = dot(bcond,bcovd)/2.;
   
+  /*
   if(magpre>B2UURATIOMAX*pp[UU]) 
     {
-      ldouble fd=sqrt(B2UURATIOMAX*pp[UU]/magpre);
+    ldouble fd=sqrt(B2UURATIOMAX*pp[UU]/magpre);
       pp[B1]*=fd;
       pp[B2]*=fd;
       pp[B3]*=fd;
-      
+        
       ret=-1;      
       if(verbose) printf("mag_floors CASE 1 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[1],magpre);
     }
+  */
+
+  if(magpre>B2RHORATIOMAX*pp[RHO]) 
+    {
+      pp[RHO]*=magpre/(B2RHORATIOMAX*pp[RHO]);
+      ret=-1;      
+      if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
+    }
+
 #endif
 
 

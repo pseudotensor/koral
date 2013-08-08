@@ -209,7 +209,7 @@ if(ut<-1 || podpierd<0. || xx<4. || NODONUT || INFLOWING) //outside donut
      
 
      //transforming primitives from BL to MYCOORDS
-     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,&geomBL,&geom);
    }
 
 //entropy

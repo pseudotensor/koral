@@ -13,7 +13,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define VECPOTGIVEN
 #define MAXBETA 0.01 //close to the target pmag/pgas
 
@@ -21,7 +21,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2K1K2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -57,14 +57,14 @@
 //coordinates / resolution
 /************************************/
 #define myMKS1COORDS
-#define MKS1R0 -2.
+#define MKS1R0 -1.
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.1-MKS1R0))
-#define MAXX (log(50.-MKS1R0))
-#define NX 60
-#define NY 40
+#define MINX (log(1.2-MKS1R0))
+#define MAXX (log(40.-MKS1R0))
+#define NX 90
+#define NY 70
 #define NZ 1
 
 #else //Schwarzschild
@@ -76,8 +76,8 @@
 #define NZ 1
 #endif
 
-#define MINY (0.1*Pi/2.)
-#define MAXY (Pi-0.1*Pi/2.)
+#define MINY (0.01*Pi/2.)
+#define MAXY (Pi-0.01*Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
@@ -99,10 +99,10 @@
 #define GAMMA (4./3.)
 #define NODONUT 0
 #define INFLOWING 0
-#define ELL 4.5
+#define ELL 3.85
 #define URIN (0.)
 #define KKK 7127.
-#define UTPOT .979
+#define UTPOT .965
 #define DTOUT1 5.e1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
