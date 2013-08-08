@@ -14,10 +14,7 @@
 #define MYCOORDS MINKCOORDS //metric
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
-//#define EDDINGTON_APR //Eddington approximation (P=1/3 I)
-//#define EXPLICIT_SUBSTEP_RAD_SOURCE
-//#define EXPLICIT_RAD_SOURCE //whether to impose explicit treatment of the radiative four force terms
-//#define IMPLICIT_FF_RAD_SOURCE //whether to use the explicit-implicit approximate implicit method
+//#define SKIPRADSOURCE
 
 #define MASS 1./MSUNCM //defines unit of length
 #define MASSCM 1.

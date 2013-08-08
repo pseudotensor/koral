@@ -588,6 +588,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       ldouble T=calc_PEQ_Tfromurho(pp2[UU],pp2[RHO]);
       ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
       ldouble Ehat = -Rtt;
+      ldouble Ehat0 = -Rtt0;
       ldouble dtau=dt/ucon[0];
       ldouble kappaabs=calc_kappa(pp2[RHO],T,geom->xx,geom->yy,geom->zz);
 
@@ -595,7 +596,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       //check signs!
       if(whichprim==RAD) //rad-primitives
 	{
-	  f[0]=Rtt - Rtt0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
+	  f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
 	}
       if(whichprim==MHD) //mhd-
 	{
@@ -628,8 +629,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   ldouble f1[4],f2[4],f3[4],xxx[4];
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
-  //verbose=1;
-
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -644,22 +643,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
-  int corr[2],fixup[2];
-
-  //print_NVvector(uu00);
-  //print_NVvector(pp00);
-
-  //print_metric(geom->gg);
-  //print_metric(geom->GG);
-  //printf("%e\n",geom->alpha);
-  //printf("%e\n",geom->gdet);
-  u2p(uu00,pp00,geom,corr,fixup);
-  //printf("%d %d\n",corr[0],corr[1]);
-
-  //print_NVvector(pp00);
-
-  p2u(pp00,uu00,geom);
-
+  
   if(verbose) //dump the problematic case to file
     {
       printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -777,7 +761,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     whichprim=MHD; 
 
   //override
-  //whichprim=RAD;
+  //whichprim=MHD;
  
   params[0]=whichprim;
 
@@ -1218,12 +1202,19 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   int iv;ldouble pp[NV],uu[NV];
   for(iv=0;iv<NV;iv++)
     {
-      pp[iv]=get_u(p,iv,ix,iy,iz); //primitives corresponding to zero-state  
-      uu[iv]=get_u(u,iv,ix,iy,iz);  
+      uu[iv]=get_u(u,iv,ix,iy,iz); //conserved after advection and geometry
+      pp[iv]=get_u(p,iv,ix,iy,iz); //some reasonable estimate of primitives 
    }
+  
+  //inversion to get the right pp[]
+  //(u2p checks against proper entropy evolution and uses entropy inversion if necessary
+
+  int corr[2],fixup[2];
+  u2p(uu,pp,&geom,corr,fixup);
+  p2u(pp,uu,&geom);
 
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
-  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+  return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
   
 
 }
