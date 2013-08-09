@@ -493,6 +493,9 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 
   int whichprim=params[0];
   int whicheq=params[1];
+  int whichframe=params[2];
+
+  //  printf("%d %d %d\n",params[0],params[1],params[2]);getchar();
 
   ldouble uu[NV],pp2[NV];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
@@ -505,9 +508,9 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   ucon[2]=pp2[3];
   ucon[3]=pp2[4];
   ucon[0]=0.;
-  //converting to 4-velocity
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
 
+  //correcting rho for MHD prims
   if(whichprim==MHD)
     {
       ldouble rho = uu0[RHO]/gdetu/ucon[0];
@@ -552,33 +555,45 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
   //radiative four-force
   ldouble Gi[4];
   calc_Gi(pp2,ggg,Gi); 
- 
-  //test
-  //ldouble Gihat[4];
-  //boost2_lab2ff(Gi,Gihat,pp2,gg,GG); //indeed 0 for time component in ff when kappa = 0
-  //print_4vector(Gi);
-  //print_4vector(Gihat);
-
   indices_21(Gi,Gi,gg);
 
-  if(whichprim==RAD) //rad-primitives
+  //errors in momenta - always in lab frame
+  if(whichprim==MHD) //mhd-primitives
     {
-      f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
-      f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
-      f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
-      f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
-    }
-  if(whichprim==MHD) //hydro-primitives
-    {
-      f[0] = uu[1] - uu0[1] - dt * gdetu * Gi[0];
       f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
       f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2];
       f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3];
     }
-
-  //fluid frame version below
-  if(whicheq==1)
+  if(whichprim==RAD) //rad-primitives
     {
+      f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
+      f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
+      f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
+    }
+
+  /***** LAB FRAME ENERGY/ENTROPY EQS *****/
+  if(whichframe==RADIMPLICIT_LABEQ)
+    {      
+      if(whichprim==RAD) //rad-primitives
+	{
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+	  else
+	    my_err("not implemented 3\n");
+	}
+      if(whichprim==MHD) //hydro-primitives
+	{
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    f[0] = uu[1] - uu0[1] - dt * gdetu * Gi[0];
+	  else
+	    my_err("not implemented 4\n");
+	}
+    }
+
+  /***** FF FRAME ENERGY/ENTROPY EQS *****/
+  if(whichframe==RADIMPLICIT_FFEQ)
+    {
+
       ldouble ucon[4],Rtt0,Rtt;
       //zero - state 
       calc_ff_Rtt(pp0,&Rtt0,ucon,geom);
@@ -593,17 +608,20 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       ldouble kappaabs=calc_kappa(pp2[RHO],T,geom->xx,geom->yy,geom->zz);
 
       //fluid frame energy equation:
-      //check signs!
       if(whichprim==RAD) //rad-primitives
 	{
-	  f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
+	  else
+	    my_err("not implemented 1\n");
 	}
       if(whichprim==MHD) //mhd-
 	{
-	  f[0]=pp2[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    f[0]=pp2[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	   else
+	    my_err("not implemented 2\n");
 	}
-
-      //printf(">>> %.10e %.10e %e\n",Rtt, Rtt0, kappaabs*(Ehat-4.*Pi*B)*dtau);getchar();
     }
   
   return ret;
@@ -754,23 +772,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   */
   
   //choice of primitives to evolve
-  int params[2],whichprim;
+  int params[3],whichprim;
   if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
     whichprim=RAD;
   else
     whichprim=MHD; 
+   params[0]=whichprim;
 
-  //override
-  //whichprim=MHD;
- 
-  params[0]=whichprim;
+   //energy or entropy equation to solve
+   params[1]=RADIMPLICIT_ENERGYEQ;
 
-
-  //choice of equation to solve
-  int LABEQ=0;
-  int FFEQ=1;
-
-  params[1]=FFEQ;
+   //frame for energy/entropy equation to solve
+   params[2]=RADIMPLICIT_LABEQ;
 
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
