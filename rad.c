@@ -632,12 +632,12 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]); //times ucon[0]?
 	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
 
-	      
+	      /*
 	      ldouble totalenergy=Ehat0+pp0[UU];
 	      ldouble uint=totalenergy-Ehat;
 	      pp[ENTR]= calc_Sfromu(pp[RHO],uint); //times ucon[0]?
 	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      
+	      */
 	    }
 	    
 	}
@@ -727,6 +727,9 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
   else
     whichprim=MHD; 
 
+  //override
+  whichprim=MHD;
+
   //solve in rad or mhd temperature?
   params[0]=whichprim;
   //energy or entropy equation to solve
@@ -752,8 +755,8 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
   if(whichprim==RAD)
     {
       xxx[0]=pp0[EE0];    
-      xxx[1]=.9*pp0[EE0]; //give better estimates based on fluid frame?
-      xxx[2]=1.1*pp0[EE0];
+      xxx[1]=.999*pp0[EE0]; //give better estimates based on fluid frame?
+      xxx[2]=1.001*pp0[EE0];
     }
 
   //oreder the lower-upper brackets 
@@ -781,14 +784,15 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
   if(verbose) printf("searching for valid brackets\n");
 
   //first try low the lower bracket
-  int MAXITER=400;
+  int MAXITER=30;
+  ldouble FAC=2.;
   iter=0.;
   while(err[1]*err[2]>0.)
     {
       iter++;
-      xxx[1]/=2.;
+      xxx[1]/=FAC;
       err[1]=calc_implicit_1dprim_err(xxx[1],uu0,pp0,dt,geom,params);
-      xxx[2]*=2.;
+      xxx[2]*=FAC;
       err[2]=calc_implicit_1dprim_err(xxx[2],uu0,pp0,dt,geom,params);
       if(verbose) printf("%d (%d) >>> [%e : %e : %e] > ",0,iter,xxx[1],xxx[0],xxx[2]);
       if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
@@ -798,7 +802,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 
   if(iter>=MAXITER)
     {
-      if(verbose) printf("brackets not found!\n");
+      if(verbose || 1) printf("brackets not found!\n");
       getchar();
       PLOOP(i) ppout[i]=pp0[i];
       return -1;
@@ -1021,7 +1025,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   params[0]=whichprim;
 
   //override
-  //params[0]=RAD;
+  //params[0]=MHD;
 
   //energy or entropy equation to solve
   //params[1]=RADIMPLICIT_ENTROPYEQ;
@@ -1123,10 +1127,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		del=EPS*ppp[UU];	   
 	      
 	      //EPS of the iterated quantity
-	      del=EPS*ppp[sh];
+	      //del=EPS*ppp[sh];
 
 	      //EPS of the geometrical mean
-	      //del=EPS*sqrt(ppp[EE0]*ppp[UU]);
+	      del=EPS*sqrt(ppp[EE0]*ppp[UU]);
 	    }
 	  else //decreasing velocity
 	    {
@@ -1426,7 +1430,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));		  
 	}
       //override - convergence with respect to the iterated quantity
-      //f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
+      f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
 	  
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	{
@@ -1476,17 +1480,17 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //inversion to get the right pp[]
   //(u2p checks against proper entropy evolution and uses entropy inversion if necessary
 
-  int corr[2],fixup[2];
+  int corr[2],fixup[2],ret;
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
   //1d solver in temperatures only
-  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
-
+  //ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
+  //if(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
   //4d solver starting from the solution satisfying above
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+  //return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
 
-  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+  return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 }
 
 

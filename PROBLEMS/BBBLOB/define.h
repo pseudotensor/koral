@@ -1,13 +1,13 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 7
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -54,7 +54,7 @@
 //blackhole
 /************************************/
 #define BHSPIN 0.0
-#define MASS 1.
+#define MASS 1.e5
 
 /************************************/
 //coordinates / resolution
