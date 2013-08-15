@@ -547,6 +547,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
     }     
 
   //updating entropy
+  pp0[ENTR]=calc_Sfromu(pp0[RHO],pp0[UU]);
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
   uu[ENTR]=pp[ENTR]*gdetu*ucon[0];
 
@@ -628,10 +629,15 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	    f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
 	  else
 	    {
+	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]); //times ucon[0]?
+	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+
+	      
 	      ldouble totalenergy=Ehat0+pp0[UU];
 	      ldouble uint=totalenergy-Ehat;
 	      pp[ENTR]= calc_Sfromu(pp[RHO],uint); //times ucon[0]?
 	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      
 	    }
 	    
 	}
@@ -652,12 +658,44 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   return ret;
 } 
 
-int
-solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble* deltas,int verbose)
+
+/*****************************************/
+/******* 1D solver in energy densities ***/
+/*****************************************/
+ldouble
+calc_implicit_1dprim_err(ldouble xxx,ldouble *uu0,ldouble *pp0,ldouble dt,void *geom,int *params)
 {
-  int i1,i2,i3,iv,i,j;
-  ldouble pp[NV],ppp[NV],uu[NV],uup[NV]; 
-  ldouble err[3],xxx[3],err4d[4];
+  int whichprim=params[0];
+  ldouble err4d[4];
+  ldouble backup;
+  if(whichprim==MHD)
+    {
+      backup=pp0[UU];
+      pp0[UU]=xxx;
+    }
+  else
+    {
+      backup=pp0[EE0];
+      pp0[EE0]=xxx;  
+    }
+  //the residual
+  f_implicit_lab_4dprim(pp0,uu0,pp0,dt,geom,err4d,params);  
+
+  //restoring original primitives
+  if(whichprim==MHD)
+    pp0[UU]=backup;
+  else
+    pp0[EE0]=backup;
+
+  return err4d[0];
+}
+
+int
+solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble* deltas,int verbose,ldouble *ppout)
+{
+  int i1,i2,i3,iv,i,j,iter;
+  ldouble pp[NV],uu[NV]; 
+  ldouble err[3],xxx[4],xxx0[4],err4d[4];
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   struct geometry *geom
@@ -676,10 +714,11 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 #endif
 
   //temperatures
-  ldouble Tgas0,Trad0,Rtt0,ugas0[4];
+  ldouble Tgas0,Trad0,Rtt0,Ehat,ugas0[4];
   calc_ff_Rtt(pp0,&Rtt0,ugas0,geom);
+  Ehat=-Rtt0;
   Tgas0=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
-  Trad0=calc_LTE_TfromE(-Rtt0);
+  Trad0=calc_LTE_TfromE(Ehat);
   
   //residual function parameters
   int params[3],whichprim;
@@ -704,49 +743,136 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 
   //initiate iterated quantity
   if(whichprim==MHD)
-    xxx[0]=pp0[UU];      
-  if(whichprim==RAD)
-    xxx[0]=pp0[EE0];    
+    {
+      xxx[0]=pp0[UU];      
+      xxx[1]=pp0[UU];
+      xxx[2]=Ehat;
+    }
 
-  //lower-upper brackets
-  xxx[1]=pp0[UU];
-  xxx[2]=pp0[EE0];
+  if(whichprim==RAD)
+    {
+      xxx[0]=pp0[EE0];    
+      xxx[1]=.9*pp0[EE0]; //give better estimates based on fluid frame?
+      xxx[2]=1.1*pp0[EE0];
+    }
+
+  //oreder the lower-upper brackets 
   if(xxx[1]>xxx[2]) 
     {
       err[0]=xxx[1];
       xxx[1]=xxx[2];
       xxx[2]=err[0];
     }
+
+  xxx0[0]=xxx[0];
+  xxx0[1]=xxx[1];
+  xxx0[2]=xxx[2];
   
   //test signs
-  if(whichprim==MHD)
-    pp[UU]=xxx[0];
-  else
-    pp[EE0]=xxx[0];  
-  f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,err4d,params);  
-  err[0]=err4d[0];
+  err[0]=calc_implicit_1dprim_err(xxx[0],uu0,pp0,dt,geom,params);
+  err[1]=calc_implicit_1dprim_err(xxx[1],uu0,pp0,dt,geom,params);
+  err[2]=calc_implicit_1dprim_err(xxx[2],uu0,pp0,dt,geom,params);
  
-  if(whichprim==MHD)
-    pp[UU]=xxx[1]/2.;
+  if(verbose) printf("starting 1D in %d\n",whichprim);
+  if(verbose) print_NVvector(pp);
+  if(verbose) printf("%d >>> [%e : %e : %e] > ",0,xxx[1],xxx[0],xxx[2]);
+  if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
+
+  if(verbose) printf("searching for valid brackets\n");
+
+  //first try low the lower bracket
+  int MAXITER=400;
+  iter=0.;
+  while(err[1]*err[2]>0.)
+    {
+      iter++;
+      xxx[1]/=2.;
+      err[1]=calc_implicit_1dprim_err(xxx[1],uu0,pp0,dt,geom,params);
+      xxx[2]*=2.;
+      err[2]=calc_implicit_1dprim_err(xxx[2],uu0,pp0,dt,geom,params);
+      if(verbose) printf("%d (%d) >>> [%e : %e : %e] > ",0,iter,xxx[1],xxx[0],xxx[2]);
+      if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
+      if(isnan(err[1]) || isnan(err[2])) iter=MAXITER;
+      if(iter>=MAXITER) break;
+    }
+
+  if(iter>=MAXITER)
+    {
+      if(verbose) printf("brackets not found!\n");
+      getchar();
+      PLOOP(i) ppout[i]=pp0[i];
+      return -1;
+    }      
+    
+  if(verbose) printf("brackets found!\n");
+
+  //call more sophisticated solver here
+  do
+    {
+      iter++;
+      xxx[0]=0.5*(xxx[1]+xxx[2]); //new estimate
+      err[0]=calc_implicit_1dprim_err(xxx[0],uu0,pp0,dt,geom,params); //new error
+      
+
+      if(err[0]*err[1]>0.) //same sign as the lower bracket
+	{
+	  xxx[1]=xxx[0];
+	  err[1]=err[0];
+	}
+      else
+	{
+	  xxx[2]=xxx[0];
+	  err[2]=err[0];
+	}
+      if(verbose) printf("%d >>> [%e : %e : %e] > ",iter,xxx[1],xxx[0],xxx[2]);
+      if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
+
+      if(isnan(xxx[0]) || isnan(err[0])) {my_err("nan in 1dprim\n");}
+    }
+  while(fabs((xxx[2]-xxx[1])/xxx[0])>1.e-7);
+
+  if(verbose) printf("solution found: %e\n",xxx[0]);
+
+  //converting to new set of primitives
+  PLOOP(i) pp[i]=pp0[i];
+  if(whichprim==RAD)
+    pp[EE0]=xxx[0];
   else
-    pp[EE0]=xxx[1]/2.;  
-  f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,err4d,params);  
-  err[1]=err4d[0];
+    pp[UU]=xxx[0];
+  
+  //total inversion, but only whichprim part matters
+  p2u(pp,uu,geom);
+   
+  //opposite changes in the other quantities and inversion
+  int corr[2],fixup[2];
+  if(whichprim==RAD)
+    {
+      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
 
+      u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+    }
   if(whichprim==MHD)
-    pp[UU]=xxx[2];
-  else
-    pp[EE0]=xxx[2];  
-  f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,err4d,params);  
-  err[2]=err4d[0];
+    {
+      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 
-  pp[UU]=pp0[UU];
-  pp[EE0]=pp0[EE0];
+      u2p_rad(uu,pp,geom,corr);
+    }     
 
-  printf("starting 1D\n");
-  printf("[%e : %e : %e]\n",xxx[1],xxx[0],xxx[2]);
-  printf("[%e : %e : %e]\n",err[1],err[0],err[2]);
-  getchar();
+  //updating entropy
+  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+
+  //returning the new set of primitives
+  PLOOP(i) ppout[i]=pp[i];
+
+  if(verbose) print_NVvector(ppout);
+  //if(verbose) getchar();
+
   return 0; 
 }
 
@@ -920,7 +1046,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
  
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-3;
+  ldouble CONV = 1.e-8;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
@@ -1168,7 +1294,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  /*
 	  //control over initial and LTE values
-	  ldouble OSEPS=1.e-5;
+  ldouble OSEPS=1.e-5;
 
 	  if(Tgas00 > Trad00)
 	    if(Tgas>(1.+OSEPS)*Tgas00 || Tgas<(1.-OSEPS)*TLTE || Trad<(1.-OSEPS)*Trad00 || Trad>(1.+OSEPS)*TLTE)
@@ -1354,12 +1480,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
-  solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose);
+  //1d solver in temperatures only
+  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
 
+  //4d solver starting from the solution satisfying above
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
-  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
-  
 
+  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 }
 
 
