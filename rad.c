@@ -477,7 +477,7 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
 //******* rad or hydro (whichprim) **************************************
 //**********************************************************************
 
-int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params)
+int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params)
 {
   int ret=0,i;
   struct geometry *geom
@@ -497,28 +497,27 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 
   //  printf("%d %d %d\n",params[0],params[1],params[2]);getchar();
 
-  ldouble uu[NV],pp2[NV];
+  ldouble uu[NV],pp[NV];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
-  for(i=0;i<NV;i++) pp2[i]=pp[i];
+  for(i=0;i<NV;i++) pp[i]=ppin[i];
   
   //rho may be inconsistent on input if iterating MHD primitives
   ldouble ucon[4];
-  ucon[1]=pp2[2];
-  ucon[2]=pp2[3];
-  ucon[3]=pp2[4];
-  ucon[0]=0.;
-  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-
   //correcting rho for MHD prims
   if(whichprim==MHD)
     {
+      ucon[1]=pp[2];
+      ucon[2]=pp[3];
+      ucon[3]=pp[4];
+      ucon[0]=0.;
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
       ldouble rho = uu0[RHO]/gdetu/ucon[0];
-      pp2[RHO]=rho;
+      pp[RHO]=rho;
     }
 
   //total inversion, but only whichprim part matters
-  p2u(pp2,uu,geom);
+  p2u(pp,uu,geom);
  
   //opposite changes in the other quantities and inversion
   if(whichprim==RAD)
@@ -528,7 +527,14 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
       uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
 
-      u2pret=u2p(uu,pp2,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+      u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+
+      //calculate ff four-velocity
+      ucon[1]=pp[2];
+      ucon[2]=pp[3];
+      ucon[3]=pp[4];
+      ucon[0]=0.;
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
     }
   if(whichprim==MHD)
     {
@@ -537,8 +543,12 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
       uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 
-      u2pret=u2p_rad(uu,pp2,geom,corr);
+      u2pret=u2p_rad(uu,pp,geom,corr);
     }     
+
+  //updating entropy
+  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+  uu[ENTR]=pp[ENTR]*gdetu*ucon[0];
 
   //print_Nvector(uu,NV);getchar();
 
@@ -554,7 +564,7 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 
   //radiative four-force
   ldouble Gi[4];
-  calc_Gi(pp2,ggg,Gi); 
+  calc_Gi(pp,ggg,Gi); 
   indices_21(Gi,Gi,gg);
 
   //errors in momenta - always in lab frame
@@ -578,13 +588,17 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
 	    f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0]; //but this works on hydro entropy and may fail!
 	  else
 	    my_err("not implemented 3\n");
 	}
       if(whichprim==MHD) //hydro-primitives
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
-	    f[0] = uu[1] - uu0[1] - dt * gdetu * Gi[0];
+	    f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0];
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)	  
+	    f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0];
 	  else
 	    my_err("not implemented 4\n");
 	}
@@ -598,14 +612,14 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
       //zero - state 
       calc_ff_Rtt(pp0,&Rtt0,ucon,geom);
       //new state
-      calc_ff_Rtt(pp2,&Rtt,ucon,geom);
+      calc_ff_Rtt(pp,&Rtt,ucon,geom);
       
-      ldouble T=calc_PEQ_Tfromurho(pp2[UU],pp2[RHO]);
+      ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
       ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
       ldouble Ehat = -Rtt;
       ldouble Ehat0 = -Rtt0;
       ldouble dtau=dt/ucon[0];
-      ldouble kappaabs=calc_kappa(pp2[RHO],T,geom->xx,geom->yy,geom->zz);
+      ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
 
       //fluid frame energy equation:
       if(whichprim==RAD) //rad-primitives
@@ -613,19 +627,129 @@ int f_implicit_lab_4dprim(ldouble *pp,ldouble *uu0,ldouble *pp0,ldouble dt,void*
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
 	    f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
 	  else
-	    my_err("not implemented 1\n");
+	    {
+	      ldouble totalenergy=Ehat0+pp0[UU];
+	      ldouble uint=totalenergy-Ehat;
+	      pp[ENTR]= calc_Sfromu(pp[RHO],uint); //times ucon[0]?
+	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	    }
+	    
 	}
       if(whichprim==MHD) //mhd-
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
-	    f[0]=pp2[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-	   else
-	    my_err("not implemented 2\n");
+	    f[0]=pp[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    {
+	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]); //times ucon[0]?
+	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	    }
+	  else
+	    my_err("not implemented 2\n");	  
 	}
     }
   
   return ret;
 } 
+
+int
+solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble* deltas,int verbose)
+{
+  int i1,i2,i3,iv,i,j;
+  ldouble pp[NV],ppp[NV],uu[NV],uup[NV]; 
+  ldouble err[3],xxx[3],err4d[4];
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  int ix=geom->ix;
+  int iy=geom->iy;
+  int iz=geom->iz;
+
+  //temporary using local arrays
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  //temperatures
+  ldouble Tgas0,Trad0,Rtt0,ugas0[4];
+  calc_ff_Rtt(pp0,&Rtt0,ugas0,geom);
+  Tgas0=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
+  Trad0=calc_LTE_TfromE(-Rtt0);
+  
+  //residual function parameters
+  int params[3],whichprim;
+  if(-Rtt0<1.e-3*pp0[UU]) //hydro preffered
+    whichprim=RAD;
+  else
+    whichprim=MHD; 
+
+  //solve in rad or mhd temperature?
+  params[0]=whichprim;
+  //energy or entropy equation to solve
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  //frame for energy/entropy equation to solve
+  params[2]=RADIMPLICIT_FFEQ;
+
+  //local vectors
+  for(iv=0;iv<NV;iv++)
+    {
+      uu[iv]=uu0[iv]; 
+      pp[iv]=pp0[iv];     
+    }
+
+  //initiate iterated quantity
+  if(whichprim==MHD)
+    xxx[0]=pp0[UU];      
+  if(whichprim==RAD)
+    xxx[0]=pp0[EE0];    
+
+  //lower-upper brackets
+  xxx[1]=pp0[UU];
+  xxx[2]=pp0[EE0];
+  if(xxx[1]>xxx[2]) 
+    {
+      err[0]=xxx[1];
+      xxx[1]=xxx[2];
+      xxx[2]=err[0];
+    }
+  
+  //test signs
+  if(whichprim==MHD)
+    pp[UU]=xxx[0];
+  else
+    pp[EE0]=xxx[0];  
+  f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,err4d,params);  
+  err[0]=err4d[0];
+ 
+  if(whichprim==MHD)
+    pp[UU]=xxx[1]/2.;
+  else
+    pp[EE0]=xxx[1]/2.;  
+  f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,err4d,params);  
+  err[1]=err4d[0];
+
+  if(whichprim==MHD)
+    pp[UU]=xxx[2];
+  else
+    pp[EE0]=xxx[2];  
+  f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,err4d,params);  
+  err[2]=err4d[0];
+
+  pp[UU]=pp0[UU];
+  pp[EE0]=pp0[EE0];
+
+  printf("starting 1D\n");
+  printf("[%e : %e : %e]\n",xxx[1],xxx[0],xxx[2]);
+  printf("[%e : %e : %e]\n",err[1],err[0],err[2]);
+  getchar();
+  return 0; 
+}
+
 
 int
 print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
@@ -638,6 +762,9 @@ print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
   return 0;
 }
 
+/*****************************************/
+/******* 4D solver working on primitives */
+/*****************************************/
 int
 solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose)
 {
@@ -754,36 +881,31 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("rad temp: %e\n",Trad00); 
       printf("LTE temp: %e\n\n",TLTE) ;  
     }
-
-  /*
-  if(xi1 > 0.1)
-    {
-      //corrects initial guess towards LTE
-      ldouble ppLTE[NV],uuLTE[NV];
-      calc_LTE_state(pp00,ppLTE,geom);  //returns LTE ugas
-      p2u(ppLTE,uuLTE,geom);
-      uuLTE[EE0] = uu00[EE0] - (uuLTE[1]-uu00[1]);
-      uuLTE[FX0] = uu00[FX0] - (uuLTE[2]-uu00[2]);
-      uuLTE[FY0] = uu00[FY0] - (uuLTE[3]-uu00[3]);
-      uuLTE[FZ0] = uu00[FZ0] - (uuLTE[4]-uu00[4]);
-      u2p_rad(uuLTE,pp00,geom,corr);
-      p2u(pp00,uu00,geom);
-    }
-  */
   
+  /******************************************/
+  /******************************************/
+  /******************************************/
   //choice of primitives to evolve
   int params[3],whichprim;
   if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
     whichprim=RAD;
   else
     whichprim=MHD; 
-   params[0]=whichprim;
+  
+  params[0]=whichprim;
 
-   //energy or entropy equation to solve
-   params[1]=RADIMPLICIT_ENERGYEQ;
+  //override
+  //params[0]=RAD;
 
-   //frame for energy/entropy equation to solve
-   params[2]=RADIMPLICIT_LABEQ;
+  //energy or entropy equation to solve
+  //params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[1]=RADIMPLICIT_ENERGYEQ;
+
+  //frame for energy/entropy equation to solve
+  params[2]=RADIMPLICIT_LABEQ;
+  /******************************************/
+  /******************************************/
+  /******************************************/
 
   //check if one can compare gas & rad velocities
   if(VELPRIM!=VELPRIMRAD) 
@@ -798,7 +920,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
  
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-10;
+  ldouble CONV = 1.e-3;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
@@ -806,7 +928,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   if(whichprim==MHD) 
     sh=UU; //solving in hydro primitives
-  else
+  else if(whichprim==RAD) 
     sh=EE0; //solving in rad primitives
 
   ldouble frdt = 1.0;
@@ -870,7 +992,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    {
 	      //uses EPS of the dominating quantity
 	      if(dominates==RAD)
-		del=EPS*ppp[EE0]; 
+		del=EPS*ppp[EE0];
 	      else
 		del=EPS*ppp[UU];	   
 	      
@@ -878,7 +1000,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      del=EPS*ppp[sh];
 
 	      //EPS of the geometrical mean
-	      del=EPS*sqrt(ppp[EE0]*ppp[UU]);
+	      //del=EPS*sqrt(ppp[EE0]*ppp[UU]);
 	    }
 	  else //decreasing velocity
 	    {
@@ -986,6 +1108,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
 	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
 	      u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+	      //calc the ff 4-velocity
+	      ucon[1]=pp[2];
+	      ucon[2]=pp[3];
+	      ucon[3]=pp[4];
+	      ucon[0]=0.;
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
 	    }
 	  if(whichprim==MHD)
 	    {
@@ -1169,11 +1297,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    else
 	      f3[i]=fabs(f3[i]/ppp[UU]);
 	  else
-	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	\
-	  
-	  //override (convergence with respect to smaller quantity)
-	  f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
+	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));		  
 	}
+      //override - convergence with respect to the iterated quantity
+      //f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
 	  
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	{
@@ -1227,8 +1354,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
+  solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose);
+
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
-  return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
   
 
 }

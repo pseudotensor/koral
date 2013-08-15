@@ -7,7 +7,7 @@
 #define INT_ORDER 1
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 //#define WAVESPEEDSATFACES
 
 //#define LABRADFLUXES
@@ -29,7 +29,7 @@
 //#define RADOUTPUTINZAMO
 #define RADOUTPUTINFF
 
-#define NX 200 //x-resoltution
+#define NX 100 //x-resoltution
 #define NY 1 //y-resolution
 #define NZ 1 //z=rezolution
 
