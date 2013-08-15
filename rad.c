@@ -833,7 +833,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 
       if(isnan(xxx[0]) || isnan(err[0])) {my_err("nan in 1dprim\n");}
     }
-  while(fabs((xxx[2]-xxx[1])/xxx[0])>1.e-7);
+  while(fabs((xxx[2]-xxx[1])/xxx[0])>1.e-5);
 
   if(verbose) printf("solution found: %e\n",xxx[0]);
 
@@ -1485,12 +1485,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   p2u(pp,uu,&geom);
 
   //1d solver in temperatures only
-  //ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
+  ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
   //if(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
+  
   //4d solver starting from the solution satisfying above
-  //return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
 
-  return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 }
 
 

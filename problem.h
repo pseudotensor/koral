@@ -69,7 +69,7 @@
 //63* ORSZAG - Orszag-Tang vortex
 //64* MAGDONUT - HD donut with poloidal magnetic fields
 
-#define PROBLEM 59
+#define PROBLEM 43
 
 #if(PROBLEM==64)
 

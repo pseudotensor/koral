@@ -7,7 +7,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 
 /************************************/
@@ -390,7 +390,7 @@
 #define URIN (0.)
 #define KKK 7127.
 #define UTPOT .979
-#define DTOUT1 5.e1
+#define DTOUT1 5.e0
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
