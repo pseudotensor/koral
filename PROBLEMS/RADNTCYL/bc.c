@@ -135,7 +135,7 @@ if(iy<0) //equatorial plane
 	
 	prad_ff2lab(pp,pp,&geomBL);
 	
-	trans_pall_coco(pp, pp, CYLCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+	trans_pall_coco(pp, pp, CYLCOORDS, MYCOORDS,xxvecBL,&geomBL,&geom);
       }
     else
       {

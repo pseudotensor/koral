@@ -282,10 +282,10 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
     
 	    if(u2pret<0)
 	      {
-		if(verbose>0 && u2pret!=-103 && u2pret!=-107)
+		if(verbose>1 && u2pret!=-103 && u2pret!=-107)
 		  {
 		    printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-		    exit(0); //see if can survive
+		    //exit(0); //should not always die because may happe in intermediate step within the implicit solver
 		  }
 
 		if(u2pret==-107)

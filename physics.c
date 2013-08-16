@@ -1199,12 +1199,21 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   //spatial derivatives
 
   //not to go out of bounds - ghost cell should not use this anyway
+  /*
   while(ix<=-NG) ix++;
   while(iy<=-NG) iy++;
   while(iz<=-NG) iz++;
   while(ix>=NX+NG-1) ix--;
   while(iy>=NY+NG-1) iy--;
   while(iz>=NZ+NG-1) iz--; 
+  */
+  //limited to the domain only
+  while(ix<0) ix++;
+  while(iy<0) iy++;
+  while(iz<0) iz++;
+  while(ix>NX-1) ix--;
+  while(iy>NY-1) iy--;
+  while(iz>NZ-1) iz--; 
 
   ldouble ppm1[NV],ppp1[NV],pp[NV];
   ldouble ggm1[4][5],GGm1[4][5];
@@ -1288,6 +1297,17 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
        {
 	 du[i][idim]=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
 	 du2[i][idim]=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+
+	 /*
+	 if(isnan(du[i][idim])) {
+	   printf("%d %d %d %d\n",ix,iy,iz,idim);
+	   printf("%e %e %e %e\n",ucovp1[i],-ucovm1[i],xxvecp1[idim], - xxvecm1[idim]);
+getchar();}
+ 	 if(isnan(du2[i][idim])) {
+	   printf("%e %e %e %e\n",uconp1[i],-uconm1[i],xxvecp1[idim], - xxvecm1[idim]);
+getchar();}
+	 */
+
        }
     }
 
@@ -1342,7 +1362,8 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 	    sum2+=dcu[j][k]*P21[k][i];
 	  }
 	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
-      }
+
+     }
 
   //filling the time component from u^mu sigma_munu = 0 (zero time derivatives in the comoving frame - no need for separate comoving routine)
   for(i=1;i<4;i++)

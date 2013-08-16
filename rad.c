@@ -1290,6 +1290,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  //decrease the applied fraction
 	  xiapp/=2.; //to be generous
+
+	  if(xiapp<1.e-5) 
+	    {
+	      printf("damped unsuccesfully in implicit_4dprim\n");
+	      return -1;	      
+	    }
 	}
       while(1); 
 
@@ -1614,13 +1620,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   p2u(pp,uu,&geom);
 
   //1d solver in temperatures only
-  ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
-  if(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
+  //ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
+  //if(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
   
   //4d solver starting from the solution satisfying above
 
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_FFEQ;
+  params[2]=RADIMPLICIT_LABEQ;
 
   //deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;return 0;
 
