@@ -42,6 +42,10 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
   {
     //ambient
     set_hdatmosphere(pp,xxvec,gg,GG,0);
+#ifdef RADIATION
+    set_radatmosphere(pp,xxvec,gg,GG,0);
+#endif
+
   }
  else //inside
    {
@@ -72,6 +76,31 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
     pp[B1]=pp[B2]=pp[B3]=0.; 
 #endif
 
+    //distributing pressure
+    ldouble P,aaa,bbb;
+    P=GAMMAM1*uint;
+    //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
+    aaa=4.*SIGMA_RAD/3.;
+    bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
+    ldouble naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
+    ldouble T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+
+    E=calc_LTE_EfromT(T4);
+    Fx=Fy=Fz=0.;
+    uint=calc_PEQ_ufromTrho(T4,rho);
+
+#ifdef RADIATION
+    pp[UU]=my_max(uint,ppback[1]);
+    pp[EE0]=my_max(E,ppback[6]);
+
+    pp[FX0]=Fx;
+    pp[FY0]=Fy;
+    pp[FZ0]=Fz;
+
+    //transforming from BL lab radiative primitives to code non-ortonormal primitives
+    prad_ff2lab(pp,pp,&geomBL);
+#endif
+
     //transforming primitives from BL to MYCOORDS
     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,&geomBL,&geom);
     
@@ -88,12 +117,14 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
 
   }
 
+/*
 #ifdef RADIATION
     //setting up radiative energy density to residual value - 
     //should immetiadelly increase sucking out the gas internal energy in opt.thick regions
     pp[EE0]=pp[UU]/1.e6;
     pp[FX0]=pp[FY0]=pp[FZ0]=0.;    
 #endif
+*/
 
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);

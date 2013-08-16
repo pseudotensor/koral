@@ -8,7 +8,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-#define SKIPRADSOURCE
+//#define SKIPRADSOURCE
 
 /************************************/
 //magnetic choices
@@ -106,9 +106,9 @@
 #define INFLOWING 0
 #define ELL 3.85
 #define URIN (0.)
-#define KKK 300.
+#define KKK 3000.
 #define UTPOT .965
 #define DTOUT1 5.e-1
-#define RHOATMMIN  1.e-20
+#define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

@@ -51,12 +51,18 @@ if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
     //atmosphere in rho,uint and velocities
     set_hdatmosphere(pp,xxvec,gg,GG,4);
 
+#ifdef RADIATION
+    set_radatmosphere(pp,xxvec,gg,GG,0);
+#endif
+
+    /*
     #ifdef RADIATION
     pp[EE0]=pp[UU]/1.e6;
     pp[FX0]=pp[VX];
     pp[FY0]=pp[VY];
     pp[FZ0]=pp[VZ];
     #endif
+    */
     
 
     p2u(pp,uu,&geom);
