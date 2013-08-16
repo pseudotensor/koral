@@ -54,7 +54,7 @@
 //blackhole
 /************************************/
 #define BHSPIN 0.0
-#define MASS 1.e0
+#define MASS 1.e10
 
 /************************************/
 //coordinates / resolution

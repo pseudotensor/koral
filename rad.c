@@ -671,7 +671,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 
   if(iter>=MAXITER)
     {
-      if(verbose || 1) {printf("brackets not found!\n");getchar();}
+      if(verbose || 1) {printf("brackets not found!\n");}
       getchar();
       PLOOP(i) ppout[i]=pp0[i];
       return -1;
@@ -1022,7 +1022,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   ldouble ppLTE[NV],uuLTE[NV];
   //  calc_LTE_state(pp00,ppLTE,geom);
   //  ldouble TLTE=calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]);
-  ldouble TLTE=calc_LTE_temp(pp00,geom);
+
+  //nolonger keep TLTE - whats below can loop up
+  //ldouble TLTE=calc_LTE_temp(pp00,geom);
+  ldouble TLTE=0.;
 
 
   ldouble kappa=calc_kappa(pp00[RHO],Tgas00,0.,0.,0.);
@@ -1182,7 +1185,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		del=EPS*ppp[UU];	   
 	      
 	      //EPS of the iterated quantity
-	      //del=EPS*ppp[sh];
+	      del=EPS*ppp[sh];
 
 	      //EPS of the geometrical mean
 	      del=EPS*sqrt(ppp[EE0]*ppp[UU]);
@@ -1318,7 +1321,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  Trad=calc_LTE_TfromE(-Rtt);
 	  //calc_LTE_state(pp,ppLTE,geom); 
 	  //TLTE=calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]);
-	  TLTE=calc_LTE_temp(pp,geom);
+	  //TLTE=calc_LTE_temp(pp,geom);
+	  TLTE=0.;
 
 	  if(verbose) 
 	    {
@@ -1504,6 +1508,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
   while(1); //main solver loop
 
+  //to print number of iterations
+  //if(geom->iy==0 && geom->ix==NX/3) printf("%d\n",iter);
+
   //returns corrections to radiative primitives
   deltas[0]=uu[EE0]-uu00[EE0];
   deltas[1]=uu[FX0]-uu00[FX0];
@@ -1547,6 +1554,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
+
+  //deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;return 0;
+
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
