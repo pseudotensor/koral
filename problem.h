@@ -67,10 +67,24 @@
 //61* MAGTESTS - simple mag tests
 //62* MAGTUBES - magnetic tubes
 //63* ORSZAG - Orszag-Tang vortex
-//64* MAGDONUT - HD donut with poloidal magnetic fields
+//64* MAGDONUT - MHD donut with poloidal magnetic fields
+//65* MRTORUS - RMHD torus with radiation
 
-#define PROBLEM 59
+#define PROBLEM 65
 
+#if(PROBLEM==65)
+
+#define PR_DEFINE "PROBLEMS/MRTORUS/define.h"
+#define PR_BC "PROBLEMS/MRTORUS/bc.c"
+#define PR_INIT "PROBLEMS/MRTORUS/init.c"
+#define PR_KAPPA "PROBLEMS/MRTORUS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MRTORUS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MRTORUS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MRTORUS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MRTORUS/dump.c"
+#define PR_TOOLS "PROBLEMS/MRTORUS/tools.c"
+
+#endif
 #if(PROBLEM==64)
 
 #define PR_DEFINE "PROBLEMS/MAGDONUT/define.h"
@@ -1216,7 +1230,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 10
+#define NRADPROFILES 11
 #endif
 
 #ifndef OUTVEL

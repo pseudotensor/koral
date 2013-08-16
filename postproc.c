@@ -94,9 +94,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
 	  profiles[4][ix]=(r*r/(sqrt(r*(r*r-3.*r))));  
-	  //location of the photosphere (7)
-	  profiles[5][ix]=calc_photloc(ix);
-	  //net accretion rate at given radius (8)
+	 //net accretion rate at given radius (8)
 	  profiles[6][ix]=fabs(calc_mdot(xxBL[1],0)/calc_mdotEdd());
 	  //inflow accretion rate at given radius (9)
 	  profiles[7][ix]=fabs(calc_mdot(xxBL[1],1)/calc_mdotEdd());
@@ -104,6 +102,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[8][ix]=fabs(calc_mdot(xxBL[1],2)/calc_mdotEdd());
 	  //luminosity at given radius (11)
 	  profiles[9][ix]=calc_lum(xxBL[1])/calc_lumEdd();
+	  //location of the photosphere (7)
+	  profiles[10][ix]=calc_photloc(ix);
 	}
     }
 
