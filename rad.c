@@ -1108,7 +1108,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
  
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-8;
+  ldouble CONV = 1.e-6;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
@@ -1291,7 +1291,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //decrease the applied fraction
 	  xiapp/=2.; //to be generous
 
-	  if(xiapp<1.e-5) 
+	  if(xiapp<1.e-7) 
 	    {
 	      printf("damped unsuccesfully in implicit_4dprim\n");
 	      return -1;	      

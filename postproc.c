@@ -14,7 +14,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],ucon3[4];
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
-  ldouble tautot[3];
+  ldouble tautot[3],tauabs[3];
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -69,6 +69,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      dx[2]=2.*M_PI*sqrt(geomBL.gg[3][3]);
 
 	      calc_tautot(pp,xxBL,dx,tautot);
+	      calc_tauabs(pp,xxBL,dx,tauabs);
 
 #ifdef CGSOUTPUT
 	      rho=rhoGU2CGS(rho);
@@ -85,8 +86,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[2][ix]+=-ucon[1]*rho*dx[1];
 	      //rho-weighted u_phi (5)
 	      profiles[3][ix]+=ucov[3]*rho*dx[1];	
-	      //optical depth (7)
-	      profiles[5][ix]+=tautot[1];	
+	      //abs optical depth (7)
+	      profiles[5][ix]+=tauabs[1];	
+	      //tot optical depth (7)
+	      profiles[6][ix]+=tautot[1];	
 	    }
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
@@ -94,16 +97,16 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
 	  profiles[4][ix]=(r*r/(sqrt(r*(r*r-3.*r))));  
-	 //net accretion rate at given radius (8)
-	  profiles[6][ix]=fabs(calc_mdot(xxBL[1],0)/calc_mdotEdd());
-	  //inflow accretion rate at given radius (9)
-	  profiles[7][ix]=fabs(calc_mdot(xxBL[1],1)/calc_mdotEdd());
-	  //outflow accretion rate at given radius (10)
-	  profiles[8][ix]=fabs(calc_mdot(xxBL[1],2)/calc_mdotEdd());
-	  //luminosity at given radius (11)
-	  profiles[9][ix]=calc_lum(xxBL[1])/calc_lumEdd();
-	  //location of the photosphere (7)
-	  profiles[10][ix]=calc_photloc(ix);
+	  //net accretion rate at given radius (7)
+	  profiles[7][ix]=fabs(calc_mdot(xxBL[1],0)/calc_mdotEdd());
+	  //inflow accretion rate at given radius (8)
+	  profiles[8][ix]=fabs(calc_mdot(xxBL[1],1)/calc_mdotEdd());
+	  //outflow accretion rate at given radius (9)
+	  profiles[9][ix]=fabs(calc_mdot(xxBL[1],2)/calc_mdotEdd());
+	  //luminosity at given radius (12)
+	  profiles[10][ix]=calc_lum(xxBL[1])/calc_lumEdd();
+	  //location of the photosphere (8)
+	  profiles[11][ix]=calc_photloc(ix);
 	}
     }
 

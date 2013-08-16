@@ -6,5 +6,5 @@ ldouble ZZsun=1.;
 ldouble kappaffcgs=6.4e22*rhocgs/Tcgs/Tcgs/Tcgs/sqrt(Tcgs);
 ldouble kappabfcgs=4.8e-24/1.67262158e-24/1.67262158e-24*rhocgs/Tcgs/Tcgs/Tcgs/sqrt(Tcgs)*ZZsun;
 
-return kappaCGS2GU(kappaffcgs)*rho+kappaCGS2GU(kappabfcgs)*rho;
+return (kappaCGS2GU(kappaffcgs)*rho+kappaCGS2GU(kappabfcgs)*rho);
 

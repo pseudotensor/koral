@@ -8,7 +8,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-//#define SKIPRADSOURCE
+#define SKIPRADSOURCE
 
 /************************************/
 //magnetic choices
@@ -31,16 +31,18 @@
 /************************************/
 #define HDVISCOSITY NOVISCOSITY
 #define RADVISCOSITY NOVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
+#define ALPHARADVISC 1.
 
 /************************************/
 //rmhd floors
 /************************************/
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e2
-#define EERHORATIOMIN 1.e-10
-#define EERHORATIOMAX 1.e10
-#define EEUURATIOMIN 1.e-10
-#define EEUURATIOMAX 1.e10
+#define EERHORATIOMIN 1.e-20
+#define EERHORATIOMAX 1.e20
+#define EEUURATIOMIN 1.e-20
+#define EEUURATIOMAX 1.e20
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100.
 #define B2RHORATIOMIN 0.
@@ -63,8 +65,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.2-MKS1R0))
 #define MAXX (log(40.-MKS1R0))
-#define NX 90
-#define NY 70
+#define NX 60
+#define NY 30
 #define NZ 1
 
 #else //Schwarzschild
@@ -77,7 +79,8 @@
 #endif
 
 #define MINY (0.01*Pi/2.)
-#define MAXY (Pi-0.01*Pi/2.)
+//efine MAXY (Pi-0.01*Pi/2.)
+#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
@@ -103,9 +106,9 @@
 #define INFLOWING 0
 #define ELL 3.85
 #define URIN (0.)
-#define KKK 10000.
+#define KKK 300.
 #define UTPOT .965
 #define DTOUT1 5.e-1
-#define RHOATMMIN  1.e-24
+#define RHOATMMIN  1.e-20
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
