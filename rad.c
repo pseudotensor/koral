@@ -1229,7 +1229,71 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  break;
 	}
 
-      
+      //applying corrections
+      ldouble xiapp=1.;
+      do //check whether energy density positive and the error function returns 0
+	{	    
+	  //original x
+	  for(i=0;i<4;i++)
+	    {
+	      xxx[i]=ppp[i+sh];
+	    }
+
+	  //updating x
+	  for(i=0;i<4;i++)
+	    {
+	      for(j=0;j<4;j++)
+		{
+		  xxx[i]-=xiapp*iJ[i][j]*f1[j];
+		}
+	    }
+
+	  //update primitives
+	  for(i=0;i<4;i++)
+	    {
+	      pp[i+sh]=xxx[i];
+	    }
+
+	  if(whichprim==MHD)
+	    {
+	      //correct rho to follow new velocity (only for MHD primitives)
+	      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+	      pp[RHO]=uu00[RHO]/gdetu/ucon[0];
+	    }
+
+	  //updating the other set of quantities
+	  p2u(pp,uu,geom);
+
+	  int u2pret;
+	  //opposite changes in the other quantities and inversion
+	  if(whichprim==RAD)
+	    {
+	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+	      u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+	      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+	    }
+	  if(whichprim==MHD)
+	    {
+	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+	      u2pret=u2p_rad(uu,pp,geom,corr);
+	    }     
+
+	  if(xxx[0]>0. && u2pret==0) break;
+
+	  //decrease the applied fraction
+	  xiapp/=2.; //to be generous
+	}
+      while(1); 
+
+      /*
       int overshoot=0,overcnt=0;	      
       ldouble xi[4]={1.,1.,1.,1.}; //fraction of the Jacobian-implied step to apply
       ldouble xiapp=1.,fneg;
@@ -1333,6 +1397,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      printf("ug3:  %.20e ur3:  %.20e\n\n",pp[VZ],pp[FZ0]);
 	      print_NVvector(uu);
 	    }
+      */
 		  
 	  //checking if overshooted significantly
 	  /*
@@ -1367,7 +1432,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    if(Trad>(1.+OSEPS)*Trad00 || Trad<(1.-OSEPS)*TLTE || Tgas<(1.-OSEPS)*Tgas00 || Tgas>(1.+OSEPS)*TLTE)
 	      overshoot=1;
 	  */
-	  
+	  /*
 	  //control over LTE temperature
 	  ldouble OSEPS=1.e-6;
 
@@ -1430,7 +1495,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	     
 	      
 	    
-
+	  */
 	      /*
 	      //damping the correction approach
 
@@ -1468,14 +1533,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		  xiapp*=minxi;
 		}
 	      */
-
+      /*
 	      overcnt++;
 
-	    }
-	}
+    }
+    }
       while(overshoot==1); //overshooting loop
 
       //if(overcnt>10) printf("over cnt: %d\n",overcnt);	    
+      */
 
       //test convergence
       for(i=0;i<4;i++)
