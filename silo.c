@@ -64,6 +64,13 @@ int fprint_silofile(ldouble time, int num, char* folder)
   ldouble *Bz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   #endif
 
+  #ifdef RADIATION
+  ldouble *Erad = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Fx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Fy = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Fz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  #endif
+
   for(iz=0;iz<nz;iz++)
     {
       for(iy=0;iy<ny;iy++)
@@ -177,6 +184,42 @@ int fprint_silofile(ldouble time, int num, char* folder)
 		    - sin(th)*bcon[2];
 		}
 	      #endif
+
+	      #ifdef RADIATION									  
+	      prad_lab2on(pp,pp,&geomout);
+
+	      Erad[nodalindex]=pp[EE0];
+
+	      ldouble rvel[4]={0,pp[FX0],pp[FY0],pp[FZ0]};	
+
+	      conv_vels(rvel,rvel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
+	      trans2_cc2on(rvel,rvel,geomout.tup);
+
+	      //outvel - ortonormal VEL4
+	      Fx[nodalindex]=rvel[1];
+	      Fy[nodalindex]=rvel[2];
+	      Fz[nodalindex]=rvel[3];
+
+	       //transform to cartesian
+	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
+		{
+		  coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
+		  ldouble r=xxvecsph[1];
+		  ldouble th=xxvecsph[2];
+		  ldouble ph=xxvecsph[3];
+
+		  Fx[nodalindex] = sin(th)*cos(ph)*rvel[1] 
+		    + cos(th)*cos(ph)*rvel[2]
+		    - sin(ph)*rvel[3];
+
+		  Fy[nodalindex] = sin(th)*sin(ph)*rvel[1] 
+		    + cos(th)*sin(ph)*rvel[2]
+		    + cos(ph)*rvel[3];
+
+		  Fz[nodalindex] = cos(th)*rvel[1] 
+		    - sin(th)*rvel[2];
+		}
+	      #endif
 	  
 	      /*
 	      printf("%d %d %d | %e %e %e | %e %e %e | %e %e | %e %e %e\n",ix,iy,iz,
@@ -256,6 +299,12 @@ int fprint_silofile(ldouble time, int num, char* folder)
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   #endif
+  #ifdef RADIATION
+  DBPutQuadvar1(file, "Erad","mesh1", Erad,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  #endif
+
 
   /* Write vectors */
   optList = DBMakeOptlist(1);
@@ -293,7 +342,23 @@ int fprint_silofile(ldouble time, int num, char* folder)
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   #endif
-  
+
+  #ifdef RADIATION 
+  //radiative flux
+  vels[0]=Fx;
+  vels[1]=Fy;
+  vels[2]=Fz;
+#ifdef SILO2D_XZPLANE
+  vels[1]=Fz;
+#endif
+  names[0] = strdup("F1");
+  names[1] = strdup("F2");
+  names[2] = strdup("F3");
+  DBPutQuadvar(file, "rad_flux","mesh1", 3, names, vels, 
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  #endif
+ 
   /* Close the Silo file */
   DBClose(file);
 

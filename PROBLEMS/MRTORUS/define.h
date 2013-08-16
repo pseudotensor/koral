@@ -13,9 +13,9 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA 0.01 //close to the target pmag/pgas
+#define MAXBETA 0.3 //close to the target pmag/pgas
 
 /************************************/
 //reconstruction / Courant
@@ -63,10 +63,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.2-MKS1R0))
+#define MINX (log(1.4-MKS1R0))
 #define MAXX (log(40.-MKS1R0))
-#define NX 60
-#define NY 30
+#define NX 160
+#define NY 120
 #define NZ 1
 
 #else //Schwarzschild
@@ -79,8 +79,8 @@
 #endif
 
 #define MINY (0.01*Pi/2.)
-//efine MAXY (Pi-0.01*Pi/2.)
-#define MAXY (Pi/2.)
+#define MAXY (Pi-0.01*Pi/2.)
+//#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
@@ -91,6 +91,7 @@
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
+#define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define SILOOUTPUT 
@@ -108,7 +109,7 @@
 #define URIN (0.)
 #define KKK 3000.
 #define UTPOT .965
-#define DTOUT1 5.e-1
+#define DTOUT1 5.e1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

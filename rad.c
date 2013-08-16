@@ -1620,7 +1620,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   p2u(pp,uu,&geom);
 
   //1d solver in temperatures only
-  //ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
+  ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
   //if(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
   
   //4d solver starting from the solution satisfying above
@@ -1630,7 +1630,17 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;return 0;
 
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret<0)
+    {
+      params[1]=RADIMPLICIT_ENTROPYEQ;
+      params[2]=RADIMPLICIT_FFEQ;
+      ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+      if(ret<0) return -1;
+    }
+    
+  return 0;
 
   //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 }

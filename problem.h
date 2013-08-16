@@ -83,6 +83,7 @@
 #define PR_OUT2GIF_1D "PROBLEMS/MRTORUS/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/MRTORUS/dump.c"
 #define PR_TOOLS "PROBLEMS/MRTORUS/tools.c"
+#define PR_POSTINIT "PROBLEMS/MRTORUS/postinit.c"
 
 #endif
 #if(PROBLEM==64)

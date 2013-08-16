@@ -68,6 +68,7 @@ for(iz=0;iz<NZ;iz++)
       }
   }
 
+/*
 printf("adjusting gas pressure...\n",fac);
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
@@ -77,7 +78,7 @@ for(iz=0;iz<NZ;iz++)
       {
 	for(ix=0;ix<NX;ix++)
 	  {
-	    /***********************************************/
+
 	    ldouble pp[NV],uu[NV];
 	    struct geometry geom;
 	    fill_geometry(ix,iy,iz,&geom);
@@ -109,6 +110,6 @@ for(iz=0;iz<NZ;iz++)
 	  }
       }
   }
-
+*/
 #endif
 	    
