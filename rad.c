@@ -471,6 +471,286 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
   return 0;
 }
 
+
+
+
+/*************************************************************************/
+/******* 1D solver in energy densities ***********************************/
+/******* totenergy is the total energy density in ff *********************/
+/******* ratio is the radio of energy denisities between ff and rad.rest frame */
+/*************************************************************************/
+ldouble
+calc_implicit_1dprim_err(ldouble xxx,ldouble *uu0,ldouble *pp0,ldouble dtau,void *ggg,int *params,ldouble totenergy,ldouble ratio)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  int whichprim=params[0];
+
+  // printf("input: %e %e %e %e\n",xxx,pp0[ENTR],dt,totenergy);
+  
+  ldouble ugas,Ehat,rho,Rtt,ucon[4],backup,err;
+
+  rho=pp0[RHO];
+
+  if(whichprim==RAD)
+    {
+      Ehat=xxx*ratio;
+      ugas=totenergy-Ehat;
+    }
+
+  if(whichprim==MHD)
+    {
+      ugas=xxx;
+      Ehat=totenergy-ugas;      
+    }
+       
+  ldouble T=calc_PEQ_Tfromurho(ugas,rho);
+  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+  ldouble kappaabs=calc_kappa(rho,T,geom->xx,geom->yy,geom->zz);
+  ldouble entr=calc_Sfromu(rho,ugas);
+  ldouble entr0=pp0[ENTR];
+
+  err = entr - entr0 - kappaabs*(Ehat-4.*Pi*B)*dtau;
+
+  //  printf("enden in: %e %e %e\n",Ehat,ugas,totenergy);
+  //  printf("output: %e %e %e %e %e\n",entr,entr0,Ehat,4.*Pi*B,dtau);getchar();
+
+  return err;
+}
+
+int
+solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble* deltas,int verbose,ldouble *ppout)
+{
+  int i1,i2,i3,iv,i,j,iter;
+  ldouble pp[NV],uu[NV]; 
+  ldouble err[3],xxx[4],xxx0[4],err4d[4];
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  int ix=geom->ix;
+  int iy=geom->iy;
+  int iz=geom->iz;
+
+  //temporary using local arrays
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  //ff rad energy density
+  ldouble Rtt0,Ehat,ugas0[4];
+  calc_ff_Rtt(pp0,&Rtt0,ugas0,geom);
+  Ehat=-Rtt0;
+
+  //time step in fluid frame
+  ldouble dtau;
+  dtau=dt/ugas0[0];
+
+  //make sure entropy in pp0 is consistent
+  pp0[ENTR]=calc_Sfromu(pp0[RHO],pp0[UU]);
+
+  //total ff energy
+  ldouble totenergy;
+  totenergy=Ehat + pp0[UU];
+
+  if(verbose) printf("starting 1D \n");
+  if(verbose) print_NVvector(pp0);
+  if(verbose) printf("enden: %e %e %e\n",Ehat,pp0[UU],totenergy);
+  
+  //residual function parameters
+  int params[3],whichprim;
+  if(-Rtt0<1.e-3*pp0[UU]) //hydro preffered
+    whichprim=RAD;
+  else
+    whichprim=MHD; 
+
+  //override
+  //whichprim=MHD;
+
+  //solve in rad or mhd temperature?
+  params[0]=whichprim;
+  //energy or entropy equation to solve
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  //frame for energy/entropy equation to solve
+  params[2]=RADIMPLICIT_FFEQ;
+
+  //local vectors
+  for(iv=0;iv<NV;iv++)
+    {
+      uu[iv]=uu0[iv]; 
+      pp[iv]=pp0[iv];     
+    }
+
+  //initiate iterated quantity
+  if(whichprim==MHD)
+    {
+      xxx[0]=pp0[UU];      
+      xxx[1]=pp0[UU];
+      xxx[2]=Ehat;
+
+      //test
+      xxx[2]=pp0[UU];
+
+      if(verbose) printf("working on MHD\n");
+    }
+
+  ldouble ratio;
+  if(whichprim==RAD)
+    {
+      ratio = Ehat/pp0[EE0]; //ratio of energy densities between the ff and rad rest frame
+      xxx[0]=pp0[EE0];    
+      xxx[1]=pp0[EE0]; 
+      xxx[2]=pp0[UU]/ratio;
+
+      //test
+      xxx[2]=pp0[EE0];
+
+      if(verbose) printf("working on RAD\n");
+    }
+
+  //order the lower-upper brackets 
+  if(xxx[1]>xxx[2]) 
+    {
+      err[0]=xxx[1];
+      xxx[1]=xxx[2];
+      xxx[2]=err[0];
+    }
+
+  xxx0[0]=xxx[0];
+  xxx0[1]=xxx[1];
+  xxx0[2]=xxx[2];
+  
+  //test signs
+  err[0]=calc_implicit_1dprim_err(xxx[0],uu0,pp0,dt,geom,params,totenergy,ratio);
+  err[1]=calc_implicit_1dprim_err(xxx[1],uu0,pp0,dt,geom,params,totenergy,ratio);
+  err[2]=calc_implicit_1dprim_err(xxx[2],uu0,pp0,dt,geom,params,totenergy,ratio);
+
+  if(verbose) printf("%d >>> [%e : %e : %e] > ",0,xxx[1],xxx[0],xxx[2]);
+  if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
+
+  if(verbose) printf("searching for valid brackets\n");
+
+  //first try low the lower bracket
+  int MAXITER=30;
+  ldouble FAC=2.;
+  ldouble CONV=1.e-5; //cannot be too low!
+  
+  iter=0.;
+  while(err[1]*err[2]>0.)
+    {
+      iter++;
+      xxx[1]/=FAC;
+      err[1]=calc_implicit_1dprim_err(xxx[1],uu0,pp0,dt,geom,params,totenergy,ratio);
+
+      /*
+      if(whichprim==RAD)
+	xxx[2]=xxx[2]+(totenergy/ratio-xxx[2])/2.;
+      if(whichprim==MHD)
+	xxx[2]=xxx[2]+(totenergy-xxx[2])/2.;
+      */
+
+      //make sure this works all the time
+      xxx[2]*=FAC;
+      if(whichprim==RAD && xxx[2]>=totenergy/ratio)
+	xxx[2]=(1.-1.e-10)*totenergy/ratio;
+      if(whichprim==MHD && xxx[2]>=totenergy)
+	xxx[2]=(1.-1.e-10)*totenergy;
+      
+      err[2]=calc_implicit_1dprim_err(xxx[2],uu0,pp0,dt,geom,params,totenergy,ratio);
+
+      if(verbose) printf("%d (%d) >>> [%e : %e : %e] > ",0,iter,xxx[1],xxx[0],xxx[2]);
+      if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
+      if(isnan(err[1]) || isnan(err[2])) iter=MAXITER;
+      if(iter>=MAXITER) break;
+    }
+
+  if(iter>=MAXITER)
+    {
+      if(verbose || 1) {printf("brackets not found!\n");getchar();}
+      getchar();
+      PLOOP(i) ppout[i]=pp0[i];
+      return -1;
+    }      
+    
+  if(verbose) printf("brackets found!\n");
+
+  //call more sophisticated solver here
+  do
+    {
+      iter++;
+      xxx[0]=0.5*(xxx[1]+xxx[2]); //new estimate
+      err[0]=calc_implicit_1dprim_err(xxx[0],uu0,pp0,dt,geom,params,totenergy,ratio); //new error
+      
+
+      if(err[0]*err[1]>0.) //same sign as the lower bracket
+	{
+	  xxx[1]=xxx[0];
+	  err[1]=err[0];
+	}
+      else
+	{
+	  xxx[2]=xxx[0];
+	  err[2]=err[0];
+	}
+      if(verbose) printf("%d >>> [%e : %e : %e] > ",iter,xxx[1],xxx[0],xxx[2]);
+      if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
+
+      if(isnan(xxx[0]) || isnan(err[0])) {my_err("nan in 1dprim\n");}
+    }
+  while(fabs((xxx[2]-xxx[1])/xxx[0])>CONV);
+
+  if(verbose) printf("solution found: %e\n",xxx[0]);
+
+  //converting to new set of primitives
+  PLOOP(i) pp[i]=pp0[i];
+  if(whichprim==RAD)
+    pp[EE0]=xxx[0];
+  else
+    pp[UU]=xxx[0];
+  
+  //is what is below required?
+
+  //total inversion, but only whichprim part matters
+  p2u(pp,uu,geom);
+   
+  //opposite changes in the other quantities and inversion
+  int corr[2],fixup[2];
+  if(whichprim==RAD)
+    {
+      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
+
+      u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+    }
+  if(whichprim==MHD)
+    {
+      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+
+      u2p_rad(uu,pp,geom,corr);
+    }     
+
+  //updating entropy
+  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+
+  //returning the new set of primitives
+  PLOOP(i) ppout[i]=pp[i];
+
+  if(verbose) print_NVvector(ppout);
+  if(verbose) getchar();
+
+  return 0; 
+}
+
 //**********************************************************************
 //******* solves implicitidly four-force source terms *********************
 //******* in the lab frame  working on primitives    ***********************
@@ -658,229 +938,6 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   return ret;
 } 
 
-
-/*****************************************/
-/******* 1D solver in energy densities ***/
-/*****************************************/
-ldouble
-calc_implicit_1dprim_err(ldouble xxx,ldouble *uu0,ldouble *pp0,ldouble dt,void *geom,int *params)
-{
-  int whichprim=params[0];
-  ldouble err4d[4];
-  ldouble backup;
-  if(whichprim==MHD)
-    {
-      backup=pp0[UU];
-      pp0[UU]=xxx;
-    }
-  else
-    {
-      backup=pp0[EE0];
-      pp0[EE0]=xxx;  
-    }
-  //the residual
-  f_implicit_lab_4dprim(pp0,uu0,pp0,dt,geom,err4d,params);  
-
-  //restoring original primitives
-  if(whichprim==MHD)
-    pp0[UU]=backup;
-  else
-    pp0[EE0]=backup;
-
-  return err4d[0];
-}
-
-int
-solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble* deltas,int verbose,ldouble *ppout)
-{
-  int i1,i2,i3,iv,i,j,iter;
-  ldouble pp[NV],uu[NV]; 
-  ldouble err[3],xxx[4],xxx0[4],err4d[4];
-  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
-
-  struct geometry *geom
-    = (struct geometry *) ggg;
-
-  int ix=geom->ix;
-  int iy=geom->iy;
-  int iz=geom->iz;
-
-  //temporary using local arrays
-  gg=geom->gg;
-  GG=geom->GG;
-  gdet=geom->gdet; gdetu=gdet;
-#if (GDETIN==0) //gdet out of derivatives
-  gdetu=1.;
-#endif
-
-  //temperatures
-  ldouble Tgas0,Trad0,Rtt0,Ehat,ugas0[4];
-  calc_ff_Rtt(pp0,&Rtt0,ugas0,geom);
-  Ehat=-Rtt0;
-  Tgas0=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
-  Trad0=calc_LTE_TfromE(Ehat);
-  
-  //residual function parameters
-  int params[3],whichprim;
-  if(-Rtt0<1.e-3*pp0[UU]) //hydro preffered
-    whichprim=RAD;
-  else
-    whichprim=MHD; 
-
-  //override
-  whichprim=MHD;
-
-  //solve in rad or mhd temperature?
-  params[0]=whichprim;
-  //energy or entropy equation to solve
-  params[1]=RADIMPLICIT_ENTROPYEQ;
-  //frame for energy/entropy equation to solve
-  params[2]=RADIMPLICIT_FFEQ;
-
-  //local vectors
-  for(iv=0;iv<NV;iv++)
-    {
-      uu[iv]=uu0[iv]; 
-      pp[iv]=pp0[iv];     
-    }
-
-  //initiate iterated quantity
-  if(whichprim==MHD)
-    {
-      xxx[0]=pp0[UU];      
-      xxx[1]=pp0[UU];
-      xxx[2]=Ehat;
-    }
-
-  if(whichprim==RAD)
-    {
-      xxx[0]=pp0[EE0];    
-      xxx[1]=.999*pp0[EE0]; //give better estimates based on fluid frame?
-      xxx[2]=1.001*pp0[EE0];
-    }
-
-  //oreder the lower-upper brackets 
-  if(xxx[1]>xxx[2]) 
-    {
-      err[0]=xxx[1];
-      xxx[1]=xxx[2];
-      xxx[2]=err[0];
-    }
-
-  xxx0[0]=xxx[0];
-  xxx0[1]=xxx[1];
-  xxx0[2]=xxx[2];
-  
-  //test signs
-  err[0]=calc_implicit_1dprim_err(xxx[0],uu0,pp0,dt,geom,params);
-  err[1]=calc_implicit_1dprim_err(xxx[1],uu0,pp0,dt,geom,params);
-  err[2]=calc_implicit_1dprim_err(xxx[2],uu0,pp0,dt,geom,params);
- 
-  if(verbose) printf("starting 1D in %d\n",whichprim);
-  if(verbose) print_NVvector(pp);
-  if(verbose) printf("%d >>> [%e : %e : %e] > ",0,xxx[1],xxx[0],xxx[2]);
-  if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
-
-  if(verbose) printf("searching for valid brackets\n");
-
-  //first try low the lower bracket
-  int MAXITER=30;
-  ldouble FAC=2.;
-  iter=0.;
-  while(err[1]*err[2]>0.)
-    {
-      iter++;
-      xxx[1]/=FAC;
-      err[1]=calc_implicit_1dprim_err(xxx[1],uu0,pp0,dt,geom,params);
-      xxx[2]*=FAC;
-      err[2]=calc_implicit_1dprim_err(xxx[2],uu0,pp0,dt,geom,params);
-      if(verbose) printf("%d (%d) >>> [%e : %e : %e] > ",0,iter,xxx[1],xxx[0],xxx[2]);
-      if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
-      if(isnan(err[1]) || isnan(err[2])) iter=MAXITER;
-      if(iter>=MAXITER) break;
-    }
-
-  if(iter>=MAXITER)
-    {
-      if(verbose || 1) printf("brackets not found!\n");
-      getchar();
-      PLOOP(i) ppout[i]=pp0[i];
-      return -1;
-    }      
-    
-  if(verbose) printf("brackets found!\n");
-
-  //call more sophisticated solver here
-  do
-    {
-      iter++;
-      xxx[0]=0.5*(xxx[1]+xxx[2]); //new estimate
-      err[0]=calc_implicit_1dprim_err(xxx[0],uu0,pp0,dt,geom,params); //new error
-      
-
-      if(err[0]*err[1]>0.) //same sign as the lower bracket
-	{
-	  xxx[1]=xxx[0];
-	  err[1]=err[0];
-	}
-      else
-	{
-	  xxx[2]=xxx[0];
-	  err[2]=err[0];
-	}
-      if(verbose) printf("%d >>> [%e : %e : %e] > ",iter,xxx[1],xxx[0],xxx[2]);
-      if(verbose) printf("[%e : %e : %e]\n",err[1],err[0],err[2]);  
-
-      if(isnan(xxx[0]) || isnan(err[0])) {my_err("nan in 1dprim\n");}
-    }
-  while(fabs((xxx[2]-xxx[1])/xxx[0])>1.e-5);
-
-  if(verbose) printf("solution found: %e\n",xxx[0]);
-
-  //converting to new set of primitives
-  PLOOP(i) pp[i]=pp0[i];
-  if(whichprim==RAD)
-    pp[EE0]=xxx[0];
-  else
-    pp[UU]=xxx[0];
-  
-  //total inversion, but only whichprim part matters
-  p2u(pp,uu,geom);
-   
-  //opposite changes in the other quantities and inversion
-  int corr[2],fixup[2];
-  if(whichprim==RAD)
-    {
-      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
-      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
-      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
-
-      u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
-    }
-  if(whichprim==MHD)
-    {
-      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
-      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
-      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
-      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
-
-      u2p_rad(uu,pp,geom,corr);
-    }     
-
-  //updating entropy
-  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
-
-  //returning the new set of primitives
-  PLOOP(i) ppout[i]=pp[i];
-
-  if(verbose) print_NVvector(ppout);
-  //if(verbose) getchar();
-
-  return 0; 
-}
-
-
 int
 print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
 {
@@ -896,7 +953,7 @@ print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
 /******* 4D solver working on primitives */
 /*****************************************/
 int
-solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose)
+solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params)
 {
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
@@ -1016,7 +1073,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   /******************************************/
   /******************************************/
   //choice of primitives to evolve
-  int params[3],whichprim;
+  int whichprim;
   if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
     whichprim=RAD;
   else
@@ -1024,15 +1081,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   
   params[0]=whichprim;
 
-  //override
+  //override the given parameters
   //params[0]=MHD;
-
   //energy or entropy equation to solve
   //params[1]=RADIMPLICIT_ENTROPYEQ;
-  params[1]=RADIMPLICIT_ENERGYEQ;
-
+  //params[1]=RADIMPLICIT_ENERGYEQ;
   //frame for energy/entropy equation to solve
-  params[2]=RADIMPLICIT_LABEQ;
+  //params[2]=RADIMPLICIT_LABEQ;
   /******************************************/
   /******************************************/
   /******************************************/
@@ -1480,16 +1535,19 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //inversion to get the right pp[]
   //(u2p checks against proper entropy evolution and uses entropy inversion if necessary
 
-  int corr[2],fixup[2],ret;
+  int corr[2],fixup[2],params[3],ret;
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
   //1d solver in temperatures only
   ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
-  //if(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
+  if(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
   
   //4d solver starting from the solution satisfying above
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 }
@@ -1534,7 +1592,10 @@ test_solve_implicit_lab()
   ldouble deltas[4];
   int verbose=1;
  
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+  int params[3];
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 }
 
 ///**********************************************************************
@@ -1644,9 +1705,12 @@ test_jon_solve_implicit_lab()
    
       ldouble deltas[4];
       int verbose=1;
+      int params[3];
       
       solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
-      solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose);
+      params[1]=RADIMPLICIT_ENERGYEQ;
+      params[2]=RADIMPLICIT_LABEQ;
+      solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
       //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 
       getchar();
