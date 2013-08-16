@@ -86,12 +86,14 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
     pp[B3]=Acov[3];
 #endif
 
+  }
+
 #ifdef RADIATION
-    //setting up radiative energy density to residual value - should immetiadelly increase sucking out the gas internal energy in opt.thick regions
+    //setting up radiative energy density to residual value - 
+    //should immetiadelly increase sucking out the gas internal energy in opt.thick regions
     pp[EE0]=pp[UU]/1.e6;
     pp[FX0]=pp[FY0]=pp[FZ0]=0.;    
 #endif
-  }
 
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);

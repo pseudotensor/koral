@@ -36,7 +36,7 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 /**********************/
 
 //radius
-if(ix>=NX) //outflow in magn field, atm. in HD
+if(ix>=NX) //outflow in magn and rad. fields, atm. in HD
   {
     iix=NX-1;
     iiy=iy;
@@ -97,7 +97,7 @@ if(iy<0.) //spin axis
       {
 	//v_theta
 #ifndef PUREAXISOUTFLOW
-	if(iv==VY || iv==B2)
+	if(iv==VY || iv==B2 || iv==FY0)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
 #endif
@@ -122,7 +122,7 @@ if(iy>=NY) //equatorial plane
   	  
     for(iv=0;iv<NV;iv++)
       {
-	if(iv==VY || iv==B2)
+	if(iv==VY || iv==B2 || iv==FY0)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);

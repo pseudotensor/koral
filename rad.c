@@ -837,7 +837,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
     ret=1;
   //printf("corr: %d %d\n",corr[0],corr[1]);
 
-  if(u2pret<-1) 
+  if(u2pret<-1 || u2pret<0) 
     {
       printf("implicit sub-sub-step failed\n");
       return -1; //allows for entropy but does not update conserved 
@@ -1165,6 +1165,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       //values at base state
       if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params)<0) 
 	{
+	  return -1;
 	  failed=1;
 		  
 	  break;
@@ -1553,7 +1554,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //4d solver starting from the solution satisfying above
 
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LABEQ;
+  params[2]=RADIMPLICIT_FFEQ;
 
   //deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;return 0;
 

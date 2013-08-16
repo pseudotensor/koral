@@ -8,7 +8,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-#define SKIPRADSOURCE
+//#define SKIPRADSOURCE
 
 /************************************/
 //magnetic choices
@@ -37,12 +37,12 @@
 /************************************/
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e2
-#define EERHORATIOMIN 1.e-20
-#define EERHORATIOMAX 1.e20
-#define EEUURATIOMIN 1.e-20
-#define EEUURATIOMAX 1.e20
+#define EERHORATIOMIN 1.e-10
+#define EERHORATIOMAX 1.e10
+#define EEUURATIOMIN 1.e-10
+#define EEUURATIOMAX 1.e10
 #define B2UURATIOMIN 0.
-#define B2UURATIOMAX 1000.
+#define B2UURATIOMAX 100.
 #define B2RHORATIOMIN 0.
 #define B2RHORATIOMAX 1000.
 #define GAMMAMAXRAD 50.
@@ -92,6 +92,8 @@
 #define NOUTSTOP 5000
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
+#define CBAUTOSCALE
+
 
 /************************************/
 //common physics / atmosphere
@@ -103,7 +105,7 @@
 #define URIN (0.)
 #define KKK 10000.
 #define UTPOT .965
-#define DTOUT1 5.e0
+#define DTOUT1 5.e-1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

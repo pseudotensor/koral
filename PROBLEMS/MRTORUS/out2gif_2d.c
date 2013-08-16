@@ -118,7 +118,7 @@ maxy= 1.02*get_xb(NX,0);
 	  //"set autoscale cb\n"
 
 #ifdef RADIATION
-	  "set title \"bsq\" offset 0,-1\n"
+	  "set title \"Erad\" offset 0,-1\n"
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($20) ti \"\" w l ls 1\n"
 #elif defined(MAGNFIELD)
 	  "set title \"bsq\" offset 0,-1\n"
@@ -169,7 +169,9 @@ maxy= 1.02*get_xb(NX,0);
 	  fname,
 	  fname,5.,5.,NX/21+1,NY/21+1,
 	  fname,
-#ifdef MAGNFIELD
+#ifdef RADIATION
+	  fname,1. ,1.,NX/21+1,NY/21+1
+#elif defined(MAGNFIELD)
 	  fname,1.,1.,NX/21+1,NY/21+1
 #else
 	  fname,3.,3.,NX/21+1,NY/21+1
