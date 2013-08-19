@@ -746,7 +746,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
   PLOOP(i) ppout[i]=pp[i];
 
   if(verbose) print_NVvector(ppout);
-  if(verbose) getchar();
+  //if(verbose) getchar();
 
   return 0; 
 }
@@ -775,7 +775,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   int whicheq=params[1];
   int whichframe=params[2];
 
-  //  printf("%d %d %d\n",params[0],params[1],params[2]);getchar();
+  //intf("%d %d %d\n",params[0],params[1],params[2]);getchar();
 
   ldouble uu[NV],pp[NV],err[4];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
@@ -865,7 +865,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
       f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
 
-      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FX0])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
       if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
       if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
     }
@@ -1130,8 +1130,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       pp[iv]=pp0[iv];     
     }
  
-  ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6;
+  ldouble EPS = 1.e-6;
+  ldouble CONV = 1.e-8;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
@@ -1217,7 +1217,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      del=EPS*ppp[sh];
 
 	      //EPS of the geometrical mean
-	      del=EPS*sqrt(ppp[EE0]*ppp[UU]);
+	      //del=EPS*sqrt(ppp[EE0]*ppp[UU]);
 	    }
 	  else //decreasing velocity
 	    {
@@ -1603,7 +1603,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  
       if(iter>MAXITER)
 	{
-	  if(verbose) 
+	  if(verbose || 1)
 	    {
 	      printf("iter exceeded in solve_implicit_lab_4dprim() for frdt=%f \n",dt);	  
 	    }
@@ -1651,8 +1651,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   p2u(pp,uu,&geom);
 
   //1d solver in temperatures only
-  ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
-  //if(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
+  //ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
+  //(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
   
   //4d solver starting from the solution satisfying above
 
@@ -1665,12 +1665,18 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret<0)
     {
+      return -1;
+    }
+
+  /*
+    if(ret<0)
+{
       params[1]=RADIMPLICIT_ENTROPYEQ;
-      params[2]=RADIMPLICIT_FFEQ;
+      params[2]=RADIMPLICIT_LABEQ;
       ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
       if(ret<0) return -1;
     }
-    
+  */
   return 0;
 
   //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
@@ -3247,11 +3253,16 @@ calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
   ldouble Tgas=calc_PEQ_Tfromurho(ugas,pp[RHO]);
 
   ldouble cbrtnaw=cbrt(9.*A + Sqrt(3.)*Sqrt(27.*Power(A,2.) - 256.*Power(A,3.)*Power(C,3.)));
+  //troublesome
+  /*
   ldouble ugasLTE=-Sqrt((4*cbrt(2./3.)*C)/
 		  cbrtnaw +  cbrtnaw/
 		   (cbrt(2.*3.*3.)*A))/2. +
     Sqrt((-4*cbrt(2./3.)*C)/cbrtnaw - cbrtnaw/(cbrt(2.*3.*3.)*A) +
 	 2./(A*Sqrt((4*cbrt(2./3.)*C)/cbrtnaw + cbrtnaw/(cbrt(2.*3.*3.)*A))))/2.;
+  */
+  
+  ldouble ugasLTE=0.;
 
   gsl_complex z0,z1,z2,z3;
   gsl_poly_complex_solve_quartic (0.,0.,1./A,C/A,
