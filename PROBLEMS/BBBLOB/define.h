@@ -1,3 +1,5 @@
+#define TRACER
+
 /************************************/
 //restart
 /************************************/
@@ -7,7 +9,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -79,7 +81,6 @@
 /************************************/
 //output
 /************************************/
-//#define SILOOUTPUT
 //#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 //#define PRINTYGC_LEFT
@@ -90,7 +91,7 @@
 #define NOUTSTOP 5000
 #define DTOUT1 .5
 #define RADOUTPUTINZAMO
-#define SILOOUTPUT
+//#define SILOOUTPUT
 
 /************************************/
 //problem params

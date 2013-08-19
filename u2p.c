@@ -29,7 +29,6 @@ calc_primitives(int ix,int iy,int iz)
 
   int corrected[2]={0,0}, fixups[2]={0,0};
 
-
   for(iv=0;iv<NV;iv++)
     {
       uu[iv]=get_u(u,iv,ix,iy,iz);
@@ -75,6 +74,7 @@ calc_primitives(int ix,int iy,int iz)
   //if(corrected[0]!=0 || corrected[1]!=0)
 
   p2u(pp,uu,&geom);
+  
   for(iv=0;iv<NV;iv++)
     {
       set_u(u,iv,ix,iy,iz,uu[iv]);
@@ -183,19 +183,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
     ppold[iv]=pp[iv];
 
   u2pret=u2p_solver(uu,pp,ggg,U2P_HOT,0); 
-
-  //************************************
-  if(pp[RHO]<1e-70) 
-    {
-      printf("test 100 (%d )\n",u2pret);
-      print_NVvector(pp);
-      print_NVvector(ppold);
-      print_NVvector(uu);
-      u2p_solver(uu,ppold,ggg,U2P_HOT,2); 
-      print_NVvector(ppold);
-      
-    }
-
   
   if(u2pret==0)
     {
@@ -416,7 +403,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   GG=geom->GG;
 
 #ifdef TRACER
-  if(pp[TRA]<0.) {pp[0]=0.; ret=-1; if(verbose) printf("hd_floors CASE TRA 1\n");}
+  if(pp[TRA]<0.) {pp[TRA]=0.; ret=-1; if(verbose) printf("hd_floors CASE TRA 1\n");}
 #endif
 
   //absolute rho
@@ -854,7 +841,7 @@ int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
   int i,j,k;
-  ldouble rho,u,p,w,W,alpha,D,Sc;
+  ldouble rho,uint,w,W,alpha,D,Sc;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
   ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
@@ -927,6 +914,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   QdotBsq = QdotB*QdotB;
 #else
   Bsq=QdotB=QdotBsq=0.;
+  Bcon[0]=Bcon[1]=Bcon[2]=0.;
 #endif  
 
   //n_mu = (-alpha, 0, 0, 0)
@@ -963,7 +951,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   
   //initial guess for W = w gamma**2 based on primitives
   rho=pp[0];
-  u=pp[1];
+  uint=pp[1];
   utcon[0]=0.;
   utcon[1]=pp[2];
   utcon[2]=pp[3];
@@ -971,18 +959,6 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   //conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon,ucov,gg);
   conv_vels(utcon,utcon,VELPRIM,VELR,gg,GG);
-
-  /*
-  ldouble bcon[4],bcov[4],bsq;
-#ifdef MAGNFIELD
-  calc_bcon_4vel(pp,ucon,ucov,bcon);
-  indices_21(bcon,bcov,gg); 
-  bsq = dot(bcon,bcov);
-#else
-  bcon[0]=bcon[1]=bcon[2]=bcon[3]=0.;
-  bsq=0.;
-#endif
-  */
 
   ldouble qsq=0.;
   for(i=1;i<4;i++)
@@ -992,7 +968,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble gamma=sqrt(gamma2);
 
   //W
-  W=(rho+GAMMA*u)*gamma2;
+  W=(rho+GAMMA*uint)*gamma2;
 
   if(verbose>1) printf("initial W:%e\n",W);
 
@@ -1002,7 +978,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
   ldouble f0,f1,dfdW;
-  ldouble CONV=1.e-10;
+  ldouble CONV=1.e-8;
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
@@ -1017,8 +993,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
       if( ((( W*W*W * ( W + 2.*Bsq ) 
 	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
-	  || isinf(f0) || isnan(f0)
-	  || isinf(dfdW) || isnan(dfdW))	  
+	  || !isfinite(f0) || !isfinite(f0)
+	  || !isfinite(dfdW) || !isfinite(dfdW))	  
 	  && (i_increase < 50)) 
 	{
 	  W *= 100.;
@@ -1031,7 +1007,13 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   while(1);
 
   if(i_increase>=50)
-    printf("failed to find initial W for Etype: %d\n",Etype);
+    {
+      printf("failed to find initial W for Etype: %d\n",Etype);
+      printf("at %d %d\n",geom->ix,geom->iy);
+      print_NVvector(uu);
+      print_NVvector(pp);
+      getchar();
+    }
 
   //1d Newton solver
   int iter=0,fu2pret;
@@ -1065,8 +1047,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  if(verbose>1) printf("sub (%d) :%d %e %e %e\n",idump,iter,W,f0,dfdW);
 	  if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
 		  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))
-	       || isinf(f0tmp) || isnan(f0tmp)
-	       || isinf(dfdWtmp) || isnan(dfdWtmp))
+	       || !isfinite(f0tmp) || !isfinite(f0tmp)
+	       || !isfinite(dfdWtmp) || !isfinite(dfdWtmp))
 	      && (idump<100))
 	    {
 	      idump++;
@@ -1103,7 +1085,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     }
 
 
-  if(isnan(W) || isinf(W)) {if(verbose) printf("nan/inf W in u2p_solver with Etype: %d\n",Etype); return -103;}
+  if(!isfinite(W) || !isfinite(W)) {if(verbose) printf("nan/inf W in u2p_solver with Etype: %d\n",Etype); return -103;}
  
   if(verbose>1) 
     {
@@ -1123,22 +1105,28 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   gamma2=1./(1.-v2);
   gamma=sqrt(gamma2);
   rho=D/gamma;
-  u=1./GAMMA*(W/gamma2-rho);
+  uint=1./GAMMA*(W/gamma2-rho);
   utcon[0]=0.;
   utcon[1]=gamma/(W+Bsq)*(Qtcon[1]+QdotB*Bcon[1]/W);
   utcon[2]=gamma/(W+Bsq)*(Qtcon[2]+QdotB*Bcon[2]/W);
   utcon[3]=gamma/(W+Bsq)*(Qtcon[3]+QdotB*Bcon[3]/W);
 
-
-  if(u<0. || gamma2<0. ||isnan(W) || isinf(W)) 
+  if(!isfinite(utcon[1]))
     {
-      if(verbose>0) printf("neg u in u2p_solver %e %e %e %e\n",rho,u,gamma2,W);//getchar();
+      print_4vector(utcon);
+      return -120;
+    }
+
+
+  if(uint<0. || gamma2<0. ||isnan(W) || !isfinite(W)) 
+    {
+      if(verbose>0) printf("neg u in u2p_solver %e %e %e %e\n",rho,uint,gamma2,W);//getchar();
       return -104;
     }
 
   if(rho<0.) 
     {
-      if(verbose>0) printf("neg rho in u2p_solver %e %e %e %e\n",rho,u,gamma2,W);//getchar();
+      if(verbose>0) printf("neg rho in u2p_solver %e %e %e %e\n",rho,uint,gamma2,W);//getchar();
       return -105;
     }
 
@@ -1146,14 +1134,14 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   conv_vels(utcon,utcon,VELR,VELPRIM,gg,GG);
   
   //returning new primitives
-  pp[0]=rho;
-  pp[1]=u;
-  pp[2]=utcon[1];
-  pp[3]=utcon[2];
-  pp[4]=utcon[3];
+  pp[RHO]=rho;
+  pp[UU]=uint;
+  pp[VX]=utcon[1];
+  pp[VY]=utcon[2];
+  pp[VZ]=utcon[3];
 
   //entropy based on UU[1]
-  pp[5]=calc_Sfromu(rho,u);
+  pp[ENTR]=calc_Sfromu(rho,uint);
 
 #ifdef MAGNFIELD
   //magnetic conserved=primitives
@@ -1166,6 +1154,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
   pp[TRA]=Dtr/gamma;
 #endif
+
 
   if(verbose) print_NVvector(pp);
 

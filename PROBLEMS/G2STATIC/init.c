@@ -45,6 +45,7 @@ pp[0]=diskrho+clrho;
 
 
 #ifdef TRACER
+
 //tracer : fraction of cloud gas //test
 ldouble tracer=clrho/(diskrho+clrho);
 
@@ -63,9 +64,6 @@ pp[2]=(pp[2]*diskrho + ucon[1]*clrho ) / (diskrho + clrho);
 pp[3]=(pp[3]*diskrho + ucon[2]*clrho ) / (diskrho + clrho);
 pp[4]=(pp[4]*diskrho + ucon[3]*clrho ) / (diskrho + clrho);  
 
-/***********************************************/
-
-/***********************************************/
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //hd floors

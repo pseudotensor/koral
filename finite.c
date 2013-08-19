@@ -415,6 +415,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
+
   //interpolation and flux-calculation
 #pragma omp parallel for private(iy,iz,iv,ix,ii)  schedule (static) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
@@ -619,6 +620,9 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	}
 
     }
+
+
+
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -633,6 +637,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //combines right - left fluxes
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
+
 
   //**********************************************************************
   //**********************************************************************
@@ -717,6 +722,9 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  if(isnan(val) || isinf(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
+	  
+	  //	  if(ix==0 && iy==0)
+	  //printf("%e %d\n",val,iv);
 
 	  set_u(u,iv,ix,iy,iz,val);	
 
@@ -727,6 +735,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
+  
   //do not update the primitives
 
   //**********************************************************************
@@ -894,6 +903,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	      
 #endif //MULTIRADFLUID
+
+   //fixup here after source term 
+   cell_fixup_rad();
+
 #endif //RADIATION
 #endif //SKIPRADSOURCE
 
@@ -903,10 +916,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
     } //source terms
 
-   
-
-   //fixup here after source term 
-   cell_fixup_rad();
 
   //**********************************************************************
   //**********************************************************************

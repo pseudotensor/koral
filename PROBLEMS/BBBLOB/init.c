@@ -1,4 +1,3 @@
-
 ldouble rho,mx,my,mz,m,E,uint,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
 ldouble uu[NV],xxvec[4],xxvecBL[4];
@@ -43,6 +42,10 @@ ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 //pp[6]=EEFLOOR*1.e5;
 pp[6]=calc_LTE_EfromT(temp);
 pp[FX0]=pp[FY0]=pp[FZ0]=0.;
+#endif
+
+#ifdef TRACER
+pp[TRA]=1.;
 #endif
 
 /***********************************************/

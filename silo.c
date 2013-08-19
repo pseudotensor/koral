@@ -371,6 +371,20 @@ int fprint_silofile(ldouble time, int num, char* folder)
   #ifdef TRACER
   free(tracer);
   #endif
+
+  #ifdef RADIATION
+  free(Erad);
+  free(Fx);
+  free(Fy);
+  free(Fz);
+  #endif
+
+  #ifdef MAGNFIELD
+  free(Bx);
+  free(By);
+  free(Bz);
+  #endif
+ 
   
   free(vx);
   free(vy);

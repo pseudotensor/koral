@@ -138,7 +138,8 @@ solve_the_problem(ldouble tstart)
       nstep++;
 
       //calculates the primitives to copy to previous time steps
-      int ii;
+      int ii;     
+
 #pragma omp parallel for private(ii,ix,iy,iz,iv) schedule (dynamic)
       for(ii=0;ii<Nloop_0;ii++) //domain only
 	{
@@ -148,7 +149,6 @@ solve_the_problem(ldouble tstart)
       
 	  calc_primitives(ix,iy,iz); 
 	}
- 
 
       //holds previous time steps
       copy_u(1.,ptm1,ptm2); ttm2=ttm1;
@@ -232,6 +232,7 @@ solve_the_problem(ldouble tstart)
      else 
        my_err("wrong time stepping specified\n");
 
+
       //**********************************************************************
       //************************* finger  ************************************
       //**********************************************************************
@@ -264,13 +265,14 @@ solve_the_problem(ldouble tstart)
 
 	  //calculate scalars
 	  calc_scalars(scalars,t);
-
+	  
 	  //print to files
 	  fprint_restartfile(t,"dumps");
 	  fprint_profiles(t,scalars,NSCALARS,0,"dumps");
           #ifdef SILOOUTPUT
 	  fprint_silofile(t,nfout1,"dumps");
 	  #endif
+	  
 	  nfout1++;
 
 	  lasttout=t;

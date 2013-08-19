@@ -1,6 +1,6 @@
 CC=gcc 
-CFLAGS=-O3 -fopenmp 
-LIBS=-lm -lgsl -lgslcblas -lsilo
+CFLAGS=-O3 -fopenmp
+LIBS=-lm -lgsl -lgslcblas -lsilo -lrt
 RM=/bin/rm
 
 OBJS = u2prad.o magn.o silo.o postproc.o fileop.o misc.o physics.o finite.o zsolve_quartic.o problem.o metric.o relele.o rad.o rad.mf.o u2p.o frames.o p2u.o
