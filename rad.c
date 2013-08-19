@@ -757,7 +757,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 //******* rad or hydro (whichprim) **************************************
 //**********************************************************************
 
-int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params)
+int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params,ldouble *err0)
 {
   int ret=0,i;
   struct geometry *geom
@@ -777,7 +777,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 
   //  printf("%d %d %d\n",params[0],params[1],params[2]);getchar();
 
-  ldouble uu[NV],pp[NV];
+  ldouble uu[NV],pp[NV],err[4];
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
   for(i=0;i<NV;i++) pp[i]=ppin[i];
@@ -854,12 +854,20 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
       f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2];
       f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3];
+
+      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
+      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
     }
   if(whichprim==RAD) //rad-primitives
     {
       f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
       f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
       f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
+
+      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
+      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
     }
 
   /***** LAB FRAME ENERGY/ENTROPY EQS *****/
@@ -868,18 +876,30 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       if(whichprim==RAD) //rad-primitives
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
-	    f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+	    {
+	      f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	    }
 	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
-	    f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0]; //but this works on hydro entropy and may fail!
+	    {
+	      f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0]; //but this works on hydro entropy and may fail!
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	    }
 	  else
 	    my_err("not implemented 3\n");
 	}
       if(whichprim==MHD) //hydro-primitives
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
-	    f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0];
-	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)	  
-	    f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0];
+	    {
+	      f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	    }
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    {	  
+	      f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	    }      
 	  else
 	    my_err("not implemented 4\n");
 	}
@@ -906,46 +926,49 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       if(whichprim==RAD) //rad-primitives
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
-	    f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
+	    {
+	      f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	    }
 	  else
 	    {
-	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]); //times ucon[0]?
+	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
 	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-
-	      /*
-	      ldouble totalenergy=Ehat0+pp0[UU];
-	      ldouble uint=totalenergy-Ehat;
-	      pp[ENTR]= calc_Sfromu(pp[RHO],uint); //times ucon[0]?
-	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      */
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	    
 	}
       if(whichprim==MHD) //mhd-
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
-	    f[0]=pp[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	    {
+	      f[0]=pp[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[UU]) + fabs(pp0[UU]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	    }
 	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	    {
-	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]); //times ucon[0]?
+	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
 	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else
 	    my_err("not implemented 2\n");	  
 	}
     }
+
+  *err0=my_max(my_max(err[0],err[1]),my_max(err[2],err[3]));
   
   return ret;
 } 
 
 int
-print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f)
+print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f,ldouble err)
 {
   printf ("iter = %3d x = % .13e % .13e % .13e % .13e "
-	  "f(x) = % .13e % .13e % .13e % .13e\n",
+	  "e = %.10e f(x) = % .10e % .10e % .10e % .10e\n",
 	  iter,
 	  //	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
-	  x[0],x[1],x[2],x[3],f[0],f[1],f[2],f[3]);
+	  x[0],x[1],x[2],x[3],err,f[0],f[1],f[2],f[3]);
   return 0;
 }
 
@@ -958,7 +981,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
-  ldouble f1[4],f2[4],f3[4],xxx[4];
+  ldouble f1[4],f2[4],f3[4],xxx[4],err;
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   struct geometry *geom
@@ -1156,20 +1179,25 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      xxx[i]=ppp[i+sh];
 	    }  
 
-	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params);
-	  print_state_implicit_lab_4dprim (iter-1,xxx,f1); 
+	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err);
+	  print_state_implicit_lab_4dprim (iter-1,xxx,f1,err); 
 	  if(ret<0) printf("f_lab_4dprim ret: %d\n",ret);
 	}
 
 
       //values at base state
-      if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params)<0) 
+      if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err)<0) 
 	{
-	  return -1;
-	  failed=1;
-		  
+	  return -1;	  
+	}
+
+	  
+      if(err<CONV)
+	{
+	  if(verbose) printf("success ===\n");
 	  break;
 	}
+
 
       //calculating approximate Jacobian
       for(j=0;j<4;j++)
@@ -1201,7 +1229,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  pp[j+sh]=ppp[j+sh]+del;
 	      
-	  int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params);  
+	  int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params,&err);  
 
 	  if(fret<0) 
 	    {
@@ -1549,6 +1577,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       //if(overcnt>10) printf("over cnt: %d\n",overcnt);	    
       */
 
+
+      /*
       //test convergence
       for(i=0;i<4;i++)
 	{
@@ -1569,6 +1599,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(verbose) printf("success ===\n");
 	  break;
 	}
+      */
 	  
       if(iter>MAXITER)
 	{
