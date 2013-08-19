@@ -837,7 +837,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
     ret=1;
   //printf("corr: %d %d\n",corr[0],corr[1]);
 
-  if(u2pret<-1 || u2pret<0) 
+  if(u2pret<-1) 
     {
       printf("implicit sub-sub-step failed\n");
       return -1; //allows for entropy but does not update conserved 
@@ -1062,6 +1062,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("\n===========\nxi1: %e xi2: %e\n===========\n\n",xi1,xi2);
       ldouble Rtt;
       calc_ff_Rtt(pp00,&Rtt,ucon,geom);
+      printf("Ehat: %e\n\n",-Rtt);
       printf("gamma gas: %e\n\n",ucon[0]);
       ldouble Gi00[4],Gihat00[4];
       //      print_Nvector(pp00,NV);
@@ -1217,7 +1218,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      del=EPS*ppp[sh];
 
 	      //EPS of the geometrical mean
-	      //del=EPS*sqrt(ppp[EE0]*ppp[UU]);
+	      del=EPS*sqrt(ppp[EE0]*ppp[UU]);
 	    }
 	  else //decreasing velocity
 	    {
@@ -1245,6 +1246,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  pp[j+sh]=ppp[j+sh];
 	}
 	  
+ 
       //inversion
       if(inverse_44matrix(J,iJ)<0)
 	{
@@ -1256,6 +1258,27 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	  break;
 	}
+
+     if(verbose) print_tensor(J);
+     if(verbose) print_tensor(iJ);
+
+     int k,l;
+     ldouble JJ[4][4];
+     for(i=0;i<4;i++)
+       {
+	 for(j=0;j<4;j++)
+	   {
+	     JJ[i][j]=0.;
+
+	     for(k=0;k<4;k++)     
+		 JJ[i][j]+=J[i][k]*iJ[k][j];
+	   }
+       }
+
+    if(verbose) print_tensor(JJ);
+	 
+    getchar();
+
 
       //applying corrections
       ldouble xiapp=1.;
@@ -1275,6 +1298,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		  xxx[i]-=xiapp*iJ[i][j]*f1[j];
 		}
 	    }
+
+	  //print_4vector(xxx);
 
 	  //update primitives
 	  for(i=0;i<4;i++)
@@ -1312,12 +1337,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
 	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 	      u2pret=u2p_rad(uu,pp,geom,corr);
-	    }     
-
-	  if(xxx[0]>0. && u2pret==0) break;
+	    }    
+	  
+	  //if(xxx[0]<0.) printf("neg\n");
+	  if(xxx[0]>0. && u2pret>=0) break;
 
 	  //decrease the applied fraction
-	  xiapp/=2.; //to be generous
+	  xiapp/=2.; 
 
 	  if(xiapp<1.e-7) 
 	    {
@@ -1721,11 +1747,19 @@ test_solve_implicit_lab()
  
   ldouble deltas[4];
   int verbose=1;
- 
   int params[3];
+  
+  solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
+   
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LABEQ;
+  params[2]=RADIMPLICIT_FFEQ;
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  /*
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[2]=RADIMPLICIT_FFEQ;
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  */
 }
 
 ///**********************************************************************

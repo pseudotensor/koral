@@ -540,7 +540,7 @@ print_tensor(ldouble T[][4])
   int i;
   printf("============\n");
   for(i=0;i<4;i++)
-    printf("%10.3e %10.3e %10.3e %10.3e\n",T[0][i],T[1][i],T[2][i],T[3][i]);
+    printf("%10.16e %10.16e %10.16e %10.16e\n",T[0][i],T[1][i],T[2][i],T[3][i]);
   printf("============\n");
   return 0;  
 }

@@ -50,13 +50,13 @@
 #define EEUURATIOMAX 1.e20
 #define ERADLIMIT 1.e-50
 #define RHOFLOOR 1.e-50
-#define GAMMAMAXRAD 100.
+#define GAMMAMAXRAD 200.
 
 /************************************/
 //blackhole
 /************************************/
 #define BHSPIN 0.0
-#define MASS 1.e10
+#define MASS 1.e5
 
 /************************************/
 //coordinates / resolution

@@ -6,7 +6,6 @@
 int 
 main(int argc, char **argv)
 {  
-  //tests
 #if(PROBLEM==60)
   //requires no rad. viscosity!
   test_jon_solve_implicit_lab();
@@ -76,6 +75,12 @@ main(int argc, char **argv)
   
   //copies initial primitives to pinit
   copy_u(1.,p,pinit);
+
+
+  //tests
+  test_solve_implicit_lab(); exit(0);
+
+
 
   //evolves
   solve_the_problem(tstart);
