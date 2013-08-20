@@ -1131,7 +1131,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       pp[iv]=pp0[iv];     
     }
  
-  ldouble EPS = 1.e-6;
+  ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-8;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
@@ -1259,25 +1259,25 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  break;
 	}
 
-     if(verbose) print_tensor(J);
-     if(verbose) print_tensor(iJ);
+      if(verbose) print_tensor(J);
+      if(verbose) print_tensor(iJ);
 
-     int k,l;
-     ldouble JJ[4][4];
-     for(i=0;i<4;i++)
-       {
-	 for(j=0;j<4;j++)
-	   {
-	     JJ[i][j]=0.;
+      int k,l;
+      ldouble JJ[4][4];
+      for(i=0;i<4;i++)
+	{
+	  for(j=0;j<4;j++)
+	    {
+	      JJ[i][j]=0.;
 
-	     for(k=0;k<4;k++)     
-		 JJ[i][j]+=J[i][k]*iJ[k][j];
-	   }
-       }
+	      for(k=0;k<4;k++)     
+		JJ[i][j]+=J[i][k]*iJ[k][j];
+	    }
+	}
 
-    if(verbose) print_tensor(JJ);
+      if(verbose) print_tensor(JJ);
 	 
-    getchar();
+      if(verbose) getchar();
 
 
       //applying corrections
@@ -1299,7 +1299,30 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		}
 	    }
 
-	  //print_4vector(xxx);
+	  if(verbose)
+	    {
+	      printf("\nsub> trying with xi=%e\n",xiapp);
+	      print_4vector(xxx);
+	    }
+
+	  //check if momenta overshoot
+	  if(whichprim==RAD)
+	    {
+	      for(i=1;i<4;i++)
+		{
+		  if((xxx[i]-pp0[UU+i])*(pp0[EE0+i]-pp0[UU+i])<0.) //rad momentum on the other side of the initial gas momentum
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
+		      xxx[i]=pp0[UU+i];
+		    }
+		  if((pp0[EE0+i]>pp0[UU+i] && xxx[i]>pp0[EE0+i]) ||
+		     (pp0[EE0+i]<pp0[UU+i] && xxx[i]<pp0[EE0+i])) //rad momentum went in the wrong direction
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
+		      xxx[i]=pp0[EE0+i];
+		    }
+		}
+	    }
 
 	  //update primitives
 	  for(i=0;i<4;i++)
@@ -1338,14 +1361,22 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 	      u2pret=u2p_rad(uu,pp,geom,corr);
 	    }    
-	  
-	  //if(xxx[0]<0.) printf("neg\n");
+
+	  //check if energy density positive and the inversion worked using U2P_HOT
 	  if(xxx[0]>0. && u2pret>=0) break;
 
-	  //decrease the applied fraction
-	  xiapp/=2.; 
+	  //if not decrease the applied fraction
+	  if(xxx[0]<=0.)
+	    {
+	      xiapp*=ppp[sh]/(ppp[sh]+fabs(xxx[0]));
+	      xiapp/=2.;
+	    }
+	  else //u2p error only
+	    {
+	      xiapp/=2.; 
+	    }
 
-	  if(xiapp<1.e-7) 
+	  if(xiapp<1.e-20) 
 	    {
 	      printf("damped unsuccesfully in implicit_4dprim\n");
 	      return -1;	      
@@ -1749,10 +1780,10 @@ test_solve_implicit_lab()
   int verbose=1;
   int params[3];
   
-  solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
+  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_FFEQ;
+  params[2]=RADIMPLICIT_LABEQ;
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   /*
