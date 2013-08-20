@@ -1109,7 +1109,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   params[0]=whichprim;
 
   //override the given parameters
-  //params[0]=MHD;
+  params[0]=MHD;
   //energy or entropy equation to solve
   //params[1]=RADIMPLICIT_ENTROPYEQ;
   //params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1324,7 +1324,23 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		    }
 		}
 	    }
-	  //TODO: MHD
+	  if(whichprim==MHD)
+	    {
+	      for(i=1;i<4;i++)
+		{
+		  if((xxx[i]-pp0[EE0+i])*(pp0[UU+i]-pp0[EE0+i])<0.) //mhd momentum on the other side of the initial rad momentum
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 3 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
+		      xxx[i]=pp0[EE0+i];
+		    }
+		  if((pp0[UU+i]>pp0[EE0+i] && xxx[i]>(1.+EPS)*pp0[UU+i]) ||
+		     (pp0[UU+i]<pp0[EE0+i] && xxx[i]<(1.-EPS)*pp0[UU+i])) //mhd momentum went in the wrong direction
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 4 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
+		      xxx[i]=pp0[UU+i];
+		    }
+		}
+	    }
 
 	  //update primitives
 	  for(i=0;i<4;i++)
