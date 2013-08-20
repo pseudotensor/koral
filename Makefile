@@ -1,5 +1,5 @@
 CC=gcc 
-CFLAGS=-O3 -fopenmp
+CFLAGS=-O3 -fopenmp -std=gnu99
 LIBS=-lm -lgsl -lgslcblas -lsilo -lrt
 RM=/bin/rm
 

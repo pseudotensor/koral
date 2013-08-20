@@ -271,6 +271,7 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 #define delta(i,j) (i==j ? 1 : 0)
 
 //fileop.c
+int fprint_restartfile(ldouble t, char* folder);
 int fprint_simplecart(ldouble t, char* folder);
 int fread_restartfile(int,ldouble*);
 int fprint_gridfile(char* folder);
@@ -298,7 +299,8 @@ struct rad_parameters
   ldouble f;
   ldouble x,y,z;
 };
-int calc_hd_nu_shearviscosity(ldouble *pp,void* ggg,ldouble S[][4],ldouble*,ldouble*);
+int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss);
+int calc_hd_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret);
 int calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
 int calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
 
@@ -363,6 +365,13 @@ int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int);
 int calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4],int);
 int dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_KS2MKS1(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_MKS12KS(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_MCYL12CYL(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_CYL2MCYL1(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_MKER12KER(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_KER2MKER1(ldouble *xx, ldouble dxdx[][4]);
+
 int calc_g(ldouble*,ldouble[][5]);
 int calc_G(ldouble*,ldouble[][5]);
 int calc_Krzysie(ldouble*,ldouble[][4][4]);
@@ -430,6 +439,7 @@ int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
 int p2u_rad(ldouble *p,ldouble *u,void*);
 
 //frames.c
+int trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1,void* ggg2);
 int boost2_lab2rf(ldouble A1[4],ldouble A2[4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5]);
 int boost22_rf2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldouble GG[][5]);
 int boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldouble GG[][5]);
@@ -493,6 +503,10 @@ int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);
 
 
 //rad.c
+int solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* deltas,int verbose);
+int apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4);
+int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5], ldouble *del4);
+int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5],ldouble tlo[][4], ldouble tup[][4],ldouble *pp);
 ldouble calc_LTE_temp(ldouble *pp,void *ggg);
 int test_solve_implicit_lab();
 int test_jon_solve_implicit_lab();
