@@ -77,11 +77,9 @@ main(int argc, char **argv)
   copy_u(1.,p,pinit);
 
 
-  //tests
+  //tests of implicit solver
   test_solve_implicit_lab(); exit(0);
-
-
-
+  
   //evolves
   solve_the_problem(tstart);
 

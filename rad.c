@@ -1193,9 +1193,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	}
 
 	  
+      //criterion of convergence on the error
       if(err<CONV)
 	{
-	  if(verbose) printf("success ===\n");
+	  if(verbose) printf("\n === success (error) ===\n");
 	  break;
 	}
 
@@ -1218,7 +1219,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      del=EPS*ppp[sh];
 
 	      //EPS of the geometrical mean
-	      del=EPS*sqrt(ppp[EE0]*ppp[UU]);
+	      //del=EPS*sqrt(ppp[EE0]*ppp[UU]);
 	    }
 	  else //decreasing velocity
 	    {
@@ -1315,14 +1316,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
 		      xxx[i]=pp0[UU+i];
 		    }
-		  if((pp0[EE0+i]>pp0[UU+i] && xxx[i]>pp0[EE0+i]) ||
-		     (pp0[EE0+i]<pp0[UU+i] && xxx[i]<pp0[EE0+i])) //rad momentum went in the wrong direction
+		  if((pp0[EE0+i]>pp0[UU+i] && xxx[i]>(1.+EPS)*pp0[EE0+i]) ||
+		     (pp0[EE0+i]<pp0[UU+i] && xxx[i]<(1.-EPS)*pp0[EE0+i])) //rad momentum went in the wrong direction
 		    {
 		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
 		      xxx[i]=pp0[EE0+i];
 		    }
 		}
 	    }
+	  //TODO: MHD
 
 	  //update primitives
 	  for(i=0;i<4;i++)
@@ -1635,29 +1637,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       */
 
 
-      /*
-      //test convergence
-      for(i=0;i<4;i++)
-	{
-	  f3[i]=(pp[i+sh]-ppp[i+sh]);
-	  if(i==0)
-	    if(dominates==RAD)
-	      f3[i]=fabs(f3[i]/ppp[EE0]);
-	    else
-	      f3[i]=fabs(f3[i]/ppp[UU]);
-	  else
-	    f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));		  
-	}
-      //override - convergence with respect to the iterated quantity
+     
+      //criterion of convergence on relative change of quantities
       f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
+      for(i=1;i<4;i++)
+	f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));		  
 	  
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	{
-	  if(verbose) printf("success ===\n");
+	  if(verbose) printf("\n === success (rel.change) ===\n");
 	  break;
-	}
-      */
-	  
+	}     
+
       if(iter>MAXITER)
 	{
 	  if(verbose || 1)
