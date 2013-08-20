@@ -1132,7 +1132,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
  
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-8;
+  ldouble CONV = 1.e-6;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
@@ -1319,7 +1319,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		  if((pp0[EE0+i]>pp0[UU+i] && xxx[i]>(1.+EPS)*pp0[EE0+i]) ||
 		     (pp0[EE0+i]<pp0[UU+i] && xxx[i]<(1.-EPS)*pp0[EE0+i])) //rad momentum went in the wrong direction
 		    {
-		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
+		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
 		      xxx[i]=pp0[EE0+i];
 		    }
 		}
@@ -1365,7 +1365,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }    
 
 	  //check if energy density positive and the inversion worked using U2P_HOT
-	  if(xxx[0]>0. && u2pret>=0) break;
+	  if(xxx[0]>0. && u2pret>=-1) break;
 
 	  //if not decrease the applied fraction
 	  if(xxx[0]<=0.)
