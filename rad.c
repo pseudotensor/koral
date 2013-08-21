@@ -1192,6 +1192,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       //values at base state
       if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err)<0) 
 	{
+	  printf("base state\n");
 	  return -1;	  
 	}
 
@@ -1214,12 +1215,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    {
 	      //uses EPS of the dominating quantity
 	      if(dominates==RAD)
-		del=EPS*ppp[EE0];
+		del=-EPS*ppp[EE0];
 	      else
-		del=EPS*ppp[UU];	   
+		del=-EPS*ppp[UU];	   
 	      
 	      //EPS of the iterated quantity
-	      del=EPS*ppp[sh];
+	      del=-EPS*ppp[sh]; //minus avoids u2p_mhd errors when working on radiative
 
 	      //EPS of the geometrical mean
 	      //del=EPS*sqrt(ppp[EE0]*ppp[UU]);
@@ -1238,6 +1239,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  if(fret<0) 
 	    {
+	      printf("Jac mid-state (%d)\n",j);
 	      return -1;
 	    }
   
@@ -1479,6 +1481,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
+
   //**** 1st ****
   //4dprim on energy eq. with overshooting check
   params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1533,6 +1536,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[3]=1.; //do momentum overshooting check
   
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) return 0;
+
+  //**** 5th ****
+  //finally desperately try 4dcon solver
+  ret = solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 
   if(ret==0) return 0;
 
