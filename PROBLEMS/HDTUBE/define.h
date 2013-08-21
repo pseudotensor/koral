@@ -1,5 +1,5 @@
 #define MYCOORDS MINKCOORDS
-#define NX 200
+#define NX 500
 #define NY 1
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter

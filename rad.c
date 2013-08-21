@@ -1109,7 +1109,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   params[0]=whichprim;
 
   //override the given parameters
-  params[0]=MHD;
+  //params[0]=MHD;
   //energy or entropy equation to solve
   //params[1]=RADIMPLICIT_ENTROPYEQ;
   //params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1260,8 +1260,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  break;
 	}
 
-      if(verbose) print_tensor(J);
-      if(verbose) print_tensor(iJ);
+      //if(verbose) print_tensor(J);
+      //if(verbose) print_tensor(iJ);
 
       int k,l;
       ldouble JJ[4][4];
@@ -1276,7 +1276,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	}
 
-      if(verbose) print_tensor(JJ);
+      //if(verbose) print_tensor(JJ);
 	 
       if(verbose) getchar();
 
@@ -1405,7 +1405,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       //criterion of convergence on relative change of quantities
       f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
       for(i=1;i<4;i++)
-	f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));		  
+	{
+	  f3[i]=pp[i+sh]-ppp[i+sh];
+	  f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
+	}
+
+      if(verbose) print_4vector(f3);
 	  
       if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
 	{
