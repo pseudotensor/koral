@@ -51,6 +51,7 @@ for(iz=0;iz<NZ;iz++)
 		ptot+=prad;
 		//if(geom.ix==NX/2 && geom.iy==NY/2) printf("%e %e %e\n",pgas,prad,ptot);
 
+#pragma omp critical
 		if(pmag/ptot>maxbeta) maxbeta=pmag/ptot;
 	      }
 	    #endif
