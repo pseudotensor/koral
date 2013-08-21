@@ -51,6 +51,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_roots.h>
@@ -68,6 +73,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_multiroots.h>
+
+
 
 #ifdef PR_DEFS
 #include PR_DEFS
@@ -145,6 +152,7 @@ ldouble calc_lum(ldouble radius);
 ldouble calc_photloc(int ix);
 
 //misc.c
+int my_clock_gettime(void* tsptr);
 int print_NVvector(ldouble v[4]);
 int print_tensor(ldouble T[][4]);
 int print_metric(ldouble T[][5]);

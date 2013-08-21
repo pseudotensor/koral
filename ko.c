@@ -158,9 +158,8 @@ solve_the_problem(ldouble tstart)
       copy_u(1.,p,ptm1); ttm1=t;             
       
       //initial time mark
-#ifndef SKIP_CLOCK
-      clock_gettime(CLOCK_REALTIME,&temp_clock);
-#endif
+      my_clock_gettime(&temp_clock);
+
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
 
@@ -247,10 +246,9 @@ solve_the_problem(ldouble tstart)
       //**********************************************************************
    
 
-#ifndef SKIP_CLOCK
       //time mark
-      clock_gettime(CLOCK_REALTIME,&temp_clock);    
-#endif
+      my_clock_gettime(&temp_clock);    
+
       ldouble end_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
      
       //performance
