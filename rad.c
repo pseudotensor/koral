@@ -1101,13 +1101,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   /******************************************/
   /******************************************/
   //choice of primitives to evolve
-  int whichprim;
+  int whichprim,do_mom_over;
   if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
     whichprim=RAD;
   else
     whichprim=MHD; 
   
-  params[0]=whichprim;
+  do_mom_over =(int)params[3];
+
+  params[0]=whichprim;  
 
   //override the given parameters
   //params[0]=MHD;
@@ -1309,7 +1311,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  mom_over_flag=0;
 	  //check if momenta overshoot
-	  if(whichprim==RAD)
+	  if(whichprim==RAD && do_mom_over)
 	    {
 	      for(i=1;i<4;i++)
 		{
@@ -1328,7 +1330,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		    }
 		}
 	    }
-	  if(whichprim==MHD)
+	  if(whichprim==MHD && do_mom_over)
 	    {
 	      for(i=1;i<4;i++)
 		{
@@ -1375,7 +1377,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
 	      u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
 	      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
-	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+
 	    }
 	  if(whichprim==MHD)
 	    {
@@ -1389,6 +1392,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //check if energy density positive and the inversion worked using U2P_HOT
 	  if(xxx[0]>0. && u2pret>=-1) break;
 
+	  
 	  //if not decrease the applied fraction
 	  if(xxx[0]<=0.)
 	    {
@@ -1471,40 +1475,54 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //inversion to get the right pp[]
   //(u2p checks against proper entropy evolution and uses entropy inversion if necessary
 
-  int corr[2],fixup[2],params[3],ret;
+  int corr[2],fixup[2],params[4],ret;
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
-  //1d solver in temperatures only
-  //ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
-  //(ret<0) solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
-  
-  //4d solver starting from the solution satisfying above
-
+  //**** 1st ****
+  //4dprim on energy eq. with overshooting check
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-
-  //deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;return 0;
-
+  params[3]=1.;
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  if(ret<0)
+  if(ret==0) return 0;
+ 
+  //**** 2nd ****
+  //4dprim on energy eq. without overshooting check
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  params[3]=0.;
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) return 0;
+  
+  //**** 3rd ****
+  //1d solver in temperatures first, then energy with overshooting
+  ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,1,pp);
+
+  if(ret==0)
     {
-      return -1;
-    }
-
-  /*
-    if(ret<0)
-{
-      params[1]=RADIMPLICIT_ENTROPYEQ;
+      params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LABEQ;
-      ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
-      if(ret<0) return -1;
-    }
-  */
-  return 0;
+      params[3]=1.; //do momentum overshooting check
 
-  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+      ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+    }
+  
+  if(ret==0) return 0;
+
+  //**** 4th ****
+  //entropy equation instead of energy equation
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[2]=RADIMPLICIT_FFEQ;
+  params[3]=1.; //do momentum overshooting check
+  
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) return 0;
+
+  return -1;
 }
 
 
@@ -1535,6 +1553,8 @@ test_solve_implicit_lab()
   iv=fscanf(in,"%lf ",&geom.gdet);
   fclose(in);
 
+  geom.ix=geom.iy=geom.iz=0;
+
   /*
   print_Nvector(uu,NV);
   print_Nvector(pp,NV);
@@ -1546,19 +1566,21 @@ test_solve_implicit_lab()
  
   ldouble deltas[4];
   int verbose=1;
-  int params[3];
+  int params[4];
   
-  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
+  //  solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
+  params[3]=0.; //mom.overshoot check
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  /*
+  
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
+  params[3]=1.;
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
-  */
+  
 }
 
 ///**********************************************************************
@@ -1668,11 +1690,12 @@ test_jon_solve_implicit_lab()
    
       ldouble deltas[4];
       int verbose=1;
-      int params[3];
+      int params[4];
       
       solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
       params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LABEQ;
+      params[3]=1.;
       solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
       //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 

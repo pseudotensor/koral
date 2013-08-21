@@ -243,8 +243,8 @@ int set_xb(int,int,ldouble);
 //end of emf
 
 //ldouble get_u(ldouble*,int,int,int,int);
-#define get_cflag(iflag,ix,iy,iz) (cellflag[iflag + (iX(ix)+NG)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS])
-#define set_cflag(iflag,ix,iy,iz,val) cellflag[iflag + (iX(ix)+NG)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS]=val
+#define get_cflag(iflag,ix,iy,iz) (cellflag[iflag + (iX(ix)+NGCX)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS])
+#define set_cflag(iflag,ix,iy,iz,val) cellflag[iflag + (iX(ix)+NGCX)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS]=val
 #define get_u(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV])
 //int set_u(ldouble*,int,int,int,int,ldouble);
 #define set_u(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV]=val

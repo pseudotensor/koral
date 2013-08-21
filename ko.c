@@ -70,15 +70,14 @@ main(int argc, char **argv)
 #include PR_POSTINIT
 #endif
 
+  //tests of implicit solver
+  //test_solve_implicit_lab(); exit(0);
+
   //prepares files
   fprint_openfiles("dumps");
   
   //copies initial primitives to pinit
   copy_u(1.,p,pinit);
-
-
-  //tests of implicit solver
-  //test_solve_implicit_lab(); exit(0);
   
   //evolves
   solve_the_problem(tstart);

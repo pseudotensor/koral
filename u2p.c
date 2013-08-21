@@ -138,6 +138,7 @@ calc_primitives_local(int ix,int iy,int iz,ldouble *pp)
 int
 u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 {
+
   struct geometry *geom
    = (struct geometry *) ggg;
 
@@ -183,7 +184,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
     ppold[iv]=pp[iv];
 
   u2pret=u2p_solver(uu,pp,ggg,U2P_HOT,0); 
-  
+
   if(u2pret==0)
     {
       //check if u2p_hot faild by making entropy decrease
@@ -194,13 +195,13 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
       ldouble s2=exp(pp[ENTR]/pp[RHO]);
       if(s2/s1 < 0.9)
       {  
-	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
 	//printf("\n PROBLEM DETECTED IN ENTROPY AT %d %d - %e!\n",geom->ix,geom->iy,s2/s1);getchar();
+	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
 	u2pret=-1;
       }
     }
   
-  
+
   //************************************
   if(u2pret<0) 
     {

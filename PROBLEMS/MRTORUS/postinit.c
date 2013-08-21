@@ -1,4 +1,4 @@
-//scales magnetic pressure so MAXBETA = pmag/pgas
+//scales magnetic pressure so MAXBETA = pmag/(pgas+prad)
 int ix,iy,iz;
 
 #ifdef MAGNFIELD
@@ -14,21 +14,46 @@ for(iz=0;iz<NZ;iz++)
 	    ldouble pp[NV],uu[NV];
 	    struct geometry geom;
 	    fill_geometry(ix,iy,iz,&geom);
+
+	    struct geometry geomBL;
+	    fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+ 
 	    int iv;
+
+	    //donut formulae
+	    ldouble podpierd=-(geomBL.GG[0][0]-2.*ELL*geomBL.GG[0][3]+ELL*ELL*geomBL.GG[3][3]);
+	    ldouble ut=-1./sqrt(podpierd);
+	    ut/=UTPOT; //rescales rin
+	    ut*=1.001; //not to account for suface
 
 	    PLOOP(iv)
 	      pp[iv]=get_u(p,iv,ix,iy,iz);
-	    
-	    ldouble pgas=GAMMAM1*pp[UU];
 
 	    ldouble bcon[4],bcov[4],bsq,pmag;
 	    calc_bcon_prim(pp,bcon,&geom);
 	    indices_21(bcon,bcov,geom.gg); 
 	    bsq = dot(bcon,bcov);
 	    pmag = bsq/2.;
+	    
+	    ldouble pgas=GAMMAM1*pp[UU];
+	    ldouble ptot=pgas;
+	    #ifdef RADIATION
+	    if(ut<-1 || podpierd<0.) //outside donut
+	      {
+		;
+	      }
+	    else
+	      {
+		ldouble Rtt,Ehat,ucon[4],prad;
+		calc_ff_Rtt(pp,&Rtt,ucon,&geom);
+		Ehat=-Rtt; 
+		prad=Ehat/3.;
+		ptot+=prad;
+		//if(geom.ix==NX/2 && geom.iy==NY/2) printf("%e %e %e\n",pgas,prad,ptot);
 
-	    if(pmag/pgas>maxbeta) maxbeta=pmag/pgas;
-
+		if(pmag/ptot>maxbeta) maxbeta=pmag/ptot;
+	      }
+	    #endif
 	  }
       }
   }

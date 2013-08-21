@@ -91,7 +91,7 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
 
 #ifdef RADIATION
     pp[UU]=my_max(uint,ppback[1]);
-    pp[EE0]=my_max(E,ppback[6]);
+    pp[EE0]=my_max(E,ppback[EE0]);
 
     pp[FX0]=Fx;
     pp[FY0]=Fy;

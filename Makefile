@@ -1,5 +1,5 @@
 CC=gcc 
-CFLAGS=-O3 -fopenmp  -L/usr/local/lib -I/usr/local/include 
+CFLAGS=-g -O3 -fopenmp -L/usr/local/lib -I/usr/local/include 
 LIBS=-lm -lgsl -lgslcblas -lsilo
 RM=/bin/rm
 
