@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 44
+#define RESTART
+#define RESTARTNUM 57
 
 /************************************/
 //radiation choices
@@ -65,21 +65,13 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.4-MKS1R0))
 #define MAXX (log(40.-MKS1R0))
-#define NX 160
-#define NY 120
-#define NZ 1
-
-#else //Schwarzschild
-#define MYCOORDS SCHWCOORDS
-#define MINX (1.5*r_horizon_BL(BHSPIN))
-#define MAXX (25.3)
-#define NX 64
-#define NY 32
+#define NX 60
+#define NY 60
 #define NZ 1
 #endif
 
-#define MINY (0.01*Pi/2.)
-#define MAXY (Pi-0.01*Pi/2.)
+#define MINY (0.05*Pi/2.)
+#define MAXY (Pi-0.05*Pi/2.)
 //#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
@@ -109,7 +101,7 @@
 #define URIN (0.)
 #define KKK 3000.
 #define UTPOT .965
-#define DTOUT1 5.e1
+#define DTOUT1 1.e1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

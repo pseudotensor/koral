@@ -1,5 +1,5 @@
 CC=gcc 
-CFLAGS=-O3 -fopenmp -L/n/home07/asadowski/Lib/lib -I/n/home07/asadowski/Lib/include
+CFLAGS=-O3 -fopenmp -L/n/home07/asadowski/Lib/lib -I/n/home07/asadowski/Lib/include -std=gnu99
 LIBS=-lm -lgsl -lgslcblas -lsilo 
 RM=/bin/rm
 

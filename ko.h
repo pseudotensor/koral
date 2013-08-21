@@ -548,12 +548,16 @@ int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble
 int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose);
 
 //magn.c
+int adjust_fluxcttoth_emfs();
 void calc_bcon_4vel(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon); 
 int calc_BfromA();
 ldouble calc_divB(int ix,int iy,int iz);
 void calc_bcon_prim(double *pp, double *bcon, void* ggg);
 void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg);
+int flux_ct();
 
+//silo.c
+int fprint_silofile(ldouble time, int num, char* folder);
 
 #include "mnemonics.h"
 

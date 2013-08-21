@@ -70,7 +70,7 @@
 //64* MAGDONUT - MHD donut with poloidal magnetic fields
 //65* MRTORUS - RMHD torus with radiation
 
-#define PROBLEM 59
+#define PROBLEM 65
 
 #if(PROBLEM==65)
 

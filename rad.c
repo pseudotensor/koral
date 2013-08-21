@@ -979,6 +979,7 @@ int
 solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params)
 {
   int i1,i2,i3,iv,i,j;
+  int mom_over_flag;
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3[4],xxx[4],err;
@@ -1306,6 +1307,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      print_4vector(xxx);
 	    }
 
+	  mom_over_flag=0;
 	  //check if momenta overshoot
 	  if(whichprim==RAD)
 	    {
@@ -1315,12 +1317,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		    {
 		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
 		      xxx[i]=pp0[UU+i];
+		      mom_over_flag=1;
 		    }
 		  if((pp0[EE0+i]>pp0[UU+i] && xxx[i]>(1.+EPS)*pp0[EE0+i]) ||
 		     (pp0[EE0+i]<pp0[UU+i] && xxx[i]<(1.-EPS)*pp0[EE0+i])) //rad momentum went in the wrong direction
 		    {
 		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
 		      xxx[i]=pp0[EE0+i];
+		      mom_over_flag=1;
 		    }
 		}
 	    }
@@ -1332,12 +1336,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		    {
 		      if(verbose) printf("overshoot %d-momentum type 3 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
 		      xxx[i]=pp0[EE0+i];
+		      mom_over_flag=1;
 		    }
 		  if((pp0[UU+i]>pp0[EE0+i] && xxx[i]>(1.+EPS)*pp0[UU+i]) ||
 		     (pp0[UU+i]<pp0[EE0+i] && xxx[i]<(1.-EPS)*pp0[UU+i])) //mhd momentum went in the wrong direction
 		    {
 		      if(verbose) printf("overshoot %d-momentum type 4 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
 		      xxx[i]=pp0[UU+i];
+		      mom_over_flag=1;
 		    }
 		}
 	    }
@@ -1412,7 +1418,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
       if(verbose) print_4vector(f3);
 	  
-      if(f3[0]<CONV && f3[1]<CONV && f3[2]<CONV && f3[3]<CONV)
+      ldouble CONVREL=CONV;
+      if(mom_over_flag==1) CONVREL*=100.; //looser criterion when keeps overshooting 
+      if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL)
 	{
 	  if(verbose) printf("\n === success (rel.change) ===\n");
 	  break;
