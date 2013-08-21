@@ -1317,6 +1317,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    {
 	      for(i=1;i<4;i++)
 		{
+		  //TODO: relax the criterion a bit because of the magnetic field!
 		  if((xxx[i]-pp0[UU+i])*(pp0[EE0+i]-pp0[UU+i])<0.) //rad momentum on the other side of the initial gas momentum
 		    {
 		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
