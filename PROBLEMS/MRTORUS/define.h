@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 57
+#define RESTART
+#define RESTARTNUM 25
 
 /************************************/
 //radiation choices
