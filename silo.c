@@ -21,7 +21,6 @@ int fprint_silofile(ldouble time, int num, char* folder)
   ldouble *nodez;
   ldouble *coordinates[3];/* The array of coordinatearrays */
   int dimensions[3];/* The number of nodes */
-
    
   /* Create the Silo file */
   file = DBCreate(bufor, DB_CLOBBER, DB_LOCAL, NULL,DB_PDB);
@@ -49,6 +48,7 @@ int fprint_silofile(ldouble time, int num, char* folder)
 
   /* get the primitives */
   ldouble *rho = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *uint = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *temp = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   #ifdef TRACER
   ldouble *tracer = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -59,6 +59,7 @@ int fprint_silofile(ldouble time, int num, char* folder)
   ldouble *vz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 
   #ifdef MAGNFIELD
+  ldouble *bsq = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *By = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -112,9 +113,12 @@ int fprint_silofile(ldouble time, int num, char* folder)
 	      //scalars
 	      #ifndef CGSOUTPUT
 	      rho[nodalindex]=pp[RHO];
+	      uint[nodalindex]=pp[UU];
 	      #else
 	      rho[nodalindex]=rhoGU2CGS(pp[RHO]);
+	      uint[nodalindex]=endenGU2CGS(pp[UU]);
 	      #endif
+
 	      temp[nodalindex]=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 	      
 	      #ifdef TRACER
@@ -154,8 +158,10 @@ int fprint_silofile(ldouble time, int num, char* folder)
 	  
 	      #ifdef MAGNFIELD
 	      //magnetic field
-	      ldouble bcon[4];
+	      ldouble bcon[4],bcov[4];
 	      calc_bcon_prim(pp,bcon,&geomout);
+	      indices_21(bcon,bcov,geomout.gg); 
+	      bsq[nodalindex] = dot(bcon,bcov);
 	      
 	      //to ortonormal	      
 	      trans2_cc2on(bcon,bcon,geomout.tup);
@@ -291,16 +297,28 @@ int fprint_silofile(ldouble time, int num, char* folder)
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 
+  DBPutQuadvar1(file, "uint","mesh1", uint,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
   DBPutQuadvar1(file, "temp","mesh1", temp,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
+
   #ifdef TRACER
   DBPutQuadvar1(file, "tracer","mesh1", tracer,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   #endif
+
   #ifdef RADIATION
-  DBPutQuadvar1(file, "Erad","mesh1", Erad,
+  DBPutQuadvar1(file, "erad","mesh1", Erad,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  #endif
+
+  #ifdef MAGNFIELD
+  DBPutQuadvar1(file, "bsq","mesh1", bsq,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   #endif
@@ -367,6 +385,7 @@ int fprint_silofile(ldouble time, int num, char* folder)
   free(nodez);
 
   free(rho);
+  free(uint);
   free(temp);
   #ifdef TRACER
   free(tracer);
@@ -380,6 +399,7 @@ int fprint_silofile(ldouble time, int num, char* folder)
   #endif
 
   #ifdef MAGNFIELD
+  free(bsq);
   free(Bx);
   free(By);
   free(Bz);
