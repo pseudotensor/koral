@@ -1555,13 +1555,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=1;
-  if(verbose) 
-    {
-      printf("trying 1st:\n");
-      print_NVvector(uu);
-      print_NVvector(pp);
-      getchar();
-    }
+
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   if(ret==0) return 0;
