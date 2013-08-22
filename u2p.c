@@ -407,24 +407,24 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   if(pp[TRA]<0.) {pp[TRA]=0.; ret=-1; if(verbose) printf("hd_floors CASE TRA 1\n");}
 #endif
 
-  //absolute rho
+  //**********************************************************************
+  //rho too small
   if(pp[0]<RHOFLOOR) 
     {
       if(verbose || 1) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix,geom->iy,pp[0]);
       pp[0]=RHOFLOOR; ret=-1; 
     }
 
-  //uint/rho ratios  
-
+  //**********************************************************************
   //too cold
   if(pp[1]<UURHORATIOMIN*pp[0]) 
     {
       if(verbose) {printf("hd_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);}//getchar();}
       pp[1]=UURHORATIOMIN*pp[0]; //increasing uint
       ret=-1;
-
     }
 
+  //**********************************************************************
   //to hot
   if(pp[1]>UURHORATIOMAX*pp[0]) 
     {
@@ -434,6 +434,29 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       if(verbose) printf("hd_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);
     }
 
+  //**********************************************************************
+  //too fast
+  if(VELPRIM==VELR) 
+    {
+      ldouble qsq=0.;
+      int i,j;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=pp[UU+i]*pp[UU+j]*gg[i][j];
+      ldouble gamma2=1.+qsq;
+      if(gamma2>GAMMAMAXHD*GAMMAMAXHD)
+	{
+	  ldouble qsqmax=GAMMAMAXHD*GAMMAMAXHD-1.;
+	  ldouble A=sqrt(qsqmax/qsq);
+	  for(j=1;j<4;j++)
+	    pp[UU+i]*=A;
+	  ret=-1;
+	  if(verbose || 1) printf("hd_floors CASE 4 at (%d,%d,%d): %e\n",geom->ix,geom->iy,geom->iz,sqrt(gamma2));
+	}
+    }
+  //TODO: implement checks for other VELPRIM
+
+  //**********************************************************************
   //too magnetized
 #ifdef MAGNFIELD
   ldouble ucond[4],ucovd[4];
@@ -447,26 +470,12 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   indices_21(bcond,bcovd,gg); 
   magpre = dot(bcond,bcovd)/2.;
   
-  /*
-  if(magpre>B2UURATIOMAX*pp[UU]) 
-    {
-    ldouble fd=sqrt(B2UURATIOMAX*pp[UU]/magpre);
-      pp[B1]*=fd;
-      pp[B2]*=fd;
-      pp[B3]*=fd;
-        
-      ret=-1;      
-      if(verbose) printf("mag_floors CASE 1 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[1],magpre);
-    }
-  */
-
   if(magpre>B2RHORATIOMAX*pp[RHO]) 
     {
       pp[RHO]*=magpre/(B2RHORATIOMAX*pp[RHO]);
       ret=-1;      
       if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
     }
-
 #endif
 
 

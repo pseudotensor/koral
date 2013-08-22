@@ -1263,7 +1263,7 @@
 #endif
 
 #ifndef GAMMAMAXHD
-#define GAMMAMAXHD 1000.
+#define GAMMAMAXHD 100.
 #endif
 
 #ifndef GAMMAMAXRAD

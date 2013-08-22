@@ -111,7 +111,7 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
 
   if(u2pret<-1) 
     {
-      printf("implicit sub-sub-step failed\n");
+      //printf("implicit sub-sub-step failed\n");
       return -1; //allows for entropy but does not update conserved 
     }
 
@@ -1204,54 +1204,67 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  break;
 	}
 
-
+      ldouble del;
       //calculating approximate Jacobian
       for(j=0;j<4;j++)
 	{
-	  ldouble del;
-
 	  //one-way derivatives
-	  if(j==0)
-	    {
-	      //uses EPS of the dominating quantity
-	      if(dominates==RAD)
-		del=-EPS*ppp[EE0];
-	      else
-		del=-EPS*ppp[UU];	   
-	      
-	      //EPS of the iterated quantity
-	      del=-EPS*ppp[sh]; //minus avoids u2p_mhd errors when working on radiative
+	  //try both signs
+	  ldouble sign=-1.;
+	  for(;;)
+	  {
+	    if(j==0)
+	      {
+		//uses EPS of the dominating quantity
+		if(dominates==RAD)
+		  del=sign*EPS*ppp[EE0];
+		else
+		  del=sign*EPS*ppp[UU];	   
+		
+		//EPS of the iterated quantity
+		del=sign*EPS*ppp[sh]; //minus avoids u2p_mhd errors when working on radiative
 
-	      //EPS of the geometrical mean
-	      //del=EPS*sqrt(ppp[EE0]*ppp[UU]);
-	    }
-	  else //decreasing velocity
-	    {
+		//EPS of the geometrical mean
+		//del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
+	      }
+	    else //decreasing velocity
+	      {
 	      if(ppp[j+sh]>=0.)
-		del=-EPS; 
+		del=sign*EPS; 
 	      else
-		del=EPS;
-	    }
-
-	  pp[j+sh]=ppp[j+sh]+del;
+		del=-sign*EPS;
+	      }	    
+	    pp[j+sh]=ppp[j+sh]+del;
 	      
-	  int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params,&err);  
-
-	  if(fret<0) 
-	    {
-	      printf("Jac mid-state (%d)\n",j);
-	      return -1;
-	    }
+	    int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params,&err);  
+	    
+	    if(fret<0) 
+	      {
+		if(sign>0.) //already switched signs
+		  {	      
+		    printf("Jac mid-state (%d) both signs lead to trouble\n",j);
+		    return -1;
+		  }
+		else
+		  {
+		    printf("Jac mid-state (%d) trying the other one\n",j);
+		    pp[j+sh]=ppp[j+sh];
+		    sign*=-1.;
+		    continue;
+		  }
+	      }
   
-	  //Jacobian matrix component
-	  for(i=0;i<4;i++)
-	    {
-	      J[i][j]=(f2[i] - f1[i])/(pp[j+sh]-ppp[j+sh]);
-	    }
+	    //Jacobian matrix component
+	    for(i=0;i<4;i++)
+	      {
+		J[i][j]=(f2[i] - f1[i])/(pp[j+sh]-ppp[j+sh]);
+	      }
 
-	  pp[j+sh]=ppp[j+sh];
+	    pp[j+sh]=ppp[j+sh];
+	    break;
+	  }
 	}
-	  
+      
  
       //inversion
       if(inverse_44matrix(J,iJ)<0)
@@ -1314,30 +1327,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  mom_over_flag=0;
 	  //check if momenta overshoot
 	  ldouble ALLOWANCE=100.; //can overshoot ten times, no more
-	  if(whichprim==RAD && do_mom_over)
+	  ldouble mommin,mommax,momsep;
+	  if(do_mom_over)
 	    {
 	      for(i=1;i<4;i++)
 		{
-		  //TODO: relax the criterion a bit because of the magnetic field!
-		  /*
-		    if((xxx[i]-pp0[UU+i])*(pp0[EE0+i]-pp0[UU+i])<0.) //rad momentum on the other side of the initial gas momentum
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
-		      xxx[i]=pp0[UU+i];
-		      mom_over_flag=1;
-		    }
-		  if((pp0[EE0+i]>pp0[UU+i] && xxx[i]>(1.+EPS)*pp0[EE0+i]) ||
-		     (pp0[EE0+i]<pp0[UU+i] && xxx[i]<(1.-EPS)*pp0[EE0+i])) //rad momentum went in the wrong direction
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
-		      xxx[i]=pp0[EE0+i];
-		      mom_over_flag=1;
-		    }
-		  */
-		  
 		  //allowed brackets 
 		  //TODO: precalculate
-		  ldouble mommin,mommax,momsep;
 		  mommin=my_min(pp0[EE0+i],pp0[UU+i]);
 		  mommax=my_max(pp0[EE0+i],pp0[UU+i]);
 		  momsep=fabs(mommin-mommax);
@@ -1357,55 +1353,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		      xxx[i]=mommax;
 		      mom_over_flag=1;
 		    }
-
-		  /*
-		  if(pp0[EE0+i]>pp0[UU+i] && xxx[i]>ALLOWANCE*pp0[EE0+i])		     
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
-		      xxx[i]=ALLOWANCE*pp0[EE0+i];
-		      mom_over_flag=1;
-		    }
-		  if(pp0[EE0+i]<pp0[UU+i] && xxx[i]<1./ALLOWANCE*pp0[EE0+i])
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
-		      xxx[i]=1./ALLOWANCE*pp0[EE0+i];
-		      mom_over_flag=1;
-		    }
-		  if(pp0[EE0+i]>pp0[UU+i] && xxx[i]<1./ALLOWANCE*pp0[UU+i])		     
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 3 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
-		      xxx[i]=1./ALLOWANCE*pp0[UU+i];
-		      mom_over_flag=1;
-		    }
-		  if(pp0[EE0+i]<pp0[UU+i] && xxx[i]>ALLOWANCE*pp0[UU+i])
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 4 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
-		      xxx[i]=ALLOWANCE*pp0[UU+i];
-		      mom_over_flag=1;
-		    }
-		  */
 		}
 	    }
-	  if(whichprim==MHD && do_mom_over)
-	    {
-	      for(i=1;i<4;i++)
-		{
-		  if((xxx[i]-pp0[EE0+i])*(pp0[UU+i]-pp0[EE0+i])<0.) //mhd momentum on the other side of the initial rad momentum
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 3 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
-		      xxx[i]=pp0[EE0+i];
-		      mom_over_flag=1;
-		    }
-		  if((pp0[UU+i]>pp0[EE0+i] && xxx[i]>(1.+EPS)*pp0[UU+i]) ||
-		     (pp0[UU+i]<pp0[EE0+i] && xxx[i]<(1.-EPS)*pp0[UU+i])) //mhd momentum went in the wrong direction
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 4 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
-		      xxx[i]=pp0[UU+i];
-		      mom_over_flag=1;
-		    }
-		}
-	    }
-
+	
 	  //update primitives
 	  for(i=0;i<4;i++)
 	    {
@@ -1551,25 +1501,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   if(ret==0) return 0;
- 
-  //**** 2nd ****
-  //4dprim on energy eq. without overshooting check
-  params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LABEQ;
-  params[3]=0.;
-  if(verbose) 
-    {
-      printf("trying 2nd:\n");
-      print_NVvector(uu);
-      print_NVvector(pp);
-      getchar();
-    }
-  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  if(ret==0) return 0;
-  
-  //**** 3rd ****
+  //**** 2nd ****
   //1d solver in temperatures first, then energy with overshooting
+  printf("trying 2nd at %d %d:\n",geom.ix,geom.iy);      
   ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
 
   if(ret==0)
@@ -1583,8 +1518,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   if(ret==0) return 0;
 
-  //**** 4th ****
+  //**** 3rd ****
   //entropy equation instead of energy equation
+  printf("trying 3rd at %d %d:\n",geom.ix,geom.iy);      
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
   params[3]=1.; //do momentum overshooting check
@@ -1593,9 +1529,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
-  //**** 5th ****
+  //**** 4th ****
   //finally desperately try 4dcon solver
-  ret = solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+   printf("trying 4th at %d %d:\n",geom.ix,geom.iy);      
+   ret = solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 
   if(ret==0) return 0;
 
@@ -1652,12 +1589,12 @@ test_solve_implicit_lab()
   params[3]=1.; //mom.overshoot check
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  /*
-  params[1]=RADIMPLICIT_ENTROPYEQ;
+  
+  params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_FFEQ;
   params[3]=1.;
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
-  */
+  
   
 }
 

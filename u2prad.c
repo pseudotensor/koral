@@ -1141,56 +1141,53 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 #ifndef MULTIRADFLUID  
   ldouble pp2[NV];
   int iv;
-  for(iv=0;iv<NV;iv++)
-    pp2[iv]=pp[iv];
-  //  ldouble Rij[4][4];
-  //  calc_Rij(pp2,ggg,Rij);
 
-  //to fluid frame to compare with gas
-  //prad_lab2ff(pp, pp2, ggg); does not work
+  //ff rad energy density
+  ldouble Rtt,Ehat,ugas[4],Eratio;
+  calc_ff_Rtt(pp,&Rtt,ugas,geom);
+  Ehat=-Rtt;
+  Eratio=pp[EE0]/Ehat; //ratio of energy densities in two frames
 
-  //absolute EE:
-  if(pp2[EE0]<ERADFLOOR) 
+  //absolute rad-frame EE:
+  if(pp[EE0]<ERADFLOOR) 
     {
-      if(verbose) printf("rhd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[0],pp2[EE0]);
-      pp2[EE0]=ERADFLOOR;
+      if(verbose) printf("rhd_floors CASE R0 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[EE0]);
+      pp[EE0]=ERADFLOOR;
       ret=-1;
      }
 
   #ifndef SKIPRADSOURCE
-   //Erf/rho ratios (inconsistent?)
-  if(pp2[EE0]<EERHORATIOMIN*pp2[0]) 
+
+  //Ehat/rho ratios 
+  if(Ehat<EERHORATIOMIN*pp[0]) 
     {
-      if(verbose) printf("hd_floors CASE R2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[0],pp2[EE0]);
-      pp2[EE0]=EERHORATIOMIN*pp2[0];
+      if(verbose) printf("hd_floors CASE R2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[EE0]);
+      pp[EE0]=Eratio*EERHORATIOMIN*pp[0];
       ret=-1;
     }
 
-  if(pp2[EE0]>EERHORATIOMAX*pp2[0]) 
+  if(Ehat>EERHORATIOMAX*pp[0]) 
     {
-      if(verbose) printf("hd_floors CASE R3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[0],pp2[EE0]);
-      pp2[0]=1./EERHORATIOMAX*pp2[EE0];
+      if(verbose) printf("hd_floors CASE R3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],Ehat);
+      pp[0]=1./EERHORATIOMAX*Ehat;
       ret=-1;
     }
   
-  //EE/uint ratios  
-  if(pp2[EE0]<EEUURATIOMIN*pp2[1]) 
+  //Ehat/uint ratios  
+  if(Ehat<EEUURATIOMIN*pp[1]) 
     {
-      if(verbose) printf("hd_floors CASE R4 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[1],pp2[EE0]);
-      pp2[EE0]=EEUURATIOMIN*pp2[1];
+      if(verbose) printf("hd_floors CASE R4 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[1],Ehat);
+      pp[EE0]=Eratio*EEUURATIOMIN*pp[1];
       ret=-1;
     }
 
-  if(pp2[EE0]>EEUURATIOMAX*pp2[1]) 
+  if(Ehat>EEUURATIOMAX*pp[1]) 
     {
-      if(verbose) printf("hd_floors CASE R5 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp2[1],pp2[EE0]);
-      pp2[1]=1./EEUURATIOMAX*pp2[EE0];
+      if(verbose) printf("hd_floors CASE R5 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[1],Ehat);
+      pp[1]=1./EEUURATIOMAX*Ehat;
       ret=-1;
     }
  #endif
- 
-  for(iv=0;iv<NV;iv++)
-    pp[iv]=pp2[iv];
 
   //prad_ff2lab(pp2, pp, ggg);  
 #endif
@@ -1199,144 +1196,4 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 
   return ret;
 
-  //skip checking velocities - primitives should work fine
-
-  int i,j,k,correct;
-  //velocities
-  ldouble a,b,c,delta;
-  ldouble u1[4],u2[4];
-  if(whichvel==VEL4)
-    {
-      //assumes u^t unknown
-      u1[0]=0.;
-      u1[1]=pp[2];
-      u1[2]=pp[3];
-      u1[3]=pp[4];
-      a=gg[0][0];
-      b=0.;
-      c=1.;
-      for(i=1;i<4;i++)
-	{
-	  b+=2.*u1[i]*gg[0][i];
-	  for(j=1;j<4;j++)
-	    {
-	      c+=u1[i]*u1[j]*gg[i][j];
-	    }
-	}
-      delta=b*b-4.*a*c;
-      correct=0;
-      if(delta<0.) 
-	correct=1;
-      else
-	{
-	  u1[0]=(-b-sqrt(delta))/2./a;
-	  if(u1[0]<1.) u1[0]=(-b+sqrt(delta))/2./a;
-	  if(u1[0]<1.) 
-	    correct=1;
-	}
-    }
-  else if(whichvel==VEL3)
-    {
-      //assumes u^t unknown
-      u1[0]=0.;
-      u1[1]=pp[2];
-      u1[2]=pp[3];
-      u1[3]=pp[4];
-      a=b=0.;
-      for(i=1;i<4;i++)
-	{
-	  a+=2.*u1[i]*gg[0][i];
-	  for(j=1;j<4;j++)
-	    {
-	      b+=u1[i]*u1[j]*gg[i][j];
-	    }
-	}
-
-      correct=0;
-      if(-1./(gg[0][0]+a+b)<0.)
-	correct=1;
-    }
-  else if(whichvel==VELR)
-    {
-      
-
-      u1[0]=0.;
-      u1[1]=pp[2];
-      u1[2]=pp[3];
-      u1[3]=pp[4];
-
-      ldouble qsq=0.;
-      for(i=1;i<4;i++)
-	for(j=1;j<4;j++)
-	  qsq+=u1[i]*u1[j]*gg[i][j];
-      ldouble gamma2=1.+qsq;
-      ldouble alpha2=-1./GG[0][0];
-      
-      correct=0;
-      if(gamma2/alpha2<0. || gamma2>GAMMAMAXHD*GAMMAMAXHD)
-	{
-	  if(verbose) 
-	    {
-	      printf("hd_floors CASE 4 %e %e %e\n",gamma2/alpha2,gamma2,GAMMAMAXHD*GAMMAMAXHD);
-	      print_4vector(u1);//getchar();
-	    }
-	  correct=1;
-	}
-    }
-  else
-    {
-      my_err("VEL not implemented in check_floors_hd()\n");
-    }
-
-  if(correct==0) return ret;
-
-  //converting to whichvel
-  conv_vels(u1,u1,whichvel,VEL4,gg,GG);
-
-  //correcting and imposing gammamax keeping the direction given by spatial components
-  ldouble Afac;
-  ldouble gammamaxhd=GAMMAMAXHD;
-
-  if(whichvel==VELR)
-    {
-      //convert spatial u1 to lab-frame
-      for(i=1;i<4;i++)
-	u1[i]=u1[i]+gammamaxhd*GG[0][i]/GG[0][0];
-    }
-
-  //normalizing to u^t=gammamaxhd
-  c=0.; b=0.;
-  for(i=1;i<4;i++)
-    {
-      a+=u1[i]*u1[i]*gg[i][i];
-      b+=2.*u1[i]*gg[0][i]*gammamaxhd;
-    }
-  c=gg[0][0]*gammamaxhd*gammamaxhd+1.;
-  delta=b*b-4.*a*c;
-      
-  Afac= (-b+sqrt(delta))/2./a;
-
-  u2[0]=gammamaxhd;
-  u2[1]=Afac*u1[1];
-  u2[2]=Afac*u1[2];
-  u2[3]=Afac*u1[3];
-
-   //converting to whichvel
-  conv_vels(u2,u2,VEL4,whichvel,gg,GG);
-
-  /*
-  print_4vector(u1);
-  print_4vector(u2);
-  printf("which: %d det: %e\n",whichvel,dot(u2,u1));
-  //  getchar();
-  */
-
-  //back to primitives
-  pp[2]=u2[1];
-  pp[3]=u2[2];
-  pp[4]=u2[3];
-
-  //to let the others know to correct conserved
-  ret=-1;
-  return ret;
 }

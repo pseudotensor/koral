@@ -64,14 +64,16 @@ main(int argc, char **argv)
   #ifdef VECPOTGIVEN
   calc_BfromA();
   #endif
+
+  #ifdef PR_POSTINIT
+  #include PR_POSTINIT
+  #endif
+
 #endif
 
-#ifdef PR_POSTINIT
-#include PR_POSTINIT
-#endif
 
   //tests of implicit solver
-  test_solve_implicit_lab(); exit(0);
+  //test_solve_implicit_lab(); exit(0);
 
   //prepares files
   fprint_openfiles("dumps");
