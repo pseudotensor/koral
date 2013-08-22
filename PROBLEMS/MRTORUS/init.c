@@ -51,6 +51,9 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
    {
     //ambient
     set_hdatmosphere(ppback,xxvec,gg,GG,0);
+#ifdef RADIATION
+    set_radatmosphere(ppback,xxvec,gg,GG,0);
+#endif
 
     ldouble h=-1./ut;
     ldouble eps=(h-1.)/GAMMA;

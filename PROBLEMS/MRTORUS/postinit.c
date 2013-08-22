@@ -49,7 +49,7 @@ for(iz=0;iz<NZ;iz++)
 		Ehat=-Rtt; 
 		prad=Ehat/3.;
 		ptot+=prad;
-		//if(geom.ix==NX/2 && geom.iy==NY/2) printf("%e %e %e\n",pgas,prad,ptot);
+		if(geom.ix==NX/2 && geom.iy==NY/2) printf("%e %e %e\n",pgas,prad,ptot);
 
 #pragma omp critical
 		if(pmag/ptot>maxbeta) maxbeta=pmag/ptot;
