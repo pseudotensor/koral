@@ -1313,12 +1313,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  mom_over_flag=0;
 	  //check if momenta overshoot
+	  ldouble ALLOWANCE=100.; //can overshoot ten times, no more
 	  if(whichprim==RAD && do_mom_over)
 	    {
 	      for(i=1;i<4;i++)
 		{
 		  //TODO: relax the criterion a bit because of the magnetic field!
-		  if((xxx[i]-pp0[UU+i])*(pp0[EE0+i]-pp0[UU+i])<0.) //rad momentum on the other side of the initial gas momentum
+		  /*
+		    if((xxx[i]-pp0[UU+i])*(pp0[EE0+i]-pp0[UU+i])<0.) //rad momentum on the other side of the initial gas momentum
 		    {
 		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
 		      xxx[i]=pp0[UU+i];
@@ -1331,6 +1333,57 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		      xxx[i]=pp0[EE0+i];
 		      mom_over_flag=1;
 		    }
+		  */
+		  
+		  //allowed brackets 
+		  //TODO: precalculate
+		  ldouble mommin,mommax,momsep;
+		  mommin=my_min(pp0[EE0+i],pp0[UU+i]);
+		  mommax=my_max(pp0[EE0+i],pp0[UU+i]);
+		  momsep=fabs(mommin-mommax);
+
+		  mommin=mommin - ALLOWANCE*momsep;
+		  mommax=mommax + ALLOWANCE*momsep;
+
+		  if(xxx[i]<mommin)
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],mommin);
+		      xxx[i]=mommin;
+		      mom_over_flag=1;
+		    }
+		  if(xxx[i]>mommax)
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],mommax);
+		      xxx[i]=mommax;
+		      mom_over_flag=1;
+		    }
+
+		  /*
+		  if(pp0[EE0+i]>pp0[UU+i] && xxx[i]>ALLOWANCE*pp0[EE0+i])		     
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
+		      xxx[i]=ALLOWANCE*pp0[EE0+i];
+		      mom_over_flag=1;
+		    }
+		  if(pp0[EE0+i]<pp0[UU+i] && xxx[i]<1./ALLOWANCE*pp0[EE0+i])
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],pp0[EE0+i]);
+		      xxx[i]=1./ALLOWANCE*pp0[EE0+i];
+		      mom_over_flag=1;
+		    }
+		  if(pp0[EE0+i]>pp0[UU+i] && xxx[i]<1./ALLOWANCE*pp0[UU+i])		     
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 3 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
+		      xxx[i]=1./ALLOWANCE*pp0[UU+i];
+		      mom_over_flag=1;
+		    }
+		  if(pp0[EE0+i]<pp0[UU+i] && xxx[i]>ALLOWANCE*pp0[UU+i])
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 4 (%e). resetting to %e\n",i,xxx[i],pp0[UU+i]);
+		      xxx[i]=ALLOWANCE*pp0[UU+i];
+		      mom_over_flag=1;
+		    }
+		  */
 		}
 	    }
 	  if(whichprim==MHD && do_mom_over)
@@ -1596,14 +1649,15 @@ test_solve_implicit_lab()
    
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=0.; //mom.overshoot check
+  params[3]=1.; //mom.overshoot check
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  
+  /*
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
   params[3]=1.;
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  */
   
 }
 
