@@ -449,9 +449,20 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 	  ldouble qsqmax=GAMMAMAXHD*GAMMAMAXHD-1.;
 	  ldouble A=sqrt(qsqmax/qsq);
 	  for(j=1;j<4;j++)
-	    pp[UU+i]*=A;
+	    pp[UU+j]*=A;
 	  ret=-1;
-	  if(verbose || 1) printf("hd_floors CASE 4 at (%d,%d,%d): %e\n",geom->ix,geom->iy,geom->iz,sqrt(gamma2));
+	  if(verbose || 1)
+	    {
+	      printf("hd_floors CASE 4 at (%d,%d,%d): %e\n",geom->ix,geom->iy,geom->iz,sqrt(gamma2));
+	      qsq=0.;
+	      for(i=1;i<4;i++)
+		for(j=1;j<4;j++)
+		  qsq+=pp[UU+i]*pp[UU+j]*gg[i][j];
+	      gamma2=1.+qsq;
+	      printf(" -> %e\n",sqrt(gamma2));
+	    }
+
+	  
 	}
     }
   //TODO: implement checks for other VELPRIM

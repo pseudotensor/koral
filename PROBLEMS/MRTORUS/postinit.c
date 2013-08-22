@@ -24,7 +24,7 @@ for(iz=0;iz<NZ;iz++)
 	    ldouble podpierd=-(geomBL.GG[0][0]-2.*ELL*geomBL.GG[0][3]+ELL*ELL*geomBL.GG[3][3]);
 	    ldouble ut=-1./sqrt(podpierd);
 	    ut/=UTPOT; //rescales rin
-	    ut*=1.001; //not to account for suface
+	    ut*=1.01; //not to account for suface
 
 	    PLOOP(iv)
 	      pp[iv]=get_u(p,iv,ix,iy,iz);
@@ -40,7 +40,6 @@ for(iz=0;iz<NZ;iz++)
 	    #ifdef RADIATION
 	    if(ut<-1 || podpierd<0.) //outside donut
 	      {
-		;
 	      }
 	    else
 	      {
@@ -50,11 +49,12 @@ for(iz=0;iz<NZ;iz++)
 		prad=Ehat/3.;
 		ptot+=prad;
 		//if(geom.ix==NX/2 && geom.iy==NY/2) printf("%e %e %e\n",pgas,prad,ptot);
+	      }
+	    #endif
 
 #pragma omp critical
 		if(pmag/ptot>maxbeta) maxbeta=pmag/ptot;
-	      }
-	    #endif
+
 	  }
       }
   }

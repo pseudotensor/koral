@@ -808,7 +808,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       /************************************************************************/
       /************************************************************************/
       /************************************************************************/
-      //entropy source term
+      //entropy source term (currently switched off)
 
       
       f_other_source_term(ix,iy,iz,ms);

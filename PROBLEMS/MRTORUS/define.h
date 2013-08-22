@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 68
 
 /************************************/
@@ -63,15 +63,15 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.4-MKS1R0))
+#define MINX (log(1.5-MKS1R0))
 #define MAXX (log(40.-MKS1R0))
 #define NX 100
 #define NY 80
 #define NZ 1
 #endif
 
-#define MINY (0.025*Pi/2.)
-#define MAXY (Pi-0.025*Pi/2.)
+#define MINY (0.05*Pi/2.)
+#define MAXY (Pi-0.05*Pi/2.)
 //#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.

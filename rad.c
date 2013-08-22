@@ -220,6 +220,7 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
       pp[iv]=pp0[iv];     
     }
 
+  //4dcon
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6; 
   int MAXITER=50;
@@ -635,6 +636,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 
   if(verbose) printf("searching for valid brackets\n");
 
+  //1dprim
   //first try low the lower bracket
   int MAXITER=30;
   ldouble FAC=2.;
@@ -839,7 +841,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 
   if(u2pret<-1) 
     {
-      printf("implicit sub-sub-step failed\n");
+      //printf("implicit sub-sub-step failed\n");
       return -1; //allows for entropy but does not update conserved 
     }
 
@@ -982,7 +984,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   int mom_over_flag;
   ldouble J[4][4],iJ[4][4];
   ldouble pp[NV],pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
-  ldouble f1[4],f2[4],f3[4],xxx[4],err;
+  ldouble f1[4],f2[4],f3[4],xxx[4],xxxbest[4],err,errbest;
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   struct geometry *geom
@@ -1015,18 +1017,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       */
       FILE *out = fopen("imp.problem.dat","w");
       for (i1=0;i1<NV;i1++)
-	fprintf(out,"%.15e ",uu00[i1]);
+	fprintf(out,"%.20e ",uu00[i1]);
       for (i1=0;i1<NV;i1++)
-	fprintf(out,"%.15e ",pp00[i1]);
+	fprintf(out,"%.20e ",pp00[i1]);
       for (i1=0;i1<4;i1++)
 	for (i2=0;i2<5;i2++)
-	  fprintf(out,"%.15e ",gg[i1][i2]);
+	  fprintf(out,"%.20e ",gg[i1][i2]);
       for (i1=0;i1<4;i1++)
 	for (i2=0;i2<5;i2++)
-	  fprintf(out,"%.15e ",GG[i1][i2]);
-      fprintf(out,"%.15e \n",dt);
-      fprintf(out,"%.15e \n",geom->alpha);
-      fprintf(out,"%.15e \n",geom->gdet);
+	  fprintf(out,"%.20e ",GG[i1][i2]);
+      fprintf(out,"%.20e \n",dt);
+      fprintf(out,"%.20e \n",geom->alpha);
+      fprintf(out,"%.20e \n",geom->gdet);
       fprintf(out,"\n");
       fclose(out);
       printf("dumped problematic case to imp.problem.dat\n");
@@ -1060,11 +1062,19 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   if(verbose) 
     {
+      printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
       printf("\n===========\nxi1: %e xi2: %e\n===========\n\n",xi1,xi2);
       ldouble Rtt;
       calc_ff_Rtt(pp00,&Rtt,ucon,geom);
       printf("Ehat: %e\n\n",-Rtt);
-      printf("gamma gas: %e\n\n",ucon[0]);
+      ldouble qsq=0.;
+      int i,j;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=pp00[UU+i]*pp00[UU+j]*geom->gg[i][j];
+      ldouble gamma2=1.+qsq;
+      
+      printf("gamma gas: %e\n\n",sqrt(gamma2));
       ldouble Gi00[4],Gihat00[4];
       //      print_Nvector(pp00,NV);
       calc_Gi(pp00, geom,Gi00);
@@ -1134,6 +1144,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       pp[iv]=pp0[iv];     
     }
  
+  //4dprim
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-6;
   ldouble MAXITER = 50;
@@ -1166,6 +1177,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   failed=0;
   iter=0;
+  errbest=BIG;
 
   do //main solver loop
     {	 
@@ -1204,6 +1216,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  break;
 	}
 
+      if(err<errbest)
+	{
+	  errbest=err;
+	  for(j=0;j<4;j++)
+	    xxxbest[j]=xxx[j];
+	}
+	  
+
       ldouble del;
       //calculating approximate Jacobian
       for(j=0;j<4;j++)
@@ -1225,14 +1245,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		del=sign*EPS*ppp[sh]; //minus avoids u2p_mhd errors when working on radiative
 
 		//EPS of the geometrical mean
-		//del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
+		del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
 	      }
 	    else //decreasing velocity
 	      {
-	      if(ppp[j+sh]>=0.)
-		del=sign*EPS; 
-	      else
-		del=-sign*EPS;
+		ldouble veleps = EPS*my_max(my_sign(ppp[j+sh])*1.e-6,ppp[j+sh]);
+		if(ppp[j+sh]>=0.)
+		  del=sign*veleps; 
+		else
+		  del=-sign*veleps;
 	      }	    
 	    pp[j+sh]=ppp[j+sh]+del;
 	      
@@ -1294,7 +1315,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	}
 
-      //if(verbose) print_tensor(JJ);
+      //      if(verbose) print_tensor(JJ);
 	 
       if(verbose) getchar();
 
@@ -1413,34 +1434,74 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(xiapp<1.e-20) 
 	    {
 	      printf("damped unsuccesfully in implicit_4dprim\n");
-	      return -1;	      
+	      failed=1;
+	      break;
 	    }
 	}
       while(1); 
 
-      //criterion of convergence on relative change of quantities
-      f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
-      for(i=1;i<4;i++)
+      if(failed==0)
 	{
-	  f3[i]=pp[i+sh]-ppp[i+sh];
-	  f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
+	  //criterion of convergence on relative change of quantities
+	  f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
+	  for(i=1;i<4;i++)
+	    {
+	      f3[i]=pp[i+sh]-ppp[i+sh];
+	      f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
+	    }
+
+	  //if(verbose) print_4vector(f3);
+	  
+	  ldouble CONVREL=CONV;
+	  //if(mom_over_flag==1) CONVREL*=100.; //looser criterion when keeps overshooting 
+	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL)
+	    {
+	      if(verbose) printf("\n === success (rel.change) ===\n");
+	      break;
+	    }     
 	}
 
-      if(verbose) print_4vector(f3);
-	  
-      ldouble CONVREL=CONV;
-      if(mom_over_flag==1) CONVREL*=100.; //looser criterion when keeps overshooting 
-      if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL)
-	{
-	  if(verbose) printf("\n === success (rel.change) ===\n");
-	  break;
-	}     
-
-      if(iter>MAXITER)
+      if(iter>MAXITER || failed==1)
 	{
 	  if(verbose)
 	    {
-	      printf("iter exceeded in solve_implicit_lab_4dprim() for frdt=%f \n",dt);	  
+	      printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,err);	  
+	    }
+
+	  ldouble CONVLOOSE=1.e-3;
+	  if(errbest<CONVLOOSE)
+	    {
+	      if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
+	      //update primitives
+	      for(i=0;i<4;i++)
+		pp[i+sh]=xxxbest[i];
+	      if(whichprim==MHD)
+		{
+		  ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
+		  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+		  pp[RHO]=uu00[RHO]/gdetu/ucon[0];
+		}
+	      p2u(pp,uu,geom);
+	      int u2pret;
+	      if(whichprim==RAD)
+		{
+		  uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+		  uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+		  uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+		  uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+		  u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+		  ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
+		  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+		}
+	      if(whichprim==MHD)
+		{
+		  uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+		  uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+		  uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+		  uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+		  u2pret=u2p_rad(uu,pp,geom,corr);
+		}    
+	      if(u2pret>=-1) break;
 	    }
 	  return -1;
 	}
@@ -1485,12 +1546,15 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
+  ldouble pp0[NV];
+  PLOOP(iv) pp0[iv]=pp[iv];
+
 
   //**** 1st ****
   //4dprim on energy eq. with overshooting check
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=1.;
+  params[3]=1;
   if(verbose) 
     {
       printf("trying 1st:\n");
@@ -1504,7 +1568,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 2nd ****
   //1d solver in temperatures first, then energy with overshooting
-  printf("trying 2nd at %d %d:\n",geom.ix,geom.iy);      
+  //printf("trying 2nd at %d %d:\n",geom.ix,geom.iy);      
+  PLOOP(iv) pp[iv]=pp0[iv]; 
   ret=solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,0,pp);
 
   if(ret==0)
@@ -1517,20 +1582,24 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     }
   
   if(ret==0) return 0;
-
+  
   //**** 3rd ****
   //entropy equation instead of energy equation
-  printf("trying 3rd at %d %d:\n",geom.ix,geom.iy);      
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  printf("trying entropy at %d %d:\n",geom.ix,geom.iy);      
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
-  params[3]=1.; //do momentum overshooting check
+  params[3]=1; //do momentum overshooting check
   
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   if(ret==0) return 0;
 
+  return -1;
+
   //**** 4th ****
   //finally desperately try 4dcon solver
+  PLOOP(iv) pp[iv]=pp0[iv]; 
    printf("trying 4th at %d %d:\n",geom.ix,geom.iy);      
    ret = solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 
@@ -1582,17 +1651,17 @@ test_solve_implicit_lab()
   int verbose=1;
   int params[4];
   
-  //  solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
+  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=1.; //mom.overshoot check
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  params[3]=1; //mom.overshoot check
+  //return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   
-  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
-  params[3]=1.;
+  params[3]=1;
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
   
   
@@ -1710,7 +1779,7 @@ test_jon_solve_implicit_lab()
       solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
       params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LABEQ;
-      params[3]=1.;
+      params[3]=1;
       solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
       //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 
