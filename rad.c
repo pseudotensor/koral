@@ -1526,6 +1526,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }    
 	  if(u2pret<-1) return -1;
 	}
+      else
+	return -1;
     }
   
   //to print number of iterations
@@ -1574,7 +1576,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //4dprim on energy eq. with loose overshooting check
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=1;
+  params[3]=0;
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
@@ -2869,7 +2871,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
       ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas,4.)/pp[UU]);
       ldouble xi2=chi*dt*(1.+Ehat/(pp[RHO]+GAMMA*pp[UU]));
    
-      if(xi1<1.e-2 && xi2<1.e-2)
+      if(xi1<1.e-2 && xi2<1.e-4)
 	{
 	  //rad-for-force
 	  solve_explicit_lab_core(uu,pp,&geom,dt,del4,0);

@@ -1,14 +1,14 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 68
+#define RESTART
+#define RESTARTNUM 32
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
-#define ALLOW_EXPLICIT_RAD_SOURCE 1
+#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -47,7 +47,7 @@
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 1000.
+#define B2RHORATIOMAX 100.
 #define GAMMAMAXRAD 50.
 
 /************************************/
@@ -64,15 +64,15 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.5-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
 #define MAXX (log(40.-MKS1R0))
-#define NX 100
-#define NY 80
+#define NX 120
+#define NY 100
 #define NZ 1
 #endif
 
-#define MINY (0.05*Pi/2.)
-#define MAXY (Pi-0.05*Pi/2.)
+#define MINY (0.025*Pi/2.)
+#define MAXY (Pi-0.025*Pi/2.)
 //#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
@@ -83,7 +83,7 @@
 /************************************/
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
-#define ALLSTEPSOUTPUT 0
+#define ALLSTEPSOUTPUT 1
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
@@ -102,7 +102,7 @@
 #define URIN (0.)
 #define KKK 3000.
 #define UTPOT .965
-#define DTOUT1 1.e1
+#define DTOUT1 1.e-1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
