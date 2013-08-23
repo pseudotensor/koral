@@ -1491,10 +1491,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     {
       if(verbose)
 	{
-	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,err);	  
+	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
 
-      ldouble CONVLOOSE=CONV;
+      ldouble CONVLOOSE=CONV*100.;
       if(errbest<CONVLOOSE)
 	{
 	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
@@ -1701,7 +1701,7 @@ test_solve_implicit_lab()
   int verbose=1;
   int params[4];
   
-  //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+  return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
