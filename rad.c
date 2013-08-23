@@ -1210,6 +1210,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  
       //criterion of convergence on the error
+      // test - should be here, not later
       if(err<CONV)
 	{
 	  if(verbose) printf("\n === success (error) ===\n");
@@ -1302,28 +1303,30 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(verbose) 
 	    {
 	      print_tensor(J);
-	      printf("Jacobian inversion failed\n");
+	      print_tensor(iJ);
+
+	      int k,l;
+	      ldouble JJ[4][4];
+	      for(i=0;i<4;i++)
+		{
+		  for(j=0;j<4;j++)
+		    {
+		      JJ[i][j]=0.;
+
+		      for(k=0;k<4;k++)     
+			JJ[i][j]+=J[i][k]*iJ[k][j];
+		    }
+		}
+
+	      print_tensor(JJ);
+
+	      printf("Jacobian inversion failed\n");getchar();
 	    }
 	  break;
 	}
 
-      //if(verbose) print_tensor(J);
-      //if(verbose) print_tensor(iJ);
-
-      int k,l;
-      ldouble JJ[4][4];
-      for(i=0;i<4;i++)
-	{
-	  for(j=0;j<4;j++)
-	    {
-	      JJ[i][j]=0.;
-
-	      for(k=0;k<4;k++)     
-		JJ[i][j]+=J[i][k]*iJ[k][j];
-	    }
-	}
-
-      //      if(verbose) print_tensor(JJ);
+      
+     
 	 
       if(verbose) getchar();
 
@@ -1458,6 +1461,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	}
       while(1); 
 
+
       /* //this may fail
       if(failed==0)
 	{
@@ -1577,9 +1581,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 1st ****
   //4dprim on energy eq. with loose overshooting check
+  PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=0;
+  params[3]=1;
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
@@ -1587,6 +1592,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 1st + 1 ****
   //4dprim on energy eq. with strict overshooting check
+  PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=2;
@@ -1597,6 +1603,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 1st + 1 bis ****
   //4dprim on energy eq. with more strict overshooting check
+  PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=3;
@@ -1607,6 +1614,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 1st + 2 ****
   //4dprim on energy eq. without overshooting check
+  PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=0;
@@ -2874,7 +2882,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
       ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas,4.)/pp[UU]);
       ldouble xi2=chi*dt*(1.+Ehat/(pp[RHO]+GAMMA*pp[UU]));
    
-      if(xi1<1.e-2 && xi2<1.e-4)
+      if(xi1<1.e-2 && xi2<1.e-6)
 	{
 	  //rad-for-force
 	  solve_explicit_lab_core(uu,pp,&geom,dt,del4,0);

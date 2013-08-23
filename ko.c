@@ -73,7 +73,7 @@ main(int argc, char **argv)
 
   /*******/
   //tests of implicit solver
-  test_solve_implicit_lab(); exit(0);
+  //test_solve_implicit_lab(); exit(0);
   /*******/
 
   //prepares files

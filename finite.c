@@ -835,12 +835,47 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //implicit in lab frame in four dimensions - fiducial 
       //test if implicit necessary
       ldouble del4[4]; 
+      //TODO: restructure and clean
       if(ALLOW_EXPLICIT_RAD_SOURCE==1)
 	{
 	  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
 	    implicit_lab_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
-	  else
+	  else //could go (and went) explicit
 	    {
+	      //TEST
+	      /*
+	      //compare with implicit
+	      ldouble del4exp[4],del4imp[4];
+	      int i;
+	      for(i=0;i<NV;i++)
+		    {
+		      uu[i]=get_u(u,i,ix,iy,iz);
+		      pp[i]=get_u(p,i,ix,iy,iz);
+		    }
+	      DLOOPA(i) del4exp[i]=del4[i]/uu[i+RHO];
+
+	      solve_implicit_lab(ix,iy,iz,dt,del4,0);
+
+	      DLOOPA(i) del4imp[i]=del4[i]/uu[i+RHO];
+
+	      if(fabs(del4imp[0]-del4exp[0])>1.e-1*my_max(fabs(del4exp[0]),fabs(del4imp[0])))
+		{
+		  struct geometry geom;
+		  fill_geometry(ix,iy,iz,&geom);
+
+		 
+
+		  //converting to primitives
+		  int corrected[2], fixups[2];
+		  u2p(uu,pp,&geom,corrected,fixups);
+
+		  printf("complain at %d %d:\n",ix,iy);
+		  print_NVvector(pp);
+		  print_4vector(del4imp);
+		  print_4vector(del4exp);
+		  getchar();
+		}			 
+	      */
 	      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
 	      apply_rad_source_del4(ix,iy,iz,del4);	      
 	    }

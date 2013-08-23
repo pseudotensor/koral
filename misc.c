@@ -56,7 +56,7 @@ ldouble my_sign(ldouble x)
 {
   if(x>0.) return 1.;
   if(x<0.) return -1.;
-  if(x==0.) return 0.;
+  if(x==0.) return 1.;
   return 0;
 }
 
@@ -567,7 +567,7 @@ print_4vector(ldouble v[4])
 {
   int i;
   printf("============\n");
-  printf("%10.3e %10.3e %10.3e %10.3e\n",v[0],v[1],v[2],v[3]);
+  printf("%10.8e %10.8e %10.8e %10.8e\n",v[0],v[1],v[2],v[3]);
   printf("============\n");
   return 0;  
 }
