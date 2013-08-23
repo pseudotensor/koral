@@ -451,9 +451,9 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 	  for(j=1;j<4;j++)
 	    pp[UU+j]*=A;
 	  ret=-1;
-	  if(verbose || 1)
+	  if(verbose)
 	    {
-	      printf("hd_floors CASE 4 at (%d,%d,%d): %e\n",geom->ix,geom->iy,geom->iz,sqrt(gamma2));
+	      printf("hd_floors CASE 4 at (%d,%d,%d): %e",geom->ix,geom->iy,geom->iz,sqrt(gamma2));
 	      qsq=0.;
 	      for(i=1;i<4;i++)
 		for(j=1;j<4;j++)

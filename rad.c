@@ -1062,7 +1062,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   if(verbose) 
     {
-      printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
+      printf("\nparams: %d %d %d\n\n",params[1],params[2],params[3]);
       printf("\n===========\nxi1: %e xi2: %e\n===========\n\n",xi1,xi2);
       ldouble Rtt;
       calc_ff_Rtt(pp00,&Rtt,ucon,geom);
@@ -1235,6 +1235,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  {
 	    if(j==0)
 	      {
+		//EEE
+		
 		//uses EPS of the dominating quantity
 		if(dominates==RAD)
 		  del=sign*EPS*ppp[EE0];
@@ -1249,7 +1251,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      }
 	    else //decreasing velocity
 	      {
-		ldouble veleps = EPS*my_max(my_sign(ppp[j+sh])*1.e-6,ppp[j+sh]);
+		ldouble veleps = EPS*my_sign(ppp[j+sh])*my_max(1.e-6,fabs(ppp[j+sh]));
 		if(ppp[j+sh]>=0.)
 		  del=sign*veleps; 
 		else
@@ -1263,12 +1265,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      {
 		if(sign>0.) //already switched signs
 		  {	      
-		    printf("Jac mid-state (%d) both signs lead to trouble\n",j);
-		    return -1;
+		    if(verbose) printf("Jac mid-state (%d) both signs lead to trouble\n",j);
+		    failed=1;
+		    break;
 		  }
 		else
 		  {
-		    printf("Jac mid-state (%d) trying the other one\n",j);
+		    if(verbose) printf("Jac mid-state (%d) trying the other one\n",j);
 		    pp[j+sh]=ppp[j+sh];
 		    sign*=-1.;
 		    continue;
@@ -1284,8 +1287,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    pp[j+sh]=ppp[j+sh];
 	    break;
 	  }
+
+	  if(failed==1)
+	    break;
 	}
       
+      if(failed==1)
+	break;
  
       //inversion
       if(inverse_44matrix(J,iJ)<0)
@@ -1347,7 +1355,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  mom_over_flag=0;
 	  //check if momenta overshoot
-	  ldouble ALLOWANCE=100.; //can overshoot ten times, no more
+	  ldouble ALLOWANCE; 
+	  if(params[3]==1) ALLOWANCE=100.;
+	  if(params[3]==2) ALLOWANCE=1.1;	  
+	  if(params[3]==3) ALLOWANCE=1.0001;	  
 	  ldouble mommin,mommax,momsep;
 	  if(do_mom_over)
 	    {
@@ -1361,6 +1372,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 		  mommin=mommin - ALLOWANCE*momsep;
 		  mommax=mommax + ALLOWANCE*momsep;
+
+		  if(verbose) printf("mom min/max (%d) %e %e\n",i,mommin,mommax);
 
 		  if(xxx[i]<mommin)
 		    {
@@ -1416,6 +1429,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      u2pret=u2p_rad(uu,pp,geom,corr);
 	    }    
 
+	  //report on ceilings
+	  if(corr[0]>0 || corr[1]>0)
+	    if(verbose) printf("corr: %d %d\n",corr[0],corr[1]);
+	    
+	  
 	  //check if energy density positive and the inversion worked using U2P_HOT
 	  if(xxx[0]>0. && u2pret>=-1) break;
 
@@ -1460,54 +1478,56 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      break;
 	    }     
 	}
-
       if(iter>MAXITER || failed==1)
-	{
-	  if(verbose)
-	    {
-	      printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,err);	  
-	    }
-
-	  ldouble CONVLOOSE=1.e-3;
-	  if(errbest<CONVLOOSE)
-	    {
-	      if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
-	      //update primitives
-	      for(i=0;i<4;i++)
-		pp[i+sh]=xxxbest[i];
-	      if(whichprim==MHD)
-		{
-		  ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
-		  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-		  pp[RHO]=uu00[RHO]/gdetu/ucon[0];
-		}
-	      p2u(pp,uu,geom);
-	      int u2pret;
-	      if(whichprim==RAD)
-		{
-		  uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-		  uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
-		  uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
-		  uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
-		  u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
-		  ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
-		  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-		}
-	      if(whichprim==MHD)
-		{
-		  uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
-		  uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
-		  uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
-		  uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
-		  u2pret=u2p_rad(uu,pp,geom,corr);
-		}    
-	      if(u2pret>=-1) break;
-	    }
-	  return -1;
-	}
+	break;
     }
   while(1); //main solver loop
 
+
+  if(iter>MAXITER || failed==1)
+    {
+      if(verbose)
+	{
+	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,err);	  
+	}
+
+      ldouble CONVLOOSE=CONV;
+      if(errbest<CONVLOOSE)
+	{
+	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
+	  //update primitives
+	  for(i=0;i<4;i++)
+	    pp[i+sh]=xxxbest[i];
+	  if(whichprim==MHD)
+	    {
+	      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+	      pp[RHO]=uu00[RHO]/gdetu/ucon[0];
+	    }
+	  p2u(pp,uu,geom);
+	  int u2pret;
+	  if(whichprim==RAD)
+	    {
+	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+	      u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+	      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+	    }
+	  if(whichprim==MHD)
+	    {
+	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+	      u2pret=u2p_rad(uu,pp,geom,corr);
+	    }    
+	  if(u2pret<-1) return -1;
+	}
+    }
+  
   //to print number of iterations
   //if(geom->iy==0 && geom->ix==NX/3) printf("%d\n",iter);
 
@@ -1551,7 +1571,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
 
   //**** 1st ****
-  //4dprim on energy eq. with overshooting check
+  //4dprim on energy eq. with loose overshooting check
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=1;
@@ -1560,7 +1580,37 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
-  //**** 2nd ****
+  //**** 1st + 1 ****
+  //4dprim on energy eq. with strict overshooting check
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  params[3]=2;
+
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) return 0;
+
+  //**** 1st + 1 bis ****
+  //4dprim on energy eq. with more strict overshooting check
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  params[3]=3;
+
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) return 0;
+
+  //**** 1st + 2 ****
+  //4dprim on energy eq. without overshooting check
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  params[3]=0;
+
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) return 0;
+
+  //**** 1st + 3 ****
   //1d solver in temperatures first, then energy with overshooting
   //printf("trying 2nd at %d %d:\n",geom.ix,geom.iy);      
   PLOOP(iv) pp[iv]=pp0[iv]; 
@@ -1577,7 +1627,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   if(ret==0) return 0;
   
-  //**** 3rd ****
+  //**** 1st + 4 ****
   //entropy equation instead of energy equation
   PLOOP(iv) pp[iv]=pp0[iv]; 
   printf("trying entropy at %d %d:\n",geom.ix,geom.iy);      
@@ -1591,12 +1641,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   return -1;
 
-  //**** 4th ****
-  //finally desperately try 4dcon solver
+  //**** 1st + 5 ****
+  //finally desperately try 4dcon solver - unused
   PLOOP(iv) pp[iv]=pp0[iv]; 
-   printf("trying 4th at %d %d:\n",geom.ix,geom.iy);      
-   ret = solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
-
+  printf("trying 4th at %d %d:\n",geom.ix,geom.iy);      
+  ret = solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+  
   if(ret==0) return 0;
 
   return -1;
@@ -1645,12 +1695,14 @@ test_solve_implicit_lab()
   int verbose=1;
   int params[4];
   
+  //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=1; //mom.overshoot check
-  //return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  params[3]=3; //mom.overshoot check
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   
   params[1]=RADIMPLICIT_ENTROPYEQ;
@@ -1918,11 +1970,15 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
       //print_metric(geom->GG);
       //printf("%e\n",geom->alpha);
       //printf("%e\n",geom->gdet);
-      //print_Nvector(uu0,NV);
-      //print_Nvector(pp,NV);
-      
-      //u2p(uu,pp,geom,corr,fixup);
-      //printf("%d %d\n",corr[0],corr[1]);
+      print_Nvector(uu,NV);
+      print_Nvector(pp,NV);
+
+      u2p(uu0,pp0,geom,corr,fixup);
+      printf("%d %d\n",corr[0],corr[1]);
+
+      print_Nvector(uu0,NV);
+      print_Nvector(pp0,NV);
+
       //print_Nvector(pp,NV);
       //calc_Gi(pp,geom,Gi);
       
@@ -1931,8 +1987,8 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
       //indices_21(Gi,Gi,geom->gg);
 
       print_4vector(deltas);
-      ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
-      printf("Tgas: %e\n",T);
+      //ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
+      //printf("Tgas: %e\n",T);
     }
   
   return 0;
@@ -2785,7 +2841,38 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
   for(iv=0;iv<NV;iv++)
     delapl[iv]=0.;
 
-  int method=0;
+  int method=-1;
+
+  if(method==-1) //based on xi1 xi2
+    {
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+  
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu[iv]=get_u(u,iv,ix,iy,iz);
+	  pp[iv]=get_u(p,iv,ix,iy,iz);
+	}
+
+      //converting to primitives
+      int corrected[2], fixups[2];
+      u2p(uu,pp,&geom,corrected,fixups);
+
+      //calculating xi1, xi2
+      ldouble Rtt,Ehat,ugas[4];
+      calc_ff_Rtt(pp,&Rtt,ugas,&geom);
+      Ehat=-Rtt;       
+      ldouble Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+      ldouble kappa=calc_kappa(pp[RHO],Tgas,geom.xx,geom.yy,geom.zz);
+      ldouble chi=kappa+calc_kappaes(pp[RHO],Tgas,geom.xx,geom.yy,geom.zz);
+      ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas,4.)/pp[UU]);
+      ldouble xi2=chi*dt*(1.+Ehat/(pp[RHO]+GAMMA*pp[UU]));
+   
+      if(xi1<1.e-3 && xi2<1.e-3)
+	return 0; //can do explicit
+      else
+	return 1; //must do implicit
+    }
   
   if(method==0) //checks if inversion succesful and then max of du/u < DULIMIT
     {
