@@ -14,3 +14,4 @@ v2=calc_divB(ix,iy,iz);
 #endif
 
 v3=Tgas;
+v4=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);

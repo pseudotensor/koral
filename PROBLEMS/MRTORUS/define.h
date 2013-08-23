@@ -8,6 +8,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
+#define ALLOW_EXPLICIT_RAD_SOURCE 1
 //#define SKIPRADSOURCE
 
 /************************************/

@@ -1639,6 +1639,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
+
   return -1;
 
   //**** 1st + 5 ****
@@ -2868,8 +2869,14 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
       ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas,4.)/pp[UU]);
       ldouble xi2=chi*dt*(1.+Ehat/(pp[RHO]+GAMMA*pp[UU]));
    
-      if(xi1<1.e-3 && xi2<1.e-3)
-	return 0; //can do explicit
+      if(xi1<1.e-2 && xi2<1.e-2)
+	{
+	  //rad-for-force
+	  solve_explicit_lab_core(uu,pp,&geom,dt,del4,0);
+	  //del4[] will be passed up
+	  indices_21(del4,del4,gg); 	  
+	  return 0; //can do explicit
+	}
       else
 	return 1; //must do implicit
     }
