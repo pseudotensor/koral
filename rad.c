@@ -1458,6 +1458,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	}
       while(1); 
 
+      /* //this may fail
       if(failed==0)
 	{
 	  //criterion of convergence on relative change of quantities
@@ -1478,6 +1479,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      break;
 	    }     
 	}
+      */
+
       if(iter>MAXITER || failed==1)
 	break;
     }
