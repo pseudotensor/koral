@@ -1205,14 +1205,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	{
 	  ppp[i]=pp[i];
 	}	
-
+      
+      for(i=0;i<4;i++)
+	{
+	  xxx[i]=ppp[i+sh];
+	}  
+      
       if(verbose>0)
 	{
-	  for(i=0;i<4;i++)
-	    {
-	      xxx[i]=ppp[i+sh];
-	    }  
-
 	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err);
 	  print_state_implicit_lab_4dprim (iter-1,xxx,f1,err); 
 	  if(ret<0) printf("f_lab_4dprim ret: %d\n",ret);
@@ -1739,7 +1739,7 @@ test_solve_implicit_lab()
   
   //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
 
-  return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+  //return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
@@ -3159,7 +3159,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 /******* implicit radiative source term in lab frame *********************/
 /******* solves numerically in 4D **************************************/
 /************************************************************************/
-int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5],ldouble tlo[][4], ldouble tup[][4],ldouble *pp)
+int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
 {
   ldouble del4[4],delapl[NV];
   int iv;

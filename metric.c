@@ -1607,7 +1607,7 @@ calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int coords)
       //make them covariant
       for(i=0;i<4;i++)
 	{	  
-	  indices_21(tmuup[i],tmuup[i],g);
+	  indices_21(&tmuup[i][0],&tmuup[i][0],g);
 	  if(tmuup[i][i]<0.) 
 	  for(j=0;j<4;j++) tmuup[i][j]*=-1.;
 	}

@@ -2,7 +2,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 40
+#define RESTARTNUM 320
 
 /************************************/
 //radiation choices

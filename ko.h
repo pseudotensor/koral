@@ -511,10 +511,11 @@ int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);
 
 
 //rad.c
+int solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params);
 int solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* deltas,int verbose);
 int apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4);
 int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5], ldouble *del4);
-int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5],ldouble tlo[][4], ldouble tup[][4],ldouble *pp);
+int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt);
 ldouble calc_LTE_temp(ldouble *pp,void *ggg);
 int test_solve_implicit_lab();
 int test_jon_solve_implicit_lab();

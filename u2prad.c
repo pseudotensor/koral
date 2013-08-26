@@ -383,9 +383,9 @@ static int get_m1closure_urfconrel(int verbose,
 	printf("end: %e %e %e %e\n",Erf,*Erfreturn,Erfslow,Erffast);
       }
 
-  if(isinf(Erf) || isinf(gammarel2) || isinf(urfconrel[0])|| isinf(urfconrel[1])|| isinf(urfconrel[2])|| isinf(urfconrel[3]) )
+  if(!isfinite(Erf) || !isfinite(gammarel2) || !isfinite(urfconrel[0])|| !isfinite(urfconrel[1])|| !isfinite(urfconrel[2])|| !isfinite(urfconrel[3]) )
     {
-      if(verbose)      printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g : %d %d %d %d : %g %g %g %g\n",geom->ix,geom->iy,geom->iz,Erf,gammarel2,urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
+      if(verbose || 1)      printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g : %d %d %d %d : %g %g %g %g\n",geom->ix,geom->iy,geom->iz,Erf,gammarel2,urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
       return -1;
   }
 
