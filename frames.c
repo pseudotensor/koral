@@ -223,8 +223,16 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
   int i,j;  
 
   calc_Rij(pp1,ggg,Rij);
+
+  print_tensor(Rij);
+
   boost22_lab2ff(Rij,Rij,pp1,gg,GG);
+
+  print_tensor(tup);
+
   trans22_cc2on(Rij,Rij,tup);
+
+  print_tensor(Rij);
 
   for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];

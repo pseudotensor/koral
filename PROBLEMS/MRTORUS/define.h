@@ -2,13 +2,14 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 6
+#define RESTARTNUM 40
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
+//#define IMPLICIT_FF_RAD_SOURCE
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -48,7 +49,8 @@
 #define B2UURATIOMAX 100.
 #define B2RHORATIOMIN 0.
 #define B2RHORATIOMAX 100.
-#define GAMMAMAXRAD 50.
+#define GAMMAMAXRAD 1000.
+#define GAMMAMAXHD 1000.
 
 /************************************/
 //blackhole
@@ -66,8 +68,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.6-MKS1R0))
 #define MAXX (log(40.-MKS1R0))
-#define NX 100
-#define NY 80
+#define NX 80
+#define NY 60
 #define NZ 1
 #endif
 

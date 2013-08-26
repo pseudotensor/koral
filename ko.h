@@ -526,7 +526,10 @@ int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],in
 int calc_Rij(ldouble *pp, void*, ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
 int solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int);
-int solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas);
+int solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int);
+int solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose);
+int solve_explicit_lab_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose);
+
 ldouble calc_LTE_EfromT(ldouble);
 ldouble calc_LTE_TfromE(ldouble);
 ldouble calc_LTE_Efromurho(ldouble E,ldouble);

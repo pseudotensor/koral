@@ -469,6 +469,8 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 /*********************************************/
 /*********************************************/
 /*********************************************/
+
+//TODO: save binary
 int
 fprint_restartfile(ldouble t, char* folder)
 {
@@ -499,7 +501,7 @@ fprint_restartfile(ldouble t, char* folder)
 		}	 
 	     
 	      for(iv=0;iv<NV;iv++)
-		fprintf(fout1,"%.15e ",pp[iv]);
+		fprintf(fout1,"%.20e ",pp[iv]);
 	      fprintf(fout1,"\n");
 	    }
 	}

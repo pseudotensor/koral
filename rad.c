@@ -1029,6 +1029,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       fprintf(out,"%.20e \n",dt);
       fprintf(out,"%.20e \n",geom->alpha);
       fprintf(out,"%.20e \n",geom->gdet);
+      for (i1=0;i1<4;i1++)
+	for (i2=0;i2<4;i2++)
+	  fprintf(out,"%.20e ",geom->tup[i1][i2]);
+      for (i1=0;i1<4;i1++)
+	for (i2=0;i2<4;i2++)
+	  fprintf(out,"%.20e ",geom->tlo[i1][i2]);
       fprintf(out,"\n");
       fclose(out);
       printf("dumped problematic case to imp.problem.dat\n");
@@ -1067,14 +1073,22 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       ldouble Rtt;
       calc_ff_Rtt(pp00,&Rtt,ucon,geom);
       printf("Ehat: %e\n\n",-Rtt);
+
       ldouble qsq=0.;
       int i,j;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
 	  qsq+=pp00[UU+i]*pp00[UU+j]*geom->gg[i][j];
       ldouble gamma2=1.+qsq;
-      
       printf("gamma gas: %e\n\n",sqrt(gamma2));
+
+      qsq=0.;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=pp00[EE0+i]*pp00[EE0+j]*geom->gg[i][j];
+      gamma2=1.+qsq;
+      printf("gamma rad: %e\n\n",sqrt(gamma2));
+
       ldouble Gi00[4],Gihat00[4];
       //      print_Nvector(pp00,NV);
       calc_Gi(pp00, geom,Gi00);
@@ -1128,6 +1142,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //params[1]=RADIMPLICIT_ENERGYEQ;
   //frame for energy/entropy equation to solve
   //params[2]=RADIMPLICIT_LABEQ;
+
+  if(verbose && whichprim==MHD) printf("Working on MHD\n\n");
+  if(verbose && whichprim==RAD) printf("Working on RAD\n\n");
+
   /******************************************/
   /******************************************/
   /******************************************/
@@ -1588,6 +1606,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
+  //  if(geom.ix==60 && geom.iy==NY/2) return -1;
+
   if(ret==0) return 0;
 
   //**** 1st + 1 ****
@@ -1692,6 +1712,14 @@ test_solve_implicit_lab()
   iv=fscanf(in,"%lf ",&dt);
   iv=fscanf(in,"%lf ",&geom.alpha);
   iv=fscanf(in,"%lf ",&geom.gdet);
+  //for imp.problems > 21
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<4;i2++)
+      iv=fscanf(in,"%lf ",&geom.tup[i1][i2]);
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<4;i2++)
+      iv=fscanf(in,"%lf ",&geom.tlo[i1][i2]);
+
   fclose(in);
 
   geom.ix=geom.iy=geom.iz=0;
@@ -1709,13 +1737,15 @@ test_solve_implicit_lab()
   int verbose=1;
   int params[4];
   
-  return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+  //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+
+  return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=3; //mom.overshoot check
+  params[3]=1; //mom.overshoot check
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   
@@ -1860,27 +1890,50 @@ test_jon_solve_implicit_lab()
 //******* used as the fail-safe backup method **************************
 //**********************************************************************
 int
-solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
+solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
-  int i1,i2,i3,iv;
-  ldouble pp[NV];
-
-  ldouble (*gg)[5],(*GG)[5];
-
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
   
-  //temporary using local arrays
-  gg=geom.gg;
-  GG=geom.GG;
-
+  int iv,ret;
+  ldouble pp[NV],uu[NV];
   for(iv=0;iv<NV;iv++)
     {
-      pp[iv]=get_u(p,iv,ix,iy,iz);      
+      pp[iv]=get_u(p,iv,ix,iy,iz); //primitives corresponding to zero-state  
+      uu[iv]=get_u(u,iv,ix,iy,iz);  
     }
 
+  ret= solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+
+  return ret;
+}
+
+int
+solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  int i1,i2,i3,iv;
+
+  ldouble pp[NV];
+  PLOOP(i1)
+    pp[i1]=pp0[i1];
+
+  if(verbose) print_NVvector(pp);
+
   //transforming radiative primitives to ortonormal fluid frame
-  prad_lab2ff(pp,pp,&geom);
+  prad_lab2ff(pp,pp,geom);
+
+  if(verbose) print_NVvector(pp);
   
   //four-force in the fluid frame
   ldouble Gi[4];
@@ -1888,13 +1941,13 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
   
   //implicit flux:
   ldouble rho=pp[RHO];
-  ldouble u=pp[1];  
+  ldouble u=pp[UU];  
   ldouble E=pp[EE0];  
   ldouble pr=(GAMMA-1.)*(u);
   ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble xx=get_x(ix,0);
-  ldouble yy=get_x(iy,1);
-  ldouble zz=get_x(iz,2);
+  ldouble xx=get_x(geom->ix,0);
+  ldouble yy=get_x(geom->iy,1);
+  ldouble zz=get_x(geom->iz,2);
   ldouble kappa=calc_kappa(rho,T,xx,yy,zz);
   ldouble chi=kappa+calc_kappaes(rho,T,xx,yy,zz);  
   ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
@@ -1914,6 +1967,61 @@ solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas)
     return -1;
 
   deltas[0]=E-pp[EE0];
+
+  if(verbose) printf("\nchanges:\n\n EE: %e -> %e\n FX: %e -> %e\n FY: %e -> %e\n FZ: %e -> %e\n",
+		     pp[EE0],E,
+		     Fold[0],Fnew[0],
+		     Fold[1],Fnew[1],
+		     Fold[2],Fnew[2]);	
+
+
+  if(verbose) print_4vector(deltas);
+
+  trans2_on2cc(deltas,deltas,geom->tlo);
+  boost2_ff2lab(deltas,deltas,pp0,geom->gg,geom->GG);
+  indices_21(deltas,deltas,geom->gg);
+
+  if(verbose) print_4vector(deltas);
+
+  if(verbose)
+    {
+      ldouble delapl[NV],uu[NV];
+
+      int iv;
+      for(iv=0;iv<NV;iv++)
+	delapl[iv]=0.;
+
+      delapl[1]=-deltas[0];
+      delapl[2]=-deltas[1];
+      delapl[3]=-deltas[2];
+      delapl[4]=-deltas[3];
+      delapl[EE0]=deltas[0];
+      delapl[FX0]=deltas[1];
+      delapl[FY0]=deltas[2];
+      delapl[FZ0]=deltas[3];
+
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu[iv]=uu0[iv]+delapl[iv];
+	}
+
+      print_NVvector(uu0);
+      print_Nvector(pp0,NV);
+
+
+      int corr[2],fixup[2];
+
+      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      printf("\n@@@@@@@@ BACKUP IMPLICIT @@@@@@@@@@@@");
+      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
+  
+      u2p(uu,pp,geom,corr,fixup);
+      printf("%d %d\n",corr[0],corr[1]);
+
+      print_NVvector(uu);
+      print_Nvector(pp,NV);
+
+    }
 
   return 0;
 
@@ -2816,7 +2924,7 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], 
 /************************************************************************/
 /******* implicit radiative source term in fluid frame and transported to lab  - backup method */
 /************************************************************************/
-int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5],ldouble tlo[][4], ldouble tup[][4],ldouble *pp)
+int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, int verbose)
 {
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITFF); 
 
@@ -2826,17 +2934,14 @@ int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5
   //skipped - there is one common call in finite.c
   //calc_primitives(ix,iy,iz);
   
-  if(solve_implicit_ff(ix,iy,iz,dt,del4)<0) 
+  if(solve_implicit_ff(ix,iy,iz,dt,del4,verbose)<0) 
     {
       //failure, keeping u[] intact, reporting
       set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1); 
       return -1;
     }
 
-  trans2_on2cc(del4,del4,tlo);
-  boost2_ff2lab(del4,del4,pp,gg,GG);
-  indices_21(del4,del4,gg);
-
+ 
   apply_rad_source_del4(ix,iy,iz,del4);
 
   set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
@@ -3059,12 +3164,8 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
   ldouble del4[4],delapl[NV];
   int iv;
   int verbose=1;
-  //  if(ix==63) verbose=1;
 
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
-
-  //test
-  //if(ix<5) return 0;
 
   if(solve_implicit_lab(ix,iy,iz,dt,del4,0)<0)
       {
@@ -3079,7 +3180,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
       //use the explicit-implicit backup method
       
       //test
-      if(implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp)<0)
+      if(implicit_ff_rad_source_term(ix,iy,iz,dt,0)<0)
 	{
 	  if(verbose) printf("imp_ff didn't work either. requesting fixup.\n");
 	  //this one failed too - failure
@@ -3087,7 +3188,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][
 	}
       else
 	{
-	  if(verbose) printf("worked.\n");
+	  if(verbose) printf("imp_ff worked.\n");
 	  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITFF); 
 	}	    
     }

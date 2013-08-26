@@ -898,7 +898,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       ldouble del4[4]; 
       if(ALLOW_EXPLICIT_RAD_SOURCE==1)
 	{
-	  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
+	  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4) || 1)
 	    {
 	      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
 	      implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
@@ -912,7 +912,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       else
 	{
 	  for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
-	  implicit_ff_rad_source_term(ix,iy,iz,dt,gg,GG,tlo,tup,pp);
+	  implicit_ff_rad_source_term(ix,iy,iz,dt,0);
 	}
 #endif
 
