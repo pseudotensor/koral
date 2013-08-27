@@ -1705,7 +1705,15 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
+  //**** 1st + 5 ****
+  //backup method
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  printf("trying backup at %d %d:\n",geom.ix,geom.iy);      
+  
+  ret=solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
+  if(ret==0) return 0;
+    
   return -1;
 
   //**** 1st + 5 ****
@@ -1801,7 +1809,7 @@ test_solve_implicit_backup()
   fill_geometry(0,0,0,&geom);
 
   pp[RHO]=10.;
-  pp[UU]=0.001;
+  pp[UU]=1.e-1;
   pp[VX]=0.;
   pp[VY]=0.;
   pp[VZ]=0.;
@@ -1809,8 +1817,8 @@ test_solve_implicit_backup()
   pp[B1]=0.;
   pp[B2]=0.;
   pp[B3]=0.;
-  pp[EE0]=0.0000001;
-  pp[FX0]=0.1;
+  pp[EE0]=1.e-10;
+  pp[FX0]=1.;
   pp[FY0]=0.;
   pp[FZ0]=0.;
 
@@ -1836,7 +1844,7 @@ test_solve_implicit_backup()
    
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=1; //mom.overshoot check
+  params[3]=2; //mom.overshoot check
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   
