@@ -1800,7 +1800,7 @@ test_solve_implicit_backup()
 
   fill_geometry(0,0,0,&geom);
 
-  pp[RHO]=100.;
+  pp[RHO]=10.;
   pp[UU]=0.001;
   pp[VX]=0.;
   pp[VY]=0.;
@@ -1809,14 +1809,14 @@ test_solve_implicit_backup()
   pp[B1]=0.;
   pp[B2]=0.;
   pp[B3]=0.;
-  pp[EE0]=0.0001;
+  pp[EE0]=0.0000001;
   pp[FX0]=0.1;
   pp[FY0]=0.;
   pp[FZ0]=0.;
 
   //TTT
 
-  dt=1.;
+  dt=10.;
 
   p2u(pp,uu,&geom);
   
@@ -1828,9 +1828,9 @@ test_solve_implicit_backup()
   
   //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
 
-  return solve_implicit_backup_core(uu,pp,&geom,dt,deltas,verbose);
+  //return solve_implicit_backup_core(uu,pp,&geom,dt,deltas,verbose);
 
-  return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+  solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
@@ -2032,16 +2032,17 @@ solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* d
   
   //implicit flux:
   ldouble rho=pp[RHO];
-  ldouble u=pp[UU];  
-  ldouble E=pp[EE0];  
-  ldouble pr=(GAMMA-1.)*(u);
-  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble u0=pp[UU],u;  
+  ldouble E0=pp[EE0],E; 
+  ldouble Trad0=calc_LTE_TfromE(E0);
+  ldouble pr=(GAMMA-1.)*(u0);
+  ldouble Tgas0=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble xx=get_x(geom->ix,0);
   ldouble yy=get_x(geom->iy,1);
   ldouble zz=get_x(geom->iz,2);
-  ldouble kappa=calc_kappa(rho,T,xx,yy,zz);
-  ldouble chi=kappa+calc_kappaes(rho,T,xx,yy,zz);  
-  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+  ldouble kappa=calc_kappa(rho,Tgas0,xx,yy,zz);
+  ldouble chi=kappa+calc_kappaes(rho,Tgas0,xx,yy,zz);  
+  ldouble B = SIGMA_RAD*pow(Tgas0,4.)/Pi;
 
   ldouble Fold[3]={pp[FX0],pp[FY0],pp[FZ0]};
   ldouble Fnew[3];
@@ -2054,17 +2055,26 @@ solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* d
   deltas[3]=Fnew[2]-Fold[2];
 
   //solving in parallel for E and u
+  E=E0;u=u0;
   if(calc_LTE_ff(rho,&u,&E,kappa,dt,0)<0) 
     return -1;
 
   deltas[0]=E-pp[EE0];
 
-  if(verbose) printf("\nchanges:\n\n EE: %e -> %e\n FX: %e -> %e\n FY: %e -> %e\n FZ: %e -> %e\n",
-		     pp[EE0],E,
+  ldouble Trad=calc_LTE_TfromE(E);
+  pr=(GAMMA-1.)*(u);
+  ldouble Tgas=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+
+ if(verbose) printf("\nchanges:\n\n"
+		     " ug: %e -> %e\n Tg: %e -> %e\n EE: %e -> %e\n Tr: %e -> %e\n FX: %e -> %e\n FY: %e -> %e\n FZ: %e -> %e\n\n\n",
+		     u0,u,
+		     Tgas0,Tgas,
+		     E0,E,
+		     Trad0,Trad,
 		     Fold[0],Fnew[0],
 		     Fold[1],Fnew[1],
-		     Fold[2],Fnew[2]);	
-
+		     Fold[2],Fnew[2]
+		     );
 
   if(verbose) print_4vector(deltas);
 
@@ -2228,7 +2238,7 @@ solve_implicit_backup_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldoubl
   
   //apply the change in velocities weighting by energy densities
   for(i1=0;i1<3;i1++)
-    pp[VX+i1] = pp0[VX+i1] + deltavel * E0/(u0+E0) * (pp0[FX0+i1] - pp0[VX+i1]);
+    pp[VX+i1] = pp0[VX+i1] + deltavel * E0/(rho+u0+E0) * (pp0[FX0+i1] - pp0[VX+i1]);
 
   //gas enden
   pp[UU]=u;

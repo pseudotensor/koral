@@ -1,4 +1,4 @@
-return .1*rho;
+return 10000.*.1*rho;
 
 /*
 ldouble rhocgs=rhoGU2CGS(rho);
