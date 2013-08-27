@@ -127,8 +127,8 @@
 //#define SPHCLOUD
 #define G2CLOUD
 
-#define IANGLE (M_PI)
-#define OMANGLE 0.
+#define IANGLE (M_PI/3.)
+#define OMANGLE 0.//M_PI/2.
 #define EARTHMASS (5.97219e27)
 #define MASSCLOUD (3.*EARTHMASS)
 #define RMINFORPART 5000.

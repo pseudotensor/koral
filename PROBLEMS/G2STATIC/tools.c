@@ -36,14 +36,16 @@ set_sgradisk(ldouble *pp,ldouble *xx,void *ggg, void* gggBL)
   //rotation
   //argument of periapsis
   //inclination
-  th=-IANGLE;
-  vec[0]=cos(th)*x + sin(th)*z;
-  vec[1]=y;
-  vec[2]=-sin(th)*x + cos(th)*z;
   th=-OMANGLE;
-  x=cos(th)*vec[0] - sin(th)*vec[1];
-  y=sin(th)*vec[0] + cos(th)*vec[1];
-  z=vec[2];
+  vec[0]=cos(th)*x - sin(th)*y;
+  vec[1]=sin(th)*x + cos(th)*y;
+  vec[2]=vec[2];
+
+  th=-IANGLE;
+  x=cos(th)*vec[0] + sin(th)*vec[2];
+  y=vec[1];
+  z=-sin(th)*vec[0] + cos(th)*vec[2];
+
   //to spherical
   ldouble r=sqrt(x*x+y*y+z*z);
   th=acos(z/r);
