@@ -529,6 +529,8 @@ int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
 int solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int);
 int solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int);
 int solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose);
+int solve_implicit_backup(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int);
+int solve_implicit_backup_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose);
 int solve_explicit_lab_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose);
 
 ldouble calc_LTE_EfromT(ldouble);
@@ -536,7 +538,7 @@ ldouble calc_LTE_TfromE(ldouble);
 ldouble calc_LTE_Efromurho(ldouble E,ldouble);
 ldouble calc_PEQ_ufromTrho(ldouble,ldouble);
 ldouble calc_PEQ_Tfromurho(ldouble,ldouble);
-int calc_LTE_ff(ldouble,ldouble*,ldouble*,ldouble,int);
+int calc_LTE_ff(ldouble,ldouble*,ldouble*,ldouble,ldouble,int);
 int solve_LTE_ff(int ix,int iy,int iz,ldouble dt);
 int solve_LTE(int ix,int iy,int iz,ldouble dt);
 int solve_radforce_ff(int ix,int iy,int iz,ldouble dt);

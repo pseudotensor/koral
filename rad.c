@@ -1227,6 +1227,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	}
 
 	  
+
       //criterion of convergence on the error
       // test - should be here, not later
       if(err<CONV)
@@ -1687,8 +1688,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 }
 
 
-///**********************************************************************
-//* test wrapper ************************************************************
+//**********************************************************************
+//* test routines
 //**********************************************************************
 
 int
@@ -1733,6 +1734,56 @@ test_solve_implicit_lab()
   getchar();
   */
  
+  ldouble deltas[4];
+  int verbose=1;
+  int params[4];
+  
+  //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+
+  //return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+
+  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
+   
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  params[3]=1; //mom.overshoot check
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[2]=RADIMPLICIT_FFEQ;
+  params[3]=1;
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  
+  
+}
+
+int
+test_solve_implicit_backup()
+{
+  FILE *in = fopen("imp.problem.0","r");
+  int i1,i2,iv;
+  ldouble uu[NV],pp[NV],dt;
+  struct geometry geom;
+
+  fill_geometry(0,0,0,&geom);
+
+  pp[RHO]=1.;
+  pp[UU]=0.001;
+  pp[VX]=0.;
+  pp[VX]=0.;
+  pp[VX]=0.;
+  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+  pp[B1]=0.;
+  pp[B2]=0.;
+  pp[B3]=0.;
+  pp[EE0]=0.0001;
+  pp[FX0]=0.;
+  pp[FY0]=0.;
+  pp[FZ0]=0.;
+  
+  p2u(pp,uu,&geom);
+  
   ldouble deltas[4];
   int verbose=1;
   int params[4];
@@ -1963,7 +2014,7 @@ solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* d
   deltas[3]=Fnew[2]-Fold[2];
 
   //solving in parallel for E and u
-  if(calc_LTE_ff(rho,&u,&E,dt,0)<0) 
+  if(calc_LTE_ff(rho,&u,&E,kappa,dt,0)<0) 
     return -1;
 
   deltas[0]=E-pp[EE0];
@@ -2015,6 +2066,167 @@ solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* d
       printf("\n@@@@@@@@ BACKUP IMPLICIT @@@@@@@@@@@@");
       printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
   
+      u2p(uu,pp,geom,corr,fixup);
+      printf("%d %d\n",corr[0],corr[1]);
+
+      print_NVvector(uu);
+      print_Nvector(pp,NV);
+
+    }
+
+  return 0;
+
+}
+
+//**********************************************************************
+//******* very approximate but qualitatively good************************
+//**********************************************************************
+int
+solve_implicit_backup(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
+{
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  int iv,ret;
+  ldouble pp[NV],uu[NV];
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=get_u(p,iv,ix,iy,iz); //primitives corresponding to zero-state  
+      uu[iv]=get_u(u,iv,ix,iy,iz);  
+    }
+
+  ret= solve_implicit_backup_core(uu,pp,&geom,dt,deltas,verbose);
+
+  return ret;
+}
+
+int
+solve_implicit_backup_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  int i1,i2,i3,iv;
+
+  if(verbose)
+    {
+      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      printf("\n@@@@@@@@ BACKUP IMPLICIT @@@@@@@@@@@@");
+      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
+    }
+
+  ldouble pp[NV],uu[NV];
+  PLOOP(i1)
+  {
+    pp[i1]=pp0[i1];
+    uu[i1]=uu0[i1];
+  }	      
+
+  if(verbose) print_NVvector(pp);
+
+  //transforming radiative primitives to ortonormal fluid frame
+  prad_lab2ff(pp,pp,geom);
+
+  if(verbose) print_NVvector(pp);
+  
+  //implicit flux:
+  ldouble rho=pp[RHO];
+  ldouble u0=pp[UU],u;  
+  ldouble E0=pp[EE0],E;
+  ldouble Trad0=calc_LTE_TfromE(E0);
+  ldouble pr=(GAMMA-1.)*(u0);
+  ldouble Tgas0=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble xx=geom->xx;
+  ldouble yy=geom->yy;
+  ldouble zz=geom->zz;
+  ldouble kappa=calc_kappa(rho,Tgas0,xx,yy,zz);
+  ldouble chi=kappa+calc_kappaes(rho,Tgas0,xx,yy,zz);  
+
+  //solving in parallel for E and u using fixed kappa
+  u=u0;
+  E=E0;
+  if(calc_LTE_ff(rho,&u,&E,kappa,dt,0)<0) 
+    {
+      printf("calc_LTE_ff failed in backup\n");
+      return -1;
+    }
+  ldouble Trad=calc_LTE_TfromE(E);
+  pr=(GAMMA-1.)*(u);
+  ldouble Tgas=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+
+  //solving for new rad fluxes in fixed fluid frame of zero state
+  ldouble Fold[3]={pp[FX0],pp[FY0],pp[FZ0]};
+  ldouble Fnew[3];
+  Fnew[0]=Fold[0]/(1.+dt*chi); 
+  Fnew[1]=Fold[1]/(1.+dt*chi);
+  Fnew[2]=Fold[2]/(1.+dt*chi);
+
+  //fractional change of fluxes - velocities
+  ldouble deltavel;
+  deltavel=(Fold[0]-Fnew[0])/Fold[0]; //same for all of them
+
+  if(verbose) printf("\nchanges:\n\n "
+		     " ug: %e -> %e\n Tg: %e -> %e\n EE: %e -> %e\n Tr: %e -> %e\n FX: %e -> %e\n FY: %e -> %e\n FZ: %e -> %e\n deltavel: %e\n",
+		     u0,u,
+		     Tgas0,Tgas,
+		     E0,E,
+		     Trad0,Trad,
+		     Fold[0],Fnew[0],
+		     Fold[1],Fnew[1],
+		     Fold[2],Fnew[2],
+		     deltavel);
+
+  //at this point I know the target temperatures and fractional change in velocities
+  
+  //apply the change in velocities weighting by energy densities
+  for(i1=0;i1<3;i1++)
+    pp[VX+i1] = pp0[VX+i1] + deltavel * E0/(u0+E0) * (pp0[FX0+i1] - pp0[VX+i1]);
+
+  //gas enden
+  pp[UU]=u;
+
+  //rad numbers calculated from energy/momentum conservation
+  p2u(pp,uu,geom);
+
+  //deltas[] defined with respect to RAD quantities so minus here
+  for(i1=0;i1<4;i1++)
+    deltas[i1]=-(uu[UU+i1]-uu0[UU+i1]);
+
+  if(verbose)
+    {
+      ldouble delapl[NV],uu[NV];
+
+      int iv;
+      for(iv=0;iv<NV;iv++)
+	delapl[iv]=0.;
+
+      delapl[1]=-deltas[0];
+      delapl[2]=-deltas[1];
+      delapl[3]=-deltas[2];
+      delapl[4]=-deltas[3];
+      delapl[EE0]=deltas[0];
+      delapl[FX0]=deltas[1];
+      delapl[FY0]=deltas[2];
+      delapl[FZ0]=deltas[3];
+
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu[iv]=uu0[iv]+delapl[iv];
+	}
+
+      print_NVvector(uu0);
+      print_Nvector(pp0,NV);
+
+      int corr[2],fixup[2];
+ 
       u2p(uu,pp,geom,corr,fixup);
       printf("%d %d\n",corr[0],corr[1]);
 
@@ -2235,23 +2447,14 @@ fdf_calc_LTE_ff (double u, void *params,
 //**********************************************************************
 //**********************************************************************
 int
-calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble dt, int verbose)
+calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble kappa,ldouble dt, int verbose)
 {
   struct calc_LTE_ff_parameters cltep;
   cltep.rho=rho;
   cltep.u=*uint;
   cltep.E=*E;
   cltep.verbose=verbose;
-  
-  if(cltep.E<EEFLOOR && 0)
-    {
-      printf("imposing EEFLOOR 0\n");
-      cltep.E=EEFLOOR;
-    }
-  
-  ldouble p=(GAMMA-1.)*cltep.u;
-  ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  cltep.kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  cltep.kappa=kappa;
 
   ldouble tlte = 1./cltep.kappa;
 
@@ -2298,12 +2501,6 @@ calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble dt, int verbose)
   ldouble Bp1 = SIGMA_RAD*pow(Ttu,4.)/Pi;
   *E=(cltep.E+4.*Pi*cltep.kappa*Bp1*dt)/(1.+cltep.kappa*dt);
   
-  if(*uint<0 && 0)
-    {
-      *uint=1.e-30;
-      printf("imposing ufloor in lte\n");
-      getch();
-    }
   return 0;
 }
 //**********************************************************************
