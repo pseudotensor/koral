@@ -1,4 +1,5 @@
-//#define TRACER
+//test
+#define MAGNFIELD
 
 /************************************/
 //restart

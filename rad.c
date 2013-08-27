@@ -1566,6 +1566,38 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   deltas[3]=uu[FZ0]-uu00[FZ0];
 
   if(verbose) print_4vector(deltas);
+  
+ if(verbose)
+    {
+      ldouble delapl[NV],uu[NV];
+
+      int iv;
+      for(iv=0;iv<NV;iv++)
+	delapl[iv]=0.;
+
+      delapl[1]=-deltas[0];
+      delapl[2]=-deltas[1];
+      delapl[3]=-deltas[2];
+      delapl[4]=-deltas[3];
+      delapl[EE0]=deltas[0];
+      delapl[FX0]=deltas[1];
+      delapl[FY0]=deltas[2];
+      delapl[FZ0]=deltas[3];
+
+      for(iv=0;iv<NV;iv++)
+	{
+	  uu[iv]=uu0[iv]+delapl[iv];
+	}
+
+      int corr[2],fixup[2];
+  
+      u2p(uu,pp,geom,corr,fixup);
+      printf("%d %d\n",corr[0],corr[1]);
+
+      print_NVvector(uu);
+      print_Nvector(pp,NV);
+
+    }
 
   return 0;
 }
@@ -1768,29 +1800,37 @@ test_solve_implicit_backup()
 
   fill_geometry(0,0,0,&geom);
 
-  pp[RHO]=1.;
+  pp[RHO]=100.;
   pp[UU]=0.001;
   pp[VX]=0.;
-  pp[VX]=0.;
-  pp[VX]=0.;
+  pp[VY]=0.;
+  pp[VZ]=0.;
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
   pp[B1]=0.;
   pp[B2]=0.;
   pp[B3]=0.;
   pp[EE0]=0.0001;
-  pp[FX0]=0.;
+  pp[FX0]=0.1;
   pp[FY0]=0.;
   pp[FZ0]=0.;
-  
+
+  //TTT
+
+  dt=1.;
+
   p2u(pp,uu,&geom);
   
+  print_NVvector(uu);
+  print_NVvector(pp);
+
   ldouble deltas[4];
-  int verbose=1;
-  int params[4];
+  int verbose=1;  int params[4];
   
   //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
 
-  //return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+  return solve_implicit_backup_core(uu,pp,&geom,dt,deltas,verbose);
+
+  return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
@@ -2171,10 +2211,10 @@ solve_implicit_backup_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldoubl
 
   //fractional change of fluxes - velocities
   ldouble deltavel;
-  deltavel=(Fold[0]-Fnew[0])/Fold[0]; //same for all of them
+  deltavel=1./(1./(dt*chi) + 1.); //same for all of them
 
-  if(verbose) printf("\nchanges:\n\n "
-		     " ug: %e -> %e\n Tg: %e -> %e\n EE: %e -> %e\n Tr: %e -> %e\n FX: %e -> %e\n FY: %e -> %e\n FZ: %e -> %e\n deltavel: %e\n",
+  if(verbose) printf("\nchanges:\n\n"
+		     " ug: %e -> %e\n Tg: %e -> %e\n EE: %e -> %e\n Tr: %e -> %e\n FX: %e -> %e\n FY: %e -> %e\n FZ: %e -> %e\n deltavel: %e\n\n",
 		     u0,u,
 		     Tgas0,Tgas,
 		     E0,E,
