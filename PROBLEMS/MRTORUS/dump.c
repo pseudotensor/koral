@@ -13,5 +13,12 @@ v1=bsqd/2.;
 v2=calc_divB(ix,iy,iz);
 #endif
 
-v3=Tgas;
+#ifdef RADIATION
+ldouble Rtt,Ehat,ucon[4],prad;
+calc_ff_Rtt(pp,&Rtt,ucon,&geom);
+Ehat=-Rtt; 
+prad=Ehat/3.;
+v3=prad;
+#endif
+
 v4=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);

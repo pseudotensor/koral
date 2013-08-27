@@ -62,14 +62,16 @@ trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
       pp2[3]=ucon[2];
       pp2[4]=ucon[3];
 
-      #ifdef MAGNFIELD_TEST
+      #ifdef MAGNFIELD
+      //TODO: verify this
+
       //magnetic field 4-vector
       ldouble bcon[4],Bcon[4];
-      calc_bcon_prim(pp,bcon,geom1);
+      calc_bcon_prim(pp1,bcon,geom1);
       //converting to CO2
-      trans2_coco(xxvec,ucon,ucon,CO1,CO2);
+      trans2_coco(xxvec,bcon,bcon,CO1,CO2);
       //coming back to primitive B^i
-      calc_Bcon_prim(pp,bcon,Bcon,geom2);
+      calc_Bcon_prim(pp2,bcon,Bcon,geom2);
       
       pp2[B1]=Bcon[1]; 
       pp2[B2]=Bcon[2];

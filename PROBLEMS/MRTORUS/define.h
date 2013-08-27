@@ -17,7 +17,7 @@
 /************************************/
 #define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA 0.3 //close to the target pmag/pgas
+#define MAXBETA .1 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -66,15 +66,15 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
-#define MAXX (log(40.-MKS1R0))
-#define NX 80
-#define NY 60
+#define MINX (log(1.7-MKS1R0))
+#define MAXX (log(30.-MKS1R0))
+#define NX 150
+#define NY 100
 #define NZ 1
 #endif
 
-#define MINY (0.05*Pi/2.)
-#define MAXY (Pi-0.05*Pi/2.)
+#define MINY (0.025*Pi/2.)
+#define MAXY (Pi-0.025*Pi/2.)
 //#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
