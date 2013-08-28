@@ -510,6 +510,9 @@ fprint_restartfile(ldouble t, char* folder)
   fflush(fout1);
   fclose(fout1);
 
+  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+  system(bufor);
+
   return 0;
 }
 							  
@@ -528,8 +531,11 @@ fread_restartfile(int nout1, ldouble *t)
   //opening dump file
   int i,ret;
   char fname[40];
-  sprintf(fname,"dumps/res%04d.dat",nout1);
-  nfout1=nout1+1; //global file no.
+  if(nout1>=0)
+    sprintf(fname,"dumps/res%04d.dat",nout1);
+  else
+    sprintf(fname,"dumps/reslast.dat",nout1);
+
   FILE *fdump=fopen(fname,"r");
 
   //reading parameters, mostly time
@@ -538,6 +544,7 @@ fread_restartfile(int nout1, ldouble *t)
   printf("dump file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
 	 fname,intpar[0],*t,intpar[1],intpar[2],intpar[3],intpar[4]); 
 
+  nfout1=intpar[0]+1; //global file no.
 
   int ix,iy,iz,iv;
   //reading conserved

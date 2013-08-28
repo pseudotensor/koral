@@ -17,7 +17,7 @@
 /************************************/
 #define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA .1 //target pmag/pgas int the midplane
+#define MAXBETA .002 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -100,10 +100,10 @@
 #define GAMMA (4./3.)
 #define NODONUT 0
 #define INFLOWING 0
-#define ELL 3.85
+#define ELL 4.2
 #define URIN (0.)
 #define KKK 3000.
-#define UTPOT .965
+#define UTPOT .97
 #define DTOUT1 2.e0
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))

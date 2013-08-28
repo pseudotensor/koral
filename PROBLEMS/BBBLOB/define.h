@@ -4,8 +4,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 7
+#define RESTART
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -90,7 +90,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define DTOUT1 .5
+#define DTOUT1 .1
 #define RADOUTPUTINZAMO
 //#define SILOOUTPUT
 

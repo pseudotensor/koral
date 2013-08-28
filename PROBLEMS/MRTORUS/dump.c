@@ -19,6 +19,16 @@ calc_ff_Rtt(pp,&Rtt,ucon,&geom);
 Ehat=-Rtt; 
 prad=Ehat/3.;
 v3=prad;
+
+//tau in radius
+ldouble tau[3];
+calc_tautot(pp,xxvec,dx,tau);
+v4=tau[1];
+calc_tauabs(pp,xxvec,dx,tau);
+v5=tau[1];
+
 #endif
 
-v4=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);
+//v4=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);
+
+
