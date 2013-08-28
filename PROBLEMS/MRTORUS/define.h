@@ -2,7 +2,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 320
+#define RESTARTNUM 81
 
 /************************************/
 //radiation choices
@@ -66,15 +66,15 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.7-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
 #define MAXX (log(30.-MKS1R0))
-#define NX 150
-#define NY 100
+#define NX 100
+#define NY 80
 #define NZ 1
 #endif
 
-#define MINY (0.025*Pi/2.)
-#define MAXY (Pi-0.025*Pi/2.)
+#define MINY (0.05*Pi/2.)
+#define MAXY (Pi-0.05*Pi/2.)
 //#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.

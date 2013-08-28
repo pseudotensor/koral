@@ -41,18 +41,30 @@ if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
     iix=NX-1;
     iiy=iy;
     iiz=iz;
-
-    //linear extrapolation
-    for(iv=0;iv<NV;iv++)
+    
+    //copying everything
+    for(iv=0;iv<=NV;iv++)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
 
-    //atmosphere in rho,uint and velocities
-    set_hdatmosphere(pp,xxvec,gg,GG,4);
+    //checking for the gas inflow
+    ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
+    conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+    if(ucon[1]<0.) //inflow, resseting to atmosphere
+      {
+	//atmosphere in rho,uint and velocities and zero magn. field
+	set_hdatmosphere(pp,xxvec,gg,GG,4);
+      }
 
 #ifdef RADIATION
-    set_radatmosphere(pp,xxvec,gg,GG,0);
+    ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};    
+    conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+    if(urfcon[1]<0.) //inflow, resseting to atmosphere
+      {
+	//atmosphere in radiation
+	set_radatmosphere(pp,xxvec,gg,GG,0);
+      }
 #endif
 
     /*

@@ -147,9 +147,18 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 	}
       ldouble delta=b*b-4.*a*c;
       if(delta<0.) {("delta.lt.0 in VEL4->VELR\n");return -1;}
-      ut[0]=(-b-sqrt(delta))/2./a;
-      if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
+      ldouble ut1,ut2;
+      ut1=(-b-sqrt(delta))/2./a;
+      ut2=(-b+sqrt(delta))/2./a;
 
+      if(ut1>0. && ut2>0.) //ambiguous solution in the ergosphere
+	{
+	  printf("ambigous ut in VEL4->VELR: %e %e\n",ut1,ut2);
+	  ut[0]=ut1;
+	}
+      else
+	ut[0]=my_max(ut1,ut2);
+       
       for(i=1;i<4;i++)
 	ut[i]=u1[i]-ut[0]*GG[0][i]/GG[0][0];
     }
