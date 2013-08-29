@@ -1648,8 +1648,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
-  printf("nefnoef\n");
-
   //****
   //4dprim on energy eq. with strict overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
@@ -1661,7 +1659,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%d %d %d) > energy + (2) overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) energy + (2) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1677,7 +1675,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%d %d %d) > energy + (3) overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > energy + (3) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1693,7 +1691,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%d %d %d) > energy + no overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > energy + no overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1715,7 +1713,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%d %d %d) > 1d enden + energy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > 1d enden + energy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1731,7 +1729,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%d %d %d) > entropy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > entropy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1744,14 +1742,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%d %d %d) > only backup worked\n",geom.ix,geom.iy,geom.iz);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > only backup worked\n",geom.ix,geom.iy,geom.iz,global_time);
       fflush(fout_fail); //may slow down
       return 0;
     }
     
   //****
   //nothing worked
-  fprintf(fout_fail,"rad implicit > (%d %d %d) > critical failure!\n",geom.ix,geom.iy,geom.iz);
+  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > critical failure!\n",geom.ix,geom.iy,geom.iz,global_time);
   
   return -1;
 

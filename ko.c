@@ -145,6 +145,7 @@ solve_the_problem(ldouble tstart)
 
   while (t < t1 && nfout1<=NOUTSTOP && i1<NSTEPSTOP)
     {    
+      global_time=t;
       nstep++;
 
       //calculates the primitives to copy to previous time steps
