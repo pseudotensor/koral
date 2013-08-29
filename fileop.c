@@ -20,6 +20,9 @@ fprint_openfiles(char* folder)
   sprintf(bufor,"%s/scalars.dat",folder);
   fout_scalars=fopen(bufor,"a");
 
+  sprintf(bufor,"%s/failures.dat",folder);
+  fout_fail=fopen(bufor,"a");
+
   return 0;
 }
 
@@ -31,6 +34,7 @@ int
 fprint_closefiles()
 {
   fclose(fout_scalars);
+  fclose(fout_fail);
   return 0;
 }
 

@@ -20,7 +20,6 @@ main(int argc, char **argv)
       nostep=atof(argv[3]);
     }
 
-  ldouble tstart;
   int i;
 
   //currently gsl is not used
@@ -60,7 +59,7 @@ main(int argc, char **argv)
       nfout1--; //correcting index
   
       //sets bc
-      set_bc(tstart,1);
+      set_bc(t,1);
      
       //calculate scalars
       calc_scalars(scalars,t);

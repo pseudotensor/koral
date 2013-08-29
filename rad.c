@@ -494,6 +494,8 @@ calc_implicit_1dprim_err(ldouble xxx,ldouble *uu0,ldouble *pp0,ldouble dtau,void
 
   rho=pp0[RHO];
 
+  Ehat=ugas=0.;
+
   if(whichprim==RAD)
     {
       Ehat=xxx*ratio;
@@ -779,7 +781,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 
   //intf("%d %d %d\n",params[0],params[1],params[2]);getchar();
 
-  ldouble uu[NV],pp[NV],err[4];
+  ldouble uu[NV],pp[NV],err[4]={0.,0.,0.,0.};
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
   for(i=0;i<NV;i++) pp[i]=ppin[i];
@@ -802,6 +804,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   p2u(pp,uu,geom);
  
   //opposite changes in the other quantities and inversion
+  u2pret=0;
   if(whichprim==RAD)
     {
       uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
@@ -1639,11 +1642,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  //  if(geom.ix==60 && geom.iy==NY/2) return -1;
-
   if(ret==0) return 0;
 
-  //**** 1st + 1 ****
+  //****
   //4dprim on energy eq. with strict overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1652,9 +1653,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  if(ret==0) return 0;
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%d %d %d) > energy + (2) overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
 
-  //**** 1st + 1 bis ****
+  //****
   //4dprim on energy eq. with more strict overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1663,9 +1669,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  if(ret==0) return 0;
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%d %d %d) > energy + (3) overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
 
-  //**** 1st + 2 ****
+  //****
   //4dprim on energy eq. without overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1674,9 +1685,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  if(ret==0) return 0;
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%d %d %d) > energy + no overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
 
-  //**** 1st + 3 ****
+  //****
   //1d solver in temperatures first, then energy with overshooting
   //printf("trying 2nd at %d %d:\n",geom.ix,geom.iy);      
   PLOOP(iv) pp[iv]=pp0[iv]; 
@@ -1691,9 +1707,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
     }
   
-  if(ret==0) return 0;
-  
-  //**** 1st + 4 ****
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%d %d %d) > 1d enden + energy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
+ 
+  //****
   //entropy equation instead of energy equation
   PLOOP(iv) pp[iv]=pp0[iv]; 
   printf("trying entropy at %d %d:\n",geom.ix,geom.iy);      
@@ -1703,19 +1724,33 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
-  if(ret==0) return 0;
-
-  //**** 1st + 5 ****
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%d %d %d) > entropy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
+ 
+  //****
   //backup method
   PLOOP(iv) pp[iv]=pp0[iv]; 
   printf("trying backup at %d %d:\n",geom.ix,geom.iy);      
   
   ret=solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
-  if(ret==0) return 0;
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%d %d %d) > only backup worked\n",geom.ix,geom.iy,geom.iz);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
     
+
+  fprintf(fout_fail,"rad implicit > (%d %d %d) > critical failure!\n",geom.ix,geom.iy,geom.iz);
+  
   return -1;
 
+  /*
   //**** 1st + 5 ****
   //finally desperately try 4dcon solver - unused
   PLOOP(iv) pp[iv]=pp0[iv]; 
@@ -1725,6 +1760,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(ret==0) return 0;
 
   return -1;
+  */
 }
 
 
