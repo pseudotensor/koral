@@ -69,8 +69,24 @@
 //63* ORSZAG - Orszag-Tang vortex
 //64* MAGDONUT - MHD donut with poloidal magnetic fields
 //65* MRTORUS - RMHD torus with radiation
+//66* MRTORUS - RMHD Newtonian torus with radiation
 
-#define PROBLEM 65
+#define PROBLEM 66
+
+#if(PROBLEM==66)
+
+#define PR_DEFINE "PROBLEMS/KTORUS/define.h"
+#define PR_BC "PROBLEMS/KTORUS/bc.c"
+#define PR_INIT "PROBLEMS/KTORUS/init.c"
+#define PR_KAPPA "PROBLEMS/KTORUS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/KTORUS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/KTORUS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/KTORUS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/KTORUS/dump.c"
+#define PR_TOOLS "PROBLEMS/KTORUS/tools.c"
+#define PR_POSTINIT "PROBLEMS/KTORUS/postinit.c"
+
+#endif
 
 #if(PROBLEM==65)
 
@@ -86,6 +102,7 @@
 #define PR_POSTINIT "PROBLEMS/MRTORUS/postinit.c"
 
 #endif
+
 #if(PROBLEM==64)
 
 #define PR_DEFINE "PROBLEMS/MAGDONUT/define.h"
