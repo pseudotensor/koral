@@ -66,8 +66,8 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
-#define MAXX (log(50.-MKS1R0))
+#define MINX (log(1.2-MKS1R0))
+#define MAXX (log(100.-MKS1R0))
 #define NX 100
 #define NY 80
 #define NZ 1
@@ -101,7 +101,7 @@
 #define NPOLI 3.
 #define RZERO 40
 #define RHOZERO rhoCGS2GU(1.) //1. g/cm3
-#define ELLA 0.46
+#define ELLA 0.
 #define VSZERO 5.6e-3
 #define ELL 4.2
 
