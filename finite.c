@@ -735,12 +735,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-  
-  //do not update the primitives
-
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
+  //to count the average number of iteration in the implicit solver
+  global_slot[0]=global_slot[1]=0.;
 
   //again over cells - source terms
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
@@ -826,6 +822,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       /************************************************************************/
 #ifndef SKIPRADSOURCE
 #ifdef RADIATION
+
       //update primitives / correct conserved
       calc_primitives(ix,iy,iz);
 
@@ -950,7 +947,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       /************************************************************************/
 
     } //source terms
-
 
   //**********************************************************************
   //**********************************************************************

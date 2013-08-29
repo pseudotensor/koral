@@ -1167,7 +1167,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
  
   //4dprim
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-6;
+  ldouble CONV = 1.e-10;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
@@ -1562,6 +1562,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //to print number of iterations
   //if(geom->iy==0 && geom->ix==NX/3) printf("%d\n",iter);
 
+  //to average number of iterations
+  global_slot[0]+=(ldouble)iter;
+  global_slot[1]+=1.;
+
   //returns corrections to radiative primitives
   deltas[0]=uu[EE0]-uu00[EE0];
   deltas[1]=uu[FX0]-uu00[FX0];
@@ -1644,6 +1648,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
+  printf("nefnoef\n");
+
   //****
   //4dprim on energy eq. with strict overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
@@ -1717,7 +1723,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //****
   //entropy equation instead of energy equation
   PLOOP(iv) pp[iv]=pp0[iv]; 
-  printf("trying entropy at %d %d:\n",geom.ix,geom.iy);      
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
   params[3]=1; //do momentum overshooting check
@@ -1734,7 +1739,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //****
   //backup method
   PLOOP(iv) pp[iv]=pp0[iv]; 
-  printf("trying backup at %d %d:\n",geom.ix,geom.iy);      
   
   ret=solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
@@ -1745,7 +1749,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       return 0;
     }
     
-
+  //****
+  //nothing worked
   fprintf(fout_fail,"rad implicit > (%d %d %d) > critical failure!\n",geom.ix,geom.iy,geom.iz);
   
   return -1;

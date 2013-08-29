@@ -261,12 +261,15 @@ solve_the_problem(ldouble tstart)
       //performance
       ldouble znps=NX*NY*NZ/(end_time-start_time);
 
+      //average number of iterations in the implicit solver
+      ldouble avimpit=global_slot[0]/global_slot[1];
+
 
       //output to a file
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
-	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %f\n"
-		 ,nfout1,t,dt,max_ws[0],end_time-start_time,znps);
+	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f avimpit: %.3f\n"
+		 ,nfout1,t,dt,max_ws[0],end_time-start_time,znps,avimpit);
 	  
 	  //projects primitives onto ghost cells
 	  set_bc(t,0);
@@ -289,8 +292,8 @@ solve_the_problem(ldouble tstart)
       //or performance to screen only every second
       else if(end_time-fprintf_time>1.) 
 	{
-	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %f\n"
-		 ,nstep,t,dt,max_ws[0],end_time-start_time,znps);
+	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f avimpit: %.3f\n"
+		 ,nstep,t,dt,max_ws[0],end_time-start_time,znps,avimpit);
 	  fprintf_time=end_time;
 	  i2=i1;
 	}
