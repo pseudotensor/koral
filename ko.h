@@ -283,8 +283,6 @@ int fprint_restartfile(ldouble t, char* folder);
 int fprint_simplecart(ldouble t, char* folder);
 int fread_restartfile(int,ldouble*);
 int fprint_gridfile(char* folder);
-int fread_dumpfile(int,ldouble*);
-int fread_dumpfile(int,ldouble*);
 int fprint_openfiles(char *);
 int fprint_closefiles();
 int fprint_profiles(ldouble,ldouble*,int,int,char*);

@@ -198,9 +198,6 @@ int fprint_silofile(ldouble time, int num, char* folder)
 
 	      ldouble rvel[4]={0,pp[FX0],pp[FY0],pp[FZ0]};	
 
-	      conv_vels(rvel,rvel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
-	      trans2_cc2on(rvel,rvel,geomout.tup);
-
 	      //outvel - ortonormal VEL4
 	      Fx[nodalindex]=rvel[1];
 	      Fy[nodalindex]=rvel[2];

@@ -344,8 +344,6 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 
 #ifdef RADOUTPUTINZAMO //to print  radiation primitives in ZAMO
 									  prad_lab2on(pp,pp,&geom);
-									  //prad_lab2ff(pp,pp,&geom);
-									  //prad_ff2zamo(pp,pp,geomout.gg,geomout.GG,geomout.eup);
 #endif
 
 #ifdef RADOUTPUTVELS
@@ -422,10 +420,10 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
 										  pp[B3],
 										  0.
 #else
-										  E,
-										  Fx,
-										  Fy,
-										  Fz
+										  0.,
+										  0.,
+										  0.,
+										  0.
 #endif
 										  );
 
@@ -586,179 +584,6 @@ fread_restartfile(int nout1, ldouble *t)
 	    }
 	}
     }
-
-    return 0;
-}
-
-/*********************************************/
-/*********************************************/
-/*********************************************/
-/* reads dump file */
-/* puts conserved into the memory */
-/* converts them to primitives */
-/*********************************************/
-/*********************************************/
-/*********************************************/
-int 
-fread_dumpfile(int nout1, ldouble *t)
-{
-  //opening dump file
-  int i,ret;
-  char fname[40];
-  sprintf(fname,"dumps/out%04d.dat",nout1);
-  nfout1=nout1+1; //global file no.
-  FILE *fdump=fopen(fname,"r");
-
-  //reading parameters, mostly time
-  int intpar[5];
-  ret=fscanf(fdump,"## %d %lf %d %d %d %d\n",&intpar[0],t,&intpar[1],&intpar[2],&intpar[3],&intpar[4]);
-  printf("dump file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
-	 fname,intpar[0],*t,intpar[1],intpar[2],intpar[3],intpar[4]); 
-
-
-  int ix,iy,iz,iv;
-  //reading conserved
-  int gclx,gcrx,gcly,gcry,gclz,gcrz;
-
-  /**************************************************/  
-  /** reading size  *********************************/  
-  /** must be the same as in fprint_profile *********/  
-  /**************************************************/  
-  gclx=gcly=gclz=0;
-  gcrx=gcry=gcrz=0;
-#ifdef PRINTGC_LEFT
-  gclx=1;//gcly=1;
-#endif
-#ifdef PRINTGC_RIGHT
-  gcrx=1;
-#endif
-#ifdef PRINTXGC_LEFT
-  gclx=1;
-#endif
-#ifdef PRINTXGC_RIGHT
-  gcrx=1;
-#endif
-#ifdef PRINTYGC_LEFT
-  gcly=1;
-#endif
-#ifdef PRINTYGC_RIGHT
-  gcry=1;
-#endif
-#ifdef PRINTZGC_LEFT
-  gclz=1;
-#endif
-#ifdef PRINTZGC_RIGHT
-  gcrz=1;
-#endif
-#ifdef PRINTZONEMORE
-  gcrz=1;
-#endif
-
-  /**************************************************/  
-  /** reading order *********************************/  
-  /** must be the same as in fprint_profile *********/  
-  /**************************************************/  
-
-
-#ifdef YZXDUMP
-  for(iy=0;iy<NY;iy++)
-    {
-      for(iz=-gclz*NG;iz<NZ+gcrz*NG;iz++)
-	{
-	  for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
-	    {
-#elif defined(ZXYDUMP)
-	      for(iz=0;iz<NZ;iz++)
-		{
-		  for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
-		    {
-		      for(iy=-gcly*NG;iy<NY+gcry*NG;iy++)
-			{
-#elif defined(YSLICE)
-			  for(iy=YSLICE;iy<YSLICE+1;iy++)
-			    {
-			      for(iz=0;iz<NZ;iz++)
-				{
-				  for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
-				    {
-#elif defined(ZSLICE)
-				      for(iz=ZSLICE;iz<ZSLICE+1;iz++)
-					{
-					  for(iy=0;iy<NY;iy++)
-					    {
-					      for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
-						{
-#elif defined(YZSLICE)
-						  for(iy=NY/2;iy<NY/2+1;iy++)
-						    {
-						      for(iz=NZ/2;iz<NZ/2+1;iz++)
-							{
-							  for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
-							    {
-#else
-							      for(iz=0;iz<NZ;iz++)
-								{
-								  for(iy=-gcly*NG;iy<NY+gcry*NG;iy++)
-								    {
-								      for(ix=-gclx*NG;ix<NX+gcrx*NG;ix++)
-									{
-#endif 
-									  struct geometry geom;
-									  fill_geometry(ix,iy,iz,&geom);
-
-									  //*****************
-									  //verify consistency here with fprint_profiles!
-									  //*****************
-									  //within domain:
-									  if(if_indomain(ix,iy,iz)==0) continue;
-									  ldouble xxvec[4],xxvecout[4];
-
-									  //transforming code coordinates to output coordinates
-									  get_xx(ix,iy,iz,xxvec);
-									  coco_N(xxvec,xxvecout,MYCOORDS,OUTCOORDS);
-									  ldouble xx = xxvecout[1];									  
-
-									  /**************************/  
-									  /**************************/  
-									  /**************************/  
-									  ldouble uu[NV],pp[NV],ftemp;
-									  char c;
-	      
-									  //reading conserved and primitives from file
-									  ret=fscanf(fdump,"%*f %*f %*f ");
-									  
-									  //10 hardcoded here
-									  for(i=0;i<10;i++)
-									    {
-									      ret=fscanf(fdump,"%lf ",&ftemp);
-									      if(i<NV) uu[i]=ftemp;
-									    }
-									  for(i=0;i<10;i++)
-									    {
-									      ret=fscanf(fdump,"%lf ",&ftemp);
-									      if(i<NV) pp[i]=ftemp;
-									    }
-
-									  //rest of line
-									  do
-									    {
-									      if(feof(fdump)) return 0;
-									      c = fgetc(fdump);
-									    }
-									  while(c != '\n');
-
-									  //saving primitives
-									  for(iv=0;iv<NV;iv++)    
-									    {
-									      set_u(u,iv,ix,iy,iz,uu[iv]);
-									      set_u(p,iv,ix,iy,iz,pp[iv]);
-									    }
-
-									  //sanity check using pp as initial guess
-									  calc_primitives(ix,iy,iz);									  
-									}
-								    }
-								}
 
     return 0;
 }
