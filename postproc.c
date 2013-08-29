@@ -71,12 +71,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      calc_tautot(pp,xxBL,dx,tautot);
 	      calc_tauabs(pp,xxBL,dx,tauabs);
 
-#ifdef CGSOUTPUT
+	      //#ifdef CGSOUTPUT
 	      rho=rhoGU2CGS(rho);
 	      dx[0]=lenGU2CGS(dx[0]); //dr
 	      dx[1]=lenGU2CGS(dx[1]); //dth
 	      dx[2]=lenGU2CGS(dx[2]); //dph
-#endif
+	      //#endif
 
 	      //surface density (2nd column)
 	      profiles[0][ix]+=rho*dx[1];
