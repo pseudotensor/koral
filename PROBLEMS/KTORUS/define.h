@@ -7,7 +7,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
 //#define SKIPRADSOURCE
@@ -15,9 +15,9 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA .002 //target pmag/pgas int the midplane
+#define MAXBETA .005 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -66,10 +66,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.2-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
 #define MAXX (log(100.-MKS1R0))
-#define NX 100
-#define NY 80
+#define NX 140
+#define NY 100
 #define NZ 1
 #endif
 
@@ -92,7 +92,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 1.e1
 
 /************************************/
 //common physics / torus / atmosphere
@@ -100,9 +100,9 @@
 #define GAMMA (4./3.)
 #define NPOLI 3.
 #define RZERO 40
-#define RHOZERO rhoCGS2GU(1.) //1. g/cm3
-#define ELLA 0.
-#define VSZERO 5.6e-3
+#define RHOZERO rhoCGS2GU(1.e-2) //1. g/cm3
+#define ELLA 0.3
+#define VSZERO 3.e-2//5.6e
 #define ELL 4.2
 
 #define RHOATMMIN  1.e-24

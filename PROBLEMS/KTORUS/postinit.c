@@ -19,13 +19,6 @@ for(iz=0;iz<NZ;iz++)
 	    fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
  
 	    int iv;
-
-	    //donut formulae
-	    ldouble podpierd=-(geomBL.GG[0][0]-2.*ELL*geomBL.GG[0][3]+ELL*ELL*geomBL.GG[3][3]);
-	    ldouble ut=-1./sqrt(podpierd);
-	    ut/=UTPOT; //rescales rin
-	    ut*=1.01; //not to account for surface
-
 	    PLOOP(iv)
 	      pp[iv]=get_u(p,iv,ix,iy,iz);
 

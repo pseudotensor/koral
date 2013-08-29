@@ -12,19 +12,19 @@ struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 //torus as in Kato+04
-ldouble R=geomBL.xx;
-ldouble r=geomBL.xx*sin(geomBL.yy);
+ldouble Rsph=geomBL.xx;
+ldouble Rcyl=geomBL.xx*sin(geomBL.yy);
 ldouble ell0=sqrt(RZERO*RZERO*RZERO)/(RZERO-2.);
-ldouble ell = ell0*pow(r/RZERO,ELLA);
+ldouble ell = ell0*pow(Rcyl/RZERO,ELLA);
 ldouble Psi0 = -1./(RZERO-2.);
-ldouble PsiT0 = Psi0 + 1./(2.*(1.-ELLA))*pow(ell/RZERO,2.);
-ldouble Psi = -1./(R-2.);
-ldouble PsiT = Psi + 1./(2.*(1.-ELLA))*pow(ell/r,2.);
+ldouble PsiT0 = Psi0 + 1./(2.*(1.-ELLA))*pow(ell0/RZERO,2.);
+ldouble Psi = -1./(Rsph-2.);
+ldouble PsiT = Psi + 1./(2.*(1.-ELLA))*pow(ell/Rcyl,2.);
 ldouble podpierd = 1. - GAMMA/(VSZERO*VSZERO)*(PsiT-PsiT0)/(NPOLI+1.);
 
 //if(geom.iy==NY/2){printf("%e %e %e\n",geomBL.xx,geomBL.yy,(PsiT-PsiT0));getch();}
 
-if(podpierd<0. || R<0.5*RZERO) //outside donut
+if(podpierd<0. || Rcyl<6.) //outside donut
   {
     //ambient
     set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
@@ -41,9 +41,10 @@ if(podpierd<0. || R<0.5*RZERO) //outside donut
 #endif
 
     rho = RHOZERO * pow(podpierd,NPOLI);
+
     pgas = RHOZERO * VSZERO * VSZERO / GAMMA * pow(rho/RHOZERO,1.+1./NPOLI);
     uint = pgas / GAMMAM1;
-    Vphi=ell/R/R;
+    Vphi=ell/Rcyl/Rcyl;
 
     //3-velocity in BL transformed to MYCOORDS
     ldouble ucon[4]={0.,0.,0.,Vphi};

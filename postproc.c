@@ -88,7 +88,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[3][ix]+=ucov[3]*rho*dx[1];	
 	      //abs optical depth (7)
 	      profiles[5][ix]+=tauabs[1];	
-	      //tot optical depth (7)
+	      //tot optical depth (8)
 	      profiles[6][ix]+=tautot[1];	
 	    }
 	  //normalizing by sigma
