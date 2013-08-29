@@ -399,8 +399,8 @@ int coco_KS2BL(ldouble *xBL, ldouble *xKS);
 
 //relele.c
 int calc_normalobs_4vel(ldouble GG[][5], ldouble *ncon);
+int calc_normalobs_relvel(ldouble GG[][5], ldouble *ncon);
 int set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
-int calc_photonrad_4vel(ldouble gg[][5],ldouble GG[][5], ldouble *ucon);
 int conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5]);
 #define dot(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2]+A[3]*B[3])
 #define dot3(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2])
@@ -422,6 +422,8 @@ ldouble r_mbound_BL(ldouble a);
 ldouble r_photon_BL(ldouble a);
 int update_entropy(int ix,int iy,int iz,int u2pflag);
 int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
+int conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
+int conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5],int);
 
 //u2p.c
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);

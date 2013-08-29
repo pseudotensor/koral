@@ -56,7 +56,7 @@ trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
       //converting to CO2
       trans2_coco(xxvec,ucon,ucon,CO1,CO2);
       //to VELPRIM
-      conv_vels(ucon,ucon,VEL4,VELPRIM,geom2->gg,geom2->GG);
+      conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geom2->gg,geom2->GG);
 
       pp2[2]=ucon[1]; 
       pp2[3]=ucon[2];
@@ -121,7 +121,7 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
       //converting to CO2
       trans2_coco(xxvec,ucon,ucon,CO1,CO2);
       //to VELPRIM
-      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom2->gg,geom2->GG);
+      conv_vels_ut(ucon,ucon,VEL4,VELPRIMRAD,geom2->gg,geom2->GG);
 
       pp2[FX0]=ucon[1]; 
       pp2[FY0]=ucon[2];

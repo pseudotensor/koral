@@ -65,7 +65,7 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
     Vphi=uPhi/uT;
     Vr=0.;
 
-    //4-velocity in BL transformed to MYCOORDS
+    //3-velocity in BL transformed to MYCOORDS
     ldouble ucon[4]={0.,-Vr,0.,Vphi};
     conv_vels(ucon,ucon,VEL3,VELPRIM,ggBL,GGBL);
    
@@ -133,6 +133,8 @@ if(ut<-1 || podpierd<0. || xx<4.) //outside donut
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //to conserved
 p2u(pp,uu,&geom);
+
+
 
 /***********************************************/
 

@@ -2,7 +2,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 81
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -67,9 +67,9 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.6-MKS1R0))
-#define MAXX (log(30.-MKS1R0))
-#define NX 100
-#define NY 80
+#define MAXX (log(50.-MKS1R0))
+#define NX 200
+#define NY 160
 #define NZ 1
 #endif
 
@@ -104,7 +104,7 @@
 #define URIN (0.)
 #define KKK 3000.
 #define UTPOT .97
-#define DTOUT1 2.e0
+#define DTOUT1 10.
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

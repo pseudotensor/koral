@@ -2896,8 +2896,8 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
     {
       pp[EE0]=ERADATMMIN; 
       ldouble ucon[4];
-      calc_normalobs_4vel(GG,ucon);
-      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
+      calc_normalobs_relvel(GG,ucon);
+      conv_vels(ucon,ucon,VELR,VELPRIMRAD,gg,GG);
       pp[FX0]=ucon[1]; 
       pp[FY0]=ucon[2];
       pp[FZ0]=ucon[3];
@@ -2920,7 +2920,7 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
       trans2_coco(xx2,ucon,ucon,BLCOORDS,MYCOORDS);
      
       // to VELPRIMRAD
-      conv_vels(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
+      conv_vels_ut(ucon,ucon,VEL4,VELPRIMRAD,gg,GG);
      
       pp[FX0]=ucon[1];
       pp[FY0]=ucon[2];
@@ -2954,7 +2954,7 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
 
       trans2_coco(xxBL,ut,ut,KERRCOORDS,MYCOORDS);
 
-      conv_vels(ut,ut,VEL4,VELPRIM,gg,GG);
+      conv_vels_ut(ut,ut,VEL4,VELPRIM,gg,GG);
       
       pp[FX0]=ut[1];      
       pp[FY0]=ut[2];      

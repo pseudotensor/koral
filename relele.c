@@ -3,12 +3,24 @@
 
 #include "ko.h"
 
+int //assumes ut unknown where applicable
+conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
+{
+  conv_vels_core(u1,u2,which1,which2,gg,GG,0);
+}
+
+int //assumes ut known where applicable
+conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
+{
+  conv_vels_core(u1,u2,which1,which2,gg,GG,1);
+}
+
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
 //converts velocities u1->u2
 int
-conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
+conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5],int utknown)
 {
   int i,j;
   ldouble ut[4];
@@ -27,24 +39,29 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
   /*************** VEL4 -> VEL4 ***************/
   else if(which1==VEL4 && which2==VEL4)
     {
-      //assumes u^t unknown
-      ldouble a,b,c;
-      a=gg[0][0];
-      b=0.;
-      c=1.;
-      for(i=1;i<4;i++)
+      if(utknown==0)
 	{
-	  b+=2.*u1[i]*gg[0][i];
-	  for(j=1;j<4;j++)
+	  //assumes u^t unknown
+	  ldouble a,b,c;
+	  a=gg[0][0];
+	  b=0.;
+	  c=1.;
+	  for(i=1;i<4;i++)
 	    {
-	      c+=u1[i]*u1[j]*gg[i][j];
+	      b+=2.*u1[i]*gg[0][i];
+	      for(j=1;j<4;j++)
+		{
+		  c+=u1[i]*u1[j]*gg[i][j];
+		}
 	    }
+	  ldouble delta=b*b-4.*a*c;
+	  if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
+	  ut[0]=(-b-sqrt(delta))/2./a;
+	  //TODO: more strict criterion
+	  if(ut[0]<0.) ut[0]=(-b+sqrt(delta))/2./a;
 	}
-      ldouble delta=b*b-4.*a*c;
-      if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
-      ut[0]=(-b-sqrt(delta))/2./a;
-      //TODO: more strict criterion
-      if(ut[0]<0.) ut[0]=(-b+sqrt(delta))/2./a;
+      else
+	ut[0]=u1[0];
      
       for(i=1;i<4;i++) ut[i]=u1[i];      
     }
@@ -56,23 +73,28 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
   /*************** VEL4 -> VEL3 ***************/
   else if(which1==VEL4 && which2==VEL3)
     {
-      //assumes u^t unknown
-      ldouble a,b,c;
-      a=gg[0][0];
-      b=0.;
-      c=1.;
-      for(i=1;i<4;i++)
+      if(utknown==0)
 	{
-	  b+=2.*u1[i]*gg[0][i];
-	  for(j=1;j<4;j++)
+	  //assumes u^t unknown
+	  ldouble a,b,c;
+	  a=gg[0][0];
+	  b=0.;
+	  c=1.;
+	  for(i=1;i<4;i++)
 	    {
-	      c+=u1[i]*u1[j]*gg[i][j];
+	      b+=2.*u1[i]*gg[0][i];
+	      for(j=1;j<4;j++)
+		{
+		  c+=u1[i]*u1[j]*gg[i][j];
+		}
 	    }
+	  ldouble delta=b*b-4.*a*c;
+	  if(delta<0.) {printf("delta.lt.0 in VEL4->VEL3\n");return -1;}
+	  ut[0]=(-b-sqrt(delta))/2./a;
+	  if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
 	}
-      ldouble delta=b*b-4.*a*c;
-      if(delta<0.) {printf("delta.lt.0 in VEL4->VEL3\n");return -1;}
-      ut[0]=(-b-sqrt(delta))/2./a;
-      if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
+      else
+	ut[0]=u1[0];
 
       for(i=1;i<4;i++) ut[i]=u1[i]/ut[0];      
     }
@@ -132,32 +154,37 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
   /*************** VEL4 -> VELR ***************/
   else if (which1==VEL4 && which2==VELR)
     {
-      //assumes u^t unknown
-      ldouble a,b,c;
-      a=gg[0][0];
-      b=0.;
-      c=1.;
-      for(i=1;i<4;i++)
+      if(utknown==0)
 	{
-	  b+=2.*u1[i]*gg[0][i];
-	  for(j=1;j<4;j++)
+	  //assumes u^t unknown
+	  ldouble a,b,c;
+	  a=gg[0][0];
+	  b=0.;
+	  c=1.;
+	  for(i=1;i<4;i++)
 	    {
-	      c+=u1[i]*u1[j]*gg[i][j];
+	      b+=2.*u1[i]*gg[0][i];
+	      for(j=1;j<4;j++)
+		{
+		  c+=u1[i]*u1[j]*gg[i][j];
+		}
 	    }
-	}
-      ldouble delta=b*b-4.*a*c;
-      if(delta<0.) {("delta.lt.0 in VEL4->VELR\n");return -1;}
-      ldouble ut1,ut2;
-      ut1=(-b-sqrt(delta))/2./a;
-      ut2=(-b+sqrt(delta))/2./a;
+	  ldouble delta=b*b-4.*a*c;
+	  if(delta<0.) {("delta.lt.0 in VEL4->VELR\n");return -1;}
+	  ldouble ut1,ut2;
+	  ut1=(-b-sqrt(delta))/2./a;
+	  ut2=(-b+sqrt(delta))/2./a;
 
-      if(ut1>0. && ut2>0.) //ambiguous solution in the ergosphere
-	{
-	  printf("ambigous ut in VEL4->VELR: %e %e\n",ut1,ut2);
-	  ut[0]=ut1;
+	  if(ut1>0. && ut2>0.) //ambiguous solution in the ergosphere
+	    {
+	      printf("ambigous ut in VEL4->VELR: %e %e\n",ut1,ut2);
+	      ut[0]=ut1;
+	    }
+	  else
+	    ut[0]=my_max(ut1,ut2);
 	}
       else
-	ut[0]=my_max(ut1,ut2);
+	ut[0]=u1[0];
        
       for(i=1;i<4;i++)
 	ut[i]=u1[i]-ut[0]*GG[0][i]/GG[0][0];
@@ -203,6 +230,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
   //write to index 0 only when needed
   if(which2==VEL4)
     u2[0]=ut[0];
+
   u2[1]=ut[1];
   u2[2]=ut[2];
   u2[3]=ut[3];
@@ -261,53 +289,17 @@ calc_normalobs_4vel(ldouble GG[][5], ldouble *ncon)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//returns contravariant four-velocity of a photon
-//with radial motion and given gammamax
+//returns contravariant relative-velocity of a normal observer
 int
-calc_photonrad_4vel(ldouble gg[][5],ldouble GG[][5], ldouble *ucon)
+calc_normalobs_relvel(ldouble GG[][5], ldouble *ncon)
 {
-#if(0) //going through VEL4
-    int i,j;
-    ldouble gammamax=100.;
-    // radial motion in VEL4
-    ldouble ncon[4]={gammamax,-1.,0.,0.};  
-    // is normalized now
-    ldouble Afac,a,b,c,delta;
-    a=0.; c=0.; b=0.;
-    for(i=1;i<4;i++)
-      {
-	a+=ncon[i]*ncon[i]*gg[i][i];
-	b+=2.*ncon[i]*gg[0][i]*gammamax;
-      }
-    c=gg[0][0]*gammamax*gammamax+1.;
-    delta=b*b-4.*a*c;
-    Afac= (-b+sqrt(delta))/2./a;
-      
-    ucon[0]=gammamax;
-    ucon[1]=Afac*ncon[1];
-    ucon[2]=Afac*ncon[2];
-    ucon[3]=Afac*ncon[3];
-#else //imposing gamma in VELR
-    int i,j;
-    ldouble gammamax=1000.;
-    // radial motion in VELR
-    ldouble ncon[4]={0.,-1.,0.,0.};  
-    // compute \gammarel using ncon
-    ldouble qsq=0.;
-    for(i=1;i<4;i++)
-      for(j=1;j<4;j++)
-	qsq+=ncon[i]*ncon[j]*gg[i][j];
-    ldouble gammatemp=sqrt(1.+qsq);
-    // now rescale ncon[i] so will give desired \gammamax
-    for(i=1;i<4;i++)
-      {
-	ncon[i] *= (gammamax/gammatemp);
-	ucon[i] = ncon[i];
-      }
-    //convert ncon to VEL4
-    conv_vels(ucon,ucon,VELR,VEL4,gg,GG);
-#endif
-  
+  ldouble ucon[4];
+  calc_normalobs_4vel(GG,ucon);
+
+  int i;
+  for(i=1;i<4;i++)
+   ncon[i]=ucon[i]-ucon[0]*GG[0][i]/GG[0][0];
+
   return 0.;
 }
 
@@ -324,8 +316,8 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       //normal observer
       ldouble ucon[4];
       ldouble xx2[4];
-      calc_normalobs_4vel(GG,ucon);
-      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+      calc_normalobs_relvel(GG,ucon);
+      conv_vels(ucon,ucon,VELR,VELPRIM,gg,GG);
       pp[2]=ucon[1];
       pp[3]=ucon[2];
       pp[4]=ucon[3];
@@ -349,8 +341,8 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       //normal observer
       ldouble ucon[4],r;
       ldouble xx2[4];
-      calc_normalobs_4vel(GG,ucon);
-      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+      calc_normalobs_relvel(GG,ucon);
+      conv_vels(ucon,ucon,VELR,VELPRIM,gg,GG);
       pp[2]=ucon[1];
       pp[3]=ucon[2];
       pp[4]=ucon[3];
@@ -375,8 +367,8 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       //normal observer
       ldouble ucon[4];
       ldouble xx2[4];
-      calc_normalobs_4vel(GG,ucon);
-      conv_vels(ucon,ucon,VEL4,VELPRIM,gg,GG);
+      calc_normalobs_relvel(GG,ucon);
+      conv_vels(ucon,ucon,VELR,VELPRIM,gg,GG);
       pp[2]=ucon[1];
       pp[3]=ucon[2];
       pp[4]=ucon[3];
