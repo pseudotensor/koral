@@ -1819,7 +1819,7 @@ test_solve_implicit_lab()
   
   //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
 
-  //return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+  return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    

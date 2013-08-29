@@ -216,11 +216,11 @@ calc_mdotEdd()
 {
   ldouble mcgs=2.23e18*MASS; //g/s
 
-#ifdef CGSOUTPUT
+  //#ifdef CGSOUTPUT
   return mcgs;
-#else
-  return 1.;
-#endif
+  //#else
+  //return 1.;
+  //#endif
 }
 
 //**********************************************************************
@@ -232,11 +232,11 @@ calc_lumEdd()
 {
   ldouble Lcgs=1.25e38*MASS; //erg/s
 
-#ifdef CGSOUTPUT
+  //#ifdef CGSOUTPUT
   return Lcgs;
-#else
-  return 1.;
-#endif
+  //#else
+  //return 1.;
+  //#endif
 }
 
 //**********************************************************************
@@ -299,16 +299,17 @@ calc_lum(ldouble radius)
 	  Fr=pp[FX(0)];	
 	  if(Fr<0.) Fr=0.;
 
-#ifdef CGSOUTPUT
+	  //#ifdef CGSOUTPUT
+	  //always!
 	  Fr=fluxGU2CGS(Fr);
 	  dx[1]=lenGU2CGS(dx[1]);
 	  dx[2]=lenGU2CGS(dx[2]);
-#endif
+	  //#endif
 
 	  lum+=Fr*dx[1]*dx[2];
 	}
 
-      return lum*2.; //because of equatorial plane symmetry
+      return lum;
     }
   else
     return -1;
@@ -424,12 +425,13 @@ calc_mdot(ldouble radius,int type)
 	  dx[1]=dx[1]*sqrt(gg[2][2]);
 	  dx[2]=2.*M_PI*sqrt(gg[3][3]);
 
-#ifdef CGSOUTPUT
+	  //#ifdef CGSOUTPUT
+	  //always
 	  rho=rhoGU2CGS(rho);
 	  ucon[1]=velGU2CGS(ucon[1]);
 	  dx[1]=lenGU2CGS(dx[1]);
 	  dx[2]=lenGU2CGS(dx[2]);
-#endif
+	  //#endif
 
 	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
 	    mdot+=rho*ucon[1]*dx[1]*dx[2];
@@ -438,5 +440,5 @@ calc_mdot(ldouble radius,int type)
   else
     return -1;
 
-  return mdot*2.;
+  return mdot;
 }

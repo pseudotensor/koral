@@ -1,13 +1,13 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
 //#define SKIPRADSOURCE
@@ -49,8 +49,8 @@
 #define B2UURATIOMAX 100.
 #define B2RHORATIOMIN 0.
 #define B2RHORATIOMAX 100.
-#define GAMMAMAXRAD 1000.
-#define GAMMAMAXHD 1000.
+#define GAMMAMAXRAD 100.
+#define GAMMAMAXHD 100.
 
 /************************************/
 //blackhole
