@@ -1140,6 +1140,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   //override the given parameters
   //params[0]=MHD;
+  
   //energy or entropy equation to solve
   //params[1]=RADIMPLICIT_ENTROPYEQ;
   //params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1520,7 +1521,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
 
-      ldouble CONVLOOSE=CONV*100.;
+      ldouble CONVLOOSE=CONV*1.;
       if(errbest<CONVLOOSE)
 	{
 	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
@@ -1648,6 +1649,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
+  /*
   //****
   //4dprim on energy eq. with strict overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
@@ -1659,7 +1661,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) energy + (2) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > energy + (2) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1675,7 +1677,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > energy + (3) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > energy + (3) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1691,7 +1693,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > energy + no overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > energy + no overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1713,11 +1715,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > 1d enden + energy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > 1d enden + energy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail); //may slow down
       return 0;
     }
- 
+ */
   //****
   //entropy equation instead of energy equation
   PLOOP(iv) pp[iv]=pp0[iv]; 
@@ -1729,7 +1731,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > entropy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy + (1) overshooting worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail); //may slow down
       return 0;
     }
@@ -1742,16 +1744,17 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > only backup worked\n",geom.ix,geom.iy,geom.iz,global_time);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > only backup worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail); //may slow down
       return 0;
     }
     
   //****
   //nothing worked
-  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.2e) > critical failure!\n",geom.ix,geom.iy,geom.iz,global_time);
+  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
   
-  return -1;
+  //leaving primitives intact
+  return 0;
 
   /*
   //**** 1st + 5 ****

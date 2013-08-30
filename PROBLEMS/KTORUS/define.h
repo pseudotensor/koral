@@ -1,13 +1,14 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM -1
+#define RESTART
+#define RESTARTNUM 182
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
+#define SKIPRADWAVESPEEDLIMITER
 //#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
 //#define SKIPRADSOURCE
@@ -92,7 +93,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e1
+#define DTOUT1 1.e0
 
 /************************************/
 //common physics / torus / atmosphere

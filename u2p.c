@@ -1145,12 +1145,6 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       return -104;
     }
 
-  if(rho<0.) 
-    {
-      if(verbose>0) printf("neg rho in u2p_solver %e %e %e %e\n",rho,uint,gamma2,W);//getchar();
-      return -105;
-    }
-
   //converting to VELPRIM
   conv_vels(utcon,utcon,VELR,VELPRIM,gg,GG);
   
@@ -1160,6 +1154,14 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   pp[VX]=utcon[1];
   pp[VY]=utcon[2];
   pp[VZ]=utcon[3];
+
+
+  if(rho<0.) 
+    {
+      if(verbose>0) printf("neg rho in u2p_solver %e %e %e %e\n",rho,uint,gamma2,W);//getchar();
+      return -105;
+    }
+
 
   //entropy based on UU[1]
   pp[ENTR]=calc_Sfromu(rho,uint);
