@@ -1649,7 +1649,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
-  /*
   //****
   //4dprim on energy eq. with strict overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
@@ -1719,13 +1718,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       fflush(fout_fail); //may slow down
       return 0;
     }
- */
+  
   //****
   //entropy equation instead of energy equation
   PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
-  params[3]=1; //do momentum overshooting check
+  params[3]=0; //do momentum overshooting check
   
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
@@ -1738,6 +1737,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
  
   //****
   //backup method
+  /* commented out - uses tetrad and screws up inside horizon
   PLOOP(iv) pp[iv]=pp0[iv]; 
   
   ret=solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
@@ -1748,12 +1748,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       fflush(fout_fail); //may slow down
       return 0;
     }
-    
+  */
   //****
   //nothing worked
   fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
   
   //leaving primitives intact
+  deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
   return 0;
 
   /*
