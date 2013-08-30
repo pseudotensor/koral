@@ -191,11 +191,14 @@ int fprint_silofile(ldouble time, int num, char* folder)
 		}
 	      #endif
 
-	      #ifdef RADIATION									  
+	      #ifdef RADIATION
+
+	      ldouble Rtt,Ehat,ugas[4];
+	      calc_ff_Rtt(pp,&Rtt,ugas,&geomout);
+	      Ehat=-Rtt;  
+	      Erad[nodalindex]=Ehat;
+									  
 	      prad_lab2on(pp,pp,&geomout);
-
-	      Erad[nodalindex]=pp[EE0];
-
 	      ldouble rvel[4]={0,pp[FX0],pp[FY0],pp[FZ0]};	
 
 	      //outvel - ortonormal VEL4

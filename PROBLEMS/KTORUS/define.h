@@ -1,14 +1,14 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 182
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
-#define SKIPRADWAVESPEEDLIMITER
+//#define SKIPRADWAVESPEEDLIMITER
 //#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
 //#define SKIPRADSOURCE
@@ -18,7 +18,7 @@
 /************************************/
 #define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA .005 //target pmag/pgas int the midplane
+#define MAXBETA .002 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -93,17 +93,17 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e0
+#define DTOUT1 1.e1
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
 #define GAMMA (4./3.)
 #define NPOLI 3.
-#define RZERO 40
-#define RHOZERO rhoCGS2GU(1.e-2) //1. g/cm3
-#define ELLA 0.3
-#define VSZERO 3.e-2//5.6e
+#define RZERO 30
+#define RHOZERO rhoCGS2GU(1.) //1. g/cm3
+#define ELLA 0.2
+#define VSZERO 3.6e-2//5.6e
 #define ELL 4.2
 
 #define RHOATMMIN  1.e-24

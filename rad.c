@@ -3109,6 +3109,8 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       if(tautot[dim]>0.) 
 	{
 	  rv2tau=4./3./tautot[dim]*4./3./tautot[dim];
+	  //test
+	  rv2tau*=10.;
 	  rv2=my_min(rv2rad,rv2tau);		     
 	}
       else

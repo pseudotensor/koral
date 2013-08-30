@@ -69,7 +69,7 @@
 //63* ORSZAG - Orszag-Tang vortex
 //64* MAGDONUT - MHD donut with poloidal magnetic fields
 //65* MRTORUS - RMHD torus with radiation
-//66* MRTORUS - RMHD Newtonian torus with radiation
+//66* KTORUS - RMHD Newtonian torus with radiation
 
 #define PROBLEM 66
 
