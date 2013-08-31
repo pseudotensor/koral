@@ -93,7 +93,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e1
+#define DTOUT1 1.e0
 
 /************************************/
 //common physics / torus / atmosphere

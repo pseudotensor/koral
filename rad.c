@@ -3178,10 +3178,11 @@ apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
   for(iv=0;iv<NV;iv++)
     delapl[iv]=0.;
 
-  delapl[1]=-del4[0];
-  delapl[2]=-del4[1];
-  delapl[3]=-del4[2];
-  delapl[4]=-del4[3];
+  delapl[UU]=-del4[0];
+  delapl[VX]=-del4[1];
+  delapl[VY]=-del4[2];
+  delapl[VZ]=-del4[3];
+  delapl[ENTR]=delapl[UU];
   delapl[EE0]=del4[0];
   delapl[FX0]=del4[1];
   delapl[FY0]=del4[2];
