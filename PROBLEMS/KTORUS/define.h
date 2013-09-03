@@ -2,7 +2,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 188
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -40,7 +40,7 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define UURHORATIOMIN 1.e-15
+#define UURHORATIOMIN 1.e-8
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
 #define EERHORATIOMAX 1.e20

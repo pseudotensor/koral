@@ -53,23 +53,27 @@ main(int argc, char **argv)
 #include PR_PREPINIT
 #endif
 
+  int ifinit=1;
 #ifdef RESTART
-  fread_restartfile(RESTARTNUM,&tstart);
+  ifinit=fread_restartfile(RESTARTNUM,&tstart);
   set_bc(tstart,1);
-#else
-  //or initialize new problem
-  set_initial_profile();
-  tstart=0.;
-  set_bc(tstart,1);
-  #ifdef VECPOTGIVEN
-  calc_BfromA();
-  #endif
-
-  #ifdef PR_POSTINIT
-  #include PR_POSTINIT
-  #endif
-
 #endif
+
+  //no restart or no restart file
+  if(ifinit==1)
+    {
+      //or initialize new problem
+      set_initial_profile();
+      tstart=0.;
+      set_bc(tstart,1);
+#ifdef VECPOTGIVEN
+      calc_BfromA();
+#endif
+
+#ifdef PR_POSTINIT
+#include PR_POSTINIT
+#endif
+    }
 
   /*******/
   //tests of implicit solver

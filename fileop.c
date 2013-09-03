@@ -540,6 +540,8 @@ fread_restartfile(int nout1, ldouble *t)
 
   FILE *fdump=fopen(fname,"r");
 
+  if(fdump==NULL) return 1; //request start from scratch
+
   //reading parameters, mostly time
   int intpar[5];
   ret=fscanf(fdump,"## %d %lf %d %d %d %d\n",&intpar[0],t,&intpar[1],&intpar[2],&intpar[3],&intpar[4]);

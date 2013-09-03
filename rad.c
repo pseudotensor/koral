@@ -1169,7 +1169,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //4dprim
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-8;
-  ldouble MAXITER = 50;
+  ldouble MAXITER = 25;
   int corr[2],fixup[2];
 
   int sh;
@@ -1520,8 +1520,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	{
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
-
-      ldouble CONVLOOSE=1.e-5;
+      
+      /*
+      ldouble CONVLOOSE=CONV;
       if(errbest<CONVLOOSE)
 	{
 	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
@@ -1557,6 +1558,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(u2pret<-1) return -1;
 	}
       else
+      */
 	return -1;
     }
   
@@ -1637,6 +1639,21 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ldouble pp0[NV];
   PLOOP(iv) pp0[iv]=pp[iv];
 
+  
+  if(get_cflag(ENTROPYFLAG,geom.ix,geom.iy,geom.iz)==1)
+    {
+      //**** 0th ****
+      //4dprim on energy eq. with loose overshooting check
+      PLOOP(iv) pp[iv]=pp0[iv]; 
+      params[1]=RADIMPLICIT_ENTROPYEQ;
+      params[2]=RADIMPLICIT_FFEQ;
+      params[3]=1;
+
+      ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+      if(ret==0) return 0;
+    }
+  
 
   //**** 1st ****
   //4dprim on energy eq. with loose overshooting check
@@ -1649,7 +1666,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) return 0;
 
-  //****
+  /****
   //4dprim on energy eq. with strict overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1664,6 +1681,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       fflush(fout_fail); //may slow down
       return 0;
     }
+  */
 
   //****
   //4dprim on energy eq. with more strict overshooting check
@@ -1755,7 +1773,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   //leaving primitives intact
   deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
-  return -1;
+  return 0;
 
   /*
   //**** 1st + 5 ****
