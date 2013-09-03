@@ -36,7 +36,7 @@ calc_primitives(int ix,int iy,int iz)
     }
 
   //aux
-  //set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
+  set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
 
   //converting to primitives
   u2p(uu,pp,&geom,corrected,fixups);
@@ -146,7 +146,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   gg=geom->gg;
   GG=geom->GG;
 
-  int verbose=1;
+  int verbose=2;
   int hdcorr=0;
   int radcor=0;
   corrected[0]=corrected[1]=0;
@@ -193,28 +193,31 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
       conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
       ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
       ldouble s2=exp(pp[ENTR]/pp[RHO]);
-      if(s2/s1 < 0.9)
+      
+      //TODO
+      //this below is in wrong place - when here is affecting the implicit solver
+      /*
+      if(s2/s1 < 0.1)
       {  
-	//printf("\n PROBLEM DETECTED IN ENTROPY AT %d %d - %e!\n",geom->ix,geom->iy,s2/s1);getchar();
-	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
+	//if(verbose>0) printf("\n PROBLEM DETECTED IN EVOLVING ENTROPY AT %d %d - %e!\n",geom->ix,geom->iy,s2/s1);//getchar();
 	u2pret=-1;
-      }
+	}
+      */
     }
   
 
   //************************************
   if(u2pret<0) 
     {
-      if(verbose>1)
+      if(verbose>2)
 	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
 
       if(u2pret==-105) 
 	//negative rho but everything else right (u2pret==-105)
 	{
-	  
 	  if(1)
 	    {
-	      printf("neg rho after entropy: %e (%d) at %d %d\n",pp[0],u2pret,geom->ix,geom->iy);
+	      printf("neg rho after hot: %e (%d) at %d %d\n",pp[0],u2pret,geom->ix,geom->iy);
 	      //print_Nvector(uu,NV);
 	      print_Nvector(pp,NV);
 	      //getchar();
@@ -236,12 +239,12 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	//u2p_entropy cannot handle negative rhos - correcting
 	if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
 	  {
-	    /*
+	    
 	    printf("at %d %d %d neg uu[0] - imposing RHOFLOOR and other floors\n",geom->ix,geom->iy,geom->iz);
-	    u2pret=u2p_hot(uu,pp,geom);
-	    printf("u2p_hot out at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
-	    getchar();
-	    */
+	    //u2pret=u2p_hot(uu,pp,geom);
+	    //printf("u2p_hot out at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
+	    //getchar();
+	   
 
 	    //using old state to estimate the correction
 	    pp[0]=RHOFLOOR;
@@ -260,10 +263,11 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	    //entropy solver - conserving entropy
 	    //u2pret=u2p_entropy(uu,pp,ggg);
 	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,0);  
+	    set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
 
 	    //************************************
 
-	    if(verbose>1)
+	    if(verbose>2)
 	      {
 		printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
 	      }
@@ -275,6 +279,10 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 		    printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 		    //exit(0); //should not always die because may happe in intermediate step within the implicit solver
 		  }
+
+		//test, to print it out 
+		//u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
+		//getchar();
 
 		if(u2pret==-107)
 		  //solver converged but p2u(u2p()).neq.1
@@ -331,6 +339,10 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
     {
       //************************************
       //leaving unchanged primitives - should not happen
+      if(verbose>0)
+	    {
+	      printf("u2p prim. unchanged > %d %d %d\n",geom->ix,geom->iy,geom->iz);
+	    }
       ret=-3;
       for(u2pret=0;u2pret<NV;u2pret++)
 	pp[u2pret]=ppbak[u2pret];	  
@@ -532,7 +544,7 @@ FTYPE compute_idrho0dp(FTYPE wmrho0)
 
 
 int
-f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df)
+f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
 {
 
   ldouble Qn=cons[0];
@@ -567,6 +579,8 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df)
   //*f= Qn + W - p;
 
   *f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
+
+  *err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
 
   // dp/dW = dp/dW + dP/dv^2 dv^2/dW
     
@@ -685,7 +699,7 @@ static FTYPE dvsq_dW(FTYPE W, FTYPE *wglobal,FTYPE Bsq,FTYPE QdotB,FTYPE QdotBsq
 //**********************************************************************
 //**********************************************************************
 int
-f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
+f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df, ldouble *err)
 {
   ldouble Qn=cons[0];
   ldouble Qt2=cons[1];
@@ -719,6 +733,8 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 
   *f= -Sc + D*Ssofchi;
 
+  *err = fabs(*f) / (fabs(Sc) + fabs(D*Ssofchi));
+
   FTYPE dSsdW,dSsdvsq,dSsdWp,dScprimedWp,dSsdrho,dSsdchi;
   FTYPE dvsq,dwmrho0dW,drho0dW;
   FTYPE dwmrho0dvsq,drho0dvsq;
@@ -750,7 +766,7 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 //**********************************************************************
 //**********************************************************************
 int
-f_u2p_cold(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
+f_u2p_cold(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df, ldouble *err)
 {
   my_err("Think f_u2p_cold over in terms of mhd\n");
 
@@ -784,6 +800,8 @@ f_u2p_cold(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 
   *f = u - UURHORATIOU2PCOLD*rho0;
 
+  *err = fabs(*f) / (fabs(u) + fabs(UURHORATIOU2PCOLD*rho0));
+
   ldouble dWdWp=1.;
   ldouble dv2dWp=Qt2*(-2.)/W/W/W*dWdWp;
   ldouble dgammadWp=.5*1./sqrt(1./(1.-v2))*(-1.)/(1.-v2)/(1.-v2)*(-1.)*dv2dWp;
@@ -802,7 +820,7 @@ f_u2p_cold(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
 //**********************************************************************
 //uses D,T^t_i to get solution with u=UURHORATIOMAX*rho
 int
-f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
+f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df, ldouble *err)
 {
   my_err("Think f_u2p_hotmax over in terms of mhd\n");
 
@@ -835,6 +853,8 @@ f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df)
   ldouble p = (GAMMA-1)*u;
 
   *f = u - UURHORATIOMAX*rho0;
+
+  *err = fabs(*f) / (fabs(u) + fabs(UURHORATIOMAX*rho0));
 
   ldouble dWdWp=1.;
   ldouble dv2dWp=Qt2*(-2.)/W/W/W*dWdWp;
@@ -882,7 +902,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   /****************************/
   //equations choice
-  int (*f_u2p)(ldouble,ldouble*,ldouble*,ldouble*);
+  int (*f_u2p)(ldouble,ldouble*,ldouble*,ldouble*,ldouble*);
  if(Etype==U2P_HOT) 
    f_u2p=&f_u2p_hot;
  if(Etype==U2P_ENTROPY) 
@@ -998,8 +1018,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   //test if does not provide reasonable gamma2
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
-  ldouble f0,f1,dfdW;
-  ldouble CONV=1.e-8;
+  ldouble f0,f1,dfdW,err;
+  ldouble CONV=1.e-8; //looser check when converged in terms of W
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
@@ -1010,7 +1030,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
       //now invoked for all solvers:
       //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
-      (*f_u2p)(W-D,cons,&f0,&dfdW);
+      (*f_u2p)(W-D,cons,&f0,&dfdW,&err);
 
       if( ((( W*W*W * ( W + 2.*Bsq ) 
 	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
@@ -1043,13 +1063,17 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       Wprev=W;
       iter++;
      
-      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW);
+      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW,&err);
 
       //numerical derivative
-      //fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW);
+      //fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW,&err);
       //dfdW=(f1-f0)/(EPS*W);
 
-      if(verbose>1) printf("%d %e %e %e\n",iter,W,f0,dfdW);
+      //convergence test
+      if(err<CONV)
+	break;
+      
+      if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,dfdW,err);
 
       if(dfdW==0.) {W*=1.1; continue;}
 
@@ -1060,12 +1084,12 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       //test if goes out of bounds and damp solution if so
       do
 	{
-	  ldouble f0tmp,dfdWtmp;
+	  ldouble f0tmp,dfdWtmp,errtmp;
 	  f0tmp=dfdWtmp=0.;
 	  //now for all solvers
 	  //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
-	  (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp);
-	  if(verbose>1) printf("sub (%d) :%d %e %e %e\n",idump,iter,W,f0,dfdW);
+	  (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp,&errtmp);
+	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e\n",idump,iter,Wnew,f0tmp,dfdWtmp,errtmp);
 	  if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
 		  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))
 	       || !isfinite(f0tmp) || !isfinite(f0tmp)
@@ -1095,13 +1119,17 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  if(verbose>1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
 	  return -103;
 	}
+
+      if((fabs((W-Wprev)/Wprev)<CONV && err<CONV*1.e4))
+	break;
     }
-  while(fabs((W-Wprev)/Wprev)>CONV && iter<50);
+  //  while((fabs((W-Wprev)/Wprev)>CONV && err>CONV*1.e3) && iter<50);
+  while(iter<50);
 
  
   if(iter>=50)
     {
-      if(verbose>0) printf("iter exceeded in u2p_hot\n"); //getchar();
+      if(verbose>0) printf("iter exceeded in u2p_solver with Etype: %d\n",Etype); //getchar();
       return -102;
     }
 
@@ -1110,8 +1138,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
  
   if(verbose>1) 
     {
-      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW);
-      printf("end: %d %e %e %e\n",iter,W,f0,dfdW);
+      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW,&err);
+      printf("end: %d %e %e %e %e\n",iter,W,f0,dfdW,err);
     }
 
   //W found, let's calculate v2 and the rest
@@ -1207,7 +1235,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  print_Nvector(uu,NV);
 	  print_Nvector(uu2,NV);  
 	  printf("u2p_solver lost precision:\n");      
-	  getchar();
+	  //getchar();
 	}
       
       //test

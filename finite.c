@@ -826,6 +826,15 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //update primitives / correct conserved
       calc_primitives(ix,iy,iz);
 
+      /*
+      if(get_u(p,RHO,ix,iy,iz)>1.e-21)
+	{
+	  printf("rho %e big at %d %d\n",get_u(p,RHO,ix,iy,iz),ix,iy);
+	  print_NVvector(&get_u(p,RHO,ix,iy,iz));
+	  getchar();
+	}
+      */
+
 #ifndef MULTIRADFLUID
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE

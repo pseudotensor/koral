@@ -1168,7 +1168,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
  
   //4dprim
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-10;
+  ldouble CONV = 1.e-8;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
@@ -1521,7 +1521,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
 
-      ldouble CONVLOOSE=CONV*1.;
+      ldouble CONVLOOSE=1.e-5;
       if(errbest<CONVLOOSE)
 	{
 	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
@@ -1755,7 +1755,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   //leaving primitives intact
   deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
-  return 0;
+  return -1;
 
   /*
   //**** 1st + 5 ****
@@ -1823,14 +1823,14 @@ test_solve_implicit_lab()
   
   //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
 
-  return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+  //return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=1; //mom.overshoot check
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  //return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   
   params[1]=RADIMPLICIT_ENTROPYEQ;
