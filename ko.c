@@ -90,6 +90,21 @@ main(int argc, char **argv)
   
   //copies initial primitives to pinit
   copy_u(1.,p,pinit);
+
+  //calculates initial scalars
+  calc_scalars(scalars,tstart);
+
+  //prints initial profiles to out0000.dat
+  if(ifinit==1)
+    {
+      fprint_restartfile(tstart,"dumps");			
+      //why this different for radiation?
+      fprint_profiles(tstart,scalars,NSCALARS,0,"dumps");			
+#ifdef SILOOUTPUT
+      fprint_silofile(tstart,nfout1,"dumps");
+#endif
+      nfout1++;
+    }
   
   //evolves
   solve_the_problem(tstart);
@@ -115,19 +130,6 @@ solve_the_problem(ldouble tstart)
    
   i1=i2=0.;
 
-  ldouble scalars[NSCALARS];
-  calc_scalars(scalars,tstart);
-
-  //prints initial profiles to out0000.dat
-#ifndef RESTART
-  fprint_restartfile(t,"dumps");			
-  //why this different for radiation?
-  fprint_profiles(t,scalars,NSCALARS,0,"dumps");			
-  #ifdef SILOOUTPUT
-  fprint_silofile(t,nfout1,"dumps");
-  #endif
-  nfout1++;
-#endif
 
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=1.;
