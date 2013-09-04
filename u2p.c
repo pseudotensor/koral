@@ -339,7 +339,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
     {
       //************************************
       //leaving unchanged primitives - should not happen
-      if(verbose>0)
+      if(verbose>1)
 	    {
 	      printf("u2p prim. unchanged > %d %d %d\n",geom->ix,geom->iy,geom->iz);
 	    }
@@ -1124,6 +1124,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  return -103;
 	}
 
+      //what about this?
       /*
       if((fabs((W-Wprev)/Wprev)<CONV && err<CONV*1.e4))
 	break;

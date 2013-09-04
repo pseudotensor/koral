@@ -828,7 +828,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   if(whichprim==RAD)
     {
       uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-      uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
+      //uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
       uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
       uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
       uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
@@ -840,7 +840,11 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
 
-      if(rettemp<0) u2pret=-2; //to return error
+      if(rettemp<0) 
+	{
+	  //printf("rettemp: %d\n",rettemp);
+	  u2pret=-2; //to return error
+	}
       else u2pret=0;
 
       //calculate ff four-velocity
@@ -927,6 +931,21 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	    {
 	      f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
 	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+
+	      ldouble bsq=0.;
+	      ldouble ucov[4],bcon[4],bcov[4];
+	      indices_21(ucon,ucov,gg);
+
+	      /*
+#ifdef MAGNFIELD
+	      calc_bcon_4vel(pp,ucon,ucov,bcon);
+	      indices_21(bcon,bcov,gg); 
+	      bsq = dot(bcon,bcov);
+#endif
+
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(GAMMA*pp[UU] + bsq)*ucon[0]*ucov[0] +fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	      */
+
 	    }
 	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	    {
@@ -1251,6 +1270,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   iter=0;
   errbest=BIG;
 
+  /*
   pp[0]=9.1442004807944783e-19;
   pp[1]=1.1344505737027843e-26;
   pp[2]=3.4435701835214215e-03;
@@ -1264,7 +1284,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   pp[10]= 3.4524709371619375e-03;
   pp[11]=-8.9748669452660058e-04;
   pp[12]=1.1684948494250750e-02;
-
+  */
 
   do //main solver loop
     {	 
@@ -1296,7 +1316,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       //values at base state
       if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err)<0) 
 	{
-	  printf("base state\n");
+	  if(verbose>0) printf("base state\n");
 	  return -1;	  
 	}
 
@@ -1529,7 +1549,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	      if(rettemp<0) u2pret=-2; //to return error
 	      else u2pret=0;
-      
+	      
+
 	      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
 	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
 
@@ -1541,11 +1562,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
 	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 	      u2pret=u2p_rad(uu,pp,geom,corr);
+	      //report on ceilings
+	      if(corr[0]>0 || corr[1]>0)
+		if(verbose) printf("corr: %d\n",corr[0]);
 	    }    
 
-	  //report on ceilings
-	  if(corr[0]>0 || corr[1]>0)
-	    if(verbose) printf("corr: %d %d\n",corr[0],corr[1]);
 	    
 	  
 	  //check if energy density positive and the inversion worked using U2P_HOT
@@ -1609,7 +1630,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
       
-      ldouble CONVLOOSE=CONV*100.;
+      ldouble CONVLOOSE=CONV*1.e4;
       if(errbest<CONVLOOSE)
 	{
 	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
@@ -1714,12 +1735,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
       */
 
-      //print_NVvector(uu);
+      /*
+      print_NVvector(uu);
       corr[0]=u2p(uu,pp,geom,corr,fixup);
-      //p2u(pp,uu,geom);
-      //print_NVvector(uu);
-      //getchar();
-
+      p2u(pp,uu,geom);
+      print_NVvector(uu);
+      getchar();
+      */
 
       //print_NVvector(uu);
       //print_Nvector(pp,NV);
@@ -1787,7 +1809,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ldouble pp0[NV];
   PLOOP(iv) pp0[iv]=pp[iv];
 
-  
+  //if entropy then entropy
   if(get_cflag(ENTROPYFLAG,geom.ix,geom.iy,geom.iz)==1)
     {
       //**** 0th ****
@@ -1796,7 +1818,16 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       params[1]=RADIMPLICIT_ENTROPYEQ;
       params[2]=RADIMPLICIT_FFEQ;
       params[3]=1;
+      params[0]=-1;
 
+      ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+      if(ret==0) return 0;
+
+      //try the other set of primitives
+      if(params[0]==MHD) params[0]=RAD;
+      else if(params[0]==RAD) params[0]=MHD;
+
+      PLOOP(iv) pp[iv]=pp0[iv]; 
       ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
       if(ret==0) return 0;
@@ -1809,10 +1840,26 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=1;
+  params[0]=-1;
+
+  //if(geom.iy==NY/2 && geom.ix==100) verbose=1;
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   if(ret==0) return 0;
+
+  //try the other set of primitives
+  if(params[0]==MHD) params[0]=RAD;
+  else if(params[0]==RAD) params[0]=MHD;
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > energy + (1) overshooting worked | others\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
 
   /****
   //4dprim on energy eq. with strict overshooting check
@@ -1837,6 +1884,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=3;
+  params[0]=-1;
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
@@ -1847,12 +1895,27 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       return 0;
     }
 
+  //try the other set of primitives
+  if(params[0]==MHD) params[0]=RAD;
+  else if(params[0]==RAD) params[0]=MHD;
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > energy + (3) overshooting worked | others\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
+
+
   //****
   //4dprim on energy eq. without overshooting check
   PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=0;
+  params[0]=-1;
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
@@ -1862,6 +1925,21 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       fflush(fout_fail); //may slow down
       return 0;
     }
+
+  //try the other set of primitives
+  if(params[0]==MHD) params[0]=RAD;
+  else if(params[0]==RAD) params[0]=MHD;
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > energy + no overshooting worked | others\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fflush(fout_fail); //may slow down
+      return 0;
+    }
+
 
   //****
   //1d solver in temperatures first, then energy with overshooting
@@ -1874,8 +1952,18 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LABEQ;
       params[3]=1.; //do momentum overshooting check
-
+      params[0]=-1;
+ 
       ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+      if(ret<0)
+	{
+	  //try the other set of primitives
+	  if(params[0]==MHD) params[0]=RAD;
+	  else if(params[0]==RAD) params[0]=MHD;
+	  PLOOP(iv) pp[iv]=pp0[iv]; 
+	  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+	}
     }
   
   if(ret==0) 
@@ -1891,7 +1979,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
   params[3]=0; //do momentum overshooting check
-  
+  params[0]=-1;
+
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   if(ret==0) 
@@ -1900,28 +1989,47 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       fflush(fout_fail); //may slow down
       return 0;
     }
- 
-  //****
-  //backup method
-  /* commented out - uses tetrad and screws up inside horizon
+
+  //try the other set of primitives
+  if(params[0]==MHD) params[0]=RAD;
+  else if(params[0]==RAD) params[0]=MHD;
   PLOOP(iv) pp[iv]=pp0[iv]; 
-  
-  ret=solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > only backup worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy + (1) overshooting worked | others\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail); //may slow down
       return 0;
     }
-  */
+ 
+  //****
+  //backup method
+  /* uses tetrad and screws up inside horizon */
+  
+  if(geom.ix>10)
+    {
+      
+      PLOOP(iv) pp[iv]=pp0[iv]; 
+      
+      ret=solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
+      
+      if(ret==0) 
+	{
+	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > only backup worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+	  fflush(fout_fail); //may slow down
+	  return 0;
+	}
+    }
+      
   //****
   //nothing worked
   fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
-  
+    
   //leaving primitives intact
   deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
-  return -1;
+  return 0;
 
   /*
   //**** 1st + 5 ****
@@ -1994,7 +2102,7 @@ test_solve_implicit_lab()
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   //$$$$$
-  params[0]=MHD;
+  params[0]=RAD;
 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
