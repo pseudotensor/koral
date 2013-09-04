@@ -513,7 +513,7 @@ fprint_restartfile(ldouble t, char* folder)
   fclose(fout1);
 
   sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
-  system(bufor);
+  iv=system(bufor);
 
   return 0;
 }
