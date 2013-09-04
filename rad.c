@@ -22,8 +22,8 @@ calc_chi(ldouble *pp, ldouble *xx)
 }
 
 //*********************************************************************
-//******* calculates total opacity over dx[] ***************************
-//**********************************************************************
+//******* calculates total opacity over dx[] *****************************
+//*********************************************************************
 int
 calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
 {
@@ -806,9 +806,23 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   //total inversion, but only whichprim part matters
   p2u(pp,uu,geom);
 
+  //print_NVvector(pp);
+  //print_NVvector(uu);
+
   //corresponding change in entropy
   uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
- 
+
+  /*
+  printf("$$$$$$\n");
+  print_NVvector(uu0);
+  print_NVvector(uu);
+
+  ldouble duu[NV];
+  PLOOP(i)
+    duu[i]=uu[i]-uu0[i];
+  print_NVvector(duu);getchar();
+  */
+
   //opposite changes in the other quantities and inversion
   u2pret=0;
   if(whichprim==RAD)
@@ -838,13 +852,24 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
     }
   if(whichprim==MHD)
     {
+
+      //print_NVvector(uu);
+
       uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
       uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
       uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
       uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 
+      //print_NVvector(uu);
+
       u2pret=u2p_rad(uu,pp,geom,corr);
-    }     
+    }   
+
+  /*
+  print_NVvector(uu);
+  print_NVvector(pp);
+  getchar();
+  */  
 
   //print_Nvector(uu,NV);getchar();
 
@@ -863,6 +888,13 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   ldouble Gi[4];
   calc_Gi(pp,ggg,Gi); 
   indices_21(Gi,Gi,gg);
+  
+  /*
+  printf("$$$$$$\n");
+  print_NVvector(pp);
+  print_4vector(Gi);
+  getchar();
+  */
 
   //errors in momenta - always in lab frame
   if(whichprim==MHD) //mhd-primitives
@@ -1219,19 +1251,20 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   iter=0;
   errbest=BIG;
 
-  pp[0]=9.1442004785169467e-19;
-  pp[1]=9.1433529887573855e-27;
-  pp[2]=3.4435701945581230e-03;
-  pp[3]=-9.0839133196612628e-04;
-  pp[4]=1.1708720415518032e-02;
-  pp[5]=-1.5565404577939846e-17;
+  pp[0]=9.1442004807944783e-19;
+  pp[1]=1.1344505737027843e-26;
+  pp[2]=3.4435701835214215e-03;
+  pp[3]=-9.0839132905284154e-04;
+  pp[4]=1.1708720377938270e-02;
+  pp[5]=-1.4973665854687175e-17;
   pp[6]=1.3960804582867962e-15;
   pp[7]=6.0644631184966211e-14;
   pp[8]=-1.7234546785889472e-12;
-  pp[9]=2.3765660704748358e-33;
-  pp[10]= 3.4534799241084119e-03;
-  pp[11]=-8.9625070845227213e-04;
-  pp[12]=1.1682254373550088e-02;
+  pp[9]=5.6293835943465512e-33;
+  pp[10]= 3.4524709371619375e-03;
+  pp[11]=-8.9748669452660058e-04;
+  pp[12]=1.1684948494250750e-02;
+
 
   do //main solver loop
     {	 
@@ -1249,12 +1282,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       
       if(verbose>0)
 	{
-	  /*
-	  print_NVvector(pp);
-	  print_NVvector(uu0);
-	  print_NVvector(pp0);
-	  */
-	  printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);	  
+	  
+	  //print_NVvector(pp);
+	  //print_NVvector(uu0);
+	  //print_NVvector(pp0);
+	  
 	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err);
 	  print_state_implicit_lab_4dprim (iter-1,xxx,f1,err); 
 	  if(ret<0) printf("f_lab_4dprim ret: %d\n",ret);
@@ -1577,7 +1609,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
       
-      
       ldouble CONVLOOSE=CONV*100.;
       if(errbest<CONVLOOSE)
 	{
@@ -1585,56 +1616,58 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //update primitives
 	  for(i=0;i<4;i++)
 	    pp[i+sh]=xxxbest[i];
-	  if(whichprim==MHD)
-	    {
-	      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
-	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-	      pp[RHO]=uu00[RHO]/gdetu/ucon[0];
-	    }
-
-	  //updating entropy
-	  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
-
-	  p2u(pp,uu,geom);
-
-	  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
-  
-
-	  int u2pret;
-	  if(whichprim==RAD)
-	    {
-	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-	      uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
-	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
-	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
-	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
-	      //u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
-
-	      int rettemp=0;
-	      if(whicheq==RADIMPLICIT_ENERGYEQ)
-		rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-	      if(whicheq==RADIMPLICIT_ENTROPYEQ)
-		rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
-
-	      if(rettemp<0) u2pret=-2; //to return error
-	      else u2pret=0;
-	      
-	      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
-	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-	    }
-	  if(whichprim==MHD)
-	    {
-	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
-	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
-	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
-	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
-	      u2pret=u2p_rad(uu,pp,geom,corr);
-	    }    
-	  if(u2pret<-1) return -1;
 	}
-      else      
+      else
 	return -1;
     }
+
+  //updating conserved
+  if(whichprim==MHD)
+    {
+      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+      pp[RHO]=uu00[RHO]/gdetu/ucon[0];
+    }
+
+  //updating entropy
+  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+
+  p2u(pp,uu,geom);
+
+  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
+  
+
+  int u2pret;
+  if(whichprim==RAD)
+    {
+      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+      uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+      //u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+
+      int rettemp=0;
+      if(whicheq==RADIMPLICIT_ENERGYEQ)
+	rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
+      if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+
+      if(rettemp<0) u2pret=-2; //to return error
+      else u2pret=0;
+	      
+      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+    }
+  if(whichprim==MHD)
+    {
+      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+      u2pret=u2p_rad(uu,pp,geom,corr);
+    }    
+  if(u2pret<-1) return -1;
   
   //to average number of iterations
   global_slot[0]+=(ldouble)iter;
@@ -1673,14 +1706,20 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
       int corr[2],fixup[2];
   
+      /*
       int rettemp=0;
       if(whicheq==RADIMPLICIT_ENERGYEQ)
 	rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
       if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+      */
 
-      //u2p(uu,pp,geom,corr,fixup);
-      //printf("%d %d\n",corr[0],corr[1]);
+      //print_NVvector(uu);
+      corr[0]=u2p(uu,pp,geom,corr,fixup);
+      //p2u(pp,uu,geom);
+      //print_NVvector(uu);
+      //getchar();
+
 
       //print_NVvector(uu);
       //print_Nvector(pp,NV);
@@ -1693,15 +1732,29 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("Tgas: %e\n",Tgas00);
       printf("Trad: %e\n",Trad00);
       
+      /*
       print_NVvector(pp);
       print_NVvector(uu0);
       print_NVvector(pp0);
       printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
+      */
 
       int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params,&err);  
 
-      printf("err %e\n",err);
+      printf("err %e del0: %e\n",err,deltas[0]);
 
+      ldouble duu[NV];
+      
+      PLOOP(i)
+	duu[i]=uu[i]-uu0[i];
+      print_NVvector(duu);
+      
+      p2u(pp,uu,geom);
+
+      PLOOP(i)
+	duu[i]=uu[i]-uu0[i];
+      print_NVvector(duu);getchar();
+      
      }
 
   return 0;
@@ -1940,7 +1993,8 @@ test_solve_implicit_lab()
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
-  params[0]=RAD;
+  //$$$$$
+  params[0]=MHD;
 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
