@@ -146,7 +146,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
   gg=geom->gg;
   GG=geom->GG;
 
-  int verbose=2;
+  int verbose=1;
   int hdcorr=0;
   int radcor=0;
   corrected[0]=corrected[1]=0;
@@ -729,6 +729,9 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df, ldouble *err)
   ldouble u = wmrho0 / GAMMA;
   ldouble p = (GAMMA-1)*u;
 
+  //test
+  //printf("%e %e %e\n",w,wmrho0,v2);
+
   ldouble Ssofchi=compute_specificentropy_wmrho0_idealgas(rho0,wmrho0);
 
   *f= -Sc + D*Ssofchi;
@@ -1038,6 +1041,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  || !isfinite(dfdW) || !isfinite(dfdW))	  
 	  && (i_increase < 50)) 
 	{
+	  if(verbose>0) printf("init W : %e -> %e (%e %e)\n",W,100.*W,f0,dfdW);
 	  W *= 100.;
 	  i_increase++;
 	  continue;
