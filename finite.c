@@ -729,6 +729,47 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  set_u(u,iv,ix,iy,iz,val);	
 
 	}
+
+      //testing if entropy increasing
+
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+
+      PLOOP(iv)
+      {
+	uu[iv]=get_u(u,iv,ix,iy,iz);
+	pp[iv]=get_u(p,iv,ix,iy,iz);
+      }
+
+      int u2pret=u2p_solver(uu,pp,&geom,U2P_HOT,0); 
+
+      if(u2pret==0)
+	{
+	  //check if u2p_hot faild by making entropy decrease
+	  //by comparing the Lagrangian uu[ENTR] value and the one from u2p_hot
+	  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+	  ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
+	  ldouble s2=exp(pp[ENTR]/pp[RHO]);
+	  
+	  if(s2/s1 < 0.9)
+	    {  
+	      //printf("\n PROBLEM DETECTED IN EVOLVING ENTROPY AT %d %d - %e!\n",geom.ix,geom.iy,s2/s1);//getchar();
+	      u2pret=-1;
+	    }
+	}
+
+      if(u2pret<0)
+	{
+	  u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
+	  p2u(pp,uu,&geom);
+	  
+	  PLOOP(iv)
+	  {
+	    set_u(u,iv,ix,iy,iz,uu[iv]);
+	    set_u(p,iv,ix,iy,iz,pp[iv]);
+	  }
+	}
     }
 
   //**********************************************************************
@@ -815,6 +856,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	}
+
+      
       
 
       /************************************************************************/

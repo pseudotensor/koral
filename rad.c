@@ -828,7 +828,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   if(whichprim==RAD)
     {
       uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-      //uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
+      uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
       uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
       uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
       uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
@@ -1023,6 +1023,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	}
     }
 
+  //print_4vector(err);
   *err0=my_max(my_max(err[0],err[1]),my_max(err[2],err[3]));
   
   return ret;
@@ -1236,7 +1237,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
  
   //4dprim
-  ldouble EPS = 1.e-8;
+  ldouble EPS = 1.e-10;
   ldouble CONV = 1.e-8;
   ldouble MAXITER = 25;
   int corr[2],fixup[2];
@@ -1594,7 +1595,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       while(1); 
 
 
-      /* //this may fail
+      //this may fail
       if(failed==0)
 	{
 	  //criterion of convergence on relative change of quantities
@@ -1607,15 +1608,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  //if(verbose) print_4vector(f3);
 	  
-	  ldouble CONVREL=CONV;
+	  ldouble CONVREL=1.e-6;
 	  //if(mom_over_flag==1) CONVREL*=100.; //looser criterion when keeps overshooting 
-	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL)
+	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && err<1.e-6)
 	    {
 	      if(verbose) printf("\n === success (rel.change) ===\n");
 	      break;
 	    }     
 	}
-      */
+     
 
       if(iter>MAXITER || failed==1)
 	break;
@@ -1630,7 +1631,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
       
-      ldouble CONVLOOSE=CONV*1.e4;
+      ldouble CONVLOOSE=CONV*1.e2;
       if(errbest<CONVLOOSE)
 	{
 	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
@@ -1743,8 +1744,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       getchar();
       */
 
-      //print_NVvector(uu);
-      //print_Nvector(pp,NV);
+      print_NVvector(uu);
+      print_Nvector(pp,NV);
 
 
       calc_ff_Rtt(pp,&Rtt00,ugas00,geom);
@@ -1765,17 +1766,29 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
       printf("err %e del0: %e\n",err,deltas[0]);
 
+      /*
       ldouble duu[NV];
       
       PLOOP(i)
 	duu[i]=uu[i]-uu0[i];
+      //      print_NVvector(pp);
       print_NVvector(duu);
       
       p2u(pp,uu,geom);
 
       PLOOP(i)
 	duu[i]=uu[i]-uu0[i];
-      print_NVvector(duu);getchar();
+      print_NVvector(duu);
+
+      
+      print_NVvector(uu);
+      corr[0]=u2p(uu,pp,geom,corr,fixup);
+      //p2u(pp,uu,geom);
+      print_NVvector(pp);
+
+
+getchar();
+      */
       
      }
 
@@ -2007,10 +2020,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //****
   //backup method
   /* uses tetrad and screws up inside horizon */
-  
+
+  /*
   if(geom.ix>10)
     {
-      
       PLOOP(iv) pp[iv]=pp0[iv]; 
       
       ret=solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
@@ -2022,6 +2035,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  return 0;
 	}
     }
+  */
       
   //****
   //nothing worked
@@ -2029,7 +2043,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     
   //leaving primitives intact
   deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
-  return 0;
+  return -1;
 
   /*
   //**** 1st + 5 ****
@@ -2091,6 +2105,8 @@ test_solve_implicit_lab()
   getchar();
   */
  
+  //p2u(pp,uu,&geom)
+
   ldouble deltas[4];
   int verbose=1;
   int params[4];
@@ -2102,13 +2118,13 @@ test_solve_implicit_lab()
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   //$$$$$
-  params[0]=RAD;
+  params[0]=-1;
 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=1; //mom.overshoot check
 
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  //return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   
   params[1]=RADIMPLICIT_ENTROPYEQ;
@@ -3388,7 +3404,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	{
 	  rv2tau=4./3./tautot[dim]*4./3./tautot[dim];
 	  //test
-	  rv2tau*=10.;
+	  rv2tau*=100.;
 	  rv2=my_min(rv2rad,rv2tau);		     
 	}
       else

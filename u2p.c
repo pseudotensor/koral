@@ -1125,10 +1125,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	}
 
       //what about this?
-      /*
+      
+      
       if((fabs((W-Wprev)/Wprev)<CONV && err<CONV*1.e4))
 	break;
-      */
+      
     }
   //  while((fabs((W-Wprev)/Wprev)>CONV && err>CONV*1.e3) && iter<50);
   while(iter<50);

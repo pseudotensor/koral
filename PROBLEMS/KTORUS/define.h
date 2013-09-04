@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 66
+#define RESTART
+#define RESTARTNUM 76
 
 /************************************/
 //radiation choices
@@ -40,7 +40,7 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define UURHORATIOMIN 1.e-8
+#define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
 #define EERHORATIOMAX 1.e20
@@ -93,7 +93,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e0
+#define DTOUT1 3.
 
 /************************************/
 //common physics / torus / atmosphere
