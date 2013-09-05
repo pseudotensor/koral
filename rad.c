@@ -2067,9 +2067,43 @@ test_solve_implicit_lab()
 
   geom.ix=geom.iy=geom.iz=0;
 
+  ldouble Rttcov[4]={uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]};
+  ldouble Rttcon[4];
+  indices_12(Rttcov,Rttcon,geom.GG);
+  print_4vector(Rttcov);
+  print_4vector(Rttcon);
+  ldouble vcon[4],ucon[4],ucov[4];
+  vcon[1]=pp0[2];
+  vcon[2]=pp0[3];
+  vcon[3]=pp0[4];
+  vcon[0]=0.;
+
   /*
-  print_Nvector(uu,NV);
-  print_Nvector(pp,NV);
+  //converting to 4-velocity
+  conv_vels(vcon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+  indices_21(ucon,ucov,geom.gg);
+  print_4vector(ucon);
+  print_4vector(ucov);
+
+  
+  ldouble pp2[NV];
+  int i;
+  PLOOP(i) pp2[i]=pp0[i];
+  u2p_solver(uu0,pp2,&geom,U2P_HOT,2);
+  
+
+
+
+  print_metric(geom.gg);
+  print_metric(geom.GG);
+
+  
+  print_Nvector(uu0,NV);
+
+  print_Nvector(pp0,NVMHD);
+  p2u(pp0,uu0,&geom);
+  print_Nvector(uu0,NVMHD);
+
   print_metric(geom.gg);
   print_metric(geom.GG);
   printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
@@ -2100,7 +2134,7 @@ test_solve_implicit_lab()
   params[3]=0; 
   //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  params[0]=MHD;
+  params[0]=RAD;
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FF;
   params[3]=0;

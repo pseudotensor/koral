@@ -1073,12 +1073,12 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       //fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW,&err);
       //dfdW=(f1-f0)/(EPS*W);
 
+      if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,dfdW,err);
+ 
       //convergence test
       if(err<CONV)
 	break;
       
-      if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,dfdW,err);
-
       if(dfdW==0.) {W*=1.1; continue;}
 
       ldouble Wnew=W-f0/dfdW;
