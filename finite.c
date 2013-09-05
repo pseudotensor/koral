@@ -730,7 +730,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	}
 
-      //testing if entropy increasing
+      //testing if entropy increased after advection
 
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
@@ -745,7 +745,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
       if(u2pret==0)
 	{
-	  //check if u2p_hot faild by making entropy decrease
+	  //check if u2p_hot failde by making entropy decrease
 	  //by comparing the Lagrangian uu[ENTR] value and the one from u2p_hot
 	  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
 	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);

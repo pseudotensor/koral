@@ -2,7 +2,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 76
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -40,7 +40,7 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define UURHORATIOMIN 1.e-10
+#define UURHORATIOMIN 1.e-8
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
 #define EERHORATIOMAX 1.e20
@@ -50,8 +50,8 @@
 #define B2UURATIOMAX 100.
 #define B2RHORATIOMIN 0.
 #define B2RHORATIOMAX 100.
-#define GAMMAMAXRAD 100.
-#define GAMMAMAXHD 100.
+#define GAMMAMAXRAD 50.
+#define GAMMAMAXHD 50.
 
 /************************************/
 //blackhole
