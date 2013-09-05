@@ -16,7 +16,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-#define MAGNFIELD
+//#define MAGNFIELD
 #define VECPOTGIVEN
 #define MAXBETA .002 //target pmag/pgas int the midplane
 
@@ -67,10 +67,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
-#define MAXX (log(100.-MKS1R0))
-#define NX 140
-#define NY 100
+#define MINX (log(1.5-MKS1R0))
+#define MAXX (log(50.-MKS1R0))
+#define NX 80
+#define NY 60
 #define NZ 1
 #endif
 
@@ -93,7 +93,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 3.
+#define DTOUT1 1.
 
 /************************************/
 //common physics / torus / atmosphere

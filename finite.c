@@ -731,11 +731,12 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	}
 
       //testing if entropy increased after advection
+      //only MHD part involved
 
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
 
-      PLOOP(iv)
+      for(iv=0;iv<NVMHD;iv++)
       {
 	uu[iv]=get_u(u,iv,ix,iy,iz);
 	pp[iv]=get_u(p,iv,ix,iy,iz);
@@ -762,13 +763,19 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       if(u2pret<0)
 	{
 	  u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
-	  p2u(pp,uu,&geom);
-	  
-	  PLOOP(iv)
-	  {
-	    set_u(u,iv,ix,iy,iz,uu[iv]);
-	    set_u(p,iv,ix,iy,iz,pp[iv]);
-	  }
+	  if(u2pret==0)
+	    {
+	      p2u(pp,uu,&geom);
+	      for(iv=0;iv<NVMHD;iv++)
+		{
+		  set_u(u,iv,ix,iy,iz,uu[iv]);
+		  set_u(p,iv,ix,iy,iz,pp[iv]);
+		}
+	    }
+	  else
+	    {
+	      printf("u2p_entropy failed when correcting toward entropy at %d %d\n",geom.ix,geom.iy);
+	    }
 	}
     }
 
