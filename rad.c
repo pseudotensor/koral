@@ -2094,7 +2094,7 @@ test_solve_implicit_lab()
   params[3]=0; //mom.overshoot check
   //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  params[0]=RAD;
+  params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0; 
