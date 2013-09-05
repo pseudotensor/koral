@@ -1022,7 +1022,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
   ldouble f0,f1,dfdW,err;
-  ldouble CONV=1.e-10; //looser check when converged in terms of W?
+  ldouble CONV=1.e-8; //looser check when converged in terms of W?
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
