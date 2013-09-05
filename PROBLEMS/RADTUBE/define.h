@@ -25,7 +25,7 @@
 #define EFLOOR 1.e-45
 
 #define TMAX 1.e10 //end time
-#define NOUTSTOP 1e3 //number of outputs to stop
+#define NOUTSTOP 50. //number of outputs to stop
 //#define RADOUTPUTINZAMO
 #define RADOUTPUTINFF
 
