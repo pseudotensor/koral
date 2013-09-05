@@ -936,7 +936,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	      ldouble ucov[4],bcon[4],bcov[4];
 	      indices_21(ucon,ucov,gg);
 
-	      /*
+	      /*	      
 #ifdef MAGNFIELD
 	      calc_bcon_4vel(pp,ucon,ucov,bcon);
 	      indices_21(bcon,bcov,gg); 
@@ -1014,6 +1014,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	    }
 	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	    {
+	      pp0[ENTR]= calc_Sfromu(pp0[RHO],pp0[UU]);
 	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
 	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
 	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
@@ -1239,7 +1240,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //4dprim
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-8;
-  ldouble MAXITER = 50;
+  ldouble MAXITER = 1000;
   int corr[2],fixup[2];
 
   int sh;
@@ -1824,12 +1825,22 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //test
 
-  //**** 000 ****
+  //**** 000th ****
   PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
   params[3]=0;
   params[0]=MHD;
+
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) return 0;
+
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  params[3]=0;
+  params[0]=RAD;
 
   ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
@@ -1845,11 +1856,28 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy MHD worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail);
       return 0;
     }
 
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[2]=RADIMPLICIT_FFEQ;
+  params[3]=0;
+  params[0]=RAD;
+
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy RAD worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fflush(fout_fail);
+      return 0;
+    }
+
+
+  //failure
   return -1;
 
 
@@ -2153,7 +2181,7 @@ test_solve_implicit_lab()
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   //$$$$$
-  params[0]=MHD;
+  params[0]=RAD;
 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
