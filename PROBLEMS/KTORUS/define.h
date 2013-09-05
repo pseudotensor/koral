@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM -1
+#define RESTART
+#define RESTARTNUM 46
 
 /************************************/
 //radiation choices
@@ -18,7 +18,7 @@
 /************************************/
 #define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA .2 //target pmag/pgas int the midplane
+#define MAXBETA .02 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -93,7 +93,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 3.
+#define DTOUT1 10.
 
 /************************************/
 //common physics / torus / atmosphere

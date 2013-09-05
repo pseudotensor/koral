@@ -15,6 +15,17 @@ main(int argc, char **argv)
   ldouble tstart;
   int i;
 
+  /*
+  printf("scalings: %e %e %e %e %e %e\n",
+	 rhoGU2CGS(1.),
+	 lenGU2CGS(1.),
+	 timeGU2CGS(1.),
+	 endenGU2CGS(1.),
+	 calc_PEQ_Tfromurho(1.,1.),
+	 K_BOLTZ/MU_GAS/M_PROTON);
+  exit(0);
+  */
+
   //gsl errors off
   gsl_set_error_handler_off();
   
