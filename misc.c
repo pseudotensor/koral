@@ -422,7 +422,7 @@ inverse_44matrix(ldouble a[][4], ldouble ia[][4])
 //1       /-------
 //       | 
 //0 ____/0
-//x9 determines the sharpness and says where step function equals 0.9
+//x9 determines the sharpness and says where step function equals 0.95
 ldouble
 step_function(ldouble x,ldouble x9)
 {

@@ -1229,7 +1229,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   int whichprim,whicheq,do_mom_over;
   if(params[0]==-1) //choose here
     {
-      if(-Rtt00<pp0[UU]) //rad sub-dominant
+      if(-Rtt00<1.e-3*pp0[UU]) //rad sub-dominant
 	whichprim=RAD;
       else //gas dominant
 	whichprim=MHD; 
@@ -1833,40 +1833,56 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
-  ldouble pp0[NV],uu0[NV];
+  ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
   PLOOP(iv) 
   {
     pp0[iv]=pp[iv];
     uu0[iv]=uu[iv];
+    pp00[iv]=pp[iv];
+    uu00[iv]=uu[iv];
   }
 
 
   //test
 
   //**** 000th ****
+  PLOOP(iv) 
+  {
+    pp0[iv]=pp00[iv];
+    uu0[iv]=uu00[iv];    
+  }
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0;
-  params[0]=-1;
+  params[0]=MHD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   if(ret==0) return 0;
 
+  PLOOP(iv) 
+  {
+    pp0[iv]=pp00[iv];
+    uu0[iv]=uu00[iv];    
+  }
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0;
-  if(params[0]==RAD) params[0]=MHD;
-  else params[0]=RAD;
+  params[0]=RAD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   if(ret==0) return 0;
 
+  PLOOP(iv) 
+  {
+    pp0[iv]=pp00[iv];
+    uu0[iv]=uu00[iv];    
+  }
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FF;
   params[3]=0;
-  params[0]=-1;
+  params[0]=MHD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
@@ -1878,11 +1894,15 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       return 0;
     }
 
+  PLOOP(iv) 
+  {
+    pp0[iv]=pp00[iv];
+    uu0[iv]=uu00[iv];    
+  }
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FF;
   params[3]=0;
-  if(params[0]==RAD) params[0]=MHD;
-  else params[0]=RAD;
+  params[0]=RAD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
@@ -1894,7 +1914,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       return 0;
     }
 
-  /*
   //backup method - interpolating between zero and LTE state
   ldouble ugas0[4],Rtt0,Tgas0,Trad0;
   calc_ff_Rtt(pp0,&Rtt0,ugas0,&geom);
@@ -1937,12 +1956,41 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) //LTE worked so can combine zero and LTE states
     {
+      xi1=xi2=1.e2;
 
+      //printf("interpolating\n %e %e\n",xi1,xi2);
+      //print_NVvector(pp0);
+      //print_NVvector(pp);
 
+      ldouble enfac = step_function(log10(xi1),2.);
+      ldouble momfac = step_function(log10(xi2),2.);
+      //printf(" %e %e\n",enfac,momfac);
 
+      pp[UU]=pp0[UU]+enfac*(pp[UU]-pp0[UU]);
+      pp[EE0]=pp0[EE0]+enfac*(pp[EE0]-pp0[EE0]);
+
+      pp[VX]=pp0[VX]+momfac*(pp[VX]-pp0[VX]);
+      pp[VY]=pp0[VY]+momfac*(pp[VY]-pp0[VY]);
+      pp[VZ]=pp0[VZ]+momfac*(pp[VZ]-pp0[VZ]);
+    
+      pp[FX0]=pp0[FX0]+momfac*(pp[FX0]-pp0[FX0]);
+      pp[FY0]=pp0[FY0]+momfac*(pp[FY0]-pp0[FY0]);
+      pp[FZ0]=pp0[FZ0]+momfac*(pp[FZ0]-pp0[FZ0]);
+
+      //print_NVvector(pp);
+      //getchar();
+
+      //calculate deltas here
+      p2u(pp,uu,&geom);
+      
+      //returns corrections to radiative primitives
+      deltas[0]=uu[EE0]-uu0[EE0];
+      deltas[1]=uu[FX0]-uu0[FX0];
+      deltas[2]=uu[FY0]-uu0[FY0];
+      deltas[3]=uu[FZ0]-uu0[FZ0];
+      
+      return 0;
     } 
-  */
-
 
   //report failure and stop
   return -1;
@@ -2019,19 +2067,17 @@ test_solve_implicit_lab()
    
   //$$$$$
   params[0]=RAD;
-
   params[1]=RADIMPLICIT_LTEEQ;
   params[3]=0; //mom.overshoot check
   //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  params[0]=RAD;
-
+  params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0; 
   return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  
+  params[0]=MHD;
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FF;
   params[3]=0;
