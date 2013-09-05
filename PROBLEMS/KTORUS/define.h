@@ -11,7 +11,7 @@
 //#define SKIPRADWAVESPEEDLIMITER
 //#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
-//#define SKIPRADSOURCE
+#define SKIPRADSOURCE
 
 /************************************/
 //magnetic choices
@@ -40,7 +40,7 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define UURHORATIOMIN 1.e-8
+#define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
 #define EERHORATIOMAX 1.e20
