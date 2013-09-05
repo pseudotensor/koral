@@ -580,7 +580,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
   //energy or entropy equation to solve
   params[1]=RADIMPLICIT_ENTROPYEQ;
   //frame for energy/entropy equation to solve
-  params[2]=RADIMPLICIT_FFEQ;
+  params[2]=RADIMPLICIT_FF;
 
   //local vectors
   for(iv=0;iv<NV;iv++)
@@ -890,7 +890,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
     }
 
   //regular energy/entropy inversion
-  if(whicheq!=RADIMPLICIT_LTE)
+  if(whicheq!=RADIMPLICIT_LTEEQ)
     {
 
       //radiative four-force
@@ -928,7 +928,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	}
 
       /***** LAB FRAME ENERGY/ENTROPY EQS *****/
-      if(whichframe==RADIMPLICIT_LABEQ)
+      if(whichframe==RADIMPLICIT_LAB)
 	{      
 	  if(whichprim==RAD) //rad-primitives
 	    {
@@ -978,7 +978,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	}
 
       /***** FF FRAME ENERGY/ENTROPY EQS *****/
-      if(whichframe==RADIMPLICIT_FFEQ)
+      if(whichframe==RADIMPLICIT_FF)
 	{
 
 	  ldouble ucon[4],Rtt0,Rtt;
@@ -1029,7 +1029,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	    }
 	}
     }
-  else //searching for full LTE (whicheq==RADIMPLICIT_LTE)
+  else //searching for full LTE (whicheq==RADIMPLICIT_LTEEQ)
     {
       ldouble ucon[4],Rtt;
       //new state
@@ -1071,14 +1071,22 @@ print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f,ldouble err)
 /******* 4D solver working on primitives */
 /*****************************************/
 int
-solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params)
+solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *pp)
 {
   int i1,i2,i3,iv,i,j;
   int mom_over_flag;
   ldouble J[4][4],iJ[4][4];
-  ldouble pp[NV],pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
+  ldouble pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3[4],xxx[4],xxxbest[4],err,errbest;
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uu0[iv]=uu00[iv]; //zero state for substepping
+      pp0[iv]=pp00[iv]; 
+      uu[iv]=uu0[iv]; 
+      pp[iv]=pp0[iv];     
+    }
 
   struct geometry *geom
     = (struct geometry *) ggg;
@@ -1102,17 +1110,17 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
 
       /*
-      print_Nvector(uu00,NV);
-      print_Nvector(pp00,NV);
+      print_Nvector(uu0,NV);
+      print_Nvector(pp0,NV);
       print_metric(gg);
       print_metric(GG);
       printf("%e %e %e\n",dt,geom->alpha,geom->gdet);
       */
       FILE *out = fopen("imp.problem.dat","w");
       for (i1=0;i1<NV;i1++)
-	fprintf(out,"%.20e ",uu00[i1]);
+	fprintf(out,"%.20e ",uu0[i1]);
       for (i1=0;i1<NV;i1++)
-	fprintf(out,"%.20e ",pp00[i1]);
+	fprintf(out,"%.20e ",pp0[i1]);
       for (i1=0;i1<4;i1++)
 	for (i2=0;i2<5;i2++)
 	  fprintf(out,"%.20e ",gg[i1][i2]);
@@ -1136,27 +1144,27 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //comparing energy densities
   ldouble ugas00[4],Rtt00,Tgas00,Trad00;
   int dominates;
-  calc_ff_Rtt(pp00,&Rtt00,ugas00,geom);
-   if(-Rtt00>pp00[UU]) 
+  calc_ff_Rtt(pp0,&Rtt00,ugas00,geom);
+   if(-Rtt00>pp0[UU]) 
     dominates = RAD;
   else
     dominates = MHD;
-  Tgas00=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
+  Tgas00=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
   Trad00=calc_LTE_TfromE(-Rtt00);
 
   ldouble ppLTE[NV],uuLTE[NV];
-  //  calc_LTE_state(pp00,ppLTE,geom);
+  //  calc_LTE_state(pp0,ppLTE,geom);
   //  ldouble TLTE=calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]);
 
   //nolonger keep TLTE - whats below can loop up
-  //ldouble TLTE=calc_LTE_temp(pp00,geom);
+  //ldouble TLTE=calc_LTE_temp(pp0,geom);
   ldouble TLTE=0.;
 
 
-  ldouble kappa=calc_kappa(pp00[RHO],Tgas00,0.,0.,0.);
-  ldouble chi=kappa+calc_kappaes(pp00[RHO],Tgas00,0.,0.,0.);
-  ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas00,4.)/pp00[UU]);
-  ldouble xi2=chi*dt*(1.+(-Rtt00)/(pp00[RHO]+GAMMA*pp00[UU]));
+  ldouble kappa=calc_kappa(pp0[RHO],Tgas00,0.,0.,0.);
+  ldouble chi=kappa+calc_kappaes(pp0[RHO],Tgas00,0.,0.,0.);
+  ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas00,4.)/pp0[UU]);
+  ldouble xi2=chi*dt*(1.+(-Rtt00)/(pp0[RHO]+GAMMA*pp0[UU]));
   ldouble ucon[4];
 
   if(verbose) 
@@ -1164,33 +1172,33 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
       printf("\n===========\nxi1: %e xi2: %e\n===========\n\n",xi1,xi2);
       ldouble Rtt;
-      calc_ff_Rtt(pp00,&Rtt,ucon,geom);
+      calc_ff_Rtt(pp0,&Rtt,ucon,geom);
       printf("Ehat: %e\n\n",-Rtt);
 
       ldouble qsq=0.;
       int i,j;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
-	  qsq+=pp00[UU+i]*pp00[UU+j]*geom->gg[i][j];
+	  qsq+=pp0[UU+i]*pp0[UU+j]*geom->gg[i][j];
       ldouble gamma2=1.+qsq;
       printf("gamma gas: %e\n\n",sqrt(gamma2));
 
       qsq=0.;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
-	  qsq+=pp00[EE0+i]*pp00[EE0+j]*geom->gg[i][j];
+	  qsq+=pp0[EE0+i]*pp0[EE0+j]*geom->gg[i][j];
       gamma2=1.+qsq;
       printf("gamma rad: %e\n\n",sqrt(gamma2));
 
       ldouble Gi00[4],Gihat00[4];
-      //      print_Nvector(pp00,NV);
-      calc_Gi(pp00, geom,Gi00);
+      //      print_Nvector(pp0,NV);
+      calc_Gi(pp0, geom,Gi00);
       //print_4vector(Gi00);
       //getchar();
       
       indices_21(Gi00,Gi00,geom->gg);
 
-      boost2_lab2ff(Gi00,Gihat00,pp00,geom->gg,geom->GG);
+      boost2_lab2ff(Gi00,Gihat00,pp0,geom->gg,geom->GG);
       for(iv=0;iv<4;iv++)
 	{
 	  Gi00[iv]*=dt*gdetu;
@@ -1202,8 +1210,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
  
 
       ldouble Trad=calc_LTE_TfromE(-Rtt);
-      ldouble Tgas=calc_PEQ_Tfromurho(pp00[UU],pp00[RHO]);
-      ldouble rho=pp00[RHO];
+      ldouble Tgas=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
+      ldouble rho=pp0[RHO];
       ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
       ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);  
       printf("\n===========\nkappa: %e chi: %e\n===========\n",kappa,kappa+kappaes);
@@ -1221,9 +1229,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   int whichprim,whicheq,do_mom_over;
   if(params[0]==-1) //choose here
     {
-      if(-Rtt00<1.e-3*pp00[UU]) //hydro preffered
+      if(-Rtt00<pp0[UU]) //rad sub-dominant
 	whichprim=RAD;
-      else
+      else //gas dominant
 	whichprim=MHD; 
       params[0]=whichprim;  
     }
@@ -1237,13 +1245,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
  
   whicheq=params[1];
   do_mom_over =params[3];
-   
-  //energy or entropy equation to solve
-  //params[1]=RADIMPLICIT_ENTROPYEQ;
-  //params[1]=RADIMPLICIT_ENERGYEQ;
-  //frame for energy/entropy equation to solve
-  //params[2]=RADIMPLICIT_LABEQ;
-
+  
   if(verbose && whichprim==MHD) printf("Working on MHD\n\n");
   if(verbose && whichprim==RAD) printf("Working on RAD\n\n");
 
@@ -1255,13 +1257,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   if(VELPRIM!=VELPRIMRAD) 
     my_err("implicit solver assumes VELPRIM == VELPRIMRAD\n");
 
-  for(iv=0;iv<NV;iv++)
-    {
-      uu0[iv]=uu00[iv]; //zero state for substepping
-      pp0[iv]=pp00[iv]; 
-      uu[iv]=uu0[iv]; 
-      pp[iv]=pp0[iv];     
-    }
  
   //4dprim
   ldouble EPS = 1.e-8;
@@ -1534,7 +1529,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      //correct rho to follow new velocity (only for MHD primitives)
 	      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
 	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-	      pp[RHO]=uu00[RHO]/gdetu/ucon[0];
+	      pp[RHO]=uu0[RHO]/gdetu/ucon[0];
 	    }
 
 	  //updating entropy
@@ -1664,7 +1659,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     {
       ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-      pp[RHO]=uu00[RHO]/gdetu/ucon[0];
+      pp[RHO]=uu0[RHO]/gdetu/ucon[0];
     }
 
   //updating entropy
@@ -1713,10 +1708,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   global_slot[1]+=1.;
 
   //returns corrections to radiative primitives
-  deltas[0]=uu[EE0]-uu00[EE0];
-  deltas[1]=uu[FX0]-uu00[FX0];
-  deltas[2]=uu[FY0]-uu00[FY0];
-  deltas[3]=uu[FZ0]-uu00[FZ0];
+  deltas[0]=uu[EE0]-uu0[EE0];
+  deltas[1]=uu[FX0]-uu0[FX0];
+  deltas[2]=uu[FY0]-uu0[FY0];
+  deltas[3]=uu[FZ0]-uu0[FZ0];
 
   if(verbose) print_4vector(deltas);
   
@@ -1809,6 +1804,8 @@ getchar();
       
      }
 
+  //succeeded
+  //primitives vector returned to pp[]
   return 0;
 }
 
@@ -1836,71 +1833,125 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   u2p(uu,pp,&geom,corr,fixup);
   p2u(pp,uu,&geom);
 
-  ldouble pp0[NV];
-  PLOOP(iv) pp0[iv]=pp[iv];
+  ldouble pp0[NV],uu0[NV];
+  PLOOP(iv) 
+  {
+    pp0[iv]=pp[iv];
+    uu0[iv]=uu[iv];
+  }
+
 
   //test
 
   //**** 000th ****
-  PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LABEQ;
+  params[2]=RADIMPLICIT_LAB;
   params[3]=0;
-  params[0]=MHD;
+  params[0]=-1;
 
-  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   if(ret==0) return 0;
 
-  PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LABEQ;
+  params[2]=RADIMPLICIT_LAB;
   params[3]=0;
-  params[0]=RAD;
+  if(params[0]==RAD) params[0]=MHD;
+  else params[0]=RAD;
 
-  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   if(ret==0) return 0;
 
-  PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENTROPYEQ;
-  params[2]=RADIMPLICIT_FFEQ;
+  params[2]=RADIMPLICIT_FF;
   params[3]=0;
-  params[0]=MHD;
+  params[0]=-1;
 
-  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy MHD worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy (subdom) worked\n",
+	      geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail);
       return 0;
     }
 
-  PLOOP(iv) pp[iv]=pp0[iv]; 
   params[1]=RADIMPLICIT_ENTROPYEQ;
-  params[2]=RADIMPLICIT_FFEQ;
+  params[2]=RADIMPLICIT_FF;
   params[3]=0;
-  params[0]=RAD;
+  if(params[0]==RAD) params[0]=MHD;
+  else params[0]=RAD;
 
-  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   if(ret==0) 
     {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy RAD worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy (other) worked\n",
+	      geom.ix,geom.iy,geom.iz,global_time,nfout1);
       fflush(fout_fail);
       return 0;
     }
 
+  /*
+  //backup method - interpolating between zero and LTE state
+  ldouble ugas0[4],Rtt0,Tgas0,Trad0;
+  calc_ff_Rtt(pp0,&Rtt0,ugas0,&geom);
+  Tgas0=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
+  Trad0=calc_LTE_TfromE(-Rtt0);
+  ldouble kappa=calc_kappa(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
+  ldouble chi=kappa+calc_kappaes(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
+  ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas0,4.)/pp0[UU]);
+  ldouble xi2=chi*dt*(1.+(-Rtt0)/(pp0[RHO]+GAMMA*pp0[UU]));
 
-  //failure
+  params[1]=RADIMPLICIT_LTEEQ;
+  params[3]=0;
+  params[0]=-1;
+
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (subdom) worked, xi1/xi2 : %e %e\n",
+	      geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
+      fflush(fout_fail);
+    }
+
+  if(ret!=0) //try the other primitives
+    {
+      params[1]=RADIMPLICIT_LTEEQ;
+      params[3]=0;
+      if(params[0]==RAD) params[0]=MHD;
+      else params[0]=RAD;
+
+      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+      if(ret==0) 
+	{
+	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
+		  geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
+	  fflush(fout_fail);
+	}
+    }
+
+  if(ret==0) //LTE worked so can combine zero and LTE states
+    {
+
+
+
+    } 
+  */
+
+
+  //report failure and stop
   return -1;
-
 
   
   //****
   //nothing worked
-  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
+	  geom.ix,geom.iy,geom.iz,global_time,nfout1);
     
   //leaving primitives intact
   deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
@@ -1917,13 +1968,13 @@ test_solve_implicit_lab()
 {
   FILE *in = fopen("imp.problem.0","r");
   int i1,i2,iv;
-  ldouble uu[NV],pp[NV],dt;
+  ldouble uu0[NV],pp0[NV],pp[NV],dt;
   struct geometry geom;
 
   for (i1=0;i1<NV;i1++)
-    iv=fscanf(in,"%lf",&uu[i1]);
+    iv=fscanf(in,"%lf",&uu0[i1]);
   for (i1=0;i1<NV;i1++)
-    iv=fscanf(in,"%lf",&pp[i1]);
+    iv=fscanf(in,"%lf",&pp0[i1]);
   for (i1=0;i1<4;i1++)
     for (i2=0;i2<5;i2++)
       iv=fscanf(in,"%lf ",&geom.gg[i1][i2]);
@@ -1969,22 +2020,22 @@ test_solve_implicit_lab()
   //$$$$$
   params[0]=RAD;
 
-  params[1]=RADIMPLICIT_LTE;
+  params[1]=RADIMPLICIT_LTEEQ;
   params[3]=0; //mom.overshoot check
-  //return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   params[0]=RAD;
 
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LABEQ;
+  params[2]=RADIMPLICIT_LAB;
   params[3]=0; 
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   
   params[1]=RADIMPLICIT_ENTROPYEQ;
-  params[2]=RADIMPLICIT_FFEQ;
+  params[2]=RADIMPLICIT_FF;
   params[3]=0;
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
   
   
 }
@@ -1994,7 +2045,7 @@ test_solve_implicit_backup()
 {
   FILE *in = fopen("imp.problem.0","r");
   int i1,i2,iv;
-  ldouble uu[NV],pp[NV],dt;
+  ldouble uu[NV],pp[NV],dt,ppret[NV];
   struct geometry geom;
 
   fill_geometry(0,0,0,&geom);
@@ -2034,15 +2085,15 @@ test_solve_implicit_backup()
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LABEQ;
+  params[2]=RADIMPLICIT_LAB;
   params[3]=2; //mom.overshoot check
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params,ppret);
 
   
   params[1]=RADIMPLICIT_ENTROPYEQ;
-  params[2]=RADIMPLICIT_FFEQ;
+  params[2]=RADIMPLICIT_FF;
   params[3]=1;
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params,ppret);
   
   
 }
@@ -2158,9 +2209,10 @@ test_jon_solve_implicit_lab()
       
       solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
       params[1]=RADIMPLICIT_ENERGYEQ;
-      params[2]=RADIMPLICIT_LABEQ;
+      params[2]=RADIMPLICIT_LAB;
       params[3]=1;
-      solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+      ldouble ppret[NV];
+      solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params,ppret);
       //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
 
       getchar();

@@ -96,9 +96,9 @@
 //rad.implicit solver parameters
 #define RADIMPLICIT_ENERGYEQ 0
 #define RADIMPLICIT_ENTROPYEQ 1
-#define RADIMPLICIT_LTE 2
+#define RADIMPLICIT_LTEEQ 2
 
-#define RADIMPLICIT_LABEQ 0
-#define RADIMPLICIT_FFEQ 1
+#define RADIMPLICIT_LAB 0
+#define RADIMPLICIT_FF 1
 
 
