@@ -2,7 +2,7 @@
 ldouble rhocgs=rhoGU2CGS(rho);
 ldouble Tcgs=tempGU2CGS(T);
 
-//if(Tcgs<1.e6) Tcgs=1.e6;
+//if(Tcgs<1.e4) Tcgs=1.e4;
 
 ldouble ZZsun=1.;
 ldouble kappaffcgs=6.4e22*rhocgs/Tcgs/Tcgs/Tcgs/sqrt(Tcgs);

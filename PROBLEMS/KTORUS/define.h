@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -18,7 +18,7 @@
 /************************************/
 #define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA .2 //target pmag/pgas int the midplane
+#define MAXBETA .02 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -40,7 +40,7 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define UURHORATIOMIN 1.e-15
+#define UURHORATIOMIN 1.e-8
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
 #define EERHORATIOMAX 1.e20
@@ -93,7 +93,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 3.
+#define DTOUT1 10.
 
 /************************************/
 //common physics / torus / atmosphere
