@@ -11,14 +11,14 @@
 //#define SKIPRADWAVESPEEDLIMITER
 //#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
-#define SKIPRADSOURCE
+//#define SKIPRADSOURCE
 
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA .002 //target pmag/pgas int the midplane
+#define MAXBETA .2 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -40,7 +40,7 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define UURHORATIOMIN 1.e-8
+#define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
 #define EERHORATIOMAX 1.e20
@@ -68,9 +68,9 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.5-MKS1R0))
-#define MAXX (log(50.-MKS1R0))
-#define NX 80
-#define NY 60
+#define MAXX (log(100.-MKS1R0))
+#define NX 120
+#define NY 100
 #define NZ 1
 #endif
 
@@ -93,7 +93,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 3.
 
 /************************************/
 //common physics / torus / atmosphere

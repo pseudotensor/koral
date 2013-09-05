@@ -1239,7 +1239,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //4dprim
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-8;
-  ldouble MAXITER = 25;
+  ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
   int sh;
@@ -1363,7 +1363,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		del=sign*EPS*ppp[sh]; //minus avoids u2p_mhd errors when working on radiative
 
 		//EPS of the geometrical mean
-		del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
+		//del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
 	      }
 	    else //decreasing velocity
 	      {
@@ -1822,6 +1822,41 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ldouble pp0[NV];
   PLOOP(iv) pp0[iv]=pp[iv];
 
+  //test
+
+  //**** 000 ****
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LABEQ;
+  params[3]=0;
+  params[0]=MHD;
+
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) return 0;
+
+  PLOOP(iv) pp[iv]=pp0[iv]; 
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[2]=RADIMPLICIT_FFEQ;
+  params[3]=0;
+  params[0]=MHD;
+
+  ret=solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
+
+  if(ret==0) 
+    {
+      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy worked\n",geom.ix,geom.iy,geom.iz,global_time,nfout1);
+      fflush(fout_fail);
+      return 0;
+    }
+
+  return -1;
+
+
+  
+
+
+
   //if entropy then entropy
   if(get_cflag(ENTROPYFLAG,geom.ix,geom.iy,geom.iz)==1)
     {
@@ -2118,18 +2153,18 @@ test_solve_implicit_lab()
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
    
   //$$$$$
-  params[0]=-1;
+  params[0]=MHD;
 
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LABEQ;
-  params[3]=1; //mom.overshoot check
+  params[3]=0; //mom.overshoot check
 
   //return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
 
   
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FFEQ;
-  params[3]=1;
+  params[3]=0;
   return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params);
   
   
