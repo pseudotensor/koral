@@ -1051,6 +1051,10 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
     }
 
   //print_4vector(err);
+  
+  if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]))
+    return -1;
+
   *err0=my_max(my_max(err[0],err[1]),my_max(err[2],err[3]));
   
   return ret;
@@ -1598,7 +1602,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  if(xiapp<1.e-20) 
 	    {
-	      printf("damped unsuccesfully in implicit_4dprim\n");
+	      if(verbose) printf("damped unsuccesfully in implicit_4dprim\n");
 	      failed=1;
 	      break;
 	    }
@@ -1806,6 +1810,21 @@ getchar();
 
   //succeeded
   //primitives vector returned to pp[]
+
+  if(pp[UU]>1.e-18 && geom->ix>=70 && geom->ix<105)
+    {
+      printf("error %d %d\n",geom->ix,geom->iy);
+      print_NVvector(pp00);
+      print_NVvector(pp);
+      printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
+      printf("\n===========\nxi1: %e xi2: %e\n===========\n\n",xi1,xi2);
+ 
+      getchar();
+
+      return 100;
+      
+    }
+
   return 0;
 }
 
@@ -1858,6 +1877,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
+  if(ret==100) {printf("err\n");return -1;}
+
   if(ret==0) return 0;
 
   PLOOP(iv) 
@@ -1871,6 +1892,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[0]=RAD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+  if(ret==100) {printf("err\n");return -1;}
 
   if(ret==0) return 0;
 
@@ -2071,11 +2094,11 @@ test_solve_implicit_lab()
   params[3]=0; //mom.overshoot check
   //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  params[0]=MHD;
+  params[0]=RAD;
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0; 
-  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENTROPYEQ;
