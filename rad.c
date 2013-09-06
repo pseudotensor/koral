@@ -1283,8 +1283,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   if(verbose) 
     {
       //printf("=== i: %d %d %d\n\n",ix,iy,iz);
-      print_Nvector(uu,NV);
-      print_Nvector(pp,NV);
+      print_conserved(uu);
+      print_primitives(pp);
       //print_metric(gg);
     }
 
@@ -1760,8 +1760,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       getchar();
       */
 
-      print_NVvector(uu);
-      print_Nvector(pp,NV);
+      print_conserved(uu);
+      print_primitives(pp);
 
 
       calc_ff_Rtt(pp,&Rtt00,ugas00,geom);
@@ -2070,40 +2070,48 @@ test_solve_implicit_lab()
   ldouble Rttcov[4]={uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]};
   ldouble Rttcon[4];
   indices_12(Rttcov,Rttcon,geom.GG);
-  print_4vector(Rttcov);
-  print_4vector(Rttcon);
+  //print_4vector(Rttcov);
+  //print_4vector(Rttcon);
   ldouble vcon[4],ucon[4],ucov[4];
+
+  //converting to 4-velocity
   vcon[1]=pp0[2];
   vcon[2]=pp0[3];
   vcon[3]=pp0[4];
-  vcon[0]=0.;
-
-  /*
-  //converting to 4-velocity
+  vcon[0]=0.;  
   conv_vels(vcon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
   indices_21(ucon,ucov,geom.gg);
   print_4vector(ucon);
   print_4vector(ucov);
 
-  
+   //converting to 4-velocity
+  /*
+  vcon[1]=pp0[FX0];
+  vcon[2]=pp0[FY0];
+  vcon[3]=pp0[FZ0];
+  vcon[0]=0.;  
+  conv_vels(vcon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+  indices_21(ucon,ucov,geom.gg);
+  print_4vector(ucon);
+  print_4vector(ucov);
+  */
+  /*
   ldouble pp2[NV];
   int i;
   PLOOP(i) pp2[i]=pp0[i];
   u2p_solver(uu0,pp2,&geom,U2P_HOT,2);
-  
+  */
 
+  //print_metric(geom.gg);
+  //print_metric(geom.GG); 
+  //print_Nvector(uu0,NV);
 
+  //print_Nvector(pp0,NVMHD);
+  //p2u(pp0,uu0,&geom);
+  //getchar();
+  //print_Nvector(uu0,NVMHD);
 
-  print_metric(geom.gg);
-  print_metric(geom.GG);
-
-  
-  print_Nvector(uu0,NV);
-
-  print_Nvector(pp0,NVMHD);
-  p2u(pp0,uu0,&geom);
-  print_Nvector(uu0,NVMHD);
-
+  /*
   print_metric(geom.gg);
   print_metric(geom.GG);
   printf("%e %e %e\n",dt,geom.alpha,geom.gdet);

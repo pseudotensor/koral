@@ -576,9 +576,67 @@ print_4vector(ldouble v[4])
 /* prints Nvvector to screen *************************************/
 /*****************************************************************/
 int
-print_NVvector(ldouble v[4])
+print_NVvector(ldouble *v)
 {
   print_Nvector(v,NV);
+  return 0;
+}
+
+/*****************************************************************/
+/* prints primitives to screen *************************************/
+/*****************************************************************/
+int
+print_primitives(ldouble *p)
+{
+  printf("\n");
+  printf("rho = %.15e\n",p[RHO]);
+  printf("ugas = %.15e\n",p[UU]);
+  printf("u^1 = %.15e\n",p[VX]);
+  printf("u^2 = %.15e\n",p[VY]);
+  printf("u^3 = %.15e\n",p[VZ]);
+  printf("S = %.15e\n",p[ENTR]);
+#ifdef MAGNFIELD
+  printf("B^1 = %.15e\n",p[B1]);
+  printf("B^2 = %.15e\n",p[B2]);
+  printf("B^3 = %.15e\n",p[B3]);
+#endif
+#ifdef RADIATION
+  printf("Erf = %.15e\n",p[EE0]);
+  printf("ur^1 = %.15e\n",p[FX0]);
+  printf("ur^2 = %.15e\n",p[FY0]);
+  printf("ur^3 = %.15e\n",p[FZ0]);
+#endif
+   printf("\n");
+
+  return 0;
+}
+
+/*****************************************************************/
+/* prints primitives to screen *************************************/
+/*****************************************************************/
+int
+print_conserved(ldouble *u)
+{
+  printf("\n");
+  printf("rho u^t = %.15e\n",u[RHO]);
+  printf("T^t_t + rho u^t = %.15e\n",u[UU]);
+  printf("T^t_1 = %.15e\n",u[VX]);
+  printf("T^t_2 = %.15e\n",u[VY]);
+  printf("T^t_3 = %.15e\n",u[VZ]);
+  printf("S u^t = %.15e\n",u[ENTR]);
+#ifdef MAGNFIELD
+  printf("B^1 = %.15e\n",u[B1]);
+  printf("B^2 = %.15e\n",u[B2]);
+  printf("B^3 = %.15e\n",u[B3]);
+#endif
+#ifdef RADIATION
+  printf("T^t_t = %.15e\n",u[EE0]);
+  printf("T^t_1 = %.15e\n",u[FX0]);
+  printf("T^t_2 = %.15e\n",u[FY0]);
+  printf("T^t_3 = %.15e\n",u[FZ0]);
+#endif
+  printf("\n");
+ 
   return 0;
 }
 
