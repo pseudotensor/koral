@@ -2,7 +2,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 46
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -93,7 +93,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 1.e-1
 
 /************************************/
 //common physics / torus / atmosphere
