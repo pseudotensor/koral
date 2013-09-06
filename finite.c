@@ -775,7 +775,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  else
 	    {
 	      printf("u2p_entropy failed when correcting toward entropy at %d %d\n",geom.ix,geom.iy);
-	      u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,2); 
+	      //u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,2); 
 	    }
 	}
     }

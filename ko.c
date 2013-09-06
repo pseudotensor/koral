@@ -16,13 +16,16 @@ main(int argc, char **argv)
   int i;
 
   /*
-  printf("scalings: %e %e %e %e %e %e\n",
+  printf("scalings (GU->CGS):\nrho: %.16e\nlen: %.16e\ntime: %.16e\nugas:"
+	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkappa: %.16e\n",
 	 rhoGU2CGS(1.),
 	 lenGU2CGS(1.),
 	 timeGU2CGS(1.),
 	 endenGU2CGS(1.),
 	 calc_PEQ_Tfromurho(1.,1.),
-	 K_BOLTZ/MU_GAS/M_PROTON);
+	 K_BOLTZ/MU_GAS/M_PROTON,
+	 kappaCGS2GU(1.)
+	 );
   exit(0);
   */
 

@@ -1120,7 +1120,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
       if(fabs(W)>BIG) 
 	{
-	  if(verbose>1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
+	  if(verbose>1 || 1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
 	  return -103;
 	}
 

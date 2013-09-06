@@ -154,6 +154,8 @@ ldouble calc_lum(ldouble radius);
 ldouble calc_photloc(int ix);
 
 //misc.c
+int print_primitives(ldouble *u);
+int print_conserved(ldouble *u);
 int my_clock_gettime(void* tsptr);
 int print_NVvector(ldouble v[4]);
 int print_tensor(ldouble T[][4]);

@@ -114,7 +114,17 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble Ttr =eta*ucon[0]*ucov[1] - bcon[0]*bcov[1];
   ldouble Ttth =eta*ucon[0]*ucov[2] - bcon[0]*bcov[2];
   ldouble Ttph =eta*ucon[0]*ucov[3] - bcon[0]*bcov[3];
-   
+
+  /*
+  printf("rho: %.20e\n"
+	 "uu: %.20e\n"
+	 "bsq: %.20e\n",
+	 rho,uu,bsq);
+  */
+
+  //print_4vector(bcon);
+  //print_4vector(bcov);
+	 
 
   u[0]=gdetu*rhout;
   u[1]=gdetu*Tttt;
