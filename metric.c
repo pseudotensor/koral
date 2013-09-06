@@ -1523,7 +1523,7 @@ calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int coords)
 {
   ldouble blob1,blob1sq;
   
-  int method=1;
+  int method=2;
   int verbose=0;
 
   //numerical search for eigenvectors

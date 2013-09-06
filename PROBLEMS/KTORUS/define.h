@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -18,7 +18,7 @@
 /************************************/
 #define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA .02 //target pmag/pgas int the midplane
+#define MAXBETA .01 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -28,6 +28,7 @@
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
+#define SHUFFLELOOPS 0
 
 /************************************/
 //viscosity choices
@@ -57,25 +58,25 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
+#define BHSPIN 0.3
 
 /************************************/
 //coordinates / resolution
 /************************************/
 #define myMKS1COORDS
-#define MKS1R0 -1.
+#define MKS1R0 0.
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.5-MKS1R0))
-#define MAXX (log(100.-MKS1R0))
-#define NX 120
-#define NY 100
+#define MINX (log(1.6-MKS1R0))
+#define MAXX (log(500.-MKS1R0))
+#define NX 180
+#define NY 120
 #define NZ 1
 #endif
 
-#define MINY (0.05*Pi/2.)
-#define MAXY (Pi-0.05*Pi/2.)
+#define MINY (0.0025*Pi/2.)
+#define MAXY (Pi-0.0025*Pi/2.)
 //#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
@@ -93,7 +94,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e-1
+#define DTOUT1 1.e1
 
 /************************************/
 //common physics / torus / atmosphere
@@ -101,10 +102,9 @@
 #define GAMMA (4./3.)
 #define NPOLI 3.
 #define RZERO 30
-#define RHOZERO rhoCGS2GU(1.) //1. g/cm3
-#define ELLA 0.2
-#define VSZERO 3.6e-2//5.6e
-#define ELL 4.2
+#define RHOZERO rhoCGS2GU(1.e-2) 
+#define ELLA 0.3
+#define VSZERO 3.6e-2
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))

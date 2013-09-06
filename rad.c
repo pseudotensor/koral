@@ -2016,11 +2016,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     } 
 
   //report failure and stop
-  return -1;
-
+  //return -1;
   
   //****
-  //nothing worked
+  //nothing worked - allow for still solution
   fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 	  geom.ix,geom.iy,geom.iz,global_time,nfout1);
     
@@ -3421,7 +3420,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	{
 	  rv2tau=4./3./tautot[dim]*4./3./tautot[dim];
 	  //test
-	  rv2tau*=100.;
+	  //rv2tau*=100.;
 	  rv2=my_min(rv2rad,rv2tau);		     
 	}
       else

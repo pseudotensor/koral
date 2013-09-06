@@ -24,7 +24,7 @@ ldouble podpierd = 1. - GAMMA/(VSZERO*VSZERO)*(PsiT-PsiT0)/(NPOLI+1.);
 
 //if(geom.iy==NY/2){printf("%e %e %e\n",geomBL.xx,geomBL.yy,(PsiT-PsiT0));getch();}
 
-if(podpierd<0. || Rcyl<6.) //outside donut
+if(podpierd<0. || Rcyl<10.) //outside donut
   {
     //ambient
     set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
@@ -46,9 +46,9 @@ if(podpierd<0. || Rcyl<6.) //outside donut
     uint = pgas / GAMMAM1;
     Vphi=ell/Rcyl/Rcyl;
 
-    //3-velocity in BL transformed to MYCOORDS
+    //3-velocity in BL transformed to rel-velocity
     ldouble ucon[4]={0.,0.,0.,Vphi};
-    conv_vels(ucon,ucon,VEL3,VELPRIM,geom.gg,geom.GG);
+    conv_vels(ucon,ucon,VEL3,VELPRIM,geomBL.gg,geomBL.GG);
    
     pp[0]=my_max(rho,ppback[0]); 
     pp[1]=my_max(uint,ppback[1]);
@@ -83,6 +83,7 @@ if(podpierd<0. || Rcyl<6.) //outside donut
 
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
     prad_ff2lab(pp,pp,&geomBL);
+
 #endif
 
     //transforming primitives from BL to MYCOORDS

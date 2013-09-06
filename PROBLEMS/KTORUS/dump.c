@@ -26,9 +26,9 @@ calc_tautot(pp,xxvec,dx,tau);
 v4=tau[1];
 calc_tauabs(pp,xxvec,dx,tau);
 v5=tau[1];
-
 #endif
 
-//v4=get_cflag(RADSOURCETYPEFLAG,ix,iy,iz);
+//a'la plasma beta : pmag/(pgas+prad)
+v6=v1/(GAMMAM1*pp[UU] + v3);
 
 
