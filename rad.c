@@ -1811,20 +1811,6 @@ getchar();
   //succeeded
   //primitives vector returned to pp[]
 
-  if(pp[UU]>1.e-18 && geom->ix>=70 && geom->ix<105)
-    {
-      printf("error %d %d\n",geom->ix,geom->iy);
-      print_NVvector(pp00);
-      print_NVvector(pp);
-      printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
-      printf("\n===========\nxi1: %e xi2: %e\n===========\n\n",xi1,xi2);
- 
-      getchar();
-
-      return 100;
-      
-    }
-
   return 0;
 }
 
@@ -1877,8 +1863,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  if(ret==100) {printf("err\n");return -1;}
-
   if(ret==0) return 0;
 
   PLOOP(iv) 
@@ -1892,8 +1876,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[0]=RAD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  if(ret==100) {printf("err\n");return -1;}
 
   if(ret==0) return 0;
 
