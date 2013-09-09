@@ -730,8 +730,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	}
 
+      /***************************/
       //testing if entropy increased after advection
       //only MHD part involved
+      /***************************/
 
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
@@ -755,14 +757,26 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  
 	  if(s2/s1 < 0.9)
 	    {  
-	      //printf("\n PROBLEM DETECTED IN EVOLVING ENTROPY AT %d %d - %e!\n",geom.ix,geom.iy,s2/s1);//getchar();
+	      //correct
 	      u2pret=-1;
 	    }
 	}
 
       if(u2pret<0)
 	{
-	  u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
+	  //u2p_entropy cannot handle negative rhos - checking/correcting
+	  if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
+	    {
+	      pp[0]=RHOFLOOR;
+	      check_floors_hd(pp,VELPRIM,&geom);
+	      pp[5]=calc_Sfromu(pp[0],pp[1]);
+	      p2u(pp,uu,&geom);
+	      u2pret=0;
+	    }
+	  else
+	    {
+	      u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
+	    }
 	  if(u2pret==0)
 	    {
 	      p2u(pp,uu,&geom);
