@@ -1052,6 +1052,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   if(i_increase>=50)
     {
+      return -150;
       printf("failed to find initial W for Etype: %d\n",Etype);
       printf("at %d %d\n",geom->ix,geom->iy);
       print_NVvector(uu);
