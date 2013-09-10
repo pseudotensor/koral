@@ -380,7 +380,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //fixup here hd after inversions
-  cell_fixup_hd();
+  //cell_fixup_hd();
   
   //**********************************************************************
   //**********************************************************************
@@ -735,6 +735,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //only MHD part involved
       /***************************/
 
+      set_cflag(HDFIXUPFLAG,ix,iy,iz,0);
+
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
 
@@ -775,6 +777,14 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	    }
 	  else
 	    {
+	      /*
+	      if(geom.ix==81 &&geom.iy==0)
+		{
+		  u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,2); 
+		  printf("u2pret: %d\n",u2pret);
+		}
+	      else
+	      */
 	      u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
 	    }
 	  if(u2pret==0)
@@ -785,14 +795,24 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 		  set_u(u,iv,ix,iy,iz,uu[iv]);
 		  set_u(p,iv,ix,iy,iz,pp[iv]);
 		}
+
 	    }
 	  else
 	    {
 	      printf("u2p_entropy failed when correcting toward entropy at %d %d\n",geom.ix,geom.iy);
+	      set_cflag(HDFIXUPFLAG,ix,iy,iz,1);
+
 	      //u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,2); 
+	      //getchar();
 	    }
 	}
     }
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+  
+  //hd fixup after advection step
+  cell_fixup_hd();
 
   //**********************************************************************
   //**********************************************************************
@@ -1010,8 +1030,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	      
 #endif //MULTIRADFLUID
 
-   //fixup here after source term 
-   cell_fixup_rad();
+      //fixup here after source term 
+      //cell_fixup_rad();
 
 #endif //RADIATION
 #endif //SKIPRADSOURCE
@@ -2181,7 +2201,7 @@ cell_fixup_hd()
 
   int ix,iy,iz,iv;
   int in,ii;
-  int verbose=0;
+  int verbose=1;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
@@ -2262,11 +2282,14 @@ cell_fixup_hd()
 		      if(verbose) 
 			{
 			  printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
-			   for(ii=0;ii<in;ii++)
-			     print_Nvector(ppn[ii],NV);
-			   printf(" -> \n");
-			   print_Nvector(pp,NV);
-			   getchar();
+			  if(verbose>1)
+			    {
+			      for(ii=0;ii<in;ii++)
+				print_Nvector(ppn[ii],NV);
+			      printf(" -> \n");
+			      print_Nvector(pp,NV);
+			      getchar();
+			    }
 			}
 
 		      //save to updated arrays memory

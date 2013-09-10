@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM -1
+#define RESTART
+#define RESTARTNUM 267
 
 /************************************/
 //radiation choices
@@ -29,6 +29,7 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
+#define DOFIXUPS 1
 
 /************************************/
 //viscosity choices
@@ -58,7 +59,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.3
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -103,8 +104,9 @@
 #define NPOLI 3.
 #define RZERO 30
 #define RHOZERO rhoCGS2GU(1.e-2) 
-#define ELLA 0.3
-#define VSZERO 3.6e-2
+#define ELLA 0.2
+#define VSZERO 3.6e-2//5.6e
+#define ELL 4.2
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))

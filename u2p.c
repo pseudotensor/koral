@@ -917,8 +917,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   /****************************/
  
   
-  if(verbose>1) {printf("********************\n");print_Nvector(uu,NV);}
-  if(verbose>1) {print_Nvector(pp,NV);}
+  if(verbose>1) {printf("********************\n");print_conserved(uu);print_primitives(pp);}
 
   /****************************/
   //conserved quantities etc
@@ -1042,7 +1041,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  && (i_increase < 50)) 
 	{
 	  if(verbose>0) printf("init W : %e -> %e (%e %e)\n",W,100.*W,f0,dfdW);
-	  W *= 100.;
+	  W *= 10.;
 	  i_increase++;
 	  continue;
 	}
@@ -1120,12 +1119,12 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
       if(fabs(W)>BIG) 
 	{
-	  if(verbose>1 || 1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
+	  if(verbose>1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
 	  return -103;
 	}
 
       //what about this?      
-      if((fabs((W-Wprev)/Wprev)<CONV && err<CONV*1.e4))
+      if((fabs((W-Wprev)/Wprev)<CONV && err<1.e-4))
 	break;
       
     }
@@ -1213,7 +1212,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 #endif
 
 
-  if(verbose) print_NVvector(pp);
+  if(verbose) print_primitives(pp);
 
   // test the inversion
   ldouble uu2[NV];
@@ -1221,10 +1220,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   int lostprecision=0;
   p2u(pp,uu2,ggg);
 
-  if(verbose) print_NVvector(uu2);
-  if(verbose) print_NVvector(uu);
-  if(verbose) printf("NVMHD: %d\n",NVMHD);
-
+  //if(verbose) print_NVvector(uu2);
+  //if(verbose) print_NVvector(uu);
+  
   for(iv=0;iv<NVMHD;iv++)
     {
       if(Etype==U2P_HOT) if(iv==5) continue;
@@ -1248,8 +1246,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       return -106;
     }
 
-  if(verbose>1) {print_Nvector(pp,NV); }
-
+  if(verbose>0) printf("u2p_solver returns 0\n");
   return 0; //ok
 
 }
