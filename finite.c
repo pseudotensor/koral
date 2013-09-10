@@ -841,66 +841,20 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
-      //redistributing radiative fluids
-#ifdef MULTIRADFLUID
-      calc_primitives(ix,iy,iz);
-      redistribute_radfluids_at_cell(ix,iy,iz);
-#ifdef MFCORRECTPHI
-      mf_correct_in_azimuth_at_cell(ix,iy,iz,dt);
-      //	      redistribute_radfluids_at_cell(ix,iy,iz);
-#endif	      
-	      
-#endif
-
-      //**********************************************************************
-      //**********************************************************************
-      //**********************************************************************
       //updating u - geometrical source terms
-      ldouble ms[NV],val;
+      ldouble ms[NV],os[NV],val;
 		  
       //metric source terms
-
-#ifdef METRICIMPLICIT
-      calc_primitives(ix,iy,iz);
-      if(solve_implicit_metric(ix,iy,iz,dt,u) < 0)
-	{
-	  f_metric_source_term(ix,iy,iz,ms);
-		  
-	  for(iv=0;iv<NV;iv++)
-	    {
-	      val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
-	      set_u(u,iv,ix,iy,iz,val);	
-	      uu[iv]=val;
-	    } 
-	}
-#else
       f_metric_source_term(ix,iy,iz,ms);
-		  
-      for(iv=0;iv<NV;iv++)
-	{
-	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
-	  set_u(u,iv,ix,iy,iz,val);	
-	  uu[iv]=val;
-	} 
-#endif
-
-      /************************************************************************/
-      /************************************************************************/
-      /************************************************************************/
-      //entropy source term (currently switched off)
-
-      
+      //other source terms, if any
       f_other_source_term(ix,iy,iz,ms);
 		  
       for(iv=0;iv<NV;iv++)
 	{
-	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
+	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt+os[iv]*dt;
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
-	}
-
-      
-      
+	} 
 
       /************************************************************************/
       /********************** RADIATION ***************************************/
@@ -911,124 +865,16 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //update primitives / correct conserved
       calc_primitives(ix,iy,iz);
 
-      /*
-      if(get_u(p,RHO,ix,iy,iz)>1.e-21)
-	{
-	  printf("rho %e big at %d %d\n",get_u(p,RHO,ix,iy,iz),ix,iy);
-	  print_NVvector(&get_u(p,RHO,ix,iy,iz));
-	  getchar();
-	}
-      */
-
-#ifndef MULTIRADFLUID
-
 #ifdef IMPLICIT_LAB_RAD_SOURCE
-      //implicit in lab frame in four dimensions - fiducial 
-      //test if implicit necessary
-      ldouble del4[4]; 
-      //TODO: restructure and clean
-      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
-	{
-	  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
-	    implicit_lab_rad_source_term(ix,iy,iz,dt);
-	  else //could go (and went) explicit
-	    {
-	      //TEST
-	      /*
-	      //compare with implicit
-	      ldouble del4exp[4],del4imp[4];
-	      int i;
-	      for(i=0;i<NV;i++)
-		    {
-		      uu[i]=get_u(u,i,ix,iy,iz);
-		      pp[i]=get_u(p,i,ix,iy,iz);
-		    }
-	      DLOOPA(i) del4exp[i]=del4[i]/uu[i+RHO];
-
-	      solve_implicit_lab(ix,iy,iz,dt,del4,0);
-
-	      DLOOPA(i) del4imp[i]=del4[i]/uu[i+RHO];
-
-	      if(fabs(del4imp[0]-del4exp[0])>1.e-1*my_max(fabs(del4exp[0]),fabs(del4imp[0])))
-		{
-		  struct geometry geom;
-		  fill_geometry(ix,iy,iz,&geom);
-
-		 
-
-		  //converting to primitives
-		  int corrected[2], fixups[2];
-		  u2p(uu,pp,&geom,corrected,fixups);
-
-		  printf("complain at %d %d:\n",ix,iy);
-		  print_NVvector(pp);
-		  print_4vector(del4imp);
-		  print_4vector(del4exp);
-		  getchar();
-		}			 
-	      */
-	      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
-	      apply_rad_source_del4(ix,iy,iz,del4);	      
-	    }
-	}
-      else
-	implicit_lab_rad_source_term(ix,iy,iz,dt);
-#endif
-
-#ifdef EXPLICIT_SUBSTEP_RAD_SOURCE
-      explicit_substep_rad_source_term(ix,iy,iz,dt,gg,GG);
+      implicit_lab_rad_source_term(ix,iy,iz,dt);
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE
       explicit_rad_source_term(ix,iy,iz,dt,gg,GG);
 #endif
 
-#ifdef IMPLICIT_FF_RAD_SOURCE
-      //implicit in ff frame - backup
-      //test if implicit necessary
-      ldouble del4[4]; 
-      if(ALLOW_EXPLICIT_RAD_SOURCE==1)
-	{
-	  if(test_if_rad_implicit(ix,iy,iz,dt,gg,GG,del4))
-	    {
-	      for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
-	      implicit_ff_rad_source_term(ix,iy,iz,dt,verbose);
-	    }
-	  else
-	    {
-	      set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT); 
-	      apply_rad_source_del4(ix,iy,iz,del4);	      
-	    }
-	}
-      else
-	{
-	  for(iv=0;iv<NV;iv++) pp[iv]=get_u(p,iv,ix,iy,iz);
-	  implicit_ff_rad_source_term(ix,iy,iz,dt,0);
-	}
-#endif
-
-
       //************************************
       //************************************
-
-	     
-      if(get_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz)<0)
-	{
-	  set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
-	  set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
-	}
-      else
-	{
-	  set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
-	  set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
-	}
-
-      //************************************
-      //************************************
-
-
-	      
-#endif //MULTIRADFLUID
 
       //fixup here after source term 
       //cell_fixup_rad();

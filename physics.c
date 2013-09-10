@@ -294,26 +294,8 @@ int f_other_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   gdetu=1.;
 #endif
 
-  ldouble rho=pp[RHO];
-  ldouble u=pp[UU];  
-  ldouble E=pp[EE0];  
-  ldouble pr=(GAMMA-1.)*(u);
-  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  
-  ldouble Gi[4];
-  calc_Gi(pp,ggg,Gi);
-
-  ldouble ucon[4]={0.,pp[2],pp[3],pp[4]},ucov[4];
-  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
-   indices_21(ucon,ucov,geom->gg);
-
-  ldouble entropy_source= -1./T*dot(ucov,Gi);
-
   for(i=0;i<NV;i++)
     ss[i]=0.;
-  
-  //  ss[5]=entropy_source;
-
 
   return 0;
 }
@@ -328,7 +310,9 @@ int f_other_source_term(int ix, int iy, int iz,ldouble *ss)
   ldouble pp[NV];  
 
   for(i=0;i<NV;i++)
-    pp[i]=get_u(p,i,ix,iy,iz);  
+    {
+      pp[i]=get_u(p,i,ix,iy,iz);  
+    }
   
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
