@@ -842,16 +842,13 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //**********************************************************************
       //updating u - geometrical source terms
-      ldouble ms[NV],os[NV],val;
+      ldouble ms[NV],val;
 		  
-      //metric source terms
       f_metric_source_term(ix,iy,iz,ms);
-      //other source terms, if any
-      f_other_source_term(ix,iy,iz,ms);
-		  
+     		  
       for(iv=0;iv<NV;iv++)
 	{
-	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt+os[iv]*dt;
+	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	} 
@@ -861,6 +858,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       /************************************************************************/
 #ifndef SKIPRADSOURCE
 #ifdef RADIATION
+
+      set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
 
       //update primitives / correct conserved
       calc_primitives(ix,iy,iz);
@@ -877,7 +876,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //************************************
 
       //fixup here after source term 
-      //cell_fixup_rad();
+      cell_fixup_rad();
 
 #endif //RADIATION
 #endif //SKIPRADSOURCE

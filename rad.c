@@ -1847,9 +1847,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     uu00[iv]=uu[iv];
   }
 
-
-  //test
-
   //**** 000th ****
   PLOOP(iv) 
   {
@@ -2001,10 +1998,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //return -1;
   
   //****
-  //nothing worked - allow for still solution
+  //nothing worked - allow for still solution or ask for fixup
   fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 	  geom.ix,geom.iy,geom.iz,global_time,nfout1);
-    
+
+  set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
+
   //leaving primitives intact
   deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
   return 0; //whether to continue or not
@@ -3499,10 +3498,6 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], 
   ldouble del4[4],delapl[NV];
   int iv;
 
-  //new primitives before the source operator
-  //skipped - there is one common call in finite.c
-  //calc_primitives(ix,iy,iz);
-
   //applied explicitly directly in lab frame
   solve_explicit_lab(ix,iy,iz,dt,del4,0);
   indices_21(del4,del4,gg);
@@ -3523,9 +3518,6 @@ int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, int verbose)
 
   ldouble del4[4],delapl[NV];
   int iv;
-
-  //skipped - there is one common call in finite.c
-  //calc_primitives(ix,iy,iz);
   
   if(solve_implicit_ff(ix,iy,iz,dt,del4,verbose)<0) 
     {
@@ -3761,29 +3753,16 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
   if(solve_implicit_lab(ix,iy,iz,dt,del4,0)<0)
-      {
+    {
       set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1);
       //numerical implicit in 4D did not work
       if(verbose) 
 	{
-	  printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\ntrying imp_ff... ",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
+	  printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\n",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
 	  solve_implicit_lab(ix,iy,iz,dt,del4,1);
 	  getchar();
 	}
       //use the explicit-implicit backup method
-      
-      //test
-      if(implicit_ff_rad_source_term(ix,iy,iz,dt,0)<0)
-	{
-	  if(verbose) printf("imp_ff didn't work either. requesting fixup.\n");
-	  //this one failed too - failure
-	  return -1;	  
-	}
-      else
-	{
-	  if(verbose) printf("imp_ff worked.\n");
-	  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITFF); 
-	}	    
     }
   else
     {
