@@ -1823,6 +1823,16 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     uu00[iv]=uu[iv];
   }
 
+  //mostly for LTE solver - can be moved further once debug is done
+  ldouble ugas0[4],Rtt0,Tgas0,Trad0;
+  calc_ff_Rtt(pp0,&Rtt0,ugas0,&geom);
+  Tgas0=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
+  Trad0=calc_LTE_TfromE(-Rtt0);
+  ldouble kappa=calc_kappa(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
+  ldouble chi=kappa+calc_kappaes(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
+  ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas0,4.)/pp0[UU]);
+  ldouble xi2=chi*dt*(1.+(-Rtt0)/(pp0[RHO]+GAMMA*pp0[UU]));
+
   //**** 000th ****
   PLOOP(iv) 
   {
@@ -1834,10 +1844,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[3]=0;
   params[0]=MHD;
 
-  //verbose=2;
-  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  if(ret==0) return 0;
+  //test
+  int ret1;
+  ret1=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+ 
+  //if(ret==0) return 0;
 
   PLOOP(iv) 
   {
@@ -1849,9 +1860,27 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[3]=0;
   params[0]=RAD;
 
-  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  //test
+  int ret2;
+  ret2=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  if(ret==0) return 0;
+  //test  
+  if(ret1==0 || ret2==0)
+    {
+      if(ret1==0 && ret2!=0)
+	{
+	  fprintf(fout_fail,"2 %d %e %e %e %e %e %e %e %e %e %e %e %e\n",
+		  ret,xi1,xi2,pp0[UU],-Rtt0,uu0[UU],uu0[VX],uu0[VY],uu0[VZ],uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]);
+	  fflush(fout_fail);
+	}
+    }
+  
+  //test
+  //leaving primitives intact
+  deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
+  return 0; //whether to continue or not
+
+  //if(ret==0) return 0;
 
   PLOOP(iv) 
   {
@@ -1865,14 +1894,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  if(ret==0) 
-    {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy (subdom) worked\n",
-	      geom.ix,geom.iy,geom.iz,global_time,nfout1);
-      fflush(fout_fail);
-      return 0;
-    }
-
+  //test
+  /*
+  fprintf(fout_fail,"3 %d %e %e %e %e %e %e %e %e %e %e %e %e\n",
+	  ret,xi1,xi2,pp0[UU],-Rtt0,uu0[UU],uu0[VX],uu0[VY],uu0[VZ],uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]);
+  fflush(fout_fail);
+  */
+  //if(ret==0) return 0;
+ 
   PLOOP(iv) 
   {
     pp0[iv]=pp00[iv];
@@ -1885,23 +1914,19 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  if(ret==0) 
-    {
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > entropy (other) worked\n",
-	      geom.ix,geom.iy,geom.iz,global_time,nfout1);
-      fflush(fout_fail);
-      return 0;
-    }
+  //test
+  /*
+  fprintf(fout_fail,"4 %d %e %e %e %e %e %e %e %e %e %e %e %e\n",
+	  ret,xi1,xi2,pp0[UU],-Rtt0,uu0[UU],uu0[VX],uu0[VY],uu0[VZ],uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]);
+  fflush(fout_fail);
+  */
+
+  //if(ret==0) return 0;
+
+
+  
 
   //backup method - interpolating between zero and LTE state
-  ldouble ugas0[4],Rtt0,Tgas0,Trad0;
-  calc_ff_Rtt(pp0,&Rtt0,ugas0,&geom);
-  Tgas0=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
-  Trad0=calc_LTE_TfromE(-Rtt0);
-  ldouble kappa=calc_kappa(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
-  ldouble chi=kappa+calc_kappaes(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
-  ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas0,4.)/pp0[UU]);
-  ldouble xi2=chi*dt*(1.+(-Rtt0)/(pp0[RHO]+GAMMA*pp0[UU]));
 
   params[1]=RADIMPLICIT_LTEEQ;
   params[3]=0;

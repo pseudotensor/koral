@@ -2,13 +2,13 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 267
+#define RESTARTNUM 100
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
-#define COUPLEMETRICWITHRADIMPLICIT
+//#define COUPLEMETRICWITHRADIMPLICIT
 //#define SKIPRADWAVESPEEDLIMITER
 //#define SKIPRADSOURCE
 
