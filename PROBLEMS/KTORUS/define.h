@@ -8,6 +8,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
+#define COUPLEMETRICWITHRADIMPLICIT
 //#define SKIPRADWAVESPEEDLIMITER
 //#define SKIPRADSOURCE
 

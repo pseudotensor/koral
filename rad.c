@@ -775,11 +775,16 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   gdetu=1.;
 #endif
 
+  //TODO: precalculate
+  ldouble ms[NV];
+  PLOOP(i) ms[i]=0.;
+#ifdef COUPLEMETRICWITHRADIMPLICIT
+  f_metric_source_term_arb(pp0,geom,ms);
+#endif
+
   int whichprim=params[0];
   int whicheq=params[1];
   int whichframe=params[2];
-
-  //intf("%d %d %d\n",params[0],params[1],params[2]);getchar();
 
   ldouble uu[NV],pp[NV],err[4]={0.,0.,0.,0.};
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
@@ -796,7 +801,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       ucon[3]=pp[4];
       ucon[0]=0.;
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-      ldouble rho = uu0[RHO]/gdetu/ucon[0];
+      ldouble rho = (uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
       pp[RHO]=rho;
     }
 
@@ -806,34 +811,19 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   //total inversion, but only whichprim part matters
   p2u(pp,uu,geom);
 
-  //print_NVvector(pp);
-  //print_NVvector(uu);
-
   //corresponding change in entropy
-  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
-
-  /*
-  printf("$$$$$$\n");
-  print_NVvector(uu0);
-  print_NVvector(uu);
-
-  ldouble duu[NV];
-  PLOOP(i)
-    duu[i]=uu[i]-uu0[i];
-  print_NVvector(duu);getchar();
-  */
+  uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]);
 
   //opposite changes in the other quantities and inversion
   u2pret=0;
   if(whichprim==RAD)
     {
-      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-      uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
-      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
-      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
-      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
+      uu[1] = uu0[1]+dt*ms[1] - (uu[EE0]-uu0[EE0]);
+      uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]);  
 
-      //      u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
       int rettemp=0;
       //if(whicheq==RADIMPLICIT_ENERGYEQ)
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
@@ -860,32 +850,19 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 
       //print_NVvector(uu);
 
-      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
-      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
-      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
-      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
-
-      //print_NVvector(uu);
+      uu[EE0] = uu0[EE0]+dt*ms[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0]+dt*ms[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]);
 
       u2pret=u2p_rad(uu,pp,geom,corr);
     }   
 
-  /*
-  print_NVvector(uu);
-  print_NVvector(pp);
-  getchar();
-  */  
-
-  //print_Nvector(uu,NV);getchar();
-
   if(corr[0]!=0 || corr[1]!=0) 
     ret=1;
   
-  //printf("corr: %d %d\n",corr[0],corr[1]);
-
   if(u2pret<-1) 
     {
-      //printf("implicit sub-sub-step failed\n");
       return -1; //allows for entropy but does not update conserved 
     }
 
@@ -898,33 +875,26 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       calc_Gi(pp,ggg,Gi); 
       indices_21(Gi,Gi,gg);
   
-      /*
-	printf("$$$$$$\n");
-	print_NVvector(pp);
-	print_4vector(Gi);
-	getchar();
-      */
-
       //errors in momenta - always in lab frame
       if(whichprim==MHD) //mhd-primitives
 	{
-	  f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
-	  f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2];
-	  f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3];
+	  f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1] + dt*ms[2];
+	  f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2] + dt*ms[3];
+	  f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3] + dt*ms[4];
 
-	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
-	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
-	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
+	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])+fabs(dt*ms[2])); else err[1]=0.;
+	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])+fabs(dt*ms[3])); else err[2]=0.;
+	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])+fabs(dt*ms[4])); else err[3]=0.;
 	}
       if(whichprim==RAD) //rad-primitives
 	{
-	  f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
-	  f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
-	  f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
+	  f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1] + dt*ms[FX0];
+	  f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2] + dt*ms[FY0];
+	  f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3] + dt*ms[FZ0];
 
-	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FX0])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
-	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
-	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
+	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FX0])+fabs(dt*gdetu*Gi[1])+fabs(dt*ms[FX0])); else err[1]=0.;
+	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])+fabs(dt*ms[FY0])); else err[2]=0.;
+	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])+fabs(dt*ms[FZ0])); else err[3]=0.;
 	}
 
       /***** LAB FRAME ENERGY/ENTROPY EQS *****/
@@ -934,8 +904,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	    {
 	      if(whicheq==RADIMPLICIT_ENERGYEQ)
 		{
-		  f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+		  f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0] + dt*ms[EE0];
+		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt*gdetu*Gi[0])+fabs(dt*ms[EE0])); else err[0]=0.;
 
 		  ldouble bsq=0.;
 		  ldouble ucov[4],bcon[4],bcov[4];
@@ -954,8 +924,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 		}
 	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 		{
-		  f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0]; //but this works on hydro entropy and may fail!
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+  		  f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0] + dt*ms[ENTR];//but this works on hydro entropy and may fail!
+		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])+fabs(dt*ms[ENTR])); else err[0]=0.;
 		}
 	      else
 		my_err("not implemented 3\n");
@@ -964,13 +934,13 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	    {
 	      if(whicheq==RADIMPLICIT_ENERGYEQ)
 		{
-		  f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0];
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+		  f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0] + dt*ms[UU];
+		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])+fabs(dt*ms[UU])); else err[0]=0.;
 		}
 	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 		{	  
-		  f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0];
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+		  f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0] + dt*ms[ENTR];
+		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])+fabs(dt*ms[ENTR])); else err[0]=0.;
 		}      
 	      else
 		my_err("not implemented 4\n");

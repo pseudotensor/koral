@@ -387,7 +387,6 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 #ifdef RADIATION
   /***************************************************/
 
-#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   calc_Rij(pp,geom,Rij); //R^ij
   indices_2221(Rij,Rij,gg); //R^i_j
@@ -421,61 +420,7 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
       ss[FY0]+=-dlgdet[l-1]*(Rij[l][2]);
       ss[FZ0]+=-dlgdet[l-1]*(Rij[l][3]);
     }
-#endif
-
-#else
-  int irf;
-  ldouble Rij[NRF][4][4];
-  calc_Rij_mf(pp,gg,GG,Rij); //R^ij
-  for(ii=0;ii<NRF;ii++)
-    indices_2221(Rij[ii],Rij[ii],gg); //R^i_jl
-
-  //terms with Christoffels
-  //hydro first
-  for(k=0;k<4;k++)
-    for(l=0;l<4;l++)
-      {
-	ss[1]+=gdetu*T[k][l]*get_gKr(l,0,k,ix,iy,iz);
-	ss[2]+=gdetu*T[k][l]*get_gKr(l,1,k,ix,iy,iz);
-	ss[3]+=gdetu*T[k][l]*get_gKr(l,2,k,ix,iy,iz);
-	ss[4]+=gdetu*T[k][l]*get_gKr(l,3,k,ix,iy,iz);	 
-      }
-  //now radiation
-  for(irf=0;irf<NRF;irf++)
-    for(k=0;k<4;k++)
-      for(l=0;l<4;l++)
-	{
-	  ss[EE(irf)]+=gdetu*Rij[irf][k][l]*get_gKr(l,0,k,ix,iy,iz);
-	  ss[FX(irf)]+=gdetu*Rij[irf][k][l]*get_gKr(l,1,k,ix,iy,iz);
-	  ss[FY(irf)]+=gdetu*Rij[irf][k][l]*get_gKr(l,2,k,ix,iy,iz);
-	  ss[FZ(irf)]+=gdetu*Rij[irf][k][l]*get_gKr(l,3,k,ix,iy,iz);
-	}
-
-  //terms with dloggdet
-#if (GDETIN==0)
-  //hydro first
-  for(l=1;l<4;l++)
-    {
-      ss[0]+=-dlgdet[l-1]*rho*ucon[l];
-      ss[1]+=-dlgdet[l-1]*(T[l][0]+rho*ucon[l]);
-      ss[2]+=-dlgdet[l-1]*(T[l][1]);
-      ss[3]+=-dlgdet[l-1]*(T[l][2]);
-      ss[4]+=-dlgdet[l-1]*(T[l][3]);
-      ss[5]+=-dlgdet[l-1]*S*ucon[l];
-    }
-
-  //rad now
-  for(irf=0;irf<NRF;irf++)
-    for(l=1;l<4;l++)
-      {
-	ss[EE(irf)]+=-dlgdet[l-1]*(Rij[irf][l][0]);
-	ss[FX(irf)]+=-dlgdet[l-1]*(Rij[irf][l][1]);
-	ss[FY(irf)]+=-dlgdet[l-1]*(Rij[irf][l][2]);
-	ss[FZ(irf)]+=-dlgdet[l-1]*(Rij[irf][l][3]);
-      }
-#endif
-
-#endif
+#endif //GDETIN
 
   /***************************************************/
 #else //pure hydro
