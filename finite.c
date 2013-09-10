@@ -861,8 +861,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 #ifndef SKIPRADSOURCE
 #ifdef RADIATION
 
-      set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
-
       //update primitives / correct conserved
       calc_primitives(ix,iy,iz);
 
@@ -874,11 +872,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       explicit_rad_source_term(ix,iy,iz,dt,gg,GG);
 #endif
 
-      //************************************
-      //************************************
-
-      //fixup here after source term 
-      cell_fixup_rad();
 
 #endif //RADIATION
 #endif //SKIPRADSOURCE
@@ -889,9 +882,15 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
     } //source terms
 
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
+      //************************************
+      //************************************
+
+      //fixup here after source term 
+   cell_fixup_rad();
+
+   //**********************************************************************
+   //**********************************************************************
+   //**********************************************************************
 
   return GSL_SUCCESS;
 }

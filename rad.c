@@ -761,7 +761,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 //******* rad or hydro (whichprim) **************************************
 //**********************************************************************
 
-int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params,ldouble *err0)
+int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ldouble dt,void* ggg,ldouble *f,int *params,ldouble *err0)
 {
   int ret=0,i;
   struct geometry *geom
@@ -773,13 +773,6 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   gdet=geom->gdet; gdetu=gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
-#endif
-
-  //TODO: precalculate
-  ldouble ms[NV];
-  PLOOP(i) ms[i]=0.;
-#ifdef COUPLEMETRICWITHRADIMPLICIT
-  f_metric_source_term_arb(pp0,geom,ms);
 #endif
 
   int whichprim=params[0];
@@ -1076,6 +1069,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
+
+  ldouble ms[NV];
+  PLOOP(i) ms[i]=0.;
+#ifdef COUPLEMETRICWITHRADIMPLICIT
+  f_metric_source_term_arb(pp0,geom,ms);
+#endif
   
   if(verbose) //dump the problematic case to file
     {
@@ -1288,14 +1287,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //print_NVvector(uu0);
 	  //print_NVvector(pp0);
 	  
-	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err);
+	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f1,params,&err);
 	  print_state_implicit_lab_4dprim (iter-1,xxx,f1,err); 
 	  if(ret<0) printf("f_lab_4dprim ret: %d\n",ret);
 	}
 
 
       //values at base state
-      if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err)<0) 
+      if(f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f1,params,&err)<0) 
 	{
 	  if(verbose>0) printf("base state\n");
 	  return -1;	  
@@ -1355,7 +1354,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      }	    
 	    pp[j+sh]=ppp[j+sh]+del;
 	      
-	    int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params,&err);  
+	    int fret=f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f2,params,&err);  
 	    
 	    if(fret<0) 
 	      {
@@ -1503,7 +1502,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      //correct rho to follow new velocity (only for MHD primitives)
 	      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
 	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-	      pp[RHO]=uu0[RHO]/gdetu/ucon[0];
+	      pp[RHO]=(uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
 	    }
 
 	  //updating entropy
@@ -1512,18 +1511,19 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //updating the other set of quantities
 	  p2u(pp,uu,geom);
 
-	  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
+	  uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]);
   
 
 	  int u2pret;
 	  //opposite changes in the other quantities and inversion
 	  if(whichprim==RAD)
 	    {
-	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-	      uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
-	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
-	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
-	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+	      uu[RHO]=uu0[RHO]+dt*ms[RHO];
+	      uu[1] = uu0[1]+dt*ms[1] - (uu[EE0]-uu0[EE0]);
+	      uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]);
+	      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]);
+	      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]);
+	      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]);
 	      //u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
 
 	      int rettemp=0;
@@ -1543,10 +1543,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	  if(whichprim==MHD)
 	    {
-	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
-	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
-	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
-	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+	      uu[EE0] = uu0[EE0]+dt*ms[EE0] - (uu[1]-uu0[1]);
+	      uu[FX0] = uu0[FX0]+dt*ms[FX0] - (uu[2]-uu0[2]);
+	      uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]);
+	      uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]);
 	      u2pret=u2p_rad(uu,pp,geom,corr);
 	      //report on ceilings
 	      if(corr[0]>0 || corr[1]>0)
@@ -1633,7 +1633,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     {
       ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-      pp[RHO]=uu0[RHO]/gdetu/ucon[0];
+      pp[RHO]=(uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
     }
 
   //updating entropy
@@ -1641,17 +1641,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   p2u(pp,uu,geom);
 
-  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
+  uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]);
   
 
   int u2pret;
   if(whichprim==RAD)
     {
-      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-      uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
-      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
-      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
-      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+      uu[RHO]=uu0[RHO]+dt*ms[RHO];
+      uu[1] = uu0[1]+dt*ms[1] - (uu[EE0]-uu0[EE0]);
+      uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]);
       //u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
 
       int rettemp=0;
@@ -1669,10 +1670,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
   if(whichprim==MHD)
     {
-      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
-      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
-      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
-      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+      uu[EE0] = uu0[EE0]+dt*ms[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0]+dt*ms[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]);
       u2pret=u2p_rad(uu,pp,geom,corr);
     }    
   if(u2pret<-1) return -1;
@@ -1682,10 +1683,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   global_slot[1]+=1.;
 
   //returns corrections to radiative primitives
-  deltas[0]=uu[EE0]-uu0[EE0];
-  deltas[1]=uu[FX0]-uu0[FX0];
-  deltas[2]=uu[FY0]-uu0[FY0];
-  deltas[3]=uu[FZ0]-uu0[FZ0];
+  deltas[0]=uu[EE0]-(uu0[EE0]+dt*ms[EE0]);
+  deltas[1]=uu[FX0]-(uu0[FX0]+dt*ms[FX0]);
+  deltas[2]=uu[FY0]-(uu0[FY0]+dt*ms[FY0]);
+  deltas[3]=uu[FZ0]-(uu0[FZ0]+dt*ms[FZ0]);
 
   if(verbose) print_4vector(deltas);
   
@@ -1697,15 +1698,21 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       for(iv=0;iv<NV;iv++)
 	delapl[iv]=0.;
 
-      delapl[1]=-deltas[0];
-      delapl[ENTR]=-deltas[0];
-      delapl[2]=-deltas[1];
-      delapl[3]=-deltas[2];
-      delapl[4]=-deltas[3];
-      delapl[EE0]=deltas[0];
-      delapl[FX0]=deltas[1];
-      delapl[FY0]=deltas[2];
-      delapl[FZ0]=deltas[3];
+      delapl[0]=dt*ms[0];
+      delapl[1]=-deltas[0]+dt*ms[1];
+      delapl[ENTR]=-deltas[0]+dt*ms[ENTR];
+      delapl[2]=-deltas[1]+dt*ms[2];
+      delapl[3]=-deltas[2]+dt*ms[3];
+      delapl[4]=-deltas[3]+dt*ms[4];
+#ifdef MAGNFIELD
+      delapl[B1]=dt*ms[B1];
+      delapl[B2]=dt*ms[B2];
+      delapl[B3]=dt*ms[B3];
+#endif
+      delapl[EE0]=deltas[0]+dt*ms[EE0];
+      delapl[FX0]=deltas[1]+dt*ms[FX0];
+      delapl[FY0]=deltas[2]+dt*ms[FY0];
+      delapl[FZ0]=deltas[3]+dt*ms[FZ0];
 
       for(iv=0;iv<NV;iv++)
 	{
@@ -1748,7 +1755,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
       */
 
-      int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params,&err);  
+      int fret=f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f2,params,&err);  
 
       printf("err %e del0: %e\n",err,deltas[0]);
 
@@ -1793,7 +1800,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 {
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
-  
+  set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
+
   int iv;ldouble pp[NV],uu[NV];
   for(iv=0;iv<NV;iv++)
     {
@@ -3435,19 +3443,38 @@ apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
 {
   ldouble delapl[NV];
 
-  int iv;
-  for(iv=0;iv<NV;iv++)
-    delapl[iv]=0.;
+  int iv;  
 
-  delapl[UU]=-del4[0];
-  delapl[VX]=-del4[1];
-  delapl[VY]=-del4[2];
-  delapl[VZ]=-del4[3];
-  delapl[ENTR]=delapl[UU];
-  delapl[EE0]=del4[0];
-  delapl[FX0]=del4[1];
-  delapl[FY0]=del4[2];
-  delapl[FZ0]=del4[3];
+
+  ldouble ms[NV],pp0[NV];
+  for(iv=0;iv<NV;iv++)
+    {
+      ms[iv]=0.;
+      delapl[iv]=0.;
+      pp0[NV]=get_u(p,iv,ix,iy,iz);
+    }
+
+#ifdef COUPLEMETRICWITHRADIMPLICIT
+   struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+ f_metric_source_term_arb(pp0,&geom,ms);
+#endif
+ 
+  delapl[RHO]=dt*ms[RHO];
+  delapl[UU]=-del4[0]+dt*ms[UU];
+  delapl[VX]=-del4[1]+dt*ms[VX];
+  delapl[VY]=-del4[2]+dt*ms[VY];
+  delapl[VZ]=-del4[3]+dt*ms[VZ];
+  delapl[ENTR]=delapl[UU]+dt*ms[ENTR];
+#ifdef MAGNFIELD
+  delapl[B1]=dt*ms[B1];
+  delapl[B2]=dt*ms[B2];
+  delapl[B3]=dt*ms[B3];
+#endif
+  delapl[EE0]=del4[0]+dt*ms[EE0];
+  delapl[FX0]=del4[1]+dt*ms[FX0];
+  delapl[FY0]=del4[2]+dt*ms[FY0];
+  delapl[FZ0]=del4[3]+dt*ms[FZ0];
 
   for(iv=0;iv<NV;iv++)
     {
