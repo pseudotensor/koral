@@ -2123,29 +2123,27 @@ cell_fixup_hd()
 			}
 		      p2u(pp,uu,&geom);
 
-		      if(verbose) 
+		      if(verbose>1) 
 			{
-			  printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
-			  if(verbose>1)
-			    {
-			      for(ii=0;ii<in;ii++)
-				print_Nvector(ppn[ii],NV);
-			      printf(" -> \n");
-			      print_Nvector(pp,NV);
-			      getchar();
-			    }
+			  printf("fixing hd up %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  for(ii=0;ii<in;ii++)
+			    print_Nvector(ppn[ii],NV);
+			  printf(" -> \n");
+			  print_Nvector(pp,NV);			
 			}
 
 		      //save to updated arrays memory
-		      for(iv=NVMHD;iv<NV;iv++)
+		      for(iv=0;iv<NVMHD;iv++)
 			{
 			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
 			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
 			}
-
 		    }
 		  else
-		    printf("didn't manage to fixup at %d %d %d\n",ix,iy,iz);
+		    {
+		      fprintf(fout_fail,"didn't manage to hd fixup at %d %d %d\n",ix,iy,iz);
+		      printf("didn't manage to fixup at %d %d %d\n",ix,iy,iz);
+		    }
 		}
 	    }
 	}
@@ -2248,14 +2246,11 @@ cell_fixup_rad()
 		      if(verbose) 
 			{
 			  printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
-			  if(verbose>1)
-			    {
-			      for(ii=0;ii<in;ii++)
-				print_Nvector(ppn[ii],NV);
-			      printf(" -> \n");
-			      print_Nvector(pp,NV);
-			      getchar();
-			    }
+			  for(ii=0;ii<in;ii++)
+			    print_Nvector(ppn[ii],NV);
+			  printf(" -> \n");
+			  print_Nvector(pp,NV);
+			  getchar();
 			}
 
 		      //save to updated arrays memory
@@ -2267,7 +2262,10 @@ cell_fixup_rad()
 
 		    }
 		  else
-		    printf("didn't manage to fixup at %d %d %d\n",ix,iy,iz);
+		    {
+		      fprintf(fout_fail,"didn't manage to rad fixup at %d %d %d\n",ix,iy,iz);
+		      printf("didn't manage to rad fixup at %d %d %d\n",ix,iy,iz);
+		    }
 		}
 	    }
 	}

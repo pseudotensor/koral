@@ -256,8 +256,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	    //************************************
 	    //************************************
 	    //entropy solver - conserving entropy
-	    //u2pret=u2p_entropy(uu,pp,ggg);
 	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,0);  
+
 	    set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
 
 
@@ -269,7 +269,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	    if(u2pret<0)
 	      {
 		//test
-		printf("u2p_entr err     >>> %d <<< %d %d\n",u2pret,geom->ix,geom->iy);getch();
+		//printf("u2p_entr err     >>> %d <<< %d %d\n",u2pret,geom->ix,geom->iy);getch();
 		//************************************
 
 
