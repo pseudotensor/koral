@@ -2,7 +2,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 200
+#define RESTARTNUM 359
 
 /************************************/
 //radiation choices
@@ -29,6 +29,7 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
+#define DOFIXUPS 1
 
 /************************************/
 //viscosity choices
@@ -94,7 +95,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e1
+#define DTOUT1 1.e0
 
 /************************************/
 //common physics / torus / atmosphere
@@ -102,7 +103,7 @@
 #define GAMMA (4./3.)
 #define NPOLI 3.
 #define RZERO 30
-#define RHOZERO rhoCGS2GU(1.e0) 
+#define RHOZERO rhoCGS2GU(1.e-2) 
 #define ELLA 0.2
 #define VSZERO 3.6e-2//5.6e
 #define ELL 4.2

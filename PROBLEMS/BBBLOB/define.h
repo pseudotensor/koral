@@ -4,13 +4,13 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 //#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -92,7 +92,7 @@
 #define NOUTSTOP 5000
 #define DTOUT1 .1
 #define RADOUTPUTINZAMO
-//#define SILOOUTPUT
+#define SILOOUTPUT
 
 /************************************/
 //problem params
