@@ -429,9 +429,9 @@ int conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5]
 
 //u2p.c
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
-int calc_primitives(int,int,int);
+int calc_primitives(int,int,int,int);
 int check_floors_hd(ldouble *uu, int,void*);
-int u2p(ldouble *uu, ldouble *pp, void*,int*,int*);
+int u2p(ldouble *uu, ldouble *pp, void*,int*,int*,int);
 int u2p_hot(ldouble*,ldouble*,void*);
 int u2p_entropy(ldouble*,ldouble*,void*);
 int u2p_cold(ldouble*,ldouble*,void*);

@@ -7,8 +7,10 @@
 //**********************************************************************
 //**********************************************************************
 //calculates primitives in given cell basing on global array u[]
+//type: 0 - regular
+//1 - extra check for decreasing entropy
 int
-calc_primitives(int ix,int iy,int iz)
+calc_primitives(int ix,int iy,int iz,int type)
 {
   int verbose=0;
   int iv,u2pret,u2pretav;
@@ -39,7 +41,7 @@ calc_primitives(int ix,int iy,int iz)
   set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
 
   //converting to primitives
-  u2p(uu,pp,&geom,corrected,fixups);
+  u2p(uu,pp,&geom,corrected,fixups,type);
 
   //imposing floors
 
@@ -52,7 +54,6 @@ calc_primitives(int ix,int iy,int iz)
   if(floorret<0.)
     {
       corrected[0]=1;
-      fixups[0]=1;
     }
   //************************************
   //************************************
@@ -62,7 +63,6 @@ calc_primitives(int ix,int iy,int iz)
   if(floorret<0.)
     {
       corrected[1]=1;
-      fixups[1]=1;
     }
 
   //************************************
@@ -125,7 +125,7 @@ calc_primitives_local(int ix,int iy,int iz,ldouble *pp)
 
   //converting to primitives
   int corrected[2], fixups[2];
-  u2p(uu,pp,&geom,corrected,fixups);
+  u2p(uu,pp,&geom,corrected,fixups,0);
 
   return 0;
 }
@@ -136,7 +136,7 @@ calc_primitives_local(int ix,int iy,int iz,ldouble *pp)
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
+u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 {
 
   struct geometry *geom
@@ -184,27 +184,22 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
     ppold[iv]=pp[iv];
 
   u2pret=u2p_solver(uu,pp,ggg,U2P_HOT,0); 
-
-  if(u2pret==0)
-    {
-      //check if u2p_hot faild by making entropy decrease
-      //by comparing the Lagrangian uu[ENTR] value and the one from u2p_hot
-      ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
-      conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
-      ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
-      ldouble s2=exp(pp[ENTR]/pp[RHO]);
-      
-      //TODO
-      //this below is in wrong place - when here is affecting the implicit solver
-      /*
-      if(s2/s1 < 0.1)
-      {  
-	//if(verbose>0) printf("\n PROBLEM DETECTED IN EVOLVING ENTROPY AT %d %d - %e!\n",geom->ix,geom->iy,s2/s1);//getchar();
-	u2pret=-1;
-	}
-      */
-    }
   
+  //check if u2p_hot failed by making entropy decrease
+  if(u2pret==0 && type==1)
+	{
+	  //by comparing the Lagrangian uu[ENTR] value and the one from u2p_hot
+	  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+	  ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
+	  ldouble s2=exp(pp[ENTR]/pp[RHO]);
+	  
+	  if(s2/s1 < 0.9)
+	    {  
+	      //correct
+	      u2pret=-1;
+	    }
+	}
 
   //************************************
   if(u2pret<0) 
@@ -265,7 +260,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
 	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,0);  
 	    set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
 
-	    //************************************
 
 	    if(verbose>2)
 	      {
@@ -274,6 +268,11 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2])
     
 	    if(u2pret<0)
 	      {
+		//test
+		printf("u2p_entr err     >>> %d <<< %d %d\n",u2pret,geom->ix,geom->iy);getch();
+		//************************************
+
+
 		if(verbose>1 && u2pret!=-103 && u2pret!=-107)
 		  {
 		    printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
@@ -1021,7 +1020,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
   ldouble f0,f1,dfdW,err;
-  ldouble CONV=1.e-8; //looser check when converged in terms of W?
+  ldouble CONV=1.e-6; //looser check when converged in terms of W?
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};
@@ -1125,8 +1124,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	}
 
       //what about this?      
-      if((fabs((W-Wprev)/Wprev)<CONV && err<1.e-4))
-	break;
+      //if((fabs((W-Wprev)/Wprev)<CONV && err<1.e-4))
+      //break;
       
     }
   //  while((fabs((W-Wprev)/Wprev)>CONV && err>CONV*1.e3) && iter<50);

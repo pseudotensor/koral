@@ -173,7 +173,7 @@ solve_the_problem(ldouble tstart)
 	  iy=loop_0[ii][1];
 	  iz=loop_0[ii][2]; 
       
-	  calc_primitives(ix,iy,iz); 
+	  calc_primitives(ix,iy,iz,0); 
 	}
 
       //holds previous time steps
@@ -354,7 +354,7 @@ test_maginv()
 
   int aa[2],bb[2],ret;
   pp[UU]*=1.1;
-  ret=u2p(uu,pp,&geom,aa,bb);
+  ret=u2p(uu,pp,&geom,aa,bb,0);
   printf("u2p ret: %d\n",ret);
   print_NVvector(pp);
 

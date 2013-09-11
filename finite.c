@@ -371,7 +371,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
       
-      calc_primitives(ix,iy,iz);
+      calc_primitives(ix,iy,iz,0);
     }
 
  
@@ -380,7 +380,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //fixup here hd after inversions
-  //cell_fixup_hd();
+  cell_fixup_hd();
   
   //**********************************************************************
   //**********************************************************************
@@ -735,6 +735,9 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //only MHD part involved
       /***************************/
 
+      calc_primitives(ix,iy,iz,1);
+
+      /*
       set_cflag(HDFIXUPFLAG,ix,iy,iz,0);
 
       struct geometry geom;
@@ -777,14 +780,6 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	    }
 	  else
 	    {
-	      /*
-	      if(geom.ix==81 &&geom.iy==0)
-		{
-		  u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,2); 
-		  printf("u2pret: %d\n",u2pret);
-		}
-	      else
-	      */
 	      u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
 	    }
 	  if(u2pret==0)
@@ -806,7 +801,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	      //getchar();
 	    }
 	}
+      */
+
     }
+     
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -862,7 +860,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 #ifdef RADIATION
 
       //update primitives / correct conserved
-      calc_primitives(ix,iy,iz);
+      calc_primitives(ix,iy,iz,0);
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
       implicit_lab_rad_source_term(ix,iy,iz,dt);

@@ -102,7 +102,7 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
   //  printf("%d \n",corr[1]);
   //print_Nvector(pp,NV);getchar();
 
-  u2pret=u2p(uu,pp,ggg,corr,fixup);
+  u2pret=u2p(uu,pp,ggg,corr,fixup,0);
   //printf("%d %d\n",corr[0],corr[1]);
   //print_Nvector(pp,NV);getchar();
 
@@ -209,7 +209,7 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
   GG=geom->GG;
 
   int corr[2],fixup[2];
-  u2p(uu00,pp00,geom,corr,fixup);
+  u2p(uu00,pp00,geom,corr,fixup,0);
   p2u(pp00,uu00,geom);
 
   for(iv=0;iv<NV;iv++)
@@ -431,7 +431,7 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
 	    }
 
 	  //update primitives corresponding to uu0
-	  u2p(uu0,pp0,geom,corr,fixup);
+	  u2p(uu0,pp0,geom,corr,fixup,0);
 	  p2u(pp0,uu0,geom);
 	  continue;
 	}
@@ -462,7 +462,7 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
 
   if(verbose) 
     {
-      u2p(uu,pp0,geom,corr,fixup);
+      u2p(uu,pp0,geom,corr,fixup,0);
       print_4vector(deltas);
       print_NVvector(uu);
       ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
@@ -731,7 +731,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
       uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
       uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
 
-      u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
+      u2p(uu,pp,geom,corr,fixup,0); //total inversion (I should separate hydro from rad)
     }
   if(whichprim==MHD)
     {
@@ -1522,7 +1522,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]-dt*ms[FX0]);
 	      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]-dt*ms[FY0]);
 	      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]-dt*ms[FZ0]);
-	      //u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
 
 	      int rettemp=0;
 	      //if(whicheq==RADIMPLICIT_ENERGYEQ)
@@ -1650,7 +1649,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]-dt*ms[FX0]);
       uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]-dt*ms[FY0]);
       uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]-dt*ms[FZ0]);
-      //u2pret=u2p(uu,pp,geom,corr,fixup); //total inversion (I should separate hydro from rad)
 
       int rettemp=0;
       //if(whicheq==RADIMPLICIT_ENERGYEQ)
@@ -1728,7 +1726,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
       /*
       print_NVvector(uu);
-      corr[0]=u2p(uu,pp,geom,corr,fixup);
+      corr[0]=u2p(uu,pp,geom,corr,fixup,0);
       p2u(pp,uu,geom);
       print_NVvector(uu);
       getchar();
@@ -1772,7 +1770,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
       
       print_NVvector(uu);
-      corr[0]=u2p(uu,pp,geom,corr,fixup);
+      corr[0]=u2p(uu,pp,geom,corr,fixup,0);
       //p2u(pp,uu,geom);
       print_NVvector(pp);
 
@@ -1811,7 +1809,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //(u2p checks against proper entropy evolution and uses entropy inversion if necessary
 
   int corr[2],fixup[2],params[4],ret;
-  u2p(uu,pp,&geom,corr,fixup);
+  u2p(uu,pp,&geom,corr,fixup,0);
   p2u(pp,uu,&geom);
 
   ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
@@ -1845,10 +1843,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[0]=MHD;
 
   //test
-  int ret1;
-  ret1=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  //int ret1;
+  //ret1=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
  
-  //if(ret==0) return 0;
+  if(ret==0) return 0;
 
   PLOOP(iv) 
   {
@@ -1861,9 +1861,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[0]=RAD;
 
   //test
-  int ret2;
-  ret2=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  //int ret2;
+  //ret2=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+  /*
   //test  
   if(ret1==0 || ret2==0)
     {
@@ -1879,8 +1882,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //leaving primitives intact
   deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
   return 0; //whether to continue or not
+  */
 
-  //if(ret==0) return 0;
+  if(ret==0) return 0;
 
   PLOOP(iv) 
   {
@@ -1900,7 +1904,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  ret,xi1,xi2,pp0[UU],-Rtt0,uu0[UU],uu0[VX],uu0[VY],uu0[VZ],uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]);
   fflush(fout_fail);
   */
-  //if(ret==0) return 0;
+  
+  if(ret==0) return 0;
  
   PLOOP(iv) 
   {
@@ -1921,10 +1926,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   fflush(fout_fail);
   */
 
-  //if(ret==0) return 0;
-
-
-  
+  if(ret==0) return 0;
 
   //backup method - interpolating between zero and LTE state
 
@@ -1960,8 +1962,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret==0) //LTE worked so can combine zero and LTE states
     {
-      xi1=xi2=1.e2;
-
       //printf("interpolating\n %e %e\n",xi1,xi2);
       //print_NVvector(pp0);
       //print_NVvector(pp);
@@ -2003,7 +2003,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     } 
 
   //report failure and stop
-  return -1;
+  //return -1;
   
   //****
   //nothing worked - allow for still solution or ask for fixup
@@ -2466,7 +2466,7 @@ solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* d
       printf("\n@@@@@@@@ BACKUP IMPLICIT @@@@@@@@@@@@");
       printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
   
-      u2p(uu,pp,geom,corr,fixup);
+      u2p(uu,pp,geom,corr,fixup,0);
       printf("%d %d\n",corr[0],corr[1]);
 
       print_NVvector(uu);
@@ -2627,7 +2627,7 @@ solve_implicit_backup_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldoubl
 
       int corr[2],fixup[2];
  
-      u2p(uu,pp,geom,corr,fixup);
+      u2p(uu,pp,geom,corr,fixup,0);
       printf("%d %d\n",corr[0],corr[1]);
 
       print_NVvector(uu);
@@ -2707,7 +2707,7 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
       print_Nvector(uu,NV);
       print_Nvector(pp,NV);
 
-      u2p(uu0,pp0,geom,corr,fixup);
+      u2p(uu0,pp0,geom,corr,fixup,0);
       printf("%d %d\n",corr[0],corr[1]);
 
       print_Nvector(uu0,NV);
@@ -3585,7 +3585,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 
       //converting to primitives
       int corrected[2], fixups[2];
-      u2p(uu,pp,&geom,corrected,fixups);
+      u2p(uu,pp,&geom,corrected,fixups,0);
 
       //calculating xi1, xi2
       ldouble Rtt,Ehat,ugas[4];
@@ -3613,7 +3613,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
     {
       //calculating radforce
       //new primitives
-      calc_primitives(ix,iy,iz);
+      calc_primitives(ix,iy,iz,0);
       //rad-for-force
       solve_explicit_lab(ix,iy,iz,dt,del4,0);
       //del4[] will be passed up
@@ -3647,7 +3647,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 
       //converting to primitives
       int corrected, fixups[2];
-      u2p(uu,pp,&geom,&corrected,fixups);
+      u2p(uu,pp,&geom,&corrected,fixups,0);
 
       if(corrected!=0) return 1; //must do implicit
       
@@ -3701,7 +3701,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
     {
       //calculating radforce
       //new primitives
-      calc_primitives(ix,iy,iz);
+      calc_primitives(ix,iy,iz,0);
       //rad-for-force
       solve_explicit_lab(ix,iy,iz,dt,del4,0);
       //del4[] will be passed up

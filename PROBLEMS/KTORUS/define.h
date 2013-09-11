@@ -2,14 +2,15 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 100
+#define RESTARTNUM 286
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
-//#define COUPLEMETRICWITHRADIMPLICIT
 //#define SKIPRADWAVESPEEDLIMITER
+//#define ALLOW_EXPLICIT_RAD_SOURCE 0
+//#define IMPLICIT_FF_RAD_SOURCE
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -22,13 +23,13 @@
 /************************************/
 //reconstruction / Courant
 /************************************/
+#define DOFIXUPS 1
 #define INT_ORDER 1
 #define TIMESTEPPING RK2K1K2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 1
 
 /************************************/
 //viscosity choices
@@ -102,7 +103,7 @@
 #define GAMMA (4./3.)
 #define NPOLI 3.
 #define RZERO 30
-#define RHOZERO rhoCGS2GU(1.e-2) 
+#define RHOZERO rhoCGS2GU(1.e-4) 
 #define ELLA 0.2
 #define VSZERO 3.6e-2//5.6e
 #define ELL 4.2
