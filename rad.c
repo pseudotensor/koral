@@ -1597,6 +1597,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      if(verbose) printf("\n === success (rel.change) ===\n");
 	      break;
 	    }     
+
 	}
      
 
@@ -1605,6 +1606,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
   while(1); //main solver loop
 
+  //to average number of iterations
+  global_slot[0]+=(ldouble)iter;
+  global_slot[1]+=1.;
 
   if(iter>MAXITER || failed==1)
     {
@@ -1613,7 +1617,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
       
-      ldouble CONVLOOSE=CONV*1.e2;
+      /*
+      ldouble CONVLOOSE=CONV*1.e0;
       if(errbest<CONVLOOSE)
 	{
 	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
@@ -1622,7 +1627,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    pp[i+sh]=xxxbest[i];
 	}
       else
-	return -1;
+      */
+
+      return -1;       
     }
 
   //updating conserved
@@ -1673,10 +1680,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }    
   if(u2pret<-1) return -1;
   
-  //to average number of iterations
-  global_slot[0]+=(ldouble)iter;
-  global_slot[1]+=1.;
-
   //returns corrections to radiative primitives
   deltas[0]=uu[EE0]-(uu0[EE0]+dt*ms[EE0]);
   deltas[1]=uu[FX0]-(uu0[FX0]+dt*ms[FX0]);
@@ -1822,10 +1825,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   }
 
   //mostly for LTE solver - can be moved further once debug is done
-  ldouble ugas0[4],Rtt0,Tgas0,Trad0;
+  ldouble ugas0[4],Rtt0,Tgas0,Trad0,Ehat;
   calc_ff_Rtt(pp0,&Rtt0,ugas0,&geom);
+  Ehat=-Rtt0;
   Tgas0=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
-  Trad0=calc_LTE_TfromE(-Rtt0);
+  Trad0=calc_LTE_TfromE(Ehat);
   ldouble kappa=calc_kappa(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
   ldouble chi=kappa+calc_kappaes(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
   ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas0,4.)/pp0[UU]);
@@ -1840,7 +1844,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0;
-  params[0]=MHD;
+  if(Ehat<1.e-2*pp0[UU])
+    params[0]=RAD;
+  else
+    params[0]=MHD;
+    
 
   //test
   //int ret1;
@@ -1858,8 +1866,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0;
-  params[0]=RAD;
-
+  if(params[0]==RAD) params[0]=MHD;
+  else params[0]=RAD;
   //test
   //int ret2;
   //ret2=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
@@ -1894,8 +1902,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FF;
   params[3]=0;
-  params[0]=MHD;
-
+  if(Ehat<1.e-2*pp0[UU])
+    params[0]=RAD;
+  else
+    params[0]=MHD;
+    
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   //test
@@ -1915,7 +1926,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENTROPYEQ;
   params[2]=RADIMPLICIT_FF;
   params[3]=0;
-  params[0]=RAD;
+  if(params[0]==RAD) params[0]=MHD;
+  else params[0]=RAD;
+
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 

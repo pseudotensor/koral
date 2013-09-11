@@ -2,7 +2,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 290
+#define RESTARTNUM 200
 
 /************************************/
 //radiation choices
@@ -23,7 +23,6 @@
 /************************************/
 //reconstruction / Courant
 /************************************/
-#define DOFIXUPS 1
 #define INT_ORDER 1
 #define TIMESTEPPING RK2K1K2
 #define TSTEPLIM .6
@@ -95,7 +94,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e0
+#define DTOUT1 1.e1
 
 /************************************/
 //common physics / torus / atmosphere
@@ -103,7 +102,7 @@
 #define GAMMA (4./3.)
 #define NPOLI 3.
 #define RZERO 30
-#define RHOZERO rhoCGS2GU(1.e-4) 
+#define RHOZERO rhoCGS2GU(1.e0) 
 #define ELLA 0.2
 #define VSZERO 3.6e-2//5.6e
 #define ELL 4.2
