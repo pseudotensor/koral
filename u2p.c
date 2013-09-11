@@ -173,9 +173,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   //************************************
   //hot hydro - conserving energy
   ret=0;
-#ifdef ENFORCEENTROPY
-  u2pret=-1;
-#else
   
   //test
   ldouble ppold[NV];
@@ -183,10 +180,25 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   PLOOP(iv)
     ppold[iv]=pp[iv];
 
-  u2pret=u2p_solver(uu,pp,ggg,U2P_HOT,0); 
+  //negative uu[0] = rho u^t
+  if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
+    {
+      printf("at %d %d %d neg uu[0] - requesting fixup or imposing floors\n",geom->ix,geom->iy,geom->iz);
+      pp[0]=RHOFLOOR; //used when not fixin up
+      ret=-2; //to request fixup
+      u2pret=0; //to skip solvers
+    }
+  else
+    {
+#ifdef ENFORCEENTROPY
+      u2pret=-1; //skip hot
+#else
+      u2pret=u2p_solver(uu,pp,ggg,U2P_HOT,0); 
   
-  //check if u2p_hot failed by making entropy decrease
-  if(u2pret==0 && type==1)
+      //check if u2p_hot went mad by making entropy decrease
+      //this check performed only when type==1
+      //which is used after the advection operator
+      if(u2pret==0 && type==1)
 	{
 	  //by comparing the Lagrangian uu[ENTR] value and the one from u2p_hot
 	  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
@@ -196,12 +208,14 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  
 	  if(s2/s1 < 0.9)
 	    {  
-	      //correct
+	      //go to entropy
 	      u2pret=-1;
 	    }
 	}
+#endif
+    }
 
-  //************************************
+  /*
   if(u2pret<0) 
     {
       if(verbose>2)
@@ -219,102 +233,79 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	    }
 	  
 	  pp[0]=RHOFLOOR; 
-	  ret=-1; //to ask for conserved update
+	  ret=-2; //to ask for conserved update and fixup
 	  u2pret=0;
 	}
     }
-#endif
-
-  
+  */
+ 
   if(ALLOWENTROPYU2P)
     if(u2pret<0)
       {
 	ret=-1;
+	
+	//************************************
+	//************************************
+	//************************************
+	//entropy solver - conserving entropy
+	u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,0);  
 
-	//u2p_entropy cannot handle negative rhos - correcting
-	if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
+	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
+
+
+	if(verbose>2)
 	  {
-	    
-	    printf("at %d %d %d neg uu[0] - imposing RHOFLOOR and other floors\n",geom->ix,geom->iy,geom->iz);
-	    //u2pret=u2p_hot(uu,pp,geom);
-	    //printf("u2p_hot out at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
-	    //getchar();
-	   
-
-	    //using old state to estimate the correction
-	    pp[0]=RHOFLOOR;
-	    check_floors_hd(pp,VELPRIM,&geom);
-	    pp[5]=calc_Sfromu(pp[0],pp[1]);
-	    p2u(pp,uu,&geom);
-	   
-	    u2pret=0;
+	    printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
 	  }
-	else //regular entropy
-	  {
-
-	    //************************************
-	    //************************************
-	    //************************************
-	    //entropy solver - conserving entropy
-	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,0);  
-
-	    set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
-
-
-	    if(verbose>2)
-	      {
-		printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
-	      }
     
-	    if(u2pret<0)
+	if(u2pret<0)
+	  {
+	    //test
+	    //printf("u2p_entr err     >>> %d <<< %d %d\n",u2pret,geom->ix,geom->iy);getch();
+	    //************************************
+
+
+	    if(verbose>1 && u2pret!=-103 && u2pret!=-107)
 	      {
-		//test
-		//printf("u2p_entr err     >>> %d <<< %d %d\n",u2pret,geom->ix,geom->iy);getch();
-		//************************************
+		printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+		//exit(0); //should not always die because may happe in intermediate step within the implicit solver
+	      }
 
+	    //test, to print it out 
+	    //u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
+	    //getchar();
 
-		if(verbose>1 && u2pret!=-103 && u2pret!=-107)
+	    if(u2pret==-107)
+	      //solver converged but p2u(u2p()).neq.1
+	      //requesting fixup
+	      {
+		ret=-2;
+	      }
+
+	    if(u2pret==-103 && 0)  //TODO: work out hotmax
+	      //solver went rho->D meaning entropy too large 
+	      //imposing URHOLIMIT 
+	      {		
+		//u2pret=u2p_hotmax(uu,pp,ggg);
+		u2pret=u2p_solver(uu,pp,ggg,U2P_HOTMAX,0);
+		if(u2pret<0)
 		  {
-		    printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-		    //exit(0); //should not always die because may happe in intermediate step within the implicit solver
-		  }
-
-		//test, to print it out 
-		//u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
-		//getchar();
-
-		if(u2pret==-107)
-		  //solver converged but p2u(u2p()).neq.1
-		  //requesting fixup
-		  {
-		    ret=-2;
-		  }
-
-		if(u2pret==-103 && 0)  //TODO: work out hotmax
-		  //solver went rho->D meaning entropy too large 
-		  //imposing URHOLIMIT 
-		  {		
-		    //u2pret=u2p_hotmax(uu,pp,ggg);
-		    u2pret=u2p_solver(uu,pp,ggg,U2P_HOTMAX,0);
-		    if(u2pret<0)
+		    if(verbose>0)
 		      {
-			if(verbose>0)
-			  {
-			    printf("u2p_hotmax err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-			  }
+			printf("u2p_hotmax err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+		      }
 			
-			//should not happen but if happens use the old state to impose URHOLIMIT
-			pp[1]=UURHORATIOMAX*pp[0];
-			check_floors_hd(pp,VELPRIM,&geom);
-			pp[5]=calc_Sfromu(pp[0],pp[1]);
-			p2u(pp,uu,&geom);	
+		    //should not happen but if happens use the old state to impose URHOLIMIT
+		    pp[1]=UURHORATIOMAX*pp[0];
+		    check_floors_hd(pp,VELPRIM,&geom);
+		    pp[5]=calc_Sfromu(pp[0],pp[1]);
+		    p2u(pp,uu,&geom);	
 
-			//no need for another entropy solver - p2u does its job
-			u2pret=0;
-		      }		    
-		  }
-	      }	
-	  }
+		    //no need for another entropy solver - p2u does its job
+		    u2pret=0;
+		  }		    
+	      }
+	  }	
       }
 
   if(ALLOWCOLDU2P)
