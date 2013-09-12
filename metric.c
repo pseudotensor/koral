@@ -1740,6 +1740,9 @@ coco_BL2KS(ldouble *xBL, ldouble *xKS)
   ldouble a=BHSPIN;
   ldouble delta=r*r-2.*r+a*a;
   ldouble sqrta=sqrt(1.-a*a);
+
+  //TODO: these transformations wrong
+
   //t
   xKS[0]=xBL[0]+2./sqrta*atanh(sqrta/(1.-r))+log(delta);
   //r
@@ -1764,6 +1767,9 @@ coco_KS2BL(ldouble *xKS, ldouble *xBL)
   ldouble a=BHSPIN;
   ldouble delta=r*r-2.*r+a*a;
   ldouble sqrta=sqrt(1.-a*a);
+
+  //TODO: these transformations wrong
+
   //t
   xBL[0]=xKS[0]-2./sqrta*atanh(sqrta/(1.-r))-log(delta);
   //r

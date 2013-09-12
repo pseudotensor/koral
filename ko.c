@@ -28,8 +28,8 @@ main(int argc, char **argv)
 	 );
   exit(0);
 */
-  
 
+ 
   //gsl errors off
   gsl_set_error_handler_off();
   
@@ -63,6 +63,33 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+ ldouble pp[NV],uu[NV];
+  struct geometry geom;
+  fill_geometry(0,13,0,&geom);
+
+  pp[6]=1.;pp[7]=pp[8]=pp[9]=0.;
+
+  pp[0]=2.3416540587761880e-25;
+  pp[1]=2.4508496594126272e-28;
+  pp[2]=-2.7759206226818264e-06;
+  pp[3]=1.2113155167840437e-11;
+  pp[4]=-7.2761445326990186e-09;
+  pp[5]=7.6879778126409055e-24;
+
+  p2u(pp,uu,&geom);getchar();
+
+  pp[0]=2.3416540587761880e-25;
+  pp[1]=2.4508496592843898e-28;
+  pp[2]=-2.7759206228319448e-06;
+  pp[3]=1.2113155167820420e-11;
+  pp[4]=-7.2761445330926705e-09;
+  pp[5]=7.6879778126041478e-24; 
+
+  p2u(pp,uu,&geom);exit(0);
+
+  
+
+
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
 #include PR_PREPINIT
@@ -89,6 +116,10 @@ main(int argc, char **argv)
 #include PR_POSTINIT
 #endif
     }
+
+
+
+
 
   /*******/
   //tests of implicit solver

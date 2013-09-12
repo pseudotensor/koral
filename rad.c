@@ -802,7 +802,9 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
   //total inversion, but only whichprim part matters
+  print_Nvector(pp,NVMHD);
   p2u(pp,uu,geom);
+  print_Nvector(uu,NVMHD);
 
   //corresponding change in entropy
   uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
@@ -878,6 +880,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])+fabs(dt*ms[2])); else err[1]=0.;
 	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])+fabs(dt*ms[3])); else err[2]=0.;
 	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])+fabs(dt*ms[4])); else err[3]=0.;
+
+	  printf(";; %e %e %e %e %e\n",f[3],fabs(uu[4]),fabs(uu0[4]),fabs(dt*gdetu*Gi[3]),fabs(dt*ms[4]));
 	}
       if(whichprim==RAD) //rad-primitives
 	{
@@ -1251,10 +1255,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   if(verbose) 
     {
-      //printf("=== i: %d %d %d\n\n",ix,iy,iz);
+      printf("=== i: %d %d %d\n\n",ix,iy,iz);
       print_conserved(uu);
       print_primitives(pp);
-      //print_metric(gg);
+      print_metric(gg);
     }
 
   if(verbose) 
@@ -1308,6 +1312,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	{
 	  //if(verbose) print_NVvector(pp0);
 	  if(verbose) printf("\n === success (error) ===\n");
+	  if(verbose==2) getchar();
 	  break;
 	}
 
@@ -1425,7 +1430,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       if(verbose) 
 	{
 	  if(verbose!=2) exit(0);
-	  //getchar();
+	  getchar();
 	}
 
 
@@ -1838,6 +1843,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ldouble xi2=chi*dt*(1.+(-Rtt0)/(pp0[RHO]+GAMMA*pp0[UU]));
 
   //**** 000th ****
+ 
   PLOOP(iv) 
   {
     pp0[iv]=pp00[iv];
@@ -1856,7 +1862,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //int ret1;
   //ret1=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
+  verbose=2;
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+  //test
+  //leaving primitives intact
+  deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
+  return 0; //whether to continue or not
  
   if(ret==0) return 0;
 

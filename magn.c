@@ -3,7 +3,7 @@
 
 #include "ko.h"
 
-/* calculate magnetic field four-vector knowing gas four-velocity */
+/* calculate magnetic field four-vector knowing gas four-velocity ucov */
 void calc_bcon_4vel(double *pr, double *ucon, double *ucov, double *bcon) 
 {
   int j ;

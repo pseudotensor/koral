@@ -630,10 +630,10 @@ print_conserved(ldouble *u)
   printf("B^3 = %.15e\n",u[B3]);
 #endif
 #ifdef RADIATION
-  printf("T^t_t = %.15e\n",u[EE0]);
-  printf("T^t_1 = %.15e\n",u[FX0]);
-  printf("T^t_2 = %.15e\n",u[FY0]);
-  printf("T^t_3 = %.15e\n",u[FZ0]);
+  printf("R^t_t = %.15e\n",u[EE0]);
+  printf("R^t_1 = %.15e\n",u[FX0]);
+  printf("R^t_2 = %.15e\n",u[FY0]);
+  printf("R^t_3 = %.15e\n",u[FZ0]);
 #endif
   printf("\n");
  
