@@ -802,9 +802,9 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
   //total inversion, but only whichprim part matters
-  print_Nvector(pp,NVMHD);
+  //print_Nvector(pp,NVMHD);
   p2u(pp,uu,geom);
-  print_Nvector(uu,NVMHD);
+  //print_Nvector(uu,NVMHD);
 
   //corresponding change in entropy
   uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
@@ -881,7 +881,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])+fabs(dt*ms[3])); else err[2]=0.;
 	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])+fabs(dt*ms[4])); else err[3]=0.;
 
-	  printf(";; %e %e %e %e %e\n",f[3],fabs(uu[4]),fabs(uu0[4]),fabs(dt*gdetu*Gi[3]),fabs(dt*ms[4]));
+	  //printf(";; %e %e %e %e %e\n",f[3],fabs(uu[4]),fabs(uu0[4]),fabs(dt*gdetu*Gi[3]),fabs(dt*ms[4]));
 	}
       if(whichprim==RAD) //rad-primitives
 	{
@@ -1237,7 +1237,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
  
   //4dprim
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-8;
+  ldouble CONV = 1.e-10;
   ldouble MAXITER = 100;
   int corr[2],fixup[2];
 
@@ -1351,7 +1351,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      }
 	    else //decreasing velocity
 	      {
-		ldouble veleps = EPS*my_sign(ppp[j+sh])*my_max(1.e-6,fabs(ppp[j+sh]));
+		ldouble veleps = EPS*my_sign(ppp[j+sh])*my_max(1.e-6/sqrt(geom->gg[j][j]),fabs(ppp[j+sh]));
 		if(ppp[j+sh]>=0.)
 		  del=sign*veleps; 
 		else
@@ -3270,7 +3270,6 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
       pp[FX0]=ucon[1]; 
       pp[FY0]=ucon[2];
       pp[FZ0]=ucon[3];
-
     }
   if(atmtype==1) //fixed Erf, urf 0 in lab frame
     {

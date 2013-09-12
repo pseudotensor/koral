@@ -723,86 +723,15 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	  if(isnan(val) || isinf(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
 	  
-	  //	  if(ix==0 && iy==0)
-	  //printf("%e %d\n",val,iv);
-
 	  set_u(u,iv,ix,iy,iz,val);	
 
 	}
 
       /***************************/
       //testing if entropy increased after advection
-      //only MHD part involved
       /***************************/
 
       calc_primitives(ix,iy,iz,1);
-
-      /*
-      set_cflag(HDFIXUPFLAG,ix,iy,iz,0);
-
-      struct geometry geom;
-      fill_geometry(ix,iy,iz,&geom);
-
-      for(iv=0;iv<NVMHD;iv++)
-      {
-	uu[iv]=get_u(u,iv,ix,iy,iz);
-	pp[iv]=get_u(p,iv,ix,iy,iz);
-      }
-
-      int u2pret=u2p_solver(uu,pp,&geom,U2P_HOT,0); 
-
-      if(u2pret==0)
-	{
-	  //check if u2p_hot failde by making entropy decrease
-	  //by comparing the Lagrangian uu[ENTR] value and the one from u2p_hot
-	  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
-	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-	  ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
-	  ldouble s2=exp(pp[ENTR]/pp[RHO]);
-	  
-	  if(s2/s1 < 0.9)
-	    {  
-	      //correct
-	      u2pret=-1;
-	    }
-	}
-
-      if(u2pret<0)
-	{
-	  //u2p_entropy cannot handle negative rhos - checking/correcting
-	  if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
-	    {
-	      pp[0]=RHOFLOOR;
-	      check_floors_hd(pp,VELPRIM,&geom);
-	      pp[5]=calc_Sfromu(pp[0],pp[1]);
-	      p2u(pp,uu,&geom);
-	      u2pret=0;
-	    }
-	  else
-	    {
-	      u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
-	    }
-	  if(u2pret==0)
-	    {
-	      p2u(pp,uu,&geom);
-	      for(iv=0;iv<NVMHD;iv++)
-		{
-		  set_u(u,iv,ix,iy,iz,uu[iv]);
-		  set_u(p,iv,ix,iy,iz,pp[iv]);
-		}
-
-	    }
-	  else
-	    {
-	      printf("u2p_entropy failed when correcting toward entropy at %d %d\n",geom.ix,geom.iy);
-	      set_cflag(HDFIXUPFLAG,ix,iy,iz,1);
-
-	      //u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,2); 
-	      //getchar();
-	    }
-	}
-      */
-
     }
      
   //**********************************************************************

@@ -58,7 +58,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.01
+#define BHSPIN 0.1
 
 /************************************/
 //coordinates / resolution
@@ -67,7 +67,7 @@
 #define MKS1R0 0.
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
-#define MYCOORDS KSCOORDS//MKS1COORDS
+#define MYCOORDS KERRCOORDS//MKS1COORDS
 #define MINX 5.2//(log(5.2-MKS1R0))
 #define MAXX (log(100.-MKS1R0))
 #define NX 120

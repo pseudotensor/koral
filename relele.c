@@ -3,6 +3,7 @@
 
 #include "ko.h"
 
+
 int //assumes ut unknown where applicable
 conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
@@ -18,7 +19,7 @@ conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//converts velocities u1->u2
+//converts contravariant velocities u1->u2
 int
 conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5],int utknown)
 {
@@ -239,6 +240,62 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
     {
       print_4vector(u2);      
       printf("conv_vels done %d %d\n",which1,which2);
+    }
+  
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts contravariant u1 -> covariant u2 (takes advantage of VELR)
+int
+conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
+{
+  int i,j;
+  ldouble ut[4];
+  int verbose=0;
+  if(verbose)
+    {
+      printf("conv_velscov: %d -> %d\n",which1,which2);
+      print_4vector(u1);      
+    }
+
+  if(which2!=VEL4)
+    {
+      my_err("conv_velscov() outputs only VEL4 u_mu\n");      
+    }
+
+  if(which1!=VELR)
+    {
+      conv_vels(u1,u2,which1,VEL4,gg,GG);
+      indices_21(u2,ut,gg);
+    }
+  else
+    {
+      ldouble u1cov[4];
+      ldouble qsq=0.;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=u1[i]*u1[j]*gg[i][j];
+      ldouble gamma=sqrt(1.+qsq);
+      ldouble alpha=sqrt(-1./GG[0][0]);
+      
+      indices_21(u1,u1cov,gg);
+ 
+      for(i=0;i<4;i++)
+	ut[i]=u1cov[i]-alpha*gamma*delta(0,i);
+    }
+ 
+  u2[0]=ut[0];
+  u2[1]=ut[1];
+  u2[2]=ut[2];
+  u2[3]=ut[3];
+
+  if(verbose)
+    {
+      print_4vector(u2);      
+      printf("conv_velscov done %d %d\n",which1,which2);
     }
   
   return 0;

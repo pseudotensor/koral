@@ -56,7 +56,7 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 
   ldouble rho=p[0];
   ldouble uu=p[1];
-  ldouble vcon[4],ucon[4],ucov[4];
+  ldouble vcon[4],vcov[4],ucon[4],ucov[4];
   ldouble bcon[4]={0.,0.,0.,0.},bcov[4]={0.,0.,0.,0.},bsq=0.;
   vcon[1]=p[2];
   vcon[2]=p[3];
@@ -67,7 +67,11 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   //converting to 4-velocity
 
   conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
+  //indices_21(ucon,ucov,gg);
+  //print_4vector(ucov);
+  conv_velscov(vcon,ucov,VELPRIM,VEL4,gg,GG);
+  //print_4vector(ucov);
+
 #ifdef MAGNFIELD
   calc_bcon_4vel(p,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
@@ -115,15 +119,16 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble Ttth =eta*ucon[0]*ucov[2] - bcon[0]*bcov[2];
   ldouble Ttph =eta*ucon[0]*ucov[3] - bcon[0]*bcov[3];
 
-  
+  /*
   printf("%e %e %e %e -> %.20e\n",eta*ucon[0]*ucov[3] - bcon[0]*bcov[3],eta,ucon[0],ucov[3],dot(ucon,ucov));
   print_4vector(vcon);
   print_4vector(ucon);
-  print_4vector(ucov);
   print_metric(gg);
-
+  
+  
+ 
  int i,j,k;
- for(i=0;i<4;i++)
+  /*for(i=0;i<4;i++)
     {
       ucov[i]=0.;
       for(k=0;k<4;k++)
@@ -132,7 +137,26 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 	  if(i==3) printf("+ %e (%d %d)\n",ucon[k]*gg[i][k],i,k);
 	}	  
     }
+ 
+ //print_4vector(ucov);
+
+ indices_21(vcon,vcov,gg);
+ //print_4vector(vcov);
+
+ // print_4vector(vcon);getch();
+ ldouble qsq=0.;
+ for(i=1;i<4;i++)
+   for(j=1;j<4;j++)
+     qsq+=vcon[i]*vcon[j]*gg[i][j];
+ ldouble gamma2=1.+qsq;
+ ldouble alpha2=-1./GG[0][0];
+ ldouble gamma=sqrt(gamma2);
+ ldouble alpha=sqrt(alpha2);
+ for(i=0;i<4;i++)
+   ucov[i]=vcov[i]-alpha*gamma*delta(0,i);
+
   print_4vector(ucov);
+  */
 
 	 
 

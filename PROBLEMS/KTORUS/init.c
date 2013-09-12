@@ -24,10 +24,11 @@ ldouble podpierd = 1. - GAMMA/(VSZERO*VSZERO)*(PsiT-PsiT0)/(NPOLI+1.);
 
 //if(geom.iy==NY/2){printf("%e %e %e\n",geomBL.xx,geomBL.yy,(PsiT-PsiT0));getch();}
 
-if(podpierd<0. || Rcyl<10.) //outside donut
+if(podpierd<0. || Rcyl<10. || 1)// outside donut
   {
     //ambient
     set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+    pp[VX]=pp[VY]=pp[VZ]=0.;//0.01/geom.xx/sqrt(geom.xx);
 #ifdef RADIATION
     set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
 #endif
@@ -115,8 +116,6 @@ if(podpierd<0. || Rcyl<10.) //outside donut
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //to conserved
 p2u(pp,uu,&geom);
-
-
 
 /***********************************************/
 
