@@ -130,7 +130,8 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
   //zero - state (precalculate!)
   ldouble ucon0[4]={0.,pp0[VX],pp0[VY],pp0[VZ]},ucov0[4];
   conv_vels(ucon0,ucon0,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon0,ucov0,gg);
+  conv_velscov(ucon0,ucov0,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon0,ucov0,gg);
   ldouble Rij0[4][4],Rtt0;
   calc_Rij(pp0,ggg,Rij0);
   indices_2221(Rij0,Rij0,gg);
@@ -148,7 +149,8 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
   //new state
   ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]},ucov[4];
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);
   ldouble Rij[4][4],Rtt;
   calc_Rij(pp,ggg,Rij);
   indices_2221(Rij,Rij,gg);
@@ -785,15 +787,18 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
   for(i=0;i<NV;i++) pp[i]=ppin[i];
   
   //rho may be inconsistent on input if iterating MHD primitives
-  ldouble ucon[4];
+  ldouble ucon[4],ucov[4];
+  ucon[1]=pp[2];
+  ucon[2]=pp[3];
+  ucon[3]=pp[4];
+  ucon[0]=0.;
+  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+
+
   //correcting rho for MHD prims
   if(whichprim==MHD)
     {
-      ucon[1]=pp[2];
-      ucon[2]=pp[3];
-      ucon[3]=pp[4];
-      ucon[0]=0.;
-      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
       ldouble rho = (uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
       pp[RHO]=rho;
     }
@@ -832,13 +837,6 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 	  u2pret=-2; //to return error
 	}
       else u2pret=0;
-
-      //calculate ff four-velocity
-      ucon[1]=pp[2];
-      ucon[2]=pp[3];
-      ucon[3]=pp[4];
-      ucon[0]=0.;
-      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
     }
   if(whichprim==MHD)
     {
@@ -905,9 +903,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt*gdetu*Gi[0])+fabs(dt*ms[EE0])); else err[0]=0.;
 
 		  ldouble bsq=0.;
-		  ldouble ucov[4],bcon[4],bcov[4];
-		  indices_21(ucon,ucov,gg);
-
+		  ldouble bcon[4],bcov[4];
+		  
 		  /*	      
 			      #ifdef MAGNFIELD
 			      calc_bcon_4vel(pp,ucon,ucov,bcon);
@@ -948,17 +945,17 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
       if(whichframe==RADIMPLICIT_FF)
 	{
 
-	  ldouble ucon[4],Rtt0,Rtt;
+	  ldouble uconf[4],Rtt0,Rtt;
 	  //zero - state 
-	  calc_ff_Rtt(pp0,&Rtt0,ucon,geom);
+	  calc_ff_Rtt(pp0,&Rtt0,uconf,geom);
 	  //new state
-	  calc_ff_Rtt(pp,&Rtt,ucon,geom);
+	  calc_ff_Rtt(pp,&Rtt,uconf,geom);
       
 	  ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 	  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
 	  ldouble Ehat = -Rtt;
 	  ldouble Ehat0 = -Rtt0;
-	  ldouble dtau=dt/ucon[0];
+	  ldouble dtau=dt/uconf[0];
 	  ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
 
 	  //fluid frame energy equation:
@@ -998,9 +995,9 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
     }
   else //searching for full LTE (whicheq==RADIMPLICIT_LTEEQ)
     {
-      ldouble ucon[4],Rtt;
+      ldouble uconf[4],Rtt;
       //new state
-      calc_ff_Rtt(pp,&Rtt,ucon,geom);
+      calc_ff_Rtt(pp,&Rtt,uconf,geom);
       ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
       ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
       ldouble Ehat = -Rtt;
@@ -1237,7 +1234,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
  
   //4dprim
   ldouble EPS = 1.e-8;
-  ldouble CONV = 1.e-10;
+  ldouble CONV = 1.e-8;
   ldouble MAXITER = 100;
   int corr[2],fixup[2];
 
@@ -1862,13 +1859,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //int ret1;
   //ret1=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  verbose=2;
+  //verbose=2;
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   //test
   //leaving primitives intact
-  deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
-  return 0; //whether to continue or not
+  //deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
+  //return 0; //whether to continue or not
  
   if(ret==0) return 0;
 
@@ -2095,7 +2092,8 @@ test_solve_implicit_lab()
   vcon[3]=pp0[4];
   vcon[0]=0.;  
   conv_vels(vcon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-  indices_21(ucon,ucov,geom.gg);
+  conv_velscov(vcon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
+  //indices_21(ucon,ucov,geom.gg);
   print_4vector(ucon);
   print_4vector(ucov);
 
@@ -2976,9 +2974,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   ucon[2]=pp[3];
   ucon[3]=pp[4];
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-
-  //covariant four-velocity
-  indices_21(ucon,ucov,gg);  
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);  
 
   //gas properties
   ldouble rho=pp[RHO];
@@ -3030,7 +3027,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   ldouble u=pp[1];
   ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);
   ldouble EE=pp[EE0];
   ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
@@ -3123,12 +3121,14 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+
 #else //Eddington
 
   ldouble h[4][4];
   ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);
   ldouble EE=pp[EE0];
   ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
   Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
@@ -3980,7 +3980,8 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   ucon[3]=pp[VZ];
   ldouble ucov[4];
   conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
-  indices_21(ucon,ucov,geom->gg);
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
+  //indices_21(ucon,ucov,geom->gg);
   ldouble Rij[4][4],Rtt;
   calc_Rij(pp,ggg,Rij);
  

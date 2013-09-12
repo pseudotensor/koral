@@ -281,7 +281,7 @@ conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
       ldouble gamma=sqrt(1.+qsq);
       ldouble alpha=sqrt(-1./GG[0][0]);
       
-      indices_21(u1,u1cov,gg);
+      indices_21(u1,u1cov,gg); //lowering indices in utilda
  
       for(i=0;i<4;i++)
 	ut[i]=u1cov[i]-alpha*gamma*delta(0,i);

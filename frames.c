@@ -492,8 +492,7 @@ calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   ucon[2]=pp[3];
   ucon[3]=pp[4];
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  //covariant four-velocity
-  indices_21(ucon,ucov,gg);  
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
 
   if(verbose>0) print_4vector(ucon);
 
@@ -548,8 +547,7 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   wcon[2]=pp[3];
   wcon[3]=pp[4];
   conv_vels(wcon,wcon,VELPRIM,VEL4,gg,GG);
-  //covariant four-velocity
-  indices_21(wcon,wcov,gg);  
+  conv_velscov(wcon,wcov,VELPRIM,VEL4,gg,GG);
  
   if(verbose>0) print_4vector(wcon);
 

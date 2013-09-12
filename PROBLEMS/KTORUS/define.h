@@ -67,8 +67,8 @@
 #define MKS1R0 0.
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
-#define MYCOORDS KERRCOORDS//MKS1COORDS
-#define MINX 5.2//(log(5.2-MKS1R0))
+#define MYCOORDS MKS1COORDS
+#define MINX (log(5.2-MKS1R0))
 #define MAXX (log(100.-MKS1R0))
 #define NX 120
 #define NY 80

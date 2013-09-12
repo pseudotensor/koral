@@ -28,7 +28,7 @@ if(podpierd<0. || Rcyl<10. || 1)// outside donut
   {
     //ambient
     set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
-    pp[VX]=pp[VY]=pp[VZ]=0.;//0.01/geom.xx/sqrt(geom.xx);
+    pp[VZ]=0.01/geom.xx/sqrt(geom.xx);
 #ifdef RADIATION
     set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
 #endif

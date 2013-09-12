@@ -87,7 +87,8 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
     ucon[iv]=pp[1+iv];
   ucon[0]=0.;
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);
 
   //**********************************************************************
   //***** hydro: speed of sound ******************************************
@@ -515,9 +516,9 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ldouble S=pp[5];
 
   //converting to 4-velocity
-  //TODO: introduce structure of state
   conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
+  conv_velscov(vcon,ucov,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);
 
   int ii, jj, irf;
   for(ii=0;ii<4;ii++)
@@ -641,7 +642,8 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
     ucon[iv]=pp[1+iv];
   ucon[0]=0.;
   conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
+  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);
 
 #ifdef MAGNFIELD
   calc_bcon_4vel(pp,ucon,ucov,bcon);
@@ -1160,7 +1162,7 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
     }
   ucon[1]=pp[istart];  ucon[2]=pp[istart+1];  ucon[3]=pp[istart+2];
   conv_vels(ucon,ucon,whichvel,VEL4,gg,GG);  
-  indices_21(ucon,ucov,gg);
+  conv_velscov(ucon,ucov,whichvel,VEL4,gg,GG);  
    
   //derivatives
   for(idim=1;idim<4;idim++)
@@ -1219,8 +1221,11 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
      conv_vels(uconm1,uconm1,whichvel,VEL4,ggm1,GGm1);
      conv_vels(uconp1,uconp1,whichvel,VEL4,ggp1,GGp1);
 
-     indices_21(uconm1,ucovm1,ggm1);
-     indices_21(uconp1,ucovp1,ggp1);
+     conv_velscov(uconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
+     conv_velscov(uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
+
+     //dices_21(uconm1,ucovm1,ggm1);
+     //dices_21(uconp1,ucovp1,ggp1);
   
      for(i=0;i<4;i++)
        {
