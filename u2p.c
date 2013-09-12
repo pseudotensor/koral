@@ -372,11 +372,14 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   
   //************************************
   //************************************
+
+  //commented out - rad fixups only for critical failure in implicit
+  /*
   if(radcor>0)     
     fixups[1]=1;
   else
     fixups[1]=0;
-
+  */
 
   //************************************
   //************************************

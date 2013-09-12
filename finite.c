@@ -2243,14 +2243,13 @@ cell_fixup_rad()
 			}
 		      p2u(pp,uu,&geom);
 
-		      if(verbose) 
+		      if(verbose>1) 
 			{
 			  printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
 			  for(ii=0;ii<in;ii++)
 			    print_Nvector(ppn[ii],NV);
 			  printf(" -> \n");
 			  print_Nvector(pp,NV);
-			  getchar();
 			}
 
 		      //save to updated arrays memory
