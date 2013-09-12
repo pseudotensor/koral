@@ -15,7 +15,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
 
@@ -58,7 +58,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.1
+#define BHSPIN 0.9
 
 /************************************/
 //coordinates / resolution
@@ -68,7 +68,7 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(5.2-MKS1R0))
+#define MINX (log(1.2-MKS1R0))
 #define MAXX (log(100.-MKS1R0))
 #define NX 120
 #define NY 80
@@ -85,6 +85,7 @@
 /************************************/
 //output
 /************************************/
+#define PRINTINSIDEBH
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0

@@ -24,7 +24,7 @@ ldouble podpierd = 1. - GAMMA/(VSZERO*VSZERO)*(PsiT-PsiT0)/(NPOLI+1.);
 
 //if(geom.iy==NY/2){printf("%e %e %e\n",geomBL.xx,geomBL.yy,(PsiT-PsiT0));getch();}
 
-if(podpierd<0. || Rcyl<10. || 1)// outside donut
+if(podpierd<0. || Rcyl<10.)// outside donut
   {
     //ambient
     set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);

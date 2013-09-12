@@ -1235,7 +1235,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //4dprim
   ldouble EPS = 1.e-8;
   ldouble CONV = 1.e-8;
-  ldouble MAXITER = 100;
+  ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
   int sh;
@@ -1859,7 +1859,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //int ret1;
   //ret1=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  //verbose=2;
+  //if(geom.iy==NY/2 && geom.ix>50) verbose=2;
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   //test

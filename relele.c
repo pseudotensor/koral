@@ -266,7 +266,7 @@ conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
       my_err("conv_velscov() outputs only VEL4 u_mu\n");      
     }
 
-  if(which1!=VELR)
+  if(which1!=VELR || 1) //TODO: this works fast, the other works slow, but this does not work with u_phi=0
     {
       conv_vels(u1,u2,which1,VEL4,gg,GG);
       indices_21(u2,ut,gg);
