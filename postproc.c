@@ -60,8 +60,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      utcon[3]=pp[4];
 
 	      conv_vels(utcon,ucon3,VELPRIM,VEL3,geomBL.gg,geomBL.GG);
-	      conv_vels(utcon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-	      conv_velscov(utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	      conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	      //conv_velscov(utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 
 	      dx[0]=dx[0]*sqrt(geomBL.gg[0][0]);
 	      dx[1]=dx[1]*sqrt(geomBL.gg[2][2]);

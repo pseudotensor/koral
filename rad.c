@@ -129,8 +129,8 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
 
   //zero - state (precalculate!)
   ldouble utcon0[4]={0.,pp0[VX],pp0[VY],pp0[VZ]},ucov0[4],ucon0[4];
-  conv_vels(utcon0,ucon0,VELPRIM,VEL4,gg,GG);
-  conv_velscov(utcon0,ucov0,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(utcon0,ucon0,ucov0,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(utcon0,ucov0,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon0,ucov0,gg);
   ldouble Rij0[4][4],Rtt0;
   calc_Rij(pp0,ggg,Rij0);
@@ -148,8 +148,8 @@ int f_implicit_lab_4dcon(ldouble *uu0,ldouble *uu,ldouble *pp0,ldouble dt,void* 
 
   //new state
   ldouble utcon[4]={0.,pp[VX],pp[VY],pp[VZ]},ucov[4],ucon[4];
-  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon,ucov,gg);
   ldouble Rij[4][4],Rtt;
   calc_Rij(pp,ggg,Rij);
@@ -792,8 +792,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
   utcon[2]=pp[3];
   utcon[3]=pp[4];
   utcon[0]=0.;
-  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
 
 
   //correcting rho for MHD prims
@@ -2091,8 +2091,8 @@ test_solve_implicit_lab()
   vcon[2]=pp0[3];
   vcon[3]=pp0[4];
   vcon[0]=0.;  
-  conv_vels(vcon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-  conv_velscov(vcon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
+  conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
+  //conv_velscov(vcon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
   //indices_21(ucon,ucov,geom.gg);
   print_4vector(ucon);
   print_4vector(ucov);
@@ -2973,8 +2973,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   utcon[1]=pp[2];
   utcon[2]=pp[3];
   utcon[3]=pp[4];
-  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon,ucov,gg);  
 
   //gas properties
@@ -3026,8 +3026,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   ldouble rho=pp[RHO];
   ldouble u=pp[1];
   ldouble ucov[4],ucon[4],utcon[4]={0,pp[2],pp[3],pp[4]};
-  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon,ucov,gg);
   ldouble EE=pp[EE0];
   ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
@@ -3126,8 +3126,8 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   ldouble h[4][4];
   ldouble ucov[4],ucon[4],utcon[4]={0,pp[2],pp[3],pp[4]};
-  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon,ucov,gg);
   ldouble EE=pp[EE0];
   ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
@@ -3979,8 +3979,8 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   utcon[1]=pp[VX];
   utcon[2]=pp[VY];
   utcon[3]=pp[VZ];
-  conv_vels(utcon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
-  conv_velscov(utcon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
+  //conv_velscov(utcon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
   //indices_21(ucon,ucov,geom->gg);
   ldouble Rij[4][4],Rtt;
   calc_Rij(pp,ggg,Rij);

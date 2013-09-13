@@ -423,10 +423,11 @@ ldouble r_horizon_BL(ldouble a);
 ldouble r_mbound_BL(ldouble a);
 ldouble r_photon_BL(ldouble a);
 int update_entropy(int ix,int iy,int iz,int u2pflag);
+int conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 int conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 int conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
-int conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5],int);
+int conv_vels_core(ldouble *u1,ldouble *u2,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5],int);
 
 //u2p.c
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);

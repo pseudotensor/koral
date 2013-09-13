@@ -4,27 +4,42 @@
 #include "ko.h"
 
 
-int //assumes ut unknown where applicable
+int //calculates only ucon, assumes ut unknown where applicable
 conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
-  conv_vels_core(u1,u2,which1,which2,gg,GG,0);
+  ldouble ucov[4];
+  conv_vels_core(u1,u2,ucov,which1,which2,gg,GG,0);
 }
 
-int //assumes ut known where applicable
+int //calculates only ucon, assumes ut known where applicable
 conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
-  conv_vels_core(u1,u2,which1,which2,gg,GG,1);
+  ldouble ucov[4];
+  conv_vels_core(u1,u2,ucov,which1,which2,gg,GG,1);
+}
+
+int //calculates both ucon and ucov, assumes ut unknown where applicable
+conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
+{
+  ldouble ucov[4];
+
+  //conv_vels(u1,u2con,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(u1,u2cov,VELPRIM,VEL4,gg,GG);
+
+  conv_vels_core(u1,u2con,u2cov,which1,which2,gg,GG,0);
 }
 
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//converts contravariant velocities u1->u2
+//converts contravariant velocities u1
+//to contravariant u2con
+//and covariant u2cov (if which2==VEL4)
 int
-conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5],int utknown)
+conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5],int utknown)
 {
   int i,j;
-  ldouble ut[4];
+  ldouble utcon[4],utcov[4];
   int verbose=0;
   if(verbose)
     {
@@ -35,7 +50,7 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
   /*************** VEL3 -> VEL3 ***************/
   if(which1==VEL3 && which2==VEL3)
     {
-      for(i=0;i<4;i++) ut[i]=u1[i];      
+      for(i=0;i<4;i++) utcon[i]=u1[i];      
     }
   /*************** VEL4 -> VEL4 ***************/
   else if(which1==VEL4 && which2==VEL4)
@@ -57,19 +72,21 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
 	    }
 	  ldouble delta=b*b-4.*a*c;
 	  if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
-	  ut[0]=(-b-sqrt(delta))/2./a;
+	  utcon[0]=(-b-sqrt(delta))/2./a;
 	  //TODO: more strict criterion
-	  if(ut[0]<0.) ut[0]=(-b+sqrt(delta))/2./a;
+	  if(utcon[0]<0.) utcon[0]=(-b+sqrt(delta))/2./a;
 	}
       else
-	ut[0]=u1[0];
+	utcon[0]=u1[0];
      
-      for(i=1;i<4;i++) ut[i]=u1[i];      
+      for(i=1;i<4;i++) utcon[i]=u1[i]; 
+
+      indices_21(utcon,utcov,gg);
     }
   /*************** VELR -> VELR ***************/
   else if(which1==VELR && which2==VELR)
     {
-      for(i=0;i<4;i++) ut[i]=u1[i];      
+      for(i=0;i<4;i++) utcon[i]=u1[i];      
     }
   /*************** VEL4 -> VEL3 ***************/
   else if(which1==VEL4 && which2==VEL3)
@@ -91,13 +108,13 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
 	    }
 	  ldouble delta=b*b-4.*a*c;
 	  if(delta<0.) {printf("delta.lt.0 in VEL4->VEL3\n");return -1;}
-	  ut[0]=(-b-sqrt(delta))/2./a;
-	  if(ut[0]<1.) ut[0]=(-b+sqrt(delta))/2./a;
+	  utcon[0]=(-b-sqrt(delta))/2./a;
+	  if(utcon[0]<1.) utcon[0]=(-b+sqrt(delta))/2./a;
 	}
       else
-	ut[0]=u1[0];
+	utcon[0]=u1[0];
 
-      for(i=1;i<4;i++) ut[i]=u1[i]/ut[0];      
+      for(i=1;i<4;i++) utcon[i]=u1[i]/utcon[0];      
     }
   /*************** VEL3 -> VEL4 ***************/
   else if(which1==VEL3 && which2==VEL4)
@@ -113,15 +130,18 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
 	    }
 	}
 						
-      ut[0]=sqrt(-1./(gg[0][0]+a+b));
-      if(ut[0]<1. || isnan(ut[0]))
+      utcon[0]=sqrt(-1./(gg[0][0]+a+b));
+      if(utcon[0]<1. || isnan(utcon[0]))
 	{
 	  printf("ut.nan in conv_vels(%d,%d) VEL3->VEL4 - returning error\n",which1,which2); //getchar();
-	  return -1;//ut[0]=1.0;
+	  return -1;//utcon[0]=1.0;
 	}
-      ut[1]=u1[1]*ut[0];
-      ut[2]=u1[2]*ut[0];
-      ut[3]=u1[3]*ut[0];      
+      utcon[1]=u1[1]*utcon[0];
+      utcon[2]=u1[2]*utcon[0];
+      utcon[3]=u1[3]*utcon[0];  
+
+      indices_21(utcon,utcov,gg);
+ 
     }
   /*************** VEL3 -> VELR ***************/
   else if(which1==VEL3 && which2==VELR)
@@ -137,20 +157,20 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
 	    }
 	}
 						
-      ut[0]=sqrt(-1./(gg[0][0]+a+b));
-      if(ut[0]<1. || isnan(ut[0]))
+      utcon[0]=sqrt(-1./(gg[0][0]+a+b));
+      if(utcon[0]<1. || isnan(utcon[0]))
 	{
 	  //	  printf("ut.nan in conv_vels(%d,%d) VEL3->VELR - returning error\n",which1,which2);
 	  //	  print_4vector(u1);//getchar();
-	  return -1;//ut[0]=1.0;
+	  return -1;//utcon[0]=1.0;
 	}
       //to 4-velocity
-      ut[1]=u1[1]*ut[0];
-      ut[2]=u1[2]*ut[0];
-      ut[3]=u1[3]*ut[0];   
+      utcon[1]=u1[1]*utcon[0];
+      utcon[2]=u1[2]*utcon[0];
+      utcon[3]=u1[3]*utcon[0];   
       //to relative velocity
       for(i=1;i<4;i++)
-	ut[i]=ut[i]-ut[0]*GG[0][i]/GG[0][0];
+	utcon[i]=utcon[i]-utcon[0]*GG[0][i]/GG[0][0];
     }
   /*************** VEL4 -> VELR ***************/
   else if (which1==VEL4 && which2==VELR)
@@ -179,16 +199,16 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
 	  if(ut1>0. && ut2>0.) //ambiguous solution in the ergosphere
 	    {
 	      printf("ambigous ut in VEL4->VELR: %e %e\n",ut1,ut2);
-	      ut[0]=ut1;
+	      utcon[0]=ut1;
 	    }
 	  else
-	    ut[0]=my_max(ut1,ut2);
+	    utcon[0]=my_max(ut1,ut2);
 	}
       else
-	ut[0]=u1[0];
+	utcon[0]=u1[0];
        
       for(i=1;i<4;i++)
-	ut[i]=u1[i]-ut[0]*GG[0][i]/GG[0][0];
+	utcon[i]=u1[i]-utcon[0]*GG[0][i]/GG[0][0];
     }
 
   /*************** VELR -> VEL4 ***************/
@@ -201,12 +221,12 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
 	  qsq+=u1[i]*u1[j]*gg[i][j];
       ldouble gamma2=1.+qsq;
       ldouble alpha2=-1./GG[0][0];
-      ut[0]=sqrt(gamma2/alpha2);
+      utcon[0]=sqrt(gamma2/alpha2);
       for(i=1;i<4;i++)
-	ut[i]=u1[i]+ut[0]*GG[0][i]/GG[0][0];
+	utcon[i]=u1[i]+utcon[0]*GG[0][i]/GG[0][0];
       */
 
-      ldouble u1cov[4],utcov[4];
+      ldouble u1cov[4];
       ldouble qsq=0.;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
@@ -220,7 +240,7 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
       for(i=0;i<4;i++)
 	utcov[i]=u1cov[i]-sqrt(alpha2*gamma2)*delta(0,i);
 
-      indices_12(utcov,ut,GG);
+      indices_12(utcov,utcon,GG);
     }
   /*************** VELR -> VEL3 ***************/
   else if (which1==VELR && which2==VEL3)
@@ -231,12 +251,12 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
 	  qsq+=u1[i]*u1[j]*gg[i][j];
       ldouble gamma2=1.+qsq;
       ldouble alpha2=-1./GG[0][0];
-      ut[0]=sqrt(gamma2/alpha2);
+      utcon[0]=sqrt(gamma2/alpha2);
       for(i=1;i<4;i++)
-	ut[i]=u1[i]+ut[0]*GG[0][i]/GG[0][0];
-      ut[1]/=ut[0];
-      ut[2]/=ut[0];
-      ut[3]/=ut[0];
+	utcon[i]=u1[i]+utcon[0]*GG[0][i]/GG[0][0];
+      utcon[1]/=utcon[0];
+      utcon[2]/=utcon[0];
+      utcon[3]/=utcon[0];
     }
 
   /*************** not supported  ***************/
@@ -248,15 +268,23 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
 
   //write to index 0 only when needed
   if(which2==VEL4)
-    u2[0]=ut[0];
+    u2con[0]=utcon[0];
 
-  u2[1]=ut[1];
-  u2[2]=ut[2];
-  u2[3]=ut[3];
+  u2con[1]=utcon[1];
+  u2con[2]=utcon[2];
+  u2con[3]=utcon[3];
+
+  if(which2==VEL4)
+    {
+      u2cov[0]=utcov[0];
+      u2cov[1]=utcov[1];
+      u2cov[2]=utcov[2];
+      u2cov[3]=utcov[3];
+    }
 
   if(verbose)
     {
-      print_4vector(u2);      
+      print_4vector(u2con);      
       printf("conv_vels done %d %d\n",which1,which2);
     }
   

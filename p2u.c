@@ -66,11 +66,24 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 
   //converting to 4-velocity
 
-  conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
+  //conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon,ucov,gg);
   //print_4vector(ucov);
-  conv_velscov(vcon,ucov,VELPRIM,VEL4,gg,GG);
-  //print_4vector(ucov);
+  //conv_velscov(vcon,ucov,VELPRIM,VEL4,gg,GG);
+  /*if(GG[0][1]!=0.)
+    {
+      print_4vector(ucon);
+      print_4vector(ucov);
+      }*/
+  conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+  /*
+  if(GG[0][1]!=0.)
+    {
+      print_4vector(ucon);
+      print_4vector(ucov);//getchar();
+    }
+  */
+
 
 #ifdef MAGNFIELD
   calc_bcon_4vel(p,ucon,ucov,bcon);

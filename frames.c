@@ -491,8 +491,8 @@ calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   utcon[1]=pp[2];
   utcon[2]=pp[3];
   utcon[3]=pp[4];
-  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
 
   if(verbose>0) print_4vector(ucon);
 
@@ -546,8 +546,8 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   wtcon[1]=pp[2];
   wtcon[2]=pp[3];
   wtcon[3]=pp[4];
-  conv_vels(wtcon,wcon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(wtcon,wcov,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(wtcon,wcon,wcov,VELPRIM,VEL4,gg,GG);
+  //conv_velscov(wtcon,wcov,VELPRIM,VEL4,gg,GG);
  
   if(verbose>0) print_4vector(wcon);
 
