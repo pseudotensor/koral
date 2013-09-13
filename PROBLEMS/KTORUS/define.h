@@ -7,7 +7,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADWAVESPEEDLIMITER
 //#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
@@ -15,7 +15,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
 
@@ -95,7 +95,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e1
+#define DTOUT1 1.e0
 
 /************************************/
 //common physics / torus / atmosphere
