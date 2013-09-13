@@ -266,25 +266,43 @@ conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
       my_err("conv_velscov() outputs only VEL4 u_mu\n");      
     }
 
-  if(which1!=VELR || 1) //TODO: this works fast, the other works slow, but this does not work with u_phi=0
+  if(which1!=VELR || GG[0][0]>0. || 1) //when out of domain do simple
     {
       conv_vels(u1,u2,which1,VEL4,gg,GG);
       indices_21(u2,ut,gg);
     }
   else
     {
-      ldouble u1cov[4];
+      ldouble u1cov[4],utcon[4];
       ldouble qsq=0.;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
 	  qsq+=u1[i]*u1[j]*gg[i][j];
-      ldouble gamma=sqrt(1.+qsq);
-      ldouble alpha=sqrt(-1./GG[0][0]);
-      
+      ldouble gamma2=(1.+qsq);
+      ldouble alpha2=(-1./GG[0][0]);
+
       indices_21(u1,u1cov,gg); //lowering indices in utilda
+
+      utcon[0]=sqrt(gamma2/alpha2);
+      for(i=1;i<4;i++)
+	utcon[i]=u1[i]+utcon[0]*GG[0][i]/GG[0][0];
  
       for(i=0;i<4;i++)
-	ut[i]=u1cov[i]-alpha*gamma*delta(0,i);
+	ut[i]=u1cov[i]-sqrt(alpha2*gamma2)*delta(0,i);
+
+      //normalizing to ucon ucov = -1
+      ldouble norm=dot(ut,utcon);
+
+      if(fabs(norm+1)>0.1 || !isfinite(norm)) //large error
+	{
+	  conv_vels(u1,u2,which1,VEL4,gg,GG);
+	  indices_21(u2,ut,gg);
+	}
+      else //correcting norm
+	{
+	  for(i=0;i<4;i++)
+	    ut[i]/=norm;
+	}
     }
  
   u2[0]=ut[0];

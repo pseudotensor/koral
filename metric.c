@@ -625,6 +625,17 @@ if(coords==MINKCOORDS) {
 ;
 }
 
+/*
+ if(G[0][0]>0. || !isfinite(x3))
+   {
+     printf("problem in calc_metric\n");
+     printf("%e %e %e\n",
+	    x1,x2,x3);
+     print_4vector(xx);
+     print_metric(G);
+     getchar();     
+   }
+*/
   return 0;
 }
 

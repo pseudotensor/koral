@@ -15,7 +15,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-#define MAGNFIELD
+//#define MAGNFIELD
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
 
@@ -85,7 +85,7 @@
 /************************************/
 //output
 /************************************/
-#define PRINTINSIDEBH
+//#define PRINTINSIDEBH
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
@@ -95,7 +95,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e0
+#define DTOUT1 1.e1
 
 /************************************/
 //common physics / torus / atmosphere

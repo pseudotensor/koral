@@ -88,6 +88,9 @@ int fprint_silofile(ldouble time, int num, char* folder)
 	      fill_geometry(iix,iiy,iiz,&geom);
 	      struct geometry geomout;
 	      fill_geometry_arb(iix,iiy,iiz,&geomout,OUTCOORDS);
+	      
+	      if(OUTCOORDS==BLCOORDS && geomout.xx<r_horizon_BL(BHSPIN))
+		continue;
 
 	      int nodalindex=iz*(ny*nx) + iy*nx + ix;
 	      for(iv=0;iv<NV;iv++)
@@ -128,8 +131,13 @@ int fprint_silofile(ldouble time, int num, char* folder)
 	      //velocities
 	      ldouble vel[4]={0,pp[VX],pp[VY],pp[VZ]};	
 
-	      conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
-	      trans2_cc2on(vel,vel,geomout.tup);
+	      if(geomout.GG[0][0]<0.)
+		{
+		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
+		  trans2_cc2on(vel,vel,geomout.tup);
+		}
+	      else //outside well defined domain of OUTCOORDS
+		vel[1]=vel[2]=vel[3]=0.;		
 
 	      //outvel - ortonormal VEL4
 	      vx[nodalindex]=vel[1];

@@ -28,7 +28,7 @@ if(podpierd<0. || Rcyl<10.)// outside donut
   {
     //ambient
     set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
-    pp[VZ]=0.01/geom.xx/sqrt(geom.xx);
+    //pp[VZ]=0.01/geom.xx/sqrt(geom.xx);
 #ifdef RADIATION
     set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
 #endif
@@ -101,7 +101,7 @@ if(podpierd<0. || Rcyl<10.)// outside donut
     pp[B3]=Acov[3];
 #endif
 
-  }
+   }
 
 /*
 #ifdef RADIATION
