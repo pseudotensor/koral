@@ -1312,7 +1312,7 @@
 #endif
 
 #ifndef GDETIN
-#define GDETIN 1
+#define GDETIN 1 //whether to include metric determinant into the fluxes; must be on for magnetic fields 'cos flux_ct assumes that
 #endif
 
 #ifndef MODYFIKUJKRZYSIE

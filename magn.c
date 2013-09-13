@@ -174,7 +174,6 @@ flux_ct()
       ////////////////////
       
 #if((NY>1)||(NZ>1))
-      //TODO: debug here
       set_emf(1,ix,iy,iz,
 	      coefemf[1] * (
                             #if(NY>1)
