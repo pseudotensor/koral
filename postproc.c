@@ -12,7 +12,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
   //adjust NRADPROFILES in problem.h
 
   int ix,iy,iz,iv;
-  ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],ucon3[4];
+  ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],utcon[4],ucon3[4];
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
   ldouble tautot[3],tauabs[3];
 
@@ -55,13 +55,13 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      rho=pp[0];
 
-	      ucon[1]=pp[2];
-	      ucon[2]=pp[3];
-	      ucon[3]=pp[4];
+	      utcon[1]=pp[2];
+	      utcon[2]=pp[3];
+	      utcon[3]=pp[4];
 
-	      conv_vels(ucon,ucon3,VELPRIM,VEL3,geomBL.gg,geomBL.GG);
-	      conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-	      conv_velscov(ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	      conv_vels(utcon,ucon3,VELPRIM,VEL3,geomBL.gg,geomBL.GG);
+	      conv_vels(utcon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	      conv_velscov(utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 
 	      dx[0]=dx[0]*sqrt(geomBL.gg[0][0]);
 	      dx[1]=dx[1]*sqrt(geomBL.gg[2][2]);

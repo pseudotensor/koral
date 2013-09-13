@@ -194,6 +194,7 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
   /*************** VELR -> VEL4 ***************/
   else if (which1==VELR && which2==VEL4)
     {
+      /*
       ldouble qsq=0.;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
@@ -203,6 +204,23 @@ conv_vels_core(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldo
       ut[0]=sqrt(gamma2/alpha2);
       for(i=1;i<4;i++)
 	ut[i]=u1[i]+ut[0]*GG[0][i]/GG[0][0];
+      */
+
+      ldouble u1cov[4],utcov[4];
+      ldouble qsq=0.;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=u1[i]*u1[j]*gg[i][j];
+      ldouble gamma2=(1.+qsq);
+      ldouble alpha2=(-1./GG[0][0]);
+
+      u1[0]=0.;
+      indices_21(u1,u1cov,gg); //lowering indices in utilda
+
+      for(i=0;i<4;i++)
+	utcov[i]=u1cov[i]-sqrt(alpha2*gamma2)*delta(0,i);
+
+      indices_12(utcov,ut,GG);
     }
   /*************** VELR -> VEL3 ***************/
   else if (which1==VELR && which2==VEL3)
@@ -266,7 +284,32 @@ conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
       my_err("conv_velscov() outputs only VEL4 u_mu\n");      
     }
 
-  if(which1!=VELR || GG[0][0]>0. || 1) //when out of domain do simple
+ 
+
+  if(which1!=VELR)
+    {
+      conv_vels(u1,u2,which1,VEL4,gg,GG);
+      indices_21(u2,ut,gg);
+    }
+  else
+    {
+      ldouble u1cov[4],utcov[4];
+      ldouble qsq=0.;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=u1[i]*u1[j]*gg[i][j];
+      ldouble gamma2=(1.+qsq);
+      ldouble alpha2=(-1./GG[0][0]);
+
+      u1[0]=0.;
+      indices_21(u1,u1cov,gg); //lowering indices in utilda
+      
+      for(i=0;i<4;i++)
+	ut[i]=u1cov[i]-sqrt(alpha2*gamma2)*delta(0,i);
+    }
+
+      /*
+	if(which1!=VELR || GG[0][0]>0. || 1) //when out of domain do simple
     {
       conv_vels(u1,u2,which1,VEL4,gg,GG);
       indices_21(u2,ut,gg);
@@ -304,6 +347,7 @@ conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
 	    ut[i]/=norm;
 	}
     }
+  */
  
   u2[0]=ut[0];
   u2[1]=ut[1];

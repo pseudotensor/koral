@@ -74,7 +74,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   ldouble axl,axr,ayl,ayr,azl,azr;
   axl=axr=ayl=ayr=azl=azr=1.;
   
-  ldouble ucon[4],ucov[4],cst1,cst2,cst3,cst4;
+  ldouble utcon[4],ucon[4],ucov[4],cst1,cst2,cst3,cst4;
   ldouble bcon[4],bcov[4],bsq;
   ldouble cs2,va2,EF,EE; 
   ldouble rho,uu,pre;
@@ -84,10 +84,10 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //**********************************************************************
 
   for(iv=1;iv<4;iv++)
-    ucon[iv]=pp[1+iv];
-  ucon[0]=0.;
-  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+    utcon[iv]=pp[1+iv];
+  utcon[0]=0.;
+  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
+  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon,ucov,gg);
 
   //**********************************************************************
@@ -634,15 +634,15 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   int iv,i,j;
   ldouble rho=pp[RHO];
   ldouble uu=pp[UU];
-  ldouble ucon[4],ucov[4];  
+  ldouble utcon[4],ucon[4],ucov[4];  
   ldouble bcon[4],bcov[4],bsq=0.;
   
   //converts to 4-velocity
   for(iv=1;iv<4;iv++)
-    ucon[iv]=pp[1+iv];
-  ucon[0]=0.;
-  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+    utcon[iv]=pp[1+iv];
+  utcon[0]=0.;
+  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
+  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
   //indices_21(ucon,ucov,gg);
 
 #ifdef MAGNFIELD
@@ -1150,7 +1150,7 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
   ldouble ggm1[4][5],GGm1[4][5];
   ldouble ggp1[4][5],GGp1[4][5];
   ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
-  ldouble uconm1[4],uconp1[4],ucon[4];
+  ldouble uconm1[4],uconp1[4],utconm1[4],utconp1[4],utcon[4],ucon[4];
   ldouble ucovm1[4],ucovp1[4],ucov[4];
   int idim;
 
@@ -1160,9 +1160,9 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
     {
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
-  ucon[1]=pp[istart];  ucon[2]=pp[istart+1];  ucon[3]=pp[istart+2];
-  conv_vels(ucon,ucon,whichvel,VEL4,gg,GG);  
-  conv_velscov(ucon,ucov,whichvel,VEL4,gg,GG);  
+  utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
+  conv_vels(utcon,ucon,whichvel,VEL4,gg,GG);  
+  conv_velscov(utcon,ucov,whichvel,VEL4,gg,GG);  
    
   //derivatives
   for(idim=1;idim<4;idim++)
@@ -1215,14 +1215,14 @@ calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 
      //calculating four velocity
 
-     uconm1[1]=ppm1[istart];  uconm1[2]=ppm1[istart+1];  uconm1[3]=ppm1[istart+2];
-     uconp1[1]=ppp1[istart];  uconp1[2]=ppp1[istart+1];  uconp1[3]=ppp1[istart+2];
+     utconm1[1]=ppm1[istart];  utconm1[2]=ppm1[istart+1];  utconm1[3]=ppm1[istart+2];
+     utconp1[1]=ppp1[istart];  utconp1[2]=ppp1[istart+1];  utconp1[3]=ppp1[istart+2];
 
-     conv_vels(uconm1,uconm1,whichvel,VEL4,ggm1,GGm1);
-     conv_vels(uconp1,uconp1,whichvel,VEL4,ggp1,GGp1);
+     conv_vels(utconm1,uconm1,whichvel,VEL4,ggm1,GGm1);
+     conv_vels(utconp1,uconp1,whichvel,VEL4,ggp1,GGp1);
 
-     conv_velscov(uconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
-     conv_velscov(uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
+     conv_velscov(utconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
+     conv_velscov(utconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
 
      //dices_21(uconm1,ucovm1,ggm1);
      //dices_21(uconp1,ucovp1,ggp1);

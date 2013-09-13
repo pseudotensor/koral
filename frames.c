@@ -487,12 +487,12 @@ calc_Lorentz_lab2ff(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   int verbose=0;
 
   //calculating the four-velocity of fluid in lab frame
-  ldouble ucon[4],ucov[4],vpr[3];
-  ucon[1]=pp[2];
-  ucon[2]=pp[3];
-  ucon[3]=pp[4];
-  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(ucon,ucov,VELPRIM,VEL4,gg,GG);
+  ldouble utcon[4],ucon[4],ucov[4],vpr[3];
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
+  conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
 
   if(verbose>0) print_4vector(ucon);
 
@@ -542,12 +542,12 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   int verbose=0;
 
   //calculating the four-velocity of fluid in lab frame
-  ldouble wcon[4],wcov[4];
-  wcon[1]=pp[2];
-  wcon[2]=pp[3];
-  wcon[3]=pp[4];
-  conv_vels(wcon,wcon,VELPRIM,VEL4,gg,GG);
-  conv_velscov(wcon,wcov,VELPRIM,VEL4,gg,GG);
+  ldouble wcon[4],wtcon[4],wcov[4];
+  wtcon[1]=pp[2];
+  wtcon[2]=pp[3];
+  wtcon[3]=pp[4];
+  conv_vels(wtcon,wcon,VELPRIM,VEL4,gg,GG);
+  conv_velscov(wtcon,wcov,VELPRIM,VEL4,gg,GG);
  
   if(verbose>0) print_4vector(wcon);
 
