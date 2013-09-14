@@ -94,7 +94,8 @@ if(podpierd<0. || Rcyl<10.)// outside donut
     //MYCOORDS vector potential to calculate B's
     ldouble Acov[4];
     Acov[0]=Acov[1]=Acov[2]=0.;
-    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
+    //Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.);
 
     pp[B1]=0.;
     pp[B2]=0.;

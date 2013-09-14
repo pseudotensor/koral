@@ -1,4 +1,4 @@
 //scattering
 
-return  kappaCGS2GU(0.34)*rho;
+return  kappaCGS2GU(0.4)*rho;
 

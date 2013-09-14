@@ -731,7 +731,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //testing if entropy increased after advection
       /***************************/
 
-      calc_primitives(ix,iy,iz,1);
+      //calc_primitives(ix,iy,iz,1);
     }
      
   //**********************************************************************
@@ -739,7 +739,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   
   //hd fixup after advection step
-  cell_fixup_hd();
+  //cell_fixup_hd();
 
   //**********************************************************************
   //**********************************************************************
@@ -782,14 +782,41 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	} 
 #endif
 
+      /***************************/
+      //testing if entropy increased after advection
+      /***************************/
+
+      calc_primitives(ix,iy,iz,1);
+    }
+
+   //**********************************************************************
+   //**********************************************************************
+   //**********************************************************************
+  
+   //hd fixup after advection step
+   cell_fixup_hd();
+
+   //**********************************************************************
+   //**********************************************************************
+   //**********************************************************************
+
+
+ //again over cells - source terms
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+   for(ii=0;ii<Nloop_0;ii++) //domain 
+    {
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+
       /************************************************************************/
       /********************** RADIATION ***************************************/
       /************************************************************************/
 #ifndef SKIPRADSOURCE
 #ifdef RADIATION
 
-      //update primitives / correct conserved
-      calc_primitives(ix,iy,iz,0);
+      //no need for it - already updated
+      //calc_primitives(ix,iy,iz,0);
 
 #ifdef IMPLICIT_LAB_RAD_SOURCE
       implicit_lab_rad_source_term(ix,iy,iz,dt);

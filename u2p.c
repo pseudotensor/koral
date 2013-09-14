@@ -214,30 +214,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	}
 #endif
     }
-
-  /*
-  if(u2pret<0) 
-    {
-      if(verbose>2)
-	printf("u2p_hot err at %d,%d,%d >>> %d <<< %e %e\n",geom->ix,geom->iy,geom->iz,u2pret,pp[0],pp[1]);
-
-      if(u2pret==-105) 
-	//negative rho but everything else right (u2pret==-105)
-	{
-	  if(1)
-	    {
-	      printf("neg rho after hot: %e (%d) at %d %d\n",pp[0],u2pret,geom->ix,geom->iy);
-	      //print_Nvector(uu,NV);
-	      print_Nvector(pp,NV);
-	      //getchar();
-	    }
-	  
-	  pp[0]=RHOFLOOR; 
-	  ret=-2; //to ask for conserved update and fixup
-	  u2pret=0;
-	}
-    }
-  */
  
   if(ALLOWENTROPYU2P)
     if(u2pret<0)
@@ -260,28 +236,18 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
     
 	if(u2pret<0)
 	  {
-	    //test
-	    //printf("u2p_entr err     >>> %d <<< %d %d\n",u2pret,geom->ix,geom->iy);getch();
-	    //************************************
-
-
-	    if(verbose>1 && u2pret!=-103 && u2pret!=-107)
+	    ret=-2;
+	    
+	    if(verbose>1)
 	      {
 		printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
-		//exit(0); //should not always die because may happe in intermediate step within the implicit solver
 	      }
 
 	    //test, to print it out 
 	    //u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
 	    //getchar();
 
-	    if(u2pret==-107)
-	      //solver converged but p2u(u2p()).neq.1
-	      //requesting fixup
-	      {
-		ret=-2;
-	      }
-
+	    /*
 	    if(u2pret==-103 && 0)  //TODO: work out hotmax
 	      //solver went rho->D meaning entropy too large 
 	      //imposing URHOLIMIT 
@@ -305,16 +271,17 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 		    u2pret=0;
 		  }		    
 	      }
+	    */
 	  }	
       }
 
+  /*
   if(ALLOWCOLDU2P)
     if(u2pret<0.)
       {
 	//***********************************
 	//cold RHD - assuming u=SMALL
 	ret=-2;
-	//u2pret=u2p_cold(uu,pp,ggg);
 	u2pret=u2p_solver(uu,pp,ggg,U2P_COLD,0);
 	//************************************
 
@@ -324,6 +291,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	      printf("u2p_cold err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 	    }
       }
+  */
 
   if(u2pret<0)
     {
@@ -1014,7 +982,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
   ldouble f0,f1,dfdW,err;
-  ldouble CONV=1.e-6; //looser check when converged in terms of W?
+  ldouble CONV=1.e-8; //looser check when converged in terms of W?
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};

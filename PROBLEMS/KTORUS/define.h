@@ -7,11 +7,12 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADWAVESPEEDLIMITER
 //#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
 //#define SKIPRADSOURCE
+
 /************************************/
 //magnetic choices
 /************************************/
@@ -29,6 +30,7 @@
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
+#define GDETIN 1
 
 /************************************/
 //viscosity choices
@@ -58,7 +60,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.9
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -68,10 +70,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.2-MKS1R0))
-#define MAXX (log(100.-MKS1R0))
-#define NX 120
-#define NY 80
+#define MINX (log(1.6-MKS1R0))
+#define MAXX (log(500.-MKS1R0))
+#define NX 200
+#define NY 140
 #define NZ 1
 #endif
 
@@ -100,13 +102,12 @@
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
-#define GAMMA (4./3.)
+#define GAMMA (5./3.)
 #define NPOLI 3.
-#define RZERO 30
+#define RZERO 40
 #define RHOZERO rhoCGS2GU(1.e-2) 
-#define ELLA 0.2
-#define VSZERO 3.6e-2//5.6e
-#define ELL 4.2
+#define ELLA 0.35
+#define VSZERO 2.6e-2//5.6e
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
