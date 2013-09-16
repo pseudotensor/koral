@@ -878,8 +878,6 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])+fabs(dt*ms[2])); else err[1]=0.;
 	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])+fabs(dt*ms[3])); else err[2]=0.;
 	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])+fabs(dt*ms[4])); else err[3]=0.;
-
-	  //printf(";; %e %e %e %e %e\n",f[3],fabs(uu[4]),fabs(uu0[4]),fabs(dt*gdetu*Gi[3]),fabs(dt*ms[4]));
 	}
       if(whichprim==RAD) //rad-primitives
 	{
@@ -1009,9 +1007,9 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
       f[2]=pp[FY0]-pp[VY];
       f[3]=pp[FZ0]-pp[VZ];
 
-      err[1]=fabs(f[1])/(fabs(pp[FX0])+fabs(pp[VX]));
-      err[2]=fabs(f[2])/(fabs(pp[FY0])+fabs(pp[VY]));
-      err[3]=fabs(f[3])/(fabs(pp[FZ0])+fabs(pp[VZ]));
+      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(pp[FX0])+fabs(pp[VX])); else err[1]=0.;
+      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(pp[FY0])+fabs(pp[VY])); else err[2]=0.;
+      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(pp[FZ0])+fabs(pp[VZ])); else err[3]=0.;
     }
 
   //print_4vector(err);
@@ -1668,8 +1666,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       if(rettemp<0)
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
 
-      if(rettemp<0) u2pret=-2; //to return error
-      else u2pret=0;
+      if(rettemp<0) //to return error if neither entropy or energy inversion succeeded
+	u2pret=-2; 
+      else 
+	u2pret=0;
 	      
       ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
@@ -1681,6 +1681,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]-dt*ms[3]);
       uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]-dt*ms[4]);
       u2pret=u2p_rad(uu,pp,geom,corr);
+
+      if(corr>0) //if final solution hit ceiling, discard 
+	{
+	  //u2pret=-2;
+	  //printf("discarding gammamax solution at %d %d\n",geom->ix,geom->iy);getch();
+	}
     }    
   if(u2pret<-1) return -1;
   
@@ -1841,6 +1847,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 000th ****
  
+  /*
+
   PLOOP(iv) 
   {
     pp0[iv]=pp00[iv];
@@ -1853,20 +1861,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     params[0]=RAD;
   else
     params[0]=MHD;
-    
-
-  //test
-  //int ret1;
-  //ret1=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  //if(geom.iy==NY/2 && geom.ix>50) verbose=2;
-  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  //test
-  //leaving primitives intact
-  //deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
-  //return 0; //whether to continue or not
  
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
   if(ret==0) return 0;
 
   PLOOP(iv) 
@@ -1879,30 +1875,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[3]=0;
   if(params[0]==RAD) params[0]=MHD;
   else params[0]=RAD;
-  //test
-  //int ret2;
-  //ret2=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  /*
-  //test  
-  if(ret1==0 || ret2==0)
-    {
-      if(ret1==0 && ret2!=0)
-	{
-	  fprintf(fout_fail,"2 %d %e %e %e %e %e %e %e %e %e %e %e %e\n",
-		  ret,xi1,xi2,pp0[UU],-Rtt0,uu0[UU],uu0[VX],uu0[VY],uu0[VZ],uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]);
-	  fflush(fout_fail);
-	}
-    }
-  
-  //test
-  //leaving primitives intact
-  deltas[0]=deltas[1]=deltas[2]=deltas[3]=0.;
-  return 0; //whether to continue or not
-  */
-
   if(ret==0) return 0;
 
   PLOOP(iv) 
@@ -1919,14 +1893,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     params[0]=MHD;
     
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  //test
-  /*
-  fprintf(fout_fail,"3 %d %e %e %e %e %e %e %e %e %e %e %e %e\n",
-	  ret,xi1,xi2,pp0[UU],-Rtt0,uu0[UU],uu0[VX],uu0[VY],uu0[VZ],uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]);
-  fflush(fout_fail);
-  */
-  
   if(ret==0) return 0;
  
   PLOOP(iv) 
@@ -1940,30 +1906,30 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(params[0]==RAD) params[0]=MHD;
   else params[0]=RAD;
 
-
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  //test
-  /*
-  fprintf(fout_fail,"4 %d %e %e %e %e %e %e %e %e %e %e %e %e\n",
-	  ret,xi1,xi2,pp0[UU],-Rtt0,uu0[UU],uu0[VX],uu0[VY],uu0[VZ],uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]);
-  fflush(fout_fail);
-  */
-
   if(ret==0) return 0;
+
+  */
 
   //backup method - interpolating between zero and LTE state
 
+  //verbose=2;
+
   params[1]=RADIMPLICIT_LTEEQ;
   params[3]=0;
-  params[0]=-1;
+   if(Ehat<1.e-2*pp0[UU])
+    params[0]=RAD;
+  else
+    params[0]=MHD;
 
-  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   if(ret==0) 
     {
       fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (subdom) worked, xi1/xi2 : %e %e\n",
 	      geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
+      //printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (subdom) worked, xi1/xi2 : %e %e\n",
+      //geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
       fflush(fout_fail);
     }
 
@@ -1980,6 +1946,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	{
 	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
 		  geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
+	  //printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
+	  //geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
 	  fflush(fout_fail);
 	}
     }
@@ -2017,7 +1985,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       f_metric_source_term_arb(pp0,&geom,ms);
 #endif
       
-      //returns corrections to radiative primitives
+      //returns corrections to radiative primitives - TODO - extra treatment?
       deltas[0]=uu[EE0]-uu0[EE0]-dt*ms[EE0];
       deltas[1]=uu[FX0]-uu0[FX0]-dt*ms[FX0];
       deltas[2]=uu[FY0]-uu0[FY0]-dt*ms[FY0];
@@ -2032,6 +2000,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //****
   //nothing worked - allow for still solution or ask for fixup
   fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
+	  geom.ix,geom.iy,geom.iz,global_time,nfout1);
+  printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 	  geom.ix,geom.iy,geom.iz,global_time,nfout1);
 
   set_cflag(RADFIXUPFLAG,ix,iy,iz,1);

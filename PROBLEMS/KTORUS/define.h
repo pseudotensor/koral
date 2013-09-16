@@ -72,8 +72,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.6-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
-#define NX 200
-#define NY 140
+#define NX 120
+#define NY 80
 #define NZ 1
 #endif
 
