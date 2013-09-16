@@ -111,6 +111,7 @@ int nfout1;
 
 //some macros
 #define my_max(x,y) (x>y?x:y)
+#define my_max3(x,y,z) (x>my_max(y,z)?x:my_max(y,z))
 
 //geometry structure
 struct geometry
