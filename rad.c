@@ -1011,14 +1011,16 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
       f[2]=pp[FY0]-pp[VY];
       f[3]=pp[FZ0]-pp[VZ];
 
+      //this one avoid spending too much time around only one zero vel component
       ldouble velnorm=my_max3((fabs(pp[FX0])+fabs(pp[VX]))*sqrt(geom->gg[1][1]),
 			      (fabs(pp[FY0])+fabs(pp[VY]))*sqrt(geom->gg[2][2]),
 			      (fabs(pp[FZ0])+fabs(pp[VZ]))*sqrt(geom->gg[3][3]));
       
+      /*
       if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(pp[FX0])+fabs(pp[VX])); else err[1]=0.;
       if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(pp[FY0])+fabs(pp[VY])); else err[2]=0.;
       if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(pp[FZ0])+fabs(pp[VZ])); else err[3]=0.;
-      
+      */
       
       if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(velnorm); else err[1]=0.;
       if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(velnorm); else err[2]=0.;
@@ -1169,6 +1171,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       ldouble gamma2=1.+qsq;
       printf("gamma gas: %e\n\n",sqrt(gamma2));
 
+      ldouble bcon[4],bcov[4],bsq;
+      calc_bcon_prim(pp0,bcon,geom);
+      indices_21(bcon,bcov,geom->gg); 
+      bsq = dot(bcon,bcov);
+      printf("bsq: %e\n\n",bsq);
+
       qsq=0.;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
@@ -1249,6 +1257,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   ldouble CONV = 1.e-8;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
+
+  if(whicheq==RADIMPLICIT_LTEEQ)
+    MAXITER=150;
 
   int sh;
 
@@ -1357,7 +1368,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 		//EPS of the geometrical mean
 		//helps solve large contrast problems
-		//but to be tested again
+		//but to be tested again!
 		del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
 	      }
 	    else //decreasing velocity
@@ -1564,7 +1575,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      if(corr[0]>0)
 		{
 		  if(verbose) printf("corr: %d\n",corr[0]);
-		  u2pret=-2; //whether to allow hitting ceiling in rad
+		  u2pret=-2; //not to allow hitting ceiling in rad
 		}
 	    }    
 
@@ -1582,7 +1593,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	  else //u2p error only
 	    {
-	      xiapp/=10.; 
+	      xiapp/=2.; 
 	    }
 
 	  if(xiapp<1.e-20) 
@@ -1938,7 +1949,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
     }
-  
   */
   if(ret!=0 || 1)
     {
@@ -1979,16 +1989,52 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      fflush(fout_fail);
 	    }
 	}
-    
-      if(ret==0) //LTE worked so can combine zero and LTE states
-	{
-	  //printf("interpolating\n %e %e\n",xi1,xi2);
-	  //print_NVvector(pp0);
-	  //print_NVvector(pp);
 
+      if(ret!=0) //numerical solver for LTE didn't work; let's estimate LTE
+	{
+	  pp[RHO]=pp0[RHO];
+	  pp[B1]=pp0[B1];
+	  pp[B2]=pp0[B2];
+	  pp[B3]=pp0[B3];
+	  pp[ENTR]=pp0[ENTR];
+
+	  ldouble uconf[4],Rtt;
+	  calc_ff_Rtt(pp0,&Rtt,uconf,&geom);
+	  ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
+	  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+	  ldouble Ehat = -Rtt;
+	  ldouble ugas = pp0[UU];
+	  ldouble Etot = Ehat+ugas;
+	  
+	  pp[VX]=pp0[VX] + Ehat/Etot * (pp0[FX0] - pp0[VX]);
+	  pp[VY]=pp0[VY] + Ehat/Etot * (pp0[FY0] - pp0[VY]);
+	  pp[VZ]=pp0[VZ] + Ehat/Etot * (pp0[FZ0] - pp0[VZ]);
+
+	  pp[FX0]=pp[VX];
+	  pp[FY0]=pp[VY];
+	  pp[FZ0]=pp[VZ];
+
+	  //calculates LTE temperature
+	  ldouble TLTE=calc_LTE_temp(pp,&geom);	   //why produces infs?
+	  //ldouble TLTE=calc_LTE_state_temp(pp,&geom);
+
+	  pp[UU]=calc_PEQ_ufromTrho(TLTE,pp[RHO]);
+	  pp[EE0]=calc_LTE_EfromT(TLTE);
+	  
+
+	  printf("%d %d -> backup squared\n\n",ix,iy);
+	  printf("%e %e | %e %e -> %e\n",Ehat,ugas,calc_LTE_TfromE(pp0[EE0]),T,TLTE);
+	  //print_primitives(pp0);
+	  //print_primitives(pp);
+	  //getch();
+	   
+	  ret=0; //consider this success
+	}
+    
+      if(ret==0) //LTE worked so can combine zero and LTE state (in pp[])
+	{
 	  ldouble enfac = step_function(log10(xi1),2.);
 	  ldouble momfac = step_function(log10(xi2),2.);
-	  //printf(" %e %e\n",enfac,momfac);
 
 	  pp[UU]=pp0[UU]+enfac*(pp[UU]-pp0[UU]);
 	  pp[EE0]=pp0[EE0]+enfac*(pp[EE0]-pp0[EE0]);
@@ -4089,6 +4135,85 @@ calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
   
 }
 
+//calculates LTE state and return temperature
+int
+calc_LTE_state_temp(ldouble *pp,void *ggg)
+{
+  int i,j;
+  ldouble Rtt,Eff,ucon[4],ugas;
+  
+  calc_ff_Rtt(pp,&Rtt,ucon,ggg);
+  Eff=-Rtt; //en.density of radiation in the fluid frame
+  ugas=pp[UU];
+  
+  ldouble C = -(Eff + ugas);
+  ldouble kt = K_BOLTZ/MU_GAS/M_PROTON;
+  ldouble A = 4.*SIGMA_RAD*pow(GAMMAM1/pp[RHO]/kt,4.);
+  ldouble Trad=calc_LTE_TfromE(Eff);
+  ldouble Tgas=calc_PEQ_Tfromurho(ugas,pp[RHO]);
+
+  ldouble cbrtnaw=cbrt(9.*A + Sqrt(3.)*Sqrt(27.*Power(A,2.) - 256.*Power(A,3.)*Power(C,3.)));
+  //troublesome
+  
+  /*
+  ldouble ugasLTE=-Sqrt((4*cbrt(2./3.)*C)/
+		  cbrtnaw +  cbrtnaw/
+		   (cbrt(2.*3.*3.)*A))/2. +
+    Sqrt((-4*cbrt(2./3.)*C)/cbrtnaw - cbrtnaw/(cbrt(2.*3.*3.)*A) +
+	 2./(A*Sqrt((4*cbrt(2./3.)*C)/cbrtnaw + cbrtnaw/(cbrt(2.*3.*3.)*A))))/2.;
+  */
+  
+  ldouble ugasLTE=0.;
+
+  gsl_complex z0,z1,z2,z3;
+  gsl_poly_complex_solve_quartic (0.,0.,1./A,C/A,
+				  &z0,&z1,&z2,&z3);
+
+  if(fabs(GSL_IMAG(z0)) < SMALL && GSL_REAL(z0)>0. && GSL_REAL(z0)<-C)  ugasLTE=GSL_REAL(z0);
+  if(fabs(GSL_IMAG(z1)) < SMALL && GSL_REAL(z1)>0. && GSL_REAL(z1)<-C) ugasLTE=GSL_REAL(z1);
+  if(fabs(GSL_IMAG(z2)) < SMALL && GSL_REAL(z2)>0. && GSL_REAL(z2)<-C) ugasLTE=GSL_REAL(z2);
+  if(fabs(GSL_IMAG(z3)) < SMALL && GSL_REAL(z3)>0. && GSL_REAL(z3)<-C) ugasLTE=GSL_REAL(z3);
+ 
+  if(isnan(ugasLTE) || 1)
+    {
+      //      gsl_complex z0,z1,z2,z3;
+      //      gsl_poly_complex_solve_quartic (0.,0.,1./A,C/A,
+      //&z0,&z1,&z2,&z3);
+
+      printf("%e\n%e + %e i\n%e + %e i\n%e + %e i\n%e + %e i\n",
+	     ugasLTE,GSL_REAL(z0),GSL_IMAG(z0),
+	     GSL_REAL(z1),GSL_IMAG(z1),
+	     GSL_REAL(z2),GSL_IMAG(z2),
+	     GSL_REAL(z3),GSL_IMAG(z3));
+
+
+      print_Nvector(pp,NV);
+      printf("%e %e %e | %e %e | %e %e\n",Eff,ugas,pp[RHO],Tgas,Trad,A,C);
+     
+      //_err("calc_LTE_state() provided nan\n");
+      //return -1;
+    }
+
+  ugasLTE=GSL_REAL(z0);
+  
+  ldouble EffLTE = -C - ugasLTE;
+  ldouble TradLTE=calc_LTE_TfromE(EffLTE);
+  ldouble TgasLTE=calc_PEQ_Tfromurho(ugasLTE,pp[RHO]);
+
+  
+  printf("Trad: %e -> %e\nTgas: %e -> %e\nurad: %e -> %e\nugas: %e -> %e\n\n",
+	 Trad,TradLTE,Tgas,TgasLTE,
+	 Eff,EffLTE,ugas,ugasLTE)
+    ;getchar();
+  
+
+  
+  return TgasLTE;
+
+  
+}
+
+ 
  
 //calculates LTE temperature
 ldouble
@@ -4140,11 +4265,12 @@ calc_LTE_temp(ldouble *pp,void *ggg)
   TgasLTE=calc_PEQ_Tfromurho(ugas,rho);
   
   
-  /*
-    printf("Trad: %e -> %e\nTgas: %e -> %e\n\n",
-	 Trad,TradLTE,Tgas,TgasLTE)
-    ;getchar();
-  */
+  
+    printf("%e %e Trad: %e -> %e\nTgas: %e -> %e\n\n",
+	   Ehat,ugas,
+	   Trad,TradLTE,Tgas,TgasLTE);
+      //  ;getchar();
+  
   
 
   return TradLTE;  

@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-//#define RESTARTNUM 359
+#define RESTART
+#define RESTARTNUM 400
 
 /************************************/
 //radiation choices
@@ -43,7 +43,7 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define UURHORATIOMIN 1.e-10
+#define UURHORATIOMIN 1.e-8
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
 #define EERHORATIOMAX 1.e20
@@ -60,7 +60,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
+#define BHSPIN 0.9
 
 /************************************/
 //coordinates / resolution
@@ -70,10 +70,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
+#define MINX (log(1.2-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
-#define NX 120
-#define NY 80
+#define NX 200
+#define NY 140
 #define NZ 1
 #endif
 

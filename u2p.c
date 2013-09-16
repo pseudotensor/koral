@@ -372,6 +372,8 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   struct geometry *geom
     = (struct geometry *) ggg;
 
+  if(geom->ix==24 && geom->iy==6) verbose=1;
+
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
   GG=geom->GG;
@@ -384,7 +386,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   //rho too small
   if(pp[0]<RHOFLOOR) 
     {
-      if(verbose || 1) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix,geom->iy,pp[0]);
+      if(verbose) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix,geom->iy,pp[0]);
       pp[0]=RHOFLOOR; ret=-1; 
     }
 
@@ -459,6 +461,13 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       pp[RHO]*=magpre/(B2RHORATIOMAX*pp[RHO]);
       ret=-1;      
       if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
+    }
+
+  if(magpre>B2UURATIOMAX*pp[UU]) 
+    {
+      pp[UU]*=magpre/(B2UURATIOMAX*pp[UU]);
+      ret=-1;      
+      if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
     }
 #endif
 
