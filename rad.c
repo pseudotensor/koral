@@ -1884,7 +1884,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 000th ****
  
-  /*
   PLOOP(iv) 
   {
     pp0[iv]=pp00[iv];
@@ -1949,9 +1948,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
     }
-  */
-  if(ret!=0 || 1)
+  
+  if(ret!=0)
     {
+      /*
+
       //backup method - interpolating between zero and LTE state
       params[1]=RADIMPLICIT_LTEEQ;
       params[3]=0;
@@ -1989,9 +1990,16 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      fflush(fout_fail);
 	    }
 	}
+      */
 
       if(ret!=0) //numerical solver for LTE didn't work; let's estimate LTE
 	{
+	  fprintf(fout_fail,"rad backup LTE squared > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
+		      geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
+	  fflush(fout_fail);
+	  printf("rad backup LTE squared > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
+		      geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
+
 	  pp[RHO]=pp0[RHO];
 	  pp[B1]=pp0[B1];
 	  pp[B2]=pp0[B2];
@@ -2015,19 +2023,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  pp[FZ0]=pp[VZ];
 
 	  //calculates LTE temperature
-	  ldouble TLTE=calc_LTE_temp(pp,&geom);	   //why produces infs?
-	  //ldouble TLTE=calc_LTE_state_temp(pp,&geom);
+	  ldouble TLTE=calc_LTE_temp(pp0,&geom);	   
+	  if(TLTE<0.)
+	    ret=-1;
 
 	  pp[UU]=calc_PEQ_ufromTrho(TLTE,pp[RHO]);
 	  pp[EE0]=calc_LTE_EfromT(TLTE);
 	  
-
-	  printf("%d %d -> backup squared\n\n",ix,iy);
-	  printf("%e %e | %e %e -> %e\n",Ehat,ugas,calc_LTE_TfromE(pp0[EE0]),T,TLTE);
-	  //print_primitives(pp0);
-	  //print_primitives(pp);
-	  //getch();
-	   
 	  ret=0; //consider this success
 	}
     
@@ -2070,7 +2072,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(ret!=0)
     {
       //report failure and stop
-      return -1;
+      //return -1;
   
       //****
       //nothing worked - allow for still solution or ask for fixup
@@ -4221,11 +4223,16 @@ calc_LTE_temp(ldouble *pp,void *ggg)
 {
   int i,j;
   ldouble Rtt,Ehat,ucon[4],ugas0,ugas,rho,Ehat0;
-  
+  int verbose=0;
+
   calc_ff_Rtt(pp,&Rtt,ucon,ggg);
   Ehat=-Rtt; //en.density of radiation in the fluid frame
   ugas=pp[UU];
   rho=pp[RHO];
+
+  ldouble Ehat00,ugas00;
+  Ehat00=Ehat;
+  ugas00=ugas;
     
   ldouble C = (Ehat + ugas);
   ldouble kt = K_BOLTZ/MU_GAS/M_PROTON;
@@ -4235,44 +4242,61 @@ calc_LTE_temp(ldouble *pp,void *ggg)
   ldouble Trad=calc_LTE_TfromE(Ehat);
   ldouble Tgas=calc_PEQ_Tfromurho(ugas,pp[RHO]);
 
-  ldouble ccc,TradLTE,TgasLTE;
-  if(ugas<Ehat)
+  if(verbose)
     {
+      printf("%e %e %e\n",C,Trad,Tgas);
+      printf("= %e %e\n",Ehat,ugas);
+    }
+  
+  ldouble ccc,TradLTE,TgasLTE;
+  int iter=0;
+
+  if(ugas00>Ehat00)
+    {
+      ugas=ugas00;
       do
 	{
+	  iter++;
 	  ugas0=ugas;
 	  ugas=(kt*rho/GAMMAM1)*sqrt(sqrt((C-ugas)/arad));
 	  ccc=fabs((ugas-ugas0)/ugas0);
+	  if(verbose) printf(">> %e %e\n",ugas,ccc);
 	}
-      while(ccc>1.e-8);
+      while(ccc>1.e-8 && iter<50);
       Ehat = C - ugas;
     }
-  else
+  
+  
+  if(ugas00<=Ehat00)
     {
+      Ehat=Ehat00;
       do
 	{
+	  iter++;
 	  Ehat0=Ehat;
-	  Ehat=arad*pow(GAMMAM1*(C-Ehat)/rho/kt,4.);
+	  //	  Ehat=arad*pow(GAMMAM1*(C-Ehat)/rho/kt,4.);
+	  Ehat = C - sqrt(sqrt(Ehat/arad))*kt*rho/GAMMAM1;
 	  ccc=fabs((Ehat-Ehat0)/Ehat0);
+	  if(verbose) printf("> %e %e %e\n",Ehat0,Ehat,ccc);
 	}
-      while(ccc>1.e-8);
+      while(ccc>1.e-8 && iter<50);
       ugas = C - Ehat;
     }
   
-  //TODO: when comparable solve quartic
+
+  if(!isfinite(ugas) || iter>=50)
+    {
+      printf("LTE_temp failed\n");
+      return -1.;
+    }
+      
+
+  //TODO: when failed solve quartic
 
   TradLTE=calc_LTE_TfromE(Ehat);
   TgasLTE=calc_PEQ_Tfromurho(ugas,rho);
   
   
-  
-    printf("%e %e Trad: %e -> %e\nTgas: %e -> %e\n\n",
-	   Ehat,ugas,
-	   Trad,TradLTE,Tgas,TgasLTE);
-      //  ;getchar();
-  
-  
-
   return TradLTE;  
 }
 

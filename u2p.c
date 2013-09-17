@@ -372,8 +372,6 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   struct geometry *geom
     = (struct geometry *) ggg;
 
-  if(geom->ix==24 && geom->iy==6) verbose=1;
-
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
   GG=geom->GG;
