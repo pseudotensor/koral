@@ -210,7 +210,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  ldouble s1=exp(uu[ENTR]/gdetu/ucon[0]/pp[RHO]);
 	  ldouble s2=exp(pp[ENTR]/pp[RHO]);
 	  
-	  if(s2/s1 < 0.9)
+	  if(s2/s1 < 0.999)
 	    {  
 	      //go to entropy
 	      u2pret=-1;
