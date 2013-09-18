@@ -145,7 +145,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
-  gdet=geom.gdet;gdetu=gdet;
+  gdet=geom->gdet;gdetu=gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
