@@ -142,9 +142,13 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   struct geometry *geom
    = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5];
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
+  gdet=geom.gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   int verbose=1;
   int hdcorr=0;
@@ -181,7 +185,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
     ppold[iv]=pp[iv];
 
   //negative uu[0] = rho u^t
-  if(uu[0]<GAMMAMAXHD*RHOFLOOR) 
+  if(uu[0]/gdetu<GAMMAMAXHD*RHOFLOOR) 
     {
       printf("at %d %d %d neg uu[0] - requesting fixup or imposing floors\n",geom->ix,geom->iy,geom->iz);
       pp[0]=RHOFLOOR; //used when not fixin up
@@ -203,7 +207,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  //by comparing the Lagrangian uu[ENTR] value and the one from u2p_hot
 	  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
 	  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-	  ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
+	  ldouble s1=exp(uu[ENTR]/gdetu/ucon[0]/pp[RHO]);
 	  ldouble s2=exp(pp[ENTR]/pp[RHO]);
 	  
 	  if(s2/s1 < 0.9)
