@@ -456,16 +456,16 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   
   if(magpre>B2RHORATIOMAX*pp[RHO]) 
     {
+      if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
       pp[RHO]*=magpre/(B2RHORATIOMAX*pp[RHO]);
       ret=-1;      
-      if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
     }
 
   if(magpre>B2UURATIOMAX*pp[UU]) 
     {
+      if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
       pp[UU]*=magpre/(B2UURATIOMAX*pp[UU]);
       ret=-1;      
-      if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
     }
 #endif
 
