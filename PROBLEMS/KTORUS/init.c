@@ -24,11 +24,10 @@ ldouble podpierd = 1. - GAMMA/(VSZERO*VSZERO)*(PsiT-PsiT0)/(NPOLI+1.);
 
 //if(geom.iy==NY/2){printf("%e %e %e\n",geomBL.xx,geomBL.yy,(PsiT-PsiT0));getch();}
 
-if(podpierd<0. || Rcyl<10.)// outside donut
+if(podpierd<0. || Rcyl<6.) //outside donut
   {
     //ambient
     set_hdatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
-    //pp[VZ]=0.01/geom.xx/sqrt(geom.xx);
 #ifdef RADIATION
     set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
 #endif
@@ -47,7 +46,7 @@ if(podpierd<0. || Rcyl<10.)// outside donut
     uint = pgas / GAMMAM1;
     Vphi=ell/Rcyl/Rcyl;
 
-    //3-velocity in BL transformed to rel-velocity
+    //3-velocity in BL transformed to MYCOORDS
     ldouble ucon[4]={0.,0.,0.,Vphi};
     conv_vels(ucon,ucon,VEL3,VELPRIM,geomBL.gg,geomBL.GG);
    
@@ -84,7 +83,6 @@ if(podpierd<0. || Rcyl<10.)// outside donut
 
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
     prad_ff2lab(pp,pp,&geomBL);
-
 #endif
 
     //transforming primitives from BL to MYCOORDS
@@ -94,15 +92,14 @@ if(podpierd<0. || Rcyl<10.)// outside donut
     //MYCOORDS vector potential to calculate B's
     ldouble Acov[4];
     Acov[0]=Acov[1]=Acov[2]=0.;
-    //Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
-    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.);
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
 
     pp[B1]=0.;
     pp[B2]=0.;
     pp[B3]=Acov[3];
 #endif
 
-   }
+  }
 
 /*
 #ifdef RADIATION
@@ -117,6 +114,8 @@ if(podpierd<0. || Rcyl<10.)// outside donut
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //to conserved
 p2u(pp,uu,&geom);
+
+
 
 /***********************************************/
 

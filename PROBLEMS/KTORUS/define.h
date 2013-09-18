@@ -2,7 +2,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 11
+#define RESTARTNUM 88
 
 /************************************/
 //radiation choices
@@ -30,7 +30,6 @@
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
-#define GDETIN 1
 
 /************************************/
 //viscosity choices
@@ -50,9 +49,9 @@
 #define EEUURATIOMIN 1.e-20
 #define EEUURATIOMAX 1.e20
 #define B2UURATIOMIN 0.
-#define B2UURATIOMAX 1.e8
+#define B2UURATIOMAX 10000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 1.e2
+#define B2RHORATIOMAX 100.
 #define GAMMAMAXRAD 50.
 #define GAMMAMAXHD 50.
 
@@ -60,7 +59,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -72,8 +71,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.6-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
-#define NX 200
-#define NY 140
+#define NX 180
+#define NY 120
 #define NZ 1
 #endif
 
@@ -87,7 +86,6 @@
 /************************************/
 //output
 /************************************/
-//#define PRINTINSIDEBH
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
@@ -97,17 +95,18 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 1.e1
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
-#define GAMMA (5./3.)
+#define GAMMA (4./3.)
 #define NPOLI 3.
-#define RZERO 40
+#define RZERO 30
 #define RHOZERO rhoCGS2GU(1.e-2) 
-#define ELLA 0.35
-#define VSZERO 2.6e-2//5.6e
+#define ELLA 0.2
+#define VSZERO 3.6e-2//5.6e
+#define ELL 4.2
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
