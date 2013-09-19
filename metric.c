@@ -1761,7 +1761,15 @@ coco_BL2KS(ldouble *xBL, ldouble *xKS)
   //theta
   xKS[2]=xBL[2];
   //phi
-  xKS[3]=xBL[3]+a/sqrta*atanh(sqrta/(1.-r));
+  if(NZ==1)
+    {
+      //phi - let's assume phi constant no to break 2d cartesian output
+      xKS[3]=xBL[3];
+    }
+  else
+    {
+      xKS[3]=xBL[3]+a/sqrta*atanh(sqrta/(1.-r));
+    }
 
   return 0;
 }
@@ -1779,16 +1787,22 @@ coco_KS2BL(ldouble *xKS, ldouble *xBL)
   ldouble delta=r*r-2.*r+a*a;
   ldouble sqrta=sqrt(1.-a*a);
 
-  //TODO: these transformations wrong
-
   //t
   xBL[0]=xKS[0]-2./sqrta*atanh(sqrta/(1.-r))-log(delta);
   //r
   xBL[1]=xKS[1];
   //theta
   xBL[2]=xKS[2];
-  //phi
-  xBL[3]=xKS[3]-a/sqrta*atanh(sqrta/(1.-r));
+  //phi  
+  if(NZ==1)
+    {
+      //phi - let's assume phi constant no to break 2d cartesian output
+      xBL[3]=xKS[3];
+    }
+  else
+    {      
+      xBL[3]=xKS[3]-a/sqrta*atanh(sqrta/(1.-r));
+    }
 
   return 0;
 }

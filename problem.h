@@ -71,7 +71,7 @@
 //65* MRTORUS - RMHD torus with radiation
 //66* KTORUS - RMHD Newtonian torus with radiation
 
-#define PROBLEM 63
+#define PROBLEM 66
 
 #if(PROBLEM==66)
 

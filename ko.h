@@ -399,6 +399,7 @@ ldouble calc_dlgdet_arb(ldouble *xx, int idim,int);
 int coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2);
 int coco_BL2KS(ldouble *xBL, ldouble *xKS);
 int coco_KS2BL(ldouble *xBL, ldouble *xKS);
+int coco_KS2MINK(ldouble *xBL, ldouble *xKS);
 
 //relele.c
 int calc_normalobs_4vel(ldouble GG[][5], ldouble *ncon);

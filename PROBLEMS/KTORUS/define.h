@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 88
 
 /************************************/
@@ -59,7 +59,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
+#define BHSPIN 0.9
 
 /************************************/
 //coordinates / resolution
@@ -69,7 +69,7 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
+#define MINX (log(1.2-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
 #define NX 180
 #define NY 120
@@ -95,7 +95,7 @@
 #define SILOOUTPUT 
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e1
+#define DTOUT1 1.e0
 
 /************************************/
 //common physics / torus / atmosphere

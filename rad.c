@@ -1059,7 +1059,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   int mom_over_flag;
   ldouble J[4][4],iJ[4][4];
   ldouble pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
-  ldouble f1[4],f2[4],f3[4],xxx[4],xxxbest[4],err,errbest;
+  ldouble f1[4],f2[4],f3[4],xxx[4],xxxbest[4],err,errbase,errbest;
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   for(iv=0;iv<NV;iv++)
@@ -1324,7 +1324,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  return -1;	  
 	}
 
-	  
+      errbase=err;	  
 
       //criterion of convergence on the error
       // test - should be here, not later
@@ -1369,7 +1369,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		//EPS of the geometrical mean
 		//helps solve large contrast problems
 		//but to be tested again!
-		del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
+		//del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
 	      }
 	    else //decreasing velocity
 	      {
@@ -1575,7 +1575,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      if(corr[0]>0)
 		{
 		  if(verbose) printf("corr: %d\n",corr[0]);
-		  u2pret=-2; //not to allow hitting ceiling in rad
+		  u2pret=-2; //not to allow hitting ceiling in rad when doing iterations
 		}
 	    }    
 
@@ -1607,7 +1607,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 
       //this may fail
-      /*
       if(failed==0)
 	{
 	  //criterion of convergence on relative change of quantities
@@ -1618,18 +1617,19 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
 	    }
 
-	  //if(verbose) print_4vector(f3);
+	  if(verbose) print_4vector(f3);
 	  
 	  ldouble CONVREL=1.e-6;
+	  ldouble CONVRELERR=1.e-6;
 
-	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && err<1.e-6)
+	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
 	    {
 	      if(verbose) printf("\n === success (rel.change) ===\n");
 	      break;
 	    }     
 
 	}
-      */
+      
      
 
       if(iter>MAXITER || failed==1)
@@ -2071,7 +2071,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret!=0)
     {
-      //report failure and stop
+      //report failure, stop and rerun with verbose
       //return -1;
   
       //****

@@ -89,8 +89,8 @@ int fprint_silofile(ldouble time, int num, char* folder)
 	      struct geometry geomout;
 	      fill_geometry_arb(iix,iiy,iiz,&geomout,OUTCOORDS);
 	      
-	      if(OUTCOORDS==BLCOORDS && geomout.xx<r_horizon_BL(BHSPIN))
-		continue;
+	      //if(OUTCOORDS==BLCOORDS && geomout.xx<r_horizon_BL(BHSPIN))
+	      //continue;
 
 	      int nodalindex=iz*(ny*nx) + iy*nx + ix;
 	      for(iv=0;iv<NV;iv++)
