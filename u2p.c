@@ -187,7 +187,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   //negative uu[0] = rho u^t
   if(uu[0]/gdetu<GAMMAMAXHD*RHOFLOOR) 
     {
-      printf("at %d %d %d neg uu[0] - requesting fixup or imposing floors\n",geom->ix,geom->iy,geom->iz);
+      printf("at %d %d %d neg uu[0] - requesting fixup\n",geom->ix,geom->iy,geom->iz);
       pp[0]=RHOFLOOR; //used when not fixin up
       ret=-2; //to request fixup
       u2pret=0; //to skip solvers
@@ -461,21 +461,25 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   if(magpre>B2RHORATIOMAX*pp[RHO]) 
     {
       if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
-      pp[RHO]*=magpre/(B2RHORATIOMAX*pp[RHO]);
+      ldouble factor=magpre/(B2RHORATIOMAX*pp[RHO]);
+      pp[RHO]*=factor;
+      //to keep the gas temperature constant
+      pp[UU]*=factor;
       ret=-1;      
     }
 
+  /*
   if(magpre>B2UURATIOMAX*pp[UU]) 
     {
       if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
       pp[UU]*=magpre/(B2UURATIOMAX*pp[UU]);
       ret=-1;      
     }
+  */
 #endif
 
-
   //updates entropy after floor corrections
-  pp[5]=calc_Sfromu(pp[0],pp[1]);
+  pp[5]=calc_Sfromu(pp[RHO],pp[UU]);
 
   return ret;
 }
