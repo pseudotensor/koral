@@ -50,6 +50,7 @@
 #define CYLCOORDS 5
 #define SPHCOORDS 6
 #define MKS1COORDS 7
+#define MKS2COORDS 10
 #define MCYL1COORDS 8
 #define MKER1COORDS 9
 

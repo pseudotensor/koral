@@ -34,6 +34,7 @@
 
 #define Cot(x)          (1./tan((ldouble)(x)))
 #define Csc(x)          (1./sin((ldouble)(x)))
+#define Sec(x)          (1./cos((ldouble)(x)))
 
 
 
