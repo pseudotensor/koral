@@ -246,7 +246,7 @@ calc_lumEdd()
 ldouble
 calc_lum(ldouble radius)
 {
-  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS)
+  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS)
     return -1.; //no BH
 
   int ix,iy,iz,iv;
@@ -321,7 +321,7 @@ calc_lum(ldouble radius)
 ldouble
 calc_photloc(int ix)
 {
-  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS)
+  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS)
     return -1.; //no BH
 
   ldouble tau=0.,pp[NV],xx[4],xxBL[4],dx[3];
@@ -372,7 +372,7 @@ calc_photloc(int ix)
 ldouble
 calc_mdot(ldouble radius,int type)
 {
-  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS)
+  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS)
     return -1.; //no BH
 
   int ix,iy,iz,iv;
