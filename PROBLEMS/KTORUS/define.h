@@ -7,7 +7,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADWAVESPEEDLIMITER
 //#define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
@@ -16,7 +16,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
 
@@ -66,12 +66,12 @@
 /************************************/
 #define myMKS2COORDS
 #define MKS1R0 0.
-#define MKS2R0 0.
+#define MKS2R0 1.
 #define MKS2H0 0.6
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(3.2-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
 #define MINY (0.0025*Pi/2.)
 #define MAXY (Pi-0.0025*Pi/2.)
@@ -79,14 +79,14 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild with concentration of grid points near equatorial plane
 #define MYCOORDS MKS2COORDS
-#define MINX (log(3.2-MKS1R0))
-#define MAXX (log(500.-MKS1R0))
+#define MINX (log(1.6-MKS2R0))
+#define MAXX (log(500.-MKS2R0))
 #define MINY (0.0025)
 #define MAXY (1.-0.0025)
 #endif
 
-#define NX 180
-#define NY 120
+#define NX 200
+#define NY 100
 #define NZ 1
 #define MINZ -1.
 #define MAXZ 1.
@@ -112,7 +112,7 @@
 #define GAMMA (4./3.)
 #define NPOLI 3.
 #define RZERO 30
-#define RHOZERO rhoCGS2GU(1.e-2) 
+#define RHOZERO rhoCGS2GU(1.e-2/20.) 
 #define ELLA 0.2
 #define VSZERO 3.6e-2//5.6e
 #define ELL 4.2

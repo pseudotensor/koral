@@ -378,6 +378,8 @@ int dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_BL2KS(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_KS2MKS1(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_MKS12KS(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_KS2MKS2(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_MKS22KS(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_MCYL12CYL(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_CYL2MCYL1(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_MKER12KER(ldouble *xx, ldouble dxdx[][4]);

@@ -64,13 +64,23 @@ main(int argc, char **argv)
   calc_metric();
 
   //test of MKS2
-  
-  ldouble x2[4],x1[4]={0,3,-0.1,0.1};
-  coco_N(x1,x2,MKS2COORDS,BLCOORDS);
+  /*
+  ldouble x2[4],x1[4]={0,3,1.1,0.1};
+  coco_N(x1,x2,MKS2COORDS,KSCOORDS);
   print_4vector(x1); print_4vector(x2);
-  coco_N(x2,x1,BLCOORDS,MKS2COORDS);
-  print_4vector(x1); 
-  exit(0);
+  ldouble x3[4]={0,3.,1./3.1,0.};
+  ldouble dxdx[4][4];
+  dxdx_MKS22KS(x3, dxdx);
+  print_tensor(dxdx);
+  ldouble g[4][5];
+  calc_g(x3,g);
+  print_metric(g);
+  calc_G(x3,g);
+  print_metric(g);
+  printf("Gdet: %e\n",  calc_gdet(x3));
+  exit(0);  */
+
+
   
 
   //precalculating problem related numbers
