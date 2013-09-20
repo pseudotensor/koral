@@ -1173,7 +1173,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     }
 
 
-  //entropy based on UU[1]
+  //entropy based on Etype
   pp[ENTR]=calc_Sfromu(rho,uint);
 
 #ifdef MAGNFIELD
