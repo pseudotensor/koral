@@ -65,22 +65,26 @@ main(int argc, char **argv)
 
   //test of MKS2
   /*
-  ldouble x2[4],x1[4]={0,3,1.1,0.1};
-  coco_N(x1,x2,MKS2COORDS,KSCOORDS);
-  print_4vector(x1); print_4vector(x2);
-  ldouble x3[4]={0,3.,1./3.1,0.};
+  ldouble x2[4],x1[4]={0,3.,0.000,0.};
+  coco_N(x1,x2,KSCOORDS,MKS2COORDS);
+  //print_4vector(x1); print_4vector(x2);
+  for(x2[2]=1.e-10;x2[2]<1.e-6;x2[2]*=1.01)
+    {
+      printf("%e %e\n",  x2[2],calc_gdet_arb(x2,MKS2COORDS));
+    }
+  exit(0);
+
   ldouble dxdx[4][4];
-  dxdx_MKS22KS(x3, dxdx);
+  dxdx_MKS22KS(x1, dxdx);
   print_tensor(dxdx);
   ldouble g[4][5];
-  calc_g(x3,g);
+  calc_g_arb(x1,g,MKS2COORDS);
   print_metric(g);
-  calc_G(x3,g);
+  calc_G_arb(x1,g,MKS2COORDS);
   print_metric(g);
-  printf("Gdet: %e\n",  calc_gdet(x3));
-  exit(0);  */
-
-
+  printf("Gdet: %e\n",  calc_gdet_arb(x1,MKS2COORDS));
+  exit(0);  
+  */
   
 
   //precalculating problem related numbers
@@ -112,7 +116,7 @@ main(int argc, char **argv)
 
   /*******/
   //tests of implicit solver
-  test_solve_implicit_lab(); exit(0);
+  //test_solve_implicit_lab(); exit(0);
   /*******/
 
   //prepares files

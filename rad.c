@@ -3994,7 +3994,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
       nu = 0.; 
 
   //limiting basing on diffusive wavespeed
-  ldouble MAXDIFFVEL=0.5; //max allowed vdiff
+  ldouble MAXDIFFVEL=1.; //max allowed vdiff
   ldouble MAXTOTVEL=0.75; //max allowed vdiff + vrad
 
   //limiting basing on maximal eigen value - slower and issues with tetrad  

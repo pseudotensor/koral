@@ -16,7 +16,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-#define MAGNFIELD
+//#define MAGNFIELD
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
 
@@ -35,8 +35,8 @@
 //viscosity choices
 /************************************/
 #define HDVISCOSITY NOVISCOSITY
-#define RADVISCOSITY NOVISCOSITY
-//#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY NOVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define ALPHARADVISC 1.
 
 /************************************/
@@ -71,8 +71,8 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
-#define MAXX (log(500.-MKS1R0))
+#define MINX (log(6.-MKS1R0))
+#define MAXX (log(100.-MKS1R0))
 #define MINY (0.0025*Pi/2.)
 #define MAXY (Pi-0.0025*Pi/2.)
 #endif
