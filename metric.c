@@ -2106,10 +2106,10 @@ coco_MKS22KS(ldouble *xMKS1, ldouble *xKS)
     = exp(x1) + R0
     ;
   xKS[2]
-    = x2
+    = 0.5*M_PI* (1.+Cot(M_PI/2.*H0)* Tan(H0 *M_PI* (-0.5+x2)))
     ;
   xKS[3]
-    = 0.5*M_PI* (1.+Cot(M_PI/2.*H0)* Tan(H0 *M_PI* (-0.5+x2)))
+    = x3
     ;
 
   return 0;
@@ -2562,9 +2562,8 @@ dxdx_KS2MKS2(ldouble *xx, ldouble dxdx[][4])
       dxdx[i][j]=delta(i,j);
   
   dxdx[1][1]=1./(KSx1-R0);
-  dxdx[2][2]=(2*Power(Cos(H0*Pi*(-0.5 + (0.5*H0 + 0.3183098861837907*
-              ArcTan(0.3183098861837907*(-3.141592653589793 + 2.*KSx2)*Tan(1.5707963267948966*H0)))/H0))
-		      ,2)*Tan(1.5707963267948966*H0))/(H0*Power(Pi,2));
+  dxdx[2][2]=(2*Power(Sin(1.5707963267948966 - 1.*ArcTan(0.6366197723675814*(-1.5707963267948966 + 1.*KSx2)*
+							 Tan(1.5707963267948966*H0))),2)*Tan(1.5707963267948966*H0))/(H0*Power(Pi,2));
 
   return 0;
 }
@@ -2621,8 +2620,8 @@ dxdx_MKS22KS(ldouble *xx, ldouble dxdx[][4])
       dxdx[i][j]=delta(i,j);
   
   dxdx[1][1]=exp(x1);
-  dxdx[2][2]=(H0*Power(Pi,2)*Cot(1.5707963267948966*H0)*
-	      Power(Csc(1.5707963267948966 - 1.*ArcTan(0. + 1.*Tan(H0*Pi*(-0.5 + x2)))),2))/2.;
+  dxdx[2][2]=
+    (H0*Power(Pi,2)*Cot(1.5707963267948966*H0)*Power(Sec(1.*ArcTan(1.*Tan(H0*Pi*(-0.5 + x2)))),2))/2.;
 
   return 0;
 }

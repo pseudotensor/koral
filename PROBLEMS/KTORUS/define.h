@@ -67,7 +67,7 @@
 #define myMKS2COORDS
 #define MKS1R0 0.
 #define MKS2R0 0.
-#define MKS2H0 0.7
+#define MKS2H0 0.6
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS

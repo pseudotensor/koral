@@ -27,7 +27,7 @@ main(int argc, char **argv)
 	 kappaCGS2GU(1.)
 	 );
   exit(0);
-*/
+  */
 
  
   //gsl errors off
@@ -63,6 +63,15 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+  //test of MKS2
+  
+  ldouble x2[4],x1[4]={0,3,-0.1,0.1};
+  coco_N(x1,x2,MKS2COORDS,BLCOORDS);
+  print_4vector(x1); print_4vector(x2);
+  coco_N(x2,x1,BLCOORDS,MKS2COORDS);
+  print_4vector(x1); 
+  exit(0);
+  
 
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
