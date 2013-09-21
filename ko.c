@@ -67,7 +67,7 @@ main(int argc, char **argv)
   /*
   struct geometry geom;
   fill_geometry(0,0,0,&geom);
-  ldouble pp[NV],uu[NV]={0,0,0,0,0,0.,-1.,1.5,0.,0.};
+  ldouble pp[NV],uu[NV]={0,0,0,0,0,0.,-1.,2.5,0.,0.};
   int corr;
   u2p_rad(uu,pp,&geom,&corr);
   printf("corr: %d\n",corr);

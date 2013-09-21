@@ -153,7 +153,7 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
    (gn11*Power(Rdtt,2) + 2.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 2.*gn13*Rdtt*Rdty + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 
     2.*(gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2));
 
-  //if(verbose)     printf("gamma2a: %e\n",gamma2a);
+  if(verbose)     printf("gamma2a: %e\n",gamma2a);
 
   if( gamma2a<GAMMASMALLLIMIT || !isfinite(gamma2a) ){
     gamma2b=(0.25*(-2.*Power(gn11,2)*Power(Rdtt,2) - 1.*gn11*(4.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 
@@ -169,7 +169,7 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
        2.*(gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2));
     gamma2=gamma2b;
 
-    //if(verbose)     printf("gamma2b: %e\n",gamma2b);
+    if(verbose)     printf("gamma2b: %e\n",gamma2b);
   }
   else{
     // choose
@@ -197,8 +197,9 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
   //if(isnan(gammarel2)) return -1;
   
   // check for machine error away from 1.0 that happens sometimes
-  if(isnan(gammarel2) || (gammarel2>GAMMASMALLLIMIT && gammarel2<1.0))
-    //if((gammarel2>GAMMASMALLLIMIT && gammarel2<1.0))
+  //if(isnan(gammarel2) || (gammarel2>GAMMASMALLLIMIT && gammarel2<1.0)) - WTF?
+  
+  if((gammarel2>GAMMASMALLLIMIT && gammarel2<1.0))
   {
     if(verbose) printf("Hit machine error of gammarel2=%27.20g fixed to be 1.0\n",gammarel2);
 
