@@ -63,6 +63,21 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+  //testing ceiling in rad
+  /*
+  struct geometry geom;
+  fill_geometry(0,0,0,&geom);
+  ldouble pp[NV],uu[NV]={0,0,0,0,0,0.,-1.,1.5,0.,0.};
+  int corr;
+  u2p_rad(uu,pp,&geom,&corr);
+  printf("corr: %d\n",corr);
+  print_primitives(pp);
+  ldouble Rij[4][4];
+  calc_Rij(pp,&geom,Rij);
+  print_tensor(Rij);
+  exit(0);
+  */
+
   //test of MKS2
   /*
   ldouble x2[4],x1[4]={0,3.,0.000,0.};

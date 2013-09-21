@@ -153,8 +153,9 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
    (gn11*Power(Rdtt,2) + 2.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 2.*gn13*Rdtt*Rdty + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 
     2.*(gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2));
 
+  //if(verbose)     printf("gamma2a: %e\n",gamma2a);
 
-  if( gamma2a<GAMMASMALLLIMIT || isinf(gamma2a) ){
+  if( gamma2a<GAMMASMALLLIMIT || !isfinite(gamma2a) ){
     gamma2b=(0.25*(-2.*Power(gn11,2)*Power(Rdtt,2) - 1.*gn11*(4.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 
                                                               Rdty*(4.*gn13*Rdtt + 2.*gn23*Rdtx + gn33*Rdty) + 2.*(2.*gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2)) + 
                    gn11*Rdtt*Sqrt(4.*Power(gn11,2)*Power(Rdtt,2) + Power(gn12*Rdtx + gn13*Rdty + gn14*Rdtz,2) + 
@@ -167,6 +168,8 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
       (gn11*Power(Rdtt,2) + 2.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 2.*gn13*Rdtt*Rdty + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 
        2.*(gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2));
     gamma2=gamma2b;
+
+    //if(verbose)     printf("gamma2b: %e\n",gamma2b);
   }
   else{
     // choose
