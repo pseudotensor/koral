@@ -14,22 +14,40 @@
 #define MYCOORDS MINKCOORDS //metric
 
 #define RADIATION //whether to solve for radiation (or pure hydro)
+//#define ENFORCEENTROPY
+//#define EXPLICIT_RAD_SOURCE
+//#define EDDINGTON_APR
 //#define SKIPRADSOURCE
+
+#define VERIFYENTROPYAFTERADVECTION 0
 
 #define MASS 1./MSUNCM //defines unit of length
 #define MASSCM 1.
 #define U2PPREC 1.e-7 //precision of the numerical hydro solver for conserved to primitives solver
 #define U2PRADPREC 1.e-7 //precision of the numerical radiation converter, used only for Eddington approximation
-#define RHOFLOOR 1.e-50 //floors (are not strictly enforced)
-#define UFLOOR 1.e-45
-#define EFLOOR 1.e-45
+
+#define DOFIXUPS 0
+
+/************************************/
+//rmhd floors
+/************************************/
+#define UURHORATIOMIN 1.e-50
+#define UURHORATIOMAX 1.e50
+#define EERHORATIOMIN 1.e-50
+#define EERHORATIOMAX 1.e50
+#define EEUURATIOMIN 1.e-50
+#define EEUURATIOMAX 1.e50
+#define GAMMAMAXRAD 5000.
+#define GAMMAMAXHD 5000.
+
+
 
 #define TMAX 1.e10 //end time
-#define NOUTSTOP 50. //number of outputs to stop
+#define NOUTSTOP 500. //number of outputs to stop
 //#define RADOUTPUTINZAMO
 #define RADOUTPUTINFF
 
-#define NX 100 //x-resoltution
+#define NX 300 //x-resoltution
 #define NY 1 //y-resolution
 #define NZ 1 //z=rezolution
 
@@ -47,7 +65,7 @@
 #define COPY_ZBC
 
 
-#define DTOUT1 1.e-0 //time step for outputs
+#define DTOUT1 2.e0 //time step for outputs
 #define ALLSTEPSOUTPUT 0 //0 (print every DTOUT1), 1 (print every step)
 //#define PRINTXGC_LEFT //if x-left ghost cells are to be printed out, 
 //#define PRINTXGC_RIGHT //if x-right ghost cells are to be printed out 
@@ -57,7 +75,7 @@
 #define MUGAS 1. //mean molecular weight (default = 1)
 
 //problem specific definitions
-#define NTUBE 1
+#define NTUBE 3
 
 #undef SIGMA_RAD
 #if (NTUBE==1)
@@ -84,7 +102,7 @@
 #undef DTOUT1
 #undef MINX
 #undef MAXX
-#define DTOUT1 1.e-0
+#define DTOUT1 2.e-0
 #define MINX -20.
 #define MAXX 20.
 #endif

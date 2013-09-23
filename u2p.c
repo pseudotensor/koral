@@ -138,7 +138,6 @@ calc_primitives_local(int ix,int iy,int iz,ldouble *pp)
 int
 u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 {
-
   struct geometry *geom
    = (struct geometry *) ggg;
 
@@ -213,6 +212,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  if(s2/s1 < 0.999)
 	    {  
 	      //go to entropy
+	      printf("enforcing entr at %d\n",geom->ix);
 	      u2pret=-1;
 	    }
 	}
@@ -233,9 +233,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
 
 
-	if(verbose>2)
+	if(verbose>2 || 1)
 	  {
-	    printf("u2p_entr     >>> %d <<< %e > %e\n",u2pret,u0,pp[1]);
+	    printf("u2p_entr     >>> %d %d <<< %e > %e\n",geom->ix,u2pret,u0,pp[1]);
 	  }
     
 	if(u2pret<0)
@@ -370,7 +370,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 int
 check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
-  int verbose=0;
+  //return 0;
+
+  int verbose=1;
   int ret=0;
 
   struct geometry *geom
@@ -389,7 +391,8 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   if(pp[0]<RHOFLOOR) 
     {
       if(verbose) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix,geom->iy,pp[0]);
-      pp[0]=RHOFLOOR; ret=-1; 
+      pp[0]=RHOFLOOR; 
+      ret=-1; 
     }
 
   //**********************************************************************
@@ -413,6 +416,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 
   //**********************************************************************
   //too fast
+  
   if(VELPRIM==VELR) 
     {
       ldouble qsq=0.;
@@ -443,7 +447,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 	}
     }
   //TODO: implement checks for other VELPRIM
-
+  
   //**********************************************************************
   //too magnetized
 #ifdef MAGNFIELD
@@ -479,7 +483,8 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 #endif
 
   //updates entropy after floor corrections
-  pp[5]=calc_Sfromu(pp[RHO],pp[UU]);
+  if(ret<0)
+    pp[5]=calc_Sfromu(pp[RHO],pp[UU]);
 
   return ret;
 }
@@ -1100,12 +1105,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  return -103;
 	}
 
-      //what about this?      
-      //if((fabs((W-Wprev)/Wprev)<CONV && err<1.e-4))
-      //break;
-      
     }
-  //  while((fabs((W-Wprev)/Wprev)>CONV && err>CONV*1.e3) && iter<50);
+  //while((fabs((W-Wprev)/Wprev)>CONV && err>CONV*1.e3) && iter<50);
   while(iter<50);
 
  

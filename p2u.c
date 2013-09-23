@@ -118,7 +118,7 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble rhout = rho*ut;
   ldouble Sut;
 
-  //S=pp[5] updated appropriately in u2p_hot, u2p_entropy and floors
+  //S=pp[5] updated appropriately in u2p_hot, u2p_entropy and floors so from outside
   Sut=S*ut;
 
   ldouble pre=(GAMMA-1.)*uu; 

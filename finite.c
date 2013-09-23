@@ -728,7 +728,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 	}
 
       /***************************/
-      //testing if entropy increased after advection
+      //testing if entropy increased after advection - moved to after metric
       /***************************/
 
       //calc_primitives(ix,iy,iz,1);
@@ -783,10 +783,10 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 #endif
 
       /***************************/
-      //testing if entropy increased after advection
+      //testing if entropy increased after advection and calculating post-advection primitives
       /***************************/
 
-      calc_primitives(ix,iy,iz,1);
+      calc_primitives(ix,iy,iz,VERIFYENTROPYAFTERADVECTION);
     }
 
    //**********************************************************************
@@ -823,7 +823,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 #endif
 
 #ifdef EXPLICIT_RAD_SOURCE
-      explicit_rad_source_term(ix,iy,iz,dt,gg,GG);
+      explicit_rad_source_term(ix,iy,iz,dt);
 #endif
 
 

@@ -896,7 +896,7 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
 #endif
 
 #ifdef EDDINGTON_APR
-  int ii;
+    int ii;
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -948,6 +948,7 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   
   //M1
   return u2p_rad_urf(uu,pp,ggg,corrected);
+  //return u2p_rad_urf_old(uu,pp,ggg,corrected);
   //  return 0;
 }
 

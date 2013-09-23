@@ -522,7 +522,9 @@ int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);
 
 //rad.c
 int solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *);
+int solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,ldouble *pp);
 int solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* deltas,int verbose);
+int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt);
 int apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4);
 int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5], ldouble *del4);
 int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt);

@@ -190,11 +190,11 @@ print_state_implicit_lab_4dcon(int iter, ldouble *x, ldouble *f)
 }
 
 int
-solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose)
+solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,ldouble *pp)
 {
   int i1,i2,i3,iv,i,j;
   ldouble J[4][4],iJ[4][4];
-  ldouble pp[NV],pp0[NV],uu[NV],uu0[NV],uup[NV]; 
+  ldouble pp0[NV],uu[NV],uu0[NV],uup[NV]; 
   ldouble f1[4],f2[4],f3hd[4],f3rad[4],xxx[4];
 
   ldouble (*gg)[5],(*GG)[5];
@@ -433,8 +433,8 @@ solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoubl
 	    }
 
 	  //update primitives corresponding to uu0
-	  u2p(uu0,pp0,geom,corr,fixup,0);
-	  p2u(pp0,uu0,geom);
+	  u2p(uu0,pp,geom,corr,fixup,0);
+	  p2u(pp,uu0,geom);
 	  continue;
 	}
       
@@ -1671,9 +1671,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
       pp[RHO]=(uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
-      //updating entropy
-      pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
     }
+  //updating entropy
+  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
   p2u(pp,uu,geom);
 
@@ -1693,7 +1693,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       //if(whicheq==RADIMPLICIT_ENTROPYEQ)
       if(rettemp<0)
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
-
+      
       if(rettemp<0) //to return error if neither entropy or energy inversion succeeded
 	u2pret=-2; 
       else 
@@ -1882,6 +1882,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ldouble xi2=chi*dt*(1.+(-Rtt0)/(pp0[RHO]+GAMMA*pp0[UU]));
 
   //**** 000th ****
+
+  //test
+  //ret=solve_implicit_lab_4dcon(uu0,pp0,&geom,dt,deltas,verbose,pp);
+  //if(ret!=0) return -1;
  
   PLOOP(iv) 
   {
@@ -1895,7 +1899,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     params[0]=RAD;
   else
     params[0]=MHD;
- 
+
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   if(ret!=0)
@@ -2777,6 +2781,7 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
 	}
       
       delapl[1]=-deltas[0];
+      delapl[ENTR]=-deltas[0];
       delapl[2]=-deltas[1];
       delapl[3]=-deltas[2];
       delapl[4]=-deltas[3];
@@ -2817,6 +2822,7 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
       //indices_21(Gi,Gi,geom->gg);
 
       print_4vector(deltas);
+      getchar();
       //ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
       //printf("Tgas: %e\n",T);
     }
@@ -3613,16 +3619,19 @@ apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
 /************************************************************************/
 /******* explicit radiative source term  ***********************************/
 /************************************************************************/
-int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5])
+int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt)
 {
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEEXPLICIT);   
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
 
   ldouble del4[4],delapl[NV];
   int iv;
 
   //applied explicitly directly in lab frame
   solve_explicit_lab(ix,iy,iz,dt,del4,0);
-  indices_21(del4,del4,gg);
+
+  //indices_21(del4,del4,geom.gg);
 
   apply_rad_source_del4(ix,iy,iz,del4);
 
