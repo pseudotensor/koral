@@ -233,7 +233,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
 
 
-	if(verbose>2 || 1)
+	if(verbose>2)
 	  {
 	    printf("u2p_entr     >>> %d %d <<< %e > %e\n",geom->ix,u2pret,u0,pp[1]);
 	  }
@@ -372,7 +372,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 {
   //return 0;
 
-  int verbose=1;
+  int verbose=0;
   int ret=0;
 
   struct geometry *geom

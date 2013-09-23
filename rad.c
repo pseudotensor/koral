@@ -3513,7 +3513,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	  rv2tau=4./3./tautot[dim]*4./3./tautot[dim];
 	  //test
 	  //rv2tau*=100.;
-	  rv2=my_min(rv2rad,rv2tau);		     
+	  rv2=my_min(rv2rad,rv2tau);
 	}
       else
 	rv2=rv2rad;
