@@ -55,13 +55,16 @@ main(int argc, char **argv)
   for(i=0;i<(SX)*(SY)*(SZ)*NV;i++)
     pavg[i]=uavg[i]=0.;
 
-  int ifile,itot=0;
+  int ifile,itot=0,readret;
   ldouble t; ldouble scalars[NSCALARS];
+
+  printf("working on files #%04d to #%04d with %d step \n",no1,no2,nostep);
+
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
       itot++;
 
-      fread_restartfile(ifile,&t);
+      readret=fread_restartfile(ifile,&t);
 
       //adding up to avg array
       add_u(1.,p,1.,pavg,pavg);
@@ -90,6 +93,7 @@ main(int argc, char **argv)
 #if(SIMOUTPUT==1)	  
       fprint_simplecart(t,nfout1,"analysis","sim");
 #endif
+  
 
     }
 

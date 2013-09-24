@@ -567,6 +567,8 @@ fread_restartfile(int nout1, ldouble *t)
     sprintf(fname,"dumps/res%04d.dat",nout1);
   else
     sprintf(fname,"dumps/reslast.dat",nout1);
+  
+  printf("opening: %s\n",fname);
 
   FILE *fdump=fopen(fname,"r");
 
@@ -583,6 +585,10 @@ fread_restartfile(int nout1, ldouble *t)
   int ix,iy,iz,iv;
   //reading conserved
   int gclx,gcrx,gcly,gcry,gclz,gcrz;
+  struct geometry geom;
+  ldouble xxvec[4],xxvecout[4];
+  ldouble uu[NV],pp[NV],ftemp;
+  char c;
   for(iz=0;iz<NZ;iz++)
     {
       for(iy=0;iy<NY;iy++)
@@ -591,16 +597,12 @@ fread_restartfile(int nout1, ldouble *t)
 	    {
 	      ret=fscanf(fdump,"%*f %*f %*f ");
 									  
-	      struct geometry geom;
 	      fill_geometry(ix,iy,iz,&geom);
 
-	      ldouble xxvec[4],xxvecout[4];
 
 	      /**************************/  
 	      /**************************/  
 	      /**************************/  
-	      ldouble uu[NV],pp[NV],ftemp;
-	      char c;
 	      
 	      //reading primitives from file
 	      for(i=0;i<NV;i++)
@@ -620,6 +622,8 @@ fread_restartfile(int nout1, ldouble *t)
 	    }
 	}
     }
+
+  fclose(fdump);
 
   return 0;
 }
