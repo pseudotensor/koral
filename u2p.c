@@ -212,7 +212,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  if(s2/s1 < 0.999)
 	    {  
 	      //go to entropy
-	      printf("enforcing entr at %d\n",geom->ix);
+	      printf("enforcing entr at %d %d %d\n",geom->ix,geom->iy,geom->iz);
 	      u2pret=-1;
 	    }
 	}

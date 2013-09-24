@@ -56,8 +56,8 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1.
-#define NX 640
-#define NY 640
+#define NX 64
+#define NY 64
 #define NZ 1
 #define PERIODIC_XBC
 #define PERIODIC_YBC
@@ -70,6 +70,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 50
 #define SILOOUTPUT
+#define OUTOUTPUT
 
 /************************************/
 //common physics / atmosphere
