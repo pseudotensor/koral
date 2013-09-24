@@ -79,7 +79,7 @@ fprint_gridfile(char* folder)
 /*********************************************/
 /*********************************************/
 /*********************************************/
-/* prints dumps to files .dat and calls gnuplot */
+/* prints dumps to files outNNNN.dat and calls gnuplot */
 /* codeprim == 1 - prints out code primitives, only coordinates converted to OUTCOORDS */
 /* codeprim == 0 - prints ZAMO frame etc primitives - post processing, called by ana.c */
 /*********************************************/
@@ -88,6 +88,10 @@ fprint_gridfile(char* folder)
 int
 fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* folder)
 {
+  #ifndef OUTOUTPUT
+  return 0;
+  #endif
+
   char bufor[50],bufor2[50];
   sprintf(bufor,"%s/rad%04d.dat",folder,nfout1);
   fout_radprofiles=fopen(bufor,"w");

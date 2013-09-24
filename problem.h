@@ -1339,12 +1339,11 @@
 #define MKS1R0 0.
 #endif
 
+//whether to check if the advection operator keeps entropy increasing,
+//if not invert with the independently evolved entropy
 #ifndef VERIFYENTROPYAFTERADVECTION
-#define VERIFYENTROPYAFTERADVECTION 1
+#define VERIFYENTROPYAFTERADVECTION 1 
 #endif
-
-
-
 
 #define NUMEPSILON DBL_EPSILON
 
