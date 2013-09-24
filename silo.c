@@ -184,7 +184,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      Bz[nodalindex]=bcon[3];
 
 	      //transform to cartesian
-	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
+	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
 		{
 		  bcon[2]*=r;
 		  bcon[3]*=r*sin(th);
@@ -222,7 +222,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      Fz[nodalindex]=rvel[3];
 
 	       //transform to cartesian
-	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
+	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
 		{
 		  rvel[2]*=r;
 		  rvel[3]*=r*sin(th);
