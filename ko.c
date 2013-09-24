@@ -56,51 +56,13 @@ main(int argc, char **argv)
   //sets the grid
   set_grid(&min_dx,&min_dy,&min_dz,&max_dt);
   //print_grid(min_dx,min_dy,min_dz);
-#ifdef GRIDOUTPUT
+
+#if(GRIDOUTPUT==1)
   fprint_gridfile("dumps");
 #endif
 
   //precalculates metric etc.
   calc_metric();
-
-  //testing ceiling in rad
-  /*
-  struct geometry geom;
-  fill_geometry(0,0,0,&geom);
-  ldouble pp[NV],uu[NV]={0,0,0,0,0,0.,-1.,2.5,0.,0.};
-  int corr;
-  u2p_rad(uu,pp,&geom,&corr);
-  printf("corr: %d\n",corr);
-  print_primitives(pp);
-  ldouble Rij[4][4];
-  calc_Rij(pp,&geom,Rij);
-  print_tensor(Rij);
-  exit(0);
-  */
-
-  //test of MKS2
-  /*
-  ldouble x2[4],x1[4]={0,3.,0.000,0.};
-  coco_N(x1,x2,KSCOORDS,MKS2COORDS);
-  //print_4vector(x1); print_4vector(x2);
-  for(x2[2]=1.e-10;x2[2]<1.e-6;x2[2]*=1.01)
-    {
-      printf("%e %e\n",  x2[2],calc_gdet_arb(x2,MKS2COORDS));
-    }
-  exit(0);
-
-  ldouble dxdx[4][4];
-  dxdx_MKS22KS(x1, dxdx);
-  print_tensor(dxdx);
-  ldouble g[4][5];
-  calc_g_arb(x1,g,MKS2COORDS);
-  print_metric(g);
-  calc_G_arb(x1,g,MKS2COORDS);
-  print_metric(g);
-  printf("Gdet: %e\n",  calc_gdet_arb(x1,MKS2COORDS));
-  exit(0);  
-  */
-  
 
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
@@ -147,11 +109,20 @@ main(int argc, char **argv)
   if(ifinit==1)
     {
       fprint_restartfile(tstart,"dumps");			
-      //why this different for radiation?
-      fprint_profiles(tstart,scalars,NSCALARS,0,"dumps");			
-#ifdef SILOOUTPUT
-      fprint_silofile(tstart,nfout1,"dumps");
+      //dumps dumps
+#if(SCAOUTPUT==1)
+      fprint_scalars(tstart,scalars,NSCALARS,"dumps");
 #endif
+#if(RADOUTPUT==1)
+      fprint_radprofiles(tstart,nfout1,"dumps","rad");
+#endif
+#if(OUTOUTPUT==1)
+      fprint_outfile(tstart,nfout1,0,"dumps","out");
+#endif
+#if(SILOOUTPUT==1)
+      fprint_silofile(tstart,nfout1,"dumps","sil");
+#endif
+
       nfout1++;
     }
   
@@ -333,12 +304,22 @@ solve_the_problem(ldouble tstart)
 	  //calculate scalars
 	  calc_scalars(scalars,t);
 	  
-	  //print to files
+	  //dumps restart
 	  fprint_restartfile(t,"dumps");
-	  fprint_profiles(t,scalars,NSCALARS,0,"dumps");
-          #ifdef SILOOUTPUT
-	  fprint_silofile(t,nfout1,"dumps");
-	  #endif
+
+	  //dumps dumps
+#if(SCAOUTPUT==1)
+	  fprint_scalars(t,scalars,NSCALARS,"dumps");
+#endif
+#if(RADOUTPUT==1)
+	  fprint_radprofiles(t,nfout1,"dumps","rad");
+#endif
+#if(OUTOUTPUT==1)
+	  fprint_outfile(t,nfout1,0,"dumps","out");
+#endif
+#if(SILOOUTPUT==1)
+	  fprint_silofile(t,nfout1,"dumps","sil");
+#endif
 	  
 	  nfout1++;
 

@@ -69,8 +69,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 50
-#define SILOOUTPUT
-#define OUTOUTPUT
+#define SILOOUTPUT 1
 
 /************************************/
 //common physics / atmosphere

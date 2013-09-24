@@ -286,11 +286,13 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 //fileop.c
 int fprint_restartfile(ldouble t, char* folder);
 int fprint_simplecart(ldouble t, char* folder);
+int fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder);
+int fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix);
 int fread_restartfile(int,ldouble*);
 int fprint_gridfile(char* folder);
 int fprint_openfiles(char *);
 int fprint_closefiles();
-int fprint_profiles(ldouble,ldouble*,int,int,char*);
+int fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix);
 int print_profiles();
 
 //physics.c
@@ -576,7 +578,7 @@ void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg);
 int flux_ct();
 
 //silo.c
-int fprint_silofile(ldouble time, int num, char* folder);
+int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 #include "mnemonics.h"
 

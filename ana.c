@@ -48,13 +48,23 @@ main(int argc, char **argv)
   sprintf(bufor,"%s/scalars.dat",folder);
   fout_scalars=fopen(bufor,"w");
 
+  //arrays for averaging of primitives
 
-  int ifile;
+  ldouble *pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  ldouble *uavg=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  for(i=0;i<(SX)*(SY)*(SZ)*NV;i++)
+    pavg[i]=uavg[i]=0.;
+
+  int ifile,itot=0;
   ldouble t; ldouble scalars[NSCALARS];
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
-      //fread_dumpfile(ifile,&t);
+      itot++;
+
       fread_restartfile(ifile,&t);
+
+      //adding up to avg array
+      add_u(1.,p,1.,pavg,pavg);
 
       nfout1--; //correcting index
   
@@ -64,12 +74,28 @@ main(int argc, char **argv)
       //calculate scalars
       calc_scalars(scalars,t);
 
-      fprint_profiles(t,scalars,NSCALARS,0,folder);
-
+      //dumps dumps
+#if(SCAOUTPUT==1)
+      fprint_scalars(t,scalars,NSCALARS,"dumps");
+#endif
+#if(RADOUTPUT==1)
+      fprint_radprofiles(t,nfout1,"dumps","rad");
+#endif
+#if(OUTOUTPUT==1)
+      fprint_outfile(t,nfout1,0,"dumps","out");
+#endif
+#if(SILOOUTPUT==1)
+      fprint_silofile(t,nfout1,"dumps","sil");
+#endif
+#if(SIMOUTPUT==1)	  
       fprint_simplecart(t,folder);
+#endif
+
     }
 
   fclose(fout_scalars);
+
+  
 
   return 0;
 }

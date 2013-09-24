@@ -1345,6 +1345,30 @@
 #define VERIFYENTROPYAFTERADVECTION 1 
 #endif
 
+#ifndef OUTOUTPUT
+#define OUTOUTPUT 1
+#endif
+
+#ifndef SCAOUTPUT
+#define SCAOUTPUT 1
+#endif
+
+#ifndef RADOUTPUT
+#define RADOUTPUT 1
+#endif
+
+#ifndef SILOOUTPUT
+#define SILOOUTPUT 0
+#endif
+
+#ifndef GRIDOUTPUT
+#define GRIDOUTPUT 0
+#endif
+
+#ifndef SIMOUTPUT
+#define SIMOUTPUT 0
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/

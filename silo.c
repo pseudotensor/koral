@@ -9,10 +9,10 @@
 /*********************************************/
 /* writes silo file in dumps
 /*********************************************/
-int fprint_silofile(ldouble time, int num, char* folder)
+int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 {
   char bufor[50];
-  sprintf(bufor,"%s/sil%04d.silo",folder,num);
+  sprintf(bufor,"%s/%s%04d.silo",folder,prefix,num);
  
   DBfile *file = NULL;/* The Silo file pointer */
   char *coordnames[3];/* Names of the coordinates */

@@ -209,7 +209,8 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  ldouble s1=exp(uu[ENTR]/gdetu/ucon[0]/pp[RHO]);
 	  ldouble s2=exp(pp[ENTR]/pp[RHO]);
 	  
-	  if(s2/s1 < 0.999)
+	  //TODO: double check on this - why in ORSZAG and RADTUBE 0.999 often exceeded?
+	  if(s2/s1 < 0.9)
 	    {  
 	      //go to entropy
 	      printf("enforcing entr at %d %d %d\n",geom->ix,geom->iy,geom->iz);

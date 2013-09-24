@@ -101,7 +101,7 @@
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define SILOOUTPUT 
+#define SILOOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 1.e0

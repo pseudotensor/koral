@@ -76,6 +76,67 @@ fprint_gridfile(char* folder)
 
   return 0;
 }
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints scalar quantities to scalars.dat
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int
+fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder)
+{
+  int iv;
+  //printing scalars
+  fprintf(fout_scalars,"%e ",t);
+  for(iv=0;iv<nscalars;iv++)
+    fprintf(fout_scalars,"%e ",scalars[iv]);
+  fprintf(fout_scalars,"\n");
+  fflush(fout_scalars);
+
+  return 0;
+}
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints radial profiles to radNNNN.dat
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int
+fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
+{
+  if(MYCOORDS == BLCOORDS || MYCOORDS == KSCOORDS || MYCOORDS == MKS1COORDS)
+    {
+      char bufor[50],bufor2[50];
+      sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
+      fout_radprofiles=fopen(bufor,"w");
+
+      int ix,iv;
+      //calculating radial profiles
+      ldouble profiles[NRADPROFILES][NX];
+      calc_radialprofiles(profiles);
+      //printing radial profiles  
+      for(ix=0;ix<NX;ix++)
+	{
+	  ldouble xx[4],xxout[4];
+	  get_xx(ix,0,0,xx);
+	  coco_N(xx,xxout,MYCOORDS,BLCOORDS); 
+	  if(xxout[1]<r_horizon_BL(BHSPIN)) continue;
+	  fprintf(fout_radprofiles,"%e ",xxout[1]);
+	  for(iv=0;iv<NRADPROFILES;iv++)
+	    fprintf(fout_radprofiles,"%e ",profiles[iv][ix]);
+	  fprintf(fout_radprofiles,"\n");
+	}
+      fclose(fout_radprofiles);
+    }
+  
+  return 0;
+}
+ 
+
 /*********************************************/
 /*********************************************/
 /*********************************************/
@@ -86,17 +147,10 @@ fprint_gridfile(char* folder)
 /*********************************************/
 /*********************************************/
 int
-fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* folder)
+fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 {
-  #ifndef OUTOUTPUT
-  return 0;
-  #endif
-
   char bufor[50],bufor2[50];
-  sprintf(bufor,"%s/rad%04d.dat",folder,nfout1);
-  fout_radprofiles=fopen(bufor,"w");
-
-  sprintf(bufor,"%s/out%04d.dat",folder,nfout1);
+  sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
   fout1=fopen(bufor,"w");
   
   //header
@@ -138,34 +192,6 @@ fprint_profiles(ldouble t, ldouble *scalars, int nscalars, int codeprim, char* f
   gcrz=1;
 #endif
   
-  
-  //printing scalars
-  fprintf(fout_scalars,"%e ",t);
-  for(iv=0;iv<nscalars;iv++)
-    fprintf(fout_scalars,"%e ",scalars[iv]);
-  fprintf(fout_scalars,"\n");
-  fflush(fout_scalars);
-  
-  if(MYCOORDS == BLCOORDS || MYCOORDS == KSCOORDS || MYCOORDS == MKS1COORDS)
-    {
-      //calculating radial profiles
-      ldouble profiles[NRADPROFILES][NX];
-      calc_radialprofiles(profiles);
-      //printing radial profiles  
-      for(ix=0;ix<NX;ix++)
-	{
-	  ldouble xx[4],xxout[4];
-	  get_xx(ix,0,0,xx);
-	  coco_N(xx,xxout,MYCOORDS,BLCOORDS); 
-	  if(xxout[1]<r_horizon_BL(BHSPIN) && codeprim==0) continue;
-	  fprintf(fout_radprofiles,"%e ",xxout[1]);
-	  for(iv=0;iv<NRADPROFILES;iv++)
-	    fprintf(fout_radprofiles,"%e ",profiles[iv][ix]);
-	  fprintf(fout_radprofiles,"\n");
-	}
-      fflush(fout_radprofiles);
-    }
-  fclose(fout_radprofiles);
   
   /**************************/  
   /** writing order *********/  
