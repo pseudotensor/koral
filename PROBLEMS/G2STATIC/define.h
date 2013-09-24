@@ -91,7 +91,8 @@
 /************************************/
 //output
 /************************************/
-#define SILOOUTPUT
+#define SILOOUTPUT 1
+#define SIMOUTPUT 1
 #define OUTCOORDS KERRCOORDS                                                                    
 //#define RADOUTPUTINZAMO
 //#define PRINTINSIDEBH

@@ -157,7 +157,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
   //## nout time problem NX NY NZ
   fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
 
-  sprintf(bufor2,"%s/out%04d.%s",folder,nfout1,IMAGETYPE);  
+  sprintf(bufor2,"%s/%s%04d.%s",folder,prefix,nfile,IMAGETYPE);  
   int ix,iy,iz,iv;
   int gclx,gcrx,gcly,gcry,gclz,gcrz;
 
@@ -621,7 +621,7 @@ fread_restartfile(int nout1, ldouble *t)
 	}
     }
 
-    return 0;
+  return 0;
 }
 
 /*********************************************/
@@ -632,90 +632,86 @@ fread_restartfile(int nout1, ldouble *t)
 /*********************************************/
 /*********************************************/
 /*********************************************/
-int
-fprint_simplecart(ldouble t, char* folder)
-{
-  if(PROBLEM==55) //G2STATIC
-    {
-      char bufor[50];
-      sprintf(bufor,"%s/sim%04d.dat",folder,nfout1);
-      fout1=fopen(bufor,"w");
+int fprint_simplecart(ldouble t, int nfile, char* folder,char* prefix)
+ {
+   char bufor[50];
+   sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
+   fout1=fopen(bufor,"w");
   
-      //header
-      //## nout time problem NX NY NZ
-      fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
+   //header
+   //## nout time problem NX NY NZ
+   fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
 
-      /***********************************/  
-      /** writing order is fixed  ********/  
-      /***********************************/  
+   /***********************************/  
+   /** writing order is fixed  ********/  
+   /***********************************/  
  
-      int ix,iy,iz,iv;
-      ldouble pp[NV];
-      for(iz=0;iz<NZ;iz++)
-	{
-	  for(iy=0;iy<NY;iy++)
-	    {
-	      for(ix=0;ix<NX;ix++)
-		{
-		  for(iv=0;iv<NV;iv++)
-		    {
-		      pp[iv]=get_u(p,iv,ix,iy,iz);
-		    }
-		  struct geometry geom,geomcart,geomout,geomsph;
-		  fill_geometry(ix,iy,iz,&geom);
-		  fill_geometry_arb(ix,iy,iz,&geomcart,MINKCOORDS);
-		  fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
-		  fill_geometry_arb(ix,iy,iz,&geomsph,SPHCOORDS);
+   int ix,iy,iz,iv;
+   ldouble pp[NV];
+   for(iz=0;iz<NZ;iz++)
+     {
+       for(iy=0;iy<NY;iy++)
+	 {
+	   for(ix=0;ix<NX;ix++)
+	     {
+	       for(iv=0;iv<NV;iv++)
+		 {
+		   pp[iv]=get_u(p,iv,ix,iy,iz);
+		 }
+	       struct geometry geom,geomcart,geomout,geomsph;
+	       fill_geometry(ix,iy,iz,&geom);
+	       fill_geometry_arb(ix,iy,iz,&geomcart,MINKCOORDS);
+	       fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
+	       fill_geometry_arb(ix,iy,iz,&geomsph,SPHCOORDS);
 
-		  ldouble dx[3];
-		  dx[0]=get_size_x(ix,0);
-		  dx[1]=get_size_x(iy,1);
-		  dx[2]=get_size_x(iz,2);
-		  ldouble gdet=geom.gdet;
-		  ldouble volume=dx[0]*dx[1]*dx[2]*gdet;
-		  trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,&geom,&geomout);
-		  ldouble rho=rhoGU2CGS(pp[RHO]);
-		  ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
-		  ldouble tracer=pp[TRA];
-		  ldouble vel[4]={0,pp[VX],pp[VY],pp[VZ]};	
-		  ldouble vx,vy,vz;
-		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
-		  trans2_cc2on(vel,vel,geomout.tup);
-		  //transform to cartesian
-		  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
-		    {
-		      ldouble r=geomsph.xx;
-		      ldouble th=geomsph.yy;
-		      ldouble ph=geomsph.zz;
+	       ldouble dx[3];
+	       dx[0]=get_size_x(ix,0);
+	       dx[1]=get_size_x(iy,1);
+	       dx[2]=get_size_x(iz,2);
+	       ldouble gdet=geom.gdet;
+	       ldouble volume=dx[0]*dx[1]*dx[2]*gdet;
+	       trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,&geom,&geomout);
+	       ldouble rho=rhoGU2CGS(pp[RHO]);
+	       ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+	       ldouble tracer=pp[TRA];
+	       ldouble vel[4]={0,pp[VX],pp[VY],pp[VZ]};	
+	       ldouble vx,vy,vz;
+	       conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
+	       trans2_cc2on(vel,vel,geomout.tup);
+	       //transform to cartesian
+	       if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
+		 {
+		   ldouble r=geomsph.xx;
+		   ldouble th=geomsph.yy;
+		   ldouble ph=geomsph.zz;
 
-		      vx = sin(th)*cos(ph)*vel[1] 
-			+ cos(th)*cos(ph)*vel[2]
-			- sin(ph)*vel[3];
+		   vx = sin(th)*cos(ph)*vel[1] 
+		     + cos(th)*cos(ph)*vel[2]
+		     - sin(ph)*vel[3];
 
-		      vy = sin(th)*sin(ph)*vel[1] 
-			+ cos(th)*sin(ph)*vel[2]
-			+ cos(ph)*vel[3];
+		   vy = sin(th)*sin(ph)*vel[1] 
+		     + cos(th)*sin(ph)*vel[2]
+		     + cos(ph)*vel[3];
 
-		      vz = cos(th)*vel[1] 
-			- sin(th)*vel[2];
-		    }
+		   vz = cos(th)*vel[1] 
+		     - sin(th)*vel[2];
+		 }
 	     
-		  fprintf(fout1,"%d %d %d ",ix,iy,iz);
+	       fprintf(fout1,"%d %d %d ",ix,iy,iz);
 
-		  fprintf(fout1,"%.5e %.5e %.5e ",geomcart.xx,geomcart.yy,geomcart.zz);
+	       fprintf(fout1,"%.5e %.5e %.5e ",geomcart.xx,geomcart.yy,geomcart.zz);
 
-		  fprintf(fout1,"%.5e %.5e %.5e ",rho,temp,tracer);
+	       fprintf(fout1,"%.5e %.5e %.5e ",rho,temp,tracer);
 
-		  fprintf(fout1,"%.5e %.5e %.5e ",vx,vy,vz);
+	       fprintf(fout1,"%.5e %.5e %.5e ",vx,vy,vz);
 
-		  fprintf(fout1,"%.5e \n",volume);
-		}
-	    }
-	}
+	       fprintf(fout1,"%.5e \n",volume);
+	     }
+	 }
+     }
 
-      fflush(fout1);
-      fclose(fout1);
-    }
+   fflush(fout1);
+   fclose(fout1);
 
-  return 0;
-}
+   return 0;
+ }

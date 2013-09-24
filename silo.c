@@ -32,7 +32,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   
   /* Give the cartesian coordinates of the mesh */
   int ix,iy,iz,iv;
-  ldouble pp[NV],uu[NV],xxvec[4],xxveccar[4],xxvecsph[4];
+  ldouble pp[NV],xxvec[4],xxveccar[4],xxvecsph[4];
 
   int nx=NX;
   int ny=NY;
@@ -95,7 +95,6 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      int nodalindex=iz*(ny*nx) + iy*nx + ix;
 	      for(iv=0;iv<NV;iv++)
 		{
-		  uu[iv]=get_u(u,iv,iix,iiy,iiz);
 		  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 		}
 

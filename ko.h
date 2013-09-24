@@ -285,7 +285,7 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 
 //fileop.c
 int fprint_restartfile(ldouble t, char* folder);
-int fprint_simplecart(ldouble t, char* folder);
+int fprint_simplecart(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder);
 int fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix);
 int fread_restartfile(int,ldouble*);
