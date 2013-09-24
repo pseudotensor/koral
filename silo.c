@@ -89,6 +89,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      struct geometry geomout;
 	      fill_geometry_arb(iix,iiy,iiz,&geomout,OUTCOORDS);
 	      
+	      coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
+	      ldouble r=xxvecsph[1];
+	      ldouble th=xxvecsph[2];
+	      ldouble ph=xxvecsph[3];
+
 	      //if(OUTCOORDS==BLCOORDS && geomout.xx<r_horizon_BL(BHSPIN))
 	      //continue;
 
@@ -132,25 +137,25 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      if(geomout.GG[0][0]<0.)
 		{
+		  //conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
+		  //trans2_cc2on(vel,vel,geomout.tup);
 		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
-		  trans2_cc2on(vel,vel,geomout.tup);
 		}
 	      else //outside well defined domain of OUTCOORDS
 		vel[1]=vel[2]=vel[3]=0.;		
 
-	      //outvel - ortonormal VEL4
+	      //outvel - non-ortonormal VEL4
 	      vx[nodalindex]=vel[1];
 	      vy[nodalindex]=vel[2];
 	      vz[nodalindex]=vel[3];
 
-	      //transform to cartesian
-	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
-		{
-		  coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
-		  ldouble r=xxvecsph[1];
-		  ldouble th=xxvecsph[2];
-		  ldouble ph=xxvecsph[3];
 
+	      //transform to cartesian
+	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
+		{
+		  vel[2]*=r;
+		  vel[3]*=r*sin(th);
+		  
 		  vx[nodalindex] = sin(th)*cos(ph)*vel[1] 
 		    + cos(th)*cos(ph)*vel[2]
 		    - sin(ph)*vel[3];
@@ -162,7 +167,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  vz[nodalindex] = cos(th)*vel[1] 
 		    - sin(th)*vel[2];
 		}
-	  
+		
+
 	      #ifdef MAGNFIELD
 	      //magnetic field
 	      ldouble bcon[4],bcov[4];
@@ -171,7 +177,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      bsq[nodalindex] = dot(bcon,bcov);
 	      
 	      //to ortonormal	      
-	      trans2_cc2on(bcon,bcon,geomout.tup);
+	      //trans2_cc2on(bcon,bcon,geomout.tup);
 
 	      Bx[nodalindex]=bcon[1];
 	      By[nodalindex]=bcon[2];
@@ -180,10 +186,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
 		{
-		  coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
-		  ldouble r=xxvecsph[1];
-		  ldouble th=xxvecsph[2];
-		  ldouble ph=xxvecsph[3];
+		  bcon[2]*=r;
+		  bcon[3]*=r*sin(th);
 
 		  Bx[nodalindex] = sin(th)*cos(ph)*bcon[1] 
 		    + cos(th)*cos(ph)*bcon[2]
@@ -205,9 +209,13 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      Ehat=-Rtt;  
 	      Erad[nodalindex]=Ehat;
 									  
-	      prad_lab2on(pp,pp,&geomout);
-	      ldouble rvel[4]={0,pp[FX0],pp[FY0],pp[FZ0]};	
-
+	      //prad_lab2on(pp,pp,&geomout);
+	      ldouble rvel[4]={0,pp[FX0],pp[FY0],pp[FZ0]};
+	      if(geomout.GG[0][0]<0.)
+		conv_vels(rvel,rvel,VELPRIM,VEL4,geomout.gg,geomout.GG);
+	      else
+		rvel[1]=rvel[2]=rvel[3]=0.;
+	
 	      //outvel - ortonormal VEL4
 	      Fx[nodalindex]=rvel[1];
 	      Fy[nodalindex]=rvel[2];
@@ -216,10 +224,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	       //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS)
 		{
-		  coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
-		  ldouble r=xxvecsph[1];
-		  ldouble th=xxvecsph[2];
-		  ldouble ph=xxvecsph[3];
+		  rvel[2]*=r;
+		  rvel[3]*=r*sin(th);
 
 		  Fx[nodalindex] = sin(th)*cos(ph)*rvel[1] 
 		    + cos(th)*cos(ph)*rvel[2]

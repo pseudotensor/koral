@@ -108,7 +108,7 @@ fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder)
 int
 fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
 {
-  if(MYCOORDS == BLCOORDS || MYCOORDS == KSCOORDS || MYCOORDS == MKS1COORDS)
+  if(MYCOORDS == BLCOORDS || MYCOORDS == KSCOORDS || MYCOORDS == MKS1COORDS || MYCOORDS == MKS2COORDS)
     {
       char bufor[50],bufor2[50];
       sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
