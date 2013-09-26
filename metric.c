@@ -2396,6 +2396,10 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       coco_MKS12KS(x1,x2);
       coco_KS2BL(x2,x2);
     }
+  else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
+    {
+      coco_KS2BL(x1,x2);
+    }
   else if (CO1==MKS2COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       coco_MKS22KS(x1,x2);

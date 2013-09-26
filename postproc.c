@@ -502,7 +502,7 @@ calc_Bflux(ldouble radius,int type)
 
 	  //#ifdef CGSOUTPUT
 	  //always
-	  Br=sqrt(endenGU2CGS(1.))*Br;
+	  Br=sqrt(endenGU2CGS(1.))*Br/CCC;
 	  dx[1]=lenGU2CGS(dx[1]);
 	  dx[2]=lenGU2CGS(dx[2]);
 	  //#endif

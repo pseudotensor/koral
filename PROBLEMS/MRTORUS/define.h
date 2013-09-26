@@ -7,7 +7,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define ALLOW_EXPLICIT_RAD_SOURCE 0
 //#define IMPLICIT_FF_RAD_SOURCE
 //#define SKIPRADSOURCE
@@ -17,7 +17,7 @@
 /************************************/
 #define MAGNFIELD
 #define VECPOTGIVEN
-#define MAXBETA .002 //target pmag/pgas int the midplane
+#define MAXBETA .01 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -56,19 +56,29 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
+#define BHSPIN 0.9
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS1COORDS
+//#define myMKS1COORDS
+#define myKSCOORDS
 #define MKS1R0 -1.
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
+#define MINX (log(1.1-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
 #define NX 100
+#define NY 80
+#define NZ 1
+#endif
+
+#ifdef myKSCOORDS //modified Kerr-Shild
+#define MYCOORDS KSCOORDS
+#define MINX 1.1
+#define MAXX 30.
+#define NX 200
 #define NY 80
 #define NZ 1
 #endif
@@ -89,7 +99,7 @@
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define SILOOUTPUT 
+#define SILOOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 
@@ -103,8 +113,8 @@
 #define ELL 4.2
 #define URIN (0.)
 #define KKK 3000.
-#define UTPOT .97
-#define DTOUT1 1.
+#define UTPOT .99
+#define DTOUT1 10.
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
