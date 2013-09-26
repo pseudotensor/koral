@@ -51,15 +51,24 @@ if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
     //checking for the gas inflow
     ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
     conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+    trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,KERRCOORDS);
+      
     if(ucon[1]<0.) //inflow, resseting to atmosphere
       {
 	//atmosphere in rho,uint and velocities and zero magn. field
-	set_hdatmosphere(pp,xxvec,gg,GG,4);
+	//set_hdatmosphere(pp,xxvec,gg,GG,4);
+	ucon[1]=0.;
+	conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+	pp[VX]=ucon[1];
+	pp[VY]=ucon[2];
+	pp[VZ]=ucon[3];
+    
       }
 
 #ifdef RADIATION
     ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};    
     conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+    trans2_coco(geom.xxvec,urfcon,urfcon,MYCOORDS,KERRCOORDS);
     if(urfcon[1]<0.) //inflow, resseting to atmosphere
       {
 	//atmosphere in radiation

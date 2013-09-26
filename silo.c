@@ -89,7 +89,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      struct geometry geomout;
 	      fill_geometry_arb(iix,iiy,iiz,&geomout,OUTCOORDS);
 	      
+	      get_xx(iix,iiy,iiz,xxvec);
 	      coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
+	      coco_N(xxvec,xxveccar,MYCOORDS,MINKCOORDS);
+
+
 	      ldouble r=xxvecsph[1];
 	      ldouble th=xxvecsph[2];
 	      ldouble ph=xxvecsph[3];
@@ -103,13 +107,22 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 		}
 
-	      get_xx(iix,iiy,iiz,xxvec);
-	      coco_N(xxvec,xxveccar,MYCOORDS,MINKCOORDS);
 
 	      //coordinates
 	      nodex[nodalindex]=xxveccar[1];
 	      nodey[nodalindex]=xxveccar[2];
 	      nodez[nodalindex]=xxveccar[3];
+
+	      //test
+	      /*
+#ifdef MAGNFIELD
+	      //magnetic field
+	      ldouble bcon[4],bcov[4];
+	      calc_bcon_prim(pp,bcon,&geom);
+	      indices_21(bcon,bcov,geom.gg); 
+	      bsq[nodalindex] = dot(bcon,bcov);
+#endif
+	      */
 
 	      //primitives to OUTCOORDS
               #ifdef RADIATION
@@ -173,10 +186,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      #ifdef MAGNFIELD
 	      //magnetic field
+	      
 	      ldouble bcon[4],bcov[4];
 	      calc_bcon_prim(pp,bcon,&geomout);
 	      indices_21(bcon,bcov,geomout.gg); 
 	      bsq[nodalindex] = dot(bcon,bcov);
+	      
 	      
 	      //to ortonormal	      
 	      //trans2_cc2on(bcon,bcon,geomout.tup);

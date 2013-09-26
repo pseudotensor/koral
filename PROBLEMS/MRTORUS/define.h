@@ -40,6 +40,9 @@
 /************************************/
 //rmhd floors
 /************************************/
+
+#define RHOFLOOR_BH
+#define RHOFLOOR_BH_NORM 1.e-23
 #define UURHORATIOMIN 1.e-15
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
@@ -106,7 +109,7 @@
 #define URIN (0.)
 #define KKK 3000.
 #define UTPOT .99
-#define DTOUT1 10.
+#define DTOUT1 .1
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

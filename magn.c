@@ -13,6 +13,7 @@ void calc_bcon_4vel(double *pr, double *ucon, double *ucov, double *bcon)
     {
       bcon[j] = (pr[B1-1+j] + bcon[0]*ucon[j])/ucon[0] ;
     }
+
   return ;
 }
 
@@ -34,6 +35,8 @@ void calc_bcon_prim(double *pp, double *bcon, void* ggg)
 
   calc_bcon_4vel(pp,ucon,ucov,bcon);
 
+ 
+
   return;
 }
 
@@ -53,12 +56,17 @@ void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg)
   conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
   indices_21(ucon,ucov,geom->gg);
 
+ 
+  
+
   Bcon[0]=0.;
 
   for(j=1;j<4;j++)
     {
       Bcon[j] = bcon[j]*ucon[0] - bcon[0]*ucon[j];
     }
+  
+  
   return;
 }
 

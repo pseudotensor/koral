@@ -21,7 +21,7 @@ trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
 /********** does not touch radiative primitives ***********************/
 /*****************************************************************/
 int 
-trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1,void* ggg2)
+trans_pmhd_coco(ldouble *ppin, ldouble *ppout, int CO1,int CO2, ldouble *xxvec, void* ggg1,void* ggg2)
 {
   struct geometry *geom1
    = (struct geometry *) ggg1;
@@ -29,8 +29,13 @@ trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
    = (struct geometry *) ggg2;
 
   int i;
-  for(i=NVMHD;i<NV;i++)
-    pp2[i]=pp1[i];
+  ldouble pp1[NV],pp2[NV];
+  for(i=0;i<NV;i++)
+    {
+      ppout[i]=ppin[i];
+      pp1[i]=ppin[i];
+      pp2[i]=ppout[i];
+    }      
      
   if(CO1==CO2)
     {
@@ -63,10 +68,118 @@ trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
       pp2[4]=ucon[3];
 
       #ifdef MAGNFIELD
-      //TODO: verify this
+      ldouble bcon[4],Bcon[4];
+      /*
+      
+      if(geom1->ix==50 && geom1->iy==NY/2)
+	{
+	  print_primitives(pp1);
+
+	  ldouble ucon[4],ucov[4],bcon[4],Bcon[4];
+
+	  ucon[0]=0;
+	  ucon[1]=pp2[2];
+	  ucon[2]=pp2[3];
+	  ucon[3]=pp2[4];
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom2->gg,geom2->GG);
+	  indices_21(ucon,ucov,geom2->gg);
+	  calc_bcon_prim(pp2,bcon,geom2);
+	  printf("dot2: %e\n",dot(bcon,ucov));
+
+	  ucon[0]=0;
+	  ucon[1]=pp1[2];
+	  ucon[2]=pp1[3];
+	  ucon[3]=pp1[4];
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom1->gg,geom1->GG);
+	  indices_21(ucon,ucov,geom1->gg);
+	  calc_bcon_prim(pp1,bcon,geom1);
+	  printf("dot2: %e\n",dot(bcon,ucov));
+
+	  trans2_coco(xxvec,bcon,bcon,CO1,CO2);
+	  trans2_coco(xxvec,ucon,ucon,CO1,CO2);
+	  indices_21(ucon,ucov,geom2->gg);
+	  printf("dot2: %e\n",dot(bcon,ucov));
+
+	  calc_bcon_prim(pp1,bcon,geom1);
+	  trans2_coco(xxvec,bcon,bcon,CO1,CO2);
+	  ucon[0]=0;
+	  ucon[1]=pp1[2];
+	  ucon[2]=pp1[3];
+	  ucon[3]=pp1[4];
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom1->gg,geom1->GG);
+	  trans2_coco(xxvec,ucon,ucon,CO1,CO2);
+	  //to VELPRIM
+	  conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geom2->gg,geom2->GG);
+	  print_4vector(ucon);
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom2->gg,geom2->GG);
+	  indices_21(ucon,ucov,geom2->gg);
+	  printf("dot2: %e\n",dot(bcon,ucov));
+	  
+	  calc_bcon_prim(pp1,bcon,geom1);
+	  trans2_coco(xxvec,bcon,bcon,CO1,CO2);
+	  ucon[0]=0;
+	  ucon[1]=pp2[2];
+	  ucon[2]=pp2[3];
+	  ucon[3]=pp2[4];
+	  print_4vector(ucon);
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom2->gg,geom2->GG);
+	  indices_21(ucon,ucov,geom2->gg);
+	  printf("dot2: %e\n",dot(bcon,ucov));
+
+	  getchar();
+
+	  //print_4vector(&pp1[B1-1]);
+	  int j;
+
+	  trans2_coco(xxvec,bcon,bcon,CO1,CO2);
+
+	  printf("dot2: %e\n",dot(bcon,ucov));
+
+	  print_4vector(bcon);
+	 
+	  
+	  Bcon[0]=0.;
+
+	  for(j=1;j<4;j++)
+	    {
+	      Bcon[j] = bcon[j]*ucon[0] - bcon[0]*ucon[j];
+	    }
+	 
+	  
+	  bcon[0] = Bcon[1]*ucov[1] + Bcon[2]*ucov[2] + Bcon[3]*ucov[3] ;
+	  for(j=1;j<4;j++)
+	    bcon[j] = (Bcon[1-1+j] + bcon[0]*ucon[j])/ucon[0] ;
+
+	  
+	  //print_4vector(Bcon);
+	  print_4vector(bcon);
+	  getchar();
+
+	  
+	  calc_Bcon_prim(pp2,bcon,Bcon,geom2);
+
+	  print_4vector(bcon);
+
+	  pp2[B1]=Bcon[1]; 
+	  pp2[B2]=Bcon[2];
+	  pp2[B3]=Bcon[3];   
+
+	  calc_bcon_prim(pp2,bcon,geom2);
+
+	  print_4vector(bcon);
+	  trans2_coco(geom2->xxvec,bcon,bcon,CO2,CO1);
+	  print_4vector(bcon);
+	  calc_Bcon_prim(pp1,bcon,Bcon,geom1);
+	  pp1[B1]=Bcon[1]; 
+	  pp1[B2]=Bcon[2];
+	  pp1[B3]=Bcon[3];   
+	  calc_bcon_prim(pp1,bcon,geom1);
+	  print_4vector(bcon);
+	  getchar();
+	}
+      */
 
       //magnetic field 4-vector
-      ldouble bcon[4],Bcon[4];
       calc_bcon_prim(pp1,bcon,geom1);
       //converting to CO2
       trans2_coco(xxvec,bcon,bcon,CO1,CO2);
@@ -78,7 +191,11 @@ trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
       pp2[B3]=Bcon[3];   
       #endif
     }
-
+  
+   for(i=0;i<NVMHD;i++)      
+    {
+      ppout[i]=pp2[i];
+    }      
  
   return 0;
 }
@@ -88,7 +205,7 @@ trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
 /********** does not touch hydro primitives ***********************/
 /*****************************************************************/
 int 
-trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1, void* ggg2)
+trans_prad_coco(ldouble *ppin, ldouble *ppout, int CO1,int CO2, ldouble *xxvec, void* ggg1, void* ggg2)
 {
   struct geometry *geom1
     = (struct geometry *) ggg1;
@@ -97,9 +214,14 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
 
   int i;
   
-  for(i=0;i<NVMHD;i++)
-    pp2[i]=pp1[i];
-
+  ldouble pp1[NV],pp2[NV];
+  for(i=0;i<NV;i++) 
+    {
+      ppout[i]=ppin[i];
+      pp1[i]=ppin[i];
+      pp2[i]=ppout[i];
+    }      
+ 
   if(CO1==CO2)
     {
       for(i=0;i<4;i++)
@@ -127,8 +249,13 @@ trans_prad_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, voi
       pp2[FY0]=ucon[2];
       pp2[FZ0]=ucon[3];
 
-   }
-  
+    }
+
+  for(i=NVMHD;i<NV;i++)     
+    {
+      ppout[i]=pp2[i];
+    }      
+ 
   return 0;
 }
 

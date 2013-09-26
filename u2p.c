@@ -404,6 +404,21 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
     }
 
   //**********************************************************************
+  //rho too small, BH-disk like
+#ifdef RHOFLOOR_BH
+  ldouble xxBL[4];
+  coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
+  ldouble rr = xxBL[1] / r_horizon_BL(BHSPIN);
+  ldouble rhofloor = RHOFLOOR_BH_NORM / sqrt(rr*rr*rr);
+  if(pp[0]<rhofloor) 
+    {
+      if(verbose) printf("hd_floors BH CASE 1 at %d %d (%e)\n",geom->ix,geom->iy,pp[0]);
+      pp[0]=rhofloor;
+      ret=-1; 
+    }
+#endif
+
+  //**********************************************************************
   //too cold
   if(pp[1]<UURHORATIOMIN*pp[0]) 
     {
@@ -488,6 +503,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       ret=-1;      
     }
   */
+
 #endif
 
   //updates entropy after floor corrections
