@@ -150,6 +150,14 @@ int
 flux_ct()
 {
 #ifdef MAGNFIELD
+
+  //requires GDETIN = 1
+  if(GDETIN==0)
+    {
+      my_err("MAGNFIELD requires GDETIN==1\n");
+      exit(0);
+    }
+
   //TOTH algorithm from HARM's fluxct.c
   ldouble coefemf[4];
 

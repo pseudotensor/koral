@@ -2371,9 +2371,9 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       x2[2]=x1[2];
       x2[3]=x1[3];
     }
-  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==KSCOORDS)
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==KSCOORDS)
     coco_BL2KS(x1,x2);
-  else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+  else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     coco_KS2BL(x1,x2);
   else if (CO1==KSCOORDS && CO2==MKS1COORDS)
     coco_KS2MKS1(x1,x2);
@@ -2395,10 +2395,6 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     {
       coco_MKS12KS(x1,x2);
       coco_KS2BL(x2,x2);
-    }
-  else if (CO1==KSCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
-    {
-      coco_KS2BL(x1,x2);
     }
   else if (CO1==MKS2COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {

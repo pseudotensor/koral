@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -16,6 +16,7 @@
 //magnetic choices
 /************************************/
 #define MAGNFIELD
+#define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
 
@@ -56,35 +57,25 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.9
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
 /************************************/
-//#define myMKS1COORDS
-#define myKSCOORDS
+#define myMKS1COORDS
 #define MKS1R0 -1.
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.1-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
 #define NX 100
 #define NY 80
 #define NZ 1
 #endif
 
-#ifdef myKSCOORDS //modified Kerr-Shild
-#define MYCOORDS KSCOORDS
-#define MINX 1.1
-#define MAXX 30.
-#define NX 200
-#define NY 80
-#define NZ 1
-#endif
-
-#define MINY (0.05*Pi/2.)
-#define MAXY (Pi-0.05*Pi/2.)
+#define MINY (0.005*Pi/2.)
+#define MAXY (Pi-0.005*Pi/2.)
 //#define MAXY (Pi/2.)
 #define MINZ -1.
 #define MAXZ 1.
@@ -100,6 +91,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define SILOOUTPUT 1
+#define OUTOUTPUT 0
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 

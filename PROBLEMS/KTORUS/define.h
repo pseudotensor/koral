@@ -17,6 +17,7 @@
 //magnetic choices
 /************************************/
 #define MAGNFIELD
+#define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
 
