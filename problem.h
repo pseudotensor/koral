@@ -71,7 +71,7 @@
 //65* MRTORUS - RMHD torus with radiation
 //66* KTORUS - RMHD Newtonian torus with radiation
 
-#define PROBLEM 63
+#define PROBLEM 66
 
 #if(PROBLEM==66)
 
@@ -1244,7 +1244,7 @@
 #endif
 
 #ifndef NSCALARS
-#define NSCALARS 3
+#define NSCALARS 4
 #endif
 
 #ifndef NRADPROFILES

@@ -149,7 +149,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   gdetu=1.;
 #endif
 
-  int verbose=1;
+  int verbose=0;
   int hdcorr=0;
   int radcor=0;
   corrected[0]=corrected[1]=0;
@@ -210,10 +210,10 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  ldouble s2=exp(pp[ENTR]/pp[RHO]);
 	  
 	  //TODO: double check on this - why in ORSZAG and RADTUBE 0.999 often exceeded?
-	  if(s2/s1 < 0.9)
+	  if(s2/s1 < 0.1 && 0)
 	    {  
 	      //go to entropy
-	      printf("enforcing entr at %d %d %d\n",geom->ix,geom->iy,geom->iz);
+	      if(verbose) printf("enforcing entr at %d %d %d\n",geom->ix,geom->iy,geom->iz);
 	      u2pret=-1;
 	    }
 	}
@@ -302,10 +302,17 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
     {
       //************************************
       //leaving unchanged primitives - should not happen
-      if(verbose>1)
+      if(verbose>1 || 1)
+	{
+	  printf("u2p prim. unchanged > %d > %d %d %d\n",u2pret,geom->ix,geom->iy,geom->iz);
+	  /*
+	  if(u2pret!=-103)
 	    {
-	      printf("u2p prim. unchanged > %d %d %d\n",geom->ix,geom->iy,geom->iz);
+	      u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
+	      getchar();
 	    }
+	  */
+	}
       ret=-3;
       for(u2pret=0;u2pret<NV;u2pret++)
 	pp[u2pret]=ppbak[u2pret];	  
@@ -1106,8 +1113,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  return -103;
 	}
 
+
+      if(fabs((W-Wprev)/Wprev)<CONV && err<1.e-1) break;
     }
-  //while((fabs((W-Wprev)/Wprev)>CONV && err>CONV*1.e3) && iter<50);
   while(iter<50);
 
  
@@ -1194,6 +1202,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   if(verbose) print_primitives(pp);
 
   // test the inversion
+  /*
   ldouble uu2[NV];
   int iv;
   int lostprecision=0;
@@ -1202,18 +1211,19 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   //if(verbose) print_NVvector(uu2);
   //if(verbose) print_NVvector(uu);
   
+ 
   for(iv=0;iv<NVMHD;iv++)
     {
       if(Etype==U2P_HOT) if(iv==5) continue;
       if(Etype==U2P_ENTROPY) if(iv==1) continue;
       if(Etype==U2P_COLD || Etype==U2P_HOTMAX) if(iv==1 || iv==5) continue;
-      if(((iv==0 || iv==1 || iv==5) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-3))
+      if(((iv==0 || iv==1 || iv==5) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-1))
 	lostprecision=1;
     }     
-
+  
   if(lostprecision)
     {
-      if(verbose>0) 
+      if(verbose>0 || 1)
 	{
 	  print_Nvector(uu,NV);
 	  print_Nvector(uu2,NV);  
@@ -1224,6 +1234,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       //test
       return -106;
     }
+  */
 
   if(verbose>0) printf("u2p_solver returns 0\n");
   return 0; //ok

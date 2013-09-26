@@ -124,15 +124,18 @@ int calc_scalars(ldouble *scalars,ldouble t)
   scalars[0]=calc_totalmass();
 
   //accretion rate through horizon (3)
-  scalars[1]=fabs(calc_mdot(r_horizon_BL(BHSPIN),0)/calc_mdotEdd());
+  ldouble mdot=calc_mdot(r_horizon_BL(BHSPIN),0);
+  scalars[1]=-mdot/calc_mdotEdd();
 
-  //luminosity (4) at 0.6*rmax
+  //luminosity (4) at 0.5*rmax
   ldouble xx[4],xxBL[4];
   get_xx(NX-1,0,0,xx);
   coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
   scalars[2]=calc_lum(xxBL[1]/2.)/calc_lumEdd();
 
+  //magnetic flux through horizon parameter (5)
+  scalars[3]=calc_Bflux(r_horizon_BL(BHSPIN),0)/2./sqrt(fabs(mdot));
 
   /*********************************************/
   //L1 ERRRORS for some problems
@@ -421,8 +424,8 @@ calc_mdot(ldouble radius,int type)
 
 	  conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 
-	  dx[1]=dx[1]*sqrt(gg[2][2]);
-	  dx[2]=2.*M_PI*sqrt(gg[3][3]);
+	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
+	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
 
 	  //#ifdef CGSOUTPUT
 	  //always
@@ -440,4 +443,79 @@ calc_mdot(ldouble radius,int type)
     return -1;
 
   return mdot;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates magnetic flux through r=radius within range of thetas
+//normalized to 2pi in phi
+//type == 0 (default)
+ldouble
+calc_Bflux(ldouble radius,int type)
+{
+  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS)
+    return -1.; //no BH
+
+  int ix,iy,iz,iv;
+  ldouble xx[4],xxBL[4],dx[3],Psi,rho,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
+
+  //search for appropriate radial index
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
+
+  Psi=0.;
+
+  if(NZ==1) //phi-symmetry
+    {
+      iz=0;
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iv=0;iv<NVMHD;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  get_xx(ix,iy,iz,xx);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=get_size_x(iz,2);
+	  pick_g(ix,iy,iz,gg);
+	  pick_G(ix,iy,iz,GG);
+
+	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+
+	  struct geometry geom;
+	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
+
+	  struct geometry geomBL;
+	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+	  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+
+	  ldouble Br=fabs(pp[B1]);
+
+	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
+	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
+
+	  //#ifdef CGSOUTPUT
+	  //always
+	  Br=sqrt(endenGU2CGS(1.))*Br;
+	  dx[1]=lenGU2CGS(dx[1]);
+	  dx[2]=lenGU2CGS(dx[2]);
+	  //#endif
+
+	  
+	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
+	    Psi+=Br*dx[1]*dx[2];
+	  
+
+	}
+    }
+  else
+    return -1;
+
+  return Psi;
 }
