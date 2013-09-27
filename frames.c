@@ -285,10 +285,12 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   int verbose=0;
  
   calc_Rij_ff(pp1,Rij);  
+  
   trans22_on2cc(Rij,Rij,tlo);  
   boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
+  
   indices_2221(Rij,Rij,gg);  
-
+  
   for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 
@@ -674,7 +676,8 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   wtcon[2]=pp[3];
   wtcon[3]=pp[4];
   conv_vels_both(wtcon,wcon,wcov,VELPRIM,VEL4,gg,GG);
-  //conv_velscov(wtcon,wcov,VELPRIM,VEL4,gg,GG);
+  //conv_vels(wtcon,wcon,VELPRIM,VEL4,gg,GG);
+  //indices_21(wcon,wcov,gg);
  
   if(verbose>0) print_4vector(wcon);
 

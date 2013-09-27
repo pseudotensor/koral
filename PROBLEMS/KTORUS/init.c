@@ -87,6 +87,7 @@ if(podpierd<0. || Rcyl<6.) //outside donut
 
     //transforming primitives from BL to MYCOORDS
     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
+
     
 #ifdef MAGNFIELD 
     //MYCOORDS vector potential to calculate B's

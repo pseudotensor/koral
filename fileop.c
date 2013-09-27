@@ -350,7 +350,12 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  if(codeprim==0)
 									    {
 									      conv_vels(vrel,vrel,VELPRIM,VEL4,gg,GG);						  
-									      trans2_cc2on(vrel,vrel,tup);
+									      //TODO
+									      //tetrads sie zesraly
+									      //trans2_cc2on(vrel,vrel,tup);
+									      vrel[2]*=xx;
+									      vrel[3]*=xx*sin(yy);
+
 									      //outvel - ortonormal VEL4
 									      vx=vrel[1];
 									      vy=vrel[2];
