@@ -70,8 +70,24 @@
 //64* MAGDONUT - MHD donut with poloidal magnetic fields
 //65* MRTORUS - RMHD torus with radiation
 //66* KTORUS - RMHD Newtonian torus with radiation
+//67* LRTORUS - RMHD limo torus
 
-#define PROBLEM 66
+#define PROBLEM 67
+
+#if(PROBLEM==67)
+
+#define PR_DEFINE "PROBLEMS/LRTORUS/define.h"
+#define PR_BC "PROBLEMS/LRTORUS/bc.c"
+#define PR_INIT "PROBLEMS/LRTORUS/init.c"
+#define PR_KAPPA "PROBLEMS/LRTORUS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/LRTORUS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/LRTORUS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/LRTORUS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/LRTORUS/dump.c"
+#define PR_TOOLS "PROBLEMS/LRTORUS/tools.c"
+#define PR_POSTINIT "PROBLEMS/LRTORUS/postinit.c"
+
+#endif
 
 #if(PROBLEM==66)
 

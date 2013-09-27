@@ -2029,6 +2029,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  ldouble TLTE=calc_LTE_temp(pp0,&geom);	   
 	  if(TLTE<0.)
 	    ret=-1;
+	  else
+	    ret=0; //consider this success
+	    
 
 	  pp[UU]=calc_PEQ_ufromTrho(TLTE,pp[RHO]);
 	  pp[EE0]=calc_LTE_EfromT(TLTE);
@@ -2036,7 +2039,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  
 	  //printf("%e %e %e | %e %e | %e\n",ugas,Ehat,4.*Pi*B,T,calc_LTE_TfromE(Ehat),TLTE);
 	  
-	  ret=0; //consider this success
 	}
     
       if(ret==0) //LTE worked so can combine zero and LTE state (in pp[])
@@ -2073,6 +2075,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  if(corr[0]>0)
 	    {
 	      if(1 || verbose) printf("LTE ultimate corr: %d\n",corr[0]);
+	      ret=-1;
 	    }
 	  
 	  /*

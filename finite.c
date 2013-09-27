@@ -839,7 +839,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       //************************************
       //************************************
 
-      //fixup here after source term 
+   //fixup here after source term 
    cell_fixup_rad();
 
    //**********************************************************************
@@ -2121,7 +2121,7 @@ cell_fixup_rad()
 
   int ix,iy,iz,iv;
   int in,ii;
-  int verbose=2;
+  int verbose=1;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
