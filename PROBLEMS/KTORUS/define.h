@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM -1
+#define RESTART
+#define RESTARTNUM 141
 
 /************************************/
 //radiation choices
@@ -16,7 +16,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -50,7 +50,8 @@
 #define EEUURATIOMIN 1.e-20
 #define EEUURATIOMAX 1.e20
 #define B2UURATIOMIN 0.
-#define B2UURATIOMAX 100000.
+#define B2UURATIOMAX 1000.
+#define B2RHOKEEPTEMP
 #define B2RHORATIOMIN 0.
 #define B2RHORATIOMAX 100.
 #define GAMMAMAXRAD 50.
@@ -70,10 +71,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.2-MKS1R0))
-#define MAXX (log(500.-MKS1R0))
-#define NX 160
-#define NY 100
+#define MINX (log(1.1-MKS1R0))
+#define MAXX (log(100.-MKS1R0))
+#define NX 100
+#define NY 80
 #define NZ 1
 #endif
 
@@ -94,20 +95,20 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define SILOOUTPUT 1
-#define OUTOUTPUT 1
+#define OUTOUTPUT 0
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 10.
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
 #define GAMMA (4./3.)
 #define NPOLI 3.
-#define RZERO 30
-#define RHOZERO rhoCGS2GU(1.e-2) 
+#define RZERO 20
+#define RHOZERO rhoCGS2GU(1.e0) 
 #define ELLA 0.2
-#define VSZERO 3.6e-2//5.6e
+#define VSZERO 5.6e-2//5.6e
 #define ELL 4.2
 
 #define RHOATMMIN  1.e-24

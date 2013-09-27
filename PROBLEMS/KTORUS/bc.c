@@ -54,12 +54,7 @@ if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
     if(ucon[1]<0.) //inflow, resseting to atmosphere
       {
 	//atmosphere in rho,uint and velocities and zero magn. field
-	//set_hdatmosphere(pp,xxvec,gg,GG,4);
-	ucon[1]=0.;
-	conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
-	pp[VX]=ucon[1];
-	pp[VY]=ucon[2];
-	pp[VZ]=ucon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	set_hdatmosphere(pp,xxvec,gg,GG,4);
       }
 
 #ifdef RADIATION
@@ -68,12 +63,7 @@ if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
     if(urfcon[1]<0.) //inflow, resseting to atmosphere
       {
 	//atmosphere in radiation
-	//set_radatmosphere(pp,xxvec,gg,GG,0);
-	urfcon[1]=0.;
-	conv_vels(urfcon,urfcon,VEL4,VELPRIM,geom.gg,geom.GG);
-	pp[FX0]=urfcon[1];
-	pp[FY0]=urfcon[2];
-	pp[FZ0]=urfcon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	set_radatmosphere(pp,xxvec,gg,GG,0);
       }
 #endif
 

@@ -490,19 +490,25 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
       ldouble factor=magpre/(B2RHORATIOMAX*pp[RHO]);
       pp[RHO]*=factor;
-      //to keep the gas temperature constant
+      
+      #ifdef B2RHOKEEPTEMP //to keep the gas temperature constant and not to check bsq/uint independently
       pp[UU]*=factor;
+      #endif
       ret=-1;      
     }
 
-  /*
+#ifndef B2RHOKEEPTEMP
+ 
   if(magpre>B2UURATIOMAX*pp[UU]) 
     {
       if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
       pp[UU]*=magpre/(B2UURATIOMAX*pp[UU]);
       ret=-1;      
     }
-  */
+
+#endif
+
+  
 
 #endif
 
