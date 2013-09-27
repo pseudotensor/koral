@@ -1,3 +1,5 @@
+int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
+
 ldouble rho,mx,my,mz,m,E,uint,pgas,Fx,Fy,Fz,pLTE,ell;  
 ldouble uu[NV], pp[NV],ppback[NV],T;
 ldouble Vphi,Vr;
