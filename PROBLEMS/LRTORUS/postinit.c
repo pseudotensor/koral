@@ -41,7 +41,8 @@ for(iz=0;iz<NZ;iz++)
 		
 #endif
 
-	    if(geom.iy==NY/2)
+		if(geom.iy==NY/2)
+		//if(geom.iy==NY-1)
 	      {
 #pragma omp critical
 		if(pmag/ptot>maxbeta) maxbeta=pmag/ptot;

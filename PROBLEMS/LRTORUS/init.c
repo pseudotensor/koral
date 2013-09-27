@@ -1,6 +1,3 @@
-#include "limotorus.inc"
-
-
 ldouble rho,mx,my,mz,m,E,uint,pgas,Fx,Fy,Fz,pLTE,ell;  
 ldouble uu[NV], pp[NV],ppback[NV],T;
 ldouble Vphi,Vr;
@@ -57,7 +54,7 @@ if(rho<0.) //outside donut
     pp[3]=ucon[2];
     pp[4]=ucon[3];
 
-    print_primitives(pp);//getchar();
+    //print_primitives(pp);getchar();
 
 #ifdef MAGNFIELD//setting them zero not to break the following coordinate transformation
     pp[B1]=pp[B2]=pp[B3]=0.; 
