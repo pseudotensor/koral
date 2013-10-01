@@ -370,7 +370,7 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
-      
+
       calc_primitives(ix,iy,iz,0);
     }
 
@@ -381,6 +381,11 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
   //fixup here hd after inversions
   cell_fixup_hd();
+
+  //correct the axis if needed
+#ifdef CORRECT_POLARAXIS
+  correct_polaraxis();
+#endif
   
   //**********************************************************************
   //**********************************************************************
@@ -2001,7 +2006,7 @@ cell_fixup_hd()
 
   int ix,iy,iz,iv;
   int in,ii;
-  int verbose=1;
+  int verbose=2;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
@@ -2081,11 +2086,13 @@ cell_fixup_hd()
 
 		      if(verbose>1) 
 			{
-			  printf("fixing hd up %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  printf("fixing mhd up %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  /*
 			  for(ii=0;ii<in;ii++)
 			    print_Nvector(ppn[ii],NV);
 			  printf(" -> \n");
 			  print_Nvector(pp,NV);			
+			  */
 			}
 
 		      //save to updated arrays memory
@@ -2426,4 +2433,114 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
   gsl_vector_free (x);
   return 0;
 
+}
+
+//treats the most polar cells is a special way, correcting them, not evolving them
+int
+correct_polaraxis()
+{
+  int ix,iy,iz,iv,iysrc;
+#pragma omp parallel for private(ix,iy,iz,iv,iysrc) schedule (static)
+  for(ix=0;ix<NX;ix++)
+    {
+      for(iz=0;iz<NZ;iz++)
+	{
+	  ldouble th,thsrc,thaxis;
+	  ldouble pp[NV],uu[NV];
+	  struct geometry geom;
+
+	  /**********************************/
+	  iy=0;iysrc=2;
+	  th=get_x(iy,1);
+	  thsrc=get_x(iysrc,1);
+	  thaxis=get_xb(0,1);
+	      	  
+	  fill_geometry(ix,iy,iz,&geom);
+	  
+	  PLOOP(iv)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+  
+	  pp[VX]=get_u(p,VX,ix,iysrc,ix);
+	  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
+	  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+
+	  p2u(pp,uu,&geom);
+
+	  PLOOP(iv)
+	  {
+	    set_u(p,iv,ix,iy,iz,pp[iv]);  
+	    set_u(u,iv,ix,iy,iz,uu[iv]);
+	  }
+  
+	  /**********************************/
+	  iy=1;iysrc=2;
+	  th=get_x(iy,1);
+	  thsrc=get_x(iysrc,1);
+	      
+	  fill_geometry(ix,iy,iz,&geom);
+	  
+	  PLOOP(iv)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+  
+	  pp[VX]=get_u(p,VX,ix,iysrc,ix);
+	  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
+	  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+
+	  p2u(pp,uu,&geom);
+
+	  PLOOP(iv)
+	  {
+	    set_u(p,iv,ix,iy,iz,pp[iv]);  
+	    set_u(u,iv,ix,iy,iz,uu[iv]);
+	  }
+  
+	  /**********************************/
+	  iy=NY-2;iysrc=NY-3;
+	  th=get_x(iy,1);
+	  thsrc=get_x(iysrc,1);
+	  thaxis=get_xb(NY,1);
+ 
+	  fill_geometry(ix,iy,iz,&geom);
+	  
+	  PLOOP(iv)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+  
+	  pp[VX]=get_u(p,VX,ix,iysrc,ix);
+	  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
+	  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+
+	  p2u(pp,uu,&geom);
+
+	  PLOOP(iv)
+	  {
+	    set_u(p,iv,ix,iy,iz,pp[iv]);  
+	    set_u(u,iv,ix,iy,iz,uu[iv]);
+	  }
+  
+	  /**********************************/
+	  iy=NY-1;iysrc=NY-3;
+	  th=get_x(iy,1);
+	  thsrc=get_x(iysrc,1);
+ 
+	  fill_geometry(ix,iy,iz,&geom);
+	  
+	  PLOOP(iv)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+  
+	  pp[VX]=get_u(p,VX,ix,iysrc,ix);
+	  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
+	  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+
+	  p2u(pp,uu,&geom);
+
+	  PLOOP(iv)
+	  {
+	    set_u(p,iv,ix,iy,iz,pp[iv]);  
+	    set_u(u,iv,ix,iy,iz,uu[iv]);
+	  }
+  
+	}
+    }
+
+  return 0; 
 }

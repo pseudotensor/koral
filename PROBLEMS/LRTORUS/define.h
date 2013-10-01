@@ -40,6 +40,7 @@
 /************************************/
 //rmhd floors
 /************************************/
+#define CORRECT_POLARAXIS
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
