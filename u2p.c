@@ -476,6 +476,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 #ifdef MAGNFIELD
   ldouble ucond[4],ucovd[4];
   ldouble bcond[4],bcovd[4],magpre;  
+  ldouble etacon[4],etarel[4];
   int iv;
   for(iv=1;iv<4;iv++)
     ucond[iv]=pp[1+iv];
@@ -484,31 +485,39 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   calc_bcon_4vel(pp,ucond,ucovd,bcond);
   indices_21(bcond,bcovd,gg); 
   magpre = dot(bcond,bcovd)/2.;
-  
+  calc_normalobs_4vel(GG,etacon);
+  conv_vels(etacon,etarel,VEL4,VELPRIM,gg,GG);
+
   if(magpre>B2RHORATIOMAX*pp[RHO]) 
     {
       if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
-      ldouble factor=magpre/(B2RHORATIOMAX*pp[RHO]);
-      pp[RHO]*=factor;
+      ldouble f=magpre/(B2RHORATIOMAX*pp[RHO]);
+      /*
+      pp[RHO]*=f;
+      pp[UU]*=f;
+      */
       
-      #ifdef B2RHOKEEPTEMP //to keep the gas temperature constant and not to check bsq/uint independently
-      pp[UU]*=factor;
-      #endif
+      //adding up new mass in ZAMO
+      ldouble rho0 = pp[RHO];
+      ldouble drho = 1./etacon[0] * ucond[0] * rho0 * (f-1.);
+      pp[RHO] += drho;
+      
+      pp[VX] = (rho0 * pp[VX] + drho * etarel[1]) / pp[RHO];
+      pp[VY] = (rho0 * pp[VY] + drho * etarel[2]) / pp[RHO];
+      pp[VZ] = (rho0 * pp[VZ] + drho * etarel[3]) / pp[RHO];
+
       ret=-1;      
     }
-
-#ifndef B2RHOKEEPTEMP
- 
+  
+  /*
+    //independent check on ugas
   if(magpre>B2UURATIOMAX*pp[UU]) 
     {
       if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
       pp[UU]*=magpre/(B2UURATIOMAX*pp[UU]);
       ret=-1;      
     }
-
-#endif
-
-  
+  */
 
 #endif
 

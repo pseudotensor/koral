@@ -2439,8 +2439,10 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
 int
 correct_polaraxis()
 {
-  int ix,iy,iz,iv,iysrc;
-#pragma omp parallel for private(ix,iy,iz,iv,iysrc) schedule (static)
+  int nc=1; //correct nc most polar cells;
+
+  int ix,iy,iz,iv,ic,iysrc;
+#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static)
   for(ix=0;ix<NX;ix++)
     {
       for(iz=0;iz<NZ;iz++)
@@ -2449,96 +2451,58 @@ correct_polaraxis()
 	  ldouble pp[NV],uu[NV];
 	  struct geometry geom;
 
-	  /**********************************/
-	  iy=0;iysrc=2;
-	  th=get_x(iy,1);
-	  thsrc=get_x(iysrc,1);
+	  //upper
 	  thaxis=get_xb(0,1);
+	  for(ic=0;ic<nc;ic++)
+	    {
+	      iy=ic;iysrc=nc;
+	      th=get_x(iy,1);
+	      thsrc=get_x(iysrc,1);	      
 	      	  
-	  fill_geometry(ix,iy,iz,&geom);
+	      fill_geometry(ix,iy,iz,&geom);
 	  
-	  PLOOP(iv)
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
+	      PLOOP(iv)
+		pp[iv]=get_u(p,iv,ix,iy,iz);
   
-	  pp[VX]=get_u(p,VX,ix,iysrc,ix);
-	  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
-	  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+	      pp[VX]=get_u(p,VX,ix,iysrc,ix);
+	      pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
+	      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
 
-	  p2u(pp,uu,&geom);
+	      p2u(pp,uu,&geom);
 
-	  PLOOP(iv)
-	  {
-	    set_u(p,iv,ix,iy,iz,pp[iv]);  
-	    set_u(u,iv,ix,iy,iz,uu[iv]);
-	  }
+	      PLOOP(iv)
+	      {
+		set_u(p,iv,ix,iy,iz,pp[iv]);  
+		set_u(u,iv,ix,iy,iz,uu[iv]);
+	      }
+	    }
   
-	  /**********************************/
-	  iy=1;iysrc=2;
-	  th=get_x(iy,1);
-	  thsrc=get_x(iysrc,1);
-	      
-	  fill_geometry(ix,iy,iz,&geom);
-	  
-	  PLOOP(iv)
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
-  
-	  pp[VX]=get_u(p,VX,ix,iysrc,ix);
-	  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
-	  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
-
-	  p2u(pp,uu,&geom);
-
-	  PLOOP(iv)
-	  {
-	    set_u(p,iv,ix,iy,iz,pp[iv]);  
-	    set_u(u,iv,ix,iy,iz,uu[iv]);
-	  }
-  
-	  /**********************************/
-	  iy=NY-2;iysrc=NY-3;
-	  th=get_x(iy,1);
-	  thsrc=get_x(iysrc,1);
+	  //lower
 	  thaxis=get_xb(NY,1);
- 
-	  fill_geometry(ix,iy,iz,&geom);
+	  for(ic=0;ic<nc;ic++)
+	    {
+	      iy=NY-1-ic;iysrc=NY-1-nc;
+	      th=get_x(iy,1);
+	      thsrc=get_x(iysrc,1);	      
+	      	  
+	      fill_geometry(ix,iy,iz,&geom);
 	  
-	  PLOOP(iv)
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
+	      PLOOP(iv)
+		pp[iv]=get_u(p,iv,ix,iy,iz);
   
-	  pp[VX]=get_u(p,VX,ix,iysrc,ix);
-	  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
-	  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+	      pp[VX]=get_u(p,VX,ix,iysrc,ix);
+	      pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
+	      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
 
-	  p2u(pp,uu,&geom);
+	      p2u(pp,uu,&geom);
 
-	  PLOOP(iv)
-	  {
-	    set_u(p,iv,ix,iy,iz,pp[iv]);  
-	    set_u(u,iv,ix,iy,iz,uu[iv]);
-	  }
-  
-	  /**********************************/
-	  iy=NY-1;iysrc=NY-3;
-	  th=get_x(iy,1);
-	  thsrc=get_x(iysrc,1);
- 
-	  fill_geometry(ix,iy,iz,&geom);
-	  
-	  PLOOP(iv)
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
-  
-	  pp[VX]=get_u(p,VX,ix,iysrc,ix);
-	  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
-	  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
-
-	  p2u(pp,uu,&geom);
-
-	  PLOOP(iv)
-	  {
-	    set_u(p,iv,ix,iy,iz,pp[iv]);  
-	    set_u(u,iv,ix,iy,iz,uu[iv]);
-	  }
-  
+	      PLOOP(iv)
+	      {
+		set_u(p,iv,ix,iy,iz,pp[iv]);  
+		set_u(u,iv,ix,iy,iz,uu[iv]);
+	      }
+	    }
+	 
 	}
     }
 
