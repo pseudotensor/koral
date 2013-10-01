@@ -13,7 +13,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -68,16 +68,16 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.1-MKS1R0))
+#define MINX (log(1.2-MKS1R0))
 #define MAXX (log(100.-MKS1R0))
-#define NX 100
-#define NY 40
+#define NX 200
+#define NY 120
 #define NZ 1
 #endif
 
 #define MINY (0.0025*Pi/2.)
-//#define MAXY (Pi-0.0025*Pi/2.)
-#define MAXY (Pi/2.)
+#define MAXY (Pi-0.0025*Pi/2.)
+//#define MAXY (Pi/2.) //change in postinit.c
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
@@ -102,8 +102,8 @@
 /************************************/
 #define GAMMA (4./3.)
 
-#define LT_KAPPA 0.01
-#define LT_XI 0.84
+#define LT_KAPPA 2.e3
+#define LT_XI 0.835
 #define LT_R1 25.
 #define LT_R2 1000.
 #define LT_GAMMA 4./3.

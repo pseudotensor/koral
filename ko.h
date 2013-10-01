@@ -531,7 +531,7 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt);
 int apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4);
 int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldouble GG[][5], ldouble *del4);
 int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt);
-ldouble calc_LTE_temp(ldouble *pp,void *ggg);
+ldouble calc_LTE_temp(ldouble *pp,void *ggg,int);
 int test_solve_implicit_lab();
 int test_jon_solve_implicit_lab();
 int calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg);

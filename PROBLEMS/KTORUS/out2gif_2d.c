@@ -8,16 +8,16 @@ ldouble minx,miny,maxx,maxy;
 
 #if (OUTCOORDS==KERRCOORDS)
 minx= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxx= 0.21*(exp(get_xb(NX,0))+MKS1R0);
+maxx= 1.01*(exp(get_xb(NX,0))+MKS1R0);
 miny= -.02*(exp(get_xb(-NG,0))+MKS1R0);
-maxy= 0.21*(exp(get_xb(NX,0))+MKS1R0);
+maxy= 1.01*(exp(get_xb(NX,0))+MKS1R0);
 
 //maxx=maxy=20.;
 #else
 minx= -.02*get_xb(NX,0);
-maxx= 1.02*get_xb(NX/2,0);
+maxx= 1.02*get_xb(NX,0);
 miny= -.02*get_xb(NX,0);
-maxy= 1.02*get_xb(NX/2,0);
+maxy= 1.02*get_xb(NX,0);
 
 #endif
 

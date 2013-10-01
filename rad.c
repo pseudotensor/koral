@@ -1954,9 +1954,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   if(ret!=0)
     {
-      /*
-
-      //backup method - interpolating between zero and LTE state
+      //backup method - searching numerically for precise LTE state
       params[1]=RADIMPLICIT_LTEEQ;
       params[3]=0;
       if(Ehat<1.e-2*pp0[UU])
@@ -1993,9 +1991,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      fflush(fout_fail);
 	    }
 	}
-      */
 
-      if(ret!=0) //numerical solver for LTE didn't work; let's estimate LTE
+      //backup method - estimating LTE state
+      if(ret!=0) 
 	{
 	  fprintf(fout_fail,"rad backup LTE squared > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
 		      geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
@@ -2026,9 +2024,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  pp[FZ0]=pp[VZ];
 
 	  //calculates LTE temperature
-	  ldouble TLTE=calc_LTE_temp(pp0,&geom);	   
+	  ldouble TLTE=calc_LTE_temp(pp0,&geom,0);	   
 	  if(TLTE<0.)
-	    ret=-1;
+	    {
+	      //calc_LTE_temp(pp0,&geom,1);
+	      ret=-1;
+	    }
 	  else
 	    ret=0; //consider this success
 	    
@@ -2041,7 +2042,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  
 	}
     
-      if(ret==0) //LTE worked so can combine zero and LTE state (in pp[])
+      //LTE worked so can combine (arbitrarily) zero and LTE state (in pp[])
+      if(ret==0) 
 	{
 	  ldouble ms[NV];
 	  PLOOP(iv) ms[iv]=0.;
@@ -2071,18 +2073,40 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]-dt*ms[3]);
 	  uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]-dt*ms[4]);
 	  u2p_rad(uu,pp,&geom,corr);
-	  //report on ceilings
+
+	  ret=0;
+	  //radiative inversion failed
 	  if(corr[0]>0)
 	    {
-	      if(1 || verbose) printf("LTE ultimate corr: %d\n",corr[0]);
-	      ret=-1;
+	      if(1 || verbose) printf("LTE ultimate rad corr: %d\n",corr[0]);
+	      //trying the other inversion
+	      p2u(pp,uu,&geom);
+
+	      uu[RHO]=uu0[RHO]+dt*ms[RHO];
+	      uu[1] = uu0[1]+dt*ms[1] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
+	      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]-dt*ms[FX0]);
+	      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]-dt*ms[FY0]);
+	      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]-dt*ms[FZ0]);
+	      uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
+
+	      int rettemp=0;
+	      //if(whicheq==RADIMPLICIT_ENERGYEQ)
+	      rettemp=u2p_solver(uu,pp,&geom,U2P_HOT,0); 
+	      //if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	      if(rettemp<0)
+		rettemp=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
+	      
+	      if(1 || verbose) printf("LTE ultimate hd corr: %d\n",rettemp);
+	      
+	      if(rettemp<0) //to return error if neither rad or mhd inversion suceeded
+		ret=-1;
 	    }
-	  
+	 
 	  /*
-	  print_NVvector(pp0);
-	  print_NVvector(uu0);
-	  print_NVvector(pp);
-	  print_NVvector(uu);getch();
+	    print_NVvector(pp0);
+	    print_NVvector(uu0);
+	    print_NVvector(pp);
+	    print_NVvector(uu);getch();
 	  */
 	}
       
@@ -4243,11 +4267,11 @@ calc_LTE_state_temp(ldouble *pp,void *ggg)
  
 //calculates LTE temperature
 ldouble
-calc_LTE_temp(ldouble *pp,void *ggg)
+calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
 {
   int i,j;
   ldouble Rtt,Ehat,ucon[4],ugas0,ugas,rho,Ehat0;
-  int verbose=0;
+  
 
   calc_ff_Rtt(pp,&Rtt,ucon,ggg);
   Ehat=-Rtt; //en.density of radiation in the fluid frame
@@ -4310,7 +4334,7 @@ calc_LTE_temp(ldouble *pp,void *ggg)
 
   if(!isfinite(ugas) || iter>=50)
     {
-      printf("LTE_temp failed\n");
+      printf("LTE_temp failed\n"); if(verbose) getchar();
       return -1.;
     }
       
