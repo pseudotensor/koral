@@ -486,7 +486,7 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   indices_21(bcond,bcovd,gg); 
   magpre = dot(bcond,bcovd)/2.;
   calc_normalobs_4vel(GG,etacon);
-  conv_vels(etacon,etarel,VEL4,VELPRIM,gg,GG);
+  conv_vels_ut(etacon,etarel,VEL4,VELPRIM,gg,GG);
 
   if(magpre>B2RHORATIOMAX*pp[RHO]) 
     {
