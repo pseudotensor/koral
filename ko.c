@@ -102,6 +102,10 @@ main(int argc, char **argv)
   //copies initial primitives to pinit
   copy_u(1.,p,pinit);
 
+  //zeros the avg array
+  copy_u(0.,p,pavg);
+  avgtime=0.;
+
   //calculates initial scalars
   calc_scalars(scalars,tstart);
 
@@ -291,6 +295,8 @@ solve_the_problem(ldouble tstart)
       //average number of iterations in the implicit solver
       ldouble avimpit=global_slot[0]/global_slot[1];
 
+      //save to avg arrays
+      save_avg(dt);
 
       //output to a file
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
@@ -308,6 +314,11 @@ solve_the_problem(ldouble tstart)
 	  fprint_restartfile(t,"dumps");
 
 	  //dumps dumps
+#if(AVGOUTPUT==1)
+	  copy_u(1./avgtime,pavg,pavg);
+	  avgtime=0.;  
+	  fprint_avgfile(t,"dumps");
+#endif
 #if(SCAOUTPUT==1)
 	  fprint_scalars(t,scalars,NSCALARS,"dumps");
 #endif

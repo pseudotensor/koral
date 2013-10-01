@@ -50,10 +50,10 @@ main(int argc, char **argv)
 
   //arrays for averaging of primitives
 
-  ldouble *pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-  ldouble *uavg=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  ldouble *panaavg=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  ldouble *uanaavg=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   for(i=0;i<(SX)*(SY)*(SZ)*NV;i++)
-    pavg[i]=uavg[i]=0.;
+    panaavg[i]=uanaavg[i]=0.;
 
   int ifile,itot=0,readret;
   ldouble t; ldouble scalars[NSCALARS];
@@ -87,8 +87,8 @@ main(int argc, char **argv)
 		    {
 		      set_u(u,iv,ix,iy,iz,uu[iv]);
 		      //adding up to avg array
-		      set_u(pavg,iv,ix,iy,iz,get_u(pavg,iv,ix,iy,iz)+pp[iv]);
-		      set_u(uavg,iv,ix,iy,iz,get_u(uavg,iv,ix,iy,iz)+uu[iv]);
+		      set_u(panaavg,iv,ix,iy,iz,get_u(panaavg,iv,ix,iy,iz)+pp[iv]);
+		      set_u(uanaavg,iv,ix,iy,iz,get_u(uanaavg,iv,ix,iy,iz)+uu[iv]);
 		    }		  
 		}
 	    }
@@ -96,7 +96,7 @@ main(int argc, char **argv)
 
 
       //adding up to avg array
-      //add_u(1.,p,1.,pavg,pavg);
+      //add_u(1.,p,1.,panaavg,panaavg);
 
       nfout1--; //correcting index
   
@@ -130,8 +130,8 @@ main(int argc, char **argv)
 
   //preparing to dump the avg files
   //average primitives and conserved
-  copy_u(1./(ldouble)itot,pavg,p);
-  copy_u(1./(ldouble)itot,uavg,u);
+  copy_u(1./(ldouble)itot,panaavg,p);
+  copy_u(1./(ldouble)itot,uanaavg,u);
   //projects on ghost cells
   set_bc(t,0);
   //calculating conserved

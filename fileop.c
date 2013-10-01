@@ -4,6 +4,91 @@
 #include "ko.h"
 
 /*********************************************/
+/* adds up current quantities to the pavg array
+/*********************************************/
+int
+save_avg(ldouble dt)
+{
+  int ix,iy,iz,iv,ii;
+
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+  for(ii=0;ii<Nloop_0;ii++) //domain 
+    {
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+      
+      ldouble avg[NV+NAVGVARS];
+      p2avg(ix,iy,iz,avg);
+
+      for(iv=0;iv<NV+NAVGVARS;iv++)
+	{
+	  set_uavg(pavg,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz)+avg[iv]*dt);
+	}
+    }
+
+  avgtime+=dt;
+  
+  return 0;
+}
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints avg files */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+
+//TODO: save binary
+int
+fprint_avgfile(ldouble t, char* folder)
+{
+  //TODO
+  char bufor[50],bufor2[50];
+  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+  fout1=fopen(bufor,"w");
+  
+  //header
+  //## nout time problem NX NY NZ
+  fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
+
+  /***********************************/  
+  /** writing order is fixed  ********/  
+  /***********************************/  
+ 
+  int ix,iy,iz,iv;
+  ldouble pp[NV];
+  for(iz=0;iz<NZ;iz++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(ix=0;ix<NX;ix++)
+	    {
+	      fprintf(fout1,"%d %d %d ",ix,iy,iz);
+	      for(iv=0;iv<NV;iv++)
+		{
+		  pp[iv]=get_u(p,iv,ix,iy,iz);
+		}	 
+	     
+	      for(iv=0;iv<NV;iv++)
+		fprintf(fout1,"%.20e ",pp[iv]);
+	      fprintf(fout1,"\n");
+	    }
+	}
+    }
+
+  fflush(fout1);
+  fclose(fout1);
+
+  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+  iv=system(bufor);
+
+  return 0;
+}
+
+
+/*********************************************/
 /* opens files etc. */
 /*********************************************/
 int 

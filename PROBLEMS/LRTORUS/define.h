@@ -93,6 +93,7 @@
 #define NOUTSTOP 5000
 #define SILOOUTPUT 1
 #define OUTOUTPUT 1
+#define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 10.

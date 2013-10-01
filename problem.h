@@ -1263,6 +1263,10 @@
 #define NSCALARS 4
 #endif
 
+#ifndef NAVGVARS
+#define NAVGVARS 4
+#endif
+
 #ifndef NRADPROFILES
 #define NRADPROFILES 12
 #endif
@@ -1371,6 +1375,10 @@
 
 #ifndef RADOUTPUT
 #define RADOUTPUT 1
+#endif
+
+#ifndef AVGOUTPUT
+#define AVGOUTPUT 0
 #endif
 
 #ifndef SILOOUTPUT

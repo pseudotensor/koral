@@ -84,10 +84,10 @@
 #define FTYPE ldouble
 #define gSIZE 20 //size of metric arrays = 16 + 1 (gdet) + 3 (dlgdet)
 
-//global variables
+//global variables (allocated or not in misc.c)
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pinit,*pproblem1,*pproblem2,*emf,
-  *ptm1,*ptm2,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,
+  *ptm1,*ptm2,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,*pavg,
   *pbLx,*pbRx,*pbLy,*pbRy,*pbLz,*pbRz,*sbLx,*sbRx,*sbLy,*sbRy,*sbLz,*sbRz,*ubLx,*ubRx,*ubLy,*ubRy,*ubLz,*ubRz,
   *flbx,*flby,*flbz,*flLx,*flRx,*flLy,*flRy,*flLz,*flRz,*gKr,*gKrbx,*gKrby,*gKrbz,*G,
   *emuup,*emulo,*emuupbx,*emulobx,*emuupby,*emuloby,*emuupbz,*emulobz,
@@ -95,7 +95,7 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
 int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,**loop_02,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4;
-ldouble global_slot[2],global_time;
+ldouble global_slot[2],global_time,avgtime;
 ldouble scalars[NSCALARS];
 
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
@@ -252,8 +252,10 @@ int set_xb(int,int,ldouble);
 #define get_cflag(iflag,ix,iy,iz) (cellflag[iflag + (iX(ix)+NGCX)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS])
 #define set_cflag(iflag,ix,iy,iz,val) cellflag[iflag + (iX(ix)+NGCX)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS]=val
 #define get_u(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV])
+#define get_uavg(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+NGCX)*(NV+NAVGVARS) + (iY(iy)+NGCY)*(SX)*(NV+NAVGVARS) + (iZ(iz)+NGCZ)*(SY)*(SX)*(NV+NAVGVARS)])
 //int set_u(ldouble*,int,int,int,int,ldouble);
 #define set_u(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV]=val
+#define set_uavg(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*(NV+NAVGVARS) + (iY(iy)+NGCY)*(SX)*(NV+NAVGVARS) + (iZ(iz)+NGCZ)*(SY)*(SX)*(NV+NAVGVARS)]=val
 #define get_u_scalar(uarr,ix,iy,iz) (uarr[(iX(ix)+NGCX) + (iY(iy)+NGCY)*(SX) + (iZ(iz)+NGCZ)*(SY)*(SX)])
 //ldouble get_u_scalar(ldouble*,int,int,int);
 //int set_u_scalar(ldouble*,int,int,int,ldouble);
@@ -285,6 +287,7 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 #define delta(i,j) (i==j ? 1 : 0)
 
 //fileop.c
+int save_avg(ldouble dt);
 int fprint_restartfile(ldouble t, char* folder);
 int fprint_simplecart(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder);
@@ -454,6 +457,7 @@ int u2p_rad_onff(ldouble *uu, ldouble *pp, void*,int*);
 int u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected);
 
 //p2u.c
+int p2avg(int,int,int,ldouble*);
 int calc_conserved(int ix,int iy,int iz);
 int p2u(ldouble *p, ldouble *u,void*);
 int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);

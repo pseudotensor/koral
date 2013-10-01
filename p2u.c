@@ -299,3 +299,74 @@ int p2u_rad(ldouble *pp,ldouble *uu,void *ggg)
 
   return 0;
 }
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//takes primitives and calculates quantities that are averaged for the avg file
+int
+p2avg(int ix,int iy,int iz,ldouble *avg)
+{
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  int iv;ldouble pp[NV],uu[NV];
+  for(iv=0;iv<NV;iv++)
+    {
+      uu[iv]=get_u(u,iv,ix,iy,iz); //conserved 
+      pp[iv]=get_u(p,iv,ix,iy,iz); //primitives 
+
+      avg[iv]=pp[iv]; //first NV slots in pavg are regular primitives
+   }
+  
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom.gg;
+  gdet=geom.gdet;
+  GG=geom.GG;
+  gdetu=gdet;
+
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  //four-vectors etc
+  ldouble rho=pp[0];
+  ldouble uint=pp[1];
+  ldouble vcon[4],vcov[4],ucon[4],ucov[4];
+  ldouble bcon[4]={0.,0.,0.,0.},bcov[4]={0.,0.,0.,0.},bsq=0.;
+  vcon[1]=pp[2];
+  vcon[2]=pp[3];
+  vcon[3]=pp[4];
+  vcon[0]=0.;
+  ldouble S=pp[5];
+  conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG); 
+#ifdef MAGNFIELD
+  calc_bcon_4vel(pp,ucon,ucov,bcon);
+  indices_21(bcon,bcov,gg); 
+  bsq = dot(bcon,bcov);
+#endif
+  
+  //hydro stress-energy
+  ldouble ut=ucon[0];
+  ldouble rhout = rho*ut;
+  ldouble Sut;
+  Sut=S*ut;
+  ldouble pre=(GAMMA-1.)*uint; 
+  ldouble w=rho+uint+pre;
+  ldouble eta=w+bsq;
+  ldouble ptot=pre+0.5*bsq;
+  //~T^i_j 
+  ldouble Tttt=rhout + eta*ucon[0]*ucov[0] + ptot - bcon[0]*bcov[0];
+  ldouble Ttr =eta*ucon[0]*ucov[1] - bcon[0]*bcov[1];
+  ldouble Ttth =eta*ucon[0]*ucov[2] - bcon[0]*bcov[2];
+  ldouble Ttph =eta*ucon[0]*ucov[3] - bcon[0]*bcov[3];
+
+  //avg 
+  avg[NV+0]=rho*ucon[0];
+  avg[NV+1]=rho*ucon[1]*ucon[0];
+  avg[NV+2]=rho*ucon[2]*ucon[0];
+  avg[NV+3]=rho*ucon[3]*ucon[0]; 
+
+  return 0.;
+}
