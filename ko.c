@@ -314,7 +314,9 @@ solve_the_problem(ldouble tstart)
 	  fprint_restartfile(t,"dumps");
 
 	  //dumps dumps
-#if(AVGOUTPUT==1)
+
+	  //avg goes first so that what is later can use it
+#if(AVGOUTPUT==1) 
 	  copy_u(1./avgtime,pavg,pavg);
 	  avgtime=0.;  
 	  fprint_avgfile(t,"dumps");
