@@ -10,7 +10,7 @@ main(int argc, char **argv)
   int no1,no2,nostep;
   if(argc!=4)
     {
-      printf("Not enough input arguments. Asks for ./ana no1 no2 nostep\n");
+      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep\n");
       return -1;
     }
   else
@@ -49,14 +49,12 @@ main(int argc, char **argv)
   fout_scalars=fopen(bufor,"w");
 
   //arrays for averaging of primitives
-
-  //ldouble *pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
   ldouble *pavgtot=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
 
   for(i=0;i<(SX)*(SY)*(SZ)*(NV+NAVGVARS);i++)
     pavg[i]=pavgtot[i]=0.;
 
-  int ifile,itot=0,readret;
+  int ifile,readret;
   ldouble t,ttot; ldouble scalars[NSCALARS];
   ttot=0.;
 
@@ -67,42 +65,44 @@ main(int argc, char **argv)
 
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
-      itot++;
-
-      //reading restart file
-      readret=fread_restartfile(ifile,&t);
-      
-      //correcting index
-      nfout1--; 
-  
-      //sets bc
-      set_bc(t,0);
-     
-      //calculate scalars
-      calc_scalars(scalars,t);
-
-      //dumps dumps to analysis analysis
-#if(SCAOUTPUT==1)
-      fprint_scalars(t,scalars,NSCALARS,"analysis");
-#endif
-#if(RADOUTPUT==1)
-      fprint_radprofiles(t,nfout1,"analysis","rad");
-#endif
-#if(OUTOUTPUT==1)
-      fprint_outfile(t,nfout1,0,"analysis","out");
-#endif
-#if(SILOOUTPUT==1)
-      fprint_silofile(t,nfout1,"analysis","sil");
-#endif
-#if(SIMOUTPUT==1)	  
-      fprint_simplecart(t,nfout1,"analysis","sim");
-#endif
-  
-
+      //reading avg file
+      readret=fread_avgfile(ifile,pavg,&dt);
+      add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
+      ttot+=dt;
     }
 
+  //average primitives and averaged quantities
+  copy_u_core(1./ttot,pavgtot,pavg,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
 
-  fclose(fout_scalars);
+  //rewrite primitives to p
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
+	for(iv=0;iv<(NV+NAVGVARS);iv++)
+	   set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
+
+  //projects on ghost cells
+  set_bc(t,0);
+
+  char prefix[40];
+  
+  //dumps dumps to analysis analysis
+#if(RADOUTPUT==1)
+  sprintf(prefix,"radavg%04d-",no1);
+  fprint_radprofiles(t,no2,"analysis",prefix);
+#endif
+#if(OUTOUTPUT==1)
+  sprintf(prefix,"outavg%04d-",no1);
+  fprint_outfile(t,no2,0,"analysis",prefix);
+#endif
+#if(SILOOUTPUT==1)
+  sprintf(prefix,"silavg%04d-",no1);
+  fprint_silofile(t,no2,"analysis",prefix);
+#endif
+#if(SIMOUTPUT==1)	  
+  sprintf(prefix,"simavg%04d-",no1);
+  fprint_simplecart(t,no2,"analysis",prefix);
+#endif
   
   return 0;
 }

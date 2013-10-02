@@ -6,6 +6,9 @@
 
 /*********************************************/
 /* calculates radial profiles - L(r) etc. */
+/* uses mostly primitives, but may use avg quantities as well */
+/* however, this part would work only when postprocessing with */
+/* ./avg, otherwise pavg hold non-normalized numbers */
 /*********************************************/
 int calc_radialprofiles(ldouble profiles[][NX])
 {
@@ -88,8 +91,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[1][ix]+=-rho*ucon[1]*dxcgs[1]*dxcgs[2];
 	      //rho-weighted minus radial velocity (4)
 	      profiles[2][ix]+=-ucon[1]*rho*dxcgs[1];
-	      //rho-weighted u_phi (5)
-	      //profiles[3][ix]+=ucov[3]*rho*dxcgs[1];	
 	      //abs optical depth (7)
 	      profiles[5][ix]+=tauabs[1];	
 	      //tot optical depth (8)
@@ -98,16 +99,15 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      for(iv=0;iv<NAVGVARS;iv++)
 		avgsums[iv][ix]+=get_uavg(pavg,NV+iv,ix,iy,iz)*dx[1];
 
-	      //(rho+u+bsq/2)u^r u_phi
+	      //<(rho+u+bsq/2)u^r><u_phi>
 	      profiles[3][ix]+=get_uavg(pavg,NV+9,ix,iy,iz)*
 		get_uavg(pavg,NV+4,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz)*dx[1];
-	      //profiles[3][ix]+=get_uavg(pavg,NV+4,ix,iy,iz)*dx[1];
 #endif
 	    }
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
 
-	  //normalizing by rho u^r
+	  //normalizing by <rho u^r>
 	  profiles[3][ix]/=avgsums[1][ix];
 
 	  //Keplerian u_phi (6)
