@@ -2124,6 +2124,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 	     geom.ix,geom.iy,geom.iz,global_time,nfout1);
 
+      global_int_slot[GLOBALINTSLOT_NCRITFAILURES]++;
+      if(global_int_slot[GLOBALINTSLOT_NCRITFAILURES]>1000)
+	{
+	  printf("exceeded # of critical failures (%d) - exiting.\n",
+		 global_int_slot[GLOBALINTSLOT_NCRITFAILURES]);
+	  exit(-1);
+	}
+
       set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
 
       return 0; 

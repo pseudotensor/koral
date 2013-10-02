@@ -72,7 +72,7 @@
 //66* KTORUS - RMHD Newtonian torus with radiation
 //67* LRTORUS - RMHD limo torus
 
-#define PROBLEM 66
+#define PROBLEM 63
 
 #if(PROBLEM==67)
 
@@ -1332,7 +1332,7 @@
 #endif
 
 #ifndef GDETIN
-#define GDETIN 0 //whether to include metric determinant into the fluxes; must be on for magnetic fields 'cos flux_ct assumes that
+#define GDETIN 1 //whether to include metric determinant into the fluxes; must be on for magnetic fields 'cos flux_ct assumes that
 #endif
 
 #ifndef MODYFIKUJKRZYSIE

@@ -153,7 +153,7 @@ solve_the_problem(ldouble tstart)
   struct rad_parameters rp;
    
   i1=i2=0.;
-
+  global_int_slot[GLOBALINTSLOT_NCRITFAILURES]=0; //counting number of critical failures
 
   lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=1.;
@@ -318,8 +318,8 @@ solve_the_problem(ldouble tstart)
 	  //avg goes first so that what is later can use it
 #if(AVGOUTPUT==1) 
 	  copy_u(1./avgtime,pavg,pavg);
-	  avgtime=0.;  
 	  fprint_avgfile(t,"dumps");
+	  avgtime=0.;
 #endif
 #if(SCAOUTPUT==1)
 	  fprint_scalars(t,scalars,NSCALARS,"dumps");

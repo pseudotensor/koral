@@ -1781,12 +1781,19 @@ copy_u(ldouble factor,ldouble *uu1,ldouble* uu2 )
 //array multiplication plus addition
 //uu3=f1*uu1+f2*uu2
 int 
-add_u(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3)
+add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3,int N)
 {
   int i;
 #pragma omp parallel for private (i) 
-  for (i=0;i<SX*SY*SZ*NV;i++)
+  for (i=0;i<N;i++)
     uu3[i]=uu1[i]*f1+uu2[i]*f2;
+  return 0;
+}
+
+int 
+add_u(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3)
+{
+  add_u_core(f1,uu1,f2,uu2,uu3,SX*SY*SZ*NV);
   return 0;
 }
 

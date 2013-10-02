@@ -46,15 +46,14 @@ fprint_avgfile(ldouble t, char* folder)
 {
   //TODO
   char bufor[50],bufor2[50];
-  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
   fout1=fopen(bufor,"w");
   
   //header
-  //## nout time problem NX NY NZ
-  fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
+  //## navg time1 time2 dt 
+  fprintf(fout1,"## %d %e %e %e\n",nfout1,t-avgtime,t,avgtime);
 
   /***********************************/  
-  /** writing order is fixed  ********/  
   /***********************************/  
  
   int ix,iy,iz,iv;
@@ -66,13 +65,10 @@ fprint_avgfile(ldouble t, char* folder)
 	  for(ix=0;ix<NX;ix++)
 	    {
 	      fprintf(fout1,"%d %d %d ",ix,iy,iz);
-	      for(iv=0;iv<NV;iv++)
+	      for(iv=0;iv<NV+NAVGVARS;iv++)
 		{
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
+		  fprintf(fout1,"%.20e ",get_uavg(pavg,iv,ix,iy,iz));
 		}	 
-	     
-	      for(iv=0;iv<NV;iv++)
-		fprintf(fout1,"%.20e ",pp[iv]);
 	      fprintf(fout1,"\n");
 	    }
 	}
@@ -81,8 +77,60 @@ fprint_avgfile(ldouble t, char* folder)
   fflush(fout1);
   fclose(fout1);
 
-  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
-  iv=system(bufor);
+  return 0;
+}
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* reads avg file */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int 
+fread_avgfile(int nout1, ldouble *pavg, ldouble *dt)
+{
+  //opening avg file
+  int i,ret;
+  char fname[40];
+  sprintf(fname,"dumps/avg%04d.dat",nout1);
+  
+  printf("opening: %s\n",fname);
+
+  FILE *fdump=fopen(fname,"r");
+
+  //reading parameters, mostly time
+  int intpar[5];
+  ldouble ldpar[5];
+  ret=fscanf(fdump,"## %d %f %f %f\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
+  printf("avg file (%s) read no. %d at times: %.2e to %.2e (%.2e)\n",
+	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
+
+  *dt=ldpar[2];
+
+  int ix,iy,iz,iv;
+  for(iz=0;iz<NZ;iz++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(ix=0;ix<NX;ix++)
+	    {
+	      ret=fscanf(fdump,"%*f %*f %*f ");
+									  
+	      /**************************/  
+	      /**************************/  
+	      /**************************/  
+	      
+	      //reading primitives from file
+	      for(i=0;i<NV;i++)
+		{
+		  ret=fscanf(fdump,"%lf ",&get_uavg(pavg,i,ix,iy,iz));
+		}
+	    }
+	}
+    }
+
+  fclose(fdump);
 
   return 0;
 }
@@ -667,14 +715,13 @@ fread_restartfile(int nout1, ldouble *t)
   //reading parameters, mostly time
   int intpar[5];
   ret=fscanf(fdump,"## %d %lf %d %d %d %d\n",&intpar[0],t,&intpar[1],&intpar[2],&intpar[3],&intpar[4]);
-  printf("dump file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
+  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
 	 fname,intpar[0],*t,intpar[1],intpar[2],intpar[3],intpar[4]); 
 
   nfout1=intpar[0]+1; //global file no.
 
   int ix,iy,iz,iv;
   //reading conserved
-  int gclx,gcrx,gcly,gcry,gclz,gcrz;
   struct geometry geom;
   ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;

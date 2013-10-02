@@ -102,4 +102,5 @@
 #define RADIMPLICIT_LAB 0
 #define RADIMPLICIT_FF 1
 
-
+//global integer slots
+#define GLOBALINTSLOT_NCRITFAILURES 0

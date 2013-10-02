@@ -96,6 +96,7 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
 int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,**loop_02,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4;
 ldouble global_slot[2],global_time,avgtime;
+int global_int_slot[1];
 ldouble scalars[NSCALARS];
 
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
@@ -202,6 +203,7 @@ ldouble f_der_hlle_obsolete(int ix,int iy, int yz,ldouble*);
 ldouble f_der_muscl(int ix,int iy, int yz,ldouble*);
 int copy_u(ldouble,ldouble*,ldouble*);
 int add_u(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble *u3);
+int add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3,int N);
 ldouble f_timeder_source_term(ldouble t, const ldouble y[], ldouble f[],  void *params);
 
 int set_bc(ldouble,int);

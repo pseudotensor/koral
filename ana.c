@@ -50,13 +50,15 @@ main(int argc, char **argv)
 
   //arrays for averaging of primitives
 
-  ldouble *panaavg=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-  ldouble *uanaavg=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-  for(i=0;i<(SX)*(SY)*(SZ)*NV;i++)
-    panaavg[i]=uanaavg[i]=0.;
+  ldouble *pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
+  ldouble *pavgtot=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
+
+  for(i=0;i<(SX)*(SY)*(SZ)*(NV+NAVGVARS);i++)
+    pavg[i]=pavgtot[i]=0.;
 
   int ifile,itot=0,readret;
-  ldouble t; ldouble scalars[NSCALARS];
+  ldouble t,ttot; ldouble scalars[NSCALARS];
+  ttot=0.;
 
   printf("working on files #%04d to #%04d with %d step \n",no1,no2,nostep);
 
@@ -67,10 +69,18 @@ main(int argc, char **argv)
     {
       itot++;
 
+      //reading avg file
+      if(ifile<no2)
+	{
+	  readret=fread_avgfile(ifile,pavg,dt);
+	  add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
+	  ttot+=dt;
+	}
+
+      //reading restart file
       readret=fread_restartfile(ifile,&t);
 
-      //projects on ghost cells
-      set_bc(t,0);
+      /*
       //calculating conserved
       for(iz=0;iz<NZ;iz++)
 	{
@@ -87,17 +97,14 @@ main(int argc, char **argv)
 		    {
 		      set_u(u,iv,ix,iy,iz,uu[iv]);
 		      //adding up to avg array
-		      set_u(panaavg,iv,ix,iy,iz,get_u(panaavg,iv,ix,iy,iz)+pp[iv]);
-		      set_u(uanaavg,iv,ix,iy,iz,get_u(uanaavg,iv,ix,iy,iz)+uu[iv]);
+		      set_u(pavg,iv,ix,iy,iz,get_u(pavg,iv,ix,iy,iz)+pp[iv]);
+		      set_u(uavg,iv,ix,iy,iz,get_u(uavg,iv,ix,iy,iz)+uu[iv]);
 		    }		  
 		}
 	    }
 	}
-
-
-      //adding up to avg array
-      //add_u(1.,p,1.,panaavg,panaavg);
-
+      */
+      
       nfout1--; //correcting index
   
       //sets bc
@@ -128,10 +135,11 @@ main(int argc, char **argv)
 
   fclose(fout_scalars);
 
+  /*
   //preparing to dump the avg files
   //average primitives and conserved
-  copy_u(1./(ldouble)itot,panaavg,p);
-  copy_u(1./(ldouble)itot,uanaavg,u);
+  copy_u(1./(ldouble)itot,pavg,p);
+  copy_u(1./(ldouble)itot,uavg,u);
   //projects on ghost cells
   set_bc(t,0);
   //calculating conserved
@@ -181,7 +189,7 @@ main(int argc, char **argv)
   sprintf(prefix,"simavg%04d-",no1);
   fprint_simplecart(t,nfout1,"analysis",prefix);
 #endif
-
+  */
 
   return 0;
 }
