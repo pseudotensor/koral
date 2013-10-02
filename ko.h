@@ -108,7 +108,7 @@ ldouble max_ws[3],max_dt,ttm1,ttm2;
 ldouble min_dx,min_dy,min_dz;
 ldouble dt,tstepdenmax;
 FILE *fout1,*fout_scalars,*fout_radprofiles,*fout_fail;
-int nfout1;
+int nfout1,nfout2;
 
 //some macros
 #define my_max(x,y) (x>y?x:y)

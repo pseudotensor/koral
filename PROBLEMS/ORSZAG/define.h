@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 49
+#define RESTART
+#define RESTARTNUM 14
 
 /************************************/
 //radiation
@@ -72,6 +72,8 @@
 #define SILOOUTPUT 1
 #define AVGOUTPUT 1
 #define OUTOUTPUT 0
+#define DTOUT1 10.
+#define DTOUT2 30.
 
 /************************************/
 //common physics / atmosphere
@@ -79,6 +81,5 @@
 
 #define GAMMA (4./3.)
 #define CSCALE 100.
-#define DTOUT1 1.
 #define BZERO (1./sqrt(4.*M_PI))
 #define VECPOTGIVEN

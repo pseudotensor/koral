@@ -46,12 +46,12 @@ fprint_avgfile(ldouble t, char* folder)
 {
   //TODO
   char bufor[50],bufor2[50];
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1-1);
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
   fout1=fopen(bufor,"w");
   
   //header
   //## navg time1 time2 dt 
-  fprintf(fout1,"## %d %e %e %e\n",nfout1-1,t-avgtime,t,avgtime);
+  fprintf(fout1,"## %d %e %e %e\n",nfout2,t-avgtime,t,avgtime);
 
   /***********************************/  
   /***********************************/  
@@ -146,6 +146,7 @@ fprint_openfiles(char* folder)
   sprintf(bufor,"rm %s/*",folder);
   int i=system(bufor);
   nfout1=0;
+  nfout2=0;
 #endif
 
   sprintf(bufor,"%s/scalars.dat",folder);
@@ -648,7 +649,7 @@ fprint_restartfile(ldouble t, char* folder)
   
   //header
   //## nout time problem NX NY NZ
-  fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
+  fprintf(fout1,"## %d %d %e %d %d %d %d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
 
   /***********************************/  
   /** writing order is fixed  ********/  
@@ -709,12 +710,13 @@ fread_restartfile(int nout1, ldouble *t)
   if(fdump==NULL) return 1; //request start from scratch
 
   //reading parameters, mostly time
-  int intpar[5];
-  ret=fscanf(fdump,"## %d %lf %d %d %d %d\n",&intpar[0],t,&intpar[1],&intpar[2],&intpar[3],&intpar[4]);
+  int intpar[6];
+  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
   printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
-	 fname,intpar[0],*t,intpar[1],intpar[2],intpar[3],intpar[4]); 
+	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
 
   nfout1=intpar[0]+1; //global file no.
+  nfout2=intpar[1]; //global file no. for avg
 
   int ix,iy,iz,iv;
   //reading conserved

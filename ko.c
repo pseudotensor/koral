@@ -135,15 +135,23 @@ solve_the_problem(ldouble tstart)
 {
   ldouble t = tstart, t1 = TMAX, dtsource, taim;
   ldouble totalmass=0.;
-  ldouble dtout = DTOUT1, lasttout = -1.,fprintf_time = 0.;
-  int i1,i2,i3,lasttout_floor,ix,iy,iz,iv;
+  ldouble dtout = DTOUT1;
+  ldouble dtoutavg = DTOUT2;
+  int lasttout_floor;
+  int lasttoutavg_floor;
+  
+  ldouble fprintf_time = 0.;
+  int i1,i2,i3,ix,iy,iz,iv;
   struct timespec temp_clock;
   struct rad_parameters rp;
    
   i1=i2=0.;
   global_int_slot[GLOBALINTSLOT_NCRITFAILURES]=0; //counting number of critical failures
 
-  lasttout=0.;lasttout_floor=floor(t/dtout); dt=-1.;
+  lasttout_floor=floor(t/dtout); 
+  lasttoutavg_floor=floor(t/dtoutavg);
+ 
+  dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=1.;
   if(NZ>1)
     tstepdenmax=max_ws[0]/min_dx + max_ws[1]/min_dy + max_ws[2]/min_dz;
@@ -286,10 +294,10 @@ solve_the_problem(ldouble tstart)
       //save to avg arrays
       save_avg(dt);
 
-      //output to a file
+      //snapshots
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
-	  printf("otpt (no #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f avimpit: %.3f\n"
+	  printf("> snap file no #%6d dumped\n"
 		 ,nfout1,t,dt,max_ws[0],end_time-start_time,znps,avimpit);
 	  
 	  //projects primitives onto ghost cells
@@ -302,13 +310,6 @@ solve_the_problem(ldouble tstart)
 	  fprint_restartfile(t,"dumps");
 
 	  //dumps dumps
-
-	  //avg goes first so that what is later can use it
-#if(AVGOUTPUT==1) 
-	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
-	  fprint_avgfile(t,"dumps");
-	  avgtime=0.;
-#endif
 #if(SCAOUTPUT==1)
 	  fprint_scalars(t,scalars,NSCALARS,"dumps");
 #endif
@@ -324,11 +325,29 @@ solve_the_problem(ldouble tstart)
 	  
 	  nfout1++;
 
-	  lasttout=t;
 	  lasttout_floor=floor(t/dtout);	 
 	}
-      //or performance to screen only every second
-      else if(end_time-fprintf_time>1.) 
+
+      //avgs
+#if(AVGOUTPUT==1) 
+      if(lasttoutavg_floor!=floor(t/dtoutavg))
+	{
+	  printf("> avg  file no #%6d dumped\n"
+		 ,nfout2,t,dt,max_ws[0],end_time-start_time,znps,avimpit);
+	  
+	  //avg goes first so that what is later can use it
+	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
+	  fprint_avgfile(t,"dumps");
+	  avgtime=0.;
+  
+	  nfout2++;
+
+	  lasttoutavg_floor=floor(t/dtoutavg);	 
+	}
+#endif
+
+      //performance to screen only every second
+      if(end_time-fprintf_time>1.) 
 	{
 	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f avimpit: %.3f\n"
 		 ,nstep,t,dt,max_ws[0],end_time-start_time,znps,avimpit);

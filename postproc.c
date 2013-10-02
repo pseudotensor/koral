@@ -152,8 +152,8 @@ int calc_scalars(ldouble *scalars,ldouble t)
   scalars[2]=calc_lum(xxBL[1]/2.)/calc_lumEdd();
 
   //magnetic flux through horizon parameter (5)
-  //printf("%e %e\n",calc_Bflux(r_horizon_BL(BHSPIN),0)/2./sqrt(fabs(mdot)),sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC);getchar();
-  ldouble Bfluxcgs=calc_Bflux(r_horizon_BL(BHSPIN),0)*sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC;
+  ldouble Bflux=calc_Bflux(r_horizon_BL(BHSPIN),0);
+  ldouble Bfluxcgs=Bflux*sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC;
   scalars[3]=Bfluxcgs/2./sqrt(fabs(mdot));
 
   /*********************************************/
