@@ -71,6 +71,7 @@
 #define NOUTSTOP 50
 #define SILOOUTPUT 1
 #define AVGOUTPUT 1
+#define OUTOUTPUT 0
 
 /************************************/
 //common physics / atmosphere

@@ -169,6 +169,7 @@ main(int argc, char **argv)
 	    }
 	}
     }
+  */
 
   char prefix[40];
   
@@ -189,7 +190,6 @@ main(int argc, char **argv)
   sprintf(prefix,"simavg%04d-",no1);
   fprint_simplecart(t,nfout1,"analysis",prefix);
 #endif
-  */
 
   return 0;
 }

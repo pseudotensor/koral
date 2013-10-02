@@ -46,12 +46,12 @@ fprint_avgfile(ldouble t, char* folder)
 {
   //TODO
   char bufor[50],bufor2[50];
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1-1);
   fout1=fopen(bufor,"w");
   
   //header
   //## navg time1 time2 dt 
-  fprintf(fout1,"## %d %e %e %e\n",nfout1,t-avgtime,t,avgtime);
+  fprintf(fout1,"## %d %e %e %e\n",nfout1-1,t-avgtime,t,avgtime);
 
   /***********************************/  
   /***********************************/  
@@ -95,15 +95,13 @@ fread_avgfile(int nout1, ldouble *pavg, ldouble *dt)
   char fname[40];
   sprintf(fname,"dumps/avg%04d.dat",nout1);
   
-  printf("opening: %s\n",fname);
-
   FILE *fdump=fopen(fname,"r");
 
   //reading parameters, mostly time
   int intpar[5];
   ldouble ldpar[5];
-  ret=fscanf(fdump,"## %d %f %f %f\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
-  printf("avg file (%s) read no. %d at times: %.2e to %.2e (%.2e)\n",
+  ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
+  printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
 	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
 
   *dt=ldpar[2];
@@ -706,8 +704,6 @@ fread_restartfile(int nout1, ldouble *t)
   else
     sprintf(fname,"dumps/reslast.dat",nout1);
   
-  printf("opening: %s\n",fname);
-
   FILE *fdump=fopen(fname,"r");
 
   if(fdump==NULL) return 1; //request start from scratch
