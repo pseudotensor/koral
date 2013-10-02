@@ -69,45 +69,11 @@ main(int argc, char **argv)
     {
       itot++;
 
-      //reading avg file
-      if(ifile<no2)
-	{
-	  readret=fread_avgfile(ifile,pavg,&dt);
-	  //	  print_NVvector(&get_uavg(pavg,0,0,0,0));
-
-	  add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
-	  ttot+=dt;
-	}
-
       //reading restart file
       readret=fread_restartfile(ifile,&t);
       
-      /*
-      //calculating conserved
-      for(iz=0;iz<NZ;iz++)
-	{
-	  for(iy=0;iy<NY;iy++)
-	    {
-	      for(ix=0;ix<NX;ix++)
-		{
-		  struct geometry geom;
-		  fill_geometry(ix,iy,iz,&geom);
-		  for(iv=0;iv<NV;iv++)
-		    pp[iv]=get_u(p,iv,ix,iy,iz);
-		  p2u(pp,uu,&geom);
-		  for(iv=0;iv<NV;iv++)
-		    {
-		      set_u(u,iv,ix,iy,iz,uu[iv]);
-		      //adding up to avg array
-		      set_u(pavg,iv,ix,iy,iz,get_u(pavg,iv,ix,iy,iz)+pp[iv]);
-		      set_u(uavg,iv,ix,iy,iz,get_u(uavg,iv,ix,iy,iz)+uu[iv]);
-		    }		  
-		}
-	    }
-	}
-      */
-      
-      nfout1--; //correcting index
+      //correcting index
+      nfout1--; 
   
       //sets bc
       set_bc(t,0);
@@ -137,69 +103,6 @@ main(int argc, char **argv)
 
 
   fclose(fout_scalars);
-
-  //average primitives and averaged quantities
-  copy_u_core(1./ttot,pavgtot,pavg,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
-
-  //rewrite primitives to p
-  for(iz=0;iz<NZ;iz++)
-    for(iy=0;iy<NY;iy++)
-      for(ix=0;ix<NX;ix++)
-	for(iv=0;iv<(NV+NAVGVARS);iv++)
-	   set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
-
-  //projects on ghost cells
-  set_bc(t,0);
-
-  /*
-  //calculating conserved
-  for(iz=0;iz<NZ;iz++)
-    {
-      for(iy=0;iy<NY;iy++)
-	{
-	  for(ix=0;ix<NX;ix++)
-	    {
-	      struct geometry geom;
-	      fill_geometry(ix,iy,iz,&geom);
-	      for(iv=0;iv<NV;iv++)
-		{
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
-		  uu[iv]=get_u(u,iv,ix,iy,iz);
-		}
-		  
-	      int corr[2],fixup[2];
-	      u2p(uu,pp,&geom,corr,fixup,0);
-	      p2u(pp,uu,&geom);
-
-	      for(iv=0;iv<NV;iv++)
-		{
-		  set_u(p,iv,ix,iy,iz,pp[iv]);
-		  set_u(u,iv,ix,iy,iz,uu[iv]);
-		}
-	    }
-	}
-    }
-  */
-
-  char prefix[40];
-  
-  //dumps dumps to analysis analysis
-#if(RADOUTPUT==1)
-  sprintf(prefix,"radavg%04d-",no1);
-  fprint_radprofiles(t,nfout1,"analysis",prefix);
-#endif
-#if(OUTOUTPUT==1)
-  sprintf(prefix,"outavg%04d-",no1);
-  fprint_outfile(t,nfout1,0,"analysis",prefix);
-#endif
-#if(SILOOUTPUT==1)
-  sprintf(prefix,"silavg%04d-",no1);
-  fprint_silofile(t,nfout1,"analysis",prefix);
-#endif
-#if(SIMOUTPUT==1)	  
-  sprintf(prefix,"simavg%04d-",no1);
-  fprint_simplecart(t,nfout1,"analysis",prefix);
-#endif
   
   return 0;
 }
