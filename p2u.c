@@ -376,11 +376,10 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   urf[3]=pp[FZ0];
   conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
   ldouble Rij[4]   ;
-  Rij[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^t_t
+  Rij[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^tt
   Rij[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*GG[0][1];
   Rij[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*GG[0][2];
   Rij[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*GG[0][3];
-  indices_21(Rij,Rij,gg); //R^t_mu
 
   avg[NV+10]=Rij[0];
   avg[NV+11]=Rij[1];

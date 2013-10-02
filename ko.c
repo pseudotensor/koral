@@ -15,21 +15,9 @@ main(int argc, char **argv)
   ldouble tstart;
   int i;
 
-  /*
-  printf("scalings (GU->CGS):\nrho: %.16e\nlen: %.16e\ntime: %.16e\nugas:"
-	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkappa: %.16e\n",
-	 rhoGU2CGS(1.),
-	 lenGU2CGS(1.),
-	 timeGU2CGS(1.),
-	 endenGU2CGS(1.),
-	 calc_PEQ_Tfromurho(1.,1.),
-	 K_BOLTZ/MU_GAS/M_PROTON,
-	 kappaCGS2GU(1.)
-	 );
-  exit(0);
-  */
-
- 
+  //print scalings GU->CGS
+  //print_scalings();
+  
   //gsl errors off
   gsl_set_error_handler_off();
   
@@ -392,5 +380,24 @@ test_maginv()
   printf("u2p ret: %d\n",ret);
   print_NVvector(pp);
 
+  return 0;
+}
+
+int
+print_scalings()
+{
+  
+  printf("scalings (GU->CGS):\nrho: %.16e\nlen: %.16e\ntime: %.16e\nugas:"
+	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkappa: %.16e\n",
+	 rhoGU2CGS(1.),
+	 lenGU2CGS(1.),
+	 timeGU2CGS(1.),
+	 endenGU2CGS(1.),
+	 calc_PEQ_Tfromurho(1.,1.),
+	 K_BOLTZ/MU_GAS/M_PROTON,
+	 kappaCGS2GU(1.)
+	 );
+  exit(0);
+  
   return 0;
 }

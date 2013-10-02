@@ -132,7 +132,8 @@ struct geometry
 
 //main.c
 int solve_the_problem(ldouble);
-
+int print_scalings(void);
+ 
 gsl_odeiv2_step **odeiv2_step_1;
 gsl_odeiv2_step **odeiv2_step_2;
 struct evolve_fluxes_1_param

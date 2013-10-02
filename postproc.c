@@ -12,10 +12,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
   //adjust NRADPROFILES in problem.h
 
   int ix,iy,iz,iv;
-  ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],utcon[4],ucon3[4];
+  ldouble xx[4],xxBL[4],dx[3],dxcgs[3],mdot,rho,ucon[4],utcon[4],ucon3[4];
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
   ldouble tautot[3],tauabs[3];
-  ldouble avgsums[NAVGVARS];
+  ldouble avgsums[NAVGVARS][NX];
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -24,6 +24,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
       for(iv=0;iv<NRADPROFILES;iv++)
 	profiles[iv][ix]=0.;
+
+      for(iv=0;iv<NAVGVARS;iv++)
+	avgsums[iv][ix]=0.;
 
       if(NZ==1) //phi-symmetry
 	{
@@ -73,37 +76,39 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //#ifdef CGSOUTPUT
 	      rho=rhoGU2CGS(rho);
-	      dx[0]=lenGU2CGS(dx[0]); //dr
-	      dx[1]=lenGU2CGS(dx[1]); //dth
-	      dx[2]=lenGU2CGS(dx[2]); //dph
+	      dxcgs[0]=lenGU2CGS(dx[0]); //dr
+	      dxcgs[1]=lenGU2CGS(dx[1]); //dth
+	      dxcgs[2]=lenGU2CGS(dx[2]); //dph
 	      //#endif
 
 #ifdef BHDISK_PROBLEMTYPE
 	      //surface density (2nd column)
-	      profiles[0][ix]+=rho*dx[1];
+	      profiles[0][ix]+=rho*dxcgs[1];
 	      //rest mass flux (3)
-	      profiles[1][ix]+=-rho*ucon[1]*dx[1]*dx[2];
+	      profiles[1][ix]+=-rho*ucon[1]*dxcgs[1]*dxcgs[2];
 	      //rho-weighted minus radial velocity (4)
-	      profiles[2][ix]+=-ucon[1]*rho*dx[1];
+	      profiles[2][ix]+=-ucon[1]*rho*dxcgs[1];
 	      //rho-weighted u_phi (5)
-	      //profiles[3][ix]+=ucov[3]*rho*dx[1];	
+	      //profiles[3][ix]+=ucov[3]*rho*dxcgs[1];	
 	      //abs optical depth (7)
 	      profiles[5][ix]+=tauabs[1];	
 	      //tot optical depth (8)
 	      profiles[6][ix]+=tautot[1];
 
 	      for(iv=0;iv<NAVGVARS;iv++)
-		avgsums[iv]+=get_uavg(pavg,NV+iv,ix,iy,iz);
+		avgsums[iv][ix]+=get_uavg(pavg,NV+iv,ix,iy,iz)*dx[1];
 
-	      //(rho+u+bsq/2)u^r
-	      profiles[3][ix]+=get_uavg(pavg,NV+8,ix,iy,iz)*get_uavg(pavg,NV+4,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      //(rho+u+bsq/2)u^r u_phi
+	      profiles[3][ix]+=get_uavg(pavg,NV+9,ix,iy,iz)*
+		get_uavg(pavg,NV+4,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz)*dx[1];
+	      //profiles[3][ix]+=get_uavg(pavg,NV+4,ix,iy,iz)*dx[1];
 #endif
 	    }
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
 
 	  //normalizing by rho u^r
-	  profiles[3][ix]/=avgsums[1];
+	  profiles[3][ix]/=avgsums[1][ix];
 
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
@@ -147,7 +152,9 @@ int calc_scalars(ldouble *scalars,ldouble t)
   scalars[2]=calc_lum(xxBL[1]/2.)/calc_lumEdd();
 
   //magnetic flux through horizon parameter (5)
-  scalars[3]=calc_Bflux(r_horizon_BL(BHSPIN),0)/2./sqrt(fabs(mdot));
+  //printf("%e %e\n",calc_Bflux(r_horizon_BL(BHSPIN),0)/2./sqrt(fabs(mdot)),sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC);getchar();
+  ldouble Bfluxcgs=calc_Bflux(r_horizon_BL(BHSPIN),0)*sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC;
+  scalars[3]=Bfluxcgs/2./sqrt(fabs(mdot));
 
   /*********************************************/
   //L1 ERRRORS for some problems
@@ -172,7 +179,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
 #endif
 
 #ifdef CALCL1_HUBBLE
-  //temporarily here: L1 error for HDWAVE
+  //temporarily here: L1 error for HUBBLE
   ldouble L1=0;
   int i;
   for(i=0;i<NX;i++)
@@ -261,8 +268,9 @@ calc_lumEdd()
 ldouble
 calc_lum(ldouble radius)
 {
-  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS)
+#ifndef BHDISK_PROBLEMTYPE
     return -1.; //no BH
+#endif
 
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3],pp[NV],Fr;
@@ -387,8 +395,9 @@ calc_photloc(int ix)
 ldouble
 calc_mdot(ldouble radius,int type)
 {
-  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS)
-    return -1.; //no BH
+#ifndef BHDISK_PROBLEMTYPE
+  return -1.; //no BH
+#endif
 
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
@@ -490,12 +499,9 @@ calc_Bflux(ldouble radius,int type)
 	  for(iv=0;iv<NVMHD;iv++)
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 
-	  //get_xx(ix,iy,iz,xx);
 	  dx[0]=get_size_x(ix,0);
 	  dx[1]=get_size_x(iy,1);
 	  dx[2]=get_size_x(iz,2);
-	  //pick_g(ix,iy,iz,gg);
-	  //pick_G(ix,iy,iz,GG);
 
 	  //coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
