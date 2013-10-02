@@ -50,7 +50,7 @@ main(int argc, char **argv)
 
   //arrays for averaging of primitives
 
-  ldouble *pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
+  //ldouble *pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
   ldouble *pavgtot=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
 
   for(i=0;i<(SX)*(SY)*(SZ)*(NV+NAVGVARS);i++)
@@ -139,7 +139,7 @@ main(int argc, char **argv)
   fclose(fout_scalars);
 
   //average primitives and averaged quantities
-  copy_u_core(1./ttot,pavgtot,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
+  copy_u_core(1./ttot,pavgtot,pavg,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
 
   //rewrite primitives to p
   for(iz=0;iz<NZ;iz++)

@@ -67,7 +67,7 @@ fprint_avgfile(ldouble t, char* folder)
 	      fprintf(fout1,"%d %d %d ",ix,iy,iz);
 	      for(iv=0;iv<NV+NAVGVARS;iv++)
 		{
-		  fprintf(fout1,"%.20e ",get_uavg(pavg,iv,ix,iy,iz));
+		  fprintf(fout1,"%.6e ",get_uavg(pavg,iv,ix,iy,iz));
 		}	 
 	      fprintf(fout1,"\n");
 	    }

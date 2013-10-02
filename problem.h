@@ -72,7 +72,7 @@
 //66* KTORUS - RMHD Newtonian torus with radiation
 //67* LRTORUS - RMHD limo torus
 
-#define PROBLEM 63
+#define PROBLEM 67
 
 #if(PROBLEM==67)
 
@@ -1264,7 +1264,15 @@
 #endif
 
 #ifndef NAVGVARS
-#define NAVGVARS 4
+#ifdef BHDISK_PROBLEMTYPE
+#ifdef RADIATION
+#define NAVGVARS 15
+#else
+#define NAVGVARS 11
+#endif
+#else
+#define NAVGVARS 0
+#endif
 #endif
 
 #ifndef NRADPROFILES

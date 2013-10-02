@@ -15,6 +15,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
   ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],utcon[4],ucon3[4];
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
   ldouble tautot[3],tauabs[3];
+  ldouble avgsums[NAVGVARS];
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -77,6 +78,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      dx[2]=lenGU2CGS(dx[2]); //dph
 	      //#endif
 
+#ifdef BHDISK_PROBLEMTYPE
 	      //surface density (2nd column)
 	      profiles[0][ix]+=rho*dx[1];
 	      //rest mass flux (3)
@@ -84,15 +86,25 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rho-weighted minus radial velocity (4)
 	      profiles[2][ix]+=-ucon[1]*rho*dx[1];
 	      //rho-weighted u_phi (5)
-	      profiles[3][ix]+=ucov[3]*rho*dx[1];	
+	      //profiles[3][ix]+=ucov[3]*rho*dx[1];	
 	      //abs optical depth (7)
 	      profiles[5][ix]+=tauabs[1];	
 	      //tot optical depth (8)
-	      profiles[6][ix]+=tautot[1];	
+	      profiles[6][ix]+=tautot[1];
+
+	      for(iv=0;iv<NAVGVARS;iv++)
+		avgsums[iv]+=get_uavg(pavg,NV+iv,ix,iy,iz);
+
+	      //(rho+u+bsq/2)u^r
+	      profiles[3][ix]+=get_uavg(pavg,NV+8,ix,iy,iz)*get_uavg(pavg,NV+4,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+#endif
 	    }
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
-	  profiles[3][ix]/=profiles[0][ix];
+
+	  //normalizing by rho u^r
+	  profiles[3][ix]/=avgsums[1];
+
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
 	  profiles[4][ix]=(r*r/(sqrt(r*(r*r-3.*r))));  
@@ -478,38 +490,40 @@ calc_Bflux(ldouble radius,int type)
 	  for(iv=0;iv<NVMHD;iv++)
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 
-	  get_xx(ix,iy,iz,xx);
+	  //get_xx(ix,iy,iz,xx);
 	  dx[0]=get_size_x(ix,0);
 	  dx[1]=get_size_x(iy,1);
 	  dx[2]=get_size_x(iz,2);
-	  pick_g(ix,iy,iz,gg);
-	  pick_G(ix,iy,iz,GG);
+	  //pick_g(ix,iy,iz,gg);
+	  //pick_G(ix,iy,iz,GG);
 
-	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  //coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
 	  struct geometry geom;
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
+	  /*
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
 	  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	  */
 
 	  ldouble Br=fabs(pp[B1]);
 
-	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
-	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
+	  dx[1]=dx[1];//*sqrt(geom.gg[2][2]);
+	  dx[2]=2.*M_PI;//*sqrt(geom.gg[3][3]);
 
 	  //#ifdef CGSOUTPUT
 	  //always
-	  Br=sqrt(endenGU2CGS(1.))*Br/CCC;
-	  dx[1]=lenGU2CGS(dx[1]);
-	  dx[2]=lenGU2CGS(dx[2]);
+	  //Br=sqrt(endenGU2CGS(1.))*Br/CCC;
+	  //dx[1]=lenGU2CGS(dx[1]);
+	  //dx[2]=lenGU2CGS(dx[2]);
 	  //#endif
 
 	  
 	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
-	    Psi+=Br*dx[1]*dx[2];
+	    Psi+=geom.gdet*Br*dx[1]*dx[2];
 	  
 
 	}

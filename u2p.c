@@ -493,24 +493,21 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
       ldouble f=magpre/(B2RHORATIOMAX*pp[RHO]);
 
-      //make slightly higher correction;
-      //f*=1.5;
-
-      /*
       //new mass in fluid frame
       pp[RHO]*=f;
       pp[UU]*=f;
-      */
-      
+
+      /*
       //new mass in ZAMO
       ldouble rho0 = pp[RHO];
       ldouble drho = 1./etacon[0] * ucond[0] * rho0 * (f-1.);
       pp[RHO] += drho;
-      
+      pp[UU] *= pp[RHO]/rho0;      
       pp[VX] = (rho0 * pp[VX] + drho * etarel[1]) / pp[RHO];
       pp[VY] = (rho0 * pp[VY] + drho * etarel[2]) / pp[RHO];
       pp[VZ] = (rho0 * pp[VZ] + drho * etarel[3]) / pp[RHO];
-
+      */
+      
       ret=-1;      
     }
   

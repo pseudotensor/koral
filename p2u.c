@@ -310,7 +310,9 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 {
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
-  
+  struct geometry geomout;
+  fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
+
   int iv;ldouble pp[NV],uu[NV];
   for(iv=0;iv<NV;iv++)
     {
@@ -319,16 +321,16 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 
       avg[iv]=pp[iv]; //first NV slots in pavg are regular primitives
    }
-  
-  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
-  gg=geom.gg;
-  gdet=geom.gdet;
-  GG=geom.GG;
-  gdetu=gdet;
 
-#if (GDETIN==0) //gdet out of derivatives
-  gdetu=1.;
+  //primitives to OUTCOORDS
+#ifdef RADIATION
+  trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,&geom,&geomout);
 #endif
+  trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,&geom,&geomout);
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geomout.gg;
+  GG=geomout.GG;
 
   //four-vectors etc
   ldouble rho=pp[0];
@@ -348,25 +350,45 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 #endif
   
   //hydro stress-energy
-  ldouble ut=ucon[0];
-  ldouble rhout = rho*ut;
-  ldouble Sut;
-  Sut=S*ut;
-  ldouble pre=(GAMMA-1.)*uint; 
-  ldouble w=rho+uint+pre;
-  ldouble eta=w+bsq;
-  ldouble ptot=pre+0.5*bsq;
-  //~T^i_j 
-  ldouble Tttt=rhout + eta*ucon[0]*ucov[0] + ptot - bcon[0]*bcov[0];
-  ldouble Ttr =eta*ucon[0]*ucov[1] - bcon[0]*bcov[1];
-  ldouble Ttth =eta*ucon[0]*ucov[2] - bcon[0]*bcov[2];
-  ldouble Ttph =eta*ucon[0]*ucov[3] - bcon[0]*bcov[3];
+  ldouble Tij[4][4];
+  calc_Tij(pp,&geomout,Tij);
+  indices_2221(Tij,Tij,gg);
 
-  //avg 
+#ifdef BHDISK_PROBLEMTYPE
+  //avg already in OUTCOORDS
   avg[NV+0]=rho*ucon[0];
-  avg[NV+1]=rho*ucon[1]*ucon[0];
-  avg[NV+2]=rho*ucon[2]*ucon[0];
-  avg[NV+3]=rho*ucon[3]*ucon[0]; 
+  avg[NV+1]=rho*ucon[1];
+  avg[NV+2]=rho*ucon[2];
+  avg[NV+3]=rho*ucon[3]; 
+  avg[NV+4]=rho*ucov[3]; 
+  avg[NV+5]=Tij[1][0]; //T^r_t
+  avg[NV+6]=Tij[2][0]; //T^th_t
+  avg[NV+7]=Tij[1][1]; //T^r_r
+  avg[NV+8]=Tij[2][1]; //T^th_r
+  avg[NV+9]=(rho+uint+bsq/2.)*ucon[1]; //to calculate u_phi(r)
+
+  #ifdef RADIATION
+  ldouble Erf=pp[EE0];
+  ldouble urf[4];
+  urf[0]=0.;
+  urf[1]=pp[FX0];
+  urf[2]=pp[FY0];
+  urf[3]=pp[FZ0];
+  conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
+  ldouble Rij[4]   ;
+  Rij[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^t_t
+  Rij[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*GG[0][1];
+  Rij[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*GG[0][2];
+  Rij[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*GG[0][3];
+  indices_21(Rij,Rij,gg); //R^t_mu
+
+  avg[NV+10]=Rij[0];
+  avg[NV+11]=Rij[1];
+  avg[NV+12]=Rij[2];
+  avg[NV+13]=Rij[3];
+  #endif
+
+#endif
 
   return 0.;
 }
