@@ -1769,12 +1769,19 @@ ldouble get_u_scalar(ldouble* uarr,int ix,int iy,int iz)
 //array multiplication
 //uu2=factor*uu1
 int 
-copy_u(ldouble factor,ldouble *uu1,ldouble* uu2 )
+copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N )
 {
   int i;
 #pragma omp parallel for private (i) 
-  for (i=0;i<SX*SY*SZ*NV;i++)
+  for (i=0;i<N;i++)
     uu2[i]=uu1[i]*factor;
+  return 0;
+}
+
+int 
+copy_u(ldouble factor,ldouble *uu1,ldouble* uu2 )
+{
+  copy_u_core(factor,uu1,uu2,SX*SY*SZ*NV);
   return 0;
 }
 

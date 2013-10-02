@@ -202,6 +202,7 @@ ldouble f_der_kurganovtadmor(int ix,int iy, int yz,ldouble*);
 ldouble f_der_hlle_obsolete(int ix,int iy, int yz,ldouble*);
 ldouble f_der_muscl(int ix,int iy, int yz,ldouble*);
 int copy_u(ldouble,ldouble*,ldouble*);
+int copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N );
 int add_u(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble *u3);
 int add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3,int N);
 ldouble f_timeder_source_term(ldouble t, const ldouble y[], ldouble f[],  void *params);

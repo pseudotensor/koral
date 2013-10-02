@@ -72,14 +72,16 @@ main(int argc, char **argv)
       //reading avg file
       if(ifile<no2)
 	{
-	  readret=fread_avgfile(ifile,pavg,dt);
+	  readret=fread_avgfile(ifile,pavg,&dt);
+	  //	  print_NVvector(&get_uavg(pavg,0,0,0,0));
+
 	  add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
 	  ttot+=dt;
 	}
 
       //reading restart file
       readret=fread_restartfile(ifile,&t);
-
+      
       /*
       //calculating conserved
       for(iz=0;iz<NZ;iz++)
@@ -133,15 +135,23 @@ main(int argc, char **argv)
 
     }
 
+
   fclose(fout_scalars);
 
-  /*
-  //preparing to dump the avg files
-  //average primitives and conserved
-  copy_u(1./(ldouble)itot,pavg,p);
-  copy_u(1./(ldouble)itot,uavg,u);
+  //average primitives and averaged quantities
+  copy_u_core(1./ttot,pavgtot,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
+
+  //rewrite primitives to p
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
+	for(iv=0;iv<(NV+NAVGVARS);iv++)
+	   set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
+
   //projects on ghost cells
   set_bc(t,0);
+
+  /*
   //calculating conserved
   for(iz=0;iz<NZ;iz++)
     {
@@ -190,7 +200,7 @@ main(int argc, char **argv)
   sprintf(prefix,"simavg%04d-",no1);
   fprint_simplecart(t,nfout1,"analysis",prefix);
 #endif
-
+  
   return 0;
 }
 

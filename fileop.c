@@ -120,7 +120,7 @@ fread_avgfile(int nout1, ldouble *pavg, ldouble *dt)
 	      /**************************/  
 	      
 	      //reading primitives from file
-	      for(i=0;i<NV;i++)
+	      for(i=0;i<NV+NAVGVARS;i++)
 		{
 		  ret=fscanf(fdump,"%lf ",&get_uavg(pavg,i,ix,iy,iz));
 		}

@@ -317,7 +317,7 @@ solve_the_problem(ldouble tstart)
 
 	  //avg goes first so that what is later can use it
 #if(AVGOUTPUT==1) 
-	  copy_u(1./avgtime,pavg,pavg);
+	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
 	  fprint_avgfile(t,"dumps");
 	  avgtime=0.;
 #endif
