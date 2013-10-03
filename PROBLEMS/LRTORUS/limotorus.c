@@ -5,12 +5,12 @@
 
 #define FTYPE double
 
-#define LT_KAPPA 1.e3
-#define LT_XI 0.84
-#define LT_R1 25.
-#define LT_R2 1000.
+#define LT_KAPPA 2.e3
+#define LT_XI 0.91
+#define LT_R1 30.
+#define LT_R2 200.
 #define LT_GAMMA 4./3.
-#define LT_RIN 10.
+#define LT_RIN 15.
 
 void compute_gd( FTYPE r, FTYPE th, FTYPE a, FTYPE *gdtt, FTYPE *gdtp, FTYPE *gdpp ) {
    FTYPE Sigma, tmp;
@@ -225,9 +225,6 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
    gsl_function integrand;
    int intstatus;
    
-   //WTF?
-   getchar();
-
    R = r*sin(th);
    if (R < LT_RIN) {*rhoout = 0.; return(0);}
 
@@ -318,15 +315,15 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
 
 int main() {
 
-   int nr = 48, nth = 16;
-   FTYPE Rin = 1.6, Rout = 200.;   // a = 0
+   int nr = 30, nth = 16;
+   FTYPE Rin = 2., Rout = 500.;   // a = 0
    //FTYPE Rin = 1.364, Rout = 2000.;   // a = 0.9
    FTYPE th1 = 0., th2 = M_PI_2;
    FTYPE dr = (Rout - Rin) / nr, dth = (th2 - th1) / nth;
    FTYPE factor;
    FTYPE r, th, rho, uu, ell;
    int i, j;
-   FILE*outfile;
+   FILE *outfile, *radfile;
 
 //    FTYPE R0 = 1.05, startx1 = -0.6736, dx1 = 0.0372985;
 
@@ -334,29 +331,34 @@ int main() {
    factor = log(Rout/Rin);
 
    outfile = fopen("slice.dat", "w");
-//    fprintf(outfile, "variables = x, z, rho\n");
-//    fprintf(outfile, "zone t=rho, i=%i, j=%i, F=POINT\n", nr+1, nth+1);
-   for (j=0; j<=nth; j++) {
-     th = th1 + j*dth;
-     if(th>M_PI) th-=0.01;
-//       th = 1.;
-      for (i=0; i<=nr; i++) {
-//          r = Rin + i*dr;
-         r = Rin*exp((FTYPE)i/nr*factor);
-//          r = R0 + exp(startx1 + (i+0.5)*dx1);
-//          r = 70.;
-         init_dsandvels_limotorus(r, th, a, &rho, &uu, &ell);
-//          fprintf(outfile, "%g\t%g\t%g\n", r*sin(th), r*cos(th), rho);
-         fprintf(outfile, "%g\t%g\t%g\t%g\t%g\n", r, th, rho, uu,ell);
-      }
-      fprintf(outfile, "\n");
-   }
-   fclose(outfile);
+   radfile = fopen("radslice.dat","w");
 
-//    th = M_PI_2*0.3;
-//    r = 350.;
-//    init_dsandvels_limotorus(r, th, a, &rho);
-//    printf("%f\n", rho);
+   FTYPE Sigma;
+
+   for (i=0; i<=nr; i++) 
+     {
+       r = Rin*exp((FTYPE)i/nr*factor);
+       printf("r: %.2f\n",r);
+
+       Sigma=0.;
+       for (j=0; j<=nth; j++) 
+	 {
+	   th = th1 + j*dth;
+	   if(th>M_PI) th-=0.01;
+
+	   init_dsandvels_limotorus(r, th, a, &rho, &uu, &ell);
+
+	   Sigma+=rho*r*dth;
+
+	   fprintf(outfile, "%g\t%g\t%g\t%g\t%g\n", r*sin(th), r*cos(th), rho, uu,ell);
+	 }
+      fprintf(outfile, "\n");
+      fprintf(radfile,"%g %g\n",r,Sigma);
+
+     }
+
+   fclose(outfile);
+   fclose(radfile);
 
    return(0);
 
