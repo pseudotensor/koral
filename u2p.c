@@ -475,21 +475,23 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       dpp[VX] = etarel[VX];
       dpp[VY] = etarel[VY];
       dpp[VZ] = etarel[VZ];
-      dpp[ENTR] = calc_Sfromu(pp[RHO],pp[UU]);
+      dpp[ENTR] = 0.;
       dpp[B1] = dpp[B2] = dpp[B3] = 0.;
 
-      p2u_mhd(dpp,duu,&geom);
-
+      p2u_mhd(dpp,duu,geom);
+ 
       for(iv=0;iv<NVMHD;iv++)
 	uu[iv]+=duu[iv];
 
       int rettemp=0;
-      rettemp=u2p_solver(uu,pp,&geom,U2P_HOT,0); 
+      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
       if(rettemp<0)
-	rettemp=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
+	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
       
       if(rettemp<0) 
-	my_err("u2p failed after imposing bsq over rho floors\n");
+	{
+	  printf("u2p failed after imposing bsq over rho floors\n");
+	}
     
       /*      
       pp[RHO] += drho;
