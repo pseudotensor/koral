@@ -285,12 +285,10 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   int verbose=0;
  
   calc_Rij_ff(pp1,Rij);  
-  
   trans22_on2cc(Rij,Rij,tlo);  
   boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
-  
   indices_2221(Rij,Rij,gg);  
-  
+
   for(i=0;i<NVMHD;i++)
     pp2[i]=pp1[i];
 

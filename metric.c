@@ -34,6 +34,7 @@ if(coords==MINKCOORDS) {
 
 if(coords==KERRCOORDS) {
  ldouble a=BHSPIN;
+
   return Sqrt(Power(Power(a,2) + 2*Power(x1,2) + 
        Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2))
     /2.;
@@ -223,7 +224,7 @@ calc_g_arb(ldouble *xx, ldouble g[][5],int coords)
   ldouble x2=xx[2];
   ldouble x3=xx[3];
 
-  g[3][4]=calc_gdet(xx);
+  g[3][4]=calc_gdet_arb(xx,coords);
 
 if(coords==MKER1COORDS) {
 #if(MYCOORDS==MKER1COORDS)
