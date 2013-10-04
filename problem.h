@@ -1405,6 +1405,10 @@
 #define DTOUT2 DTOUT1
 #endif
 
+#ifndef B2RHOFLOORFRAME
+#define B2RHOFLOORFRAME ZAMOFRAME
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/
@@ -1426,4 +1430,6 @@
 #define TSEC (MASSCM/CCC) //unit of time in seconds
 
 #define GMC2CM (MASSCM) //gravitational radius in cm
+
+
 

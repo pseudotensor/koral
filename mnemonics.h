@@ -104,3 +104,7 @@
 
 //global integer slots
 #define GLOBALINTSLOT_NCRITFAILURES 0
+
+//frames
+#define ZAMOFRAME 0
+#define FFFRAME 1

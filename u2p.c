@@ -382,6 +382,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 
   int verbose=0;
   int ret=0;
+  int iv;
 
   struct geometry *geom
     = (struct geometry *) ggg;
@@ -390,9 +391,8 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
   gg=geom->gg;
   GG=geom->GG;
 
-  
-  int iv;
-
+  ldouble uu[NV];
+  p2u_mhd(pp,uu,ggg);
  
 #ifdef TRACER
   if(pp[TRA]<0.) {pp[TRA]=0.; ret=-1; if(verbose) printf("hd_floors CASE TRA 1\n");}
@@ -463,12 +463,11 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
       ldouble f=magpre/(B2RHORATIOMAX*pp[RHO]);
 
-
-#ifdef B2RHOFLOOR_ZAMO //new mass in ZAMO
+#if (B2RHOFLOORFRAME==ZAMOFRAME) //new mass in ZAMO
       ldouble dpp[NV],duu[NV];
       ldouble drho = 1./etacon[0] * ucond[0] * pp[RHO] * (f-1.);
     
-      PLOOP(iv)
+      for(iv=0;iv<NVMHD;iv++)
 	dpp[iv]=0.0;
 
       dpp[RHO]=drho;
@@ -479,7 +478,18 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       dpp[ENTR] = calc_Sfromu(pp[RHO],pp[UU]);
       dpp[B1] = dpp[B2] = dpp[B3] = 0.;
 
-      p2u(dpp,duu,&geom);
+      p2u_mhd(dpp,duu,&geom);
+
+      for(iv=0;iv<NVMHD;iv++)
+	uu[iv]+=duu[iv];
+
+      int rettemp=0;
+      rettemp=u2p_solver(uu,pp,&geom,U2P_HOT,0); 
+      if(rettemp<0)
+	rettemp=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
+      
+      if(rettemp<0) 
+	my_err("u2p failed after imposing bsq over rho floors\n");
     
       /*      
       pp[RHO] += drho;
@@ -489,12 +499,10 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       pp[VZ] = (rho0 * pp[VZ] + drho * etarel[3]) / pp[RHO];
       */
 
-#else //new mass in fluid frame
+#elif(B2RHOFLOORFRAME==FFFRAME) //new mass in fluid frame
       pp[RHO]*=f;
       pp[UU]*=f;
 #endif
-
-     
       
       ret=-1;      
     }
