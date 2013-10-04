@@ -1266,12 +1266,12 @@
 #ifndef NAVGVARS
 #ifdef BHDISK_PROBLEMTYPE
 #ifdef RADIATION
-#define NAVGVARS 15
+#define NAVGVARS (126)
 #else
-#define NAVGVARS 11
+#define NAVGVARS (109)
 #endif
 #else
-#define NAVGVARS 0
+#define NAVGVARS (0)
 #endif
 #endif
 

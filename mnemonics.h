@@ -108,3 +108,27 @@
 //frames
 #define ZAMOFRAME 0
 #define FFFRAME 1
+
+//avg quantities
+#define AVGBSQ 0
+#define AVGUCON 1
+#define AVGUCOV 5
+#define AVGBCON 9
+#define AVGBCOV 13
+#define AVGRHOUCON 17
+#define AVGRHOUCOV 21
+#define AVGUUUCON 25
+#define AVGUUCOV 29
+#define AVGBSQUCON 33
+#define AVGBSQUCOV 37
+#define AVGRHOUCONUCOV 41
+#define AVGUUUCONUCOV 57
+#define AVGBSQUCONUCOV 73
+#define AVGBCONBCOV 89
+#define AVGWUCON 105
+#define AVGEHAT 109
+#define AVGRIJ 110
+
+
+
+

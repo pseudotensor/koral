@@ -253,7 +253,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   struct geometry geomout;
   fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
 
-  int iv;ldouble pp[NV],uu[NV];
+  int iv,iv2;ldouble pp[NV],uu[NV];
   for(iv=0;iv<NV;iv++)
     {
       uu[iv]=get_u(u,iv,ix,iy,iz); //conserved 
@@ -296,36 +296,55 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 
 #ifdef BHDISK_PROBLEMTYPE
   //avg already in OUTCOORDS
-  avg[NV+0]=rho*ucon[0];
-  avg[NV+1]=rho*ucon[1];
-  avg[NV+2]=rho*ucon[2];
-  avg[NV+3]=rho*ucon[3]; 
-  avg[NV+4]=rho*ucov[3]; 
-  avg[NV+5]=Tij[1][0]; //T^r_t
-  avg[NV+6]=Tij[2][0]; //T^th_t
-  avg[NV+7]=Tij[1][1]; //T^r_r
-  avg[NV+8]=Tij[2][1]; //T^th_r
-  avg[NV+9]=(rho+uint+bsq/2.)*ucon[1]; //to calculate u_phi(r)
+  avg[NV+AVGBSQ]=bsq;
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGUCON+iv]=ucon[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGUCOV+iv]=ucov[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGBCON+iv]=bcon[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGBCOV+iv]=bcov[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGRHOUCON+iv]=rho*ucon[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGRHOUCOV+iv]=rho*ucov[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGUUUCON+iv]=uint*ucon[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGUUCOV+iv]=uint*ucov[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGBSQUCON+iv]=bsq*ucon[iv];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGBSQUCOV+iv]=bsq*ucov[iv];
+  for(iv=0;iv<4;iv++)
+    for(iv2=0;iv2<4;iv2++)
+      avg[NV+AVGRHOUCONUCOV+iv*4+iv2]=rho*ucon[iv]*ucov[iv2];
+  for(iv=0;iv<4;iv++)
+    for(iv2=0;iv2<4;iv2++)
+      avg[NV+AVGUUUCONUCOV+iv*4+iv2]=uint*ucon[iv]*ucov[iv2];
+  for(iv=0;iv<4;iv++)
+    for(iv2=0;iv2<4;iv2++)
+      avg[NV+AVGBSQUCONUCOV+iv*4+iv2]=bsq*ucon[iv]*ucov[iv2];
+  for(iv=0;iv<4;iv++)
+    for(iv2=0;iv2<4;iv2++)
+      avg[NV+AVGBCONBCOV+iv*4+iv2]=bcon[iv]*bcov[iv2];
+  for(iv=0;iv<4;iv++)
+    avg[NV+AVGWUCON+iv]=(rho+uint+bsq/2)*ucon[iv];
+   
+#ifdef RADIATION
+  ldouble Rtt,Ehat,ugas[4];
+  calc_ff_Rtt(pp,&Rtt,ugas,&geomout);
+  Ehat=-Rtt;       
+  ldouble Rij[4][4];
+  calc_Rij(pp,&geomout,Rij);
 
-  #ifdef RADIATION
-  ldouble Erf=pp[EE0];
-  ldouble urf[4];
-  urf[0]=0.;
-  urf[1]=pp[FX0];
-  urf[2]=pp[FY0];
-  urf[3]=pp[FZ0];
-  conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
-  ldouble Rij[4]   ;
-  Rij[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^tt
-  Rij[1]=4./3.*Erf*urf[0]*urf[1] + 1./3.*Erf*GG[0][1];
-  Rij[2]=4./3.*Erf*urf[0]*urf[2] + 1./3.*Erf*GG[0][2];
-  Rij[3]=4./3.*Erf*urf[0]*urf[3] + 1./3.*Erf*GG[0][3];
+  avg[NV+AVGEHAT]=Ehat;
+  for(iv=0;iv<4;iv++)
+    for(iv2=0;iv2<4;iv2++)
+      avg[NV+AVGRIJ+iv*4+iv2]=Rij[iv][iv2];
 
-  avg[NV+10]=Rij[0];
-  avg[NV+11]=Rij[1];
-  avg[NV+12]=Rij[2];
-  avg[NV+13]=Rij[3];
-  #endif
+#endif
 
 #endif
 
