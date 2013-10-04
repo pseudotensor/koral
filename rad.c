@@ -1715,8 +1715,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(verbose>1)
 	    printf("final solution corrected in rad\n");
 	  u2pret=-2;
-	  //test
-	  printf("discarding gammamax solution at %d %d\n",geom->ix,geom->iy);
+
+	  //printf("discarding gammamax solution at %d %d\n",geom->ix,geom->iy);
 	}
     }    
   if(u2pret<-1) 
