@@ -2078,7 +2078,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  //radiative inversion failed
 	  if(corr[0]>0)
 	    {
-	      if(1 || verbose) printf("LTE ultimate rad corr: %d\n",corr[0]);
+	      if(verbose) printf("LTE ultimate rad corr: %d\n",corr[0]);
 	      //trying the other inversion
 	      p2u(pp,uu,&geom);
 
@@ -2096,7 +2096,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      if(rettemp<0)
 		rettemp=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
 	      
-	      if(1 || verbose) printf("LTE ultimate hd corr: %d\n",rettemp);
+	      if(verbose) printf("LTE ultimate hd corr: %d\n",rettemp);
 	      
 	      if(rettemp<0) //to return error if neither rad or mhd inversion suceeded
 		ret=-1;
@@ -2115,7 +2115,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(ret!=0)
     {
       //report failure, stop and rerun with verbose
-      return -1;
+      //return -1;
   
       //****
       //nothing worked - allow for still solution or ask for fixup

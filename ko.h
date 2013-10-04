@@ -448,7 +448,7 @@ int conv_vels_core(ldouble *u1,ldouble *u2,ldouble *u2cov,int which1,int which2,
 //u2p.c
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
 int calc_primitives(int,int,int,int);
-int check_floors_hd(ldouble *uu, int,void*);
+int check_floors_mhd(ldouble *uu, int,void*);
 int u2p(ldouble *uu, ldouble *pp, void*,int*,int*,int);
 int u2p_hot(ldouble*,ldouble*,void*);
 int u2p_entropy(ldouble*,ldouble*,void*);
@@ -468,6 +468,7 @@ int calc_conserved(int ix,int iy,int iz);
 int p2u(ldouble *p, ldouble *u,void*);
 int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
 int p2u_rad(ldouble *p,ldouble *u,void*);
+int p2u_mhd(ldouble *p,ldouble *u,void*);
 
 //frames.c
 int trans_pmhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1,void* ggg2);

@@ -49,7 +49,7 @@ calc_primitives(int ix,int iy,int iz,int type)
   //************************************
   //checking on hd floors  
   int floorret;
-  floorret=check_floors_hd(pp,VELPRIM,&geom);
+  floorret=check_floors_mhd(pp,VELPRIM,&geom);
 
   if(floorret<0.)
     {
@@ -268,7 +268,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 			
 		    //should not happen but if happens use the old state to impose URHOLIMIT
 		    pp[1]=UURHORATIOMAX*pp[0];
-		    check_floors_hd(pp,VELPRIM,&geom);
+		    check_floors_mhd(pp,VELPRIM,&geom);
 		    pp[5]=calc_Sfromu(pp[0],pp[1]);
 		    p2u(pp,uu,&geom);	
 
@@ -376,7 +376,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 //**********************************************************************
 //checks if hydro primitives make sense
 int
-check_floors_hd(ldouble *pp, int whichvel,void *ggg)
+check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 {
   //return 0;
 
@@ -390,6 +390,10 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
   gg=geom->gg;
   GG=geom->GG;
 
+  
+  int iv;
+
+ 
 #ifdef TRACER
   if(pp[TRA]<0.) {pp[TRA]=0.; ret=-1; if(verbose) printf("hd_floors CASE TRA 1\n");}
 #endif
@@ -437,6 +441,76 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
       if(verbose) printf("hd_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);
     }
 
+  
+  //**********************************************************************
+  //too magnetized
+#ifdef MAGNFIELD
+  ldouble ucond[4],ucovd[4];
+  ldouble bcond[4],bcovd[4],magpre;  
+  ldouble etacon[4],etarel[4];
+  for(iv=1;iv<4;iv++)
+    ucond[iv]=pp[1+iv];
+  conv_vels(ucond,ucond,VELPRIM,VEL4,gg,GG);
+  indices_21(ucond,ucovd,gg);
+  calc_bcon_4vel(pp,ucond,ucovd,bcond);
+  indices_21(bcond,bcovd,gg); 
+  magpre = dot(bcond,bcovd)/2.;
+  calc_normalobs_4vel(GG,etacon);
+  conv_vels_ut(etacon,etarel,VEL4,VELPRIM,gg,GG);
+
+  if(magpre>B2RHORATIOMAX*pp[RHO]) 
+    {
+      if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
+      ldouble f=magpre/(B2RHORATIOMAX*pp[RHO]);
+
+
+#ifdef B2RHOFLOOR_ZAMO //new mass in ZAMO
+      ldouble dpp[NV],duu[NV];
+      ldouble drho = 1./etacon[0] * ucond[0] * pp[RHO] * (f-1.);
+    
+      PLOOP(iv)
+	dpp[iv]=0.0;
+
+      dpp[RHO]=drho;
+      dpp[UU] = pp[UU]*drho/pp[RHO];
+      dpp[VX] = etarel[VX];
+      dpp[VY] = etarel[VY];
+      dpp[VZ] = etarel[VZ];
+      dpp[ENTR] = calc_Sfromu(pp[RHO],pp[UU]);
+      dpp[B1] = dpp[B2] = dpp[B3] = 0.;
+
+      p2u(dpp,duu,&geom);
+    
+      /*      
+      pp[RHO] += drho;
+      pp[UU] *= pp[RHO]/rho0;      
+      pp[VX] = (rho0 * pp[VX] + drho * etarel[1]) / pp[RHO];
+      pp[VY] = (rho0 * pp[VY] + drho * etarel[2]) / pp[RHO];
+      pp[VZ] = (rho0 * pp[VZ] + drho * etarel[3]) / pp[RHO];
+      */
+
+#else //new mass in fluid frame
+      pp[RHO]*=f;
+      pp[UU]*=f;
+#endif
+
+     
+      
+      ret=-1;      
+    }
+  
+  /*
+  //independent check on ugas
+  if(magpre>B2UURATIOMAX*pp[UU]) 
+    {
+      if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
+      pp[UU]*=magpre/(B2UURATIOMAX*pp[UU]);
+      ret=-1;      
+    }
+  */
+
+#endif
+
   //**********************************************************************
   //too fast
   
@@ -465,63 +539,10 @@ check_floors_hd(ldouble *pp, int whichvel,void *ggg)
 	      gamma2=1.+qsq;
 	      printf(" -> %e\n",sqrt(gamma2));
 	    }
-
-	  
 	}
     }
   //TODO: implement checks for other VELPRIM
-  
-  //**********************************************************************
-  //too magnetized
-#ifdef MAGNFIELD
-  ldouble ucond[4],ucovd[4];
-  ldouble bcond[4],bcovd[4],magpre;  
-  ldouble etacon[4],etarel[4];
-  int iv;
-  for(iv=1;iv<4;iv++)
-    ucond[iv]=pp[1+iv];
-  conv_vels(ucond,ucond,VELPRIM,VEL4,gg,GG);
-  indices_21(ucond,ucovd,gg);
-  calc_bcon_4vel(pp,ucond,ucovd,bcond);
-  indices_21(bcond,bcovd,gg); 
-  magpre = dot(bcond,bcovd)/2.;
-  calc_normalobs_4vel(GG,etacon);
-  conv_vels_ut(etacon,etarel,VEL4,VELPRIM,gg,GG);
 
-  if(magpre>B2RHORATIOMAX*pp[RHO]) 
-    {
-      if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
-      ldouble f=magpre/(B2RHORATIOMAX*pp[RHO]);
-
-      //new mass in fluid frame
-      pp[RHO]*=f;
-      pp[UU]*=f;
-
-      /*
-      //new mass in ZAMO
-      ldouble rho0 = pp[RHO];
-      ldouble drho = 1./etacon[0] * ucond[0] * rho0 * (f-1.);
-      pp[RHO] += drho;
-      pp[UU] *= pp[RHO]/rho0;      
-      pp[VX] = (rho0 * pp[VX] + drho * etarel[1]) / pp[RHO];
-      pp[VY] = (rho0 * pp[VY] + drho * etarel[2]) / pp[RHO];
-      pp[VZ] = (rho0 * pp[VZ] + drho * etarel[3]) / pp[RHO];
-      */
-      
-      ret=-1;      
-    }
-  
-  /*
-  //independent check on ugas
-  if(magpre>B2UURATIOMAX*pp[UU]) 
-    {
-      if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
-      pp[UU]*=magpre/(B2UURATIOMAX*pp[UU]);
-      ret=-1;      
-    }
-  */
-
-#endif
 
   //updates entropy after floor corrections
   if(ret<0)

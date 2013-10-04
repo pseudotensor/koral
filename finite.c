@@ -497,9 +497,9 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,0,&geom);
-	  check_floors_hd(fd_pl,VELPRIM,&geom);
+	  check_floors_mhd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix+1,iy,iz,0,&geom);
-	  check_floors_hd(fd_pr,VELPRIM,&geom);
+	  check_floors_mhd(fd_pr,VELPRIM,&geom);
 	  //end of floor section
 
 	  f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
@@ -551,9 +551,9 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,1,&geom);
-	  check_floors_hd(fd_pl,VELPRIM,&geom);
+	  check_floors_mhd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix,iy+1,iz,1,&geom);
-	  check_floors_hd(fd_pr,VELPRIM,&geom);
+	  check_floors_mhd(fd_pr,VELPRIM,&geom);
 
 	  f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
 	  f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
@@ -604,9 +604,9 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
 
 	  //testing if interpolated primitives make sense
 	  fill_geometry_face(ix,iy,iz,2,&geom);
-	  check_floors_hd(fd_pl,VELPRIM,&geom);
+	  check_floors_mhd(fd_pl,VELPRIM,&geom);
 	  fill_geometry_face(ix,iy,iz+1,2,&geom);
-	  check_floors_hd(fd_pr,VELPRIM,&geom);
+	  check_floors_mhd(fd_pr,VELPRIM,&geom);
 	  //end of floor section
 
 	  f_flux_prime(fd_pl,2,ix,iy,iz,ffl);
@@ -2100,7 +2100,7 @@ cell_fixup_hd()
 
 		      if(verbose>1) 
 			{
-			  printf("fixing mhd up %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  printf("fixing up mhd %d %d %d with %d neighbors\n",ix,iy,iz,in);
 			  /*
 			  for(ii=0;ii<in;ii++)
 			    print_Nvector(ppn[ii],NV);
@@ -2142,7 +2142,7 @@ cell_fixup_rad()
 
   int ix,iy,iz,iv;
   int in,ii;
-  int verbose=1;
+  int verbose=2;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
@@ -2222,11 +2222,13 @@ cell_fixup_rad()
 
 		      if(verbose>1) 
 			{
-			  printf("fixing up %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  printf("fixing up rad %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  /*
 			  for(ii=0;ii<in;ii++)
 			    print_Nvector(ppn[ii],NV);
 			  printf(" -> \n");
 			  print_Nvector(pp,NV);
+			  */
 			}
 
 		      //save to updated arrays memory

@@ -32,13 +32,28 @@ calc_conserved(int ix,int iy,int iz)
   return 0;
 }
  
-
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
 //primitive to conserved converter
 int
 p2u(ldouble *p, ldouble *u, void *ggg)
+{
+  p2u_mhd(p,u,ggg);
+
+#ifdef RADIATION
+  p2u_rad(p,u,ggg);
+#endif
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//primitive to conserved converter
+int
+p2u_mhd(ldouble *p, ldouble *u, void *ggg)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -64,26 +79,7 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   vcon[0]=0.;
   ldouble S=p[5];
 
-  //converting to 4-velocity
-
-  //conv_vels(vcon,ucon,VELPRIM,VEL4,gg,GG);
-  //indices_21(ucon,ucov,gg);
-  //print_4vector(ucov);
-  //conv_velscov(vcon,ucov,VELPRIM,VEL4,gg,GG);
-  /*if(GG[0][1]!=0.)
-    {
-      print_4vector(ucon);
-      print_4vector(ucov);
-      }*/
   conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-  /*
-  if(GG[0][1]!=0.)
-    {
-      print_4vector(ucon);
-      print_4vector(ucov);//getchar();
-    }
-  */
-
 
 #ifdef MAGNFIELD
   calc_bcon_4vel(p,ucon,ucov,bcon);
@@ -91,19 +87,6 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   bsq = dot(bcon,bcov);
 #endif
 
-  //************************************
-  //************************************
-  //************************************
-  //radiation part
-  //************************************
-  //************************************
-  //************************************
-
-#ifdef RADIATION
-  
-  p2u_rad(p,u,ggg);
- 
-#endif
 
   //************************************
   //************************************
@@ -132,47 +115,6 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   ldouble Ttth =eta*ucon[0]*ucov[2] - bcon[0]*bcov[2];
   ldouble Ttph =eta*ucon[0]*ucov[3] - bcon[0]*bcov[3];
 
-  /*
-  printf("%e %e %e %e -> %.20e\n",eta*ucon[0]*ucov[3] - bcon[0]*bcov[3],eta,ucon[0],ucov[3],dot(ucon,ucov));
-  print_4vector(vcon);
-  print_4vector(ucon);
-  print_metric(gg);
-  
-  
- 
- int i,j,k;
-  /*for(i=0;i<4;i++)
-    {
-      ucov[i]=0.;
-      for(k=0;k<4;k++)
-	{
-	  ucov[i]+=ucon[k]*gg[i][k];
-	  if(i==3) printf("+ %e (%d %d)\n",ucon[k]*gg[i][k],i,k);
-	}	  
-    }
- 
- //print_4vector(ucov);
-
- indices_21(vcon,vcov,gg);
- //print_4vector(vcov);
-
- // print_4vector(vcon);getch();
- ldouble qsq=0.;
- for(i=1;i<4;i++)
-   for(j=1;j<4;j++)
-     qsq+=vcon[i]*vcon[j]*gg[i][j];
- ldouble gamma2=1.+qsq;
- ldouble alpha2=-1./GG[0][0];
- ldouble gamma=sqrt(gamma2);
- ldouble alpha=sqrt(alpha2);
- for(i=0;i<4;i++)
-   ucov[i]=vcov[i]-alpha*gamma*delta(0,i);
-
-  print_4vector(ucov);
-  */
-
-	 
-
   u[0]=gdetu*rhout;
   u[1]=gdetu*Tttt;
   u[2]=gdetu*Ttr;
@@ -199,8 +141,6 @@ p2u(ldouble *p, ldouble *u, void *ggg)
   u[B2]=gdetu*p[B2];
   u[B3]=gdetu*p[B3];
 #endif
-  
- 
 
   return 0.;
 }
