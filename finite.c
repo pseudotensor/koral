@@ -2455,7 +2455,7 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
 int
 correct_polaraxis()
 {
-  int nc=1; //correct nc most polar cells;
+  int nc=1; //correct velocity in nc most polar cells;
 
   int ix,iy,iz,iv,ic,iysrc;
 #pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static)

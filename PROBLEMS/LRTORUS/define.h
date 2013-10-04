@@ -7,7 +7,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 65
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -55,7 +55,7 @@
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 10000.
+#define B2RHORATIOMAX 1000.
 #define GAMMAMAXRAD 50.
 #define GAMMAMAXHD 50.
 
@@ -74,9 +74,9 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.2-MKS1R0))
-#define MAXX (log(100.-MKS1R0))
-#define NX 160
-#define NY 100
+#define MAXX (log(500.-MKS1R0))
+#define NX 250
+#define NY 200
 #define NZ 1
 #endif
 
@@ -101,8 +101,8 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
-#define DTOUT2 .1
+#define DTOUT1 25.
+#define DTOUT2 250.
 
 /************************************/
 //common physics / torus / atmosphere

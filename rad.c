@@ -1992,6 +1992,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	    }
 	}
 
+      /*
       //backup method - estimating LTE state
       if(ret!=0) 
 	{
@@ -2041,6 +2042,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  //printf("%e %e %e | %e %e | %e\n",ugas,Ehat,4.*Pi*B,T,calc_LTE_TfromE(Ehat),TLTE);
 	  
 	}
+      */
     
       //LTE worked so can combine (arbitrarily) zero and LTE state (in pp[])
       if(ret==0) 
@@ -2101,15 +2103,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      if(rettemp<0) //to return error if neither rad or mhd inversion suceeded
 		ret=-1;
 	    }
-	 
-	  /*
-	    print_NVvector(pp0);
-	    print_NVvector(uu0);
-	    print_NVvector(pp);
-	    print_NVvector(uu);getch();
-	  */
 	}
-      
     }
 
   if(ret!=0)
@@ -2118,14 +2112,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       //return -1;
   
       //****
-      //nothing worked - allow for still solution or ask for fixup
+      //nothing worked - ask for fixup
       fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 	      geom.ix,geom.iy,geom.iz,global_time,nfout1);
       printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 	     geom.ix,geom.iy,geom.iz,global_time,nfout1);
 
       global_int_slot[GLOBALINTSLOT_NCRITFAILURES]++;
-      if(global_int_slot[GLOBALINTSLOT_NCRITFAILURES]>1000)
+      if(global_int_slot[GLOBALINTSLOT_NCRITFAILURES]>1.e6)
 	{
 	  printf("exceeded # of critical failures (%d) - exiting.\n",
 		 global_int_slot[GLOBALINTSLOT_NCRITFAILURES]);
