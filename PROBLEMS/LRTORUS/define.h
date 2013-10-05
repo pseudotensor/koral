@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -95,7 +95,7 @@
 #define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
-#define NOUTSTOP 5000
+#define NOUTSTOP 1000
 #define SILOOUTPUT 1
 #define OUTOUTPUT 1
 #define AVGOUTPUT 1

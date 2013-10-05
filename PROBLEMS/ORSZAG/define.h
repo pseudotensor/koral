@@ -67,13 +67,13 @@
 //output
 /************************************/
 #define ALLSTEPSOUTPUT 0
-#define NSTEPSTOP 1.e10
+#define NSTEPSTOP 100
 #define NOUTSTOP 50
 #define SILOOUTPUT 1
 #define AVGOUTPUT 1
 #define OUTOUTPUT 0
-#define DTOUT1 10.
-#define DTOUT2 30.
+#define DTOUT1 1000.
+#define DTOUT2 3000.
 
 /************************************/
 //common physics / atmosphere
