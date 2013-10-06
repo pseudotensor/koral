@@ -465,7 +465,8 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 
 #if (B2RHOFLOORFRAME==ZAMOFRAME) //new mass in ZAMO
       ldouble dpp[NV],duu[NV];
-      ldouble drho = 1./etacon[0] * ucond[0] * pp[RHO] * (f-1.);
+      //      ldouble drho = 1./etacon[0] * ucond[0] * pp[RHO] * (f-1.);
+      ldouble drho=pp[RHO]*(f-1.);
     
       for(iv=0;iv<NVMHD;iv++)
 	dpp[iv]=0.0;

@@ -6,13 +6,13 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/

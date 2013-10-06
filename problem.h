@@ -72,7 +72,7 @@
 //66* KTORUS - RMHD Newtonian torus with radiation
 //67* LRTORUS - RMHD limo torus
 
-#define PROBLEM 63
+#define PROBLEM 67
 
 #if(PROBLEM==67)
 
@@ -1086,6 +1086,11 @@
 //max B^2 over uint
 #ifndef B2UURATIOMAX 
 #define B2UURATIOMAX 100.
+#endif
+
+//max B^2 over Ehat
+#ifndef B2EERATIOMAX
+#define B2EERATIOMAX 100.
 #endif
 
 //min B^2 over rho 

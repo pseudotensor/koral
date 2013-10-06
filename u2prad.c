@@ -1192,9 +1192,38 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
       pp[1]=1./EEUURATIOMAX*Ehat;
       ret=-1;
     }
- #endif
 
-  //prad_ff2lab(pp2, pp, ggg);  
+#ifdef SKIP_MAGNFIELD
+
+  ldouble ucond[4],ucovd[4];
+  ldouble bcond[4],bcovd[4],magpre;  
+  ldouble etacon[4],etarel[4];
+  for(iv=1;iv<4;iv++)
+    ucond[iv]=pp[1+iv];
+  conv_vels(ucond,ucond,VELPRIM,VEL4,gg,GG);
+  indices_21(ucond,ucovd,gg);
+  calc_bcon_4vel(pp,ucond,ucovd,bcond);
+  indices_21(bcond,bcovd,gg); 
+  magpre = dot(bcond,bcovd)/2.;
+
+  //Ehat/uint ratios 
+  
+  if(magpre>B2EERATIOMAX*Ehat) 
+    {
+      if(verbose) printf("rad_floors CASE MR4 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,magpre,Ehat);
+      pp[EE0]=Eratio*magpre/B2EERATIOMAX;
+      ret=-1;
+    }
+  
+  /* don't check this one
+  if(Ehat>EEB2RATIOMAX*magpre) 
+    {
+    }
+  */
+
+#endif
+
+#endif
 #endif
 #endif
  
