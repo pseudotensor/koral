@@ -1687,7 +1687,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]-dt*ms[FX0]);
       uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]-dt*ms[FY0]);
       uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]-dt*ms[FZ0]);
-      uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
+      uu[ENTR] = uu0[ENTR]+dt*ms[ENTR];// - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
 
       int rettemp=0;
       //if(whicheq==RADIMPLICIT_ENERGYEQ)
@@ -2103,7 +2103,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	      if(verbose) printf("LTE ultimate hd corr: %d\n",rettemp);
 	      
 	      if(rettemp<0) //to return error if neither rad or mhd inversion suceeded
-		ret=-1;
+		{
+		  ret=-1;
+		  fprintf(fout_fail,"inv. after LTE failed > (%4d %4d %4d) (t=%.5e) (otpt=%d)\n",
+			  geom.ix,geom.iy,geom.iz,global_time,nfout1);
+		  printf("inv. after LTE failed > (%4d %4d %4d) (t=%.5e) (otpt=%d)\n",
+			 geom.ix,geom.iy,geom.iz,global_time,nfout1);		}
+
 	    }
 	}
     }
