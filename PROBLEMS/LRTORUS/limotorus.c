@@ -5,10 +5,9 @@
 
 #define FTYPE double
 
-#define BHSPIN 0.
-#define LT_KAPPA 1.5e3
-#define LT_XI 0.9
-#define LT_R1 31.75
+#define LT_KAPPA 2.e3
+#define LT_XI 0.91
+#define LT_R1 30.
 #define LT_R2 200.
 #define LT_GAMMA 4./3.
 #define LT_RIN 15.
@@ -328,7 +327,7 @@ int main() {
 
 //    FTYPE R0 = 1.05, startx1 = -0.6736, dx1 = 0.0372985;
 
-   FTYPE a = BHSPIN;
+   FTYPE a = 0.9;
    factor = log(Rout/Rin);
 
    outfile = fopen("slice.dat", "w");
@@ -351,7 +350,7 @@ int main() {
 
 	   Sigma+=rho*r*dth;
 
-	   fprintf(outfile, "%g\t%g\t%g\t%g\t%g\t%g\t%g\n", r*sin(th), r*cos(th), rho, uu,ell,r,th);
+	   fprintf(outfile, "%g\t%g\t%g\t%g\t%g\n", r*sin(th), r*cos(th), rho, uu,ell);
 	 }
       fprintf(outfile, "\n");
       fprintf(radfile,"%g %g\n",r,Sigma);

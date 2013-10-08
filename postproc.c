@@ -15,11 +15,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
   //adjust NRADPROFILES in problem.h
 
   int ix,iy,iz,iv;
-  ldouble xx[4],xxBL[4],dx[3],dxcgs[3],mdot,rho,ucon[4],utcon[4],ucon3[4];
+  ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,ucon[4],utcon[4],ucon3[4];
   ldouble rhouconr;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
   ldouble tautot[3],tauabs[3];
-  ldouble avgsums[NAVGVARS][NX];
+  ldouble avgsums[NV+NAVGVARS][NX];
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -32,7 +32,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
       for(iv=0;iv<NAVGVARS;iv++)
 	avgsums[iv][ix]=0.;
 
-      if(NZ==1) //phi-symmetry
+ #ifdef BHDISK_PROBLEMTYPE
+     if(NZ==1) //phi-symmetry
 	{
 	  iz=0;
 	  for(iy=0;iy<NY;iy++)
@@ -45,9 +46,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		}
 
 	      get_xx(ix,iy,iz,xx);
-	      dx[0]=get_size_x(ix,0);
-	      dx[1]=get_size_x(iy,1);
-	      dx[2]=get_size_x(iz,2);
+	      
 	      pick_g(ix,iy,iz,gg);
 	      pick_G(ix,iy,iz,GG);
 
@@ -59,15 +58,22 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      struct geometry geomBL;
 	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 	      
+	      //to BL
 	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
-
+	      dxph[0]=get_size_x(ix,0)*sqrt(geom.gg[1][1]);
+	      dxph[1]=get_size_x(iy,1)*sqrt(geom.gg[2][2]);
+	      dxph[2]=get_size_x(iz,2)*sqrt(geom.gg[3][3]);
+	      dx[0]=dxph[0]/sqrt(geomBL.gg[1][1]);
+	      dx[1]=dxph[1]/sqrt(geomBL.gg[2][2]);
+	      dx[2]=dxph[2]/sqrt(geomBL.gg[3][3]);
+	      
 	      if(doingavg)
 		{
 		  rho=get_uavg(pavg,RHO,ix,iy,iz);
-		  utcon[1]=get_uavg(pavg,NV+AVGRHOUCON+1,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
-		  utcon[2]=get_uavg(pavg,NV+AVGRHOUCON+2,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
-		  utcon[3]=get_uavg(pavg,NV+AVGRHOUCON+3,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
-		  rhouconr=get_uavg(pavg,NV+AVGRHOUCON+1,ix,iy,iz);	      	      
+		  utcon[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  utcon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  utcon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);	      	      
 		}
 	      else
 		{
@@ -81,44 +87,41 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		}
 
 
-	      dx[0]=dx[0]*sqrt(geom.gg[1][1]);
-	      dx[1]=dx[1]*sqrt(geom.gg[2][2]);
-	      dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
-
+	      
 	      calc_tautot(pp,xxBL,dx,tautot);
 	      calc_tauabs(pp,xxBL,dx,tauabs);
 
 	      //#ifdef CGSOUTPUT
+	      /*
 	      rho=rhoGU2CGS(rho);
 	      dxcgs[0]=lenGU2CGS(dx[0]); //dr
 	      dxcgs[1]=lenGU2CGS(dx[1]); //dth
 	      dxcgs[2]=lenGU2CGS(dx[2]); //dph
+	      */
 	      //#endif
 
-#ifdef BHDISK_PROBLEMTYPE
 	      //surface density (2nd column)
-	      profiles[0][ix]+=rho*dxcgs[1];
+	      profiles[0][ix]+=rho*dxph[1];
 	      //rest mass flux (3)
-	      profiles[1][ix]+=-rhouconr*dxcgs[1]*dxcgs[2];
+	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 	      //rho-weighted minus radial velocity (4)
-	      profiles[2][ix]+=-ucon[1]*rho*dxcgs[1];
+	      profiles[2][ix]+=-ucon[1]*rho*dxph[1];
 	      //abs optical depth (7)
 	      profiles[5][ix]+=tauabs[1];	
 	      //tot optical depth (8)
 	      profiles[6][ix]+=tautot[1];
 
-	      for(iv=0;iv<NAVGVARS;iv++)
-		avgsums[iv][ix]+=get_uavg(pavg,NV+iv,ix,iy,iz)*dx[1];
+	      for(iv=0;iv<NV+NAVGVARS;iv++)
+		avgsums[iv][ix]+=get_uavg(pavg,iv,ix,iy,iz)*dxph[1];
 
 	      //<(rho+u+bsq/2)u^r><u_phi> (5)
-	      profiles[3][ix]+=get_uavg(pavg,NV+AVGWUCON+1,ix,iy,iz)*get_uavg(pavg,NV+AVGUCOV+3,ix,iy,iz)*dx[1];
-#endif
+	      profiles[3][ix]+=get_uavg(pavg,AVGWUCON(1),ix,iy,iz)*get_uavg(pavg,AVGUCOV(3),ix,iy,iz)*dxph[1];
 	    }
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
 
 	  //normalizing by <(rho+u+bsq/2)u^r>
-	  profiles[3][ix]/=avgsums[AVGWUCON+1][ix];
+	  profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];
 
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
@@ -133,6 +136,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[10][ix]=calc_lum(xxBL[1])/calc_lumEdd();
 	  //location of the photosphere (8)
 	  profiles[11][ix]=calc_photloc(ix);
+
+#endif
+
 	}
     }
 

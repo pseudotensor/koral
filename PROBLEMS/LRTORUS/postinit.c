@@ -2,7 +2,6 @@
 int ix,iy,iz;
 
 #ifdef MAGNFIELD
-#ifdef MAXBETA
 ldouble maxbeta=0.;
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
 for(iz=0;iz<NZ;iz++)
@@ -87,7 +86,6 @@ for(iz=0;iz<NZ;iz++)
       }
   }
 
-
 /*
 printf("adjusting gas pressure...\n",fac);
 
@@ -133,4 +131,3 @@ for(iz=0;iz<NZ;iz++)
 */
 #endif
 	    
-#endif

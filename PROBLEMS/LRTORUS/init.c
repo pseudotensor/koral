@@ -85,10 +85,6 @@ if(rho<0.) //outside donut
 
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
     prad_ff2lab(pp,pp,&geomBL);
-
-    if(!isfinite(pp[EE0])) {printf("%d %d %e %e %e\n",ix,iy,E,geomBL.gdet,Sqrt(Power(Power(BHSPIN,2) + 2*Power(r,2) + 
-										Power(BHSPIN,2)*Cos(2*th),2)*Power(Sin(th),2))
-				   /2.);getchar();}
 #endif
 
     //transforming primitives from BL to MYCOORDS
@@ -121,9 +117,6 @@ if(rho<0.) //outside donut
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //to conserved
 p2u(pp,uu,&geom);
-
-
-
 
 
 

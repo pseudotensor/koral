@@ -110,24 +110,24 @@
 #define FFFRAME 1
 
 //avg quantities
-#define AVGBSQ 0
-#define AVGUCON 1
-#define AVGUCOV 5
-#define AVGBCON 9
-#define AVGBCOV 13
-#define AVGRHOUCON 17
-#define AVGRHOUCOV 21
-#define AVGUUUCON 25
-#define AVGUUCOV 29
-#define AVGBSQUCON 33
-#define AVGBSQUCOV 37
-#define AVGRHOUCONUCOV 41
-#define AVGUUUCONUCOV 57
-#define AVGBSQUCONUCOV 73
-#define AVGBCONBCOV 89
-#define AVGWUCON 105
-#define AVGEHAT 109
-#define AVGRIJ 110
+#define AVGBSQ (NV+0)
+#define AVGUCON(i) (NV+1+i)
+#define AVGUCOV(i) (NV+5+i)
+#define AVGBCON(i) (NV+9+i)
+#define AVGBCOV(i) (NV+13+i)
+#define AVGRHOUCON(i) (NV+17+i)
+#define AVGRHOUCOV(i) (NV+21+i)
+#define AVGUUUCON(i) (NV+25+i)
+#define AVGUUCOV(i) (NV+29+i)
+#define AVGBSQUCON(i) (NV+33+i)
+#define AVGBSQUCOV(i) (NV+37+i)
+#define AVGRHOUCONUCOV(i,j) (NV+41+i*4+j)
+#define AVGUUUCONUCOV(i,j) (NV+57+i*4+j)
+#define AVGBSQUCONUCOV(i,j) (NV+73+i*4+j)
+#define AVGBCONBCOV(i,j) (NV+89+i*4+j)
+#define AVGWUCON(i) (NV+105+i)
+#define AVGEHAT (NV+109)
+#define AVGRIJ(i,j) (NV+110+i*4+j)
 
 
 

@@ -296,41 +296,41 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 
 #ifdef BHDISK_PROBLEMTYPE
   //avg already in OUTCOORDS
-  avg[NV+AVGBSQ]=bsq;
+  avg[AVGBSQ]=bsq;
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGUCON+iv]=ucon[iv];
+    avg[AVGUCON(iv)]=ucon[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGUCOV+iv]=ucov[iv];
+    avg[AVGUCOV(iv)]=ucov[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGBCON+iv]=bcon[iv];
+    avg[AVGBCON(iv)]=bcon[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGBCOV+iv]=bcov[iv];
+    avg[AVGBCOV(iv)]=bcov[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGRHOUCON+iv]=rho*ucon[iv];
+    avg[AVGRHOUCON(iv)]=rho*ucon[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGRHOUCOV+iv]=rho*ucov[iv];
+    avg[AVGRHOUCOV(iv)]=rho*ucov[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGUUUCON+iv]=uint*ucon[iv];
+    avg[AVGUUUCON(iv)]=uint*ucon[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGUUCOV+iv]=uint*ucov[iv];
+    avg[AVGUUCOV(iv)]=uint*ucov[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGBSQUCON+iv]=bsq*ucon[iv];
+    avg[AVGBSQUCON(iv)]=bsq*ucon[iv];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGBSQUCOV+iv]=bsq*ucov[iv];
-  for(iv=0;iv<4;iv++)
-    for(iv2=0;iv2<4;iv2++)
-      avg[NV+AVGRHOUCONUCOV+iv*4+iv2]=rho*ucon[iv]*ucov[iv2];
+    avg[AVGBSQUCOV(iv)]=bsq*ucov[iv];
   for(iv=0;iv<4;iv++)
     for(iv2=0;iv2<4;iv2++)
-      avg[NV+AVGUUUCONUCOV+iv*4+iv2]=uint*ucon[iv]*ucov[iv2];
+      avg[AVGRHOUCONUCOV(iv,iv2)]=rho*ucon[iv]*ucov[iv2];
   for(iv=0;iv<4;iv++)
     for(iv2=0;iv2<4;iv2++)
-      avg[NV+AVGBSQUCONUCOV+iv*4+iv2]=bsq*ucon[iv]*ucov[iv2];
+      avg[AVGUUUCONUCOV(iv,iv2)]=uint*ucon[iv]*ucov[iv2];
   for(iv=0;iv<4;iv++)
     for(iv2=0;iv2<4;iv2++)
-      avg[NV+AVGBCONBCOV+iv*4+iv2]=bcon[iv]*bcov[iv2];
+      avg[AVGBSQUCONUCOV(iv,iv2)]=bsq*ucon[iv]*ucov[iv2];
   for(iv=0;iv<4;iv++)
-    avg[NV+AVGWUCON+iv]=(rho+uint+bsq/2)*ucon[iv];
+    for(iv2=0;iv2<4;iv2++)
+      avg[AVGBCONBCOV(iv,iv2)]=bcon[iv]*bcov[iv2];
+  for(iv=0;iv<4;iv++)
+    avg[AVGWUCON(iv)]=(rho+uint+bsq/2)*ucon[iv];
    
 #ifdef RADIATION
   ldouble Rtt,Ehat,ugas[4];
@@ -339,10 +339,10 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   ldouble Rij[4][4];
   calc_Rij(pp,&geomout,Rij);
 
-  avg[NV+AVGEHAT]=Ehat;
+  avg[AVGEHAT]=Ehat;
   for(iv=0;iv<4;iv++)
     for(iv2=0;iv2<4;iv2++)
-      avg[NV+AVGRIJ+iv*4+iv2]=Rij[iv][iv2];
+      avg[AVGRIJ(iv,iv2)]=Rij[iv][iv2];
 
 #endif
 
