@@ -113,57 +113,49 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      nodey[nodalindex]=xxveccar[2];
 	      nodez[nodalindex]=xxveccar[3];
 
-	      //test
-	      /*
-#ifdef MAGNFIELD
-	      //magnetic field
-	      ldouble bcon[4],bcov[4];
-	      calc_bcon_prim(pp,bcon,&geom);
-	      indices_21(bcon,bcov,geom.gg); 
-	      bsq[nodalindex] = dot(bcon,bcov);
-#endif
-	      */
-
 	      //primitives to OUTCOORDS
               #ifdef RADIATION
 	      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
               #endif
 	      trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 
-	      //scalars
-	      #ifndef CGSOUTPUT
-	      rho[nodalindex]=pp[RHO];
-	      uint[nodalindex]=pp[UU];
-	      #else
-	      rho[nodalindex]=rhoGU2CGS(pp[RHO]);
-	      uint[nodalindex]=endenGU2CGS(pp[UU]);
+	      
+	      //velocities
+	      ldouble vel[4];
+
+	      if(doingavg==0) //using snapshot date
+		{
+		  rho[nodalindex]=pp[RHO];
+		  uint[nodalindex]=pp[UU];
+		  vel[1]=pp[VX];
+		  vel[2]=pp[VY];
+		  vel[3]=pp[VZ];
+		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
+		}
+	      else //using averaged data
+		{
+		  rho[nodalindex]=get_uavg(pavg,RHO,ix,iy,iz);
+		  uint[nodalindex]=get_uavg(pavg,UU,ix,iy,iz);
+		  vel[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  vel[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  vel[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
+		}
+
+	      #ifdef CGSOUTPUT
+	      rho[nodalindex]=rhoGU2CGS(rho[nodalindex]);
+	      uint[nodalindex]=endenGU2CGS(uint[nodalindex]);
 	      #endif
 
-	      temp[nodalindex]=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+	      temp[nodalindex]=calc_PEQ_Tfromurho(rho[nodalindex],uint[nodalindex]);
 	      
 	      #ifdef TRACER
 	      tracer[nodalindex]=pp[TRA];
 	      #endif
 
-	      //velocities
-	      ldouble vel[4]={0,pp[VX],pp[VY],pp[VZ]};	
-
-	      if(geomout.GG[0][0]<0.)
-		{
-		  //conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
-		  //trans2_cc2on(vel,vel,geomout.tup);
-		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
-		}
-	      else //outside well defined domain of OUTCOORDS
-		vel[1]=vel[2]=vel[3]=0.;		
-
 	      //outvel - non-ortonormal VEL4
 	      vx[nodalindex]=vel[1];
 	      vy[nodalindex]=vel[2];
 	      vz[nodalindex]=vel[3];
-
-	     
-
 
 	      //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
@@ -188,11 +180,21 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      //magnetic field
 	      
 	      ldouble bcon[4],bcov[4];
-	      calc_bcon_prim(pp,bcon,&geomout);
-	      indices_21(bcon,bcov,geomout.gg); 
-	      bsq[nodalindex] = dot(bcon,bcov);
-	      
-	      
+
+	      if(doingavg==0)
+		{
+		  calc_bcon_prim(pp,bcon,&geomout);
+		  indices_21(bcon,bcov,geomout.gg); 
+		  bsq[nodalindex] = dot(bcon,bcov);
+		}
+	      else
+		{
+		  bcon[1]=get_uavg(pavg,AVGBCON(1),ix,iy,iz);
+		  bcon[2]=get_uavg(pavg,AVGBCON(2),ix,iy,iz);
+		  bcon[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
+		  bsq[nodalindex]=get_uavg(pavg,AVGBSQ,ix,iy,iz);
+		}
+	      	      
 	      //to ortonormal	      
 	      //trans2_cc2on(bcon,bcon,geomout.tup);
 
@@ -221,39 +223,49 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      #ifdef RADIATION
 
-	      ldouble Rtt,Ehat,ugas[4];
-	      calc_ff_Rtt(pp,&Rtt,ugas,&geomout);
-	      Ehat=-Rtt;  
-	      Erad[nodalindex]=Ehat;
-									  
-	      //prad_lab2on(pp,pp,&geomout);
-	      ldouble rvel[4]={0,pp[FX0],pp[FY0],pp[FZ0]};
-	      if(geomout.GG[0][0]<0.)
-		conv_vels(rvel,rvel,VELPRIM,VEL4,geomout.gg,geomout.GG);
+	      ldouble Rtt,Ehat,ugas[4],rvel[4],Rij[4][4];
+
+	      if(doingavg==0)
+		{
+		  calc_ff_Rtt(pp,&Rtt,ugas,&geomout);
+		  Ehat=-Rtt;  	      							  
+		  //prad_lab2on(pp,pp,&geomout);
+		  //rvel[1]=pp[FX0];
+		  //rvel[2]=pp[FY0];
+		  //rvel[3]=pp[FZ0];
+		  //conv_vels(rvel,rvel,VELPRIM,VEL4,geomout.gg,geomout.GG);
+		  calc_Rij(pp,&geomout,Rij); //calculates R^munu in OUTCOORDS
+		}
 	      else
-		rvel[1]=rvel[2]=rvel[3]=0.;
-	
-	      //outvel - ortonormal VEL4
-	      Fx[nodalindex]=rvel[1];
-	      Fy[nodalindex]=rvel[2];
-	      Fz[nodalindex]=rvel[3];
+		{
+		  Ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
+		  Rij[0][0]=get_uavg(pavg,AVGRIJ(0,0),ix,iy,iz);
+		  Rij[0][1]=get_uavg(pavg,AVGRIJ(0,1),ix,iy,iz);
+		  Rij[0][2]=get_uavg(pavg,AVGRIJ(0,2),ix,iy,iz);
+		  Rij[0][3]=get_uavg(pavg,AVGRIJ(0,3),ix,iy,iz);		  
+		}
+	      	
+	      Erad[nodalindex]=Ehat;
+	      Fx[nodalindex]=Rij[0][1];
+	      Fy[nodalindex]=Rij[0][2];
+	      Fz[nodalindex]=Rij[0][3];
 
 	       //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
 		{
-		  rvel[2]*=r;
-		  rvel[3]*=r*sin(th);
+		  Rij[0][2]*=r;
+		  Rij[0][3]*=r*sin(th);
 
-		  Fx[nodalindex] = sin(th)*cos(ph)*rvel[1] 
-		    + cos(th)*cos(ph)*rvel[2]
-		    - sin(ph)*rvel[3];
+		  Fx[nodalindex] = sin(th)*cos(ph)*Rij[0][1] 
+		    + cos(th)*cos(ph)*Rij[0][2]
+		    - sin(ph)*Rij[0][3];
 
-		  Fy[nodalindex] = sin(th)*sin(ph)*rvel[1] 
-		    + cos(th)*sin(ph)*rvel[2]
-		    + cos(ph)*rvel[3];
+		  Fy[nodalindex] = sin(th)*sin(ph)*Rij[0][1] 
+		    + cos(th)*sin(ph)*Rij[0][2]
+		    + cos(ph)*Rij[0][3];
 
-		  Fz[nodalindex] = cos(th)*rvel[1] 
-		    - sin(th)*rvel[2];
+		  Fz[nodalindex] = cos(th)*Rij[0][1] 
+		    - sin(th)*Rij[0][2];
 		}
 	      #endif
 	  
