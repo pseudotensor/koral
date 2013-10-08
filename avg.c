@@ -21,6 +21,7 @@ main(int argc, char **argv)
     }
 
   int i;
+  doingavg=0;
 
   //currently gsl is not used
   gsl_set_error_handler_off();
@@ -78,7 +79,7 @@ main(int argc, char **argv)
   for(iz=0;iz<NZ;iz++)
     for(iy=0;iy<NY;iy++)
       for(ix=0;ix<NX;ix++)
-	for(iv=0;iv<(NV+NAVGVARS);iv++)
+	for(iv=0;iv<NV;iv++)
 	   set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
 
   //projects on ghost cells

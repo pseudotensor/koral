@@ -98,6 +98,7 @@ int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,**loop_02,Nloop_0,Nlo
 ldouble global_slot[2],global_time,avgtime;
 int global_int_slot[1];
 ldouble scalars[NSCALARS];
+int doingavg;
 
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
 

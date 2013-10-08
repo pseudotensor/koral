@@ -12,7 +12,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -55,7 +55,7 @@
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 1000.
+#define B2RHORATIOMAX 500.
 #define GAMMAMAXRAD 50.
 #define GAMMAMAXHD 50.
 
@@ -74,9 +74,9 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.2-MKS1R0))
-#define MAXX (log(500.-MKS1R0))
-#define NX 150
-#define NY 100
+#define MAXX (log(100.-MKS1R0))
+#define NX 100
+#define NY 60
 #define NZ 1
 #endif
 
@@ -101,13 +101,13 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 25.
-#define DTOUT2 250.
+#define DTOUT1 1.
+#define DTOUT2 1.
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
-#define GAMMA (4./3.)
+#define GAMMA (5./3.)
 
 #define LT_KAPPA 2.e3
 #define LT_XI 0.91

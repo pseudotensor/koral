@@ -14,6 +14,7 @@ main(int argc, char **argv)
 
   ldouble tstart;
   int i;
+  doingavg=0;
 
   //print scalings GU->CGS
   //print_scalings();

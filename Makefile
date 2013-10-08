@@ -13,7 +13,7 @@ ko: ko.o $(OBJS) Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
 ana: ana.o $(OBJS)  Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
 	$(CC) $(CFLAGS) -o ana ana.o $(OBJS) $(LIBS)
 
-avg: avg.o $(OBJS)  Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
+avg: avg.o $(OBJS) Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
 	$(CC) $(CFLAGS) -o avg avg.o $(OBJS) $(LIBS)
 
 clean:

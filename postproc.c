@@ -16,6 +16,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3],dxcgs[3],mdot,rho,ucon[4],utcon[4],ucon3[4];
+  ldouble rhouconr;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
   ldouble tautot[3],tauabs[3];
   ldouble avgsums[NAVGVARS][NX];
@@ -60,19 +61,29 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      
 	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 
-	      rho=pp[0];
+	      if(doingavg)
+		{
+		  rho=get_uavg(pavg,RHO,ix,iy,iz);
+		  utcon[1]=get_uavg(pavg,NV+AVGRHOUCON+1,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  utcon[2]=get_uavg(pavg,NV+AVGRHOUCON+2,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  utcon[3]=get_uavg(pavg,NV+AVGRHOUCON+3,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  rhouconr=get_uavg(pavg,NV+AVGRHOUCON+1,ix,iy,iz);	      	      
+		}
+	      else
+		{
+		  rho=pp[0];
+		  utcon[1]=pp[2];
+		  utcon[2]=pp[3];
+		  utcon[3]=pp[4];
 
-	      utcon[1]=pp[2];
-	      utcon[2]=pp[3];
-	      utcon[3]=pp[4];
+		  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+		  rhouconr=rho*ucon[1];	      
+		}
 
-	      conv_vels(utcon,ucon3,VELPRIM,VEL3,geomBL.gg,geomBL.GG);
-	      conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-	      //conv_velscov(utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 
-	      dx[0]=dx[0]*sqrt(geomBL.gg[0][0]);
-	      dx[1]=dx[1]*sqrt(geomBL.gg[2][2]);
-	      dx[2]=2.*M_PI*sqrt(geomBL.gg[3][3]);
+	      dx[0]=dx[0]*sqrt(geom.gg[1][1]);
+	      dx[1]=dx[1]*sqrt(geom.gg[2][2]);
+	      dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
 
 	      calc_tautot(pp,xxBL,dx,tautot);
 	      calc_tauabs(pp,xxBL,dx,tauabs);
@@ -88,7 +99,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //surface density (2nd column)
 	      profiles[0][ix]+=rho*dxcgs[1];
 	      //rest mass flux (3)
-	      profiles[1][ix]+=-rho*ucon[1]*dxcgs[1]*dxcgs[2];
+	      profiles[1][ix]+=-rhouconr*dxcgs[1]*dxcgs[2];
 	      //rho-weighted minus radial velocity (4)
 	      profiles[2][ix]+=-ucon[1]*rho*dxcgs[1];
 	      //abs optical depth (7)
@@ -99,16 +110,15 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      for(iv=0;iv<NAVGVARS;iv++)
 		avgsums[iv][ix]+=get_uavg(pavg,NV+iv,ix,iy,iz)*dx[1];
 
-	      //<(rho+u+bsq/2)u^r><u_phi>
-	      profiles[3][ix]+=get_uavg(pavg,NV+9,ix,iy,iz)*
-		get_uavg(pavg,NV+4,ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz)*dx[1];
+	      //<(rho+u+bsq/2)u^r><u_phi> (5)
+	      profiles[3][ix]+=get_uavg(pavg,NV+AVGWUCON+1,ix,iy,iz)*get_uavg(pavg,NV+AVGUCOV+3,ix,iy,iz)*dx[1];
 #endif
 	    }
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
 
-	  //normalizing by <rho u^r>
-	  profiles[3][ix]/=avgsums[1][ix];
+	  //normalizing by <(rho+u+bsq/2)u^r>
+	  profiles[3][ix]/=avgsums[AVGWUCON+1][ix];
 
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
