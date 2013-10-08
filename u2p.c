@@ -464,8 +464,8 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       ldouble f=magpre/(B2RHORATIOMAX*pp[RHO]);
 
 #if (B2RHOFLOORFRAME==ZAMOFRAME) //new mass in ZAMO
+
       ldouble dpp[NV],duu[NV];
-      //      ldouble drho = 1./etacon[0] * ucond[0] * pp[RHO] * (f-1.);
       ldouble drho=pp[RHO]*(f-1.);
     
       for(iv=0;iv<NVMHD;iv++)
@@ -494,17 +494,11 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 	  printf("u2p failed after imposing bsq over rho floors\n");
 	}
     
-      /*      
-      pp[RHO] += drho;
-      pp[UU] *= pp[RHO]/rho0;      
-      pp[VX] = (rho0 * pp[VX] + drho * etarel[1]) / pp[RHO];
-      pp[VY] = (rho0 * pp[VY] + drho * etarel[2]) / pp[RHO];
-      pp[VZ] = (rho0 * pp[VZ] + drho * etarel[3]) / pp[RHO];
-      */
-
 #elif(B2RHOFLOORFRAME==FFFRAME) //new mass in fluid frame
+
       pp[RHO]*=f;
       pp[UU]*=f;
+
 #endif
       
       ret=-1;      

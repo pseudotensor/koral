@@ -55,7 +55,7 @@
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 1000.
+#define B2RHORATIOMAX 500.
 #define GAMMAMAXRAD 50.
 #define GAMMAMAXHD 50.
 
@@ -101,13 +101,13 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 25.
+#define DTOUT1 10.
 #define DTOUT2 250.
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
-#define GAMMA (4./3.)
+#define GAMMA (5./3.)
 
 #define LT_KAPPA 1.5e3
 #define LT_XI 0.9

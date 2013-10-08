@@ -1414,6 +1414,10 @@
 #define B2RHOFLOORFRAME ZAMOFRAME
 #endif
 
+#ifndef NCCORRECTPOLAR
+#define NCCORRECTPOLAR 2
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/
