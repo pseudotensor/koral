@@ -18,9 +18,9 @@
 //#define EXPLICIT_RAD_SOURCE
 //#define EDDINGTON_APR
 //#define SKIPRADSOURCE
-#ifndef TIMESTEPPING
-#define TIMESTEPPING RK2K1K2
-#endif
+//#ifndef TIMESTEPPING
+//#define TIMESTEPPING RK2K1K2
+//#endif
 
 #define VERIFYENTROPYAFTERADVECTION 0
 
@@ -78,7 +78,7 @@
 #define MUGAS 1. //mean molecular weight (default = 1)
 
 //problem specific definitions
-#define NTUBE 4
+#define NTUBE 3
 
 #undef SIGMA_RAD
 #if (NTUBE==1)

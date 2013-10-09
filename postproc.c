@@ -137,9 +137,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  //location of the photosphere (8)
 	  profiles[11][ix]=calc_photloc(ix);
 
-#endif
+
+
 
 	}
+
+#endif
     }
 
   return 0;
