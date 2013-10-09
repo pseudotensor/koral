@@ -1641,9 +1641,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
   while(1); //main solver loop
 
-  //to average number of iterations
-  global_slot[0]+=(ldouble)iter;
-  global_slot[1]+=1.;
 
   if(iter>MAXITER || failed==1)
     {
@@ -1834,6 +1831,44 @@ getchar();
   //succeeded
   //primitives vector returned to pp[]
 
+  //to calculate average number of succesful iterations
+
+  if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ)
+    {
+      //#pragma omp critical //to make the counting precise
+      global_int_slot[GLOBALINTSLOT_ITERIMPENERRAD]+=iter;
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_NIMPENERRAD]+=1;
+    }
+  if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_ITERIMPENERMHD]+=iter;
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+=1;
+    }
+  if(whichprim==RAD && whicheq==RADIMPLICIT_ENTROPYEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]+=iter;
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]+=1;
+    }
+  if(whichprim==MHD && whicheq==RADIMPLICIT_ENTROPYEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_ITERIMPENTRMHD]+=iter;
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]+=1;
+    }
+  if(whicheq==RADIMPLICIT_LTEEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_ITERIMPLTE]+=iter;
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_NIMPLTE]+=1;
+    }
+
   return 0;
 }
 
@@ -1883,7 +1918,21 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas0,4.)/pp0[UU]);
   ldouble xi2=chi*dt*(1.+(-Rtt0)/(pp0[RHO]+GAMMA*pp0[UU]));
 
-  //**** 000th ****
+  ldouble qsq=0.;
+  int i,j;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=pp0[UU+i]*pp0[UU+j]*geom.gg[i][j];
+  ldouble gammagas2=1.+qsq;
+  qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=pp0[EE0+i]*pp0[EE0+j]*geom.gg[i][j];
+  ldouble gammarad2=1.+qsq;
+
+  if(verbose) printf("gammas: %e %e\n\n",sqrt(gammagas2),sqrt(gammarad2));
+
+  //**** 0th ****
 
   //test
   //ret=solve_implicit_lab_4dcon(uu0,pp0,&geom,dt,deltas,verbose,pp);
@@ -2114,25 +2163,42 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	}
     }
 
+ 
+ 
+
   if(ret!=0)
     {
       //report failure, stop and rerun with verbose
       //return -1;
-  
+
       //****
       //nothing worked - ask for fixup
-      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
-	      geom.ix,geom.iy,geom.iz,global_time,nfout1);
-      printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
-	     geom.ix,geom.iy,geom.iz,global_time,nfout1);
 
-      global_int_slot[GLOBALINTSLOT_NCRITFAILURES]++;
-      if(global_int_slot[GLOBALINTSLOT_NCRITFAILURES]>1.e6)
+      //to regard as critical error only if far from starting with gammamax which already unphysical
+      if(gammagas2<0.9*GAMMAMAXHD*GAMMAMAXHD && gammarad2<0.9*GAMMAMAXRAD*GAMMAMAXRAD)
 	{
-	  printf("exceeded # of critical failures (%d) - exiting.\n",
-		 global_int_slot[GLOBALINTSLOT_NCRITFAILURES]);
-	  exit(-1);
+	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
+		  geom.ix,geom.iy,geom.iz,global_time,nfout1);
+	  printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
+		 geom.ix,geom.iy,geom.iz,global_time,nfout1);
+
+	  //#pragma omp critical
+	  global_int_slot[GLOBALINTSLOT_NCRITFAILURES]++;
+	  //#pragma omp critical
+	  global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]++;
+	  if(global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]>1.e6)
+	    {
+	      printf("exceeded # of critical failures (%d) - exiting.\n",
+		     global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]);
+	      exit(-1);
+	    }
 	}
+      else
+	{
+	  //#pragma omp critical
+	  global_int_slot[GLOBALINTSLOT_NRADFIXUPS]++;
+	}
+  
 
       set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
 
@@ -2140,6 +2206,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     }
 
   //succeeded!
+
+
+
   //solution given in pp[]
 
   //calculate deltas here
@@ -2259,7 +2328,7 @@ test_solve_implicit_lab()
   params[0]=MHD;
   params[1]=RADIMPLICIT_LTEEQ;
   params[3]=0; //mom.overshoot check
-  //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;

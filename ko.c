@@ -147,8 +147,8 @@ solve_the_problem(ldouble tstart)
   struct rad_parameters rp;
    
   i1=i2=0.;
-  global_int_slot[GLOBALINTSLOT_NCRITFAILURES]=0; //counting number of critical failures
-
+  global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]=0; //counting number of critical failures
+    
   lasttout_floor=floor(t/dtout); 
   lasttoutavg_floor=floor(t/dtoutavg);
  
@@ -290,7 +290,25 @@ solve_the_problem(ldouble tstart)
       ldouble znps=NX*NY*NZ/(end_time-start_time);
 
       //average number of iterations in the implicit solver
-      ldouble avimpit=global_slot[0]/global_slot[1];
+      ldouble avimpit[5];
+      
+      
+      avimpit[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
+      avimpit[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
+      avimpit[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
+      avimpit[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
+      avimpit[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPLTE]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPLTE];
+            
+      int impnums[7];
+      
+      impnums[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
+      impnums[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
+      impnums[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
+      impnums[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
+      impnums[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE];
+      impnums[5]=global_int_slot[GLOBALINTSLOT_NRADFIXUPS];
+      impnums[6]=global_int_slot[GLOBALINTSLOT_NCRITFAILURES]; 
+      
 
       //save to avg arrays
       save_avg(dt);
@@ -350,8 +368,16 @@ solve_the_problem(ldouble tstart)
       //performance to screen only every second
       if(end_time-fprintf_time>1.) 
 	{
-	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f avimpit: %.3f\n"
-		 ,nstep,t,dt,max_ws[0],end_time-start_time,znps,avimpit);
+	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
+		 ,nstep,t,dt,max_ws[0],end_time-start_time,znps);
+#ifdef RADIATION
+	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
+		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],
+		 avimpit[0],avimpit[1],avimpit[2],avimpit[3],avimpit[5]);
+#else
+	  printf("\n");
+#endif
+
 	  fprintf_time=end_time;
 	  i2=i1;
 	}

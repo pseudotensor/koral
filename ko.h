@@ -42,6 +42,7 @@
 
 //other stuff
 #include "problem.h"
+#include "mnemonics.h"
 
 #include "mdefs.h"
 #include <stdio.h>
@@ -95,8 +96,8 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
 int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,**loop_02,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4;
-ldouble global_slot[2],global_time,avgtime;
-int global_int_slot[1];
+ldouble global_time,avgtime;
+int global_int_slot[NGLOBALINTSLOT];
 ldouble scalars[NSCALARS];
 int doingavg;
 

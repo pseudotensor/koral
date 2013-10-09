@@ -751,7 +751,8 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //to count the average number of iteration in the implicit solver
-  global_slot[0]=global_slot[1]=0.;
+  for(ii=0;ii<12;ii++)
+    global_int_slot[ii]=0.;
 
   //again over cells - source terms
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
@@ -2142,7 +2143,7 @@ cell_fixup_rad()
 
   int ix,iy,iz,iv;
   int in,ii;
-  int verbose=2;
+  int verbose=0;
 
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
