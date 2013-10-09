@@ -485,8 +485,10 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									      //TODO
 									      //tetrads sie zesraly
 									      //trans2_cc2on(vrel,vrel,tup);
+									      #ifdef BHDISK_PROBLEMTYPE
 									      vrel[2]*=xx;
 									      vrel[3]*=xx*sin(yy);
+									      #endif
 
 									      //outvel - ortonormal VEL4
 									      vx=vrel[1];

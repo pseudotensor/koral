@@ -72,7 +72,7 @@
 //66* KTORUS - RMHD Newtonian torus with radiation
 //67* LRTORUS - RMHD limo torus
 
-#define PROBLEM 6
+#define PROBLEM 62
 
 #if(PROBLEM==67)
 
