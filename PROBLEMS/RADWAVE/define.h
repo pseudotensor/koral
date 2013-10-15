@@ -6,8 +6,6 @@
 
 #define MYCOORDS MINKCOORDS
 
-#define RK3STEPPING
-#define INT_ORDER 1
 #define NY 1
 #define NZ 1
 #define TSTEPLIM .5
@@ -32,9 +30,9 @@
 //#define EDDINGTON_APR
 #define KAPPAES 0.
 #define KAPPA 0.
-#define NX 100
+#define NX 200
 
-//#define RADIATION
+//efine RADIATION
 
 #undef SIGMA_RAD
 
@@ -44,14 +42,14 @@
 #if (NWAVE==5) //sound wave with radiation set up according to Jiang+12
 //#define FLUXDISSIPATIONOFF
 
-#define NUMERO 11
+#define NUMERO 41
 
 #if (NUMERO==41)
 #define PP 100.
 #define CC 1.e2
 #undef KAPPA
 #define KAPPA 10.
-#define RHOFAC 0.01
+#define RHOFAC 1.e-1
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
 #define DVRE (4.06372e-6*RHOFAC)
@@ -72,7 +70,7 @@
 #define CC 1.e2
 #undef KAPPA
 #define KAPPA 0.01
-#define RHOFAC 0.01
+#define RHOFAC 10.
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
 #define DVRE (9.99998e-6*RHOFAC)
@@ -140,11 +138,11 @@
 #if (NWAVE==2) //hydro sound wave
 //#define FLUXDISSIPATIONOFF
 #define PP 0.01
-#define CC 1.e6
-#define DTOUT1 (.05*CC)
-#define VX 0.
+#define CC 1.e2
+#define DTOUT1 (.005*CC)
+#define VVX 0.
 #define RHOZERO 1.
-#define AAA 1.e-5
+#define AAA 1.e-3
 #define ERAD 1.
 #define KK 2.*Pi
 #define UINT (1./CC/CC)*RHOZERO/GAMMA/(GAMMA-1.-1./CC/CC)

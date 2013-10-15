@@ -210,7 +210,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  ldouble s2=exp(pp[ENTR]/pp[RHO]);
 	  
 	  //TODO: double check on this - why in ORSZAG and RADTUBE 0.999 often exceeded?
-	  if(s2/s1 < 0.1 && 0)
+	  if(s2/s1 < 0.1 && 1)
 	    {  
 	      //go to entropy
 	      if(verbose) printf("enforcing entr at %d %d %d\n",geom->ix,geom->iy,geom->iz);
@@ -1069,7 +1069,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   // Make sure that W is large enough so that v^2 < 1 : 
   int i_increase = 0;
   ldouble f0,f1,dfdW,err;
-  ldouble CONV=1.e-8; //looser check when converged in terms of W?
+  ldouble CONV=1.e-12; //looser check when converged in terms of W?
   ldouble EPS=1.e-4;
   ldouble Wprev=W;
   ldouble cons[6]={Qn,Qt2,D,QdotBsq,Bsq,Sc};

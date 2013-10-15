@@ -58,14 +58,14 @@ Fz=Fy=0.;
 #if (NWAVE==1)
 rho=RHOZERO*(1.+AAA*cos(KK*xx));
 uint=UINT;
-vx=VX;
+vx=VVX;
 #endif
 
 //radiative hydro density wave
 #if (NWAVE==3)
 rho=RHOZERO*(1.+AAA*cos(KK*xx));
 uint=UINT;
-vx=VX;
+vx=VVX;
 E=ERAD;
 Fx=Fz=Fy=0.;
 #endif
