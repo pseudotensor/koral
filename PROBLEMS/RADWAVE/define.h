@@ -49,7 +49,7 @@
 #define CC 1.e2
 #undef KAPPA
 #define KAPPA 10.
-#define RHOFAC 1.e-1
+#define RHOFAC 1.e1
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
 #define DVRE (4.06372e-6*RHOFAC)
