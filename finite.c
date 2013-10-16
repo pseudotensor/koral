@@ -2256,7 +2256,7 @@ cell_fixup_rad()
 			}
 		      p2u(pp,uu,&geom);
 
-		      if(verbose>1) 
+		      if(verbose>1 || 1) 
 			{
 			  printf("fixing up rad %d %d %d with %d neighbors\n",ix,iy,iz,in);
 			  /*

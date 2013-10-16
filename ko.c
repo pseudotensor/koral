@@ -53,6 +53,12 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+  /*******/
+  //tests of implicit solver
+  //test_solve_implicit_lab(); exit(0);
+  /*******/
+
+ 
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
 #include PR_PREPINIT
@@ -80,12 +86,7 @@ main(int argc, char **argv)
 #endif
     }
 
-  /*******/
-  //tests of implicit solver
-  //test_solve_implicit_lab(); exit(0);
-  /*******/
-
-  //prepares files
+ //prepares files
   fprint_openfiles("dumps");
   
   //copies initial primitives to pinit

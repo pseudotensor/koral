@@ -1160,6 +1160,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   if(verbose) 
     {
       printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
+
+      if(params[1]==RADIMPLICIT_ENERGYEQ)
+	printf("energy eq.\n");
+      if(params[1]==RADIMPLICIT_ENTROPYEQ)
+	printf("entropy eq.\n");
+      if(params[1]==RADIMPLICIT_LTEEQ)
+	printf("LTE eq.\n");
+      if(params[2]==RADIMPLICIT_FF)
+	printf("fluid\n");
+      if(params[2]==RADIMPLICIT_LAB)
+	printf("lab\n");
+
       printf("\n===========\nxi1: %e xi2: %e\n===========\n\n",xi1,xi2);
       ldouble Rtt;
       calc_ff_Rtt(pp0,&Rtt,ucon,geom);
@@ -1608,8 +1620,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       while(1); 
 
 
-      //this may fail but necessary to start of a.neq.0 runs
-      /*
+      //TODO:
+      //this may fail but necessary to start of a.neq.0 runs      
+#ifdef BHDISK_PROBLEMTYPE
       if(failed==0 && global_time<100.)
 	{
 	  //criterion of convergence on relative change of quantities
@@ -1623,16 +1636,16 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(verbose) print_4vector(f3);
 	  
 	  ldouble CONVREL=1.e-6;
-	  ldouble CONVRELERR=1.e-6;
+	  ldouble CONVRELERR=1.e-2;
 
 	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
 	    {
 	      if(verbose) printf("\n === success (rel.change) ===\n");
 	      break;
 	    }     
-
 	}
-      */
+#endif
+      
       
      
 
@@ -1934,251 +1947,120 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 0th ****
 
-  //test
+  //in pp00[] initial guess for solvers
+  params[3]=0; //no overshooting check
+
+  //old method
   //ret=solve_implicit_lab_4dcon(uu0,pp0,&geom,dt,deltas,verbose,pp);
   //if(ret!=0) return -1;
  
+  //*********** 1th ************
   PLOOP(iv) 
-  {
-    pp0[iv]=pp00[iv];
-    uu0[iv]=uu00[iv];    
-  }
+  { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
-  params[3]=0;
-  if(Ehat<1.e-2*pp0[UU])
-    params[0]=RAD;
-  else
-    params[0]=MHD;
-
+  if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
   if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
 
-  if(ret!=0)
-    {
+  //*********** 2th ************
+  if(ret!=0) {
       PLOOP(iv) 
-      {
-	pp0[iv]=pp00[iv];
-	uu0[iv]=uu00[iv];    
-      }
+      {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
       params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LAB;
-      params[3]=0;
-      if(params[0]==RAD) params[0]=MHD;
-      else params[0]=RAD;
-
+      if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
       if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
  
-  if(ret!=0)
-    {
+  //*********** 3th ************
+  if(ret!=0) {
       PLOOP(iv) 
-      {
-	pp0[iv]=pp00[iv];
-	uu0[iv]=uu00[iv];    
-      }
+      {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
       params[1]=RADIMPLICIT_ENTROPYEQ;
       params[2]=RADIMPLICIT_FF;
-      params[3]=0;
-      if(Ehat<1.e-2*pp0[UU])
-	params[0]=RAD;
-      else
-	params[0]=MHD;
-    
+      if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
       if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
     }
 
-  if(ret!=0)
-    {
+  //*********** 4th ************
+  if(ret!=0) {
       PLOOP(iv) 
-      {
-	pp0[iv]=pp00[iv];
-	uu0[iv]=uu00[iv];    
-      }
+      {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
       params[1]=RADIMPLICIT_ENTROPYEQ;
       params[2]=RADIMPLICIT_FF;
-      params[3]=0;
-      if(params[0]==RAD) params[0]=MHD;
-      else params[0]=RAD;
-
+      if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
       if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
     }
-  
-#ifdef BHDISK_PROBLEMTYPE
-  if(ret!=0 && geom.ix>NCELLSINSIDEHORIZON+1) //close nad inside BH fixup rather then solving LTE
-#else
-  if(ret!=0)
-#endif
-    {
-      //backup method - searching numerically for precise LTE state
-      params[1]=RADIMPLICIT_LTEEQ;
-      params[3]=0;
-      if(Ehat<1.e-2*pp0[UU])
-	params[0]=RAD;
-      else
-	params[0]=MHD;
 
-      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  //*********** 4th ************
+  if(ret!=0 && xi1>1. && xi2>1.) {
+    //failed, trying LTE state as initial guess
+    PLOOP(iv) 
+    {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+    params[1]=RADIMPLICIT_LTEEQ;
+    if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
+    ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-      if(ret==0) 
-	{
-	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (subdom) worked, xi1/xi2 : %e %e\n",
-		  geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
-	  //printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (subdom) worked, xi1/xi2 : %e %e\n",
-	  //geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
-	  fflush(fout_fail);
-	}
+    if(ret!=0)
+      {
+	if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
+	ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+      }
 
-      if(ret!=0) //try the other primitives
-	{
-	  params[1]=RADIMPLICIT_LTEEQ;
-	  params[3]=0;
-	  if(params[0]==RAD) params[0]=MHD;
-	  else params[0]=RAD;
+    if(ret==0) 
+      {
+	//LTE found, stored in pp00[]
+	PLOOP(iv) pp00[iv]=pp[iv];
 
+	//trying the energy/entropy solvers again
+	//*********** 41th ************
+	PLOOP(iv) 
+	{ pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+	params[1]=RADIMPLICIT_ENERGYEQ;
+	params[2]=RADIMPLICIT_LAB;
+	if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+	ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+	if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
+
+	//*********** 42th ************
+	if(ret!=0) {
+	  PLOOP(iv) 
+	  {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+	  params[1]=RADIMPLICIT_ENERGYEQ;
+	  params[2]=RADIMPLICIT_LAB;
+	  if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
 	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-	  if(ret==0) 
-	    {
-	      fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
-		      geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
-	      //printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
-	      //geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
-	      fflush(fout_fail);
-	    }
+	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
 	}
-
-      /*
-      //backup method - estimating LTE state
-      if(ret!=0) 
-	{
-	  fprintf(fout_fail,"rad backup LTE squared > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
-		      geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
-	  fflush(fout_fail);
-	  printf("rad backup LTE squared > (%4d %4d %4d) (t=%.5e) (otpt=%d) > LTE (other) worked, xi1/xi2 : %e %e\n",
-		      geom.ix,geom.iy,geom.iz,global_time,nfout1,xi1,xi2);
-
-	  pp[RHO]=pp0[RHO];
-	  pp[B1]=pp0[B1];
-	  pp[B2]=pp0[B2];
-	  pp[B3]=pp0[B3];
-	  pp[ENTR]=pp0[ENTR];
-
-	  ldouble uconf[4],Rtt;
-	  calc_ff_Rtt(pp0,&Rtt,uconf,&geom);
-	  ldouble T=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
-	  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
-	  ldouble Ehat = -Rtt;
-	  ldouble ugas = pp0[UU];
-	  ldouble Etot = Ehat+ugas;
-	  
-	  pp[VX]=pp0[VX] + Ehat/Etot * (pp0[FX0] - pp0[VX]);
-	  pp[VY]=pp0[VY] + Ehat/Etot * (pp0[FY0] - pp0[VY]);
-	  pp[VZ]=pp0[VZ] + Ehat/Etot * (pp0[FZ0] - pp0[VZ]);
-
-	  pp[FX0]=pp[VX];
-	  pp[FY0]=pp[VY];
-	  pp[FZ0]=pp[VZ];
-
-	  //calculates LTE temperature
-	  ldouble TLTE=calc_LTE_temp(pp0,&geom,0);	   
-	  if(TLTE<0.)
-	    {
-	      //calc_LTE_temp(pp0,&geom,1);
-	      ret=-1;
-	    }
-	  else
-	    ret=0; //consider this success
-	    
-
-	  pp[UU]=calc_PEQ_ufromTrho(TLTE,pp[RHO]);
-	  pp[EE0]=calc_LTE_EfromT(TLTE);
-
-	  
-	  //printf("%e %e %e | %e %e | %e\n",ugas,Ehat,4.*Pi*B,T,calc_LTE_TfromE(Ehat),TLTE);
-	  
-	}
-      */
-    
-      //LTE worked so can combine (arbitrarily) zero and LTE state (in pp[])
-      if(ret==0) 
-	{
-	  set_cflag(RADFIXUPFLAG,ix,iy,iz,2);
-
-	  ldouble ms[NV];
-	  PLOOP(iv) ms[iv]=0.;
-#ifdef COUPLEMETRICWITHRADIMPLICIT
-	  my_err("LTE backup solvers does not work with COUPLEMETRICWITHRADIMPLICIT\n");
-	  f_metric_source_term_arb(pp0,&geom,ms);
-#endif
-	  
-	  ldouble enfac = step_function(log10(xi1),2.);
-	  ldouble momfac = step_function(log10(xi2),2.);
-
-	  pp[UU]=pp0[UU]+enfac*(pp[UU]-pp0[UU]);
-	  pp[EE0]=pp0[EE0]+enfac*(pp[EE0]-pp0[EE0]);
-
-	  pp[VX]=pp0[VX]+momfac*(pp[VX]-pp0[VX]);
-	  pp[VY]=pp0[VY]+momfac*(pp[VY]-pp0[VY]);
-	  pp[VZ]=pp0[VZ]+momfac*(pp[VZ]-pp0[VZ]);
-    
-	  pp[FX0]=pp0[FX0]+momfac*(pp[FX0]-pp0[FX0]);
-	  pp[FY0]=pp0[FY0]+momfac*(pp[FY0]-pp0[FY0]);
-	  pp[FZ0]=pp0[FZ0]+momfac*(pp[FZ0]-pp0[FZ0]);
-
-	  p2u(pp,uu,&geom);
-
-	  uu[EE0] = uu0[EE0]+dt*ms[EE0] - (uu[1]-uu0[1]-dt*ms[1]);
-	  uu[FX0] = uu0[FX0]+dt*ms[FX0] - (uu[2]-uu0[2]-dt*ms[2]);
-	  uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]-dt*ms[3]);
-	  uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]-dt*ms[4]);
-	  u2p_rad(uu,pp,&geom,corr);
-
-	  ret=0;
-	  //radiative inversion failed
-	  if(corr[0]>0)
-	    {
-	      if(verbose) printf("LTE ultimate rad corr: %d\n",corr[0]);
-	      //trying the other inversion
-	      p2u(pp,uu,&geom);
-
-	      uu[RHO]=uu0[RHO]+dt*ms[RHO];
-	      uu[1] = uu0[1]+dt*ms[1] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
-	      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]-dt*ms[FX0]);
-	      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]-dt*ms[FY0]);
-	      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]-dt*ms[FZ0]);
-	      uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
-
-	      int rettemp=0;
-	      //if(whicheq==RADIMPLICIT_ENERGYEQ)
-	      rettemp=u2p_solver(uu,pp,&geom,U2P_HOT,0); 
-	      //if(whicheq==RADIMPLICIT_ENTROPYEQ)
-	      if(rettemp<0)
-		rettemp=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
-	      
-	      if(verbose) printf("LTE ultimate hd corr: %d\n",rettemp);
-	      
-	      if(rettemp<0) //to return error if neither rad or mhd inversion suceeded
-		{
-		  ret=-1;
-		  fprintf(fout_fail,"inv. after LTE failed > (%4d %4d %4d) (t=%.5e) (otpt=%d)\n",
-			  geom.ix,geom.iy,geom.iz,global_time,nfout1);
-		  printf("inv. after LTE failed > (%4d %4d %4d) (t=%.5e) (otpt=%d)\n",
-			 geom.ix,geom.iy,geom.iz,global_time,nfout1);		}
-
-	    }
-	}
-    }
-
  
- 
+	//*********** 43th ************
+	if(ret!=0) {
+	  PLOOP(iv) 
+	  {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+	  params[1]=RADIMPLICIT_ENTROPYEQ;
+	  params[2]=RADIMPLICIT_FF;
+	  if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
+	}
+
+	//*********** 44th ************
+	if(ret!=0) {
+	  PLOOP(iv) 
+	  {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+	  params[1]=RADIMPLICIT_ENTROPYEQ;
+	  params[2]=RADIMPLICIT_FF;
+	  if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
+	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
+	} 
+      }      
+  }
+
 
   if(ret!=0)
     {
@@ -2189,11 +2071,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       //nothing worked - ask for fixup
 
       //to regard as critical error only if far from starting with gammamax which already unphysical
-#ifdef BHDISK_PROBLEMTYPE
-      if(gammagas2<0.9*GAMMAMAXHD*GAMMAMAXHD && gammarad2<0.9*GAMMAMAXRAD*GAMMAMAXRAD && geom.ix>NCELLSINSIDEHORIZON+1)
-#else
       if(gammagas2<0.9*GAMMAMAXHD*GAMMAMAXHD && gammarad2<0.9*GAMMAMAXRAD*GAMMAMAXRAD)
-#endif
 	{
 	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 		  geom.ix,geom.iy,geom.iz,global_time,nfout1);
@@ -2224,9 +2102,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     }
 
   //succeeded!
-
-
-
   //solution given in pp[]
 
   //calculate deltas here
@@ -2346,13 +2221,13 @@ test_solve_implicit_lab()
   params[0]=MHD;
   params[1]=RADIMPLICIT_LTEEQ;
   params[3]=0; //mom.overshoot check
-  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0; 
-  //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENTROPYEQ;
