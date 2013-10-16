@@ -7,7 +7,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 96
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -75,8 +75,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.2-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
-#define NX 300
-#define NY 200
+#define NX 150
+#define NY 100
 #define NZ 1
 #endif
 

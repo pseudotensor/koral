@@ -2157,7 +2157,7 @@ cell_fixup_rad()
 	{
 	  for(iz=0;iz<NZ;iz++)
 	    {	      
-	      if(get_cflag(RADFIXUPFLAG,ix,iy,iz)==1)
+	      if(get_cflag(RADFIXUPFLAG,ix,iy,iz)<0)
 		{
 		  //total fixups  
 		  struct geometry geom;
@@ -2207,10 +2207,43 @@ cell_fixup_rad()
 			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
 		    }
 
+		  //try corners
+		  //TODO: so far only for NZ==1
+		  if(NZ==1)
+		    {
+		      if(ix-1>=0 && iy-1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy-1,iz)==0)
+			{
+			  in++;
+			  for(iv=0;iv<NV;iv++)
+			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+			}
+
+		      if(ix+1>=0 && iy-1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy-1,iz)==0)
+			{
+			  in++;
+			  for(iv=0;iv<NV;iv++)
+			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+			}
+
+		      if(ix+1>=0 && iy+1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy+1,iz)==0)
+			{
+			  in++;
+			  for(iv=0;iv<NV;iv++)
+			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+			}
+
+		      if(ix-1>=0 && iy+1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy+1,iz)==0)
+			{
+			  in++;
+			  for(iv=0;iv<NV;iv++)
+			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+			}			 
+		    }
+		
 		  if((NZ==1 && NY==1 && in>=1) ||
-		     (NZ==1 && in>=2) ||
+		     (NZ==1 && in>=1) ||
 		     (NY==1 && in>=1) ||
-		     in>3) //sufficient number of n1eighbors
+		     in>3) //sufficient number of neighbors
 		    {
 		      for(iv=0;iv<NV;iv++)
 			{

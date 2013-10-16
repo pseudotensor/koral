@@ -1953,6 +1953,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
+  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
+
   if(ret!=0)
     {
       PLOOP(iv) 
@@ -1967,6 +1969,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       else params[0]=RAD;
 
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
  
   if(ret!=0)
@@ -1985,6 +1989,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	params[0]=MHD;
     
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
     }
 
   if(ret!=0)
@@ -2001,9 +2007,15 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       else params[0]=RAD;
 
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
     }
   
+#ifdef BHDISK_PROBLEMTYPE
+  if(ret!=0 && geom.ix>NCELLSINSIDEHORIZON+1) //close nad inside BH fixup rather then solving LTE
+#else
   if(ret!=0)
+#endif
     {
       //backup method - searching numerically for precise LTE state
       params[1]=RADIMPLICIT_LTEEQ;
@@ -2098,6 +2110,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       //LTE worked so can combine (arbitrarily) zero and LTE state (in pp[])
       if(ret==0) 
 	{
+	  set_cflag(RADFIXUPFLAG,ix,iy,iz,2);
+
 	  ldouble ms[NV];
 	  PLOOP(iv) ms[iv]=0.;
 #ifdef COUPLEMETRICWITHRADIMPLICIT
@@ -2175,7 +2189,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       //nothing worked - ask for fixup
 
       //to regard as critical error only if far from starting with gammamax which already unphysical
+#ifdef BHDISK_PROBLEMTYPE
+      if(gammagas2<0.9*GAMMAMAXHD*GAMMAMAXHD && gammarad2<0.9*GAMMAMAXRAD*GAMMAMAXRAD && geom.ix>NCELLSINSIDEHORIZON+1)
+#else
       if(gammagas2<0.9*GAMMAMAXHD*GAMMAMAXHD && gammarad2<0.9*GAMMAMAXRAD*GAMMAMAXRAD)
+#endif
 	{
 	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 		  geom.ix,geom.iy,geom.iz,global_time,nfout1);
@@ -2200,7 +2218,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	}
   
 
-      set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
+      set_cflag(RADFIXUPFLAG,ix,iy,iz,-1);
 
       return 0; 
     }

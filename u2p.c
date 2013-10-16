@@ -87,10 +87,12 @@ calc_primitives(int ix,int iy,int iz,int type)
   else
     set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
 
+  
   if(fixups[1]>0)
-    set_cflag(RADFIXUPFLAG,ix,iy,iz,1); 
+    set_cflag(RADFIXUPFLAG,ix,iy,iz,-1); 
   else
     set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
+  
 
   return 0;
 }

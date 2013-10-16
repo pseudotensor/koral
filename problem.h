@@ -72,7 +72,7 @@
 //66* KTORUS - RMHD Newtonian torus with radiation
 //67* LRTORUS - RMHD limo torus
 
-#define PROBLEM 15
+#define PROBLEM 67
 
 #if(PROBLEM==67)
 
@@ -1417,6 +1417,11 @@
 #ifndef NCCORRECTPOLAR
 #define NCCORRECTPOLAR 2
 #endif
+
+#ifndef NCELLSINSIDEHORIZON
+#define NCELLSINSIDEHORIZON 6
+#endif
+
 
 #define NUMEPSILON DBL_EPSILON
 
