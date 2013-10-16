@@ -7,7 +7,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM -1
+#define RESTARTNUM 820
 
 /************************************/
 //radiation choices
@@ -27,7 +27,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2K1K2
+#define TIMESTEPPING RK2
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -55,8 +55,8 @@
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 500.
-#define GAMMAMAXRAD 50.
+#define B2RHORATIOMAX 100.
+#define GAMMAMAXRAD 100.
 #define GAMMAMAXHD 50.
 
 /************************************/
@@ -73,10 +73,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.2-MKS1R0))
+#define MINX (log(1.275-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
-#define NX 150
-#define NY 100
+#define NX 300
+#define NY 200
 #define NZ 1
 #endif
 
@@ -101,7 +101,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 .1
+#define DTOUT1 1.
 #define DTOUT2 250.
 
 /************************************/

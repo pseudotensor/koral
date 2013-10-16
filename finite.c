@@ -2013,6 +2013,7 @@ int set_bc(ldouble t,int ifinit)
   return 0;
 }
 
+//fixing after failed MHD main inversion
 int
 cell_fixup_hd()
 {
@@ -2135,6 +2136,7 @@ cell_fixup_hd()
 }
 
 
+//fixing after radiative implicit solver
 int
 cell_fixup_rad()
 {
@@ -2207,9 +2209,9 @@ cell_fixup_rad()
 			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
 		    }
 
-		  //try corners
+		  //try corners as well
 		  //TODO: so far only for NZ==1
-		  if(NZ==1)
+		  if(NZ==1 && NY>1)
 		    {
 		      if(ix-1>=0 && iy-1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy-1,iz)==0)
 			{
@@ -2266,7 +2268,8 @@ cell_fixup_rad()
 			}
 
 		      //save to updated arrays memory
-		      for(iv=NVMHD;iv<NV;iv++)
+		      //all the primitives!
+		      for(iv=0;iv<NV;iv++)
 			{
 			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
 			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
