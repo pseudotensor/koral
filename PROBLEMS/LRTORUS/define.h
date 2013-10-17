@@ -7,7 +7,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 820
+#define RESTARTNUM 2350
 
 /************************************/
 //radiation choices
@@ -56,14 +56,14 @@
 #define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
 #define B2RHORATIOMAX 100.
-#define GAMMAMAXRAD 100.
+#define GAMMAMAXRAD 50.
 #define GAMMAMAXHD 50.
 
 /************************************/
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.9
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -73,7 +73,7 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.275-MKS1R0))
+#define MINX (log(1.75-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
 #define NX 300
 #define NY 200
@@ -101,7 +101,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 .25
 #define DTOUT2 250.
 
 /************************************/

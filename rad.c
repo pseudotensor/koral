@@ -927,6 +927,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 	      if(whicheq==RADIMPLICIT_ENERGYEQ)
 		{
 		  f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0] - dt*ms[UU];
+		  //printf("%e %e %e %e | %e\n",uu[UU] ,-uu0[UU],- dt * gdetu * Gi[0],- dt*ms[UU],f[0]);
 		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])+fabs(dt*ms[UU])); else err[0]=0.;
 		}
 	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
@@ -1600,10 +1601,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  
 	  //if not decrease the applied fraction
-	  if(xxx[0]<=0.)
+	  //test TTT
+	  if(xxx[0]<=0. && 1)
 	    {
 	      xiapp*=ppp[sh]/(ppp[sh]+fabs(xxx[0]));
-	      xiapp*=sqrt(EPS); //not to land too close to zero
+	      xiapp*=sqrt(EPS); //not to land too close to zero, but sometimes prevents from finding proper solution
 	    }
 	  else //u2p error only
 	    {
@@ -1623,7 +1625,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       //TODO:
       //this may fail but necessary to start of a.neq.0 runs      
 #ifdef BHDISK_PROBLEMTYPE
-      if(failed==0 && global_time<100.)
+      if(0 && failed==0 && global_time<100.)
 	{
 	  //criterion of convergence on relative change of quantities
 	  f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
@@ -1633,10 +1635,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
 	    }
 
-	  if(verbose) print_4vector(f3);
+	  if(verbose) {
+	    //print_4vector(&ppp[sh]);
+	    //print_4vector(&pp[sh]);
+	    print_4vector(f3);
+	  }
 	  
-	  ldouble CONVREL=1.e-6;
-	  ldouble CONVRELERR=1.e-2;
+	  ldouble CONVREL=EPS;
+	  ldouble CONVRELERR=1.-EPS;
 
 	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
 	    {
@@ -1961,6 +1967,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[2]=RADIMPLICIT_LAB;
   if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  if(ret!=0)
+    {
+      params[2]=RADIMPLICIT_FF;
+      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+    }      
   if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
 
   //*********** 2th ************
@@ -1971,6 +1982,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       params[2]=RADIMPLICIT_LAB;
       if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+      if(ret!=0)
+	{
+	  params[2]=RADIMPLICIT_FF;
+	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+	}      
       if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
  
@@ -2073,6 +2089,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       //to regard as critical error only if far from starting with gammamax which already unphysical
       if(gammagas2<0.9*GAMMAMAXHD*GAMMAMAXHD && gammarad2<0.9*GAMMAMAXRAD*GAMMAMAXRAD)
 	{
+
+	  return -1;
+	  
 	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 		  geom.ix,geom.iy,geom.iz,global_time,nfout1);
 	  printf("rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
@@ -2205,7 +2224,13 @@ test_solve_implicit_lab()
   getchar();
   */
  
-  //p2u(pp,uu,&geom)
+  /*
+  pp0[FX0]/=10.;
+  pp0[FY0]/=10.;
+  pp0[FZ0]/=10.;
+  */
+
+  p2u(pp0,uu0,&geom);
 
   ldouble deltas[4];
   int verbose=2;
@@ -2216,7 +2241,10 @@ test_solve_implicit_lab()
   //return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
-   
+  //  return solve_implicit_lab_4dcon(uu0,pp0,&geom,dt,deltas,verbose,pp);
+
+  
+
   //$$$$$
   params[0]=MHD;
   params[1]=RADIMPLICIT_LTEEQ;
@@ -2225,9 +2253,9 @@ test_solve_implicit_lab()
 
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LAB;
+  params[2]=RADIMPLICIT_FF;
   params[3]=0; 
-  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENTROPYEQ;
@@ -2262,8 +2290,6 @@ test_solve_implicit_backup()
   pp[FY0]=0.;
   pp[FZ0]=0.;
 
-  //TTT
-
   dt=10.;
 
   p2u(pp,uu,&geom);
@@ -2281,7 +2307,9 @@ test_solve_implicit_backup()
   solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
 
   //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
-   
+
+  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose,ppret);
+  
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   params[3]=0; //mom.overshoot check

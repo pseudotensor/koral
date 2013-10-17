@@ -2150,7 +2150,8 @@ cell_fixup_rad()
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
 
-  ldouble ppn[6][NV],pp[NV],uu[NV];
+  ldouble ppn[26][NV],pp[NV],uu[NV];
+  int idx[26][3];
   //gets the neiboring the primitives
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   for(ix=0;ix<NX;ix++)
@@ -2172,13 +2173,19 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
+		      idx[in-1][0]=ix-1;
+		      idx[in-1][1]=iy;
+		      idx[in-1][2]=iz;
 		    }
-
+		  
 		  if(ix+1<NX && get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
+		      idx[in-1][0]=ix+1;
+		      idx[in-1][1]=iy;
+		      idx[in-1][2]=iz;
 		    }
 
 		  if(iy-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0)
@@ -2186,6 +2193,9 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
+		      idx[in-1][0]=ix;
+		      idx[in-1][1]=iy-1;
+		      idx[in-1][2]=iz;
 		    }
 
 		  if(iy+1<NY && get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0)
@@ -2193,6 +2203,9 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
+		      idx[in-1][0]=ix;
+		      idx[in-1][1]=iy+1;
+		      idx[in-1][2]=iz;
 		    }
 
 		  if(iz-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0)
@@ -2200,6 +2213,9 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
+		      idx[in-1][0]=ix;
+		      idx[in-1][1]=iy;
+		      idx[in-1][2]=iz-1;
 		    }
 
 		  if(iz+1<NZ && get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0)
@@ -2207,10 +2223,14 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
+		      idx[in-1][0]=ix;
+		      idx[in-1][1]=iy;
+		      idx[in-1][2]=iz+1;
 		    }
 
 		  //try corners as well
 		  //TODO: so far only for NZ==1
+
 		  if(NZ==1 && NY>1)
 		    {
 		      if(ix-1>=0 && iy-1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy-1,iz)==0)
@@ -2218,29 +2238,42 @@ cell_fixup_rad()
 			  in++;
 			  for(iv=0;iv<NV;iv++)
 			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+			  idx[in-1][0]=ix-1;
+			  idx[in-1][1]=iy-1;
+			  idx[in-1][2]=iz;
 			}
 
 		      if(ix+1>=0 && iy-1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy-1,iz)==0)
 			{
 			  in++;
 			  for(iv=0;iv<NV;iv++)
-			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+			    ppn[in-1][iv]=get_u(p,iv,ix+1,iy-1,iz);
+			  idx[in-1][0]=ix+1;
+			  idx[in-1][1]=iy-1;
+			  idx[in-1][2]=iz;
 			}
 
 		      if(ix+1>=0 && iy+1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy+1,iz)==0)
 			{
 			  in++;
 			  for(iv=0;iv<NV;iv++)
-			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+			    ppn[in-1][iv]=get_u(p,iv,ix+1,iy+1,iz);
+			  idx[in-1][0]=ix+1;
+			  idx[in-1][1]=iy+1;
+			  idx[in-1][2]=iz;
 			}
 
 		      if(ix-1>=0 && iy+1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy+1,iz)==0)
 			{
 			  in++;
 			  for(iv=0;iv<NV;iv++)
-			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy+1,iz);
+			  idx[in-1][0]=ix-1;
+			  idx[in-1][1]=iy+1;
+			  idx[in-1][2]=iz;
 			}			 
 		    }
+
 		
 		  if((NZ==1 && NY==1 && in>=1) ||
 		     (NZ==1 && in>=1) ||
@@ -2259,11 +2292,20 @@ cell_fixup_rad()
 		      if(verbose>1 || 1) 
 			{
 			  printf("fixing up rad %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  
 			  /*
+			  print_Nvector(&get_u(p,RHO,ix,iy,iz),NV);
+			  printf(" -> \n");
+			  
 			  for(ii=0;ii<in;ii++)
-			    print_Nvector(ppn[ii],NV);
+			    {
+			      printf("%d %d %d : ",idx[ii][0],idx[ii][1],idx[ii][2]);
+			      print_Nvector(&ppn[ii][0],NV);
+			    }
 			  printf(" -> \n");
 			  print_Nvector(pp,NV);
+
+			  getchar();
 			  */
 			}
 
@@ -2271,6 +2313,7 @@ cell_fixup_rad()
 		      //all the primitives!
 		      for(iv=0;iv<NV;iv++)
 			{
+			  if(iv!=UU && iv!=EE0) continue;
 			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
 			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
 			}

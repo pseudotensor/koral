@@ -146,7 +146,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      uint[nodalindex]=endenGU2CGS(uint[nodalindex]);
 	      #endif
 
-	      temp[nodalindex]=calc_PEQ_Tfromurho(rho[nodalindex],uint[nodalindex]);
+	      temp[nodalindex]=calc_PEQ_Tfromurho(uint[nodalindex],rho[nodalindex]);
 	      
 	      #ifdef TRACER
 	      tracer[nodalindex]=pp[TRA];
