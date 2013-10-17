@@ -2089,8 +2089,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       //to regard as critical error only if far from starting with gammamax which already unphysical
       if(gammagas2<0.9*GAMMAMAXHD*GAMMAMAXHD && gammarad2<0.9*GAMMAMAXRAD*GAMMAMAXRAD)
 	{
-
-	  return -1;
+	  //return -1;
 	  
 	  fprintf(fout_fail,"rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure!\n",
 		  geom.ix,geom.iy,geom.iz,global_time,nfout1);
