@@ -71,8 +71,23 @@
 //65* MRTORUS - RMHD torus with radiation
 //66* KTORUS - RMHD Newtonian torus with radiation
 //67* LRTORUS - RMHD limo torus
+//68* RMHDWAVE - radiation modified linear magnetosonic waves
 
-#define PROBLEM 67
+#define PROBLEM 68
+
+#if(PROBLEM==68)
+
+#define PR_DEFINE "PROBLEMS/RMHDWAVE/define.h"
+#define PR_BC "PROBLEMS/RMHDWAVE/bc.c"
+#define PR_INIT "PROBLEMS/RMHDWAVE/init.c"
+#define PR_KAPPA "PROBLEMS/RMHDWAVE/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RMHDWAVE/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RMHDWAVE/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RMHDWAVE/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RMHDWAVE/dump.c"
+#define PR_TOOLS "PROBLEMS/RMHDWAVE/tools.c"
+
+#endif
 
 #if(PROBLEM==67)
 
@@ -1422,6 +1437,9 @@
 #define NCELLSINSIDEHORIZON 6
 #endif
 
+#ifndef ALLSTEPSOUTPUT
+#define ALLSTEPSOUTPUT 0
+#endif
 
 #define NUMEPSILON DBL_EPSILON
 
