@@ -179,6 +179,21 @@ int calc_scalars(ldouble *scalars,ldouble t)
   //L1 ERRRORS for some problems
   /*********************************************/
 
+#ifdef CALCL1_RMHDWAVE
+  //temporarily here: L1 error for RMHDWAVE
+  ldouble L1=0;
+  int i;
+  for(i=0;i<NX;i++)
+    {
+      ldouble xx=get_x(i,0);
+      ldouble dx=get_size_x(i,0);
+      ldouble myrho=RHOZERO+DRRE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DRIM/DRRE*sin(OMRE*t-KK*xx));
+      //L1 in rho:
+      L1+=fabs(get_u(p,RHO,i,0,0)-myrho)*dx;
+    }
+  scalars[0]=L1;///(ldouble)NX;
+#endif
+
 #ifdef CALCL1_HDWAVE
   //temporarily here: L1 error for HDWAVE
   ldouble L1=0;

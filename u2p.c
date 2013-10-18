@@ -475,9 +475,9 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 
       dpp[RHO]=drho;
       dpp[UU] = pp[UU]*drho/pp[RHO];
-      dpp[VX] = etarel[VX];
-      dpp[VY] = etarel[VY];
-      dpp[VZ] = etarel[VZ];
+      dpp[VX] = etarel[1];
+      dpp[VY] = etarel[2];
+      dpp[VZ] = etarel[3];
       dpp[ENTR] = 0.;
       dpp[B1] = dpp[B2] = dpp[B3] = 0.;
 

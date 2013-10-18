@@ -1,6 +1,6 @@
 #define MYCOORDS MINKCOORDS
 
-#define NX 128
+#define NX 256
 #define NY 1
 #define NZ 1
 
@@ -10,7 +10,8 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 2.
+#define INT_ORDER 1
 
 #define GAMMA (ldouble)(5./3.)
 #define MINX 0
@@ -25,14 +26,16 @@
 #define KK (2.*M_PI)
 #define MAGNFIELD
 
-#define NWAVE 1
 #define RADOUTPUTINZAMO
+#define CALCL1_RMHDWAVE
+#define TIMESTEPPING RK2
+
 
 #define NUMERO 10
 
 #if (NUMERO==1) //sonic wave
 #define KAPPA 0.
-#define RHOFAC 1.
+#define RHOFAC 1.e-1
 #define RHOZERO 1.
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
@@ -49,12 +52,14 @@
 #define DB2IM 0.
 #define OMRE 0.0628319
 #define OMIM 0.
-#define DTOUT1 2.
+#define NOUTSTOP 11
+#define TMAX 2.*M_PI/OMRE*2.
+#define DTOUT1 2.*M_PI/OMRE/10.
 #endif
 
 #if (NUMERO==10) //fast-magnetosonic wave, no-rad
 #define KAPPA 0.
-#define RHOFAC 1.
+#define RHOFAC 1.e-1
 #define RHOZERO 1.
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
@@ -71,7 +76,9 @@
 #define DB2IM 0.
 #define OMRE 0.101654
 #define OMIM 0.
-#define DTOUT1 2.
+#define TMAX 2.*M_PI/OMRE*2.
+#define DTOUT1 2*M_PI/OMRE/10.
+#define NOUTSTOP 11
 #endif
 
 #if (NUMERO==11)

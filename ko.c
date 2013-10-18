@@ -177,8 +177,10 @@ solve_the_problem(ldouble tstart)
       nstep++;
 
       //calculates the primitives to copy to previous time steps
+      //TODO: should be combined with f_timeder
+      //this overwrittes FIXUP flags
+      /*
       int ii;     
-
 #pragma omp parallel for private(ii,ix,iy,iz,iv) schedule (dynamic)
       for(ii=0;ii<Nloop_0;ii++) //domain only
 	{
@@ -188,6 +190,7 @@ solve_the_problem(ldouble tstart)
       
 	  calc_primitives(ix,iy,iz,0); 
 	}
+      */
 
       //holds previous time steps
       copy_u(1.,ptm1,ptm2); ttm2=ttm1;
