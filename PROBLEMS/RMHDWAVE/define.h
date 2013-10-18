@@ -30,14 +30,36 @@
 
 #define NUMERO 10
 
-#if (NUMERO==10) //fast-magnetosonic wave
+#if (NUMERO==1) //sonic wave
 #define KAPPA 0.
 #define RHOFAC 1.
 #define RHOZERO 1.
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
-#define UZERO 0.000900135
-#define DURE (0.0000161788*RHOFAC)
+#define UZERO 0.0000900135
+#define DURE (1.50023e-7*RHOFAC)
+#define DUIM 0.
+#define DV1RE (0.00001*RHOFAC)
+#define DV1IM 0.
+#define DV2RE 0.
+#define DV2IM 0.
+#define B1ZERO 0.
+#define B2ZERO 0.
+#define DB2RE 0.
+#define DB2IM 0.
+#define OMRE 0.0628319
+#define OMIM 0.
+#define DTOUT1 2.
+#endif
+
+#if (NUMERO==10) //fast-magnetosonic wave, no-rad
+#define KAPPA 0.
+#define RHOFAC 1.
+#define RHOZERO 1.
+#define DRRE (1.e-3*RHOFAC)
+#define DRIM 0.
+#define UZERO 0.0000900135
+#define DURE (1.50023e-7*RHOFAC)
 #define DUIM 0.
 #define DV1RE (0.0000161788*RHOFAC)
 #define DV1IM 0.
@@ -49,7 +71,7 @@
 #define DB2IM 0.
 #define OMRE 0.101654
 #define OMIM 0.
-#define DTOUT1 1.e-0
+#define DTOUT1 2.
 #endif
 
 #if (NUMERO==11)

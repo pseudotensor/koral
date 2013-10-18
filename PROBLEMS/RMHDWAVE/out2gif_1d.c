@@ -60,7 +60,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($21+1.e-80) w lp ls 2 pt 7 ps .5  ti \"Fx\"\n"
+	  "plot \"%s\" u 1:($21) w lp ls 2 pt 7 ps .5  ti \"By\"\n"
 
 	  "set lmargin at screen 0.07\n"
 	  "set rmargin at screen 0.33\n"
@@ -72,7 +72,7 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  //	  "set log y\n"
-	  "plot \"%s\" u 1:15 w lp ls 3 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:20 w lp ls 7 pt 7 ps .5 ti \"E_rad\"\n"
+	  "plot \"%s\" u 1:15 w lp ls 3 pt 7 ps .5 ti \"u_int\"\n"
 	  //	  "unset log y\n"
 
 	  "set lmargin at screen 0.40\n"
@@ -83,7 +83,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:24 w p ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:25 w l lc 9 lw 2 ti \"Trad\"\n"
+	  "plot \"%s\" u 1:17 w p ls 4 pt 7 ti \"vy\"\n"
 
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -94,7 +94,7 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"vx\""
-	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname);
+	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname);
 
 
 
