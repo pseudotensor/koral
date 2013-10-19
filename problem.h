@@ -1441,6 +1441,14 @@
 #define ALLSTEPSOUTPUT 0
 #endif
 
+#ifndef U2PCONV
+#define U2PCONV 1.e-12
+#endif
+
+#ifndef RADIMPCONV
+#define RADIMPCONV 1.e-8
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/
