@@ -1,6 +1,6 @@
 #define MYCOORDS MINKCOORDS
 
-#define NX 64
+#define NX 256
 #define NY 1
 #define NZ 1
 
@@ -28,7 +28,7 @@
 
 #define RADOUTPUTINZAMO
 #define CALCL1_RMHDWAVE
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK3
 
 
 #define NUMERO 10
