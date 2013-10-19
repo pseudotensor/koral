@@ -1,10 +1,10 @@
 #define MYCOORDS MINKCOORDS
 
-#define NX 256
+#define NX 64
 #define NY 1
 #define NZ 1
 
-#define TSTEPLIM .6
+#define TSTEPLIM .3
 
 #define PERIODIC_XBC
 #define COPY_YBC

@@ -1,14 +1,8 @@
-#define U2PPREC 1.e-6
-#define U2PRADPREC 1.e-7
-#define RADFORCEPREC 1.e-5
-#define VERBOSE0 0
-
 #define MYCOORDS MINKCOORDS
 
-#define INT_ORDER 1
 #define NY 1
 #define NZ 1
-#define TSTEPLIM .03125
+#define TSTEPLIM .6
 #define TIMESTEPPING RK2
 #define INITTSTEPLIM (TSTEPLIM/10.)
 
@@ -28,7 +22,7 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define NX 50
+#define NX 256
 
 #define NWAVE 2
 
@@ -50,6 +44,7 @@
 
 //#ifdef NWAVE2 //hydro sound wave
 #if(NWAVE==2)
+#define CALCL1_HDWAVE
 #define NOUTSTOP 41
 #define CC 1.e3 //1/cs
 #define DTOUT1 (.05*CC)
