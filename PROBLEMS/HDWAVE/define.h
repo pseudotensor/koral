@@ -1,4 +1,6 @@
 #define MYCOORDS MINKCOORDS
+#define U2PCONV 1.e-12
+#define INT_ORDER 1
 
 #define NY 1
 #define NZ 1
@@ -10,7 +12,7 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.5
 
 #define ALLSTEPSOUTPUT 0
 
@@ -22,7 +24,7 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define NX 256
+#define NX 512
 
 #define NWAVE 2
 
@@ -46,7 +48,7 @@
 #if(NWAVE==2)
 #define CALCL1_HDWAVE
 #define NOUTSTOP 41
-#define CC 1.e3 //1/cs
+#define CC 1.e2 //1/cs
 #define DTOUT1 (.05*CC)
 #define VELX 0.
 #define RHOZERO 1.

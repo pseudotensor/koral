@@ -200,6 +200,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   int i;
   for(i=0;i<NX;i++)
     {
+      calc_primitives(i,0,0,0);
       ldouble xx=get_x(i,0);
       ldouble om=1./CC*2.*Pi;
       ldouble myrho=RHOZERO*(1.+AAA*cos(KK*xx-om*t));

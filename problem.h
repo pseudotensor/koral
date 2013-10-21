@@ -73,7 +73,7 @@
 //67* LRTORUS - RMHD limo torus
 //68* RMHDWAVE - radiation modified linear magnetosonic waves
 
-#define PROBLEM 68
+#define PROBLEM 50
 
 #if(PROBLEM==68)
 
@@ -1390,7 +1390,7 @@
 //whether to check if the advection operator keeps entropy increasing,
 //if not invert with the independently evolved entropy
 #ifndef VERIFYENTROPYAFTERADVECTION
-#define VERIFYENTROPYAFTERADVECTION 1 
+#define VERIFYENTROPYAFTERADVECTION 0
 #endif
 
 #ifndef OUTOUTPUT
