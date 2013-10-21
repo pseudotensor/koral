@@ -185,6 +185,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   int i;
   for(i=0;i<NX;i++)
     {
+      calc_primitives(i,0,0,0);
       ldouble xx=get_x(i,0);
       ldouble dx=get_size_x(i,0);
       ldouble myrho=RHOZERO+DRRE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DRIM/DRRE*sin(OMRE*t-KK*xx));

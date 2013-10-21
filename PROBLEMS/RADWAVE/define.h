@@ -42,7 +42,7 @@
 #if (NWAVE==5) //sound wave with radiation set up according to Jiang+12
 //#define FLUXDISSIPATIONOFF
 
-#define NUMERO 41
+#define NUMERO 11
 
 #if (NUMERO==41)
 #define PP 100.
@@ -70,7 +70,7 @@
 #define CC 1.e2
 #undef KAPPA
 #define KAPPA 0.01
-#define RHOFAC 10.
+#define RHOFAC 1.
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
 #define DVRE (9.99998e-6*RHOFAC)

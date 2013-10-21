@@ -23,14 +23,14 @@ ldouble t=0.;
 
 rho=RHOZERO+DRRE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DRIM/DRRE*sin(OMRE*t-KK*xx));
 uint=UZERO+DURE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DUIM/DURE*sin(OMRE*t-KK*xx));
-vx=0.+DV1RE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx))-DV1IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx) ; 
-vy=0.+DV2RE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx))-DV2IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx) ; 
+vx=0.+DV1RE*exp(-OMIM*t)*cos(OMRE*t-KK*xx)-DV1IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx) ; 
+vy=0.+DV2RE*exp(-OMIM*t)*cos(OMRE*t-KK*xx)-DV2IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx) ; 
 Bx=B1ZERO;
 By=B2ZERO+DB2RE*exp(-OMIM*t)*cos(OMRE*t-KK*xx)-DB2IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx); 
 #ifdef RADIATION
-E=EEZERO+DEERE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DEEIM/DEERE*sin(OMRE*t-KK*xx));
-Fx=0.+ERAD*DF1RE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx))-DF1IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx);
-Fy=0.+ERAD*DF2RE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx))-DF2IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx);
+E=EEZERO+DEERE*exp(-OMIM*t)*cos(OMRE*t-KK*xx)-DEEIM*exp(-OMIM*t)*sin(OMRE*t-KK*xx);
+Fx=0.+DF1RE*exp(-OMIM*t)*cos(OMRE*t-KK*xx)-DF1IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx) ; 
+Fy=0.+DF2RE*exp(-OMIM*t)*cos(OMRE*t-KK*xx)-DF2IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx) ; 
 #endif
 
 pp[0]=rho;
