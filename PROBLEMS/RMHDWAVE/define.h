@@ -25,15 +25,17 @@
 #define KK (2.*M_PI)
 #define MAGNFIELD
 
-#define U2PCONV 1.e-12
+
 #define RADOUTPUTINZAMO
 #define CALCL1_RMHDWAVE
 #define TIMESTEPPING RK2
+
 #define RADIMPCONV 1.e-12
+#define U2PCONV 1.e-12
 
-#define NX 256
+#define NX 512
 
-#define NUMERO 101
+#define NUMERO 102
 
 #if (NUMERO==1) //sonic wave
 #define KAPPA 0.
@@ -107,71 +109,70 @@
 #define NOUTSTOP 11
 #endif
 
-
-#if (NUMEROold==101) //rad modified, sonic wave, tau=0.01, P=0.01/3
+#if (NUMERO==101) //rad modified, sonic wave, tau=0.01, P=0.01
 #define RADIATION
 #define KAPPA 0.01
 #undef SIGMA_RAD 
-#define SIGMA_RAD 8.22962e-43
+#define SIGMA_RAD 2.46889e-42
 #define RHOFAC 1.e-1
 #define RHOZERO 1.
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
 #define UZERO 0.0000900135
-#define DURE (1.50022e-7*RHOFAC)
-#define DUIM (2.54682e-10*RHOFAC)
-#define DV1RE (9.99998e-6*RHOFAC)
-#define DV1IM (8.48878e-8*RHOFAC)
+#define DURE (1.5001477607e-7*RHOFAC)
+#define DUIM (7.6399157051e-10*RHOFAC)
+#define DV1RE (9.999775486e-6*RHOFAC)
+#define DV1IM (2.5465054939e-8*RHOFAC)
 #define DV2RE (0.)
 #define DV2IM (0.)
 #define B1ZERO 0.0
 #define B2ZERO 0.0
 #define DB2RE 0.
 #define DB2IM 0.
-#define EEZERO 6.0009e-7
-#define DEERE (1.1753e-14*RHOFAC)
-#define DEEIM (1.14691e-13*RHOFAC)
-#define DF1RE (-8.01169e-12*RHOFAC)
-#define DF1IM (2.54116e-12*RHOFAC)
+#define EEZERO 1.8002700405e-6
+#define DEERE (3.272468477e-14*RHOFAC)
+#define DEEIM (3.44343726e-13*RHOFAC)
+#define DF1RE (-2.4099469e-11*RHOFAC)
+#define DF1IM (7.58186629475e-12*RHOFAC)
 #define DF2RE (0.)
 #define DF2IM (0.)
-#define OMRE 0.0628317
-#define OMIM 0.0000533366
+#define OMRE 0.0628304424
+#define OMIM 0.000160001659
 #define TMAX 2.*M_PI/OMRE*2.
 #define DTOUT1 2*M_PI/OMRE/10.
 #define NOUTSTOP 11
 
 #endif
 
-#if (NUMERO==101) //rad modified, sonic wave, tau=0.01, P=0.01
+#if (NUMERO==102) //rad modified, sonic wave, tau=0.1, P=0.01
 #define RADIATION
-#define KAPPA 0.01
+#define KAPPA 0.1
 #undef SIGMA_RAD 
 #define SIGMA_RAD 2.46889e-42
-#define RHOFAC 1.e0
+#define RHOFAC 1.e-1
 #define RHOZERO 1.
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
 #define UZERO 0.0000900135
-#define DURE (1.50015e-7*RHOFAC)
-#define DUIM (7.63992e-10*RHOFAC)
-#define DV1RE (9.99978e-6*RHOFAC)
-#define DV1IM (2.54651e-8*RHOFAC)
+#define DURE (1.49254e-7*RHOFAC)
+#define DUIM (7.547e-9*RHOFAC)
+#define DV1RE (9.97763e-6*RHOFAC)
+#define DV1IM (2.53022e-7*RHOFAC)
 #define DV2RE (0.)
 #define DV2IM (0.)
 #define B1ZERO 0.0
 #define B2ZERO 0.0
 #define DB2RE 0.
 #define DB2IM 0.
-#define EEZERO 1.80027e-6
-#define DEERE (3.27247e-14*RHOFAC)
-#define DEEIM (3.44344e-13*RHOFAC)
-#define DF1RE (-2.40995e-11*RHOFAC)
-#define DF1IM (7.58187e-12*RHOFAC)
+#define EEZERO 1.8002700405e-6
+#define DEERE (3.22869e-12*RHOFAC)
+#define DEEIM (3.8497e-12*RHOFAC)
+#define DF1RE (-3.35009e-11*RHOFAC)
+#define DF1IM (7.48081e-11*RHOFAC)
 #define DF2RE (0.)
 #define DF2IM (0.)
-#define OMRE 0.0628304
-#define OMIM 0.000160002
+#define OMRE 0.0626913
+#define OMIM 0.00158978
 #define TMAX 2.*M_PI/OMRE*2.
 #define DTOUT1 2*M_PI/OMRE/10.
 #define NOUTSTOP 11
