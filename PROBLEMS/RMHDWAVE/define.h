@@ -31,7 +31,7 @@
 #define TIMESTEPPING RK2
 
 #define RADIMPCONV 1.e-12
-#define U2PCONV 1.e-12
+#define U2PCONV 1.e-14
 
 #define NX 512
 
