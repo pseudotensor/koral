@@ -560,8 +560,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 
 									  fprintf(fout1,"%.4e %.4e %.4e "
 										  "%.3e %.3e %.3e %.3e %.3e %.3e %.3e %.3e %.3e "
-										  "%.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e "
-										  "%.6e %.6e ",
+										  "%.9e %.9e %.9e %.9e %.9e %.9e %.9e %.9e %.9e "
+										  "%.9e %.9e ",
 										  xx,     //1
 										  yy,     //2
 										  zz,     //3		      

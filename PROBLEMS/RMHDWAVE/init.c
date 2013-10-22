@@ -50,10 +50,15 @@ pp[FZ0]=0.;
 prad_ff2lab(pp,pp,&geom);
 #endif
 
+
 //print_Nvector(pp,NV); getchar();
 p2u(pp,uu,&geom);	 
 
-
+/*
+print_primitives(pp);
+print_conserved(uu);
+getchar();
+*/
 /***********************************************/
 
 int iv;
