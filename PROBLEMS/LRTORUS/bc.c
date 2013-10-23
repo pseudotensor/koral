@@ -114,6 +114,9 @@ if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
 	 //pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
+
+      //      pp[0] = get_u(p,0,0,iiy,iiz)*pow(r/r0,-1.5);
+      //pp[1] = get_u(p,1,0,iiy,iiz)*pow(r/r0,-1.5);
  
 
      p2u(pp,uu,&geom);

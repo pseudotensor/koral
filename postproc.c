@@ -126,12 +126,15 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
 	  profiles[4][ix]=(r*r/(sqrt(r*(r*r-3.*r))));  
+	  ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
+
+
 	  //net accretion rate at given radius (7)
-	  profiles[7][ix]=fabs(calc_mdot(xxBL[1],0)/calc_mdotEdd());
+	  profiles[7][ix]=fabs(calc_mdot(xxBL[1],0)*mdotscale/calc_mdotEdd());
 	  //inflow accretion rate at given radius (8)
-	  profiles[8][ix]=fabs(calc_mdot(xxBL[1],1)/calc_mdotEdd());
+	  profiles[8][ix]=fabs(calc_mdot(xxBL[1],1)*mdotscale/calc_mdotEdd());
 	  //outflow accretion rate at given radius (9)
-	  profiles[9][ix]=fabs(calc_mdot(xxBL[1],2)/calc_mdotEdd());
+	  profiles[9][ix]=fabs(calc_mdot(xxBL[1],2)*mdotscale/calc_mdotEdd());
 	  //luminosity at given radius (12)
 	  profiles[10][ix]=calc_lum(xxBL[1])/calc_lumEdd();
 	  //location of the photosphere (8)
@@ -160,8 +163,10 @@ int calc_scalars(ldouble *scalars,ldouble t)
   scalars[0]=calc_totalmass();
 
   //accretion rate through horizon (3)
+  ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
+
   ldouble mdot=calc_mdot(r_horizon_BL(BHSPIN),0);
-  scalars[1]=-mdot/calc_mdotEdd();
+  scalars[1]=-mdot*mdotscale/calc_mdotEdd();
 
   //luminosity (4) at 0.5*rmax
   ldouble xx[4],xxBL[4];
@@ -172,8 +177,10 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   //magnetic flux through horizon parameter (5)
   ldouble Bflux=calc_Bflux(r_horizon_BL(BHSPIN),0);
-  ldouble Bfluxcgs=Bflux*sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC;
-  scalars[3]=Bfluxcgs/2./sqrt(fabs(mdot));
+  //ldouble Bfluxcgs=Bflux*sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC;
+  //scalars[3]=Bfluxcgs/2./sqrt(fabs(mdot));
+
+  scalars[3]=Bflux/sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.;
 
   /*********************************************/
   //L1 ERRRORS for some problems
@@ -468,32 +475,37 @@ calc_mdot(ldouble radius,int type)
 	  struct geometry geom;
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
+	  /*
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
 	  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
-
+	  */
 	  rho=pp[0];
 
 	  ucon[1]=pp[2];
 	  ucon[2]=pp[3];
 	  ucon[3]=pp[4];
 
-	  conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	  //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
 
-	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
-	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
+	  dx[1]=dx[1];//*sqrt(geom.gg[2][2]);
+	  dx[2]=2.*M_PI;//*sqrt(geom.gg[3][3]);
 
 	  //#ifdef CGSOUTPUT
 	  //always
+
+	  /*
 	  rho=rhoGU2CGS(rho);
 	  ucon[1]=velGU2CGS(ucon[1]);
 	  dx[1]=lenGU2CGS(dx[1]);
 	  dx[2]=lenGU2CGS(dx[2]);
+	  */
 	  //#endif
 
 	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
-	    mdot+=rho*ucon[1]*dx[1]*dx[2];
+	    mdot+=geom.gdet*rho*ucon[1]*dx[1]*dx[2];
 	}
     }
   else

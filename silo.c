@@ -63,6 +63,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *Bx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *By = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *phi = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   #endif
 
   #ifdef RADIATION
@@ -74,8 +75,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
   for(iz=0;iz<nz;iz++)
     {
+      
+      
       for(iy=0;iy<ny;iy++)
 	{
+	  
 	  for(ix=0;ix<nx;ix++)
 	    {
 	      int iix,iiy,iiz;
@@ -201,6 +205,15 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      Bx[nodalindex]=bcon[1];
 	      By[nodalindex]=bcon[2];
 	      Bz[nodalindex]=bcon[3];
+
+	      if(iy==0)
+		phi[nodalindex]=geomout.gdet*pp[B1]*get_size_x(iy,1);
+	      else
+		{
+		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
+		  phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*get_size_x(iy,1);
+		}
+
 
 	      //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
@@ -361,6 +374,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
   #ifdef MAGNFIELD
   DBPutQuadvar1(file, "bsq","mesh1", bsq,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  DBPutQuadvar1(file, "phi","mesh1", phi,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   #endif
