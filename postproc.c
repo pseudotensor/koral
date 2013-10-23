@@ -315,6 +315,8 @@ calc_lum(ldouble radius)
     return -1.; //no BH
 #endif
 
+#ifdef RADIATION
+
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3],pp[NV],Fr;
 
@@ -377,6 +379,8 @@ calc_lum(ldouble radius)
       return lum;
     }
   else
+
+#endif
     return -1;
 }
 
@@ -526,6 +530,8 @@ calc_Bflux(ldouble radius,int type)
   if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS)
     return -1.; //no BH
 
+  #ifdef MAGNFIELD
+
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3],Psi,rho,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
 
@@ -586,4 +592,7 @@ calc_Bflux(ldouble radius,int type)
     return -1;
 
   return Psi;
+#else
+  return -1;
+#endif
 }

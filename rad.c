@@ -1625,7 +1625,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       //TODO:
       //this may fail but necessary to start of a.neq.0 runs      
 #ifdef BHDISK_PROBLEMTYPE
-      if(0 && failed==0 && global_time<100.)
+      if(1 && failed==0 && global_time<100.)
 	{
 	  //criterion of convergence on relative change of quantities
 	  f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);

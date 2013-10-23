@@ -314,39 +314,3 @@
 #define DTOUT1 2*M_PI/OMRE/10.
 #define NOUTSTOP 11
 #endif
-
-#if (NUMERO==1003) //rad modified, slow msonic wave, tau=10., P=10., CC=1e2
-#define RADIATION
-#define KAPPA 10.
-#undef SIGMA_RAD 
-#define SIGMA_RAD 2.46889e-39
-#define RHOFAC 1.e-3
-#define RHOZERO 1.
-#define DRRE (1.e-3*RHOFAC)
-#define DRIM 0.
-#define UZERO 0.0000900135
-#define DURE (8.99241e-8*RHOFAC)
-#define DUIM (7.51995e-10*RHOFAC)
-#define DV1RE (5.07163e-6*RHOFAC)
-#define DV1IM (7.2926e-7*RHOFAC)
-#define DV2RE (6.61826e-6*RHOFAC)
-#define DV2IM (1.62925e-6*RHOFAC)
-#define B1ZERO 0.0100008
-#define B2ZERO 0.0100008
-#define DB2RE (-3.23804e-6*RHOFAC)
-#define DB2IM (-1.3090e-6*RHOFAC)
-#define EEZERO 0.00180027
-#define DEERE (-7.12812e-9*RHOFAC)
-#define DEEIM (5.99678e-8*RHOFAC)
-#define DF1RE (-1.2559e-8*RHOFAC)
-#define DF1IM (-1.49156e-9*RHOFAC)
-#define DF2RE (0.)
-#define DF2IM (0.)
-#define OMRE 0.031866
-#define OMIM 0.00458207 
-#define TMAX 2.*M_PI/OMRE*2.
-#define DTOUT1 2*M_PI/OMRE/10.
-#define NOUTSTOP 11
-#endif
-
-

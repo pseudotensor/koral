@@ -96,6 +96,8 @@ main(int argc, char **argv)
   copy_u(0.,p,pavg);
   avgtime=0.;
 
+
+
   //calculates initial scalars
   calc_scalars(scalars,tstart);
 
