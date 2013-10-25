@@ -166,7 +166,8 @@ int calc_scalars(ldouble *scalars,ldouble t)
   ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
 
   ldouble mdot=calc_mdot(r_horizon_BL(BHSPIN),0);
-  scalars[1]=-mdot*mdotscale/calc_mdotEdd();
+  scalars[1]=-mdot;
+  scalars[4]=-mdot*mdotscale/calc_mdotEdd();
 
   //luminosity (4) at 0.5*rmax
   ldouble xx[4],xxBL[4];
@@ -180,7 +181,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   //ldouble Bfluxcgs=Bflux*sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC;
   //scalars[3]=Bfluxcgs/2./sqrt(fabs(mdot));
 
-  scalars[3]=Bflux/sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.;
+  scalars[3]=Bflux;///sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.;
 
   /*********************************************/
   //L1 ERRRORS for some problems

@@ -64,6 +64,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *By = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *phi = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *tautot = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *tauabs = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   #endif
 
   #ifdef RADIATION
@@ -150,7 +152,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      uint[nodalindex]=endenGU2CGS(uint[nodalindex]);
 	      #endif
 
-	      temp[nodalindex]=calc_PEQ_Tfromurho(uint[nodalindex],rho[nodalindex]);
+	      ldouble temploc=calc_PEQ_Tfromurho(uint[nodalindex],rho[nodalindex]);
+	      temp[nodalindex]=temploc;
 	      
 	      #ifdef TRACER
 	      tracer[nodalindex]=pp[TRA];
@@ -207,7 +210,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      Bz[nodalindex]=bcon[3];
 
 	      if(iy==0)
-		phi[nodalindex]=geomout.gdet*pp[B1]*get_size_x(iy,1);
+		{
+		  phi[nodalindex]=geomout.gdet*pp[B1]*get_size_x(iy,1);
+		}
 	      else
 		{
 		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
@@ -238,8 +243,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      ldouble Rtt,Ehat,ugas[4],rvel[4],Rij[4][4];
 
+	      ldouble tauabsloc = calc_kappa(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
+	      ldouble tautotloc = calc_kappaes(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
+
 	      if(doingavg==0)
 		{
+
 		  calc_ff_Rtt(pp,&Rtt,ugas,&geomout);
 		  Ehat=-Rtt;  	      							  
 		  //prad_lab2on(pp,pp,&geomout);
@@ -258,6 +267,19 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Rij[0][3]=get_uavg(pavg,AVGRIJ(0,3),ix,iy,iz);		  
 		}
 	      	
+	      if(iy==0)
+		{
+		  tautot[nodalindex]=tautotloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  tauabs[nodalindex]=tauabsloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		}
+	      else
+		{
+		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
+		  tautot[nodalindex]=tautot[nodalindex]+tautotloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  tauabs[nodalindex]=tauabs[nodalindex]+tauabsloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		}
+
+
 	      Erad[nodalindex]=Ehat;
 	      Fx[nodalindex]=Rij[0][1];
 	      Fy[nodalindex]=Rij[0][2];
@@ -368,6 +390,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
   #ifdef RADIATION
   DBPutQuadvar1(file, "erad","mesh1", Erad,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  DBPutQuadvar1(file, "tautot","mesh1", tautot,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  DBPutQuadvar1(file, "tauabs","mesh1", tauabs,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   #endif
