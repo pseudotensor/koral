@@ -58,7 +58,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *vy = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *vz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 
-  #ifdef MAGNFIELD
+
+ #ifdef MAGNFIELD
   ldouble *bsq = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *By = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -70,6 +71,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
   #ifdef RADIATION
   ldouble *Erad = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Ehat = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Fx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Fy = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Fz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -136,6 +138,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  vel[1]=pp[VX];
 		  vel[2]=pp[VY];
 		  vel[3]=pp[VZ];
+		  
 		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
 		}
 	      else //using averaged data
@@ -144,7 +147,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  uint[nodalindex]=get_uavg(pavg,UU,ix,iy,iz);
 		  vel[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
-		  vel[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
+		  vel[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+
 		}
 
 	      #ifdef CGSOUTPUT
@@ -264,8 +268,15 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Rij[0][0]=get_uavg(pavg,AVGRIJ(0,0),ix,iy,iz);
 		  Rij[0][1]=get_uavg(pavg,AVGRIJ(0,1),ix,iy,iz);
 		  Rij[0][2]=get_uavg(pavg,AVGRIJ(0,2),ix,iy,iz);
-		  Rij[0][3]=get_uavg(pavg,AVGRIJ(0,3),ix,iy,iz);		  
+		  Rij[0][3]=get_uavg(pavg,AVGRIJ(0,3),ix,iy,iz);	  
+		
 		}
+	      
+	      Ehat[nodalindex]=Ehat;
+	      Erad[nodalindex]=Rij[0][0];
+	      Fx[nodalindex]=Rij[0][1];
+	      Fy[nodalindex]=Rij[0][2];
+	      Fz[nodalindex]=Rij[0][3];
 	      	
 	      if(iy==0)
 		{
@@ -280,10 +291,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 
 
-	      Erad[nodalindex]=Ehat;
-	      Fx[nodalindex]=Rij[0][1];
-	      Fy[nodalindex]=Rij[0][2];
-	      Fz[nodalindex]=Rij[0][3];
+	      
 
 	       //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
@@ -390,6 +398,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
   #ifdef RADIATION
   DBPutQuadvar1(file, "erad","mesh1", Erad,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  DBPutQuadvar1(file, "ehat","mesh1", Ehat,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   DBPutQuadvar1(file, "tautot","mesh1", tautot,

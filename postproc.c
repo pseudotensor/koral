@@ -59,6 +59,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 	      
 	      //to BL
+	     
 	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 	      dxph[0]=get_size_x(ix,0)*sqrt(geom.gg[1][1]);
 	      dxph[1]=get_size_x(iy,1)*sqrt(geom.gg[2][2]);
@@ -448,7 +449,7 @@ calc_mdot(ldouble radius,int type)
 #endif
 
   int ix,iy,iz,iv;
-  ldouble xx[4],xxBL[4],dx[3],mdot,rho,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
+  ldouble xx[4],xxBL[4],dx[3],mdot,gdet,rho,rhouconr,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -480,23 +481,46 @@ calc_mdot(ldouble radius,int type)
 	  struct geometry geom;
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
-	  /*
+	  
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-
+	  /*
 	  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 	  */
-	  rho=pp[0];
 
-	  ucon[1]=pp[2];
-	  ucon[2]=pp[3];
-	  ucon[3]=pp[4];
+	  if(doingavg)
+	    {
+	      rho=get_uavg(pavg,RHO,ix,iy,iz);
+	      ucon[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      ucon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      ucon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);	      	      
+	      gdet=geomBL.gdet;
+	      ldouble dxph[3];
+	      dxph[0]=get_size_x(ix,0)*sqrt(geom.gg[1][1]);
+	      dxph[1]=get_size_x(iy,1)*sqrt(geom.gg[2][2]);
+	      dxph[2]=get_size_x(iz,2)*sqrt(geom.gg[3][3]);
+	      dx[0]=dxph[0]/sqrt(geomBL.gg[1][1]);
+	      dx[1]=dxph[1]/sqrt(geomBL.gg[2][2]);
+	      dx[2]=dxph[2]/sqrt(geomBL.gg[3][3]);
+	    }
+	  else
+	    {
+	      rho=pp[0];
+	      ucon[1]=pp[2];
+	      ucon[2]=pp[3];
+	      ucon[3]=pp[4];
 
-	  //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+	      rhouconr=rho*ucon[1];
+	      gdet=geom.gdet;	
+	      dx[1]=dx[1];	     
+	      dx[2]=2.*M_PI;
+	    }
 
-	  dx[1]=dx[1];//*sqrt(geom.gg[2][2]);
-	  dx[2]=2.*M_PI;//*sqrt(geom.gg[3][3]);
+	 
+
+	  
 
 	  //#ifdef CGSOUTPUT
 	  //always
@@ -510,7 +534,7 @@ calc_mdot(ldouble radius,int type)
 	  //#endif
 
 	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
-	    mdot+=geom.gdet*rho*ucon[1]*dx[1]*dx[2];
+	    mdot+=gdet*rhouconr*dx[1]*dx[2];
 	}
     }
   else
