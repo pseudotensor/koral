@@ -6,13 +6,13 @@
 /************************************/
 //restart
 /************************************/
-//efine RESTART
+#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -75,8 +75,8 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.275-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
-#define NX 150
-#define NY 100
+#define NX 300
+#define NY 200
 #define NZ 1
 #endif
 

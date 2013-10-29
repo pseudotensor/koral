@@ -245,7 +245,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      #ifdef RADIATION
 
-	      ldouble Rtt,Ehat,ugas[4],rvel[4],Rij[4][4];
+	      ldouble Rtt,ehat,ugas[4],rvel[4],Rij[4][4];
 
 	      ldouble tauabsloc = calc_kappa(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
 	      ldouble tautotloc = calc_kappaes(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
@@ -254,7 +254,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		{
 
 		  calc_ff_Rtt(pp,&Rtt,ugas,&geomout);
-		  Ehat=-Rtt;  	      							  
+		  ehat=-Rtt;  	      							  
 		  //prad_lab2on(pp,pp,&geomout);
 		  //rvel[1]=pp[FX0];
 		  //rvel[2]=pp[FY0];
@@ -264,7 +264,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 	      else
 		{
-		  Ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
+		  ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
 		  Rij[0][0]=get_uavg(pavg,AVGRIJ(0,0),ix,iy,iz);
 		  Rij[0][1]=get_uavg(pavg,AVGRIJ(0,1),ix,iy,iz);
 		  Rij[0][2]=get_uavg(pavg,AVGRIJ(0,2),ix,iy,iz);
@@ -272,7 +272,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		
 		}
 	      
-	      Ehat[nodalindex]=Ehat;
+	      Ehat[nodalindex]=ehat;
 	      Erad[nodalindex]=Rij[0][0];
 	      Fx[nodalindex]=Rij[0][1];
 	      Fy[nodalindex]=Rij[0][2];
@@ -490,6 +490,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
   #ifdef RADIATION
   free(Erad);
+  free(Ehat);
   free(Fx);
   free(Fy);
   free(Fz);

@@ -84,7 +84,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  utcon[3]=pp[4];
 
 		  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-		  rhouconr=rho*ucon[1];	      
+		  rhouconr=rho*utcon[1];	      
 		}
 
 
@@ -106,7 +106,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 	      //rho-weighted minus radial velocity (4)
-	      profiles[2][ix]+=-ucon[1]*rho*dxph[1];
+	      profiles[2][ix]+=-utcon[1]*rho*dxph[1];
 	      //abs optical depth (7)
 	      profiles[5][ix]+=tauabs[1];	
 	      //tot optical depth (8)
@@ -130,15 +130,15 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
 
 
-	  //net accretion rate at given radius (7)
+	  //net accretion rate at given radius (9)
 	  profiles[7][ix]=fabs(calc_mdot(xxBL[1],0)*mdotscale/calc_mdotEdd());
-	  //inflow accretion rate at given radius (8)
+	  //inflow accretion rate at given radius (10)
 	  profiles[8][ix]=fabs(calc_mdot(xxBL[1],1)*mdotscale/calc_mdotEdd());
-	  //outflow accretion rate at given radius (9)
+	  //outflow accretion rate at given radius (11)
 	  profiles[9][ix]=fabs(calc_mdot(xxBL[1],2)*mdotscale/calc_mdotEdd());
 	  //luminosity at given radius (12)
 	  profiles[10][ix]=calc_lum(xxBL[1])/calc_lumEdd();
-	  //location of the photosphere (8)
+	  //location of the photosphere (13)
 	  profiles[11][ix]=calc_photloc(ix);
 
 
