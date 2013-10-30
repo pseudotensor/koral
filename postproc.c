@@ -58,9 +58,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      struct geometry geomBL;
 	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 	      
-	      //to BL
-	     
+	      //to BL     
 	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+
 	      dxph[0]=get_size_x(ix,0)*sqrt(geom.gg[1][1]);
 	      dxph[1]=get_size_x(iy,1)*sqrt(geom.gg[2][2]);
 	      dxph[2]=get_size_x(iz,2)*sqrt(geom.gg[3][3]);
@@ -537,9 +537,8 @@ calc_mdot(ldouble radius,int type)
 	  
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-	  /*
-	  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
-	  */
+	  
+	  
 
 	  if(doingavg)
 	    {
@@ -577,12 +576,32 @@ calc_mdot(ldouble radius,int type)
 	      ucon[1]=pp[2];
 	      ucon[2]=pp[3];
 	      ucon[3]=pp[4];
-
+	      
 	      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
 	      rhouconr=rho*ucon[1];
 	      gdet=geom.gdet;	
 	      dx[1]=dx[1];	     
 	      dx[2]=2.*M_PI;
+	      /*
+	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	      ldouble dxph[3];
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	      rhouconr=rho*ucon[1];
+	      ldouble xx1[4],xx2[4];
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[0]=fabs(xx2[1]-xx1[1]);
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[1]=fabs(xx2[2]-xx1[2]);
+	      dx[2]=2.*M_PI;
+	      gdet=geomBL.gdet;
+	      */
+	      
 	    }
 
 	 

@@ -32,6 +32,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   
   /* Give the cartesian coordinates of the mesh */
   int ix,iy,iz,iv;
+  int i,j;
   ldouble pp[NV],xxvec[4],xxveccar[4],xxvecsph[4];
 
   int nx=NX;
@@ -57,6 +58,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *vx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *vy = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *vz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+
+  ldouble *Edotx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Edoty = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Edotz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 
 
  #ifdef MAGNFIELD
@@ -128,8 +133,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 
 	      
-	      //velocities
+	      //velocities etc
 	      ldouble vel[4];
+	      ldouble Tit[4],Tij[4][4];
 
 	      if(doingavg==0) //using snapshot date
 		{
@@ -139,7 +145,15 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  vel[2]=pp[VY];
 		  vel[3]=pp[VZ];
 		  
-		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);						  
+		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);
+
+		  calc_Tij(pp,&geomout,Tij);
+		  indices_2221(Tij,Tij,geomout.gg);
+
+		  Tit[1]=Tij[1][0];
+		  Tit[2]=Tij[2][0];
+		  Tit[3]=Tij[3][0];
+
 		}
 	      else //using averaged data
 		{
@@ -149,6 +163,18 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  vel[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 
+		  Tit[1]=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
+		    + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+		  Tit[2]=get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz)
+		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(2,0),ix,iy,iz)
+		    + get_uavg(pavg,AVGBSQUCONUCOV(2,0),ix,iy,iz)
+		    - get_uavg(pavg,AVGBCONBCOV(2,0),ix,iy,iz); 
+		  Tit[3]=get_uavg(pavg,AVGRHOUCONUCOV(3,0),ix,iy,iz)
+		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(3,0),ix,iy,iz)
+		    + get_uavg(pavg,AVGBSQUCONUCOV(3,0),ix,iy,iz)
+		    - get_uavg(pavg,AVGBCONBCOV(3,0),ix,iy,iz); 
 		}
 
 	      #ifdef CGSOUTPUT
@@ -163,10 +189,14 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      tracer[nodalindex]=pp[TRA];
 	      #endif
 
-	      //outvel - non-ortonormal VEL4
+	      //default, but can be non-ortonormal VEL4
 	      vx[nodalindex]=vel[1];
 	      vy[nodalindex]=vel[2];
 	      vz[nodalindex]=vel[3];
+
+	      Edotx[nodalindex]=Tit[1];
+	      Edoty[nodalindex]=Tit[2];
+	      Edotz[nodalindex]=Tit[3];
 
 	      //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
@@ -184,6 +214,20 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 		  vz[nodalindex] = cos(th)*vel[1] 
 		    - sin(th)*vel[2];
+
+		  Tit[2]*=r;
+		  Tit[3]*=r*sin(th);
+		  
+		  Edotx[nodalindex] = sin(th)*cos(ph)*Tit[1] 
+		    + cos(th)*cos(ph)*Tit[2]
+		    - sin(ph)*Tit[3];
+
+		  Edoty[nodalindex] = sin(th)*sin(ph)*Tit[1] 
+		    + cos(th)*sin(ph)*Tit[2]
+		    + cos(ph)*Tit[3];
+
+		  Edotz[nodalindex] = cos(th)*Tit[1] 
+		    - sin(th)*Tit[2];
 		}
 		
 
@@ -261,22 +305,29 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  //rvel[3]=pp[FZ0];
 		  //conv_vels(rvel,rvel,VELPRIM,VEL4,geomout.gg,geomout.GG);
 		  calc_Rij(pp,&geomout,Rij); //calculates R^munu in OUTCOORDS
+		  indices_2221(Rij,Rij,geomout.gg);
 		}
 	      else
 		{
 		  ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
-		  Rij[0][0]=get_uavg(pavg,AVGRIJ(0,0),ix,iy,iz);
-		  Rij[0][1]=get_uavg(pavg,AVGRIJ(0,1),ix,iy,iz);
-		  Rij[0][2]=get_uavg(pavg,AVGRIJ(0,2),ix,iy,iz);
-		  Rij[0][3]=get_uavg(pavg,AVGRIJ(0,3),ix,iy,iz);	  
-		
+		  /*
+		  ldouble Rtop[4];
+		  Rtop[0]=get_uavg(pavg,AVGRIJ(0,0),ix,iy,iz);
+		  Rtop[1]=get_uavg(pavg,AVGRIJ(0,1),ix,iy,iz);
+		  Rtop[2]=get_uavg(pavg,AVGRIJ(0,2),ix,iy,iz);
+		  Rtop[3]=get_uavg(pavg,AVGRIJ(0,3),ix,iy,iz);
+		  */
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+		  indices_2221(Rij,Rij,geomout.gg);		
 		}
 	      
 	      Ehat[nodalindex]=ehat;
 	      Erad[nodalindex]=Rij[0][0];
-	      Fx[nodalindex]=Rij[0][1];
-	      Fy[nodalindex]=Rij[0][2];
-	      Fz[nodalindex]=Rij[0][3];
+	      Fx[nodalindex]=Rij[1][0];
+	      Fy[nodalindex]=Rij[2][0];
+	      Fz[nodalindex]=Rij[3][0];
 	      	
 	      if(iy==0)
 		{
@@ -290,25 +341,22 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  tauabs[nodalindex]=tauabs[nodalindex]+tauabsloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
 		}
 
-
-	      
-
-	       //transform to cartesian
+	      //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
 		{
 		  Rij[0][2]*=r;
 		  Rij[0][3]*=r*sin(th);
 
-		  Fx[nodalindex] = sin(th)*cos(ph)*Rij[0][1] 
-		    + cos(th)*cos(ph)*Rij[0][2]
-		    - sin(ph)*Rij[0][3];
+		  Fx[nodalindex] = sin(th)*cos(ph)*Rij[1][0] 
+		    + cos(th)*cos(ph)*Rij[2][0]
+		    - sin(ph)*Rij[3][0];
 
-		  Fy[nodalindex] = sin(th)*sin(ph)*Rij[0][1] 
-		    + cos(th)*sin(ph)*Rij[0][2]
-		    + cos(ph)*Rij[0][3];
+		  Fy[nodalindex] = sin(th)*sin(ph)*Rij[1][0] 
+		    + cos(th)*sin(ph)*Rij[2][0]
+		    + cos(ph)*Rij[3][0];
 
-		  Fz[nodalindex] = cos(th)*Rij[0][1] 
-		    - sin(th)*Rij[0][2];
+		  Fz[nodalindex] = cos(th)*Rij[1][0] 
+		    - sin(th)*Rij[2][0];
 		}
 	      #endif
 	  
@@ -439,6 +487,21 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   names[1] = strdup("vel2");
   names[2] = strdup("vel3");
   DBPutQuadvar(file, "velocity","mesh1", 3, names, vels, 
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  //en. flux
+  vels[0]=Edotx;
+  vels[1]=Edoty;
+  vels[2]=Edotz;
+#ifdef SILO2D_XZPLANE
+  vels[1]=Edotz;
+#endif
+
+  names[0] = strdup("Tit1");
+  names[1] = strdup("Tit2");
+  names[2] = strdup("Tit3");
+  DBPutQuadvar(file, "en_flux","mesh1", 3, names, vels, 
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 
