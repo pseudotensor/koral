@@ -20,7 +20,6 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-//#define EDDINGTON_APR
 #define KAPPAES 0.
 #define KK (2.*M_PI)
 #define MAGNFIELD
@@ -33,9 +32,9 @@
 #define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-14
 
-#define NX 64
+#define NX 256
 
-#define NUMERO 11
+#define NUMERO 1001
 
 #if (NUMERO==1) //sonic wave
 #define KAPPA 0.

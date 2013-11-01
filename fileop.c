@@ -665,7 +665,8 @@ fprint_restartfile(ldouble t, char* folder)
 	{
 	  for(ix=0;ix<NX;ix++)
 	    {
-	      fprintf(fout1,"%d %d %d ",ix,iy,iz);
+	      fprintf(fout1,"%e %e %e ",get_x(ix,0),get_x(iy,0),get_x(iz,0));
+	      
 	      for(iv=0;iv<NV;iv++)
 		{
 		  pp[iv]=get_u(p,iv,ix,iy,iz);

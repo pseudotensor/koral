@@ -141,6 +141,7 @@
 #define AVGWUCON(i) (NV+105+i)
 #define AVGEHAT (NV+109)
 #define AVGRIJ(i,j) (NV+110+i*4+j)
+#define AVGEHATUCON(i) (NV+126+i)
 
 
 
