@@ -1286,7 +1286,8 @@
 #ifndef NAVGVARS
 #ifdef BHDISK_PROBLEMTYPE
 #ifdef RADIATION
-#define NAVGVARS (142)
+//#define NAVGVARS (142)
+#define NAVGVARS (126)
 #else
 #define NAVGVARS (109)
 #endif
@@ -1296,7 +1297,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 20
+#define NRADPROFILES 21
 #endif
 
 #ifndef OUTVEL

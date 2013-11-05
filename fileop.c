@@ -240,11 +240,15 @@ fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder)
 int
 fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
 {
-  if(MYCOORDS == BLCOORDS || MYCOORDS == KSCOORDS || MYCOORDS == MKS1COORDS || MYCOORDS == MKS2COORDS)
-    {
+#ifdef BHDISK_PROBLEMTYPE 
       char bufor[50],bufor2[50];
       sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
       fout_radprofiles=fopen(bufor,"w");
+      
+      ldouble mdotscale = (rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.))/calc_mdotEdd();
+      ldouble lumscale = (fluxGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.))/calc_lumEdd();
+
+      fprintf(fout_radprofiles,"# mdotGU2CGS: %e lumGU2CGS: %e\n",mdotscale,lumscale);
 
       int ix,iv;
       //calculating radial profiles
@@ -263,7 +267,7 @@ fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
 	  fprintf(fout_radprofiles,"\n");
 	}
       fclose(fout_radprofiles);
-    }
+#endif
   
   return 0;
 }
