@@ -33,8 +33,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   /* Give the cartesian coordinates of the mesh */
   int ix,iy,iz,iv;
   int i,j;
-  ldouble pp[NV],xxvec[4],xxveccar[4],xxvecsph[4],xx1[4],xx2[4];
-
+  ldouble pp[NV],uu[NV],xxvec[4],xxveccar[4],xxvecsph[4],xx1[4],xx2[4];
+  
   int nx=NX;
   int ny=NY;
   int nz=NZ;
@@ -83,6 +83,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *Fx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Fy = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Fz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *uradx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *urady = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *uradz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   #endif
 
   for(iz=0;iz<nz;iz++)
@@ -113,8 +116,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      ldouble ph=xxvecsph[3];
 
 	      //gdet and coordinates of cells +- 1 in radius
-	      ldouble gdet1,gdet2,gdet;
+	      ldouble gdet1,gdet2,gdet,gdetu;
 	      gdet=geomout.gdet;
+	      gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+	      gdetu=1.;
+#endif
 
 	      get_xx(iix-1,iiy,iiz,xx1);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
@@ -148,17 +155,34 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
               #endif
 	      trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 
+	      //magnetic fields
+	      ldouble bcon[4],bcov[4];
+	      if(doingavg==0)
+		{
+		  calc_bcon_prim(pp,bcon,&geomout);
+		  indices_21(bcon,bcov,geomout.gg); 
+		  bsq[nodalindex] = dot(bcon,bcov);
+		}
+	      else
+		{
+		  bcon[1]=get_uavg(pavg,AVGBCON(1),ix,iy,iz);
+		  bcon[2]=get_uavg(pavg,AVGBCON(2),ix,iy,iz);
+		  bcon[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
+		  bsq[nodalindex]=get_uavg(pavg,AVGBSQ,ix,iy,iz);
+		}
 	      
 	      //velocities etc
 	      ldouble vel[4],velprim[4];
 	      ldouble Tit[4],Tij[4][4];
 	      ldouble dpdr; //d/dr (gdet * p)
 	      ldouble gracen; //gdet T^k_l Gamma^l_kr
+	      ldouble w;//entalphy
 
 	      if(doingavg==0) //using snapshot date
 		{
 		  rho[nodalindex]=pp[RHO];
 		  uint[nodalindex]=pp[UU];
+		  w=rho[nodalindex]+GAMMA*uint[nodalindex]+bsq[nodalindex];
 		  vel[1]=pp[VX];
 		  vel[2]=pp[VY];
 		  vel[3]=pp[VZ];
@@ -185,7 +209,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		{
 		  rho[nodalindex]=get_uavg(pavg,RHO,ix,iy,iz);
 		  uint[nodalindex]=get_uavg(pavg,UU,ix,iy,iz);
-
+		  w=rho[nodalindex]+GAMMA*uint[nodalindex]+bsq[nodalindex];
+		 
 		  vel[0]=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
@@ -216,10 +241,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		    for(j=0;j<4;j++)
 		      gracen += gdet*Tij[i][j]*get_gKr(j,1,i,ix,iy,iz);
 
-		  forcebal1[nodalindex]=dpdr;
+		  forcebal1[nodalindex]=-dpdr;
 		  forcebal2[nodalindex]=gracen;
 		}
 
+	     
 	      //fdef CGSOUTPUT
 	      //rho[nodalindex]=rhoGU2CGS(rho[nodalindex]);
 	      //uint[nodalindex]=endenGU2CGS(uint[nodalindex]);
@@ -277,21 +303,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      #ifdef MAGNFIELD
 	      //magnetic field
 	      
-	      ldouble bcon[4],bcov[4];
 
-	      if(doingavg==0)
-		{
-		  calc_bcon_prim(pp,bcon,&geomout);
-		  indices_21(bcon,bcov,geomout.gg); 
-		  bsq[nodalindex] = dot(bcon,bcov);
-		}
-	      else
-		{
-		  bcon[1]=get_uavg(pavg,AVGBCON(1),ix,iy,iz);
-		  bcon[2]=get_uavg(pavg,AVGBCON(2),ix,iy,iz);
-		  bcon[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
-		  bsq[nodalindex]=get_uavg(pavg,AVGBSQ,ix,iy,iz);
-		}
 	      	      
 	      //to ortonormal	      
 	      //trans2_cc2on(bcon,bcon,geomout.tup);
@@ -332,7 +344,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      #ifdef RADIATION
 
-	      ldouble Rtt,ehat,ugas[4],rvel[4],Rij[4][4],Gi[4];
+	      ldouble Rtt,ehat,ugas[4],urad[4],rvel[4],Rij[4][4],Gi[4];
 
 	      ldouble tauabsloc = calc_kappa(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
 	      ldouble tautotloc = calc_kappaes(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
@@ -349,8 +361,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  //conv_vels(rvel,rvel,VELPRIM,VEL4,geomout.gg,geomout.GG);
 		  calc_Rij(pp,&geomout,Rij); //calculates R^munu in OUTCOORDS
 		  indices_2221(Rij,Rij,geomout.gg);
-		  calc_Gi(pp,&geomout,Gi); 
-		  indices_21(Gi,Gi,geomout.gg);
+
+		  
 		}
 	      else
 		{
@@ -366,15 +378,44 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
 		  indices_2221(Rij,Rij,geomout.gg);		
-		  calc_Gi(pp,&geomout,Gi); 
-		  indices_21(Gi,Gi,geomout.gg);
+		  
 		}
+
+	      //correcting rad-velocities basing on <R^t_mu>
+	      int radcorr;
+	      //print_primitives(pp);
+	      
+	      p2u(pp,uu,&geomout);
+	      //print_conserved(uu);
+	      uu[EE0]=gdetu*Rij[0][0];
+	      uu[FX0]=gdetu*Rij[0][1];
+	      uu[FY0]=gdetu*Rij[0][2];
+	      uu[FZ0]=gdetu*Rij[0][3];
+	      //print_conserved(uu);
+	      u2p_rad(uu,pp,&geomout,&radcorr);
+	      
+	      //print_primitives(pp);getchar();
+	      
+	      //four fource
+	      calc_Gi(pp,&geomout,Gi); 
+	      indices_21(Gi,Gi,geomout.gg);
 	      
 	      Ehat[nodalindex]=ehat;
 	      Erad[nodalindex]=Rij[0][0];
+
 	      Fx[nodalindex]=Rij[1][0];
 	      Fy[nodalindex]=Rij[2][0];
 	      Fz[nodalindex]=Rij[3][0];
+
+	      urad[1]=pp[FX0];
+	      urad[2]=pp[FY0];
+	      urad[3]=pp[FZ0];
+	      conv_vels(urad,urad,VELPRIM,VEL4,geomout.gg,geomout.GG);
+
+	      uradx[nodalindex]=urad[1];
+	      urady[nodalindex]=urad[2];
+	      uradz[nodalindex]=urad[3];
+
 	      forcebal3[nodalindex]=gdet*Gi[1];
 	      	
 	      if(iy==0)
@@ -392,8 +433,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      //transform to cartesian
 	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
 		{
-		  Rij[0][2]*=r;
-		  Rij[0][3]*=r*sin(th);
+		  Rij[2][0]*=r;
+		  Rij[3][0]*=r*sin(th);
 
 		  Fx[nodalindex] = sin(th)*cos(ph)*Rij[1][0] 
 		    + cos(th)*cos(ph)*Rij[2][0]
@@ -405,16 +446,38 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 		  Fz[nodalindex] = cos(th)*Rij[1][0] 
 		    - sin(th)*Rij[2][0];
+
+		  urad[2]*=r;
+		  urad[3]*=r*sin(th);
+
+		  uradx[nodalindex] = sin(th)*cos(ph)*urad[1]
+		    + cos(th)*cos(ph)*urad[2]
+		    - sin(ph)*urad[3];
+
+		  urady[nodalindex] = sin(th)*sin(ph)*urad[1]
+		    + cos(th)*sin(ph)*urad[2]
+		    + cos(ph)*urad[3];
+
+		  uradz[nodalindex] = cos(th)*urad[1]
+		    - sin(th)*urad[2];
 		}
+
+	      if(iy==NY/2 && 0)
+		{
+		  printf("%d %d %d | %e %e %e | %e %e %e | %e %e %e | %e %e %e\n",ix,iy,iz,
+			 xxvec[1],xxvec[2],xxvec[3],
+			 xxveccar[1],xxveccar[2],xxveccar[3],
+			 //			 urad[1],urad[2],urad[3],
+			 //Rij[0][1],Rij[0][2],Rij[0][3]
+			 uradx[nodalindex],urady[nodalindex],uradz[nodalindex],
+			 Fx[nodalindex],Fy[nodalindex],Fz[nodalindex]
+			 );getchar();
+		}
+
 	      #endif
 	  
-	      /*
-	      printf("%d %d %d | %e %e %e | %e %e %e | %e %e | %e %e %e\n",ix,iy,iz,
-		     xxvec[1],xxvec[2],xxvec[3],
-		     xxveccar[1],xxveccar[2],xxveccar[3],
-		     rho[nodalindex],temp[nodalindex],
-		     vx[nodalindex],vy[nodalindex],vz[nodalindex]);getchar();
-	      */
+	      
+	      
 	    }
 	}
     }
@@ -592,6 +655,20 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   names[1] = strdup("F2");
   names[2] = strdup("F3");
   DBPutQuadvar(file, "rad_flux","mesh1", 3, names, vels, 
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  //rad rest frame velocity
+  vels[0]=uradx;
+  vels[1]=urady;
+  vels[2]=uradz;
+#ifdef SILO2D_XZPLANE
+  vels[1]=uradz;
+#endif
+  names[0] = strdup("urad1");
+  names[1] = strdup("urad2");
+  names[2] = strdup("urad3");
+  DBPutQuadvar(file, "rad_vel","mesh1", 3, names, vels, 
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   #endif
