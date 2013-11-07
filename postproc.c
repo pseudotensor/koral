@@ -151,6 +151,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //surface density (2) (column)
 	      profiles[0][ix]+=rho*dxph[1];
+
+	      //surface density in the inflow (23)
+	      if(utcon[1]<0.)
+		profiles[21][ix]+=rho*dxph[1];
+
+	      
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 
@@ -181,6 +187,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //rho-weighted minus radial velocity (4)
 	      profiles[2][ix]+=-utcon[1]*rho*dxph[1];
+
+	      //rho-weighted minus radial velocity in the inflow (24)
+	      if(utcon[1]<0.)
+		profiles[22][ix]+=-utcon[1]*rho*dxph[1];
+
 	      //abs optical depth (7)
 	      profiles[5][ix]+=tauabs[1];	
 	      //tot optical depth (8)
@@ -196,6 +207,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
+	  profiles[22][ix]/=profiles[21][ix];
 
 	  //normalizing by <(rho+u+bsq/2)u^r>
 	  //profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];

@@ -16,9 +16,8 @@ main(int argc, char **argv)
   int i;
   doingavg=0;
 
-  //print scalings GU->CGS
-  print_scalings(); return -1;
-  
+  //print scalings GU->CGS and quit
+  //print_scalings();   
   
   //gsl errors off
   gsl_set_error_handler_off();
