@@ -248,7 +248,7 @@ fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
       ldouble mdotscale = (rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.))/calc_mdotEdd();
       ldouble lumscale = (fluxGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.))/calc_lumEdd();
 
-      fprintf(fout_radprofiles,"# mdotGU2CGS: %e lumGU2CGS: %e\n",mdotscale,lumscale);
+      fprintf(fout_radprofiles,"# mdotGU2Edd: %e lumGU2Edd: %e\n",mdotscale,lumscale);
 
       int ix,iv;
       //calculating radial profiles

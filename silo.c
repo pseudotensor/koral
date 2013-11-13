@@ -52,6 +52,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *temp = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *forcebal1 = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *forcebal2 = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Omega = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *muBe = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  
 
   #ifdef TRACER
   ldouble *tracer = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -172,7 +175,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 	      
 	      //velocities etc
-	      ldouble vel[4],velprim[4];
+	      ldouble vel[4],vcov[4],velprim[4];
 	      ldouble Tit[4],Tij[4][4];
 	      ldouble dpdr; //d/dr (gdet * p)
 	      ldouble gracen; //gdet T^k_l Gamma^l_kr
@@ -188,6 +191,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  vel[3]=pp[VZ];
 		  
 		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);
+		  indices_21(vel,vcov,geomout.gg);
+ 
+		  Omega[nodalindex]=vel[3];
 
 		  calc_Tij(pp,&geomout,Tij);
 		  indices_2221(Tij,Tij,geomout.gg);
@@ -195,6 +201,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[1]=Tij[1][0];
 		  Tit[2]=Tij[2][0];
 		  Tit[3]=Tij[3][0];
+
+		  //muBe[nodalindex]=Tij[1][0]/(rho[nodalindex]*vel[1])-1.;
+		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
+				     GAMMA*uint[nodalindex]*vcov[0]+
+				     bsq[nodalindex])/rho[nodalindex]-1.;
 
 		  dpdr = (gdet2*GAMMA*get_u(p,UU,iix+1,iiy,iiz)-gdet1*GAMMA*get_u(p,UU,iix-1,iiy,iiz)) / (xx2[1]-xx1[1]);
 		  gracen=0.;
@@ -215,8 +226,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  vel[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
-
+		  indices_21(vel,vcov,geomout.gg);
+ 
 		  conv_vels_ut(vel,velprim,VEL4,VELPRIM,geomout.gg,geomout.GG);
+		 
+		  Omega[nodalindex]=vel[3];
 
 		  pp[VX]=vel[1]; //updates pp[VI] to have rho-weighted velocities there
 		  pp[VY]=vel[2];
@@ -234,6 +248,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[1]=Tij[1][0];
 		  Tit[2]=Tij[2][0];
 		  Tit[3]=Tij[3][0];
+
+		  //		  muBe[nodalindex]=Tij[1][0]/(rho[nodalindex]*vel[1])-1.;
+		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
+				     GAMMA*uint[nodalindex]*vcov[0]+
+				     bsq[nodalindex])/rho[nodalindex]-1.;
 
 		  dpdr = (gdet2*GAMMA*get_uavg(pavg,UU,iix+1,iiy,iiz)-gdet1*GAMMA*get_uavg(pavg,UU,iix-1,iiy,iiz)) / (xx2[1]-xx1[1]);
 		  gracen=0.;
@@ -546,6 +565,14 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		DB_DOUBLE, DB_NODECENT, optList);
 
   DBPutQuadvar1(file, "temp","mesh1", temp,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  DBPutQuadvar1(file, "omega","mesh1", Omega,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  DBPutQuadvar1(file, "muBe","mesh1", muBe,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 

@@ -371,7 +371,7 @@ calc_totalmass()
 ldouble
 calc_mdotEdd()
 {
-  ldouble mcgs=2.23e18*MASS; //g/s
+  ldouble mcgs=1.09649*2.23e18*MASS; //g/s
 
   //#ifdef CGSOUTPUT
   return mcgs;
@@ -457,22 +457,25 @@ calc_lum(ldouble radius,int type)
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
 	      dx[2]=2.*M_PI;
+	      dxph[0]=dx[0]*sqrt(geomBL.gg[1][1]);
+	      dxph[1]=dx[1]*sqrt(geomBL.gg[2][2]);
+	      dxph[2]=dx[2]*sqrt(geomBL.gg[3][3]);
 	      gdet=geomBL.gdet;
 
 	      PLOOP(iv)
 		pp[iv]=get_uavg(pavg,iv,ix,iy,iz);
 
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-	      calc_tautot(pp,xxBL,dx,tautot);
+	      calc_tautot(pp,xxBL,dxph,tautot);
 
 	      tau+=tautot[1];
 
 	      if(type==0) //R^r_t outside photosphere
 		{
 		  if(tau>1.) break;
-		  //prad_lab2on(pp,pp,&geomBL);
-		  //Fr=pp[FX(0)];	
-		  calc_Rij(pp,&geomBL,Rij); 
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
 		  indices_2221(Rij,Rij,geomBL.gg);
 		  Fr=-Rij[1][0];
 		  if(Fr<0.) Fr=0.;
@@ -486,7 +489,7 @@ calc_lum(ldouble radius,int type)
 		  indices_2221(Rij,Rij,geomBL.gg);
 		  ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  Fr=-Rij[1][0];// + ehat*uconr);
-		  if(uconr<0.) Fr=0.;
+		  if(uconr<0. || Fr<0.) Fr=0.;
 		}
 	      else
 		Fr=0.;
