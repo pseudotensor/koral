@@ -193,7 +193,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);
 		  indices_21(vel,vcov,geomout.gg);
  
-		  Omega[nodalindex]=vel[3];
+		  Omega[nodalindex]=vel[3]/vel[0];
 
 		  calc_Tij(pp,&geomout,Tij);
 		  indices_2221(Tij,Tij,geomout.gg);

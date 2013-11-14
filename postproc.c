@@ -371,7 +371,7 @@ calc_totalmass()
 ldouble
 calc_mdotEdd()
 {
-  ldouble mcgs=1.09649*2.23e18*MASS; //g/s
+  ldouble mcgs=1.09649*2.23e18*MASS; //g/s assuming eta=0.057
 
   //#ifdef CGSOUTPUT
   return mcgs;

@@ -710,7 +710,7 @@ fread_restartfile(int nout1, ldouble *t)
   if(nout1>=0)
     sprintf(fname,"dumps/res%04d.dat",nout1);
   else
-    sprintf(fname,"dumps/reslast.dat",nout1);
+    sprintf(fname,"dumps/reslast.dat");
   
   FILE *fdump=fopen(fname,"r");
 
