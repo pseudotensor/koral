@@ -10,7 +10,7 @@ fprint_profiles(ldouble t, ldouble totmass)
 //analytical profile of damped wave
 
 v1=RHOZERO+DRRE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DRIM/DRRE*sin(OMRE*t-KK*xx));
-v1-=rho;
+v1=((rho-RHOZERO))/(v1-RHOZERO);
 v2=UZERO+DURE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx)-DUIM/DURE*sin(OMRE*t-KK*xx));
 v3=0.+DV1RE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx))-DV1IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx) ; 
 v4=0.+DV2RE*exp(-OMIM*t)*(cos(OMRE*t-KK*xx))-DV2IM*exp(-OMIM*t)*sin(OMRE*t-KK*xx) ; 

@@ -9,7 +9,7 @@
 #define COPY_YBC
 #define COPY_ZBC
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define INT_ORDER 1
 
 #define GAMMA (ldouble)(5./3.)
@@ -32,9 +32,9 @@
 #define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-14
 
-#define NX 256
+#define NX 10
 
-#define NUMERO 1001
+#define NUMERO 1
 
 #if (NUMERO==1) //sonic wave
 #define KAPPA 0.
