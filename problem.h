@@ -73,7 +73,7 @@
 //67* LRTORUS - RMHD limo torus
 //68* RMHDWAVE - radiation modified linear magnetosonic waves
 
-#define PROBLEM 68
+#define PROBLEM 67
 
 #if(PROBLEM==68)
 
@@ -1297,7 +1297,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 23
+#define NRADPROFILES 26
 #endif
 
 #ifndef OUTVEL

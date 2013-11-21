@@ -244,7 +244,7 @@ fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
       char bufor[50],bufor2[50];
       sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
       fout_radprofiles=fopen(bufor,"w");
-      
+
       ldouble mdotscale = (rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.))/calc_mdotEdd();
       ldouble lumscale = (fluxGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.))/calc_lumEdd();
 

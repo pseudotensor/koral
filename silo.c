@@ -54,6 +54,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *forcebal2 = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Omega = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *muBe = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Qtheta = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+
   
 
   #ifdef TRACER
@@ -106,17 +108,36 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      iiz=iz;
 	      if(iiz>=NZ) iiz-=NZ;
 
+
 	      struct geometry geom;
 	      fill_geometry(iix,iiy,iiz,&geom);
 	      struct geometry geomout;
 	      fill_geometry_arb(iix,iiy,iiz,&geomout,OUTCOORDS);
 	      
+	      ldouble dxph[3],dx[3];
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[0]=fabs(xx2[1]-xx1[1]);
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[1]=fabs(xx2[2]-xx1[2]);
+	      dx[2]=2.*M_PI;
+	      dxph[0]=dx[0]*sqrt(geomout.gg[1][1]);
+	      dxph[1]=dx[1]*sqrt(geomout.gg[2][2]);
+	      dxph[2]=dx[2]*sqrt(geomout.gg[3][3]);
+
 	      get_xx(iix,iiy,iiz,xxvec);
 	      coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
 	      coco_N(xxvec,xxveccar,MYCOORDS,MINKCOORDS);
 	      ldouble r=xxvecsph[1];
 	      ldouble th=xxvecsph[2];
 	      ldouble ph=xxvecsph[3];
+
+
 
 	      //gdet and coordinates of cells +- 1 in radius
 	      ldouble gdet1,gdet2,gdet,gdetu;
@@ -208,6 +229,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 				     GAMMA*uint[nodalindex]*vcov[0]+
 				     bsq[nodalindex])/rho[nodalindex]-1.;
 
+		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
+		  
+
 		  dpdr = (gdet2*GAMMA*get_u(p,UU,iix+1,iiy,iiz)-gdet1*GAMMA*get_u(p,UU,iix-1,iiy,iiz)) / (xx2[1]-xx1[1]);
 		  gracen=0.;
 		  for(i=0;i<4;i++)
@@ -255,6 +279,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
 				     GAMMA*uint[nodalindex]*vcov[0]+
 				     bsq[nodalindex])/rho[nodalindex]-1.;
+
+		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
 
 		  dpdr = (gdet2*GAMMA*get_uavg(pavg,UU,iix+1,iiy,iiz)-gdet1*GAMMA*get_uavg(pavg,UU,iix-1,iiy,iiz)) / (xx2[1]-xx1[1]);
 		  gracen=0.;
@@ -367,8 +393,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      ldouble Rtt,ehat,ugas[4],urad[4],rvel[4],Rij[4][4],Gi[4];
 
-	      ldouble tauabsloc = vcon[0]*calc_kappa(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
-	      ldouble tautotloc = vcon[0]*calc_kappaes(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
+	      ldouble tauabsloc = vcon[0]*calc_kappa(rho[nodalindex],temploc,geomout.xx,geomout.yy,geomout.zz);
+	      ldouble tautotloc = vcon[0]*calc_kappaes(rho[nodalindex],temploc,geomout.xx,geomout.yy,geomout.zz);
 
 	      if(doingavg==0)
 		{
@@ -441,14 +467,14 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      	
 	      if(iy==0)
 		{
-		  tautot[nodalindex]=tautotloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
-		  tauabs[nodalindex]=tauabsloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  tautot[nodalindex]=tautotloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  tauabs[nodalindex]=tauabsloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
 		}
 	      else
 		{
 		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
-		  tautot[nodalindex]=tautot[nodalindex]+tautotloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
-		  tauabs[nodalindex]=tauabs[nodalindex]+tauabsloc*get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  tautot[nodalindex]=tautot[nodalindex]+tautotloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  tauabs[nodalindex]=tauabs[nodalindex]+tauabsloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
 		}
 
 	      //transform to cartesian
@@ -575,6 +601,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		DB_DOUBLE, DB_NODECENT, optList);
 
   DBPutQuadvar1(file, "muBe","mesh1", muBe,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  DBPutQuadvar1(file, "Qtheta","mesh1", Qtheta,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 

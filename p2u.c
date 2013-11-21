@@ -344,8 +344,9 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
     for(iv2=0;iv2<4;iv2++)
       avg[AVGRIJ(iv,iv2)]=Rij[iv][iv2];
 
-  for(iv=0;iv<4;iv++)
-    avg[AVGEHATUCON(iv)]=Ehat*ucon[iv];
+  //to uncomment for next runs
+  //for(iv=0;iv<4;iv++)
+  //      avg[AVGEHATUCON(iv)]=Ehat*ucon[iv];
 
 #endif
 

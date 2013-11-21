@@ -15,10 +15,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
   //adjust NRADPROFILES in problem.h
 
   int ix,iy,iz,iv,i,j;
-  ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,ucon[4],utcon[4],ucon3[4];
+  ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
   ldouble rhouconr,Tij[4][4],Rij[4][4],Trt,Rrt,bsq,bcon[4],bcov[4];
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
-  ldouble tautot[3],tauabs[3];
+  ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
 
   //search for appropriate radial index
@@ -31,6 +31,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
       for(iv=0;iv<NAVGVARS;iv++)
 	avgsums[iv][ix]=0.;
+
+      tautot=tauabs=0.;
 
  #ifdef BHDISK_PROBLEMTYPE
      if(NZ==1) //phi-symmetry
@@ -85,14 +87,17 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      dxph[0]=dx[0]*sqrt(geomBL.gg[1][1]);
 	      dxph[1]=dx[1]*sqrt(geomBL.gg[2][2]);
 	      dxph[2]=dx[2]*sqrt(geomBL.gg[3][3]);
-	      
 
+
+	
 	      if(doingavg)
 		{
 		  
 	
 		  rho=get_uavg(pavg,RHO,ix,iy,iz);
+		  uint=get_uavg(pavg,UU,ix,iy,iz);
 		  bsq=get_uavg(pavg,AVGBSQ,ix,iy,iz);
+		  utcon[0]=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
@@ -117,6 +122,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      else
 		{
 		  rho=pp[0];
+		  uint=pp[1];
 		  utcon[1]=pp[2];
 		  utcon[2]=pp[3];
 		  utcon[3]=pp[4];
@@ -127,7 +133,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  bsq = dot(bcon,bcov);
 #endif
 
-		  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+		  conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 		  rhouconr=rho*utcon[1];
 
 		  calc_Tij(pp,&geomBL,Tij);
@@ -145,9 +151,19 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 
 	      
-	      calc_tautot(pp,xxBL,dx,tautot);
-	      calc_tauabs(pp,xxBL,dx,tauabs);
+	      //calc_tautot(pp,xxBL,dx,tautot);
+	      //calc_tauabs(pp,xxBL,dx,tauabs);
 
+	      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
+	      
+	      ldouble tauabsloc = utcon[0]*calc_kappa(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
+	      ldouble tautotloc = utcon[0]*calc_kappaes(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
+
+	      tautot+=tautotloc*dxph[1];
+	      tauabs+=tauabsloc*dxph[1];
+
+
+	
 
 	      //surface density (2) (column)
 	      profiles[0][ix]+=rho*dxph[1];
@@ -162,6 +178,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //total mhd energy flux (14)
 	      profiles[12][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
+	      //opt thin mhd energy flux (25)
+	      if(tautot<1.)
+		profiles[23][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 	      //outflowin mhd energy flux (15)
 	      if(utcon[1]>0.)
 		profiles[13][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
@@ -171,6 +190,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
+	      //opt. thin rad energy flux (26)
+	      if(tautot<1.)
+		profiles[24][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 	      //outflowin rad energy flux (18)
 	      if(utcon[1]>0.)
 		profiles[16][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
@@ -181,6 +203,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //outflowin mass flux (20)
 	      if(utcon[1]>0.)
 		profiles[18][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
+	      //opt. thin mass flux (27)
+	      if(tautot<1.)
+		profiles[25][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
 	      //jet mass flux (21)
 	      if(utcon[1]>0. && bsq>rho)
 		profiles[19][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
@@ -193,9 +218,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[22][ix]+=-utcon[1]*rho*dxph[1];
 
 	      //abs optical depth (7)
-	      profiles[5][ix]+=tauabs[1];	
+	      profiles[5][ix]=tauabs;	
 	      //tot optical depth (8)
-	      profiles[6][ix]+=tautot[1];
+	      profiles[6][ix]=tautot;
 
 	      for(iv=0;iv<NV+NAVGVARS;iv++)
 		avgsums[iv][ix]+=get_uavg(pavg,iv,ix,iy,iz)*dxph[1];
@@ -204,6 +229,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //profiles[3][ix]+=get_uavg(pavg,AVGWUCON(1),ix,iy,iz)*get_uavg(pavg,AVGUCOV(3),ix,iy,iz)*dxph[1];
 	      profiles[3][ix]+=get_uavg(pavg,AVGRHOUCOV(3),ix,iy,iz)*dxph[1];
 	    }
+
+
 
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
