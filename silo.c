@@ -175,7 +175,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 	      
 	      //velocities etc
-	      ldouble vel[4],vcov[4],velprim[4];
+	      ldouble vel[4],vcov[4],vcon[4],velprim[4];
 	      ldouble Tit[4],Tij[4][4];
 	      ldouble dpdr; //d/dr (gdet * p)
 	      ldouble gracen; //gdet T^k_l Gamma^l_kr
@@ -191,6 +191,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  vel[3]=pp[VZ];
 		  
 		  conv_vels(vel,vel,VELPRIM,VEL4,geomout.gg,geomout.GG);
+		  for(i=0;i<4;i++) vcon[i]=vel[i];
 		  indices_21(vel,vcov,geomout.gg);
  
 		  Omega[nodalindex]=vel[3]/vel[0];
@@ -226,11 +227,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  vel[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+		  for(i=0;i<4;i++) vcon[i]=vel[i];
 		  indices_21(vel,vcov,geomout.gg);
  
 		  conv_vels_ut(vel,velprim,VEL4,VELPRIM,geomout.gg,geomout.GG);
 		 
-		  Omega[nodalindex]=vel[3];
+		  Omega[nodalindex]=vel[3]/vel[0];
 
 		  pp[VX]=vel[1]; //updates pp[VI] to have rho-weighted velocities there
 		  pp[VY]=vel[2];
@@ -365,8 +367,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      ldouble Rtt,ehat,ugas[4],urad[4],rvel[4],Rij[4][4],Gi[4];
 
-	      ldouble tauabsloc = calc_kappa(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
-	      ldouble tautotloc = calc_kappaes(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
+	      ldouble tauabsloc = vcon[0]*calc_kappa(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
+	      ldouble tautotloc = vcon[0]*calc_kappaes(pp[RHO],temploc,geomout.xx,geomout.yy,geomout.zz);
 
 	      if(doingavg==0)
 		{

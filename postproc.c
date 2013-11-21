@@ -468,7 +468,10 @@ calc_lum(ldouble radius,int type)
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 	      calc_tautot(pp,xxBL,dxph,tautot);
 
-	      tau+=tautot[1];
+	      ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
+
+	      tau+=ucont*tautot[1];
 
 	      if(type==0) //R^r_t outside photosphere
 		{
@@ -487,7 +490,7 @@ calc_lum(ldouble radius,int type)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
 		  indices_2221(Rij,Rij,geomBL.gg);
-		  ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+
 		  Fr=-Rij[1][0];// + ehat*uconr);
 		  if(uconr<0. || Fr<0.) Fr=0.;
 		}
@@ -505,7 +508,12 @@ calc_lum(ldouble radius,int type)
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 	      calc_tautot(pp,xxBL,dx,tautot);
 
-	      tau+=tautot[1];
+	      ucongas[1]=pp[2];
+	      ucongas[2]=pp[3];
+	      ucongas[3]=pp[4];	      
+	      conv_vels(ucongas,ucongas,VELPRIM,VEL4,geom.gg,geom.GG);
+
+	      tau+=ucongas[0]*tautot[1];
 
 	      if(type==0) //R^r_t outside photosphere
 		{
@@ -523,10 +531,6 @@ calc_lum(ldouble radius,int type)
 		  //ehat=-Rtt;
 		  calc_Rij(pp,&geom,Rij); 
 		  indices_2221(Rij,Rij,geom.gg);
-		  ucongas[1]=pp[2];
-		  ucongas[2]=pp[3];
-		  ucongas[3]=pp[4];	      
-		  conv_vels(ucongas,ucongas,VELPRIM,VEL4,geom.gg,geom.GG);
 		  Fr=-Rij[1][0];// + ehat*ucongas[1];
 		  if(ucongas[1]<0.)
 		    Fr=0.;
