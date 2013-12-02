@@ -88,7 +88,7 @@
 //global variables (allocated or not in misc.c)
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
   *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
-  *dut0,*dut1,*dut2,*dut3,
+  *dut0,*dut1,*dut2,*dut3,*uforget,*drt0,*drt1,*drt2,*drt3,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pinit,*pproblem1,*pproblem2,*emf,
   *ptm1,*ptm2,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,*pavg,
   *pbLx,*pbRx,*pbLy,*pbRy,*pbLz,*pbRz,*sbLx,*sbRx,*sbLy,*sbRy,*sbLz,*sbRz,*ubLx,*ubRx,*ubLy,*ubRy,*ubLz,*ubRz,
@@ -198,8 +198,8 @@ int solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase);
 int cell_fixup_rad();
 int cell_fixup_hd();
 ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz);
-int op_explicit(ldouble t, ldouble dt,ldouble *,ldouble *);
-int op_implicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff);
+int op_explicit(ldouble t, ldouble dt,ldouble *);
+int op_implicit(ldouble t, ldouble dt,ldouble *ubase);
 int set_grid(ldouble*, ldouble*, ldouble*,ldouble*);
 int print_grid(ldouble,ldouble,ldouble);
 ldouble fd_flux_limiter(ldouble r);
@@ -211,6 +211,8 @@ int copy_u(ldouble,ldouble*,ldouble*);
 int copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N );
 int add_u(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble *u3);
 int add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3,int N);
+int add_u_3(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble f3, ldouble *u3, ldouble *u4);
+int add_u_core_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble *uu3, ldouble *uu4,int N);
 ldouble f_timeder_source_term(ldouble t, const ldouble y[], ldouble f[],  void *params);
 
 int set_bc(ldouble,int);

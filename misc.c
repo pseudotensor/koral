@@ -176,6 +176,11 @@ initialize_arrays()
   dut1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   dut2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   dut3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  drt0=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  drt1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  drt2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  drt3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  uforget=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   u_bak=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   p_bak=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
@@ -292,6 +297,11 @@ free_arrays()
   free(dut1);
   free(dut2);
   free(dut3);
+  free(drt0);
+  free(drt1);
+  free(drt2);
+  free(drt3);
+  free(uforget);
   free(u_bak);
   free(p_bak);
 

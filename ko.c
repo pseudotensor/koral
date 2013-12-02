@@ -221,69 +221,36 @@ solve_the_problem(ldouble tstart)
       //**********************************************************************
       //**********************************************************************
       
-     if(TIMESTEPPING==RK2K2)
+      if(TIMESTEPPING==RK2IMEX)
 	{
-	  /*
-	  //1st
-	  f_timeder (t,.5*dt,ut0); //updates u
-	  //2nd
-	  f_timeder (t,dt,ut1); //in ut1 midpoint
-	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
-	  //together     
-	  t+=dt;    
-	  add_u(1.,ut0,1.,ut2,u);
-	  */
-
-	  //******************************* RK2 **********************************
-	  //1st
-	  op_explicit (t,.5*dt,ut0,dut0); 
-	  op_implicit (t,.5*dt,ut3,dut0); 
-	  //2nd
-	  op_explicit (t,dt,ut1,dut0); 
-	  op_implicit (t,dt,ut3,dut0); 
-	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
-	  //together     
-	  t+=dt;    
-	  add_u(1.,ut0,1.,ut2,u);
-	  //************************** end of RK2 **********************************
+	  ldouble gamma=1.-1./sqrt(2.);
+	  op_implicit (t,dt*gamma,ut0); //U(n) in *ut0;  U(1) in *u
+	  add_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
+	  op_explicit (t,dt,ut1); //U(1) in *ut1; 
+	  add_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
+	  add_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
+	  op_implicit (t,gamma*dt,uforget); //U(2) in *u
+	  add_u(1./(dt*gamma),u,-1./(dt*gamma),uforget,drt2); //R(U(2)) in *drt2;
+	  op_explicit (t,dt,ut2); //U(2) in *ut2; 
+	  add_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
+	  add_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
+	  add_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
+	  t+=dt;
 	}
-     else if(TIMESTEPPING==RK2K1K2)
-	{
-	  //******************************* RK2 **********************************
-	  //1st
-	  op_explicit (t,dt,ut0,dut0); //updates u
-	  add_u(1.,u,-1.,ut0,ut1); //k1 in ut1
-	  //midpoint
-	  add_u(1.,ut0,.5,ut1,u);
-	  //2nd
-	  t+=.5*dt;
-	  op_explicit (t,dt,ut2,dut0); 
-	  add_u(1.,u,-1.,ut2,ut2); //k2 in ut2
-	  //together     
-	  t+=.5*dt;    
-	  add_u(1.,ut0,.5,ut1,u);
-	  add_u(1.,u,.5,ut2,u);
-	  //************************** end of RK2 **********************************
-	}
-     else if(TIMESTEPPING==RK3)
-	{
-	  //******************************* RK3 **********************************
-	  //1st
-	  op_explicit (t,dt,ut0,dut0);  
-	  copy_u(1.,u,ut1);
-	  //2nd
-	  op_explicit (t,dt,ut2,dut0); 
-	  add_u(1.,u,-1.,ut2,ut2);   
-	  add_u(.75,ut0,.25,ut1,u);
-	  add_u(1.,u,.25,ut2,u);      
-	  //3rd
-	  op_explicit (t,dt,ut2,dut0); 
-	  add_u(1.,u,-1.,ut2,ut3);   
-	  //together     
-	  t+=dt;    
-	  add_u(1./3.,ut0,2./3.,ut2,u);
-	  add_u(1.,u,2./3.,ut3,u);      
-	  //************************** end of RK3 **********************************/
+     else if(TIMESTEPPING==RK2)
+       { 
+	 //******************************* RK2 **********************************
+	 //1st
+	 op_explicit (t,.5*dt,ut0); 
+	 op_implicit (t,.5*dt,ut3); 
+	 //2nd
+	 op_explicit (t,dt,ut1); 
+	 op_implicit (t,dt,ut3); 
+	 add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
+	 //together     
+	 t+=dt;    
+	 add_u(1.,ut0,1.,ut2,u);
+	 //************************** end of RK2 **********************************
 	}
      else 
        my_err("wrong time stepping specified\n");

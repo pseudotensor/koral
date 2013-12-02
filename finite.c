@@ -337,10 +337,9 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 /* the advective plus metric operator  *************/
 /* applied explicitly using Lax-Friedrcich fluxes **/
 /* starts from *u, copies to *ubase, updates *u, ***/
-/* puts the difference in *udiff *******************/
 /***************************************************/
 int
-op_explicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff) 
+op_explicit(ldouble t, ldouble dt,ldouble *ubase) 
 {
   int ix,iy,iz,iv,ii;
 
@@ -838,9 +837,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff)
 #endif //SKIPRADSOURCE
 #endif //RADIATION
 
-   //calculating difference
-   add_u(1.,u,-1.,ubase,udiff);  
-
+   
    //**********************************************************************
    //**********************************************************************
    //**********************************************************************
@@ -852,17 +849,17 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff)
 /***************************************************/
 /* the radiative implcit source term operator ******/
 /* starts from *u, copies to *ubase, updates *u, ***/
-/* puts the difference in *udiff *******************/
 /***************************************************/
 int
-op_implicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff) 
+op_implicit(ldouble t, ldouble dt,ldouble *ubase) 
 {
-#ifdef RADIATION
+  copy_u(1., u, ubase);
 
   /************************************************************************/
   /******** implicit **** RADIATION ***************************************/
   /************************************************************************/
 
+#ifdef RADIATION
 #ifndef SKIPRADSOURCE
 #ifdef IMPLICIT_LAB_RAD_SOURCE
   int ix,iy,iz,iv,ii;
@@ -874,10 +871,6 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff)
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
-
-      //parasite
-      PLOOP(iv)
-	set_u(ubase,iv,ix,iy,iz,get_u(u,iv,ix,iy,iz));
       
       calc_primitives(ix,iy,iz,0);
 
@@ -891,9 +884,7 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff)
 #endif //SKIPRADSOURCE
 #endif //RADIATION
 
-  //calculating difference
-  add_u(1.,u,-1.,ubase,udiff);  
-
+  
   return 0;
 }
 
@@ -1844,6 +1835,25 @@ int
 add_u(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3)
 {
   add_u_core(f1,uu1,f2,uu2,uu3,SX*SY*SZ*NV);
+  return 0;
+}
+
+//array multiplication plus addition on 3 matrices
+//uu3=f1*uu1+f2*uu2
+int 
+add_u_core_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble *uu3, ldouble *uu4,int N)
+{
+  int i;
+#pragma omp parallel for private (i) 
+  for (i=0;i<N;i++)
+    uu4[i]=uu1[i]*f1+uu2[i]*f2+uu3[i]*f3;
+  return 0;
+}
+
+int 
+add_u_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble *uu3, ldouble *uu4)
+{
+  add_u_core_3(f1,uu1,f2,uu2,f3,uu3,uu4,SX*SY*SZ*NV);
   return 0;
 }
 

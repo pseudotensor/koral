@@ -70,7 +70,7 @@
 //67 LRTORUS - RMHD limo torus
 //68 RMHDWAVE - radiation modified linear magnetosonic waves
 
-#define PROBLEM 6
+#define PROBLEM 8
 
 #if(PROBLEM==68)
 
@@ -1214,7 +1214,7 @@
 #endif
 
 #ifndef TIMESTEPPING
-#define TIMESTEPPING RK2 //time stepping
+#define TIMESTEPPING RK2IMEX //time stepping
 #endif
 
 #ifndef NG

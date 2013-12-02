@@ -83,11 +83,8 @@
 #define HLL_FLUX 1
 
 //timestepping
-#define RK2 2
-#define RK2K2 2
-#define RK2K1K2 3
-#define RK3 4
-#define RK4 5
+#define RK2IMEX 1
+#define RK2 0
 
 //types of hd/rad viscosity
 #define NOVISCOSITY 0
