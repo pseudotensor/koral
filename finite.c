@@ -333,11 +333,14 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   return 0;
 }
 
-/**********************************************/
-/* main time derivative routine, AIO ***********/
-/**********************************************/
+/***************************************************/
+/* the advective plus metric operator  *************/
+/* applied explicitly using Lax-Friedrcich fluxes **/
+/* starts from *u, copies to *ubase, updates *u, ***/
+/* puts the difference in *udiff *******************/
+/***************************************************/
 int
-f_timeder (ldouble t, ldouble dt,ldouble *ubase) 
+op_explicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff) 
 {
   int ix,iy,iz,iv,ii;
 
@@ -806,53 +809,92 @@ f_timeder (ldouble t, ldouble dt,ldouble *ubase)
    //**********************************************************************
    //**********************************************************************
 
+#ifdef RADIATION
 
- //again over cells - source terms
+   /************************************************************************/
+   /********* explicit *** RADIATION ***************************************/
+   /************************************************************************/
+
+#ifndef SKIPRADSOURCE
+#ifdef EXPLICIT_LAB_RAD_SOURCE
+
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-   for(ii=0;ii<Nloop_0;ii++) //domain 
+  for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      /************************************************************************/
-      /********************** RADIATION ***************************************/
-      /************************************************************************/
-#ifndef SKIPRADSOURCE
-#ifdef RADIATION
-
       //no need for it - already updated
       //calc_primitives(ix,iy,iz,0);
 
-#ifdef IMPLICIT_LAB_RAD_SOURCE
-      implicit_lab_rad_source_term(ix,iy,iz,dt);
-#endif
-
-#ifdef EXPLICIT_RAD_SOURCE
       explicit_rad_source_term(ix,iy,iz,dt);
-#endif
-
-
-#endif //RADIATION
-#endif //SKIPRADSOURCE
-
-      /************************************************************************/
-      /************************************************************************/
-      /************************************************************************/
-
     } //source terms
 
-      //************************************
-      //************************************
+  //no need of radiative fixup here after source term 
+  //cell_fixup_rad();
 
-   //fixup here after source term 
-   cell_fixup_rad();
+#endif //EXPLICIT_LAB
+#endif //SKIPRADSOURCE
+#endif //RADIATION
+
+   //calculating difference
+   add_u(1.,u,-1.,ubase,udiff);  
 
    //**********************************************************************
    //**********************************************************************
    //**********************************************************************
 
   return GSL_SUCCESS;
+}
+
+
+/***************************************************/
+/* the radiative implcit source term operator ******/
+/* starts from *u, copies to *ubase, updates *u, ***/
+/* puts the difference in *udiff *******************/
+/***************************************************/
+int
+op_implicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff) 
+{
+#ifdef RADIATION
+
+  /************************************************************************/
+  /******** implicit **** RADIATION ***************************************/
+  /************************************************************************/
+
+#ifndef SKIPRADSOURCE
+#ifdef IMPLICIT_LAB_RAD_SOURCE
+  int ix,iy,iz,iv,ii;
+
+  //again over cells - source terms
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  for(ii=0;ii<Nloop_0;ii++) //domain 
+    {
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+
+      //parasite
+      PLOOP(iv)
+	set_u(ubase,iv,ix,iy,iz,get_u(u,iv,ix,iy,iz));
+      
+      calc_primitives(ix,iy,iz,0);
+
+      implicit_lab_rad_source_term(ix,iy,iz,dt);
+    } //source terms
+
+   //fixup here after source term 
+  cell_fixup_rad();
+
+#endif //IMPLICIT_LAB_RAD_SOURCE
+#endif //SKIPRADSOURCE
+#endif //RADIATION
+
+  //calculating difference
+  add_u(1.,u,-1.,ubase,udiff);  
+
+  return 0;
 }
 
 //************************************************************************

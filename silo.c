@@ -71,17 +71,17 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *Edotz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 
 
- #ifdef MAGNFIELD
+  #ifdef MAGNFIELD
   ldouble *bsq = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *By = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *phi = (ldouble*)malloc(nx*ny*nz*sizeof(double));
-  ldouble *tautot = (ldouble*)malloc(nx*ny*nz*sizeof(double));
-  ldouble *tauabs = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   #endif
 
   #ifdef RADIATION
+  ldouble *tautot = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *tauabs = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *forcebal3 = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Erad = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Ehat = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -180,6 +180,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 
 	      //magnetic fields
+#ifdef MAGNFIELD
 	      ldouble bcon[4],bcov[4];
 	      if(doingavg==0)
 		{
@@ -194,6 +195,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  bcon[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
 		  bsq[nodalindex]=get_uavg(pavg,AVGBSQ,ix,iy,iz);
 		}
+#endif
 	      
 	      //velocities etc
 	      ldouble vel[4],vcov[4],vcon[4],velprim[4];
@@ -206,7 +208,6 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		{
 		  rho[nodalindex]=pp[RHO];
 		  uint[nodalindex]=pp[UU];
-		  w=rho[nodalindex]+GAMMA*uint[nodalindex]+bsq[nodalindex];
 		  vel[1]=pp[VX];
 		  vel[2]=pp[VY];
 		  vel[3]=pp[VZ];
@@ -225,11 +226,14 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[3]=Tij[3][0];
 
 		  //muBe[nodalindex]=Tij[1][0]/(rho[nodalindex]*vel[1])-1.;
+		  #ifdef MAGNFIELD
 		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
 				     GAMMA*uint[nodalindex]*vcov[0]+
 				     bsq[nodalindex])/rho[nodalindex]-1.;
 
+
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
+                  #endif
 		  
 
 		  dpdr = (gdet2*GAMMA*get_u(p,UU,iix+1,iiy,iiz)-gdet1*GAMMA*get_u(p,UU,iix-1,iiy,iiz)) / (xx2[1]-xx1[1]);
@@ -245,7 +249,6 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		{
 		  rho[nodalindex]=get_uavg(pavg,RHO,ix,iy,iz);
 		  uint[nodalindex]=get_uavg(pavg,UU,ix,iy,iz);
-		  w=rho[nodalindex]+GAMMA*uint[nodalindex]+bsq[nodalindex];
 		 
 		  vel[0]=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
@@ -275,12 +278,14 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[2]=Tij[2][0];
 		  Tit[3]=Tij[3][0];
 
+		  #ifdef MAGNFIELD
 		  //		  muBe[nodalindex]=Tij[1][0]/(rho[nodalindex]*vel[1])-1.;
 		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
 				     GAMMA*uint[nodalindex]*vcov[0]+
 				     bsq[nodalindex])/rho[nodalindex]-1.;
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
+		  #endif
 
 		  dpdr = (gdet2*GAMMA*get_uavg(pavg,UU,iix+1,iiy,iiz)-gdet1*GAMMA*get_uavg(pavg,UU,iix-1,iiy,iiz)) / (xx2[1]-xx1[1]);
 		  gracen=0.;

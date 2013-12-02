@@ -86,7 +86,9 @@
 #define gSIZE 20 //size of metric arrays = 16 + 1 (gdet) + 3 (dlgdet)
 
 //global variables (allocated or not in misc.c)
-ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,*u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
+ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
+  *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
+  *dut0,*dut1,*dut2,*dut3,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pinit,*pproblem1,*pproblem2,*emf,
   *ptm1,*ptm2,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,*pavg,
   *pbLx,*pbRx,*pbLy,*pbRy,*pbLz,*pbRz,*sbLx,*sbRx,*sbLy,*sbRy,*sbLz,*sbRz,*ubLx,*ubRx,*ubLy,*ubRy,*ubLz,*ubRz,
@@ -196,7 +198,8 @@ int solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase);
 int cell_fixup_rad();
 int cell_fixup_hd();
 ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz);
-int f_timeder (ldouble t, ldouble dt,ldouble *);
+int op_explicit(ldouble t, ldouble dt,ldouble *,ldouble *);
+int op_implicit(ldouble t, ldouble dt,ldouble *ubase,ldouble *udiff);
 int set_grid(ldouble*, ldouble*, ldouble*,ldouble*);
 int print_grid(ldouble,ldouble,ldouble);
 ldouble fd_flux_limiter(ldouble r);

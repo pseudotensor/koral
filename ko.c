@@ -223,11 +223,24 @@ solve_the_problem(ldouble tstart)
       
      if(TIMESTEPPING==RK2K2)
 	{
-	  //******************************* RK2 **********************************
+	  /*
 	  //1st
 	  f_timeder (t,.5*dt,ut0); //updates u
 	  //2nd
 	  f_timeder (t,dt,ut1); //in ut1 midpoint
+	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
+	  //together     
+	  t+=dt;    
+	  add_u(1.,ut0,1.,ut2,u);
+	  */
+
+	  //******************************* RK2 **********************************
+	  //1st
+	  op_explicit (t,.5*dt,ut0,dut0); 
+	  op_implicit (t,.5*dt,ut3,dut0); 
+	  //2nd
+	  op_explicit (t,dt,ut1,dut0); 
+	  op_implicit (t,dt,ut3,dut0); 
 	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
 	  //together     
 	  t+=dt;    
@@ -238,13 +251,13 @@ solve_the_problem(ldouble tstart)
 	{
 	  //******************************* RK2 **********************************
 	  //1st
-	  f_timeder (t,dt,ut0); //updates u
+	  op_explicit (t,dt,ut0,dut0); //updates u
 	  add_u(1.,u,-1.,ut0,ut1); //k1 in ut1
 	  //midpoint
 	  add_u(1.,ut0,.5,ut1,u);
 	  //2nd
 	  t+=.5*dt;
-	  f_timeder (t,dt,ut2); 
+	  op_explicit (t,dt,ut2,dut0); 
 	  add_u(1.,u,-1.,ut2,ut2); //k2 in ut2
 	  //together     
 	  t+=.5*dt;    
@@ -256,15 +269,15 @@ solve_the_problem(ldouble tstart)
 	{
 	  //******************************* RK3 **********************************
 	  //1st
-	  f_timeder (t,dt,ut0);  
+	  op_explicit (t,dt,ut0,dut0);  
 	  copy_u(1.,u,ut1);
 	  //2nd
-	  f_timeder (t,dt,ut2); 
+	  op_explicit (t,dt,ut2,dut0); 
 	  add_u(1.,u,-1.,ut2,ut2);   
 	  add_u(.75,ut0,.25,ut1,u);
 	  add_u(1.,u,.25,ut2,u);      
 	  //3rd
-	  f_timeder (t,dt,ut2); 
+	  op_explicit (t,dt,ut2,dut0); 
 	  add_u(1.,u,-1.,ut2,ut3);   
 	  //together     
 	  t+=dt;    

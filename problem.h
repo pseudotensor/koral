@@ -3,77 +3,74 @@
 
 //available problems:
 
-//* denotes tested and working problems
-//(if you need more, email me :)
-
-//1* RADBEAM2D - beam of light 
-//2* RADINFALL - radial inflow
-//3* DONUT - 2d Polish donut
+//1 RADBEAM2D - beam of light 
+//2 RADINFALL - radial inflow
+//3 DONUT - 2d Polish donut
 //4 GEODESICINFALL - geodesic infall with blobs or not
 //5 EDDINFALL - infall with flux from inside
-//6* RADTUBE- radiative shock tubes as in Farris et al 09 - assumes Edd.approximation which is currently not handled
-//7* BONDI - like in Fragile's paper
-//8* HDTUBE - relativistic shock tube
+//6 RADTUBE- radiative shock tubes as in Farris et al 09
+//7 BONDI - like in Fragile's paper
+//8 HDTUBE - relativistic shock tube
 //9 HDTUBE2D - in 2d
-//10* RADPULSE - radiative blob spreading around
-//11* RADSHADOW - radiative shadow
-//12* RADATM - atmosphere enlighted
+//10 RADPULSE - radiative blob spreading around
+//11 RADSHADOW - radiative shadow
+//12 RADATM - atmosphere enlighted
 //13 DONUTOSC - 2d Polish donut oscillating
 //14 RADWAVEBC - 1d linear rad wave imposed on boundary
-//15* RADWAVE - 1d linear rad wave with periodic BC
+//15 RADWAVE - 1d linear rad wave with periodic BC
 //16 RADPULSE3D - radiative blob spreading around
-//17* RADDBLSHADOW - radiative shadow with two beams inclined
+//17 RADDBLSHADOW - radiative shadow with two beams inclined
 //18 ATMSTATIC - hydro atmosphere 
-//19* RADBEAM2DKS - beam of light in KS coordinates
+//19 RADBEAM2DKS - beam of light in KS coordinates
 //20 ATMKS - radial atmosphere infalling in KS
 //21 DONUTKS - 2d Polish donut in KS
-//22* DONUTMKS1 - 2d Polish donut in MKS1
+//22 DONUTMKS1 - 2d Polish donut in MKS1
 //23 ATMMKS1 - radial atmosphere infalling in MKS1
-//24* RADBEAMFLAT - beam of light in Cartesian 
-//25* RDONUT - 2d radiative Polish donut in KS
-//26* RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
-//27* RADFLATNESS - flat but with non-zero four-force
-//28* BOWSHOCK - bow shock hydro test
-//29* RADWALL - flat with wall
-//30* RADNT - emission from midplane
-//31* FLATDISK - emission from flat disk
-//32* CYLBEAM - beam towards the axis in cylindrical
-//33* RADDOT - radiating dots
-//34* MFPULSE - multi fluid pulse
-//35* MFBEAMS - multi fluid colliding beams
-//36* MFDOTS - multi fluid radiating dots
-//37* MFCYLBEAM - beam towards the axis in cylindrical with multifluids
-//40* CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
-//41* FLATDOT - dot which may be bigger than a dot
-//42* RVDONUT - radiative and viscous dougnut
-//43* RVDONUTIN - radiative and viscous dougnut inflowing
-//44* RADNTCYL - emission from midplane in cylindrical
-//45* MFRADNTCYL - multi fluid emission from midplane in cylindrical
-//46* MFRADNTSPH - multi fluid emission from midplane in spherical
+//24 RADBEAMFLAT - beam of light in Cartesian 
+//25 RDONUT - 2d radiative Polish donut in KS
+//26 RADBEAM2DKSVERT - 2d radiative beam in r,theta plane
+//27 RADFLATNESS - flat but with non-zero four-force
+//28 BOWSHOCK - bow shock hydro test
+//29 RADWALL - flat with wall
+//30 RADNT - emission from midplane
+//31 FLATDISK - emission from flat disk
+//32 CYLBEAM - beam towards the axis in cylindrical
+//33 RADDOT - radiating dots
+//34 MFPULSE - multi fluid pulse
+//35 MFBEAMS - multi fluid colliding beams
+//36 MFDOTS - multi fluid radiating dots
+//37 MFCYLBEAM - beam towards the axis in cylindrical with multifluids
+//40 CYLBEAMCART - similar to discrete CYLBEAM but in cartesian 
+//41 FLATDOT - dot which may be bigger than a dot
+//42 RVDONUT - radiative and viscous dougnut
+//43 RVDONUTIN - radiative and viscous dougnut inflowing
+//44 RADNTCYL - emission from midplane in cylindrical
+//45 MFRADNTCYL - multi fluid emission from midplane in cylindrical
+//46 MFRADNTSPH - multi fluid emission from midplane in spherical
 //47 MFDONUT - inflowing donut with radiation/viscosity and multi-fluids
-//48* RVDTEST - testing the entropy near the axis
-//49* RVRING - 1d donut ring
-//50* HDWAVE - hydro wave for testing entropy
-//51* HUBBLE - hubble-type test as in the WHAM paper
-//52* SPHFLAT - spherical flat to test Christoffels
-//53* 1DDONUT - 1d donut equatorial plane structure
-//54* RVDISK - viscous rad. disk damped from larger radius
-//55* G2STATIC - cloud through static atmosphere
-//56* EDDSPH - 1d Edd Sphere
-//57* LIMOTORUS - torus from Bob's/Akshay's paper
-//58* LUKE - beam hitting a net gas flow
-//59* BBBLOB - rad blobs
-//60* JONTESTS - testing jon's fails.dat
-//61* MAGTESTS - simple mag tests
-//62* MAGTUBES - magnetic tubes
-//63* ORSZAG - Orszag-Tang vortex
-//64* MAGDONUT - MHD donut with poloidal magnetic fields
-//65* MRTORUS - RMHD torus with radiation
-//66* KTORUS - RMHD Newtonian torus with radiation
-//67* LRTORUS - RMHD limo torus
-//68* RMHDWAVE - radiation modified linear magnetosonic waves
+//48 RVDTEST - testing the entropy near the axis
+//49 RVRING - 1d donut ring
+//50 HDWAVE - hydro wave for testing entropy
+//51 HUBBLE - hubble-type test as in the WHAM paper
+//52 SPHFLAT - spherical flat to test Christoffels
+//53 1DDONUT - 1d donut equatorial plane structure
+//54 RVDISK - viscous rad. disk damped from larger radius
+//55 G2STATIC - cloud through static atmosphere
+//56 EDDSPH - 1d Edd Sphere
+//57 LIMOTORUS - torus from Bob's/Akshay's paper
+//58 LUKE - beam hitting a net gas flow
+//59 BBBLOB - rad blobs
+//60 JONTESTS - testing jon's fails.dat
+//61 MAGTESTS - simple mag tests
+//62 MAGTUBES - magnetic tubes
+//63 ORSZAG - Orszag-Tang vortex
+//64 MAGDONUT - MHD donut with poloidal magnetic fields
+//65 MRTORUS - RMHD torus with radiation
+//66 KTORUS - RMHD Newtonian torus with radiation
+//67 LRTORUS - RMHD limo torus
+//68 RMHDWAVE - radiation modified linear magnetosonic waves
 
-#define PROBLEM 67
+#define PROBLEM 6
 
 #if(PROBLEM==68)
 
