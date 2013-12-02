@@ -78,7 +78,7 @@
 #define MUGAS 1. //mean molecular weight (default = 1)
 
 //problem specific definitions
-#define NTUBE 2
+#define NTUBE 3
 
 #undef SIGMA_RAD
 #if (NTUBE==1)

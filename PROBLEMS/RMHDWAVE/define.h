@@ -27,14 +27,14 @@
 
 #define RADOUTPUTINFF
 #define CALCL1_RMHDWAVE
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2IMEX
 
 #define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-14
 
-#define NX 10
+#define NX 64
 
-#define NUMERO 1
+#define NUMERO 1102
 
 #if (NUMERO==1) //sonic wave
 #define KAPPA 0.
