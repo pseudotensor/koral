@@ -4039,30 +4039,37 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   */
 
   //limiting basing on diffusive wavespeed
-  /*
+  
   ldouble MAXDIFFVEL=1.; //max allowed vdiff
-  ldouble MAXTOTVEL=0.75; //max allowed vdiff + vrad
+  ldouble MAXTOTVEL=1.; //max allowed vdiff + vrad
 
   //limiting basing on maximal eigen value - slower and issues with tetrad  
-  evmax=calc_eigen_4x4(shearon,ev);
+  //evmax=calc_eigen_4x4(shearon,ev);
 
   //limiting assuming maximal eigen value 1/dt
-  //evmax=1./dt;
+  evmax=1./dt;
 
   //square of characteristic velocity for diffusion
   vdiff2=2.*nu*evmax;
 
+  
   //checking if vdiff too large
-  if(0 && vdiff2 > MAXDIFFVEL*MAXDIFFVEL)
+  if(vdiff2 > MAXDIFFVEL*MAXDIFFVEL)
     {
-      printf("damping vdiff %e -> %e at %d %d evmax: %e\n",sqrt(vdiff2),MAXDIFFVEL,geom->ix,geom->iy,evmax);
+      //printf("damping vdiff %e -> %e at %d %d evmax: %e\n",sqrt(vdiff2),MAXDIFFVEL,geom->ix,geom->iy,evmax);
       nu = MAXDIFFVEL*MAXDIFFVEL/2./evmax;
       vdiff2=2.*nu*evmax;
     }
-  */
+  
 
+  
+  //checking if vdiff+vrad > 1  
   /*
-  //checking if vdiff+vrad > 1
+  ldouble urcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
+  conv_vels(urcon,urcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+  ldouble vrad=sqrt(1.-1./urcon[0]/urcon[0]);
+
+
   if(vrad>MAXTOTVEL*MAXTOTVEL)
     {
       nu=0.;
