@@ -155,8 +155,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      gdet2=calc_gdet_arb(xx2,BLCOORDS);
 
-	      //if(OUTCOORDS==BLCOORDS && geomout.xx<r_horizon_BL(BHSPIN))
-	      //continue;
+	      if(OUTCOORDS==BLCOORDS && geomout.xx<r_horizon_BL(BHSPIN))
+	      continue;
 
 	      int nodalindex=iz*(ny*nx) + iy*nx + ix;
 	      for(iv=0;iv<NV;iv++)

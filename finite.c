@@ -752,9 +752,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-  //to count the average number of iteration in the implicit solver
-  for(ii=0;ii<12;ii++)
-    global_int_slot[ii]=0.;
 
   //again over cells - source terms
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
@@ -853,7 +850,12 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 int
 op_implicit(ldouble t, ldouble dt,ldouble *ubase) 
 {
+  int ix,iy,iz,iv,ii;
   copy_u(1., u, ubase);
+
+  //to count the average number of iteration in the implicit solver
+  for(ii=0;ii<12;ii++)
+    global_int_slot[ii]=0.;
 
   /************************************************************************/
   /******** implicit **** RADIATION ***************************************/
@@ -862,8 +864,7 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
 #ifdef RADIATION
 #ifndef SKIPRADSOURCE
 #ifdef IMPLICIT_LAB_RAD_SOURCE
-  int ix,iy,iz,iv,ii;
-
+  
   //again over cells - source terms
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain 

@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -27,7 +27,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -63,7 +63,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.9
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -73,10 +73,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.275-MKS1R0))
-#define MAXX (log(500.-MKS1R0))
-#define NX 300
-#define NY 200
+#define MINX (log(1.575-MKS1R0))
+#define MAXX (log(50.-MKS1R0))
+#define NX 150
+#define NY 40
 #define NZ 1
 #endif
 
