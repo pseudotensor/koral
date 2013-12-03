@@ -3280,13 +3280,22 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   ldouble shear[4][4];
   ldouble nu,vdiff2;
   calc_rad_shearviscosity(pp,geom,shear,&nu,&vdiff2);
-  ldouble Erf=pp[EE0];
+
+  //which energy density?
+  ldouble Erad;
+  //radiation rest frame:
+  //Erad=pp[EE0]; 
+
+  //lab-frame
+  ldouble Rtt,ncon[4];
+  calc_normal_Rtt(pp,&Rtt,ncon,geom);
+  Erad=-Rtt;
 
   //multiply by viscosity to get viscous tensor
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
-	Tvisc[i][j]= -2. * nu * Erf * shear[i][j];
+	Tvisc[i][j]= -2. * nu * Erad * shear[i][j];
       }
 #endif 
 
@@ -4003,11 +4012,9 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
 
   //calculating the viscosity coefficient 
 
-  //radiative energy density - so far in the radiative frame!
-  ldouble Erf=pp[EE0];
   //mean free path
   ldouble chi=calc_chi(pp,geom->xxvec);
-  ldouble mfp = 1./chi;
+  ldouble mfp = 1./chi; // dr / dtau
 
   //limiting in opt.thin region
   ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),   //here gg can be face or cell, get_size_x always refers to cell
@@ -4018,17 +4025,21 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   else if(NZ==1) mindx = my_min(dx[0],dx[1]);
   else if(NY==1) mindx = my_min(dx[0],dx[2]);
   else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
-  if(mfp>mindx || chi<SMALL) mfp=mindx;
 
+  if(mfp>mindx || chi<SMALL) mfp=mindx;
+  
   ldouble ev[4],evmax,eta,nu,vdiff2;
   nu = ALPHARADVISC * 1./3. * mfp;
   
   //no longer necessary?
+  /*
   if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
     if(geom->ix>=NX-2)
       nu = 0.; 
+  */
 
   //limiting basing on diffusive wavespeed
+  /*
   ldouble MAXDIFFVEL=1.; //max allowed vdiff
   ldouble MAXTOTVEL=0.75; //max allowed vdiff + vrad
 
@@ -4042,11 +4053,13 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   vdiff2=2.*nu*evmax;
 
   //checking if vdiff too large
-  if(vdiff2 > MAXDIFFVEL*MAXDIFFVEL)
+  if(0 && vdiff2 > MAXDIFFVEL*MAXDIFFVEL)
     {
+      printf("damping vdiff %e -> %e at %d %d evmax: %e\n",sqrt(vdiff2),MAXDIFFVEL,geom->ix,geom->iy,evmax);
       nu = MAXDIFFVEL*MAXDIFFVEL/2./evmax;
+      vdiff2=2.*nu*evmax;
     }
-  vdiff2=2.*nu*evmax;
+  */
 
   /*
   //checking if vdiff+vrad > 1
@@ -4102,6 +4115,53 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
 
   return 0;
 
+}
+
+//calculates normal observer's radiative energy density
+//and returns his four-velocity
+int
+calc_normal_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ncon,void* ggg)
+{
+  int i1,i2,i,j;
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble ncov[4];
+  ldouble Rij[4][4],Rtt;
+
+  calc_normalobs_4vel(geom->GG,ncon);
+
+  //print_4vector(ncon);getchar();
+  indices_21(ncon,ncov,geom->gg);
+
+  //filling Rij manualy because calc_Rij calls the viscous part as well
+  //calc_Rij(pp,ggg,Rij);
+  
+  //radiative energy density in the radiation rest frame
+  ldouble Erf,urfcon[4];
+  Erf=pp[EE0];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+  //lab frame stress energy tensor:
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom->GG[i][j];
+
+  
+  indices_2221(Rij,Rij,geom->gg);
+  Rtt=0.;
+  for(i1=0;i1<4;i1++)
+    for(i2=0;i2<4;i2++)
+      Rtt+=-Rij[i1][i2]*ncon[i2]*ncov[i1];
+
+  *Rttret = Rtt;
+
+
+  return 0;
 }
 
 //calculates LTE state

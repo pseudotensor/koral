@@ -555,6 +555,7 @@ int test_jon_solve_implicit_lab();
 int calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg);
 int calc_LTE_state_temp(ldouble *pp,void *ggg);
 int calc_ff_Rtt(ldouble *pp,ldouble *Rtt, ldouble* ucon,void* ggg);
+int calc_normal_Rtt(ldouble *pp,ldouble *Rtt, ldouble* ucon,void* ggg);
 int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret);
 int calc_visc_Rij(ldouble *pp, void* ggg, ldouble T[][4], ldouble R[][4]);
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);

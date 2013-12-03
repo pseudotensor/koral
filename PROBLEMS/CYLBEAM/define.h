@@ -4,7 +4,7 @@
 #define HDVISCOSITY NOVISCOSITY
 #define RADVISCOSITY SHEARVISCOSITY
 #define ALPHARADVISC 1.
-//#define ZEROTIMEINSHEAR
+#define ZEROTIMEINSHEAR
 
 #define SHUFFLELOOPS 0
 
@@ -83,10 +83,9 @@
 #define ERADATMMIN  (calc_LTE_EfromT(1.e9))
 
 #define INT_ORDER 1
-#define RK2_STEPPING
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 2.
 
 #define NODONUT 0
 #define INFLOWING 0

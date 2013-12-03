@@ -117,7 +117,7 @@ getchar();
 
 	    pp[4]=0.;
 	
-	    trans_pall_coco(pp, pp, CYLCOORDS, MYCOORDS,xxvecCYL,ggCYL,GGCYL,gg,GG);
+	    trans_pall_coco(pp, pp, CYLCOORDS, MYCOORDS,xxvecCYL,&geomCYL,&geom);
 	    //	print_Nvector(pp,NV);getchar();
 	  }
 	else
