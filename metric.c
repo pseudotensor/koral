@@ -1564,9 +1564,10 @@ if(coords==MINKCOORDS) {
 int 
 fill_geometry(int ix,int iy,int iz,void *geom)
 {
- struct geometry *ggg 
-   = (struct geometry *) geom;
+  struct geometry *ggg 
+    = (struct geometry *) geom;
 
+  ggg->ifacedim = -1;
   pick_g(ix,iy,iz,ggg->gg);
   pick_G(ix,iy,iz,ggg->GG);
   pick_T(tmuup,ix,iy,iz,ggg->tup);
@@ -1599,6 +1600,9 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
 
   pick_gb(ix,iy,iz,idim,ggg->gg);
   pick_Gb(ix,iy,iz,idim,ggg->GG);
+
+  ggg->ifacedim = idim;
+
   if(idim==0)
     {
       /*

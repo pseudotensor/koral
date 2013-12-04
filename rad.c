@@ -3159,7 +3159,32 @@ calc_Gi_ff(ldouble *pp, ldouble Gi[4])
 //******* takes primitives and closes R^ij in arbitrary frame ****************************
 //***********************************************************************************
 int
-calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
+calc_Rij(ldouble *pp, void *ggg, ldouble Rij[][4])
+{
+#ifdef RADIATION
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  //todo:
+  //in some places we may want only the M1 part?
+  calc_Rij_M1(pp,ggg,Rij);  
+
+#if (RADVISCOSITY!=NOVISCOSITY)
+  int i,j;
+  ldouble Tvisc[4][4];
+  calc_visc_Rij(pp,ggg,Tvisc,Rij);
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]+=Tvisc[i][j];
+#endif  
+
+#endif //RADIATION
+
+  return 0;
+}
+
+int
+calc_Rij_M1(ldouble *pp, void* ggg, ldouble Rij[][4])
 {
 #ifdef RADIATION
   struct geometry *geom
@@ -3169,15 +3194,12 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   gg=geom->gg;
   GG=geom->GG;
   
-  ldouble pp[NV],Erf;
+  ldouble Erf;
   int verbose=0;
   int i,j;
- //relative velocity
   ldouble urfcon[4];
-  //covariant formulation
 
-  for(i=0;i<NV;i++)
-    pp[i]=pp0[i];
+  //covariant formulation
 
   //radiative energy density in the radiation rest frame
   Erf=pp[EE0];
@@ -3192,18 +3214,10 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
 
-#if (RADVISCOSITY!=NOVISCOSITY)
-  ldouble Tvisc[4][4];
-  calc_visc_Rij(pp,ggg,Tvisc,Rij);
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]+=Tvisc[i][j];
-#endif  
-
-#endif //RADIATION
-
+  #endif
   return 0;
 }
+
 
 //**********************************************************************
 //**********************************************************************
@@ -3225,7 +3239,7 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
 #if (RADVISCOSITY==SHEARVISCOSITY)
   ldouble shear[4][4];
   ldouble nu,vdiff2;
-  calc_rad_shearviscosity(pp,geom,shear,&nu,&vdiff2);
+  calc_rad_shearviscosity(pp,ggg,shear,&nu,&vdiff2);
 
   //which energy density?
   ldouble Erad;
@@ -3475,7 +3489,8 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       print_4vector(&uu0[EE0]);
     }
      
-  //redundancy in idim somewhere here
+  //todo:
+  //redundancy in idim
   for(idim=0;idim<3;idim++)
     {
       f_flux_prime_rad(pp0,idim,ggg,ff0);
@@ -3493,9 +3508,13 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	    }
 	  
 	  uu[j+EE0]=uu0[j+EE0]+del;
+	  //todo: the derivatives in shear taken between ix+1 and ix-1 so shear component of stress do not change because of del
+
 	  if(verbose>1) { printf("%d: ",j);print_4vector(&uu[EE0]); }
 
 	  u2p_rad(uu,pp,ggg,&corr);
+
+	  //if(corr==1) printf("rad corrected at %d\n",j);
 
 	  f_flux_prime_rad(pp,idim,ggg,ff);
  
@@ -3526,12 +3545,20 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       ldouble axl=my_min_N(ev,4);
       ldouble axr=my_max_N(ev,4);
 
-      if(!isfinite(axl) || !isfinite(axr))
-	printf("problem: %e %e\n",axl,axr);
+      if(!isfinite(axl) || !isfinite(axr) || fabs(axl)>100. || fabs(axr)>100.)
+	{
+	  printf("problem: %e %e at %d %d\n",axl,axr,ix,iy);
+	  print_4vector(ev);
+	  print_4vector(pp0);
+	  print_4vector(uu0);
+	  print_tensor(JJ);
+	  getchar();
+	}
+	  
 
-
-      aval[idim*2+0]=axl;
-      aval[idim*2+1]=axr;
+      ldouble fac=1.; //to artificially increase numerical diffusion/stability
+      aval[idim*2+0]=fac*axl;
+      aval[idim*2+1]=fac*axr;
 
       
 
@@ -4030,7 +4057,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
     = (struct geometry *) ggg;
 
   //calculating shear
-  calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,1);  
+  calc_shear_lab(pp,ggg,shear,1);  
   indices_1122(shear,shear,geom->GG);
 
   //transforming to ortonormal

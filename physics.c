@@ -87,9 +87,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
     utcon[iv]=pp[1+iv];
   utcon[0]=0.;
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
-  //indices_21(ucon,ucov,gg);
-
+ 
   //**********************************************************************
   //***** hydro: speed of sound ******************************************
   //**********************************************************************
@@ -173,7 +171,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   ldouble dx[3];
   ldouble xx[4]={0.,geom->xx,geom->yy,geom->zz};
   
-  //ix,iy,iz has the indices of the face, so the depth taken from left/right
+  //ix,iy,iz could be the indices of a face, so the depth taken from left/right
   dx[0]=my_max(get_size_x(geom->ix,0)*sqrt(gg[1][1]),get_size_x(geom->ix+1,0)*sqrt(gg[1][1]));
   dx[1]=my_max(get_size_x(geom->iy,1)*sqrt(gg[2][2]),get_size_x(geom->iy+1,1)*sqrt(gg[2][2]));
   dx[2]=my_max(get_size_x(geom->iz,2)*sqrt(gg[3][3]),get_size_x(geom->iz+1,2)*sqrt(gg[3][3]));
@@ -254,15 +252,6 @@ calc_wavespeeds_lr(int ix, int iy, int iz,ldouble *aaa)
 
   calc_wavespeeds_lr_pure(pp,&geom,aaa);
 
-  /*
-  conv_velsinprims(pp,VELPRIM,VEL3,gg,GG);
-  if(fabs(pp[2])>.2 || (ix==NX-1 && iy==NY-1))
-    {
-      printf("%d %d %d\n %e %e %e\n",ix,iy,iz,pp[2],pp[3],pp[4]);
-      print_Nvector(aaa,6);
-      getchar();
-    }
-  */
   return 0;
 }
 
@@ -667,7 +656,7 @@ int calc_hd_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
     = (struct geometry *) ggg;
 
   //calculating shear
-  calc_shear_lab(geom->ix,geom->iy,geom->iz,shear,0);  
+  calc_shear_lab(pp,ggg,shear,0);  
   indices_1122(shear,shear,geom->GG);
   
   //transforming to ortonormal
@@ -1002,19 +991,339 @@ calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 //whichvel == 0 -> using gas velocity
 //whichvel == 1 -> using radiative velocity
 int
-calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
+calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 {
   int i,j,k,iv;
 
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
+  struct geometry *geom
+    = (struct geometry *) ggg;
 
   ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
-  gg=geom.gg;
-  GG=geom.GG;
-  tlo=geom.tlo;
-  tup=geom.tup;
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
 
+  int ix,iy,iz;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+
+  //let's start with derivatives
+  ldouble du[4][4]; //du_i,j
+  ldouble du2[4][4]; //du^i,j
+
+  //time derivatives
+
+  ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucovtm2[4];
+
+  int istart,whichvel;
+  if(hdorrad==0)
+    {
+      whichvel=VELPRIM;
+      istart=VX;
+    }
+  else if(hdorrad==1)
+    {
+      whichvel=VELPRIMRAD;
+      istart=FX(0);
+    }
+
+#ifndef ZEROTIMEINSHEAR
+  if(geom->ifacedim!=-1)
+    my_err("time derivatives in shear don't work with cell faces - use ZEROTIMEINSHEAR please\n");
+
+  ucontm1[0]=ucontm2[0]=0.; //time component will be calculated
+
+  ucontm1[1]=get_u(ptm1,istart,ix,iy,iz);
+  ucontm1[2]=get_u(ptm1,istart+1,ix,iy,iz);
+  ucontm1[3]=get_u(ptm1,istart+2,ix,iy,iz);
+  ucontm2[1]=get_u(ptm2,istart,ix,iy,iz);
+  ucontm2[2]=get_u(ptm2,istart+1,ix,iy,iz);
+  ucontm2[3]=get_u(ptm2,istart+2,ix,iy,iz);
+
+  conv_vels(ucontm1,ucontm1,whichvel,VEL4,gg,GG);
+  conv_vels(ucontm2,ucontm2,whichvel,VEL4,gg,GG);
+
+  indices_21(ucontm1,ucovtm1,gg);
+  indices_21(ucontm2,ucovtm2,gg);
+#endif
+
+  for(i=0;i<4;i++)
+    {
+#ifndef ZEROTIMEINSHEAR
+      if(fabs(ttm1-ttm2) < SMALL)
+	{
+	  du[i][0] = 0.;
+	  du2[i][0] = 0.;
+	}
+      else
+	{
+	  du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
+	  du2[i][0]=(ucontm1[i]-ucontm2[i])/(ttm1-ttm2);
+	}
+#else //force d/dt = 0 in shear
+      du[i][0] = 0.;
+      du2[i][0] = 0.;
+#endif
+    }
+
+
+  //spatial derivatives
+
+  //not to go out of bounds - ghost cell should not use this anyway
+  
+  //limited to the domain only
+  while(ix<0) ix++;
+  while(iy<0) iy++;
+  while(iz<0) iz++;
+
+  //todo:
+  //something wrong here
+  //for some reason I cannot allow for the outermost face
+  if(geom->ifacedim==0) 
+      while(ix>NX-1) ix--;
+  else
+    while(ix>NX-1) ix--;
+  if(geom->ifacedim==1) 
+      while(iy>NY-1) iy--;
+  else
+    while(iy>NY-1) iy--;
+ if(geom->ifacedim==2) 
+      while(iz>NZ-1) iz--;
+  else
+    while(iz>NZ-1) iz--;
+ 
+
+  ldouble ppm1[NV],ppp1[NV],pp[NV];
+  ldouble ggm1[4][5],GGm1[4][5];
+  ldouble ggp1[4][5],GGp1[4][5];
+  ldouble xxvecm1[4],*xxvec,xxvecp1[4];
+  ldouble uconm1[4],uconp1[4],utconm1[4],utconp1[4],utcon[4],ucon[4];
+  ldouble ucovm1[4],ucovp1[4],ucov[4];
+  int idim;
+  
+  //four-velocity at point 
+  //get_xx(ix,iy,iz,xxvec);
+  xxvec=geom->xxvec;
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=pp0[iv];
+    }
+  utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
+  conv_vels_both(utcon,ucon,ucov,whichvel,VEL4,gg,GG);  
+
+  //  print_4vector(ucon);
+  //print_4vector(xxvec);
+  //printf("dim: %d\n",geom->ifacedim);
+   
+  //derivatives
+  for(idim=1;idim<4;idim++)
+    {
+      if(idim==1)
+	{
+	  if(0 && idim==geom->ifacedim+1) //pp from a face in this direction
+	    {
+	      get_xx(ix-1,iy,iz,xxvecm1);
+	      get_xx(ix,iy,iz,xxvecp1);
+	      for(iv=0;iv<NV;iv++)
+		{
+		  ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
+		  ppp1[iv]=get_u(p,iv,ix,iy,iz);
+		}	  
+	      pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
+	      pick_g(ix,iy,iz,ggp1);  pick_G(ix,iy,iz,GGp1);
+
+	    }
+	  else
+	    {
+	      get_xx(ix-1,iy,iz,xxvecm1);
+	      get_xx(ix+1,iy,iz,xxvecp1);	  
+	      for(iv=0;iv<NV;iv++)
+		{
+		  ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
+		  ppp1[iv]=get_u(p,iv,ix+1,iy,iz);
+		}
+	      pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
+	      pick_g(ix+1,iy,iz,ggp1);  pick_G(ix+1,iy,iz,GGp1);
+	    }	  
+	}
+
+      if(idim==2)
+	{
+	  if(0 && idim==geom->ifacedim+1) //pp from a face
+	    {
+	      get_xx(ix,iy-1,iz,xxvecm1);
+	      get_xx(ix,iy,iz,xxvecp1);
+	      for(iv=0;iv<NV;iv++)
+		{
+		  ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
+		  ppp1[iv]=get_u(p,iv,ix,iy,iz);
+		}	  
+	      pick_g(ix,iy-1,iz,ggm1);  pick_G(ix,iy-1,iz,GGm1);
+	      pick_g(ix,iy,iz,ggp1);  pick_G(ix,iy,iz,GGp1);
+
+	    }
+	  else
+	    {
+	      get_xx(ix,iy-1,iz,xxvecm1);
+	      get_xx(ix,iy+1,iz,xxvecp1);	  
+	      for(iv=0;iv<NV;iv++)
+		{
+		  ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
+		  ppp1[iv]=get_u(p,iv,ix,iy+1,iz);
+		}
+	      pick_g(ix,iy-1,iz,ggm1);  pick_G(ix,iy-1,iz,GGm1);
+	      pick_g(ix,iy+1,iz,ggp1);  pick_G(ix,iy+1,iz,GGp1);
+	    }	  
+	}
+
+     if(idim==3)
+	{
+	  if(0 && idim==geom->ifacedim+1) //pp from a face
+	    {
+	      get_xx(ix,iy,iz-1,xxvecm1);
+	      get_xx(ix,iy,iz,xxvecp1);
+	      for(iv=0;iv<NV;iv++)
+		{
+		  ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
+		  ppp1[iv]=get_u(p,iv,ix,iy,iz);
+		}	  
+	      pick_g(ix,iy,iz-1,ggm1);  pick_G(ix,iy,iz-1,GGm1);
+	      pick_g(ix,iy,iz,ggp1);  pick_G(ix,iy,iz,GGp1);
+
+	    }
+	  else
+	    {
+	      get_xx(ix,iy,iz-1,xxvecm1);
+	      get_xx(ix,iy,iz+1,xxvecp1);	  
+	      for(iv=0;iv<NV;iv++)
+		{
+		  ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
+		  ppp1[iv]=get_u(p,iv,ix,iy,iz+1);
+		}
+	      pick_g(ix,iy,iz-1,ggm1);  pick_G(ix,iy,iz-1,GGm1);
+	      pick_g(ix,iy,iz+1,ggp1);  pick_G(ix,iy,iz+1,GGp1);
+	    }	  
+	}
+
+     //calculating four velocity
+
+     utconm1[1]=ppm1[istart];  utconm1[2]=ppm1[istart+1];  utconm1[3]=ppm1[istart+2];
+     utconp1[1]=ppp1[istart];  utconp1[2]=ppp1[istart+1];  utconp1[3]=ppp1[istart+2];
+
+     conv_vels_both(utconm1,uconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
+     conv_vels_both(utconp1,uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
+
+     //actual derivatives
+  
+     ldouble dleft,dright;
+     for(i=0;i<4;i++)
+       {
+	 //2nd order, centered
+	 //du[i][idim]=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 //du2[i][idim]=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+
+	 //average of 1st orders
+	 dleft=(ucov[i]-ucovm1[i]) / (xxvec[idim] - xxvecm1[idim]);
+	 dright=(ucovp1[i]-ucov[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 du[i][idim] = 0.5*(dleft+dright);
+
+ 	 dleft=(ucon[i]-uconm1[i]) / (xxvec[idim] - xxvecm1[idim]);
+	 dright=(uconp1[i]-ucon[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 du2[i][idim] = 0.5*(dleft+dright);
+      }
+    }
+
+  //covariant derivative tensor du_i;j
+  ldouble dcu[4][4];
+  //covariant derivative tensor du^i;j - only for expansion
+  ldouble dcu2[4][4];
+  ldouble Krsum;
+
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Krsum=0.;
+	  for(k=0;k<4;k++)
+	    Krsum+=get_gKr(k,i,j,ix,iy,iz)*ucov[k];
+
+	  dcu[i][j] = du[i][j] - Krsum;
+	}
+    
+      //only diagonal terms for expansion
+      Krsum=0.;
+      for(k=0;k<4;k++)
+	Krsum+=get_gKr(i,i,k,ix,iy,iz)*ucon[k];
+    
+      dcu2[i][i] = du2[i][i] + Krsum; 
+    }
+
+  //expansion
+  ldouble theta=0.;
+  for(i=0;i<4;i++)
+    theta+=dcu2[i][i];
+
+  //projection tensors P11=P_ij, P21=P^i_j
+  ldouble P11[4][4],P21[4][4];
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	P11[i][j] = gg[i][j] + ucov[i]*ucov[j];
+	P21[i][j] = delta(i,j) + ucon[i]*ucov[j];
+      }
+
+  //the shear tensor sigma_ij - only spatial components
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      {
+	ldouble sum1,sum2;
+	sum1=sum2=0.;
+	for(k=0;k<4;k++)
+	  {
+	    sum1+=dcu[i][k]*P21[k][j];
+	    sum2+=dcu[j][k]*P21[k][i];
+	  }
+	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
+
+      }
+
+  //filling the time component from u^mu sigma_munu = 0 
+  //(zero time derivatives in the comoving frame - no need for separate comoving routine)
+  for(i=1;i<4;i++)
+    S[i][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][i]+ucon[2]*S[2][i]+ucon[3]*S[3][i]);
+
+  S[0][0]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
+
+  //  print_tensor(S); getch();
+  
+  return 0;
+}
+    
+   
+
+  
+
+int
+calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
+{
+  int i,j,k,iv;
+
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+
+  int ix,iy,iz;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
   //let's start with derivatives
   ldouble du[4][4]; //du_i,j
   ldouble du2[4][4]; //du^i,j
@@ -1253,6 +1562,3 @@ getchar();}
 }
     
    
-
-  
-

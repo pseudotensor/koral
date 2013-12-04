@@ -122,6 +122,7 @@ int nfout1,nfout2;
 struct geometry
 {
   int ix,iy,iz;
+  int ifacedim; //-1 - cell center, 0 - x face, 1 - y face, 2 - z face
   ldouble xxvec[4];
   ldouble xx,yy,zz;
   ldouble gg[4][5];
@@ -335,7 +336,7 @@ struct rad_parameters
 int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss);
 int calc_hd_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret);
 int calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
-int calc_shear_lab(int ix,int iy,int iz,ldouble S[][4],int hdorrad);
+int calc_shear_lab(ldouble *pp,void* ggg,ldouble S[][4],int hdorrad);
 
 int calc_wavespeeds_lr_pure(ldouble *pp,void*,ldouble *aaa);
 int calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4]);
@@ -562,6 +563,7 @@ int calc_ff_Rtt(ldouble *pp,ldouble *Rtt, ldouble* ucon,void* ggg);
 int calc_normal_Rtt(ldouble *pp,ldouble *Rtt, ldouble* ucon,void* ggg);
 int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret);
 int calc_visc_Rij(ldouble *pp, void* ggg, ldouble T[][4], ldouble R[][4]);
+int calc_Rij_M1(ldouble *pp, void* ggg, ldouble R[][4]);
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int calc_Rij(ldouble *pp, void*, ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
