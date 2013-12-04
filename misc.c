@@ -500,19 +500,19 @@ http://benpfaff.org/writings/clc/shuffle.html
 
 void shuffle_loop(int **array, size_t n)
 {
-    if (n > 1) {
-        size_t i;
-	for (i = 0; i < n - 1; i++) {
-	  size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
-	  int t[3] = {array[j][0],array[j][1],array[j][2]};
-	  array[j][0] = array[i][0];
-	  array[j][1] = array[i][1];
-	  array[j][2] = array[i][2];
-	  array[i][0] = t[0];
-	  array[i][1] = t[1];
-	  array[i][2] = t[2];
-	}
+  if (n > 1) {
+    size_t i;
+    for (i = 0; i < n - 1; i++) {
+      size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+      int t[3] = {array[j][0],array[j][1],array[j][2]};
+      array[j][0] = array[i][0];
+      array[j][1] = array[i][1];
+      array[j][2] = array[i][2];
+      array[i][0] = t[0];
+      array[i][1] = t[1];
+      array[i][2] = t[2];
     }
+  }
 }
 
 //**********************************************************************
@@ -520,7 +520,7 @@ void shuffle_loop(int **array, size_t n)
 //**********************************************************************
 //calculates eigen values of a symmetric 4x4 matrix
 ldouble
-calc_eigen_4x4(ldouble g[][4], ldouble *ev)
+calc_eigen_4x4symm(ldouble g[][4], ldouble *ev)
 {
   int verbose=0;
   double matrix[]={g[0][0],g[0][1],g[0][2],g[0][3],
@@ -549,6 +549,38 @@ calc_eigen_4x4(ldouble g[][4], ldouble *ev)
   return my_max(my_max(fabs(ev[0]),fabs(ev[1])),my_max(fabs(ev[2]),fabs(ev[3])));
 }
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates eigen values of a non-symmetric 4x4 matrix
+ldouble
+calc_eigen_4x4(ldouble g[][4], ldouble *ev)
+{
+  int verbose=0;
+  double matrix[]={g[0][0],g[0][1],g[0][2],g[0][3],
+		   g[1][0],g[1][1],g[1][2],g[1][3],
+		   g[2][0],g[2][1],g[2][2],g[2][3],
+		   g[3][0],g[3][1],g[3][2],g[3][3]};		       
+
+  gsl_matrix_view m = gsl_matrix_view_array (matrix, 4, 4);     
+  gsl_vector_complex *eval = gsl_vector_complex_alloc (4);
+  gsl_eigen_nonsymm_workspace * w = gsl_eigen_nonsymm_alloc (4);       
+  gsl_eigen_nonsymm (&m.matrix, eval, w);     
+  gsl_eigen_nonsymm_free (w);
+       
+  int i,j;
+     
+  for (i = 0; i < 4; i++)
+    {
+      gsl_complex eval_i 
+           = gsl_vector_complex_get (eval, i);
+      ev[i]=GSL_REAL(eval_i);
+    }
+
+  gsl_vector_free (eval);
+
+  return my_max(my_max(fabs(ev[0]),fabs(ev[1])),my_max(fabs(ev[2]),fabs(ev[3])));
+}
 
 /*****************************************************************/
 /* prints tensor to screen *****************************************/

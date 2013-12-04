@@ -171,6 +171,7 @@ int print_metric(ldouble T[][5]);
 int print_4vector(ldouble v[4]);
 int print_Nvector(ldouble v[4],int);
 ldouble calc_eigen_4x4(ldouble g[][4], ldouble *ev);
+ldouble calc_eigen_4x4symm(ldouble g[][4], ldouble *ev);
 ldouble my_atan2(ldouble y, ldouble x);
 void shuffle_loop(int **array, size_t n);
 ldouble step_function(ldouble x,ldouble k);

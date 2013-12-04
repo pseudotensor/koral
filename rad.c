@@ -3443,19 +3443,75 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 #ifdef NUMRADWAVESPEEDS
   //calculating the Jacobi matrix of radiative fluxes, then its eigenvalues and chooses the largest
   int ix,iy,iz;
+  int idim,corr;
   //may not work properly with WAVESPEEDSATFACES
   //what is below assumes geometry at cell center
   ix=geom->ix;
   iy=geom->iy;
   iz=geom->iz;
 
-  ldouble uu0[NV],uu[NV],pp0[NV];
+  ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],JJ[4][4],del;
+  ldouble EPS=1.e-6;
+
+  //override
+  pp[EE0]=1.e-10;
+  pp[FX0]=.15;
+  pp[FY0]=.15;
+  pp[FZ0]=0.;
+
   PLOOP(i)
     pp0[i]=pp[i];
   p2u(pp0,uu0,ggg);
   PLOOP(i)
     uu[i]=uu0[i];
 
+  print_4vector(&pp0[EE0]);
+  print_4vector(&uu0[EE0]);
+     
+  //redundancy in idim somewhere here
+  for(idim=0;idim<3;idim++)
+    {
+      f_flux_prime_rad(pp0,idim,ggg,ff0);
+
+      //calculating approximate Jacobian
+      for(j=0;j<4;j++)
+	{
+	  if(j==0) //energy density
+	    {
+	      del = EPS*uu[EE0];
+	    }
+	  else //radiative momenta
+	    {
+	      del = EPS*my_max(1.e-6/sqrt(geom->gg[j][j])*fabs(uu0[EE0]),fabs(uu0[j+EE0]));
+	    }
+	  
+	  uu[j+EE0]=uu0[j+EE0]+del;
+	  //	  printf("%d: ",j);print_4vector(&uu[EE0]);
+
+	  u2p_rad(uu,pp,ggg,&corr);
+
+	  f_flux_prime_rad(pp,idim,ggg,ff);
+ 
+	  //Jacobian matrix component
+	  for(i=0;i<4;i++)
+	    {
+	      JJ[i][j]=(ff[i+EE0] - ff0[i+EE0])/del;
+	    }
+
+	  uu[j+EE0]=uu0[j+EE0];
+	  pp[j+EE0]=pp0[j+EE0];
+	}
+      
+      //Jacobian matrix in JJ
+      //eigenvalues - velocitiies in idim
+
+      print_tensor(JJ);
+      ldouble evmax,ev[4];
+      evmax=calc_eigen_4x4(JJ,ev);
+      print_4vector(ev);
+      getchar();
+      
+    }
 #else 
   //transforming 1/sqrt(3) from radiation rest frame + limiter based on optical depth
   //relative four-velocity
@@ -3987,7 +4043,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   ldouble MAXTOTVEL=1.; //max allowed vdiff + vrad
 
   //limiting basing on maximal eigen value - slower and issues with tetrad  
-  //evmax=calc_eigen_4x4(shearon,ev);
+  //evmax=calc_eigen_4x4symm(shearon,ev);
 
   //limiting assuming maximal eigen value 1/dt
   evmax=1./dt;

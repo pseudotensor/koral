@@ -11,6 +11,8 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 100.
 
+#define NUMRADWAVESPEEDS
+
 //#define myMCYL1COORDS
 
 #define OMSCALE 1.
