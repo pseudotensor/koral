@@ -3513,7 +3513,9 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   urfcon[3]=pp[4];
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIM,VEL4,gg,GG);
-#else 
+
+#else //regular M1
+
   urfcon[0]=0.;
   urfcon[1]=pp[FX0];
   urfcon[2]=pp[FY0];
@@ -3542,12 +3544,9 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   for(dim=0;dim<3;dim++)
     {
       //characterisitic limiter based on the optical depth
-      //TODO: validate against opt.thick tests
       if(tautot[dim]>0.) 
 	{
 	  rv2tau=4./3./tautot[dim]*4./3./tautot[dim];
-	  //test
-	  //rv2tau*=100.;
 	  rv2=my_min(rv2rad,rv2tau);
 	}
       else
@@ -3557,7 +3556,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       rv2=rv2rad;
 #endif
 
-#ifdef FULLRADFRAMEWAVESPEED
+#ifdef FULLRADWAVESPEEDS
       rv2=1.;
 #endif
 

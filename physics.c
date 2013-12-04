@@ -181,20 +181,12 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   calc_tautot(pp,xx,dx,tautot);
 
 #ifndef MULTIRADFLUID
+  //M1
   calc_rad_wavespeeds(pp,geom,tautot,aval,verbose);
-
-#ifdef FULLRADWAVESPEEDS
-  aval[0]=aval[1]=1./sqrt(gg[1][1]);
-  aval[2]=aval[3]=1./sqrt(gg[2][2]);
-  aval[4]=aval[5]=1./sqrt(gg[3][3]);
-#endif
-
-#else //multifluid
+#else 
+  //multifluid
   calc_rad_wavespeeds_mf_total(pp,gg,GG,tautot,aval);
 #endif
-
-  //TODO:
-  //include rad diffusive wavespeed here!
 
   axl=aval[0];
   axr=aval[1];
@@ -220,12 +212,14 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   if(azr<0.) azr=0.;
 
   //saving and passing up
+  //hd:
   aaa[0]=axhdl;
   aaa[1]=axhdr;
   aaa[2]=ayhdl;
   aaa[3]=ayhdr;
   aaa[4]=azhdl;
   aaa[5]=azhdr;
+  //rad:
   aaa[6]=axl;
   aaa[7]=axr;
   aaa[8]=ayl;

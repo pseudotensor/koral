@@ -415,7 +415,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       iz=loop_1[ii][2]; ldouble aaa[12];
 
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
-
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
   //**********************************************************************
