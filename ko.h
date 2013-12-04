@@ -345,7 +345,7 @@ int calc_wavespeeds_lr_faces( int,int,int,int, ldouble*,ldouble*);
 int max_eigen_lr_Jac(ldouble *,ldouble*,int,void*,ldouble*,ldouble*);
 int calc_Jac_num(ldouble *xx,ldouble *ujac, int idim,void *parameters,ldouble *fd_jac);
 int set_initial_profile();
-ldouble f_flux_prime(ldouble *uu, int,int,int,int,ldouble *ff);
+int f_flux_prime(ldouble *uu, int,int,int,int,ldouble *ff);
 ldouble f_diffusion_prime(ldouble *uu, ldouble *du, int iv,int,void*);
 ldouble f_grav_potential(ldouble,ldouble,ldouble);
 ldouble f_der_grav_potential(ldouble,ldouble,ldouble,int);
@@ -542,6 +542,7 @@ int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);
 
 
 //rad.c
+int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff);
 int solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *);
 int solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,ldouble *pp);
 int solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* deltas,int verbose);

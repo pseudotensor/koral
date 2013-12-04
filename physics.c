@@ -473,7 +473,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 //***************************************
 // calculates fluxes at faces
 //***************************************
-ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
+int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 {  
   int iv;
   for(iv=0;iv<NV;iv++)
@@ -511,8 +511,6 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
   //converting to 4-velocity
   conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-  //conv_velscov(vcon,ucov,VELPRIM,VEL4,gg,GG);
-  //indices_21(ucon,ucov,gg);
 
   int ii, jj, irf;
   for(ii=0;ii<4;ii++)
@@ -531,37 +529,14 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   calc_bcon_4vel(pp,ucon,ucov,bcon);
 #endif
  
-#ifdef RADIATION
-
-#ifndef MULTIRADFLUID
-  ldouble Rij[4][4];
-  calc_Rij(pp,&geom,Rij); //R^ij
-  indices_2221(Rij,Rij,gg); //R^i_j
-#else
-  ldouble Rij[NRF][4][4];
-  calc_Rij_mf(pp,gg,GG,Rij); //R^ij
-
-  for(ii=0;ii<NRF;ii++)
-    {
-      indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
-    }
-#endif
-
-#endif
-
   //fluxes
 
   //hydro
   ff[0]= gdetu*rho*ucon[idim+1];
-
   ff[1]= gdetu*(T[idim+1][0]+rho*ucon[idim+1]);
-
   ff[2]= gdetu*(T[idim+1][1]);
-
-  ff[3]= gdetu*(T[idim+1][2]);
- 
+  ff[3]= gdetu*(T[idim+1][2]); 
   ff[4]= gdetu*(T[idim+1][3]);
-
   ff[5]= gdetu*S*ucon[idim+1];
 
 #ifdef TRACER
@@ -573,41 +548,14 @@ ldouble f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ff[B1]=gdetu*(bcon[1]*ucon[idim+1] - bcon[idim+1]*ucon[1]);
   ff[B2]=gdetu*(bcon[2]*ucon[idim+1] - bcon[idim+1]*ucon[2]);
   ff[B3]=gdetu*(bcon[3]*ucon[idim+1] - bcon[idim+1]*ucon[3]);
-
-  /*
-  if(idim==0 && ix==NX/3)
-    {
-      print_4vector(bcon);
-      print_4vector(ucon);
-      printf("ff: %e %e %e\n",ff[B1],ff[B2],ff[B3]);
-      getchar();
-    }
-  */
-  
 #endif
 
   //radiation
 #ifdef RADIATION
-#ifndef MULTIRADFLUID
-  ff[EE0]= gdetu*Rij[idim+1][0];
-      
-  ff[FX0]= gdetu*Rij[idim+1][1];
-      
-  ff[FY0]= gdetu*Rij[idim+1][2];
-      
-  ff[FZ0]= gdetu*Rij[idim+1][3];
-#else
-  for(irf=0;irf<NRF;irf++)
-    {
-      ff[EE(irf)]=gdetu*Rij[irf][idim+1][0];
-      ff[FX(irf)]=gdetu*Rij[irf][idim+1][1];
-      ff[FY(irf)]=gdetu*Rij[irf][idim+1][2];
-      ff[FZ(irf)]=gdetu*Rij[irf][idim+1][3];
-    }
-#endif
+  f_flux_prime_rad(pp,idim,&geom,ff);
 #endif
 
-  return 0.;
+  return 0;
 }
 
 //**********************************************************************

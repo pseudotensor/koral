@@ -3439,7 +3439,25 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   GG=geom->GG;
 
   int i,j;
-  
+
+#ifdef NUMRADWAVESPEEDS
+  //calculating the Jacobi matrix of radiative fluxes, then its eigenvalues and chooses the largest
+  int ix,iy,iz;
+  //may not work properly with WAVESPEEDSATFACES
+  //what is below assumes geometry at cell center
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+
+  ldouble uu0[NV],uu[NV],pp0[NV];
+  PLOOP(i)
+    pp0[i]=pp[i];
+  p2u(pp0,uu0,ggg);
+  PLOOP(i)
+    uu[i]=uu0[i];
+
+#else 
+  //transforming 1/sqrt(3) from radiation rest frame + limiter based on optical depth
   //relative four-velocity
   ldouble urfcon[4];
 
@@ -3521,6 +3539,8 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       aval[dim*2+0]=axl;
       aval[dim*2+1]=axr;
     }
+
+#endif
 
   return 0;
 }
@@ -4338,3 +4358,57 @@ calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
 }
 
  
+
+//***************************************
+// calculates radiative fluxes at faces
+//***************************************
+int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
+{  
+#ifdef RADIATION
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+#ifndef MULTIRADFLUID
+  ldouble Rij[4][4];
+  calc_Rij(pp,ggg,Rij); //R^ij
+  indices_2221(Rij,Rij,gg); //R^i_j
+#else
+  ldouble Rij[NRF][4][4];
+  calc_Rij_mf(pp,gg,GG,Rij); //R^ij
+
+  for(ii=0;ii<NRF;ii++)
+    {
+      indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
+    }
+#endif
+
+  //fluxes to ff[EE0+]
+#ifndef MULTIRADFLUID
+  ff[EE0]= gdetu*Rij[idim+1][0];
+      
+  ff[FX0]= gdetu*Rij[idim+1][1];
+      
+  ff[FY0]= gdetu*Rij[idim+1][2];
+      
+  ff[FZ0]= gdetu*Rij[idim+1][3];
+#else
+  for(irf=0;irf<NRF;irf++)
+    {
+      ff[EE(irf)]=gdetu*Rij[irf][idim+1][0];
+      ff[FX(irf)]=gdetu*Rij[irf][idim+1][1];
+      ff[FY(irf)]=gdetu*Rij[irf][idim+1][2];
+      ff[FZ(irf)]=gdetu*Rij[irf][idim+1][3];
+    }
+#endif
+
+#endif
+  return 0;
+}
