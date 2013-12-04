@@ -1618,16 +1618,12 @@ calc_Rij_ff_mf(ldouble *pp, ldouble Rij[][4][4])
 
       nlen=sqrt(nx*nx+ny*ny+nz*nz);
  
-#ifdef EDDINGTON_APR
-      f=1./3.;
-#else  
       if(nlen>=1.)
 	{
 	  f=1.;
 	}
-      else //M1
+      else
 	f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
-#endif
   
       if(nlen>0) 
 	{

@@ -167,47 +167,6 @@ int p2u_rad(ldouble *pp,ldouble *uu,void *ggg)
   gdetu=1.;
 #endif
  
-#ifdef LABRADFLUXES
-  
-  uu[EE0]=gdetu*pp[EE0]; //R^t_t
-  uu[FX0]=gdetu*pp[FX0]; //R^t_i
-  uu[FY0]=gdetu*pp[FY0];
-  uu[FZ0]=gdetu*pp[FZ0];
-  return 0;
- 
-#endif
-
-#ifdef EDDINGTON_APR
-  int ii,jj;
-  ldouble Rij[4][4],h[4][4];
-  ldouble ucov[4],ucon[4]={0,pp[2],pp[3],pp[4]};
-  conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
-  indices_21(ucon,ucov,gg);
-  ldouble EE=pp[EE0];
-  ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
-  Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
-  //projection tensor
-  for(ii=0;ii<4;ii++)
-    for(jj=0;jj<4;jj++)
-      h[ii][jj]=GG[ii][jj] + ucon[ii]*ucon[jj];
-  //Fragile's formula
-  for(ii=0;ii<4;ii++)
-    for(jj=0;jj<4;jj++)
-      Rij[ii][jj]=EE*ucon[ii]*ucon[jj] + Fcon[ii]*ucon[jj] + Fcon[jj]*ucon[ii] + 1./3.*EE*delta(ii,jj)*h[ii][jj];
-  indices_2221(Rij,Rij,gg);
-
-  //  print_Nvector(p,NV);
-  //  print_4vector(ucon);
-  //  print_4vector(Fcon);
-      
-  uu[EE0]=gdetu*Rij[0][0];
-  uu[FX0]=gdetu*Rij[0][1];
-  uu[FY0]=gdetu*Rij[0][2];
-  uu[FZ0]=gdetu*Rij[0][3];
-
-  return 0;
-#endif
-  
   //M1
   for(irf=0;irf<NRF;irf++)
     {

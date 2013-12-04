@@ -512,9 +512,6 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 
 									  if(codeprim==0)
 									    {
-#ifndef LABRADFLUXES
-#ifndef EDDINGTON_APR						
-
 #ifdef RADOUTPUTINFF
 									  prad_lab2ff(pp,pp,&geom);
 #endif
@@ -533,8 +530,6 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  pp[9]=vrelrad[3];	  
 #endif
 
-#endif
-#endif
 									    }
 #endif
 						  
@@ -555,9 +550,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									      Fz+=pp[FZ(irf)];
 									      //						      break;
 									    }
-#ifdef LABRADFLUXES
-									  E*=-1.;
-#endif
+
 
 									  Trad=calc_LTE_TfromE(fabs(E));
 									  if(E<EEFLOOR || isnan(E)) E=EEFLOOR;

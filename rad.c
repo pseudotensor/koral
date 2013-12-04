@@ -3066,7 +3066,6 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   gg=geom->gg;
   GG=geom->GG;
 
-#ifndef EDDINGTON_APR //M1 here
   //radiative stress tensor in the lab frame
   ldouble Rij[4][4];
   calc_Rij(pp,ggg,Rij);
@@ -3124,32 +3123,6 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
     }
   */
 
-#else //Eddington apr. here
-
-  ldouble rho=pp[RHO];
-  ldouble u=pp[1];
-  ldouble ucov[4],ucon[4],utcon[4]={0,pp[2],pp[3],pp[4]};
-  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
-  //indices_21(ucon,ucov,gg);
-  ldouble EE=pp[EE0];
-  ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
-  Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
- 
-  ldouble p= (GAMMA-1.)*u;
-  ldouble T = p*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
-  ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
-  ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);
-  ldouble chi=kappa+kappaes;
-
-  for(i=0;i<4;i++)
-    Gi[i]=kappa*(EE-4.*Pi*B)*ucon[i] + chi * Fcon[i];
-#endif  
-
-  //print_4vector(Gi);getchar();
-
   return 0;
 }
 
@@ -3203,15 +3176,9 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ldouble urfcon[4];
   //covariant formulation
 
-#ifdef LABRADFLUXES
-  //artificially puts pp=uu and converts them to urf and Erf using the regular converter
-  u2p_rad_urf(pp0,pp,ggg,&i);
-#else
   for(i=0;i<NV;i++)
     pp[i]=pp0[i];
-#endif //LABRADFLUXES
 
-#ifndef EDDINGTON_APR //M1 here
   //radiative energy density in the radiation rest frame
   Erf=pp[EE0];
   urfcon[0]=0.;
@@ -3224,27 +3191,6 @@ calc_Rij(ldouble *pp0, void *ggg, ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
-
-#else //Eddington
-
-  ldouble h[4][4];
-  ldouble ucov[4],ucon[4],utcon[4]={0,pp[2],pp[3],pp[4]};
-  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
-  //indices_21(ucon,ucov,gg);
-  ldouble EE=pp[EE0];
-  ldouble Fcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
-  Fcon[0]=-1./ucov[0]*(Fcon[1]*ucov[1]+Fcon[2]*ucov[2]+Fcon[3]*ucov[3]); //F^0 u_0 = - F^i u_i
-  //projection tensor
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      h[i][j]=GG[i][j] + ucon[i]*ucon[j];
-  //Fragile's formula
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]=EE*ucon[i]*ucon[j] + Fcon[i]*ucon[j] + Fcon[j]*ucon[i] + 1./3.*EE*delta(i,j)*h[i][j];
-#endif
-
 
 #if (RADVISCOSITY!=NOVISCOSITY)
   ldouble Tvisc[4][4];
@@ -3322,17 +3268,13 @@ calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
   nz=F[2]/E;
 
   nlen=sqrt(nx*nx+ny*ny+nz*nz);
- 
-#ifdef EDDINGTON_APR
-  f=1./3.;
-#else  
+  
   if(nlen>=1.)
-    {
-      f=1.;
-    }
-  else //M1
+	{
+	  f=1.;
+	}
+  else
     f=(3.+4.*(nx*nx+ny*ny+nz*nz))/(5.+2.*sqrt(4.-3.*(nx*nx+ny*ny+nz*nz)));  
-#endif
   
   if(nlen>0) 
     {
@@ -3497,24 +3439,9 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   GG=geom->GG;
 
   int i,j;
-
-#ifdef LABRADFLUXES
-  //artificially puts pp=uu and converts them to urf and Erf using the regular converter
-  u2p_rad_urf(pp,pp,ggg,&i);
-#endif
   
   //relative four-velocity
   ldouble urfcon[4];
-
-#ifdef EDDINGTON_APR //in Eddington I take the fluid velocity - think over, maybe use max(cs2,1/3)?
-  urfcon[0]=0.;
-  urfcon[1]=pp[2];
-  urfcon[2]=pp[3];
-  urfcon[3]=pp[4];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIM,VEL4,gg,GG);
-
-#else //regular M1
 
   urfcon[0]=0.;
   urfcon[1]=pp[FX0];
@@ -3522,9 +3449,6 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   urfcon[3]=pp[FZ0];
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
-#endif
-
-  
 
   //square of radiative wavespeed in radiative rest frame
   ldouble rv2rad = 1./3.;
