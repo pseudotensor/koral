@@ -179,6 +179,8 @@ int calc_stationary1d_solution()  ;
 int initialize_arrays();
 int free_arrays();
 ldouble my_min(ldouble a, ldouble b);
+ldouble my_min_N(ldouble* a, int);
+ldouble my_max_N(ldouble* a, int );
 //ldouble my_max(ldouble a, ldouble b);
 ldouble my_sign(ldouble);
 int find_eigenvalues3(ldouble[3][3],ldouble*);

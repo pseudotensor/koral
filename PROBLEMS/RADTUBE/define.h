@@ -7,7 +7,7 @@
 #define INT_ORDER 1
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 //#define WAVESPEEDSATFACES
 
 //#define LABRADFLUXES
@@ -15,13 +15,7 @@
 
 #define NUMRADWAVESPEEDS
 #define RADIATION //whether to solve for radiation (or pure hydro)
-//#define ENFORCEENTROPY
-//#define EXPLICIT_RAD_SOURCE
-//#define EDDINGTON_APR
-//#define SKIPRADSOURCE
-//#ifndef TIMESTEPPING
-#define TIMESTEPPING RK2IMEX
-//#endif
+#define TIMESTEPPING RK2
 
 #define VERIFYENTROPYAFTERADVECTION 0
 
@@ -79,7 +73,7 @@
 #define MUGAS 1. //mean molecular weight (default = 1)
 
 //problem specific definitions
-#define NTUBE 3
+#define NTUBE 1
 
 #undef SIGMA_RAD
 #if (NTUBE==1)

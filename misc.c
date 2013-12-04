@@ -52,6 +52,30 @@ ldouble my_min(ldouble a, ldouble b)
   else return b;
 }
 
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+ldouble my_min_N(ldouble *v,int N)
+{
+  ldouble min=v[0];
+  int i;
+  for(i=1;i<N;i++)
+    if(v[i]<min) min=v[i];
+  return min;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+ldouble my_max_N(ldouble *v,int N)
+{
+  ldouble max=v[0];
+  int i;
+  for(i=1;i<N;i++)
+    if(v[i]>max) max=v[i];
+  return max;
+}
+
 ldouble my_sign(ldouble x)
 {
   if(x>0.) return 1.;
@@ -577,7 +601,7 @@ calc_eigen_4x4(ldouble g[][4], ldouble *ev)
       ev[i]=GSL_REAL(eval_i);
     }
 
-  gsl_vector_free (eval);
+  gsl_vector_complex_free (eval);
 
   return my_max(my_max(fabs(ev[0]),fabs(ev[1])),my_max(fabs(ev[2]),fabs(ev[3])));
 }

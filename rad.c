@@ -3431,6 +3431,8 @@ ldouble calc_LTE_Efromurho(ldouble u,ldouble rho)
 int
 calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int verbose)
 {
+  verbose=0;
+
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -3451,13 +3453,15 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   iz=geom->iz;
 
   ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],JJ[4][4],del;
-  ldouble EPS=1.e-6;
+  ldouble EPS=1.e-8;
 
   //override
+  /*
   pp[EE0]=1.e-10;
-  pp[FX0]=.15;
-  pp[FY0]=.15;
+  pp[FX0]=.5;
+  pp[FY0]=.5;
   pp[FZ0]=0.;
+  */
 
   PLOOP(i)
     pp0[i]=pp[i];
@@ -3465,8 +3469,11 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   PLOOP(i)
     uu[i]=uu0[i];
 
-  print_4vector(&pp0[EE0]);
-  print_4vector(&uu0[EE0]);
+  if(verbose)
+    {
+      print_4vector(&pp0[EE0]);
+      print_4vector(&uu0[EE0]);
+    }
      
   //redundancy in idim somewhere here
   for(idim=0;idim<3;idim++)
@@ -3482,11 +3489,11 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	    }
 	  else //radiative momenta
 	    {
-	      del = EPS*my_max(1.e-6/sqrt(geom->gg[j][j])*fabs(uu0[EE0]),fabs(uu0[j+EE0]));
+	      del = -EPS*my_max(1.e-6/sqrt(geom->gg[j][j])*fabs(uu0[EE0]),fabs(uu0[j+EE0]));
 	    }
 	  
 	  uu[j+EE0]=uu0[j+EE0]+del;
-	  //	  printf("%d: ",j);print_4vector(&uu[EE0]);
+	  if(verbose>1) { printf("%d: ",j);print_4vector(&uu[EE0]); }
 
 	  u2p_rad(uu,pp,ggg,&corr);
 
@@ -3505,12 +3512,32 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       //Jacobian matrix in JJ
       //eigenvalues - velocitiies in idim
 
-      print_tensor(JJ);
+      if(verbose)
+	print_tensor(JJ);
       ldouble evmax,ev[4];
       evmax=calc_eigen_4x4(JJ,ev);
-      print_4vector(ev);
-      getchar();
+
+      if(verbose)
+	{
+	  print_4vector(ev);
+	  getchar();
+	}      
+
+      ldouble axl=my_min_N(ev,4);
+      ldouble axr=my_max_N(ev,4);
+
+      if(!isfinite(axl) || !isfinite(axr))
+	printf("problem: %e %e\n",axl,axr);
+
+
+      aval[idim*2+0]=axl;
+      aval[idim*2+1]=axr;
+
       
+
+      //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
+      if(tautot[idim]>1.) 
+	aval[idim*2+0]/=tautot[idim];
     }
 #else 
   //transforming 1/sqrt(3) from radiation rest frame + limiter based on optical depth
@@ -3997,6 +4024,7 @@ int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
 /***************************************/
 int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret)
 {  
+  
 #if(RADVISCOSITY==SHEARVISCOSITY) //full shear tensor
   struct geometry *geom
     = (struct geometry *) ggg;
@@ -4006,8 +4034,8 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   indices_1122(shear,shear,geom->GG);
 
   //transforming to ortonormal
-  ldouble shearon[4][4];
-  trans22_cc2on(shear,shearon,geom->tup);
+  //ldouble shearon[4][4];
+  //trans22_cc2on(shear,shearon,geom->tup);
 
   //calculating the viscosity coefficient 
 
@@ -4042,6 +4070,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   ldouble MAXDIFFVEL=1.; //max allowed vdiff
   ldouble MAXTOTVEL=1.; //max allowed vdiff + vrad
 
+  /*
   //limiting basing on maximal eigen value - slower and issues with tetrad  
   //evmax=calc_eigen_4x4symm(shearon,ev);
 
@@ -4059,7 +4088,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
       nu = MAXDIFFVEL*MAXDIFFVEL/2./evmax;
       vdiff2=2.*nu*evmax;
     }
-  
+  */
 
   
   //checking if vdiff+vrad > 1  
@@ -4085,9 +4114,14 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   *nuret=nu;
   *vdiff2ret=vdiff2;
 
-  return 0;
+#else //no rad.viscosity
+  int i1,i2;
+  for(i1=0;i1<4;i1++)
+    for(i2=0;i2<4;i2++)
+      shear[i1][i2]=0.;
+  *nuret=*vdiff2ret=0.;
 #endif
-  
+  return 0;  
 }
 
  
