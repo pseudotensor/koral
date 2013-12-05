@@ -6,8 +6,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM -1
+#define RESTART
+#define RESTARTNUM 8
 
 /************************************/
 //radiation choices
@@ -18,7 +18,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-#define MAGNFIELD
+//#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -27,7 +27,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX
+#define TIMESTEPPING RK2//IMEX //test IMEX with radiation etc!!!
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -40,7 +40,9 @@
 #define HDVISCOSITY NOVISCOSITY
 #define RADVISCOSITY NOVISCOSITY
 //#define RADVISCOSITY SHEARVISCOSITY
-//#define ALPHARADVISC 1.
+#define ZEROTIMEINSHEAR
+#define ALPHARADVISC 1.
+//#define NUMRADWAVESPEEDS
 
 /************************************/
 //rmhd floors
@@ -73,10 +75,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.575-MKS1R0))
+#define MINX (log(2.575-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 150
-#define NY 40
+#define NX 80
+#define NY 70
 #define NZ 1
 #endif
 

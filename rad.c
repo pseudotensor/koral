@@ -3567,7 +3567,10 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 
       //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
       if(tautot[idim]>1.) 
-	aval[idim*2+0]/=tautot[idim];
+	{
+	  aval[idim*2+0]/=tautot[idim];
+	  aval[idim*2+1]/=tautot[idim];
+	}
     }
 #else 
   //transforming 1/sqrt(3) from radiation rest frame + limiter based on optical depth
