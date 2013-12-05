@@ -990,8 +990,11 @@ calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 //calculates shear tensor sigma_ij in the lab frame
 //whichvel == 0 -> using gas velocity
 //whichvel == 1 -> using radiative velocity
+
+  
+
 int
-calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
+calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 {
   int i,j,k,iv;
 
@@ -1003,18 +1006,16 @@ calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
   GG=geom->GG;
   tlo=geom->tlo;
   tup=geom->tup;
-
+  
   int ix,iy,iz;
   ix=geom->ix;
   iy=geom->iy;
   iz=geom->iz;
-
   //let's start with derivatives
   ldouble du[4][4]; //du_i,j
   ldouble du2[4][4]; //du^i,j
 
   //time derivatives
-
   ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucovtm2[4];
 
   int istart,whichvel;
@@ -1032,6 +1033,7 @@ calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 #ifndef ZEROTIMEINSHEAR
   if(geom->ifacedim!=-1)
     my_err("time derivatives in shear don't work with cell faces - use ZEROTIMEINSHEAR please\n");
+#endif
 
   ucontm1[0]=ucontm2[0]=0.; //time component will be calculated
 
@@ -1047,7 +1049,6 @@ calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 
   indices_21(ucontm1,ucovtm1,gg);
   indices_21(ucontm2,ucovtm2,gg);
-#endif
 
   for(i=0;i<4;i++)
     {
@@ -1072,27 +1073,21 @@ calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
   //spatial derivatives
 
   //not to go out of bounds - ghost cell should not use this anyway
-  
-  //limited to the domain only
+  /*
   while(ix<0) ix++;
   while(iy<0) iy++;
   while(iz<0) iz++;
+  while(ix>NX-1) ix--;
+  while(iy>NY-1) iy--;
+  while(iz>NZ-1) iz--; 
+  */
 
-  //todo:
-  //something wrong here
-  //for some reason I cannot allow for the outermost face
-  if(geom->ifacedim==0) 
-      while(ix>NX-1) ix--;
-  else
-    while(ix>NX-1) ix--;
-  if(geom->ifacedim==1) 
-      while(iy>NY-1) iy--;
-  else
-    while(iy>NY-1) iy--;
- if(geom->ifacedim==2) 
-      while(iz>NZ-1) iz--;
-  else
-    while(iz>NZ-1) iz--;
+  while(ix<0) ix++;
+  while(iy<0) iy++;
+  while(iz<0) iz++;
+  while(ix>NX-1) ix--;
+  while(iy>NY-1) iy--;
+  while(iz>NZ-1) iz--;
  
 
   ldouble ppm1[NV],ppp1[NV],pp[NV];
@@ -1102,27 +1097,23 @@ calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
   ldouble uconm1[4],uconp1[4],utconm1[4],utconp1[4],utcon[4],ucon[4];
   ldouble ucovm1[4],ucovp1[4],ucov[4];
   int idim;
-  
-  //four-velocity at point 
-  //get_xx(ix,iy,iz,xxvec);
+
+  //four-velocity at cell/face
   xxvec=geom->xxvec;
   for(iv=0;iv<NV;iv++)
     {
-      pp[iv]=pp0[iv];
+      pp[iv]=pp0[iv];//get_u(p,iv,ix,iy,iz);
     }
   utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
   conv_vels_both(utcon,ucon,ucov,whichvel,VEL4,gg,GG);  
-
-  //  print_4vector(ucon);
-  //print_4vector(xxvec);
-  //printf("dim: %d\n",geom->ifacedim);
    
   //derivatives
   for(idim=1;idim<4;idim++)
     {
       if(idim==1)
 	{
-	  if(0 && idim==geom->ifacedim+1) //pp from a face in this direction
+	  /*
+	  if(idim==geom->ifacedim+1) //pp from a face in this direction
 	    {
 	      get_xx(ix-1,iy,iz,xxvecm1);
 	      get_xx(ix,iy,iz,xxvecp1);
@@ -1133,79 +1124,45 @@ calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 		}	  
 	      pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
 	      pick_g(ix,iy,iz,ggp1);  pick_G(ix,iy,iz,GGp1);
-
 	    }
-	  else
+	  */
+	  get_xx(ix-1,iy,iz,xxvecm1);
+	  get_xx(ix+1,iy,iz,xxvecp1);	  
+	  for(iv=0;iv<NV;iv++)
 	    {
-	      get_xx(ix-1,iy,iz,xxvecm1);
-	      get_xx(ix+1,iy,iz,xxvecp1);	  
-	      for(iv=0;iv<NV;iv++)
-		{
-		  ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
-		  ppp1[iv]=get_u(p,iv,ix+1,iy,iz);
-		}
-	      pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
-	      pick_g(ix+1,iy,iz,ggp1);  pick_G(ix+1,iy,iz,GGp1);
-	    }	  
+	      ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
+	      ppp1[iv]=get_u(p,iv,ix+1,iy,iz);
+	    }
+	  pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
+	  pick_g(ix+1,iy,iz,ggp1);  pick_G(ix+1,iy,iz,GGp1);
 	}
 
       if(idim==2)
 	{
-	  if(0 && idim==geom->ifacedim+1) //pp from a face
+	  get_xx(ix,iy-1,iz,xxvecm1);
+	  get_xx(ix,iy+1,iz,xxvecp1);	  
+	  for(iv=0;iv<NV;iv++)
 	    {
-	      get_xx(ix,iy-1,iz,xxvecm1);
-	      get_xx(ix,iy,iz,xxvecp1);
-	      for(iv=0;iv<NV;iv++)
-		{
-		  ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
-		  ppp1[iv]=get_u(p,iv,ix,iy,iz);
-		}	  
-	      pick_g(ix,iy-1,iz,ggm1);  pick_G(ix,iy-1,iz,GGm1);
-	      pick_g(ix,iy,iz,ggp1);  pick_G(ix,iy,iz,GGp1);
-
+	      ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
+	      ppp1[iv]=get_u(p,iv,ix,iy+1,iz);
 	    }
-	  else
-	    {
-	      get_xx(ix,iy-1,iz,xxvecm1);
-	      get_xx(ix,iy+1,iz,xxvecp1);	  
-	      for(iv=0;iv<NV;iv++)
-		{
-		  ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
-		  ppp1[iv]=get_u(p,iv,ix,iy+1,iz);
-		}
-	      pick_g(ix,iy-1,iz,ggm1);  pick_G(ix,iy-1,iz,GGm1);
-	      pick_g(ix,iy+1,iz,ggp1);  pick_G(ix,iy+1,iz,GGp1);
-	    }	  
+	  pick_g(ix,iy-1,iz,ggm1);  pick_G(ix,iy-1,iz,GGm1);
+	  pick_g(ix,iy+1,iz,ggp1);  pick_G(ix,iy+1,iz,GGp1);
+	    
 	}
 
      if(idim==3)
-	{
-	  if(0 && idim==geom->ifacedim+1) //pp from a face
-	    {
-	      get_xx(ix,iy,iz-1,xxvecm1);
-	      get_xx(ix,iy,iz,xxvecp1);
-	      for(iv=0;iv<NV;iv++)
-		{
-		  ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
-		  ppp1[iv]=get_u(p,iv,ix,iy,iz);
-		}	  
-	      pick_g(ix,iy,iz-1,ggm1);  pick_G(ix,iy,iz-1,GGm1);
-	      pick_g(ix,iy,iz,ggp1);  pick_G(ix,iy,iz,GGp1);
-
-	    }
-	  else
-	    {
-	      get_xx(ix,iy,iz-1,xxvecm1);
-	      get_xx(ix,iy,iz+1,xxvecp1);	  
-	      for(iv=0;iv<NV;iv++)
-		{
-		  ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
-		  ppp1[iv]=get_u(p,iv,ix,iy,iz+1);
-		}
-	      pick_g(ix,iy,iz-1,ggm1);  pick_G(ix,iy,iz-1,GGm1);
-	      pick_g(ix,iy,iz+1,ggp1);  pick_G(ix,iy,iz+1,GGp1);
-	    }	  
-	}
+       {
+	 get_xx(ix,iy,iz-1,xxvecm1);
+	 get_xx(ix,iy,iz+1,xxvecp1);	  
+	 for(iv=0;iv<NV;iv++)
+	   {
+	     ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
+	     ppp1[iv]=get_u(p,iv,ix,iy,iz+1);
+	   }
+	 pick_g(ix,iy,iz-1,ggm1);  pick_G(ix,iy,iz-1,GGm1);
+	 pick_g(ix,iy,iz+1,ggp1);  pick_G(ix,iy,iz+1,GGp1);
+       }
 
      //calculating four velocity
 
@@ -1215,24 +1172,21 @@ calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
      conv_vels_both(utconm1,uconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
      conv_vels_both(utconp1,uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
 
-     //actual derivatives
-  
-     ldouble dleft,dright;
+     ldouble dl,dr,dc;
      for(i=0;i<4;i++)
        {
-	 //2nd order, centered
-	 //du[i][idim]=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
-	 //du2[i][idim]=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 dc=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 dr=(ucovp1[i]-ucov[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 dl=(ucov[i]-ucovm1[i]) / (xxvec[idim] - xxvecm1[idim]);
 
-	 //average of 1st orders
-	 dleft=(ucov[i]-ucovm1[i]) / (xxvec[idim] - xxvecm1[idim]);
-	 dright=(ucovp1[i]-ucov[i]) / (xxvecp1[idim] - xxvec[idim]);
-	 du[i][idim] = 0.5*(dleft+dright);
+	 du[i][idim]=dc;//.25*(2.*dc+dl+dr);
 
- 	 dleft=(ucon[i]-uconm1[i]) / (xxvec[idim] - xxvecm1[idim]);
-	 dright=(uconp1[i]-ucon[i]) / (xxvecp1[idim] - xxvec[idim]);
-	 du2[i][idim] = 0.5*(dleft+dright);
-      }
+	 dc=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 dr=(uconp1[i]-ucon[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 dl=(ucon[i]-uconm1[i]) / (xxvec[idim] - xxvecm1[idim]);
+
+	 du2[i][idim]=dc;//.25*(2.*dc+dl+dr);
+       }       
     }
 
   //covariant derivative tensor du_i;j
@@ -1287,26 +1241,21 @@ calc_shear_lab_new(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	  }
 	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
 
-      }
+     }
 
-  //filling the time component from u^mu sigma_munu = 0 
-  //(zero time derivatives in the comoving frame - no need for separate comoving routine)
+  //filling the time component from u^mu sigma_munu = 0 (zero time derivatives in the comoving frame - no need for separate comoving routine)
   for(i=1;i<4;i++)
     S[i][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][i]+ucon[2]*S[2][i]+ucon[3]*S[3][i]);
 
   S[0][0]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
 
-  //  print_tensor(S); getch();
-  
   return 0;
 }
     
    
 
-  
-
 int
-calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
+calc_shear_lab_old2(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 {
   int i,j,k,iv;
 
