@@ -2589,70 +2589,159 @@ correct_polaraxis()
 {
   int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
-  int ix,iy,iz,iv,ic,iysrc;
-#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static)
-  for(ix=0;ix<NX;ix++)
+  int ix,iy,iz,iv,ic,iysrc,ixsrc;
+
+  //spherical like coords
+  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
     {
-      for(iz=0;iz<NZ;iz++)
+#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static)
+      for(ix=0;ix<NX;ix++)
 	{
-	  ldouble th,thsrc,thaxis;
-	  ldouble pp[NV],uu[NV];
-	  struct geometry geom;
-
-	  //upper
-	  thaxis=get_xb(0,1);
-	  for(ic=0;ic<nc;ic++)
+	  for(iz=0;iz<NZ;iz++)
 	    {
-	      iy=ic;iysrc=nc;
-	      th=get_x(iy,1);
-	      thsrc=get_x(iysrc,1);	      
+	      ldouble th,thsrc,thaxis;
+	      ldouble pp[NV],uu[NV];
+	      struct geometry geom;
+
+	      //upper
+	      thaxis=get_xb(0,1);
+	      for(ic=0;ic<nc;ic++)
+		{
+		  iy=ic;iysrc=nc;
+		  th=get_x(iy,1);
+		  thsrc=get_x(iysrc,1);	      
 	      	  
-	      fill_geometry(ix,iy,iz,&geom);
+		  fill_geometry(ix,iy,iz,&geom);
 	  
-	      PLOOP(iv)
-		pp[iv]=get_u(p,iv,ix,iy,iz);
-  
-	      pp[VX]=get_u(p,VX,ix,iysrc,ix);
-	      pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
-	      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+		  PLOOP(iv)
+		    pp[iv]=get_u(p,iv,ix,iy,iz);
 
-	      p2u(pp,uu,&geom);
+		  //gas densities
+		  pp[RHO]=get_u(p,RHO,ix,iysrc,ix);
+		  pp[UU]=get_u(p,UU,ix,iysrc,ix);
+		  pp[ENTR]=get_u(p,ENTR,ix,iysrc,ix);		  
 
-	      PLOOP(iv)
-	      {
-		set_u(p,iv,ix,iy,iz,pp[iv]);  
-		set_u(u,iv,ix,iy,iz,uu[iv]);
-	      }
-	    }
+		  //gas velocities
+		  pp[VX]=get_u(p,VX,ix,iysrc,ix);
+		  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
+		  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+
+		  //rad density
+		  pp[EE0]=get_u(p,EE0,ix,iysrc,ix);
+
+		  //rad velocities
+		  pp[FX0]=get_u(p,FX0,ix,iysrc,ix);
+		  pp[FZ0]=get_u(p,FZ0,ix,iysrc,ix);
+		  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,ix);
+
+		  p2u(pp,uu,&geom);
+
+		  PLOOP(iv)
+		  {
+		    set_u(p,iv,ix,iy,iz,pp[iv]);  
+		    set_u(u,iv,ix,iy,iz,uu[iv]);
+		  }
+		}
   
-	  //lower
-	  thaxis=get_xb(NY,1);
-	  for(ic=0;ic<nc;ic++)
-	    {
-	      iy=NY-1-ic;iysrc=NY-1-nc;
-	      th=get_x(iy,1);
-	      thsrc=get_x(iysrc,1);	      
+	      //lower
+	      thaxis=get_xb(NY,1);
+	      for(ic=0;ic<nc;ic++)
+		{
+		  iy=NY-1-ic;iysrc=NY-1-nc;
+		  th=get_x(iy,1);
+		  thsrc=get_x(iysrc,1);	      
 	      	  
-	      fill_geometry(ix,iy,iz,&geom);
+		  fill_geometry(ix,iy,iz,&geom);
 	  
-	      PLOOP(iv)
-		pp[iv]=get_u(p,iv,ix,iy,iz);
+		  PLOOP(iv)
+		    pp[iv]=get_u(p,iv,ix,iy,iz);
   
-	      pp[VX]=get_u(p,VX,ix,iysrc,ix);
-	      pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
-	      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+		  //gas densities
+		  pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
+		  pp[UU]=get_u(p,UU,ix,iysrc,iz);
+		  pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
 
-	      p2u(pp,uu,&geom);
+		  //gas velocities
+		  pp[VX]=get_u(p,VX,ix,iysrc,iz);
+		  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
+		  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
-	      PLOOP(iv)
-	      {
-		set_u(p,iv,ix,iy,iz,pp[iv]);  
-		set_u(u,iv,ix,iy,iz,uu[iv]);
-	      }
-	    }
+		  //rad density
+		  pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
+
+		  //rad velocities
+		  pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
+		  pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
+		  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
+		  
+		  p2u(pp,uu,&geom);
+
+		  PLOOP(iv)
+		  {
+		    set_u(p,iv,ix,iy,iz,pp[iv]);  
+		    set_u(u,iv,ix,iy,iz,uu[iv]);
+		  }
+		}
 	 
+	    }
 	}
     }
+
+  //cylindrical like coords
+  if (MYCOORDS==CYLCOORDS || MYCOORDS==MCYL1COORDS)
+    {
+#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static)
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {
+	      ldouble R,Rsrc,Raxis;
+	      ldouble pp[NV],uu[NV];
+	      struct geometry geom;
+
+	      //upper
+	      Raxis=get_xb(0,0);
+	      for(ic=0;ic<nc;ic++)
+		{
+		  ix=ic;ixsrc=nc;
+		  R=get_x(ix,0);
+		  Rsrc=get_x(ixsrc,0);	      
+	      	  
+		  fill_geometry(ix,iy,iz,&geom);
+	  
+		  PLOOP(iv)
+		    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+		  //gas densities
+		  pp[RHO]=get_u(p,RHO,ixsrc,iy,iz);
+		  pp[UU]=get_u(p,UU,ixsrc,iy,iz);
+		  pp[ENTR]=get_u(p,ENTR,ixsrc,iy,iz);		  
+
+		  //gas velocities
+		  pp[VY]=get_u(p,VY,ixsrc,iy,iz);
+		  pp[VZ]=get_u(p,VZ,ixsrc,iy,iz);
+		  pp[VX]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,VX,ixsrc,iy,iz);
+
+		  //rad density
+		  pp[EE0]=get_u(p,EE0,ixsrc,iy,iz);
+
+		  //rad velocities
+		  pp[FY0]=get_u(p,FY0,ixsrc,iy,iz);
+		  pp[FZ0]=get_u(p,FZ0,ixsrc,iy,iz);
+		  pp[FX0]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,FX0,ixsrc,iy,iz);
+
+		  p2u(pp,uu,&geom);
+
+		  PLOOP(iv)
+		  {
+		    set_u(p,iv,ix,iy,iz,pp[iv]);  
+		    set_u(u,iv,ix,iy,iz,uu[iv]);
+		  }
+		}
+	    }
+	}
+    }
+
 
   return 0; 
 }

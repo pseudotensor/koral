@@ -2,11 +2,13 @@
 #define SKIPRADSOURCE
 
 //#define RESTART
-#define RESTARTNUM 16
+#define RESTARTNUM 90
 
 #define RADVISCOSITY SHEARVISCOSITY
-#define ALPHARADVISC .5
+#define ALPHARADVISC 1.
 #define ZEROTIMEINSHEAR
+#define CORRECT_POLARAXIS
+#define NCCORRECTPOLAR 2
 
 #define MASS 10.
 #define BHSPIN 0.
@@ -35,9 +37,9 @@
 #define MAXX (log(50.-MKS1R0))
 #define NX 30
 #else
-#define MINX (0.01)
+#define MINX (.01)
 #define MAXX 15.
-#define NX 80
+#define NX 60
 #endif
 
 #define NY 40 
@@ -62,7 +64,7 @@
 #define ERADATMMIN  (calc_LTE_EfromT(1.e9))
 
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.

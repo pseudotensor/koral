@@ -3159,7 +3159,7 @@ calc_Gi_ff(ldouble *pp, ldouble Gi[4])
 //******* takes primitives and closes R^ij in arbitrary frame ****************************
 //***********************************************************************************
 int
-calc_Rij(ldouble *pp, void *ggg, ldouble Rij[][4])
+calc_Rij_total(ldouble *pp, void *ggg, ldouble Rij[][4])
 {
 #ifdef RADIATION
   struct geometry *geom
@@ -3167,15 +3167,15 @@ calc_Rij(ldouble *pp, void *ggg, ldouble Rij[][4])
 
   //todo:
   //in some places we may want only the M1 part?
-  calc_Rij_M1(pp,ggg,Rij);  
+  calc_Rij(pp,ggg,Rij);  
 
 #if (RADVISCOSITY!=NOVISCOSITY)
   int i,j;
-  ldouble Tvisc[4][4];
-  calc_visc_Rij(pp,ggg,Tvisc,Rij);
+  ldouble Rvisc[4][4];
+  calc_Rij_visc(pp,ggg,Rvisc);
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      Rij[i][j]+=Tvisc[i][j];
+      Rij[i][j]+=Rvisc[i][j];
 #endif  
 
 #endif //RADIATION
@@ -3183,8 +3183,9 @@ calc_Rij(ldouble *pp, void *ggg, ldouble Rij[][4])
   return 0;
 }
 
+//M1 only
 int
-calc_Rij_M1(ldouble *pp, void* ggg, ldouble Rij[][4])
+calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 {
 #ifdef RADIATION
   struct geometry *geom
@@ -3223,17 +3224,16 @@ calc_Rij_M1(ldouble *pp, void* ggg, ldouble Rij[][4])
 //**********************************************************************
 //**********************************************************************
 int
-calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
+calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4])
 {
   int i,j;
-  ldouble Rij0[4][4];
+  
   struct geometry *geom
    = (struct geometry *) ggg;
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
-	Tvisc[i][j]=0.;
-	Rij0[i][j]=Rij[i][j];
+	Rvisc[i][j]=0.;	
       }
 
 #if (RADVISCOSITY==SHEARVISCOSITY)
@@ -3255,7 +3255,7 @@ calc_visc_Rij(ldouble *pp, void* ggg, ldouble Tvisc[][4], ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
-	Tvisc[i][j]= -2. * nu * Erad * shear[i][j];
+	Rvisc[i][j]= -2. * nu * Erad * shear[i][j];
       }
 #endif 
 
@@ -3438,9 +3438,10 @@ ldouble calc_LTE_Efromurho(ldouble u,ldouble rho)
 }
 
 /************************************************************************/
-/******* calculates wavespeeds in the lab frame takin 1/@3 in ************/
-/******* radiative rest frame and boosting it to lab frame *****************/
-/******* using the HARM algorithm - with taul limiter ********************/
+/******* calculates wavespeeds in the lab frame takin 1/@3 in ***********/
+/******* radiative rest frame and boosting it to lab frame **************/
+/******* using the HARM algorithm - with taul limiter *******************/
+/******* or calculating numerically at cell centers *********************/
 /************************************************************************/
 int
 calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int verbose)
@@ -3490,7 +3491,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
     }
      
   //todo:
-  //redundancy in idim
+  //redundancy in idim!
   for(idim=0;idim<3;idim++)
     {
       f_flux_prime_rad(pp0,idim,ggg,ff0);
@@ -3504,7 +3505,9 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	    }
 	  else //radiative momenta
 	    {
-	      del = -EPS*my_max(1.e-6/sqrt(geom->gg[j][j])*fabs(uu0[EE0]),fabs(uu0[j+EE0]));
+	      //test
+	      del = EPS*uu[EE0];
+	      //del = -EPS*my_sign(uu0[j+EE0])*my_max(1.e-6/sqrt(geom->gg[j][j])*fabs(uu0[EE0]),fabs(uu0[j+EE0]));
 	    }
 	  
 	  uu[j+EE0]=uu0[j+EE0]+del;
@@ -4047,7 +4050,7 @@ int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
 } 
 
 /***************************************/
-/***************************************/
+/* rad viscosity and shear at cell centers */
 /***************************************/
 int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret)
 {  
@@ -4056,7 +4059,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   struct geometry *geom
     = (struct geometry *) ggg;
 
-  //calculating shear
+  //calculating shear at cell center!
   calc_shear_lab(pp,ggg,shear,1);  
   indices_1122(shear,shear,geom->GG);
 
@@ -4477,11 +4480,13 @@ calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
  
 
 //***************************************
-// calculates radiative fluxes at faces
+// calculates radiative fluxes at faces or centers
 //***************************************
 int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
 {  
 #ifdef RADIATION
+  int i,j;
+
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -4496,8 +4501,50 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   calc_Rij(pp,ggg,Rij); //R^ij
+  
+  #if (RADVISCOSITY==SHEARVISCOSITY)
+  //when face and shear viscosity put the face primitives at both cell centers and average the viscous stress tensor
+  if(geom->ifacedim>-1)
+    //face centered fluxes
+    {      
+      int ix,iy,iz; 
+      ix=geom->ix;
+      iy=geom->iy;
+      iz=geom->iz;
+      struct geometry geomcent;
+      ldouble Rvisc1[4][4],Rvisc2[4][4];
+      //left
+      if(idim==0)
+	fill_geometry(ix-1,iy,iz,&geomcent);
+      if(idim==1)
+	fill_geometry(ix,iy-1,iz,&geomcent);
+      if(idim==2)
+	fill_geometry(ix,iy,iz-1,&geomcent);
+      calc_Rij_visc(pp,&geomcent,Rvisc1);
+      //right
+      fill_geometry(ix,iy,iz,&geomcent);
+      calc_Rij_visc(pp,&geomcent,Rvisc2);
+      //adding up to M1 tensor
+      
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  Rij[i][j]+=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
+    }
+  else
+    //cell centered fluxes for char. wavespeed evaluation
+    {
+      ldouble Rvisc[4][4];
+      calc_Rij_visc(pp,ggg,Rvisc);
+      //adding up to M1 tensor
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  Rij[i][j]+=Rvisc[i][j];
+    }
+  #endif
+
   indices_2221(Rij,Rij,gg); //R^i_j
-#else
+  
+#else //multifluid
   ldouble Rij[NRF][4][4];
   calc_Rij_mf(pp,gg,GG,Rij); //R^ij
 

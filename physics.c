@@ -987,11 +987,9 @@ calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//calculates shear tensor sigma_ij in the lab frame
+//calculates shear tensor sigma_ij in the lab frame at cell centers only!
 //whichvel == 0 -> using gas velocity
 //whichvel == 1 -> using radiative velocity
-
-  
 
 int
 calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
@@ -1073,36 +1071,31 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
   //spatial derivatives
 
   //not to go out of bounds - ghost cell should not use this anyway
+  
   /*
   while(ix<0) ix++;
   while(iy<0) iy++;
   while(iz<0) iz++;
   while(ix>NX-1) ix--;
   while(iy>NY-1) iy--;
-  while(iz>NZ-1) iz--; 
-  */
-
-  while(ix<0) ix++;
-  while(iy<0) iy++;
-  while(iz<0) iz++;
-  while(ix>NX-1) ix--;
-  while(iy>NY-1) iy--;
   while(iz>NZ-1) iz--;
+  */
  
 
   ldouble ppm1[NV],ppp1[NV],pp[NV];
   ldouble ggm1[4][5],GGm1[4][5];
   ldouble ggp1[4][5],GGp1[4][5];
-  ldouble xxvecm1[4],*xxvec,xxvecp1[4];
+  ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
   ldouble uconm1[4],uconp1[4],utconm1[4],utconp1[4],utcon[4],ucon[4];
   ldouble ucovm1[4],ucovp1[4],ucov[4];
   int idim;
 
-  //four-velocity at cell/face
-  xxvec=geom->xxvec;
+  //four-velocity at cell basing on pp[]
+  //xxvec=geom->xxvec;
+  get_xx(ix,iy,iz,xxvec);
   for(iv=0;iv<NV;iv++)
     {
-      pp[iv]=pp0[iv];//get_u(p,iv,ix,iy,iz);
+      pp[iv]=pp0[iv];
     }
   utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
   conv_vels_both(utcon,ucon,ucov,whichvel,VEL4,gg,GG);  
@@ -1173,19 +1166,60 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
      conv_vels_both(utconp1,uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
 
      ldouble dl,dr,dc;
+     ldouble dl2,dr2,dc2;
      for(i=0;i<4;i++)
        {
 	 dc=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
 	 dr=(ucovp1[i]-ucov[i]) / (xxvecp1[idim] - xxvec[idim]);
 	 dl=(ucov[i]-ucovm1[i]) / (xxvec[idim] - xxvecm1[idim]);
+	 dc2=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 dr2=(uconp1[i]-ucon[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 dl2=(ucon[i]-uconm1[i]) / (xxvec[idim] - xxvecm1[idim]);
 
-	 du[i][idim]=dc;//.25*(2.*dc+dl+dr);
+	 if((ix<0 && iy==0 && iz==0 && idim!=1) ||
+	    (iy<0 && ix==0 && iz==0 && idim!=2) ||
+	    (iz<0 && ix==0 && iy==0 && idim!=3))
+	   {
+	     du[i][idim]=dr;
+	     du2[i][idim]=dr2;
+	   }
+	 else if((ix<0 && iy==NY-1 && iz==NZ-1 && idim!=1) ||
+	    (iy<0 && ix==NX-1 && iz==NZ-1 && idim!=2) ||
+	    (iz<0 && ix==NX-1 && iy==NY-1 && idim!=3))
+	   {
+	     du[i][idim]=dl;
+	     du2[i][idim]=dl2;
+	   }
+	 else if((ix>=NX && iy==0 && iz==0 && idim!=1) ||
+	    (iy>=NY && ix==0 && iz==0 && idim!=2) ||
+	    (iz>=NZ && ix==0 && iy==0 && idim!=3))
+	   {
+	     du[i][idim]=dr;
+	     du2[i][idim]=dr2;
+	   }
+	 else if((ix>=NX && iy==NY-1 && iz==NZ-1 && idim!=1) ||
+	    (iy>=NY && ix==NX-1 && iz==NZ-1 && idim!=2) ||
+	    (iz>=NZ && ix==NX-1 && iy==NY-1 && idim!=3))
+	   {
+	     du[i][idim]=dl;
+	     du2[i][idim]=dl2;
+	   }
+	 else
+	   {
+	     du[i][idim]=.5*(dl+dr);
+	     du2[i][idim]=.5*(dl2+dr2);
+	   }
 
-	 dc=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
-	 dr=(uconp1[i]-ucon[i]) / (xxvecp1[idim] - xxvec[idim]);
-	 dl=(ucon[i]-uconm1[i]) / (xxvec[idim] - xxvecm1[idim]);
-
-	 du2[i][idim]=dc;//.25*(2.*dc+dl+dr);
+	 if(isnan(du[i][idim])) {
+	   printf("%d %d %d %d\n",ix,iy,iz,idim);
+	   print_4vector(ucovm1);
+	   print_4vector(ucov);
+	   print_4vector(ucovp1);
+	   print_4vector(xxvecm1);
+	   print_4vector(xxvec);	   
+	   print_4vector(xxvecp1);
+	   getchar();
+	 }	 	 
        }       
     }
 
