@@ -5,6 +5,9 @@
 #define RADVISCOSITY SHEARVISCOSITY
 #define ALPHARADVISC 1.
 #define ZEROTIMEINSHEAR
+#define CORRECT_POLARAXIS
+#define NCCORRECTPOLAR 1
+#define NUMRADWAVESPEEDS
 
 #define SHUFFLELOOPS 0
 
@@ -39,7 +42,7 @@
 
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
-#define MINX (log(0.01-MKS1R0))
+#define MINX (log(0.1-MKS1R0))
 #define MAXX (log(10.-MKS1R0))
 #define NX 100
 #else

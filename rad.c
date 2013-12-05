@@ -3552,8 +3552,8 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	{
 	  printf("problem: %e %e at %d %d\n",axl,axr,ix,iy);
 	  print_4vector(ev);
-	  print_4vector(pp0);
-	  print_4vector(uu0);
+	  print_4vector(&pp0[EE0]);
+	  print_4vector(&uu0[EE0]);
 	  print_tensor(JJ);
 	  getchar();
 	}

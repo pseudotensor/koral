@@ -513,21 +513,21 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  if(codeprim==0)
 									    {
 #ifdef RADOUTPUTINFF
-									  prad_lab2ff(pp,pp,&geom);
+									      prad_lab2ff(pp,pp,&geom);
 #endif
 
-#ifdef RADOUTPUTINZAMO //to print  radiation primitives in ZAMO
-									  prad_lab2on(pp,pp,&geom);
+#ifdef RADOUTPUTINZAMO //to print  radiation primitives in ZAMO, sometimes may not tetrad properly
+									      prad_lab2on(pp,pp,&geom);
 #endif
 
 #ifdef RADOUTPUTVELS
-									  ldouble vrelrad[4]={0,pp[7],pp[8],pp[9]};
-									  conv_vels(vrelrad,vrelrad,VELPRIMRAD,VEL4,gg,GG);						  
-									  trans2_cc2on(vrelrad,vrelrad,tup);
-									  //rad outvel - ortonormal VEL4
-									  pp[7]=vrelrad[1];
-									  pp[8]=vrelrad[2];
-									  pp[9]=vrelrad[3];	  
+									      ldouble vrelrad[4]={0,pp[7],pp[8],pp[9]};
+									      conv_vels(vrelrad,vrelrad,VELPRIMRAD,VEL4,gg,GG);						  
+									      //trans2_cc2on(vrelrad,vrelrad,tup);
+									      //rad outvel - ortonormal VEL4
+									      pp[7]=vrelrad[1];
+									      pp[8]=vrelrad[2];
+									      pp[9]=vrelrad[3];	  
 #endif
 
 									    }
