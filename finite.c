@@ -292,8 +292,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 #endif
 
   //passing up the characteristic wavespeeds
-  //TODO: correlate threads
-
   ldouble dx=get_size_x(ix,0);
   ldouble dy=get_size_x(iy,1);
   ldouble dz=get_size_x(iz,2);

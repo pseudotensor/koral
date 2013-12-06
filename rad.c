@@ -3651,6 +3651,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       //damping viscosity (done basing on mhd + viscous velocity!)
       //todo:
       //does not work...
+      
       /*
       if(maxvel > MAXRADVISCVEL)
 	{
@@ -3659,7 +3660,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	  axr=MAXRADVISCVEL;
 	  set_u_scalar(radviscfac,ix,iy,iz,fac);
 
-	  //printf("damping viscosity by %f at %d %d %d\n",fac,ix,iy,iz);
+	  printf("damping viscosity by %f at %d %d %d\n",fac,ix,iy,iz);
 	}
       else
 	set_u_scalar(radviscfac,ix,iy,iz,1.);

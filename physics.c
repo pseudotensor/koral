@@ -1180,6 +1180,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	 dr2=(uconp1[i]-ucon[i]) / (xxvecp1[idim] - xxvec[idim]);
 	 dl2=(ucon[i]-uconm1[i]) / (xxvec[idim] - xxvecm1[idim]);
 
+	 //to avoid corners
 	 if((ix<0 && iy==0 && iz==0 && idim!=1) ||
 	    (iy<0 && ix==0 && iz==0 && idim!=2) ||
 	    (iz<0 && ix==0 && iy==0 && idim!=3))

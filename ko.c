@@ -156,15 +156,13 @@ solve_the_problem(ldouble tstart)
   lasttoutavg_floor=floor(t/dtoutavg);
  
   dt=-1.;
-  max_ws[0]=max_ws[1]=max_ws[2]=1.;
+  max_ws[0]=max_ws[1]=max_ws[2]=10000.;
   if(NZ>1)
     tstepdenmax=max_ws[0]/min_dx + max_ws[1]/min_dy + max_ws[2]/min_dz;
   else if(NY>1)
     tstepdenmax=max_ws[0]/min_dx + max_ws[1]/min_dy;
   else
     tstepdenmax=max_ws[0]/min_dx;            
-
-  tstepdenmax*=10.;
 
   //copy primitives to hold previous time steps
   copy_u(1.,p,ptm1); ttm1=t;
@@ -204,6 +202,7 @@ solve_the_problem(ldouble tstart)
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
       
+      //dt based on the estimate from the last midpoint
       dt=TSTEPLIM*1./tstepdenmax;
 
       if(t+dt>t1) {dt=t1-t;}
@@ -216,6 +215,44 @@ solve_the_problem(ldouble tstart)
 
       //iteration counter
       i1++;
+
+      //**********************************************************************
+      //**********************************************************************
+      //**********************************************************************
+      /*
+      //calculates the timestep
+      int ii;ldouble max_lws[3];
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+      for(ii=0;ii<Nloop_0;ii++) //domain only
+	{
+	  ix=loop_0[ii][0];
+	  iy=loop_0[ii][1];
+	  iz=loop_0[ii][2]; 
+
+	  calc_primitives(ix,iy,iz,0);
+	}
+      cell_fixup_hd();
+#ifdef CORRECT_POLARAXIS
+      correct_polaraxis();
+#endif
+      set_bc(t,0);
+#pragma omp parallel for private(ix,iy,iz,iv,max_lws,ii) schedule (static)
+      for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
+	{
+	  ix=loop_1[ii][0];
+	  iy=loop_1[ii][1];
+	  iz=loop_1[ii][2]; ldouble aaa[12];
+
+	  calc_wavespeeds_lr(ix,iy,iz,aaa);	
+	  save_wavespeeds(ix,iy,iz,aaa,max_lws);
+	}
+      dt=TSTEPLIM*1./tstepdenmax;
+      if(t+dt>t1) {dt=t1-t;}
+      */
+      //**********************************************************************
+      //**********************************************************************
+      //**********************************************************************
+
 
       //**********************************************************************
       //**********************************************************************
