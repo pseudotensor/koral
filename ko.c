@@ -235,7 +235,7 @@ solve_the_problem(ldouble tstart)
 	  add_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
 	  add_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
 	  add_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
-	  t+=dt;
+	  t+=dt;	 
 	}
      else if(TIMESTEPPING==RK2)
        { 
@@ -250,6 +250,23 @@ solve_the_problem(ldouble tstart)
 	 //together     
 	 t+=dt;    
 	 add_u(1.,ut0,1.,ut2,u);
+	 //************************** end of RK2 **********************************
+	}
+     else if(TIMESTEPPING==RK2HEUN)
+       { 
+	 //******************************* RK2 **********************************
+	 //1st
+	 //todo:
+	 op_explicit (t,1.*dt,ut0); 
+	 op_implicit (t,1.*dt,uforget); 
+	 add_u(1.,u,-1.,ut0,ut2); 
+	 //2nd
+	 op_explicit (t,dt,ut1); 
+	 op_implicit (t,dt,uforget); 
+	 add_u(1.,u,-1.,ut1,ut3); 
+	 //together     
+	 t+=dt;    
+	 add_u_3(1.,u,1./2.,ut2,1./2.,ut3,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
 	 //************************** end of RK2 **********************************
 	}
      else 

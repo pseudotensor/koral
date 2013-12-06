@@ -85,6 +85,7 @@
 //timestepping
 #define RK2IMEX 1
 #define RK2 0
+#define RK2HEUN 2
 
 //types of hd/rad viscosity
 #define NOVISCOSITY 0

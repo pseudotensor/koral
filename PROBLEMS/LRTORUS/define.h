@@ -6,13 +6,13 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 8
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -27,7 +27,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2//IMEX //test IMEX with radiation etc!!!
+#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -48,6 +48,7 @@
 //rmhd floors
 /************************************/
 #define CORRECT_POLARAXIS
+#define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20

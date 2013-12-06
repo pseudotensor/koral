@@ -343,6 +343,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 {
   int ix,iy,iz,iv,ii;
 
+  copy_u(1.,u,ubase);
 
   //global
   max_ws[0]=max_ws[1]=max_ws[2]=-1.;
@@ -478,10 +479,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  for(i=0;i<NV;i++)
 	    {
-	      //parasite
-	      set_u(ubase,i,ix,iy,iz,get_u(u,i,ix,iy,iz));
-	      //end of parasite
-
 	      //resetting derivatives
 	      fd_der[i]=0.;
 
@@ -853,7 +850,7 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
   copy_u(1., u, ubase);
 
   //to count the average number of iteration in the implicit solver
-  for(ii=0;ii<12;ii++)
+  for(ii=0;ii<NGLOBALINTSLOT;ii++)
     global_int_slot[ii]=0.;
 
   /************************************************************************/
@@ -2615,24 +2612,26 @@ correct_polaraxis()
 	  
 		  PLOOP(iv)
 		    pp[iv]=get_u(p,iv,ix,iy,iz);
-
+		  
 		  //gas densities
-		  pp[RHO]=get_u(p,RHO,ix,iysrc,ix);
-		  pp[UU]=get_u(p,UU,ix,iysrc,ix);
-		  pp[ENTR]=get_u(p,ENTR,ix,iysrc,ix);		  
-
+		  pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
+		  pp[UU]=get_u(p,UU,ix,iysrc,iz);
+		  pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
+		  		  		  
 		  //gas velocities
-		  pp[VX]=get_u(p,VX,ix,iysrc,ix);
-		  pp[VZ]=get_u(p,VZ,ix,iysrc,ix);
-		  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,ix);
+		  pp[VX]=get_u(p,VX,ix,iysrc,iz);
+		  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
+		  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
+		  #ifdef RADIATION
 		  //rad density
-		  pp[EE0]=get_u(p,EE0,ix,iysrc,ix);
+		  pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
 
 		  //rad velocities
-		  pp[FX0]=get_u(p,FX0,ix,iysrc,ix);
-		  pp[FZ0]=get_u(p,FZ0,ix,iysrc,ix);
-		  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,ix);
+		  pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
+		  pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
+		  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
+		  #endif 
 
 		  p2u(pp,uu,&geom);
 
@@ -2666,6 +2665,7 @@ correct_polaraxis()
 		  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
 		  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
+		  #ifdef RADIATION
 		  //rad density
 		  pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
 
@@ -2673,6 +2673,7 @@ correct_polaraxis()
 		  pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
 		  pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
 		  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
+		  #endif 
 		  
 		  p2u(pp,uu,&geom);
 
@@ -2690,7 +2691,7 @@ correct_polaraxis()
   //cylindrical like coords
   if (MYCOORDS==CYLCOORDS || MYCOORDS==MCYL1COORDS)
     {
-#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static)
+#pragma omp parallel for private(ic,ix,iy,iz,iv,ixsrc) schedule (static)
       for(iy=0;iy<NY;iy++)
 	{
 	  for(iz=0;iz<NZ;iz++)
@@ -2722,6 +2723,7 @@ correct_polaraxis()
 		  pp[VZ]=get_u(p,VZ,ixsrc,iy,iz);
 		  pp[VX]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,VX,ixsrc,iy,iz);
 
+		  #ifdef RADIATION
 		  //rad density
 		  pp[EE0]=get_u(p,EE0,ixsrc,iy,iz);
 
@@ -2729,6 +2731,7 @@ correct_polaraxis()
 		  pp[FY0]=get_u(p,FY0,ixsrc,iy,iz);
 		  pp[FZ0]=get_u(p,FZ0,ixsrc,iy,iz);
 		  pp[FX0]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,FX0,ixsrc,iy,iz);
+		  #endif 
 
 		  p2u(pp,uu,&geom);
 
