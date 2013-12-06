@@ -1013,8 +1013,6 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
   ldouble du[4][4]; //du_i,j
   ldouble du2[4][4]; //du^i,j
 
-  //time derivatives
-  ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucovtm2[4];
 
   int istart,whichvel;
   if(hdorrad==0)
@@ -1028,11 +1026,9 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
       istart=FX(0);
     }
 
-#ifndef ZEROTIMEINSHEAR
-  if(geom->ifacedim!=-1)
-    my_err("time derivatives in shear don't work with cell faces - use ZEROTIMEINSHEAR please\n");
-#endif
-
+  //neglecting time derivatives
+  /*
+  ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucovtm2[4];
   ucontm1[0]=ucontm2[0]=0.; //time component will be calculated
 
   ucontm1[1]=get_u(ptm1,istart,ix,iy,iz);
@@ -1066,12 +1062,20 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
       du2[i][0] = 0.;
 #endif
     }
+  */
+
+  //instead:
+  for(i=0;i<4;i++)
+    {
+      //force d/dt = 0 in shear
+      du[i][0] = 0.;
+      du2[i][0] = 0.;
+    }
 
 
   //spatial derivatives
 
   //not to go out of bounds - ghost cell should not use this anyway
-  
   /*
   while(ix<0) ix++;
   while(iy<0) iy++;

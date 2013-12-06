@@ -3457,126 +3457,11 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 
   int i,j;
 
-#ifdef NUMRADWAVESPEEDS
-  //calculating the Jacobi matrix of radiative fluxes, then its eigenvalues and chooses the largest
-  int ix,iy,iz;
-  int idim,corr;
-  //may not work properly with WAVESPEEDSATFACES
-  //what is below assumes geometry at cell center
-  ix=geom->ix;
-  iy=geom->iy;
-  iz=geom->iz;
-
-  ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],JJ[4][4],del;
-  ldouble EPS=1.e-8;
-
-  //override
-  /*
-  pp[EE0]=1.e-10;
-  pp[FX0]=.5;
-  pp[FY0]=.5;
-  pp[FZ0]=0.;
-  */
-
-  PLOOP(i)
-    pp0[i]=pp[i];
-  p2u(pp0,uu0,ggg);
-  PLOOP(i)
-    uu[i]=uu0[i];
-
-  if(verbose)
-    {
-      print_4vector(&pp0[EE0]);
-      print_4vector(&uu0[EE0]);
-    }
-     
-  //todo:
-  //redundancy in idim!
-  for(idim=0;idim<3;idim++)
-    {
-      f_flux_prime_rad(pp0,idim,ggg,ff0);
-
-      //calculating approximate Jacobian
-      for(j=0;j<4;j++)
-	{
-	  if(j==0) //energy density
-	    {
-	      del = EPS*uu[EE0];
-	    }
-	  else //radiative momenta
-	    {
-	      //test
-	      del = EPS*uu[EE0];
-	      //del = -EPS*my_sign(uu0[j+EE0])*my_max(1.e-6/sqrt(geom->gg[j][j])*fabs(uu0[EE0]),fabs(uu0[j+EE0]));
-	    }
-	  
-	  uu[j+EE0]=uu0[j+EE0]+del;
-	  //todo: the derivatives in shear taken between ix+1 and ix-1 so shear component of stress do not change because of del
-
-	  if(verbose>1) { printf("%d: ",j);print_4vector(&uu[EE0]); }
-
-	  u2p_rad(uu,pp,ggg,&corr);
-
-	  //if(corr==1) printf("rad corrected at %d\n",j);
-
-	  f_flux_prime_rad(pp,idim,ggg,ff);
- 
-	  //Jacobian matrix component
-	  for(i=0;i<4;i++)
-	    {
-	      JJ[i][j]=(ff[i+EE0] - ff0[i+EE0])/del;
-	    }
-
-	  uu[j+EE0]=uu0[j+EE0];
-	  pp[j+EE0]=pp0[j+EE0];
-	}
-      
-      //Jacobian matrix in JJ
-      //eigenvalues - velocitiies in idim
-
-      if(verbose)
-	print_tensor(JJ);
-      ldouble evmax,ev[4];
-      evmax=calc_eigen_4x4(JJ,ev);
-
-      if(verbose)
-	{
-	  print_4vector(ev);
-	  getchar();
-	}      
-
-      ldouble axl=my_min_N(ev,4);
-      ldouble axr=my_max_N(ev,4);
-
-      if(!isfinite(axl) || !isfinite(axr) || fabs(axl)>100. || fabs(axr)>100.)
-	{
-	  printf("problem: %e %e at %d %d\n",axl,axr,ix,iy);
-	  print_4vector(ev);
-	  print_4vector(&pp0[EE0]);
-	  print_4vector(&uu0[EE0]);
-	  print_tensor(JJ);
-	  getchar();
-	}
-	  
-
-      ldouble fac=1.; //to artificially increase numerical diffusion/stability
-      aval[idim*2+0]=fac*axl;
-      aval[idim*2+1]=fac*axr;
-
-      
-
-      //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
-      if(tautot[idim]>1.) 
-	{
-	  aval[idim*2+0]/=tautot[idim];
-	  aval[idim*2+1]/=tautot[idim];
-	}
-    }
-#else 
+  //**********************************************************************
   //transforming 1/sqrt(3) from radiation rest frame + limiter based on optical depth
-  //relative four-velocity
-  ldouble urfcon[4];
+  //**********************************************************************
 
+  ldouble urfcon[4]; 
   urfcon[0]=0.;
   urfcon[1]=pp[FX0];
   urfcon[2]=pp[FY0];
@@ -3588,10 +3473,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   ldouble rv2rad = 1./3.;
   ldouble rv2,rv2tau;
 
-  //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
-  //**********************************************************************
-
   ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
   ldouble axl,axr,ayl,ayr,azl,azr;
   axl=axr=ayl=ayr=azl=azr=1.;
@@ -3655,6 +3537,145 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       aval[dim*2+0]=axl;
       aval[dim*2+1]=axr;
     }
+
+#ifdef NUMRADWAVESPEEDS
+  //calculating the Jacobi matrix of radiative fluxes, then its eigenvalues and chooses the largest
+
+  int ix,iy,iz;
+  int idim,corr;
+  //may not work properly with WAVESPEEDSATFACES
+  //what is below assumes geometry at cell center
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+
+  ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],JJ[4][4],del;
+  ldouble EPS=1.e-8;
+
+
+  PLOOP(i)
+    pp0[i]=pp[i];
+  p2u(pp0,uu0,ggg);
+  PLOOP(i)
+    uu[i]=uu0[i];
+
+  if(verbose)
+    {
+      print_4vector(&pp0[EE0]);
+      print_4vector(&uu0[EE0]);
+    }
+     
+  //todo:
+  //redundancy in idim!
+  for(idim=0;idim<3;idim++)
+    {
+      f_flux_prime_rad(pp0,idim,ggg,ff0);
+
+      //calculating approximate Jacobian
+      for(j=0;j<4;j++)
+	{
+	  if(j==0) //energy density
+	    {
+	      del = EPS*uu[EE0];
+	    }
+	  else //radiative momenta
+	    {
+	      del = -EPS*fabs(uu[EE0])*my_sign(uu0[j+EE0]);
+	    }
+	  
+	  uu[j+EE0]=uu0[j+EE0]+del;
+	  //todo: the derivatives in shear taken between ix+1 and ix-1 so shear component of stress do not change because of del
+
+	  if(verbose>1) { printf("%d: ",j);print_4vector(&uu[EE0]); }
+
+	  u2p_rad(uu,pp,ggg,&corr);
+
+	  if(verbose>0 && corr==1) printf("rad corrected at %d\n",j);
+
+	  f_flux_prime_rad(pp,idim,ggg,ff);
+ 
+	  //Jacobian matrix component
+	  for(i=0;i<4;i++)
+	    {
+	      JJ[i][j]=(ff[i+EE0] - ff0[i+EE0])/del;
+	    }
+
+	  uu[j+EE0]=uu0[j+EE0];
+	  pp[j+EE0]=pp0[j+EE0];
+	}
+      
+      //Jacobian matrix in JJ
+      //eigenvalues - velocitiies in idim
+
+      if(verbose)
+	print_tensor(JJ);
+      ldouble evmax,ev[4];
+      evmax=calc_eigen_4x4(JJ,ev);
+
+      if(verbose)
+	{
+	  print_4vector(ev);
+	  getchar();
+	}      
+
+      ldouble axl=my_min_N(ev,4);
+      ldouble axr=my_max_N(ev,4);
+
+      /*
+      if(!isfinite(axl) || !isfinite(axr) || fabs(axl)>100. || fabs(axr)>100.)
+	{
+	  printf("problem: %e %e at %d %d\n",axl,axr,ix,iy);
+	  print_4vector(ev);
+	  print_4vector(&pp0[EE0]);
+	  print_4vector(&uu0[EE0]);
+	  print_tensor(JJ);	 
+	  getchar();	  
+	}
+      */
+      
+      //regular rad velocity, calculated analytically in the begining
+      ldouble axl0,axr0;
+      axl0=aval[idim*2+0];
+      axr0=aval[idim*2+1];
+
+      //numerical values
+      ldouble fac=1.; //to artificially increase numerical diffusion/stability
+      axl*=fac;
+      axr*=fac;
+      
+      ldouble maxvel = my_max(fabs(axl),fabs(axr));
+      ldouble maxvel0 = my_max(fabs(axl0),fabs(axr0));
+      
+      //damping viscosity (done basing on mhd + viscous velocity!)
+      //todo:
+      //does not work...
+      /*
+      if(maxvel > MAXRADVISCVEL)
+	{
+	  fac=(MAXRADVISCVEL-maxvel0)/maxvel;
+	  axl=-MAXRADVISCVEL;
+	  axr=MAXRADVISCVEL;
+	  set_u_scalar(radviscfac,ix,iy,iz,fac);
+
+	  //printf("damping viscosity by %f at %d %d %d\n",fac,ix,iy,iz);
+	}
+      else
+	set_u_scalar(radviscfac,ix,iy,iz,1.);
+      */
+
+      //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
+      if(tautot[idim]>1.) 
+	{
+	  axl/=tautot[idim];
+	  axr/=tautot[idim];
+	}
+
+      aval[idim*2+0]=axl;
+      aval[idim*2+1]=axr;
+
+
+    }
+
 
 #endif
 
@@ -4090,12 +4111,14 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   
   ldouble ev[4],evmax,eta,nu,vdiff2;
   nu = ALPHARADVISC * 1./3. * mfp;
-  
-  //no longer necessary?
+
+  //damping if too strong, factor calculated together with rad_wavespeeds
+  //todo: be careful, this asks for values out of domain while radviscfac filled only inside
+  //other way of damping viscosity?
   /*
-  if(PROBLEM==30 || PROBLEM==43 || PROBLEM==54) //RADNT to overcome huge gradients near fixed radiative atmosphere at r>rout
-    if(geom->ix>=NX-2)
-      nu = 0.; 
+  nu*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
+  if(get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz)==0.) {
+    printf("%e %d %d\n",get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz),geom->ix,geom->iz);}
   */
 
   //limiting basing on diffusive wavespeed

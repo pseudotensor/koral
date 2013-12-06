@@ -203,7 +203,7 @@ solve_the_problem(ldouble tstart)
 
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
-
+      
       dt=TSTEPLIM*1./tstepdenmax;
 
       if(t+dt>t1) {dt=t1-t;}
@@ -220,7 +220,7 @@ solve_the_problem(ldouble tstart)
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
-      
+    
       if(TIMESTEPPING==RK2IMEX)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
@@ -272,7 +272,7 @@ solve_the_problem(ldouble tstart)
      else 
        my_err("wrong time stepping specified\n");
 
-
+ 
       //**********************************************************************
       //************************* finger  ************************************
       //**********************************************************************
@@ -312,6 +312,7 @@ solve_the_problem(ldouble tstart)
       impnums[5]=global_int_slot[GLOBALINTSLOT_NRADFIXUPS];
       impnums[6]=global_int_slot[GLOBALINTSLOT_NCRITFAILURES]; 
       
+
 
       //save to avg arrays
       save_avg(dt);
@@ -372,7 +373,7 @@ solve_the_problem(ldouble tstart)
       if(end_time-fprintf_time>1.) 
 	{
 	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
-		 ,nstep,t,dt,max_ws[0],end_time-start_time,znps);
+		 ,nstep,t,dt,my_max(my_max(max_ws[0],max_ws[1]),max_ws[2]),end_time-start_time,znps);
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],

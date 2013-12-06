@@ -70,7 +70,7 @@
 //67 LRTORUS - RMHD limo torus
 //68 RMHDWAVE - radiation modified linear magnetosonic waves
 
-#define PROBLEM 67
+#define PROBLEM 1
 
 #if(PROBLEM==68)
 
@@ -1375,6 +1375,10 @@
 
 #ifndef RADVISCOSITY
 #define RADVISCOSITY NOVISCOSITY
+#endif
+
+#ifndef MAXRADVISCVEL
+#define MAXRADVISCVEL 1.
 #endif
 
 #ifndef SHUFFLELOOPS

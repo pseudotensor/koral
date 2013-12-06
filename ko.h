@@ -87,7 +87,7 @@
 
 //global variables (allocated or not in misc.c)
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
-  *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
+  *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,*radviscfac,
   *dut0,*dut1,*dut2,*dut3,*uforget,*drt0,*drt1,*drt2,*drt3,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,*aradyr,*aradzr,*p,*pinit,*pproblem1,*pproblem2,*emf,
   *ptm1,*ptm2,*pt0,*px,*py,*pz,*s,*g,*gbx,*gby,*gbz,*Gbx,*Gby,*Gbz,*pavg,

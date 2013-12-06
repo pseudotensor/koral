@@ -4,6 +4,7 @@
 #define NZ 1
 
 #define TSTEPLIM .6
+#define FULLDISSIPATION
 
 #define PERIODIC_XBC
 #define COPY_YBC
@@ -32,9 +33,9 @@
 #define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-14
 
-#define NX 64
+#define NX 128
 
-#define NUMERO 1102
+#define NUMERO 1
 
 #if (NUMERO==1) //sonic wave
 #define KAPPA 0.

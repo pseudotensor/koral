@@ -1,28 +1,28 @@
 #define TMAX 1.e10
-//#define FLUXDISSIPATIONFULL
 #define RADIATION
-//#define LABRADFLUXES
-//#define EDDINGTON_APR
 
 #define MYCOORDS  SCHWCOORDS
 #define NX 30
 #define NY 1
 #define NZ 30
-#define TSTEPLIM .5//kind of courant limiter
+#define TSTEPLIM .5
 #define INT_ORDER 1
-#define RK3STEPPING
+#define TIMESTEPPING RK2
+#define SKIPRADSOURCE
+#define RADVISCOSITY SHEARVISCOSITY
+#define ALPHARADVISC 1.
+#define NLEFT 0.9
+#define NUMRADWAVESPEEDS
+#define MAXRADVISCVEL 5.
 
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (1.4)
-#define EXPLICIT_RAD_SOURCE
-//#define IMPLICIT_FF_RAD_SOURCE
+
 #define BEAMNO 1
 #define IFBEAM 1
-//#define GASRADOFF
-//#define RADSOURCEOFF
 #define FLATBACKGROUND
 
 
@@ -62,7 +62,6 @@
 #define EFLOOR 1.e-40
 #define TAMB 1e7
 #define TLEFT 1e9
-#define NLEFT 0.999
 #define RHOAMB 1.e0
 #define KAPPA 0.
 #define SPECIFIC_BC
