@@ -493,15 +493,18 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	 		
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
-	  //testing if interpolated primitives make sense
-	  fill_geometry_face(ix,iy,iz,0,&geom);
-	  check_floors_mhd(fd_pl,VELPRIM,&geom);
-	  fill_geometry_face(ix+1,iy,iz,0,&geom);
-	  check_floors_mhd(fd_pr,VELPRIM,&geom);
-	  //end of floor section
-
-	  f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
-	  f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr);   	  
+	  if(ix>=0) //no need to calculate at left face of first GC
+	    {
+	      fill_geometry_face(ix,iy,iz,0,&geom);
+	      check_floors_mhd(fd_pl,VELPRIM,&geom);
+	      f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
+	    }
+	  if(ix<NX)
+	    {
+	      fill_geometry_face(ix+1,iy,iz,0,&geom);
+	      check_floors_mhd(fd_pr,VELPRIM,&geom);
+	      f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr);   	  
+	    }
 
 	  //saving to memory
 	  for(i=0;i<NV;i++)
@@ -548,13 +551,19 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
 	  //testing if interpolated primitives make sense
-	  fill_geometry_face(ix,iy,iz,1,&geom);
-	  check_floors_mhd(fd_pl,VELPRIM,&geom);
-	  fill_geometry_face(ix,iy+1,iz,1,&geom);
-	  check_floors_mhd(fd_pr,VELPRIM,&geom);
+	  if(iy>=0)
+	    {
+	      fill_geometry_face(ix,iy,iz,1,&geom);
+	      check_floors_mhd(fd_pl,VELPRIM,&geom);
+	      f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
+	    }
 
-	  f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
-	  f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
+	  if(iy<NY)
+	    {
+	      fill_geometry_face(ix,iy+1,iz,1,&geom);
+	      check_floors_mhd(fd_pr,VELPRIM,&geom);
+	      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
+	    }
 
 	  //saving to memory
 	  for(i=0;i<NV;i++)
@@ -600,15 +609,19 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
-	  //testing if interpolated primitives make sense
-	  fill_geometry_face(ix,iy,iz,2,&geom);
-	  check_floors_mhd(fd_pl,VELPRIM,&geom);
-	  fill_geometry_face(ix,iy,iz+1,2,&geom);
-	  check_floors_mhd(fd_pr,VELPRIM,&geom);
-	  //end of floor section
+	  if(iz>=0)
+	    {
+	      fill_geometry_face(ix,iy,iz,2,&geom);
+	      check_floors_mhd(fd_pl,VELPRIM,&geom);
+	      f_flux_prime(fd_pl,2,ix,iy,iz,ffl);
+	    }
 
-	  f_flux_prime(fd_pl,2,ix,iy,iz,ffl);
-	  f_flux_prime(fd_pr,2,ix,iy,iz+1,ffr);   	          
+	  if(iz<NZ)
+	    {
+	      fill_geometry_face(ix,iy,iz+1,2,&geom);
+	      check_floors_mhd(fd_pr,VELPRIM,&geom);
+	      f_flux_prime(fd_pr,2,ix,iy,iz+1,ffr);   	          
+	    }
 
 	  //saving to memory
 	  for(i=0;i<NV;i++)

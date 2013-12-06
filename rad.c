@@ -3549,6 +3549,8 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   iy=geom->iy;
   iz=geom->iz;
 
+  //  printf("%d %d %d\n",ix,iy,iz); getchar();
+
   ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],JJ[4][4],del;
   ldouble EPS=1.e-8;
 
@@ -4083,6 +4085,12 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   struct geometry *geom
     = (struct geometry *) ggg;
 
+  if(geom->ix<-1) 
+    {
+      printf("rad_shear too far at %d %d\n",geom->ix,geom->iy);
+      getchar();
+    }
+  
   //calculating shear at cell center!
   calc_shear_lab(pp,ggg,shear,1);  
   indices_1122(shear,shear,geom->GG);
@@ -4117,8 +4125,6 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   //other way of damping viscosity?
   /*
   nu*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
-  if(get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz)==0.) {
-    printf("%e %d %d\n",get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz),geom->ix,geom->iz);}
   */
 
   //limiting basing on diffusive wavespeed
@@ -4531,8 +4537,9 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   #if (RADVISCOSITY==SHEARVISCOSITY)
   //when face and shear viscosity put the face primitives at both cell centers and average the viscous stress tensor
   if(geom->ifacedim>-1)
-    //face centered fluxes
+    //face fluxes
     {      
+      //printf("%d %d face %d\n",geom->ix,geom->iz,geom->ifacedim); //getchar();
       int ix,iy,iz; 
       ix=geom->ix;
       iy=geom->iy;
@@ -4559,6 +4566,8 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   else
     //cell centered fluxes for char. wavespeed evaluation
     {
+      //printf("%d %d center %d\n",geom->ix,geom->iz,geom->ifacedim); //getchar();
+
       ldouble Rvisc[4][4];
       calc_Rij_visc(pp,ggg,Rvisc);
       //adding up to M1 tensor
