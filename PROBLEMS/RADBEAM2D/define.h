@@ -1,17 +1,20 @@
 #define TMAX 1.e10
 #define RADIATION
 
+//#define RESTART
+#define RESTARTNUM 10
+
 #define MYCOORDS  SCHWCOORDS
 #define NX 30
 #define NY 1
 #define NZ 30
 #define TSTEPLIM .5
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2IMEX
 #define SKIPRADSOURCE
 #define RADVISCOSITY SHEARVISCOSITY
 #define ALPHARADVISC 1.
-#define NLEFT 0.5
+#define NLEFT 0.99
 #define NUMRADWAVESPEEDS
 #define MAXRADVISCVEL 5.
 #define GAMMAMAXRAD 50

@@ -4547,22 +4547,41 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
       iz=geom->iz;
       struct geometry geomcent;
       ldouble Rvisc1[4][4],Rvisc2[4][4];
+      int iix,iiy,iiz;
+      iix=ix;iiy=iy;iiz=iz;
       //left
       if(idim==0)
-	fill_geometry(ix-1,iy,iz,&geomcent);
+	iix=ix-1;
       if(idim==1)
-	fill_geometry(ix,iy-1,iz,&geomcent);
+	iiy=iy-1;
       if(idim==2)
-	fill_geometry(ix,iy,iz-1,&geomcent);
-      calc_Rij_visc(pp,&geomcent,Rvisc1);
+	iiz=iz-1;
+      fill_geometry(iix,iiy,iiz,&geomcent);
+
+      //using the face interpolated primitives
+      //calc_Rij_visc(pp,&geomcent,Rvisc1);
+      //using primitives from the cell center
+      calc_Rij_visc(&get_u(p,0,iix,iiy,iiz),&geomcent,Rvisc1);
+
       //right
       fill_geometry(ix,iy,iz,&geomcent);
-      calc_Rij_visc(pp,&geomcent,Rvisc2);
-      //adding up to M1 tensor
       
+      //calc_Rij_visc(pp,&geomcent,Rvisc2);
+      calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc2);
+
+      //adding up to M1 tensor
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
-	  Rij[i][j]+=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
+	  //test - works for RADBEAM2D with high NLEFT but reduces slightly diffusion
+
+	  	  
+	  if(get_u(p,EE0,iix,iiy,iiz)<get_u(p,EE0,ix,iy,iz))
+	    Rij[i][j]+=Rvisc1[i][j];
+	  else
+	    Rij[i][j]+=Rvisc2[i][j];
+	  		   
+	  
+	  //Rij[i][j]+=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
     }
   else
     //cell centered fluxes for char. wavespeed evaluation

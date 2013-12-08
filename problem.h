@@ -70,7 +70,7 @@
 //67 LRTORUS - RMHD limo torus
 //68 RMHDWAVE - radiation modified linear magnetosonic waves
 
-#define PROBLEM 1
+#define PROBLEM 44
 
 #if(PROBLEM==68)
 
