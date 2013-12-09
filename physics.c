@@ -656,7 +656,7 @@ int calc_hd_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nur
     = (struct geometry *) ggg;
 
   //calculating shear
-  calc_shear_lab(pp,ggg,shear,0);  
+  calc_shear_lab(pp,ggg,shear,MHD);  
   indices_1122(shear,shear,geom->GG);
   
   //transforming to ortonormal
@@ -1015,12 +1015,12 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 
 
   int istart,whichvel;
-  if(hdorrad==0)
+  if(hdorrad==MHD)
     {
       whichvel=VELPRIM;
       istart=VX;
     }
-  else if(hdorrad==1)
+  else if(hdorrad==RAD)
     {
       whichvel=VELPRIMRAD;
       istart=FX(0);
@@ -1092,6 +1092,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
   ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
   ldouble uconm1[4],uconp1[4],utconm1[4],utconp1[4],utcon[4],ucon[4];
   ldouble ucovm1[4],ucovp1[4],ucov[4];
+  ldouble enl,enr;
   int idim;
 
   //four-velocity at cell basing on pp[]
@@ -1124,7 +1125,17 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	    }
 	  */
 	  get_xx(ix-1,iy,iz,xxvecm1);
-	  get_xx(ix+1,iy,iz,xxvecp1);	  
+	  get_xx(ix+1,iy,iz,xxvecp1);
+	  if(hdorrad==RAD) 
+	    {
+	      enl=get_u(u,EE0,ix-1,iy,iz);
+	      enr=get_u(u,EE0,ix+1,iy,iz);
+	    }
+	  else
+	    {
+	      enl=get_u(u,UU,ix-1,iy,iz);
+	      enr=get_u(u,UU,ix+1,iy,iz);
+	    }
 	  for(iv=0;iv<NV;iv++)
 	    {
 	      ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
@@ -1138,6 +1149,16 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	{
 	  get_xx(ix,iy-1,iz,xxvecm1);
 	  get_xx(ix,iy+1,iz,xxvecp1);	  
+	  if(hdorrad==RAD) 
+	    {
+	      enl=get_u(u,EE0,ix,iy-1,iz);
+	      enr=get_u(u,EE0,ix,iy+1,iz);
+	    }
+	  else
+	    {
+	      enl=get_u(u,UU,ix,iy-1,iz);
+	      enr=get_u(u,UU,ix,iy+1,iz);
+	    }
 	  for(iv=0;iv<NV;iv++)
 	    {
 	      ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
@@ -1151,7 +1172,17 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
      if(idim==3)
        {
 	 get_xx(ix,iy,iz-1,xxvecm1);
-	 get_xx(ix,iy,iz+1,xxvecp1);	  
+	 get_xx(ix,iy,iz+1,xxvecp1);
+	 if(hdorrad==RAD) 
+	    {
+	      enl=get_u(u,EE0,ix,iy,iz-1);
+	      enr=get_u(u,EE0,ix,iy,iz+1);
+	    }
+	  else
+	    {
+	      enl=get_u(u,UU,ix,iy,iz-1);
+	      enr=get_u(u,UU,ix,iy,iz+1);
+	    }
 	 for(iv=0;iv<NV;iv++)
 	   {
 	     ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
@@ -1211,8 +1242,21 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	   }
 	 else
 	   {
-	     du[i][idim]=.5*(dl+dr);
-	     du2[i][idim]=.5*(dl2+dr2);
+	     //symmetric, but does not reflect changes in *pp - important for wavespeeds and Jacobian derivatives
+	     /*
+	     du[i][idim]=dc;
+	     du2[i][idim]=dc2;
+	     */
+	     if(fabs(enl)>fabs(enr))
+	       {
+		 du[i][idim]=dl;
+		 du2[i][idim]=dl2;
+	       }
+	     else
+	       {
+		 du[i][idim]=dr;
+		 du2[i][idim]=dr2;
+	       }
 	   }
 
 	 if(isnan(du[i][idim])) {
@@ -1320,12 +1364,12 @@ calc_shear_lab_old2(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
   ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucovtm2[4];
 
   int istart,whichvel;
-  if(hdorrad==0)
+  if(hdorrad==MHD)
     {
       whichvel=VELPRIM;
       istart=VX;
     }
-  else if(hdorrad==1)
+  else if(hdorrad==RAD)
     {
       whichvel=VELPRIMRAD;
       istart=FX(0);

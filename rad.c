@@ -4093,7 +4093,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
     }
   
   //calculating shear at cell center!
-  calc_shear_lab(pp,ggg,shear,1);  
+  calc_shear_lab(pp,ggg,shear,RAD);  
   indices_1122(shear,shear,geom->GG);
 
   //transforming to ortonormal
@@ -4572,16 +4572,15 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
       //adding up to M1 tensor
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
-	  //test - works for RADBEAM2D with high NLEFT but reduces slightly diffusion
-
-	  	  
-	  if(get_u(p,EE0,iix,iiy,iiz)<get_u(p,EE0,ix,iy,iz))
+	  //test - works for RADBEAM2D with high NLEFT but reduces slightly diffusion	  	  
+	  
+	  /*
+	  if(fabs(get_u(u,EE0,iix,iiy,iiz))>fabs(get_u(u,EE0,ix,iy,iz)))
 	    Rij[i][j]+=Rvisc1[i][j];
 	  else
-	    Rij[i][j]+=Rvisc2[i][j];
-	  		   
-	  
-	  //Rij[i][j]+=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
+	    Rij[i][j]+=Rvisc2[i][j];	  
+	  */
+	  Rij[i][j]+=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
     }
   else
     //cell centered fluxes for char. wavespeed evaluation
