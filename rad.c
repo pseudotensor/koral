@@ -3652,19 +3652,19 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       //todo:
       //does not work...
       
-      /*
+      
       if(maxvel > MAXRADVISCVEL)
 	{
 	  fac=(MAXRADVISCVEL-maxvel0)/maxvel;
-	  axl=-MAXRADVISCVEL;
-	  axr=MAXRADVISCVEL;
+	  axl=-MAXRADVISCVEL*1.5;
+	  axr=MAXRADVISCVEL*1.5;
 	  set_u_scalar(radviscfac,ix,iy,iz,fac);
 
-	  printf("damping viscosity by %f at %d %d %d\n",fac,ix,iy,iz);
+	  //printf("damping viscosity by %f at %d %d %d\n",fac,ix,iy,iz);
 	}
       else
 	set_u_scalar(radviscfac,ix,iy,iz,1.);
-      */
+      
 
       //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
       if(tautot[idim]>1.) 
@@ -4124,9 +4124,9 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   //damping if too strong, factor calculated together with rad_wavespeeds
   //todo: be careful, this asks for values out of domain while radviscfac filled only inside
   //other way of damping viscosity?
-  /*
+  
   nu*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
-  */
+  
 
   //limiting basing on diffusive wavespeed
   

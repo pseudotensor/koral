@@ -16,7 +16,7 @@
 #define ALPHARADVISC 1.
 #define NLEFT 0.99
 #define NUMRADWAVESPEEDS
-#define MAXRADVISCVEL 5.
+#define MAXRADVISCVEL 1.
 #define GAMMAMAXRAD 50
 
 #define INITTSTEPLIM (TSTEPLIM/10.)//for the 1st time step
