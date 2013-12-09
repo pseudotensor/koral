@@ -1,7 +1,7 @@
 #define RADIATION
 #define SKIPRADSOURCE
 
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 10
 
 #define RADVISCOSITY SHEARVISCOSITY

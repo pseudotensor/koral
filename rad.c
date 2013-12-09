@@ -3451,6 +3451,8 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   struct geometry *geom
     = (struct geometry *) ggg;
 
+  if(geom->ix==NX/2 && geom->iy==0) verbose = 1;
+
   ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
   GG=geom->GG;
@@ -3572,7 +3574,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   for(idim=0;idim<3;idim++)
     {
       f_flux_prime_rad(pp0,idim,ggg,ff0);
-
+      
       //calculating approximate Jacobian
       for(j=0;j<4;j++)
 	{
@@ -3595,7 +3597,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	  if(verbose>0 && corr==1) printf("rad corrected at %d\n",j);
 
 	  f_flux_prime_rad(pp,idim,ggg,ff);
- 
+
 	  //Jacobian matrix component
 	  for(i=0;i<4;i++)
 	    {
@@ -3613,20 +3615,121 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	print_tensor(JJ);
       ldouble evmax,ev[4];
       evmax=calc_eigen_4x4(JJ,ev);
-
-      if(verbose)
-	{
-	  print_4vector(ev);
-	  getchar();
-	}      
-
+      
+      //regular rad velocity, calculated analytically in the begining
       ldouble axl=my_min_N(ev,4);
       ldouble axr=my_max_N(ev,4);
 
+      //test: only viscous
+      ldouble Rtemp[4][4];
+      calc_Rij_visc(pp0,ggg,Rtemp);
+      indices_2221(Rtemp,Rtemp,geom->gg);
+      ff0[EE0+0]=Rtemp[idim+1][0];
+      ff0[EE0+1]=Rtemp[idim+1][1];
+      ff0[EE0+2]=Rtemp[idim+1][2];
+      ff0[EE0+3]=Rtemp[idim+1][3];
+
+      //calculating approximate Jacobian
+      for(j=0;j<4;j++)
+	{
+	  if(j==0) //energy density
+	    {
+	      del = EPS*uu[EE0];
+	    }
+	  else //radiative momenta
+	    {
+	      del = -EPS*fabs(uu[EE0])*my_sign(uu0[j+EE0]);
+	    }
+	  
+	  uu[j+EE0]=uu0[j+EE0]+del;
+	  //todo: the derivatives in shear taken between ix+1 and ix-1 so shear component of stress do not change because of del
+
+	  if(verbose>1) { printf("%d: ",j);print_4vector(&uu[EE0]); }
+
+	  u2p_rad(uu,pp,ggg,&corr);
+
+	  if(verbose>0 && corr==1) printf("rad corrected at %d\n",j);
+
+	  //test - viscous only
+	  calc_Rij_visc(pp,ggg,Rtemp);
+	  indices_2221(Rtemp,Rtemp,geom->gg);
+	  ff[EE0+0]=Rtemp[idim+1][0];
+	  ff[EE0+1]=Rtemp[idim+1][1];
+	  ff[EE0+2]=Rtemp[idim+1][2];
+	  ff[EE0+3]=Rtemp[idim+1][3];
+
+	  //Jacobian matrix component
+	  for(i=0;i<4;i++)
+	    {
+	      JJ[i][j]=(ff[i+EE0] - ff0[i+EE0])/del;
+	    }
+
+	  uu[j+EE0]=uu0[j+EE0];
+	  pp[j+EE0]=pp0[j+EE0];
+	}
+      
+      if(verbose)
+	print_tensor(JJ);
+
+      ldouble evmaxvisc,evvisc[4];
+      evmaxvisc=calc_eigen_4x4(JJ,evvisc);
+      //regular rad velocity, calculated analytically in the begining
+      ldouble axlvisc=my_min_N(evvisc,4);
+      ldouble axrvisc=my_max_N(evvisc,4);
+      //end: test
+      
+      //regular, calculated analytically before
+      ldouble axl0,axr0;
+      axl0=aval[idim*2+0];
+      axr0=aval[idim*2+1];
+
+      if(verbose)
+	{
+	  printf("\n vfull: %e %e \n",axl,axr);
+	  print_4vector(ev);
+	  printf("\n vvisc: %e %e \n",axlvisc,axrvisc);
+	  print_4vector(evvisc);
+	  printf("\n vanal: %e %e \n",axl0,axr0);
+
+	  //calculating shear for comparison
+	  /*
+	  ldouble shear[4][4];
+	  calc_shear_lab(pp0,ggg,shear,RAD);  
+	  indices_1121(shear,shear,geom->GG);
+	  evmax=calc_eigen_4x4(shear,ev);
+	  ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),   //here gg can be face or cell, get_size_x always refers to cell
+		 get_size_x(geom->iy,1)*sqrt(geom->gg[2][2]),
+			 get_size_x(geom->iz,2)*sqrt(geom->gg[3][3])};
+	  ldouble mindx;
+	  //mean free path
+	  ldouble chi=calc_chi(pp,geom->xxvec);
+	  ldouble mfp = 1./chi; // dr / dtau
+	  if(NY==1 && NZ==1) mindx = dx[0];
+	  else if(NZ==1) mindx = my_min(dx[0],dx[1]);
+	  else if(NY==1) mindx = my_min(dx[0],dx[2]);
+	  else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
+	  if(mfp>mindx || chi<SMALL) mfp=mindx;
+	  ldouble ev[4],evmax,eta,nu,vdiff2;
+	  nu = ALPHARADVISC * 1./3. * mfp;
+	  nu*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
+	  
+	  for(i=0;i<4;i++)
+	    {
+	      ev[i]*=2.*nu;
+	      ev[i]=sqrt(ev[i]);
+	    }
+	  print_4vector(ev);
+	  */
+	  printf("end of dim %d\n",idim);
+	  getchar();
+	}      
+
+      
       /*
       if(!isfinite(axl) || !isfinite(axr) || fabs(axl)>100. || fabs(axr)>100.)
 	{
 	  printf("problem: %e %e at %d %d\n",axl,axr,ix,iy);
+
 	  print_4vector(ev);
 	  print_4vector(&pp0[EE0]);
 	  print_4vector(&uu0[EE0]);
@@ -3635,11 +3738,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	}
       */
       
-      //regular rad velocity, calculated analytically in the begining
-      ldouble axl0,axr0;
-      axl0=aval[idim*2+0];
-      axr0=aval[idim*2+1];
-
+      
       //numerical values
       ldouble fac=1.; //to artificially increase numerical diffusion/stability
       axl*=fac;
@@ -4533,7 +4632,8 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
 
 #ifndef MULTIRADFLUID
   ldouble Rij[4][4];
-  calc_Rij(pp,ggg,Rij); //R^ij
+
+  calc_Rij(pp,ggg,Rij); //regular R^ij
   
   #if (RADVISCOSITY==SHEARVISCOSITY)
   //when face and shear viscosity put the face primitives at both cell centers and average the viscous stress tensor

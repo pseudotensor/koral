@@ -1242,11 +1242,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	   }
 	 else
 	   {
-	     //symmetric, but does not reflect changes in *pp - important for wavespeeds and Jacobian derivatives
-	     /*
-	     du[i][idim]=dc;
-	     du2[i][idim]=dc2;
-	     */
+	     
 	     if(fabs(enl)>fabs(enr))
 	       {
 		 du[i][idim]=dl;
@@ -1257,6 +1253,11 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 		 du[i][idim]=dr;
 		 du2[i][idim]=dr2;
 	       }
+	     //symmetric, but does not reflect changes in *pp - important for wavespeeds and Jacobian derivatives
+	     /*
+	     du[i][idim]=dc;
+	     du2[i][idim]=dc2;
+	     */
 	   }
 
 	 if(isnan(du[i][idim])) {

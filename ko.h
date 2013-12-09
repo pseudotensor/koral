@@ -506,6 +506,7 @@ int indices_2221(ldouble T1[][4],ldouble T2[][4],ldouble gg[][5]);
 int indices_2122(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5]);
 int indices_2211(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5]);
 int indices_1122(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5]);
+int indices_1121(ldouble T1[][4],ldouble T2[][4],ldouble GG[][5]);
 int indices_21(ldouble A1[4],ldouble A2[4],ldouble gg[][5]);
 int indices_12(ldouble A1[4],ldouble A2[4],ldouble GG[][5]);
 int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg);
