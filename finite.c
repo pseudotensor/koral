@@ -291,7 +291,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   if(aaazhd>max_lws[2]) max_lws[2]=aaazhd;
 #endif
 
-  //passing up the characteristic wavespeeds
   ldouble dx=get_size_x(ix,0);
   ldouble dy=get_size_x(iy,1);
   ldouble dz=get_size_x(iz,2);
@@ -308,25 +307,32 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   wsz=aaazhd;
   #endif
 
-  ldouble tstepden;
-  //#pragma omp critical
-  if(wsx>max_ws[0]) max_ws[0]=wsx;
-  //#pragma omp critical
-  if(wsy>max_ws[1]) max_ws[1]=wsy;
-  //#pragma omp critical
-  if(wsz>max_ws[2]) max_ws[2]=wsz;
+  //determining the time step
+  //only domain cells 
 
-  if(NZ>1 && NY>1)
-    tstepden=max_ws[0]/dx + max_ws[1]/dy + max_ws[2]/dz;
-  else if(NZ==1 && NY>1)
-    tstepden=max_ws[0]/dx + max_ws[1]/dy;
-  else if(NY==1 && NZ>1)
-    tstepden=max_ws[0]/dx + max_ws[2]/dz;
-  else
-    tstepden=max_ws[0]/dx;   
+  if(if_indomain(ix,iy,iz)==1) 
+    {
+      
+      ldouble tstepden;
+      //#pragma omp critical
+      if(wsx>max_ws[0]) max_ws[0]=wsx;
+      //#pragma omp critical
+      if(wsy>max_ws[1]) max_ws[1]=wsy;
+      //#pragma omp critical
+      if(wsz>max_ws[2]) max_ws[2]=wsz;
+      
+      if(NZ>1 && NY>1)
+	tstepden=max_ws[0]/dx + max_ws[1]/dy + max_ws[2]/dz;
+      else if(NZ==1 && NY>1)
+	tstepden=max_ws[0]/dx + max_ws[1]/dy;
+      else if(NY==1 && NZ>1)
+	tstepden=max_ws[0]/dx + max_ws[2]/dz;
+      else
+	tstepden=max_ws[0]/dx;   
 
-  //#pragma omp critical
-  if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
+      //#pragma omp critical
+      if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
+    }
   
   return 0;
 }

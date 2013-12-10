@@ -219,44 +219,6 @@ solve_the_problem(ldouble tstart)
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
-      /*
-      //calculates the timestep
-      int ii;ldouble max_lws[3];
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-      for(ii=0;ii<Nloop_0;ii++) //domain only
-	{
-	  ix=loop_0[ii][0];
-	  iy=loop_0[ii][1];
-	  iz=loop_0[ii][2]; 
-
-	  calc_primitives(ix,iy,iz,0);
-	}
-      cell_fixup_hd();
-#ifdef CORRECT_POLARAXIS
-      correct_polaraxis();
-#endif
-      set_bc(t,0);
-#pragma omp parallel for private(ix,iy,iz,iv,max_lws,ii) schedule (static)
-      for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
-	{
-	  ix=loop_1[ii][0];
-	  iy=loop_1[ii][1];
-	  iz=loop_1[ii][2]; ldouble aaa[12];
-
-	  calc_wavespeeds_lr(ix,iy,iz,aaa);	
-	  save_wavespeeds(ix,iy,iz,aaa,max_lws);
-	}
-      dt=TSTEPLIM*1./tstepdenmax;
-      if(t+dt>t1) {dt=t1-t;}
-      */
-      //**********************************************************************
-      //**********************************************************************
-      //**********************************************************************
-
-
-      //**********************************************************************
-      //**********************************************************************
-      //**********************************************************************
     
       if(TIMESTEPPING==RK2IMEX)
 	{
