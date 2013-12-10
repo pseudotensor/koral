@@ -4609,12 +4609,10 @@ calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
   return TradLTE;  
 }
 
- 
-
 //***************************************
-// calculates radiative fluxes at faces or centers
+// calculates radiative tensor at faces or centers
 //***************************************
-int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
+int f_flux_prime_rad_total(ldouble *pp, int idim, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4])
 {  
 #ifdef RADIATION
   int i,j;
@@ -4625,22 +4623,18 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
-  gdet=geom->gdet; gdetu=gdet;
-#if (GDETIN==0) //gdet out of derivatives
-  gdetu=1.;
-#endif
 
-#ifndef MULTIRADFLUID
-  ldouble Rij[4][4];
-
-  calc_Rij(pp,ggg,Rij); //regular R^ij
+  #ifndef MULTIRADFLUID
+  calc_Rij(pp,ggg,RijM1); //regular M1 R^ij
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=RijM1[i][j];
   
   #if (RADVISCOSITY==SHEARVISCOSITY)
   //when face and shear viscosity put the face primitives at both cell centers and average the viscous stress tensor
   if(geom->ifacedim>-1)
     //face fluxes
     {      
-      //printf("%d %d face %d\n",geom->ix,geom->iz,geom->ifacedim); //getchar();
       int ix,iy,iz; 
       ix=geom->ix;
       iy=geom->iy;
@@ -4672,27 +4666,29 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
       //adding up to M1 tensor
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
+	  {
 	  //test - works for RADBEAM2D with high NLEFT but reduces slightly diffusion	  	  
-	  
 	  /*
-	  if(fabs(get_u(u,EE0,iix,iiy,iiz))>fabs(get_u(u,EE0,ix,iy,iz)))
+	    if(fabs(get_u(u,EE0,iix,iiy,iiz))>fabs(get_u(u,EE0,ix,iy,iz)))
 	    Rij[i][j]+=Rvisc1[i][j];
-	  else
+	    else
 	    Rij[i][j]+=Rvisc2[i][j];	  
 	  */
-	  Rij[i][j]+=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
+	  Rijvisc[i][j]=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
+	  Rij[i][j]+=Rijvisc[i][j];
+	  }
+      
     }
   else
     //cell centered fluxes for char. wavespeed evaluation
     {
       //printf("%d %d center %d\n",geom->ix,geom->iz,geom->ifacedim); //getchar();
 
-      ldouble Rvisc[4][4];
-      calc_Rij_visc(pp,ggg,Rvisc);
+      calc_Rij_visc(pp,ggg,Rijvisc);
       //adding up to M1 tensor
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
-	  Rij[i][j]+=Rvisc[i][j];
+	  Rij[i][j]+=Rijvisc[i][j];
     }
   #endif
 
@@ -4707,6 +4703,33 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
       indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
     }
 #endif
+
+#endif
+
+  return 0;
+}
+
+//***************************************
+// calculates radiative fluxes at faces or centers
+//***************************************
+int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
+{  
+#ifdef RADIATION
+  int i,j;
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  ldouble Rij[4][4],RijM1[4][4],Rijvisc[4][4];
+  f_flux_prime_rad_total(pp,idim,ggg,Rij,RijM1,Rijvisc);
 
   //fluxes to ff[EE0+]
 #ifndef MULTIRADFLUID

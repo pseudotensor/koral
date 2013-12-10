@@ -548,6 +548,7 @@ int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);
 
 //rad.c
 int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff);
+int f_flux_prime_rad_total(ldouble *pp, int idim, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4]);
 int solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *);
 int solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,ldouble *pp);
 int solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* deltas,int verbose);
