@@ -3244,12 +3244,12 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4])
   //which energy density?
   ldouble Erad;
   //radiation rest frame:
-  //Erad=pp[EE0]; 
+  Erad=pp[EE0]; 
 
   //lab-frame
-  ldouble Rtt,ncon[4];
-  calc_normal_Rtt(pp,&Rtt,ncon,geom);
-  Erad=-Rtt;
+  //ldouble Rtt,ncon[4];
+  //calc_normal_Rtt(pp,&Rtt,ncon,geom);
+  //Erad=-Rtt;
 
   //multiply by viscosity to get viscous tensor
   for(i=0;i<4;i++)
@@ -3686,17 +3686,19 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	  getchar();
 	  */
 
-	  ldouble fac,maxvel_ph;      
-	  fac=1./maxvelvisc;
-
-	  //axl/axr modify or not?
-	  axl=my_min(axl0,axlvisc*fac);
-	  axr=my_max(axr0,axrvisc*fac);
-
-	  axl=axl0-axlvisc*fac;
-	  axr=axr0+axrvisc*fac;
-	      
-	  set_u_scalar(radviscfac,ix,iy,iz,fac);
+	  ldouble fac,maxvel_ph; 
+	  if(maxvelvisc>MAXRADVISCVEL)
+	    {
+	      fac=MAXRADVISCVEL/maxvelvisc;
+	      //axl/axr - how to modify them?
+	      axl=my_min(axl0,axlvisc*fac);
+	      axr=my_max(axr0,axrvisc*fac);
+	    
+	      axl=axl0-axlvisc*fac;
+	      axr=axr0+axrvisc*fac;
+	    
+	      set_u_scalar(radviscfac,ix,iy,iz,fac);
+	    }
 	}
 
       //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
@@ -4496,11 +4498,10 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   ldouble ev[4],evmax,eta,nu,vdiff2;
   nu = ALPHARADVISC * 1./3. * mfp;
 
+#ifdef NUMRADWAVESPEEDS
   //damping if too strong, factor calculated together with rad_wavespeeds
-  //todo: be careful, this asks for values out of domain while radviscfac filled only inside
-  //other way of damping viscosity?
-  
   nu*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
+#endif
   
 
   //limiting basing on diffusive wavespeed
@@ -4893,6 +4894,9 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 #ifdef RADIATION
   int i,j;
 
+  ldouble uu[NV];
+  p2u(pp,uu,ggg);
+
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -4900,12 +4904,13 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   gg=geom->gg;
   GG=geom->GG;
 
-  #ifndef MULTIRADFLUID
   calc_Rij(pp,ggg,RijM1); //regular M1 R^ij
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=RijM1[i][j];
-  
+  indices_2221(Rij,Rij,gg); //R^i_j
+  indices_2221(RijM1,RijM1,gg); //R^i_j
+
   #if (RADVISCOSITY==SHEARVISCOSITY)
   //when face and shear viscosity put the face primitives at both cell centers and average the viscous stress tensor
   if(geom->ifacedim>-1)
@@ -4952,9 +4957,8 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 	    Rij[i][j]+=Rvisc2[i][j];	  
 	  */
 	    Rijvisc[i][j]=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
-	    Rij[i][j]+=Rijvisc[i][j];
-	  }
-      
+	  }      
+
     }
   else
     //cell centered fluxes for char. wavespeed evaluation
@@ -4963,22 +4967,50 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 
       calc_Rij_visc(pp,ggg,Rijvisc);
       //adding up to M1 tensor
-      for(i=0;i<4;i++)
-	for(j=0;j<4;j++)
-	  Rij[i][j]+=Rijvisc[i][j];
-    }
-  #endif
+    }  
 
-  indices_2221(Rij,Rij,gg); //R^i_j
-  
-#else //multifluid
-  ldouble Rij[NRF][4][4];
-  calc_Rij_mf(pp,gg,GG,Rij); //R^ij
+  indices_2221(Rijvisc,Rijvisc,gg); //R^i_j
 
-  for(ii=0;ii<NRF;ii++)
+#ifdef NUMRADWAVESPEEDS
+  //adding up to Rij
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Rij[i][j]+=Rijvisc[i][j];
+      }
+
+#else
+  //damping the viscous term if necessary
+  //basing on radiative Reynolds number Re = diffusiv flux of conserved quantity / conserved quantity
+  int idim;
+  ldouble vel,maxvel=-1.,dampfac;
+
+  //printf("i: %d %d face: %d\n",geom->ix,geom->iy,geom->ifacedim);
+  for(idim=0;idim<3;idim++)
+    for(i=0;i<4;i++)
+      {
+	vel=Rijvisc[idim+1][i]/uu[EE0+i]*sqrt(gg[idim+1][idim+1]);
+	if(fabs(vel)>maxvel) maxvel=fabs(vel);       
+      }
+
+   //adjust:
+  if(maxvel>MAXRADVISCVEL)
     {
-      indices_2221(Rij[ii],Rij[ii],gg); //R^i_j
+      dampfac=MAXRADVISCVEL/maxvel;
+      //if(geom->ix==10) printf("%d %d > damping %f to %f\n",geom->ix,geom->iy,maxvel,MAXRADVISCVEL);
     }
+ else
+    dampfac=1.;
+ 
+  //adding up to Rij
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Rijvisc[i][j]*=dampfac;
+	Rij[i][j]+=Rijvisc[i][j];
+      }
+
+#endif
 #endif
 
 #endif

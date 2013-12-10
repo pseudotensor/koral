@@ -1243,7 +1243,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	 else
 	   {
 	     //choice of 1st order derivative
-	     
+	     #ifdef NUMRADWAVESPEEDS
 	     if(fabs(enl)>fabs(enr))
 	       {
 		 du[i][idim]=dl;
@@ -1253,7 +1253,11 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	       {
 		 du[i][idim]=dr;
 		 du2[i][idim]=dr2;
-		 }
+	       }
+	     #else
+	     du[i][idim]=dc;
+	     du2[i][idim]=dc2;
+	     #endif
 	     
 	     /*
 	     if(fabs(dl)<fabs(dr))
