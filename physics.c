@@ -988,8 +988,8 @@ calc_shear_comoving(int ix,int iy,int iz,ldouble S[][4],int hdorrad)
 //**********************************************************************
 //**********************************************************************
 //calculates shear tensor sigma_ij in the lab frame at cell centers only!
-//whichvel == 0 -> using gas velocity
-//whichvel == 1 -> using radiative velocity
+//hdorrad == MHD -> using gas velocity
+//hdorrad == RAD -> using radiative velocity
 
 int
 calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
@@ -1243,6 +1243,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	 else
 	   {
 	     //choice of 1st order derivative
+	     
 	     if(fabs(enl)>fabs(enr))
 	       {
 		 du[i][idim]=dl;
@@ -1252,7 +1253,20 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 	       {
 		 du[i][idim]=dr;
 		 du2[i][idim]=dr2;
+		 }
+	     
+	     /*
+	     if(fabs(dl)<fabs(dr))
+	       {
+		 du[i][idim]=dl; 
+		 du2[i][idim]=dl2;
 	       }
+	     else
+	       {
+		 du[i][idim]=dr; 
+		 du2[i][idim]=dr2;
+	       }
+	     */
 	     //symmetric, but does not reflect changes in *pp - important for wavespeeds and Jacobian derivatives
 	     /*
 	     du[i][idim]=dc;

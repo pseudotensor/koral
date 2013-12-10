@@ -3641,22 +3641,21 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   for(idim=0;idim<3;idim++)
     {
 
-      if(verbose)
-	print_tensor(JJ[idim]);
-      ldouble evmax,ev[4];
-      evmax=calc_eigen_4x4(JJ[idim],ev);
-      
       //regular rad velocity, calculated analytically in the begining
       ldouble axl0,axr0;
       axl0=aval[idim*2+0];
       axr0=aval[idim*2+1];
-      
+
+      //total wavespeeds
+      ldouble evmax,ev[4];
+      evmax=calc_eigen_4x4(JJ[idim],ev);
+       
       //**********************************************************************
       //numerical velocities
       ldouble axl=my_min_N(ev,4);
       ldouble axr=my_max_N(ev,4);
-      ldouble maxvel = my_max(fabs(axl),fabs(axr));
-      ldouble maxvel0 = my_max(fabs(axl0),fabs(axr0));
+      ldouble maxvel = my_max(fabs(axl),fabs(axr))*sqrt(gg[idim+1][idim+1]);
+      ldouble maxvel0 = my_max(fabs(axl0),fabs(axr0))*sqrt(gg[idim+1][idim+1]);
     
       if(verbose)
 	{
@@ -3668,27 +3667,37 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 
       
       //**********************************************************************
-      //damping viscosity (done basing on mhd + viscous velocity!)
-      //velocities in code units, e.g., angular velocities!
-            
-      ldouble fac,maxvel_ph;      
-      maxvel_ph=maxvel*sqrt(gg[idim+1][idim+1]);
-      if(maxvel_ph > MAXRADVISCVEL)
+      //verify causality
+      set_u_scalar(radviscfac,ix,iy,iz,1.);
+      if(maxvel > 1.) //total wavespeed exceeding speed of light
 	{
-	  //todo:
+	  //viscous wavespeeds
+	  ldouble evmaxvisc,evvisc[4];
+	  evmaxvisc=calc_eigen_4x4(JJvisc[idim],evvisc);
+	  ldouble maxvelvisc = fabs(evmaxvisc)*sqrt(gg[idim+1][idim+1]);
+	  ldouble axlvisc=my_min_N(evvisc,4);
+	  ldouble axrvisc=my_max_N(evvisc,4);
 	  /*
-	  fac=(MAXRADVISCVEL-maxvel0)/maxvel;
-	  axl=-MAXRADVISCVEL*1.5;
-	  axr=MAXRADVISCVEL*1.5;
+	  printf("---\n at: %d %d dim: %d\n",ix,iy,idim);
+	  printf("total: %f %f %f %f\n",ev[0]*sqrt(gg[idim+1][idim+1]),ev[1]*sqrt(gg[idim+1][idim+1]),
+		 ev[2]*sqrt(gg[idim+1][idim+1]),ev[3]*sqrt(gg[idim+1][idim+1]));
+	  printf("visc : %f %f %f %f\n",evvisc[0]*sqrt(gg[idim+1][idim+1]),evvisc[1]*sqrt(gg[idim+1][idim+1]),
+		 evvisc[2]*sqrt(gg[idim+1][idim+1]),evvisc[3]*sqrt(gg[idim+1][idim+1]));
+	  getchar();
 	  */
-	  fac=1.;
-	  set_u_scalar(radviscfac,ix,iy,iz,fac);
 
-	  //printf("damping viscosity by %f at %d %d %d\n",fac,ix,iy,iz);
+	  ldouble fac,maxvel_ph;      
+	  fac=1./maxvelvisc;
+
+	  //axl/axr modify or not?
+	  axl=my_min(axl0,axlvisc*fac);
+	  axr=my_max(axr0,axrvisc*fac);
+
+	  axl=axl0-axlvisc*fac;
+	  axr=axr0+axrvisc*fac;
+	      
+	  set_u_scalar(radviscfac,ix,iy,iz,fac);
 	}
-      else
-	set_u_scalar(radviscfac,ix,iy,iz,1.);
-      
 
       //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
       axl/=(1.+tautot[idim]);
@@ -4935,7 +4944,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
 	  {
-	  //test - works for RADBEAM2D with high NLEFT but reduces slightly diffusion	  	  
+	  //test - works for RADBEAM2D reducing diffusion at the vacuum edge with high NLEFT but reduces slightly diffusion	 
 	  /*
 	    if(fabs(get_u(u,EE0,iix,iiy,iiz))>fabs(get_u(u,EE0,ix,iy,iz)))
 	    Rij[i][j]+=Rvisc1[i][j];
