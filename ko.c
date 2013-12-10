@@ -211,6 +211,7 @@ solve_the_problem(ldouble tstart)
       max_ws[0]=-1.;
       max_ws[1]=-1.;
       max_ws[2]=-1.;
+      max_ws_ph=-1.;
       tstepdenmax=-1.;
 
       //iteration counter
@@ -320,7 +321,7 @@ solve_the_problem(ldouble tstart)
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
 	  printf("> snap file no #%6d dumped\n"
-		 ,nfout1,t,dt,max_ws[0],end_time-start_time,znps,avimpit);
+		 ,nfout1);
 	  
 	  //projects primitives onto ghost cells
 	  set_bc(t,0);
@@ -355,7 +356,7 @@ solve_the_problem(ldouble tstart)
       if(lasttoutavg_floor!=floor(t/dtoutavg))
 	{
 	  printf("> avg  file no #%6d dumped\n"
-		 ,nfout2,t,dt,max_ws[0],end_time-start_time,znps,avimpit);
+		 ,nfout2);
 	  
 	  //avg goes first so that what is later can use it
 	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
@@ -372,7 +373,7 @@ solve_the_problem(ldouble tstart)
       if(end_time-fprintf_time>1.) 
 	{
 	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
-		 ,nstep,t,dt,my_max(my_max(max_ws[0],max_ws[1]),max_ws[2]),end_time-start_time,znps);
+		 ,nstep,t,dt,max_ws_ph,end_time-start_time,znps);
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],

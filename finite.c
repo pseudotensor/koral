@@ -311,16 +311,24 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   //only domain cells 
 
   if(if_indomain(ix,iy,iz)==1) 
-    {
-      
-      ldouble tstepden;
+    {      
+      ldouble tstepden,ws_ph;
+     
+      ws_ph=wsx*sqrt(get_g(g,1,1,ix,iy,iz));
       //#pragma omp critical
       if(wsx>max_ws[0]) max_ws[0]=wsx;
+      if(ws_ph>max_ws_ph) max_ws_ph=ws_ph;
+      
+      ws_ph=wsy*sqrt(get_g(g,2,2,ix,iy,iz));
       //#pragma omp critical
       if(wsy>max_ws[1]) max_ws[1]=wsy;
+      if(ws_ph>max_ws_ph) max_ws_ph=ws_ph;
+
+      ws_ph=wsz*sqrt(get_g(g,3,3,ix,iy,iz));
       //#pragma omp critical
       if(wsz>max_ws[2]) max_ws[2]=wsz;
-      
+      if(ws_ph>max_ws_ph) max_ws_ph=ws_ph;
+
       if(NZ>1 && NY>1)
 	tstepden=max_ws[0]/dx + max_ws[1]/dy + max_ws[2]/dz;
       else if(NZ==1 && NY>1)

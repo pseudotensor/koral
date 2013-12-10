@@ -3671,12 +3671,17 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       //damping viscosity (done basing on mhd + viscous velocity!)
       //velocities in code units, e.g., angular velocities!
             
-      ldouble fac;      
-      if(0 && maxvel > MAXRADVISCVEL)
+      ldouble fac,maxvel_ph;      
+      maxvel_ph=maxvel*sqrt(gg[idim+1][idim+1]);
+      if(maxvel_ph > MAXRADVISCVEL)
 	{
+	  //todo:
+	  /*
 	  fac=(MAXRADVISCVEL-maxvel0)/maxvel;
 	  axl=-MAXRADVISCVEL*1.5;
 	  axr=MAXRADVISCVEL*1.5;
+	  */
+	  fac=1.;
 	  set_u_scalar(radviscfac,ix,iy,iz,fac);
 
 	  //printf("damping viscosity by %f at %d %d %d\n",fac,ix,iy,iz);

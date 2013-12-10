@@ -108,7 +108,7 @@ ldouble Kr_tmp[4][4][4],g_tmp[4][4];
 ldouble inputarg[10];
 int **gcidx;
 
-ldouble max_ws[3],max_dt,ttm1,ttm2;
+ldouble max_ws[3],max_dt,ttm1,ttm2,max_ws_ph;
 ldouble min_dx,min_dy,min_dz;
 ldouble dt,tstepdenmax;
 FILE *fout1,*fout_scalars,*fout_radprofiles,*fout_fail;
