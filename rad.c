@@ -4495,9 +4495,11 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
 
   if(mfp>mindx || chi<SMALL) mfp=mindx;
+  //test
+  //if(mfp>dt || chi<SMALL) mfp=dt;
   
   ldouble ev[4],evmax,eta,nu,vdiff2;
-  nu = ALPHARADVISC * 1./3. * mfp;
+  nu = ALPHARADVISC * mfp;
 
 #ifdef NUMRADWAVESPEEDS
   //damping if too strong, factor calculated together with rad_wavespeeds

@@ -69,8 +69,23 @@
 //66 KTORUS - RMHD Newtonian torus with radiation
 //67 LRTORUS - RMHD limo torus
 //68 RMHDWAVE - radiation modified linear magnetosonic waves
+//69 INJDISK - magnetized gas damped from outer boundary
 
-#define PROBLEM 1
+#define PROBLEM 69
+
+#if(PROBLEM==69)
+
+#define PR_DEFINE "PROBLEMS/INJDISK/define.h"
+#define PR_BC "PROBLEMS/INJDISK/bc.c"
+#define PR_INIT "PROBLEMS/INJDISK/init.c"
+#define PR_KAPPA "PROBLEMS/INJDISK/kappa.c"
+#define PR_KAPPAES "PROBLEMS/INJDISK/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/INJDISK/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/INJDISK/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/INJDISK/dump.c"
+#define PR_TOOLS "PROBLEMS/INJDISK/tools.c"
+
+#endif
 
 #if(PROBLEM==68)
 

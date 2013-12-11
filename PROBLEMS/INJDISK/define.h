@@ -12,38 +12,34 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MAGNFIELD
+//#define MAGNFIELD
 #define GDETIN 1
-#define VECPOTGIVEN
-#define MAXBETA .01 //target pmag/pgas int the midplane
+//#define VECPOTGIVEN
+#define MAXBETA .01 //pmag/pgas at the boundary
 
 /************************************/
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
+#define TIMESTEPPING RK2IMEX 
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
-#define SHUFFLELOOPS 0
 #define DOFIXUPS 1
 
 /************************************/
 //viscosity choices
 /************************************/
-#define HDVISCOSITY NOVISCOSITY
-//#define RADVISCOSITY NOVISCOSITY
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define ZEROTIMEINSHEAR
 #define ALPHARADVISC 1.
 #define MAXRADVISCVEL 1./3.
-//#define NUMRADWAVESPEEDS
 
 /************************************/
 //rmhd floors
@@ -77,16 +73,26 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(2.575-MKS1R0))
+#define MINX (log(5.575-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 80
-#define NY 70
+#define NX 60
+#define NY 30
 #define NZ 1
 #endif
 
+
 #define MINY (0.0025*Pi/2.)
 #define MAXY (Pi-0.0025*Pi/2.)
-//#define MAXY (Pi/2.) //change in postinit.c
+
+#define HALFY
+#ifdef HALFY
+#undef CORRECT_POLARAXIS
+#undef NY
+#undef MAXY
+#define NY 15
+#define MAXY (Pi/2.)
+#endif
+
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
@@ -113,12 +119,11 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define LT_KAPPA 1.5e3
-#define LT_XI 0.9
-#define LT_R1 31.75
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 15.
+#define DISKH .25
+#define DISKRHO rhoCGS2GU(1.)
+#define DISKTEMP 1.e7
+#define DISKRCIR 25.
+#define DISKVR -0.1;
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))

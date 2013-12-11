@@ -2668,6 +2668,8 @@ correct_polaraxis()
 		}
   
 	      //lower
+	      #ifndef HALFY
+
 	      thaxis=get_xb(NY,1);
 	      for(ic=0;ic<nc;ic++)
 		{
@@ -2708,6 +2710,7 @@ correct_polaraxis()
 		    set_u(u,iv,ix,iy,iz,uu[iv]);
 		  }
 		}
+	      #endif
 	 
 	    }
 	}
