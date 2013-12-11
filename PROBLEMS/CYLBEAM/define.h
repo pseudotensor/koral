@@ -1,13 +1,21 @@
 #define RADIATION
 #define SKIPRADSOURCE
 
+#define INT_ORDER 1
+#define TSTEPLIM .6
+#define FLUXLIMITER 0
+#define MINMOD_THETA 1.
+
+#define OMSCALE 1.
 #define HDVISCOSITY NOVISCOSITY
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
+//#define NUMRADWAVESPEEDS
 #define ALPHARADVISC 1.
+#define MAXRADVISCVEL 1.
 #define ZEROTIMEINSHEAR
 #define CORRECT_POLARAXIS
 #define NCCORRECTPOLAR 1
-#define NUMRADWAVESPEEDS
+
 
 #define SHUFFLELOOPS 0
 
@@ -79,16 +87,12 @@
 #define SPECIFIC_BC
 
 #define GAMMA (4./3.)
-#define OMSCALE 1.
+
 
 #define RHOATMMIN  1.e-2
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e11,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(1.e9))
 
-#define INT_ORDER 1
-#define TSTEPLIM .6
-#define FLUXLIMITER 0
-#define MINMOD_THETA 2.
 
 #define NODONUT 0
 #define INFLOWING 0

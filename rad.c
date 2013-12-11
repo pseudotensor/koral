@@ -3247,6 +3247,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4])
   Erad=pp[EE0]; 
 
   //lab-frame
+  //test
   //ldouble Rtt,ncon[4];
   //calc_normal_Rtt(pp,&Rtt,ncon,geom);
   //Erad=-Rtt;
@@ -4613,24 +4614,7 @@ calc_normal_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ncon,void* ggg)
   //print_4vector(ncon);getchar();
   indices_21(ncon,ncov,geom->gg);
 
-  //filling Rij manualy because calc_Rij calls the viscous part as well
-  //calc_Rij(pp,ggg,Rij);
-  
-  //radiative energy density in the radiation rest frame
-  ldouble Erf,urfcon[4];
-  Erf=pp[EE0];
-  urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
-  //lab frame stress energy tensor:
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom->GG[i][j];
-
-  
+  calc_Rij(pp,ggg,Rij);
   indices_2221(Rij,Rij,geom->gg);
   Rtt=0.;
   for(i1=0;i1<4;i1++)
@@ -4924,6 +4908,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
       ldouble Rvisc1[4][4],Rvisc2[4][4];
       int iix,iiy,iiz;
       iix=ix;iiy=iy;iiz=iz;
+
       //left
       if(geom->ifacedim==0)
 	iix=ix-1;
@@ -4972,6 +4957,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   indices_2221(Rijvisc,Rijvisc,gg); //R^i_j
 
 #ifdef NUMRADWAVESPEEDS
+  //viscosity damped through radviscdamp[]
   //adding up to Rij
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -4987,7 +4973,9 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 
   //printf("i: %d %d face: %d\n",geom->ix,geom->iy,geom->ifacedim);
   for(idim=0;idim<3;idim++)
-    for(i=0;i<4;i++)
+    //for(i=0;i<4;i++) //fails when one of the fluxes to divide by equals zero
+    //test
+    for(i=0;i<1;i++)
       {
 	vel=Rijvisc[idim+1][i]/uu[EE0+i]*sqrt(gg[idim+1][idim+1]);
 	if(fabs(vel)>maxvel) maxvel=fabs(vel);       
@@ -4997,10 +4985,13 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   if(maxvel>MAXRADVISCVEL)
     {
       dampfac=MAXRADVISCVEL/maxvel;
-      //if(geom->ix==10) printf("%d %d > damping %f to %f\n",geom->ix,geom->iy,maxvel,MAXRADVISCVEL);
+      //printf("%d %d > damping %f to %f\n",geom->ix,geom->iy,maxvel,MAXRADVISCVEL);
     }
  else
     dampfac=1.;
+
+  //todo: choose best prescription
+  dampfac = 1. / (1. + sqrt(maxvel/MAXRADVISCVEL));
  
   //adding up to Rij
   for(i=0;i<4;i++)
