@@ -12,16 +12,16 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
 //magnetic choices
 /************************************/
-//#define MAGNFIELD
+#define MAGNFIELD
 #define GDETIN 1
 //#define VECPOTGIVEN
-#define MAXBETA .01 //pmag/pgas at the boundary
+#define MAGBETA .01 //pmag/pgas at the boundary
 
 /************************************/
 //reconstruction / Courant
@@ -36,7 +36,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define ZEROTIMEINSHEAR
 #define ALPHARADVISC 1.
 #define MAXRADVISCVEL 1./3.
@@ -45,7 +45,7 @@
 //rmhd floors
 /************************************/
 #define CORRECT_POLARAXIS
-#define NCCORRECTPOLAR 2
+#define NCCORRECTPOLAR 1
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
@@ -73,10 +73,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(5.575-MKS1R0))
+#define MINX (log(1.575-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 60
-#define NY 30
+#define NX 150
+#define NY 100
 #define NZ 1
 #endif
 
@@ -84,12 +84,11 @@
 #define MINY (0.0025*Pi/2.)
 #define MAXY (Pi-0.0025*Pi/2.)
 
-#define HALFY
+//#define HALFY
 #ifdef HALFY
-#undef CORRECT_POLARAXIS
 #undef NY
 #undef MAXY
-#define NY 15
+#define NY 20
 #define MAXY (Pi/2.)
 #endif
 
@@ -119,10 +118,10 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define DISKH .25
-#define DISKRHO rhoCGS2GU(1.)
-#define DISKTEMP 1.e7
-#define DISKRCIR 25.
+#define DISKH .2
+#define DISKRHO rhoCGS2GU(1.e-2)
+#define DISKTEMP 1.e9
+#define DISKRCIR 20.
 #define DISKVR -0.1;
 
 #define RHOATMMIN  1.e-24

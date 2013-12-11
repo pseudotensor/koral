@@ -20,14 +20,17 @@ int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
    uint=calc_PEQ_ufromTrho(DISKTEMP,rho);
    Om=sqrt(DISKRCIR)/r/r;
 
+   ldouble rhoatm=pp[RHO];
+   ldouble uintatm =pp[UU];
+
    ucon[1]=DISKVR;
    ucon[2]=0.;
    ucon[3]=Om;
     
    conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL->gg,geomBL->GG);
    
-   pp[0]=rho;
-   pp[1]=uint;
+   pp[0]=my_max(rho,rhoatm);
+   pp[1]=my_max(uint,uintatm);
    pp[2]=ucon[1]; 
    pp[3]=ucon[2];
    pp[4]=ucon[3];
@@ -39,7 +42,8 @@ int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
 #endif
 
 #ifdef RADIATION
-    /*
+    ldouble Eatm=pp[EE0];
+    ldouble E,Fx, Fy,Fz;
     //distributing pressure
     ldouble P,aaa,bbb;
     P=GAMMAM1*uint;
@@ -53,23 +57,30 @@ int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
     Fx=Fy=Fz=0.;
     uint=calc_PEQ_ufromTrho(T4,rho);
 
-    pp[UU]=my_max(uint,ppback[1]);
-    pp[EE0]=my_max(E,ppback[EE0]);
+    pp[UU]=my_max(uint,uintatm);
+    pp[EE0]=my_max(E,Eatm);
 
     pp[FX0]=Fx;
     pp[FY0]=Fy;
     pp[FZ0]=Fz;
 
+ 
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
-    prad_ff2lab(pp,pp,&geomBL);
-    */
+    prad_ff2lab(pp,pp,geomBL);
+    
 #endif
 
     //transforming primitives from BL to MYCOORDS
     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL->xxvec,gggBL,ggg);
-
+    
+ 
     
 #ifdef MAGNFIELD 
+    //artificiall impose poloidal magnetic field
+    ldouble Pgas;
+    Pgas=GAMMAM1*uint;
+    pp[B2]=sqrt(Pgas)*MAGBETA/sqrt(geom->gg[2][2]);
+
     /*
     //MYCOORDS vector potential to calculate B's
     ldouble Acov[4];

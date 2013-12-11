@@ -55,6 +55,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *Omega = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *muBe = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Qtheta = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *divB = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 
   
 
@@ -233,6 +234,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
+		  divB[nodalindex]=calc_divB(ix,iy,iz);
                   #endif
 		  
 
@@ -285,6 +287,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 				     bsq[nodalindex])/rho[nodalindex]-1.;
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
+		  divB[nodalindex]=calc_divB(ix,iy,iz);
 		  #endif
 
 		  dpdr = (gdet2*GAMMA*get_uavg(pavg,UU,iix+1,iiy,iiz)-gdet1*GAMMA*get_uavg(pavg,UU,iix-1,iiy,iiz)) / (xx2[1]-xx1[1]);
@@ -610,6 +613,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		DB_DOUBLE, DB_NODECENT, optList);
 
   DBPutQuadvar1(file, "Qtheta","mesh1", Qtheta,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  DBPutQuadvar1(file, "divB","mesh1", divB,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 
