@@ -4993,7 +4993,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 	if(fabs(vel)>maxvel) maxvel=fabs(vel);       
       }
 
-   //adjust:
+  //adjust:
   if(maxvel>MAXRADVISCVEL)
     {
       dampfac=MAXRADVISCVEL/maxvel;
