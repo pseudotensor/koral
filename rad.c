@@ -4926,19 +4926,22 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   //basing on radiative Reynolds number Re = diffusiv flux of conserved quantity / conserved quantity
   ldouble dampfac=1.;
   int idim;
-  ldouble vel,maxvel=-1.;
+  ldouble vel[3]={0.,0.,0.},maxvel=-1.;
 
   //printf("i: %d %d face: %d\n",geom->ix,geom->iy,geom->ifacedim);
   for(idim=0;idim<3;idim++)
-    for(i=0;i<4;i++)
+    for(i=1;i<4;i++)
       {
 	if(i==2 && NY==1) continue;
 	if(i==3 && NZ==1) continue;
 	if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
-	vel=Rijvisc[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(gg[idim+1][idim+1]);
-	if(fabs(vel)>maxvel) maxvel=fabs(vel);       
-        //printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
+	vel[idim]=Rijvisc[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(gg[idim+1][idim+1]);
+	//printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
       }
+  if(geom->ifacedim>-1)
+    maxvel=fabs(vel[geom->ifacedim]);
+  else
+    maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
 
   //adjust:
   if(maxvel>MAXRADVISCVEL)
@@ -4957,7 +4960,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 
   //dampfac= 1. / (1.+sqrt(maxvel/MAXRADVISCVEL));
   //dampfac=1.;
-  //dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
+  dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
   
  //adding up to Rij
   for(i=0;i<4;i++)
