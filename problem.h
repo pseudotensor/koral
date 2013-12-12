@@ -70,8 +70,23 @@
 //67 LRTORUS - RMHD limo torus
 //68 RMHDWAVE - radiation modified linear magnetosonic waves
 //69 INJDISK - magnetized gas damped from outer boundary
+//70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 
-#define PROBLEM 69
+#define PROBLEM 70
+
+#if(PROBLEM==70)
+
+#define PR_DEFINE "PROBLEMS/M1SHOCK/define.h"
+#define PR_BC "PROBLEMS/M1SHOCK/bc.c"
+#define PR_INIT "PROBLEMS/M1SHOCK/init.c"
+#define PR_KAPPA "PROBLEMS/M1SHOCK/kappa.c"
+#define PR_KAPPAES "PROBLEMS/M1SHOCK/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/M1SHOCK/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/M1SHOCK/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/M1SHOCK/dump.c"
+#define PR_TOOLS "PROBLEMS/M1SHOCK/tools.c"
+
+#endif
 
 #if(PROBLEM==69)
 

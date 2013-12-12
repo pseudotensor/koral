@@ -553,8 +553,6 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
     utcon[iv]=pp[1+iv];
   utcon[0]=0.;
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
-  //indices_21(ucon,ucov,gg);
 
 #ifdef MAGNFIELD
   calc_bcon_4vel(pp,ucon,ucov,bcon);
