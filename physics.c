@@ -122,25 +122,10 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   ldouble vtot2; //total characteristic velocity
   vtot2=cs2 + va2 - cs2*va2;
 
+  /*
   if(vtot2<0.) vtot2=0.;
   if(vtot2>1.) vtot2=1.;
-
-  //**********************************************************************
-  //**********************************************************************    
-  //combining regular and viscous velocities when SHEARVISCOSITY
-  if (HDVISCOSITY==SHEARVISCOSITY)
-    {
-      ldouble shear[4][4];
-      ldouble vdiff2,nu;
-      calc_hd_shearviscosity(pp,geom,shear,&nu,&vdiff2);
-
-      //sum
-      vtot2=sqrt(vdiff2)+sqrt(cs2);
-      vtot2*=vtot2;
-     
-      //should be already limited in calc_hd_nu_shearnuviscosity
-      if(vtot2>1.) vtot2=1.;
-    }
+  */
 
   //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
@@ -589,129 +574,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
     for(j=0;j<4;j++)
       T[i][j]=eta*ucon[i]*ucon[j] + ptot*GG[i][j] - bcon[i]*bcon[j];
 
-
-#if (HDVISCOSITY!=NOVISCOSITY)
-  ldouble Tvisc[4][4];
-  calc_visc_Tij(pp,ggg,Tvisc);
-
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      {	
-	T[i][j]+=Tvisc[i][j];
-      }
-#endif  
-
   return 0;
-}
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//calculates viscouss energy-momentum tensor components
-//returns T^munu
-int
-calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
-{
-  int i,j;
-  struct geometry *geom
-    = (struct geometry *) ggg;
-
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
-  gg=geom->gg;
-  GG=geom->GG;
-  tlo=geom->tlo;
-  tup=geom->tup;
-
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      T[i][j]=0.;
-
-#if (HDVISCOSITY==SHEARVISCOSITY)
-  ldouble shear[4][4];
-  ldouble nu,vdiff2;
-  calc_hd_shearviscosity(pp,geom,shear,&nu,&vdiff2);
-  ldouble rho=pp[RHO];
-
-  //multiply by viscosity to get viscous tensor
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      {
-	T[i][j]= -2. * nu * rho * shear[i][j];
-      }
-#endif 
-
-  return 0;
-
-}
-
-int calc_hd_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret)
-{  
-#if(HDVISCOSITY==SHEARVISCOSITY) //full shear tensor
-  struct geometry *geom
-    = (struct geometry *) ggg;
-
-  //calculating shear
-  calc_shear_lab(pp,ggg,shear,MHD);  
-  indices_1122(shear,shear,geom->GG);
-  
-  //transforming to ortonormal
-  ldouble shearon[4][4];
-  trans22_cc2on(shear,shearon,geom->tup);
-
-  //calculating the viscosity coefficient 
-  ldouble xxvec[4]={0.,geom->xx,geom->yy,geom->zz};
-  ldouble xxvecBL[4];
-  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
-  ldouble rho=pp[RHO];
-  ldouble pgas=(GAMMA-1.)*pp[UU];
-  ldouble cs2=GAMMA*pgas/(rho+pp[UU]+pgas);
-  ldouble Omk = 1./sqrt(xxvecBL[1]*xxvecBL[1]*xxvecBL[1]);
-
-  //Trphi = eta shear = alpha p
-  ldouble eta = ALPHAHDVISC * pgas / Omk;
-  
-  //nu = eta/rho
-  ldouble nu=eta/rho,vdiff2;  
-  
-  //limiter section
-  ldouble MAXDIFFVEL=0.5; //max allowed vdiff
-  ldouble MAXTOTVEL = 0.75; //max allowed vdiff + cs
-
-  ldouble ev[4],evmax;
-  //limiting basing on maximal eigen value - slower and issues with tetrad  
-  //evmax=calc_eigen_4x4(shearon,ev);
-
-  //limiting assuming maximal eigen value 1/dt
-  evmax=1./dt;
-
-  //square of characteristic velocity for diffusion
-  vdiff2=2.*nu*evmax;
-
-  //checking if vdiff too large
-  if(vdiff2 > MAXDIFFVEL*MAXDIFFVEL)
-    {
-      nu = MAXDIFFVEL*MAXDIFFVEL/2./evmax;
-    }
-  vdiff2=2.*nu*evmax;
-
-  //checking if vdiff+cs > 1
-  if(cs2>MAXTOTVEL*MAXTOTVEL)
-    {
-      nu=0.;
-      vdiff2=0.;
-    }
-  else if(sqrt(cs2)+sqrt(vdiff2)>MAXTOTVEL)
-    {
-      vdiff2=MAXTOTVEL-sqrt(cs2);
-      vdiff2*=vdiff2;
-      nu=vdiff2/2./evmax;
-    }
-  
-  *nuret=nu;
-  *vdiff2ret=vdiff2;
-   
-  return 0;
-#endif
 }
 
 
