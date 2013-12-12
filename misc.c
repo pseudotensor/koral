@@ -726,32 +726,12 @@ print_conserved(ldouble *u)
 int
 print_Nvector(ldouble v[4],int N)
 {
-#ifndef MULTIRADFLUID
   int i;
   printf("============\n");
   for(i=0;i<N;i++)
   printf("%10.16e ",v[i]);
   printf("\n============\n");
   return 0;  
-#else
-  int i; 
-  printf("============\n");
-  if(N!=NV)
-    {
-      for(i=0;i<N;i++)
-	printf("%10.16e ",v[i]);
-    }
-  else
-    {
-      for(i=0;i<NVMHD;i++)
-	printf("%10.16e ",v[i]);
-      for(i=0;i<NRF;i++)
-	printf("\n%10.16e %10.16e %10.16e %10.16e",v[EE(i)],v[FX(i)],v[FY(i)],v[FZ(i)]);
-      printf("\n");
-    }
-  printf("\n============\n");
-  return 0;  
-#endif
 }
 
 

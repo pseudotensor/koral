@@ -178,13 +178,8 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   ldouble tautot[3];
   calc_tautot(pp,xx,dx,tautot);
 
-#ifndef MULTIRADFLUID
   //M1
   calc_rad_wavespeeds(pp,geom,tautot,aval,verbose);
-#else 
-  //multifluid
-  calc_rad_wavespeeds_mf_total(pp,gg,GG,tautot,aval);
-#endif
 
   axl=aval[0];
   axr=aval[1];

@@ -1081,7 +1081,6 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 
 
 #ifdef RADIATION  
-#ifndef MULTIRADFLUID  
   ldouble pp2[NV];
   int iv;
 
@@ -1161,7 +1160,6 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 
 #endif
 
-#endif
 #endif
 #endif
  

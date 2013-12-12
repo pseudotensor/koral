@@ -278,7 +278,6 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   gdetu=1.;
 #endif
 
-#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   int i,j;
 
@@ -302,33 +301,6 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   int corrected;
 
   u2p_rad(pp2,pp2,geom,&corrected);
-#else
-  ldouble Rij[NRF][4][4];
-  int i,j,irf;
-  int verbose=0;
-
-  calc_Rij_ff_mf(pp1,Rij);  
-  for(irf=0;irf<NRF;irf++)
-    {
-      trans22_on2cc(Rij[irf],Rij[irf],tlo);  
-      boost22_ff2lab(Rij[irf],Rij[irf],pp1,gg,GG); 
-      indices_2221(Rij[irf],Rij[irf],gg);  
-      //temporarily store conserved in pp2[]
-      pp2[EE(irf)]=gdetu*Rij[irf][0][0];
-      pp2[FX(irf)]=gdetu*Rij[irf][0][1];
-      pp2[FY(irf)]=gdetu*Rij[irf][0][2];
-      pp2[FZ(irf)]=gdetu*Rij[irf][0][3];
-    }
-
-  //hydro
-  for(i=0;i<NVMHD;i++)
-    pp2[i]=pp1[i];
-
-  //convert to real primitives
-  int corrected;
-
-  u2p_rad(pp2,pp2,geom,&corrected);
-#endif
 
   return 0;
 } 
@@ -347,7 +319,6 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
   tlo=geom->tlo;
   tup=geom->tup;
 
-#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   int i,j;  
 
@@ -365,26 +336,6 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
   pp2[FX0]=Rij[0][1];
   pp2[FY0]=Rij[0][2];
   pp2[FZ0]=Rij[0][3];
-#else
-  ldouble Rij[NRF][4][4];
-  int i,j,irf;  
-
-  calc_Rij_mf(pp1,gg,GG,Rij);
-  for(irf=0;irf<NRF;irf++)
-    {
-      boost22_lab2ff(Rij[irf],Rij[irf],pp1,gg,GG);
-      trans22_cc2on(Rij[irf],Rij[irf],tup);
-      //E,F^i
-      pp2[EE(irf)]=Rij[irf][0][0];
-      pp2[FX(irf)]=Rij[irf][0][1];
-      pp2[FY(irf)]=Rij[irf][0][2];
-      pp2[FZ(irf)]=Rij[irf][0][3];
-    }
-
-  for(i=0;i<NVMHD;i++)
-    pp2[i]=pp1[i];
-  
-#endif
 
   return 0;
 } 
@@ -407,7 +358,6 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   gdetu=1.;
 #endif
 
-#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   int i,j;
 
@@ -430,32 +380,7 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   int corrected;
 
   u2p_rad(pp2,pp2,geom,&corrected);
-#else
-  ldouble Rij[NRF][4][4];
-  int i,j,irf;
-  int verbose=0;
 
-  calc_Rij_ff_mf(pp1,Rij);  
-  for(irf=0;irf<NRF;irf++)
-    {
-      trans22_on2cc(Rij[irf],Rij[irf],tlo);  
-      indices_2221(Rij[irf],Rij[irf],gg);  
-      //temporarily store conserved in pp2[]
-      pp2[EE(irf)]=gdetu*Rij[irf][0][0];
-      pp2[FX(irf)]=gdetu*Rij[irf][0][1];
-      pp2[FY(irf)]=gdetu*Rij[irf][0][2];
-      pp2[FZ(irf)]=gdetu*Rij[irf][0][3];
-    }
-
-  //hydro
-  for(i=0;i<NVMHD;i++)
-    pp2[i]=pp1[i];
-
-  //convert to real primitives
-  int corrected;
-
-  u2p_rad(pp2,pp2,geom,&corrected);
-#endif
 
   return 0;
 } 
@@ -474,7 +399,6 @@ int prad_lab2on(ldouble *pp1, ldouble *pp2, void *ggg)
   tlo=geom->tlo;
   tup=geom->tup;
 
-#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   int i,j;  
 
@@ -489,25 +413,7 @@ int prad_lab2on(ldouble *pp1, ldouble *pp2, void *ggg)
   pp2[FX0]=Rij[0][1];
   pp2[FY0]=Rij[0][2];
   pp2[FZ0]=Rij[0][3];
-#else
-  ldouble Rij[NRF][4][4];
-  int i,j,irf;  
 
-  calc_Rij_mf(pp1,gg,GG,Rij);
-  for(irf=0;irf<NRF;irf++)
-    {
-      trans22_cc2on(Rij[irf],Rij[irf],tup);
-      //E,F^i
-      pp2[EE(irf)]=Rij[irf][0][0];
-      pp2[FX(irf)]=Rij[irf][0][1];
-      pp2[FY(irf)]=Rij[irf][0][2];
-      pp2[FZ(irf)]=Rij[irf][0][3];
-    }
-
-  for(i=0;i<NVMHD;i++)
-    pp2[i]=pp1[i];
-  
-#endif
 
   return 0;
 } 
@@ -517,7 +423,6 @@ int prad_lab2on(ldouble *pp1, ldouble *pp2, void *ggg)
 /***********************************************************************/
 int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4])
 {
-#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   int i,j;
 
@@ -532,26 +437,6 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   pp2[FX0]=Rij[0][1];
   pp2[FY0]=Rij[0][2];
   pp2[FZ0]=Rij[0][3];
-#else
-  ldouble Rij[NRF][4][4];
-  int i,j,irf;
-
-  calc_Rij_ff_mf(pp1,Rij);
-
-  for(i=0;i<NVMHD;i++)
-    pp2[i]=pp1[i];
-
-  for(irf=0;irf<NRF;irf++)
-    {
-      boost22_ff2zamo(Rij[irf],Rij[irf],pp1,gg,GG,eup);
-
-      //(E,F^i)_ZAMO
-      pp2[EE(irf)]=Rij[irf][0][0];
-      pp2[FX(irf)]=Rij[irf][0][1];
-      pp2[FY(irf)]=Rij[irf][0][2];
-      pp2[FZ(irf)]=Rij[irf][0][3];
-    }
-#endif  
 
   return 0;
 } 
@@ -561,7 +446,6 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
 /***********************************************************************/
 int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], ldouble eup[][4])
 {
-#ifndef MULTIRADFLUID
   ldouble Rij[4][4];
   int i,j;
 
@@ -577,28 +461,6 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   pp2[FX0]=Rij[0][1];
   pp2[FY0]=Rij[0][2];
   pp2[FZ0]=Rij[0][3];
-#else
-  ldouble Rij[NRF][4][4];
-  int i,j,irf;
-
-  //infact, closure in ZAMO flat space
-  calc_Rij_ff_mf(pp1,Rij);
-
-  for(irf=0;irf<NRF;irf++)
-    {
-      boost22_zamo2ff(Rij[irf],Rij[irf],pp1,gg,GG,eup);
-
-      //(E,F^i)_ff
-      pp2[EE(irf)]=Rij[irf][0][0];
-      pp2[FX(irf)]=Rij[irf][0][1];
-      pp2[FY(irf)]=Rij[irf][0][2];
-      pp2[FZ(irf)]=Rij[irf][0][3];
-    }
-  
-  for(i=0;i<NVMHD;i++)
-    pp2[i]=pp1[i];
-
-#endif
 
   return 0;
 } 

@@ -4402,57 +4402,6 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
   return 0;
 }
 
-/*************************************************************************/
-/****** radiative lab M1-like primitives to lab Edd-like primitives*******/
-/*************************************************************************/
-int prad_m12edd(ldouble *pp1, ldouble *pp2, void* ggg)
-{
-  struct geometry *geom
-   = (struct geometry *) ggg;
-
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
-  gg=geom->gg;
-  GG=geom->GG;
-  tlo=geom->tlo;
-  tup=geom->tup;
-
-#ifndef MULTIRADFLUID
-  ldouble Rij[4][4],uufake[NV];
-  int i,j;
-
-  print_Nvector(pp1,NV);
-  //to ortonormal fluid frame
-  prad_lab2ff(pp1,pp1,ggg);
-
-  print_Nvector(pp1,NV);
-  //now set 1/3 on the diagonal and move back to lab frame and do u2p_rad()
-
-  Rij[0][0]=pp1[EE0];
-  Rij[0][1]=Rij[1][0]=pp1[FX0];
-  Rij[0][2]=Rij[2][0]=pp1[FY0];
-  Rij[0][3]=Rij[3][0]=pp1[FZ0];
-  Rij[1][1]=Rij[2][2]=Rij[3][3]=1./3.*Rij[0][0];
-  Rij[1][2]=Rij[2][1]=Rij[1][3]=Rij[3][1]=Rij[2][3]=Rij[3][2]=0.;
-
-  trans22_on2cc(Rij,Rij,tlo);  
-  boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
-  indices_2221(Rij,Rij,gg);  
-
-  uufake[EE0]=Rij[0][0];
-  uufake[FX0]=Rij[0][1];
-  uufake[FY0]=Rij[0][2];
-  uufake[FZ0]=Rij[0][3];
-
-  //  print_Nvector(uufake,NV);
-  //  getchar();
-
-  u2p_rad(uufake,pp2,ggg,&i);
-#else
-  my_err("Edd does not work with multifluids yet\n");
-#endif
-
-  return 0;
-} 
 
 /***************************************/
 /* rad viscosity and shear at cell centers */
@@ -5034,7 +4983,6 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
 
   //fluxes to ff[EE0+]
-#ifndef MULTIRADFLUID
   ff[EE0]= gdetu*Rij[idim+1][0];
       
   ff[FX0]= gdetu*Rij[idim+1][1];
@@ -5042,15 +4990,6 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   ff[FY0]= gdetu*Rij[idim+1][2];
       
   ff[FZ0]= gdetu*Rij[idim+1][3];
-#else
-  for(irf=0;irf<NRF;irf++)
-    {
-      ff[EE(irf)]=gdetu*Rij[irf][idim+1][0];
-      ff[FX(irf)]=gdetu*Rij[irf][idim+1][1];
-      ff[FY(irf)]=gdetu*Rij[irf][idim+1][2];
-      ff[FZ(irf)]=gdetu*Rij[irf][idim+1][3];
-    }
-#endif
 
 #endif
   return 0;
