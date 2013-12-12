@@ -4,12 +4,19 @@
 #define MINMOD_THETA 1.
 #define TIMESTEPPING RK2IMEX
 
+//#define RESTART
+#define RESTARTNUM 1
+
 #define RADIATION 
+//#define SKIPRADSOURCE
+
 #define RADVISCOSITY SHEARVISCOSITY
 //#define NUMRADWAVESPEEDS
 #define ZEROTIMEINSHEAR
 #define ALPHARADVISC 1.
 #define MAXRADVISCVEL 1./3.
+#define MAXRADVISCMFP (5./NX)
+//#define SKIPRADWAVESPEEDLIMITER
 
 #define MYCOORDS MINKCOORDS //metric
 
@@ -28,7 +35,7 @@
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 
-#define NX 200 //x-resoltution
+#define NX 200 //x-resolution
 #define NY 1 //y-resolution
 #define NZ 1 //z=rezolution
 

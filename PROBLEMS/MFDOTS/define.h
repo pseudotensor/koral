@@ -3,8 +3,8 @@
 
 #define HDVISCOSITY NOVISCOSITY
 #define RADVISCOSITY SHEARVISCOSITY
-#define MAXRADVISCVEL (1./3.)
-#define ALPHARADVISC 10.
+#define MAXRADVISCVEL 1./3.
+#define ALPHARADVISC 1.
 #define ZEROTIMEINSHEAR
 
 //#define EDDINGTON_APR
@@ -20,8 +20,8 @@
 //#define LABRADFLUXES
 
 #define MYCOORDS MINKCOORDS
-#define NX 41
-#define NY 41
+#define NX 40
+#define NY 40
 #define NZ 1
 //#define ZSLICE 20
 
@@ -55,15 +55,15 @@
 #define MAXZ 1
 
 
-#define IXDOT1 10
-#define IYDOT1 20//10//10//20
+#define IXDOT1 (1./4.*NX)
+#define IYDOT1 (NY/2)//10//10//20
 #define IZDOT1 0
 #define FXDOT1 0.
 #define FYDOT1 0.
 #define FZDOT1 0.
 
-#define IXDOT2 30
-#define IYDOT2 20//30//20
+#define IXDOT2 (3./4.*NX)
+#define IYDOT2 (NY/2)//30//20
 #define IZDOT2 0
 #define FXDOT2 0.
 #define FYDOT2 0.

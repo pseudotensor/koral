@@ -3230,6 +3230,10 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4])
   
   struct geometry *geom
    = (struct geometry *) ggg;
+  ldouble gdet=geom->gdet;ldouble gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
@@ -3258,6 +3262,49 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4])
       {
 	Rvisc[i][j]= -2. * nu * Erad * shear[i][j];
       }
+
+  //limiting
+#ifdef NUMRADWAVESPEEDS
+  //damping if too strong, factor calculated together with rad_wavespeeds
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Rvisc[i][j]*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
+      }
+#else //here for cell centers, somewhere else for fluxes at faces
+  /*
+  ldouble uu[NV];
+  p2u(pp,uu,ggg);
+  int idim;
+  ldouble vel,maxvel=-1.,dampfac;
+  ldouble Rijlower[4][4];
+  indices_2221(Rvisc,Rijlower,geom->gg);
+  for(idim=0;idim<3;idim++)
+    for(i=0;i<4;i++)
+      {
+	if(i==2 && NY==1) continue;
+	if(i==3 && NZ==1) continue;
+	if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
+	vel=Rijlower[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(geom->gg[idim+1][idim+1]);
+	if(fabs(vel)>maxvel) maxvel=fabs(vel);       
+        //printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
+      } 
+  //dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
+  dampfac=1.;
+  if(maxvel/MAXRADVISCVEL>1.)
+    {
+      printf("limiting at %d (%e)\n",geom->ix,maxvel);
+      dampfac=MAXRADVISCVEL/maxvel;
+    }
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Rvisc[i][j]*=dampfac;
+      }
+  */
+#endif
+  
+
 #endif 
 
   return 0;
@@ -4443,64 +4490,18 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   else if(NY==1) mindx = my_min(dx[0],dx[2]);
   else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
 
+#ifdef MAXRADVISCMFP
+  if(mfp>MAXRADVISCMFP || chi<SMALL) mfp=MAXRADVISCMFP;
+#else
   if(mfp>mindx || chi<SMALL) mfp=mindx;
-  //test
-  //if(mfp>dt || chi<SMALL) mfp=dt;
+#endif
   
   ldouble ev[4],evmax,eta,nu,vdiff2;
   nu = ALPHARADVISC * mfp;
 
-#ifdef NUMRADWAVESPEEDS
-  //damping if too strong, factor calculated together with rad_wavespeeds
-  nu*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
-#endif
-  
-
-  //limiting basing on diffusive wavespeed
-  
-  ldouble MAXDIFFVEL=1.; //max allowed vdiff
-  ldouble MAXTOTVEL=1.; //max allowed vdiff + vrad
-
-  /*
-  //limiting basing on maximal eigen value - slower and issues with tetrad  
-  //evmax=calc_eigen_4x4symm(shearon,ev);
-
-  //limiting assuming maximal eigen value 1/dt
-  evmax=1./dt;
-
-  //square of characteristic velocity for diffusion
-  vdiff2=2.*nu*evmax;
-
-  
-  //checking if vdiff too large
-  if(vdiff2 > MAXDIFFVEL*MAXDIFFVEL)
-    {
-      //printf("damping vdiff %e -> %e at %d %d evmax: %e\n",sqrt(vdiff2),MAXDIFFVEL,geom->ix,geom->iy,evmax);
-      nu = MAXDIFFVEL*MAXDIFFVEL/2./evmax;
-      vdiff2=2.*nu*evmax;
-    }
-  */
-
-  
-  //checking if vdiff+vrad > 1  
-  /*
-  ldouble urcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};
-  conv_vels(urcon,urcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
-  ldouble vrad=sqrt(1.-1./urcon[0]/urcon[0]);
+ 
 
 
-  if(vrad>MAXTOTVEL*MAXTOTVEL)
-    {
-      nu=0.;
-      vdiff2=0.;
-    }
-  else if(sqrt(vrad)+sqrt(vdiff2)>MAXTOTVEL)
-    {
-      vdiff2=MAXTOTVEL-sqrt(vrad);
-      vdiff2*=vdiff2;
-      nu=vdiff2/2./evmax;
-    }
-  */
   
   *nuret=nu;
   *vdiff2ret=vdiff2;
@@ -4838,6 +4839,10 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
 
   calc_Rij(pp,ggg,RijM1); //regular M1 R^ij
   for(i=0;i<4;i++)
@@ -4919,32 +4924,42 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 #else
   //damping the viscous term if necessary
   //basing on radiative Reynolds number Re = diffusiv flux of conserved quantity / conserved quantity
+  ldouble dampfac=1.;
   int idim;
-  ldouble vel,maxvel=-1.,dampfac;
+  ldouble vel,maxvel=-1.;
 
   //printf("i: %d %d face: %d\n",geom->ix,geom->iy,geom->ifacedim);
   for(idim=0;idim<3;idim++)
-    //for(i=0;i<4;i++) //fails when one of the fluxes to divide by equals zero
-    //test
-    for(i=0;i<1;i++)
+    for(i=0;i<4;i++)
       {
-	vel=Rijvisc[idim+1][i]/uu[EE0+i]*sqrt(gg[idim+1][idim+1]);
+	if(i==2 && NY==1) continue;
+	if(i==3 && NZ==1) continue;
+	if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
+	vel=Rijvisc[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(gg[idim+1][idim+1]);
 	if(fabs(vel)>maxvel) maxvel=fabs(vel);       
+        //printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
       }
 
   //adjust:
   if(maxvel>MAXRADVISCVEL)
     {
       dampfac=MAXRADVISCVEL/maxvel;
-      //printf("%d %d > damping %f to %f\n",geom->ix,geom->iy,maxvel,MAXRADVISCVEL);
-    }
+      //printf("damping at %d (%e)\n",geom->ix,maxvel);
+     }
  else
     dampfac=1.;
 
   //todo: choose best prescription
-  dampfac = 1. / (1. + sqrt(maxvel/MAXRADVISCVEL));
- 
-  //adding up to Rij
+  //if(dampfac<1.) dampfac = 0.5 + 1. / (1. + (maxvel/MAXRADVISCVEL));
+  //dampfac = step_function(1.-maxvel/MAXRADVISCVEL,.01);
+  //dampfac= 1. / (1.+exp(2.*(maxvel/MAXRADVISCVEL-1.)));
+  //if(dampfac<1.)dampfac = MAXRADVISCVEL/maxvel;
+
+  //dampfac= 1. / (1.+sqrt(maxvel/MAXRADVISCVEL));
+  //dampfac=1.;
+  //dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
+  
+ //adding up to Rij
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {

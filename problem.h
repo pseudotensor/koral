@@ -1205,14 +1205,6 @@
 #define VERBOSE0 0 //verbose level
 #endif
 
-#ifndef U2PPREC
-#define U2PPREC 1.e-7 //precision of the numerical u2p hydro solver
-#endif
-
-#ifndef IMPLABPREC
-#define IMPLABPREC 1.e-7 //precision for the numerical solver in solve_implicit_lab()
-#endif
-
 #ifndef EXPLICIT_RAD_SOURCE
 #ifndef EXPLICIT_SUBSTEP_RAD_SOURCE
 #ifndef IMPLICIT_FF_RAD_SOURCE
