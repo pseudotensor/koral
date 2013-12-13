@@ -3271,37 +3271,8 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4])
       {
 	Rvisc[i][j]*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
       }
-#else //here for cell centers, somewhere else for fluxes at faces
-  /*
-  ldouble uu[NV];
-  p2u(pp,uu,ggg);
-  int idim;
-  ldouble vel,maxvel=-1.,dampfac;
-  ldouble Rijlower[4][4];
-  indices_2221(Rvisc,Rijlower,geom->gg);
-  for(idim=0;idim<3;idim++)
-    for(i=0;i<4;i++)
-      {
-	if(i==2 && NY==1) continue;
-	if(i==3 && NZ==1) continue;
-	if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
-	vel=Rijlower[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(geom->gg[idim+1][idim+1]);
-	if(fabs(vel)>maxvel) maxvel=fabs(vel);       
-        //printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
-      } 
-  //dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
-  dampfac=1.;
-  if(maxvel/MAXRADVISCVEL>1.)
-    {
-      printf("limiting at %d (%e)\n",geom->ix,maxvel);
-      dampfac=MAXRADVISCVEL/maxvel;
-    }
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      {
-	Rvisc[i][j]*=dampfac;
-      }
-  */
+#else //here would be for cell centers, somewhere else for fluxes at faces
+  ;
 #endif
   
 
@@ -3688,7 +3659,8 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 
   for(idim=0;idim<3;idim++)
     {
-
+      if(idim==1 && NY==1) continue;
+      if(idim==2 && NZ==1) continue;
       //regular rad velocity, calculated analytically in the begining
       ldouble axl0,axr0;
       axl0=aval[idim*2+0];
@@ -3716,38 +3688,44 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       
       //**********************************************************************
       //verify causality
+      //todo: choose maximum from all dimensions?
       set_u_scalar(radviscfac,ix,iy,iz,1.);
-      if(maxvel > 1.) //total wavespeed exceeding speed of light
-	{
-	  //viscous wavespeeds
-	  ldouble evmaxvisc,evvisc[4];
-	  evmaxvisc=calc_eigen_4x4(JJvisc[idim],evvisc);
-	  ldouble maxvelvisc = fabs(evmaxvisc)*sqrt(gg[idim+1][idim+1]);
-	  ldouble axlvisc=my_min_N(evvisc,4);
-	  ldouble axrvisc=my_max_N(evvisc,4);
-	  /*
-	  printf("---\n at: %d %d dim: %d\n",ix,iy,idim);
-	  printf("total: %f %f %f %f\n",ev[0]*sqrt(gg[idim+1][idim+1]),ev[1]*sqrt(gg[idim+1][idim+1]),
-		 ev[2]*sqrt(gg[idim+1][idim+1]),ev[3]*sqrt(gg[idim+1][idim+1]));
-	  printf("visc : %f %f %f %f\n",evvisc[0]*sqrt(gg[idim+1][idim+1]),evvisc[1]*sqrt(gg[idim+1][idim+1]),
-		 evvisc[2]*sqrt(gg[idim+1][idim+1]),evvisc[3]*sqrt(gg[idim+1][idim+1]));
-	  getchar();
-	  */
+      //if(maxvel > MAXRADVISCVEL) //total wavespeed exceeding speed of light
+      //{
+      //viscous wavespeeds
+      ldouble evmaxvisc,evvisc[4];
+      evmaxvisc=calc_eigen_4x4(JJvisc[idim],evvisc);
+      ldouble maxvelvisc = fabs(evmaxvisc)*sqrt(gg[idim+1][idim+1]);
+      ldouble axlvisc=my_min_N(evvisc,4);
+      if(axlvisc>0.) axlvisc=0.;
+      ldouble axrvisc=my_max_N(evvisc,4);
+      if(axrvisc<0.) axrvisc=0.;
+      /*
+	printf("---\n at: %d %d dim: %d\n",ix,iy,idim);
+	printf("total: %f %f %f %f\n",ev[0]*sqrt(gg[idim+1][idim+1]),ev[1]*sqrt(gg[idim+1][idim+1]),
+	ev[2]*sqrt(gg[idim+1][idim+1]),ev[3]*sqrt(gg[idim+1][idim+1]));
+	printf("visc : %f %f %f %f\n",evvisc[0]*sqrt(gg[idim+1][idim+1]),evvisc[1]*sqrt(gg[idim+1][idim+1]),
+	evvisc[2]*sqrt(gg[idim+1][idim+1]),evvisc[3]*sqrt(gg[idim+1][idim+1]));
+	getchar();
+      */
 
-	  ldouble fac,maxvel_ph; 
-	  if(maxvelvisc>MAXRADVISCVEL)
-	    {
-	      fac=MAXRADVISCVEL/maxvelvisc;
-	      //axl/axr - how to modify them?
-	      axl=my_min(axl0,axlvisc*fac);
-	      axr=my_max(axr0,axrvisc*fac);
-	    
-	      axl=axl0-axlvisc*fac;
-	      axr=axr0+axrvisc*fac;
-	    
-	      set_u_scalar(radviscfac,ix,iy,iz,fac);
-	    }
+      ldouble fac,maxvel_ph; 
+      if(0 && maxvelvisc>MAXRADVISCVEL)
+	{
+	  fac=MAXRADVISCVEL/maxvelvisc*1.;
+	  //axl/axr - how to modify them?
+	  //
+	  //axl=my_min(axl0,axlvisc*fac);
+	  //axr=my_max(axr0,axrvisc*fac);
+ 
+	  axl=axl0+axlvisc*(1. - (1.-fac)/2.);
+	  axr=axr0+axrvisc*(1. - (1.-fac)/2.);
+
+	  //axl=axl0;
+	  //axr=axr0;
+	  set_u_scalar(radviscfac,ix,iy,iz,fac);
 	}
+      //}
 
       //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
       axl/=(1.+tautot[idim]);
@@ -3762,353 +3740,6 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   return 0;
 }
 
-/************************************************************************/
-/******* calculates wavespeeds in the lab frame takin 1/@3 in ***********/
-/******* radiative rest frame and boosting it to lab frame **************/
-/******* using the HARM algorithm - with taul limiter *******************/
-/******* or calculating numerically at cell centers *********************/
-/************************************************************************/
-int
-calc_rad_wavespeeds_old(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int verbose)
-{
-  verbose=0;
-
-  struct geometry *geom
-    = (struct geometry *) ggg;
-
-  //if(geom->ix==NX/2 && geom->iy==0) verbose = 1;
-
-  ldouble (*gg)[5],(*GG)[5];
-  gg=geom->gg;
-  GG=geom->GG;
-
-  int i,j;
-
-  //**********************************************************************
-  //transforming 1/sqrt(3) from radiation rest frame + limiter based on optical depth
-  //**********************************************************************
-
-  ldouble urfcon[4]; 
-  urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
-
-  //square of radiative wavespeed in radiative rest frame
-  ldouble rv2rad = 1./3.;
-  ldouble rv2,rv2tau;
-
-  //algorithm from HARM to transform the fluid frame wavespeed into lab frame
-  ldouble Acov[4],Acon[4],Bcov[4],Bcon[4],Asq,Bsq,Au,Bu,AB,Au2,Bu2,AuBu,A,B,discr,wspeed2;
-  ldouble axl,axr,ayl,ayr,azl,azr;
-  axl=axr=ayl=ayr=azl=azr=1.;
-   
-  //**********************************************************************
-  //**********************************************************************
-  int dim;
-  for(dim=0;dim<3;dim++)
-    {
-      //characterisitic limiter based on the optical depth
-      if(tautot[dim]>0.) 
-	{
-	  rv2tau=4./3./tautot[dim]*4./3./tautot[dim];
-	  rv2=my_min(rv2rad,rv2tau);
-	}
-      else
-	rv2=rv2rad;
-      
-#ifdef SKIPRADWAVESPEEDLIMITER
-      rv2=rv2rad;
-#endif
-
-#ifdef FULLRADWAVESPEEDS
-      rv2=1.;
-#endif
-
-      Acov[0]=0.;
-      Acov[1]=0.;
-      Acov[2]=0.;
-      Acov[3]=0.;
-      Acov[dim+1]=1.;
-      indices_12(Acov,Acon,GG);
-  
-      Bcov[0]=1.;
-      Bcov[1]=0.;
-      Bcov[2]=0.;
-      Bcov[3]=0.;
-      indices_12(Bcov,Bcon,GG);
-
-      Asq = dot(Acon,Acov);
-      Bsq = dot(Bcon,Bcov);
-      Au = dot(Acov, urfcon);
-      Bu = dot(Bcov, urfcon);
-      AB = dot(Acon, Bcov);
-      Au2 = Au * Au;
-      Bu2 = Bu * Bu;
-      AuBu = Au * Bu;
-
-      wspeed2=rv2;
-      B = 2. * (AuBu * (1.0-wspeed2)  - AB*wspeed2);
-      A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
-      discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
-      if(discr<0.) {printf("x1discr in ravespeeds lt 0\n"); discr=0.;}
-      discr = sqrt(discr);
-      ldouble cst1 = -(-B + discr) / (2. * A);
-      ldouble cst2 = -(-B - discr) / (2. * A);  
-
-      axl = my_min(cst1,cst2);
-      axr = my_max(cst1,cst2);
-
-      aval[dim*2+0]=axl;
-      aval[dim*2+1]=axr;
-    }
-
-#ifdef NUMRADWAVESPEEDS
-  //calculating the Jacobi matrix of radiative fluxes, then its eigenvalues and chooses the largest
-
-  int ix,iy,iz;
-  int idim,corr;
-  //may not work properly with WAVESPEEDSATFACES
-  //what is below assumes geometry at cell center
-  ix=geom->ix;
-  iy=geom->iy;
-  iz=geom->iz;
-
-  //  printf("%d %d %d\n",ix,iy,iz); getchar();
-
-  ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],JJ[4][4],del;
-  ldouble EPS=1.e-8;
-
-
-  PLOOP(i)
-    pp0[i]=pp[i];
-  p2u(pp0,uu0,ggg);
-  PLOOP(i)
-    uu[i]=uu0[i];
-
-  if(verbose)
-    {
-      print_4vector(&pp0[EE0]);
-      print_4vector(&uu0[EE0]);
-    }
-     
-  //todo:
-  //redundancy in idim!
-  for(idim=0;idim<3;idim++)
-    {
-      f_flux_prime_rad(pp0,idim,ggg,ff0);
-      
-      //calculating approximate Jacobian
-      for(j=0;j<4;j++)
-	{
-	  if(j==0) //energy density
-	    {
-	      del = EPS*uu[EE0];
-	    }
-	  else //radiative momenta
-	    {
-	      del = -EPS*fabs(uu[EE0])*my_sign(uu0[j+EE0]);
-	    }
-	  
-	  uu[j+EE0]=uu0[j+EE0]+del;
-	  //todo: the derivatives in shear taken between ix+1 and ix-1 so shear component of stress do not change because of del
-
-	  if(verbose>1) { printf("%d: ",j);print_4vector(&uu[EE0]); }
-
-	  u2p_rad(uu,pp,ggg,&corr);
-
-	  if(verbose>0 && corr==1) printf("rad corrected at %d\n",j);
-
-	  f_flux_prime_rad(pp,idim,ggg,ff);
-
-	  //Jacobian matrix component
-	  for(i=0;i<4;i++)
-	    {
-	      JJ[i][j]=(ff[i+EE0] - ff0[i+EE0])/del;
-	    }
-
-	  uu[j+EE0]=uu0[j+EE0];
-	  pp[j+EE0]=pp0[j+EE0];
-	}
-      
-      //Jacobian matrix in JJ
-      //eigenvalues - velocitiies in idim
-
-      if(verbose)
-	print_tensor(JJ);
-      ldouble evmax,ev[4];
-      evmax=calc_eigen_4x4(JJ,ev);
-      
-      //regular rad velocity, calculated analytically in the begining
-      ldouble axl=my_min_N(ev,4);
-      ldouble axr=my_max_N(ev,4);
-
-      //test: only viscous
-      ldouble Rtemp[4][4];
-      calc_Rij_visc(pp0,ggg,Rtemp);
-      indices_2221(Rtemp,Rtemp,geom->gg);
-      ff0[EE0+0]=Rtemp[idim+1][0];
-      ff0[EE0+1]=Rtemp[idim+1][1];
-      ff0[EE0+2]=Rtemp[idim+1][2];
-      ff0[EE0+3]=Rtemp[idim+1][3];
-
-      //calculating approximate Jacobian
-      for(j=0;j<4;j++)
-	{
-	  if(j==0) //energy density
-	    {
-	      del = EPS*uu[EE0];
-	    }
-	  else //radiative momenta
-	    {
-	      del = -EPS*fabs(uu[EE0])*my_sign(uu0[j+EE0]);
-	    }
-	  
-	  uu[j+EE0]=uu0[j+EE0]+del;
-	  //todo: the derivatives in shear taken between ix+1 and ix-1 so shear component of stress do not change because of del
-
-	  if(verbose>1) { printf("%d: ",j);print_4vector(&uu[EE0]); }
-
-	  u2p_rad(uu,pp,ggg,&corr);
-
-	  if(verbose>0 && corr==1) printf("rad corrected at %d\n",j);
-
-	  //test - viscous only
-	  calc_Rij_visc(pp,ggg,Rtemp);
-	  indices_2221(Rtemp,Rtemp,geom->gg);
-	  ff[EE0+0]=Rtemp[idim+1][0];
-	  ff[EE0+1]=Rtemp[idim+1][1];
-	  ff[EE0+2]=Rtemp[idim+1][2];
-	  ff[EE0+3]=Rtemp[idim+1][3];
-
-	  //Jacobian matrix component
-	  for(i=0;i<4;i++)
-	    {
-	      JJ[i][j]=(ff[i+EE0] - ff0[i+EE0])/del;
-	    }
-
-	  uu[j+EE0]=uu0[j+EE0];
-	  pp[j+EE0]=pp0[j+EE0];
-	}
-      
-      if(verbose)
-	print_tensor(JJ);
-
-      ldouble evmaxvisc,evvisc[4];
-      evmaxvisc=calc_eigen_4x4(JJ,evvisc);
-      //regular rad velocity, calculated analytically in the begining
-      ldouble axlvisc=my_min_N(evvisc,4);
-      ldouble axrvisc=my_max_N(evvisc,4);
-      //end: test
-      
-      //regular, calculated analytically before
-      ldouble axl0,axr0;
-      axl0=aval[idim*2+0];
-      axr0=aval[idim*2+1];
-
-      if(verbose)
-	{
-	  printf("\n vfull: %e %e \n",axl,axr);
-	  print_4vector(ev);
-	  printf("\n vvisc: %e %e \n",axlvisc,axrvisc);
-	  print_4vector(evvisc);
-	  printf("\n vanal: %e %e \n",axl0,axr0);
-
-	  //calculating shear for comparison
-	  /*
-	  ldouble shear[4][4];
-	  calc_shear_lab(pp0,ggg,shear,RAD);  
-	  indices_1121(shear,shear,geom->GG);
-	  evmax=calc_eigen_4x4(shear,ev);
-	  ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),   //here gg can be face or cell, get_size_x always refers to cell
-		 get_size_x(geom->iy,1)*sqrt(geom->gg[2][2]),
-			 get_size_x(geom->iz,2)*sqrt(geom->gg[3][3])};
-	  ldouble mindx;
-	  //mean free path
-	  ldouble chi=calc_chi(pp,geom->xxvec);
-	  ldouble mfp = 1./chi; // dr / dtau
-	  if(NY==1 && NZ==1) mindx = dx[0];
-	  else if(NZ==1) mindx = my_min(dx[0],dx[1]);
-	  else if(NY==1) mindx = my_min(dx[0],dx[2]);
-	  else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
-	  if(mfp>mindx || chi<SMALL) mfp=mindx;
-	  ldouble ev[4],evmax,eta,nu,vdiff2;
-	  nu = ALPHARADVISC * 1./3. * mfp;
-	  nu*=get_u_scalar(radviscfac,geom->ix,geom->iy,geom->iz);
-	  
-	  for(i=0;i<4;i++)
-	    {
-	      ev[i]*=2.*nu;
-	      ev[i]=sqrt(ev[i]);
-	    }
-	  print_4vector(ev);
-	  */
-	  printf("end of dim %d\n",idim);
-	  getchar();
-	}      
-
-      
-      /*
-      if(!isfinite(axl) || !isfinite(axr) || fabs(axl)>100. || fabs(axr)>100.)
-	{
-	  printf("problem: %e %e at %d %d\n",axl,axr,ix,iy);
-
-	  print_4vector(ev);
-	  print_4vector(&pp0[EE0]);
-	  print_4vector(&uu0[EE0]);
-	  print_tensor(JJ);	 
-	  getchar();	  
-	}
-      */
-      
-      
-      //numerical values
-      ldouble fac=1.; //to artificially increase numerical diffusion/stability
-      axl*=fac;
-      axr*=fac;
-      
-      ldouble maxvel = my_max(fabs(axl),fabs(axr));
-      ldouble maxvel0 = my_max(fabs(axl0),fabs(axr0));
-      
-      //damping viscosity (done basing on mhd + viscous velocity!)
-      //todo:
-      //does not work...
-      
-
-      /*
-      if(maxvel > MAXRADVISCVEL)
-	{
-	  fac=(MAXRADVISCVEL-maxvel0)/maxvel;
-	  axl=-MAXRADVISCVEL*1.5;
-	  axr=MAXRADVISCVEL*1.5;
-	  set_u_scalar(radviscfac,ix,iy,iz,fac);
-
-	  //printf("damping viscosity by %f at %d %d %d\n",fac,ix,iy,iz);
-	}
-      else
-	set_u_scalar(radviscfac,ix,iy,iz,1.);
-      */
-
-      //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
-      if(tautot[idim]>1.) 
-	{
-	  axl/=tautot[idim];
-	  axr/=tautot[idim];
-	}
-
-      aval[idim*2+0]=axl;
-      aval[idim*2+1]=axr;
-
-
-    }
-
-
-#endif
-
-  return 0;
-}
 
 
 /************************************************************************/
@@ -4960,7 +4591,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 
   //dampfac= 1. / (1.+sqrt(maxvel/MAXRADVISCVEL));
   //dampfac=1.;
-  dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
+  //dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
   
  //adding up to Rij
   for(i=0;i<4;i++)

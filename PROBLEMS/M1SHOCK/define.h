@@ -5,7 +5,7 @@
 #define TIMESTEPPING RK2IMEX
 
 //#define RESTART
-#define RESTARTNUM 1
+#define RESTARTNUM 5
 
 #define RADIATION 
 //#define SKIPRADSOURCE

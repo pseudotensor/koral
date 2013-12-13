@@ -77,9 +77,10 @@ int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
     
 #ifdef MAGNFIELD 
     //artificiall impose poloidal magnetic field
-    ldouble Pgas;
+    ldouble Pgas,Prad;
     Pgas=GAMMAM1*uint;
-    pp[B2]=sqrt(Pgas)*MAGBETA/sqrt(geom->gg[2][2]);
+    Prad=E/3.;
+    pp[B2]=sqrt((Pgas+Prad)*MAGBETA)/sqrt(geom->gg[2][2]);
 
     /*
     //MYCOORDS vector potential to calculate B's
