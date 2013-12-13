@@ -3689,6 +3689,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       //**********************************************************************
       //verify causality
       //todo: choose maximum from all dimensions?
+      //todo: save independently for each dimension?
       set_u_scalar(radviscfac,ix,iy,iz,1.);
       //if(maxvel > MAXRADVISCVEL) //total wavespeed exceeding speed of light
       //{
