@@ -642,9 +642,10 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
 //calculates shear tensor sigma_ij in the lab frame at cell centers only!
 //hdorrad == MHD -> using gas velocity
 //hdorrad == RAD -> using radiative velocity
+//derdir[] determines the type of derivative in each dimension (left,right,centered)
 
 int
-calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
+calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
 {
   int i,j,k,iv;
 
@@ -907,8 +908,24 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad)
 		 du2[i][idim]=dr2;
 	       }
 	     #else
-	     du[i][idim]=dc;
-	     du2[i][idim]=dc2;
+
+	     if(derdir[idim-1]==0)
+	       {
+		 du[i][idim]=dc;
+		 du2[i][idim]=dc2;
+	       }
+	     if(derdir[idim-1]==1)
+	       {
+		 du[i][idim]=dl;
+		 du2[i][idim]=dl2;
+	       }
+	     if(derdir[idim-1]==2)
+	       {
+		 du[i][idim]=dr;
+		 du2[i][idim]=dr2;
+	       }
+	     
+
 	     #endif
 	     
 	     /*

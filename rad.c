@@ -3171,8 +3171,8 @@ calc_Rij_total(ldouble *pp, void *ggg, ldouble Rij[][4])
 
 #if (RADVISCOSITY!=NOVISCOSITY)
   int i,j;
-  ldouble Rvisc[4][4];
-  calc_Rij_visc(pp,ggg,Rvisc);
+  ldouble Rvisc[4][4];int derdir[3]={0,0,0};
+  calc_Rij_visc(pp,ggg,Rvisc,derdir);
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]+=Rvisc[i][j];
@@ -3224,7 +3224,7 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 //**********************************************************************
 //**********************************************************************
 int
-calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4])
+calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
 {
   int i,j;
   
@@ -3243,7 +3243,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4])
 #if (RADVISCOSITY==SHEARVISCOSITY)
   ldouble shear[4][4];
   ldouble nu,vdiff2;
-  calc_rad_shearviscosity(pp,ggg,shear,&nu,&vdiff2);
+  calc_rad_shearviscosity(pp,ggg,shear,&nu,&vdiff2,derdir);
 
   //which energy density?
   ldouble Erad;
@@ -4084,7 +4084,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
 /***************************************/
 /* rad viscosity and shear at cell centers */
 /***************************************/
-int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret)
+int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret,int *derdir)
 {  
   
 #if(RADVISCOSITY==SHEARVISCOSITY) //full shear tensor
@@ -4098,7 +4098,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
     }
   
   //calculating shear at cell center!
-  calc_shear_lab(pp,ggg,shear,RAD);  
+  calc_shear_lab(pp,ggg,shear,RAD,derdir);  
   indices_1122(shear,shear,geom->GG);
 
   //transforming to ortonormal
@@ -4454,7 +4454,74 @@ calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
 }
 
 //***************************************
+// calculates d/di (eta * shear) - viscous source term
+//***************************************
+int f_radvisc_source_term(int ix,int iy,int iz,ldouble *ms)
+{
+  //todo: precalculate shear
+  int iix,iiy,iiz,idim,i,j; 
+  struct geometry geom1,geom2,geom;
+  ldouble Rij[4][4],RijM1[4][4],Rvisc1[4][4],Rvisc2[4][4],dx;
+  PLOOP(i) ms[i]=0.;
+  fill_geometry(ix,iy,iz,&geom);
+  ldouble gdetu=geom.gdet;
+#if (GDETIN==0) //no metric determinant inside derivatives
+  gdetu=1.;
+#endif
+
+  for(idim=0;idim<3;idim++)
+    {
+      if(idim==1 && NY==1) continue;
+      if(idim==2 && NZ==1) continue;
+
+      //left
+      iix=ix;iiy=iy;iiz=iz;
+      if(idim==0)
+	iix=ix-1;
+      if(idim==1)
+	iiy=iy-1;
+      if(idim==2)
+	iiz=iz-1;
+      fill_geometry(iix,iiy,iiz,&geom1);
+      f_flux_prime_rad_total(&get_u(p,0,iix,iiy,iiz),&geom1,Rij,RijM1,Rvisc1);
+
+      //right
+      iix=ix;iiy=iy;iiz=iz;
+      if(idim==0)
+	iix=ix+1;
+      if(idim==1)
+	iiy=iy+1;
+      if(idim==2)
+	iiz=iz+1;
+      fill_geometry(iix,iiy,iiz,&geom2);
+      f_flux_prime_rad_total(&get_u(p,0,iix,iiy,iiz),&geom2,Rij,RijM1,Rvisc2);
+
+      if(idim==0)
+	dx=geom2.xx-geom1.xx;
+      if(idim==1)
+	dx=geom2.yy-geom1.yy;
+      if(idim==2)
+	dx=geom2.zz-geom1.zz;
+
+      for(i=0;i<4;i++)
+	{
+	  ms[EE0+i]+=gdetu*(Rvisc2[idim+1][i]-Rvisc1[idim+1][i])/dx;	  
+	}
+      if(0 && ix==NX/3) 
+	{
+	  print_4vector(&ms[EE0]);
+	  print_tensor(Rvisc1);
+	  print_tensor(Rvisc2);
+	}
+    }
+
+     
+  return 0;
+}
+
+//***************************************
 // calculates radiative tensor at faces or centers
+// returns total, pure M1, visc
 //***************************************
 int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4])
 {  
@@ -4466,7 +4533,8 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 
   struct geometry *geom
     = (struct geometry *) ggg;
-
+  ldouble Rvisc1[4][4],Rvisc2[4][4];
+  int ix,iy,iz; int iix,iiy,iiz; 
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
   GG=geom->GG;
@@ -4482,18 +4550,18 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   indices_2221(Rij,Rij,gg); //R^i_j
   indices_2221(RijM1,RijM1,gg); //R^i_j
 
-  #if (RADVISCOSITY==SHEARVISCOSITY)
+  
+#if (RADVISCOSITY==SHEARVISCOSITY)
   //when face and shear viscosity put the face primitives at both cell centers and average the viscous stress tensor
   if(geom->ifacedim>-1)
     //face fluxes
     {      
-      int ix,iy,iz; 
+       
       ix=geom->ix;
       iy=geom->iy;
       iz=geom->iz;
       struct geometry geomcent;
-      ldouble Rvisc1[4][4],Rvisc2[4][4];
-      int iix,iiy,iiz;
+      
       iix=ix;iiy=iy;iiz=iz;
 
       //left
@@ -4503,20 +4571,25 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 	iiy=iy-1;
       if(geom->ifacedim==2)
 	iiz=iz-1;
-      fill_geometry(iix,iiy,iiz,&geomcent);
-
+      
       //using the face interpolated primitives
       //calc_Rij_visc(pp,&geomcent,Rvisc1);
 
+      int derdir[3]={0,0,0}; //by default centered derivatives in calc_shear
       //using primitives from the cell centers of neighbours
-      calc_Rij_visc(&get_u(p,0,iix,iiy,iiz),&geomcent,Rvisc1);
+
+      //left
+      fill_geometry(iix,iiy,iiz,&geomcent);
+      derdir[geom->ifacedim]=0; //right derivative
+      calc_Rij_visc(&get_u(p,0,iix,iiy,iiz),&geomcent,Rvisc1,derdir);
+      indices_2221(Rvisc1,Rvisc1,geomcent.gg); //R^i_j
 
       //right
-      fill_geometry(ix,iy,iz,&geomcent);
+      fill_geometry(ix,iy,iz,&geomcent);      
+      derdir[geom->ifacedim]=0; //left derivative
+      calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc2,derdir);
+      indices_2221(Rvisc2,Rvisc2,geomcent.gg); //R^i_j
       
-      //calc_Rij_visc(pp,&geomcent,Rvisc2);
-      calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc2);
-
       //adding up to M1 tensor
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
@@ -4536,12 +4609,13 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
     //cell centered fluxes for char. wavespeed evaluation
     {
       //printf("%d %d center %d\n",geom->ix,geom->iz,geom->ifacedim); //getchar();
-
-      calc_Rij_visc(pp,ggg,Rijvisc);
+      int derdir[3]={0,0,0};
+      calc_Rij_visc(pp,ggg,Rijvisc,derdir);
+      indices_2221(Rijvisc,Rijvisc,gg); //R^i_j
       //adding up to M1 tensor
     }  
 
-  indices_2221(Rijvisc,Rijvisc,gg); //R^i_j
+  
 
 #ifdef NUMRADWAVESPEEDS
   //viscosity damped through radviscdamp[]
@@ -4559,51 +4633,115 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   int idim;
   ldouble vel[3]={0.,0.,0.},maxvel=-1.;
 
-  //printf("i: %d %d face: %d\n",geom->ix,geom->iy,geom->ifacedim);
-  for(idim=0;idim<3;idim++)
-    for(i=1;i<4;i++)
-      {
-	if(i==2 && NY==1) continue;
-	if(i==3 && NZ==1) continue;
-	if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
-	vel[idim]=Rijvisc[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(gg[idim+1][idim+1]);
-	//printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
-      }
-  if(geom->ifacedim>-1)
-    maxvel=fabs(vel[geom->ifacedim]);
-  else
-    maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
-
-  //adjust:
-  if(maxvel>MAXRADVISCVEL)
-    {
-      dampfac=MAXRADVISCVEL/maxvel;
-      //printf("damping at %d (%e)\n",geom->ix,maxvel);
-     }
- else
-    dampfac=1.;
-
-  //todo: choose best prescription
-  //if(dampfac<1.) dampfac = 0.5 + 1. / (1. + (maxvel/MAXRADVISCVEL));
-  //dampfac = step_function(1.-maxvel/MAXRADVISCVEL,.01);
-  //dampfac= 1. / (1.+exp(2.*(maxvel/MAXRADVISCVEL-1.)));
-  //if(dampfac<1.)dampfac = MAXRADVISCVEL/maxvel;
-
-  //dampfac= 1. / (1.+sqrt(maxvel/MAXRADVISCVEL));
-  //dampfac=1.;
-  //dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
   
- //adding up to Rij
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      {
-	Rijvisc[i][j]*=dampfac;
-	Rij[i][j]+=Rijvisc[i][j];
-      }
+  //printf("i: %d %d face: %d\n",geom->ix,geom->iy,geom->ifacedim);
+  if(0 &&geom->ifacedim>-1) //at faces - damping independently Rvisc1 & Rvisc2
+    {
+      //Rvisc1
+      for(idim=0;idim<3;idim++) 
+	for(i=1;i<4;i++)
+	  {
+	    if(i==2 && NY==1) continue;
+	    if(i==3 && NZ==1) continue;
+	    if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
+	    vel[idim]=Rvisc1[idim+1][i]/(get_u(u,EE0+i,iix,iiy,iiz)/gdetu)*sqrt(gg[idim+1][idim+1]);
+	  }
+      if(geom->ifacedim>-1)
+	maxvel=fabs(vel[geom->ifacedim]);
+      else
+	maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
+
+      //adjust:
+      if(maxvel>MAXRADVISCVEL)
+	{
+	  dampfac=MAXRADVISCVEL/maxvel;
+	  //intf("damping at %d (%e)\n",geom->ix,maxvel);
+	}
+      else
+	dampfac=1.;
+
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  {
+	    Rvisc1[i][j]*=dampfac;
+	    Rij[i][j]+=Rijvisc[i][j];
+	  }
+
+      //Rvisc2
+      for(idim=0;idim<3;idim++) 
+	for(i=1;i<4;i++)
+	  {
+	    if(i==2 && NY==1) continue;
+	    if(i==3 && NZ==1) continue;
+	    if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
+	    vel[idim]=Rvisc2[idim+1][i]/(get_u(u,EE0+i,ix,iy,iz)/gdetu)*sqrt(gg[idim+1][idim+1]);
+	  }
+      if(geom->ifacedim>-1)
+	maxvel=fabs(vel[geom->ifacedim]);
+      else
+	maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
+
+      //adjust:
+      if(maxvel>MAXRADVISCVEL)
+	{
+	  dampfac=MAXRADVISCVEL/maxvel;
+	  //printf("damping at %d (%e)\n",geom->ix,maxvel);
+	}
+      else
+	dampfac=1.;
+
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  {
+	    Rvisc2[i][j]*=dampfac;
+	  }
+
+      //summing up
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  {
+	    Rij[i][j]+=Rvisc1[i][j]+Rvisc2[i][j];
+	  }
+    }
+  else //face centers, using given uu
+    {
+      for(idim=0;idim<3;idim++)
+	for(i=1;i<4;i++)
+	  {
+	    if(i==2 && NY==1) continue;
+	    if(i==3 && NZ==1) continue;
+	    if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
+	    vel[idim]=Rijvisc[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(gg[idim+1][idim+1]);
+	    //printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
+	  }
+      if(geom->ifacedim>-1)
+	maxvel=fabs(vel[geom->ifacedim]);
+      else
+	maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
+
+      //adjust:
+      if(maxvel>MAXRADVISCVEL)
+	{
+	  dampfac=MAXRADVISCVEL/maxvel;
+	  //printf("damping at %d (%e)\n",geom->ix,maxvel);
+	}
+      else
+	dampfac=1.;
+
+      //todo: choose best prescription
+      //dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
+  
+      //adding up to Rij
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  {
+	    Rijvisc[i][j]*=dampfac;
+	    Rij[i][j]+=Rijvisc[i][j];
+	  }
+    }
 
 #endif
 #endif
-
 #endif
 
   return 0;
@@ -4632,13 +4770,24 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
 
   //fluxes to ff[EE0+]
-  ff[EE0]= gdetu*Rij[idim+1][0];
+#ifndef RADVISCSOURCETERM
+  ff[EE0]= gdetu*(RijM1[idim+1][0]+Rijvisc[idim+1][0]);
       
-  ff[FX0]= gdetu*Rij[idim+1][1];
+  ff[FX0]= gdetu*(RijM1[idim+1][1]+Rijvisc[idim+1][1]);
       
-  ff[FY0]= gdetu*Rij[idim+1][2];
+  ff[FY0]= gdetu*(RijM1[idim+1][2]+Rijvisc[idim+1][2]);
       
-  ff[FZ0]= gdetu*Rij[idim+1][3];
+  ff[FZ0]= gdetu*(RijM1[idim+1][3]+Rijvisc[idim+1][3]);
+#else
+  ff[EE0]= gdetu*(RijM1[idim+1][0]);
+      
+  ff[FX0]= gdetu*(RijM1[idim+1][1]);
+      
+  ff[FY0]= gdetu*(RijM1[idim+1][2]);
+      
+  ff[FZ0]= gdetu*(RijM1[idim+1][3]);
+#endif
+
 
 #endif
   return 0;

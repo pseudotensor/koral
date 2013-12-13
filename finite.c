@@ -795,10 +795,20 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //**********************************************************************
       //updating u - geometrical source terms
+ldouble ms[NV],val;
 #ifndef COUPLEMETRICWITHRADIMPLICIT
-      ldouble ms[NV],val;
-		  
       f_metric_source_term(ix,iy,iz,ms);
+     		  
+      for(iv=0;iv<NV;iv++)
+	{
+	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
+	  set_u(u,iv,ix,iy,iz,val);	
+	  uu[iv]=val;
+	} 
+#endif
+
+#ifdef RADVISCSOURCETERM
+      f_radvisc_source_term(ix,iy,iz,ms);
      		  
       for(iv=0;iv<NV;iv++)
 	{
