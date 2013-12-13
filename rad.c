@@ -3600,8 +3600,53 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 
   //**********************************************************************
   
+
+
   //zero state 
   f_flux_prime_rad_total(pp0,ggg,Rij0,RijM10,Rijvisc0);
+
+  
+  //damping here?
+
+  //test
+  //ttt
+  ldouble vel[3]={0.,0.,0.},maxvel;
+  for(idim=0;idim<3;idim++) 
+    for(i=1;i<4;i++)
+      {
+	if(i==2 && NY==1) continue;
+	if(i==3 && NZ==1) continue;
+	if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
+	vel[idim]=Rijvisc0[idim+1][i]/(uu0[EE0+i]/gdetu)*sqrt(gg[idim+1][idim+1]);
+	printf("> %d > %e %e > %e\n",idim,Rijvisc0[idim+1][i],uu0[EE0+i]/gdetu,vel[idim]);
+      }
+  if(geom->ifacedim>-1)
+    maxvel=fabs(vel[geom->ifacedim]);
+  else
+    maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
+
+  ldouble dampfac;
+  if(maxvel>MAXRADVISCVEL)
+    {
+      dampfac=MAXRADVISCVEL/maxvel;
+    }
+  else
+    dampfac=1.;
+
+
+
+  //if(dampfac<1.) verbose=1;
+
+  dampfac=1.; 
+
+  printf("%d > maxvel: %e\n",ix,maxvel);
+ 
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Rijvisc0[i][j]*=dampfac;
+	Rij0[i][j]=RijM10[i][j]+Rijvisc0[i][j];
+      }
   
   
   //**********************************************************************
@@ -3628,6 +3673,15 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 
       //perturbed state
       f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
+
+      int i1,i2;
+      for(i1=0;i1<4;i1++)
+	for(i2=0;i2<4;i2++)
+	  {
+	    Rijvisc[i1][i2]*=dampfac;
+	    Rij[i1][i2]=RijM1[i1][i2]+Rijvisc[i1][i2];
+	  }
+      
 
       //the Jacobi matrices
       ldouble fl,fl0;
@@ -3677,13 +3731,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       ldouble maxvel = my_max(fabs(axl),fabs(axr))*sqrt(gg[idim+1][idim+1]);
       ldouble maxvel0 = my_max(fabs(axl0),fabs(axr0))*sqrt(gg[idim+1][idim+1]);
     
-      if(verbose)
-	{
-	  printf("\n vfull: %e %e \n",axl,axr);
-	  print_4vector(ev);
-	  printf("end of dim %d\n",idim);
-	  getchar();
-	}      
+       
 
       
       //**********************************************************************
@@ -3701,6 +3749,18 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       if(axlvisc>0.) axlvisc=0.;
       ldouble axrvisc=my_max_N(evvisc,4);
       if(axrvisc<0.) axrvisc=0.;
+
+      if(axlvisc!=0. || axrvisc!=0) verbose=1;
+      if(verbose)
+	{
+	  printf("i: %d %d",ix,iy);
+	  printf("\n vfull: %e %e \n",axl,axr);
+	  printf("\n vanal: %e %e \n",axl0,axr0);
+	  printf("\n vvisc: %e %e \n",axlvisc,axrvisc);
+	  print_4vector(evvisc);
+	  printf("end of dim %d\n",idim);
+	  getchar();
+	}     
       /*
 	printf("---\n at: %d %d dim: %d\n",ix,iy,idim);
 	printf("total: %f %f %f %f\n",ev[0]*sqrt(gg[idim+1][idim+1]),ev[1]*sqrt(gg[idim+1][idim+1]),
@@ -4730,7 +4790,8 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 	dampfac=1.;
 
       //todo: choose best prescription
-      //dampfac= 1. / (1.+maxvel/MAXRADVISCVEL);
+      //dampfac= 1. / (1.+pow(maxvel/MAXRADVISCVEL,2.));
+      //dampfac = 1.-step_function(-1.+maxvel/MAXRADVISCVEL,.5);
   
       //adding up to Rij
       for(i=0;i<4;i++)
