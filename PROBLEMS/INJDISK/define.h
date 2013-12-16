@@ -12,7 +12,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -21,7 +21,7 @@
 #define MAGNFIELD
 #define GDETIN 1
 //#define VECPOTGIVEN
-#define MAGBETA .01 //pmag/pgas at the boundary
+#define MAGBETA .01 //pmag/ptot at the boundary
 
 /************************************/
 //reconstruction / Courant
@@ -128,8 +128,8 @@
 #define ELLA 0.2
 #define MAGNOMEGA 1.e-2
 
-//outdated
-#define DISKH (.2*ROUT)
+#define DISKHR (.2)
+#define DISKH (DISKHR*ROUT)
 #define DISKTEMP 1.e9
 
 #define RHOATMMIN  1.e-24

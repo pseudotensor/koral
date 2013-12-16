@@ -387,7 +387,13 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 #else
 		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
 #endif
-		  phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*get_size_x(iy,1);
+		  if(iy<=NY/2) //proper integration only in the upper half
+		    phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*get_size_x(iy,1);
+		  else
+		    {
+		      idx=iz*(ny*nx) + (NY-iy-1)*nx + ix;
+		      phi[nodalindex]=phi[idx];
+		    }
 		}
 
 
