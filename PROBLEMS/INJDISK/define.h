@@ -12,7 +12,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -70,11 +70,11 @@
 /************************************/
 #define myMKS1COORDS
 #define MKS1R0 0.
-
+#define ROUT 50.
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.575-MKS1R0))
-#define MAXX (log(50.-MKS1R0))
+#define MAXX (log(ROUT-MKS1R0))
 #define NX 150
 #define NY 100
 #define NZ 1
@@ -112,17 +112,25 @@
 #define CBAUTOSCALE
 #define DTOUT1 10.
 #define DTOUT2 250.
+#define PRINTXGC_RIGHT
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
 #define GAMMA (5./3.)
 
-#define DISKH .2
+
 #define DISKRHO rhoCGS2GU(1.e-2)
-#define DISKTEMP 1.e9
 #define DISKRCIR 20.
-#define DISKVR -0.1;
+#define DISKVR (-1./sqrt(ROUT)*0.1) //v_kepl * alpha
+#define VSZERO sqrt(1./ROUT/ROUT/ROUT*DISKH*DISKH*3.3) //determines H/R
+#define NPOLI 3.
+#define ELLA 0.2
+#define MAGNOMEGA 1.e-2
+
+//outdated
+#define DISKH (.2*ROUT)
+#define DISKTEMP 1.e9
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))

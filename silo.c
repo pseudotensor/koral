@@ -101,7 +101,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
       for(iy=0;iy<ny;iy++)
 	{
 	  
+#ifdef PRINTXGC_RIGHT
+	  for(ix=NG;ix<nx+NG;ix++)
+#else
 	  for(ix=0;ix<nx;ix++)
+#endif
+
 	    {
 	      int iix,iiy,iiz;
 	      iix=ix;
@@ -159,7 +164,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      if(OUTCOORDS==BLCOORDS && geomout.xx<r_horizon_BL(BHSPIN))
 	      continue;
 
+#ifdef PRINTXGC_RIGHT
+	      int nodalindex=iz*(ny*nx) + iy*nx + ix-NG;
+#else
 	      int nodalindex=iz*(ny*nx) + iy*nx + ix;
+#endif
 	      for(iv=0;iv<NV;iv++)
 		{
 		  if(doingavg)
@@ -373,7 +382,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 	      else
 		{
+#ifdef PRINTXGC_RIGHT
+		  int idx=iz*(ny*nx) + (iy-1)*nx + ix-NG;
+#else
 		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
+#endif
 		  phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*get_size_x(iy,1);
 		}
 
@@ -480,9 +493,13 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 	      else
 		{
+#ifdef PRINTXGC_RIGHT
+		  int idx=iz*(ny*nx) + (iy-1)*nx + ix-NG;
+#else
 		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
-		  tautot[nodalindex]=tautot[nodalindex]+tautotloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
-		  tauabs[nodalindex]=tauabs[nodalindex]+tauabsloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+#endif
+		  tautot[nodalindex]=tautot[idx]+tautotloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  tauabs[nodalindex]=tauabs[idx]+tauabsloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
 		}
 
 	      //transform to cartesian
