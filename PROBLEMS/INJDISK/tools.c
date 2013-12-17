@@ -113,25 +113,26 @@ int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
   if(theq>thmax)
     return -1; //outside disk;
    
-  ldouble rho,uint,uphi,Om,ucon[4],temp;
+  ldouble rho,uint,uphi,Om,Omk,ucon[4],temp,pre0,uint0,temp0;
 
   rho=DISKRHO*pow(1.-pow(theq/thmax,2.),3.);
-  temp=DISKTEMP*(1.-pow(theq/thmax,2.));
-		   
+
+  Omk=1./sqrt(r*r*r);
+  pre0 = DISKSIGMA * Omk * Omk * DISKH * DISKH / 2. / DISKH ;  //P=2Hp, P/S = Om^2 H^2 
+  uint0 = pre0 / GAMMAM1;
+  temp0 = calc_PEQ_Tfromurho(uint0, DISKRHO);
+  temp=temp0*(1.-pow(theq/thmax,2.));
   uint=calc_PEQ_ufromTrho(temp,rho);
   Om=sqrt(DISKRCIR)/r/r;
-
-  ldouble rhoatm=pp[RHO];
-  ldouble uintatm =pp[UU];
 
   ucon[1]=DISKVR;
   ucon[2]=0.;
   ucon[3]=Om;
     
   conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL->gg,geomBL->GG);
-   
-  pp[0]=my_max(rho,rhoatm);
-  pp[1]=my_max(uint,uintatm);
+ 
+  pp[0]=rho;//my_max(rho,rhoatm);
+  pp[1]=uint;//my_max(uint,uintatm);
   pp[2]=ucon[1]; 
   pp[3]=ucon[2];
   pp[4]=ucon[3];
@@ -158,8 +159,8 @@ int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
   Fx=Fy=Fz=0.;
   uint=calc_PEQ_ufromTrho(T4,rho);
 
-  pp[UU]=my_max(uint,uintatm);
-  pp[EE0]=my_max(E,Eatm);
+  pp[UU]=uint;//my_max(uint,uintatm);
+  pp[EE0]=E;//my_max(E,Eatm);
 
   pp[FX0]=Fx;
   pp[FY0]=Fy;

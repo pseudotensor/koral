@@ -22,6 +22,8 @@
 #define velGU2CGS(x)    (x*CCC)
 #define rhoCGS2GU(x)    (x*GGG/CCC/CCC*MASSCM*MASSCM)
 #define rhoGU2CGS(x)    (x/GGG*CCC*CCC/MASSCM/MASSCM)
+#define surfdensCGS2GU(x)    (x*GGG/CCC/CCC*MASSCM)
+#define surfdensGU2CGS(x)    (x/GGG*CCC*CCC/MASSCM)
 #define massCGS2GU(x)    (x*GGG/CCC/CCC/MASSCM)
 #define massGU2CGS(x)    (x/GGG*CCC*CCC*MASSCM)
 #define kappaCGS2GU(x)  (x/GGG*CCC*CCC/MASSCM)

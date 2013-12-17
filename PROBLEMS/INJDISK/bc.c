@@ -41,50 +41,52 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 //outer edge, outflows with velocity check
 if(ix>=NX) 
   {
-    iix=NX-1;
-    iiy=iy;
-    iiz=iz;
+    if(diskatboundary(pp, &geom, &geomBL)<0)
+      {
+	iix=NX-1;
+	iiy=iy;
+	iiz=iz;
     
-    //copying everything
-    for(iv=0;iv<=NV;iv++)
-      {
-	pp[iv]=get_u(p,iv,iix,iiy,iiz);
-      }
+	//copying everything
+	for(iv=0;iv<=NV;iv++)
+	  {
+	    pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	  }
 
-    //checking for the gas inflow
-    ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
-    conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-    if(ucon[1]<0.) //inflow, resetting the radial velocity
-      {
-	//set_hdatmosphere(pp,xxvec,gg,GG,4);
-	ucon[1]=0.;
-	conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
-	pp[VX]=ucon[1];
-	pp[VY]=ucon[2];
-	pp[VZ]=ucon[3];//atmosphere in rho,uint and velocities and zero magn. field
-      }
+	//checking for the gas inflow
+	ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
+	conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+	if(ucon[1]<0.) //inflow, resetting the radial velocity
+	  {
+	    //set_hdatmosphere(pp,xxvec,gg,GG,4);
+	    ucon[1]=0.;
+	    conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+	    pp[VX]=ucon[1];
+	    pp[VY]=ucon[2];
+	    pp[VZ]=ucon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	  }
 
 #ifdef RADIATION
-    ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};    
-    conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
-    if(urfcon[1]<0.) //inflow, resetting the radial velocity
-      {
-	//set_radatmosphere(pp,xxvec,gg,GG,0);
-	urfcon[1]=0.;
-	conv_vels(urfcon,urfcon,VEL4,VELPRIM,geom.gg,geom.GG);
-	pp[FX0]=urfcon[1];
-	pp[FY0]=urfcon[2];
-	pp[FZ0]=urfcon[3];//atmosphere in rho,uint and velocities and zero magn. field
-      }
+	ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};    
+	conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+	if(urfcon[1]<0.) //inflow, resetting the radial velocity
+	  {
+	    //set_radatmosphere(pp,xxvec,gg,GG,0);
+	    urfcon[1]=0.;
+	    conv_vels(urfcon,urfcon,VEL4,VELPRIM,geom.gg,geom.GG);
+	    pp[FX0]=urfcon[1];
+	    pp[FY0]=urfcon[2];
+	    pp[FZ0]=urfcon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	  }
 #endif
-	
-    diskatboundary(pp, &geom, &geomBL);
+      }
+
   
     p2u(pp,uu,&geom);
 
     /*
-    print_primitives(pp);
-    print_conserved(uu);getchar();
+      print_primitives(pp);
+      print_conserved(uu);getchar();
     */
 
     return 0;  

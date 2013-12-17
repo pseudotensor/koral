@@ -72,7 +72,7 @@
 //69 INJDISK - magnetized gas damped from outer boundary
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 
-#define PROBLEM 70
+#define PROBLEM 69
 
 #if(PROBLEM==70)
 
@@ -99,6 +99,7 @@
 #define PR_OUT2GIF_1D "PROBLEMS/INJDISK/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/INJDISK/dump.c"
 #define PR_TOOLS "PROBLEMS/INJDISK/tools.c"
+#define PR_POSTINIT "PROBLEMS/INJDISK/postinit.c"
 
 #endif
 

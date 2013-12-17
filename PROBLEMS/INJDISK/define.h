@@ -12,7 +12,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -20,8 +20,6 @@
 /************************************/
 #define MAGNFIELD
 #define GDETIN 1
-//#define VECPOTGIVEN
-#define MAGBETA .01 //pmag/ptot at the boundary
 
 /************************************/
 //reconstruction / Courant
@@ -119,18 +117,21 @@
 /************************************/
 #define GAMMA (5./3.)
 
-
-#define DISKRHO rhoCGS2GU(1.e-2)
-#define DISKRCIR 20.
-#define DISKVR (-1./sqrt(ROUT)*0.1) //v_kepl * alpha
-#define VSZERO sqrt(1./ROUT/ROUT/ROUT*DISKH*DISKH*3.3) //determines H/R
-#define NPOLI 3.
-#define ELLA 0.2
-#define MAGNOMEGA 1.e-2
-
 #define DISKHR (.2)
 #define DISKH (DISKHR*ROUT)
 #define DISKTEMP 1.e9
+#define DISKSIGMA surfdensCGS2GU(1.e4)
+#define DISKRHO DISKSIGMA/DISKH/(96./35.)
+#define DISKRCIR 20.
+#define DISKVR (-1./sqrt(ROUT)*0.1) //v_kepl * alpha
+#define MAGNOMEGA 1.e-2
+#define MAGBETA 0.02
+
+//KTORUS only:
+#define VSZERO sqrt(1./ROUT/ROUT/ROUT*DISKH*DISKH*3.3) //determines H/R
+#define NPOLI 3.
+#define ELLA 0.2
+
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
