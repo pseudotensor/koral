@@ -387,13 +387,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 #else
 		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
 #endif
-		  if(iy<=NY/2) //proper integration only in the upper half
-		    phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*get_size_x(iy,1);
-		  else
-		    {
-		      idx=iz*(ny*nx) + (NY-iy-1)*nx + ix;
-		      phi[nodalindex]=phi[idx];
-		    }
+		  phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*get_size_x(iy,1);
 		}
 
 
@@ -504,8 +498,17 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 #else
 		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
 #endif
-		  tautot[nodalindex]=tautot[idx]+tautotloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
-		  tauabs[nodalindex]=tauabs[idx]+tauabsloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  if(iy<=NY/2) //proper integration only in the upper half
+		    {
+		      tautot[nodalindex]=tautot[idx]+tautotloc*dxph[1];
+		      tauabs[nodalindex]=tauabs[idx]+tauabsloc*dxph[1];
+		    }
+		  else
+		    {
+		      idx=iz*(ny*nx) + (NY-iy-1)*nx + ix-NG;
+		      tautot[nodalindex]=tautot[idx];
+		      tauabs[nodalindex]=tauabs[idx];
+		    }
 		}
 
 	      //transform to cartesian
