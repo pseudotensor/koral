@@ -124,7 +124,7 @@
 #define DISKRHO DISKSIGMA/DISKH/(96./35.)
 #define DISKRCIR 20.
 #define DISKVR (-1./sqrt(ROUT)*0.1) //v_kepl * alpha
-#define MAGNOMEGA 1.e-2
+#define MAGNOMEGA (5.e-3*pow(ROUT/50.,-1.5))
 #define MAGBETA 0.02
 
 //KTORUS only:
