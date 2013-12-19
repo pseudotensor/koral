@@ -4626,114 +4626,42 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   ldouble dampfac=1.;
   int idim;
   ldouble vel[3]={0.,0.,0.},maxvel=-1.;
+ 
+  //face centers, using given uu
+  for(idim=0;idim<3;idim++)
+    for(i=1;i<4;i++)
+      {
+	if(i==2 && NY==1) continue;
+	if(i==3 && NZ==1) continue;
+	if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
+	vel[idim]=Rijvisc[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(gg[idim+1][idim+1]);
+	//printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
+      }
+  if(geom->ifacedim>-1)
+    maxvel=fabs(vel[geom->ifacedim]);
+  else
+    maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
 
-  
-  //printf("i: %d %d face: %d\n",geom->ix,geom->iy,geom->ifacedim);
-  if(0 &&geom->ifacedim>-1) //at faces - damping independently Rvisc1 & Rvisc2
+  //adjust:
+  if(maxvel>MAXRADVISCVEL)
     {
-      //Rvisc1
-      for(idim=0;idim<3;idim++) 
-	for(i=1;i<4;i++)
-	  {
-	    if(i==2 && NY==1) continue;
-	    if(i==3 && NZ==1) continue;
-	    if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
-	    vel[idim]=Rvisc1[idim+1][i]/(get_u(u,EE0+i,iix,iiy,iiz)/gdetu)*sqrt(gg[idim+1][idim+1]);
-	  }
-      if(geom->ifacedim>-1)
-	maxvel=fabs(vel[geom->ifacedim]);
-      else
-	maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
-
-      //adjust:
-      if(maxvel>MAXRADVISCVEL)
-	{
-	  dampfac=MAXRADVISCVEL/maxvel;
-	  //intf("damping at %d (%e)\n",geom->ix,maxvel);
-	}
-      else
-	dampfac=1.;
-
-      for(i=0;i<4;i++)
-	for(j=0;j<4;j++)
-	  {
-	    Rvisc1[i][j]*=dampfac;
-	    Rij[i][j]+=Rijvisc[i][j];
-	  }
-
-      //Rvisc2
-      for(idim=0;idim<3;idim++) 
-	for(i=1;i<4;i++)
-	  {
-	    if(i==2 && NY==1) continue;
-	    if(i==3 && NZ==1) continue;
-	    if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
-	    vel[idim]=Rvisc2[idim+1][i]/(get_u(u,EE0+i,ix,iy,iz)/gdetu)*sqrt(gg[idim+1][idim+1]);
-	  }
-      if(geom->ifacedim>-1)
-	maxvel=fabs(vel[geom->ifacedim]);
-      else
-	maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
-
-      //adjust:
-      if(maxvel>MAXRADVISCVEL)
-	{
-	  dampfac=MAXRADVISCVEL/maxvel;
-	  //printf("damping at %d (%e)\n",geom->ix,maxvel);
-	}
-      else
-	dampfac=1.;
-
-      for(i=0;i<4;i++)
-	for(j=0;j<4;j++)
-	  {
-	    Rvisc2[i][j]*=dampfac;
-	  }
-
-      //summing up
-      for(i=0;i<4;i++)
-	for(j=0;j<4;j++)
-	  {
-	    Rij[i][j]+=Rvisc1[i][j]+Rvisc2[i][j];
-	  }
+      dampfac=MAXRADVISCVEL/maxvel;
+      //printf("damping at %d (%e)\n",geom->ix,maxvel);
     }
-  else //face centers, using given uu
-    {
-      for(idim=0;idim<3;idim++)
-	for(i=1;i<4;i++)
-	  {
-	    if(i==2 && NY==1) continue;
-	    if(i==3 && NZ==1) continue;
-	    if(fabs(uu[EE0+i])<1.e-10 * fabs(uu[EE0])) continue;
-	    vel[idim]=Rijvisc[idim+1][i]/(uu[EE0+i]/gdetu)*sqrt(gg[idim+1][idim+1]);
-	    //printf("%d %e\n",geom->ix,vel); if(geom->ix==0)getchar();
-	  }
-      if(geom->ifacedim>-1)
-	maxvel=fabs(vel[geom->ifacedim]);
-      else
-	maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
+  else
+    dampfac=1.;
 
-      //adjust:
-      if(maxvel>MAXRADVISCVEL)
-	{
-	  dampfac=MAXRADVISCVEL/maxvel;
-	  //printf("damping at %d (%e)\n",geom->ix,maxvel);
-	}
-      else
-	dampfac=1.;
-
-      //todo: choose best prescription
-      //dampfac= 1. / (1.+pow(maxvel/MAXRADVISCVEL,2.));
-      //dampfac = 1.-step_function(-1.+maxvel/MAXRADVISCVEL,.5);
+  //todo: choose best prescription
+  //dampfac= 1. / (1.+pow(maxvel/MAXRADVISCVEL,2.));
+  //dampfac = 1.-step_function(-1.+maxvel/MAXRADVISCVEL,.5);
   
-      //adding up to Rij
-      for(i=0;i<4;i++)
-	for(j=0;j<4;j++)
-	  {
-	    Rijvisc[i][j]*=dampfac;
-	    Rij[i][j]+=Rijvisc[i][j];
-	  }
-    }
+  //adding up to Rij
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Rijvisc[i][j]*=dampfac;
+	Rij[i][j]+=Rijvisc[i][j];
+      }
 
 #endif
 #endif
@@ -4765,13 +4693,25 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
 
   //fluxes to ff[EE0+]
-  ff[EE0]= gdetu*(RijM1[idim+1][0]);
+
+#ifdef TESTRADVISC
+  ff[EE0]= gdetu*(Rij[idim+1][0]+ALPHARADVISC*Rij[0][0]*sqrt(geom->gg[idim+1][idim+1]));
       
-  ff[FX0]= gdetu*(RijM1[idim+1][1]);
+  ff[FX0]= gdetu*(Rij[idim+1][1]+ALPHARADVISC*Rij[0][1]*sqrt(geom->gg[idim+1][idim+1]));
       
-  ff[FY0]= gdetu*(RijM1[idim+1][2]);
+  ff[FY0]= gdetu*(Rij[idim+1][2]+ALPHARADVISC*Rij[0][2]*sqrt(geom->gg[idim+1][idim+1]));
       
-  ff[FZ0]= gdetu*(RijM1[idim+1][3]);
+  ff[FZ0]= gdetu*(Rij[idim+1][3]+ALPHARADVISC*Rij[0][3]*sqrt(geom->gg[idim+1][idim+1]));
+#else
+  ff[EE0]= gdetu*(Rij[idim+1][0]);
+      
+  ff[FX0]= gdetu*(Rij[idim+1][1]);
+      
+  ff[FY0]= gdetu*(Rij[idim+1][2]);
+      
+  ff[FZ0]= gdetu*(Rij[idim+1][3]);
+#endif
+
 
 #endif
   return 0;
