@@ -338,6 +338,7 @@ struct rad_parameters
 int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss);
 int calc_hd_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret);
 int calc_shear_lab(ldouble *pp,void* ggg,ldouble S[][4],int hdorrad,int *);
+int calc_shear_rad_lab(ldouble *pp,void* ggg,ldouble S[][4],int *);
 
 int calc_wavespeeds_lr_pure(ldouble *pp,void*,ldouble *aaa);
 int calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4]);

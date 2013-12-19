@@ -3245,13 +3245,20 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
   ldouble nu,vdiff2;
   calc_rad_shearviscosity(pp,ggg,shear,&nu,&vdiff2,derdir);
 
+#ifdef RADVISCSHEARRAD
+  //energy density included in the shear
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	Rvisc[i][j]= -2. * nu * shear[i][j];
+      }
+#else
   //which energy density?
   ldouble Erad;
   //radiation rest frame:
   Erad=pp[EE0]; 
 
   //lab-frame
-  //test
   //ldouble Rtt,ncon[4];
   //calc_normal_Rtt(pp,&Rtt,ncon,geom);
   //Erad=-Rtt;
@@ -3262,6 +3269,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
       {
 	Rvisc[i][j]= -2. * nu * Erad * shear[i][j];
       }
+#endif
 
   //limiting
 #ifdef NUMRADWAVESPEEDS
@@ -4160,15 +4168,15 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
     }
   
   //calculating shear at cell center!
+#ifdef RADVISCSHEARRAD
+  calc_shear_rad_lab(pp,ggg,shear,derdir);  
+#else
   calc_shear_lab(pp,ggg,shear,RAD,derdir);  
+#endif
+
   indices_1122(shear,shear,geom->GG);
-
-  //transforming to ortonormal
-  //ldouble shearon[4][4];
-  //trans22_cc2on(shear,shearon,geom->tup);
-
+ 
   //calculating the viscosity coefficient 
-
   //mean free path
   ldouble chi=calc_chi(pp,geom->xxvec);
   ldouble mfp = 1./chi; // dr / dtau
@@ -4197,10 +4205,6 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   ldouble ev[4],evmax,eta,nu,vdiff2;
   nu = ALPHARADVISC * mfp;
 
- 
-
-
-  
   *nuret=nu;
   *vdiff2ret=vdiff2;
 
@@ -4860,3 +4864,669 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
 #endif
   return 0;
 }
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates shear tensor sigma_ij in the lab frame at cell centers only!
+//hdorrad == MHD -> using gas velocity
+//hdorrad == RAD -> using radiative velocity
+//derdir[] determines the type of derivative in each dimension (left,right,centered)
+
+int
+calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
+{
+  int i,j,k,iv;
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+  
+  int ix,iy,iz;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+  //let's start with derivatives
+  ldouble du[4][4]; //du_i,j
+  ldouble du2[4][4]; //du^i,j
+
+
+  int istart,whichvel;
+  if(hdorrad==MHD)
+    {
+      whichvel=VELPRIM;
+      istart=VX;
+    }
+  else if(hdorrad==RAD)
+    {
+      whichvel=VELPRIMRAD;
+      istart=FX(0);
+    }
+
+  //neglecting time derivatives
+  /*
+  ldouble ucontm1[4],ucovtm1[4],ucontm2[4],ucovtm2[4];
+  ucontm1[0]=ucontm2[0]=0.; //time component will be calculated
+
+  ucontm1[1]=get_u(ptm1,istart,ix,iy,iz);
+  ucontm1[2]=get_u(ptm1,istart+1,ix,iy,iz);
+  ucontm1[3]=get_u(ptm1,istart+2,ix,iy,iz);
+  ucontm2[1]=get_u(ptm2,istart,ix,iy,iz);
+  ucontm2[2]=get_u(ptm2,istart+1,ix,iy,iz);
+  ucontm2[3]=get_u(ptm2,istart+2,ix,iy,iz);
+
+  conv_vels(ucontm1,ucontm1,whichvel,VEL4,gg,GG);
+  conv_vels(ucontm2,ucontm2,whichvel,VEL4,gg,GG);
+
+  indices_21(ucontm1,ucovtm1,gg);
+  indices_21(ucontm2,ucovtm2,gg);
+
+  for(i=0;i<4;i++)
+    {
+#ifndef ZEROTIMEINSHEAR
+      if(fabs(ttm1-ttm2) < SMALL)
+	{
+	  du[i][0] = 0.;
+	  du2[i][0] = 0.;
+	}
+      else
+	{
+	  du[i][0]=(ucovtm1[i]-ucovtm2[i])/(ttm1-ttm2);
+	  du2[i][0]=(ucontm1[i]-ucontm2[i])/(ttm1-ttm2);
+	}
+#else //force d/dt = 0 in shear
+      du[i][0] = 0.;
+      du2[i][0] = 0.;
+#endif
+    }
+  */
+
+  //instead:
+  for(i=0;i<4;i++)
+    {
+      //force d/dt = 0 in shear
+      du[i][0] = 0.;
+      du2[i][0] = 0.;
+    }
+
+  ldouble ppm1[NV],ppp1[NV],pp[NV];
+  ldouble ggm1[4][5],GGm1[4][5];
+  ldouble ggp1[4][5],GGp1[4][5];
+  ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
+  ldouble uconm1[4],uconp1[4],utconm1[4],utconp1[4],utcon[4],ucon[4];
+  ldouble ucovm1[4],ucovp1[4],ucov[4];
+  ldouble enl,enr;
+  int idim;
+
+  //four-velocity at cell basing on pp[]
+  //xxvec=geom->xxvec;
+  get_xx(ix,iy,iz,xxvec);
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=pp0[iv];
+    }
+  utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
+  conv_vels_both(utcon,ucon,ucov,whichvel,VEL4,gg,GG);  
+   
+  //derivatives
+  for(idim=1;idim<4;idim++)
+    {
+      if(idim==1)
+	{
+	  get_xx(ix-1,iy,iz,xxvecm1);
+	  get_xx(ix+1,iy,iz,xxvecp1);
+	  if(hdorrad==RAD) 
+	    {
+	      enl=get_u(u,EE0,ix-1,iy,iz);
+	      enr=get_u(u,EE0,ix+1,iy,iz);
+	    }
+	  else
+	    {
+	      enl=get_u(u,UU,ix-1,iy,iz);
+	      enr=get_u(u,UU,ix+1,iy,iz);
+	    }
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
+	      ppp1[iv]=get_u(p,iv,ix+1,iy,iz);
+	    }
+	  pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
+	  pick_g(ix+1,iy,iz,ggp1);  pick_G(ix+1,iy,iz,GGp1);
+	}
+
+      if(idim==2)
+	{
+	  get_xx(ix,iy-1,iz,xxvecm1);
+	  get_xx(ix,iy+1,iz,xxvecp1);	  
+	  if(hdorrad==RAD) 
+	    {
+	      enl=get_u(u,EE0,ix,iy-1,iz);
+	      enr=get_u(u,EE0,ix,iy+1,iz);
+	    }
+	  else
+	    {
+	      enl=get_u(u,UU,ix,iy-1,iz);
+	      enr=get_u(u,UU,ix,iy+1,iz);
+	    }
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
+	      ppp1[iv]=get_u(p,iv,ix,iy+1,iz);
+	    }
+	  pick_g(ix,iy-1,iz,ggm1);  pick_G(ix,iy-1,iz,GGm1);
+	  pick_g(ix,iy+1,iz,ggp1);  pick_G(ix,iy+1,iz,GGp1);
+	    
+	}
+
+     if(idim==3)
+       {
+	 get_xx(ix,iy,iz-1,xxvecm1);
+	 get_xx(ix,iy,iz+1,xxvecp1);
+	 if(hdorrad==RAD) 
+	    {
+	      enl=get_u(u,EE0,ix,iy,iz-1);
+	      enr=get_u(u,EE0,ix,iy,iz+1);
+	    }
+	  else
+	    {
+	      enl=get_u(u,UU,ix,iy,iz-1);
+	      enr=get_u(u,UU,ix,iy,iz+1);
+	    }
+	 for(iv=0;iv<NV;iv++)
+	   {
+	     ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
+	     ppp1[iv]=get_u(p,iv,ix,iy,iz+1);
+	   }
+	 pick_g(ix,iy,iz-1,ggm1);  pick_G(ix,iy,iz-1,GGm1);
+	 pick_g(ix,iy,iz+1,ggp1);  pick_G(ix,iy,iz+1,GGp1);
+       }
+
+     //calculating four velocity
+
+     utconm1[1]=ppm1[istart];  utconm1[2]=ppm1[istart+1];  utconm1[3]=ppm1[istart+2];
+     utconp1[1]=ppp1[istart];  utconp1[2]=ppp1[istart+1];  utconp1[3]=ppp1[istart+2];
+
+     conv_vels_both(utconm1,uconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
+     conv_vels_both(utconp1,uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
+
+     ldouble dl,dr,dc;
+     ldouble dl2,dr2,dc2;
+     for(i=0;i<4;i++)
+       {
+	 dc=(ucovp1[i]-ucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 dr=(ucovp1[i]-ucov[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 dl=(ucov[i]-ucovm1[i]) / (xxvec[idim] - xxvecm1[idim]);
+	 dc2=(uconp1[i]-uconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 dr2=(uconp1[i]-ucon[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 dl2=(ucon[i]-uconm1[i]) / (xxvec[idim] - xxvecm1[idim]);
+
+	 //to avoid corners
+	 if((ix<0 && iy==0 && iz==0 && idim!=1) ||
+	    (iy<0 && ix==0 && iz==0 && idim!=2) ||
+	    (iz<0 && ix==0 && iy==0 && idim!=3))
+	   {
+	     du[i][idim]=dr;
+	     du2[i][idim]=dr2;
+	   }
+	 else if((ix<0 && iy==NY-1 && iz==NZ-1 && idim!=1) ||
+	    (iy<0 && ix==NX-1 && iz==NZ-1 && idim!=2) ||
+	    (iz<0 && ix==NX-1 && iy==NY-1 && idim!=3))
+	   {
+	     du[i][idim]=dl;
+	     du2[i][idim]=dl2;
+	   }
+	 else if((ix>=NX && iy==0 && iz==0 && idim!=1) ||
+	    (iy>=NY && ix==0 && iz==0 && idim!=2) ||
+	    (iz>=NZ && ix==0 && iy==0 && idim!=3))
+	   {
+	     du[i][idim]=dr;
+	     du2[i][idim]=dr2;
+	   }
+	 else if((ix>=NX && iy==NY-1 && iz==NZ-1 && idim!=1) ||
+	    (iy>=NY && ix==NX-1 && iz==NZ-1 && idim!=2) ||
+	    (iz>=NZ && ix==NX-1 && iy==NY-1 && idim!=3))
+	   {
+	     du[i][idim]=dl;
+	     du2[i][idim]=dl2;
+	   }
+	 else
+	   {
+	     //choice of 1st order derivative
+	     #ifdef NUMRADWAVESPEEDS
+	     if(fabs(enl)>fabs(enr))
+	       {
+		 du[i][idim]=dl;
+		 du2[i][idim]=dl2;
+	       }
+	     else
+	       {
+		 du[i][idim]=dr;
+		 du2[i][idim]=dr2;
+	       }
+	     #else
+
+	     if(derdir[idim-1]==0)
+	       {
+		 du[i][idim]=dc;
+		 du2[i][idim]=dc2;
+	       }
+	     if(derdir[idim-1]==1)
+	       {
+		 du[i][idim]=dl;
+		 du2[i][idim]=dl2;
+	       }
+	     if(derdir[idim-1]==2)
+	       {
+		 du[i][idim]=dr;
+		 du2[i][idim]=dr2;
+	       }
+	     #endif
+	   }
+
+	 if(isnan(du[i][idim])) {
+	   printf("nan in shear_lab : %d %d %d %d\n",ix,iy,iz,idim);
+	   print_4vector(ucovm1);
+	   print_4vector(ucov);
+	   print_4vector(ucovp1);
+	   print_4vector(xxvecm1);
+	   print_4vector(xxvec);	   
+	   print_4vector(xxvecp1);
+	   getchar();
+	 }	 	 
+       }       
+    }
+
+  //covariant derivative tensor du_i;j
+  ldouble dcu[4][4];
+  //covariant derivative tensor du^i;j - only for expansion
+  ldouble dcu2[4][4];
+  ldouble Krsum;
+
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Krsum=0.;
+	  for(k=0;k<4;k++)
+	    Krsum+=get_gKr(k,i,j,ix,iy,iz)*ucov[k];
+
+	  dcu[i][j] = du[i][j] - Krsum;
+	}
+    
+      //only diagonal terms for expansion
+      Krsum=0.;
+      for(k=0;k<4;k++)
+	Krsum+=get_gKr(i,i,k,ix,iy,iz)*ucon[k];
+    
+      dcu2[i][i] = du2[i][i] + Krsum; 
+    }
+
+  //expansion
+  ldouble theta=0.;
+  for(i=0;i<4;i++)
+    theta+=dcu2[i][i];
+
+  //projection tensors P11=P_ij, P21=P^i_j
+  ldouble P11[4][4],P21[4][4];
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	P11[i][j] = gg[i][j] + ucov[i]*ucov[j];
+	P21[i][j] = delta(i,j) + ucon[i]*ucov[j];
+      }
+
+  //the shear tensor sigma_ij - only spatial components
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      {
+	ldouble sum1,sum2;
+	sum1=sum2=0.;
+	for(k=0;k<4;k++)
+	  {
+	    sum1+=dcu[i][k]*P21[k][j];
+	    sum2+=dcu[j][k]*P21[k][i];
+	  }
+	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
+
+     }
+
+  //filling the time component from u^mu sigma_munu = 0 
+  //(zero time derivatives in the comoving frame - no need for separate comoving routine)
+  for(i=1;i<4;i++)
+    S[i][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][i]+ucon[2]*S[2][i]+ucon[3]*S[3][i]);
+
+  S[0][0]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
+
+
+  return 0;
+}
+    
+   
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates shear tensor sigma_ij at cell centers
+//using R^t_mu instead of u_mu of radiation rest frame
+//but the projection tensor kept intact
+//derdir[] determines the type of derivative in each dimension (left,right,centered)
+
+int
+calc_shear_rad_lab(ldouble *pp0, void* ggg,ldouble S[][4],int *derdir)
+{
+  int i,j,k,iv;
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+  struct geometry geomm1,geomp1;
+
+  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom->gg;
+  GG=geom->GG;
+  tlo=geom->tlo;
+  tup=geom->tup;
+  
+  int ix,iy,iz;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+  //let's start with derivatives
+  ldouble du[4][4]; //dR^t_i,j
+  ldouble du2[4][4]; //dR^ti,j
+
+
+  int istart,whichvel;
+  whichvel=VELPRIMRAD;
+  istart=FX(0);
+
+  //neglecting time derivatives
+   for(i=0;i<4;i++)
+    {
+      du[i][0] = 0.;
+      du2[i][0] = 0.;
+    }
+
+  ldouble ppm1[NV],ppp1[NV],pp[NV];
+  ldouble ggm1[4][5],GGm1[4][5];
+  ldouble ggp1[4][5],GGp1[4][5];
+  ldouble xxvecm1[4],xxvec[4],xxvecp1[4];
+  ldouble uconm1[4],uconp1[4],utconm1[4],utconp1[4],utcon[4],ucon[4];
+  ldouble ucovm1[4],ucovp1[4],ucov[4];
+  ldouble enl,enr;
+  ldouble Rij[4][4];
+  ldouble Rtmucov[4],Rtmucovm1[4],Rtmucovp1[4]; //R^t_mu
+  ldouble Rtmucon[4],Rtmuconm1[4],Rtmuconp1[4]; //R^{t,mu}
+  ldouble Rtmunorm;
+  int idim;
+
+  //four-velocity at cell basing on pp[]
+  get_xx(ix,iy,iz,xxvec);
+  for(iv=0;iv<NV;iv++)
+    {
+      pp[iv]=pp0[iv];
+    }
+  utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
+  conv_vels_both(utcon,ucon,ucov,whichvel,VEL4,gg,GG);  
+  
+  //flux four-vector
+  calc_Rij(pp,ggg,Rij);
+  for(i=0;i<4;i++)
+    Rtmucon[i]=Rij[0][i];
+  indices_21(Rtmucon,Rtmucov,geom->gg);
+
+  Rtmunorm = dot(Rtmucon,Rtmucov);
+   
+  //derivatives
+  for(idim=1;idim<4;idim++)
+    {
+      if(idim==1)
+	{
+	  get_xx(ix-1,iy,iz,xxvecm1);
+	  get_xx(ix+1,iy,iz,xxvecp1);
+
+	  enl=get_u(u,EE0,ix-1,iy,iz);
+	  enr=get_u(u,EE0,ix+1,iy,iz);
+
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      ppm1[iv]=get_u(p,iv,ix-1,iy,iz);
+	      ppp1[iv]=get_u(p,iv,ix+1,iy,iz);
+	    }
+	  pick_g(ix-1,iy,iz,ggm1);  pick_G(ix-1,iy,iz,GGm1);
+	  pick_g(ix+1,iy,iz,ggp1);  pick_G(ix+1,iy,iz,GGp1);
+
+	  fill_geometry(ix-1,iy,iz,&geomm1);
+	  fill_geometry(ix+1,iy,iz,&geomp1);
+	}
+
+      if(idim==2)
+	{
+	  get_xx(ix,iy-1,iz,xxvecm1);
+	  get_xx(ix,iy+1,iz,xxvecp1);	  
+
+	  enl=get_u(u,EE0,ix,iy-1,iz);
+	  enr=get_u(u,EE0,ix,iy+1,iz);
+
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      ppm1[iv]=get_u(p,iv,ix,iy-1,iz);
+	      ppp1[iv]=get_u(p,iv,ix,iy+1,iz);
+	    }
+	  pick_g(ix,iy-1,iz,ggm1);  pick_G(ix,iy-1,iz,GGm1);
+	  pick_g(ix,iy+1,iz,ggp1);  pick_G(ix,iy+1,iz,GGp1);
+
+	  fill_geometry(ix,iy-1,iz,&geomm1);
+	  fill_geometry(ix,iy+1,iz,&geomp1);
+	}
+
+     if(idim==3)
+       {
+	 get_xx(ix,iy,iz-1,xxvecm1);
+	 get_xx(ix,iy,iz+1,xxvecp1);
+
+	 enl=get_u(u,EE0,ix,iy,iz-1);
+	 enr=get_u(u,EE0,ix,iy,iz+1);
+
+	 for(iv=0;iv<NV;iv++)
+	   {
+	     ppm1[iv]=get_u(p,iv,ix,iy,iz-1);
+	     ppp1[iv]=get_u(p,iv,ix,iy,iz+1);
+	   }
+	 pick_g(ix,iy,iz-1,ggm1);  pick_G(ix,iy,iz-1,GGm1);
+	 pick_g(ix,iy,iz+1,ggp1);  pick_G(ix,iy,iz+1,GGp1);
+
+	 fill_geometry(ix,iy,iz-1,&geomm1);
+	 fill_geometry(ix,iy,iz+1,&geomp1);
+       }
+
+     //calculating four velocity
+
+     utconm1[1]=ppm1[istart];  utconm1[2]=ppm1[istart+1];  utconm1[3]=ppm1[istart+2];
+     utconp1[1]=ppp1[istart];  utconp1[2]=ppp1[istart+1];  utconp1[3]=ppp1[istart+2];
+
+     conv_vels_both(utconm1,uconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
+     conv_vels_both(utconp1,uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
+
+     //calculating flux four-vectors
+     calc_Rij(ppm1,&geomm1,Rij);
+     for(i=0;i<4;i++)
+       Rtmuconm1[i]=Rij[0][i];
+     indices_21(Rtmuconm1,Rtmucovm1,geomm1.gg);
+
+     calc_Rij(ppp1,&geomp1,Rij);
+     for(i=0;i<4;i++)
+       Rtmuconp1[i]=Rij[0][i];
+     indices_21(Rtmuconp1,Rtmucovp1,geomp1.gg);
+
+
+     //derivatives
+     ldouble dl,dr,dc;
+     ldouble dl2,dr2,dc2;
+     for(i=0;i<4;i++)
+       {
+	 dc=(Rtmucovp1[i]-Rtmucovm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 dr=(Rtmucovp1[i]-Rtmucov[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 dl=(Rtmucov[i]-Rtmucovm1[i]) / (xxvec[idim] - xxvecm1[idim]);
+	 dc2=(Rtmuconp1[i]-Rtmuconm1[i]) / (xxvecp1[idim] - xxvecm1[idim]);
+	 dr2=(Rtmuconp1[i]-Rtmucon[i]) / (xxvecp1[idim] - xxvec[idim]);
+	 dl2=(Rtmucon[i]-Rtmuconm1[i]) / (xxvec[idim] - xxvecm1[idim]);
+
+	 //to avoid corners
+	 if((ix<0 && iy==0 && iz==0 && idim!=1) ||
+	    (iy<0 && ix==0 && iz==0 && idim!=2) ||
+	    (iz<0 && ix==0 && iy==0 && idim!=3))
+	   {
+	     du[i][idim]=dr;
+	     du2[i][idim]=dr2;
+	   }
+	 else if((ix<0 && iy==NY-1 && iz==NZ-1 && idim!=1) ||
+	    (iy<0 && ix==NX-1 && iz==NZ-1 && idim!=2) ||
+	    (iz<0 && ix==NX-1 && iy==NY-1 && idim!=3))
+	   {
+	     du[i][idim]=dl;
+	     du2[i][idim]=dl2;
+	   }
+	 else if((ix>=NX && iy==0 && iz==0 && idim!=1) ||
+	    (iy>=NY && ix==0 && iz==0 && idim!=2) ||
+	    (iz>=NZ && ix==0 && iy==0 && idim!=3))
+	   {
+	     du[i][idim]=dr;
+	     du2[i][idim]=dr2;
+	   }
+	 else if((ix>=NX && iy==NY-1 && iz==NZ-1 && idim!=1) ||
+	    (iy>=NY && ix==NX-1 && iz==NZ-1 && idim!=2) ||
+	    (iz>=NZ && ix==NX-1 && iy==NY-1 && idim!=3))
+	   {
+	     du[i][idim]=dl;
+	     du2[i][idim]=dl2;
+	   }
+	 else
+	   {
+	     //choice of 1st order derivative
+	     #ifdef NUMRADWAVESPEEDS
+	     if(fabs(enl)>fabs(enr))
+	       {
+		 du[i][idim]=dl;
+		 du2[i][idim]=dl2;
+	       }
+	     else
+	       {
+		 du[i][idim]=dr;
+		 du2[i][idim]=dr2;
+	       }
+	     #else
+
+	     if(derdir[idim-1]==0)
+	       {
+		 du[i][idim]=dc;
+		 du2[i][idim]=dc2;
+	       }
+	     if(derdir[idim-1]==1)
+	       {
+		 du[i][idim]=dl;
+		 du2[i][idim]=dl2;
+	       }
+	     if(derdir[idim-1]==2)
+	       {
+		 du[i][idim]=dr;
+		 du2[i][idim]=dr2;
+	       }
+	     #endif
+	   }
+
+	 if(isnan(du[i][idim])) {
+	   printf("nan in shear_lab : %d %d %d %d\n",ix,iy,iz,idim);
+	   print_4vector(Rtmucovm1);
+	   print_4vector(Rtmucov);
+	   print_4vector(Rtmucovp1);
+	   print_4vector(xxvecm1);
+	   print_4vector(xxvec);	   
+	   print_4vector(xxvecp1);
+	   getchar();
+	 }	 	 
+       }       
+    }
+
+  //covariant derivative tensor du_i;j
+  ldouble dcu[4][4];
+  //covariant derivative tensor du^i;j - only for expansion
+  ldouble dcu2[4][4];
+  ldouble Krsum;
+
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  Krsum=0.;
+	  for(k=0;k<4;k++)
+	    Krsum+=get_gKr(k,i,j,ix,iy,iz)*Rtmucov[k];
+
+	  dcu[i][j] = du[i][j] - Krsum;
+	}
+    
+      //only diagonal terms for expansion
+      Krsum=0.;
+      for(k=0;k<4;k++)
+	Krsum+=get_gKr(i,i,k,ix,iy,iz)*Rtmucon[k];
+    
+      dcu2[i][i] = du2[i][i] + Krsum; 
+    }
+
+  //expansion
+  ldouble theta=0.;
+  for(i=0;i<4;i++)
+    theta+=dcu2[i][i];
+
+  //projection tensors P11=P_ij, P21=P^i_j
+  //based on radiative velocity or normalized R^{t,mu} ?
+  ldouble P11[4][4],P21[4][4];
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	P11[i][j] = gg[i][j] + Rtmucov[i]*Rtmucov[j]/(-Rtmunorm);
+	P21[i][j] = delta(i,j) + Rtmucon[i]*Rtmucov[j]/(-Rtmunorm);
+	/*
+	P11[i][j] = gg[i][j] + ucov[i]*ucov[j];
+	P21[i][j] = delta(i,j) + ucon[i]*ucov[j];
+	*/
+      }
+
+  //the shear tensor sigma_ij - only spatial components
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      {
+	ldouble sum1,sum2;
+	sum1=sum2=0.;
+	for(k=0;k<4;k++)
+	  {
+	    sum1+=dcu[i][k]*P21[k][j];
+	    sum2+=dcu[j][k]*P21[k][i];
+	  }
+	S[i][j] = 0.5*(sum1+sum2) - 1./3.*theta*P11[i][j];
+
+     }
+
+  /*
+  //filling the time component from u^mu sigma_munu = 0 
+  //(zero time derivatives in the comoving frame - no need for separate comoving routine)
+  for(i=1;i<4;i++)
+    S[i][0]=S[0][i]=-1./ucon[0]*(ucon[1]*S[1][i]+ucon[2]*S[2][i]+ucon[3]*S[3][i]);
+
+  S[0][0]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
+  */
+
+  //filling the time component from R^{t,mu} sigma_munu = 0 
+  for(i=1;i<4;i++)
+    S[i][0]=S[0][i]=-1./Rtmucon[0]*(Rtmucon[1]*S[1][i]+Rtmucon[2]*S[2][i]+Rtmucon[3]*S[3][i]);
+
+  S[0][0]=-1./Rtmucon[0]*(Rtmucon[1]*S[1][0]+Rtmucon[2]*S[2][0]+Rtmucon[3]*S[3][0]);
+
+
+  return 0;
+}
+    
+   
