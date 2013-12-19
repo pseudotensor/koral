@@ -4197,9 +4197,6 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   //calculating the mean free path
   calc_rad_visccoeff(pp,ggg,&nu,&mfp,&mindx);
   
-  //calculating the viscosity coefficient 
-  nu = ALPHARADVISC * mfp;
-
   *nuret=nu;
 
 #else //no rad.viscosity
@@ -5431,7 +5428,8 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   nu = ALPHARADVISC * mfp;
 
 #ifdef RADVISCNUDAMP
-  ldouble nulimit = mindx*mindx / dt;
+  ldouble nulimit = mindx*mindx / 2. / dt;
+  ldouble fac=nu/nulimit;
   if(nu>nulimit)
     {
       //printf("famping at %d %d | %e | %e %e | %e\n",geom->ix,geom->iy,nu,mfp,mindx,dt); getchar();
