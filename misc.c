@@ -231,10 +231,10 @@ initialize_arrays()
   aradxr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
   aradyr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
   aradzr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-
-  //scaling the rad viscous contribution
-  radviscfac=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-
+  
+  //extra scalar arrays
+  radviscfac=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)); //scaling the rad viscous contribution
+ 
   return 0;
 }
 

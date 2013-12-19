@@ -3246,7 +3246,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
   calc_rad_shearviscosity(pp,ggg,shear,&nu,derdir);
 
 #ifdef RADVISCSHEARRAD
-  //energy density included in the shear
+  //energy density included in the shear - so far does not work properly
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
@@ -3571,6 +3571,15 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       aval[dim*2+0]=axl;
       aval[dim*2+1]=axr;
     }
+
+  //verifying that the diffusion coefficient satisfies dt<(dx)^2 / D   
+  //if not - extra damping of time step
+#if (RADVISCOSITY==SHEARVISCOSITY)
+  ldouble mfp,mindx,D;
+  calc_rad_visccoeff(pp,ggg,&D,&mfp,&mindx);
+  //#pragma omp critical
+  if(mindx/D<timestepdamp) timestepdamp=mindx/D;
+#endif
 
   //**********************************************************************
   //**********************************************************************
@@ -4178,7 +4187,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   indices_1122(shear,shear,geom->GG);
  
   //calculating the mean free path
-  calc_rad_meanfreepath(pp,ggg,&mfp,&mindx);
+  calc_rad_visccoeff(pp,ggg,&nu,&mfp,&mindx);
   
   //calculating the viscosity coefficient 
   nu = ALPHARADVISC * mfp;
@@ -5508,13 +5517,14 @@ calc_shear_rad_lab(ldouble *pp0, void* ggg,ldouble S[][4],int *derdir)
     
 //calculates mean free path used in the viscosity coefficient
 int 
-calc_rad_meanfreepath(ldouble *pp,void *ggg,ldouble *mfpret,ldouble *mindx)
+calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble *mindxret)
 {
   struct geometry *geom
     = (struct geometry *) ggg;
 
   ldouble chi=calc_chi(pp,geom->xxvec);
   ldouble mfp = 1./chi; // dr / dtau
+  ldouble mindx,nu;
 
   //limiting in opt.thin region
 
@@ -5522,7 +5532,7 @@ calc_rad_meanfreepath(ldouble *pp,void *ggg,ldouble *mfpret,ldouble *mindx)
   ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),   
 		 get_size_x(geom->iy,1)*sqrt(geom->gg[2][2]),
 		 get_size_x(geom->iz,2)*sqrt(geom->gg[3][3])};
-  ldouble mindx;
+
   if(NY==1 && NZ==1) mindx = dx[0];
   else if(NZ==1) mindx = my_min(dx[0],dx[1]);
   else if(NY==1) mindx = my_min(dx[0],dx[2]);
@@ -5538,6 +5548,7 @@ calc_rad_meanfreepath(ldouble *pp,void *ggg,ldouble *mfpret,ldouble *mindx)
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS, BLCOORDS);
   if(mfp>mindx || chi<SMALL) mfp=xxBL[1]*sin(xxBL[2]); //Rcyl = Rsph * sin(th)
+  if(mfp<0.) mfp=0.;
 
 #else
 
@@ -5545,7 +5556,11 @@ calc_rad_meanfreepath(ldouble *pp,void *ggg,ldouble *mfpret,ldouble *mindx)
 
 #endif
 
+  nu = ALPHARADVISC * mfp;
+
+  *nuret=nu;
   *mfpret=mfp;
+  *mindxret=mindx;
 
   return 0;
 }

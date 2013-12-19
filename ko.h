@@ -100,7 +100,7 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
 int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,**loop_02,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4;
-ldouble global_time,avgtime;
+ldouble global_time,avgtime,timestepdamp;
 int global_int_slot[NGLOBALINTSLOT];
 ldouble scalars[NSCALARS];
 int doingavg;
@@ -527,7 +527,7 @@ int trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec,
 int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 
 //rad.c
-int calc_rad_meanfreepath(ldouble *pp,void *ggg,ldouble *mfpret,ldouble *);
+int calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *,ldouble *mfpret,ldouble *);
 int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff);
 int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4]);
 int solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *);

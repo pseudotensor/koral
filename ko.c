@@ -162,7 +162,8 @@ solve_the_problem(ldouble tstart)
   else if(NY>1)
     tstepdenmax=max_ws[0]/min_dx + max_ws[1]/min_dy;
   else
-    tstepdenmax=max_ws[0]/min_dx;            
+    tstepdenmax=max_ws[0]/min_dx;
+  timestepdamp=1.;
 
   //copy primitives to hold previous time steps
   copy_u(1.,p,ptm1); ttm1=t;
@@ -175,26 +176,6 @@ solve_the_problem(ldouble tstart)
     {    
       global_time=t;
       nstep++;
-
-      //calculates the primitives to copy to previous time steps
-      //TODO: should be combined with f_timeder
-      //this overwrittes FIXUP flags
-      /*
-      int ii;     
-#pragma omp parallel for private(ii,ix,iy,iz,iv) schedule (dynamic)
-      for(ii=0;ii<Nloop_0;ii++) //domain only
-	{
-	  ix=loop_0[ii][0];
-	  iy=loop_0[ii][1];
-	  iz=loop_0[ii][2]; 
-      
-	  calc_primitives(ix,iy,iz,0); 
-	}
-      */
-
-      //holds previous time steps
-      copy_u(1.,ptm1,ptm2); ttm2=ttm1;
-      copy_u(1.,p,ptm1); ttm1=t;             
       
       //initial time mark
       my_clock_gettime(&temp_clock);
@@ -203,7 +184,7 @@ solve_the_problem(ldouble tstart)
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
       
       //dt based on the estimate from the last midpoint
-      dt=TSTEPLIM*1./tstepdenmax;
+      dt=TSTEPLIM*1./tstepdenmax*timestepdamp;
 
       if(t+dt>t1) {dt=t1-t;}
 
@@ -213,6 +194,7 @@ solve_the_problem(ldouble tstart)
       max_ws[2]=-1.;
       max_ws_ph=-1.;
       tstepdenmax=-1.;
+      timestepdamp=1.;
 
       //iteration counter
       i1++;
@@ -372,8 +354,8 @@ solve_the_problem(ldouble tstart)
       //performance to screen only every second
       if(end_time-fprintf_time>1.) 
 	{
-	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
-		 ,nstep,t,dt,max_ws_ph,end_time-start_time,znps);
+	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f|%.2f) (real time: %10.4f) znps: %.0f "
+		 ,nstep,t,dt,max_ws_ph,timestepdamp,end_time-start_time,znps);
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],
