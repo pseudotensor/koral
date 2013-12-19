@@ -184,7 +184,10 @@ solve_the_problem(ldouble tstart)
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
       
       //dt based on the estimate from the last midpoint
-      dt=TSTEPLIM*1./tstepdenmax*timestepdamp;
+      dt=TSTEPLIM*1./tstepdenmax;//*timestepdamp;
+      #ifdef RADVISCTIMESTEPDAMP
+      if(dt>timestepdamp) dt=timestepdamp;
+      #endif
 
       if(t+dt>t1) {dt=t1-t;}
 

@@ -3571,15 +3571,20 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 
   //verifying that the diffusion coefficient satisfies dt<(dx)^2 / D   
   //if not - extra damping of time step
+  
+#ifdef RADVISCTIMESTEPDAMP
 #if (RADVISCOSITY==SHEARVISCOSITY)
   ldouble mfp,mindx,D;
   calc_rad_visccoeff(pp,ggg,&D,&mfp,&mindx);
   //#pragma omp critical
-  if(mindx/D<timestepdamp) timestepdamp=mindx/D;
+  //if(mindx/D<timestepdamp) timestepdamp=mindx/D;
+  ldouble tslimit = mindx*mindx/D;
+  if(tslimit<timestepdamp) timestepdamp=tslimit;
 #else
-  timestepdamp=1.;
+  timestepdamp=1.e20;
 #endif
-
+#endif
+  
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -5420,6 +5425,16 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
 #endif
 
   nu = ALPHARADVISC * mfp;
+
+#ifdef RADVISCNUDAMP
+  ldouble nulimit = 0.01*mindx*mindx / dt;
+  if(nu>nulimit)
+    {
+      //printf("famping at %d %d\n",geom->ix,geom->iy);
+      nu=nulimit;
+    }
+#endif
+
 
   *nuret=nu;
   *mfpret=mfp;
