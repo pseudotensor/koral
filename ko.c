@@ -163,7 +163,8 @@ solve_the_problem(ldouble tstart)
     tstepdenmax=max_ws[0]/min_dx + max_ws[1]/min_dy;
   else
     tstepdenmax=max_ws[0]/min_dx;
-  timestepdamp=1.;
+
+  timestepdamp=-1.;
 
   //copy primitives to hold previous time steps
   copy_u(1.,p,ptm1); ttm1=t;
@@ -185,8 +186,12 @@ solve_the_problem(ldouble tstart)
       
       //dt based on the estimate from the last midpoint
       dt=TSTEPLIM*1./tstepdenmax;//*timestepdamp;
-      #ifdef RADVISCTIMESTEPDAMP
-      if(dt>timestepdamp) dt=timestepdamp;
+      #ifdef RADVISCTIMESTEPDAMP1
+      if(timestepdamp>0.) dt*=timestepdamp;
+      #endif
+
+      #ifdef RADVISCTIMESTEPDAMP2
+      if(timestepdamp>0. && dt>timestepdamp) dt=timestepdamp;
       #endif
 
       if(t+dt>t1) {dt=t1-t;}
@@ -197,7 +202,7 @@ solve_the_problem(ldouble tstart)
       max_ws[2]=-1.;
       max_ws_ph=-1.;
       tstepdenmax=-1.;
-      timestepdamp=1.;
+      timestepdamp=-1.;
 
       //iteration counter
       i1++;
