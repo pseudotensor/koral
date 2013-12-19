@@ -4694,15 +4694,6 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
 
   //fluxes to ff[EE0+]
 
-#ifdef TESTRADVISC
-  ff[EE0]= gdetu*(Rij[idim+1][0]+ALPHARADVISC*Rij[0][0]*sqrt(geom->gg[idim+1][idim+1]));
-      
-  ff[FX0]= gdetu*(Rij[idim+1][1]+ALPHARADVISC*Rij[0][1]*sqrt(geom->gg[idim+1][idim+1]));
-      
-  ff[FY0]= gdetu*(Rij[idim+1][2]+ALPHARADVISC*Rij[0][2]*sqrt(geom->gg[idim+1][idim+1]));
-      
-  ff[FZ0]= gdetu*(Rij[idim+1][3]+ALPHARADVISC*Rij[0][3]*sqrt(geom->gg[idim+1][idim+1]));
-#else
   ff[EE0]= gdetu*(Rij[idim+1][0]);
       
   ff[FX0]= gdetu*(Rij[idim+1][1]);
@@ -4710,8 +4701,6 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   ff[FY0]= gdetu*(Rij[idim+1][2]);
       
   ff[FZ0]= gdetu*(Rij[idim+1][3]);
-#endif
-
 
 #endif
   return 0;
