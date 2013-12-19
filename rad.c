@@ -4509,71 +4509,7 @@ calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
   return TradLTE;  
 }
 
-//***************************************
-// calculates d/di (eta * shear) - viscous source term
-//***************************************
-int f_radvisc_source_term(int ix,int iy,int iz,ldouble *ms)
-{
-  //todo: precalculate shear
-  int iix,iiy,iiz,idim,i,j; 
-  struct geometry geom1,geom2,geom;
-  ldouble Rij[4][4],RijM1[4][4],Rvisc1[4][4],Rvisc2[4][4],dx;
-  PLOOP(i) ms[i]=0.;
-  fill_geometry(ix,iy,iz,&geom);
-  ldouble gdetu=geom.gdet;
-#if (GDETIN==0) //no metric determinant inside derivatives
-  gdetu=1.;
-#endif
 
-  for(idim=0;idim<3;idim++)
-    {
-      if(idim==1 && NY==1) continue;
-      if(idim==2 && NZ==1) continue;
-
-      //left
-      iix=ix;iiy=iy;iiz=iz;
-      if(idim==0)
-	iix=ix-1;
-      if(idim==1)
-	iiy=iy-1;
-      if(idim==2)
-	iiz=iz-1;
-      fill_geometry(iix,iiy,iiz,&geom1);
-      f_flux_prime_rad_total(&get_u(p,0,iix,iiy,iiz),&geom1,Rij,RijM1,Rvisc1);
-
-      //right
-      iix=ix;iiy=iy;iiz=iz;
-      if(idim==0)
-	iix=ix+1;
-      if(idim==1)
-	iiy=iy+1;
-      if(idim==2)
-	iiz=iz+1;
-      fill_geometry(iix,iiy,iiz,&geom2);
-      f_flux_prime_rad_total(&get_u(p,0,iix,iiy,iiz),&geom2,Rij,RijM1,Rvisc2);
-
-      if(idim==0)
-	dx=geom2.xx-geom1.xx;
-      if(idim==1)
-	dx=geom2.yy-geom1.yy;
-      if(idim==2)
-	dx=geom2.zz-geom1.zz;
-
-      for(i=0;i<4;i++)
-	{
-	  ms[EE0+i]+=gdetu*(Rvisc2[idim+1][i]-Rvisc1[idim+1][i])/dx;	  
-	}
-      if(0 && ix==NX/3) 
-	{
-	  print_4vector(&ms[EE0]);
-	  print_tensor(Rvisc1);
-	  print_tensor(Rvisc2);
-	}
-    }
-
-     
-  return 0;
-}
 
 //***************************************
 // calculates radiative tensor at faces or centers
@@ -4829,15 +4765,6 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
 
   //fluxes to ff[EE0+]
-#ifndef RADVISCSOURCETERM
-  ff[EE0]= gdetu*(RijM1[idim+1][0]+Rijvisc[idim+1][0]);
-      
-  ff[FX0]= gdetu*(RijM1[idim+1][1]+Rijvisc[idim+1][1]);
-      
-  ff[FY0]= gdetu*(RijM1[idim+1][2]+Rijvisc[idim+1][2]);
-      
-  ff[FZ0]= gdetu*(RijM1[idim+1][3]+Rijvisc[idim+1][3]);
-#else
   ff[EE0]= gdetu*(RijM1[idim+1][0]);
       
   ff[FX0]= gdetu*(RijM1[idim+1][1]);
@@ -4845,8 +4772,6 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   ff[FY0]= gdetu*(RijM1[idim+1][2]);
       
   ff[FZ0]= gdetu*(RijM1[idim+1][3]);
-#endif
-
 
 #endif
   return 0;

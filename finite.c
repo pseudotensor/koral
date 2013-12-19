@@ -807,16 +807,6 @@ ldouble ms[NV],val;
 	} 
 #endif
 
-#ifdef RADVISCSOURCETERM
-      f_radvisc_source_term(ix,iy,iz,ms);
-     		  
-      for(iv=0;iv<NV;iv++)
-	{
-	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
-	  set_u(u,iv,ix,iy,iz,val);	
-	  uu[iv]=val;
-	} 
-#endif
 
       /***************************/
       //testing if entropy increased after advection and calculating post-advection primitives
