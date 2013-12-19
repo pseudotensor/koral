@@ -3242,8 +3242,8 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
 
 #if (RADVISCOSITY==SHEARVISCOSITY)
   ldouble shear[4][4];
-  ldouble nu,vdiff2;
-  calc_rad_shearviscosity(pp,ggg,shear,&nu,&vdiff2,derdir);
+  ldouble nu;
+  calc_rad_shearviscosity(pp,ggg,shear,&nu,derdir);
 
 #ifdef RADVISCSHEARRAD
   //energy density included in the shear
@@ -3571,7 +3571,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       aval[dim*2+0]=axl;
       aval[dim*2+1]=axr;
     }
-  
+
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -4153,12 +4153,13 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
 /***************************************/
 /* rad viscosity and shear at cell centers */
 /***************************************/
-int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret,int *derdir)
+int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,int *derdir)
 {  
   
 #if(RADVISCOSITY==SHEARVISCOSITY) //full shear tensor
   struct geometry *geom
     = (struct geometry *) ggg;
+  ldouble mfp,nu,mindx;
 
 
   if(geom->ix<-1) 
@@ -4176,37 +4177,13 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
 
   indices_1122(shear,shear,geom->GG);
  
-  //calculating the viscosity coefficient 
-  //mean free path
-  ldouble chi=calc_chi(pp,geom->xxvec);
-  ldouble mfp = 1./chi; // dr / dtau
-
-  //limiting in opt.thin region
-  ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),   //here gg can be face or cell, get_size_x always refers to cell
-		 get_size_x(geom->iy,1)*sqrt(geom->gg[2][2]),
-		 get_size_x(geom->iz,2)*sqrt(geom->gg[3][3])};
-  ldouble mindx;
-  if(NY==1 && NZ==1) mindx = dx[0];
-  else if(NZ==1) mindx = my_min(dx[0],dx[1]);
-  else if(NY==1) mindx = my_min(dx[0],dx[2]);
-  else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
-
-//choice of mean free path limiter for tau<<1
-#ifdef MAXRADVISCMFP
-  if(mfp>MAXRADVISCMFP || chi<SMALL) mfp=MAXRADVISCMFP;
-#elif defined(RADVISCMFPCYL)
-  ldouble xxBL[4];
-  coco_N(geom->xxvec,xxBL,MYCOORDS, BLCOORDS);
-  if(mfp>mindx || chi<SMALL) mfp=xxBL[1]*sin(xxBL[2]); //Rcyl = Rsph * sin(th)
-#else
-  if(mfp>mindx || chi<SMALL) mfp=mindx;
-#endif
+  //calculating the mean free path
+  calc_rad_meanfreepath(pp,ggg,&mfp,&mindx);
   
-  ldouble ev[4],evmax,eta,nu,vdiff2;
+  //calculating the viscosity coefficient 
   nu = ALPHARADVISC * mfp;
 
   *nuret=nu;
-  *vdiff2ret=vdiff2;
 
 #else //no rad.viscosity
   int i1,i2;
@@ -5529,4 +5506,46 @@ calc_shear_rad_lab(ldouble *pp0, void* ggg,ldouble S[][4],int *derdir)
   return 0;
 }
     
-   
+//calculates mean free path used in the viscosity coefficient
+int 
+calc_rad_meanfreepath(ldouble *pp,void *ggg,ldouble *mfpret,ldouble *mindx)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble chi=calc_chi(pp,geom->xxvec);
+  ldouble mfp = 1./chi; // dr / dtau
+
+  //limiting in opt.thin region
+
+  //minimal cell size
+  ldouble dx[3]={get_size_x(geom->ix,0)*sqrt(geom->gg[1][1]),   
+		 get_size_x(geom->iy,1)*sqrt(geom->gg[2][2]),
+		 get_size_x(geom->iz,2)*sqrt(geom->gg[3][3])};
+  ldouble mindx;
+  if(NY==1 && NZ==1) mindx = dx[0];
+  else if(NZ==1) mindx = my_min(dx[0],dx[1]);
+  else if(NY==1) mindx = my_min(dx[0],dx[2]);
+  else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
+
+//choice of mean free path limiter for tau<<1
+#ifdef MAXRADVISCMFP
+
+  if(mfp>MAXRADVISCMFP || chi<SMALL) mfp=MAXRADVISCMFP;
+
+#elif defined(RADVISCMFPCYL)
+
+  ldouble xxBL[4];
+  coco_N(geom->xxvec,xxBL,MYCOORDS, BLCOORDS);
+  if(mfp>mindx || chi<SMALL) mfp=xxBL[1]*sin(xxBL[2]); //Rcyl = Rsph * sin(th)
+
+#else
+
+  if(mfp>mindx || chi<SMALL) mfp=mindx;
+
+#endif
+
+  *mfpret=mfp;
+
+  return 0;
+}

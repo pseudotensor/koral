@@ -526,29 +526,8 @@ int trans_mhd_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, 
 int trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec, void* ggg1, void* ggg2);
 int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 
-
-//rad.mf.c
-int
-calc_rad_wavespeeds_on_base_mf(ldouble *pp, ldouble*,ldouble *avaltop);
-int redistribute_with_velocities(ldouble avals[6],ldouble A[NRF],ldouble,ldouble);
-int calc_rad_wavespeeds_on(ldouble nx,ldouble ny,ldouble nz, ldouble *avals);
-int mf_correct_in_azimuth(ldouble *pp, ldouble *uu, void* ggg,ldouble);
-int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
-int calc_Rij_mf(ldouble *pp, ldouble gg[][5], ldouble GG[][5], ldouble Rij[][4][4]);
-int calc_rad_wavespeeds_mf_total(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble tautot[3],ldouble *aval);
-int calc_rad_wavespeeds_pure_mf_each(ldouble *pp,void*,ldouble aval[][6]);
-int calc_Rij_ff_mf(ldouble *pp, ldouble  Rij[][4][4]);
-int redistribute_radfluids(ldouble *pp, ldouble *uu0, void* ggg);
-int redistribute_radfluids_m1(ldouble *pp, ldouble *uu0, void* ggg);
-int redistribute_radfluids_m2(ldouble *pp, ldouble *uu0, void* ggg);
-int redistribute_radfluids_m3(ldouble *pp, ldouble *uu0, void* ggg);
-int redistribute_radfluids_along_axes(ldouble *pp, ldouble *uu0, void* ggg);
-int redistribute_radfluids_at_cell(int ix,int iy,int iz);
-int mf_correct_in_azimuth_at_cell(int ix,int iy,int iz,ldouble);
-
-
-
 //rad.c
+int calc_rad_meanfreepath(ldouble *pp,void *ggg,ldouble *mfpret,ldouble *);
 int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff);
 int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4]);
 int solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *);
@@ -565,7 +544,7 @@ int calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg);
 int calc_LTE_state_temp(ldouble *pp,void *ggg);
 int calc_ff_Rtt(ldouble *pp,ldouble *Rtt, ldouble* ucon,void* ggg);
 int calc_normal_Rtt(ldouble *pp,ldouble *Rtt, ldouble* ucon,void* ggg);
-int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret,int *);
+int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,int *);
 int calc_Rij_visc(ldouble *pp, void* ggg, ldouble T[][4],int *);
 int calc_Rij_total(ldouble *pp, void* ggg, ldouble R[][4]);
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
