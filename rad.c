@@ -4152,6 +4152,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   struct geometry *geom
     = (struct geometry *) ggg;
 
+
   if(geom->ix<-1) 
     {
       printf("rad_shear too far at %d %d\n",geom->ix,geom->iy);
@@ -4182,8 +4183,13 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   else if(NY==1) mindx = my_min(dx[0],dx[2]);
   else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
 
+//choice of mean free path limiter for tau<<1
 #ifdef MAXRADVISCMFP
   if(mfp>MAXRADVISCMFP || chi<SMALL) mfp=MAXRADVISCMFP;
+#elif defined(RADVISCMFPCYL)
+  ldouble xxBL[4];
+  coco_N(geom->xxvec,xxBL,MYCOORDS, BLCOORDS);
+  if(mfp>mindx || chi<SMALL) mfp=xxBL[1]*sin(xxBL[2]); //Rcyl = Rsph * sin(th)
 #else
   if(mfp>mindx || chi<SMALL) mfp=mindx;
 #endif
