@@ -3230,10 +3230,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
   
   struct geometry *geom
    = (struct geometry *) ggg;
-  ldouble gdet=geom->gdet;ldouble gdetu=gdet;
-#if (GDETIN==0) //gdet out of derivatives
-  gdetu=1.;
-#endif
+  
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
@@ -3284,7 +3281,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
 #endif
   
 
-#endif 
+#endif //SHEARVISCOSITY
 
   return 0;
 
@@ -3579,6 +3576,8 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   calc_rad_visccoeff(pp,ggg,&D,&mfp,&mindx);
   //#pragma omp critical
   if(mindx/D<timestepdamp) timestepdamp=mindx/D;
+#else
+  timestepdamp=1.;
 #endif
 
   //**********************************************************************
@@ -4199,7 +4198,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
   for(i1=0;i1<4;i1++)
     for(i2=0;i2<4;i2++)
       shear[i1][i2]=0.;
-  *nuret=*vdiff2ret=0.;
+  *nuret=0.;
 #endif
   return 0;  
 }
@@ -4601,11 +4600,13 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 #endif
 
   calc_Rij(pp,ggg,RijM1); //regular M1 R^ij
+  indices_2221(RijM1,RijM1,gg); //R^i_j
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      Rij[i][j]=RijM1[i][j];
-  indices_2221(Rij,Rij,gg); //R^i_j
-  indices_2221(RijM1,RijM1,gg); //R^i_j
+      {
+	Rij[i][j]=RijM1[i][j];
+	Rijvisc[i][j]=0.;
+      }
 
   
 #if (RADVISCOSITY==SHEARVISCOSITY)
@@ -5519,6 +5520,7 @@ calc_shear_rad_lab(ldouble *pp0, void* ggg,ldouble S[][4],int *derdir)
 int 
 calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble *mindxret)
 {
+#if (RADVISCOSITY==SHEARVISCOSITY)
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -5539,9 +5541,9 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   else mindx = my_min(dx[0],my_min(dx[1],dx[2]));
 
 //choice of mean free path limiter for tau<<1
-#ifdef MAXRADVISCMFP
+#ifdef RADVISCMFPCONST
 
-  if(mfp>MAXRADVISCMFP || chi<SMALL) mfp=MAXRADVISCMFP;
+  if(mfp>RADVISCMFPCONST || chi<SMALL) mfp=RADVISCMFPCONST;
 
 #elif defined(RADVISCMFPCYL)
 
@@ -5561,6 +5563,6 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   *nuret=nu;
   *mfpret=mfp;
   *mindxret=mindx;
-
+#endif
   return 0;
 }

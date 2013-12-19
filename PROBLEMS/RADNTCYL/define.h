@@ -11,7 +11,7 @@
 #define MAXRADVISCVEL 1./3.
 //#define RADVISCSHEARRAD
 #define RADVISCMFPCYL
-//#define MAXRADVISCMFP .2
+//#define RADVISCMFPCONST .2
 #define ZEROTIMEINSHEAR
 #define CORRECT_POLARAXIS
 #define NCCORRECTPOLAR 1
@@ -49,7 +49,7 @@
 #define NX 60
 #endif
 
-#define NY 40 
+#define NY 30 
 #define NZ 1
 
 #define MINY 0

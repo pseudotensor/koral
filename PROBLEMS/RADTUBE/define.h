@@ -13,7 +13,7 @@
 //#define LABRADFLUXES
 #define MYCOORDS MINKCOORDS //metric
 
-#define NUMRADWAVESPEEDS
+//#define NUMRADWAVESPEEDS
 #define RADIATION //whether to solve for radiation (or pure hydro)
 #define TIMESTEPPING RK2
 

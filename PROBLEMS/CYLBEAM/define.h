@@ -5,17 +5,20 @@
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
+#ifndef TIMESTEPPING
+#define TIMESTEPPING RK2
+#endif
 
 #define OMSCALE 1.
-#define HDVISCOSITY NOVISCOSITY
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 //#define NUMRADWAVESPEEDS
-#define ALPHARADVISC 1.
+#define ALPHARADVISC 0.01
 #define MAXRADVISCVEL 1.
-#define ZEROTIMEINSHEAR
+//#define RADVISCSHEARRAD
+#define RADVISCMFPCYL
+//#define RADVISCMFPCONST .2
 #define CORRECT_POLARAXIS
 #define NCCORRECTPOLAR 1
-
 
 #define SHUFFLELOOPS 0
 
@@ -50,11 +53,11 @@
 
 #ifdef myMCYL1COORDS
 #define MKS1R0 -1.
-#define MINX (log(0.1-MKS1R0))
+#define MINX (log(0.01-MKS1R0))
 #define MAXX (log(10.-MKS1R0))
 #define NX 100
 #else
-#define MINX  .0001
+#define MINX  .1
 #define MAXX 10.
 #define NX 200
 #endif
