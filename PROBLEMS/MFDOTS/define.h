@@ -1,11 +1,10 @@
 #define TMAX 1.e10
 #define RADIATION
 
-#define HDVISCOSITY NOVISCOSITY
 #define RADVISCOSITY SHEARVISCOSITY
-#define MAXRADVISCVEL 1./3.
+#define MAXRADVISCVEL 1.
 #define ALPHARADVISC 1.
-#define MAXRADVISCMFP (1./NX)
+#define RADVISCMFPCONST (2./NX)
 #define ZEROTIMEINSHEAR
 
 //#define EDDINGTON_APR
@@ -39,7 +38,7 @@
 #ifdef FORGETDOTS
 #define DTOUT1 .005
 #else
-#define DTOUT1 .025
+#define DTOUT1 .1
 #endif
 
 #define GAMMA (4./3.)
