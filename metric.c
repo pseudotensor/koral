@@ -306,6 +306,7 @@ if(coords==MKS1COORDS) {
 if(coords==MKS2COORDS) {
   ldouble a=BHSPIN;
   ldouble R0,H0;
+  R0=H0=0.;
 #if(MYCOORDS==MKS2COORDS)
   R0=MKS2R0;
   H0=MKS2H0;
@@ -2024,6 +2025,7 @@ coco_KS2MKS2(ldouble *xKS, ldouble *xMKS1)
   ldouble KSx2=xKS[2];
   ldouble KSx3=xKS[3];
   ldouble R0,H0;
+  R0=H0=0.;
 
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
@@ -2097,6 +2099,7 @@ coco_MKS22KS(ldouble *xMKS1, ldouble *xKS)
   ldouble x2=xMKS1[2];
   ldouble x3=xMKS1[3];
   ldouble R0,H0;
+  R0=H0=0.;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKS1R0;
 #endif

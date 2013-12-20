@@ -9,6 +9,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 {
   ldouble ucov[4];
   conv_vels_core(u1,u2,ucov,which1,which2,gg,GG,0);
+  return 0;
 }
 
 int //calculates only ucon, assumes ut known where applicable
@@ -16,6 +17,7 @@ conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
 {
   ldouble ucov[4];
   conv_vels_core(u1,u2,ucov,which1,which2,gg,GG,1);
+  return 0;
 }
 
 int //calculates both ucon and ucov, assumes ut unknown where applicable
@@ -27,6 +29,7 @@ conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
   //conv_velscov(u1,u2cov,VELPRIM,VEL4,gg,GG);
 
   conv_vels_core(u1,u2con,u2cov,which1,which2,gg,GG,0);
+  return 0;
 }
 
 //**********************************************************************

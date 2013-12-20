@@ -763,6 +763,20 @@ fread_restartfile(int nout1, ldouble *t)
   return 0;
 }
 
+/* wrapper for simple output */
+int fprint_simplefile(ldouble t, int nfile, char* folder,char* prefix)
+{
+#if (PROBLEM==55) //G2STATIC
+  fprint_simplecart(t,nfile,folder,prefix);
+#endif
+
+#ifdef BHDISK_PROBLEMTYPE
+  fprint_simplesph(t,nfile,folder,prefix);
+#endif
+
+  return 0;
+}
+
 /*********************************************/
 /*********************************************/
 /*********************************************/
@@ -843,6 +857,74 @@ int fprint_simplecart(ldouble t, int nfile, char* folder,char* prefix)
 	       fprintf(fout1,"%.5e %.5e %.5e ",rho,temp,tracer);
 
 	       fprintf(fout1,"%.5e %.5e %.5e ",vx,vy,vz);
+
+	       fprintf(fout1,"%.5e \n",volume);
+	     }
+	 }
+     }
+
+   fflush(fout1);
+   fclose(fout1);
+
+   return 0;
+ }
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints in ASCII & BL coordinates,  */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
+ {
+   char bufor[50];
+   sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
+   fout1=fopen(bufor,"w");
+  
+   /***********************************/  
+   /** writing order is fixed  ********/  
+   /***********************************/  
+ 
+   int ix,iy,iz,iv;
+   ldouble pp[NV];
+   for(iz=0;iz<NZ;iz++)
+     {
+       for(iy=0;iy<NY;iy++)
+	 {
+	   for(ix=0;ix<NX;ix++)
+	     {
+	       for(iv=0;iv<NV;iv++)
+		 {
+		   pp[iv]=get_u(p,iv,ix,iy,iz);
+		 }
+	       struct geometry geom,geomBL;
+	       fill_geometry(ix,iy,iz,&geom);
+	       fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+	       ldouble dx[3];
+	       dx[0]=get_size_x(ix,0);
+	       dx[1]=get_size_x(iy,1);
+	       dx[2]=get_size_x(iz,2);
+	       ldouble gdet=geom.gdet;
+	       ldouble volume=dx[0]*dx[1]*dx[2]*gdet;
+	       trans_pmhd_coco(pp, pp, MYCOORDS,BLCOORDS, geom.xxvec,&geom,&geomBL);
+
+	       ldouble rho=rhoGU2CGS(pp[RHO]);
+	       ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+	       ldouble vel[4]={0,pp[VX],pp[VY],pp[VZ]};	
+	       conv_vels(vel,vel,VELPRIM,VEL4,geomBL.gg,geomBL.GG);						  
+	       ldouble r=geomBL.xx;
+	       ldouble th=geomBL.yy;
+	       ldouble ph=geomBL.zz;
+	     
+	       fprintf(fout1,"%d %d %d ",ix,iy,iz);
+
+	       fprintf(fout1,"%.5e %.5e %.5e ",r,th,ph);
+
+	       fprintf(fout1,"%.5e %.5e ",rho,temp);
+
+	       fprintf(fout1,"%.5e %.5e %.5e ",vel[1],vel[2],vel[3]);
 
 	       fprintf(fout1,"%.5e \n",volume);
 	     }

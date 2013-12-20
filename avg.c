@@ -58,6 +58,7 @@ main(int argc, char **argv)
   int ifile,readret;
   ldouble t,ttot; ldouble scalars[NSCALARS];
   ttot=0.;
+  t=global_time;
 
   printf("working on files #%04d to #%04d with %d step \n",no1,no2,nostep);
 

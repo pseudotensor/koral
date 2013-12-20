@@ -1962,6 +1962,8 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
   p2u(pval,uval,&geom);
      
 #endif //SPECIFIC_BC   
+
+  return 0;
 }
 
 //**********************************************************************

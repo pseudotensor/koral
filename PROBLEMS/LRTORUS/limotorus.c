@@ -7,11 +7,11 @@
 
 #define LT_BHSPIN 0.
 #define LT_KAPPA 2.e3
-#define LT_XI 0.9
-#define LT_R1 30.
+#define LT_XI 0.95
+#define LT_R1 16.
 #define LT_R2 200.
 #define LT_GAMMA 4./3.
-#define LT_RIN 15.
+#define LT_RIN 10.
 
 void compute_gd( FTYPE r, FTYPE th, FTYPE a, FTYPE *gdtt, FTYPE *gdtp, FTYPE *gdpp ) {
    FTYPE Sigma, tmp;
@@ -354,7 +354,7 @@ int main() {
 	   fprintf(outfile, "%g\t%g\t%g\t%g\t%g\n", r*sin(th), r*cos(th), rho, uu,ell);
 	 }
       fprintf(outfile, "\n");
-      fprintf(radfile,"%g %g\n",r,Sigma);
+      fprintf(radfile,"%g %g %g\n",r,Sigma,ell);
 
      }
 

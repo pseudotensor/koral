@@ -118,6 +118,9 @@ main(int argc, char **argv)
 #if(SILOOUTPUT==1)
       fprint_silofile(tstart,nfout1,"dumps","sil");
 #endif
+#if(SIMPLEOUTPUT==1)
+      fprint_simplefile(tstart,nfout1,"dumps","sim");
+#endif
 
       nfout1++;
     }
