@@ -140,6 +140,9 @@
 #define AVGEHAT (NV+109)
 #define AVGRIJ(i,j) (NV+110+i*4+j)
 #define AVGEHATUCON(i) (NV+126+i)
+#define AVGEHATUCOV(i) (NV+130+i)
+#define AVGURFCON(i) (NV+134+i)
+#define AVGURFCOV(i) (NV+138+i)
 
 
 

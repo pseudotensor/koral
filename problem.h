@@ -1306,8 +1306,7 @@
 #ifndef NAVGVARS
 #ifdef BHDISK_PROBLEMTYPE
 #ifdef RADIATION
-//#define NAVGVARS (142)
-#define NAVGVARS (126)
+#define NAVGVARS (142)
 #else
 #define NAVGVARS (109)
 #endif

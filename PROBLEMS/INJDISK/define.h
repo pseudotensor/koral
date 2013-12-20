@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 1332
 
 /************************************/
@@ -122,8 +122,8 @@
 #define DISKSIGMA surfdensCGS2GU(1.e4)
 #define DISKRHO DISKSIGMA/DISKH/(96./35.)
 #define DISKRCIR 20.
-#define DISKVR (-1./sqrt(ROUT)*0.1*0.1) //v_kepl * alpha * factor
-#define MAGNOMEGA (4.e-3*pow(ROUT/50.,-1.5))
+#define DISKVR (-1.*pow(ROUT/50.,-1.5)*0.01) //normalized to 0.01 at R=50
+#define MAGNOMEGA (1.e-3*pow(ROUT/50.,-1.5)) //omega should follow the free fall time?
 #define MAGBETA 0.02
 
 //KTORUS only:

@@ -297,15 +297,27 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   Ehat=-Rtt;       
   ldouble Rij[4][4];
   calc_Rij(pp,&geomout,Rij);
+  indices_2221(Rij,Rij,geomout.gg);
+  vcon[1]=pp[FX(0)];
+  vcon[2]=pp[FY(0)];
+  vcon[3]=pp[FZ(0)];
+  vcon[0]=0.;  
+  conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG); 
 
+  for(iv=0;iv<4;iv++)
+    avg[AVGURFCON(iv)]=ucon[iv];
+  for(iv=0;iv<4;iv++)
+    avg[AVGURFCOV(iv)]=ucov[iv];
+   
   avg[AVGEHAT]=Ehat;
   for(iv=0;iv<4;iv++)
     for(iv2=0;iv2<4;iv2++)
       avg[AVGRIJ(iv,iv2)]=Rij[iv][iv2];
 
-  //to uncomment for next runs
-  //for(iv=0;iv<4;iv++)
-  //      avg[AVGEHATUCON(iv)]=Ehat*ucon[iv];
+  for(iv=0;iv<4;iv++)
+    avg[AVGEHATUCON(iv)]=Ehat*ucon[iv];
+  for(iv=0;iv<4;iv++)
+    avg[AVGEHATUCOV(iv)]=Ehat*ucov[iv];
 
 #endif
 
