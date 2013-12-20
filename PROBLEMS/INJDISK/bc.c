@@ -21,21 +21,6 @@ fill_geometry(ix,iy,iz,&geom);
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
-//metric
-ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
-pick_g(ix,iy,iz,gg);
-pick_G(ix,iy,iz,GG);
-pick_T(emuup,ix,iy,iz,eup);
-pick_T(emulo,ix,iy,iz,elo);
-
-//BL
-ldouble ggBL[4][5],GGBL[4][5];
-calc_g_arb(xxvecBL,ggBL,KERRCOORDS);
-calc_G_arb(xxvecBL,GGBL,KERRCOORDS);
-ldouble eupBL[4][4],eloBL[4][4];
-ldouble tupBL[4][4],tloBL[4][4];
-calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
-calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 /**********************/
 
 //outer edge, outflows with velocity check
@@ -54,33 +39,41 @@ if(ix>=NX)
 	  }
 
 	//checking for the gas inflow
-	ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
+	ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]},uconBL[4];    
 	conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-	if(ucon[1]<0.) //inflow, resetting the radial velocity
+	trans2_coco(geom.xxvec,ucon,uconBL,MYCOORDS,BLCOORDS);
+	
+	if(uconBL[1]<0.) //inflow
 	  {
-	    //set_hdatmosphere(pp,xxvec,gg,GG,4);
-	    ucon[1]=0.;
+	    //set_hdatmosphere(pp,xxvec,gg,GG,4); //atmosphere with zero BL velocity	    
+	    uconBL[1]=0.;
+	    trans2_coco(geomBL.xxvec,uconBL,ucon,BLCOORDS,MYCOORDS);
 	    conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 	    pp[VX]=ucon[1];
 	    pp[VY]=ucon[2];
-	    pp[VZ]=ucon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	    pp[VZ]=ucon[3];
 	  }
 
 #ifdef RADIATION
-	ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};    
+	ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]},urfconBL[4];    
 	conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+	trans2_coco(geom.xxvec,urfcon,urfconBL,MYCOORDS,BLCOORDS);
 	if(urfcon[1]<0.) //inflow, resetting the radial velocity
 	  {
-	    //set_radatmosphere(pp,xxvec,gg,GG,0);
-	    urfcon[1]=0.;
+	    //set_radatmosphere(pp,xxvec,gg,GG,1);
+	    urfconBL[1]=0.;
+	    trans2_coco(geomBL.xxvec,urfconBL,urfcon,BLCOORDS,MYCOORDS);
 	    conv_vels(urfcon,urfcon,VEL4,VELPRIM,geom.gg,geom.GG);
 	    pp[FX0]=urfcon[1];
 	    pp[FY0]=urfcon[2];
-	    pp[FZ0]=urfcon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	    pp[FZ0]=urfcon[3];	    
 	  }
 #endif
+      
+#ifdef MAGNFIELD
+    pp[B1]=pp[B2]=pp[B3]=0.;
+#endif
       }
-
   
     p2u(pp,uu,&geom);
 

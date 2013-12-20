@@ -6,13 +6,13 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 8
+#define RESTART
+#define RESTARTNUM 1332
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -35,9 +35,8 @@
 //viscosity choices
 /************************************/
 #define RADVISCOSITY SHEARVISCOSITY
-#define ZEROTIMEINSHEAR
 #define ALPHARADVISC 1.
-#define MAXRADVISCVEL 1./3.
+#define MAXRADVISCVEL 1.
 
 /************************************/
 //rmhd floors
@@ -123,8 +122,8 @@
 #define DISKSIGMA surfdensCGS2GU(1.e4)
 #define DISKRHO DISKSIGMA/DISKH/(96./35.)
 #define DISKRCIR 20.
-#define DISKVR (-1./sqrt(ROUT)*0.1) //v_kepl * alpha
-#define MAGNOMEGA (5.e-3*pow(ROUT/50.,-1.5))
+#define DISKVR (-1./sqrt(ROUT)*0.1*0.1) //v_kepl * alpha * factor
+#define MAGNOMEGA (4.e-3*pow(ROUT/50.,-1.5))
 #define MAGBETA 0.02
 
 //KTORUS only:
