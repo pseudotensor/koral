@@ -109,20 +109,19 @@
 #define CBAUTOSCALE
 #define DTOUT1 10.
 #define DTOUT2 250.
-#define PRINTXGC_RIGHT
+//#define PRINTXGC_RIGHT
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
 #define GAMMA (5./3.)
 
-#define DISKHR (.2)
+#define DISKHR (1./3.)
 #define DISKH (DISKHR*ROUT)
-#define DISKTEMP 1.e9
 #define DISKSIGMA surfdensCGS2GU(1.e4)
 #define DISKRHO DISKSIGMA/DISKH/(96./35.)
 #define DISKRCIR 20.
-#define DISKVR (-1.*pow(ROUT/50.,-1.5)*0.01) //normalized to 0.01 at R=50
+#define DISKVR (-0.02*pow(ROUT/50.,-1.5)) //normalized to 0.01 at R=50
 #define MAGNOMEGA (1.e-3*pow(ROUT/50.,-1.5)) //omega should follow the free fall time?
 #define MAGBETA 0.02
 
@@ -131,7 +130,7 @@
 #define NPOLI 3.
 #define ELLA 0.2
 
-
+//atmosphere
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
