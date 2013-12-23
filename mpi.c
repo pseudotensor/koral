@@ -1,6 +1,31 @@
 #include "ko.h"
 
 void
+mpi_myinit(int argc, char *argv[])
+{
+#ifdef MPI
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &PROCID);
+  MPI_Comm_size(MPI_COMM_WORLD, &NPROCS);
+  
+  mpi_procid2tile(PROCID,&TI,&TJ,&TK);
+  mpi_tileorigin(TI,TJ,TK,&TOI,&TOJ,&TOK);
+
+  printf("pid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
+	 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
+  getchar();
+#endif
+}
+
+void
+mpi_myfinalize()
+{
+#ifdef MPI
+  MPI_Finalize();
+#endif
+}
+
+void
 mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok)
 {
   *toi = ti * NX;

@@ -23,7 +23,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2K1K2
+#define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -70,9 +70,13 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define NX 60 
-#define NY 60
-#define NZ 1
+#define TNX 60 
+#define TNY 60
+#define TNZ 1
+
+#define NTX 2
+#define NTY 2
+#define NTZ 1
 
 //#define SPECIFIC_BC
 #define COPY_XBC
@@ -92,7 +96,7 @@
 #define NOUTSTOP 5000
 #define DTOUT1 .1
 #define RADOUTPUTINZAMO
-#define SILOOUTPUT
+#define SILOOUTPUT 1
 
 /************************************/
 //problem params

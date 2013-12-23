@@ -72,7 +72,7 @@
 //69 INJDISK - magnetized gas damped from outer boundary
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 
-#define PROBLEM 69
+#define PROBLEM 59
 
 #if(PROBLEM==70)
 
@@ -1220,18 +1220,6 @@
 #define ALLOW_EXPLICIT_RAD_SOURCE 0 //whether to allow reducing implicit_lab to explicit
 #endif
 
-#ifndef NX
-#define NX 100 //x-resolution
-#endif
-
-#ifndef NY
-#define NY 1 //y-resolution
-#endif 
-
-#ifndef NZ
-#define NZ 1 //z-resolution
-#endif
-
 #ifndef INT_ORDER
 #define INT_ORDER 1 //reconstruction order
 #endif
@@ -1528,3 +1516,14 @@
 #define TNZ (NZ*NTZ)
 #endif
 
+#ifndef NX
+#define NX (TNX/NTX)
+#endif 
+
+#ifndef NY
+#define NY (TNY/NTY)
+#endif
+ 
+#ifndef NZ
+#define NZ (TNZ/NTZ)
+#endif 

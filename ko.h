@@ -54,6 +54,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#ifdef MPI
+#include <mpi.h>
+#endif
+
 #ifdef __MACH__
 #include <mach/clock.h>
 #include <mach/mach.h>
@@ -87,7 +91,20 @@
 #define FTYPE ldouble
 #define gSIZE 20 //size of metric arrays = 16 + 1 (gdet) + 3 (dlgdet)
 
-//global variables (allocated or not in misc.c)
+//global variables, some of them to be distributed in some way over processes
+ldouble global_time,avgtime,timestepdamp;
+int global_int_slot[NGLOBALINTSLOT];
+ldouble max_ws[3],max_dt,ttm1,ttm2,max_ws_ph
+;ldouble dt,tstepdenmax;
+ldouble min_dx,min_dy,min_dz;
+
+//tile specific
+int TI,TJ,TK; //tile order
+int TOI,TOJ,TOK; //indices of the tile origin
+int PROCID;
+int NPROCS;
+
+//arrays and stuff
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
   *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,*radviscfac,
   *dut0,*dut1,*dut2,*dut3,*uforget,*drt0,*drt1,*drt2,*drt3,
@@ -100,19 +117,12 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
 int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,**loop_02,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4;
-ldouble global_time,avgtime,timestepdamp;
-int global_int_slot[NGLOBALINTSLOT];
+
 ldouble scalars[NSCALARS];
 int doingavg;
-
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
-
 ldouble inputarg[10];
 int **gcidx;
-
-ldouble max_ws[3],max_dt,ttm1,ttm2,max_ws_ph;
-ldouble min_dx,min_dy,min_dz;
-ldouble dt,tstepdenmax;
 FILE *fout1,*fout_scalars,*fout_radprofiles,*fout_fail;
 int nfout1,nfout2;
 

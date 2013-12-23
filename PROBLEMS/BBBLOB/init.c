@@ -51,7 +51,7 @@ pp[TRA]=1.;
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //hd floors
-check_floors_hd(pp,VELPRIM,&geom);
+//check_floors_hd(pp,VELPRIM,&geom);
 //to conserved
 p2u(pp,uu,&geom);
 /***********************************************/

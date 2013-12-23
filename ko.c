@@ -6,6 +6,8 @@
 int 
 main(int argc, char **argv)
 {  
+  mpi_myinit();
+
 #if(PROBLEM==60)
   //requires no rad. viscosity!
   test_jon_solve_implicit_lab();
@@ -130,6 +132,9 @@ main(int argc, char **argv)
 
   //free_arrays();
   fprint_closefiles();
+  
+  mpi_myfinalize();
+
   return 0;
 }
 

@@ -17,7 +17,7 @@ if(ix>=NX) //outflow
    
 
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,&geom);
+    //check_floors_hd(pp,VELPRIM,&geom);
     //end of floor section
      
     p2u(pp,uu,&geom);
@@ -29,7 +29,7 @@ if(ix<0) //bulk inflow
   {
     
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,&geom);
+    //check_floors_hd(pp,VELPRIM,&geom);
     //end of floor section
      
     p2u(pp,uu,&geom);
@@ -42,7 +42,7 @@ if(iy<0) //beam
     
 
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,&geom);
+    //check_floors_hd(pp,VELPRIM,&geom);
     //end of floor section
      
     p2u(pp,uu,&geom);
@@ -55,7 +55,7 @@ if(iy>=NY) //bulk motion
     
 
     //testing if interpolated primitives make sense
-    check_floors_hd(pp,VELPRIM,&geom);
+    //check_floors_hd(pp,VELPRIM,&geom);
     //end of floor section
      
     p2u(pp,uu,&geom);
