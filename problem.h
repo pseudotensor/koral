@@ -1495,5 +1495,36 @@
 
 #define GMC2CM (MASSCM) //gravitational radius in cm
 
+/*********************/
+/*********************/
+/*********************/
+/*********************/
+/***** mpi-spec ******/
+/*********************/
+/*********************/
+/*********************/
+/*********************/
+#ifndef NTX
+#define NTX 1 //number of tiles in X
+#endif
 
+#ifndef NTY
+#define NTY 1
+#endif
+
+#ifndef NTZ
+#define NTZ 1
+#endif
+
+#ifndef TNX
+#define TNX (NX*NTX)
+#endif
+
+#ifndef TNY
+#define TNY (NY*NTY)
+#endif
+
+#ifndef TNZ
+#define TNZ (NZ*NTZ)
+#endif
 

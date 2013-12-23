@@ -591,6 +591,12 @@ int flux_ct();
 //silo.c
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
+//mpi.c
+void mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
+void mpi_tile2procid(int tilei, int tilej, int tilek, int *procid);
+void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);
+
+
 #include "mnemonics.h"
 
 /*********************/
