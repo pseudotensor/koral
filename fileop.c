@@ -88,13 +88,12 @@ fprint_avgfile(ldouble t, char* folder)
 /*********************************************/
 /*********************************************/
 int 
-fread_avgfile(int nout1, ldouble *pavg, ldouble *dt)
+fread_avgfile(int nout1, char *folder, ldouble *pavg, ldouble *dt)
 {
   //opening avg file
   int i,ret;
   char fname[40];
-  sprintf(fname,"dumps/avg%04d.dat",nout1);
-  
+  sprintf(fname,"%s/avg%04d.dat",folder,nout1);
   FILE *fdump=fopen(fname,"r");
 
   //reading parameters, mostly time
@@ -243,6 +242,7 @@ fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
 #ifdef BHDISK_PROBLEMTYPE 
       char bufor[50],bufor2[50];
       sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
+
       fout_radprofiles=fopen(bufor,"w");
 
       ldouble mdotscale = (rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.))/calc_mdotEdd();
@@ -294,6 +294,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
   fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
 
   sprintf(bufor2,"%s/%s%04d.%s",folder,prefix,nfile,IMAGETYPE);  
+
   int ix,iy,iz,iv;
   int gclx,gcrx,gcly,gcry,gclz,gcrz;
 
@@ -695,16 +696,16 @@ fprint_restartfile(ldouble t, char* folder)
 /*********************************************/
 /*********************************************/
 int 
-fread_restartfile(int nout1, ldouble *t)
+  fread_restartfile(int nout1, char *folder, ldouble *t)
 {
   //opening dump file
   int i,ret;
   char fname[40];
   if(nout1>=0)
-    sprintf(fname,"dumps/res%04d.dat",nout1);
+    sprintf(fname,"%s/res%04d.dat",folder,nout1);
   else
-    sprintf(fname,"dumps/reslast.dat");
-  
+    sprintf(fname,"%s/reslast.dat",folder);
+
   FILE *fdump=fopen(fname,"r");
 
   if(fdump==NULL) return 1; //request start from scratch
@@ -880,6 +881,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
  {
    char bufor[50];
    sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
+
    fout1=fopen(bufor,"w");
   
    /***********************************/  

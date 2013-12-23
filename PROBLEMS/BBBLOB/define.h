@@ -74,6 +74,7 @@
 #define TNY 60
 #define TNZ 1
 
+//# of tiles
 #define NTX 2
 #define NTY 2
 #define NTZ 1
@@ -115,6 +116,8 @@
 #define VELYBLOB2 (VELXBLOB2*0.)
 #define XBLOB1 -.5
 #define XBLOB2 .5
+#define YBLOB1 -.5
+#define YBLOB2 .5
 #define SIZEBLOB1 .1
 #define SIZEBLOB2 .1
 

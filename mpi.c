@@ -13,7 +13,7 @@ mpi_myinit(int argc, char *argv[])
 
   printf("pid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
 	 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
-  getchar();
+
 #endif
 }
 

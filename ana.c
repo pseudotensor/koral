@@ -20,6 +20,12 @@ main(int argc, char **argv)
       nostep=atof(argv[3]);
     }
 
+  char folder[100],bufer[100];
+  sprintf(folder,"%s","dumps");
+  #ifdef MPI
+  sprintf(folder,"%s/%d",folder,PROCID);
+  #endif
+
   int i;
   doingavg=0;
 
@@ -38,16 +44,9 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
-  //folder to write in
-  char folder[100],bufor[100];
-  sprintf(folder,"analysis");
-
-  //sprintf(bufor,"rm %s/*",folder);
-  //i=system(bufor);
-
   //opens the scalar file
-  sprintf(bufor,"%s/scalars.dat",folder);
-  fout_scalars=fopen(bufor,"w");
+  sprintf(bufer,"%s/scalars.dat",folder);
+  fout_scalars=fopen(bufer,"w");
 
   //arrays for averaging of primitives
 
@@ -71,7 +70,7 @@ main(int argc, char **argv)
       itot++;
 
       //reading restart file
-      readret=fread_restartfile(ifile,&t);
+      readret=fread_restartfile(ifile,folder,&t);
       
       //correcting index
       nfout1--; 
@@ -84,19 +83,19 @@ main(int argc, char **argv)
 
       //dumps dumps to analysis analysis
 #if(SCAOUTPUT==1)
-      fprint_scalars(t,scalars,NSCALARS,"analysis");
+      fprint_scalars(t,scalars,NSCALARS,folder);
 #endif
 #if(RADOUTPUT==1)
-      fprint_radprofiles(t,nfout1,"analysis","rad");
+      fprint_radprofiles(t,nfout1,folder,"rad");
 #endif
 #if(OUTOUTPUT==1)
-      fprint_outfile(t,nfout1,0,"analysis","out");
+      fprint_outfile(t,nfout1,0,folder,"out");
 #endif
 #if(SILOOUTPUT==1)
-      fprint_silofile(t,nfout1,"analysis","sil");
+      fprint_silofile(t,nfout1,folder,"sil");
 #endif
 #if(SIMOUTPUT==1)	  
-      fprint_simplefile(t,nfout1,"analysis","sim");
+      fprint_simplefile(t,nfout1,folder,"sim");
 #endif
   
 

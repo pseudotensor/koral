@@ -148,7 +148,7 @@ struct geometry
 };
 
 //main.c
-int solve_the_problem(ldouble);
+int solve_the_problem(ldouble,char*);
 int print_scalings(void);
  
 gsl_odeiv2_step **odeiv2_step_1;
@@ -316,14 +316,14 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 //fileop.c
 int save_avg(ldouble dt);
 int fprint_avgfile(ldouble t, char* folder);
-int fread_avgfile(int nout1, ldouble *pavg, ldouble *dt);
+int fread_avgfile(int nout1, char*,ldouble *pavg, ldouble *dt);
 int fprint_restartfile(ldouble t, char* folder);
 int fprint_simplefile(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_simplecart(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_simplesph(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder);
 int fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix);
-int fread_restartfile(int,ldouble*);
+int fread_restartfile(int,char *,ldouble*);
 int fprint_gridfile(char* folder);
 int fprint_openfiles(char *);
 int fprint_closefiles();

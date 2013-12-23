@@ -15,7 +15,14 @@ main(int argc, char **argv)
 #endif
 
   ldouble tstart;
-  int i;
+  int i; char folder[100],bufer[100];
+  sprintf(folder,"%s","dumps");
+  #ifdef MPI
+  sprintf(folder,"%s/%d",folder,PROCID);
+  sprintf(bufer,"mkdir %s",folder);
+  system(bufer);
+  #endif
+
   doingavg=0;
 
   //print scalings GU->CGS and quit
@@ -49,7 +56,7 @@ main(int argc, char **argv)
   //print_grid(min_dx,min_dy,min_dz);
 
 #if(GRIDOUTPUT==1)
-  fprint_gridfile("dumps");
+  fprint_gridfile(folder);
 #endif
 
   //precalculates metric etc.
@@ -88,8 +95,9 @@ main(int argc, char **argv)
 #endif
     }
 
- //prepares files
-  fprint_openfiles("dumps");
+  //prepares files
+  
+  fprint_openfiles(folder);
   
   //copies initial primitives to pinit
   copy_u(1.,p,pinit);
@@ -106,29 +114,29 @@ main(int argc, char **argv)
   //prints initial profiles to out0000.dat
   if(ifinit==1)
     {
-      fprint_restartfile(tstart,"dumps");			
+      fprint_restartfile(tstart,folder);			
       //dumps dumps
 #if(SCAOUTPUT==1)
-      fprint_scalars(tstart,scalars,NSCALARS,"dumps");
+      fprint_scalars(tstart,scalars,NSCALARS,folder);
 #endif
 #if(RADOUTPUT==1)
-      fprint_radprofiles(tstart,nfout1,"dumps","rad");
+      fprint_radprofiles(tstart,nfout1,folder,"rad");
 #endif
 #if(OUTOUTPUT==1)
-      fprint_outfile(tstart,nfout1,0,"dumps","out");
+      fprint_outfile(tstart,nfout1,0,folder,"out");
 #endif
 #if(SILOOUTPUT==1)
-      fprint_silofile(tstart,nfout1,"dumps","sil");
+      fprint_silofile(tstart,nfout1,folder,"sil");
 #endif
 #if(SIMPLEOUTPUT==1)
-      fprint_simplefile(tstart,nfout1,"dumps","sim");
+      fprint_simplefile(tstart,nfout1,folder,"sim");
 #endif
 
       nfout1++;
     }
   
   //evolves
-  solve_the_problem(tstart);
+  solve_the_problem(tstart, folder);
 
   //free_arrays();
   fprint_closefiles();
@@ -143,7 +151,7 @@ main(int argc, char **argv)
 /******************************************************/
 
 int
-solve_the_problem(ldouble tstart)
+solve_the_problem(ldouble tstart, char* folder)
 {
   ldouble t = tstart, t1 = TMAX, dtsource, taim;
   ldouble totalmass=0.;
@@ -328,20 +336,20 @@ solve_the_problem(ldouble tstart)
 	  calc_scalars(scalars,t);
 	  
 	  //dumps restart
-	  fprint_restartfile(t,"dumps");
+	  fprint_restartfile(t,folder);
 
 	  //dumps dumps
 #if(SCAOUTPUT==1)
-	  fprint_scalars(t,scalars,NSCALARS,"dumps");
+	  fprint_scalars(t,scalars,NSCALARS,folder);
 #endif
 #if(RADOUTPUT==1)
-	  fprint_radprofiles(t,nfout1,"dumps","rad");
+	  fprint_radprofiles(t,nfout1,folder,"rad");
 #endif
 #if(OUTOUTPUT==1)
-	  fprint_outfile(t,nfout1,0,"dumps","out");
+	  fprint_outfile(t,nfout1,0,folder,"out");
 #endif
 #if(SILOOUTPUT==1)
-	  fprint_silofile(t,nfout1,"dumps","sil");
+	  fprint_silofile(t,nfout1,folder,"sil");
 #endif
 	  
 	  nfout1++;
@@ -358,7 +366,7 @@ solve_the_problem(ldouble tstart)
 	  
 	  //avg goes first so that what is later can use it
 	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
-	  fprint_avgfile(t,"dumps");
+	  fprint_avgfile(t,folder);
 	  avgtime=0.;
   
 	  nfout2++;

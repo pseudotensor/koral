@@ -48,7 +48,7 @@
 	  "set autoscale \n"
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
-	  //"set cbrange [1:40]\n"
+	  "set cbrange [1:1e10]\n"
 	  //"set log cb\n"
 
 	  "set xlabel \"x\"\n"
@@ -86,7 +86,7 @@
 	  "set autoscale \n"
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
-	  //"set cbrange [1:40]\n"
+	  "set cbrange [1:1e10]\n"
 	  //"set log cb\n"
 
 	  "set xlabel \"x\"\n"
