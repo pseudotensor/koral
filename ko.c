@@ -180,11 +180,12 @@ solve_the_problem(ldouble tstart, char* folder)
   else
     tstepdenmax=max_ws[0]/min_dx;
 
-  timestepdamp=-1.;
+  //chooses the smalles timestep etc.
+  mpi_synchtiming(&t);
 
   //copy primitives to hold previous time steps
-  copy_u(1.,p,ptm1); ttm1=t;
-  copy_u(1.,p,ptm2); ttm2=t;
+  //copy_u(1.,p,ptm1); ttm1=t;
+  //copy_u(1.,p,ptm2); ttm2=t;
 
   //main time loop
   int nstep=0;
@@ -200,16 +201,12 @@ solve_the_problem(ldouble tstart, char* folder)
       ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble imp_time1=0.,imp_time2=0.,tstepden;
       
+      //chooses the smalles timestep etc.
+      mpi_synchtiming(&t);
+
       //dt based on the estimate from the last midpoint
-      dt=TSTEPLIM*1./tstepdenmax;//*timestepdamp;
-      #ifdef RADVISCTIMESTEPDAMP1
-      if(timestepdamp>0.) dt*=timestepdamp;
-      #endif
-
-      #ifdef RADVISCTIMESTEPDAMP2
-      if(timestepdamp>0. && dt>timestepdamp) dt=timestepdamp;
-      #endif
-
+      dt=TSTEPLIM*1./tstepdenmax;
+ 
       if(t+dt>t1) {dt=t1-t;}
 
       //reseting wavespeeds
@@ -218,7 +215,6 @@ solve_the_problem(ldouble tstart, char* folder)
       max_ws[2]=-1.;
       max_ws_ph=-1.;
       tstepdenmax=-1.;
-      timestepdamp=-1.;
 
       //iteration counter
       i1++;
@@ -378,8 +374,8 @@ solve_the_problem(ldouble tstart, char* folder)
       //performance to screen only every second
       if(end_time-fprintf_time>1.) 
 	{
-	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f|%.2f) (real time: %10.4f) znps: %.0f "
-		 ,nstep,t,dt,max_ws_ph,timestepdamp,end_time-start_time,znps);
+	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
+		 ,nstep,t,dt,max_ws_ph,end_time-start_time,znps);
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],

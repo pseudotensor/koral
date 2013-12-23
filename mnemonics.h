@@ -145,5 +145,5 @@
 #define AVGURFCOV(i) (NV+138+i)
 
 
-
-
+//MPI mnemonics
+#define MPI_MSG_TIME 100

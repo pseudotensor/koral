@@ -92,10 +92,13 @@
 #define gSIZE 20 //size of metric arrays = 16 + 1 (gdet) + 3 (dlgdet)
 
 //global variables, some of them to be distributed in some way over processes
-ldouble global_time,avgtime,timestepdamp;
+ldouble global_time;
+ldouble global_tstepdenmax;
+
+ldouble avgtime,dt;
 int global_int_slot[NGLOBALINTSLOT];
-ldouble max_ws[3],max_dt,ttm1,ttm2,max_ws_ph
-;ldouble dt,tstepdenmax;
+ldouble max_ws[3],max_dt,ttm1,ttm2,max_ws_ph;
+ldouble tstepdenmax;
 ldouble min_dx,min_dy,min_dz;
 
 //tile specific
@@ -605,7 +608,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 void mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
 void mpi_tile2procid(int tilei, int tilej, int tilek, int *procid);
 void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);
-
+void mpi_synchtiming(ldouble*);
 
 #include "mnemonics.h"
 

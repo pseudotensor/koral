@@ -3569,6 +3569,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       aval[dim*2+1]=axr;
     }
 
+  /*
   //verifying that the diffusion coefficient satisfies dt<(dx)^2 / D   
   //if not - extra damping of time step
   
@@ -3588,7 +3589,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   if(tslimit<timestepdamp || timestepdamp<0.) timestepdamp=tslimit;
 #endif
 #endif
-  
+  */
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -3646,7 +3647,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	printf("> %d > %e %e > %e\n",idim,Rijvisc0[idim+1][i],uu0[EE0+i]/gdetu,vel[idim]);
       }
   if(geom->ifacedim>-1)
-    maxvel=fabs(vel[geom->ifacedim]);
+    maxvel=fabs(vel[geom->dim]);
   else
     maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
 

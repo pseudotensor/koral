@@ -1,6 +1,27 @@
 #include "ko.h"
 
 void
+mpi_synchtiming(ldouble *time)
+{
+#ifdef MPI
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  
+  global_time=*time;
+  
+  MPI_Allreduce(&tstepdenmax, &global_tstepdenmax, 1, MPI_DOUBLE, MPI_MAX,
+                MPI_COMM_WORLD);
+
+  MPI_Bcast(&global_time, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  *time=global_time;
+  tstepdenmax=global_tstepdenmax;
+ #endif
+}
+
+void
 mpi_myinit(int argc, char *argv[])
 {
 #ifdef MPI
