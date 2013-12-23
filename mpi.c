@@ -1,6 +1,58 @@
 #include "ko.h"
 
 void
+mpi_senddata()
+{
+
+
+}
+
+void
+mpi_recvdata()
+{
+
+
+}
+
+//verify if there is real BC at all, if set_bc() needed
+int
+mpi_hasBC()
+{
+#ifndef MPI
+  return 1;
+#else
+  if(TI==0 || TI==NTX-1 || TJ==0 || TJ==NTY-1 || TK==0 || TK==NTZ-1)
+    return 1; //this cell has some real BC
+  else
+    return 0;
+#endif
+}
+
+//verify if given cell from set_bc() falls into a real BC
+int
+mpi_isitBC(int BCtype)
+{
+#ifndef MPI
+  return 1;
+#else //check here if real BC
+  if(BCtype==XBCLO && TI==0)
+    return 1;
+  if(BCtype==XBCHI && TI==NTX-1)
+    return 1;
+  if(BCtype==YBCLO && TJ==0)
+    return 1;
+  if(BCtype==YBCHI && TJ==NTY-1)
+    return 1;
+  if(BCtype==ZBCLO && TK==0)
+    return 1;
+  if(BCtype==ZBCHI && TK==NTZ-1)
+    return 1;
+
+  return 0; 
+#endif
+}
+
+void
 mpi_synchtiming(ldouble *time)
 {
 #ifdef MPI

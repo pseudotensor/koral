@@ -389,7 +389,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       calc_primitives(ix,iy,iz,0);
     }
 
- 
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -403,13 +402,21 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 #endif
   
   //**********************************************************************
+  //* MPI ****************************************************************
+  //**********************************************************************
+ 
+  mpi_senddata();
+
+  mpi_recvdata();
+ 
+ //**********************************************************************
   //**********************************************************************
   //**********************************************************************
 
-  //TODO: combine set_bc with the loop above / below
-
-  //projects primitives onto ghost cells
-  set_bc(t,0);
+  //projects primitives onto ghost cells at the boundaries of the total domain
+  //if needed
+  if(mpi_hasBC()==1)
+    set_bc(t,0);
 
   //**********************************************************************
   //**********************************************************************
@@ -1974,7 +1981,10 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
 int set_bc(ldouble t,int ifinit)
 {
   int ix,iy,iz,ii,iv;
- 
+  int isBC[7];
+  for(ii=XBCLO;ii<=ZBCHI;ii++)
+    isBC[ii]=mpi_isitBC(ii);
+
   //first fill the GC with no corners
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only, no corners
@@ -1991,6 +2001,9 @@ int set_bc(ldouble t,int ifinit)
       if(iy>0) BCtype=YBCHI;
       if(iz<0) BCtype=ZBCLO;
       if(iz>0) BCtype=ZBCHI;
+
+      if(isBC[BCtype]==0)  //this border exchanged through MPI
+	continue;
       
       ldouble uval[NV],pval[NV];
       set_bc_core(ix,iy,iz,t,uval,pval,ifinit,BCtype);
@@ -2001,90 +2014,6 @@ int set_bc(ldouble t,int ifinit)
 	  set_u(p,iv,ix,iy,iz,pval[iv]);	      
 	}
     }
-
-  //now fill the first cells in corners if necessary
-#ifdef MAGNFIELD_TEST
-#pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
-  for(ii=0;ii<Nloop_3;ii++) //surface layers of corners
-    {
-      ix=loop_3[ii][0];
-      iy=loop_3[ii][1];
-      iz=loop_3[ii][2];
-
-      //basing on ix,iy,iz determine BCtype for each dimension
-      //calculate fractional impact of each dimension
-      //for each point do three calc_bc and sum them up with weights
-      ldouble w1,w2,w3;
-      int d1,d2,d3;
-      ldouble p1[NV],p2[NV],p3[NV],uval[NV],pval[NV];
-
-      if(NZ==1 && NY==1)
-	{
-	  //loop_3 empty
-	}
-
-      if(NZ==1)
-	{
-	  if(ix<0 && iy<0)
-	    {
-	      d1=-ix;
-	      d2=-iy;
-	      w1=d1/(d1+d2);
-	      w2=d2/(d1+d2);
-	      set_bc_core(ix,iy,iz,t,uval,p1,ifinit,XBCLO);
-	      set_bc_core(ix,iy,iz,t,uval,p2,ifinit,YBCLO);
-	    }
-
-	  if(ix<0 && iy>NY-1)
-	    {
-	      d1=-ix;
-	      d2=iy-NY+1;
-	      w1=d1/(d1+d2);
-	      w2=d2/(d1+d2);
-	      set_bc_core(ix,iy,iz,t,uval,p1,ifinit,XBCLO);
-	      set_bc_core(ix,iy,iz,t,uval,p2,ifinit,YBCHI);
-	    }
-
-	  if(ix>NX-1 && iy>NY-1)
-	    {
-	      d1=ix-NX+1;
-	      d2=iy-NY+1;
-	      w1=d1/(d1+d2);
-	      w2=d2/(d1+d2);
-	      set_bc_core(ix,iy,iz,t,uval,p1,ifinit,XBCHI);
-	      set_bc_core(ix,iy,iz,t,uval,p2,ifinit,YBCHI);
-	    }
-
-	  if(ix>NX-1 && iy<0)
-	    {
-	      d1=ix-NX+1;
-	      d2=-iy;
-	      w1=d1/(d1+d2);
-	      w2=d2/(d1+d2);
-	      set_bc_core(ix,iy,iz,t,uval,p1,ifinit,XBCHI);
-	      set_bc_core(ix,iy,iz,t,uval,p2,ifinit,YBCLO);
-	    }
-
-	  PLOOP(iv)
-	    pval[iv]=w1*p1[iv]+w2*p2[iv];     
-	}
-
-      //TODO: etc
-      //but would it work fine?
-      //hopefully yes     
-
-      struct geometry geom;
-      fill_geometry(ix,iy,iz,&geom);
-      p2u(pval,uval,&geom);
-      
-      PLOOP(iv)
-      {
-	set_u(u,iv,ix,iy,iz,uval[iv]);
-	set_u(p,iv,ix,iy,iz,pval[iv]);
-      }
-    }
-
-  #endif
 
   return 0;
 }
