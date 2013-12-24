@@ -115,7 +115,9 @@ initialize_arrays()
   ptm2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //buffer for sending/receiving messages
-  msgbuf1=(ldouble*)malloc(my_max3(NX*NY*NV*NG,NY*NZ*NV*NG,NZ*NX*NV*NG)*sizeof(ldouble));
+  msgbufs=(ldouble**)malloc(12*sizeof(ldouble*));
+  for(i=0;i<12;i++)
+    msgbufs[i]=(ldouble*)malloc(my_max3(NX*NY*NV*NG,NY*NZ*NV*NG,NZ*NX*NV*NG)*sizeof(ldouble));
 
 #ifdef MAGNFIELD
   //electromotive force at corners
@@ -262,7 +264,9 @@ free_arrays()
 
   free(ptm1);
   free(ptm2);
-  free(msgbuf1);
+  for(i=0;i<12;i++)
+  free(msgbufs[i]);
+  free(msgbufs);
   free(px);
   free(py);
   free(pz);

@@ -108,7 +108,7 @@ int PROCID;
 int NPROCS;
 
 //arrays and stuff
-ldouble *msgbuf1;
+ldouble **msgbufs;
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
   *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,*radviscfac,
   *dut0,*dut1,*dut2,*dut3,*uforget,*drt0,*drt1,*drt2,*drt3,
@@ -610,8 +610,9 @@ void mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
 int mpi_tile2procid(int tilei, int tilej, int tilek);
 void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);
 void mpi_synchtiming(ldouble*);
-int mpi_senddata();
-int mpi_recvdata();
+int mpi_senddata(MPI_Request *reqs, int *nreqs);
+int mpi_recvdata(MPI_Request *reqs, int *nreqs);
+int mpi_exchangedata();
 int mpi_isitBC(int BCtype);
 
 #include "mnemonics.h"
