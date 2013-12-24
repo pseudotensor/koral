@@ -3,94 +3,173 @@
 int
 mpi_recvdata()
 {
+  
 #ifdef MPI
+  int i,j,k,iv;
   MPI_Status status;
   double temp;
   int verbose=1;
-  //lower x
-  if(mpi_isitBC(XBCLO)==0)
-    {
-      MPI_Recv(&temp, 1, MPI_DOUBLE,
-	       mpi_tile2procid(TI-1,TJ,TK), MPI_MSG_XHI, MPI_COMM_WORLD, &status);
-      if(verbose) printf("%d received MPI_MSG_XHI from %d\n",PROCID,mpi_tile2procid(TI-1,TJ,TK));
-    }
   //upper x
   if(mpi_isitBC(XBCHI)==0)
     {
-      MPI_Recv(&temp, 1, MPI_DOUBLE,
+      MPI_Recv(msgbuf1, NY*NZ*NV*NG, MPI_DOUBLE,
 	       mpi_tile2procid(TI+1,TJ,TK), MPI_MSG_XLO, MPI_COMM_WORLD, &status);
-       if(verbose) printf("%d received MPI_MSG_XLO from %d\n",PROCID,mpi_tile2procid(TI+1,TJ,TK));
+      if(verbose) printf("%d received MPI_MSG_XLO from %d\n",PROCID,mpi_tile2procid(TI+1,TJ,TK));
+      for(i=-NG;i<0;i++)
+	for(j=0;j<NY;j++)
+	  for(k=0;k<NZ;k++)
+	    for(iv=0;iv<NV;iv++)
+	      set_u(p,iv,i,j,k,msgbuf1[(i+NG)*NY*NZ*NV + j*NZ*NV + k*NV + iv]);
     }
+
+  //lower x
+  if(mpi_isitBC(XBCLO)==0)
+    {
+      MPI_Recv(msgbuf1, NY*NZ*NV*NG, MPI_DOUBLE,
+	       mpi_tile2procid(TI-1,TJ,TK), MPI_MSG_XHI, MPI_COMM_WORLD, &status);
+      if(verbose) printf("%d received MPI_MSG_XHI from %d\n",PROCID,mpi_tile2procid(TI-1,TJ,TK));
+      for(i=NX;i<NX+NG;i++)
+	for(j=0;j<NY;j++)
+	  for(k=0;k<NZ;k++)
+	    for(iv=0;iv<NV;iv++)
+	      set_u(p,iv,i,j,k,msgbuf1[(i-NX)*NY*NZ*NV + j*NZ*NV + k*NV + iv]);
+    } 
+  return 0;
+ //upper y
+  if(mpi_isitBC(YBCHI)==0)
+    {
+      MPI_Recv(msgbuf1, NX*NG*NZ*NV, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ+1,TK), MPI_MSG_YLO, MPI_COMM_WORLD, &status);
+      if(verbose) printf("%d received MPI_MSG_YLO from %d\n",PROCID,mpi_tile2procid(TI,TJ+1,TK));
+      for(i=0;i<NX;i++)
+	for(j=-NG;j<0;j++)
+	  for(k=0;k<NZ;k++)
+	    for(iv=0;iv<NV;iv++)
+	      set_u(p,iv,i,j,k,msgbuf1[i*NG*NZ*NV + (j+NG)*NZ*NV + k*NV + iv]);
+
+    }
+
   //lower y
   if(mpi_isitBC(YBCLO)==0)
     {
-      MPI_Recv(&temp, 1, MPI_DOUBLE,
+      MPI_Recv(msgbuf1, NX*NG*NZ*NV, MPI_DOUBLE,
 	       mpi_tile2procid(TI,TJ-1,TK), MPI_MSG_YHI, MPI_COMM_WORLD, &status);
       if(verbose) printf("%d received MPI_MSG_YHI from %d\n",PROCID,mpi_tile2procid(TI,TJ-1,TK));
+      for(i=0;i<NX;i++)
+	for(j=NY;j<NY+NG;j++)
+	  for(k=0;k<NZ;k++)
+	    for(iv=0;iv<NV;iv++)
+	      set_u(p,iv,i,j,k,msgbuf1[i*NG*NZ*NV + (j-NY)*NZ*NV + k*NV + iv]);
+
     }
-  //upper y
-  if(mpi_isitBC(YBCHI)==0)
-    {
-      MPI_Recv(&temp, 1, MPI_DOUBLE,
-	       mpi_tile2procid(TI,TJ+1,TK), MPI_MSG_YLO, MPI_COMM_WORLD, &status);
-      if(verbose) printf("%d received MPI_MSG_YLO from %d\n",PROCID,mpi_tile2procid(TI,TJ+1,TK));
-    }
-  //lower z
-  if(mpi_isitBC(ZBCLO)==0)
-    {
-      MPI_Recv(&temp, 1, MPI_DOUBLE,
-	       mpi_tile2procid(TI,TJ,TK-1), MPI_MSG_ZHI, MPI_COMM_WORLD, &status);
-      if(verbose) printf("%d received MPI_MSG_ZHI from %d\n",PROCID,mpi_tile2procid(TI,TJ,TK-1));
-    }
-  //upper z
+ //upper z
   if(mpi_isitBC(ZBCHI)==0)
     {
-      MPI_Recv(&temp, 1, MPI_DOUBLE,
+      MPI_Recv(msgbuf1, NX*NY*NZ*NV, MPI_DOUBLE,
 	       mpi_tile2procid(TI,TJ,TK+1), MPI_MSG_ZLO, MPI_COMM_WORLD, &status);
       if(verbose) printf("%d received MPI_MSG_ZLO from %d\n",PROCID,mpi_tile2procid(TI,TJ,TK+1));
+      for(i=0;i<NX;i++)
+	for(j=0;j<NY;j++)
+	  for(k=-NG;k<0;k++)
+	    for(iv=0;iv<NV;iv++)
+	      set_u(p,iv,i,j,k,msgbuf1[i*NY*NG*NV + j*NG*NV + (k+NG)*NV + iv]);
     }
+   //lower z
+  if(mpi_isitBC(ZBCLO)==0)
+    {
+      MPI_Recv(msgbuf1, NX*NY*NZ*NV, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ,TK-1), MPI_MSG_ZHI, MPI_COMM_WORLD, &status);
+      if(verbose) printf("%d received MPI_MSG_ZHI from %d\n",PROCID,mpi_tile2procid(TI,TJ,TK-1));
+      for(i=0;i<NX;i++)
+	for(j=0;j<NY;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    for(iv=0;iv<NV;iv++)
+	      set_u(p,iv,i,j,k,msgbuf1[i*NY*NG*NV + j*NG*NV + (k-NZ)*NV + iv]);
+
+    }
+ 
 #endif
 }
 
 int
 mpi_senddata()
-{
+{  
+  int i,j,k,iv;
+  int verbose=1;
+  ldouble temp;
 #ifdef MPI
-  double temp;
   //lower x
   if(mpi_isitBC(XBCLO)==0)
     {
-      MPI_Send(&temp, 1, MPI_DOUBLE,
+      for(i=-NG;i<0;i++)
+	for(j=0;j<NY;j++)
+	  for(k=0;k<NZ;k++)
+	    for(iv=0;iv<NV;iv++)
+	      msgbuf1[(i+NG)*NY*NZ*NV + j*NZ*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+      if(verbose) printf("%d attempting to send MPI_MSG_XLO to %d\n",PROCID,mpi_tile2procid(TI-1,TJ,TK));
+      MPI_Send(msgbuf1, NY*NZ*NV*NG, MPI_DOUBLE,
 	       mpi_tile2procid(TI-1,TJ,TK), MPI_MSG_XLO, MPI_COMM_WORLD);
+      if(verbose) printf("%d sent MPI_MSG_XLO to %d\n",PROCID,mpi_tile2procid(TI-1,TJ,TK));
+      
     }
+
   //upper x
   if(mpi_isitBC(XBCHI)==0)
     {
-      MPI_Send(&temp, 1, MPI_DOUBLE,
+      for(i=NX;i<NX+NG;i++)
+	for(j=0;j<NY;j++)
+	  for(k=0;k<NZ;k++)
+	    for(iv=0;iv<NV;iv++)
+	      msgbuf1[(i-NX)*NY*NZ*NV + j*NZ*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+      if(verbose) printf("%d attempting to send MPI_MSG_XHI to %d\n",PROCID,mpi_tile2procid(TI+1,TJ,TK));
+      MPI_Send(msgbuf1,NV*NY, MPI_DOUBLE,
 	       mpi_tile2procid(TI+1,TJ,TK), MPI_MSG_XHI, MPI_COMM_WORLD);
+      if(verbose) printf("%d sent MPI_MSG_XHI to %d\n",PROCID,mpi_tile2procid(TI+1,TJ,TK));
+
     }
+return 0;
   //lower y
   if(mpi_isitBC(YBCLO)==0)
     {
-      MPI_Send(&temp, 1, MPI_DOUBLE,
+      for(i=0;i<NX;i++)
+	for(j=-NG;j<0;j++)
+	  for(k=0;k<NZ;k++)
+	    for(iv=0;iv<NV;iv++)
+	      msgbuf1[i*NG*NZ*NV + (j+NG)*NZ*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+      MPI_Send(msgbuf1, NX*NG*NZ*NV, MPI_DOUBLE,
 	       mpi_tile2procid(TI,TJ-1,TK), MPI_MSG_YLO, MPI_COMM_WORLD);
     }
-  //upper x
+  //upper y
   if(mpi_isitBC(YBCHI)==0)
     {
-      MPI_Send(&temp, 1, MPI_DOUBLE,
+      for(i=0;i<NX;i++)
+	for(j=NY;j<NY+NG;j++)
+	  for(k=0;k<NZ;k++)
+	    for(iv=0;iv<NV;iv++)
+	      msgbuf1[i*NG*NZ*NV + (j-NY)*NZ*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+      MPI_Send(msgbuf1, NX*NG*NZ*NV, MPI_DOUBLE,
 	       mpi_tile2procid(TI,TJ+1,TK), MPI_MSG_YHI, MPI_COMM_WORLD);
     }
-  //lower x
+  //lower z
   if(mpi_isitBC(ZBCLO)==0)
     {
-      MPI_Send(&temp, 1, MPI_DOUBLE,
+      for(i=0;i<NX;i++)
+	for(j=0;j<NY;j++)
+	  for(k=-NG;k<0;k++)
+	    for(iv=0;iv<NV;iv++)
+	      msgbuf1[i*NY*NG*NV + j*NG*NV + (k+NG)*NV + iv]=get_u(p,iv,i,j,k);
+      MPI_Send(msgbuf1, NX*NY*NG*NV, MPI_DOUBLE,
 	       mpi_tile2procid(TI,TJ,TK-1), MPI_MSG_ZLO, MPI_COMM_WORLD);
     }
-  //upper x
+  //upper z
   if(mpi_isitBC(ZBCHI)==0)
     {
-      MPI_Send(&temp, 1, MPI_DOUBLE,
+      for(i=0;i<NX;i++)
+	for(j=0;j<NY;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    for(iv=0;iv<NV;iv++)
+	      msgbuf1[i*NY*NG*NV + j*NG*NV + (k-NZ)*NV + iv]=get_u(p,iv,i,j,k);
+      MPI_Send(msgbuf1, NX*NY*NG*NV, MPI_DOUBLE,
 	       mpi_tile2procid(TI,TJ,TK+1), MPI_MSG_ZHI, MPI_COMM_WORLD);
     }
 #endif

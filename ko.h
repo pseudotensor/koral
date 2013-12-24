@@ -108,6 +108,7 @@ int PROCID;
 int NPROCS;
 
 //arrays and stuff
+ldouble *msgbuf1;
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
   *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,*radviscfac,
   *dut0,*dut1,*dut2,*dut3,*uforget,*drt0,*drt1,*drt2,*drt3,
@@ -177,7 +178,7 @@ ldouble calc_mdot(ldouble radius,int);
 ldouble calc_lum(ldouble radius,int);
 ldouble calc_photloc(int ix);
 
-//misc.c
+//misc§<.c
 int print_primitives(ldouble *u);
 int print_conserved(ldouble *u);
 int my_clock_gettime(void* tsptr);

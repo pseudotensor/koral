@@ -414,11 +414,8 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
 
   //projects primitives onto ghost cells at the boundaries of the total domain
-  //if needed
-  //todo:
-  //always on for testing message passing
-  if(1 || mpi_hasBC()==1)
-    set_bc(t,0);
+  //or calulates conserved from exchanged primitives
+  set_bc(t,0);
 
   //**********************************************************************
   //**********************************************************************
@@ -2010,15 +2007,21 @@ int set_bc(ldouble t,int ifinit)
       if(iz>0) BCtype=ZBCHI;
 
       if(isBC[BCtype]==0)  //this border exchanged through MPI
-	continue;
-      
-      ldouble uval[NV],pval[NV];
-      set_bc_core(ix,iy,iz,t,uval,pval,ifinit,BCtype);
-
-      for(iv=0;iv<NV;iv++)
 	{
-	  set_u(u,iv,ix,iy,iz,uval[iv]);
-	  set_u(p,iv,ix,iy,iz,pval[iv]);	      
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	}
+      else //need for real BC
+	{
+	  ldouble uval[NV],pval[NV];
+	  set_bc_core(ix,iy,iz,t,uval,pval,ifinit,BCtype);
+	  
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      set_u(u,iv,ix,iy,iz,uval[iv]);
+	      set_u(p,iv,ix,iy,iz,pval[iv]);	      
+	    }
 	}
     }
 
