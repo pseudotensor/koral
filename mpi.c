@@ -1,17 +1,101 @@
 #include "ko.h"
 
-void
-mpi_senddata()
-{
-
-
-}
-
-void
+int
 mpi_recvdata()
 {
+#ifdef MPI
+  MPI_Status status;
+  double temp;
+  int verbose=1;
+  //lower x
+  if(mpi_isitBC(XBCLO)==0)
+    {
+      MPI_Recv(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI-1,TJ,TK), MPI_MSG_XHI, MPI_COMM_WORLD, &status);
+      if(verbose) printf("%d received MPI_MSG_XHI from %d\n",PROCID,mpi_tile2procid(TI-1,TJ,TK));
+    }
+  //upper x
+  if(mpi_isitBC(XBCHI)==0)
+    {
+      MPI_Recv(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI+1,TJ,TK), MPI_MSG_XLO, MPI_COMM_WORLD, &status);
+       if(verbose) printf("%d received MPI_MSG_XLO from %d\n",PROCID,mpi_tile2procid(TI+1,TJ,TK));
+    }
+  //lower y
+  if(mpi_isitBC(YBCLO)==0)
+    {
+      MPI_Recv(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ-1,TK), MPI_MSG_YHI, MPI_COMM_WORLD, &status);
+      if(verbose) printf("%d received MPI_MSG_YHI from %d\n",PROCID,mpi_tile2procid(TI,TJ-1,TK));
+    }
+  //upper y
+  if(mpi_isitBC(YBCHI)==0)
+    {
+      MPI_Recv(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ+1,TK), MPI_MSG_YLO, MPI_COMM_WORLD, &status);
+      if(verbose) printf("%d received MPI_MSG_YLO from %d\n",PROCID,mpi_tile2procid(TI,TJ+1,TK));
+    }
+  //lower z
+  if(mpi_isitBC(ZBCLO)==0)
+    {
+      MPI_Recv(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ,TK-1), MPI_MSG_ZHI, MPI_COMM_WORLD, &status);
+      if(verbose) printf("%d received MPI_MSG_ZHI from %d\n",PROCID,mpi_tile2procid(TI,TJ,TK-1));
+    }
+  //upper z
+  if(mpi_isitBC(ZBCHI)==0)
+    {
+      MPI_Recv(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ,TK+1), MPI_MSG_ZLO, MPI_COMM_WORLD, &status);
+      if(verbose) printf("%d received MPI_MSG_ZLO from %d\n",PROCID,mpi_tile2procid(TI,TJ,TK+1));
+    }
+#endif
+}
 
+int
+mpi_senddata()
+{
+#ifdef MPI
+  double temp;
+  //lower x
+  if(mpi_isitBC(XBCLO)==0)
+    {
+      MPI_Send(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI-1,TJ,TK), MPI_MSG_XLO, MPI_COMM_WORLD);
+    }
+  //upper x
+  if(mpi_isitBC(XBCHI)==0)
+    {
+      MPI_Send(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI+1,TJ,TK), MPI_MSG_XHI, MPI_COMM_WORLD);
+    }
+  //lower y
+  if(mpi_isitBC(YBCLO)==0)
+    {
+      MPI_Send(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ-1,TK), MPI_MSG_YLO, MPI_COMM_WORLD);
+    }
+  //upper x
+  if(mpi_isitBC(YBCHI)==0)
+    {
+      MPI_Send(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ+1,TK), MPI_MSG_YHI, MPI_COMM_WORLD);
+    }
+  //lower x
+  if(mpi_isitBC(ZBCLO)==0)
+    {
+      MPI_Send(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ,TK-1), MPI_MSG_ZLO, MPI_COMM_WORLD);
+    }
+  //upper x
+  if(mpi_isitBC(ZBCHI)==0)
+    {
+      MPI_Send(&temp, 1, MPI_DOUBLE,
+	       mpi_tile2procid(TI,TJ,TK+1), MPI_MSG_ZHI, MPI_COMM_WORLD);
+    }
+#endif
 
+  return 0;
 }
 
 //verify if there is real BC at all, if set_bc() needed
@@ -114,8 +198,8 @@ mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek)
   *tilei = procid - NTX * NTY * (*tilek) - NTX * (*tilej);
 }
 
-void
-mpi_tile2procid(int tilei, int tilej, int tilek, int *procid)
+int
+mpi_tile2procid(int tilei, int tilej, int tilek)
 {
-  *procid = tilek * NTX * NTY + tilej * NTX + tilei;
+  return tilek * NTX * NTY + tilej * NTX + tilei;
 }

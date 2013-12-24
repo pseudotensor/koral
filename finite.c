@@ -415,7 +415,9 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
   //projects primitives onto ghost cells at the boundaries of the total domain
   //if needed
-  if(mpi_hasBC()==1)
+  //todo:
+  //always on for testing message passing
+  if(1 || mpi_hasBC()==1)
     set_bc(t,0);
 
   //**********************************************************************
@@ -1983,7 +1985,12 @@ int set_bc(ldouble t,int ifinit)
   int ix,iy,iz,ii,iv;
   int isBC[7];
   for(ii=XBCLO;ii<=ZBCHI;ii++)
-    isBC[ii]=mpi_isitBC(ii);
+    {
+      isBC[ii]=mpi_isitBC(ii);
+      //todo:
+      //test for message passing
+      isBC[ii]=1;
+    }
 
   //first fill the GC with no corners
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)

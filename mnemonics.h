@@ -146,4 +146,10 @@
 
 
 //MPI mnemonics
-#define MPI_MSG_TIME 100
+#define MPI_MSG_XLO 100
+#define MPI_MSG_XHI 101
+#define MPI_MSG_YLO 102
+#define MPI_MSG_YHI 103
+#define MPI_MSG_ZLO 104
+#define MPI_MSG_ZHI 105
+

@@ -606,11 +606,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
 void mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
-void mpi_tile2procid(int tilei, int tilej, int tilek, int *procid);
+int mpi_tile2procid(int tilei, int tilej, int tilek);
 void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);
 void mpi_synchtiming(ldouble*);
-void mpi_senddata();
-void mpi_recvdata();
+int mpi_senddata();
+int mpi_recvdata();
 int mpi_isitBC(int BCtype);
 
 #include "mnemonics.h"

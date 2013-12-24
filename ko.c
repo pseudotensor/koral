@@ -292,7 +292,7 @@ solve_the_problem(ldouble tstart, char* folder)
       ldouble end_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
      
       //performance
-      ldouble znps=NX*NY*NZ/(end_time-start_time);
+      ldouble znps=TNX*TNY*TNZ/(end_time-start_time);
 
       //average number of iterations in the implicit solver
       ldouble avimpit[5];
@@ -374,8 +374,8 @@ solve_the_problem(ldouble tstart, char* folder)
       //performance to screen only every second
       if(end_time-fprintf_time>1.) 
 	{
-	  printf("step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
-		 ,nstep,t,dt,max_ws_ph,end_time-start_time,znps);
+	  printf("%d : step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
+		 ,PROCID,nstep,t,dt,max_ws_ph,end_time-start_time,znps);
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],
