@@ -406,6 +406,8 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
  
   mpi_exchangedata();
+  //test
+  //exit(-1);
  
  //**********************************************************************
   //**********************************************************************
@@ -1978,14 +1980,14 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
 int set_bc(ldouble t,int ifinit)
 {
   int ix,iy,iz,ii,iv;
+
+  /*
   int isBC[7];
   for(ii=XBCLO;ii<=ZBCHI;ii++)
     {
       isBC[ii]=mpi_isitBC(ii);
-      //todo:
-      //test for message passing
-      isBC[ii]=1;
     }
+  */
 
   //first fill the GC with no corners
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
@@ -1998,17 +2000,27 @@ int set_bc(ldouble t,int ifinit)
       //type of BC
       int BCtype;
       if(ix<0) BCtype=XBCLO;
-      if(ix>0) BCtype=XBCHI;
+      if(ix>=NX) BCtype=XBCHI;
       if(iy<0) BCtype=YBCLO;
-      if(iy>0) BCtype=YBCHI;
+      if(iy>=NY) BCtype=YBCHI;
       if(iz<0) BCtype=ZBCLO;
-      if(iz>0) BCtype=ZBCHI;
+      if(iz>=NZ) BCtype=ZBCHI;
 
-      if(isBC[BCtype]==0)  //this border exchanged through MPI
+      if(mpi_isitBC(BCtype)==0) //this border exchanged through MPI
 	{
 	  struct geometry geom;
 	  fill_geometry(ix,iy,iz,&geom);
 	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	  
+	  /*
+	  if(BCtype==XBCHI)
+	    {
+	      printf("%d %d > %e > %d\n",ix,iy,get_u(p,0,ix,iy,iz),PROCID);
+	      print_primitives(&get_u(p,0,ix,iy,iz));
+	      print_conserved(&get_u(u,0,ix,iy,iz));
+	      exit(-1);	  
+	    }
+	  */
 	}
       else //need for real BC
 	{

@@ -10,8 +10,10 @@
 int
 convert_out2gif_2d(char *fname,char *fname2,int niter,ldouble t)
 {
-  FILE *fgnu=fopen("plot.gp","w");
-  char bufor[50];
+  char buf1[50],buf2[50];  
+  sprintf(buf1,"plot.gp.%d",PROCID);
+  FILE *fgnu=fopen(buf1,"w");
+
 
   //PROBLEMS/XXX/out2gid_2d.c
   #include PR_OUT2GIF_2D
@@ -19,7 +21,8 @@ convert_out2gif_2d(char *fname,char *fname2,int niter,ldouble t)
   fprintf(fgnu,"\n");
   fclose(fgnu);   
   
-  int i=system("gnuplot plot.gp ");
+  sprintf(buf2,"gnuplot %s",buf1);
+  int i=system(buf2);
   return 0;
 }
 

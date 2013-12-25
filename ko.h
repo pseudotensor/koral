@@ -613,6 +613,7 @@ void mpi_synchtiming(ldouble*);
 int mpi_senddata(MPI_Request *reqs, int *nreqs);
 int mpi_recvdata(MPI_Request *reqs, int *nreqs);
 int mpi_exchangedata();
+int mpi_savedata();
 int mpi_isitBC(int BCtype);
 
 #include "mnemonics.h"

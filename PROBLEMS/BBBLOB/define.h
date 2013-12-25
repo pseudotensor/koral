@@ -70,12 +70,12 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define TNX 200 
-#define TNY 200
+#define TNX 150
+#define TNY 100
 #define TNZ 1
 
 //# of tiles
-#define NTX 2
+#define NTX 3
 #define NTY 2
 #define NTZ 1
 
@@ -95,7 +95,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define DTOUT1 .1
+#define DTOUT1 .75
 #define RADOUTPUTINZAMO
 #define SILOOUTPUT 1
 
@@ -112,8 +112,8 @@
 #define TEMPBLOB2 1.e7
 #define VELXBLOB1 0.1
 #define VELXBLOB2 -0.1
-#define VELYBLOB1 (VELXBLOB1*0.25)
-#define VELYBLOB2 (VELXBLOB2*0.)
+#define VELYBLOB1 (VELXBLOB1*0.5)
+#define VELYBLOB2 (VELXBLOB2*0.25)
 #define XBLOB1 -.5
 #define XBLOB2 .5
 #define YBLOB1 -.5

@@ -1,6 +1,8 @@
-  fprintf(fgnu,
+char bufloc[100];
+sprintf(bufloc,"table.gp.%d",PROCID);
+ fprintf(fgnu,
           
-	  "set table \"table.gp\"\n"
+	  "set table \"%s\"\n"
 	  "set contour base\n"
 	  "unset surface\n"
 	  "set log z\n"
@@ -48,7 +50,7 @@
 	  "set autoscale \n"
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
-	  "set cbrange [1:1e10]\n"
+	  "set cbrange [1:2e10]\n"
 	  //"set log cb\n"
 
 	  "set xlabel \"x\"\n"
@@ -73,7 +75,7 @@
 	  "unset border\n"
 	  "unset pm3d\n"
 	  "unset surface\n"
-	  "plot \"table.gp\" w l ls 2\n"
+	  "plot \"%s\" w l ls 2\n"
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"
@@ -86,7 +88,7 @@
 	  "set autoscale \n"
 	  "set xrange [%f:%f]\n"
 	  "set yrange [%f:%f]\n"
-	  "set cbrange [1:1e10]\n"
+	  "set cbrange [1:2e10]\n"
 	  //"set log cb\n"
 
 	  "set xlabel \"x\"\n"
@@ -111,17 +113,17 @@
 	  "unset border\n"
 	  "unset pm3d\n"
 	  "unset surface\n"
-	  "plot \"table.gp\" w l ls 2\n"
+	  "plot \"%s\" w l ls 2\n"
 	  "set pm3d\n"
 	  "set tics\n"
 	  "set border\n"
 #endif
 
-	  ,fname,fname2,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1)
-	  ,fname,fname,50./(get_xb(NX,0)-get_xb(0,0)),50./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NY/20)
+	 ,bufloc,fname,fname2,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1)
+	 ,fname,fname,50./(get_xb(NX,0)-get_xb(0,0)),50./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NY/20),bufloc
 #ifdef RADIATION
 	  ,get_xb(0,0),get_xb(NX,0),get_xb(0,1),get_xb(NY,1)
-	  ,fname,fname,50./(get_xb(NX,0)-get_xb(0,0)),50./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NY/20)
+	 ,fname,fname,50./(get_xb(NX,0)-get_xb(0,0)),50./(get_xb(NY,1)-get_xb(0,1)),(int)(NX/20),(int)(NY/20),bufloc
 #endif
 );
 	    

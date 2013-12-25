@@ -76,6 +76,8 @@ main(int argc, char **argv)
   int ifinit=1;
 #ifdef RESTART
   ifinit=fread_restartfile(RESTARTNUM,&tstart);
+  //exchange initial state
+  mpi_exchangedata();
   set_bc(tstart,1);
 #endif
 
@@ -85,6 +87,8 @@ main(int argc, char **argv)
       //or initialize new problem
       set_initial_profile();
       tstart=0.;
+      //exchange initial state
+      mpi_exchangedata();
       set_bc(tstart,1);
 #ifdef VECPOTGIVEN
       calc_BfromA();
@@ -95,8 +99,9 @@ main(int argc, char **argv)
 #endif
     }
 
-  //prepares files
-  
+ 
+
+  //prepares files  
   fprint_openfiles(folder);
   
   //copies initial primitives to pinit
