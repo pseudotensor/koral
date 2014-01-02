@@ -68,7 +68,7 @@ main(int argc, char **argv)
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
       //reading avg file
-      readret=fread_avgfile(ifile,pavg,&dt);
+      readret=fread_avgfile(ifile,folder,pavg,&dt);
       add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
       ttot+=dt;
     }

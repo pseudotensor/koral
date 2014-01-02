@@ -20,7 +20,7 @@ main(int argc, char **argv)
   #ifdef MPI
   sprintf(folder,"%s/%d",folder,PROCID);
   sprintf(bufer,"mkdir %s",folder);
-  system(bufer);
+  i=system(bufer);
   #endif
 
   doingavg=0;
