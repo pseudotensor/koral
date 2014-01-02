@@ -327,8 +327,8 @@ solve_the_problem(ldouble tstart, char* folder)
       //snapshots
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
-	  printf("> snap file no #%6d dumped\n"
-		 ,nfout1);
+	  printf("%d > snap file no #%6d dumped\n"
+		 ,PROCID,nfout1);
 	  
 	  //projects primitives onto ghost cells
 	  set_bc(t,0);
@@ -377,7 +377,7 @@ solve_the_problem(ldouble tstart, char* folder)
 #endif
 
       //performance to screen only every second
-      if(end_time-fprintf_time>1.) 
+      if(end_time-fprintf_time>1. && PROCID==0) 
 	{
 	  printf("%d : step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
 		 ,PROCID,nstep,t,dt,max_ws_ph,end_time-start_time,znps);

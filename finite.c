@@ -491,10 +491,14 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  dx0=get_size_x(ix,0);    
 	  dxm1=get_size_x(ix-1,0);    
-	  dxm2=get_size_x(ix-2,0);    
 	  dxp1=get_size_x(ix+1,0);    
-	  dxp2=get_size_x(ix+2,0);    
-
+	  
+	  if(INT_ORDER>1)
+	    {
+	      dxm2=get_size_x(ix-2,0);    
+	      dxp2=get_size_x(ix+2,0);    
+	    }
+	  
 	  for(i=0;i<NV;i++)
 	    {
 	      //resetting derivatives
@@ -503,10 +507,12 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	      //primitives - to be interpolated
 	      fd_p0[i]=get_u(p,i,ix,iy,iz);
 	      fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
-	      fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
 	      fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
-	      fd_pm2[i]=get_u(p,i,ix-2,iy,iz);
-
+	      if(INT_ORDER>1)
+		{
+		  fd_pm2[i]=get_u(p,i,ix-2,iy,iz);
+		  fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
+		}
 	    }
 	 		
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
@@ -553,17 +559,24 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  dx0=get_size_x(iy,1);    
 	  dxm1=get_size_x(iy-1,1);    
-	  dxm2=get_size_x(iy-2,1);    
-	  dxp1=get_size_x(iy+1,1);    
-	  dxp2=get_size_x(iy+2,1);    
+  	  dxp1=get_size_x(iy+1,1);    
+	
+	  if(INT_ORDER>1)
+	    {
+	      dxm2=get_size_x(iy-2,1);  
+	      dxp2=get_size_x(iy+2,1);
+	    }    
 		  
 	  for(i=0;i<NV;i++)
 	    {
 	      fd_p0[i]=get_u(p,i,ix,iy,iz);
 	      fd_pp1[i]=get_u(p,i,ix,iy+1,iz);
-	      fd_pp2[i]=get_u(p,i,ix,iy+2,iz);
 	      fd_pm1[i]=get_u(p,i,ix,iy-1,iz);
-	      fd_pm2[i]=get_u(p,i,ix,iy-2,iz);
+	      if(INT_ORDER>1)
+		{
+		  fd_pm2[i]=get_u(p,i,ix,iy-2,iz);
+		  fd_pp2[i]=get_u(p,i,ix,iy+2,iz);
+		}
 	    }
 
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
@@ -612,17 +625,23 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  dx0=get_size_x(iz,2);    
 	  dxm1=get_size_x(iz-1,2);    
-	  dxm2=get_size_x(iz-2,2);    
 	  dxp1=get_size_x(iz+1,2);    
-	  dxp2=get_size_x(iz+2,2);    
+	  if(INT_ORDER>1)
+	    {
+	      dxm2=get_size_x(iz-2,2);    
+	      dxp2=get_size_x(iz+2,2);    
+	    }
 		 
 	  for(i=0;i<NV;i++)
 	    {
 	      fd_p0[i]=get_u(p,i,ix,iy,iz);
 	      fd_pp1[i]=get_u(p,i,ix,iy,iz+1);
-	      fd_pp2[i]=get_u(p,i,ix,iy,iz+2);
 	      fd_pm1[i]=get_u(p,i,ix,iy,iz-1);
-	      fd_pm2[i]=get_u(p,i,ix,iy,iz-2);
+	      if(INT_ORDER>1)
+		{
+		  fd_pm2[i]=get_u(p,i,ix,iy,iz-2);
+		  fd_pp2[i]=get_u(p,i,ix,iy,iz+2);
+		}
 	    }
 
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
@@ -1505,7 +1524,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //all corners of the domain
+  //all corners of the domain cells
   
   Nloop_4=0;
   loop_4=(int **)malloc(sizeof(int*));

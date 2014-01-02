@@ -83,6 +83,7 @@
 #define COPY_XBC
 #define COPY_YBC
 #define COPY_ZBC
+#define SHUFFLELOOPS 0
 
 /************************************/
 //output
@@ -95,7 +96,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define DTOUT1 100.75
+#define DTOUT1 0.75
 #define RADOUTPUTINZAMO
 #define SILOOUTPUT 1
 

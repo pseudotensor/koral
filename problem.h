@@ -1230,7 +1230,7 @@
 
 #ifndef NG
 #if (INT_ORDER==1)
-#define NG 3 //number of ghost cells //verify!
+#define NG 2 //number of ghost cells
 #endif
 #if (INT_ORDER==2)
 #define NG 3
