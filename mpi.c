@@ -10,23 +10,34 @@ mpi_exchangedata()
   mpi_recvdata(reqs,&nreqs);
   MPI_Waitall(nreqs, reqs, MPI_STATUSES_IGNORE);
   mpi_savedata();
-
-  /*
-  int i;
-  printf("sent:\n");
-  for(i=0;i<10;i++)
-    printf("%e.",msgbufs[0][i]);
-  printf("\n");
-
-  
-  printf("recvd:\n");
-  for(i=0;i<10;i++)
-    printf("%e.",msgbufs[6][i]);
-  printf("\n");
-  */
-
   MPI_Barrier(MPI_COMM_WORLD);
 
+  /*
+  MPI_Status status;
+  int i,nleft=nreqs,flag,reqsflag[12];
+  for(i=0;i<nreqs;i++)
+    reqsflag[i]=0; //not received yet
+  i=0;
+  for(;;)
+    {
+      MPI_Test(reqs[i], &flag, &status);
+      if(flag)
+	{
+	  reqsflag[i]=1; //received;
+	  nleft--;
+	  mpi_savedata(i);
+	  if(nleft==0) break;
+	}
+
+      do //try another not-received yet
+	{
+	  i++;
+	  if(i>nreqs) i=0;
+	}
+      while(reqsflag[i]==1);
+    }
+  */
+  
   
 #endif
   return 0;
@@ -153,7 +164,7 @@ mpi_savedata()
 	for(j=0;j<NY;j++)
 	  for(k=NZ;k<NZ+NG;k++)
 	    for(iv=0;iv<NV;iv++)
-	      set_u(p,iv,i,j,k,msgbufs[1][i*NY*NG*NV + j*NG*NV + (k-NZ)*NV + iv]);
+	      set_u(p,iv,i,j,k,msgbufs[10][i*NY*NG*NV + j*NG*NV + (k-NZ)*NV + iv]);
     }
    //lower z
   if(mpi_isitBC(ZBCLO)==0)

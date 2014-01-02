@@ -75,8 +75,8 @@
 #endif
 
 //total resolution
-#define TNX 160
-#define TNY 100
+#define TNX 100
+#define TNY 60
 #define TNZ 1
 //# of tiles
 #define NTX 4
