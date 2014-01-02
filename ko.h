@@ -606,6 +606,7 @@ int flux_ct();
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
+#ifdef MPI
 void mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
 int mpi_tile2procid(int tilei, int tilej, int tilek);
 void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);
@@ -615,6 +616,7 @@ int mpi_recvdata(MPI_Request *reqs, int *nreqs);
 int mpi_exchangedata();
 int mpi_savedata();
 int mpi_isitBC(int BCtype);
+#endif
 
 #include "mnemonics.h"
 

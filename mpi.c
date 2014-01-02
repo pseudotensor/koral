@@ -3,6 +3,7 @@
 int 
 mpi_exchangedata()
 {
+#ifdef MPI
   MPI_Request reqs[12];
   int nreqs=0;
   mpi_senddata(reqs,&nreqs);
@@ -27,13 +28,14 @@ mpi_exchangedata()
   MPI_Barrier(MPI_COMM_WORLD);
 
   return 0;
+#endif
 }
 
+#ifdef MPI //thick bracket comments out recv and send so that non-mpi compiler can compile without MPI_Request
 int
 mpi_recvdata(MPI_Request *reqs, int *nreqs)
 {
   
-#ifdef MPI
   int i,j,k,iv;
   MPI_Status status;
   double temp;
@@ -89,7 +91,6 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
       if(verbose) printf("%d received MPI_MSG_ZHI from %d\n",PROCID,mpi_tile2procid(TI,TJ,TK-1));
     }
  
-#endif
 }
 
 
@@ -97,7 +98,6 @@ int
 mpi_savedata()
 {
   
-#ifdef MPI
   int i,j,k,iv;
   MPI_Status status;
   double temp;
@@ -164,7 +164,6 @@ mpi_savedata()
 	      set_u(p,iv,i,j,k,msgbufs[11][i*NY*NG*NV + j*NG*NV + (k+NG)*NV + iv]);
     }
  
-#endif
 }
 
 int
@@ -173,7 +172,7 @@ mpi_senddata(MPI_Request *reqs, int *nreqs)
   int i,j,k,iv;
   int verbose=0;
   ldouble temp;
-#ifdef MPI
+
   //lower x
   if(mpi_isitBC(XBCLO)==0)
     {
@@ -254,10 +253,10 @@ mpi_senddata(MPI_Request *reqs, int *nreqs)
 	       mpi_tile2procid(TI,TJ,TK+1), MPI_MSG_ZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
     }
-#endif
 
   return 0;
 }
+#endif
 
 //verify if there is real BC at all, if set_bc() needed
 int

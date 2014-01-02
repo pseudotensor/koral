@@ -70,8 +70,8 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define TNX 150
-#define TNY 100
+#define TNX 600
+#define TNY 400
 #define TNZ 1
 
 //# of tiles
@@ -95,7 +95,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define DTOUT1 .75
+#define DTOUT1 100.75
 #define RADOUTPUTINZAMO
 #define SILOOUTPUT 1
 
