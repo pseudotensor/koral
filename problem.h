@@ -72,7 +72,7 @@
 //69 INJDISK - magnetized gas damped from outer boundary
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 
-#define PROBLEM 59
+#define PROBLEM 69
 
 #if(PROBLEM==70)
 

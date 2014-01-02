@@ -6,7 +6,7 @@
 int 
 main(int argc, char **argv)
 {  
-  mpi_myinit();
+  mpi_myinit(argc,argv);
 
 #if(PROBLEM==60)
   //requires no rad. viscosity!

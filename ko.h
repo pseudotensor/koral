@@ -616,6 +616,9 @@ int mpi_recvdata(MPI_Request *reqs, int *nreqs);
 int mpi_exchangedata();
 int mpi_savedata();
 int mpi_isitBC(int BCtype);
+void mpi_myinit(int argc, char *argv[]);
+void mpi_myfinalize();
+
 #endif
 
 #include "mnemonics.h"

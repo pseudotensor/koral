@@ -27,8 +27,9 @@ mpi_exchangedata()
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  return 0;
+  
 #endif
+  return 0;
 }
 
 #ifdef MPI //thick bracket comments out recv and send so that non-mpi compiler can compile without MPI_Request

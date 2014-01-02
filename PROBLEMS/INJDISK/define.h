@@ -70,13 +70,18 @@
 #define ROUT 50.
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.575-MKS1R0))
+#define MINX (log(3.575-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
-#define NX 150
-#define NY 100
-#define NZ 1
 #endif
 
+//total resolution
+#define TNX 160
+#define TNY 100
+#define TNZ 1
+//# of tiles
+#define NTX 4
+#define NTY 2
+#define NTZ 1
 
 #define MINY (0.0025*Pi/2.)
 #define MAXY (Pi-0.0025*Pi/2.)
