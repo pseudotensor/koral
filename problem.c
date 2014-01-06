@@ -54,7 +54,7 @@ calc_bc(int ix,int iy,int iz,ldouble t,
 int
 set_initial_profile()
 {
-  printf("Initializing problem... ");
+  if(PROCID==0) printf("Initializing problem... ");
   int ix,iy,iz;
 
 
@@ -71,7 +71,7 @@ set_initial_profile()
 	    }
 	}
     }
-  printf("done!\n");
+  if(PROCID==0) printf("done!\n");
 
   return 0;
 }

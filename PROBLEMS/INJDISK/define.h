@@ -65,26 +65,37 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS1COORDS
-#define MKS1R0 0.
-#define ROUT 50.
+#define myMKS2COORDS
+#define ROUT 200.
+
 #ifdef myMKS1COORDS //modified Kerr-Shild
+#define MKS1R0 0.
 #define MYCOORDS MKS1COORDS
-#define MINX (log(3.575-MKS1R0))
+#define MINX (log(1.575-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
+#define MINY (0.0025*Pi/2.)
+#define MAXY (Pi-0.0025*Pi/2.)
+#endif
+
+#ifdef myMKS2COORDS //modified Kerr-Shild with more cells towards the eq.plane
+#define MKS2R0 0.
+#define MKS2H0 0.7
+#define MYCOORDS MKS2COORDS
+#define MINX (log(1.575-MKS2R0))
+#define MAXX (log(ROUT-MKS2R0))
+#define MINY (0.0025)
+#define MAXY (1.-0.0025)
 #endif
 
 //total resolution
-#define TNX 100
-#define TNY 60
+#define TNX 190
+#define TNY 120
 #define TNZ 1
 //# of tiles
-#define NTX 4
-#define NTY 2
+#define NTX 2
+#define NTY 1
 #define NTZ 1
 
-#define MINY (0.0025*Pi/2.)
-#define MAXY (Pi-0.0025*Pi/2.)
 
 //#define HALFY
 #ifdef HALFY

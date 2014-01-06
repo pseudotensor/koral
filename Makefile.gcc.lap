@@ -7,10 +7,10 @@ OBJS = mpi.o u2prad.o magn.o silo.o postproc.o fileop.o misc.o physics.o finite.
 
 all: ko ana
 
-ko: ko.o $(OBJS) Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
+ko: ko.o $(OBJS) Makefile ko.h problem.h mnemonics.h 
 	$(CC) $(CFLAGS) -o ko ko.o $(OBJS) $(LIBS)
 
-ana: ana.o $(OBJS)  Makefile ko.h problem.h mnemonics.h Makefile.gcc Makefile.icc
+ana: ana.o $(OBJS)  Makefile ko.h problem.h mnemonics.h 
 	$(CC) $(CFLAGS) -o ana ana.o $(OBJS) $(LIBS)
 
 clean:

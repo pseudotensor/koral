@@ -203,8 +203,8 @@ solve_the_problem(ldouble tstart, char* folder)
       //initial time mark
       my_clock_gettime(&temp_clock);
 
-      ldouble start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
-      ldouble imp_time1=0.,imp_time2=0.,tstepden;
+      start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
+      ldouble tstepden;
       
       //chooses the smalles timestep etc.
       mpi_synchtiming(&t);
@@ -291,14 +291,7 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
    
 
-      //time mark
-      my_clock_gettime(&temp_clock);    
-
-      ldouble end_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
-     
-      //performance
-      ldouble znps=TNX*TNY*TNZ/(end_time-start_time);
-
+    
       //average number of iterations in the implicit solver
       ldouble avimpit[5];
       
@@ -319,16 +312,22 @@ solve_the_problem(ldouble tstart, char* folder)
       impnums[5]=global_int_slot[GLOBALINTSLOT_NRADFIXUPS];
       impnums[6]=global_int_slot[GLOBALINTSLOT_NCRITFAILURES]; 
       
-
-
       //save to avg arrays
       save_avg(dt);
+
+      //time mark
+      my_clock_gettime(&temp_clock);    
+
+      end_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
+     
+      //performance
+      ldouble znps=TNX*TNY*TNZ/(end_time-start_time);
 
       //snapshots
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
-	  printf("%d > snap file no #%6d dumped\n"
-		 ,PROCID,nfout1);
+	  if(PROCID==0)
+	    printf("%d > snap file no #%6d dumped\n",PROCID,nfout1);
 	  
 	  //projects primitives onto ghost cells
 	  set_bc(t,0);
@@ -379,8 +378,8 @@ solve_the_problem(ldouble tstart, char* folder)
       //performance to screen only every second
       if(end_time-fprintf_time>1. && PROCID==0) 
 	{
-	  printf("%d : step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %10.4f) znps: %.0f "
-		 ,PROCID,nstep,t,dt,max_ws_ph,end_time-start_time,znps);
+	  printf("%d : step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %7.2f | %7.6f) znps: %.0f "
+		 ,PROCID,nstep,t,dt,max_ws_ph,end_time-start_time,2*maxmp_time,znps);
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],

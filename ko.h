@@ -94,6 +94,7 @@
 //global variables, some of them to be distributed in some way over processes
 ldouble global_time;
 ldouble global_tstepdenmax;
+ldouble start_time, end_time, mid1_time, mid2_time, maxmp_time;
 
 ldouble avgtime,dt;
 int global_int_slot[NGLOBALINTSLOT];

@@ -3,14 +3,20 @@
 int 
 mpi_exchangedata()
 {
+  //time mark
+  struct timespec temp_clock;
+  my_clock_gettime(&temp_clock);    
+  mid1_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
+
 #ifdef MPI
+  
   MPI_Request reqs[12];
   int nreqs=0;
   mpi_senddata(reqs,&nreqs);
   mpi_recvdata(reqs,&nreqs);
   MPI_Waitall(nreqs, reqs, MPI_STATUSES_IGNORE);
   mpi_savedata();
-  MPI_Barrier(MPI_COMM_WORLD);
+  //MPI_Barrier(MPI_COMM_WORLD);
 
   /*
   MPI_Status status;
@@ -40,6 +46,10 @@ mpi_exchangedata()
   
   
 #endif
+
+  my_clock_gettime(&temp_clock);    
+  mid2_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
+
   return 0;
 }
 
@@ -194,7 +204,6 @@ mpi_senddata(MPI_Request *reqs, int *nreqs)
 	    {
 	      for(iv=0;iv<NV;iv++)
 		msgbufs[0][(i)*NY*NZ*NV + j*NZ*NV + k*NV + iv]=get_u(p,iv,i,j,k);
-	      //printf("s %d > %d %d > %e %e\n",PROCID,i,j,msgbufs[0][(i)*NY*NZ*NV + j*NZ*NV + k*NV + 0],get_u(p,RHO,i,j,k));
 	    }
       MPI_Isend(msgbufs[0], NY*NZ*NV*NG, MPI_DOUBLE,
 		mpi_tile2procid(TI-1,TJ,TK), MPI_MSG_XLO, MPI_COMM_WORLD,&reqs[*nreqs]);
@@ -320,6 +329,11 @@ mpi_synchtiming(ldouble *time)
   MPI_Allreduce(&tstepdenmax, &global_tstepdenmax, 1, MPI_DOUBLE, MPI_MAX,
                 MPI_COMM_WORLD);
 
+  //maximal time taken by information exchange
+  ldouble localmp_time=mid2_time-mid1_time;
+  MPI_Allreduce(&localmp_time, &maxmp_time, 1, MPI_DOUBLE, MPI_MAX,
+                MPI_COMM_WORLD);   
+
   MPI_Bcast(&global_time, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   
   MPI_Barrier(MPI_COMM_WORLD);
@@ -339,16 +353,19 @@ mpi_myinit(int argc, char *argv[])
 
   if(NPROCS!=NTX*NTY*NTZ)
     {
-      printf("Wrong number of processes. Problem set up for: %d x %d x %d = %d processes.\n",NTX,NTY,NTZ,NTX*NTY*NTZ);
+      if(PROCID==0) printf("Wrong number of processes. Problem set up for: %d x %d x %d = %d processes.\n",NTX,NTY,NTZ,NTX*NTY*NTZ);
       exit(-1);
     }
   
   mpi_procid2tile(PROCID,&TI,&TJ,&TK);
   mpi_tileorigin(TI,TJ,TK,&TOI,&TOJ,&TOK);
 
-  printf("pid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
+  if(PROCID==0) printf("pid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
 	 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
 
+#else
+  PROCID=0;
+  NPROCS=1;
 #endif
 }
 
