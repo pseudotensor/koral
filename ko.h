@@ -88,6 +88,7 @@
 #endif
 
 #define ldouble double
+
 #define FTYPE ldouble
 #define gSIZE 20 //size of metric arrays = 16 + 1 (gdet) + 3 (dlgdet)
 
@@ -608,6 +609,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
 #ifdef MPI
+#define MPI_LDOUBLE MPI_DOUBLE
 void mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
 int mpi_tile2procid(int tilei, int tilej, int tilek);
 void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);

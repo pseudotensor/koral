@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 1
 
 /************************************/
@@ -118,6 +118,8 @@
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
+
+#define MPI_OUTPUTPERCORE
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
 #define AVGOUTPUT 1

@@ -659,22 +659,56 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 /*********************************************/
 /*********************************************/
 
-//TODO: save binary
 int
 fprint_restartfile(ldouble t, char* folder)
 {
-  char bufor[50],bufor2[50];
+  char bufor[250];
   sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
 
   #ifdef RESOUTPUT_ASCII
-  fout1=fopen(bufor,"w");
+
+  fprint_restartfile_ascii(t,folder);
+
   #else
-  fout1=fopen(bufor,"wb");
+
+  #ifdef MPI_OUTPUTPERCORE
+  
+  fprint_restartfile_percore(t,folder);
+
+  #else //MPI-IO
+
+  fprint_restartfile_mpi(t,folder);
+
   #endif
+  #endif
+  
+  return 0;
+}
+
+ int //parallel output to a single file
+fprint_restartfile_mpi(ldouble t, char* folder)
+{
+  #ifdef MPI
+  char bufor[250];
+  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+
+  MPI_File cFile;
+  MPI_Status status;
+
+  int rc = MPI_File_open( MPI_COMM_WORLD, bufor, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &cFile );
+  if (rc) {
+    printf( "Unable to open/create file %s\n", bufor );fflush(stdout); exit(-1);
+    }
+
+  //set the initial location
+  int reshead_length = 52; //fixed and hard-coded length of the header 
+  MPI_File_seek( cFile, reshead_length+PROCID*NX*NY*NZ*NV*(3*sizeof(int)+NV*sizeof(ldouble)), MPI_SEEK_SET ); 
   
   //header
   //## nout time problem NX NY NZ
-  fprintf(fout1,"## %d %d %e %d %d %d %d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
+  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
+  int reshead_length = 52; //(int)strlen(bufor); //characters for the header
+  if(PROCID==0) fprintf(fout1,"%s",bufor);
 
   /******************************************/  
   /** writing order is no longer fixed  ********/  
@@ -686,27 +720,48 @@ fprint_restartfile(ldouble t, char* folder)
     for(iy=0;iy<NY;iy++)
       for(ix=0;ix<NX;ix++)
 	{
-          #ifdef RESOUTPUT_ASCII
+	  //todo: global indices
+	  MPI_File_write( cFile, &ix, 1, MPI_INT, &status );
+	  MPI_File_write( cFile, &iy, 1, MPI_INT, &status );
+	  MPI_File_write( cFile, &iz, 1, MPI_INT, &status );
+	  MPI_File_write( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
+	}
 
-	  fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",ix,iy,iz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
-	  for(iv=0;iv<NV;iv++)
-	    {
-	      pp[iv]=get_u(p,iv,ix,iy,iz);
-	      fprintf(fout1,"%.12e ",pp[iv]);
-	    }
-	  fprintf(fout1,"\n");
+  MPI_File_close( &cFile );
 
-	  #else
+  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+  iv=system(bufor);
 
+  #endif
+  return 0;
+}
+
+int //serial binary output
+fprint_restartfile_percore(ldouble t, char* folder)
+{
+  char bufor[250];
+  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+
+  fout1=fopen(bufor,"wb"); 
+   
+  //header
+  //## nout time problem NX NY NZ
+  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
+  int reshead_length = 52; //(int)strlen(bufor); //characters for the header
+  fprintf(fout1,"%s",bufor);
+
+  int ix,iy,iz,iv;
+  ldouble pp[NV];
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
+	{
 	  fwrite(&ix,sizeof(int),1,fout1);
 	  fwrite(&iy,sizeof(int),1,fout1);
 	  fwrite(&iz,sizeof(int),1,fout1);
 	  fwrite(&get_u(p,0,ix,iy,iz),sizeof(ldouble),NV,fout1);
-
-	  #endif
 	}
 
-  //fflush(fout1);
   fclose(fout1);
 
   sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
@@ -714,6 +769,43 @@ fprint_restartfile(ldouble t, char* folder)
 
   return 0;
 }
+
+//serial writing in ascii per core 
+int
+fprint_restartfile_ascii(ldouble t, char* folder)
+{
+  char bufor[250];
+  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+
+  fout1=fopen(bufor,"w");
+  //header
+  //## nout time problem NX NY NZ
+  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
+  fprintf(fout1,"%s",bufor);
+
+  int ix,iy,iz,iv;
+  ldouble pp[NV];
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
+	{
+	  fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",ix,iy,iz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      pp[iv]=get_u(p,iv,ix,iy,iz);
+	      fprintf(fout1,"%.12e ",pp[iv]);
+	    }
+	  fprintf(fout1,"\n");
+	}
+
+  fclose(fout1);
+
+  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+  iv=system(bufor);
+
+  return 0;
+}
+
 							  
 /*********************************************/
 /*********************************************/

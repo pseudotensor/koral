@@ -121,8 +121,6 @@ mpi_savedata()
 {
   
   int i,j,k,iv;
-  MPI_Status status;
-  double temp;
   int verbose=0;
   //upper x
   if(mpi_isitBC(XBCHI)==0)
@@ -347,6 +345,17 @@ void
 mpi_myinit(int argc, char *argv[])
 {
 #ifdef MPI
+
+  //check for conflicts in declarations
+  #ifndef MPI_OUTPUTPERCORE
+  #ifdef RESOUTPUT_ASCII
+  my_err("RESOUTPUT_ASCII requires MPI_OUTPUTPERCORE\n");exit(-1);
+  #endif
+  #ifdef AVGOUTPUT_ASCII
+  my_err("RESOUTPUT_ASCII requires MPI_OUTPUTPERCORE\n");exit(-1);
+  #endif
+  #endif
+
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &PROCID);
   MPI_Comm_size(MPI_COMM_WORLD, &NPROCS);

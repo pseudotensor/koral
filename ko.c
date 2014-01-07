@@ -18,9 +18,11 @@ main(int argc, char **argv)
   int i; char folder[100],bufer[100];
   sprintf(folder,"%s","dumps");
   #ifdef MPI
+  #ifdef MPI_OUTPUTPERCORE
   sprintf(folder,"%s/%d",folder,PROCID);
   sprintf(bufer,"mkdir %s",folder);
   i=system(bufer);
+  #endif
   #endif
 
   doingavg=0;
