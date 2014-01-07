@@ -715,15 +715,16 @@ fprint_restartfile_mpi(ldouble t, char* folder)
   /******************************************/  
  
   int ix,iy,iz,iv;
+  int gix,giy,giz;
   ldouble pp[NV];
   for(iz=0;iz<NZ;iz++)
     for(iy=0;iy<NY;iy++)
       for(ix=0;ix<NX;ix++)
 	{
-	  //todo: global indices
-	  MPI_File_write( cFile, &ix, 1, MPI_INT, &status );
-	  MPI_File_write( cFile, &iy, 1, MPI_INT, &status );
-	  MPI_File_write( cFile, &iz, 1, MPI_INT, &status );
+	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  MPI_File_write( cFile, &gix, 1, MPI_INT, &status );
+	  MPI_File_write( cFile, &giy, 1, MPI_INT, &status );
+	  MPI_File_write( cFile, &giz, 1, MPI_INT, &status );
 	  MPI_File_write( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
 	}
 
@@ -751,14 +752,16 @@ fprint_restartfile_percore(ldouble t, char* folder)
   fprintf(fout1,"%s",bufor);
 
   int ix,iy,iz,iv;
+  int gix,giy,giz;
   ldouble pp[NV];
   for(iz=0;iz<NZ;iz++)
     for(iy=0;iy<NY;iy++)
       for(ix=0;ix<NX;ix++)
 	{
-	  fwrite(&ix,sizeof(int),1,fout1);
-	  fwrite(&iy,sizeof(int),1,fout1);
-	  fwrite(&iz,sizeof(int),1,fout1);
+	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  fwrite(&gix,sizeof(int),1,fout1);
+	  fwrite(&giy,sizeof(int),1,fout1);
+	  fwrite(&giz,sizeof(int),1,fout1);
 	  fwrite(&get_u(p,0,ix,iy,iz),sizeof(ldouble),NV,fout1);
 	}
 
@@ -784,12 +787,14 @@ fprint_restartfile_ascii(ldouble t, char* folder)
   fprintf(fout1,"%s",bufor);
 
   int ix,iy,iz,iv;
+  int gix,giy,giz;
   ldouble pp[NV];
   for(iz=0;iz<NZ;iz++)
     for(iy=0;iy<NY;iy++)
       for(ix=0;ix<NX;ix++)
 	{
-	  fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",ix,iy,iz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
+	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",gix,giy,giz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
 	  for(iv=0;iv<NV;iv++)
 	    {
 	      pp[iv]=get_u(p,iv,ix,iy,iz);
@@ -844,7 +849,7 @@ fread_restartfile(int nout1, char *folder, ldouble *t)
   nfout1=intpar[0]+1; //global file no.
   nfout2=intpar[1]; //global file no. for avg
 
-  int ix,iy,iz,iv,i,ic;
+  int ix,iy,iz,iv,i,ic,gix,giy,giz;
 
   //reading primitives from file
   struct geometry geom;
@@ -855,19 +860,20 @@ fread_restartfile(int nout1, char *folder, ldouble *t)
     {
       #ifdef RESOUTPUT_ASCII
 
-      ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&ix,&iy,&iz);
+      ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&gix,&giy,&giz);
       for(i=0;i<NV;i++)
       ret=fscanf(fdump,"%lf ",&pp[i]);
 
       #else
 
-      fread(&ix,sizeof(int),1,fdump);
-      fread(&iy,sizeof(int),1,fdump);
-      fread(&iz,sizeof(int),1,fdump);
+      fread(&gix,sizeof(int),1,fdump);
+      fread(&giy,sizeof(int),1,fdump);
+      fread(&giz,sizeof(int),1,fdump);
       fread(pp,sizeof(ldouble),NV,fdump);
 
       #endif
 
+      mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
       fill_geometry(ix,iy,iz,&geom);
       p2u(pp,uu,&geom);
 

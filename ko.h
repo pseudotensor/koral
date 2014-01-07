@@ -324,6 +324,9 @@ int save_avg(ldouble dt);
 int fprint_avgfile(ldouble t, char* folder);
 int fread_avgfile(int nout1, char*,ldouble *pavg, ldouble *dt);
 int fprint_restartfile(ldouble t, char* folder);
+int fprint_restartfile_ascii(ldouble t, char* folder);
+int fprint_restartfile_percore(ldouble t, char* folder);
+int fprint_restartfile_mpi(ldouble t, char* folder);
 int fprint_simplefile(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_simplecart(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_simplesph(ldouble t, int nfile, char* folder, char* prefix);
@@ -610,7 +613,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 //mpi.c
 #ifdef MPI
 #define MPI_LDOUBLE MPI_DOUBLE
-void mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
+void
+mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
 int mpi_tile2procid(int tilei, int tilej, int tilek);
 void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);
 void mpi_synchtiming(ldouble*);
@@ -621,6 +625,11 @@ int mpi_savedata();
 int mpi_isitBC(int BCtype);
 void mpi_myinit(int argc, char *argv[]);
 void mpi_myfinalize();
+void
+mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz);
+void
+mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz);
+
 
 #endif
 

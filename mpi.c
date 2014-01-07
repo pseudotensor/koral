@@ -395,6 +395,43 @@ mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok)
 }
 
 void
+mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz)
+{
+  #ifdef MPI
+  int tilei,tilej,tilek;
+  int toi,toj,tok;
+  mpi_procid2tile(PROCID,&tilei,&tilej,&tilek);
+  mpi_tileorigin(tilei,tilej,tilek,&toi,&toj,&tok);
+  *lix = gix - toi;
+  *liy = giy - toj;
+  *liz = giz - tok;
+  #else
+  *lix = gix;
+  *liy = giy;
+  *liz = giz;
+  #endif
+}
+
+
+void
+mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz)
+{
+  #ifdef MPI
+  int tilei,tilej,tilek;
+  int toi,toj,tok;
+  mpi_procid2tile(PROCID,&tilei,&tilej,&tilek);
+  mpi_tileorigin(tilei,tilej,tilek,&toi,&toj,&tok);
+  *gix = lix + toi;
+  *giy = liy + toj;
+  *giz = liz + tok;
+  #else
+  *gix = lix;
+  *giy = liy;
+  *giz = liz;
+  #endif
+}
+
+void
 mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek)
 {
   *tilek = floor(procid / (NTX * NTY));
