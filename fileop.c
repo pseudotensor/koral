@@ -46,7 +46,12 @@ fprint_avgfile(ldouble t, char* folder)
 {
   char bufor[50],bufor2[50];
   sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
+
+  #ifdef AVGOUTPUT_ASCII
   fout1=fopen(bufor,"w");
+  #else
+  fout1=fopen(bufor,"wb");
+  #endif
   
   //header
   //## navg time1 time2 dt 
@@ -63,6 +68,7 @@ fprint_avgfile(ldouble t, char* folder)
 	{
 	  for(ix=0;ix<NX;ix++)
 	    {
+	      #ifdef AVGOUTPUT_ASCII
 	      fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",ix,iy,iz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
 
 	      for(iv=0;iv<NV+NAVGVARS;iv++)
@@ -70,11 +76,20 @@ fprint_avgfile(ldouble t, char* folder)
 		  fprintf(fout1,"%.6e ",get_uavg(pavg,iv,ix,iy,iz));
 		}	 
 	      fprintf(fout1,"\n");
+
+              #else
+
+	      fwrite(&ix,sizeof(int),1,fout1);
+	      fwrite(&iy,sizeof(int),1,fout1);
+	      fwrite(&iz,sizeof(int),1,fout1);
+	      fwrite(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fout1);
+
+              #endif
 	    }
 	}
     }
 
-  fflush(fout1);
+  //fflush(fout1);
   fclose(fout1);
 
   return 0;
@@ -94,7 +109,13 @@ fread_avgfile(int nout1, char *folder, ldouble *pavg, ldouble *dt)
   int i,ret;
   char fname[40];
   sprintf(fname,"%s/avg%04d.dat",folder,nout1);
+
+  #ifdef AVGOUTPUT_ASCII
   FILE *fdump=fopen(fname,"r");
+  #else
+  FILE *fdump=fopen(fname,"rb");
+  #endif
+  
 
   //reading parameters, mostly time
   int intpar[5];
@@ -108,17 +129,22 @@ fread_avgfile(int nout1, char *folder, ldouble *pavg, ldouble *dt)
   int ix,iy,iz,iv,ic;
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
+      #ifdef AVGOUTPUT_ASCII
+     
       ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&ix,&iy,&iz);
-									  
-      /**************************/  
-      /**************************/  
-      /**************************/  
-	      
-      //reading primitives from file
       for(i=0;i<NV+NAVGVARS;i++)
 	{
 	  ret=fscanf(fdump,"%lf ",&get_uavg(pavg,i,ix,iy,iz));
 	}
+
+      #else
+
+      fread(&ix,sizeof(int),1,fdump);
+      fread(&iy,sizeof(int),1,fdump);
+      fread(&iz,sizeof(int),1,fdump);
+      fread(&get_uavg(pavg,i,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
+
+      #endif
     }
 
   fclose(fdump);
