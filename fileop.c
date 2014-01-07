@@ -44,7 +44,6 @@ save_avg(ldouble dt)
 int
 fprint_avgfile(ldouble t, char* folder)
 {
-  //TODO
   char bufor[50],bufor2[50];
   sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
   fout1=fopen(bufor,"w");
@@ -64,7 +63,8 @@ fprint_avgfile(ldouble t, char* folder)
 	{
 	  for(ix=0;ix<NX;ix++)
 	    {
-	      fprintf(fout1,"%d %d %d ",ix,iy,iz);
+	      fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",ix,iy,iz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
+
 	      for(iv=0;iv<NV+NAVGVARS;iv++)
 		{
 		  fprintf(fout1,"%.6e ",get_uavg(pavg,iv,ix,iy,iz));
@@ -105,25 +105,19 @@ fread_avgfile(int nout1, char *folder, ldouble *pavg, ldouble *dt)
 
   *dt=ldpar[2];
 
-  int ix,iy,iz,iv;
-  for(iz=0;iz<NZ;iz++)
+  int ix,iy,iz,iv,ic;
+  for(ic=0;ic<NX*NY*NZ;ic++)
     {
-      for(iy=0;iy<NY;iy++)
-	{
-	  for(ix=0;ix<NX;ix++)
-	    {
-	      ret=fscanf(fdump,"%*f %*f %*f ");
+      ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&ix,&iy,&iz);
 									  
-	      /**************************/  
-	      /**************************/  
-	      /**************************/  
+      /**************************/  
+      /**************************/  
+      /**************************/  
 	      
-	      //reading primitives from file
-	      for(i=0;i<NV+NAVGVARS;i++)
-		{
-		  ret=fscanf(fdump,"%lf ",&get_uavg(pavg,i,ix,iy,iz));
-		}
-	    }
+      //reading primitives from file
+      for(i=0;i<NV+NAVGVARS;i++)
+	{
+	  ret=fscanf(fdump,"%lf ",&get_uavg(pavg,i,ix,iy,iz));
 	}
     }
 
@@ -651,31 +645,25 @@ fprint_restartfile(ldouble t, char* folder)
   //## nout time problem NX NY NZ
   fprintf(fout1,"## %d %d %e %d %d %d %d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
 
-  /***********************************/  
-  /** writing order is fixed  ********/  
-  /***********************************/  
+  /******************************************/  
+  /** writing order is no longer fixed  ********/  
+  /******************************************/  
  
   int ix,iy,iz,iv;
   ldouble pp[NV];
   for(iz=0;iz<NZ;iz++)
-    {
-      for(iy=0;iy<NY;iy++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
 	{
-	  for(ix=0;ix<NX;ix++)
-	    {
-	      fprintf(fout1,"%e %e %e ",get_x(ix,0),get_x(iy,0),get_x(iz,0));
+	  fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",ix,iy,iz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
 	      
-	      for(iv=0;iv<NV;iv++)
-		{
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
-		}	 
-	     
-	      for(iv=0;iv<NV;iv++)
-		fprintf(fout1,"%.20e ",pp[iv]);
-	      fprintf(fout1,"\n");
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      pp[iv]=get_u(p,iv,ix,iy,iz);
+	      fprintf(fout1,"%.12e ",pp[iv]);
 	    }
+	  fprintf(fout1,"\n");
 	}
-    }
 
   fflush(fout1);
   fclose(fout1);
@@ -696,10 +684,10 @@ fprint_restartfile(ldouble t, char* folder)
 /*********************************************/
 /*********************************************/
 int 
-  fread_restartfile(int nout1, char *folder, ldouble *t)
+fread_restartfile(int nout1, char *folder, ldouble *t)
 {
   //opening dump file
-  int i,ret;
+  int ret;
   char fname[40];
   if(nout1>=0)
     sprintf(fname,"%s/res%04d.dat",folder,nout1);
@@ -719,43 +707,31 @@ int
   nfout1=intpar[0]+1; //global file no.
   nfout2=intpar[1]; //global file no. for avg
 
-  int ix,iy,iz,iv;
-  //reading conserved
+  int ix,iy,iz,iv,i,ic;
+
+  //reading primitives from file
   struct geometry geom;
   ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;
   char c;
-  for(iz=0;iz<NZ;iz++)
+  for(ic=0;ic<NX*NY*NZ;ic++)
     {
-      for(iy=0;iy<NY;iy++)
+      ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&ix,&iy,&iz);
+
+      fill_geometry(ix,iy,iz,&geom);
+
+      for(i=0;i<NV;i++)
 	{
-	  for(ix=0;ix<NX;ix++)
-	    {
-	      ret=fscanf(fdump,"%*f %*f %*f ");
-									  
-	      fill_geometry(ix,iy,iz,&geom);
+	  ret=fscanf(fdump,"%lf ",&pp[i]);
+	}
 
+      p2u(pp,uu,&geom);
 
-	      /**************************/  
-	      /**************************/  
-	      /**************************/  
-	      
-	      //reading primitives from file
-	      for(i=0;i<NV;i++)
-		{
-		  ret=fscanf(fdump,"%lf ",&pp[i]);
-		}
-	      
-	      p2u(pp,uu,&geom);
-
-	      //saving primitives
-	      for(iv=0;iv<NV;iv++)    
-		{
-		  set_u(u,iv,ix,iy,iz,uu[iv]);
-		  set_u(p,iv,ix,iy,iz,pp[iv]);
-		}
-	    								  
-	    }
+      //saving primitives
+      for(iv=0;iv<NV;iv++)    
+	{
+	  set_u(u,iv,ix,iy,iz,uu[iv]);
+	  set_u(p,iv,ix,iy,iz,pp[iv]);
 	}
     }
 

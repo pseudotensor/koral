@@ -1492,6 +1492,16 @@
 /*********************/
 /*********************/
 /*********************/
+
+#ifndef MPI
+#undef NTX
+#undef NTY
+#undef NTZ
+#define NTX 1 //number of tiles in X
+#define NTY 1
+#define NTZ 1
+#endif
+
 #ifndef NTX
 #define NTX 1 //number of tiles in X
 #endif

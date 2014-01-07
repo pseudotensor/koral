@@ -6,8 +6,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 1332
+#define RESTART
+#define RESTARTNUM 1
 
 /************************************/
 //radiation choices
@@ -88,11 +88,11 @@
 #endif
 
 //total resolution
-#define TNX 190
-#define TNY 120
+#define TNX 150
+#define TNY 30
 #define TNZ 1
-//# of tiles
-#define NTX 2
+//number of tiles
+#define NTX 1 
 #define NTY 1
 #define NTZ 1
 
@@ -123,7 +123,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define DTOUT2 250.
 //#define PRINTXGC_RIGHT
 
