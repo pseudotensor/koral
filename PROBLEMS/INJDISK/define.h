@@ -92,7 +92,7 @@
 #define TNY 30
 #define TNZ 1
 //number of tiles
-#define NTX 1 
+#define NTX 2
 #define NTY 1
 #define NTZ 1
 
@@ -119,7 +119,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 
-#define MPI_OUTPUTPERCORE
+//#define OUTPUTPERCORE
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
 #define AVGOUTPUT 1

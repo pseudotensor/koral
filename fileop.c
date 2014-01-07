@@ -671,13 +671,19 @@ fprint_restartfile(ldouble t, char* folder)
 
   #else
 
-  #ifdef MPI_OUTPUTPERCORE
+  #ifdef OUTPUTPERCORE
   
   fprint_restartfile_percore(t,folder);
 
   #else //MPI-IO
 
+  #ifdef MPI
   fprint_restartfile_mpi(t,folder);
+  #else
+  if(PROCID==0)
+      printf("MPI-I/O requires MPI\n"); 
+  exit(-1);
+  #endif
 
   #endif
   #endif
@@ -702,13 +708,19 @@ fprint_restartfile_mpi(ldouble t, char* folder)
 
   //set the initial location
   int reshead_length = 52; //fixed and hard-coded length of the header 
-  MPI_File_seek( cFile, reshead_length+PROCID*NX*NY*NZ*NV*(3*sizeof(int)+NV*sizeof(ldouble)), MPI_SEEK_SET ); 
+  int pos;
+  if(PROCID==0) pos=0;
+  else
+    pos=reshead_length+PROCID*NX*NY*NZ*(3*sizeof(int)+NV*sizeof(ldouble));
+  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
   //header
   //## nout time problem NX NY NZ
-  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
-  int reshead_length = 52; //(int)strlen(bufor); //characters for the header
-  if(PROCID==0) fprintf(fout1,"%s",bufor);
+  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+  if(PROCID==0) 
+    {
+      MPI_File_write(cFile, bufor, reshead_length, MPI_CHAR, &status);
+    }
 
   /******************************************/  
   /** writing order is no longer fixed  ********/  
@@ -747,7 +759,7 @@ fprint_restartfile_percore(ldouble t, char* folder)
    
   //header
   //## nout time problem NX NY NZ
-  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
+  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
   int reshead_length = 52; //(int)strlen(bufor); //characters for the header
   fprintf(fout1,"%s",bufor);
 
@@ -783,7 +795,7 @@ fprint_restartfile_ascii(ldouble t, char* folder)
   fout1=fopen(bufor,"w");
   //header
   //## nout time problem NX NY NZ
-  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,NX,NY,NZ);
+  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
   fprintf(fout1,"%s",bufor);
 
   int ix,iy,iz,iv;
