@@ -639,7 +639,12 @@ fprint_restartfile(ldouble t, char* folder)
 {
   char bufor[50],bufor2[50];
   sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+
+  #ifdef RESOUTPUT_ASCII
   fout1=fopen(bufor,"w");
+  #else
+  fout1=fopen(bufor,"wb");
+  #endif
   
   //header
   //## nout time problem NX NY NZ
@@ -655,17 +660,27 @@ fprint_restartfile(ldouble t, char* folder)
     for(iy=0;iy<NY;iy++)
       for(ix=0;ix<NX;ix++)
 	{
+          #ifdef RESOUTPUT_ASCII
+
 	  fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",ix,iy,iz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
-	      
 	  for(iv=0;iv<NV;iv++)
 	    {
 	      pp[iv]=get_u(p,iv,ix,iy,iz);
 	      fprintf(fout1,"%.12e ",pp[iv]);
 	    }
 	  fprintf(fout1,"\n");
+
+	  #else
+
+	  fwrite(&ix,sizeof(int),1,fout1);
+	  fwrite(&iy,sizeof(int),1,fout1);
+	  fwrite(&iz,sizeof(int),1,fout1);
+	  fwrite(&get_u(p,0,ix,iy,iz),sizeof(ldouble),NV,fout1);
+
+	  #endif
 	}
 
-  fflush(fout1);
+  //fflush(fout1);
   fclose(fout1);
 
   sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
@@ -694,7 +709,11 @@ fread_restartfile(int nout1, char *folder, ldouble *t)
   else
     sprintf(fname,"%s/reslast.dat",folder);
 
+  #ifdef RESOUTPUT_ASCII
   FILE *fdump=fopen(fname,"r");
+  #else
+  FILE *fdump=fopen(fname,"rb");
+  #endif
 
   if(fdump==NULL) return 1; //request start from scratch
 
@@ -716,15 +735,22 @@ fread_restartfile(int nout1, char *folder, ldouble *t)
   char c;
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
+      #ifdef RESOUTPUT_ASCII
+
       ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&ix,&iy,&iz);
+      for(i=0;i<NV;i++)
+      ret=fscanf(fdump,"%lf ",&pp[i]);
+
+      #else
+
+      fread(&ix,sizeof(int),1,fdump);
+      fread(&iy,sizeof(int),1,fdump);
+      fread(&iz,sizeof(int),1,fdump);
+      fread(pp,sizeof(ldouble),NV,fdump);
+
+      #endif
 
       fill_geometry(ix,iy,iz,&geom);
-
-      for(i=0;i<NV;i++)
-	{
-	  ret=fscanf(fdump,"%lf ",&pp[i]);
-	}
-
       p2u(pp,uu,&geom);
 
       //saving primitives
