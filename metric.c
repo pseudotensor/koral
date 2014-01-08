@@ -3123,7 +3123,7 @@ calc_metric()
 
     }
 
-  printf("done!\n");
+  if(PROCID==0) printf("done!\n");
   
   return 0;
 }

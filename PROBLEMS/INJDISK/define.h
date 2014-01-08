@@ -120,6 +120,7 @@
 #define NOUTSTOP 5000
 
 //#define OUTPUTPERCORE
+//#define RESOUTPUT_ASCII
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
 #define AVGOUTPUT 1

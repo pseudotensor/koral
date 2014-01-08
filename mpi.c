@@ -15,36 +15,7 @@ mpi_exchangedata()
   mpi_senddata(reqs,&nreqs);
   mpi_recvdata(reqs,&nreqs);
   MPI_Waitall(nreqs, reqs, MPI_STATUSES_IGNORE);
-  mpi_savedata();
-  //MPI_Barrier(MPI_COMM_WORLD);
-
-  /*
-  MPI_Status status;
-  int i,nleft=nreqs,flag,reqsflag[12];
-  for(i=0;i<nreqs;i++)
-    reqsflag[i]=0; //not received yet
-  i=0;
-  for(;;)
-    {
-      MPI_Test(reqs[i], &flag, &status);
-      if(flag)
-	{
-	  reqsflag[i]=1; //received;
-	  nleft--;
-	  mpi_savedata(i);
-	  if(nleft==0) break;
-	}
-
-      do //try another not-received yet
-	{
-	  i++;
-	  if(i>nreqs) i=0;
-	}
-      while(reqsflag[i]==1);
-    }
-  */
-  
-  
+  mpi_savedata();  
 #endif
 
   my_clock_gettime(&temp_clock);    
@@ -347,7 +318,7 @@ mpi_myinit(int argc, char *argv[])
 #ifdef MPI
 
   //check for conflicts in declarations
-  #ifndef MPI_OUTPUTPERCORE
+  #ifndef OUTPUTPERCORE
   #ifdef RESOUTPUT_ASCII
   my_err("RESOUTPUT_ASCII requires MPI_OUTPUTPERCORE\n");exit(-1);
   #endif
