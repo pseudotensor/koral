@@ -903,12 +903,20 @@ fread_restartfile_ascii(int nout1, char *folder, ldouble *t)
   if(nout1>=0)
     {
       sprintf(fname,"%s/res%04d.dat",folder,nout1);
+      #ifdef MPI
       sprintf(fnamehead,"%s/../0/res%04d.head",folder,nout1);
+      #else
+      sprintf(fnamehead,"%s/res%04d.head",folder,nout1);
+      #endif
     }
   else
     {
       sprintf(fname,"%s/reslast.dat",folder);
-      sprintf(fnamehead,"%s/../0/reslast.head",folder);
+      #ifdef MPI
+      sprintf(fnamehead,"%s/../0/reslast.head",folder,nout1);
+      #else
+      sprintf(fnamehead,"%s/reslast.head",folder,nout1);
+      #endif
     } 
   
   //header
@@ -966,12 +974,20 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   if(nout1>=0)
     {
       sprintf(fname,"%s/res%04d.dat",folder,nout1);
+      #ifdef MPI
       sprintf(fnamehead,"%s/../0/res%04d.head",folder,nout1);
+      #else
+      sprintf(fnamehead,"%s/res%04d.head",folder,nout1);
+      #endif
     }
   else
     {
       sprintf(fname,"%s/reslast.dat",folder);
+      #ifdef MPI
       sprintf(fnamehead,"%s/../0/reslast.head",folder);
+      #else
+      sprintf(fnamehead,"%s/../0/reslast.head",folder);
+      #endif
     }
 
   FILE *fdump;
@@ -979,6 +995,8 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   /***********/
   //header file
   fdump=fopen(fnamehead,"r");
+
+  printf("%s\n",fnamehead);
   if(fdump==NULL) return 1; //request start from scratch
   //reading parameters, mostly time
   int intpar[6];
