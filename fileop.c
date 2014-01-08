@@ -759,15 +759,21 @@ int //serial binary output
 fprint_restartfile_bin(ldouble t, char* folder)
 {
   char bufor[250];
-  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
-
-  fout1=fopen(bufor,"wb"); 
-   
+  
   //header
-  //## nout time problem NX NY NZ
-  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
-  int reshead_length = 52; //(int)strlen(bufor); //characters for the header
-  fprintf(fout1,"%s",bufor);
+  if(PROCID==0)
+    {
+       sprintf(bufor,"%s/res%04d.head",folder,nfout1);
+       fout1=fopen(bufor,"w"); 
+       //## nout time problem NX NY NZ
+       sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+       fprintf(fout1,"%s",bufor);
+       fclose(fout1);
+    }
+
+  //body
+  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+  fout1=fopen(bufor,"wb"); 
 
   int ix,iy,iz,iv;
   int gix,giy,giz;
@@ -788,6 +794,12 @@ fprint_restartfile_bin(ldouble t, char* folder)
   sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
   iv=system(bufor);
 
+  if(PROCID==0)
+    {
+      sprintf(bufor,"cp %s/res%04d.head %s/reslast.head",folder,nfout1,folder);
+      iv=system(bufor);    
+    }
+
   return 0;
 }
 
@@ -796,13 +808,21 @@ int
 fprint_restartfile_ascii(ldouble t, char* folder)
 {
   char bufor[250];
-  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
 
-  fout1=fopen(bufor,"w");
   //header
-  //## nout time problem NX NY NZ
-  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
-  fprintf(fout1,"%s",bufor);
+  if(PROCID==0)
+    {
+      sprintf(bufor,"%s/res%04d.head",folder,nfout1);
+      fout1=fopen(bufor,"w");
+
+      //## nout time problem NX NY NZ
+      sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+      fprintf(fout1,"%s",bufor);
+      fclose(fout1);
+    }
+
+  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
+  fout1=fopen(bufor,"w");
 
   int ix,iy,iz,iv;
   int gix,giy,giz;
@@ -879,13 +899,20 @@ fread_restartfile_ascii(int nout1, char *folder, ldouble *t)
 {
   //opening dump file
   int ret;
-  char fname[40];
+  char fname[40],fnamehead[40];
   if(nout1>=0)
-    sprintf(fname,"%s/res%04d.dat",folder,nout1);
+    {
+      sprintf(fname,"%s/res%04d.dat",folder,nout1);
+      sprintf(fnamehead,"%s/../0/res%04d.head",folder,nout1);
+    }
   else
-    sprintf(fname,"%s/reslast.dat",folder);
-
-  FILE *fdump=fopen(fname,"r");
+    {
+      sprintf(fname,"%s/reslast.dat",folder);
+      sprintf(fnamehead,"%s/../0/reslast.head",folder);
+    } 
+  
+  //header
+  FILE *fdump=fopen(fnamehead,"r");
 
   if(fdump==NULL) return 1; //request start from scratch
 
@@ -897,6 +924,10 @@ fread_restartfile_ascii(int nout1, char *folder, ldouble *t)
 
   nfout1=intpar[0]+1; //global file no.
   nfout2=intpar[1]; //global file no. for avg
+  fclose(fdump);
+
+  //body
+  fdump=fopen(fname,"r");
 
   int ix,iy,iz,iv,i,ic,gix,giy,giz;
 
@@ -930,30 +961,38 @@ fread_restartfile_ascii(int nout1, char *folder, ldouble *t)
 int 
 fread_restartfile_bin(int nout1, char *folder, ldouble *t)
 {
-  //opening dump file
-  int ret;
-  char fname[40];
+  int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
+  char fname[40],fnamehead[40];
   if(nout1>=0)
-    sprintf(fname,"%s/res%04d.dat",folder,nout1);
+    {
+      sprintf(fname,"%s/res%04d.dat",folder,nout1);
+      sprintf(fnamehead,"%s/../0/res%04d.head",folder,nout1);
+    }
   else
-    sprintf(fname,"%s/reslast.dat",folder);
+    {
+      sprintf(fname,"%s/reslast.dat",folder);
+      sprintf(fnamehead,"%s/../0/reslast.head",folder);
+    }
 
-  FILE *fdump=fopen(fname,"rb");
+  FILE *fdump;
 
+  /***********/
+  //header file
+  fdump=fopen(fnamehead,"r");
   if(fdump==NULL) return 1; //request start from scratch
-
   //reading parameters, mostly time
   int intpar[6];
   ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
   printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
 	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
-
   nfout1=intpar[0]+1; //global file no.
   nfout2=intpar[1]; //global file no. for avg
+  fclose(fdump);
 
-  int ix,iy,iz,iv,i,ic,gix,giy,giz;
-
-  //reading primitives from file
+  /***********/
+  //body file
+  fdump=fopen(fname,"rb");
+ 
   struct geometry geom;
   ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;

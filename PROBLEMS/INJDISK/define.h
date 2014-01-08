@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTNUM 1
 
 /************************************/
@@ -119,8 +119,8 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 
-//#define OUTPUTPERCORE
-//#define RESOUTPUT_ASCII
+#define OUTPUTPERCORE
+//#define RESOUTPUT_ASCII //by default binary
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
 #define AVGOUTPUT 1

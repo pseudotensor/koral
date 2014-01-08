@@ -1,5 +1,5 @@
 CC=mpicc 
-CFLAGS=-O3 -fopenmp -L/usr/local/lib -I/usr/local/include
+CFLAGS=-O3 -L/usr/local/lib -I/usr/local/include -DMPI
 LIBS=-lm -lgsl -lgslcblas -lsilo
 RM=/bin/rm
 
@@ -8,13 +8,13 @@ OBJS = mpi.o u2prad.o magn.o silo.o postproc.o fileop.o misc.o physics.o finite.
 all: ko ana avg
 
 ko: ko.o $(OBJS) Makefile ko.h problem.h mnemonics.h 
-	$(CC) $(CFLAGS) -DMPI -o ko ko.o $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o ko ko.o $(OBJS) $(LIBS)
 
 ana: ana.o $(OBJS) Makefile ko.h problem.h mnemonics.h 
-	$(CC) $(CFLAGS) -fopenmp -o ana ana.o $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o ana ana.o $(OBJS) $(LIBS)
 
 avg: avg.o $(OBJS)  Makefile ko.h problem.h mnemonics.h 
-	$(CC) $(CFLAGS) -fopenmp -o avg avg.o $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o avg avg.o $(OBJS) $(LIBS)
 
 clean:
 	$(RM) -f ko ana avg *~ *.o *.oo
