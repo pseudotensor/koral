@@ -121,7 +121,7 @@ fread_avgfile_old(int nout1, char *folder, ldouble *pavg, ldouble *dt)
   int intpar[5];
   ldouble ldpar[5];
   ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
-  printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
+  if(PROCID==0) printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
 	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
 
   *dt=ldpar[2];
@@ -996,7 +996,6 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   //header file
   fdump=fopen(fnamehead,"r");
 
-  printf("%s\n",fnamehead);
   if(fdump==NULL) return 1; //request start from scratch
   //reading parameters, mostly time
   int intpar[6];
@@ -1137,7 +1136,7 @@ fprint_avgfile_mpi(ldouble t, char* folder)
 {
   #ifdef MPI
   char bufor[250];
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
 
   MPI_File cFile;
   MPI_Status status;
@@ -1149,7 +1148,7 @@ fprint_avgfile_mpi(ldouble t, char* folder)
     }
 
   //set the initial location
-  int reshead_length = 39; //verify! fixed and hard-coded length of the header 
+  int reshead_length = 48; //verify! fixed and hard-coded length of the header 
   int pos;
   if(PROCID==0) pos=0;
   else
@@ -1198,7 +1197,7 @@ fprint_avgfile_bin(ldouble t, char* folder)
   //header
   if(PROCID==0)
     {
-       sprintf(bufor,"%s/avg%04d.head",folder,nfout1);
+       sprintf(bufor,"%s/avg%04d.head",folder,nfout2);
        fout1=fopen(bufor,"w"); 
        sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
        fprintf(fout1,"%s",bufor);
@@ -1206,7 +1205,7 @@ fprint_avgfile_bin(ldouble t, char* folder)
     }
 
   //body
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
   fout1=fopen(bufor,"wb"); 
 
   int ix,iy,iz,iv;
@@ -1237,14 +1236,14 @@ fprint_avgfile_ascii(ldouble t, char* folder)
   //header
   if(PROCID==0)
     {
-      sprintf(bufor,"%s/avg%04d.head",folder,nfout1);
+      sprintf(bufor,"%s/avg%04d.head",folder,nfout2);
       fout1=fopen(bufor,"w");
       sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
       fprintf(fout1,"%s",bufor);
       fclose(fout1);
     }
 
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
   fout1=fopen(bufor,"w");
 
   int ix,iy,iz,iv;
@@ -1284,7 +1283,6 @@ int
 fread_avgfile(int nout1, char* folder,ldouble *pavg, ldouble *dt)
 {
   char bufor[250];
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
 
   #ifdef RESOUTPUT_ASCII
 
@@ -1338,7 +1336,7 @@ fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   int intpar[5];
   ldouble ldpar[5];
   ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
-  printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
+  if(PROCID==0) printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
 	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
 
  *dt=ldpar[2];
@@ -1387,14 +1385,14 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   /***********/
   //header file
   fdump=fopen(fnamehead,"r");
-
+  printf("%s\n",fnamehead);
   if(fdump==NULL) return 1; //request start from scratch
 
   //reading parameters, mostly time
   int intpar[5];
   ldouble ldpar[5];
   ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
-  printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
+  if(PROCID==0) printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
 	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
   
   *dt=ldpar[2];
@@ -1437,7 +1435,7 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   int intpar[5];
   ldouble ldpar[5];
   ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
-  printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
+  if(PROCID==0) printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
 	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
   
   *dt=ldpar[2];

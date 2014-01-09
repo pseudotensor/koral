@@ -22,9 +22,6 @@ main(int argc, char **argv)
 
   char folder[100],bufer[100];
   sprintf(folder,"%s","dumps");
-  #ifdef MPI
-  sprintf(folder,"%s/%d",folder,PROCID);
-  #endif
 
   int i;
   doingavg=0;
@@ -71,10 +68,8 @@ main(int argc, char **argv)
 
       //reading restart file
       readret=fread_restartfile(ifile,folder,&t);
+      nfout1=ifile;
       
-      //correcting index
-      nfout1--; 
-  
       //sets bc
       set_bc(t,0);
      
@@ -83,19 +78,19 @@ main(int argc, char **argv)
 
       //dumps dumps to analysis analysis
 #if(SCAOUTPUT==1)
-      fprint_scalars(t,scalars,NSCALARS,folder);
+      fprint_scalars(t,scalars,NSCALARS,"analysis");
 #endif
 #if(RADOUTPUT==1)
-      fprint_radprofiles(t,nfout1,folder,"rad");
+      fprint_radprofiles(t,nfout1,"analysis","rad");
 #endif
 #if(OUTOUTPUT==1)
-      fprint_outfile(t,nfout1,0,folder,"out");
+      fprint_outfile(t,nfout1,0,"analysis","out");
 #endif
 #if(SILOOUTPUT==1)
-      fprint_silofile(t,nfout1,folder,"sil");
+      fprint_silofile(t,nfout1,"analysis","sil");
 #endif
 #if(SIMOUTPUT==1)	  
-      fprint_simplefile(t,nfout1,folder,"sim");
+      fprint_simplefile(t,nfout1,"analysis","sim");
 #endif
   
 

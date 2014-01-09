@@ -122,7 +122,8 @@ main(int argc, char **argv)
   if(ifinit==1)
     {
       fprint_restartfile(tstart,folder);			
-      //dumps dumps
+      //dumps dumps only for shared memory
+#ifndef MPI
 #if(SCAOUTPUT==1)
       fprint_scalars(tstart,scalars,NSCALARS,folder);
 #endif
@@ -137,6 +138,7 @@ main(int argc, char **argv)
 #endif
 #if(SIMPLEOUTPUT==1)
       fprint_simplefile(tstart,nfout1,folder,"sim");
+#endif
 #endif
 
       nfout1++;
@@ -341,6 +343,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  fprint_restartfile(t,folder);
 
 	  //dumps dumps
+#ifndef MPI
 #if(SCAOUTPUT==1)
 	  fprint_scalars(t,scalars,NSCALARS,folder);
 #endif
@@ -353,6 +356,7 @@ solve_the_problem(ldouble tstart, char* folder)
 #if(SILOOUTPUT==1)
 	  fprint_silofile(t,nfout1,folder,"sil");
 #endif
+#endif
 	  
 	  nfout1++;
 
@@ -363,8 +367,8 @@ solve_the_problem(ldouble tstart, char* folder)
 #if(AVGOUTPUT==1) 
       if(lasttoutavg_floor!=floor(t/dtoutavg))
 	{
-	  printf("> avg  file no #%6d dumped\n"
-		 ,nfout2);
+	  if(PROCID==0)
+	    printf("> avg  file no #%6d dumped\n",nfout2);
 	  
 	  //avg goes first so that what is later can use it
 	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));

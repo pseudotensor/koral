@@ -122,12 +122,13 @@
 #define OUTPUTPERCORE
 //#define RESOUTPUT_ASCII //by default binary
 #define SILOOUTPUT 1
+#define RADOUTPUT 1
 #define OUTOUTPUT 0
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 1.
-#define DTOUT2 250.
+#define DTOUT2 1.
 //#define PRINTXGC_RIGHT
 
 /************************************/

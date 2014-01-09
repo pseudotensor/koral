@@ -1410,11 +1410,11 @@
 #endif
 
 #ifndef SCAOUTPUT
-#define SCAOUTPUT 1
+#define SCAOUTPUT 0
 #endif
 
 #ifndef RADOUTPUT
-#define RADOUTPUT 1
+#define RADOUTPUT 0
 #endif
 
 #ifndef AVGOUTPUT
