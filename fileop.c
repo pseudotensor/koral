@@ -1385,7 +1385,6 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   /***********/
   //header file
   fdump=fopen(fnamehead,"r");
-  printf("%s\n",fnamehead);
   if(fdump==NULL) return 1; //request start from scratch
 
   //reading parameters, mostly time
@@ -1412,10 +1411,12 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
       fread(&giy,sizeof(int),1,fdump);
       fread(&giz,sizeof(int),1,fdump);
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
-      fread(&get_uavg(pavg,i,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
+      fread(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
     }
 
   fclose(fdump);
+
+
 
   return 0;
 }

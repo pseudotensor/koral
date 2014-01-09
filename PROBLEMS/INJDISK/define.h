@@ -121,6 +121,7 @@
 
 #define OUTPUTPERCORE
 //#define RESOUTPUT_ASCII //by default binary
+#define SCAOUTPUT 1
 #define SILOOUTPUT 1
 #define RADOUTPUT 1
 #define OUTOUTPUT 0

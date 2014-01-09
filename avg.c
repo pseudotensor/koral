@@ -6,6 +6,11 @@
 int 
 main(int argc, char **argv)
 {  
+  #ifdef MPI
+  printf("avg works on one core only, do not use MPI, please\n");
+  exit(-1);
+  #endif
+
   //which files to read
   int no1,no2,nostep;
   if(argc!=4)
