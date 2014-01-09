@@ -1,4 +1,5 @@
 #!/bin/bash
+#merges all the res... files from per core folders and puts them in dumps/
 for i in dumps/0/res*head; do cp $i dumps; done
 for i in dumps/0/res*dat; do cp $i dumps; done
 typeset -i i END

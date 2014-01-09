@@ -42,7 +42,7 @@ save_avg(ldouble dt)
 
 //TODO: save binary
 int
-fprint_avgfile(ldouble t, char* folder)
+fprint_avgfile_old(ldouble t, char* folder)
 {
   char bufor[50],bufor2[50];
   sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
@@ -103,7 +103,7 @@ fprint_avgfile(ldouble t, char* folder)
 /*********************************************/
 /*********************************************/
 int 
-fread_avgfile(int nout1, char *folder, ldouble *pavg, ldouble *dt)
+fread_avgfile_old(int nout1, char *folder, ldouble *pavg, ldouble *dt)
 {
   //opening avg file
   int i,ret;
@@ -1039,7 +1039,6 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   return 0;
 }
 
-//todo:
 int 
 fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 {
@@ -1050,7 +1049,408 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
     sprintf(fname,"%s/res%04d.dat",folder,nout1);
   else
     sprintf(fname,"%s/reslast.dat",folder);
+  
+  FILE *fdump=fopen(fname,"rb");
 
+  if(fdump==NULL) return 1; //request start from scratch
+
+  //reading parameters, mostly time
+  int intpar[6];
+  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
+  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
+	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
+
+  nfout1=intpar[0]+1; //global file no.
+  nfout2=intpar[1]; //global file no. for avg
+
+  int ix,iy,iz,iv,i,ic,gix,giy,giz;
+
+  //reading primitives from file
+  struct geometry geom;
+  ldouble xxvec[4],xxvecout[4];
+  ldouble uu[NV],pp[NV],ftemp;
+  char c;
+  for(ic=0;ic<NX*NY*NZ;ic++)
+    {
+      fread(&gix,sizeof(int),1,fdump);
+      fread(&giy,sizeof(int),1,fdump);
+      fread(&giz,sizeof(int),1,fdump);
+      fread(pp,sizeof(ldouble),NV,fdump);
+
+      mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+      fill_geometry(ix,iy,iz,&geom);
+      p2u(pp,uu,&geom);
+
+      //saving primitives
+      for(iv=0;iv<NV;iv++)    
+	{
+	  set_u(u,iv,ix,iy,iz,uu[iv]);
+	  set_u(p,iv,ix,iy,iz,pp[iv]);
+	}
+    }
+
+  fclose(fdump);
+
+  return 0;
+}
+							    
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints avg files */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+
+int
+fprint_avgfile(ldouble t, char* folder)
+{
+  #ifdef RESOUTPUT_ASCII
+
+  fprint_avgfile_ascii(t,folder);
+
+  #else //binary output
+
+  #ifdef OUTPUTPERCORE //each process dumps independent files
+  
+  fprint_avgfile_bin(t,folder); 
+
+  #else //MPI-IO, each process writes in parallel to the same file
+
+  #ifdef MPI
+  fprint_avgfile_mpi(t,folder);
+  #else
+  if(PROCID==0)
+      printf("MPI-I/O requires MPI\n"); 
+  exit(-1);
+  #endif
+
+  #endif
+  #endif
+  
+  return 0;
+}
+
+ int //parallel output to a single file
+fprint_avgfile_mpi(ldouble t, char* folder)
+{
+  #ifdef MPI
+  char bufor[250];
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
+
+  MPI_File cFile;
+  MPI_Status status;
+  MPI_Request req;
+
+  int rc = MPI_File_open( MPI_COMM_WORLD, bufor, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &cFile );
+  if (rc) {
+    printf( "Unable to open/create file %s\n", bufor );fflush(stdout); exit(-1);
+    }
+
+  //set the initial location
+  int reshead_length = 52; //fixed and hard-coded length of the header 
+  int pos;
+  if(PROCID==0) pos=0;
+  else
+    pos=reshead_length+PROCID*NX*NY*NZ*(3*sizeof(int)+NV*sizeof(ldouble));
+  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
+  
+  //header
+  //## nout time problem NX NY NZ
+  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+  if(PROCID==0) 
+    {
+      MPI_File_write(cFile, bufor, reshead_length, MPI_CHAR, &status);
+    }
+
+  /******************************************/  
+  /** writing order is no longer fixed  ********/  
+  /******************************************/  
+ 
+  int ix,iy,iz,iv;
+  int gix,giy,giz;
+  ldouble pp[NV];
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
+	{
+	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  
+	    MPI_File_write( cFile, &gix, 1, MPI_INT, &status );
+	    MPI_File_write( cFile, &giy, 1, MPI_INT, &status );
+	    MPI_File_write( cFile, &giz, 1, MPI_INT, &status );
+	    MPI_File_write( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
+	}
+
+  MPI_File_close( &cFile );
+
+  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+  iv=system(bufor);
+
+  #endif
+  return 0;
+}
+
+int //serial binary output
+fprint_avgfile_bin(ldouble t, char* folder)
+{
+  char bufor[250];
+  
+  //header
+  if(PROCID==0)
+    {
+       sprintf(bufor,"%s/avg%04d.head",folder,nfout1);
+       fout1=fopen(bufor,"w"); 
+       //## nout time problem NX NY NZ
+       sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+       fprintf(fout1,"%s",bufor);
+       fclose(fout1);
+    }
+
+  //body
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
+  fout1=fopen(bufor,"wb"); 
+
+  int ix,iy,iz,iv;
+  int gix,giy,giz;
+  ldouble pp[NV];
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
+	{
+	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  fwrite(&gix,sizeof(int),1,fout1);
+	  fwrite(&giy,sizeof(int),1,fout1);
+	  fwrite(&giz,sizeof(int),1,fout1);
+	  fwrite(&get_u(p,0,ix,iy,iz),sizeof(ldouble),NV,fout1);
+	}
+
+  fclose(fout1);
+
+  return 0;
+}
+
+//serial writing in ascii per core 
+int
+fprint_avgfile_ascii(ldouble t, char* folder)
+{
+  char bufor[250];
+
+  //header
+  if(PROCID==0)
+    {
+      sprintf(bufor,"%s/avg%04d.head",folder,nfout1);
+      fout1=fopen(bufor,"w");
+
+      //## nout time problem NX NY NZ
+      sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+      fprintf(fout1,"%s",bufor);
+      fclose(fout1);
+    }
+
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
+  fout1=fopen(bufor,"w");
+
+  int ix,iy,iz,iv;
+  int gix,giy,giz;
+  ldouble pp[NV];
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
+	{
+	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",gix,giy,giz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      pp[iv]=get_u(p,iv,ix,iy,iz);
+	      fprintf(fout1,"%.12e ",pp[iv]);
+	    }
+	  fprintf(fout1,"\n");
+	}
+
+  fclose(fout1);
+
+  return 0;
+}
+
+							  
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* reads dump file */
+/* puts conserved into the memory */
+/* converts them to primitives */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+
+
+int
+fread_avgfile(int nout1, char* folder,ldouble *pavg, ldouble *dt)
+{
+  char bufor[250];
+  sprintf(bufor,"%s/avg%04d.dat",folder,nfout1);
+
+  #ifdef RESOUTPUT_ASCII
+
+  fread_avgfile_ascii(nout1,folder,pavg,dt);
+
+  #else //binary output
+
+  #ifdef OUTPUTPERCORE //each process dumps independent files
+  
+  fread_avgfile_bin(nout1,folder,pavg,dt);
+
+  #else //MPI-IO, each process writes in parallel to the same file
+
+  #ifdef MPI
+  fread_avgfile_mpi(nout1,folder,pavg,dt);
+  #else
+  if(PROCID==0)
+      printf("MPI-I/O requires MPI\n"); 
+  exit(-1);
+  #endif
+
+  #endif
+  #endif
+  
+  return 0;
+}
+
+
+int 
+fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
+{
+  //opening dump file
+  int ret;
+  char fname[40],fnamehead[40];
+
+
+  sprintf(fname,"%s/avg%04d.dat",folder,nout1);
+#ifdef MPI
+  sprintf(fnamehead,"%s/../0/avg%04d.head",folder,nout1);
+#else
+  sprintf(fnamehead,"%s/avg%04d.head",folder,nout1);
+#endif
+   
+  
+  //header
+  FILE *fdump=fopen(fnamehead,"r");
+
+  if(fdump==NULL) return 1; //request start from scratch
+
+  //reading parameters, mostly time
+  int intpar[6];
+  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
+  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
+	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
+
+  nfout1=intpar[0]+1; //global file no.
+  nfout2=intpar[1]; //global file no. for avg
+  fclose(fdump);
+
+  //body
+  fdump=fopen(fname,"r");
+
+  int ix,iy,iz,iv,i,ic,gix,giy,giz;
+
+  //reading primitives from file
+  struct geometry geom;
+  ldouble xxvec[4],xxvecout[4];
+  ldouble uu[NV],pp[NV],ftemp;
+  char c;
+  for(ic=0;ic<NX*NY*NZ;ic++)
+    {
+      ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&gix,&giy,&giz);
+      for(i=0;i<NV;i++)
+      ret=fscanf(fdump,"%lf ",&pp[i]);
+      mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+      fill_geometry(ix,iy,iz,&geom);
+      p2u(pp,uu,&geom);
+
+      //saving primitives
+      for(iv=0;iv<NV;iv++)    
+	{
+	  set_u(u,iv,ix,iy,iz,uu[iv]);
+	  set_u(p,iv,ix,iy,iz,pp[iv]);
+	}
+    }
+
+  fclose(fdump);
+
+  return 0;
+}
+
+int 
+fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
+{
+  int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
+  char fname[40],fnamehead[40];
+
+  sprintf(fname,"%s/avg%04d.dat",folder,nout1);
+#ifdef MPI
+  sprintf(fnamehead,"%s/../0/avg%04d.head",folder,nout1);
+#else
+  sprintf(fnamehead,"%s/avg%04d.head",folder,nout1);
+#endif
+  
+
+  FILE *fdump;
+
+  /***********/
+  //header file
+  fdump=fopen(fnamehead,"r");
+
+  printf("%s\n",fnamehead);
+  if(fdump==NULL) return 1; //request start from scratch
+  //reading parameters, mostly time
+  int intpar[6];
+  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
+  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
+	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
+  nfout1=intpar[0]+1; //global file no.
+  nfout2=intpar[1]; //global file no. for avg
+  fclose(fdump);
+
+  /***********/
+  //body file
+  fdump=fopen(fname,"rb");
+ 
+  struct geometry geom;
+  ldouble xxvec[4],xxvecout[4];
+  ldouble uu[NV],pp[NV],ftemp;
+  char c;
+  for(ic=0;ic<NX*NY*NZ;ic++)
+    {
+      fread(&gix,sizeof(int),1,fdump);
+      fread(&giy,sizeof(int),1,fdump);
+      fread(&giz,sizeof(int),1,fdump);
+      fread(pp,sizeof(ldouble),NV,fdump);
+
+      mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+      fill_geometry(ix,iy,iz,&geom);
+      p2u(pp,uu,&geom);
+
+      //saving primitives
+      for(iv=0;iv<NV;iv++)    
+	{
+	  set_u(u,iv,ix,iy,iz,uu[iv]);
+	  set_u(p,iv,ix,iy,iz,pp[iv]);
+	}
+    }
+
+  fclose(fdump);
+
+  return 0;
+}
+
+int 
+fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
+{
+  //opening dump file
+  int ret;
+  char fname[40];
+  sprintf(fname,"%s/avg%04d.dat",folder,nout1);
   FILE *fdump=fopen(fname,"rb");
 
   if(fdump==NULL) return 1; //request start from scratch
