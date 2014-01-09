@@ -1072,6 +1072,7 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   char c;
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
+      //TODO!
       fread(&gix,sizeof(int),1,fdump);
       fread(&giy,sizeof(int),1,fdump);
       fread(&giz,sizeof(int),1,fdump);
@@ -1148,7 +1149,7 @@ fprint_avgfile_mpi(ldouble t, char* folder)
     }
 
   //set the initial location
-  int reshead_length = 52; //fixed and hard-coded length of the header 
+  int reshead_length = 39; //verify! fixed and hard-coded length of the header 
   int pos;
   if(PROCID==0) pos=0;
   else
@@ -1157,7 +1158,8 @@ fprint_avgfile_mpi(ldouble t, char* folder)
   
   //header
   //## nout time problem NX NY NZ
-  sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+
+  sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
   if(PROCID==0) 
     {
       MPI_File_write(cFile, bufor, reshead_length, MPI_CHAR, &status);
@@ -1179,13 +1181,10 @@ fprint_avgfile_mpi(ldouble t, char* folder)
 	    MPI_File_write( cFile, &gix, 1, MPI_INT, &status );
 	    MPI_File_write( cFile, &giy, 1, MPI_INT, &status );
 	    MPI_File_write( cFile, &giz, 1, MPI_INT, &status );
-	    MPI_File_write( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
+	    MPI_File_write( cFile, &get_uavg(pavg,0,ix,iy,iz), NV+NAVGVARS, MPI_LDOUBLE, &status );
 	}
 
   MPI_File_close( &cFile );
-
-  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
-  iv=system(bufor);
 
   #endif
   return 0;
@@ -1201,8 +1200,7 @@ fprint_avgfile_bin(ldouble t, char* folder)
     {
        sprintf(bufor,"%s/avg%04d.head",folder,nfout1);
        fout1=fopen(bufor,"w"); 
-       //## nout time problem NX NY NZ
-       sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+       sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
        fprintf(fout1,"%s",bufor);
        fclose(fout1);
     }
@@ -1222,7 +1220,7 @@ fprint_avgfile_bin(ldouble t, char* folder)
 	  fwrite(&gix,sizeof(int),1,fout1);
 	  fwrite(&giy,sizeof(int),1,fout1);
 	  fwrite(&giz,sizeof(int),1,fout1);
-	  fwrite(&get_u(p,0,ix,iy,iz),sizeof(ldouble),NV,fout1);
+	  fwrite(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fout1);
 	}
 
   fclose(fout1);
@@ -1241,9 +1239,7 @@ fprint_avgfile_ascii(ldouble t, char* folder)
     {
       sprintf(bufor,"%s/avg%04d.head",folder,nfout1);
       fout1=fopen(bufor,"w");
-
-      //## nout time problem NX NY NZ
-      sprintf(bufor,"## %5d %5d %10.6e %5d %5d %5d %5d\n",nfout1,nfout2,t,PROBLEM,TNX,TNY,TNZ);
+      sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
       fprintf(fout1,"%s",bufor);
       fclose(fout1);
     }
@@ -1259,11 +1255,10 @@ fprint_avgfile_ascii(ldouble t, char* folder)
       for(ix=0;ix<NX;ix++)
 	{
 	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
-	  fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",gix,giy,giz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
-	  for(iv=0;iv<NV;iv++)
+	  fprintf(fout1,"%d %d %d ",gix,giy,giz);
+	  for(iv=0;iv<NV+NAVGVARS;iv++)
 	    {
-	      pp[iv]=get_u(p,iv,ix,iy,iz);
-	      fprintf(fout1,"%.12e ",pp[iv]);
+	      fprintf(fout1,"%.12e ",get_uavg(pavg,iv,ix,iy,iz));
 	    }
 	  fprintf(fout1,"\n");
 	}
@@ -1340,13 +1335,14 @@ fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   if(fdump==NULL) return 1; //request start from scratch
 
   //reading parameters, mostly time
-  int intpar[6];
-  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
-  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
-	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
+  int intpar[5];
+  ldouble ldpar[5];
+  ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
+  printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
+	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
 
-  nfout1=intpar[0]+1; //global file no.
-  nfout2=intpar[1]; //global file no. for avg
+ *dt=ldpar[2];
+ 
   fclose(fdump);
 
   //body
@@ -1361,19 +1357,10 @@ fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   char c;
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
-      ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&gix,&giy,&giz);
-      for(i=0;i<NV;i++)
-      ret=fscanf(fdump,"%lf ",&pp[i]);
+      ret=fscanf(fdump,"%d %d %d ",&gix,&giy,&giz);
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
-      fill_geometry(ix,iy,iz,&geom);
-      p2u(pp,uu,&geom);
-
-      //saving primitives
-      for(iv=0;iv<NV;iv++)    
-	{
-	  set_u(u,iv,ix,iy,iz,uu[iv]);
-	  set_u(p,iv,ix,iy,iz,pp[iv]);
-	}
+      for(i=0;i<NV+NAVGVARS;i++)
+	ret=fscanf(fdump,"%lf ",&get_uavg(pavg,i,ix,iy,iz));
     }
 
   fclose(fdump);
@@ -1401,17 +1388,18 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   //header file
   fdump=fopen(fnamehead,"r");
 
-  printf("%s\n",fnamehead);
   if(fdump==NULL) return 1; //request start from scratch
-  //reading parameters, mostly time
-  int intpar[6];
-  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
-  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
-	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
-  nfout1=intpar[0]+1; //global file no.
-  nfout2=intpar[1]; //global file no. for avg
-  fclose(fdump);
 
+  //reading parameters, mostly time
+  int intpar[5];
+  ldouble ldpar[5];
+  ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
+  printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
+	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
+  
+  *dt=ldpar[2];
+  fclose(fdump);
+ 
   /***********/
   //body file
   fdump=fopen(fname,"rb");
@@ -1425,18 +1413,8 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
       fread(&gix,sizeof(int),1,fdump);
       fread(&giy,sizeof(int),1,fdump);
       fread(&giz,sizeof(int),1,fdump);
-      fread(pp,sizeof(ldouble),NV,fdump);
-
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
-      fill_geometry(ix,iy,iz,&geom);
-      p2u(pp,uu,&geom);
-
-      //saving primitives
-      for(iv=0;iv<NV;iv++)    
-	{
-	  set_u(u,iv,ix,iy,iz,uu[iv]);
-	  set_u(p,iv,ix,iy,iz,pp[iv]);
-	}
+      fread(&get_uavg(pavg,i,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
     }
 
   fclose(fdump);
@@ -1456,13 +1434,14 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   if(fdump==NULL) return 1; //request start from scratch
 
   //reading parameters, mostly time
-  int intpar[6];
-  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
-  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
-	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
-
-  nfout1=intpar[0]+1; //global file no.
-  nfout2=intpar[1]; //global file no. for avg
+  int intpar[5];
+  ldouble ldpar[5];
+  ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
+  printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
+	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
+  
+  *dt=ldpar[2];
+  fclose(fdump);
 
   int ix,iy,iz,iv,i,ic,gix,giy,giz;
 
@@ -1473,6 +1452,7 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   char c;
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
+      //TODO!
       fread(&gix,sizeof(int),1,fdump);
       fread(&giy,sizeof(int),1,fdump);
       fread(&giz,sizeof(int),1,fdump);
