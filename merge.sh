@@ -5,6 +5,7 @@ for i in dumps/0/res*dat; do cp $i dumps; done
 typeset -i i END
 let END=$1 i=1
 while ((i<END)); do
+    echo $i
     cd dumps/$i
     for j in res*dat; do cat $j >> ../$j; done
     cd ../..
@@ -15,8 +16,8 @@ for k in dumps/0/avg*dat; do cp $k dumps; done
 typeset -i i END
 let END=$1 i=1
 while ((i<END)); do
+    echo $i
     cd "dumps/$i"
-    pwd
     for j in avg*dat; do cat $j >> ../$j; done
     cd ../..
     let i++

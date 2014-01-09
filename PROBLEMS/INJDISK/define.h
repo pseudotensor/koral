@@ -88,8 +88,8 @@
 #endif
 
 //total resolution
-#define TNX 150
-#define TNY 30
+#define TNX 140
+#define TNY 60
 #define TNZ 1
 //number of tiles
 #define NTX 2
@@ -128,8 +128,8 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
-#define DTOUT2 1.
+#define DTOUT1 .5
+#define DTOUT2 100.
 //#define PRINTXGC_RIGHT
 
 /************************************/

@@ -662,6 +662,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 int
 fprint_restartfile(ldouble t, char* folder)
 {
+  //return 0;
+
   #ifdef RESOUTPUT_ASCII
 
   fprint_restartfile_ascii(t,folder);
