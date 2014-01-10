@@ -1,5 +1,13 @@
+#by default parallel, use 'make SERIAL=1' for serial
+
+ifneq ($(SERIAL),1)
+CC=mpicc 
+CFLAGS= -O3 -L/usr/local/lib -I/usr/local/include -DMPI
+else
 CC=gcc 
 CFLAGS= -fopenmp -O3 -L/usr/local/lib -I/usr/local/include 
+endif
+
 LIBS=-lm -lgsl -lgslcblas -lsilo -lrt
 RM=/bin/rm
 

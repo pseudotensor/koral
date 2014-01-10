@@ -28,7 +28,6 @@ mpi_exchangedata()
 int
 mpi_recvdata(MPI_Request *reqs, int *nreqs)
 {
-  
   int i,j,k,iv;
   MPI_Status status;
   double temp;
@@ -83,14 +82,14 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
       *nreqs=*nreqs+1;
       if(verbose) printf("%d received MPI_MSG_ZHI from %d\n",PROCID,mpi_tile2procid(TI,TJ,TK-1));
     }
- 
+
+  return 0;
 }
 
 
 int
 mpi_savedata()
 {
-  
   int i,j,k,iv;
   int verbose=0;
   //upper x
@@ -154,7 +153,7 @@ mpi_savedata()
 	    for(iv=0;iv<NV;iv++)
 	      set_u(p,iv,i,j,k,msgbufs[11][i*NY*NG*NV + j*NG*NV + (k+NG)*NV + iv]);
     }
- 
+  return 0; 
 }
 
 int

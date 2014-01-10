@@ -139,10 +139,10 @@ fread_avgfile_old(int nout1, char *folder, ldouble *pavg, ldouble *dt)
 
       #else
 
-      fread(&ix,sizeof(int),1,fdump);
-      fread(&iy,sizeof(int),1,fdump);
-      fread(&iz,sizeof(int),1,fdump);
-      fread(&get_uavg(pavg,i,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
+      ret=fread(&ix,sizeof(int),1,fdump);
+      ret=fread(&iy,sizeof(int),1,fdump);
+      ret=fread(&iz,sizeof(int),1,fdump);
+      ret=fread(&get_uavg(pavg,i,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
 
       #endif
     }
@@ -1018,10 +1018,10 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   char c;
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
-      fread(&gix,sizeof(int),1,fdump);
-      fread(&giy,sizeof(int),1,fdump);
-      fread(&giz,sizeof(int),1,fdump);
-      fread(pp,sizeof(ldouble),NV,fdump);
+      ret=fread(&gix,sizeof(int),1,fdump);
+      ret=fread(&giy,sizeof(int),1,fdump);
+      ret=fread(&giz,sizeof(int),1,fdump);
+      ret=fread(pp,sizeof(ldouble),NV,fdump);
 
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
       fill_geometry(ix,iy,iz,&geom);
@@ -1074,10 +1074,10 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
       //TODO!
-      fread(&gix,sizeof(int),1,fdump);
-      fread(&giy,sizeof(int),1,fdump);
-      fread(&giz,sizeof(int),1,fdump);
-      fread(pp,sizeof(ldouble),NV,fdump);
+      ret=fread(&gix,sizeof(int),1,fdump);
+      ret=fread(&giy,sizeof(int),1,fdump);
+      ret=fread(&giz,sizeof(int),1,fdump);
+      ret=fread(pp,sizeof(ldouble),NV,fdump);
 
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
       fill_geometry(ix,iy,iz,&geom);
@@ -1409,11 +1409,11 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   char c;
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
-      fread(&gix,sizeof(int),1,fdump);
-      fread(&giy,sizeof(int),1,fdump);
-      fread(&giz,sizeof(int),1,fdump);
+      ret=fread(&gix,sizeof(int),1,fdump);
+      ret=fread(&giy,sizeof(int),1,fdump);
+      ret=fread(&giz,sizeof(int),1,fdump);
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
-      fread(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
+      ret=fread(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
     }
 
   fclose(fdump);
@@ -1454,10 +1454,10 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
       //TODO!
-      fread(&gix,sizeof(int),1,fdump);
-      fread(&giy,sizeof(int),1,fdump);
-      fread(&giz,sizeof(int),1,fdump);
-      fread(pp,sizeof(ldouble),NV,fdump);
+      ret=fread(&gix,sizeof(int),1,fdump);
+      ret=fread(&giy,sizeof(int),1,fdump);
+      ret=fread(&giz,sizeof(int),1,fdump);
+      ret=fread(pp,sizeof(ldouble),NV,fdump);
 
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
       fill_geometry(ix,iy,iz,&geom);

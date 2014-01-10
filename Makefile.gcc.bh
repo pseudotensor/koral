@@ -1,5 +1,12 @@
+
+ifneq ($(SERIAL),1)
 CC=gcc 
-CFLAGS=-O3 -fopenmp -L/n/home07/asadowski/Lib/lib -I/n/home07/asadowski/Lib/include -std=gnu99
+CFLAGS=-O3 -DMPI -L/n/home07/asadowski/Lib/lib -I/n/home07/asadowski/Lib/include -lrt 
+else
+CC=gcc 
+CFLAGS=-O3 -fopenmp -L/n/home07/asadowski/Lib/lib -I/n/home07/asadowski/Lib/include -lrt 
+endif
+
 LIBS=-lm -lgsl -lgslcblas -lsilo 
 RM=/bin/rm
 
