@@ -1024,6 +1024,16 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
       ret=fread(pp,sizeof(ldouble),NV,fdump);
 
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+
+      /*
+      if(ix==100 && (iy==20 || iy==NY/2-1))
+	{
+	  printf("%d %d %d > %d %d %d\n",gix,giy,giz, NX, NY, NZ); 
+	  print_primitives(pp);
+	  getchar();
+	}
+      */
+
       fill_geometry(ix,iy,iz,&geom);
       p2u(pp,uu,&geom);
 

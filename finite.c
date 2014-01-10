@@ -2594,87 +2594,93 @@ correct_polaraxis()
 	      struct geometry geom;
 
 	      //upper
-	      thaxis=get_xb(0,1);
-	      for(ic=0;ic<nc;ic++)
+	      if(TJ==0) //tile number
 		{
-		  iy=ic;iysrc=nc;
-		  th=get_x(iy,1);
-		  thsrc=get_x(iysrc,1);	      
+		  thaxis=get_xb(0,1);
+		  for(ic=0;ic<nc;ic++)
+		    {
+		      iy=ic;iysrc=nc;
+		      th=get_x(iy,1);
+		      thsrc=get_x(iysrc,1);	      
 	      	  
-		  fill_geometry(ix,iy,iz,&geom);
+		      fill_geometry(ix,iy,iz,&geom);
 	  
-		  PLOOP(iv)
-		    pp[iv]=get_u(p,iv,ix,iy,iz);
+		      PLOOP(iv)
+			pp[iv]=get_u(p,iv,ix,iy,iz);
 		  
-		  //gas densities
-		  pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
-		  pp[UU]=get_u(p,UU,ix,iysrc,iz);
-		  pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
+		      //gas densities
+		      pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
+		      pp[UU]=get_u(p,UU,ix,iysrc,iz);
+		      pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
 		  		  		  
-		  //gas velocities
-		  pp[VX]=get_u(p,VX,ix,iysrc,iz);
-		  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
-		  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
+		      //gas velocities
+		      pp[VX]=get_u(p,VX,ix,iysrc,iz);
+		      pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
+		      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
-		  #ifdef RADIATION
-		  //rad density
-		  pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
+#ifdef RADIATION
+		      //rad density
+		      pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
 
-		  //rad velocities
-		  pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
-		  pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
-		  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
-		  #endif 
+		      //rad velocities
+		      pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
+		      pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
+		      pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
+#endif 
 
-		  p2u(pp,uu,&geom);
+		      p2u(pp,uu,&geom);
 
-		  PLOOP(iv)
-		  {
-		    set_u(p,iv,ix,iy,iz,pp[iv]);  
-		    set_u(u,iv,ix,iy,iz,uu[iv]);
-		  }
+		      PLOOP(iv)
+		      {
+			set_u(p,iv,ix,iy,iz,pp[iv]);  
+			set_u(u,iv,ix,iy,iz,uu[iv]);
+		      }
+		    }
 		}
   
 	      //lower
-	      thaxis=get_xb(NY,1);
-	      for(ic=0;ic<nc;ic++)
+	      if(TJ==NTY-1)
 		{
-		  iy=NY-1-ic;iysrc=NY-1-nc;
-		  th=get_x(iy,1);
-		  thsrc=get_x(iysrc,1);	      
+		  thaxis=get_xb(NY,1);
+		  for(ic=0;ic<nc;ic++)
+		    {
+		      iy=NY-1-ic;iysrc=NY-1-nc;
+		      th=get_x(iy,1);
+		      thsrc=get_x(iysrc,1);	      
 	      	  
-		  fill_geometry(ix,iy,iz,&geom);
+		      fill_geometry(ix,iy,iz,&geom);
 	  
-		  PLOOP(iv)
-		    pp[iv]=get_u(p,iv,ix,iy,iz);
+		      PLOOP(iv)
+			pp[iv]=get_u(p,iv,ix,iy,iz);
   
-		  //gas densities
-		  pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
-		  pp[UU]=get_u(p,UU,ix,iysrc,iz);
-		  pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
+		      //gas densities
+		      pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
+		      pp[UU]=get_u(p,UU,ix,iysrc,iz);
+		      pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
 
-		  //gas velocities
-		  pp[VX]=get_u(p,VX,ix,iysrc,iz);
-		  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
-		  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
+		      //gas velocities
+		      pp[VX]=get_u(p,VX,ix,iysrc,iz);
+		      pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
+		      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
-		  #ifdef RADIATION
-		  //rad density
-		  pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
+#ifdef RADIATION
+		      //rad density
+		      pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
 
-		  //rad velocities
-		  pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
-		  pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
-		  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
-		  #endif 
+		      //rad velocities
+		      pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
+		      pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
+		      pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
+#endif 
 		  
-		  p2u(pp,uu,&geom);
+		      p2u(pp,uu,&geom);
 
-		  PLOOP(iv)
-		  {
-		    set_u(p,iv,ix,iy,iz,pp[iv]);  
-		    set_u(u,iv,ix,iy,iz,uu[iv]);
-		  }
+		      PLOOP(iv)
+		      {
+			set_u(p,iv,ix,iy,iz,pp[iv]);  
+			set_u(u,iv,ix,iy,iz,uu[iv]);
+		      }
+		    }
 		}
 	    }
 	}

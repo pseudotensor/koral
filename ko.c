@@ -123,7 +123,7 @@ main(int argc, char **argv)
     {
       fprint_restartfile(tstart,folder);			
       //dumps dumps only for shared memory
-#ifndef MPI
+      #ifndef MPI
 #if(SCAOUTPUT==1)
       fprint_scalars(tstart,scalars,NSCALARS,folder);
 #endif
@@ -139,7 +139,7 @@ main(int argc, char **argv)
 #if(SIMPLEOUTPUT==1)
       fprint_simplefile(tstart,nfout1,folder,"sim");
 #endif
-#endif
+      #endif
 
       nfout1++;
     }
@@ -343,7 +343,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  fprint_restartfile(t,folder);
 
 	  //dumps dumps
-#ifndef MPI
+	  #ifdef MPI //comment if you want .silo etc files per core for OUTPUTPERCORE
 #if(SCAOUTPUT==1)
 	  fprint_scalars(t,scalars,NSCALARS,folder);
 #endif
@@ -356,7 +356,7 @@ solve_the_problem(ldouble tstart, char* folder)
 #if(SILOOUTPUT==1)
 	  fprint_silofile(t,nfout1,folder,"sil");
 #endif
-#endif
+	  #endif
 	  
 	  nfout1++;
 

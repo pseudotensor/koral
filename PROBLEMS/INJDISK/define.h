@@ -88,12 +88,12 @@
 #endif
 
 //total resolution
-#define TNX 140
-#define TNY 60
+#define TNX 192
+#define TNY 192
 #define TNZ 1
 //number of tiles
-#define NTX 2
-#define NTY 1
+#define NTX 16
+#define NTY 8
 #define NTZ 1
 
 
@@ -128,8 +128,8 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 .5
-#define DTOUT2 100.
+#define DTOUT1 50.
+#define DTOUT2 250.
 //#define PRINTXGC_RIGHT
 
 /************************************/
@@ -139,11 +139,11 @@
 
 #define DISKHR (1./3.)
 #define DISKH (DISKHR*ROUT)
-#define DISKSIGMA surfdensCGS2GU(1.e4)
+#define DISKSIGMA surfdensCGS2GU(5.e3)
 #define DISKRHO DISKSIGMA/DISKH/(96./35.)
-#define DISKRCIR 20.
+#define DISKRCIR 50.
 #define DISKVR (-0.02*pow(ROUT/50.,-1.5)) //normalized to 0.01 at R=50
-#define MAGNOMEGA (1.e-3*pow(ROUT/50.,-1.5)) //omega should follow the free fall time?
+#define MAGNOMEGA (1.5e-2*pow(200./50.,-1.5)) //omega should follow the free fall time?
 #define MAGBETA 0.02
 
 //KTORUS only:

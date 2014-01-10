@@ -70,14 +70,14 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
   //upper z
   if(mpi_isitBC(ZBCHI)==0)
     {
-      MPI_Irecv(msgbufs[10], NX*NY*NZ*NV, MPI_DOUBLE,
+      MPI_Irecv(msgbufs[10], NX*NY*NG*NV, MPI_DOUBLE,
 		mpi_tile2procid(TI,TJ,TK+1), MPI_MSG_ZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
     }
   //lower z
   if(mpi_isitBC(ZBCLO)==0)
     {
-      MPI_Irecv(msgbufs[11], NX*NY*NZ*NV, MPI_DOUBLE,
+      MPI_Irecv(msgbufs[11], NX*NY*NG*NV, MPI_DOUBLE,
 		mpi_tile2procid(TI,TJ,TK-1), MPI_MSG_ZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
       if(verbose) printf("%d received MPI_MSG_ZHI from %d\n",PROCID,mpi_tile2procid(TI,TJ,TK-1));
@@ -343,6 +343,8 @@ mpi_myinit(int argc, char *argv[])
 	 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
 
 #else
+  TI=TJ=TK=0;
+  TOI=TOJ=TOK=0;
   PROCID=0;
   NPROCS=1;
 #endif
