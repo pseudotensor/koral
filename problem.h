@@ -71,8 +71,23 @@
 //68 RMHDWAVE - radiation modified linear magnetosonic waves
 //69 INJDISK - magnetized gas damped from outer boundary
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
+//71 MBBBLOB - rad blobs with magn field
 
-#define PROBLEM 69
+#define PROBLEM 71
+
+#if(PROBLEM==71)
+
+#define PR_DEFINE "PROBLEMS/MBBBLOB/define.h"
+#define PR_BC "PROBLEMS/MBBBLOB/bc.c"
+#define PR_INIT "PROBLEMS/MBBBLOB/init.c"
+#define PR_KAPPA "PROBLEMS/MBBBLOB/kappa.c"
+#define PR_KAPPAES "PROBLEMS/MBBBLOB/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/MBBBLOB/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/MBBBLOB/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/MBBBLOB/dump.c"
+#define PR_TOOLS "PROBLEMS/MBBBLOB/tools.c"
+
+#endif
 
 #if(PROBLEM==70)
 
