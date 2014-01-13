@@ -378,7 +378,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      if(iy==0)
 		{
-		  phi[nodalindex]=geomout.gdet*pp[B1]*get_size_x(iy,1);
+		  //phi[nodalindex]=geomout.gdet*pp[B1]*dx[1];//*get_size_x(iy,1);
+		  phi[nodalindex]=geom.gdet*get_u(p,B1,ix,iy,iz)*get_size_x(iy,1)*2.*M_PI;
 		}
 	      else
 		{
@@ -387,7 +388,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 #else
 		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
 #endif
-		  phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*get_size_x(iy,1);
+		  //phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*dx[1];//*get_size_x(iy,1);
+		  phi[nodalindex]=phi[idx]+geom.gdet*get_u(p,B1,ix,iy,iz)*get_size_x(iy,1)*2.*M_PI;
 		}
 
 

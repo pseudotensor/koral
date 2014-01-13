@@ -915,9 +915,9 @@ fread_restartfile_ascii(int nout1, char *folder, ldouble *t)
     {
       sprintf(fname,"%s/reslast.dat",folder);
       #ifdef MPI
-      sprintf(fnamehead,"%s/../0/reslast.head",folder,nout1);
+      sprintf(fnamehead,"%s/../0/reslast.head",folder);
       #else
-      sprintf(fnamehead,"%s/reslast.head",folder,nout1);
+      sprintf(fnamehead,"%s/reslast.head",folder);
       #endif
     } 
   
