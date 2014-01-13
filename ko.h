@@ -170,6 +170,7 @@ struct evolve_fluxes_2_param
 };
 
 //postproc.c
+ldouble calc_resmri(ldouble);
 int calc_scalars(ldouble*,ldouble);
 ldouble calc_Bflux(ldouble radius,int type);
 ldouble calc_mdotEdd();
@@ -618,6 +619,8 @@ ldouble calc_divB(int ix,int iy,int iz);
 void calc_bcon_prim(double *pp, double *bcon, void* ggg);
 void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg);
 int flux_ct();
+ldouble calc_Qtheta(int ix, int iy, int iz);
+
 
 //silo.c
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix);

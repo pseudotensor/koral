@@ -477,3 +477,23 @@ calc_divB(int ix,int iy,int iz)
 
   return divB;  
 }
+
+ldouble
+calc_Qtheta(int ix, int iy, int iz)
+{
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+  ldouble rho=get_u(p,RHO,ix,iy,iz);
+  ldouble bcon[4];
+  calc_bcon_prim(&get_u(p,0,ix,iy,iz),bcon,&geom);
+  ldouble ucon[4];
+  ucon[1]=get_u(p,VX,ix,iy,iz);
+  ucon[2]=get_u(p,VY,ix,iy,iz);
+  ucon[3]=get_u(p,VZ,ix,iy,iz);
+  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+  ldouble Omega = ucon[3]/ucon[0];
+  ldouble dx=get_xb(iy+1,1)-get_xb(iy,1);
+
+  return 2.*M_PI/Omega/dx*fabs(bcon[2])/sqrt(rho);
+}

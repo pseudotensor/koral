@@ -1288,7 +1288,7 @@
 #endif
 
 #ifndef NSCALARS
-#define NSCALARS 5
+#define NSCALARS 6
 #endif
 
 #ifndef NAVGVARS
@@ -1304,7 +1304,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 26
+#define NRADPROFILES 27
 #endif
 
 #ifndef OUTVEL

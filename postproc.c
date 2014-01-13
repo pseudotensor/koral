@@ -16,7 +16,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
   int ix,iy,iz,iv,i,j;
   ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
-  ldouble rhouconr,Tij[4][4],Rij[4][4],Trt,Rrt,bsq,bcon[4],bcov[4];
+  ldouble rhouconr,Tij[4][4],Rij[4][4],Trt,Rrt,bsq,bcon[4],bcov[4],Qtheta;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
   ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
@@ -63,14 +63,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //to BL     
 	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 
-	      /*
-		dxph[0]=get_size_x(ix,0)*sqrt(geom.gg[1][1]);
-		dxph[1]=get_size_x(iy,1)*sqrt(geom.gg[2][2]);
-		dxph[2]=get_size_x(iz,2)*sqrt(geom.gg[3][3]);
-		dx[0]=dxph[0]/sqrt(geomBL.gg[1][1]);
-		dx[1]=dxph[1]/sqrt(geomBL.gg[2][2]);
-		dx[2]=dxph[2]/sqrt(geomBL.gg[3][3]);
-	      */
 	      ldouble dxph[3];
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
@@ -97,6 +89,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  rho=get_uavg(pavg,RHO,ix,iy,iz);
 		  uint=get_uavg(pavg,UU,ix,iy,iz);
 		  bsq=get_uavg(pavg,AVGBSQ,ix,iy,iz);
+		  bcon[0]=get_uavg(pavg,AVGBCON(0),ix,iy,iz);
+		  bcon[1]=get_uavg(pavg,AVGBCON(1),ix,iy,iz);
+		  bcon[2]=get_uavg(pavg,AVGBCON(2),ix,iy,iz);
+		  bcon[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
 		  utcon[0]=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
@@ -128,9 +124,17 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  utcon[3]=pp[4];
 		  
 #ifdef MAGNFIELD
-		  calc_bcon_4vel(pp,ucon,ucov,bcon);
+		  calc_bcon_prim(pp,bcon,&geomBL);
 		  indices_21(bcon,bcov,geomBL.gg); 
-		  bsq = dot(bcon,bcov);
+		  bsq = dot(bcon,bcov); 
+
+		  /*
+		  if(iy==NY/2 && ix>NX/2)
+		    {printf("%d %d %e\n",ix,iy,bsq);
+		      print_primitives(pp);
+		      print_4vector(bcon);print_4vector(ucon);getch();
+		    }
+		  */
 #endif
 
 		  conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -155,13 +159,16 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //calc_tauabs(pp,xxBL,dx,tauabs);
 
 	      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
+	      ldouble Omega=utcon[3]/utcon[0];
+	      ldouble qtheta=calc_Qtheta(ix,iy,iz);//2.*M_PI/Omega/dx[1]*fabs(bcon[2])/sqrt(rho);
+	     
 	      
+
 	      ldouble tauabsloc = utcon[0]*calc_kappa(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
 	      ldouble tautotloc = utcon[0]*calc_kappaes(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
 
 	      tautot+=tautotloc*dxph[1];
 	      tauabs+=tauabsloc*dxph[1];
-
 
 	
 
@@ -172,6 +179,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      if(utcon[1]<0.)
 		profiles[21][ix]+=rho*dxph[1];
 
+	      //rho-weighted q-theta (28)
+	      profiles[26][ix]+=rho*qtheta;
 	      
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
@@ -227,7 +236,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //<(rho+u+bsq/2)u^r><u_phi> (5)
 	      //profiles[3][ix]+=get_uavg(pavg,AVGWUCON(1),ix,iy,iz)*get_uavg(pavg,AVGUCOV(3),ix,iy,iz)*dxph[1];
-	      profiles[3][ix]+=get_uavg(pavg,AVGRHOUCOV(3),ix,iy,iz)*dxph[1];
+
+	      if(doingavg)
+		profiles[3][ix]+=get_uavg(pavg,AVGRHOUCOV(3),ix,iy,iz)*dxph[1];
+	      else
+		profiles[3][ix]+=rho*ucov[3]*dxph[1];
 	    }
 
 
@@ -235,7 +248,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  //normalizing by sigma
 	  profiles[2][ix]/=profiles[0][ix];
 	  profiles[22][ix]/=profiles[21][ix];
-
+	  profiles[26][ix]/=profiles[0][ix];
+ 
 	  //normalizing by <(rho+u+bsq/2)u^r>
 	  //profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];
 	  profiles[3][ix]/=profiles[0][ix];
@@ -243,8 +257,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  //Keplerian u_phi (6)
 	  ldouble r=xxBL[1];
 	  profiles[4][ix]=((r*r-2.*BHSPIN*sqrt(r)+BHSPIN*BHSPIN)/(sqrt(r*(r*r-3.*r+2.*BHSPIN*sqrt(r)))));  
-
-
 
 	  //net accretion rate at given radius (9)
 	  profiles[7][ix]=fabs(calc_mdot(xxBL[1],0));
@@ -258,9 +270,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[20][ix]=calc_lum(xxBL[1],1);
 	  //location of the photosphere (13)
 	  profiles[11][ix]=calc_photloc(ix);
-
-
-
 
 	}
 
@@ -286,14 +295,27 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   ldouble mdot=calc_mdot(r_horizon_BL(BHSPIN),0);
   scalars[1]=-mdot;
+
+  //accretion rate through horizon in Edd. units (3)
   scalars[4]=-mdot*mdotscale/calc_mdotEdd();
 
-  //luminosity (4) at 0.5*rmax
   ldouble xx[4],xxBL[4];
   get_xx(NX-1,0,0,xx);
   coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
-  scalars[2]=calc_lum(xxBL[1]/2.,0)/calc_lumEdd();
+  //luminosity (4) rlum
+  ldouble rlum=xxBL[1]/2.;
+#if(PROBLEM==61) //INJDISK
+  rlum=2./3.*DISKRCIR;
+#endif
+  scalars[2]=calc_lum(rlum,0)/calc_lumEdd();
+
+  //mri resolution parameter Q_theta (5) at rmri
+  ldouble rmri=xxBL[1]/2.;
+#if(PROBLEM==61) //INJDISK
+  rmri=2./3.*DISKRCIR;
+#endif
+  scalars[5]=calc_resmri(rmri);
 
   //magnetic flux through horizon parameter (5)
   ldouble Bflux=calc_Bflux(r_horizon_BL(BHSPIN),0);
@@ -585,6 +607,54 @@ calc_lum(ldouble radius,int type)
 
 #endif
     return -1;
+}
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates MRI resolution parameter Q_theta ar rmri
+ldouble
+calc_resmri(ldouble radius)
+{
+#ifndef BHDISK_PROBLEMTYPE
+  return -1.; //no MRI
+#endif
+
+#ifdef MAGNFIELD
+
+  int ix,iy,iz,iv;
+  ldouble xx[4],xxBL[4],dx[3];
+  ldouble qtheta=0.,sigma=0.,rho,pp[NV];
+ 
+  //search for appropriate radial index
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
+
+  if(NZ==1)
+    {
+      iz=0;
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iv=0;iv<NV;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  dx[1]=get_size_x(iy,1);
+	  rho=get_u(p,RHO,ix,iy,iz);
+
+	  sigma+=rho*dx[1];
+	  qtheta+=rho*calc_Qtheta(ix,iy,iz)*dx[1];
+	}
+
+      return qtheta/sigma;
+    }
+  else
+    return -1.;
+
+#endif
+    return -1.;
 }
 
 //**********************************************************************
