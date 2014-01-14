@@ -407,7 +407,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
  
   mpi_exchangedata();
  
- //**********************************************************************
+  //**********************************************************************
   //**********************************************************************
   //**********************************************************************
 
@@ -1382,7 +1382,8 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	{
 	  for(iz=-zlim;iz<NZ+zlim;iz++)
 	    {	
-	      if(if_outsidegc(ix,iy,iz)==1) continue;
+	      //comment to calculate in corners?
+	      //if(if_outsidegc(ix,iy,iz)==1) continue;
 
 	      loop_1[Nloop_1][0]=ix;
 	      loop_1[Nloop_1][1]=iy;
@@ -1523,6 +1524,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //**********************************************************************
   //**********************************************************************
   //all corners of the domain cells
+  //what?
   
   Nloop_4=0;
   loop_4=(int **)malloc(sizeof(int*));
