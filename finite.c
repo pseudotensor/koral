@@ -406,13 +406,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
  
   mpi_exchangedata();
-
-  /*
-  if(PROCID==0)
-    printf("0 > NX NY > %e\n",get_u(p,UU,NX,NY,0));
-  if(PROCID==3)
-    printf("3 > 0 0 > %e\n",get_u(p,UU,0,0,0));
-  */
  
   //**********************************************************************
   //**********************************************************************
@@ -703,6 +696,15 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
     }
 
+  if(PROCID==0)
+    {
+      printf("0 > %e\n",get_ub(flRy,UU,NX,0,0,0));
+    }
+  if(PROCID==1)
+    {
+      printf("1 > %e\n",get_ub(flRy,UU,0,0,0,0));
+    }
+      
 
 
   //**********************************************************************
