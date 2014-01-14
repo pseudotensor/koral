@@ -610,8 +610,15 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
 	    }
 
-	  if(ix==NX) getchar();
-
+	  /*
+	  if(ix==NX && iy==0)
+	    {
+	      print_primitives(fd_pl);
+	      print_NVvector(ffl);
+	      getch();
+	      
+	    }
+	  */
 	  //saving to memory
 	  for(i=0;i<NV;i++)
 	    {
@@ -696,15 +703,25 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
     }
 
+  /*
   if(PROCID==0)
     {
-      printf("0 > %e\n",get_ub(flRy,UU,NX,0,0,0));
+      printf("0p > %e\n",get_u(p,VX,NX,NY,0));
+      //printf("0 > %e\n",get_ub(flRy,UU,NX,NY-1,0,1));
+    }
+  if(PROCID==3)
+    {
+      printf("3p > %e\n",get_u(p,VX,0,0,0));
+      //printf("0 > %e\n",get_ub(flRy,UU,NX,NY-1,0,1));
     }
   if(PROCID==1)
     {
-      printf("1 > %e\n",get_ub(flRy,UU,0,0,0,0));
+      printf("1p > %e\n",get_u(p,VX,0,NY,0));
+      //printf("1 > %e\n",get_ub(flRy,UU,0,NY-1,0,1));
+
     }
-      
+    getch();   
+  */   
 
 
   //**********************************************************************
@@ -2162,6 +2179,10 @@ int set_bc(ldouble t,int ifinit)
 	set_u(u,iv,ix,NY,iz,get_u(u,iv,ix,NY-1,iz));
 	set_u(p,iv,ix,NY,iz,get_u(p,iv,ix,NY-1,iz));
       }
+    }
+
+  if(mpi_isitBC(XBCHI)==1)
+    {
       ix=NX;
       PLOOP(iv)
       {
@@ -2169,6 +2190,30 @@ int set_bc(ldouble t,int ifinit)
 	set_u(p,iv,ix,-1,iz,get_u(p,iv,ix,0,iz));
 	set_u(u,iv,ix,NY,iz,get_u(u,iv,ix,NY-1,iz));
 	set_u(p,iv,ix,NY,iz,get_u(p,iv,ix,NY-1,iz));
+      }
+   }
+
+  if(mpi_isitBC(YBCLO)==1)
+    {
+      iy=-1;
+      PLOOP(iv)
+      {
+	set_u(u,iv,-1,iy,iz,get_u(u,iv,0,iy,iz));
+	set_u(p,iv,-1,iy,iz,get_u(p,iv,0,iy,iz));
+	set_u(u,iv,NX,iy,iz,get_u(u,iv,NX-1,iy,iz));
+	set_u(p,iv,NX,iy,iz,get_u(p,iv,NX-1,iy,iz));
+      }
+   }
+
+  if(mpi_isitBC(YBCHI)==1)
+    {
+      iy=NY;
+      PLOOP(iv)
+      {
+	set_u(u,iv,-1,iy,iz,get_u(u,iv,0,iy,iz));
+	set_u(p,iv,-1,iy,iz,get_u(p,iv,0,iy,iz));
+	set_u(u,iv,NX,iy,iz,get_u(u,iv,NX-1,iy,iz));
+	set_u(p,iv,NX,iy,iz,get_u(p,iv,NX-1,iy,iz));
       }
    }
 
