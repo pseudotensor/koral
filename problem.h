@@ -73,7 +73,7 @@
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 //71 MBBBLOB - rad blobs with magn field
 
-#define PROBLEM 69
+#define PROBLEM 71
 
 #if(PROBLEM==71)
 
@@ -1552,3 +1552,19 @@
 #ifndef NZ
 #define NZ (TNZ/NTZ)
 #endif 
+
+#ifndef MPIMSGBUFSIZE
+#define MPIMSGBUFSIZE 12
+#endif
+
+#ifndef MPI4CORNERS
+#ifdef MAGNFIELD
+#define MPI4CORNERS
+#undef MPIMSGBUFSIZE
+#if (TNX>1 && TNY>1 && TNY>1) //3d
+#define MPIMSGBUFSIZE 52
+#else //2d
+#define MPIMSGBUFSIZE 20
+#endif
+#endif
+#endif

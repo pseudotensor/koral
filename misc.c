@@ -118,8 +118,8 @@ initialize_arrays()
   ptm2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //buffer for sending/receiving messages
-  msgbufs=(ldouble**)malloc(12*sizeof(ldouble*));
-  for(i=0;i<12;i++)
+  msgbufs=(ldouble**)malloc(MPIMSGBUFSIZE*sizeof(ldouble*));
+  for(i=0;i<MPIMSGBUFSIZE;i++)
     msgbufs[i]=(ldouble*)malloc(my_max3(NX*NY*NV*NG,NY*NZ*NV*NG,NZ*NX*NV*NG)*sizeof(ldouble));
 
 #ifdef MAGNFIELD
