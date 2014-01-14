@@ -51,7 +51,7 @@ main(int argc, char **argv)
   //i=system(bufor);
 
   //opens the scalar file
-  sprintf(bufor,"%s/scalars.dat",folder);
+  sprintf(bufor,"%s/avgscalars.dat",folder);
   fout_scalars=fopen(bufor,"w");
 
   //arrays for averaging of primitives

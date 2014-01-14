@@ -171,6 +171,7 @@ struct evolve_fluxes_2_param
 
 //postproc.c
 ldouble calc_resmri(ldouble);
+ldouble calc_meantemp(ldouble);
 int calc_scalars(ldouble*,ldouble);
 ldouble calc_Bflux(ldouble radius,int type);
 ldouble calc_mdotEdd();

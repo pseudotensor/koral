@@ -182,6 +182,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rho-weighted q-theta (28)
 	      profiles[26][ix]+=rho*qtheta;
 	      
+	      //rho-weighted temperature (29)
+	      profiles[27][ix]+=rho*temp;
+	      
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 
@@ -249,6 +252,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[2][ix]/=profiles[0][ix];
 	  profiles[22][ix]/=profiles[21][ix];
 	  profiles[26][ix]/=profiles[0][ix];
+	  profiles[27][ix]/=profiles[0][ix];
  
 	  //normalizing by <(rho+u+bsq/2)u^r>
 	  //profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];
@@ -296,7 +300,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   ldouble mdot=calc_mdot(r_horizon_BL(BHSPIN),0);
   scalars[1]=-mdot;
 
-  //accretion rate through horizon in Edd. units (3)
+  //accretion rate through horizon in Edd. units (6)
   scalars[4]=-mdot*mdotscale/calc_mdotEdd();
 
   ldouble xx[4],xxBL[4];
@@ -305,17 +309,24 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   //luminosity (4) rlum
   ldouble rlum=xxBL[1]/2.;
-#if(PROBLEM==61) //INJDISK
+#if(PROBLEM==69) //INJDISK
   rlum=2./3.*DISKRCIR;
 #endif
-  scalars[2]=calc_lum(rlum,0)/calc_lumEdd();
+  scalars[2]=calc_lum(rlum,0);
 
-  //mri resolution parameter Q_theta (5) at rmri
+  //mri resolution parameter Q_theta (7) at rmri
   ldouble rmri=xxBL[1]/2.;
-#if(PROBLEM==61) //INJDISK
-  rmri=2./3.*DISKRCIR;
+#if(PROBLEM==69) //INJDISK
+  rmri=20.;
 #endif
   scalars[5]=calc_resmri(rmri);
+
+  //rho-weighted temperature at rtemp (8)
+  ldouble rtemp=xxBL[1]/2.;
+#if(PROBLEM==69) //INJDISK
+  rtemp=20.;
+#endif
+  scalars[6]=calc_meantemp(rtemp);
 
   //magnetic flux through horizon parameter (5)
   ldouble Bflux=calc_Bflux(r_horizon_BL(BHSPIN),0);
@@ -488,29 +499,30 @@ calc_lum(ldouble radius,int type)
 	  fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 	  struct geometry geom;
 	  fill_geometry(ix,iy,iz,&geom);
-
+	  get_xx(ix,iy,iz,xx);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=2.*M_PI;
+	  gdet=geom.gdet;
+	  ldouble dxph[3],dxBL[3];
+	  ldouble xx1[4],xx2[4];
+	  xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	  xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	  dxBL[0]=fabs(xx2[1]-xx1[1]);
+	  xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	  xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	  dxBL[1]=fabs(xx2[2]-xx1[2]);
+	  dxBL[2]=2.*M_PI;
+	  dxph[0]=dxBL[0]*sqrt(geomBL.gg[1][1]);
+	  dxph[1]=dxBL[1]*sqrt(geomBL.gg[2][2]);
+	  dxph[2]=dxBL[2]*sqrt(geomBL.gg[3][3]);
+	  
 	  if(doingavg)
 	    {
-	      
-
-	      ldouble dxph[3];
-	      ldouble xx1[4],xx2[4];
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
-	      dx[0]=fabs(xx2[1]-xx1[1]);
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
-	      dx[1]=fabs(xx2[2]-xx1[2]);
-	      dx[2]=2.*M_PI;
-	      dxph[0]=dx[0]*sqrt(geomBL.gg[1][1]);
-	      dxph[1]=dx[1]*sqrt(geomBL.gg[2][2]);
-	      dxph[2]=dx[2]*sqrt(geomBL.gg[3][3]);
-	      gdet=geomBL.gdet;
-
 	      PLOOP(iv)
 		pp[iv]=get_uavg(pavg,iv,ix,iy,iz);
 
@@ -528,7 +540,7 @@ calc_lum(ldouble radius,int type)
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
-		  indices_2221(Rij,Rij,geomBL.gg);
+		  //indices_2221(Rij,Rij,geomBL.gg);
 		  Fr=-Rij[1][0];
 		  if(Fr<0.) Fr=0.;
 		}
@@ -538,24 +550,22 @@ calc_lum(ldouble radius,int type)
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
-		  indices_2221(Rij,Rij,geomBL.gg);
-
+		  //indices_2221(Rij,Rij,geomBL.gg);
+		  
 		  Fr=-Rij[1][0];// + ehat*uconr);
 		  if(uconr<0. || Fr<0.) Fr=0.;
 		}
 	      else
 		Fr=0.;
+
+	      lum+=geomBL.gdet*Fr*dxBL[1]*dxBL[2];
 	    }
 	  else
 	    {
-	      get_xx(ix,iy,iz,xx);
-	      dx[0]=get_size_x(ix,0);
-	      dx[1]=get_size_x(iy,1);
-	      dx[2]=2.*M_PI;
-	      gdet=geom.gdet;
+	      
 
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-	      calc_tautot(pp,xxBL,dx,tautot);
+	      calc_tautot(pp,xxBL,dxph,tautot);
 
 	      ucongas[1]=pp[2];
 	      ucongas[2]=pp[3];
@@ -563,7 +573,7 @@ calc_lum(ldouble radius,int type)
 	      conv_vels(ucongas,ucongas,VELPRIM,VEL4,geom.gg,geom.GG);
 
 	      tau+=ucongas[0]*tautot[1];
-
+	      
 	      if(type==0) //R^r_t outside photosphere
 		{
 		  if(tau>1.) break;	  
@@ -586,6 +596,8 @@ calc_lum(ldouble radius,int type)
 		}
 	      else
 		Fr=0.;
+
+	      lum+=gdet*Fr*dx[1]*dx[2];
 	    }
 
 	  //#ifdef CGSOUTPUT
@@ -597,8 +609,6 @@ calc_lum(ldouble radius,int type)
 
 
 	  //printf("%e %e %e -> %e\n",Fr,gdet,dx[1],dx[2],lum);getch();
-
-	  lum+=gdet*Fr*dx[1]*dx[2];
 	}
       
       return lum;
@@ -623,7 +633,7 @@ calc_resmri(ldouble radius)
 
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3];
-  ldouble qtheta=0.,sigma=0.,rho,pp[NV];
+  ldouble qtheta=0.,sigma=0.,rho;
  
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -638,9 +648,6 @@ calc_resmri(ldouble radius)
       iz=0;
       for(iy=0;iy<NY;iy++)
 	{
-	  for(iv=0;iv<NV;iv++)
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
-
 	  dx[1]=get_size_x(iy,1);
 	  rho=get_u(p,RHO,ix,iy,iz);
 
@@ -654,6 +661,49 @@ calc_resmri(ldouble radius)
     return -1.;
 
 #endif
+    return -1.;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates mean temperature at rmri
+ldouble
+calc_meantemp(ldouble radius)
+{
+#ifndef BHDISK_PROBLEMTYPE
+  return -1.; //no disk no cry
+#endif
+
+
+  int ix,iy,iz,iv;
+  ldouble xx[4],xxBL[4],dx[3];
+  ldouble mtemp=0.,sigma=0.,rho,ugas;
+ 
+  //search for appropriate radial index
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
+
+   if(NZ==1)
+    {
+      iz=0;
+      for(iy=5;iy<NY-5;iy++)
+	{
+	  dx[1]=get_size_x(iy,1);
+	  rho=get_u(p,RHO,ix,iy,iz);
+	  ugas=get_u(p,UU,ix,iy,iz);
+	  ldouble temp=calc_PEQ_Tfromurho(ugas,rho);
+	  sigma+=rho*dx[1];
+	  mtemp+=rho*temp*dx[1];
+	}
+
+      return mtemp/sigma;
+    }
+  else
     return -1.;
 }
 

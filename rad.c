@@ -28,7 +28,7 @@ int
 calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
 {
   ldouble rho=pp[RHO];
-  ldouble u=pp[1];  
+  ldouble u=pp[UU];  
   ldouble pr=(GAMMA-1.)*(u);
   ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
 
