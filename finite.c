@@ -610,7 +610,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
 	    }
 
-	 
+	  if(ix==NX) getchar();
 
 	  //saving to memory
 	  for(i=0;i<NV;i++)
