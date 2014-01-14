@@ -579,7 +579,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
-	  //testing if interpolated primitives make sense
 	  if(iy>=0)
 	    {
 	      fill_geometry_face(ix,iy,iz,1,&geom);
@@ -623,7 +622,8 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  dx0=get_size_x(iz,2);    
 	  dxm1=get_size_x(iz-1,2);    
-	  dxp1=get_size_x(iz+1,2);    
+	  dxp1=get_size_x(iz+1,2);
+    
 	  if(INT_ORDER>1)
 	    {
 	      dxm2=get_size_x(iz-2,2);    
@@ -635,6 +635,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	      fd_p0[i]=get_u(p,i,ix,iy,iz);
 	      fd_pp1[i]=get_u(p,i,ix,iy,iz+1);
 	      fd_pm1[i]=get_u(p,i,ix,iy,iz-1);
+
 	      if(INT_ORDER>1)
 		{
 		  fd_pm2[i]=get_u(p,i,ix,iy,iz-2);
@@ -1382,8 +1383,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	{
 	  for(iz=-zlim;iz<NZ+zlim;iz++)
 	    {	
-	      //comment to calculate in corners?
-	      //if(if_outsidegc(ix,iy,iz)==1) continue;
+	      if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
 
 	      loop_1[Nloop_1][0]=ix;
 	      loop_1[Nloop_1][1]=iy;
@@ -2053,6 +2053,56 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	}
     }
+
+#ifdef MPI4CORNERS
+  //now calculate conserved in corners - 
+  //they are never real BC
+  struct geometry geom;
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0) 
+    {
+      for(ix=-NG;ix<0;ix++)
+	for(iy=-NG;iy<0;iy++)
+	  for(iz=0;iz<NZ;iz++)
+	    {	    
+	      fill_geometry(ix,iy,iz,&geom);
+	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	    }
+    }
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0) 
+    {
+      for(ix=NX;ix<NX+NG;ix++)
+	for(iy=-NG;iy<0;iy++)
+	  for(iz=0;iz<NZ;iz++)
+	    {	    
+	      fill_geometry(ix,iy,iz,&geom);
+	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	    }
+    }
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0) 
+    {
+      for(ix=-NG;ix<0;ix++)
+	for(iy=NY;iy<NY+NG;iy++)
+	  for(iz=0;iz<NZ;iz++)
+	    {	    
+	      fill_geometry(ix,iy,iz,&geom);
+	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	    }
+    }
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0) 
+    {
+      for(ix=NX;ix<NX+NG;ix++)
+	for(iy=NY;iy<NY+NG;iy++)
+	  for(iz=0;iz<NZ;iz++)
+	    {	    
+	      //int tix,tiy,tiz;
+	      //mpi_local2globalidx(ix,iy,iz,&tix,&tiy,&tiz);
+	      //printf("%d %d > %d %d\n",ix,iy,tix,tiy);
+	      fill_geometry(ix,iy,iz,&geom);
+	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	    }
+    }
+
+#endif
 
   return 0;
 }
