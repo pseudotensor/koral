@@ -473,7 +473,11 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //x 'sweep'
 
+#ifdef MPI4CORNERS
+      if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1)
+#else
       if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
+#endif
 	{
 	  x0[0]=get_x(ix,0);
 
@@ -513,6 +517,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 		}
 	    }
 	 		
+
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
 	  if(ix>=0) //no need to calculate at left face of first GC
@@ -543,7 +548,11 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //y 'sweep'
 
+#ifdef MPI4CORNERS
+      if(NY>1 && ix>=-1 && ix<NX+1 && iz>=-1 && iz<NZ+1)
+#else
       if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
+#endif
 	{
 	  x0l[1]=get_xb(iy,1);
 	  xm1[1]=get_x(iy-1,1);
@@ -577,8 +586,16 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 		}
 	    }
 
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
+	  /*
+	  printf("y> %d %d\n",ix,iy);
+	  print_primitives(fd_pm1);
+	  print_primitives(fd_p0);
+	  print_primitives(fd_pp1);
+	  getch();
+	  */
 
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
+	  
 	  if(iy>=0)
 	    {
 	      fill_geometry_face(ix,iy,iz,1,&geom);
@@ -592,6 +609,8 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	      check_floors_mhd(fd_pr,VELPRIM,&geom);
 	      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
 	    }
+
+	 
 
 	  //saving to memory
 	  for(i=0;i<NV;i++)
@@ -608,7 +627,11 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //z 'sweep'	      
 
+#ifdef MPI4CORNERS
+      if(NZ>1 && ix>=-1 && ix<NX+1 && iy>=-1 && iy<NY+1)
+#else
       if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
+#endif
 	{
 	  x0l[2]=get_xb(iz,2);
 	  xm1[2]=get_x(iz-1,2);
@@ -1428,7 +1451,8 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	      if(if_indomain(ix,iy,iz)==1) continue;
 
 	      //at the corners
-	      if(if_outsidegc(ix,iy,iz)==1) continue;
+	      //I commented it out to precalculate metric in the corners but may affect something, who knows? :)
+	      //if(if_outsidegc(ix,iy,iz)==1) continue;
 
 	      loop_2[Nloop_2][0]=ix;
 	      loop_2[Nloop_2][1]=iy;
@@ -2056,7 +2080,6 @@ int set_bc(ldouble t,int ifinit)
 
 #ifdef MPI4CORNERS
   //now calculate conserved in corners - 
-  //they are never real BC
   struct geometry geom;
   if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0) 
     {
@@ -2101,7 +2124,48 @@ int set_bc(ldouble t,int ifinit)
 	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 	    }
     }
+  
+  //corners of the whole domain are never real BC so need to fill them with something 
+  int xlim,ylim,zlim;
+  int lim;
 
+  if(INT_ORDER==1) lim=1;
+  if(INT_ORDER==2) lim=1;
+  if(INT_ORDER==4) lim=2;
+
+  if(NX>1) xlim=lim; else xlim=0;  
+  if(NY>1) ylim=lim; else ylim=0;
+  if(NZ>1) zlim=lim; else zlim=0;
+
+  if(NZ>1)
+    {
+      printf("filling corners not implemented for NTZ>1\n");exit(-1);
+    }
+
+  iz=0;
+  //may be overlapping but who cares
+  if(mpi_isitBC(XBCLO)==1)
+    {
+      ix=-1;
+      PLOOP(iv)
+      {
+	set_u(u,iv,ix,-1,iz,get_u(u,iv,ix,0,iz));
+	set_u(p,iv,ix,-1,iz,get_u(p,iv,ix,0,iz));
+	set_u(u,iv,ix,NY,iz,get_u(u,iv,ix,NY-1,iz));
+	set_u(p,iv,ix,NY,iz,get_u(p,iv,ix,NY-1,iz));
+      }
+      ix=NX;
+      PLOOP(iv)
+      {
+	set_u(u,iv,ix,-1,iz,get_u(u,iv,ix,0,iz));
+	set_u(p,iv,ix,-1,iz,get_u(p,iv,ix,0,iz));
+	set_u(u,iv,ix,NY,iz,get_u(u,iv,ix,NY-1,iz));
+	set_u(p,iv,ix,NY,iz,get_u(p,iv,ix,NY-1,iz));
+      }
+   }
+
+
+ 
 #endif
 
   return 0;

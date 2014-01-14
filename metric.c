@@ -3000,6 +3000,8 @@ calc_metric()
 	  */
 
 	}
+
+
       xx[0]=0.;
       xx[1]=get_x(ix,0);
       xx[2]=get_xb(iy+1,1);

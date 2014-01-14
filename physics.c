@@ -464,7 +464,17 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
   ldouble T[4][4];
 
   calc_Tij(pp,&geom,T);
+
+  /*
+  printf("in flux: %d %d %d (%d)\n",ix,iy,iz,idim);
+  print_primitives(pp);
+  print_metric(gg);
+  print_tensor(T);
+  getch();
+  */
+
   indices_2221(T,T,gg);
+
 
   //primitives
 #ifdef TRACER
