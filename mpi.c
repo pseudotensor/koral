@@ -10,7 +10,7 @@ mpi_exchangedata()
 
 #ifdef MPI
   
-  MPI_Request reqs[12];
+  MPI_Request reqs[MPIMSGBUFSIZE];
   int nreqs=0;
   mpi_senddata(reqs,&nreqs);
   mpi_recvdata(reqs,&nreqs);

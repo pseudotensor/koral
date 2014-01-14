@@ -31,7 +31,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   coordnames[2] = strdup("Z");
   
   /* Give the cartesian coordinates of the mesh */
-  int ix,iy,iz,iv;
+  int ix,iy,iz,iv,imx,imy,imz;
   int i,j;
   ldouble pp[NV],uu[NV],xxvec[4],xxveccar[4],xxvecsph[4],xx1[4],xx2[4];
   
@@ -92,19 +92,22 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *uradx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *urady = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *uradz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
-  #endif
+#endif
 
   for(iz=0;iz<nz;iz++)
     {
       
       
-      for(iy=0;iy<ny;iy++)
-	{
-	  
+#ifdef PRINTYGC_RIGHT
+      for(iy=NG;iy<ny+NG;iy++)
+#else
+	for(iy=0;iy<ny;iy++)
+#endif
+	  {  
 #ifdef PRINTXGC_RIGHT
 	  for(ix=NG;ix<nx+NG;ix++)
 #else
-	  for(ix=0;ix<nx;ix++)
+   for(ix=0;ix<nx;ix++)
 #endif
 
 	    {
@@ -164,11 +167,16 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      if(OUTCOORDS==BLCOORDS && geomout.xx<r_horizon_BL(BHSPIN))
 	      continue;
 
+	      imz=iz;
+	      imy=iy;
+	      imx=ix;
 #ifdef PRINTXGC_RIGHT
-	      int nodalindex=iz*(ny*nx) + iy*nx + ix-NG;
-#else
-	      int nodalindex=iz*(ny*nx) + iy*nx + ix;
+	      imx=ix-NG;
 #endif
+#ifdef PRINTYGC_RIGHT
+	      imy=iy-NG;
+#endif
+	      int nodalindex=imz*(ny*nx) + imy*nx + imx;
 	      for(iv=0;iv<NV;iv++)
 		{
 		  if(doingavg)
@@ -383,11 +391,17 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 	      else
 		{
+		  imz=iz;
+		  imy=iy;
+		  imx=ix;
 #ifdef PRINTXGC_RIGHT
-		  int idx=iz*(ny*nx) + (iy-1)*nx + ix-NG;
-#else
-		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
+		  imx=ix-NG;
 #endif
+#ifdef PRINTYGC_RIGHT
+		  imy=iy-NG;
+#endif
+		  int idx=imz*(ny*nx) + (imy-1)*nx + imx;
+
 		  //phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*dx[1];//*get_size_x(iy,1);
 		  phi[nodalindex]=phi[idx]+geom.gdet*get_u(p,B1,ix,iy,iz)*get_size_x(iy,1)*2.*M_PI;
 		}
@@ -494,11 +508,16 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 	      else
 		{
+		  imz=iz;
+		  imy=iy;
+		  imx=ix;
 #ifdef PRINTXGC_RIGHT
-		  int idx=iz*(ny*nx) + (iy-1)*nx + ix-NG;
-#else
-		  int idx=iz*(ny*nx) + (iy-1)*nx + ix;
+		  imx=ix-NG;
 #endif
+#ifdef PRINTYGC_RIGHT
+		  imy=iy-NG;
+#endif
+		  int idx=imz*(ny*nx) + (imy-1)*nx + imx;
 		  if(iy<=NY/2) //proper integration only in the upper half
 		    {
 		      tautot[nodalindex]=tautot[idx]+tautotloc*dxph[1];
@@ -506,7 +525,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		    }
 		  else
 		    {
-		      idx=iz*(ny*nx) + (NY-iy-1)*nx + ix-NG;
+		      idx=imz*(ny*nx) + (NY-imy-1)*nx + imx-NG;
 		      tautot[nodalindex]=tautot[idx];
 		      tauabs[nodalindex]=tauabs[idx];
 		    }

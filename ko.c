@@ -343,7 +343,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  fprint_restartfile(t,folder);
 
 	  //dumps dumps
-	  #ifndef MPI //comment if you want .silo etc files per core for OUTPUTPERCORE
+	  //#ifndef MPI //comment if you want .silo etc files per core for OUTPUTPERCORE
 #if(SCAOUTPUT==1)
 	  fprint_scalars(t,scalars,NSCALARS,folder);
 #endif
@@ -356,7 +356,7 @@ solve_the_problem(ldouble tstart, char* folder)
 #if(SILOOUTPUT==1)
 	  fprint_silofile(t,nfout1,folder,"sil");
 #endif
-	  #endif
+	  //#endif
 	  
 	  nfout1++;
 

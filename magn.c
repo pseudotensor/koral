@@ -77,6 +77,7 @@ void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg)
 /* wrappers for missing cells / dimensions */
 int fl_x(int i)
 { if(NX==1) return 0;
+  /*
   if(i<0) {
     #ifdef PERIODIC_XBC
     return NX+i;
@@ -91,10 +92,12 @@ int fl_x(int i)
     return NX-1;
     #endif 
   }
+  */
   return i; }
 
 int fl_y(int i)
 { if(NY==1) return 0;
+  /*
   if(i<0) {
     #ifdef PERIODIC_YBC
     return NY+i;
@@ -109,10 +112,12 @@ int fl_y(int i)
     return NY-1;
     #endif 
   }
+  */
   return i; }
 
 int fl_z(int i)
 { if(NZ==1) return 0;
+  /*
   if(i<0) {
     #ifdef PERIODIC_ZBC
     return NZ+i;
@@ -127,6 +132,7 @@ int fl_z(int i)
     return NZ-1;
     #endif 
   }
+  */
   return i; }
 
 int flx_x(int i)
@@ -317,7 +323,7 @@ calc_BfromA()
   //A_mu converted to code coordinates in init.c
   
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
+  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells 
     {
       ix=loop_02[ii][0];
       iy=loop_02[ii][1];

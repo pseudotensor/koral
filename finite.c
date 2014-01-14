@@ -406,6 +406,13 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
  
   mpi_exchangedata();
+
+  /*
+  if(PROCID==0)
+    printf("0 > NX NY > %e\n",get_u(p,UU,NX,NY,0));
+  if(PROCID==3)
+    printf("3 > 0 0 > %e\n",get_u(p,UU,0,0,0));
+  */
  
   //**********************************************************************
   //**********************************************************************
@@ -1548,7 +1555,6 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //**********************************************************************
   //**********************************************************************
   //all corners of the domain cells
-  //what?
   
   Nloop_4=0;
   loop_4=(int **)malloc(sizeof(int*));
