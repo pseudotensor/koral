@@ -610,15 +610,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
 	    }
 
-	  /*
-	  if(ix==NX && iy==0)
-	    {
-	      print_primitives(fd_pl);
-	      print_NVvector(ffl);
-	      getch();
-	      
-	    }
-	  */
 	  //saving to memory
 	  for(i=0;i<NV;i++)
 	    {
@@ -706,23 +697,23 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   /*
   if(PROCID==0)
     {
-      printf("0p > %e\n",get_u(p,VX,NX,NY,0));
-      //printf("0 > %e\n",get_ub(flRy,UU,NX,NY-1,0,1));
+      //printf("0p > %e\n",get_u(p,VX,NX,NY,0));
+      printf("0 > %e\n",get_ub(flLy,UU,NX,NY,0,1));
     }
   if(PROCID==3)
     {
-      printf("3p > %e\n",get_u(p,VX,0,0,0));
-      //printf("0 > %e\n",get_ub(flRy,UU,NX,NY-1,0,1));
+      //printf("3p > %e\n",get_u(p,VX,0,0,0));
+      printf("3 > %e\n",get_ub(flLy,UU,0,0,0,1));
     }
   if(PROCID==1)
     {
-      printf("1p > %e\n",get_u(p,VX,0,NY,0));
-      //printf("1 > %e\n",get_ub(flRy,UU,0,NY-1,0,1));
+      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
+      printf("1 > %e\n",get_ub(flLy,UU,0,NY,0,1));
 
     }
     getch();   
-  */   
-
+  */
+  
 
   //**********************************************************************
   //**********************************************************************
@@ -739,6 +730,31 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
 
+  /*
+  if(PROCID==0)
+    {
+      //printf("0p > %e\n",get_u(p,VX,NX,NY,0));
+      printf("0 > %e\n",get_ub(flby,B1,NX-1,NY,0,1));
+    }
+  if(PROCID==3)
+    {
+      //printf("3p > %e\n",get_u(p,VX,0,0,0));
+      //printf("3 > %e\n",get_ub(flbx,B2,0,0,0,0));
+    }
+  if(PROCID==1)
+    {
+      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
+      //printf("1 > %e\n",get_ub(flby,B1,0,NY-1,0,0));
+
+    }
+  if(PROCID==2)
+    {
+      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
+      printf("2 > %e\n",get_ub(flby,B1,NX-1,0,0,1));
+
+    }
+  //  getch();  
+  */
 
   //**********************************************************************
   //**********************************************************************
@@ -747,6 +763,32 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 #ifdef MAGNFIELD
   flux_ct(); //constrained transport to preserve div.B=0
 #endif
+
+  /*
+if(PROCID==0)
+    {
+      //printf("0p > %e\n",get_u(p,VX,NX,NY,0));
+      printf("0b > %e\n",get_ub(flby,B1,NX-1,NY,0,1));
+    }
+  if(PROCID==3)
+    {
+      //printf("3p > %e\n",get_u(p,VX,0,0,0));
+      //printf("3b > %e\n",get_ub(flbx,B2,0,0,0,0));
+    }
+  if(PROCID==1)
+    {
+      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
+      //printf("1b > %e\n",get_ub(flbx,B3,0,NY-1,0,0));
+
+    }
+ if(PROCID==2)
+    {
+      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
+      printf("2 > %e\n",get_ub(flby,B1,NX-1,0,0,1));
+
+    }
+  getch();
+  */
 
   //**********************************************************************
   //**********************************************************************
@@ -1002,8 +1044,12 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //**********************************************************************
   //x 'sweep'
  
-  if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
-    {
+#ifdef MPI4CORNERS
+    if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1)
+#else
+    if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
+#endif
+      {
       //characteristic wave speeds for calculating the flux on both sides of a face
       ap1l[0]=get_u_scalar(ahdxl,ix,iy,iz);
       ap1r[0]=get_u_scalar(ahdxr,ix,iy,iz);
@@ -1105,7 +1151,11 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //**********************************************************************
   //**********************************************************************
   //y 'sweep'
-  if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
+#ifdef MPI4CORNERS
+    if(NY>1 && ix>=-1 && ix<NX+1 && iz>=-1 && iz<NZ+1)
+#else
+    if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
+#endif
     {
       ap1l[0]=get_u_scalar(ahdyl,ix,iy,iz);
       ap1r[0]=get_u_scalar(ahdyr,ix,iy,iz);
@@ -1197,7 +1247,11 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //**********************************************************************
   //**********************************************************************
   //z 'sweep'
-  if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
+#ifdef MPI4CORNERS
+    if(NZ>1 && ix>=-1 && ix<NX+1 && iy>=-1 && iy<NY+1)
+#else
+    if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
+#endif
     {
       ap1l[0]=get_u_scalar(ahdzl,ix,iy,iz);
       ap1r[0]=get_u_scalar(ahdzr,ix,iy,iz);
@@ -1432,7 +1486,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	{
 	  for(iz=-zlim;iz<NZ+zlim;iz++)
 	    {	
-	      if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
+	      //if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
 
 	      loop_1[Nloop_1][0]=ix;
 	      loop_1[Nloop_1][1]=iy;
@@ -2079,16 +2133,6 @@ int set_bc(ldouble t,int ifinit)
 	  struct geometry geom;
 	  fill_geometry(ix,iy,iz,&geom);
 	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
-	  
-	  /*
-	  if(BCtype==XBCHI)
-	    {
-	      printf("%d %d > %e > %d\n",ix,iy,get_u(p,0,ix,iy,iz),PROCID);
-	      print_primitives(&get_u(p,0,ix,iy,iz));
-	      print_conserved(&get_u(u,0,ix,iy,iz));
-	      exit(-1);	  
-	    }
-	  */
 	}
       else //need for real BC
 	{
@@ -2142,9 +2186,6 @@ int set_bc(ldouble t,int ifinit)
 	for(iy=NY;iy<NY+NG;iy++)
 	  for(iz=0;iz<NZ;iz++)
 	    {	    
-	      //int tix,tiy,tiz;
-	      //mpi_local2globalidx(ix,iy,iz,&tix,&tiy,&tiz);
-	      //printf("%d %d > %d %d\n",ix,iy,tix,tiy);
 	      fill_geometry(ix,iy,iz,&geom);
 	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 	    }
@@ -2153,14 +2194,6 @@ int set_bc(ldouble t,int ifinit)
   //corners of the whole domain are never real BC so need to fill them with something 
   int xlim,ylim,zlim;
   int lim;
-
-  if(INT_ORDER==1) lim=1;
-  if(INT_ORDER==2) lim=1;
-  if(INT_ORDER==4) lim=2;
-
-  if(NX>1) xlim=lim; else xlim=0;  
-  if(NY>1) ylim=lim; else ylim=0;
-  if(NZ>1) zlim=lim; else zlim=0;
 
   if(NZ>1)
     {
