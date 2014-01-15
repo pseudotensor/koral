@@ -73,7 +73,7 @@
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 //71 MBBBLOB - rad blobs with magn field
 
-#define PROBLEM 71
+#define PROBLEM 70
 
 #if(PROBLEM==71)
 
@@ -1566,5 +1566,11 @@
 #else //2d
 #define MPIMSGBUFSIZE 20
 #endif
+#endif
+#endif
+
+#ifndef MPI
+#ifndef OUTPUTPERCORE
+#define OUTPUTPERCORE
 #endif
 #endif

@@ -113,8 +113,6 @@ main(int argc, char **argv)
   copy_u(0.,p,pavg);
   avgtime=0.;
 
-
-
   //calculates initial scalars
   calc_scalars(scalars,tstart);
 
@@ -144,6 +142,16 @@ main(int argc, char **argv)
       nfout1++;
     }
   
+  /*
+  //test
+  ldouble pp[NV]={1.,.1,0.,0.,0.,-1.,1.,0.2,0.1,0.7};
+  struct geometry geom;
+  fill_geometry(0.,0.,0.,&geom);
+  ldouble Rd[4][4];
+  calc_PM1_der(pp,&geom,Rd,1);
+  exit(-1);
+  */  
+
   //evolves
   solve_the_problem(tstart, folder);
 

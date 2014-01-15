@@ -5445,3 +5445,86 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
 #endif
   return 0;
 }
+
+/************************************************************************/
+/******* calculates derivative of the M1 stress energy tensor ***********/
+/******* through flux vectors (gdet * R^i_nu) with respect to R^tt  *****/
+/************************************************************************/
+int
+calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  int i,j;
+  
+  int ix,iy,iz;
+  int idim,corr;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+
+  ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],del;
+  ldouble EPS=1.e-8;
+  ldouble Rij[4][4],RijM1[4][4],Rijvisc[4][4];
+  ldouble Rij0[4][4],RijM10[4][4],Rijvisc0[4][4];
+
+  PLOOP(i)
+    pp0[i]=pp[i];
+  p2u(pp0,uu0,ggg);
+  PLOOP(i)
+    uu[i]=uu0[i];
+
+ 
+  //**********************************************************************
+
+  //zero state 
+  f_flux_prime_rad_total(pp0,ggg,Rij0,RijM10,Rijvisc0);
+  indices_2221(RijM10,RijM10,gg);
+
+  //**********************************************************************
+   
+  //calculating approximate Jacobian by numerical differentiation wrt energy density
+  del = EPS*uu[EE0];
+  uu[j+EE0]=uu0[j+EE0]+del;
+
+  if(verbose) { printf("org p : ");print_4vector(&pp0[EE0]); }
+  if(verbose) { printf("org u : ");print_4vector(&uu0[EE0]); }
+  if(verbose) { printf("pert u: ");print_4vector(&uu[EE0]); }
+
+  u2p_rad(uu,pp,ggg,&corr);
+
+  //perturbed state
+  f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
+  indices_2221(RijM1,RijM1,gg);
+
+  //the derivative
+  ldouble fl,fl0;
+  for(i=0;i<4;i++)
+    {
+      for(j=0;j<4;j++)
+	{
+	  //M1 only
+	  fl=gdetu*RijM1[i][j];
+	  fl0=gdetu*RijM10[i][j];
+	  Rd[i][j]=(fl - fl0)/del;
+	}
+    }
+
+  uu[j+EE0]=uu0[j+EE0];
+  pp[j+EE0]=pp0[j+EE0];
+
+  if(verbose) { print_tensor(RijM10); }
+  if(verbose) { print_tensor(RijM1); }
+  if(verbose) { print_tensor(Rd); getchar(); }
+
+  return 0;
+}
