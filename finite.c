@@ -697,18 +697,13 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   /*
   if(PROCID==0)
     {
-      //printf("0p > %e\n",get_u(p,VX,NX,NY,0));
-      printf("0 > %e\n",get_ub(flLy,UU,NX,NY,0,1));
-    }
-  if(PROCID==3)
-    {
-      //printf("3p > %e\n",get_u(p,VX,0,0,0));
-      printf("3 > %e\n",get_ub(flLy,UU,0,0,0,1));
+      printf("0p > %e\n",get_u(p,VX,NX+1,-2,0));
+      //printf("0 > %e\n",get_ub(flLy,UU,NX,NY,0,1));
     }
   if(PROCID==1)
     {
-      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
-      printf("1 > %e\n",get_ub(flLy,UU,0,NY,0,1));
+      printf("1p > %e\n",get_u(p,VX,1,-2,0));
+      //printf("1 > %e\n",get_ub(flLy,UU,0,NY,0,1));
 
     }
     getch();   
@@ -1633,11 +1628,13 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   loop_4=(int **)malloc(sizeof(int*));
   loop_4[0]=(int *)malloc(3*sizeof(int));
 
+  if(NY>1) ylim=NY; else ylim=0;
+  if(NZ>1) zlim=NZ; else zlim=0;
   for(ix=0;ix<=NX;ix++)
     {
-      for(iy=0;iy<=NY;iy++)
+      for(iy=0;iy<=ylim;iy++)
 	{
-	  for(iz=0;iz<=NZ;iz++)
+	  for(iz=0;iz<=zlim;iz++)
 	    {	
 	      loop_4[Nloop_4][0]=ix;
 	      loop_4[Nloop_4][1]=iy;
@@ -2048,39 +2045,51 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
   calc_bc(ix,iy,iz,t,uval,pval,ifinit,BCtype);
 
 #else  
-  //standard BC         
+  //standard BC  
+  if(BCtype==XBCLO || BCtype==XBCHI)
+    {       
 #ifdef PERIODIC_XBC
-  iix=ix;
-  if(ix<0) iix=ix+NX;
-  if(ix>NX-1) iix=ix-NX;
-#endif
-#ifdef PERIODIC_YBC
-  iiy=iy;
-  if(iy<0) iiy=iy+NY;
-  if(iy>NY-1) iiy=iy-NY;
-  if(NY<NG) iiy=0;
-#endif
-#ifdef PERIODIC_ZBC
-  iiz=iz;
-  if(iz<0) iiz=iz+NZ;
-  if(iz>NZ-1) iiz=iz-NZ;
-  if(NZ<NG) iiz=0;
+      iix=ix;
+      if(ix<0) iix=ix+NX;
+      if(ix>NX-1) iix=ix-NX;
 #endif
 #ifdef COPY_XBC
-  iix=ix;
-  if(ix<0) iix=0;
-  if(ix>NX-1) iix=NX-1;
+      iix=ix;
+      if(ix<0) iix=0;
+      if(ix>NX-1) iix=NX-1;
+#endif
+    }
+
+  if(BCtype==YBCLO || BCtype==YBCHI)
+    {       
+#ifdef PERIODIC_YBC
+      iiy=iy;
+      if(iy<0) iiy=iy+NY;
+      if(iy>NY-1) iiy=iy-NY;
+      if(NY<NG) iiy=0;
 #endif
 #ifdef COPY_YBC
-  iiy=iy;
-  if(iy<0) iiy=0;
-  if(iy>NY-1) iiy=NY-1;
+      iiy=iy;
+      if(iy<0) iiy=0;
+      if(iy>NY-1) iiy=NY-1;
 #endif
-#ifdef COPY_ZBC
-  iiz=iz;
-  if(iz<0) iiz=0;
-  if(iz>NZ-1) iiz=NZ-1;
-#endif   
+    }
+
+  if(BCtype==ZBCLO || BCtype==ZBCHI)
+    {       
+#ifdef PERIODIC_YBC
+      iiy=iy;
+      if(iy<0) iiy=iy+NY;
+      if(iy>NY-1) iiy=iy-NY;
+      if(NY<NG) iiy=0;
+#endif
+#ifdef COPY_YBC
+      iiy=iy;
+      if(iy<0) iiy=0;
+      if(iy>NY-1) iiy=NY-1;
+#endif
+    }
+
 
   for(iv=0;iv<NV;iv++)
     pval[iv]=get_u(p,iv,iix,iiy,iiz);
@@ -2191,67 +2200,210 @@ int set_bc(ldouble t,int ifinit)
 	    }
     }
   
-  //corners of the whole domain are never real BC so need to fill them with something 
+  //corners of the whole domain are never real BC so need to fill them with something
   int xlim,ylim,zlim;
-  int lim;
+  int lim,i,j;
 
   if(NZ>1)
     {
-      printf("filling corners not implemented for NTZ>1\n");exit(-1);
+      printf("filling corners not implemented for NZ>1\n");exit(-1);
     }
 
   iz=0;
-  //may be overlapping but who cares
-  if(mpi_isitBC(XBCLO)==1)
+
+  //total corners, filling one cell deep surfaces
+  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
     {
-      ix=-1;
       PLOOP(iv)
-      {
-	set_u(u,iv,ix,-1,iz,get_u(u,iv,ix,0,iz));
-	set_u(p,iv,ix,-1,iz,get_u(p,iv,ix,0,iz));
-	set_u(u,iv,ix,NY,iz,get_u(u,iv,ix,NY-1,iz));
-	set_u(p,iv,ix,NY,iz,get_u(p,iv,ix,NY-1,iz));
-      }
+	set_u(p,iv,-1,-1,iz,get_u(p,iv,0,0,iz));
+      fill_geometry(-1,-1,iz,&geom);
+      p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
+
+      for(i=0;i<NG-1;i++)
+	{
+	  PLOOP(iv)
+	  {
+	    set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+1,0,iz));
+	    set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+1,iz));
+	  }
+	  fill_geometry(-NG+i,-1,iz,&geom);
+	  p2u(&get_u(p,0,-NG+i,-1,iz),&get_u(u,0,-NG+i,-1,iz),&geom);
+	  fill_geometry(-1,-NG+i,iz,&geom);
+	  p2u(&get_u(p,0,-1,-NG+i,iz),&get_u(u,0,-1,-NG+i,iz),&geom);
+	}
     }
 
-  if(mpi_isitBC(XBCHI)==1)
+  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
     {
-      ix=NX;
       PLOOP(iv)
-      {
-	set_u(u,iv,ix,-1,iz,get_u(u,iv,ix,0,iz));
-	set_u(p,iv,ix,-1,iz,get_u(p,iv,ix,0,iz));
-	set_u(u,iv,ix,NY,iz,get_u(u,iv,ix,NY-1,iz));
-	set_u(p,iv,ix,NY,iz,get_u(p,iv,ix,NY-1,iz));
-      }
-   }
+	set_u(p,iv,-1,NY,iz,get_u(p,iv,0,NY-1,iz));
+      fill_geometry(-1,NY,iz,&geom);
+      p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
 
-  if(mpi_isitBC(YBCLO)==1)
+      for(i=0;i<NG-1;i++)
+	{
+	  PLOOP(iv)
+	  {
+	    set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+1,NY-1,iz));
+	    set_u(p,iv,-1,NY+i+1,iz,get_u(p,iv,0,NY+i+1,iz));
+	  }
+	  fill_geometry(-NG+i,NY,iz,&geom);
+	  p2u(&get_u(p,0,-NG+i,NY,iz),&get_u(u,0,-NG+i,NY,iz),&geom);
+	  fill_geometry(-1,NY+i+1,iz,&geom);
+	  p2u(&get_u(p,0,-1,NY+i+1,iz),&get_u(u,0,-1,NY+i+1,iz),&geom);
+	}
+    }
+
+  if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1)
     {
-      iy=-1;
       PLOOP(iv)
-      {
-	set_u(u,iv,-1,iy,iz,get_u(u,iv,0,iy,iz));
-	set_u(p,iv,-1,iy,iz,get_u(p,iv,0,iy,iz));
-	set_u(u,iv,NX,iy,iz,get_u(u,iv,NX-1,iy,iz));
-	set_u(p,iv,NX,iy,iz,get_u(p,iv,NX-1,iy,iz));
-      }
-   }
+	set_u(p,iv,NX,-1,iz,get_u(p,iv,NX-1,0,iz));
+      fill_geometry(NX,-1,iz,&geom);
+      p2u(&get_u(p,0,NX,-1,iz),&get_u(u,0,NX,-1,iz),&geom);
 
-  if(mpi_isitBC(YBCHI)==1)
+      for(i=0;i<NG-1;i++)
+	{
+	  PLOOP(iv)
+	  {
+	    set_u(p,iv,NX+i+1,-1,iz,get_u(p,iv,NX+i+1,0,iz));
+	    set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+1,iz));
+	  }
+	  fill_geometry(NX+i+1,-1,iz,&geom);
+	  p2u(&get_u(p,0,NX+i+1,-1,iz),&get_u(u,0,NX+i+1,-1,iz),&geom);
+	  fill_geometry(NX,-NG+i,iz,&geom);
+	  p2u(&get_u(p,0,NX,-NG+i,iz),&get_u(u,0,NX,-NG+i,iz),&geom);
+	}
+    }
+
+ if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1)
     {
-      iy=NY;
       PLOOP(iv)
-      {
-	set_u(u,iv,-1,iy,iz,get_u(u,iv,0,iy,iz));
-	set_u(p,iv,-1,iy,iz,get_u(p,iv,0,iy,iz));
-	set_u(u,iv,NX,iy,iz,get_u(u,iv,NX-1,iy,iz));
-	set_u(p,iv,NX,iy,iz,get_u(p,iv,NX-1,iy,iz));
-      }
-   }
+	set_u(p,iv,NX,NY,iz,get_u(p,iv,NX-1,NY-1,iz));
+      fill_geometry(NX,NY,iz,&geom);
+      p2u(&get_u(p,0,NX,NY,iz),&get_u(u,0,NX,NY,iz),&geom);
 
+      for(i=0;i<NG-1;i++)
+	{
+	  PLOOP(iv)
+	  {
+	    set_u(p,iv,NX+i+1,NY,iz,get_u(p,iv,NX+i+1,NY-1,iz));
+	    set_u(p,iv,NX,NY+i+1,iz,get_u(p,iv,NX-1,NY+i+1,iz));
+	  }
+	  fill_geometry(NX+i+1,NY,iz,&geom);
+	  p2u(&get_u(p,0,NX+i+1,NY,iz),&get_u(u,0,NX+i+1,NY,iz),&geom);
+	  fill_geometry(NX,NY+i+1,iz,&geom);
+	  p2u(&get_u(p,0,NX,NY+i+1,iz),&get_u(u,0,NX,NY+i+1,iz),&geom);
+	}
+    }
 
- 
+ ldouble uval[NV],pval[NV];
+ iz=0;
+ //corners in the midda - apply boundary condition on what is already in ghost cells
+ if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=-NG;j<0;j++)
+	  {
+	    set_bc_core(i,j,iz,t,uval,pval,ifinit,XBCLO);
+	    PLOOP(iv)
+	    {
+	      set_u(u,iv,i,j,iz,uval[iv]);
+	      set_u(p,iv,i,j,iz,pval[iv]);	      
+	    }
+	  }
+    }
+ if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=NY;j<NY+NG;j++)
+	  {
+	    set_bc_core(i,j,iz,t,uval,pval,ifinit,XBCLO);
+	    PLOOP(iv)
+	    {
+	      set_u(u,iv,i,j,iz,uval[iv]);
+	      set_u(p,iv,i,j,iz,pval[iv]);	      
+	    }
+	  }
+    }
+ if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=-NG;j<0;j++)
+	  {
+	    set_bc_core(i,j,iz,t,uval,pval,ifinit,XBCHI);
+	    PLOOP(iv)
+	    {
+	      set_u(u,iv,i,j,iz,uval[iv]);
+	      set_u(p,iv,i,j,iz,pval[iv]);	      
+	    }
+	  }
+    }
+ if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=NY;j<NY+NG;j++)
+	  {
+	    set_bc_core(i,j,iz,t,uval,pval,ifinit,XBCHI);
+	    PLOOP(iv)
+	    {
+	      set_u(u,iv,i,j,iz,uval[iv]);
+	      set_u(p,iv,i,j,iz,pval[iv]);	      
+	    }
+	  }
+    }
+ if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(XBCLO)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=-NG;j<0;j++)
+	  {
+	    set_bc_core(i,j,iz,t,uval,pval,ifinit,YBCLO);
+	    PLOOP(iv)
+	    {
+	      set_u(u,iv,i,j,iz,uval[iv]);
+	      set_u(p,iv,i,j,iz,pval[iv]);	      
+	    }
+	  }
+    }
+ if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(XBCHI)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=-NG;j<0;j++)
+	  {
+	    set_bc_core(i,j,iz,t,uval,pval,ifinit,YBCLO);
+	    PLOOP(iv)
+	    {
+	      set_u(u,iv,i,j,iz,uval[iv]);
+	      set_u(p,iv,i,j,iz,pval[iv]);	      
+	    }
+	  }
+    }
+ if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(XBCLO)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=NY;j<NY+NG;j++)
+	  {
+	    set_bc_core(i,j,iz,t,uval,pval,ifinit,YBCHI);
+	    PLOOP(iv)
+	    {
+	      set_u(u,iv,i,j,iz,uval[iv]);
+	      set_u(p,iv,i,j,iz,pval[iv]);	      
+	    }
+	  }
+    }
+ if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(XBCHI)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=NY;j<NY+NG;j++)
+	  {
+	    set_bc_core(i,j,iz,t,uval,pval,ifinit,YBCHI);
+	    PLOOP(iv)
+	    {
+	      set_u(u,iv,i,j,iz,uval[iv]);
+	      set_u(p,iv,i,j,iz,pval[iv]);	      
+	    }
+	  }
+    }
+  
 #endif
 
   return 0;

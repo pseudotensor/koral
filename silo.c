@@ -1,4 +1,4 @@
-#if (SILOOUTPUT==1)
+#ifndef NOSILO
 
 //KORAL - silo.c
 //routines for writing a silo file with quadratic mesh
@@ -307,7 +307,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
 		  divB[nodalindex]=calc_divB(ix,iy,iz);
-		  #endif
+                  #endif
 
 		  dpdr = (gdet2*GAMMA*get_uavg(pavg,UU,iix+1,iiy,iiz)-gdet1*GAMMA*get_uavg(pavg,UU,iix-1,iiy,iiz)) / (xx2[1]-xx1[1]);
 		  gracen=0.;

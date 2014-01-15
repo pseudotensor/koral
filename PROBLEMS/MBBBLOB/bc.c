@@ -12,7 +12,8 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 /***********************************************/
 /***********************************************/
-if(ix>=NX) //outflow
+//if(ix>=NX) //outflow
+if(BCtype==XBCHI)
   {
    
 
@@ -25,7 +26,8 @@ if(ix>=NX) //outflow
     return 0;
   }
  
-if(ix<0) //bulk inflow
+if(BCtype==XBCLO)
+  //if(ix<0) //bulk inflow
   {
     
     //testing if interpolated primitives make sense
@@ -37,7 +39,8 @@ if(ix<0) //bulk inflow
     return 0;
   }
  
-if(iy<0) //beam
+if(BCtype==YBCLO)
+  //if(iy<0) //beam
   {
     
 
@@ -50,7 +53,8 @@ if(iy<0) //beam
     return 0;
   }
  
-if(iy>=NY) //bulk motion
+if(BCtype==YBCHI)
+  //if(iy>=NY) //bulk motion
   {
     
 

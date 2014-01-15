@@ -24,7 +24,7 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 /**********************/
 
 //outer edge, outflows with velocity check
-if(ix>=NX) 
+if(BCtype==XBCHI)
   {
     if(diskatboundary(pp, &geom, &geomBL)<0)
       {
@@ -85,7 +85,7 @@ if(ix>=NX)
     return 0;  
   }
 
- else if(ix<0) //outflow inside BH
+ else if(BCtype==XBCLO) //outflow inside BH
    {
      iix=0;
      iiy=iy;
@@ -102,7 +102,7 @@ if(ix>=NX)
    }
 
 //reflections in theta 
-if(iy<0.) //axis
+if(BCtype==YBCLO) //axis
   {      
     
     iiy=-iy-1;
@@ -122,7 +122,7 @@ if(iy<0.) //axis
     p2u(pp,uu,&geom);
     return 0;
   }
-if(iy>=NY) //axis or eq.plane
+if(BCtype==YBCHI)//axis or eq.plane
   {
     iiy=NY-(iy-NY)-1;
     iiz=iz;

@@ -264,7 +264,7 @@ flux_ct()
       // F1
       ////////////////////////////////////
 #if(NX>1)
-      //if(iy<NY && iz<NZ) //no need to fill x-face fluxes for iy=NY etc.
+      if(iy<NY && iz<NZ) //no need to fill x-face fluxes for iy=NY etc.
 	{
 	  set_ubx(flbx,B1,ix,iy,iz,0.);
 	  set_ubx(flbx,B2,ix,iy,iz,0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix,iy+1,iz)));
@@ -276,19 +276,27 @@ flux_ct()
       // F2
       ////////////////////////////////////
 #if(NY>1)
-	//if(ix<NX && iz<NZ)	
+      if(ix<NX && iz<NZ)	
 	{
+
 	  set_uby(flby,B1,ix,iy,iz,-0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix+1,iy,iz)));
 	  set_uby(flby,B2,ix,iy,iz,0.);
 	  set_uby(flby,B3,ix,iy,iz,0.5 * (get_emf(1,ix,iy,iz) + get_emf(1,ix,iy,iz+1)));
+
+	  /*
+	  if(ix>=NX && PROCID==7) printf("%d %d %d %e %e %e\n",ix,iy,iz,
+			    get_ub(flby,B1,ix,iy,iz,1),
+			    get_ub(flby,B2,ix,iy,iz,1),get_ub(flby,B3,ix,iy,iz,1));
+	  */
 	}
 #endif
-
+      
+			    
       /////////////////////////////////////
       // F3
       ////////////////////////////////////
 #if(NZ>1)
-	//if(ix<NX && iy<NY)	
+	if(ix<NX && iy<NY)	
 	{
 	  set_ubz(flbz,B1,ix,iy,iz,0.5 * (get_emf(2,ix,iy,iz) + get_emf(2,ix+1,iy,iz)));
 	  set_ubz(flbz,B2,ix,iy,iz,-0.5 * (get_emf(1,ix,iy,iz) + get_emf(1,ix,iy+1,iz)));
