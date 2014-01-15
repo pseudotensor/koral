@@ -67,7 +67,6 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_roots.h>
 #include <gsl/gsl_vector.h>
-#include <gsl/gsl_odeiv2.h>
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_spline.h>  
 #include <gsl/gsl_deriv.h>
@@ -157,18 +156,6 @@ struct geometry
 int solve_the_problem(ldouble,char*);
 int print_scalings(void);
  
-gsl_odeiv2_step **odeiv2_step_1;
-gsl_odeiv2_step **odeiv2_step_2;
-struct evolve_fluxes_1_param
-{
-  ldouble ix,iy,iz,t,dt;
-};
-struct evolve_fluxes_2_param
-{
-  ldouble ix,iy,iz,t,dt;
-  struct rad_parameters *rp;
-};
-
 //postproc.c
 ldouble calc_resmri(ldouble);
 ldouble calc_meantemp(ldouble);

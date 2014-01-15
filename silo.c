@@ -1,3 +1,5 @@
+#if (SILOOUTPUT==1)
+
 //KORAL - silo.c
 //routines for writing a silo file with quadratic mesh
 //used both on the go and separately
@@ -826,3 +828,5 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
   return (0);
 }
+
+#endif
