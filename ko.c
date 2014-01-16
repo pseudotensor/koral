@@ -145,6 +145,7 @@ main(int argc, char **argv)
     }
   
   
+  /*
   //test
   struct geometry geom;
   fill_geometry(0.,0.,0.,&geom);
@@ -154,9 +155,8 @@ main(int argc, char **argv)
   pp[UU]=1.*calc_PEQ_ufromTrho(calc_LTE_TfromE(-Ehat),1.);
   ldouble Rd[4][4];
   calc_Rij_PM1conv(pp,&geom,Rd);
-
   exit(-1);
-    
+  */
 
   //evolves
   solve_the_problem(tstart, folder);

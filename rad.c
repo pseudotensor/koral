@@ -3155,34 +3155,6 @@ calc_Gi_ff(ldouble *pp, ldouble Gi[4])
 }
 
 
-//***********************************************************************************
-//******* takes primitives and closes R^ij in arbitrary frame ****************************
-//***********************************************************************************
-int
-calc_Rij_total(ldouble *pp, void *ggg, ldouble Rij[][4])
-{
-#ifdef RADIATION
-  struct geometry *geom
-   = (struct geometry *) ggg;
-
-  //todo:
-  //in some places we may want only the M1 part?
-  calc_Rij(pp,ggg,Rij);  
-
-#if (RADVISCOSITY!=NOVISCOSITY)
-  int i,j;
-  ldouble Rvisc[4][4];int derdir[3]={0,0,0};
-  calc_Rij_visc(pp,ggg,Rvisc,derdir);
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]+=Rvisc[i][j];
-#endif  
-
-#endif //RADIATION
-
-  return 0;
-}
-
 //M1 only
 int
 calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
@@ -4629,6 +4601,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 
 #else
   //damping the viscous term if necessary
+#ifdef RADVISCMAXVELDAMP
   //basing on radiative Reynolds number Re = diffusiv flux of conserved quantity / conserved quantity
   ldouble dampfac=1.;
   int idim;
@@ -4661,17 +4634,37 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   //todo: choose best prescription
   //dampfac= 1. / (1.+pow(maxvel/MAXRADVISCVEL,2.));
   //dampfac = 1.-step_function(-1.+maxvel/MAXRADVISCVEL,.5);
-  
-  //adding up to Rij
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
 	Rijvisc[i][j]*=dampfac;
+      }
+  
+#endif
+  //adding up to Rij
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
 	Rij[i][j]+=Rijvisc[i][j];
       }
 
 #endif
 #endif
+
+#ifdef RADPERTM1CONV
+
+  ldouble RpM1[4][4];
+  //calc_Rij_PM1conv(pp,ggg,RpM1);
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	RpM1[i][j]*=0.;
+	Rijvisc[i][j]+=RpM1[i][j];
+	Rij[i][j]+=RpM1[i][j];
+      }
+  
+#endif
+
 #endif
 
   return 0;
