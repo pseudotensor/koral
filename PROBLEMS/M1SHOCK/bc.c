@@ -23,7 +23,7 @@ ldouble Fx,Fy,Fz;
 /**********************/
 /**********************/
 /**********************/
-if(ix<0 || ix>=NX)
+if(BCtype==XBCLO || BCtype==XBCHI)
   {
     Fx=Fz=Fy=0.;
     pp[0]=1.;
@@ -37,7 +37,8 @@ if(ix<0 || ix>=NX)
     pp[5]=calc_Sfromu(pp[RHO],pp[UU]);
 
     pp[EE0]=calc_LTE_EfromT(TEMPOUT);
-    pp[FX0]=Fx;
+    if(BCtype==XBCLO) pp[FX0]=pp[EE0]*FBEAM;
+    if(BCtype==XBCHI) pp[FX0]=-pp[EE0]*FBEAM;
     pp[FY0]=Fy;
     pp[FZ0]=Fz; 
 

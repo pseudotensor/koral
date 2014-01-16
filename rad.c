@@ -4656,7 +4656,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 
 #ifdef RADPERTM1CONV
   ldouble RpM1[4][4];
-  calc_Rij_PM1conv(pp,ggg,RpM1,0);
+  calc_Rij_PM1conv(pp,ggg,RpM1,0); //returns mixed indices
   
   //damping only to perturbed part
   ldouble ratio,maxratio=-1.;
@@ -4667,14 +4667,20 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 	if(ratio>maxratio) maxratio=ratio;
       }
 
-  /*
-  if(maxratio>RADPERTM1DELTA) 
+  
+  if(maxratio>RADPERTM1DELTA)
     {
+      //printf("damping %e\n",maxratio);
       ratio=RADPERTM1DELTA/maxratio;
     }
-  */
+  else
+    ratio=1.;
+  
+  //  maxratio=fabs((Rij[1][1]+Rij[0][0])/RpM1[1][1]);
+  //if(maxratio<RADPERTM1DELTA) 
+  //ratio=maxratio;
 
-  ratio = RADPERTM1DELTA/(RADPERTM1DELTA+maxratio);
+  //ratio = RADPERTM1DELTA/(RADPERTM1DELTA+maxratio);
 
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -5604,7 +5610,7 @@ calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4],int verbose)
   //total perturbed M1 like R^i_j,pert
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
-      RpM1[i][j]=-fac*(Rij0[i][j]-Rijder[i][j]); //!!! minus here inconsistent with Frank+12
+      RpM1[i][j]=fac*(Rij0[i][j]-Rijder[i][j]); //!!! minus here ? inconsistent with Frank+12
   
   if(verbose) printf("********* %d %d %d **********\n",geom->ix,geom->iy,geom->iz);
   if(verbose) print_primitives(pp);

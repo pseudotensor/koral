@@ -6,4 +6,4 @@
 //from rad.c
 //**********************
 
-return 0.*0.01*rho;
+return 0.0*rho;

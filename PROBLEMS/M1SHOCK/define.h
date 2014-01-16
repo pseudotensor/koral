@@ -11,13 +11,14 @@
 //#define SKIPRADSOURCE
 
 #define RADPERTM1CONV
+#define RADPERTM1DELTA 1.
 
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 //#define NUMRADWAVESPEEDS
 #define RADVISCNUDAMP
 #define ALPHARADVISC 1.
 #define MAXRADVISCVEL 1.
-#define RADVISCMFPCONST (1./NX)
+#define RADVISCMFPCONST (.5/NX)
 #define ZEROTIMEINSHEAR
 
 #define MYCOORDS MINKCOORDS //metric
@@ -37,7 +38,7 @@
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 
-#define NX 100 //x-resolution
+#define NX 200 //x-resolution
 #define NY 1 //y-resolution
 #define NZ 1 //z=rezolution
 
@@ -51,6 +52,7 @@
 #define SPECIFIC_BC //whether the boundary conditions are more complicated and given in PROBLEMS/XXX/bc.c
 
 #define DTOUT1 0.1 
+//#define NOUTSTOP 50
 #define ALLSTEPSOUTPUT 0 
 #define PRINTXGC_LEFT //if x-left ghost cells are to be printed out, 
 #define PRINTXGC_RIGHT //if x-right ghost cells are to be printed out 
@@ -60,3 +62,4 @@
 #define GAMMA (5./3.)
 #define TEMPIN 1.e7
 #define TEMPOUT 2.e8
+#define FBEAM 0.9
