@@ -549,6 +549,7 @@ int trans_pall_coco(ldouble *pp1, ldouble *pp2, int CO1,int CO2, ldouble *xxvec,
 int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 
 //rad.c
+int calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble Rconv[][4]);
 int calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose);
 int calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *,ldouble *mfpret,ldouble *);
 int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff);

@@ -144,15 +144,19 @@ main(int argc, char **argv)
       nfout1++;
     }
   
-  /*
+  
   //test
-  ldouble pp[NV]={1.,.1,0.,0.,0.,-1.,1.,0.2,0.1,0.7};
   struct geometry geom;
   fill_geometry(0.,0.,0.,&geom);
+  ldouble pp[NV]={1.,.1,0.,0.,0.,-1.,1.,0.3,0.,0.};
+  ldouble Ehat,ucon[4];
+  calc_ff_Rtt(pp,&Ehat,ucon,&geom);
+  pp[UU]=1.*calc_PEQ_ufromTrho(calc_LTE_TfromE(-Ehat),1.);
   ldouble Rd[4][4];
-  calc_PM1_der(pp,&geom,Rd,1);
+  calc_Rij_PM1conv(pp,&geom,Rd);
+
   exit(-1);
-  */  
+    
 
   //evolves
   solve_the_problem(tstart, folder);

@@ -4211,7 +4211,7 @@ int calc_rad_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nu
 }
 
  
-//calculates fluid frame radiative energy density
+//calculates fluid frame radiative energy density (-R^t_t = Ehat)
 //and lab-frame four-velocity of gas
 int
 calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
@@ -4520,7 +4520,7 @@ calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
 
 //***************************************
 // calculates radiative tensor at faces or centers
-// returns total, pure M1, visc
+// returns total, pure M1, visc ~ R^i_j
 //***************************************
 int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4])
 {  
@@ -5488,8 +5488,7 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
 
   //zero state 
   f_flux_prime_rad_total(pp0,ggg,Rij0,RijM10,Rijvisc0);
-  indices_2221(RijM10,RijM10,gg);
-
+  
   //**********************************************************************
    
   //calculating approximate Jacobian by numerical differentiation wrt energy density
@@ -5504,8 +5503,7 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
 
   //perturbed state
   f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
-  indices_2221(RijM1,RijM1,gg);
-
+  
   //the derivative
   ldouble fl,fl0;
   for(i=0;i<4;i++)
@@ -5522,9 +5520,78 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
   uu[j+EE0]=uu0[j+EE0];
   pp[j+EE0]=pp0[j+EE0];
 
-  if(verbose) { print_tensor(RijM10); }
-  if(verbose) { print_tensor(RijM1); }
-  if(verbose) { print_tensor(Rd); getchar(); }
+  //if(verbose) { print_tensor(RijM10); }
+  //if(verbose) { print_tensor(RijM1); }
+  //if(verbose) { print_tensor(Rd);  }
 
   return 0;
+}
+
+//**********************************************************************
+//* calculates the convective correction as in the perturbed M1 ********
+//**********************************************************************
+int
+calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4])
+{
+  int i,j;
+  int verbose=1;
+  
+  struct geometry *geom
+   = (struct geometry *) ggg;
+  
+  ldouble RijM1[4][4],Rij0[4][4],Rijder[4][4],pp0[NV];
+  ldouble Rtt; //R^tt
+  
+  //regular M1 tensor
+  calc_Rij(pp,ggg,RijM1);
+  Rtt=RijM1[0][0];
+
+  //indices down to get R^i_j,M1
+  indices_2221(RijM1,RijM1,geom->gg);
+  
+  //zero-flux lab-frame tensor
+  pp0[EE0]=1.;
+  pp0[FX0]=pp0[FY0]=pp0[FZ0]=0.;
+  calc_Rij(pp0,ggg,Rij0);
+
+  //multiply by energy density
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij0[i][j]*=Rtt;
+
+  //indices down to get R^i_j,0
+  indices_2221(Rij0,Rij0,geom->gg);
+
+  //derivative of M1 R^i_j wrt. R^t_t
+  calc_PM1_der(pp,ggg,Rijder,0);
+
+  //multiply by R^t_t
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rijder[i][j]*=RijM1[0][0];
+  
+  //radiative four-force G^0
+  ldouble Gi[4];
+  calc_Gi(pp,ggg,Gi); 
+  indices_21(Gi,Gi,geom->gg);
+
+  //total opacity
+  ldouble chi=calc_chi(pp,geom->xxvec);
+
+  //factor (1 - G^0 / Rtt / chi)
+  ldouble fac=1. - Gi[0]/chi/Rtt;
+
+  //total perturbed M1 like R^i_j,pert
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      RpM1[i][j]=fac*(Rij0[i][j]-Rijder[i][j]);
+  
+  if(verbose) print_tensor(Rij0);
+  if(verbose) print_tensor(Rijder);
+  if(verbose) print_4vector(Gi);
+  if(verbose) printf("(1-G^0/chi/Rtt) = %e\n",fac);
+  if(verbose) print_tensor(RpM1);
+  
+  return 0;
+
 }
