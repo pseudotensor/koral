@@ -4667,11 +4667,14 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 	if(ratio>maxratio) maxratio=ratio;
       }
 
-  if(maxratio>1.) 
+  /*
+  if(maxratio>RADPERTM1DELTA) 
     {
-      //printf("%d > %e\n",geom->ix,maxratio);
-      ratio=1./maxratio;
+      ratio=RADPERTM1DELTA/maxratio;
     }
+  */
+
+  ratio = RADPERTM1DELTA/(RADPERTM1DELTA+maxratio);
 
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -5484,7 +5487,7 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
   iz=geom->iz;
 
   ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],del;
-  ldouble EPS=1.e-8;
+  ldouble EPS=1.e-6;
   ldouble Rij[4][4],RijM1[4][4],Rijvisc[4][4];
   ldouble Rij0[4][4],RijM10[4][4],Rijvisc0[4][4];
 
@@ -5505,7 +5508,7 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
    
   //calculating approximate Jacobian by numerical differentiation wrt energy density
   del = EPS*uu[EE0];
-  uu[j+EE0]=uu0[j+EE0]+del;
+  uu[EE0]=uu0[EE0]-del;
 
   if(verbose) { printf("org p : ");print_4vector(&pp0[EE0]); }
   if(verbose) { printf("org u : ");print_4vector(&uu0[EE0]); }
@@ -5592,8 +5595,12 @@ calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4],int verbose)
   ldouble chi=calc_chi(pp,geom->xxvec);
 
   //factor (1 - G^0 / Rtt / chi)
-  ldouble fac=1. - Gi[0]/chi/Rtt;  
-
+  ldouble fac;
+  if(chi<SMALL)
+    chi=SMALL; //too large perturbation is damped in flux_rad_total()
+  
+  fac=1. - Gi[0]/chi/Rtt;  
+  
   //total perturbed M1 like R^i_j,pert
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)

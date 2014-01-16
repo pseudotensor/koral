@@ -6,17 +6,21 @@
 
 #define MYCOORDS  MINKCOORDS//SCHWCOORDS
 #define MINKOWSKI
-#define NX 30
+#define NX 50
 #define NY 1
-#define NZ 30
+#define NZ 50
 #define TSTEPLIM .5
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
 #define SKIPRADSOURCE
 
 //#define RADVISCOSITY SHEARVISCOSITY
+
+#define RADPERTM1CONV
+#define RADPERTM1DELTA .1
+
 #define ALPHARADVISC 1.
-#define NLEFT 0.999
+#define NLEFT 0.9
 //#define NUMRADWAVESPEEDS
 #define MAXRADVISCVEL 1.
 #define GAMMAMAXRAD 50

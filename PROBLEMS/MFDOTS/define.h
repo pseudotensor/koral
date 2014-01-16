@@ -1,19 +1,26 @@
 #define TMAX 1.e10
 #define RADIATION
 
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADPERTM1CONV
+//#define RADPERTM1DELTA .5
+
+//#define RADVISCOSITY SHEARVISCOSITY
 #define MAXRADVISCVEL 1.
 #define ALPHARADVISC 1.
+
 #define RADVISCMFPCONST (2./NX)
 #define ZEROTIMEINSHEAR
 
 //#define EDDINGTON_APR
-//#define MULTIRADFLUID
+
+/* outdated
+#define MULTIRADFLUID
 #define MFSKEW 20.
 #define MFMINVEL 1.e-3
 #define MFREDISTRIBUTEMETHOD 3
 #define MFWEDGESTYPE 1
 #define NRF 4
+*/
 
 //#define FORGETDOTS
 

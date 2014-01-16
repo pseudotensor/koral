@@ -1,18 +1,17 @@
 #define TMAX 1.e10
 #define RADIATION
 
-//#define LABRADFLUXES
-//#define EDDINGTON_APR
+//#define RADPERTM1CONV
+#define RADPERTM1DELTA 1.
 
 #define MYCOORDS MINKCOORDS
-#define NX 101
-#define NY 101
+#define NX 61
+#define NY 61
 #define NZ 1 
 //#define ZSLICE 20
 
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
-#define RK3STEPPING
 
 #define RADOUTPUTINZAMO
 
@@ -38,8 +37,9 @@
 #define IXDOTMAX NX/2
 #define IYDOTMAX NY/3
 #define IZDOTMAX 0
+
 #define FXDOT 0.
-#define FYDOT 0.99
+#define FYDOT 0.
 #define FZDOT 0.
 
 #define MASSCM 1.

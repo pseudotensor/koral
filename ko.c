@@ -143,10 +143,8 @@ main(int argc, char **argv)
 
       nfout1++;
     }
-  
-  
-  
-  //test
+    
+  /*
   //to plot Fig.1 from Frank+12
   struct geometry geom;
   fill_geometry(0.,0.,0.,&geom);
@@ -164,7 +162,7 @@ main(int argc, char **argv)
       printf("%e %e %e %e %e %e\n",pp[FX0],pp[UU],uu[EE0],uu[FX0],Rd[1][1],RM1[1][1]/RM1[0][0]);
     }
   exit(-1);
-  
+  */
 
   //evolves
   solve_the_problem(tstart, folder);
