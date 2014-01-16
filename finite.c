@@ -517,15 +517,15 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 		}
 	    }
 	 		
-
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
-
+	  
 	  if(ix>=0) //no need to calculate at left face of first GC
 	    {
 	      fill_geometry_face(ix,iy,iz,0,&geom);
 	      check_floors_mhd(fd_pl,VELPRIM,&geom);
 	      f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
 	    }
+
 	  if(ix<NX)
 	    {
 	      fill_geometry_face(ix+1,iy,iz,0,&geom);
@@ -547,13 +547,14 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //**********************************************************************
       //y 'sweep'
-
+  
+ 
 #ifdef MPI4CORNERS
       if(NY>1 && ix>=-1 && ix<NX+1 && iz>=-1 && iz<NZ+1)
 #else
       if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
 #endif
-	{
+	{    
 	  x0l[1]=get_xb(iy,1);
 	  xm1[1]=get_x(iy-1,1);
 	  x0l[0]=xm1[0]=get_x(ix,0); 
@@ -586,14 +587,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 		}
 	    }
 
-	  /*
-	  printf("y> %d %d\n",ix,iy);
-	  print_primitives(fd_pm1);
-	  print_primitives(fd_p0);
-	  print_primitives(fd_pp1);
-	  getch();
-	  */
-
 	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 	  
 	  if(iy>=0)
@@ -624,7 +617,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //**********************************************************************
       //z 'sweep'	      
-
 #ifdef MPI4CORNERS
       if(NZ>1 && ix>=-1 && ix<NX+1 && iy>=-1 && iy<NY+1)
 #else
@@ -679,6 +671,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	      check_floors_mhd(fd_pr,VELPRIM,&geom);
 	      f_flux_prime(fd_pr,2,ix,iy,iz+1,ffr);   	          
 	    }
+	  
 
 	  //saving to memory
 	  for(i=0;i<NV;i++)
@@ -691,6 +684,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	    }
 	  
 	}
+
 
     }
 
@@ -708,7 +702,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
     }
     getch();   
   */
-  
 
   //**********************************************************************
   //**********************************************************************
@@ -724,6 +717,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //combines right - left fluxes
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
+
 
   /*
   if(PROCID==0)
@@ -985,7 +979,7 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
   copy_u(1., u, ubase);
 
   //to count the average number of iteration in the implicit solver
-  for(ii=0;ii<NGLOBALINTSLOT;ii++)
+  for(ii=0;ii<GLOBALINTSLOT_ITERIMPLTE;ii++)
     global_int_slot[ii]=0.;
 
   /************************************************************************/
@@ -2298,6 +2292,7 @@ int set_bc(ldouble t,int ifinit)
 
  ldouble uval[NV],pval[NV];
  iz=0;
+
  //corners in the midda - apply boundary condition on what is already in ghost cells
  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==0)
     {

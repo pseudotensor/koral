@@ -12,7 +12,8 @@
 
 #define RADPERTM1CONV
 
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
+#define NUMRADWAVESPEEDS
 #define RADVISCNUDAMP
 #define ALPHARADVISC 1.
 #define MAXRADVISCVEL 1.
@@ -36,7 +37,7 @@
 #define RADOUTPUTINZAMO
 //#define RADOUTPUTINFF
 
-#define NX 200 //x-resolution
+#define NX 100 //x-resolution
 #define NY 1 //y-resolution
 #define NZ 1 //z=rezolution
 

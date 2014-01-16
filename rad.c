@@ -3603,10 +3603,11 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   //zero state 
   f_flux_prime_rad_total(pp0,ggg,Rij0,RijM10,Rijvisc0);
 
-  
+  ldouble dampfac;
   //damping here?
 
   //test
+  /*
   //ttt
   ldouble vel[3]={0.,0.,0.},maxvel;
   for(idim=0;idim<3;idim++) 
@@ -3619,25 +3620,22 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
 	printf("> %d > %e %e > %e\n",idim,Rijvisc0[idim+1][i],uu0[EE0+i]/gdetu,vel[idim]);
       }
   if(geom->ifacedim>-1)
-    maxvel=fabs(vel[geom->dim]);
+    maxvel=fabs(vel[geom->idim]);
   else
     maxvel=sqrt(vel[0]*vel[0]+vel[1]*vel[1]+vel[2]*vel[2]);
 
-  ldouble dampfac;
+  
   if(maxvel>MAXRADVISCVEL)
     {
       dampfac=MAXRADVISCVEL/maxvel;
     }
   else
     dampfac=1.;
-
-
-
-  //if(dampfac<1.) verbose=1;
+ printf("%d > maxvel: %e\n",ix,maxvel);
+   */
 
   dampfac=1.; 
 
-  printf("%d > maxvel: %e\n",ix,maxvel);
  
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -3748,7 +3746,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       ldouble axrvisc=my_max_N(evvisc,4);
       if(axrvisc<0.) axrvisc=0.;
 
-      if(axlvisc!=0. || axrvisc!=0) verbose=1;
+      //if(axlvisc!=0. || axrvisc!=0) verbose=1;
       if(verbose)
 	{
 	  printf("i: %d %d",ix,iy);
@@ -3769,22 +3767,26 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       */
 
       ldouble fac,maxvel_ph; 
-      if(0 && maxvelvisc>MAXRADVISCVEL)
+      set_u_scalar(radviscfac,ix,iy,iz,1.);
+      
+      /*
+      if(1 && maxvelvisc>MAXRADVISCVEL)
 	{
 	  fac=MAXRADVISCVEL/maxvelvisc*1.;
 	  //axl/axr - how to modify them?
 	  //
-	  //axl=my_min(axl0,axlvisc*fac);
-	  //axr=my_max(axr0,axrvisc*fac);
+	  axl=my_min(axl0,axlvisc*fac);
+	  axr=my_max(axr0,axrvisc*fac);
  
-	  axl=axl0+axlvisc*(1. - (1.-fac)/2.);
-	  axr=axr0+axrvisc*(1. - (1.-fac)/2.);
+	  //axl=axl0+axlvisc*(1. - (1.-fac)/2.);
+	  //axr=axr0+axrvisc*(1. - (1.-fac)/2.);
 
 	  //axl=axl0;
 	  //axr=axr0;
 	  set_u_scalar(radviscfac,ix,iy,iz,fac);
 	}
-      //}
+      */
+
 
       //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
       axl/=(1.+tautot[idim]);
@@ -3793,7 +3795,7 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       aval[idim*2+0]=axl;
       aval[idim*2+1]=axr;
     }
-
+  
 #endif
 
   return 0;
@@ -4495,7 +4497,8 @@ calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
 // returns total, pure M1, visc ~ R^i_j
 //***************************************
 int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4])
-{  
+{    
+
 #ifdef RADIATION
   int i,j;
 
@@ -4652,14 +4655,29 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 #endif
 
 #ifdef RADPERTM1CONV
-
   ldouble RpM1[4][4];
-  //calc_Rij_PM1conv(pp,ggg,RpM1);
+  calc_Rij_PM1conv(pp,ggg,RpM1);
+  
+  //damping only to perturb
+  ldouble ratio,maxratio=-1.;
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
-	RpM1[i][j]*=0.;
-	Rijvisc[i][j]+=RpM1[i][j];
+	ratio=fabs(RpM1[i][j]/Rij[i][j]);
+	if(ratio>maxratio) maxratio=ratio;
+      }
+
+  if(maxratio>.5) 
+    {
+      //printf("%d > %e\n",geom->ix,maxratio);
+      ratio=.5/maxratio;
+    }
+
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      {
+	RpM1[i][j]*=ratio;
+	//Rijvisc[i][j]+=RpM1[i][j];
 	Rij[i][j]+=RpM1[i][j];
       }
   
@@ -5480,8 +5498,9 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
   //**********************************************************************
 
   //zero state 
-  f_flux_prime_rad_total(pp0,ggg,Rij0,RijM10,Rijvisc0);
-  
+  calc_Rij(pp0,ggg,RijM10); //regular M1 R^ij
+  indices_2221(RijM10,RijM10,gg); //R^i_j
+   
   //**********************************************************************
    
   //calculating approximate Jacobian by numerical differentiation wrt energy density
@@ -5495,7 +5514,8 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
   u2p_rad(uu,pp,ggg,&corr);
 
   //perturbed state
-  f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
+  calc_Rij(pp,ggg,RijM1); //M1 R^ij
+  indices_2221(RijM1,RijM1,gg); //R^i_j
   
   //the derivative
   ldouble fl,fl0;
@@ -5508,10 +5528,11 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
 	  fl0=gdetu*RijM10[i][j];
 	  Rd[i][j]=(fl - fl0)/del;
 	}
+      
+      uu[i+EE0]=uu0[i+EE0];
+      pp[i+EE0]=pp0[i+EE0];
     }
 
-  uu[j+EE0]=uu0[j+EE0];
-  pp[j+EE0]=pp0[j+EE0];
 
   //if(verbose) { print_tensor(RijM10); }
   //if(verbose) { print_tensor(RijM1); }
@@ -5527,7 +5548,7 @@ int
 calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4])
 {
   int i,j;
-  int verbose=1;
+  int verbose=0;
   
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -5556,7 +5577,7 @@ calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4])
   indices_2221(Rij0,Rij0,geom->gg);
 
   //derivative of M1 R^i_j wrt. R^t_t
-  calc_PM1_der(pp,ggg,Rijder,0);
+  calc_PM1_der(pp,ggg,Rijder,verbose);
 
   //multiply by R^t_t
   for(i=0;i<4;i++)
@@ -5579,11 +5600,16 @@ calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4])
     for(j=0;j<4;j++)
       RpM1[i][j]=fac*(Rij0[i][j]-Rijder[i][j]);
   
+  if(verbose) printf("********* %d %d %d **********\n",geom->ix,geom->iy,geom->iz);
+  if(verbose) print_primitives(pp);
   if(verbose) print_tensor(Rij0);
   if(verbose) print_tensor(Rijder);
   if(verbose) print_4vector(Gi);
   if(verbose) printf("(1-G^0/chi/Rtt) = %e\n",fac);
   if(verbose) print_tensor(RpM1);
+  if(verbose) getch();
+
+  
   
   return 0;
 
