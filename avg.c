@@ -103,8 +103,10 @@ main(int argc, char **argv)
   fprint_outfile(t,no2,0,"analysis",prefix);
 #endif
 #if(SILOOUTPUT==1)
+#ifndef NOSILO
   sprintf(prefix,"silavg%04d-",no1);
   fprint_silofile(t,no2,"analysis",prefix);
+#endif
 #endif
 #if(SIMOUTPUT==1)	  
   sprintf(prefix,"simavg%04d-",no1);
