@@ -4656,7 +4656,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 
 #ifdef RADPERTM1CONV
   ldouble RpM1[4][4];
-  calc_Rij_PM1conv(pp,ggg,RpM1);
+  calc_Rij_PM1conv(pp,ggg,RpM1,0);
   
   //damping only to perturbed part
   ldouble ratio,maxratio=-1.;
@@ -5459,7 +5459,7 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
 
 /************************************************************************/
 /******* calculates derivative of the M1 stress energy tensor ***********/
-/******* through flux vectors (gdet * R^i_nu) with respect to R^tt  *****/
+/******* R^i_j with respect to R^tt  ************************************/
 /************************************************************************/
 int
 calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
@@ -5545,10 +5545,9 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
 //* calculates the convective correction as in the perturbed M1 ********
 //**********************************************************************
 int
-calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4])
+calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4],int verbose)
 {
   int i,j;
-  int verbose=0;
   
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -5603,6 +5602,7 @@ calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4])
   if(verbose) printf("********* %d %d %d **********\n",geom->ix,geom->iy,geom->iz);
   if(verbose) print_primitives(pp);
   if(verbose) print_tensor(Rij0);
+  if(verbose) print_tensor(RijM1);
   if(verbose) print_tensor(Rijder);
   if(verbose) print_4vector(Gi);
   if(verbose) printf("(1-G^0/chi/Rtt) = %e\n",fac);

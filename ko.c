@@ -145,18 +145,26 @@ main(int argc, char **argv)
     }
   
   
-  /*
+  
   //test
+  //to plot Fig.1 from Frank+12
   struct geometry geom;
   fill_geometry(0.,0.,0.,&geom);
-  ldouble pp[NV]={1.,.1,0.,0.,0.,-1.,1.,0.3,0.,0.};
+  ldouble pp[NV]={1.,.1,0.,0.,0.,-1.,1.,0.9,0.,0.},uu[NV];
   ldouble Ehat,ucon[4];
-  calc_ff_Rtt(pp,&Ehat,ucon,&geom);
-  pp[UU]=1.*calc_PEQ_ufromTrho(calc_LTE_TfromE(-Ehat),1.);
-  ldouble Rd[4][4];
-  calc_Rij_PM1conv(pp,&geom,Rd);
+  ldouble Rd[4][4],RM1[4][4];
+
+  for(pp[FX0]=0.01; pp[FX0]<10.; pp[FX0]*=1.5)
+    {
+      p2u(pp,uu,&geom);
+      calc_Rij(pp,&geom,RM1);
+      calc_ff_Rtt(pp,&Ehat,ucon,&geom);
+      pp[UU]=1.*calc_PEQ_ufromTrho(calc_LTE_TfromE(-Ehat),1.);
+      calc_Rij_PM1conv(pp,&geom,Rd,0);
+      printf("%e %e %e %e %e %e\n",pp[FX0],pp[UU],uu[EE0],uu[FX0],Rd[1][1],RM1[1][1]/RM1[0][0]);
+    }
   exit(-1);
-  */
+  
 
   //evolves
   solve_the_problem(tstart, folder);
