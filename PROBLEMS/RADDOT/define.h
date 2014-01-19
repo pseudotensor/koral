@@ -10,8 +10,17 @@
 #define NZ 1 
 //#define ZSLICE 20
 
-#define TSTEPLIM .5//kind of courant limiter
+#define TSTEPLIM .6//kind of courant limiter
 #define INT_ORDER 1
+
+
+#define RADVISCOSITY SHEARVISCOSITY
+//#define NUMRADWAVESPEEDS
+#define RADVISCNUDAMP
+#define ALPHARADVISC 1.
+#define MAXRADVISCVEL 1.
+#define RADVISCMFPCONST (.5/NX)
+#define ZEROTIMEINSHEAR
 
 #define RADOUTPUTINZAMO
 
@@ -39,7 +48,7 @@
 #define IZDOTMAX 0
 
 #define FXDOT 0.
-#define FYDOT 0.
+#define FYDOT 0.8
 #define FZDOT 0.
 
 #define MASSCM 1.

@@ -1,5 +1,5 @@
 #define INT_ORDER 1
-#define TSTEPLIM .6
+#define TSTEPLIM .2
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define TIMESTEPPING RK2IMEX
@@ -52,7 +52,7 @@
 #define SPECIFIC_BC //whether the boundary conditions are more complicated and given in PROBLEMS/XXX/bc.c
 
 #define DTOUT1 0.1 
-//#define NOUTSTOP 50
+#define NOUTSTOP 50
 #define ALLSTEPSOUTPUT 0 
 #define PRINTXGC_LEFT //if x-left ghost cells are to be printed out, 
 #define PRINTXGC_RIGHT //if x-right ghost cells are to be printed out 

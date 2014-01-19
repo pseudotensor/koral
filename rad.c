@@ -4676,10 +4676,14 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   else
     ratio=1.;
   
-  //  maxratio=fabs((Rij[1][1]+Rij[0][0])/RpM1[1][1]);
-  //if(maxratio<RADPERTM1DELTA) 
-  //ratio=maxratio;
+  //limiter a'la Frank+2012
+  /*
+  maxratio=fabs((RijM1[1][1]+RijM1[0][0])/RpM1[1][1]);
+  if(maxratio<RADPERTM1DELTA) 
+  ratio=maxratio;
+  */
 
+  //smooth limiter
   //ratio = RADPERTM1DELTA/(RADPERTM1DELTA+maxratio);
 
   for(i=0;i<4;i++)
@@ -5493,7 +5497,7 @@ calc_PM1_der(ldouble *pp,void *ggg,ldouble Rd[][4],int verbose)
   iz=geom->iz;
 
   ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],del;
-  ldouble EPS=1.e-6;
+  ldouble EPS=1.e-8;
   ldouble Rij[4][4],RijM1[4][4],Rijvisc[4][4];
   ldouble Rij0[4][4],RijM10[4][4],Rijvisc0[4][4];
 
