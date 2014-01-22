@@ -1,7 +1,7 @@
 #!/bin/bash
 #compiles the code using serial openmp
 make clean
-make -j SERIAL=0
+make -j ko SERIAL=0
 
 
 

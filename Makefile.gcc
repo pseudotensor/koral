@@ -25,4 +25,4 @@ avg: avg.o $(OBJS) Makefile ko.h problem.h mnemonics.h
 	$(CC) $(CFLAGS) -o avg avg.o $(OBJS) $(LIBS)
 
 clean:
-	$(RM) -f ko ana $(OBJS) *~ *.o *.oo
+	$(RM) -f ko $(OBJS) *~ *.o *.oo

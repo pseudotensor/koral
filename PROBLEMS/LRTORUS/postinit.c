@@ -2,6 +2,7 @@
 int ix,iy,iz;
 
 #ifdef MAGNFIELD
+if(PROCID==0) {printf("Renormalizing magnetic field... ");fflush(stdout);}
 ldouble maxbeta=0.;
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
 for(iz=0;iz<NZ;iz++)
@@ -47,7 +48,6 @@ for(iz=0;iz<NZ;iz++)
 		if(pmag/ptot>maxbeta) 
 		  {
 		    maxbeta=pmag/ptot;
-		    //TODO: distribute maxbeta throughout!
 		    //printf("%d %d > %e %e %e\n",ix,iy,pmag,ptot,maxbeta);
 		  }
 		    
@@ -62,8 +62,19 @@ for(iz=0;iz<NZ;iz++)
       }
   }
 
+//choosing maximal maxbeta from the whole domain
+#ifdef MPI
+  MPI_Barrier(MPI_COMM_WORLD);
+  ldouble global_maxbeta;
+  
+  MPI_Allreduce(&maxbeta, &global_maxbeta, 1, MPI_DOUBLE, MPI_MAX,
+                MPI_COMM_WORLD);
+
+  maxbeta=global_maxbeta;
+ #endif
+
 ldouble fac=sqrt(MAXBETA/maxbeta);
-printf("rescaling magn.fields by %e (%e)\n",fac,maxbeta);
+//printf("rescaling magn.fields by %e (%e)\n",fac,maxbeta);
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
 for(iz=0;iz<NZ;iz++)
@@ -139,5 +150,7 @@ for(iz=0;iz<NZ;iz++)
       }
   }
 */
+
+if(PROCID==0) {printf("done!\n");fflush(stdout);}
 #endif
 	    

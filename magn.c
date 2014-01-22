@@ -326,6 +326,7 @@ int
 calc_BfromA()
 {
   #ifdef MAGNFIELD
+  if(PROCID==0) {printf("Calculating magn. field... ");fflush(stdout);}
 
   int ix,iy,iz,iv,ii;
   //A_mu converted to code coordinates in init.c
@@ -463,7 +464,9 @@ calc_BfromA()
       set_u(u,B2,ix,iy,iz,uu[B2]);
       set_u(u,B3,ix,iy,iz,uu[B3]);     
     }
-  
+
+   if(PROCID==0) {printf("done!\n");fflush(stdout);}
+ 
 #endif //MAGNFIELD
 
   return 0;

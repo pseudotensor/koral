@@ -1,5 +1,6 @@
 //returns problem specific BC
-//int calc_bc(int ix,int iy,int iz,ldouble t,ldouble *uu,ldouble *pp) {
+//int calc_bc(int ix,int iy,int iz,ldouble t,
+//	ldouble *uu,ldouble *pp,int ifinit,int BCtype)
 
 /**********************/
 //geometries
@@ -36,7 +37,7 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 /**********************/
 
 //radius
-if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
+if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
   {
     iix=NX-1;
     iiy=iy;
@@ -90,7 +91,7 @@ if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
     p2u(pp,uu,&geom);
     return 0;  
   }
- else if(ix<0) //outflow near BH
+ else if(BCtype==XBCLO) //outflow near BH
    {
      iix=0;
      iiy=iy;
@@ -124,7 +125,7 @@ if(ix>=NX) //outflow in magn, atm in rad., atm. in HD
    }
 
 //reflections/outflow in theta 
-if(iy<0.) //spin axis 
+if(BCtype==YBCLO) //spin axis 
   {      
     
     iiy=-iy-1;
@@ -147,7 +148,7 @@ if(iy<0.) //spin axis
     p2u(pp,uu,&geom);
     return 0;
   }
-if(iy>=NY) //equatorial plane
+if(BCtype==YBCHI) //equatorial plane
   {
     iiy=NY-(iy-NY)-1;
     iiz=iz;
@@ -172,8 +173,8 @@ if(iy>=NY) //equatorial plane
 iiz=iz;
 iiy=iy;
 iix=ix;
-if(iz<0) iiz=iz+NZ;
-if(iz>NZ-1) iiz=iz-NZ;
+if(BCtype==ZBCLO) iiz=iz+NZ;
+if(BCtype==ZBCHI) iiz=iz-NZ;
 
 for(iv=0;iv<NV;iv++)
   {

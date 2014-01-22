@@ -80,9 +80,14 @@
 #define MYCOORDS MKS1COORDS
 #define MINX (log(1.575-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
-#define NX 150
-#define NY 70
-#define NZ 1
+//total resolution
+#define TNX 256
+#define TNY 128
+#define TNZ 1
+//number of tiles
+#define NTX 4
+#define NTY 2
+#define NTZ 1
 #endif
 
 #define MINY (0.0025*Pi/2.)
@@ -95,6 +100,7 @@
 /************************************/
 //output
 /************************************/
+#define OUTPUTPERCORE
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
