@@ -7,7 +7,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 1
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -60,7 +60,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
+#define BHSPIN 0.9
 
 /************************************/
 //coordinates / resolution
@@ -71,7 +71,7 @@
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MKS1R0 0.
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.575-MKS1R0))
+#define MINX (log(1.2-MKS1R0))
 #define MAXX (log(ROUT-MKS1R0))
 #define MINY (0.0025*Pi/2.)
 #define MAXY (Pi-0.0025*Pi/2.)
@@ -81,19 +81,19 @@
 #define MKS2R0 0.
 #define MKS2H0 0.7
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.575-MKS2R0))
+#define MINX (log(1.2-MKS2R0))
 #define MAXX (log(ROUT-MKS2R0))
 #define MINY (0.0025)
 #define MAXY (1.-0.0025)
 #endif
 
 //total resolution
-#define TNX 192
+#define TNX 198
 #define TNY 192
 #define TNZ 1
 //number of tiles
-#define NTX 16
-#define NTY 8
+#define NTX 9
+#define NTY 4
 #define NTZ 1
 
 

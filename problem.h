@@ -1206,11 +1206,11 @@
 #endif
 
 #ifndef NOUTSTOP
-#define NOUTSTOP 1e7 //max n of outputs
+#define NOUTSTOP 1e50 //max n of outputs
 #endif
 
 #ifndef NSTEPSTOP
-#define NSTEPSTOP 1e7 //max n of steps
+#define NSTEPSTOP 1e50 //max n of steps
 #endif
 
 #ifndef TMAX
@@ -1319,7 +1319,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 28
+#define NRADPROFILES 29
 #endif
 
 #ifndef OUTVEL

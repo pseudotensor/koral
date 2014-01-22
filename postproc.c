@@ -153,24 +153,23 @@ int calc_radialprofiles(ldouble profiles[][NX])
 #endif
 		}
 
-
-	      
-	      //calc_tautot(pp,xxBL,dx,tautot);
-	      //calc_tauabs(pp,xxBL,dx,tauabs);
-
+	      //temparature
 	      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
-	      ldouble Omega=utcon[3]/utcon[0];
-	      ldouble qtheta=calc_Qtheta(ix,iy,iz);//2.*M_PI/Omega/dx[1]*fabs(bcon[2])/sqrt(rho);
-	     
-	      
 
+	      //angular velocity
+	      ldouble Omega=utcon[3]/utcon[0];
+
+	      //MRI resolution parameter
+	      ldouble qtheta=calc_Qtheta(ix,iy,iz);//2.*M_PI/Omega/dx[1]*fabs(bcon[2])/sqrt(rho);
+
+	      //Bpoloidal / Btoroida
+	      ldouble BpBphi = calc_BpBphi(ix,iy,iz);
+	      
+	      //optical depths
 	      ldouble tauabsloc = utcon[0]*calc_kappa(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
 	      ldouble tautotloc = utcon[0]*calc_kappaes(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
-
 	      tautot+=tautotloc*dxph[1];
-	      tauabs+=tauabsloc*dxph[1];
-
-	
+	      tauabs+=tauabsloc*dxph[1];	
 
 	      //surface density (2) (column)
 	      profiles[0][ix]+=rho*dxph[1];
@@ -180,10 +179,13 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[21][ix]+=rho*dxph[1];
 
 	      //rho-weighted q-theta (28)
-	      profiles[26][ix]+=rho*qtheta;
+	      profiles[26][ix]+=rho*qtheta*dxph[1];
+
+	      //rho-weighted Bp/Bphi (30)
+	      profiles[28][ix]+=rho*BpBphi*dxph[1];
 	      
 	      //rho-weighted temperature (29)
-	      profiles[27][ix]+=rho*temp;
+	      profiles[27][ix]+=rho*temp*dxph[1];
 	      
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
@@ -253,6 +255,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[22][ix]/=profiles[21][ix];
 	  profiles[26][ix]/=profiles[0][ix];
 	  profiles[27][ix]/=profiles[0][ix];
+	  profiles[28][ix]/=profiles[0][ix];
  
 	  //normalizing by <(rho+u+bsq/2)u^r>
 	  //profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];

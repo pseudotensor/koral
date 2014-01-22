@@ -511,3 +511,28 @@ calc_Qtheta(int ix, int iy, int iz)
 
   return 2.*M_PI/Omega/dx*fabs(bcon[2])/sqrt(rho);
 }
+
+//calculates ratio of poloidal to toroidal magnetic field
+ldouble
+calc_BpBphi(int ix, int iy, int iz)
+{
+  int i;
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  struct geometry geomBL;
+  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+  ldouble pp[NV];
+  PLOOP(i)
+    pp[i]=get_u(p,i,ix,iy,iz);
+	      
+  //to BL     
+  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+  
+  ldouble Bp = sqrt(pp[B1]*pp[B1]*geomBL.gg[1][1] + pp[B2]*pp[B2]*geomBL.gg[2][2]);
+  ldouble Bphi = sqrt(pp[B3]*pp[B3]*geomBL.gg[3][3]);
+  ldouble BpBphi = Bp/Bphi;
+
+  return BpBphi;
+}
