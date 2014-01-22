@@ -41,13 +41,23 @@ for(iz=0;iz<NZ;iz++)
 		
 #endif
 
-		if(geom.iy==NY/2)
-		//if(geom.iy==NY-1)
-	      {
+#ifdef BETANORMFULL
+		//normalizing wrt everywhere
 #pragma omp critical
-		if(pmag/ptot>maxbeta) maxbeta=pmag/ptot;
-	      }
-
+		if(pmag/ptot>maxbeta) 
+		  {
+		    maxbeta=pmag/ptot;
+		    //TODO: distribute maxbeta throughout!
+		    //printf("%d %d > %e %e %e\n",ix,iy,pmag,ptot,maxbeta);
+		  }
+		    
+#else //normalizing wrt to the equatorial plane
+		if(geom.iy==NY/2)
+		  {
+#pragma omp critical
+		    if(pmag/ptot>maxbeta) maxbeta=pmag/ptot;
+		  }
+#endif
 	  }
       }
   }

@@ -56,8 +56,6 @@ if(rho<0.) //outside donut
     pp[3]=ucon[2];
     pp[4]=ucon[3];
 
-    //print_primitives(pp);getchar();
-
 #ifdef MAGNFIELD//setting them zero not to break the following coordinate transformation
     pp[B1]=pp[B2]=pp[B3]=0.; 
 #endif
@@ -89,29 +87,52 @@ if(rho<0.) //outside donut
 
     //transforming primitives from BL to MYCOORDS
     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-
     
 #ifdef MAGNFIELD 
     //MYCOORDS vector potential to calculate B's
     ldouble Acov[4];
     Acov[0]=Acov[1]=Acov[2]=0.;
+
+#if(NTORUS==3)
+    //LIMOFIELD from a=0 SANE harm init.c
+    ldouble lambda = 2.5;
+    ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
+    ldouble rchop = 550.; //outer boundary of field loops
+    ldouble u_av = pp[UU];
+    ldouble u_av_chop, u_av_mid;
+    //midplane at r
+    init_dsandvels_limotorus(r, M_PI/2., BHSPIN, &rho, &u_av_mid, &ell);
+    //midplane at rchop
+    init_dsandvels_limotorus(rchop, M_PI/2., BHSPIN, &rho, &u_av_chop, &ell);
+    
+    //vetor potential follows contours of UU
+    ldouble uchop = u_av - u_av_chop; //vpot->zero on contour of radius r=rchop
+    ldouble uchopmid = u_av_mid - u_av_chop; //vpot->zero away from midplane
+
+    ldouble rin=LT_RIN;
+    ldouble STARTFIELD = 2.5*rin;
+    ldouble q, fr, fr_start, vpot=0.;
+    if (r > STARTFIELD && r < rchop) {
+      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 3); // * pow(tanh(r/rsmooth),2);
+    } else q = 0;
+
+    if(q > 0.) {
+      fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
+      fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
+      vpot += q * sin(fr - fr_start) ;
+    }
+
+    Acov[3]=vpot;
+#else
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
+#endif
 
     pp[B1]=0.;
     pp[B2]=0.;
     pp[B3]=Acov[3];
 #endif
 
-  }
-
-/*
-#ifdef RADIATION
-    //setting up radiative energy density to residual value - 
-    //should immetiadelly increase sucking out the gas internal energy in opt.thick regions
-    pp[EE0]=pp[UU]/1.e6;
-    pp[FX0]=pp[FY0]=pp[FZ0]=0.;    
-#endif
-*/
+   }
 
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);

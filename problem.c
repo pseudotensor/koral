@@ -54,16 +54,16 @@ calc_bc(int ix,int iy,int iz,ldouble t,
 int
 set_initial_profile()
 {
-  if(PROCID==0) printf("Initializing problem... ");
+  if(PROCID==0) {printf("Initializing problem... ");fflush(stdout);}
   int ix,iy,iz;
 
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
-  for(iz=0;iz<NZ;iz++)
+  for(ix=0;ix<NX;ix++)
     {
       for(iy=0;iy<NY;iy++)
 	{
-	  for(ix=0;ix<NX;ix++)
+	  for(iz=0;iz<NZ;iz++)
 	    {
 
 #include PR_INIT

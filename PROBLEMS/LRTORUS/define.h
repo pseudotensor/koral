@@ -12,7 +12,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -39,7 +39,7 @@
 /************************************/
 #define HDVISCOSITY NOVISCOSITY
 //#define RADVISCOSITY NOVISCOSITY
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define ALPHARADVISC 0.1
@@ -78,9 +78,9 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(2.575-MKS1R0))
-#define MAXX (log(50.-MKS1R0))
-#define NX 80
+#define MINX (log(1.575-MKS1R0))
+#define MAXX (log(1000.-MKS1R0))
+#define NX 150
 #define NY 70
 #define NZ 1
 #endif
@@ -114,12 +114,37 @@
 /************************************/
 #define GAMMA (5./3.)
 
+#define NTORUS 3
+
+#if(NTORUS==3) //a=0 SANE, no rad!
+#define LT_KAPPA 1.e-2
+#define LT_XI 0.708
+#define LT_R1 42.
+#define LT_R2 1000.
+#define LT_GAMMA 5./3.
+#define LT_RIN 10.
+#undef MAXBETA
+#define MAXBETA (1./30.) //target pmag/pgas int the midplane
+#define BETANORMFULL
+#endif
+
+#if(NTORUS==1) //original
 #define LT_KAPPA 1.5e3
 #define LT_XI 0.9
 #define LT_R1 31.75
 #define LT_R2 200.
 #define LT_GAMMA 4./3.
 #define LT_RIN 15.
+#endif
+
+#if(NTORUS==2) //for Yucong?
+#define LT_KAPPA 2.e3
+#define LT_XI 0.95
+#define LT_R1 16.
+#define LT_R2 200.
+#define LT_GAMMA 4./3.
+#define LT_RIN 10.
+#endif
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
