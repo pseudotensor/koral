@@ -112,7 +112,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 3.
 #define DTOUT2 250.
 
 /************************************/
