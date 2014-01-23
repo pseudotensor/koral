@@ -512,7 +512,7 @@ calc_Qtheta(int ix, int iy, int iz)
   ldouble Omega = ucon[3]/ucon[0];
   ldouble dx=get_xb(iy+1,1)-get_xb(iy,1);
 
-  return 2.*M_PI/Omega/dx*fabs(bcon[2])/sqrt(rho);
+  return 2.*M_PI/fabs(Omega)/dx*fabs(bcon[2])/sqrt(rho);
 }
 
 //calculates ratio of poloidal to toroidal magnetic field
@@ -565,7 +565,7 @@ calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
   indices_21(bcon,bcov,geomBL.gg); 
 
   *bsq = dot(bcon,bcov);
-  *brbphi = sqrt(geomBL.gg[1][1]*geomBL.gg[3][3]*bcon[1]*bcon[3]);
+  *brbphi = sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*bcon[1]*bcon[3];
 
   return 0;
 }

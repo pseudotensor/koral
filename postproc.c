@@ -9,6 +9,38 @@
 /* uses mostly primitives, but may use avg quantities as well */
 /* however, this part would work only when postprocessing with */
 /* ./avg, otherwise pavg hold non-normalized numbers */
+
+//surface density (2) (column)
+//rest mass flux (3)
+//rho-weighted minus radial velocity (4)
+//<u_phi>* (5)
+//Keplerian u_phi (6)
+//abs optical depth (7)
+//tot optical depth (8)
+//net accretion rate at given radius (9)
+//inflow accretion rate at given radius (10)
+//outflow accretion rate at given radius (11)
+//luminosity at given radius (12)
+//location of the photosphere (13)
+//total mhd energy flux (14)
+//outflowin mhd energy flux (15)
+//jet mhd energy flux (16)
+//total rad energy flux (17)
+//outflowin rad energy flux (18)
+//jet rad energy flux (19)
+//outflowin mass flux (20)
+//jet mass flux (21)
+//luminosity at given radius (22)
+//surface density in the inflow (23)
+//rho-weighted minus radial velocity in the inflow (24)
+//opt thin mhd energy flux (25)
+//opt. thin rad energy flux (26)
+//opt. thin mass flux (27)
+//rho-weighted q-theta (28)
+//rho-weighted temperature (29)
+//rho-weighted magn.field angle <sqrt(grr gphph)b^r b^ph> / <bsq> (30)
+
+
 /*********************************************/
 int calc_radialprofiles(ldouble profiles[][NX])
 {
@@ -167,6 +199,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //to calculate magn. field angle
 	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
+	      
+	      //printf("> %e %e\n",bsq,brbphi);getchar();
+
 	      Bangle1+=rho*brbphi*dxph[1];
 	      Bangle2+=rho*bsq*dxph[1];
 
@@ -187,7 +222,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //rho-weighted q-theta (28)
 	      profiles[26][ix]+=rho*qtheta*dxph[1];
-
 	       
 	      //rho-weighted temperature (29)
 	      profiles[27][ix]+=rho*temp*dxph[1];
@@ -197,24 +231,30 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //total mhd energy flux (14)
 	      profiles[12][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
+
 	      //opt thin mhd energy flux (25)
 	      if(tautot<1.)
 		profiles[23][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
+
 	      //outflowin mhd energy flux (15)
 	      if(utcon[1]>0.)
 		profiles[13][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
+
 	      //jet mhd energy flux (16)
 	      if(utcon[1]>0. && bsq>rho)
 		profiles[14][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
+
 	      //opt. thin rad energy flux (26)
 	      if(tautot<1.)
 		profiles[24][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
+
 	      //outflowin rad energy flux (18)
 	      if(utcon[1]>0.)
 		profiles[16][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
+
 	      //jet rad energy flux (19)
 	      if(utcon[1]>0. && bsq>rho)
 		profiles[17][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
@@ -222,9 +262,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //outflowin mass flux (20)
 	      if(utcon[1]>0.)
 		profiles[18][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
+
 	      //opt. thin mass flux (27)
 	      if(tautot<1.)
 		profiles[25][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
+
 	      //jet mass flux (21)
 	      if(utcon[1]>0. && bsq>rho)
 		profiles[19][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
@@ -238,6 +280,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //abs optical depth (7)
 	      profiles[5][ix]=tauabs;	
+
 	      //tot optical depth (8)
 	      profiles[6][ix]=tautot;
 
@@ -263,8 +306,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  Bangle1/=profiles[0][ix];
 	  Bangle2/=profiles[0][ix];
 
-	  //rho-weighted magn.field angle <sqrt(grr gphph)b^r b^ph> / <bsq> (30)
-	  profiles[28][ix]=Bangle1/Bangle2;
+	  //rho-weighted magn.field angle -<sqrt(grr gphph)b^r b^ph> / <bsq> (30)
+	  profiles[28][ix]=-Bangle1/Bangle2;
 	     
 	  //normalizing by <(rho+u+bsq/2)u^r>
 	  //profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];
