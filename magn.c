@@ -485,6 +485,7 @@ calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
 
 //calculates curl of a 3-vector field from array ptu starting from index idx
 //returns to curl[1..4]
+//TODO: idx not used
 int
 calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble *curl)
 {
@@ -643,10 +644,25 @@ mimic_dynamo(ldouble dt)
       Omk = 1./sqrt(xxBL[1]*xxBL[1]*xxBL[1]);
       Pk = 2.*M_PI/Omk;
       
-      Aphi = ALPHADYNAMO * step_function(xxBL[1]-6.,1.) * dt / Pk * Bp * get_u(p,B3,ix,iy,iz) * my_max(0., 1.-4.*angle);
+      ldouble facangle=0.;
+      if(isfinite(angle))
+	{
+	  if(angle<-1.) angle=-1.;
+	  facangle = my_max(0., 1.-4.*angle);
+	}
+      ldouble facradius = step_function(xxBL[1]-6.,1.);
+      ldouble facmagnetization = step_function(1.-bsq/get_u(p,RHO,ix,iy,iz),.01);
+     
+      Aphi = ALPHADYNAMO * facradius * facmagnetization * dt / Pk * get_u(p,B3,ix,iy,iz) * facangle;
 
       //saving vector potential to ptemp1
-      set_u(ptemp1,B3,ix,iy,iz,Aphi);
+      set_u(ptemp1,B3,ix,iy,iz,Aphi); 
+
+      /*
+      if(ix==50 && iy==50)
+	printf("... %e %f ",dt/Pk,xxBL[1]);
+      */
+      
     }
 
   //once the whole array is filled with A^phi we can calculate the extra magnetic field
@@ -664,22 +680,23 @@ mimic_dynamo(ldouble dt)
       ldouble B[4]; 
       calc_curl(ptemp1,B1,ix,iy,iz,&geom,B);     
       
+      set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
+      set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
+      set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
+
       /*
-      if(iy==NY/2)
+      if(ix==50   && iy==50)
 	{
 	  ldouble angle,brbphi,bsq;
 	  calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
 	  angle=-brbphi/bsq;
-	  printf("%d > %f %e\n",ix,angle,get_u(ptemp1,B3,ix,iy,iz));
-	  print_4vector(&get_u(p,B1-1,ix,iy,iz));
-	  print_4vector(B);
-	  getchar();
+	  printf("%d > %f %e > %e %.20e > %e\n",
+		 ix,angle,get_u(ptemp1,B3,ix,iy,iz),
+		 get_u(p,B1,ix,iy,iz),get_u(u,B1,ix,iy,iz),
+		 B[1]/get_u(p,B1,ix,iy,iz));
+	  	  getchar();
 	}
       */
-
-      set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
-      set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
-      set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
 
       p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
     }
