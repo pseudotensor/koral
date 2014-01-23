@@ -718,33 +718,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
 
-
-  /*
-  if(PROCID==0)
-    {
-      //printf("0p > %e\n",get_u(p,VX,NX,NY,0));
-      printf("0 > %e\n",get_ub(flby,B1,NX-1,NY,0,1));
-    }
-  if(PROCID==3)
-    {
-      //printf("3p > %e\n",get_u(p,VX,0,0,0));
-      //printf("3 > %e\n",get_ub(flbx,B2,0,0,0,0));
-    }
-  if(PROCID==1)
-    {
-      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
-      //printf("1 > %e\n",get_ub(flby,B1,0,NY-1,0,0));
-
-    }
-  if(PROCID==2)
-    {
-      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
-      printf("2 > %e\n",get_ub(flby,B1,NX-1,0,0,1));
-
-    }
-  //  getch();  
-  */
-
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -752,32 +725,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 #ifdef MAGNFIELD
   flux_ct(); //constrained transport to preserve div.B=0
 #endif
-
-  /*
-if(PROCID==0)
-    {
-      //printf("0p > %e\n",get_u(p,VX,NX,NY,0));
-      printf("0b > %e\n",get_ub(flby,B1,NX-1,NY,0,1));
-    }
-  if(PROCID==3)
-    {
-      //printf("3p > %e\n",get_u(p,VX,0,0,0));
-      //printf("3b > %e\n",get_ub(flbx,B2,0,0,0,0));
-    }
-  if(PROCID==1)
-    {
-      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
-      //printf("1b > %e\n",get_ub(flbx,B3,0,NY-1,0,0));
-
-    }
- if(PROCID==2)
-    {
-      //printf("1p > %e\n",get_u(p,VX,0,NY,0));
-      printf("2 > %e\n",get_ub(flby,B1,NX-1,0,0,1));
-
-    }
-  getch();
-  */
 
   //**********************************************************************
   //**********************************************************************
@@ -859,13 +806,7 @@ if(PROCID==0)
 
 	}
 
-      /***************************/
-      //testing if entropy increased after advection - moved to after metric
-      /***************************/
-
-      //calc_primitives(ix,iy,iz,1);
-    }
-     
+    }     
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -961,8 +902,14 @@ ldouble ms[NV],val;
 
    
    //**********************************************************************
+   //* mimics alpha-dynamo in axisymmetric sims involvin MRI ***************
    //**********************************************************************
-   //**********************************************************************
+
+#ifdef MIMICDYNAMO
+
+  mimic_dynamo(dt);
+
+#endif
 
   return GSL_SUCCESS;
 }

@@ -109,9 +109,12 @@ initialize_arrays()
   //primitives at cell centers at initial state - used for fixed boundary conditions
   pinit=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
  
-  //primitives at cell centers at initial state - may be used for initializing problem
+  //primitives at cell centers for other uses 
   pproblem1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   pproblem2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+
+  //arrays for temporary use (e.g., mimic_dynamo)
+  ptemp1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //primitives at cell centers in previous time steps
   ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
@@ -260,6 +263,7 @@ free_arrays()
   free(pinit);
   free(pproblem1);
   free(pproblem2);
+  free(ptemp1);
 
 #ifdef MAGNFIELD
   free(emf);

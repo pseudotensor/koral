@@ -501,11 +501,11 @@ calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble 
   else
     {
       if(ix>-NG && ix<NX+NG-1)
-	dA[1][2]=(get_u(p,B2,ix+1,iy,iz)-get_u(p,B2,ix-1,iy,iz))/(get_x(ix+1,0)-get_x(ix-1,0));
+	dA[1][2]=(get_u(ptu,B2,ix+1,iy,iz)-get_u(ptu,B2,ix-1,iy,iz))/(get_x(ix+1,0)-get_x(ix-1,0));
       if(ix==-NG)
-	dA[1][2]=(-3.*get_u(p,B2,ix,iy,iz)+4.*get_u(p,B2,ix+1,iy,iz)-get_u(p,B2,ix,iy,iz+2))/(get_x(ix+2,0)-get_x(ix,0));
+	dA[1][2]=(-3.*get_u(ptu,B2,ix,iy,iz)+4.*get_u(ptu,B2,ix+1,iy,iz)-get_u(ptu,B2,ix,iy,iz+2))/(get_x(ix+2,0)-get_x(ix,0));
       if(ix==NX+NG-1)
-	dA[1][2]=(3.*get_u(p,B2,ix,iy,iz)-4.*get_u(p,B2,ix-1,iy,iz)+get_u(p,B2,ix-2,iy,iz))/(get_x(ix,0)-get_x(ix-2,0));
+	dA[1][2]=(3.*get_u(ptu,B2,ix,iy,iz)-4.*get_u(ptu,B2,ix-1,iy,iz)+get_u(ptu,B2,ix-2,iy,iz))/(get_x(ix,0)-get_x(ix-2,0));
     }
 
   //d_1 A_3
@@ -514,11 +514,11 @@ calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble 
   else
     {
       if(ix>-NG && ix<NX+NG-1)
-	dA[1][3]=(get_u(p,B3,ix+1,iy,iz)-get_u(p,B3,ix-1,iy,iz))/(get_x(ix+1,0)-get_x(ix-1,0));
+	dA[1][3]=(get_u(ptu,B3,ix+1,iy,iz)-get_u(ptu,B3,ix-1,iy,iz))/(get_x(ix+1,0)-get_x(ix-1,0));
       if(ix==-NG)
-	dA[1][3]=(-3.*get_u(p,B3,ix,iy,iz)+4.*get_u(p,B3,ix+1,iy,iz)-get_u(p,B3,ix,iy,iz+2))/(get_x(ix+2,0)-get_x(ix,0));
+	dA[1][3]=(-3.*get_u(ptu,B3,ix,iy,iz)+4.*get_u(ptu,B3,ix+1,iy,iz)-get_u(ptu,B3,ix,iy,iz+2))/(get_x(ix+2,0)-get_x(ix,0));
       if(ix==NX+NG-1)
-	dA[1][3]=(3.*get_u(p,B3,ix,iy,iz)-4.*get_u(p,B3,ix-1,iy,iz)+get_u(p,B3,ix-2,iy,iz))/(get_x(ix,0)-get_x(ix-2,0));
+	dA[1][3]=(3.*get_u(ptu,B3,ix,iy,iz)-4.*get_u(ptu,B3,ix-1,iy,iz)+get_u(ptu,B3,ix-2,iy,iz))/(get_x(ix,0)-get_x(ix-2,0));
     }
 
   //d_2 A_3
@@ -527,11 +527,11 @@ calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble 
   else
     {
       if(iy>-NG && iy<NY+NG-1)
-	dA[2][3]=(get_u(p,B3,ix,iy+1,iz)-get_u(p,B3,ix,iy-1,iz))/(get_x(iy+1,1)-get_x(iy-1,1));
+	dA[2][3]=(get_u(ptu,B3,ix,iy+1,iz)-get_u(ptu,B3,ix,iy-1,iz))/(get_x(iy+1,1)-get_x(iy-1,1));
       if(iy==-NG)
-	dA[2][3]=(-3.*get_u(p,B3,ix,iy,iz)+4.*get_u(p,B3,ix,iy+1,iz)-get_u(p,B3,ix,iy+2,iz))/(get_x(iy+2,1)-get_x(iy,1));
+	dA[2][3]=(-3.*get_u(ptu,B3,ix,iy,iz)+4.*get_u(ptu,B3,ix,iy+1,iz)-get_u(ptu,B3,ix,iy+2,iz))/(get_x(iy+2,1)-get_x(iy,1));
       if(iy==NY+NG-1)
-	dA[2][3]=(3.*get_u(p,B3,ix,iy,iz)-4.*get_u(p,B3,ix,iy-1,iz)+get_u(p,B3,ix,iy-2,iz))/(get_x(iy,1)-get_x(iy-2,1));
+	dA[2][3]=(3.*get_u(ptu,B3,ix,iy,iz)-4.*get_u(ptu,B3,ix,iy-1,iz)+get_u(ptu,B3,ix,iy-2,iz))/(get_x(iy,1)-get_x(iy-2,1));
     }
 
   //d_2 A_1
@@ -540,11 +540,11 @@ calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble 
   else
     {
       if(iy>-NG && iy<NY+NG-1)
-	dA[2][1]=(get_u(p,B1,ix,iy+1,iz)-get_u(p,B1,ix,iy-1,iz))/(get_x(iy+1,1)-get_x(iy-1,1));
+	dA[2][1]=(get_u(ptu,B1,ix,iy+1,iz)-get_u(ptu,B1,ix,iy-1,iz))/(get_x(iy+1,1)-get_x(iy-1,1));
       if(iy==-NG)
-	dA[2][1]=(-3.*get_u(p,B1,ix,iy,iz)+4.*get_u(p,B1,ix,iy+1,iz)-get_u(p,B1,ix,iy+2,iz))/(get_x(iy+2,1)-get_x(iy,1));
+	dA[2][1]=(-3.*get_u(ptu,B1,ix,iy,iz)+4.*get_u(ptu,B1,ix,iy+1,iz)-get_u(ptu,B1,ix,iy+2,iz))/(get_x(iy+2,1)-get_x(iy,1));
       if(iy==NY+NG-1)
-	dA[2][1]=(3.*get_u(p,B1,ix,iy,iz)-4.*get_u(p,B1,ix,iy-1,iz)+get_u(p,B1,ix,iy-2,iz))/(get_x(iy,1)-get_x(iy-2,1));
+	dA[2][1]=(3.*get_u(ptu,B1,ix,iy,iz)-4.*get_u(ptu,B1,ix,iy-1,iz)+get_u(ptu,B1,ix,iy-2,iz))/(get_x(iy,1)-get_x(iy-2,1));
     }
 
   //d_3 A_2
@@ -553,11 +553,11 @@ calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble 
   else
     {
       if(iz>-NG && iz<NZ+NG-1)
-	dA[3][2]=(get_u(p,B2,ix,iy,iz+1)-get_u(p,B2,ix,iy,iz-1))/(get_x(iz+1,2)-get_x(iz-1,2));
+	dA[3][2]=(get_u(ptu,B2,ix,iy,iz+1)-get_u(ptu,B2,ix,iy,iz-1))/(get_x(iz+1,2)-get_x(iz-1,2));
       if(iz==-NG)
-	dA[3][2]=(-3.*get_u(p,B2,ix,iy,iz)+4.*get_u(p,B2,ix,iy,iz+1)-get_u(p,B2,ix,iy,iz+2))/(get_x(iz+2,2)-get_x(iz,2));
+	dA[3][2]=(-3.*get_u(ptu,B2,ix,iy,iz)+4.*get_u(ptu,B2,ix,iy,iz+1)-get_u(ptu,B2,ix,iy,iz+2))/(get_x(iz+2,2)-get_x(iz,2));
       if(iz==NZ+NG-1)
-	dA[3][2]=(3.*get_u(p,B2,ix,iy,iz)-4.*get_u(p,B2,ix,iy,iz-1)+get_u(p,B2,ix,iy,iz-2))/(get_x(iz,2)-get_x(iz-2,2));
+	dA[3][2]=(3.*get_u(ptu,B2,ix,iy,iz)-4.*get_u(ptu,B2,ix,iy,iz-1)+get_u(ptu,B2,ix,iy,iz-2))/(get_x(iz,2)-get_x(iz-2,2));
     }
 
   //d_3 A_1
@@ -566,11 +566,11 @@ calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble 
   else
     {
       if(iz>-NG && iz<NZ+NG-1)
-	dA[3][1]=(get_u(p,B1,ix,iy,iz+1)-get_u(p,B1,ix,iy,iz-1))/(get_x(iz+1,2)-get_x(iz-1,2));
+	dA[3][1]=(get_u(ptu,B1,ix,iy,iz+1)-get_u(ptu,B1,ix,iy,iz-1))/(get_x(iz+1,2)-get_x(iz-1,2));
       if(iz==-NG)
-	dA[3][1]=(-3.*get_u(p,B1,ix,iy,iz)+4.*get_u(p,B1,ix,iy,iz+1)-get_u(p,B1,ix,iy,iz+2))/(get_x(iz+2,2)-get_x(iz,2));
+	dA[3][1]=(-3.*get_u(ptu,B1,ix,iy,iz)+4.*get_u(ptu,B1,ix,iy,iz+1)-get_u(ptu,B1,ix,iy,iz+2))/(get_x(iz+2,2)-get_x(iz,2));
       if(iz==NZ+NG-1)
-	dA[3][1]=(3.*get_u(p,B1,ix,iy,iz)-4.*get_u(p,B1,ix,iy,iz-1)+get_u(p,B1,ix,iy,iz-2))/(get_x(iz,2)-get_x(iz-2,2));
+	dA[3][1]=(3.*get_u(ptu,B1,ix,iy,iz)-4.*get_u(ptu,B1,ix,iy,iz-1)+get_u(ptu,B1,ix,iy,iz-2))/(get_x(iz,2)-get_x(iz-2,2));
     }
 
   //gdet B^i = d_j A_k eps^ijk
@@ -580,4 +580,116 @@ calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble 
   curl[3]=(dA[1][2] - dA[2][1])/geom->gdet;
 
   return 0;
+}
+
+/***********************************************************************************************/
+/************************* mimics alpha-dynamo in axisymmetric sims involvin MRI ***************/
+/***********************************************************************************************/
+int
+mimic_dynamo(ldouble dt)
+{
+#ifdef MAGNFIELD
+#ifdef MIMICDYNAMO
+#ifdef BHDISK_PROBLEMTYPE
+
+  int ix,iy,iz,iv,ii;
+  //A_mu converted to code coordinates in init.c
+  
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells 
+    {
+      ix=loop_02[ii][0];
+      iy=loop_02[ii][1];
+      iz=loop_02[ii][2]; 
+
+      calc_primitives(ix,iy,iz,0);
+
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+
+      //let's use ptemp1 to hold the extra vector potential
+      set_u(ptemp1,B1,ix,iy,iz,0.);
+      set_u(ptemp1,B2,ix,iy,iz,0.);
+      set_u(ptemp1,B3,ix,iy,iz,0.);
+
+      ldouble Aphi,Pk,Omk;
+      ldouble xxBL[4],bcon[4],bcov[4],Bp;
+      ldouble ucon[4],ucov[4];
+      int j;
+      ldouble angle,brbphi,bsq;
+
+      //magnetic field angle
+      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
+      angle=-brbphi/bsq;
+      
+      //BL radius
+      coco_N(geom.xxvec,xxBL,MYCOORDS, BLCOORDS);
+
+      //to avoid BH
+      if(xxBL[1]<1.1*r_horizon_BL(BHSPIN)) continue;
+
+      //to calculate length of poloidal field
+      ucon[0]=0;ucon[1]=get_u(p,VX,ix,iy,iz);ucon[2]=get_u(p,VY,ix,iy,iz);ucon[3]=get_u(p,VZ,ix,iy,iz);
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+      indices_21(ucon,ucov,geom.gg);
+      ldouble pr[4]={0., get_u(p,B1,ix,iy,iz), get_u(p,B1,ix,iy,iz), 0.};
+      bcon[0] = pr[1]*ucov[1] + pr[2]*ucov[2] + pr[3]*ucov[3] ;
+      for(j=1;j<4;j++)
+	  bcon[j] = (pr[1-1+j] + bcon[0]*ucon[j])/ucon[0] ;
+      indices_21(bcon,bcov,geom.gg); 
+      Bp = sqrt(dot(bcon,bcov));
+
+      //dynamo formula
+      Omk = 1./sqrt(xxBL[1]*xxBL[1]*xxBL[1]);
+      Pk = 2.*M_PI/Omk;
+      
+      Aphi = ALPHADYNAMO * step_function(xxBL[1]-6.,1.) * dt / Pk * Bp * get_u(p,B3,ix,iy,iz) * my_max(0., 1.-4.*angle);
+
+      //saving vector potential to ptemp1
+      set_u(ptemp1,B3,ix,iy,iz,Aphi);
+    }
+
+  //once the whole array is filled with A^phi we can calculate the extra magnetic field
+  //and superimpose it on the original one
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells 
+    {
+      ix=loop_02[ii][0];
+      iy=loop_02[ii][1];
+      iz=loop_02[ii][2];
+
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+
+      ldouble B[4]; 
+      calc_curl(ptemp1,B1,ix,iy,iz,&geom,B);     
+      
+      /*
+      if(iy==NY/2)
+	{
+	  ldouble angle,brbphi,bsq;
+	  calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
+	  angle=-brbphi/bsq;
+	  printf("%d > %f %e\n",ix,angle,get_u(ptemp1,B3,ix,iy,iz));
+	  print_4vector(&get_u(p,B1-1,ix,iy,iz));
+	  print_4vector(B);
+	  getchar();
+	}
+      */
+
+      set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
+      set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
+      set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
+
+      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+    }
+
+  //done
+     
+
+#endif
+#endif
+#endif
+
+return 0;
 }
