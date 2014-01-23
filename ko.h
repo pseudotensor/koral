@@ -602,8 +602,8 @@ int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble
 int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose);
 
 //magn.c
-ldouble
-calc_BpBphi(int ix, int iy, int iz);
+int calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq);
+ldouble calc_BpBphi(int ix, int iy, int iz);
 int adjust_fluxcttoth_emfs();
 void calc_bcon_4vel(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon); 
 int calc_BfromA();

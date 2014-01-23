@@ -539,3 +539,34 @@ calc_BpBphi(int ix, int iy, int iz)
 
   return BpBphi;
 }
+
+//calculates sqrt(g_rr g_phph) b^r b^phi and b^w
+int
+calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
+{
+  int i;
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  struct geometry geomBL;
+  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+  ldouble pp[NV],bcon[4],bcov[4];
+  PLOOP(i)
+    pp[i]=get_u(p,i,ix,iy,iz);
+	      
+  //to BL     
+  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+  
+  //b^mu
+  calc_bcon_prim(pp, bcon, &geomBL);
+  
+  //b_mu
+  indices_21(bcon,bcov,geomBL.gg); 
+
+  *bsq = dot(bcon,bcov);
+  *brbphi = sqrt(geomBL.gg[1][1]*geomBL.gg[3][3]*bcon[1]*bcon[3]);
+
+  return 0;
+}
+

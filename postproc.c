@@ -20,6 +20,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
   ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
+  ldouble Bangle1,Bangle2,brbphi;
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -28,6 +29,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
       for(iv=0;iv<NRADPROFILES;iv++)
 	profiles[iv][ix]=0.;
+      
+      Bangle1=Bangle2=0.;
 
       for(iv=0;iv<NAVGVARS;iv++)
 	avgsums[iv][ix]=0.;
@@ -162,7 +165,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //MRI resolution parameter
 	      ldouble qtheta=calc_Qtheta(ix,iy,iz);//2.*M_PI/Omega/dx[1]*fabs(bcon[2])/sqrt(rho);
 
-	      //Bpoloidal / Btoroida
+	      //to calculate magn. field angle
+	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
+	      Bangle1+=rho*brbphi*dxph[1];
+	      Bangle2+=rho*bsq*dxph[1];
+
 	      ldouble BpBphi = calc_BpBphi(ix,iy,iz);
 	      
 	      //optical depths
@@ -181,9 +188,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rho-weighted q-theta (28)
 	      profiles[26][ix]+=rho*qtheta*dxph[1];
 
-	      //rho-weighted Bp/Bphi (30)
-	      profiles[28][ix]+=rho*BpBphi*dxph[1];
-	      
+	       
 	      //rho-weighted temperature (29)
 	      profiles[27][ix]+=rho*temp*dxph[1];
 	      
@@ -255,8 +260,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[22][ix]/=profiles[21][ix];
 	  profiles[26][ix]/=profiles[0][ix];
 	  profiles[27][ix]/=profiles[0][ix];
-	  profiles[28][ix]/=profiles[0][ix];
- 
+	  Bangle1/=profiles[0][ix];
+	  Bangle2/=profiles[0][ix];
+
+	  //rho-weighted magn.field angle <sqrt(grr gphph)b^r b^ph> / <bsq> (30)
+	  profiles[28][ix]=Bangle1/Bangle2;
+	     
 	  //normalizing by <(rho+u+bsq/2)u^r>
 	  //profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];
 	  profiles[3][ix]/=profiles[0][ix];
