@@ -7,7 +7,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 8
+#define RESTARTNUM 230
 
 /************************************/
 //radiation choices
@@ -60,7 +60,7 @@
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 100.
+#define B2RHORATIOMAX 50.
 #define GAMMAMAXRAD 50.
 #define GAMMAMAXHD 50.
 
@@ -81,12 +81,12 @@
 #define MINX (log(1.575-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 256
-#define TNY 128
+#define TNX 160
+#define TNY 120
 #define TNZ 1
 //number of tiles
-#define NTX 4
-#define NTY 2
+#define NTX 16
+#define NTY 8
 #define NTZ 1
 #endif
 
@@ -109,11 +109,13 @@
 #define NOUTSTOP 5000
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
+#define RADOUTPUT 1
+#define SCAOUTPUT 1
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 3.
-#define DTOUT2 250.
+#define DTOUT1 50.
+#define DTOUT2 500.
 
 /************************************/
 //common physics / torus / atmosphere
