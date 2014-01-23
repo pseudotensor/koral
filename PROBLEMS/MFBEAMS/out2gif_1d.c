@@ -34,6 +34,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
+	  "set yrange [0:4.]\n"
 #ifdef SKIP_MULTIRADFLUID
 	  "plot \"%s\" u 1:($20+$24) w l ls 4 ti \"E_total\", \"%s\" u 1:20 w l ls 2 ti \"E_1\", \"%s\" u 1:24 w l ls 3  ti \"E_2\" \n"
 #else
@@ -48,6 +49,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
+	  "set yrange [-1.5:1.5]\n"
 #ifdef SKIP_MULTIRADFLUID
 	   "plot  \"%s\" u 1:($21+$25) w l ls 4  ti \"F_total\",\"%s\" u 1:21 w l ls 2  ti \"F_1\", \"%s\" u 1:25 w l ls 3  ti \"F_2\"\n"
 #else

@@ -1,15 +1,18 @@
-#define U2PPREC 1.e-5
-#define U2PRADPREC 1.e-5
-#define RADFORCEPREC 1.e-5
 #define VERBOSE0 0
 #define MYCOORDS MINKCOORDS
 
 #define RADIATION
+#define GAMMAMAXRAD 100.
 //#define MULTIRADFLUID
 //#define REFLECT
 //#define MFREDISTRIBUTEMETHOD 2
 
+//#define RADPERTM1CONV
+#define RADPERTM1DELTA 2.
+
 //#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCMFPCONST (0.1*2./NX)
+#define RADVISCNUDAMP
 #define ALPHARADVISC 1.
 #define ZEROTIMEINSHEAR
 
@@ -22,8 +25,8 @@
 #define INITTSTEPLIM (TSTEPLIM/10.)
 
 #define SPECIFIC_BC
-#define PRINTXGC_LEFT
-#define PRINTXGC_RIGHT
+//#define PRINTXGC_LEFT
+//#define PRINTXGC_RIGHT
 
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
@@ -41,7 +44,7 @@
 #define RHO_AMB 1.e0
 #define T_AMB 1.e6
 
-#define EEAMB 1.e-1
+#define EEAMB 1.e-5
 #define EEBEAM1 1.
 #define EEBEAM2 1.
 #define FRATIO1 .99
