@@ -641,7 +641,7 @@ mimic_dynamo(ldouble dt)
       Bp = sqrt(dot(bcon,bcov));
 
       //dynamo formula
-      Omk = 1./sqrt(xxBL[1]*xxBL[1]*xxBL[1]);
+      Omk = 1./(BHSPIN+sqrt(xxBL[1]*xxBL[1]*xxBL[1]));
       Pk = 2.*M_PI/Omk;
       
       ldouble facangle=0.;
@@ -653,7 +653,7 @@ mimic_dynamo(ldouble dt)
       ldouble facradius = step_function(xxBL[1]-6.,1.);
       ldouble facmagnetization = step_function(1.-bsq/get_u(p,RHO,ix,iy,iz),.01);
      
-      Aphi = ALPHADYNAMO * facradius * facmagnetization * dt / Pk * get_u(p,B3,ix,iy,iz) * facangle;
+      Aphi = ALPHADYNAMO * dt / Pk * facradius * facmagnetization * geom.gdet * sqrt(geom.gg[3][3]) * get_u(p,B3,ix,iy,iz) * facangle;
 
       //saving vector potential to ptemp1
       set_u(ptemp1,B3,ix,iy,iz,Aphi); 
