@@ -483,7 +483,7 @@ calc_divB(int ix,int iy,int iz)
   ldouble divB;
   
   //TODO: so far 2d only
-  //this is based on corners
+  //this is corner based 
   divB = (pick_gdet(ix,iy,iz)*get_u(p,B1,ix,iy,iz) + pick_gdet(ix,iy-1,iz)*get_u(p,B1,ix,iy-1,iz) 
 	  - pick_gdet(ix-1,iy,iz)*get_u(p,B1,ix-1,iy,iz) - pick_gdet(ix-1,iy-1,iz)*get_u(p,B1,ix-1,iy-1,iz))/(2.*(get_x(ix+1,0)-get_x(ix,0)))
     + (pick_gdet(ix,iy,iz)*get_u(p,B2,ix,iy,iz) + pick_gdet(ix-1,iy,iz)*get_u(p,B2,ix-1,iy,iz) 
@@ -739,7 +739,8 @@ mimic_dynamo(ldouble dt)
       ldouble facradius = step_function(xxBL[1]-6.,1.);
       ldouble facmagnetization = step_function(1.-bsq/get_u(p,RHO,ix,iy,iz),.01);
      
-      Aphi = ALPHADYNAMO * dt / Pk * facradius * facmagnetization * geom.gdet * sqrt(geom.gg[3][3]) * get_u(p,B3,ix,iy,iz) * facangle;
+      Aphi = ALPHADYNAMO * dt / Pk  * geom.gdet * sqrt(geom.gg[3][3]) * get_u(p,B3,ix,iy,iz) 
+	* facradius * facmagnetization* facangle;
 
       //saving vector potential to ptemp1
       set_u(ptemp1,B3,ix,iy,iz,Aphi); 
@@ -768,8 +769,8 @@ mimic_dynamo(ldouble dt)
       ldouble B[4]; 
       
       B[1]=get_u(ptemp1,1,ix,iy,iz);
-      B[2]=get_u(ptemp1,2,ix,iy,iz)
-      B[3]=get_u(ptemp1,3,ix,iy,iz;)
+      B[2]=get_u(ptemp1,2,ix,iy,iz);
+      B[3]=get_u(ptemp1,3,ix,iy,iz);
       
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
