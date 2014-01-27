@@ -332,17 +332,7 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
       iy=loop_4[ii][1];
       iz=loop_4[ii][2]; 
 
-      //to avoid corners on the edge
-      /*
-      if(ix==-NG || ix==NX+NG) continue;
-      if(NY>1 && (iy==-NG || iy==NY+NG)) continue;
-      if(NZ>1 && (iz==-NG || iz==NZ+NG)) continue;
-      */
-
       //calculating A_i on corners by averaging neighbouring cell centers
-      
-      //do I provide corners of the domain at init?
-
       ldouble A[3];
 
       for(iv=0;iv<3;iv++)
@@ -372,25 +362,7 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
   
   //calculating curl and B
   //new components of B^i in ptemp1[1...3]
-
-  /*
-  print_Nvector(&get_u(ptemp1,0,0,120,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,1,120,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,1,119,0),B3+1);
-  getch();
-  */
-
   calc_BfromA_core();
-    
-  /*
-  print_Nvector(&get_u(ptemp1,0,0,120,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,1,120,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,1,119,0),B3+1);
-  getch();
-  */
-
   
   //overwriting vector potential with magnetic fields (e.g., at init)  
   if(ifoverwrite)
@@ -737,19 +709,6 @@ mimic_dynamo(ldouble dt)
       //to avoid BH
       if(xxBL[1]<1.1*r_horizon_BL(BHSPIN)) continue;
 
-      //to calculate length of poloidal field
-      /*
-      ucon[0]=0;ucon[1]=get_u(p,VX,ix,iy,iz);ucon[2]=get_u(p,VY,ix,iy,iz);ucon[3]=get_u(p,VZ,ix,iy,iz);
-      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-      indices_21(ucon,ucov,geom.gg);
-      ldouble pr[4]={0., get_u(p,B1,ix,iy,iz), get_u(p,B1,ix,iy,iz), 0.};
-      bcon[0] = pr[1]*ucov[1] + pr[2]*ucov[2] + pr[3]*ucov[3] ;
-      for(j=1;j<4;j++)
-	  bcon[j] = (pr[1-1+j] + bcon[0]*ucon[j])/ucon[0] ;
-      indices_21(bcon,bcov,geom.gg); 
-      Bp = sqrt(dot(bcon,bcov));
-      */
-
       //dynamo formula
       Omk = 1./(BHSPIN+sqrt(xxBL[1]*xxBL[1]*xxBL[1]));
       Pk = 2.*M_PI/Omk;
@@ -771,18 +730,9 @@ mimic_dynamo(ldouble dt)
 
     }
 
-
   //once the whole array is filled with cell centered A^phi we can calculate the extra magnetic field
-
   calc_BfromA(ptemp1,0);  
-  
-  /*
-  if(PROCID==55) {printf("%d > %e %e\n",PROCID,get_u(ptemp1,B3,0,5,0),get_u(p,B2,-1,0,0));fflush(stdout);}
-  if(PROCID==54) {printf("%d > %e %e\n",PROCID,get_u(ptemp1,B3,NX,5,0),get_u(p,B2,NX-1,0,0));fflush(stdout);}
-  MPI_Barrier(MPI_COMM_WORLD);
-  if(PROCID==54) {printf("\n");fflush(stdout);}
-  */
-  
+   
   //and superimpose (through ptemp1) it on the original one
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only!
@@ -808,8 +758,7 @@ mimic_dynamo(ldouble dt)
     }
 
   //done consistently only inside the inner domain
-  //need for set_bc / exchange information
-
+  //need for set_bc / exchange information afterwards or executed as the last operator
   //done
      
 

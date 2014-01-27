@@ -907,14 +907,14 @@ ldouble ms[NV],val;
 
 #ifdef MIMICDYNAMO
  
+  //correlates ghost cells
   mpi_exchangedata();
   set_bc(t,0);
 
-  mimic_dynamo(dt);
-
- 
+  //mimics dynamo
+  mimic_dynamo(dt); 
   
-//must be the last one as it does not update the magn. field outside the inner domain
+  //must be the last one as it does not update the magn. field outside the inner domain
 
 #endif
 
