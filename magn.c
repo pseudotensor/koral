@@ -317,57 +317,80 @@ int adjust_fluxcttoth_emfs()
   return 0;
 }
 
+//calculates magnetic field from vector potential given in pvecpot[B1..B3]
 int
-calc_BfromA(int ifoverwrite)
+calc_BfromA(ldouble* pvecpot, int ifoverwrite)
 {
   #ifdef MAGNFIELD
 
   int ix,iy,iz,iv,ii;
   
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-  for(ii=0;ii<Nloop_4;ii++) //corners 
+  for(ii=0;ii<Nloop_4;ii++) //all corners of the inner domain
     {      
       ix=loop_4[ii][0];
       iy=loop_4[ii][1];
       iz=loop_4[ii][2]; 
 
       //to avoid corners on the edge
+      /*
       if(ix==-NG || ix==NX+NG) continue;
       if(NY>1 && (iy==-NG || iy==NY+NG)) continue;
       if(NZ>1 && (iz==-NG || iz==NZ+NG)) continue;
+      */
 
       //calculating A_i on corners by averaging neighbouring cell centers
+      
+      //do I provide corners of the domain at init?
+
       ldouble A[3];
 
       for(iv=0;iv<3;iv++)
 	{
 	  if(NY==1 && NZ==1)
-	    A[iv]=1./2.*(get_u(p,B1+iv,ix,iy,iz) + get_u(p,B1+iv,ix-1,iy,iz));
+	    A[iv]=1./2.*(get_u(pvecpot,B1+iv,ix,iy,iz) + get_u(pvecpot,B1+iv,ix-1,iy,iz));
 
 	  if(NY>1 && NZ==1)
-	    A[iv]=1./4.*(get_u(p,B1+iv,ix,iy,iz) + get_u(p,B1+iv,ix,iy-1,iz) + get_u(p,B1+iv,ix-1,iy,iz) + get_u(p,B1+iv,ix-1,iy-1,iz));
+	    A[iv]=1./4.*(get_u(pvecpot,B1+iv,ix,iy,iz) + get_u(pvecpot,B1+iv,ix,iy-1,iz) + 
+			 get_u(pvecpot,B1+iv,ix-1,iy,iz) + get_u(pvecpot,B1+iv,ix-1,iy-1,iz));
 
 	  if(NZ>1 && NY==1)
-	    A[iv]=1./4.*(get_u(p,B1+iv,ix,iy,iz) + get_u(p,B1+iv,ix,iy,iz-1) + get_u(p,B1+iv,ix-1,iy,iz) + get_u(p,B1+iv,ix-1,iy,iz-1));
+	    A[iv]=1./4.*(get_u(pvecpot,B1+iv,ix,iy,iz) + get_u(pvecpot,B1+iv,ix,iy,iz-1) + 
+			 get_u(pvecpot,B1+iv,ix-1,iy,iz) + get_u(pvecpot,B1+iv,ix-1,iy,iz-1));
 
 	  if(NZ>1 && NY>1)
-	    A[iv]=1./8.*(get_u(p,B1+iv,ix,iy,iz) + get_u(p,B1+iv,ix,iy-1,iz) + get_u(p,B1+iv,ix-1,iy,iz) + get_u(p,B1+iv,ix-1,iy-1,iz)
-			 +get_u(p,B1+iv,ix,iy,iz-1) + get_u(p,B1+iv,ix,iy-1,iz-1) + get_u(p,B1+iv,ix-1,iy,iz-1) + get_u(p,B1+iv,ix-1,iy-1,iz-1));
+	    A[iv]=1./8.*(get_u(pvecpot,B1+iv,ix,iy,iz) + get_u(pvecpot,B1+iv,ix,iy-1,iz) + 
+			 get_u(pvecpot,B1+iv,ix-1,iy,iz) + get_u(pvecpot,B1+iv,ix-1,iy-1,iz)
+			 +get_u(pvecpot,B1+iv,ix,iy,iz-1) + get_u(pvecpot,B1+iv,ix,iy-1,iz-1) 
+			 + get_u(pvecpot,B1+iv,ix-1,iy,iz-1) + get_u(pvecpot,B1+iv,ix-1,iy-1,iz-1));
 
 	  //saving to ptemp1
 	  set_u(ptemp1,B1+iv,ix,iy,iz,A[iv]);
 	}
-      
-      set_u(pinit,B1,ix,iy,iz,get_u(ptemp1,1,ix,iy,iz));
-      set_u(pinit,B2,ix,iy,iz,get_u(ptemp1,2,ix,iy,iz));
-      set_u(pinit,B3,ix,iy,iz,get_u(ptemp1,3,ix,iy,iz));
-      
+            
     } //cell loop
   
   //calculating curl and B
   //new components of B^i in ptemp1[1...3]
-  
-  calc_BfromA_core();     
+
+  /*
+  print_Nvector(&get_u(ptemp1,0,0,120,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,1,120,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,1,119,0),B3+1);
+  getch();
+  */
+
+  calc_BfromA_core();
+    
+  /*
+  print_Nvector(&get_u(ptemp1,0,0,120,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,1,120,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,1,119,0),B3+1);
+  getch();
+  */
+
   
   //overwriting vector potential with magnetic fields (e.g., at init)  
   if(ifoverwrite)
@@ -683,11 +706,11 @@ mimic_dynamo(ldouble dt)
   //A_mu converted to code coordinates in init.c
   
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells 
-    {
-      ix=loop_02[ii][0];
-      iy=loop_02[ii][1];
-      iz=loop_02[ii][2]; 
+  for(ii=0;ii<Nloop_6;ii++) //inner domain plus 1-cell layer including corners
+    {      
+      ix=loop_6[ii][0];
+      iy=loop_6[ii][1];
+      iz=loop_6[ii][2]; 
 
       calc_primitives(ix,iy,iz,0);
 
@@ -745,19 +768,33 @@ mimic_dynamo(ldouble dt)
       //saving vector potential to ptemp1
       set_u(ptemp1,B3,ix,iy,iz,Aphi); 
 
-      /*
-      if(ix==50 && iy==50)
-	printf("... %e %f ",dt/Pk,xxBL[1]);
-      */
-      
     }
 
-  //once the whole array is filled with A^phi we can calculate the extra magnetic field
-  calc_BfromA(0);
+  /*
+  print_Nvector(&get_u(ptemp1,0,-1,120,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,-1,119,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,-1,118,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,0,120,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,0,118,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,1,120,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,1,119,0),B3+1);
+  print_Nvector(&get_u(ptemp1,0,1,118,0),B3+1);
+  getchar();
+  */
+  
+  //once the whole array is filled with cell centered A^phi we can calculate the extra magnetic field
+  calc_BfromA(ptemp1,0);
+  
+  
+  /*
+    print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
+    getchar();
+  */
   
   //and superimpose (through ptemp1) it on the original one
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells 
+  for(ii=0;ii<Nloop_02;ii++) //domain and important ghost cells 
     {
       ix=loop_02[ii][0];
       iy=loop_02[ii][1];
@@ -772,26 +809,18 @@ mimic_dynamo(ldouble dt)
       B[2]=get_u(ptemp1,2,ix,iy,iz);
       B[3]=get_u(ptemp1,3,ix,iy,iz);
       
+      
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
       set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
+      
 
-      /*
-      if(ix==50   && iy==50)
-	{
-	  ldouble angle,brbphi,bsq;
-	  calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
-	  angle=-brbphi/bsq;
-	  printf("%d > %f %e > %e %.20e > %e\n",
-		 ix,angle,get_u(ptemp1,B3,ix,iy,iz),
-		 get_u(p,B1,ix,iy,iz),get_u(u,B1,ix,iy,iz),
-		 B[1]/get_u(p,B1,ix,iy,iz));
-	  	  getchar();
-	}
-      */
-
+    
       p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
     }
+
+  //done consistently only inside the inner domain
+  //need for set_bc / exchange information
 
   //done
      

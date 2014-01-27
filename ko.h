@@ -122,7 +122,8 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
   *emuup2,*emulo2,*emuupbx2,*emulobx2,*emuupby2,*emuloby2,*emuupbz2,*emulobz2,
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
-int *cellflag,**loop_0,**loop_1,**loop_2,**loop_3,**loop_4,**loop_02,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4;
+int *cellflag,**loop_0,**loop_02,**loop_1,**loop_2,**loop_3,**loop_4,**loop_5,**loop_6;
+int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;
 
 ldouble scalars[NSCALARS];
 int doingavg;
@@ -609,7 +610,7 @@ int calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq);
 ldouble calc_BpBphi(int ix, int iy, int iz);
 int adjust_fluxcttoth_emfs();
 void calc_bcon_4vel(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon); 
-int calc_BfromA(int);
+int calc_BfromA(ldouble*,int);
 int calc_BfromA_core();
 ldouble calc_divB(int ix,int iy,int iz);
 void calc_bcon_prim(double *pp, double *bcon, void* ggg);

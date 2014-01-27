@@ -799,7 +799,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
 
-	  if(isnan(val) || isinf(val)) {printf("i: %d %d %d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
+	  if(isnan(val) || isinf(val)) {printf("i: %4d %4d %4d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
 	  
 	  set_u(u,iv,ix,iy,iz,val);	
@@ -1446,7 +1446,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //only ghost cells
+  //only ghost cells (with no corners)
 
   //reduction of size basing on the dimension
   //for constrained transport fluxes copied onto missing dimensions
@@ -1491,7 +1491,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //domain and all ghost cells
+  //domain and all ghost cells (no corners)
   Nloop_02=Nloop_0+Nloop_2;
   loop_02=(int **)malloc(Nloop_02*sizeof(int*));
   for(ix=0;ix<Nloop_0;ix++)
@@ -1544,7 +1544,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	      else diz=iz-NZ+1;	      
 	      if(dix!=1 && diy!=1 && diz!=1) continue;
 
-	      //printf("%d %d %d %d %d %d\n",ix,iy,iz,dix,diy,diz);
+	      //printf("%4d %4d %4d %d %d %d\n",ix,iy,iz,dix,diy,diz);
 	      
 	      loop_3[Nloop_3][0]=ix;
 	      loop_3[Nloop_3][1]=iy;
@@ -1565,7 +1565,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //all corners of the domain cells
+  //all corners of the domain 
   
   Nloop_4=0;
   loop_4=(int **)malloc(sizeof(int*));
@@ -1594,6 +1594,71 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   //shuffling:
 #if (SHUFFLELOOPS)
   shuffle_loop(loop_4,Nloop_4);
+#endif
+      
+  //**********************************************************************
+  //**********************************************************************
+  //all corners
+  
+  Nloop_5=0;
+  loop_5=(int **)malloc(sizeof(int*));
+  loop_5[0]=(int *)malloc(3*sizeof(int));
+
+   for(ix=-NGCX;ix<=NX+NGCX;ix++)
+    {
+      for(iy=-NGCY;iy<=NY+NGCY;iy++)
+	{
+	  for(iz=-NGCZ;iz<=NZ+NGCZ;iz++)
+	    {	
+	      loop_5[Nloop_5][0]=ix;
+	      loop_5[Nloop_5][1]=iy;
+	      loop_5[Nloop_5][2]=iz;
+
+	      Nloop_5++;
+	      
+	      loop_5=(int **)realloc(loop_5,(Nloop_5+1)*sizeof(int*));
+	      loop_5[Nloop_5]=(int *)malloc(3*sizeof(int));	      
+	    }
+	}
+    }
+
+  //shuffling:
+#if (SHUFFLELOOPS)
+  shuffle_loop(loop_5,Nloop_5);
+#endif
+      
+  //**********************************************************************
+  //**********************************************************************
+  //inner domain plus 1-cell layer including corners
+  
+  Nloop_6=0;
+  loop_6=(int **)malloc(sizeof(int*));
+  loop_6[0]=(int *)malloc(3*sizeof(int));
+
+  if(NY>1) ylim=1 ; else ylim=0;
+  if(NZ>1) zlim=1 ; else zlim=0;
+
+  for(ix=-1;ix<NX+1;ix++)
+    {
+      for(iy=-ylim;iy<NY+ylim;iy++)
+	{
+	  for(iz=-zlim;iz<=NZ+zlim;iz++)
+	    {
+	      loop_6[Nloop_6][0]=ix;
+	      loop_6[Nloop_6][1]=iy;
+	      loop_6[Nloop_6][2]=iz;
+
+	      Nloop_6++;
+	      
+	      loop_6=(int **)realloc(loop_6,(Nloop_6+1)*sizeof(int*));
+	      loop_6[Nloop_6]=(int *)malloc(3*sizeof(int));	      
+	    }
+	}
+    }
+
+  //shuffling:
+#if (SHUFFLELOOPS)
+  shuffle_loop(loop_6,Nloop_6);
 #endif
       
 
@@ -1881,7 +1946,7 @@ ldouble get_u_scalar(ldouble* uarr,int ix,int iy,int iz)
   //TODO something better, so far skipping calculating wave speeds at ghosts
   //as it is easier due to extrapolation of primitives quantities 
 
-  //printf("%d %d %d\n",ix,iy,iz); getchar();
+  //printf("%4d %4d %4d\n",ix,iy,iz); getchar();
   
   return uarr[ix+NG + (iy+NG)*(NX+2*NG) + (iz+NG)*(NY+2*NG)*(NX+2*NG)];
 }
@@ -2442,7 +2507,7 @@ cell_fixup_hd()
 
 		      if(verbose>1) 
 			{
-			  printf("fixing up mhd %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
 			  /*
 			  for(ii=0;ii<in;ii++)
 			    print_Nvector(ppn[ii],NV);
@@ -2460,8 +2525,8 @@ cell_fixup_hd()
 		    }
 		  else
 		    {
-		      fprintf(fout_fail,"didn't manage to hd fixup at %d %d %d\n",ix,iy,iz);
-		      printf("didn't manage to fixup at %d %d %d\n",ix,iy,iz);
+		      fprintf(fout_fail,"%4d > %4d %4d %4d > HDFIXFAIL > didn't manage to hd fixup\n",PROCID,ix,iy,iz);
+		      printf("%4d > %4d %4d %4d > HDFIXFAIL > didn't manage to hd fixup \n",PROCID,ix,iy,iz);
 		    }
 		}
 	    }
@@ -2631,7 +2696,7 @@ cell_fixup_rad()
 
 		      if(verbose>1 || 1) 
 			{
-			  printf("fixing up rad %d %d %d with %d neighbors\n",ix,iy,iz,in);
+			  printf("%4d > %4d %4d %4d > RADFIX > fixing up rad with %d neighbors\n",PROCID,ix,iy,iz,in);
 			  
 			  /*
 			  print_Nvector(&get_u(p,RHO,ix,iy,iz),NV);
@@ -2639,7 +2704,7 @@ cell_fixup_rad()
 			  
 			  for(ii=0;ii<in;ii++)
 			    {
-			      printf("%d %d %d : ",idx[ii][0],idx[ii][1],idx[ii][2]);
+			      printf("%4d %4d %4d : ",idx[ii][0],idx[ii][1],idx[ii][2]);
 			      print_Nvector(&ppn[ii][0],NV);
 			    }
 			  printf(" -> \n");
@@ -2661,8 +2726,8 @@ cell_fixup_rad()
 		    }
 		  else
 		    {
-		      fprintf(fout_fail,"didn't manage to rad fixup at %d %d %d\n",ix,iy,iz);
-		      printf("didn't manage to rad fixup at %d %d %d\n",ix,iy,iz);
+		      fprintf(fout_fail,"%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup\n",PROCID,ix,iy,iz);
+		      printf("%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup \n",PROCID,ix,iy,iz);
 		    }
 		}
 	    }

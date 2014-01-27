@@ -7,7 +7,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 1
+#define RESTARTNUM 230
 
 /************************************/
 //radiation choices
@@ -19,7 +19,7 @@
 //magnetic choices
 /************************************/
 #define MIMICDYNAMO
-#define ALPHADYNAMO .001
+#define ALPHADYNAMO 0.001
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
@@ -80,11 +80,11 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(3.575-MKS1R0))
+#define MINX (log(1.575-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 120
-#define TNY 80
+#define TNX 160
+#define TNY 120
 #define TNZ 1
 //number of tiles
 #define NTX 16
@@ -116,7 +116,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 5.
+#define DTOUT1 50.
 #define DTOUT2 500.
 
 /************************************/

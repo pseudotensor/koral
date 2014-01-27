@@ -188,7 +188,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   //negative uu[0] = rho u^t
   if(uu[0]/gdetu<GAMMAMAXHD*RHOFLOOR) 
     {
-      printf("%d > at %d %d %d neg uu[0] - requesting fixup\n",PROCID,geom->ix,geom->iy,geom->iz);
+      printf("%4d > %4d %4d %4d > NEGUU  > neg uu[0] - requesting fixup\n",PROCID,geom->ix,geom->iy,geom->iz);
       pp[0]=RHOFLOOR; //used when not fixin up
       ret=-2; //to request fixup
       u2pret=0; //to skip solvers
@@ -215,7 +215,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  if(s2/s1 < 0.1)
 	    {  
 	      //go to entropy
-	      if(verbose) printf("enforcing entr at %d %d %d\n",geom->ix,geom->iy,geom->iz);
+	      if(verbose) printf("enforcing entr at %4d %4d %4d\n",geom->ix,geom->iy,geom->iz);
 	      u2pret=-1;
 	    }
 	}
@@ -247,7 +247,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	    
 	    if(verbose>1)
 	      {
-		printf("u2p_entr err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+		printf("u2p_entr err No. %4d > %e %e %e > %e %e > %4d %4d %4d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 	      }
 
 	    //test, to print it out 
@@ -265,7 +265,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 		  {
 		    if(verbose>0)
 		      {
-			printf("u2p_hotmax err No. %d > %e %e %e > %e %e > %d %d %d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+			printf("u2p_hotmax err No. %4d > %e %e %e > %e %e > %4d %4d %4d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 		      }
 			
 		    //should not happen but if happens use the old state to impose URHOLIMIT
@@ -295,7 +295,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	if(u2pret<0)
 	  if(verbose>0)
 	    {
-	      printf("u2p_cold err > %e %e > %e %e > %d %d %d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
+	      printf("u2p_cold err > %e %e > %e %e > %4d %4d %4d\n",uu[0],uu[1],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 	    }
       }
   */
@@ -306,7 +306,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
       //leaving unchanged primitives - should not happen
       if(verbose>1 || 1)
 	{
-	  printf("u2p prim. unchanged > %d > %d %d %d\n",u2pret,geom->ix,geom->iy,geom->iz);
+	  printf("%4d > %4d %4d %4d > MHDU2PFAIL > u2p prim. unchanged > %d \n",PROCID,geom->ix,geom->iy,geom->iz,u2pret);
 	  /*
 	  if(u2pret!=-103)
 	    {
