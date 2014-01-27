@@ -18,7 +18,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
+#define MIMICDYNAMO
 #define ALPHADYNAMO 0.001
 #define MAGNFIELD
 #define GDETIN 1
@@ -116,7 +116,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 .1
 #define DTOUT2 500.
 
 /************************************/

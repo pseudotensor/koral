@@ -906,10 +906,15 @@ ldouble ms[NV],val;
    //**********************************************************************
 
 #ifdef MIMICDYNAMO
+ 
+  mpi_exchangedata();
+  set_bc(t,0);
 
   mimic_dynamo(dt);
-  //must be the last one as it does not update the magn. field in corners
-  //(due to corners, would have to pass one extra ghost cell)
+
+ 
+  
+//must be the last one as it does not update the magn. field outside the inner domain
 
 #endif
 

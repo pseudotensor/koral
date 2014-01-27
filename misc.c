@@ -115,6 +115,7 @@ initialize_arrays()
 
   //arrays for temporary use (e.g., vector potential, mimic_dynamo)
   ptemp1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  pvecpot=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //primitives at cell centers in previous time steps
   ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
@@ -264,6 +265,7 @@ free_arrays()
   free(pproblem1);
   free(pproblem2);
   free(ptemp1);
+  free(pvecpot);
 
 #ifdef MAGNFIELD
   free(emf);

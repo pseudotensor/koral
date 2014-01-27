@@ -319,7 +319,7 @@ int adjust_fluxcttoth_emfs()
 
 //calculates magnetic field from vector potential given in pvecpot[B1..B3]
 int
-calc_BfromA(ldouble* pvecpot, int ifoverwrite)
+calc_BfromA(ldouble* pinput, int ifoverwrite)
 {
   #ifdef MAGNFIELD
 
@@ -348,24 +348,24 @@ calc_BfromA(ldouble* pvecpot, int ifoverwrite)
       for(iv=0;iv<3;iv++)
 	{
 	  if(NY==1 && NZ==1)
-	    A[iv]=1./2.*(get_u(pvecpot,B1+iv,ix,iy,iz) + get_u(pvecpot,B1+iv,ix-1,iy,iz));
+	    A[iv]=1./2.*(get_u(pinput,B1+iv,ix,iy,iz) + get_u(pinput,B1+iv,ix-1,iy,iz));
 
 	  if(NY>1 && NZ==1)
-	    A[iv]=1./4.*(get_u(pvecpot,B1+iv,ix,iy,iz) + get_u(pvecpot,B1+iv,ix,iy-1,iz) + 
-			 get_u(pvecpot,B1+iv,ix-1,iy,iz) + get_u(pvecpot,B1+iv,ix-1,iy-1,iz));
+	    A[iv]=1./4.*(get_u(pinput,B1+iv,ix,iy,iz) + get_u(pinput,B1+iv,ix,iy-1,iz) + 
+			 get_u(pinput,B1+iv,ix-1,iy,iz) + get_u(pinput,B1+iv,ix-1,iy-1,iz));
 
 	  if(NZ>1 && NY==1)
-	    A[iv]=1./4.*(get_u(pvecpot,B1+iv,ix,iy,iz) + get_u(pvecpot,B1+iv,ix,iy,iz-1) + 
-			 get_u(pvecpot,B1+iv,ix-1,iy,iz) + get_u(pvecpot,B1+iv,ix-1,iy,iz-1));
+	    A[iv]=1./4.*(get_u(pinput,B1+iv,ix,iy,iz) + get_u(pinput,B1+iv,ix,iy,iz-1) + 
+			 get_u(pinput,B1+iv,ix-1,iy,iz) + get_u(pinput,B1+iv,ix-1,iy,iz-1));
 
 	  if(NZ>1 && NY>1)
-	    A[iv]=1./8.*(get_u(pvecpot,B1+iv,ix,iy,iz) + get_u(pvecpot,B1+iv,ix,iy-1,iz) + 
-			 get_u(pvecpot,B1+iv,ix-1,iy,iz) + get_u(pvecpot,B1+iv,ix-1,iy-1,iz)
-			 +get_u(pvecpot,B1+iv,ix,iy,iz-1) + get_u(pvecpot,B1+iv,ix,iy-1,iz-1) 
-			 + get_u(pvecpot,B1+iv,ix-1,iy,iz-1) + get_u(pvecpot,B1+iv,ix-1,iy-1,iz-1));
+	    A[iv]=1./8.*(get_u(pinput,B1+iv,ix,iy,iz) + get_u(pinput,B1+iv,ix,iy-1,iz) + 
+			 get_u(pinput,B1+iv,ix-1,iy,iz) + get_u(pinput,B1+iv,ix-1,iy-1,iz)
+			 +get_u(pinput,B1+iv,ix,iy,iz-1) + get_u(pinput,B1+iv,ix,iy-1,iz-1) 
+			 + get_u(pinput,B1+iv,ix-1,iy,iz-1) + get_u(pinput,B1+iv,ix-1,iy-1,iz-1));
 
-	  //saving to ptemp1
-	  set_u(ptemp1,B1+iv,ix,iy,iz,A[iv]);
+	  //saving to pvecpot used inside calc_BfromA_core(); 
+ 	  set_u(pvecpot,B1+iv,ix,iy,iz,A[iv]);
 	}
             
     } //cell loop
@@ -408,9 +408,9 @@ calc_BfromA(ldouble* pvecpot, int ifoverwrite)
 	  ldouble pp[NV],uu[NV];
 	  PLOOP(iv)
 	    pp[iv]=get_u(p,B1,ix,iy,iz);
-	  pp[B1]=get_u(ptemp1,1,ix,iy,iz);
-	  pp[B2]=get_u(ptemp1,2,ix,iy,iz);
-	  pp[B3]=get_u(ptemp1,3,ix,iy,iz);
+	  pp[B1]=get_u(pvecpot,1,ix,iy,iz);
+	  pp[B2]=get_u(pvecpot,2,ix,iy,iz);
+	  pp[B3]=get_u(pvecpot,3,ix,iy,iz);
 
 	  p2u(pp,uu,&geom);
 
@@ -464,10 +464,10 @@ calc_BfromA_core()
 	  //temporary assuming only A_phi!=0   
 	  //TODO
 
-	  B[1] = -(get_u(ptemp1,B3,ix,iy,iz) - get_u(ptemp1,B3,ix,iy+1,iz)
-		   + get_u(ptemp1,B3,ix+1,iy,iz) - get_u(ptemp1,B3,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)*geom.gdet) ;
-          B[2] = (get_u(ptemp1,B3,ix,iy,iz) + get_u(ptemp1,B3,ix,iy+1,iz)
-		  - get_u(ptemp1,B3,ix+1,iy,iz) - get_u(ptemp1,B3,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)*geom.gdet) ;
+	  B[1] = -(get_u(pvecpot,B3,ix,iy,iz) - get_u(pvecpot,B3,ix,iy+1,iz)
+		   + get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)*geom.gdet) ;
+          B[2] = (get_u(pvecpot,B3,ix,iy,iz) + get_u(pvecpot,B3,ix,iy+1,iz)
+		  - get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)*geom.gdet) ;
 	  B[3] = 0. ;
 
 	}
@@ -482,9 +482,9 @@ calc_BfromA_core()
 	  my_err("3D in calc_BfromA_core() not implemented.\n"); exit(-1);
 	}
 
-      set_u(ptemp1,1,ix,iy,iz,B[1]);
-      set_u(ptemp1,2,ix,iy,iz,B[2]);
-      set_u(ptemp1,3,ix,iy,iz,B[3]);
+      set_u(pvecpot,1,ix,iy,iz,B[1]);
+      set_u(pvecpot,2,ix,iy,iz,B[2]);
+      set_u(pvecpot,3,ix,iy,iz,B[3]);
      
     } //cell loop
   
@@ -703,7 +703,6 @@ mimic_dynamo(ldouble dt)
 #ifdef BHDISK_PROBLEMTYPE
 
   int ix,iy,iz,iv,ii;
-  //A_mu converted to code coordinates in init.c
   
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_6;ii++) //inner domain plus 1-cell layer including corners
@@ -739,6 +738,7 @@ mimic_dynamo(ldouble dt)
       if(xxBL[1]<1.1*r_horizon_BL(BHSPIN)) continue;
 
       //to calculate length of poloidal field
+      /*
       ucon[0]=0;ucon[1]=get_u(p,VX,ix,iy,iz);ucon[2]=get_u(p,VY,ix,iy,iz);ucon[3]=get_u(p,VZ,ix,iy,iz);
       conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
       indices_21(ucon,ucov,geom.gg);
@@ -748,6 +748,7 @@ mimic_dynamo(ldouble dt)
 	  bcon[j] = (pr[1-1+j] + bcon[0]*ucon[j])/ucon[0] ;
       indices_21(bcon,bcov,geom.gg); 
       Bp = sqrt(dot(bcon,bcov));
+      */
 
       //dynamo formula
       Omk = 1./(BHSPIN+sqrt(xxBL[1]*xxBL[1]*xxBL[1]));
@@ -770,34 +771,25 @@ mimic_dynamo(ldouble dt)
 
     }
 
-  /*
-  print_Nvector(&get_u(ptemp1,0,-1,120,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,-1,119,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,-1,118,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,0,120,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,0,118,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,1,120,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,1,119,0),B3+1);
-  print_Nvector(&get_u(ptemp1,0,1,118,0),B3+1);
-  getchar();
-  */
-  
+
   //once the whole array is filled with cell centered A^phi we can calculate the extra magnetic field
-  calc_BfromA(ptemp1,0);
+
+  calc_BfromA(ptemp1,0);  
   
   /*
-    print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
-    getchar();
+  if(PROCID==55) {printf("%d > %e %e\n",PROCID,get_u(ptemp1,B3,0,5,0),get_u(p,B2,-1,0,0));fflush(stdout);}
+  if(PROCID==54) {printf("%d > %e %e\n",PROCID,get_u(ptemp1,B3,NX,5,0),get_u(p,B2,NX-1,0,0));fflush(stdout);}
+  MPI_Barrier(MPI_COMM_WORLD);
+  if(PROCID==54) {printf("\n");fflush(stdout);}
   */
   
   //and superimpose (through ptemp1) it on the original one
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-  for(ii=0;ii<Nloop_02;ii++) //domain and important ghost cells 
+  for(ii=0;ii<Nloop_0;ii++) //domain only!
     {
-      ix=loop_02[ii][0];
-      iy=loop_02[ii][1];
-      iz=loop_02[ii][2];
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2];
 
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
@@ -808,12 +800,10 @@ mimic_dynamo(ldouble dt)
       B[2]=get_u(ptemp1,2,ix,iy,iz);
       B[3]=get_u(ptemp1,3,ix,iy,iz);
       
-      /*
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
       set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
-      */
-    
+
       p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
     }
 
