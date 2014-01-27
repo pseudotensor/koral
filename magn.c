@@ -786,7 +786,6 @@ mimic_dynamo(ldouble dt)
   //once the whole array is filled with cell centered A^phi we can calculate the extra magnetic field
   calc_BfromA(ptemp1,0);
   
-  
   /*
     print_Nvector(&get_u(ptemp1,0,0,119,0),B3+1);
     getchar();
@@ -809,12 +808,11 @@ mimic_dynamo(ldouble dt)
       B[2]=get_u(ptemp1,2,ix,iy,iz);
       B[3]=get_u(ptemp1,3,ix,iy,iz);
       
-      
+      /*
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
       set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
-      
-
+      */
     
       p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
     }

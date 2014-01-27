@@ -2222,10 +2222,6 @@ int set_bc(ldouble t,int ifinit)
   //total corners, filling one cell deep surfaces
   if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
     {
-      PLOOP(iv)
-	set_u(p,iv,-1,-1,iz,get_u(p,iv,0,0,iz));
-      fill_geometry(-1,-1,iz,&geom);
-      p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
 
       for(i=0;i<NG-1;i++)
 	{
@@ -2239,15 +2235,26 @@ int set_bc(ldouble t,int ifinit)
 	  fill_geometry(-1,-NG+i,iz,&geom);
 	  p2u(&get_u(p,0,-1,-NG+i,iz),&get_u(u,0,-1,-NG+i,iz),&geom);
 	}
+      
+      //copying (0,0) -> (-1,-1) 
+      /*
+      PLOOP(iv)
+	set_u(p,iv,-1,-1,iz,get_u(p,iv,0,0,iz));
+      fill_geometry(-1,-1,iz,&geom);
+      p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
+      */
+
+      //averaging <(-1,0),(0,-1)> -> (-1,-1)
+      PLOOP(iv)
+	set_u(p,iv,-1,-1,iz,.5*(get_u(p,iv,-1,0,iz)+get_u(p,iv,0,-1,iz)));
+      fill_geometry(-1,-1,iz,&geom);
+      p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
+
     }
 
   if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
     {
-      PLOOP(iv)
-	set_u(p,iv,-1,NY,iz,get_u(p,iv,0,NY-1,iz));
-      fill_geometry(-1,NY,iz,&geom);
-      p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
-
+ 
       for(i=0;i<NG-1;i++)
 	{
 	  PLOOP(iv)
@@ -2260,16 +2267,16 @@ int set_bc(ldouble t,int ifinit)
 	  fill_geometry(-1,NY+i+1,iz,&geom);
 	  p2u(&get_u(p,0,-1,NY+i+1,iz),&get_u(u,0,-1,NY+i+1,iz),&geom);
 	}
-    }
+
+      PLOOP(iv)
+	set_u(p,iv,-1,NY,iz,.5*(get_u(p,iv,-1,NY-1,iz)+get_u(p,iv,0,NY,iz)));
+      fill_geometry(-1,NY,iz,&geom);
+      p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
+   }
 
   if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1)
     {
-      PLOOP(iv)
-	set_u(p,iv,NX,-1,iz,get_u(p,iv,NX-1,0,iz));
-      fill_geometry(NX,-1,iz,&geom);
-      p2u(&get_u(p,0,NX,-1,iz),&get_u(u,0,NX,-1,iz),&geom);
-
-      for(i=0;i<NG-1;i++)
+     for(i=0;i<NG-1;i++)
 	{
 	  PLOOP(iv)
 	  {
@@ -2281,15 +2288,16 @@ int set_bc(ldouble t,int ifinit)
 	  fill_geometry(NX,-NG+i,iz,&geom);
 	  p2u(&get_u(p,0,NX,-NG+i,iz),&get_u(u,0,NX,-NG+i,iz),&geom);
 	}
+
+      PLOOP(iv)
+	set_u(p,iv,NX,-1,iz,.5*(get_u(p,iv,NX-1,-1,iz)+get_u(p,iv,NX,0,iz)));
+      fill_geometry(NX,-1,iz,&geom);
+      p2u(&get_u(p,0,NX,-1,iz),&get_u(u,0,NX,-1,iz),&geom);
+
     }
 
  if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1)
     {
-      PLOOP(iv)
-	set_u(p,iv,NX,NY,iz,get_u(p,iv,NX-1,NY-1,iz));
-      fill_geometry(NX,NY,iz,&geom);
-      p2u(&get_u(p,0,NX,NY,iz),&get_u(u,0,NX,NY,iz),&geom);
-
       for(i=0;i<NG-1;i++)
 	{
 	  PLOOP(iv)
@@ -2302,6 +2310,11 @@ int set_bc(ldouble t,int ifinit)
 	  fill_geometry(NX,NY+i+1,iz,&geom);
 	  p2u(&get_u(p,0,NX,NY+i+1,iz),&get_u(u,0,NX,NY+i+1,iz),&geom);
 	}
+
+      PLOOP(iv)
+	set_u(p,iv,NX,NY,iz,.5*(get_u(p,iv,NX-1,NY,iz)+get_u(p,iv,NX,NY-1,iz)));
+      fill_geometry(NX,NY,iz,&geom);
+      p2u(&get_u(p,0,NX,NY,iz),&get_u(u,0,NX,NY,iz),&geom);
     }
 
  ldouble uval[NV],pval[NV];
