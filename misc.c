@@ -113,7 +113,7 @@ initialize_arrays()
   pproblem1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   pproblem2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
-  //arrays for temporary use (e.g., mimic_dynamo)
+  //arrays for temporary use (e.g., vector potential, mimic_dynamo)
   ptemp1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //primitives at cell centers in previous time steps
@@ -500,10 +500,13 @@ step_function(ldouble x,ldouble x9)
 int
 my_err(char *message)
 {
-  char bufor[200];
-  sprintf(bufor,"|err| : %s\n",message);
-  printf("%s",bufor);
-  getchar();
+  if(PROCID==0)
+    {
+      char bufor[200];
+      sprintf(bufor,"|err| : %s\n",message);
+      printf("%s",bufor);
+      getchar();
+    }
   return 0;  
 }
 

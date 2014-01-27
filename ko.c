@@ -95,7 +95,11 @@ main(int argc, char **argv)
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
       set_bc(tstart,1);
 #ifdef VECPOTGIVEN
-      calc_BfromA();
+      if(PROCID==0) {printf("Calculating magn. field... ");fflush(stdout);}
+      calc_BfromA(1);
+      //exchange magn. field calculated in domain
+      mpi_exchangedata();
+      if(PROCID==0) {printf("done!\n");fflush(stdout);}
 #endif
 
 #ifdef PR_POSTINIT
