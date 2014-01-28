@@ -706,6 +706,19 @@ mimic_dynamo(ldouble dt)
       //BL radius
       coco_N(geom.xxvec,xxBL,MYCOORDS, BLCOORDS);
 
+      /*
+      if(ix==NX/4 && iy==NY/2)
+	{
+	  printf("%d %d %e %e %e %e %e \n",ix,iy,
+		 xxBL[1],
+		 geom.gdet,
+		 sqrt(geom.gg[1][1])*sqrt(geom.gg[2][2])*sqrt(geom.gg[3][3]),
+		 geom.gdet * sqrt(geom.gg[3][3]),
+		 xxBL[1] * geom.gg[3][3]);
+	  getchar();
+	}
+      */
+
       //to avoid BH
       if(xxBL[1]<1.1*r_horizon_BL(BHSPIN)) continue;
 

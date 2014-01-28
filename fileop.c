@@ -1055,6 +1055,7 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
 int 
 fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 {
+  #ifdef MPI
   int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
   char fname[40],fnamehead[40];
   if(nout1>=0)
@@ -1127,7 +1128,7 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 	}
 
   MPI_File_close( &cFile );
-
+#endif
   return 0;
 }
 							    
