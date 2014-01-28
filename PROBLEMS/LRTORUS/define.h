@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 230
 
 /************************************/
@@ -18,7 +18,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
+//#define MIMICDYNAMO
 #define ALPHADYNAMO 0.001
 #define MAGNFIELD
 #define GDETIN 1

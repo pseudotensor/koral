@@ -5,8 +5,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 7
+#define RESTART
+#define RESTARTNUM 3
 
 /************************************/
 //radiation choices
@@ -94,13 +94,14 @@
 //#define PRINTYGC_LEFT
 //#define PRINTYGC_RIGHT
 
-#define OUTPUTPERCORE 
+//#define OUTPUTPERCORE 
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define DTOUT1 1.
 #define RADOUTPUTINZAMO
 #define SILOOUTPUT 1
+#define AVGOUTPUT 1
 
 /************************************/
 //problem params

@@ -735,8 +735,10 @@ mimic_dynamo(ldouble dt)
       ldouble facradius = step_function(xxBL[1]-6.,1.);
       ldouble facmagnetization = step_function(1.-bsq/get_u(p,RHO,ix,iy,iz),.01);
      
+      /*
       Aphi = ALPHADYNAMO * dt / Pk  * geom.gdet * sqrt(geom.gg[3][3]) * get_u(p,B3,ix,iy,iz) 
 	* facradius * facmagnetization* facangle;
+	*/
 
       Aphi = ALPHADYNAMO * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
 	* facradius * facmagnetization* facangle;
