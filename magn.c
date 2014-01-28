@@ -317,7 +317,7 @@ int adjust_fluxcttoth_emfs()
   return 0;
 }
 
-//calculates magnetic field from vector potential given in pvecpot[B1..B3]
+//calculates magnetic field from vector potential given in pinput[B1..B3]
 int
 calc_BfromA(ldouble* pinput, int ifoverwrite)
 {
@@ -361,7 +361,7 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
     } //cell loop
   
   //calculating curl and B
-  //new components of B^i in ptemp1[1...3]
+  //new components of B^i in pvecpot[1...3]
   calc_BfromA_core();
   
   //overwriting vector potential with magnetic fields (e.g., at init)  
@@ -402,8 +402,8 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
 }
 
 /***********************************************************************************************/
-/** calculates B-field from A given on corners in B1-B3 primitives of ptemp1 *******************/
-//new components of B^i in ptemp1[1...3]
+/** calculates B-field from A given on corners in B1-B3 primitives of pvecpot *******************/
+//new components of B^i in pvecpot[1...3]
 /***********************************************************************************************/
 int
 calc_BfromA_core()
@@ -738,12 +738,16 @@ mimic_dynamo(ldouble dt)
       Aphi = ALPHADYNAMO * dt / Pk  * geom.gdet * sqrt(geom.gg[3][3]) * get_u(p,B3,ix,iy,iz) 
 	* facradius * facmagnetization* facangle;
 
+      Aphi = ALPHADYNAMO * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
+	* facradius * facmagnetization* facangle;
+
       //saving vector potential to ptemp1
       set_u(ptemp1,B3,ix,iy,iz,Aphi); 
 
     }
 
-  //once the whole array is filled with cell centered A^phi we can calculate the extra magnetic field
+  //once the whole array is filled with cell centered A^phi we can 
+  //calculate the extra magnetic field returned through pvecpot[1..3]
   calc_BfromA(ptemp1,0);  
    
   //and superimpose (through ptemp1) it on the original one
@@ -759,9 +763,9 @@ mimic_dynamo(ldouble dt)
 
       ldouble B[4]; 
       
-      B[1]=get_u(ptemp1,1,ix,iy,iz);
-      B[2]=get_u(ptemp1,2,ix,iy,iz);
-      B[3]=get_u(ptemp1,3,ix,iy,iz);
+      B[1]=get_u(pvecpot,1,ix,iy,iz);
+      B[2]=get_u(pvecpot,2,ix,iy,iz);
+      B[3]=get_u(pvecpot,3,ix,iy,iz);
       
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
