@@ -64,12 +64,6 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
-  /*******/
-  //tests of implicit solver
-  //test_solve_implicit_lab(); exit(0);
-  /*******/
-
- 
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
 #include PR_PREPINIT
@@ -107,8 +101,6 @@ main(int argc, char **argv)
 #include PR_POSTINIT
 #endif
     }
-
- 
 
   //prepares files  
   fprint_openfiles(folder);
@@ -151,26 +143,6 @@ main(int argc, char **argv)
       nfout1++;
     }
     
-  /*
-  //to plot Fig.1 from Frank+12
-  struct geometry geom;
-  fill_geometry(0.,0.,0.,&geom);
-  ldouble pp[NV]={1.,.1,0.,0.,0.,-1.,1.,0.9,0.,0.},uu[NV];
-  ldouble Ehat,ucon[4];
-  ldouble Rd[4][4],RM1[4][4];
-
-  for(pp[FX0]=0.01; pp[FX0]<10.; pp[FX0]*=1.5)
-    {
-      p2u(pp,uu,&geom);
-      calc_Rij(pp,&geom,RM1);
-      calc_ff_Rtt(pp,&Ehat,ucon,&geom);
-      pp[UU]=1.*calc_PEQ_ufromTrho(calc_LTE_TfromE(-Ehat),1.);
-      calc_Rij_PM1conv(pp,&geom,Rd,0);
-      printf("%e %e %e %e %e %e\n",pp[FX0],pp[UU],uu[EE0],uu[FX0],Rd[1][1],RM1[1][1]/RM1[0][0]);
-    }
-  exit(-1);
-  */
-
   //evolves
   solve_the_problem(tstart, folder);
 
@@ -354,6 +326,24 @@ solve_the_problem(ldouble tstart, char* folder)
       //performance
       ldouble znps=TNX*TNY*TNZ/(end_time-start_time);
 
+      //avg files
+#if(AVGOUTPUT==1) 
+      if(lasttoutavg_floor!=floor(t/dtoutavg))
+	{
+	  if(PROCID==0)
+	    printf("> avg  file no #%6d dumped\n",nfout2);
+	  
+	  //avg goes first so that what is later can use it
+	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
+	  fprint_avgfile(t,folder);
+	  avgtime=0.;
+  
+	  nfout2++;
+
+	  lasttoutavg_floor=floor(t/dtoutavg);	 
+	}
+#endif
+
       //snapshots
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
 	{
@@ -366,7 +356,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  //calculate scalars
 	  calc_scalars(scalars,t);
 	  
-	  //dumps restart
+	  //restart files
 	  fprint_restartfile(t,folder);
 
 	  //dumps dumps
@@ -392,23 +382,6 @@ solve_the_problem(ldouble tstart, char* folder)
 	  lasttout_floor=floor(t/dtout);	 
 	}
 
-      //avgs
-#if(AVGOUTPUT==1) 
-      if(lasttoutavg_floor!=floor(t/dtoutavg))
-	{
-	  if(PROCID==0)
-	    printf("> avg  file no #%6d dumped\n",nfout2);
-	  
-	  //avg goes first so that what is later can use it
-	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
-	  fprint_avgfile(t,folder);
-	  avgtime=0.;
-  
-	  nfout2++;
-
-	  lasttoutavg_floor=floor(t/dtoutavg);	 
-	}
-#endif
 
       //performance to screen only every second
       if(end_time-fprintf_time>1. && PROCID==0) 

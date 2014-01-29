@@ -32,126 +32,6 @@ save_avg(ldouble dt)
   return 0;
 }
 
-/*********************************************/
-/*********************************************/
-/*********************************************/
-/* prints avg files */
-/*********************************************/
-/*********************************************/
-/*********************************************/
-
-//TODO: save binary
-int
-fprint_avgfile_old(ldouble t, char* folder)
-{
-  char bufor[50],bufor2[50];
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
-
-  #ifdef AVGOUTPUT_ASCII
-  fout1=fopen(bufor,"w");
-  #else
-  fout1=fopen(bufor,"wb");
-  #endif
-  
-  //header
-  //## navg time1 time2 dt 
-  fprintf(fout1,"## %d %e %e %e\n",nfout2,t-avgtime,t,avgtime);
-
-  /***********************************/  
-  /***********************************/  
- 
-  int ix,iy,iz,iv;
-  ldouble pp[NV];
-  for(iz=0;iz<NZ;iz++)
-    {
-      for(iy=0;iy<NY;iy++)
-	{
-	  for(ix=0;ix<NX;ix++)
-	    {
-	      #ifdef AVGOUTPUT_ASCII
-	      fprintf(fout1,"%d %d %d %.2e %.2e %.2e ",ix,iy,iz,get_x(ix,0),get_x(iy,0),get_x(iz,0));
-
-	      for(iv=0;iv<NV+NAVGVARS;iv++)
-		{
-		  fprintf(fout1,"%.6e ",get_uavg(pavg,iv,ix,iy,iz));
-		}	 
-	      fprintf(fout1,"\n");
-
-              #else
-
-	      fwrite(&ix,sizeof(int),1,fout1);
-	      fwrite(&iy,sizeof(int),1,fout1);
-	      fwrite(&iz,sizeof(int),1,fout1);
-	      fwrite(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fout1);
-
-              #endif
-	    }
-	}
-    }
-
-  //fflush(fout1);
-  fclose(fout1);
-
-  return 0;
-}
-
-/*********************************************/
-/*********************************************/
-/*********************************************/
-/* reads avg file */
-/*********************************************/
-/*********************************************/
-/*********************************************/
-int 
-fread_avgfile_old(int nout1, char *folder, ldouble *pavg, ldouble *dt)
-{
-  //opening avg file
-  int i,ret;
-  char fname[40];
-  sprintf(fname,"%s/avg%04d.dat",folder,nout1);
-
-  #ifdef AVGOUTPUT_ASCII
-  FILE *fdump=fopen(fname,"r");
-  #else
-  FILE *fdump=fopen(fname,"rb");
-  #endif
-  
-
-  //reading parameters, mostly time
-  int intpar[5];
-  ldouble ldpar[5];
-  ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
-  if(PROCID==0) printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
-	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
-
-  *dt=ldpar[2];
-
-  int ix,iy,iz,iv,ic;
-  for(ic=0;ic<NX*NY*NZ;ic++)
-    {
-      #ifdef AVGOUTPUT_ASCII
-     
-      ret=fscanf(fdump,"%d %d %d %*f %*f %*f ",&ix,&iy,&iz);
-      for(i=0;i<NV+NAVGVARS;i++)
-	{
-	  ret=fscanf(fdump,"%lf ",&get_uavg(pavg,i,ix,iy,iz));
-	}
-
-      #else
-
-      ret=fread(&ix,sizeof(int),1,fdump);
-      ret=fread(&iy,sizeof(int),1,fdump);
-      ret=fread(&iz,sizeof(int),1,fdump);
-      ret=fread(&get_uavg(pavg,i,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
-
-      #endif
-    }
-
-  fclose(fdump);
-
-  return 0;
-}
-
 
 /*********************************************/
 /* opens files etc. */
@@ -690,6 +570,9 @@ fprint_restartfile(ldouble t, char* folder)
   return 0;
 }
 
+/*********************************************/
+/*********************************************/
+
 int //parallel output to a single file
 fprint_restartfile_mpi(ldouble t, char* folder)
 {
@@ -759,6 +642,9 @@ fprint_restartfile_mpi(ldouble t, char* folder)
   return 0;
 }
 
+/*********************************************/
+/*********************************************/
+
 int //serial binary output
 fprint_restartfile_bin(ldouble t, char* folder)
 {
@@ -806,6 +692,9 @@ fprint_restartfile_bin(ldouble t, char* folder)
 
   return 0;
 }
+
+/*********************************************/
+/*********************************************/
 
 //serial writing in ascii per core 
 int
@@ -897,6 +786,8 @@ fread_restartfile(int nout1, char* folder,ldouble *t)
   return 0;
 }
 
+/*********************************************/
+/*********************************************/
 
 int 
 fread_restartfile_ascii(int nout1, char *folder, ldouble *t)
@@ -970,6 +861,9 @@ fread_restartfile_ascii(int nout1, char *folder, ldouble *t)
   return 0;
 }
 
+/*********************************************/
+/*********************************************/
+
 int 
 fread_restartfile_bin(int nout1, char *folder, ldouble *t)
 {
@@ -999,8 +893,8 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   /***********/
   //header file
   fdump=fopen(fnamehead,"r");
-
   if(fdump==NULL) return 1; //request start from scratch
+
   //reading parameters, mostly time
   int intpar[6];
   ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
@@ -1027,15 +921,6 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
 
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
 
-      /*
-      if(ix==100 && (iy==20 || iy==NY/2-1))
-	{
-	  printf("%d %d %d > %d %d %d\n",gix,giy,giz, NX, NY, NZ); 
-	  print_primitives(pp);
-	  getchar();
-	}
-      */
-
       fill_geometry(ix,iy,iz,&geom);
       p2u(pp,uu,&geom);
 
@@ -1051,6 +936,9 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
 
   return 0;
 }
+
+/*********************************************/
+/*********************************************/
 
 int 
 fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
@@ -1074,8 +962,8 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   /***********/
   //header file
   fdump=fopen(fnamehead,"r");
-
   if(fdump==NULL) return 1; //request start from scratch
+
   //reading parameters, mostly time
   int intpar[6];
   ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
@@ -1087,8 +975,6 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 
   /***********/
   //body file
-  fdump=fopen(fname,"rb");
- 
   struct geometry geom;
   ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;
@@ -1169,7 +1055,10 @@ fprint_avgfile(ldouble t, char* folder)
   return 0;
 }
 
- int //parallel output to a single file
+/*********************************************/
+/*********************************************/
+
+int //parallel output to a single file
 fprint_avgfile_mpi(ldouble t, char* folder)
 {
   #ifdef MPI
@@ -1224,6 +1113,9 @@ fprint_avgfile_mpi(ldouble t, char* folder)
   return 0;
 }
 
+/*********************************************/
+/*********************************************/
+
 int //serial binary output
 fprint_avgfile_bin(ldouble t, char* folder)
 {
@@ -1261,6 +1153,9 @@ fprint_avgfile_bin(ldouble t, char* folder)
 
   return 0;
 }
+
+/*********************************************/
+/*********************************************/
 
 //serial writing in ascii per core 
 int
@@ -1345,6 +1240,8 @@ fread_avgfile(int nout1, char* folder,ldouble *pavg, ldouble *dt)
   return 0;
 }
 
+/*********************************************/
+/*********************************************/
 
 int 
 fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
@@ -1401,6 +1298,9 @@ fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   return 0;
 }
 
+/*********************************************/
+/*********************************************/
+
 int 
 fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
 {
@@ -1450,10 +1350,11 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
 
   fclose(fdump);
 
-
-
   return 0;
 }
+
+/*********************************************/
+/*********************************************/
 
 int 
 fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
@@ -1483,8 +1384,6 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
 
   /***********/
   //body file
-  fdump=fopen(fname,"rb");
- 
   struct geometry geom;
   ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;
