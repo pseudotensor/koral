@@ -72,6 +72,7 @@ main(int argc, char **argv)
   int ifinit=1;
 #ifdef RESTART
   ifinit=fread_restartfile(RESTARTNUM,folder,&tstart);
+
   //exchange initial state
   mpi_exchangedata();
   set_bc(tstart,1);
@@ -331,7 +332,7 @@ solve_the_problem(ldouble tstart, char* folder)
       if(lasttoutavg_floor!=floor(t/dtoutavg))
 	{
 	  if(PROCID==0)
-	    printf("> avg  file no #%6d dumped\n",nfout2);
+	    printf("%d > avg file no #%6d dumped\n",PROCID,nfout2);
 	  
 	  //avg goes first so that what is later can use it
 	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));

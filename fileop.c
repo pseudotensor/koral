@@ -757,23 +757,26 @@ fprint_restartfile_ascii(ldouble t, char* folder)
 int
 fread_restartfile(int nout1, char* folder,ldouble *t)
 {
+  int ret;
   char bufor[250];
   sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
 
   #ifdef RESOUTPUT_ASCII
 
-  fread_restartfile_ascii(nout1,folder,t);
+  ret=fread_restartfile_ascii(nout1,folder,t);
 
   #else //binary output
 
   #ifdef OUTPUTPERCORE //each process dumps independent files
   
-  fread_restartfile_bin(nout1,folder,t);
+  ret=fread_restartfile_bin(nout1,folder,t);
 
   #else //MPI-IO, each process writes in parallel to the same file
 
   #ifdef MPI
-  fread_restartfile_mpi(nout1,folder,t);
+
+  ret=fread_restartfile_mpi(nout1,folder,t);
+
   #else
   if(PROCID==0)
       printf("MPI-I/O requires MPI\n"); 
@@ -783,7 +786,7 @@ fread_restartfile(int nout1, char* folder,ldouble *t)
   #endif
   #endif
   
-  return 0;
+  return ret;
 }
 
 /*********************************************/
