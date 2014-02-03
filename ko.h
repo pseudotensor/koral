@@ -36,6 +36,7 @@
 //constants
 #define K_BOLTZ (1.3806488e-16 * GGG / CCC / CCC / CCC / CCC / MASSCM)
 #define M_PROTON massCGS2GU(1.67262158e-24)
+#define M_ELECTR massCGS2GU(9.11e-28)
 #define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM)
 #define MU_GAS 1.
 #define Z_RATIO (1.0)

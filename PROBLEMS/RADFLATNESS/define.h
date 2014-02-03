@@ -1,7 +1,6 @@
 #define TMAX 1.e10
 #define RADIATION
-
-//#define LABRADFLUXES
+#define COMPTONIZATION
 
 #define MYCOORDS MINKCOORDS
 #define NX 31
@@ -10,15 +9,15 @@
 #define TSTEPLIM .5//kind of courant limiter
 #define INT_ORDER 1
 
-#define RADOUTPUTINZAMO
-
+//#define RADOUTPUTINZAMO
+#define RESOUTPUT_ASCII
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define ALLSTEPSOUTPUT 0
 #define DTOUT1 1.0
 #define GAMMA (4./3.)
+
 //#define EXPLICIT_RAD_SOURCE
-//#define IMPLICIT_FF_RAD_SOURCE
 
 #define MINX 0
 #define MAXX 1
@@ -27,13 +26,13 @@
 #define MINZ 0
 #define MAXZ 1
 
-#define MASSCM 1.e5
+#define MASSCM 1.e11
 
-#define LTEFACTOR 200.
+#define LTEFACTOR .1
 #define URFX 0.
 
-#define KAPPA 1000.
-#define KAPPAES 0.
+#define KAPPA 0.
+#define KAPPAES .1
 #define PERIODIC_XBC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC

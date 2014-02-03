@@ -82,7 +82,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:24 w p ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:25 w l lc 9 lw 2 ti \"Trad\"\n"
+	  "plot \"%s\" u 1:24 w p ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:25 w p lc 9 lw 2 ti \"Trad\"\n"
 
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -93,7 +93,7 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"vx\""
-	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname);
+	  ,fname2,t,t/CCC,get_xb(0,0),get_xb(NX,0),fname,fname,fname,fname,fname,fname,fname,fname);
 
 
 

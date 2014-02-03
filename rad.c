@@ -3091,7 +3091,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 
   //contravariant four-force in the lab frame
 
-  //R^ab u_a u_b
+  //R^ab u_a u_b = Erad in fluid frame
   ldouble Ruu=0.;
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -3107,21 +3107,14 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
     }
 
-  /*
-  //as in Ramesh's code
-  ldouble Ehat=0.;
-  indices_2221(Rij,Rij,gg);
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Ehat+=Rij[i][j]*ucov[i]*ucon[j];
+#ifdef COMPTONIZATION
+  ldouble Ehatrad = Ruu;
+  ldouble Thatrad = calc_LTE_TfromE(Ehatrad);
 
   for(i=0;i<4;i++)
-    {
-      Gi[i]= - (kappaes*Ehat + kappa*4.*Pi*B)*ucon[i];
-      for(j=0;j<4;j++)
-	Gi[i]-=(chi)*Rij[i][j]*ucon[j];
-    }
-  */
+    Gi[i]+=kappaes * Ehatrad * (4.*K_BOLTZ*(Thatrad - Tgas)/M_ELECTR) * (1. + 4.*K_BOLTZ*Tgas/M_ELECTR) * ucon[i]; 
+
+#endif 
 
   return 0;
 }

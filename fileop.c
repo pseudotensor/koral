@@ -403,12 +403,6 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 						  
 						  
 
-									  /******************/
-									  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
-
-#include PR_DUMP
-									  /******************/
-
 #ifdef RADIATION
 
 									  if(codeprim==0)
@@ -453,8 +447,16 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									    }
 
 
-									  Trad=calc_LTE_TfromE(fabs(E));
+									  Trad=calc_LTE_TfromE(E);
 									  if(E<EEFLOOR || isnan(E)) E=EEFLOOR;
+
+
+									  /******************/
+									  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
+
+#include PR_DUMP
+									  /******************/
+
 
 									  fprintf(fout1,"%.4e %.4e %.4e "
 										  "%.3e %.3e %.3e %.3e %.3e %.3e %.3e %.3e %.3e "

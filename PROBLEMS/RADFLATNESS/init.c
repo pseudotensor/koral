@@ -16,9 +16,7 @@ ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;
 ldouble xx,yy,zz;
 ldouble uu[NV];
 
-
-
-  struct geometry geom;
+struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);	 
 
 xx=get_x(ix,0);
@@ -36,13 +34,13 @@ ldouble pp[NV],T;
 /*****************************/
 
 pp[0]=1.;
-pp[1]=1.;
+pp[1]=.001;
 pp[2]=0.;
 pp[3]=0.;
 pp[4]=0.;
 pp[5]=calc_Sfromu(rho,uint);
-pp[6]=LTEFACTOR*calc_LTE_Efromurho(pp[0],pp[1]);
-pp[7]=URFX*pp[6];
+pp[6]=LTEFACTOR*calc_LTE_Efromurho(pp[1],pp[0]);
+pp[7]=URFX;
 pp[8]=0.;
 pp[9]=0.;
 
@@ -52,7 +50,7 @@ prad_ff2lab(pp,pp,&geom);
 
 p2u(pp,uu,&geom);
 
-
+//print_primitives(pp);getch();
 
 /**************************/
 
