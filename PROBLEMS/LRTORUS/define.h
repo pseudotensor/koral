@@ -18,8 +18,9 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
-#define ALPHADYNAMO 0.001
+#define MIMICDYNAMO
+#define ALPHADYNAMO 0.03
+#define EXPECTEDHR 0.4
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
@@ -84,7 +85,7 @@
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
 #define TNX 160
-#define TNY 120
+#define TNY 60
 #define TNZ 1
 //number of tiles
 #define NTX 16
@@ -116,7 +117,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 .1
+#define DTOUT1 1.
 #define DTOUT2 500.
 
 /************************************/
@@ -134,7 +135,7 @@
 #define LT_GAMMA 5./3.
 #define LT_RIN 10.
 #undef MAXBETA
-#define MAXBETA (1./30.) //target pmag/pgas int the midplane
+#define MAXBETA (1./30.) //target pmag/pgas inside torus
 #define BETANORMFULL
 #endif
 

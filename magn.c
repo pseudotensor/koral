@@ -706,42 +706,36 @@ mimic_dynamo(ldouble dt)
       //BL radius
       coco_N(geom.xxvec,xxBL,MYCOORDS, BLCOORDS);
 
-      /*
-      if(ix==NX/4 && iy==NY/2)
-	{
-	  printf("%d %d %e %e %e %e %e \n",ix,iy,
-		 xxBL[1],
-		 geom.gdet,
-		 sqrt(geom.gg[1][1])*sqrt(geom.gg[2][2])*sqrt(geom.gg[3][3]),
-		 geom.gdet * sqrt(geom.gg[3][3]),
-		 xxBL[1] * geom.gg[3][3]);
-	  getchar();
-	}
-      */
-
       //to avoid BH
-      if(xxBL[1]<1.1*r_horizon_BL(BHSPIN)) continue;
+      if(xxBL[1]<1.0001*r_horizon_BL(BHSPIN)) continue;
 
       //dynamo formula
       Omk = 1./(BHSPIN+sqrt(xxBL[1]*xxBL[1]*xxBL[1]));
       Pk = 2.*M_PI/Omk;
-      
+
+      //lambda MRI
+      ldouble dth=get_size_x(iy,1);
+      ldouble lambda=calc_Qtheta(ix,iy,iz)*dth;
+      ldouble lambdaBL=lambda * sqrt(geom.gg[2][2]);
+      if(!isfinite(lambdaBL) || lambdaBL>1.e3*xxBL[1]) lambdaBL=1.e3*xxBL[1];
+      ldouble faclambda=step_function(1. - lambdaBL/(EXPECTEDHR * xxBL[1]),.1);  
+
+      //printf("%d %d %e %e %e\n",ix,iy,lambda,lambdaBL,faclambda);getch();
+
+      //faclambda=1.;
+
+      //angle
       ldouble facangle=0.;
       if(isfinite(angle))
 	{
 	  if(angle<-1.) angle=-1.;
 	  facangle = my_max(0., 1.-4.*angle);
 	}
-      ldouble facradius = step_function(xxBL[1]-6.,1.);
+      ldouble facradius = step_function(xxBL[1]-6.,2.);
       ldouble facmagnetization = step_function(1.-bsq/get_u(p,RHO,ix,iy,iz),.01);
      
-      /*
-      Aphi = ALPHADYNAMO * dt / Pk  * geom.gdet * sqrt(geom.gg[3][3]) * get_u(p,B3,ix,iy,iz) 
-	* facradius * facmagnetization* facangle;
-	*/
-
-      Aphi = ALPHADYNAMO * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
-	* facradius * facmagnetization* facangle;
+      Aphi = ALPHADYNAMO * EXPECTEDHR/0.4 * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
+	* facradius * facmagnetization * faclambda * facangle;
 
       //saving vector potential to ptemp1
       set_u(ptemp1,B3,ix,iy,iz,Aphi); 
