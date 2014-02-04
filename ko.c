@@ -85,7 +85,7 @@ main(int argc, char **argv)
       set_initial_profile();
       tstart=0.;
       //exchange initial state
-      if(PROCID==0) {printf("Sending initial data...");fflush(stdout);}
+      if(PROCID==0) {printf("Sending initial data... ");fflush(stdout);}
       mpi_exchangedata();
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
       set_bc(tstart,1);

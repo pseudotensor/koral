@@ -5428,14 +5428,14 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS, BLCOORDS);
   if(mfp>mindx || chi<SMALL) mfp=xxBL[1]*sin(xxBL[2]); //Rcyl = Rsph * sin(th)
-  if(mfp<0.) mfp=0.;
+  if(mfp<0. || !isfinite(mfp)) mfp=0.;
 
 #elif defined(RADVISCMFPSPH)
 
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS, BLCOORDS);
   if(mfp>mindx || chi<SMALL) mfp=xxBL[1]; //Rcyl = Rsph
-  if(mfp<0.) mfp=0.;
+  if(mfp<0. || !isfinite(mfp)) mfp=0.;
 
 #else
 
