@@ -20,7 +20,6 @@
 /************************************/
 //#define MIMICDYNAMO
 #define ALPHADYNAMO 0.03
-#define EXPECTEDHR 0.4
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
@@ -128,6 +127,7 @@
 #define NTORUS 4
 
 #if(NTORUS==4) //a=0 SANE, no rad, denser loops
+#define EXPECTEDHR 0.4
 #define LT_KAPPA 1.e-2
 #define LT_XI 0.708
 #define LT_R1 42.
@@ -140,6 +140,7 @@
 #endif
 
 #if(NTORUS==3) //a=0 SANE, no rad!
+#define EXPECTEDHR 0.4
 #define LT_KAPPA 1.e-2
 #define LT_XI 0.708
 #define LT_R1 42.
