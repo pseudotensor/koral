@@ -746,7 +746,7 @@ mimic_dynamo(ldouble dt)
   //calculate the extra magnetic field returned through pvecpot[1..3]
   calc_BfromA(ptemp1,0);  
    
-  //and superimpose (through ptemp1) it on the original one
+  //and superimpose it on the original one
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only!
     {

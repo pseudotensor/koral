@@ -79,6 +79,18 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *By = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *phi = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+
+
+  #ifdef MIMICDYNAMO
+  mpi_exchangedata();
+  set_bc(time,0);
+  mimic_dynamo(1.); 
+  ldouble *Bxdyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Bydyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Bzdyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *phidyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  #endif
+
   #endif
 
   #ifdef RADIATION
@@ -215,6 +227,19 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  bcon[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
 		  bsq[nodalindex]=get_uavg(pavg,AVGBSQ,ix,iy,iz);
 		}
+
+	      #ifdef MIMICDYNAMO
+	      ldouble bcondyn[4],bcovdyn[4];
+	      ldouble ppdyn[NV];int idyn;
+	      PLOOP(idyn) ppdyn[idyn]=get_u(p,idyn,ix,iy,iz);	      
+	      ppdyn[B1]=get_u(pvecpot,1,ix,iy,iz);
+	      ppdyn[B2]=get_u(pvecpot,2,ix,iy,iz);
+	      ppdyn[B3]=get_u(pvecpot,3,ix,iy,iz);	      
+	      trans_pmhd_coco(ppdyn, ppdyn, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
+	      calc_bcon_prim(ppdyn,bcondyn,&geomout);
+	      indices_21(bcondyn,bcovdyn,geomout.gg); 
+	      //if(ix==NX/2 && iy==NY/2) {print_primitives(ppdyn);print_primitives(&get_u(pvecpot,0,ix,iy,iz));getch();}
+	      #endif
 #endif
 	      
 	      //velocities etc
@@ -392,27 +417,24 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		
 
 	      #ifdef MAGNFIELD
-	      //magnetic field
-	      
-
-	      	      
-	      //to ortonormal	      
-	      //trans2_cc2on(bcon,bcon,geomout.tup);
-
+	      //magnetic field	      
 	      Bx[nodalindex]=bcon[1];
 	      By[nodalindex]=bcon[2];
 	      Bz[nodalindex]=bcon[3];
+	      #ifdef MIMICDYNAMO
+	      Bxdyn[nodalindex]=bcondyn[1];
+	      Bydyn[nodalindex]=bcondyn[2];
+	      Bzdyn[nodalindex]=bcondyn[3];
+	      #endif
+	      
 
 	      if(iy==0)
 		{
-		  //phi[nodalindex]=geomout.gdet*pp[B1]*dx[1];//*get_size_x(iy,1);
 		  phi[nodalindex]=geom.gdet*get_u(p,B1,ix,iy,iz)*get_size_x(iy,1)*2.*M_PI;
 		}
 	      else
 		{
-		  imz=iz;
-		  imy=iy;
-		  imx=ix;
+		  imz=iz;imy=iy;imx=ix;
 #ifdef PRINTXGC_RIGHT
 		  imx=ix-NG;
 #endif
@@ -420,10 +442,27 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  imy=iy-NG;
 #endif
 		  int idx=imz*(ny*nx) + (imy-1)*nx + imx;
-
-		  //phi[nodalindex]=phi[idx]+geomout.gdet*pp[B1]*dx[1];//*get_size_x(iy,1);
 		  phi[nodalindex]=phi[idx]+geom.gdet*get_u(p,B1,ix,iy,iz)*get_size_x(iy,1)*2.*M_PI;
 		}
+
+	      #ifdef MIMICDYNAMO
+	      if(iy==0)
+		{
+		  phidyn[nodalindex]=geom.gdet*get_u(pvecpot,1,ix,iy,iz)*get_size_x(iy,1)*2.*M_PI;
+		}
+	      else
+		{
+		  imz=iz;imy=iy;imx=ix;
+#ifdef PRINTXGC_RIGHT
+		  imx=ix-NG;
+#endif
+#ifdef PRINTYGC_RIGHT
+		  imy=iy-NG;
+#endif
+		  int idx=imz*(ny*nx) + (imy-1)*nx + imx;
+		  phidyn[nodalindex]=phidyn[idx]+geom.gdet*get_u(pvecpot,1,ix,iy,iz)*get_size_x(iy,1)*2.*M_PI;
+		}
+	      #endif
 
 
 	      //transform to cartesian
@@ -442,6 +481,22 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 		  Bz[nodalindex] = cos(th)*bcon[1] 
 		    - sin(th)*bcon[2];
+
+		  #ifdef MIMICDYNAMO
+		  bcondyn[2]*=r;
+		  bcondyn[3]*=r*sin(th);
+
+		  Bxdyn[nodalindex] = sin(th)*cos(ph)*bcondyn[1] 
+		    + cos(th)*cos(ph)*bcondyn[2]
+		    - sin(ph)*bcondyn[3];
+
+		  Bydyn[nodalindex] = sin(th)*sin(ph)*bcondyn[1] 
+		    + cos(th)*sin(ph)*bcondyn[2]
+		    + cos(ph)*bcondyn[3];
+
+		  Bzdyn[nodalindex] = cos(th)*bcondyn[1] 
+		    - sin(th)*bcondyn[2];
+                  #endif
 		}
 	      #endif
 
@@ -737,6 +792,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   DBPutQuadvar1(file, "phi","mesh1", phi,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
+  #ifdef MIMICDYNAMO
+  DBPutQuadvar1(file, "phidyn","mesh1", phidyn,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  #endif
   #endif
 
 
@@ -798,6 +859,27 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   DBPutQuadvar(file, "magn_field","mesh1", 3, names, vels, 
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
+
+  #ifdef MIMICDYNAMO
+//magn field
+  vels[0]=Bxdyn;
+  vels[1]=Bydyn;
+  vels[2]=Bzdyn;
+  #ifdef SILO2D_XZPLANE
+  vels[1]=Bzdyn;
+  DBPutQuadvar1(file, "magn_field_dyn_z","mesh1", Bydyn,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  #endif
+  names[0] = strdup("B1dyn");
+  names[1] = strdup("B2dyn");
+  names[2] = strdup("B3dyn");
+  DBPutQuadvar(file, "magn_field_dyn","mesh1", 3, names, vels, 
+  		dimensions, ndim, NULL, 0, 
+	       DB_DOUBLE, DB_NODECENT, optList);
+  #endif
+
+
   #endif
 
   #ifdef RADIATION 
@@ -873,7 +955,14 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   free(Bx);
   free(By);
   free(Bz);
-  free(phi);
+  free(phi); 
+
+  #ifdef MIMICDYNAMO
+  free(Bxdyn);
+  free(Bydyn);
+  free(Bzdyn);
+  free(phidyn);
+  #endif
   #endif
  
 
