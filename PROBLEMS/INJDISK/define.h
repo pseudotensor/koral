@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -90,8 +90,8 @@
 #endif
 
 //total resolution
-#define TNX 192
-#define TNY 192
+#define TNX 102
+#define TNY 52
 #define TNZ 1
 //number of tiles
 #define NTX 16
@@ -130,7 +130,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 1.
 #define DTOUT2 250.
 //#define PRINTXGC_RIGHT
 

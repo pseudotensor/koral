@@ -58,9 +58,6 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *muBe = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Qtheta = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *divB = (ldouble*)malloc(nx*ny*nz*sizeof(double));
-  ldouble *Bangle = (ldouble*)malloc(nx*ny*nz*sizeof(double));
-
-  
 
   #ifdef TRACER
   ldouble *tracer = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -76,6 +73,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 
   #ifdef MAGNFIELD
+  ldouble *Bangle = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *bsq = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *By = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -84,8 +82,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   #endif
 
   #ifdef RADIATION
-  ldouble *tautot = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *tausca = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *tauabs = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *taueff = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *forcebal3 = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Erad = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Ehat = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -451,7 +450,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      ldouble Rtt,ehat,ugas[4],urad[4],rvel[4],Rij[4][4],Gi[4];
 
 	      ldouble tauabsloc = vcon[0]*calc_kappa(rho[nodalindex],temploc,geomout.xx,geomout.yy,geomout.zz);
-	      ldouble tautotloc = vcon[0]*calc_kappaes(rho[nodalindex],temploc,geomout.xx,geomout.yy,geomout.zz);
+	      ldouble tauscaloc = vcon[0]*calc_kappaes(rho[nodalindex],temploc,geomout.xx,geomout.yy,geomout.zz);
+	      ldouble taueffloc = sqrt(tauabsloc*(tauabsloc+tauscaloc));
 
 	      if(doingavg==0)
 		{
@@ -523,8 +523,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      	
 	      if(iy==0)
 		{
-		  tautot[nodalindex]=tautotloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
-		  tauabs[nodalindex]=tauabsloc*dxph[1];//get_size_x(iy,1)*sqrt(geomout.gg[2][2]);
+		  tausca[nodalindex]=tauscaloc*dxph[1];
+		  tauabs[nodalindex]=tauabsloc*dxph[1];
+		  taueff[nodalindex]=taueffloc*dxph[1];
 		}
 	      else
 		{
@@ -540,14 +541,16 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  int idx=imz*(ny*nx) + (imy-1)*nx + imx;
 		  if(iy<=NY/2) //proper integration only in the upper half
 		    {
-		      tautot[nodalindex]=tautot[idx]+tautotloc*dxph[1];
+		      tausca[nodalindex]=tausca[idx]+tauscaloc*dxph[1];
 		      tauabs[nodalindex]=tauabs[idx]+tauabsloc*dxph[1];
+		      taueff[nodalindex]=taueff[idx]+taueffloc*dxph[1];
 		    }
 		  else
 		    {
 		      idx=imz*(ny*nx) + (NY-imy-1)*nx + imx-NG;
-		      tautot[nodalindex]=tautot[idx];
+		      tausca[nodalindex]=tausca[idx];
 		      tauabs[nodalindex]=tauabs[idx];
+		      taueff[nodalindex]=taueff[idx];
 		    }
 		}
 
@@ -713,10 +716,13 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   DBPutQuadvar1(file, "ehat","mesh1", Ehat,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
-  DBPutQuadvar1(file, "tautot","mesh1", tautot,
+  DBPutQuadvar1(file, "tausca","mesh1", tausca,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   DBPutQuadvar1(file, "tauabs","mesh1", tauabs,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  DBPutQuadvar1(file, "taueff","mesh1", taueff,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   DBPutQuadvar1(file, "forcebal3","mesh1", forcebal3,
@@ -744,6 +750,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[2]=vz;
 #ifdef SILO2D_XZPLANE
   vels[1]=vz;
+  DBPutQuadvar1(file, "velocity_z","mesh1", vy,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
 #endif
 
   names[0] = strdup("vel1");
@@ -759,6 +769,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[2]=Edotz;
 #ifdef SILO2D_XZPLANE
   vels[1]=Edotz;
+  DBPutQuadvar1(file, "en_flux_z","mesh1", Edoty,
+  		dimensions, ndim, NULL, 0, 
+	      DB_DOUBLE, DB_NODECENT, optList);
 #endif
 
   names[0] = strdup("Tit1");
@@ -775,6 +788,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[2]=Bz;
 #ifdef SILO2D_XZPLANE
   vels[1]=Bz;
+  DBPutQuadvar1(file, "magn_field_z","mesh1", By,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
 #endif
   names[0] = strdup("B1");
   names[1] = strdup("B2");
@@ -791,6 +807,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[2]=Fz;
 #ifdef SILO2D_XZPLANE
   vels[1]=Fz;
+  DBPutQuadvar1(file, "erad_z","mesh1", Fy,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
 #endif
   names[0] = strdup("F1");
   names[1] = strdup("F2");
@@ -805,6 +824,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[2]=uradz;
 #ifdef SILO2D_XZPLANE
   vels[1]=uradz;
+  DBPutQuadvar1(file, "rad_vel_z","mesh1", uradz,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
 #endif
   names[0] = strdup("urad1");
   names[1] = strdup("urad2");
@@ -824,29 +846,53 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   free(rho);
   free(uint);
   free(temp);
+  free(forcebal1);
+  free(forcebal2);
+  free(Omega);
+  free(muBe);
+  free(Qtheta);
+  free(divB);
+
+
   #ifdef TRACER
   free(tracer);
   #endif
 
+
+  free(vx);
+  free(vy);
+  free(vz);
+  free(Edotx);
+  free(Edoty);
+  free(Edotz);
+
+
+  #ifdef MAGNFIELD
+  free(Bangle);
+  free(bsq);
+  free(Bx);
+  free(By);
+  free(Bz);
+  free(phi);
+  #endif
+ 
+
   #ifdef RADIATION
+  free(tausca);
+  free(tauabs);
+  free(taueff);
+  free(forcebal3);
   free(Erad);
   free(Ehat);
   free(Fx);
   free(Fy);
   free(Fz);
+  free(uradx);
+  free(urady);
+  free(uradz);
   #endif
 
-  #ifdef MAGNFIELD
-  free(bsq);
-  free(Bx);
-  free(By);
-  free(Bz);
-  #endif
- 
   
-  free(vx);
-  free(vy);
-  free(vz);
 
   return (0);
 }
