@@ -28,7 +28,7 @@ main(int argc, char **argv)
   doingavg=0;
 
   //print scalings GU->CGS and quit
-  print_scalings();   
+  //print_scalings();   
   
   //gsl errors off
   gsl_set_error_handler_off();
