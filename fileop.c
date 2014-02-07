@@ -544,29 +544,30 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 int
 fprint_restartfile(ldouble t, char* folder)
 {
-  //return 0;
-
-  #ifdef RESOUTPUT_ASCII
+  #ifdef RESOUTPUT_ASCII //ASCII output
 
   fprint_restartfile_ascii(t,folder);
 
   #else //binary output
 
-  #ifdef OUTPUTPERCORE //each process dumps independent files
-  
+  #ifdef MPI
+
+  #ifdef OUTPUTPERCORE
+
   fprint_restartfile_bin(t,folder); 
 
-  #else //MPI-IO, each process writes in parallel to the same file
-
-  #ifdef MPI
-  fprint_restartfile_mpi(t,folder);
   #else
-  if(PROCID==0)
-      printf("MPI-I/O requires MPI\n"); 
-  exit(-1);
-  #endif
+
+  fprint_restartfile_mpi(t,folder);
 
   #endif
+
+  #else 
+
+  fprint_restartfile_bin(t,folder); 
+
+  #endif
+
   #endif
   
   return 0;
@@ -769,22 +770,22 @@ fread_restartfile(int nout1, char* folder,ldouble *t)
 
   #else //binary output
 
+  #ifdef MPI
+
   #ifdef OUTPUTPERCORE //each process dumps independent files
   
   ret=fread_restartfile_bin(nout1,folder,t);
 
-  #else //MPI-IO, each process writes in parallel to the same file
-
-  #ifdef MPI
+  #else 
 
   ret=fread_restartfile_mpi(nout1,folder,t);
 
-  #else
-  if(PROCID==0)
-      printf("MPI-I/O requires MPI\n"); 
-  exit(-1);
   #endif
 
+  #else //no MPI 
+
+  ret=fread_restartfile_bin(nout1,folder,t);
+  
   #endif
   #endif
   
@@ -1040,19 +1041,21 @@ fprint_avgfile(ldouble t, char* folder)
 
   #else //binary output
 
+  #ifdef MPI
+  
   #ifdef OUTPUTPERCORE //each process dumps independent files
   
   fprint_avgfile_bin(t,folder); 
 
-  #else //MPI-IO, each process writes in parallel to the same file
+  #else 
 
-  #ifdef MPI
   fprint_avgfile_mpi(t,folder);
-  #else
-  if(PROCID==0)
-      printf("MPI-I/O requires MPI\n"); 
-  exit(-1);
+
   #endif
+
+  #else
+
+  fprint_avgfile_bin(t,folder); 
 
   #endif
   #endif
@@ -1094,7 +1097,7 @@ fprint_avgfile_mpi(ldouble t, char* folder)
   MPI_Offset pos;
   if(PROCID==0) pos=0;
   else
-    pos=PROCID*NX*NY*NZ*(3*sizeof(int)+NV*sizeof(ldouble));
+    pos=PROCID*NX*NY*NZ*(3*sizeof(int)+(NV+NAVGVARS)*sizeof(ldouble));
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
   int ix,iy,iz,iv;
@@ -1225,19 +1228,21 @@ fread_avgfile(int nout1, char* folder,ldouble *pavg, ldouble *dt)
 
   #else //binary output
 
+  #ifdef MPI
+  
   #ifdef OUTPUTPERCORE //each process dumps independent files
   
   fread_avgfile_bin(nout1,folder,pavg,dt);
 
   #else //MPI-IO, each process writes in parallel to the same file
 
-  #ifdef MPI
   fread_avgfile_mpi(nout1,folder,pavg,dt);
-  #else
-  if(PROCID==0)
-      printf("MPI-I/O requires MPI\n"); 
-  exit(-1);
+  
   #endif
+
+  #else //no MPI
+
+  fread_avgfile_bin(nout1,folder,pavg,dt);
 
   #endif
   #endif
@@ -1338,6 +1343,7 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
  
   /***********/
   //body file
+
   fdump=fopen(fname,"rb");
  
   struct geometry geom;
