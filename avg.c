@@ -13,9 +13,9 @@ main(int argc, char **argv)
 
   //which files to read
   int no1,no2,nostep;
-  if(argc!=4)
+  if(argc!=5)
     {
-      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep\n");
+      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep whatfile\n");
       return -1;
     }
   else
@@ -23,10 +23,10 @@ main(int argc, char **argv)
       no1=atof(argv[1]);
       no2=atof(argv[2]);
       nostep=atof(argv[3]);
+      doingavg=atoi(argv[4]);
     }
 
   int i;
-  doingavg=1;
 
   //currently gsl is not used
   gsl_set_error_handler_off();
@@ -56,25 +56,49 @@ main(int argc, char **argv)
 
   //arrays for averaging of primitives
   ldouble *pavgtot=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
-
   for(i=0;i<(SX)*(SY)*(SZ)*(NV+NAVGVARS);i++)
     pavg[i]=pavgtot[i]=0.;
+
+  if(doingavg)
+    {
+      printf("working on avg files #%04d to #%04d with %d step \n",no1,no2,nostep);
+    }
+  else
+    {
+      printf("working on res files #%04d to #%04d with %d step \n",no1,no2,nostep);
+    }
+    
 
   int ifile,readret;
   ldouble t,ttot; ldouble scalars[NSCALARS];
   ttot=0.;
   t=global_time;
 
-  printf("working on files #%04d to #%04d with %d step \n",no1,no2,nostep);
-
   int ix,iy,iz,iv;
   ldouble pp[NV],uu[NV];
 
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
-      //reading avg file
-      readret=fread_avgfile(ifile,"dumps",pavg,&dt);
+      if(doingavg)
+	{
+	  //reading avg file
+	  readret=fread_avgfile(ifile,"dumps",pavg,&dt);
+	}
+      else
+	{
+	  //reading res file
+	  readret=fread_restartfile(ifile,"dumps",&t);
+	  dt=1.;
+	  //rewrite primitives to pavg
+	  for(iz=0;iz<NZ;iz++)
+	    for(iy=0;iy<NY;iy++)
+	      for(ix=0;ix<NX;ix++)
+		for(iv=0;iv<NV;iv++)
+		  set_uavg(pavg,iv,ix,iy,iz,get_u(p,iv,ix,iy,iz));
+	}
+
       add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
+	
       ttot+=dt;
     }
 
@@ -86,30 +110,35 @@ main(int argc, char **argv)
     for(iy=0;iy<NY;iy++)
       for(ix=0;ix<NX;ix++)
 	for(iv=0;iv<NV;iv++)
-	   set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
+	  set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
 
   //projects on ghost cells
   set_bc(t,0);
 
   char prefix[40];
+  char suffix[10];
+  if(doingavg)
+    sprintf(suffix,"");
+  else
+    sprintf(suffix,"res");
   
   //dumps dumps to analysis analysis
 #if(RADOUTPUT==1)
-  sprintf(prefix,"radavg%04d-",no1);
+  sprintf(prefix,"radavg%s%04d-",suffix,no1);
   fprint_radprofiles(t,no2,"analysis",prefix);
 #endif
 #if(OUTOUTPUT==1)
-  sprintf(prefix,"outavg%04d-",no1);
+  sprintf(prefix,"outavg%s%04d-",suffix,no1);
   fprint_outfile(t,no2,0,"analysis",prefix);
 #endif
 #if(SILOOUTPUT==1)
 #ifndef NOSILO
-  sprintf(prefix,"silavg%04d-",no1);
+  sprintf(prefix,"silavg%s%04d-",suffix,no1);
   fprint_silofile(t,no2,"analysis",prefix);
 #endif
 #endif
 #if(SIMOUTPUT==1)	  
-  sprintf(prefix,"simavg%04d-",no1);
+  sprintf(prefix,"simavg%s%04d-",suffix,no1);
   fprint_simplecart(t,no2,"analysis",prefix);
 #endif
   
