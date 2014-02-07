@@ -12,8 +12,8 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
-//#define SKIPRADSOURCE
+#define RADIATION
+#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
@@ -80,11 +80,11 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.575-MKS1R0))
+#define MINX (log(1.75-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 120
-#define TNY 60
+#define TNX 300
+#define TNY 200
 #define TNZ 1
 //number of tiles
 #define NTX 16
@@ -102,7 +102,7 @@
 /************************************/
 //output
 /************************************/
-#define OUTPUTPERCORE
+//#define OUTPUTPERCORE
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
@@ -116,7 +116,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 100.
 #define DTOUT2 500.
 
 /************************************/
@@ -124,7 +124,7 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 4
+#define NTORUS 1
 
 #if(NTORUS==4) //a=0 SANE, no rad, denser loops
 #define EXPECTEDHR 0.4
@@ -152,7 +152,7 @@
 #define BETANORMFULL
 #endif
 
-#if(NTORUS==1) //original
+#if(NTORUS==1) //original (2nd koral paper)
 #define LT_KAPPA 1.5e3
 #define LT_XI 0.9
 #define LT_R1 31.75

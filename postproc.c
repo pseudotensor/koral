@@ -39,6 +39,7 @@
 //rho-weighted q-theta (28)
 //rho-weighted temperature (29)
 //rho-weighted magn.field angle <sqrt(grr gphph)b^r b^ph> / <bsq> (30)
+//scale-height (31)
 
 
 /*********************************************/
@@ -216,6 +217,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //surface density (2) (column)
 	      profiles[0][ix]+=rho*dxph[1];
 
+	      //numerator of scale heightz (31) (column)
+	      profiles[29][ix]+=rho*dxph[1]*pow(tan(fabs(M_PI/2.-xxBL[2])),2.);
+
 	      //surface density in the inflow (23)
 	      if(utcon[1]<0.)
 		profiles[21][ix]+=rho*dxph[1];
@@ -303,6 +307,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[22][ix]/=profiles[21][ix];
 	  profiles[26][ix]/=profiles[0][ix];
 	  profiles[27][ix]/=profiles[0][ix];
+	  profiles[29][ix]/=profiles[0][ix];
+	  profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
+
 	  Bangle1/=profiles[0][ix];
 	  Bangle2/=profiles[0][ix];
 

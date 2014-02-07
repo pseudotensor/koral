@@ -73,7 +73,7 @@
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 //71 MBBBLOB - rad blobs with magn field
 
-#define PROBLEM 69
+#define PROBLEM 67
 
 #if(PROBLEM==71)
 
@@ -1319,7 +1319,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 29
+#define NRADPROFILES 30
 #endif
 
 #ifndef OUTVEL
