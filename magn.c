@@ -767,7 +767,12 @@ mimic_dynamo(ldouble dt)
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
       set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
 
-      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+      ldouble uutemp[NV];
+      p2u(&get_u(p,0,ix,iy,iz),uutemp,&geom);
+      set_u(u,B1,ix,iy,iz,uutemp[B1]);
+      set_u(u,B2,ix,iy,iz,uutemp[B2]);
+      set_u(u,B3,ix,iy,iz,uutemp[B3]);
+
     }
 
   //done consistently only inside the inner domain

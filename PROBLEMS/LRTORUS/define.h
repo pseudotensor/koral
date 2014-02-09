@@ -18,7 +18,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
+#define MIMICDYNAMO
 #define ALPHADYNAMO 0.03
 #define MAGNFIELD
 #define GDETIN 1
@@ -124,7 +124,7 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 1
+#define NTORUS 4
 
 #if(NTORUS==4) //a=0 SANE, no rad, denser loops
 #define EXPECTEDHR 0.4
