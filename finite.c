@@ -357,6 +357,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
   copy_u(1.,u,ubase);
 
+
   //global
   max_ws[0]=max_ws[1]=max_ws[2]=-1.;
 
@@ -688,21 +689,14 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
     }
 
+
   /*
   if(PROCID==0)
     {
-      printf("0p > %e\n",get_u(p,VX,NX+1,-2,0));
-      //printf("0 > %e\n",get_ub(flLy,UU,NX,NY,0,1));
+      print_Nvector(&get_u(p,0,0,0,-1),NV);
     }
-  if(PROCID==1)
-    {
-      printf("1p > %e\n",get_u(p,VX,1,-2,0));
-      //printf("1 > %e\n",get_ub(flLy,UU,0,NY,0,1));
-
-    }
-    getch();   
   */
-
+  
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -2090,16 +2084,16 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
 
   if(BCtype==ZBCLO || BCtype==ZBCHI)
     {       
-#ifdef PERIODIC_YBC
-      iiy=iy;
-      if(iy<0) iiy=iy+NY;
-      if(iy>NY-1) iiy=iy-NY;
-      if(NY<NG) iiy=0;
+#ifdef PERIODIC_ZBC
+      iiz=iz;
+      if(iz<0) iiz=iz+NZ;
+      if(iz>NZ-1) iiy=iz-NZ;
+      if(NZ<NG) iiz=0;
 #endif
-#ifdef COPY_YBC
-      iiy=iy;
-      if(iy<0) iiy=0;
-      if(iy>NY-1) iiy=NY-1;
+#ifdef COPY_ZBC
+      iiz=iz;
+      if(iz<0) iiz=0;
+      if(iz>NZ-1) iiz=NZ-1;
 #endif
     }
 
@@ -2125,13 +2119,6 @@ int set_bc(ldouble t,int ifinit)
 {
   int ix,iy,iz,ii,iv;
 
-  /*
-  int isBC[7];
-  for(ii=XBCLO;ii<=ZBCHI;ii++)
-    {
-      isBC[ii]=mpi_isitBC(ii);
-    }
-  */
 
   //first fill the GC with no corners
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)

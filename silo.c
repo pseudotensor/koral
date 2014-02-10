@@ -738,13 +738,6 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 
-  DBPutQuadvar1(file, "Qtheta","mesh1", Qtheta,
-  		dimensions, ndim, NULL, 0, 
-		DB_DOUBLE, DB_NODECENT, optList);
-
-  DBPutQuadvar1(file, "Bangle","mesh1", Bangle,
-  		dimensions, ndim, NULL, 0, 
-		DB_DOUBLE, DB_NODECENT, optList);
 
   DBPutQuadvar1(file, "divB","mesh1", divB,
   		dimensions, ndim, NULL, 0, 
@@ -792,6 +785,14 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   DBPutQuadvar1(file, "phi","mesh1", phi,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
+  DBPutQuadvar1(file, "Qtheta","mesh1", Qtheta,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  DBPutQuadvar1(file, "Bangle","mesh1", Bangle,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
   #ifdef MIMICDYNAMO
   DBPutQuadvar1(file, "phidyn","mesh1", phidyn,
   		dimensions, ndim, NULL, 0, 

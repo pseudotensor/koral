@@ -72,8 +72,23 @@
 //69 INJDISK - magnetized gas damped from outer boundary
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 //71 MBBBLOB - rad blobs with magn field
+//72 BOWSHOCK - bow shock in wind tunnel
 
-#define PROBLEM 67
+#define PROBLEM 72
+
+#if(PROBLEM==72)
+
+#define PR_DEFINE "PROBLEMS/BOWSHOCK/define.h"
+#define PR_BC "PROBLEMS/BOWSHOCK/bc.c"
+#define PR_INIT "PROBLEMS/BOWSHOCK/init.c"
+#define PR_KAPPA "PROBLEMS/BOWSHOCK/kappa.c"
+#define PR_KAPPAES "PROBLEMS/BOWSHOCK/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/BOWSHOCK/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/BOWSHOCK/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/BOWSHOCK/dump.c"
+#define PR_TOOLS "PROBLEMS/BOWSHOCK/tools.c"
+
+#endif
 
 #if(PROBLEM==71)
 
