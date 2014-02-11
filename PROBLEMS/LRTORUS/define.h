@@ -12,13 +12,13 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
+//#define MIMICDYNAMO
 #define ALPHADYNAMO 0.03
 #define MAGNFIELD
 #define GDETIN 1
@@ -83,8 +83,8 @@
 #define MINX (log(1.75-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 300
-#define TNY 200
+#define TNX 120
+#define TNY 80
 #define TNZ 1
 //number of tiles
 #define NTX 16
@@ -124,7 +124,20 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 4
+#define NTORUS 5
+
+#if(NTORUS==5) //single toroidal loop
+#define EXPECTEDHR 0.4
+#define LT_KAPPA 1.e-2
+#define LT_XI 0.708
+#define LT_R1 42.
+#define LT_R2 1000.
+#define LT_GAMMA 5./3.
+#define LT_RIN 10.
+#undef MAXBETA
+#define MAXBETA (1./30.) //target pmag/pgas inside torus
+#define BETANORMFULL
+#endif
 
 #if(NTORUS==4) //a=0 SANE, no rad, denser loops
 #define EXPECTEDHR 0.4

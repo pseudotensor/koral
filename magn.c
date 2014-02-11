@@ -379,7 +379,8 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
       
 	  ldouble pp[NV],uu[NV];
 	  PLOOP(iv)
-	    pp[iv]=get_u(p,B1,ix,iy,iz);
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
 	  pp[B1]=get_u(pvecpot,1,ix,iy,iz);
 	  pp[B2]=get_u(pvecpot,2,ix,iy,iz);
 	  pp[B3]=get_u(pvecpot,3,ix,iy,iz);
@@ -392,6 +393,8 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
 	  set_u(u,B1,ix,iy,iz,uu[B1]);
 	  set_u(u,B2,ix,iy,iz,uu[B2]);
 	  set_u(u,B3,ix,iy,iz,uu[B3]);     
+
+
 	}
     }
 

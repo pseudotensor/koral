@@ -154,12 +154,18 @@ if(rho<0.) //outside donut
     }
 
     Acov[3]=vpot;
-#else
+
+#elif (NTORUS==5)
+    //single toroidal loop
+    
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
+     
+#else //standard single poloidal loop
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
 #endif
 
-    pp[B1]=0.;
-    pp[B2]=0.;
+    pp[B1]=Acov[1];
+    pp[B2]=Acov[2];
     pp[B3]=Acov[3];
 #endif
 
