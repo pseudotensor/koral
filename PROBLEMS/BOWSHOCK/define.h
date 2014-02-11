@@ -54,7 +54,7 @@
 #define MINY 0.
 #define MAXY 1.
 #define MINZ -1.
-#define MAXZ 2. 
+#define MAXZ 1. 
 #define NX 30 
 #define NY 30
 #define NZ 30
@@ -85,6 +85,6 @@
 #define RHOCLOUD 1.e2
 #define UUCLOUD 1.e-2
 #define VELAMB  .1
-#define SIGMACLOUD .25
+#define SIGMACLOUD .1
 
 

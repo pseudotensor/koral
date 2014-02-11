@@ -2091,8 +2091,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	{
 	  //return -1;
 	  
+	  #ifndef MPI
 	  fprintf(fout_fail,"%d > rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure no. %d!\n",
 		  PROCID,geom.ix,geom.iy,geom.iz,global_time,nfout1,global_int_slot[GLOBALINTSLOT_NCRITFAILURES]);
+	  #endif
+
 	  printf("%d > rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure no %d!\n",
 		 PROCID,geom.ix,geom.iy,geom.iz,global_time,nfout1,global_int_slot[GLOBALINTSLOT_NCRITFAILURES]);
 

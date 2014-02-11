@@ -42,17 +42,22 @@ fprint_openfiles(char* folder)
   char bufor[100];
 
 #ifndef RESTART
-  sprintf(bufor,"rm %s/*",folder);
-  int i=system(bufor);
+  if(PROCID==0)
+    {
+      sprintf(bufor,"rm %s/*",folder);
+      int i=system(bufor);
+    }
   nfout1=0;
   nfout2=0;
 #endif
 
+#ifndef MPI
   sprintf(bufor,"%s/scalars.dat",folder);
   fout_scalars=fopen(bufor,"a");
 
   sprintf(bufor,"%s/failures.dat",folder);
   fout_fail=fopen(bufor,"a");
+#endif
 
   return 0;
 }
@@ -64,9 +69,11 @@ fprint_openfiles(char* folder)
 int 
 fprint_closefiles()
 {
+#ifndef MPI
   fclose(fout_scalars);
   fclose(fout_fail);
   return 0;
+#endif
 }
 
 /*********************************************/
@@ -118,6 +125,7 @@ fprint_gridfile(char* folder)
 int
 fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder)
 {
+  #ifndef MPI
   int iv;
   //printing scalars
   fprintf(fout_scalars,"%e ",t);
@@ -125,6 +133,7 @@ fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder)
     fprintf(fout_scalars,"%e ",scalars[iv]);
   fprintf(fout_scalars,"\n");
   fflush(fout_scalars);
+  #endif
 
   return 0;
 }
