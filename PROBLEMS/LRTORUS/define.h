@@ -18,7 +18,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
+#define MIMICDYNAMO
 #define ALPHADYNAMO 0.03
 #define MAGNFIELD
 #define GDETIN 1
@@ -80,11 +80,11 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.75-MKS1R0))
+#define MINX (log(3.75-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
 #define TNX 120
-#define TNY 80
+#define TNY 100
 #define TNZ 1
 //number of tiles
 #define NTX 16
@@ -116,7 +116,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 100.
+#define DTOUT1 10.
 #define DTOUT2 500.
 
 /************************************/

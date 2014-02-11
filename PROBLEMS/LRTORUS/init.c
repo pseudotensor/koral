@@ -156,10 +156,16 @@ if(rho<0.) //outside donut
     Acov[3]=vpot;
 
 #elif (NTORUS==5)
-    //single toroidal loop
-    
-    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
-     
+    ldouble rin=LT_RIN;
+    ldouble rchop = 1.e15;
+    ldouble STARTFIELD = 15.;
+    ldouble rrho=pp[RHO]/1.;
+    ldouble rxx=geomBL.xx/25.;
+    if (r > STARTFIELD && r < rchop) 
+      //      Acov[2]=my_max(rrho*rrho*rxx*rxx*rxx*rxx-.1,0.)*pow(sin(M_PI/2.-geomBL.yy),1.);
+      //Acov[2]=my_max(rrho*rrho*rrho*rxx*rxx*rxx*rxx*rxx*rxx*rxx*rxx-1.*rxx*rxx,0.)*(M_PI/2.-geomBL.yy);
+      Acov[2]=my_max(sqrt(rho)*rxx*rxx*rxx*rxx-100.,0.)*(M_PI/2.-geomBL.yy);
+ 
 #else //standard single poloidal loop
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
 #endif

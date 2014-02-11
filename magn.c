@@ -426,6 +426,8 @@ calc_BfromA_core()
       fill_geometry(ix,iy,iz,&geom);
 
       ldouble B[4];
+      ldouble dA[4][4];
+      dA[1][1]=dA[2][2]=dA[3][3]=0.;
 
       if(NY==1 && NZ==1)
 	{
@@ -434,16 +436,25 @@ calc_BfromA_core()
 
       if(NY>1 && NZ==1)
 	{
-	  /* flux-ct */
+	  /* flux-ct-compatible */
 
-	  //temporary assuming only A_phi!=0   
-	  //TODO
+	  dA[1][2] = -(get_u(pvecpot,B1,ix,iy,iz) - get_u(pvecpot,B1,ix,iy+1,iz)
+		   + get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
+          dA[1][1] = -(get_u(pvecpot,B1,ix,iy,iz) + get_u(pvecpot,B1,ix,iy+1,iz)
+		  - get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+	  dA[1][3] = 0.;
 
-	  B[1] = -(get_u(pvecpot,B3,ix,iy,iz) - get_u(pvecpot,B3,ix,iy+1,iz)
-		   + get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)*geom.gdet) ;
-          B[2] = (get_u(pvecpot,B3,ix,iy,iz) + get_u(pvecpot,B3,ix,iy+1,iz)
-		  - get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)*geom.gdet) ;
-	  B[3] = 0. ;
+	  dA[2][2] = -(get_u(pvecpot,B2,ix,iy,iz) - get_u(pvecpot,B2,ix,iy+1,iz)
+		   + get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
+          dA[2][1] = -(get_u(pvecpot,B2,ix,iy,iz) + get_u(pvecpot,B2,ix,iy+1,iz)
+		  - get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+	  dA[2][3] = 0.;
+
+	  dA[3][2] = -(get_u(pvecpot,B3,ix,iy,iz) - get_u(pvecpot,B3,ix,iy+1,iz)
+		   + get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
+          dA[3][1] = -(get_u(pvecpot,B3,ix,iy,iz) + get_u(pvecpot,B3,ix,iy+1,iz)
+		  - get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+	  dA[3][3] = 0.;
 
 	}
 
@@ -456,6 +467,10 @@ calc_BfromA_core()
 	{
 	  my_err("3D in calc_BfromA_core() not implemented.\n"); exit(-1);
 	}
+
+      B[1]=(dA[2][3] - dA[3][2])/geom.gdet;
+      B[2]=(dA[3][1] - dA[1][3])/geom.gdet;
+      B[3]=(dA[1][2] - dA[2][1])/geom.gdet;
 
       set_u(pvecpot,1,ix,iy,iz,B[1]);
       set_u(pvecpot,2,ix,iy,iz,B[2]);

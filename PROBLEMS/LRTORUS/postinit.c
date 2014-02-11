@@ -55,7 +55,8 @@ for(iz=0;iz<NZ;iz++)
 		if(geom.iy==NY/2)
 		  {
 #pragma omp critical
-		    if(pmag/ptot>maxbeta) maxbeta=pmag/ptot;
+		    if(pmag/ptot>maxbeta) 
+		      maxbeta=pmag/ptot;
 		  }
 #endif
 	  }
@@ -71,7 +72,7 @@ for(iz=0;iz<NZ;iz++)
                 MPI_COMM_WORLD);
 
   maxbeta=global_maxbeta;
- #endif
+#endif
 
 ldouble fac=sqrt(MAXBETA/maxbeta);
 //printf("rescaling magn.fields by %e (%e)\n",fac,maxbeta);
