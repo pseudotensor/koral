@@ -23,7 +23,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *nodez;
   ldouble *coordinates[3];/* The array of coordinatearrays */
   int dimensions[3];/* The number of nodes */
-   
+
   /* Create the Silo file */
   file = DBCreate(bufor, DB_CLOBBER, DB_LOCAL, NULL,DB_PDB);
 
@@ -107,6 +107,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *urady = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *uradz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 #endif
+
 
   for(iz=0;iz<nz;iz++)
     {
@@ -198,7 +199,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  else
 		    pp[iv]=get_u(p,iv,iix,iiy,iiz);
 		}
-
+	     
 
 	      //coordinates
 	      nodex[nodalindex]=xxveccar[1];

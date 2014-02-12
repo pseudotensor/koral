@@ -693,7 +693,7 @@ mimic_dynamo(ldouble dt)
 #ifdef BHDISK_PROBLEMTYPE
 
   int ix,iy,iz,iv,ii;
-  
+
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_6;ii++) //inner domain plus 1-cell layer including corners
     {      
@@ -719,8 +719,9 @@ mimic_dynamo(ldouble dt)
 
       //magnetic field angle
       calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
+
       angle=-brbphi/bsq;
-      
+
       //BL radius
       coco_N(geom.xxvec,xxBL,MYCOORDS, BLCOORDS);
 

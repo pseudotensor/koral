@@ -109,8 +109,13 @@ main(int argc, char **argv)
   for(iz=0;iz<NZ;iz++)
     for(iy=0;iy<NY;iy++)
       for(ix=0;ix<NX;ix++)
-	for(iv=0;iv<NV;iv++)
-	  set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
+	{
+	  for(iv=0;iv<NV;iv++)
+	    set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	}
 
   //projects on ghost cells
   set_bc(t,0);
@@ -122,11 +127,13 @@ main(int argc, char **argv)
   else
     sprintf(suffix,"res");
   
+  
   //dumps dumps to analysis analysis
 #if(RADOUTPUT==1)
   sprintf(prefix,"radavg%s%04d-",suffix,no1);
   fprint_radprofiles(t,no2,"analysis",prefix);
 #endif
+  
 #if(OUTOUTPUT==1)
   sprintf(prefix,"outavg%s%04d-",suffix,no1);
   fprint_outfile(t,no2,0,"analysis",prefix);
@@ -137,6 +144,7 @@ main(int argc, char **argv)
   fprint_silofile(t,no2,"analysis",prefix);
 #endif
 #endif
+  
 #if(SIMOUTPUT==1)	  
   sprintf(prefix,"simavg%s%04d-",suffix,no1);
   fprint_simplecart(t,no2,"analysis",prefix);
