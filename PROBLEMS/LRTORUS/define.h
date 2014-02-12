@@ -80,11 +80,11 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(3.75-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 120
-#define TNY 100
+#define TNX 256
+#define TNY 128
 #define TNZ 1
 //number of tiles
 #define NTX 16
@@ -116,8 +116,8 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
-#define DTOUT2 500.
+#define DTOUT1 100.
+#define DTOUT2 1000.
 
 /************************************/
 //common physics / torus / atmosphere
@@ -137,6 +137,7 @@
 #undef MAXBETA
 #define MAXBETA (1./30.) //target pmag/pgas inside torus
 #define BETANORMFULL
+//#define BETANORMFACTOR 2.e-10
 #endif
 
 #if(NTORUS==4) //a=0 SANE, no rad, denser loops

@@ -75,6 +75,11 @@ for(iz=0;iz<NZ;iz++)
 #endif
 
 ldouble fac=sqrt(MAXBETA/maxbeta);
+
+//manual normalization - verify beta!
+#ifdef BETANORMFACTOR
+fac=BETANORMFACTOR;
+#endif
 //printf("rescaling magn.fields by %e (%e)\n",fac,maxbeta);
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)

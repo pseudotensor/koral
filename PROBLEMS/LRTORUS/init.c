@@ -156,16 +156,59 @@ if(rho<0.) //outside donut
     Acov[3]=vpot;
 
 #elif (NTORUS==5)
+
+   //LIMOFIELD from a=0 SANE harm init.c
+    ldouble lambda = 2.5;
+    ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
+    ldouble rchop = 550.; //outer boundary of field loops
+    ldouble u_av = pp[UU];
+    ldouble u_av_chop, u_av_mid;
+    //midplane at r
+    init_dsandvels_limotorus(r, M_PI/2., BHSPIN, &rho, &u_av_mid, &ell);
+    //midplane at rchop
+    init_dsandvels_limotorus(rchop, M_PI/2., BHSPIN, &rho, &u_av_chop, &ell);
+    
+    //vetor potential follows contours of UU
+    ldouble uchop = u_av - u_av_chop; //vpot->zero on contour of radius r=rchop
+    ldouble uchopmid = u_av_mid - u_av_chop; //vpot->zero away from midplane
+
+    ldouble rin=LT_RIN;
+    ldouble STARTFIELD = 2.5*rin;
+    ldouble q, fr, fr_start, vpot=0.;
+    if (r > STARTFIELD && r < rchop) {
+      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 3); // * pow(tanh(r/rsmooth),2);
+    } else q = 0;
+
+    
+    if(q > 0.) {
+      fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
+      fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
+      vpot += q * sin(fr - fr_start) ;
+    }
+        
+    Acov[2]=vpot*sin((M_PI/2.-geomBL.yy));;
+
+    /*
     ldouble rin=LT_RIN;
     ldouble rchop = 1.e15;
     ldouble STARTFIELD = 15.;
     ldouble rrho=pp[RHO]/1.;
     ldouble rxx=geomBL.xx/25.;
-    if (r > STARTFIELD && r < rchop) 
+    ldouble lambda=8.;
+    //if (r > STARTFIELD && r < rchop && pp[RHO]>1.e-3) 
       //      Acov[2]=my_max(rrho*rrho*rxx*rxx*rxx*rxx-.1,0.)*pow(sin(M_PI/2.-geomBL.yy),1.);
       //Acov[2]=my_max(rrho*rrho*rrho*rxx*rxx*rxx*rxx*rxx*rxx*rxx*rxx-1.*rxx*rxx,0.)*(M_PI/2.-geomBL.yy);
-      Acov[2]=my_max(sqrt(rho)*rxx*rxx*rxx*rxx-100.,0.)*(M_PI/2.-geomBL.yy);
- 
+      //Acov[2]=my_max(sqrt(rho)*rxx*rxx*rxx*rxx-100.,0.)*(M_PI/2.-geomBL.yy);
+      //Acov[2]=my_max(sqrt(rho)*rxx*rxx*rxx*rxx-100.,0.);//*(M_PI/2.-geomBL.yy);
+    Acov[2]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx,2.)-1.e0,0.)*sin((M_PI/2.-geomBL.yy));
+    //    Acov[2]*=pow(geomBL.xx,5./2.);
+    Acov[2]*=pow(geomBL.xx,5./2.);
+
+    ldouble fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
+    ldouble fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
+    //Acov[2] *= sin(fr - fr_start) ;
+    //Acov[2] *= sin(fr - fr_start) ;
+    */
 #else //standard single poloidal loop
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
 #endif
