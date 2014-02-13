@@ -120,8 +120,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	
 	      if(doingavg)
 		{
-		  
-	
 		  rho=get_uavg(pavg,RHO,ix,iy,iz);
 		  uint=get_uavg(pavg,UU,ix,iy,iz);
 		  bsq=get_uavg(pavg,AVGBSQ,ix,iy,iz);
@@ -135,7 +133,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  utcon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
 
-		  
 		  Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
 		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
 		    + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
@@ -199,15 +196,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      ldouble qtheta=calc_Qtheta(ix,iy,iz);//2.*M_PI/Omega/dx[1]*fabs(bcon[2])/sqrt(rho);
 
 	      //to calculate magn. field angle
-	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
-	      
-	      //printf("> %e %e\n",bsq,brbphi);getchar();
 
+	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
 	      Bangle1+=rho*brbphi*dxph[1];
 	      Bangle2+=rho*bsq*dxph[1];
 
-	      ldouble BpBphi = calc_BpBphi(ix,iy,iz);
-	      
 	      //optical depths
 	      ldouble tauabsloc = utcon[0]*calc_kappa(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
 	      ldouble tautotloc = utcon[0]*calc_kappaes(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);

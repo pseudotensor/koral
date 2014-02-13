@@ -527,31 +527,6 @@ calc_Qtheta(int ix, int iy, int iz)
   return 2.*M_PI/fabs(Omega)/dx*fabs(bcon[2])/sqrt(rho);
 }
 
-//calculates ratio of poloidal to toroidal magnetic field
-ldouble
-calc_BpBphi(int ix, int iy, int iz)
-{
-  int i;
-
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
-  struct geometry geomBL;
-  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-
-  ldouble pp[NV];
-  PLOOP(i)
-    pp[i]=get_u(p,i,ix,iy,iz);
-	      
-  //to BL     
-  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
-  
-  ldouble Bp = sqrt(pp[B1]*pp[B1]*geomBL.gg[1][1] + pp[B2]*pp[B2]*geomBL.gg[2][2]);
-  ldouble Bphi = sqrt(pp[B3]*pp[B3]*geomBL.gg[3][3]);
-  ldouble BpBphi = Bp/Bphi;
-
-  return BpBphi;
-}
-
 //calculates sqrt(g_rr g_phph) b^r b^phi and b^2
 int
 calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
@@ -564,25 +539,40 @@ calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
   fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
   ldouble pp[NV],bcon[4],bcov[4];
-  PLOOP(i)
-    pp[i]=get_u(p,i,ix,iy,iz);
-	      
-  //to BL     
-  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
-  
-  //b^mu
-  calc_bcon_prim(pp, bcon, &geomBL);
-  
-  //b_mu
-  indices_21(bcon,bcov,geomBL.gg); 
 
-  *bsq = dot(bcon,bcov);
-  *brbphi = sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*bcon[1]*bcon[3];
+  if(doingavg)
+    {
+      *bsq = get_uavg(pavg,AVGBSQ,ix,iy,iz);
+      ldouble bcon1bcon3 = 
+	get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz)*geomBL.GG[3][0] + 
+	get_uavg(pavg,AVGBCONBCOV(1,1),ix,iy,iz)*geomBL.GG[3][1] +
+	get_uavg(pavg,AVGBCONBCOV(1,2),ix,iy,iz)*geomBL.GG[3][2] +
+	get_uavg(pavg,AVGBCONBCOV(1,3),ix,iy,iz)*geomBL.GG[3][3];
+      *brbphi = sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*bcon1bcon3;
+    }
+  else
+    {
+      PLOOP(i)
+	pp[i]=get_u(p,i,ix,iy,iz);
+      
+      //to BL     
+      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+      
+      //b^mu
+      calc_bcon_prim(pp, bcon, &geomBL);
+      
+      //b_mu
+      indices_21(bcon,bcov,geomBL.gg); 
+
+      *bsq = dot(bcon,bcov);
+      *brbphi = sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*bcon[1]*bcon[3];
+    }
 
   return 0;
 }
 
 //calculates b^p b^phi and b^2
+//here cannot work on averages (bpoloidal bphi is not averaged)
 int
 calc_angle_bpbphibsq(int ix, int iy, int iz, ldouble *bpbphi, ldouble *bsq)
 {
