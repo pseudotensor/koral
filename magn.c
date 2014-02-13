@@ -552,7 +552,7 @@ calc_BpBphi(int ix, int iy, int iz)
   return BpBphi;
 }
 
-//calculates sqrt(g_rr g_phph) b^r b^phi and b^w
+//calculates sqrt(g_rr g_phph) b^r b^phi and b^2
 int
 calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
 {
@@ -578,6 +578,41 @@ calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
 
   *bsq = dot(bcon,bcov);
   *brbphi = sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*bcon[1]*bcon[3];
+
+  return 0;
+}
+
+//calculates b^p b^phi and b^2
+int
+calc_angle_bpbphibsq(int ix, int iy, int iz, ldouble *bpbphi, ldouble *bsq)
+{
+  int i;
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  struct geometry geomBL;
+  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+  ldouble pp[NV],bcon[4],bcov[4];
+  PLOOP(i)
+    pp[i]=get_u(p,i,ix,iy,iz);
+	      
+  //to BL     
+  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+  
+  //b^mu
+  calc_bcon_prim(pp, bcon, &geomBL);
+  
+  //b_mu
+  indices_21(bcon,bcov,geomBL.gg); 
+
+  *bsq = dot(bcon,bcov);
+
+  ldouble br = sqrt(geomBL.gg[1][1])*bcon[1];
+  ldouble bth = sqrt(geomBL.gg[2][2])*bcon[2];
+  ldouble bp = sqrt(br*br + bth*bth)*my_sign(bcon[1]);
+
+  *bpbphi = bp*sqrt(geomBL.gg[3][3])*bcon[3];
 
   return 0;
 }
@@ -715,12 +750,13 @@ mimic_dynamo(ldouble dt)
       ldouble xxBL[4],bcon[4],bcov[4],Bp;
       ldouble ucon[4],ucov[4];
       int j;
-      ldouble angle,brbphi,bsq;
+      ldouble angle,bbphi,bsq;
 
       //magnetic field angle
-      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
+      //calc_angle_bpbphibsq(ix,iy,iz,&bbphi,&bsq);
+      calc_angle_brbphibsq(ix,iy,iz,&bbphi,&bsq);
 
-      angle=-brbphi/bsq;
+      angle=-bbphi/bsq;
 
       //BL radius
       coco_N(geom.xxvec,xxBL,MYCOORDS, BLCOORDS);
@@ -739,10 +775,6 @@ mimic_dynamo(ldouble dt)
       if(!isfinite(lambdaBL) || lambdaBL>1.e3*xxBL[1]) lambdaBL=1.e3*xxBL[1];
       ldouble faclambda=step_function(1. - lambdaBL/(EXPECTEDHR * xxBL[1]),.1);  
 
-      //printf("%d %d %e %e %e\n",ix,iy,lambda,lambdaBL,faclambda);getch();
-
-      //faclambda=1.;
-
       //angle
       ldouble facangle=0.;
       if(isfinite(angle))
@@ -750,8 +782,12 @@ mimic_dynamo(ldouble dt)
 	  if(angle<-1.) angle=-1.;
 	  facangle = my_max(0., 1.-4.*angle);
 	}
-      ldouble facradius = step_function(xxBL[1]-6.,2.);
-      ldouble facmagnetization = step_function(1.-bsq/get_u(p,RHO,ix,iy,iz),.01);
+
+      //radius
+      ldouble facradius = step_function(xxBL[1]-4.,1.);
+
+      //bsq/rho
+      ldouble facmagnetization = step_function(.1-bsq/get_u(p,RHO,ix,iy,iz),.01);
      
       Aphi = ALPHADYNAMO * EXPECTEDHR/0.4 * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
 	* facradius * facmagnetization * faclambda * facangle;

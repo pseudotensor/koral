@@ -608,6 +608,7 @@ int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbo
 int mimic_dynamo(ldouble);
 int calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble *curl);
 int calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq);
+int calc_angle_bpbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq);
 ldouble calc_BpBphi(int ix, int iy, int iz);
 int adjust_fluxcttoth_emfs();
 void calc_bcon_4vel(ldouble *pr, ldouble *ucon, ldouble *ucov, ldouble *bcon); 
