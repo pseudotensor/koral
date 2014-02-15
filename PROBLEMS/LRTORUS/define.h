@@ -20,7 +20,8 @@
 /************************************/
 #define MIMICDYNAMO
 //#define AVOIDMAD
-#define ALPHAFLIPSSIGN
+//#define ALPHAFLIPSSIGN
+#define DYNAMOREVERSAL 10.
 #define ALPHADYNAMO 0.03
 #define MAGNFIELD
 #define GDETIN 1

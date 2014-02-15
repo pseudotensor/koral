@@ -786,6 +786,10 @@ mimic_dynamo(ldouble dt)
       effalpha = - (M_PI/2. - xxBL[2])/(M_PI/2.) / (EXPECTEDHR/2.) * ALPHADYNAMO;
       #endif
 
+      #ifdef DYNAMOREVERSAL
+      effalpha *= cos(global_time/(DYNAMOREVERSAL*Pk));
+      #endif
+
       Aphi = effalpha * EXPECTEDHR/0.4 * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
 	* facradius * facmagnetization * faclambda * facangle;
 

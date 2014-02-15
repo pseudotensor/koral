@@ -2986,6 +2986,13 @@ correct_polaraxis()
 		      pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
 		      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
+#ifdef MAGNFIELD
+		      //gas velocities
+		      pp[B1]=get_u(p,B1,ix,iysrc,iz);
+		      pp[B3]=get_u(p,B3,ix,iysrc,iz);
+		      pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
+#endif
+
 #ifdef RADIATION
 		      //rad density
 		      pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
@@ -3030,6 +3037,12 @@ correct_polaraxis()
 		      pp[VX]=get_u(p,VX,ix,iysrc,iz);
 		      pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
 		      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
+
+#ifdef MAGNFIELD
+		      pp[B1]=get_u(p,B1,ix,iysrc,iz);
+		      pp[B3]=get_u(p,B3,ix,iysrc,iz);
+		      pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
+#endif
 
 #ifdef RADIATION
 		      //rad density
@@ -3088,6 +3101,12 @@ correct_polaraxis()
 		  pp[VY]=get_u(p,VY,ixsrc,iy,iz);
 		  pp[VZ]=get_u(p,VZ,ixsrc,iy,iz);
 		  pp[VX]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,VX,ixsrc,iy,iz);
+
+		  #ifdef MAGNFIELD
+		  pp[B2]=get_u(p,B2,ixsrc,iy,iz);
+		  pp[B3]=get_u(p,B3,ixsrc,iy,iz);
+		  pp[B1]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,B1,ixsrc,iy,iz);
+		  #endif
 
 		  #ifdef RADIATION
 		  //rad density
