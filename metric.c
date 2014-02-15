@@ -2798,6 +2798,17 @@ r_horizon_BL(ldouble a)
   return 1.+sqrt(1-a*a);
 }
 
+//returns location of ISCO in BL
+ldouble
+r_ISCO_BL(ldouble ac)
+{
+  double Z1,Z2;
+  Z1=1.+pow(1.-ac*ac,1./3.)*(pow(1.+ac,1./3.)+pow(1.-ac,1./3.));
+  Z2=pow(3.*ac*ac+Z1*Z1,1./2.);
+  return (3.+Z2-pow((3.-Z1)*(3.+Z1+2.*Z2),1./2.));
+}
+
+
 //returns location of the co-rotating marginally bound orbit in BL
 ldouble
 r_mbound_BL(ldouble a)

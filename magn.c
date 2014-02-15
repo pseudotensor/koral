@@ -779,7 +779,14 @@ mimic_dynamo(ldouble dt)
       //bsq/rho
       ldouble facmagnetization = step_function(.1-bsq/get_u(p,RHO,ix,iy,iz),.01);
      
-      Aphi = ALPHADYNAMO * EXPECTEDHR/0.4 * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
+      //the extra vector potential
+      ldouble effalpha=ALPHADYNAMO;
+
+      #ifdef ALPHAFLIPSSIGN
+      effalpha = - (M_PI/2. - xxBL[2])/(M_PI/2.) / (EXPECTEDHR/2.) * ALPHADYNAMO;
+      #endif
+
+      Aphi = effalpha * EXPECTEDHR/0.4 * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
 	* facradius * facmagnetization * faclambda * facangle;
 
       //saving vector potential to ptemp1
@@ -790,6 +797,17 @@ mimic_dynamo(ldouble dt)
   //once the whole array is filled with cell centered A^phi we can 
   //calculate the extra magnetic field returned through pvecpot[1..3]
   calc_BfromA(ptemp1,0);  
+
+  //to avoid MAD
+  
+  #ifdef AVOIDMAD
+  ldouble rhor = r_horizon_BL(BHSPIN);
+  ldouble Bflux=calc_Bflux(r_horizon_BL(BHSPIN),0);
+  ldouble mdot=calc_mdot(r_horizon_BL(BHSPIN),0);
+  ldouble phi = sqrt(4.*M_PI)/2.*Bflux/fabs(mdot);
+  //printf("phi : %f\n",phi);
+  #endif
+  
    
   //and superimpose it on the original one
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
@@ -800,9 +818,12 @@ mimic_dynamo(ldouble dt)
       iz=loop_0[ii][2];
 
       struct geometry geom;
-      fill_geometry(ix,iy,iz,&geom);
+      ldouble B[4]; ldouble xxBL[4];
 
-      ldouble B[4]; 
+      fill_geometry(ix,iy,iz,&geom);
+      //BL radius
+      coco_N(geom.xxvec,xxBL,MYCOORDS, BLCOORDS);
+
       
       B[1]=get_u(pvecpot,1,ix,iy,iz);
       B[2]=get_u(pvecpot,2,ix,iy,iz);
@@ -811,6 +832,27 @@ mimic_dynamo(ldouble dt)
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
       set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
+
+
+      //to avoid MAD
+#ifdef AVOIDMAD
+      ldouble phifac = step_function(phi-10.,1.);
+      ldouble risco = r_ISCO_BL(BHSPIN);
+      ldouble rlimit = rhor + 0.5*(risco-rhor);
+      ldouble radfac = step_function(rlimit-xxBL[1],1./3.*(rlimit-rhor));
+      ldouble OmISCO = 1./sqrt(risco*risco*risco);
+      ldouble PISCO = 2.*M_PI/OmISCO;
+
+      B[1]=get_u(p,B1,ix,iy,iz);
+      B[2]=get_u(p,B2,ix,iy,iz);
+
+      B[1] += -B[1]*dt/PISCO * radfac * phifac;
+      B[2] += -B[2]*dt/PISCO * radfac * phifac;
+      
+      set_u(p,B1,ix,iy,iz,B[1]);
+      set_u(p,B2,ix,iy,iz,B[2]);
+#endif
+
 
       ldouble uutemp[NV];
       p2u(&get_u(p,0,ix,iy,iz),uutemp,&geom);

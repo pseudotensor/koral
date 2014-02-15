@@ -6,8 +6,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 230
+#define RESTART
+#define RESTARTNUM 0
 
 /************************************/
 //radiation choices
@@ -19,6 +19,8 @@
 //magnetic choices
 /************************************/
 #define MIMICDYNAMO
+//#define AVOIDMAD
+#define ALPHAFLIPSSIGN
 #define ALPHADYNAMO 0.03
 #define MAGNFIELD
 #define GDETIN 1
@@ -116,7 +118,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 100.
+#define DTOUT1 1.e-1
 #define DTOUT2 1000.
 
 /************************************/

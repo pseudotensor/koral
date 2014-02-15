@@ -474,6 +474,7 @@ int print_u(ldouble *p);
 int convert_uold2urel(ldouble *x,ldouble *u);
 int calc_sourceterms(int,int,int);
 ldouble r_horizon_BL(ldouble a);
+ldouble r_ISCO_BL(ldouble ac);
 ldouble r_mbound_BL(ldouble a);
 ldouble r_photon_BL(ldouble a);
 int update_entropy(int ix,int iy,int iz,int u2pflag);
