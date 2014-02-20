@@ -787,7 +787,21 @@ mimic_dynamo(ldouble dt)
       #endif
 
       #ifdef DYNAMOREVERSAL
-      effalpha *= cos(global_time/(DYNAMOREVERSAL*Pk));
+      ldouble rrev=DYNAMOREVERSALRREV;
+      ldouble Omrev = 1./(BHSPIN+sqrt(rrev*rrev*rrev));
+      ldouble Pkrev = 2.*M_PI/Omrev;
+      ldouble thphase = 0.;
+      ldouble rphase = 0.;
+
+      #ifdef DYNAMOREVERSALTHPHASE
+      thphase = fabs(M_PI/2.-xxBL[2])/(M_PI/2.)/EXPECTEDHR * DYNAMOREVERSALTHPHASE * 2.*M_PI;
+      #endif
+
+      #ifdef DYNAMOREVERSALRPHASE
+      rphase = (xxBL[1]-DYNAMOREVERSALRREV)/DYNAMOREVERSALRREV * DYNAMOREVERSALRPHASE * 2.*M_PI;
+      #endif
+
+      effalpha *= cos(global_time/Pkrev+thphase+rphase);
       #endif
 
       Aphi = effalpha * EXPECTEDHR/0.4 * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 

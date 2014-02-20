@@ -58,14 +58,7 @@
 #define NX 30 
 #define NY 30
 #define NZ 30
-
 #define SPECIFIC_BC
-/*
-#define PERIODIC_XBC
-#define PERIODIC_YBC
-#define PERIODIC_ZBC
-*/
-
 
 /************************************/
 //output
