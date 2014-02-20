@@ -644,8 +644,6 @@ void
 mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz);
 void
 mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz);
-
-
 #endif
 
 #include "mnemonics.h"
