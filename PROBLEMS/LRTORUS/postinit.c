@@ -12,6 +12,9 @@ for(iz=0;iz<NZ;iz++)
 	for(ix=0;ix<NX;ix++)
 	  {
 	    /***********************************************/
+	    int gix,giy,giz;
+	    mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+
 	    ldouble pp[NV],uu[NV];
 	    struct geometry geom;
 	    fill_geometry(ix,iy,iz,&geom);
@@ -52,7 +55,7 @@ for(iz=0;iz<NZ;iz++)
 		  }
 		    
 #else //normalizing wrt to the equatorial plane
-		if(geom.iy==NY/2)
+		if(giy==TNY/2)
 		  {
 #pragma omp critical
 		    if(pmag/ptot>maxbeta) 
