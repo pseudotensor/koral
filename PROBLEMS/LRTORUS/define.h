@@ -7,23 +7,24 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM -1
+#define RESTARTNUM 250
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
-//#define AVOIDMAD                                                                                                                                    
-//#define ALPHAFLIPSSIGN                                                                                                                              
-#define DYNAMOREVERSAL
+#define MIMICDYNAMO
+#define PRESERVEBSQ
+//#define AVOIDMAD
+//#define ALPHAFLIPSSIGN
+//#define DYNAMOREVERSAL 
 #define DYNAMOREVERSALRREV 20.
-#define DYNAMOREVERSALTHPHASE 1.
+#define DYNAMOREVERSALTHPHASE 0.
 #define DYNAMOREVERSALRPHASE 0.
 #define ALPHADYNAMO 0.03
 #define MAGNFIELD
@@ -86,11 +87,11 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(5.6-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 60
-#define TNY 60
+#define TNX 256
+#define TNY 128
 #define TNZ 1
 //number of tiles
 #define NTX 16
@@ -122,7 +123,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 100.
 #define DTOUT2 1000.
 
 /************************************/
@@ -130,19 +131,7 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 6
-
-#if(NTORUS==6) //for not-so-hyper
-#define LT_KAPPA 1.e3
-#define LT_XI 0.95
-#define LT_R1 16.
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 10.25
-#undef MAXBETA
-#define MAXBETA (1./25.)
-//#define BETANORMFACTOR 2.e-10
-#endif
+#define NTORUS 5
 
 #if(NTORUS==5) //single toroidal loop
 #define EXPECTEDHR 0.4
@@ -153,7 +142,7 @@
 #define LT_GAMMA 5./3.
 #define LT_RIN 10.
 #undef MAXBETA
-#define MAXBETA (1./30.) //target pmag/pgas inside torus
+#define MAXBETA (1./100.) //target pmag/pgas inside torus
 #define BETANORMFULL
 //#define BETANORMFACTOR 2.e-10
 #endif

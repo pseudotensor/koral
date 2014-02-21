@@ -842,15 +842,294 @@ mimic_dynamo(ldouble dt)
       //BL radius
       coco_N(geom.xxvec,xxBL,MYCOORDS, BLCOORDS);
 
-      
       B[1]=get_u(pvecpot,1,ix,iy,iz);
       B[2]=get_u(pvecpot,2,ix,iy,iz);
       B[3]=get_u(pvecpot,3,ix,iy,iz);
+
+#ifdef PRESERVEBSQ
+      ldouble bcon[4],bcov[4],BSQ,bsq,bsqnew;
+      ldouble ucon[4],ucov[4];
+      ldouble pp[NV],pp0[NV];
+      int iv;
+      PLOOP(iv)
+        pp[iv]=get_u(p,iv,ix,iy,iz);
+
+      //4vel
+      ucon[0]=0;
+      ucon[1]=pp[2];
+      ucon[2]=pp[3];
+      ucon[3]=pp[4];
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+      indices_21(ucon,ucov,geom.gg);
       
+      //bsq
+      calc_bcon_4vel(pp,ucon,ucov,bcon);
+      indices_21(bcon,bcov,geom.gg); 
+      BSQ = dot(bcon,bcov);
+
+      //dynamoed
+      pp[B1]+=B[1];
+      pp[B2]+=B[2];
+      calc_bcon_prim(pp, bcon, &geom);
+      indices_21(bcon,bcov,geom.gg); 
+      bsqnew = dot(bcon,bcov);
+
+      //math
+      ldouble Bcon1,Bcon2,Bcon3;
+      Bcon1=pp[B1];      Bcon2=pp[B2];      Bcon3=pp[B3];
+      ldouble ucon0,ucon1,ucon2,ucon3;
+      ucon0=ucon[0];       ucon1=ucon[1];       ucon2=ucon[2];       ucon3=ucon[3]; 
+      ldouble g00,g01,g02,g03;
+      g00=geom.gg[0][0];       g01=geom.gg[0][1];       g02=geom.gg[0][2];       g03=geom.gg[0][3]; 
+      ldouble g10,g11,g12,g13;
+      g10=geom.gg[1][0];       g11=geom.gg[1][1];       g12=geom.gg[1][2];       g13=geom.gg[1][3]; 
+      ldouble g20,g21,g22,g23;
+      g20=geom.gg[2][0];       g21=geom.gg[2][1];       g22=geom.gg[2][2];       g23=geom.gg[2][3]; 
+      ldouble g30,g31,g32,g33;
+      g30=geom.gg[3][0];       g31=geom.gg[3][1];       g32=geom.gg[3][2];       g33=geom.gg[3][3]; 
+      ldouble bb1 = ucon0 *g10 + ucon1 *g11 + ucon2 *g12 + ucon3 *g13;
+      ldouble bb2 = ucon0 *g20 + ucon1 *g21 + ucon2 *g22 + ucon3 *g23;
+      ldouble bb3 = ucon0 *g30 + ucon1 *g31 + ucon2 *g32 + ucon3 *g33;
+      
+      ldouble B31 = -(Bcon1*g13 + Bcon2*g23 + Bcon1*g31 + Bcon2*g32 + bb3*Bcon1*g01*ucon0 + 
+      bb3*Bcon2*g02*ucon0 + bb1*Bcon1*g03*ucon0 + bb2*Bcon2*g03*ucon0 + 
+      bb3*Bcon1*g10*ucon0 + bb3*Bcon2*g20*ucon0 + bb1*Bcon1*g30*ucon0 + 
+      bb2*Bcon2*g30*ucon0 + 2*bb1*bb3*Bcon1*g00*Power(ucon0,2) + 
+      2*bb2*bb3*Bcon2*g00*Power(ucon0,2) + 2*bb3*Bcon1*g11*ucon1 + 
+      bb3*Bcon2*g12*ucon1 + bb1*Bcon1*g13*ucon1 + bb2*Bcon2*g13*ucon1 + 
+      bb3*Bcon2*g21*ucon1 + bb1*Bcon1*g31*ucon1 + bb2*Bcon2*g31*ucon1 + 
+      2*bb1*bb3*Bcon1*g01*ucon0*ucon1 + 2*bb2*bb3*Bcon2*g01*ucon0*ucon1 + 
+      2*bb1*bb3*Bcon1*g10*ucon0*ucon1 + 2*bb2*bb3*Bcon2*g10*ucon0*ucon1 + 
+      2*bb1*bb3*Bcon1*g11*Power(ucon1,2) + 2*bb2*bb3*Bcon2*g11*Power(ucon1,2) + 
+      bb3*Bcon1*g12*ucon2 + bb3*Bcon1*g21*ucon2 + 2*bb3*Bcon2*g22*ucon2 + 
+      bb1*Bcon1*g23*ucon2 + bb2*Bcon2*g23*ucon2 + bb1*Bcon1*g32*ucon2 + 
+      bb2*Bcon2*g32*ucon2 + 2*bb1*bb3*Bcon1*g02*ucon0*ucon2 + 
+      2*bb2*bb3*Bcon2*g02*ucon0*ucon2 + 2*bb1*bb3*Bcon1*g20*ucon0*ucon2 + 
+      2*bb2*bb3*Bcon2*g20*ucon0*ucon2 + 2*bb1*bb3*Bcon1*g12*ucon1*ucon2 + 
+      2*bb2*bb3*Bcon2*g12*ucon1*ucon2 + 2*bb1*bb3*Bcon1*g21*ucon1*ucon2 + 
+      2*bb2*bb3*Bcon2*g21*ucon1*ucon2 + 2*bb1*bb3*Bcon1*g22*Power(ucon2,2) + 
+      2*bb2*bb3*Bcon2*g22*Power(ucon2,2) + bb3*Bcon1*g13*ucon3 + 
+      bb3*Bcon2*g23*ucon3 + bb3*Bcon1*g31*ucon3 + bb3*Bcon2*g32*ucon3 + 
+      2*bb1*Bcon1*g33*ucon3 + 2*bb2*Bcon2*g33*ucon3 + 
+      2*bb1*bb3*Bcon1*g03*ucon0*ucon3 + 2*bb2*bb3*Bcon2*g03*ucon0*ucon3 + 
+      2*bb1*bb3*Bcon1*g30*ucon0*ucon3 + 2*bb2*bb3*Bcon2*g30*ucon0*ucon3 + 
+      2*bb1*bb3*Bcon1*g13*ucon1*ucon3 + 2*bb2*bb3*Bcon2*g13*ucon1*ucon3 + 
+      2*bb1*bb3*Bcon1*g31*ucon1*ucon3 + 2*bb2*bb3*Bcon2*g31*ucon1*ucon3 + 
+      2*bb1*bb3*Bcon1*g23*ucon2*ucon3 + 2*bb2*bb3*Bcon2*g23*ucon2*ucon3 + 
+      2*bb1*bb3*Bcon1*g32*ucon2*ucon3 + 2*bb2*bb3*Bcon2*g32*ucon2*ucon3 + 
+      2*bb1*bb3*Bcon1*g33*Power(ucon3,2) + 2*bb2*bb3*Bcon2*g33*Power(ucon3,2) - 
+      Sqrt(Power(Bcon1*(g31 + bb3*g01*ucon0 + bb1*g03*ucon0 + bb3*g10*ucon0 + 
+             bb1*g30*ucon0 + 2*bb1*bb3*g00*Power(ucon0,2) + 2*bb3*g11*ucon1 + 
+             bb1*g31*ucon1 + 2*bb1*bb3*g01*ucon0*ucon1 + 
+             2*bb1*bb3*g10*ucon0*ucon1 + 2*bb1*bb3*g11*Power(ucon1,2) + 
+             bb3*g12*ucon2 + bb3*g21*ucon2 + bb1*g23*ucon2 + bb1*g32*ucon2 + 
+             2*bb1*bb3*g02*ucon0*ucon2 + 2*bb1*bb3*g20*ucon0*ucon2 + 
+             2*bb1*bb3*g12*ucon1*ucon2 + 2*bb1*bb3*g21*ucon1*ucon2 + 
+             2*bb1*bb3*g22*Power(ucon2,2) + bb3*g31*ucon3 + 2*bb1*g33*ucon3 + 
+             2*bb1*bb3*g03*ucon0*ucon3 + 2*bb1*bb3*g30*ucon0*ucon3 + 
+             2*bb1*bb3*g31*ucon1*ucon3 + 2*bb1*bb3*g23*ucon2*ucon3 + 
+             2*bb1*bb3*g32*ucon2*ucon3 + 2*bb1*bb3*g33*Power(ucon3,2) + 
+             g13*(1 + bb1*ucon1 + bb3*ucon3 + 2*bb1*bb3*ucon1*ucon3)) + 
+          Bcon2*(g32 + bb3*g02*ucon0 + bb2*g03*ucon0 + bb3*g20*ucon0 + 
+             bb2*g30*ucon0 + 2*bb2*bb3*g00*Power(ucon0,2) + bb3*g12*ucon1 + 
+             bb2*g13*ucon1 + bb3*g21*ucon1 + bb2*g31*ucon1 + 
+             2*bb2*bb3*g01*ucon0*ucon1 + 2*bb2*bb3*g10*ucon0*ucon1 + 
+             2*bb2*bb3*g11*Power(ucon1,2) + 2*bb3*g22*ucon2 + bb2*g32*ucon2 + 
+             2*bb2*bb3*g02*ucon0*ucon2 + 2*bb2*bb3*g20*ucon0*ucon2 + 
+             2*bb2*bb3*g12*ucon1*ucon2 + 2*bb2*bb3*g21*ucon1*ucon2 + 
+             2*bb2*bb3*g22*Power(ucon2,2) + bb3*g32*ucon3 + 2*bb2*g33*ucon3 + 
+             2*bb2*bb3*g03*ucon0*ucon3 + 2*bb2*bb3*g30*ucon0*ucon3 + 
+             2*bb2*bb3*g13*ucon1*ucon3 + 2*bb2*bb3*g31*ucon1*ucon3 + 
+             2*bb2*bb3*g32*ucon2*ucon3 + 2*bb2*bb3*g33*Power(ucon3,2) + 
+             g23*(1 + bb2*ucon2 + bb3*ucon3 + 2*bb2*bb3*ucon2*ucon3)),2) - 
+        4*(g33*Power(1 + bb3*ucon3,2) + 
+           bb3*(g30*ucon0 + bb3*g00*Power(ucon0,2) + g13*ucon1 + g31*ucon1 + 
+              bb3*g01*ucon0*ucon1 + bb3*g10*ucon0*ucon1 + 
+              bb3*g11*Power(ucon1,2) + g23*ucon2 + g32*ucon2 + 
+              bb3*g02*ucon0*ucon2 + bb3*g20*ucon0*ucon2 + bb3*g12*ucon1*ucon2 + 
+              bb3*g21*ucon1*ucon2 + bb3*g22*Power(ucon2,2) + 
+              bb3*g30*ucon0*ucon3 + bb3*g13*ucon1*ucon3 + bb3*g31*ucon1*ucon3 + 
+              bb3*g23*ucon2*ucon3 + bb3*g32*ucon2*ucon3 + 
+              g03*(ucon0 + bb3*ucon0*ucon3)))*
+         (-(BSQ*Power(ucon0,2)) + 
+           Bcon1*Bcon2*(g21 + bb2*g01*ucon0 + bb1*g02*ucon0 + bb2*g10*ucon0 + 
+              bb1*g20*ucon0 + 2*bb1*bb2*g00*Power(ucon0,2) + 2*bb2*g11*ucon1 + 
+              bb1*g21*ucon1 + 2*bb1*bb2*g01*ucon0*ucon1 + 
+              2*bb1*bb2*g10*ucon0*ucon1 + 2*bb1*bb2*g11*Power(ucon1,2) + 
+              bb2*g21*ucon2 + 2*bb1*g22*ucon2 + 2*bb1*bb2*g02*ucon0*ucon2 + 
+              2*bb1*bb2*g20*ucon0*ucon2 + 2*bb1*bb2*g21*ucon1*ucon2 + 
+              2*bb1*bb2*g22*Power(ucon2,2) + 
+              g12*(1 + bb1*ucon1 + bb2*ucon2 + 2*bb1*bb2*ucon1*ucon2) + 
+              bb2*g13*ucon3 + bb1*g23*ucon3 + bb2*g31*ucon3 + bb1*g32*ucon3 + 
+              2*bb1*bb2*g03*ucon0*ucon3 + 2*bb1*bb2*g30*ucon0*ucon3 + 
+              2*bb1*bb2*g13*ucon1*ucon3 + 2*bb1*bb2*g31*ucon1*ucon3 + 
+              2*bb1*bb2*g23*ucon2*ucon3 + 2*bb1*bb2*g32*ucon2*ucon3 + 
+              2*bb1*bb2*g33*Power(ucon3,2)) + 
+           Power(Bcon1,2)*(g11*Power(1 + bb1*ucon1,2) + 
+              bb1*(g01*ucon0 + g10*ucon0 + bb1*g00*Power(ucon0,2) + 
+                 bb1*g01*ucon0*ucon1 + bb1*g10*ucon0*ucon1 + g12*ucon2 + 
+                 g21*ucon2 + bb1*g02*ucon0*ucon2 + bb1*g20*ucon0*ucon2 + 
+                 bb1*g12*ucon1*ucon2 + bb1*g21*ucon1*ucon2 + 
+                 bb1*g22*Power(ucon2,2) + g13*ucon3 + g31*ucon3 + 
+                 bb1*g03*ucon0*ucon3 + bb1*g30*ucon0*ucon3 + 
+                 bb1*g13*ucon1*ucon3 + bb1*g31*ucon1*ucon3 + 
+                 bb1*g23*ucon2*ucon3 + bb1*g32*ucon2*ucon3 + 
+                 bb1*g33*Power(ucon3,2))) + 
+           Power(Bcon2,2)*(g22*Power(1 + bb2*ucon2,2) + 
+              bb2*(g02*ucon0 + g20*ucon0 + bb2*g00*Power(ucon0,2) + g12*ucon1 + 
+                 g21*ucon1 + bb2*g01*ucon0*ucon1 + bb2*g10*ucon0*ucon1 + 
+                 bb2*g11*Power(ucon1,2) + bb2*g02*ucon0*ucon2 + 
+                 bb2*g20*ucon0*ucon2 + bb2*g12*ucon1*ucon2 + 
+                 bb2*g21*ucon1*ucon2 + g23*ucon3 + g32*ucon3 + 
+                 bb2*g03*ucon0*ucon3 + bb2*g30*ucon0*ucon3 + 
+                 bb2*g13*ucon1*ucon3 + bb2*g31*ucon1*ucon3 + 
+                 bb2*g23*ucon2*ucon3 + bb2*g32*ucon2*ucon3 + 
+                 bb2*g33*Power(ucon3,2))))))/
+   (2.*(g33*Power(1 + bb3*ucon3,2) + 
+       bb3*(g30*ucon0 + bb3*g00*Power(ucon0,2) + g13*ucon1 + g31*ucon1 + 
+          bb3*g01*ucon0*ucon1 + bb3*g10*ucon0*ucon1 + bb3*g11*Power(ucon1,2) + 
+          g23*ucon2 + g32*ucon2 + bb3*g02*ucon0*ucon2 + bb3*g20*ucon0*ucon2 + 
+          bb3*g12*ucon1*ucon2 + bb3*g21*ucon1*ucon2 + bb3*g22*Power(ucon2,2) + 
+          bb3*g30*ucon0*ucon3 + bb3*g13*ucon1*ucon3 + bb3*g31*ucon1*ucon3 + 
+          bb3*g23*ucon2*ucon3 + bb3*g32*ucon2*ucon3 + 
+	    g03*(ucon0 + bb3*ucon0*ucon3))));
+
+      ldouble B32 = -(Bcon1*g13 + Bcon2*g23 + Bcon1*g31 + Bcon2*g32 + bb3*Bcon1*g01*ucon0 + 
+      bb3*Bcon2*g02*ucon0 + bb1*Bcon1*g03*ucon0 + bb2*Bcon2*g03*ucon0 + 
+      bb3*Bcon1*g10*ucon0 + bb3*Bcon2*g20*ucon0 + bb1*Bcon1*g30*ucon0 + 
+      bb2*Bcon2*g30*ucon0 + 2*bb1*bb3*Bcon1*g00*Power(ucon0,2) + 
+      2*bb2*bb3*Bcon2*g00*Power(ucon0,2) + 2*bb3*Bcon1*g11*ucon1 + 
+      bb3*Bcon2*g12*ucon1 + bb1*Bcon1*g13*ucon1 + bb2*Bcon2*g13*ucon1 + 
+      bb3*Bcon2*g21*ucon1 + bb1*Bcon1*g31*ucon1 + bb2*Bcon2*g31*ucon1 + 
+      2*bb1*bb3*Bcon1*g01*ucon0*ucon1 + 2*bb2*bb3*Bcon2*g01*ucon0*ucon1 + 
+      2*bb1*bb3*Bcon1*g10*ucon0*ucon1 + 2*bb2*bb3*Bcon2*g10*ucon0*ucon1 + 
+      2*bb1*bb3*Bcon1*g11*Power(ucon1,2) + 2*bb2*bb3*Bcon2*g11*Power(ucon1,2) + 
+      bb3*Bcon1*g12*ucon2 + bb3*Bcon1*g21*ucon2 + 2*bb3*Bcon2*g22*ucon2 + 
+      bb1*Bcon1*g23*ucon2 + bb2*Bcon2*g23*ucon2 + bb1*Bcon1*g32*ucon2 + 
+      bb2*Bcon2*g32*ucon2 + 2*bb1*bb3*Bcon1*g02*ucon0*ucon2 + 
+      2*bb2*bb3*Bcon2*g02*ucon0*ucon2 + 2*bb1*bb3*Bcon1*g20*ucon0*ucon2 + 
+      2*bb2*bb3*Bcon2*g20*ucon0*ucon2 + 2*bb1*bb3*Bcon1*g12*ucon1*ucon2 + 
+      2*bb2*bb3*Bcon2*g12*ucon1*ucon2 + 2*bb1*bb3*Bcon1*g21*ucon1*ucon2 + 
+      2*bb2*bb3*Bcon2*g21*ucon1*ucon2 + 2*bb1*bb3*Bcon1*g22*Power(ucon2,2) + 
+      2*bb2*bb3*Bcon2*g22*Power(ucon2,2) + bb3*Bcon1*g13*ucon3 + 
+      bb3*Bcon2*g23*ucon3 + bb3*Bcon1*g31*ucon3 + bb3*Bcon2*g32*ucon3 + 
+      2*bb1*Bcon1*g33*ucon3 + 2*bb2*Bcon2*g33*ucon3 + 
+      2*bb1*bb3*Bcon1*g03*ucon0*ucon3 + 2*bb2*bb3*Bcon2*g03*ucon0*ucon3 + 
+      2*bb1*bb3*Bcon1*g30*ucon0*ucon3 + 2*bb2*bb3*Bcon2*g30*ucon0*ucon3 + 
+      2*bb1*bb3*Bcon1*g13*ucon1*ucon3 + 2*bb2*bb3*Bcon2*g13*ucon1*ucon3 + 
+      2*bb1*bb3*Bcon1*g31*ucon1*ucon3 + 2*bb2*bb3*Bcon2*g31*ucon1*ucon3 + 
+      2*bb1*bb3*Bcon1*g23*ucon2*ucon3 + 2*bb2*bb3*Bcon2*g23*ucon2*ucon3 + 
+      2*bb1*bb3*Bcon1*g32*ucon2*ucon3 + 2*bb2*bb3*Bcon2*g32*ucon2*ucon3 + 
+      2*bb1*bb3*Bcon1*g33*Power(ucon3,2) + 2*bb2*bb3*Bcon2*g33*Power(ucon3,2) + 
+      Sqrt(Power(Bcon1*(g31 + bb3*g01*ucon0 + bb1*g03*ucon0 + bb3*g10*ucon0 + 
+             bb1*g30*ucon0 + 2*bb1*bb3*g00*Power(ucon0,2) + 2*bb3*g11*ucon1 + 
+             bb1*g31*ucon1 + 2*bb1*bb3*g01*ucon0*ucon1 + 
+             2*bb1*bb3*g10*ucon0*ucon1 + 2*bb1*bb3*g11*Power(ucon1,2) + 
+             bb3*g12*ucon2 + bb3*g21*ucon2 + bb1*g23*ucon2 + bb1*g32*ucon2 + 
+             2*bb1*bb3*g02*ucon0*ucon2 + 2*bb1*bb3*g20*ucon0*ucon2 + 
+             2*bb1*bb3*g12*ucon1*ucon2 + 2*bb1*bb3*g21*ucon1*ucon2 + 
+             2*bb1*bb3*g22*Power(ucon2,2) + bb3*g31*ucon3 + 2*bb1*g33*ucon3 + 
+             2*bb1*bb3*g03*ucon0*ucon3 + 2*bb1*bb3*g30*ucon0*ucon3 + 
+             2*bb1*bb3*g31*ucon1*ucon3 + 2*bb1*bb3*g23*ucon2*ucon3 + 
+             2*bb1*bb3*g32*ucon2*ucon3 + 2*bb1*bb3*g33*Power(ucon3,2) + 
+             g13*(1 + bb1*ucon1 + bb3*ucon3 + 2*bb1*bb3*ucon1*ucon3)) + 
+          Bcon2*(g32 + bb3*g02*ucon0 + bb2*g03*ucon0 + bb3*g20*ucon0 + 
+             bb2*g30*ucon0 + 2*bb2*bb3*g00*Power(ucon0,2) + bb3*g12*ucon1 + 
+             bb2*g13*ucon1 + bb3*g21*ucon1 + bb2*g31*ucon1 + 
+             2*bb2*bb3*g01*ucon0*ucon1 + 2*bb2*bb3*g10*ucon0*ucon1 + 
+             2*bb2*bb3*g11*Power(ucon1,2) + 2*bb3*g22*ucon2 + bb2*g32*ucon2 + 
+             2*bb2*bb3*g02*ucon0*ucon2 + 2*bb2*bb3*g20*ucon0*ucon2 + 
+             2*bb2*bb3*g12*ucon1*ucon2 + 2*bb2*bb3*g21*ucon1*ucon2 + 
+             2*bb2*bb3*g22*Power(ucon2,2) + bb3*g32*ucon3 + 2*bb2*g33*ucon3 + 
+             2*bb2*bb3*g03*ucon0*ucon3 + 2*bb2*bb3*g30*ucon0*ucon3 + 
+             2*bb2*bb3*g13*ucon1*ucon3 + 2*bb2*bb3*g31*ucon1*ucon3 + 
+             2*bb2*bb3*g32*ucon2*ucon3 + 2*bb2*bb3*g33*Power(ucon3,2) + 
+             g23*(1 + bb2*ucon2 + bb3*ucon3 + 2*bb2*bb3*ucon2*ucon3)),2) - 
+        4*(g33*Power(1 + bb3*ucon3,2) + 
+           bb3*(g30*ucon0 + bb3*g00*Power(ucon0,2) + g13*ucon1 + g31*ucon1 + 
+              bb3*g01*ucon0*ucon1 + bb3*g10*ucon0*ucon1 + 
+              bb3*g11*Power(ucon1,2) + g23*ucon2 + g32*ucon2 + 
+              bb3*g02*ucon0*ucon2 + bb3*g20*ucon0*ucon2 + bb3*g12*ucon1*ucon2 + 
+              bb3*g21*ucon1*ucon2 + bb3*g22*Power(ucon2,2) + 
+              bb3*g30*ucon0*ucon3 + bb3*g13*ucon1*ucon3 + bb3*g31*ucon1*ucon3 + 
+              bb3*g23*ucon2*ucon3 + bb3*g32*ucon2*ucon3 + 
+              g03*(ucon0 + bb3*ucon0*ucon3)))*
+         (-(BSQ*Power(ucon0,2)) + 
+           Bcon1*Bcon2*(g21 + bb2*g01*ucon0 + bb1*g02*ucon0 + bb2*g10*ucon0 + 
+              bb1*g20*ucon0 + 2*bb1*bb2*g00*Power(ucon0,2) + 2*bb2*g11*ucon1 + 
+              bb1*g21*ucon1 + 2*bb1*bb2*g01*ucon0*ucon1 + 
+              2*bb1*bb2*g10*ucon0*ucon1 + 2*bb1*bb2*g11*Power(ucon1,2) + 
+              bb2*g21*ucon2 + 2*bb1*g22*ucon2 + 2*bb1*bb2*g02*ucon0*ucon2 + 
+              2*bb1*bb2*g20*ucon0*ucon2 + 2*bb1*bb2*g21*ucon1*ucon2 + 
+              2*bb1*bb2*g22*Power(ucon2,2) + 
+              g12*(1 + bb1*ucon1 + bb2*ucon2 + 2*bb1*bb2*ucon1*ucon2) + 
+              bb2*g13*ucon3 + bb1*g23*ucon3 + bb2*g31*ucon3 + bb1*g32*ucon3 + 
+              2*bb1*bb2*g03*ucon0*ucon3 + 2*bb1*bb2*g30*ucon0*ucon3 + 
+              2*bb1*bb2*g13*ucon1*ucon3 + 2*bb1*bb2*g31*ucon1*ucon3 + 
+              2*bb1*bb2*g23*ucon2*ucon3 + 2*bb1*bb2*g32*ucon2*ucon3 + 
+              2*bb1*bb2*g33*Power(ucon3,2)) + 
+           Power(Bcon1,2)*(g11*Power(1 + bb1*ucon1,2) + 
+              bb1*(g01*ucon0 + g10*ucon0 + bb1*g00*Power(ucon0,2) + 
+                 bb1*g01*ucon0*ucon1 + bb1*g10*ucon0*ucon1 + g12*ucon2 + 
+                 g21*ucon2 + bb1*g02*ucon0*ucon2 + bb1*g20*ucon0*ucon2 + 
+                 bb1*g12*ucon1*ucon2 + bb1*g21*ucon1*ucon2 + 
+                 bb1*g22*Power(ucon2,2) + g13*ucon3 + g31*ucon3 + 
+                 bb1*g03*ucon0*ucon3 + bb1*g30*ucon0*ucon3 + 
+                 bb1*g13*ucon1*ucon3 + bb1*g31*ucon1*ucon3 + 
+                 bb1*g23*ucon2*ucon3 + bb1*g32*ucon2*ucon3 + 
+                 bb1*g33*Power(ucon3,2))) + 
+           Power(Bcon2,2)*(g22*Power(1 + bb2*ucon2,2) + 
+              bb2*(g02*ucon0 + g20*ucon0 + bb2*g00*Power(ucon0,2) + g12*ucon1 + 
+                 g21*ucon1 + bb2*g01*ucon0*ucon1 + bb2*g10*ucon0*ucon1 + 
+                 bb2*g11*Power(ucon1,2) + bb2*g02*ucon0*ucon2 + 
+                 bb2*g20*ucon0*ucon2 + bb2*g12*ucon1*ucon2 + 
+                 bb2*g21*ucon1*ucon2 + g23*ucon3 + g32*ucon3 + 
+                 bb2*g03*ucon0*ucon3 + bb2*g30*ucon0*ucon3 + 
+                 bb2*g13*ucon1*ucon3 + bb2*g31*ucon1*ucon3 + 
+                 bb2*g23*ucon2*ucon3 + bb2*g32*ucon2*ucon3 + 
+                 bb2*g33*Power(ucon3,2))))))/
+   (2.*(g33*Power(1 + bb3*ucon3,2) + 
+       bb3*(g30*ucon0 + bb3*g00*Power(ucon0,2) + g13*ucon1 + g31*ucon1 + 
+          bb3*g01*ucon0*ucon1 + bb3*g10*ucon0*ucon1 + bb3*g11*Power(ucon1,2) + 
+          g23*ucon2 + g32*ucon2 + bb3*g02*ucon0*ucon2 + bb3*g20*ucon0*ucon2 + 
+          bb3*g12*ucon1*ucon2 + bb3*g21*ucon1*ucon2 + bb3*g22*Power(ucon2,2) + 
+          bb3*g30*ucon0*ucon3 + bb3*g13*ucon1*ucon3 + bb3*g31*ucon1*ucon3 + 
+          bb3*g23*ucon2*ucon3 + bb3*g32*ucon2*ucon3 + 
+	    g03*(ucon0 + bb3*ucon0*ucon3))));
+
+      //corrected
+
+      /*
+      pp[B3]=B31;
+      calc_bcon_prim(pp, bcon, &geom);
+      indices_21(bcon,bcov,geom.gg); 
+      bsq = dot(bcon,bcov);
+      printf("%d %d > %e > %e > %e ",ix,iy,BSQ,bsqnew,bsq);
+
+      pp[B3]=B32;
+      calc_bcon_prim(pp, bcon, &geom);
+      indices_21(bcon,bcov,geom.gg); 
+      bsq = dot(bcon,bcov);
+      printf("| %e (%e | %e) > %e %e\n",bsq,B31,B32,B[1],B[2]);
+
+      if(ix==NX/2 && iy==NY/2-2 && fabs(B31)>1.e-10) getch();
+      */
+
+      //choose the same sign
+      if(pp[B3]*B31>0. && isfinite(B31))
+	pp[B3]=B31;
+      else if(isfinite(B32))
+	pp[B3]=B32;
+      else
+	pp[B3]=pp[B3];
+
+      //to be compatible with what is below
+      B[3]=pp[B3]-get_u(p,B3,ix,iy,iz);
+#endif
+
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
       set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
-
 
       //to avoid MAD
 #ifdef AVOIDMAD
@@ -866,7 +1145,7 @@ mimic_dynamo(ldouble dt)
 
       B[1] += -B[1]*dt/PISCO * radfac * phifac;
       B[2] += -B[2]*dt/PISCO * radfac * phifac;
-      
+
       set_u(p,B1,ix,iy,iz,B[1]);
       set_u(p,B2,ix,iy,iz,B[2]);
 #endif

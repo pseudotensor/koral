@@ -2453,47 +2453,49 @@ cell_fixup_hd()
 
 		  ldouble ppn[6][NV],pp[NV],uu[NV];
 
-		  int gix,giy,giz;
-		  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+		  //int gix,giy,giz;
+		  //mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+
+		  //should care about global but at the stage where it is called knowns not about the boundaries
 
 		  in=0; //number of successfull neighbors
 		  
-		  if(gix-1>=0 &&  get_cflag(HDFIXUPFLAG,ix-1,iy,iz)==0)
+		  if(ix-1>=0 &&  get_cflag(HDFIXUPFLAG,ix-1,iy,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
 		    }
 
-		  if(gix+1<NX && get_cflag(HDFIXUPFLAG,ix+1,iy,iz)==0)
+		  if(ix+1<NX && get_cflag(HDFIXUPFLAG,ix+1,iy,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
 		    }
 
-		  if(giy-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy-1,iz)==0)
+		  if(iy-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy-1,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
 		    }
 
-		  if(giy+1<NY && get_cflag(HDFIXUPFLAG,ix,iy+1,iz)==0)
+		  if(iy+1<NY && get_cflag(HDFIXUPFLAG,ix,iy+1,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
 		    }
 
-		  if(giz-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy,iz-1)==0)
+		  if(iz-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy,iz-1)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
 		    }
 
-		  if(giz+1<NZ && get_cflag(HDFIXUPFLAG,ix,iy,iz+1)==0)
+		  if(iz+1<NZ && get_cflag(HDFIXUPFLAG,ix,iy,iz+1)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
@@ -2575,12 +2577,13 @@ cell_fixup_rad()
 		  struct geometry geom;
 		  fill_geometry(ix,iy,iz,&geom); 
 		  
-		  int gix,giy,giz;
-		  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+		  //int gix,giy,giz;
+		  //mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+		  //as above
 
 		  in=0; //number of successfull neighbors
 		  
-		  if(gix-1>=0 &&  get_cflag(RADFIXUPFLAG,ix-1,iy,iz)==0)
+		  if(ix-1>=0 &&  get_cflag(RADFIXUPFLAG,ix-1,iy,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
@@ -2590,7 +2593,7 @@ cell_fixup_rad()
 		      idx[in-1][2]=iz;
 		    }
 		  
-		  if(gix+1<NX && get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0)
+		  if(ix+1<NX && get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
@@ -2600,7 +2603,7 @@ cell_fixup_rad()
 		      idx[in-1][2]=iz;
 		    }
 
-		  if(giy-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0)
+		  if(iy-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
@@ -2610,7 +2613,7 @@ cell_fixup_rad()
 		      idx[in-1][2]=iz;
 		    }
 
-		  if(giy+1<NY && get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0)
+		  if(iy+1<NY && get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
@@ -2620,7 +2623,7 @@ cell_fixup_rad()
 		      idx[in-1][2]=iz;
 		    }
 
-		  if(giz-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0)
+		  if(iz-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
@@ -2630,7 +2633,7 @@ cell_fixup_rad()
 		      idx[in-1][2]=iz-1;
 		    }
 
-		  if(giz+1<NZ && get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0)
+		  if(iz+1<NZ && get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0)
 		    {
 		      in++;
 		      for(iv=0;iv<NV;iv++)
@@ -2641,9 +2644,9 @@ cell_fixup_rad()
 		    }
 
 		  //try corners as well
-		  //unnecessary?
+		  //unnecessary + typos
 		  //TODO: so far only for NZ==1
-		  
+		  /*
 		  if(NZ==1 && NY>1)
 		    {
 		      if(gix-1>=0 && giy-1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy-1,iz)==0)
@@ -2686,7 +2689,7 @@ cell_fixup_rad()
 			  idx[in-1][2]=iz;
 			}			 
 		    }
-		  
+		  */
 		
 		  if((NZ==1 && NY==1 && in>=1) ||
 		     (NZ==1 && in>=1) ||

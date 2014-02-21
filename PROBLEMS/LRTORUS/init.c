@@ -187,7 +187,7 @@ if(rho<0.) //outside donut
       vpot += q * sin(fr - fr_start) ;
     }
         
-    Acov[2]=vpot*sin((M_PI/2.-geomBL.yy));;
+    Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
 
     
 
