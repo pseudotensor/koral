@@ -7,7 +7,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 250
+#define RESTARTNUM 10
 
 /************************************/
 //radiation choices
@@ -23,9 +23,9 @@
 //#define AVOIDMAD
 //#define ALPHAFLIPSSIGN
 //#define DYNAMOREVERSAL 
-#define DYNAMOREVERSALRREV 20.
-#define DYNAMOREVERSALTHPHASE 0.
-#define DYNAMOREVERSALRPHASE 0.
+//#define DYNAMOREVERSALRREV 20.
+//#define DYNAMOREVERSALTHPHASE 0.
+//#define DYNAMOREVERSALRPHASE 0.
 #define ALPHADYNAMO 0.03
 #define MAGNFIELD
 #define GDETIN 1

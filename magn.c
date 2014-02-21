@@ -862,7 +862,7 @@ mimic_dynamo(ldouble dt)
       conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
       indices_21(ucon,ucov,geom.gg);
       
-      //bsq
+      //original bsq
       calc_bcon_4vel(pp,ucon,ucov,bcon);
       indices_21(bcon,bcov,geom.gg); 
       BSQ = dot(bcon,bcov);
@@ -1096,10 +1096,14 @@ mimic_dynamo(ldouble dt)
           bb3*g30*ucon0*ucon3 + bb3*g13*ucon1*ucon3 + bb3*g31*ucon1*ucon3 + 
           bb3*g23*ucon2*ucon3 + bb3*g32*ucon2*ucon3 + 
 	    g03*(ucon0 + bb3*ucon0*ucon3))));
-
-      //corrected
-
+      
       /*
+      int gix,giy,giz;
+      mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+      if(gix==115 && giy==TNY/2) 
+	{
+	  print_primitives(&get_u(p,0,ix,iy,iz));
+
       pp[B3]=B31;
       calc_bcon_prim(pp, bcon, &geom);
       indices_21(bcon,bcov,geom.gg); 
@@ -1112,16 +1116,38 @@ mimic_dynamo(ldouble dt)
       bsq = dot(bcon,bcov);
       printf("| %e (%e | %e) > %e %e\n",bsq,B31,B32,B[1],B[2]);
 
-      if(ix==NX/2 && iy==NY/2-2 && fabs(B31)>1.e-10) getch();
-      */
-
       //choose the same sign
       if(pp[B3]*B31>0. && isfinite(B31))
 	pp[B3]=B31;
       else if(isfinite(B32))
 	pp[B3]=B32;
       else
-	pp[B3]=pp[B3];
+	pp[B3]=get_u(p,B3,ix,iy,iz); 
+      B[3]=pp[B3]-get_u(p,B3,ix,iy,iz);
+      set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
+      printf(">> %e %e \n",bcon[3],get_u(p,B3,ix,iy,iz));
+	}
+      */
+
+      /*
+      //choose the same sign
+      if(pp[B3]*B31>0. && isfinite(B31))
+	pp[B3]=B31;
+      else if(isfinite(B32))
+	pp[B3]=B32;
+      else
+	pp[B3]=get_u(p,B3,ix,iy,iz);
+      */
+
+      if(isfinite(B31) && isfinite(B32)) //closer one
+	{
+	  if(fabs(B31-get_u(p,B3,ix,iy,iz)) < fabs(B32-get_u(p,B3,ix,iy,iz)))
+	    pp[B3]=B31;
+	  else
+	    pp[B3]=B32;	    
+	}
+      else //no change
+	pp[B3]=get_u(p,B3,ix,iy,iz);
 
       //to be compatible with what is below
       B[3]=pp[B3]-get_u(p,B3,ix,iy,iz);
@@ -1130,26 +1156,6 @@ mimic_dynamo(ldouble dt)
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
       set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
-
-      //to avoid MAD
-#ifdef AVOIDMAD
-      ldouble phifac = step_function(phi-10.,1.);
-      ldouble risco = r_ISCO_BL(BHSPIN);
-      ldouble rlimit = rhor + 0.5*(risco-rhor);
-      ldouble radfac = step_function(rlimit-xxBL[1],1./3.*(rlimit-rhor));
-      ldouble OmISCO = 1./sqrt(risco*risco*risco);
-      ldouble PISCO = 2.*M_PI/OmISCO;
-
-      B[1]=get_u(p,B1,ix,iy,iz);
-      B[2]=get_u(p,B2,ix,iy,iz);
-
-      B[1] += -B[1]*dt/PISCO * radfac * phifac;
-      B[2] += -B[2]*dt/PISCO * radfac * phifac;
-
-      set_u(p,B1,ix,iy,iz,B[1]);
-      set_u(p,B2,ix,iy,iz,B[2]);
-#endif
-
 
       ldouble uutemp[NV];
       p2u(&get_u(p,0,ix,iy,iz),uutemp,&geom);
