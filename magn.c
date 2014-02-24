@@ -763,7 +763,8 @@ mimic_dynamo(ldouble dt)
       ldouble lambda=calc_Qtheta(ix,iy,iz)*dth;
       ldouble lambdaBL=lambda * sqrt(geom.gg[2][2]);
       if(!isfinite(lambdaBL) || lambdaBL>1.e3*xxBL[1]) lambdaBL=1.e3*xxBL[1];
-      ldouble faclambda=step_function(1. - lambdaBL/(EXPECTEDHR * xxBL[1]),.1);  
+      ldouble faclambda=step_function(1. - lambdaBL/(EXPECTEDHR * xxBL[1]),.1); 
+      faclambda=1.;
 
       //angle
       ldouble facangle=0.;
@@ -783,7 +784,7 @@ mimic_dynamo(ldouble dt)
       ldouble effalpha=ALPHADYNAMO;
 
       #ifdef ALPHAFLIPSSIGN
-      effalpha = - (M_PI/2. - xxBL[2])/(M_PI/2.) / (EXPECTEDHR/2.) * ALPHADYNAMO;
+      effalpha = - (M_PI/2. - xxBL[2])/(M_PI/2.) / (EXPECTEDHR) * ALPHADYNAMO;
       #endif
 
       #ifdef DYNAMOREVERSAL

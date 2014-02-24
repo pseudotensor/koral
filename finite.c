@@ -2560,7 +2560,7 @@ cell_fixup_rad()
   copy_u(1.,u,u_bak);
   copy_u(1.,p,p_bak);
 
-  //gets the neiboring the primitives
+  //gets the neighboring the primitives
 #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static)
   for(ix=0;ix<NX;ix++)
     {
@@ -2571,8 +2571,7 @@ cell_fixup_rad()
 	      if(get_cflag(RADFIXUPFLAG,ix,iy,iz)<0)
 		{
 		  ldouble ppn[26][NV],pp[NV],uu[NV];
-		  int idx[26][3];
- 
+
 		  //total fixups  
 		  struct geometry geom;
 		  fill_geometry(ix,iy,iz,&geom); 
@@ -2588,9 +2587,6 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
-		      idx[in-1][0]=ix-1;
-		      idx[in-1][1]=iy;
-		      idx[in-1][2]=iz;
 		    }
 		  
 		  if(ix+1<NX && get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0)
@@ -2598,9 +2594,6 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
-		      idx[in-1][0]=ix+1;
-		      idx[in-1][1]=iy;
-		      idx[in-1][2]=iz;
 		    }
 
 		  if(iy-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0)
@@ -2608,9 +2601,6 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
-		      idx[in-1][0]=ix;
-		      idx[in-1][1]=iy-1;
-		      idx[in-1][2]=iz;
 		    }
 
 		  if(iy+1<NY && get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0)
@@ -2618,9 +2608,6 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
-		      idx[in-1][0]=ix;
-		      idx[in-1][1]=iy+1;
-		      idx[in-1][2]=iz;
 		    }
 
 		  if(iz-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0)
@@ -2628,9 +2615,6 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
-		      idx[in-1][0]=ix;
-		      idx[in-1][1]=iy;
-		      idx[in-1][2]=iz-1;
 		    }
 
 		  if(iz+1<NZ && get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0)
@@ -2638,9 +2622,6 @@ cell_fixup_rad()
 		      in++;
 		      for(iv=0;iv<NV;iv++)
 			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
-		      idx[in-1][0]=ix;
-		      idx[in-1][1]=iy;
-		      idx[in-1][2]=iz+1;
 		    }
 
 		  //try corners as well
@@ -2712,7 +2693,7 @@ cell_fixup_rad()
 		      //all the primitives!
 		      for(iv=0;iv<NV;iv++)
 			{
-			  if(iv!=UU && iv!=EE0) continue; //why?
+			  //if(iv!=UU && iv!=EE0) continue; //why?
 			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
 			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
 			}

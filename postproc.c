@@ -385,10 +385,10 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   //magnetic flux through horizon parameter (5)
   ldouble Bflux=calc_Bflux(r_horizon_BL(BHSPIN),0);
-  //ldouble Bfluxcgs=Bflux*sqrt(endenGU2CGS(1.))*lenGU2CGS(1.)*lenGU2CGS(1.)/CCC;
-  //scalars[3]=Bfluxcgs/2./sqrt(fabs(mdot));
+  scalars[3]=Bflux;
 
-  scalars[3]=Bflux;///sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.;
+  //MAD parameter (9)
+  scalars[7]=Bflux/sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.;
 
   /*********************************************/
   //L1 ERRRORS for some problems
