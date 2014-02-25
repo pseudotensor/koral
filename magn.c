@@ -745,7 +745,6 @@ mimic_dynamo(ldouble dt)
       //magnetic field angle
       //calc_angle_bpbphibsq(ix,iy,iz,&bbphi,&bsq);
       calc_angle_brbphibsq(ix,iy,iz,&bbphi,&bsq);
-
       angle=-bbphi/bsq;
 
       //BL radius
@@ -764,7 +763,7 @@ mimic_dynamo(ldouble dt)
       ldouble lambdaBL=lambda * sqrt(geom.gg[2][2]);
       if(!isfinite(lambdaBL) || lambdaBL>1.e3*xxBL[1]) lambdaBL=1.e3*xxBL[1];
       ldouble faclambda=step_function(1. - lambdaBL/(EXPECTEDHR * xxBL[1]),.1); 
-      faclambda=1.;
+      faclambda=1.; //override
 
       //angle
       ldouble facangle=0.;
@@ -777,14 +776,26 @@ mimic_dynamo(ldouble dt)
       //radius
       ldouble facradius = step_function(xxBL[1]-4.,1.);
 
-      //bsq/rho
-      ldouble facmagnetization = step_function(.1-bsq/get_u(p,RHO,ix,iy,iz),.01);
-     
+      //bsq/rho 
+      //ldouble facmagnetization = step_function(.1-bsq/get_u(p,RHO,ix,iy,iz),.01);     
+
+      //pmag/pre(gas+rad)
+      ldouble prermhd = GAMMAM1*get_u(p,UU,ix,iy,iz);
+#ifdef RADIATION
+      ldouble Rtt,Ehat,uconr[4],prad;
+      calc_ff_Rtt(&get_u(p,0,ix,iy,iz),&Rtt,uconr,&geom);
+      Ehat=-Rtt; 
+      prad=Ehat/3.;
+      prermhd+=prad;		
+#endif
+
+      ldouble facmagnetization = step_function(1.-bsq/2./prermhd,.1);
+
       //the extra vector potential
       ldouble effalpha=ALPHADYNAMO;
 
       #ifdef ALPHAFLIPSSIGN
-      effalpha = - (M_PI/2. - xxBL[2])/(M_PI/2.) / (EXPECTEDHR) * ALPHADYNAMO;
+      effalpha = - (M_PI/2. - xxBL[2])/(M_PI/2.) / (EXPECTEDHR/2.) * ALPHADYNAMO;
       #endif
 
       #ifdef DYNAMOREVERSAL
@@ -816,17 +827,6 @@ mimic_dynamo(ldouble dt)
   //once the whole array is filled with cell centered A^phi we can 
   //calculate the extra magnetic field returned through pvecpot[1..3]
   calc_BfromA(ptemp1,0);  
-
-  //to avoid MAD
-  
-  #ifdef AVOIDMAD
-  ldouble rhor = r_horizon_BL(BHSPIN);
-  ldouble Bflux=calc_Bflux(r_horizon_BL(BHSPIN),0);
-  ldouble mdot=calc_mdot(r_horizon_BL(BHSPIN),0);
-  ldouble phi = sqrt(4.*M_PI)/2.*Bflux/fabs(mdot);
-  //printf("phi : %f\n",phi);
-  #endif
-  
    
   //and superimpose it on the original one
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)

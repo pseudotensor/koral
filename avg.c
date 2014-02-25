@@ -15,7 +15,7 @@ main(int argc, char **argv)
   int no1,no2,nostep;
   if(argc!=5)
     {
-      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep whatfile\n");
+      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep doingavg\n");
       return -1;
     }
   else
@@ -46,9 +46,6 @@ main(int argc, char **argv)
   //folder to write in
   char folder[100],bufor[100];
   sprintf(folder,"analysis");
-
-  //sprintf(bufor,"rm %s/*",folder);
-  //i=system(bufor);
 
   //opens the scalar file
   sprintf(bufor,"%s/avgscalars.dat",folder);
