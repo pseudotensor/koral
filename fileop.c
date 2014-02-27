@@ -959,7 +959,7 @@ int
 fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 {
   #ifdef MPI
-  int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
+  int ret, ix,iy,iz,iv,i,ic,gix,giy,giz,tix,tiy,tiz;
   char fname[40],fnamehead[40];
   if(nout1>=0)
     {
@@ -1006,14 +1006,23 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 
   //set the initial location
   MPI_Offset pos;
+
+#ifndef RESTARTGENERALINDICES
   if(PROCID==0) pos=0;
   else
     pos=PROCID*NX*NY*NZ*(3*sizeof(int)+NV*sizeof(ldouble));
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
-  for(iz=0;iz<NZ;iz++)
-    for(iy=0;iy<NY;iy++)
-      for(ix=0;ix<NX;ix++)
+  for(tiz=0;tiz<NZ;tiz++)
+    for(tiy=0;tiy<NY;tiy++)
+      for(tix=0;tix<NX;tix++)
+#else //going through the whole file, useful when changing number of cores
+  pos=0;
+  MPI_File_seek( cFile, pos, MPI_SEEK_SET );
+  for(tiz=0;tiz<TNZ;tiz++)
+    for(tiy=0;tiy<TNY;tiy++)
+      for(tix=0;tix<TNX;tix++)
+#endif
 	{
 	  MPI_File_read( cFile, &gix, 1, MPI_INT, &status );
 	  MPI_File_read( cFile, &giy, 1, MPI_INT, &status );
@@ -1021,11 +1030,15 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 
 	  mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
 
-	  MPI_File_read( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
+	  MPI_File_read( cFile, pp, NV, MPI_LDOUBLE, &status );
 
-
-	  fill_geometry(ix,iy,iz,&geom);
-	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	  if(if_indomain(ix,iy,iz))
+	    {
+	      fill_geometry(ix,iy,iz,&geom);
+	      PLOOP(iv)
+		set_u(p,iv,ix,iy,iz,pp[iv]);
+	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	    }
 	}
 
   MPI_File_close( &cFile );

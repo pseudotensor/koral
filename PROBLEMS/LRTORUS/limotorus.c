@@ -5,13 +5,13 @@
 
 #define FTYPE double
 
-#define LT_BHSPIN 0.
+#define LT_BHSPIN 0.9
 #define LT_KAPPA 2.e3
-#define LT_XI 0.95
-#define LT_R1 16.
+#define LT_XI 0.975
+#define LT_R1 30.
 #define LT_R2 200.
 #define LT_GAMMA 4./3.
-#define LT_RIN 10.
+#define LT_RIN 22.
 
 void compute_gd( FTYPE r, FTYPE th, FTYPE a, FTYPE *gdtt, FTYPE *gdtp, FTYPE *gdpp ) {
    FTYPE Sigma, tmp;
@@ -316,8 +316,8 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
 
 int main() {
 
-   int nr = 30, nth = 16;
-   FTYPE Rin = 2., Rout = 100.;   // a = 0
+   int nr = 60, nth = 36;
+   FTYPE Rin = 2., Rout = 500.;   // a = 0
    //FTYPE Rin = 1.364, Rout = 2000.;   // a = 0.9
    FTYPE th1 = 0., th2 = M_PI_2;
    FTYPE dr = (Rout - Rin) / nr, dth = (th2 - th1) / nth;

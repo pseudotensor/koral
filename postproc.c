@@ -40,6 +40,7 @@
 //rho-weighted temperature (29)
 //rho-weighted magn.field angle <sqrt(grr gphph)b^r b^ph> / <bsq> (30)
 //scale-height (31)
+//rho-weighted beta (32)
 
 
 /*********************************************/
@@ -102,12 +103,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      ldouble dxph[3];
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
@@ -196,7 +197,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      ldouble qtheta=calc_Qtheta(ix,iy,iz);//2.*M_PI/Omega/dx[1]*fabs(bcon[2])/sqrt(rho);
 
 	      //to calculate magn. field angle
-
 	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
 	      Bangle1+=rho*brbphi*dxph[1];
 	      Bangle2+=rho*bsq*dxph[1];
@@ -222,6 +222,18 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	       
 	      //rho-weighted temperature (29)
 	      profiles[27][ix]+=rho*temp*dxph[1];
+	      
+	      //rho-weighted beta (32)
+	      ldouble prermhd = GAMMAM1*get_u(p,UU,ix,iy,iz);
+              #ifdef RADIATION
+	      ldouble Rtt,Ehat,uconr[4],prad;
+	      calc_ff_Rtt(&get_u(p,0,ix,iy,iz),&Rtt,uconr,&geomBL);
+	      Ehat=-Rtt; 
+	      prad=Ehat/3.;
+	      prermhd+=prad;		
+              #endif
+	      ldouble beta=(prermhd+bsq/2.)/(bsq/2.);
+	      profiles[30][ix]+=rho*beta*dxph[1];
 	      
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
@@ -301,6 +313,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[26][ix]/=profiles[0][ix];
 	  profiles[27][ix]/=profiles[0][ix];
 	  profiles[29][ix]/=profiles[0][ix];
+	  profiles[30][ix]/=profiles[0][ix];
 	  profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
 
 	  Bangle1/=profiles[0][ix];

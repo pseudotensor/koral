@@ -510,21 +510,42 @@ calc_divB(int ix,int iy,int iz)
 ldouble
 calc_Qtheta(int ix, int iy, int iz)
 {
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
+  if(!doingavg)
+    {
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
 
-  ldouble rho=get_u(p,RHO,ix,iy,iz);
-  ldouble bcon[4];
-  calc_bcon_prim(&get_u(p,0,ix,iy,iz),bcon,&geom);
-  ldouble ucon[4];
-  ucon[1]=get_u(p,VX,ix,iy,iz);
-  ucon[2]=get_u(p,VY,ix,iy,iz);
-  ucon[3]=get_u(p,VZ,ix,iy,iz);
-  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-  ldouble Omega = ucon[3]/ucon[0];
-  ldouble dx=get_xb(iy+1,1)-get_xb(iy,1);
+      ldouble rho=get_u(p,RHO,ix,iy,iz);
+      ldouble bcon[4];
+      calc_bcon_prim(&get_u(p,0,ix,iy,iz),bcon,&geom);
+      ldouble ucon[4];
+      ucon[1]=get_u(p,VX,ix,iy,iz);
+      ucon[2]=get_u(p,VY,ix,iy,iz);
+      ucon[3]=get_u(p,VZ,ix,iy,iz);
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+      ldouble Omega = ucon[3]/ucon[0];
+      ldouble dx=get_xb(iy+1,1)-get_xb(iy,1);
 
-  return 2.*M_PI/fabs(Omega)/dx*fabs(bcon[2])/sqrt(rho);
+      return 2.*M_PI/fabs(Omega)/dx*fabs(bcon[2])/sqrt(rho);
+    }
+  else //doingavg, in BL
+    {
+      struct geometry geomBL;
+      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+      ldouble bcon2 = get_uavg(pavg,AVGBCON(2),ix,iy,iz);
+      ldouble Omega = get_uavg(pavg,AVGUCON(3),ix,iy,iz)/get_uavg(pavg,AVGUCON(0),ix,iy,iz);
+      ldouble rho = get_uavg(pavg,RHO,ix,iy,iz);
+      ldouble dx;
+      ldouble xx1[4],xx2[4];
+      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+      dx=fabs(xx2[2]-xx1[2]);
+
+      return 2.*M_PI/fabs(Omega)/dx*fabs(bcon2)/sqrt(rho);
+    }
 }
 
 //calculates sqrt(g_rr g_phph) b^r b^phi and b^2
@@ -769,9 +790,11 @@ mimic_dynamo(ldouble dt)
       ldouble facangle=0.;
       if(isfinite(angle))
 	{
-	  if(angle<-1.) angle=-1.;
-	  facangle = my_max(0., 1.-4.*angle);
+	  //if(angle<-1.) angle=-1.;
+	  //facangle = my_max(0., 1.-4.*angle);
+	  facangle=step_function(0.25-angle,0.025); 
 	}
+      facangle=1.; //override      
 
       //radius
       ldouble facradius = step_function(xxBL[1]-4.,1.);
@@ -796,24 +819,6 @@ mimic_dynamo(ldouble dt)
 
       #ifdef ALPHAFLIPSSIGN
       effalpha = - (M_PI/2. - xxBL[2])/(M_PI/2.) / (EXPECTEDHR/2.) * ALPHADYNAMO;
-      #endif
-
-      #ifdef DYNAMOREVERSAL
-      ldouble rrev=DYNAMOREVERSALRREV;
-      ldouble Omrev = 1./(BHSPIN+sqrt(rrev*rrev*rrev));
-      ldouble Pkrev = 2.*M_PI/Omrev;
-      ldouble thphase = 0.;
-      ldouble rphase = 0.;
-
-      #ifdef DYNAMOREVERSALTHPHASE
-      thphase = fabs(M_PI/2.-xxBL[2])/(M_PI/2.)/EXPECTEDHR * DYNAMOREVERSALTHPHASE * 2.*M_PI;
-      #endif
-
-      #ifdef DYNAMOREVERSALRPHASE
-      rphase = (xxBL[1]-DYNAMOREVERSALRREV)/DYNAMOREVERSALRREV * DYNAMOREVERSALRPHASE * 2.*M_PI;
-      #endif
-
-      effalpha *= cos(global_time/Pkrev+thphase+rphase);
       #endif
 
       Aphi = effalpha * EXPECTEDHR/0.4 * dt / Pk  * xxBL[1] * geom.gg[3][3] * get_u(p,B3,ix,iy,iz) 
