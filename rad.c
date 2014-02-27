@@ -1973,6 +1973,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
     }      
   if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
+  
+  //test!
+  if(PROCID==2) set_cflag(RADFIXUPFLAG,ix,iy,iz,-1);
 
   //*********** 2th ************
   if(ret!=0) {
@@ -1998,7 +2001,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       params[2]=RADIMPLICIT_FF;
       if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
+      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
 
   //*********** 4th ************
@@ -2009,7 +2012,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       params[2]=RADIMPLICIT_FF;
       if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
+      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
 
   //*********** 4th ************
@@ -2061,7 +2064,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  params[2]=RADIMPLICIT_FF;
 	  if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
 	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
+	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
 	}
 
 	//*********** 44th ************
@@ -2072,7 +2075,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  params[2]=RADIMPLICIT_FF;
 	  if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
 	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,1);
+	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
 	} 
       }      
   }

@@ -2530,7 +2530,9 @@ cell_fixup_hd()
 		    }
 		  else
 		    {
+		      #ifndef MPI
 		      fprintf(fout_fail,"%4d > %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup\n",PROCID,ix,iy,iz);
+		      #endif
 		      printf("%4d > %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup \n",PROCID,ix,iy,iz);
 		    }
 		}
@@ -2671,7 +2673,7 @@ cell_fixup_rad()
 			}			 
 		    }
 		  */
-		
+		  
 		  if((NZ==1 && NY==1 && in>=1) ||
 		     (NZ==1 && in>=1) ||
 		     (NY==1 && in>=1) ||
@@ -2685,7 +2687,7 @@ cell_fixup_rad()
 			  pp[iv]/=(ldouble)in;  
 			}
 		      p2u(pp,uu,&geom);
-
+		      
 		      if(verbose>1 || 1) 
 			  printf("%4d > %4d %4d %4d > RADFIX > fixing up rad with %d neighbors\n",PROCID,ix,iy,iz,in);
 
@@ -2697,13 +2699,15 @@ cell_fixup_rad()
 			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
 			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
 			}
-
 		    }
 		  else
 		    {
+                      #ifndef MPI
 		      fprintf(fout_fail,"%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup\n",PROCID,ix,iy,iz);
+                      #endif
 		      printf("%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup \n",PROCID,ix,iy,iz);
 		    }
+		  
 		}
 	    }
 	}
