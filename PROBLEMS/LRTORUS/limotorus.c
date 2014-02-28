@@ -6,7 +6,7 @@
 #define FTYPE double
 
 #define LT_BHSPIN 0.9
-#define LT_KAPPA 2.e3
+#define LT_KAPPA 2.e2
 #define LT_XI 0.975
 #define LT_R1 30.
 #define LT_R2 200.
@@ -316,7 +316,7 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
 
 int main() {
 
-   int nr = 60, nth = 36;
+   int nr = 30, nth = 16;
    FTYPE Rin = 2., Rout = 500.;   // a = 0
    //FTYPE Rin = 1.364, Rout = 2000.;   // a = 0.9
    FTYPE th1 = 0., th2 = M_PI_2;
