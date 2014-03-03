@@ -7,22 +7,22 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 18
-#define RESTARTGENERALINDICES
+#define RESTARTNUM -1
+//#define RESTARTGENERALINDICES
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
-#define COMPTONIZATION
+//#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
+//#define MIMICDYNAMO
 #define ALPHAFLIPSSIGN                                                        
 #define ALPHADYNAMO 0.03
-#define MAGNFIELD
+//#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -72,7 +72,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.9
+#define BHSPIN 0.
 
 /************************************/
 //coordinates / resolution
@@ -82,10 +82,10 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.275-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 256
+#define TNX 300
 #define TNY 200
 #define TNZ 1
 //number of tiles
@@ -116,6 +116,7 @@
 #define RADOUTPUT 1
 #define SCAOUTPUT 1
 #define AVGOUTPUT 1
+#define SIMOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 50.
@@ -126,7 +127,7 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 7
+#define NTORUS 2
 
 #if(NTORUS==7) //flat sigma
 #define LT_KAPPA 5.e2
@@ -204,12 +205,13 @@
 #endif
 
 #if(NTORUS==2) //for Yucong?
-#define LT_KAPPA 2.e3
-#define LT_XI 0.95
-#define LT_R1 16.
+#define LT_KAPPA 5.e2
+#define EXPECTEDHR 0.4
+#define LT_XI 0.975
+#define LT_R1 30.
 #define LT_R2 200.
 #define LT_GAMMA 4./3.
-#define LT_RIN 10.
+#define LT_RIN 22.
 #endif
 
 #define RHOATMMIN  1.e-24

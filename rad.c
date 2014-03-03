@@ -1974,9 +1974,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     }      
   if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
   
-  //test!
-  if(PROCID==2) set_cflag(RADFIXUPFLAG,ix,iy,iz,-1);
-
   //*********** 2th ************
   if(ret!=0) {
       PLOOP(iv) 

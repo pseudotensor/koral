@@ -275,6 +275,10 @@ pp[5]=calc_Sfromu(pp[0],pp[1]);
 //to conserved
 p2u(pp,uu,&geom);
 
+//printf("%d %d\n",ix,iy);
+//print_primitives(pp);
+//print_conserved(pp);
+//getch();
 
 
 /***********************************************/
