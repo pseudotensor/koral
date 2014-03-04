@@ -12,6 +12,7 @@
 /************************************/
 #define RADIATION
 #define NCOMPTONIZATION
+#define COMPTONIZATION
 //#define SKIPRADSOURCE
 
 /************************************/

@@ -3079,8 +3079,6 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   utcon[2]=pp[3];
   utcon[3]=pp[4];
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
-  //indices_21(ucon,ucov,gg);  
 
   //gas properties
   ldouble rho=pp[RHO];
@@ -3112,7 +3110,27 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 
 #ifdef COMPTONIZATION
   ldouble Ehatrad = Ruu;
-  ldouble Thatrad = calc_LTE_TfromE(Ehatrad);
+  ldouble Thatrad;
+
+  #ifdef NCOMPTONIZATION //number of photons conserved
+
+  ldouble nphrf = pp[NF(0)];
+  ldouble urfcon[4];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+
+  ldouble relgamma = urfcon[0]*ucov[0] + urfcon[1]*ucov[1] +urfcon[2]*ucov[2] +urfcon[3]*ucov[3]; 
+  ldouble nphhat = - relgamma*nphrf;
+  Thatrad = 1./2.70118/K_BOLTZ * Ehatrad / nphhat;
+
+  #else //thermal comptonization
+  
+  Thatrad = calc_LTE_TfromE(Ehatrad);
+  
+  #endif
 
   for(i=0;i<4;i++)
     Gi[i]+=kappaes * Ehatrad * (4.*K_BOLTZ*(Thatrad - Tgas)/M_ELECTR) * (1. + 4.*K_BOLTZ*Tgas/M_ELECTR) * ucon[i]; 
