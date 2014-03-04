@@ -1215,7 +1215,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   if(!isfinite(utcon[1]))
     {
-      print_4vector(utcon);
+      //print_4vector(utcon);
       return -120;
     }
 

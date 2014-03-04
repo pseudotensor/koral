@@ -38,6 +38,7 @@
 #define M_PROTON massCGS2GU(1.67262158e-24)
 #define M_ELECTR massCGS2GU(9.11e-28)
 #define SIGMA_RAD (5.67e-5 * GGG / CCC / CCC / CCC / CCC / CCC * MASSCM * MASSCM)
+#define A_RAD (4.*SIGMA_RAD)
 #define MU_GAS 1.
 #define Z_RATIO (1.0)
 #define Pi (3.141592654)     
@@ -584,7 +585,8 @@ int solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldoubl
 int solve_implicit_backup(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int);
 int solve_implicit_backup_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose);
 int solve_explicit_lab_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose);
-
+ldouble calc_NFfromT(ldouble T);
+ldouble calc_NFfromE(ldouble E);
 ldouble calc_LTE_EfromT(ldouble);
 ldouble calc_LTE_TfromE(ldouble);
 ldouble calc_LTE_Efromurho(ldouble E,ldouble);

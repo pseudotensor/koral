@@ -885,9 +885,27 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
 {
   //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
   *corrected=0;
-  
+
+  int u2pret=u2p_rad_urf(uu,pp,ggg,corrected);
+
+  #ifdef NCOMPTONIZATION
+  struct geometry *geom
+   = (struct geometry *) ggg;
+  ldouble gdetu=geom->gdet;
+  #if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+  #endif
+  ldouble urfcon[4];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+  pp[NF(0)]=uu[NF(0)]/urfcon[0]/gdetu;
+  #endif
+
   //M1
-  return u2p_rad_urf(uu,pp,ggg,corrected);
+  return u2pret;
 }
 
 

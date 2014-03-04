@@ -3410,6 +3410,18 @@ ldouble calc_PEQ_Tfromurho(ldouble u,ldouble rho)
   return T;
 }
 
+ldouble calc_NFfromT(ldouble T)
+{
+  return A_RAD*T*T*T/2.70118/K_BOLTZ;
+}
+
+ldouble calc_NFfromE(ldouble E)
+{
+  ldouble temp=calc_LTE_TfromE(E);
+  return calc_NFfromT(temp);
+}
+
+
 ldouble calc_LTE_EfromT(ldouble T)
 {
   return 4.*SIGMA_RAD*T*T*T*T;
@@ -4728,6 +4740,17 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   ff[FY0]= gdetu*(Rij[idim+1][2]);
       
   ff[FZ0]= gdetu*(Rij[idim+1][3]);
+
+#ifdef NCOMPTONIZATION
+  ldouble nphrad=pp[NF0];
+  ldouble urfcon[4];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+  ff[NF0]= gdetu*nphrad*urfcon[idim+1];
+#endif
 
 #endif
   return 0;

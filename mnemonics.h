@@ -22,17 +22,28 @@
 #define B2 (NVHD+1)
 #define B3 (NVHD+2)
 
+//number of radiative quantities per fluid
+#ifndef NCOMPTONIZATION
+#define NRADVAR 4
+#else
+#define NRADVAR 5
+#endif
+
 //multi rad-fluid macros
-#define EE(nf) (NVMHD+nf*4)
-#define FX(nf) (NVMHD+nf*4+1)
-#define FY(nf) (NVMHD+nf*4+2)
-#define FZ(nf) (NVMHD+nf*4+3)
+#define EE(nf) (NVMHD+nf*NRADVAR)
+#define FX(nf) (NVMHD+nf*NRADVAR+1)
+#define FY(nf) (NVMHD+nf*NRADVAR+2)
+#define FZ(nf) (NVMHD+nf*NRADVAR+3)
+
+//number of photons
+#define NF(nf) (NVMHD+nf*NRADVAR+4)
 
 //single fluid macros
 #define EE0 EE(0)
 #define FX0 FX(0)
 #define FY0 FY(0)
 #define FZ0 FZ(0)
+#define NF0 NF(0)
 
 //u2p inversion types
 #define U2P_HOT 0

@@ -10,7 +10,8 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
+#define NCOMPTONIZATION
 //#define SKIPRADSOURCE
 
 /************************************/
@@ -70,8 +71,8 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define TNX 600
-#define TNY 400
+#define TNX 100
+#define TNY 100
 #define TNZ 1
 
 //# of tiles
@@ -96,7 +97,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define DTOUT1 0.75
+#define DTOUT1 0.1
 #define RADOUTPUTINZAMO
 #define SILOOUTPUT 1
 

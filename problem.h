@@ -74,7 +74,7 @@
 //71 MBBBLOB - rad blobs with magn field
 //72 BOWSHOCK - bow shock in wind tunnel
 
-#define PROBLEM 67
+#define PROBLEM 59
 
 #if(PROBLEM==72)
 
@@ -1293,12 +1293,19 @@
 //number of total variables
 #ifdef RADIATION
 
+//number of radiative quantities per fluid
+#ifndef NCOMPTONIZATION
+#define NRADVAR 4
+#else
+#define NRADVAR 5
+#endif
+
 #ifndef MULTIRADFLUID
 #undef NRF
 #define NRF 1
 #endif
 
-#define NV (NVMHD+4*NRF)
+#define NV (NVMHD+NRADVAR*NRF)
 
 #else //no RADIATION
 

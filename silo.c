@@ -102,7 +102,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *Ehat = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Fx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Fy = (ldouble*)malloc(nx*ny*nz*sizeof(double));
-  ldouble *Fz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Fz = (ldouble*)malloc(nx*ny*nz*sizeof(double));  
+  ldouble *Nph = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *uradx = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *urady = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *uradz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -561,6 +562,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      
 	      Ehat[nodalindex]=ehat;
 	      Erad[nodalindex]=Rij[0][0];
+	      Nph[nodalindex]=pp[NF0];
 
 	      Fx[nodalindex]=Rij[1][0];
 	      Fy[nodalindex]=Rij[2][0];
@@ -777,6 +779,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   DBPutQuadvar1(file, "forcebal3","mesh1", forcebal3,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
+  #ifdef NCOMPTONIZATION
+  DBPutQuadvar1(file, "nph","mesh1", Nph,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  #endif
   #endif
 
   #ifdef MAGNFIELD
@@ -978,6 +985,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   free(Fx);
   free(Fy);
   free(Fz);
+  free(Nph);
   free(uradx);
   free(urady);
   free(uradz);

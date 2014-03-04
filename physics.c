@@ -354,6 +354,12 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   ldouble Rij[4][4];
   calc_Rij(pp,geom,Rij); //R^ij
   indices_2221(Rij,Rij,gg); //R^i_j
+  ldouble urfcon[4];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
 
   //terms with Christoffels
   for(k=0;k<4;k++)
@@ -383,6 +389,9 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
       ss[FX0]+=-dlgdet[l-1]*(Rij[l][1]);
       ss[FY0]+=-dlgdet[l-1]*(Rij[l][2]);
       ss[FZ0]+=-dlgdet[l-1]*(Rij[l][3]);
+      #ifdef NCOMPTONIZATION
+      ss[NF0]+=-dlgdet[l-1]*pp[NF0]*urfcon[l];
+      #endif
     }
 #endif //GDETIN
 
@@ -426,15 +435,15 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 {
   int i;
-  ldouble pp[NV];  
 
-  for(i=0;i<NV;i++)
-    pp[i]=get_u(p,i,ix,iy,iz);  
+  //ldouble pp[NV];  
+  //  for(i=0;i<NV;i++)
+  //pp[i]=get_u(p,i,ix,iy,iz);  
   
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
 
-  f_metric_source_term_arb(pp,&geom,ss);
+  f_metric_source_term_arb(&get_u(p,0,ix,iy,iz),&geom,ss);
 
   return 0;
 }
@@ -463,19 +472,8 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
   //calculating Tij
   ldouble T[4][4];
-
   calc_Tij(pp,&geom,T);
-
-  /*
-  printf("in flux: %d %d %d (%d)\n",ix,iy,iz,idim);
-  print_primitives(pp);
-  print_metric(gg);
-  print_tensor(T);
-  getch();
-  */
-
   indices_2221(T,T,gg);
-
 
   //primitives
 #ifdef TRACER

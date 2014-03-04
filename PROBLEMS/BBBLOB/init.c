@@ -41,6 +41,11 @@ ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 
 pp[EE0]=calc_LTE_EfromT(temp);
 pp[FX0]=pp[FY0]=pp[FZ0]=0.;
+
+#ifdef NCOMPTONIZATION
+pp[NF0]=calc_NFfromE(pp[EE0]);
+#endif
+
 #endif
 
 #ifdef TRACER

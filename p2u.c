@@ -194,6 +194,10 @@ int p2u_rad(ldouble *pp,ldouble *uu,void *ggg)
       uu[FX(irf)]=gdetu*Rtopp[1]; //R^t_i
       uu[FY(irf)]=gdetu*Rtopp[2];
       uu[FZ(irf)]=gdetu*Rtopp[3];
+
+      #ifdef NCOMPTONIZATION
+      uu[NF(irf)]=gdetu*pp[NF(irf)]*urf[0];
+      #endif
     }
 
   return 0;
