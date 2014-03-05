@@ -781,7 +781,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
   int whicheq=params[1];
   int whichframe=params[2];
 
-  ldouble uu[NV],pp[NV],err[4]={0.,0.,0.,0.};
+  ldouble uu[NV],pp[NV],err[5]={0.,0.,0.,0.,0.};
   int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
 
   for(i=0;i<NV;i++) pp[i]=ppin[i];
@@ -795,13 +795,15 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
   //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
 
-
   //correcting rho for MHD prims
   if(whichprim==MHD)
     {
       ldouble rho = (uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
       pp[RHO]=rho;
     }
+
+  //correcting number of photons for for RAD prims
+  //... ?
 
   //updating entropy
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
@@ -840,7 +842,6 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
     }
   if(whichprim==MHD)
     {
-
       //print_NVvector(uu);
 
       uu[EE0] = uu0[EE0]+dt*ms[EE0] - (uu[1]-uu0[1]-dt*ms[1]);
@@ -862,6 +863,11 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
   //regular energy/entropy inversion
   if(whicheq!=RADIMPLICIT_LTEEQ)
     {
+      #ifdef NCOMPTONIZATION
+      ldouble nsource=calc_nsource(pp,ggg);
+      f[4]=uu[NF0] - uu0[NF0] - dt * gdetu * nsource - dt*ms[NF0];
+      if(fabs(f[4])>SMALL) err[4]=fabs(f[4])/(fabs(uu[NF0])+fabs(uu0[NF0])+fabs(dt*gdetu*nsource)+fabs(dt*ms[NF0])); else err[4]=0.;
+      #endif
 
       //radiative four-force
       ldouble Gi[4];
@@ -902,18 +908,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 
 		  ldouble bsq=0.;
 		  ldouble bcon[4],bcov[4];
-		  
-		  /*	      
-			      #ifdef MAGNFIELD
-			      calc_bcon_4vel(pp,ucon,ucov,bcon);
-			      indices_21(bcon,bcov,gg); 
-			      bsq = dot(bcon,bcov);
-			      #endif
-
-			      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(GAMMA*pp[UU] + bsq)*ucon[0]*ucov[0] +fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
-		  */
-
-		}
+		  		}
 	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 		{
   		  f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0] - dt*ms[ENTR];//but this works on hydro entropy and may fail!
@@ -996,6 +991,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
     }
   else //searching for full LTE (whicheq==RADIMPLICIT_LTEEQ)
     {
+      //what about number of photons?
+
       ldouble uconf[4],Rtt;
       //new state
       calc_ff_Rtt(pp,&Rtt,uconf,geom);
@@ -1006,7 +1003,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
       ldouble vEhat=(Ehat);
       ldouble vB=(4.*Pi*B);
 
-      f[0]=vEhat-vB; //log no to loose precision when one different by many orders of magnitude
+      f[0]=vEhat-vB; 
 
       err[0]=fabs(f[0])/(fabs(vEhat)+fabs(vB));
 
@@ -1019,24 +1016,24 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 			      (fabs(pp[FY0])+fabs(pp[VY]))*sqrt(geom->gg[2][2]),
 			      (fabs(pp[FZ0])+fabs(pp[VZ]))*sqrt(geom->gg[3][3]));
       
-      /*
-      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(pp[FX0])+fabs(pp[VX])); else err[1]=0.;
-      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(pp[FY0])+fabs(pp[VY])); else err[2]=0.;
-      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(pp[FZ0])+fabs(pp[VZ])); else err[3]=0.;
-      */
-      
       if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(velnorm); else err[1]=0.;
       if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(velnorm); else err[2]=0.;
       if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(velnorm); else err[3]=0.;
       
     }
 
-  //print_4vector(err);
-  
+#ifndef NCOMPTONIZATION
   if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]))
     return -1;
 
   *err0=my_max(my_max(err[0],err[1]),my_max(err[2],err[3]));
+#else
+  if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]) || !isfinite(f[4]))
+    return -1;
+
+  *err0=my_max(my_max(my_max(err[0],err[1]),my_max(err[2],err[3])),err[4]);
+#endif
+
   
   return ret;
 } 
@@ -1060,9 +1057,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 {
   int i1,i2,i3,iv,i,j;
   int mom_over_flag;
-  ldouble J[4][4],iJ[4][4];
+  ldouble J[5][5],iJ[5][5]; //5 just in case NCOMPTONIZATION used
   ldouble pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
-  ldouble f1[4],f2[4],f3[4],xxx[4],xxxbest[4],err,errbase,errbest;
+  ldouble f1[5],f2[5],f3[5],xxx[5],xxxbest[5],err,errbase,errbest;
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   for(iv=0;iv<NV;iv++)
@@ -1143,14 +1140,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   Tgas00=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
   Trad00=calc_LTE_TfromE(-Rtt00);
 
-  ldouble ppLTE[NV],uuLTE[NV];
-  //  calc_LTE_state(pp0,ppLTE,geom);
-  //  ldouble TLTE=calc_PEQ_Tfromurho(ppLTE[UU],ppLTE[RHO]);
-
-  //nolonger keep TLTE - whats below can loop up
-  //ldouble TLTE=calc_LTE_temp(pp0,geom);
   ldouble TLTE=0.;
-
 
   ldouble kappa=calc_kappa(pp0[RHO],Tgas00,0.,0.,0.);
   ldouble chi=kappa+calc_kappaes(pp0[RHO],Tgas00,0.,0.,0.);
@@ -1200,11 +1190,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("gamma rad: %e\n\n",sqrt(gamma2));
 
       ldouble Gi00[4],Gihat00[4];
-      //      print_Nvector(pp0,NV);
       calc_Gi(pp0, geom,Gi00);
-      //print_4vector(Gi00);
-      //getchar();
-      
+       
       indices_21(Gi00,Gi00,geom->gg);
 
       boost2_lab2ff(Gi00,Gihat00,pp0,geom->gg,geom->GG);
@@ -1213,11 +1200,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  Gi00[iv]*=dt*gdetu;
 	  Gihat00[iv]*=dt*gdetu;
 	}
-      //print_4vector(Gi00);
-      //print_4vector(Gihat00);
-      //getchar();
  
-
       ldouble Trad=calc_LTE_TfromE(-Rtt);
       ldouble Tgas=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
       ldouble rho=pp0[RHO];
@@ -1276,12 +1259,18 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   if(whicheq==RADIMPLICIT_LTEEQ)
     MAXITER=150;
 
-  int sh;
+  int sh,np;
 
   if(whichprim==MHD) 
     sh=UU; //solving in hydro primitives
   else if(whichprim==RAD) 
     sh=EE0; //solving in rad primitives
+
+  #ifndef NCOMPTONIZATION
+  np=4;
+  #else
+  np=5;
+  #endif
 
   ldouble frdt = 1.0;
 
@@ -1314,18 +1303,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  ppp[i]=pp[i];
 	}	
       
-      for(i=0;i<4;i++)
+      for(i=0;i<np;i++)
 	{
 	  xxx[i]=ppp[i+sh];
 	}  
       
       if(verbose>0)
 	{
-	  
-	  //print_NVvector(pp);
-	  //print_NVvector(uu0);
-	  //print_NVvector(pp0);
-	  
 	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f1,params,&err);
 	  print_state_implicit_lab_4dprim (iter-1,xxx,f1,err); 
 	  if(ret<0) printf("f_lab_4dprim ret: %d\n",ret);
@@ -1354,14 +1338,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       if(err<errbest)
 	{
 	  errbest=err;
-	  for(j=0;j<4;j++)
+	  for(j=0;j<np;j++)
 	    xxxbest[j]=xxx[j];
 	}
 	  
 
       ldouble del;
       //calculating approximate Jacobian
-      for(j=0;j<4;j++)
+      for(j=0;j<np;j++)
 	{
 	  //one-way derivatives
 	  //try both signs
@@ -1386,6 +1370,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		//but to be tested again!
 		//del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
 	      }
+	    else if(j==5) //number of photons
+	      {
+		del=EPS*ppp[NF0];
+	      }	    
 	    else //decreasing velocity
 	      {
 		ldouble veleps = EPS*my_sign(ppp[j+sh])*my_max(1.e-6/sqrt(geom->gg[j][j]),fabs(ppp[j+sh]));
@@ -1416,7 +1404,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      }
   
 	    //Jacobian matrix component
-	    for(i=0;i<4;i++)
+	    for(i=0;i<np;i++)
 	      {
 		J[i][j]=(f2[i] - f1[i])/(pp[j+sh]-ppp[j+sh]);
 	      }
@@ -1433,6 +1421,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	break;
  
       //inversion
+#ifndef NCOMPTONIZATION
       if(inverse_44matrix(J,iJ)<0)
 	{
 	  failed=1;
@@ -1460,9 +1449,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	  break;
 	}
-
-      
-     
+#else
+      if(inverse_matrix(&J[0][0],&iJ[0][0],5)<0)
+	{
+	  failed=1;
+	  if(verbose) 
+	      printf("Jacobian 5x5 inversion failed\n");getchar();
+	  break;
+	}  
+#endif     
 	 
       if(verbose) 
 	{
@@ -1476,15 +1471,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       do //check whether energy density positive and the error function returns 0
 	{	    
 	  //original x
-	  for(i=0;i<4;i++)
+	  for(i=0;i<np;i++)
 	    {
 	      xxx[i]=ppp[i+sh];
 	    }
 
 	  //updating x
-	  for(i=0;i<4;i++)
+	  for(i=0;i<np;i++)
 	    {
-	      for(j=0;j<4;j++)
+	      for(j=0;j<np;j++)
 		{
 		  xxx[i]-=xiapp*iJ[i][j]*f1[j];
 		}
@@ -1534,7 +1529,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	
 	  //update primitives
-	  for(i=0;i<4;i++)
+	  for(i=0;i<np;i++)
 	    {
 	      pp[i+sh]=xxx[i];
 	    }
@@ -1629,7 +1624,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	{
 	  //criterion of convergence on relative change of quantities
 	  f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
-	  for(i=1;i<4;i++)
+	  for(i=1;i<np;i++)
 	    {
 	      f3[i]=pp[i+sh]-ppp[i+sh];
 	      f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
@@ -5668,3 +5663,66 @@ calc_Rij_PM1conv(ldouble *pp, void* ggg, ldouble RpM1[][4],int verbose)
   return 0;
 
 }
+
+//**********************************************************************
+//* calculates the source term for number of photons
+//**********************************************************************
+ldouble
+calc_nsource(ldouble *pp, void* ggg)
+{
+  int i,j;
+
+#ifdef NCOMPTONIZATION
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  //velocities of the frames
+  ldouble uffcov[4],uffcon[4];
+  conv_vels_both(&pp[VX-1],uffcon,uffcov,VELPRIM,VEL4,gg,GG);
+  ldouble urfcov[4],urfcon[4];
+  conv_vels_both(&pp[FX0-1],urfcon,urfcov,VELPRIM,VEL4,gg,GG);
+
+  //radiative stress tensor in the lab frame
+  ldouble Rij[4][4];
+  calc_Rij(pp,ggg,Rij);
+
+  //R^ab u_a u_b = Erad in fluid frame
+  ldouble Ehatrad = 0.;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Ehatrad+=Rij[i][j]*uffcov[i]*uffcov[j];
+
+  //radiation temperature
+  ldouble nphrf = pp[NF0];
+  ldouble Thatrad;
+  ldouble relgamma = -(urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]); 
+  ldouble nphhat = relgamma*nphrf;
+  Thatrad = 1./2.70118/K_BOLTZ * Ehatrad / nphhat;
+
+  //gas properties
+  ldouble rho=pp[RHO];
+  ldouble u=pp[1];
+  ldouble p= (GAMMA-1.)*(ldouble)u;
+  ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
+  ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  
+  //change in number of photons in fluid frame
+  ldouble Cn=1./2.70118/K_BOLTZ;
+  ldouble ndotff = -kappa*Cn*(Ehatrad/Thatrad - 4.*M_PI*B/Tgas);
+  ldouble ndotrf = ndotff/relgamma; //VERIFY!!!
+
+  return ndotrf; 
+#else
+  return 0;
+#endif
+}
+

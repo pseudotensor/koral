@@ -444,32 +444,12 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       if(get_m1closure_gammarel2(verbose,ggg,Avcon,Avcov,&gammarel2,&delta,&numerator,&divisor)<0)
 	{
 	  printf("get_m1closure_gammarel2 failed\n");
-	  
-	  /*
-	  // compute old \gammarel using pp[]
-	  urfcon[0]=0.;
-	  urfcon[1]=pp[7]; //single fluid only!
-	  urfcon[2]=pp[8]; 
-	  urfcon[3]=pp[9];
-	  conv_vels(urfcon,urfcon,VELPRIMRAD,VELR,gg,GG);
-	  ldouble qsq=0.;
-	  int i,j;
-	  for(i=1;i<4;i++)
-	    for(j=1;j<4;j++)
-	      qsq+=urfcon[i]*urfcon[j]*gg[i][j];
-	  ldouble gammaprev=sqrt(1.+qsq);
-
-	  printf("correcting g2: %e -> %e\n",gammarel2,gammaprev);
-
-	  gammarel2 = gammaprev*gammaprev;
-	  */
+	 
 	  return -1;
 	}
 
       // get E in radiation frame
       get_m1closure_Erf(ggg,Avcon,gammarel2,&Erf);
-
-      //if(verbose) printf("erf init: %e\n",Erf);
 
       // get relative 4-velocity
       if(get_m1closure_urfconrel(verbose,ggg,pp,Avcon,Avcov,gammarel2,delta,numerator,divisor,&Erf,urfcon,corrected)<0)
@@ -478,17 +458,6 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	  return -1;
 	}
 
-      /*
-      if(Erf/pp[EE(irf)]>1.e3 && Erf>1.e-8) 
-	{
-	  print_4vector(Avcon);
-	  print_4vector(Avcov);
-	  printf("%d %d %d\n",geom->ix,geom->iy,geom->iz);
-	  printf("erf: %d %e->%e %e\n",*corrected,pp[6],Erf,urfcon[0]);
-	  getchar();	  
-	}
-      */
-      
       conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
 
       //new primitives

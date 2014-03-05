@@ -376,6 +376,78 @@ free_arrays()
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//inverse general matrix
+int
+inverse_matrix(ldouble *a, ldouble *ia, int N)
+{
+  /*
+  gsl_matrix_view m 
+    = gsl_matrix_view_array (a, N, N);
+  gsl_matrix_view im 
+    = gsl_matrix_view_array (ia, N, N);
+  
+  gsl_permutation * p = gsl_permutation_alloc (N);
+
+  int s;
+
+  gsl_linalg_LU_decomp (&m.matrix, p, &s);
+
+  gsl_linalg_LU_invert (&m.matrix, p, &im.matrix);
+ 
+  gsl_permutation_free(p);
+  */
+
+  gsl_matrix *m
+    = gsl_matrix_alloc (N, N);
+  gsl_matrix *im
+    = gsl_matrix_alloc (N, N);
+  int i,j;
+  for(i=0;i<N;i++)
+      for(j=0;j<N;j++)
+	  gsl_matrix_set(m,i,j,a[i*N+j]);
+
+  gsl_permutation * p = gsl_permutation_alloc (N);
+
+  int s;
+
+  gsl_linalg_LU_decomp (m, p, &s);
+
+  gsl_linalg_LU_invert (m, p, im);
+  for(i=0;i<N;i++)
+    for(j=0;j<N;j++)
+      ia[i*N+j]=gsl_matrix_get(im,i,j);
+
+  /*
+  gsl_matrix *im
+    = gsl_matrix_alloc (N, N);
+  int i,j;
+  for(i=0;i<N;i++)
+    {
+      for(j=0;j<N;j++)
+	{
+	  gsl_matrix_set(im,i,j,a[i*N+j]);
+	  //printf("%e ",a[i*N+j]);
+	}
+      //printf("\n");
+    }
+
+  gsl_linalg_cholesky_decomp (im);
+
+  gsl_linalg_cholesky_invert (im);
+
+  for(i=0;i<N;i++)
+    for(j=0;j<N;j++)
+      ia[i*N+j]=gsl_matrix_get(im,i,j);
+   
+  gsl_matrix_free(im);
+  */
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //inverse 4by4 matrix
 int
 inverse_44matrix(ldouble a[][4], ldouble ia[][4])

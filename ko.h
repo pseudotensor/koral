@@ -65,6 +65,7 @@
 #include <mach/mach.h>
 #endif
 
+#include <gsl/gsl_linalg.h>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_roots.h>
@@ -201,6 +202,7 @@ ldouble find_max_eigenvalue(ldouble *data,int N);
 int find_max_eigenvalue_lr(ldouble *data,int N,ldouble*,ldouble*);
 int my_err(char *);
 int inverse_44matrix(ldouble a[][4], ldouble ia[][4]);
+int inverse_matrix(ldouble *a, ldouble *ia, int N);
 int convert_out2gif_1d(char *fname,char*,int niter,ldouble t);
 int convert_out2gif_2d(char *fname,char*,int niter,ldouble t);
 int getch(void);
@@ -606,6 +608,7 @@ int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,
 int calc_rad_wavespeeds(ldouble *pp,void*,ldouble tautot[3],ldouble *aval,int verbose);
 int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval);
 int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose);
+ldouble calc_nsource(ldouble *pp, void* ggg);
 
 //magn.c
 int mimic_dynamo(ldouble);
