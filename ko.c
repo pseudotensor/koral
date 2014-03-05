@@ -25,36 +25,8 @@ main(int argc, char **argv)
   #endif
   #endif
 
+  //this is not avg.c
   doingavg=0;
-
-  //test of inversion
-  double a_data[] = { 0.18, 0.60, 0.57, 0.96, 0.1,
-                      0.41, 0.24, 0.99, 0.58, 0.1,
-                      0.14, -0.30, 0.97, 0.66, 0.1,
-                      0.34, 0.30, 0.94, 0.16, 0.2,
-                      0.51, 0.13, 0.19, 0.85, 0.1};
-
-  double b_data[25];
-  int N=5;
-  inverse_matrix(a_data,b_data,N);
-
-  int k,l,j;
-  ldouble JJ[4][4];
-  for(i=0;i<N;i++)
-    {
-      for(j=0;j<N;j++)
-	{
-	  JJ[i][j]=0.;
-
-	  for(k=0;k<N;k++)     
-	    JJ[i][j]+=a_data[i*N+k]*b_data[k*N+j];
-
-	  printf("%f ",JJ[i][j]);
-	}
-      printf("\n");
-    }
-
-  exit(-1);
 
   //print scalings GU->CGS and quit
   //print_scalings();   

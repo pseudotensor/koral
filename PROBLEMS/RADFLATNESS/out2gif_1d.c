@@ -92,7 +92,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"vx\""
+	  "plot \"%s\" u 1:($26) w lp ls 4 pt 7 ti \"nf\""
 	  ,fname2,t,t/CCC,get_xb(0,0),get_xb(NX,0),fname,fname,fname,fname,fname,fname,fname,fname);
 
 

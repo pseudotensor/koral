@@ -18,3 +18,4 @@ v4=tau[0];
 v3=get_u_scalar(aradx,ix,iy,iz);
 v4=get_u_scalar(aradz,ix,iy,iz);
  
+v3=pp[NF0];

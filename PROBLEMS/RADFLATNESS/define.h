@@ -1,9 +1,10 @@
 #define TMAX 1.e10
 #define RADIATION
 #define COMPTONIZATION
+#define NCOMPTONIZATION
 
 #define MYCOORDS MINKCOORDS
-#define NX 31
+#define NX 5
 #define NY 1
 #define NZ 1
 #define TSTEPLIM .5//kind of courant limiter
@@ -16,6 +17,8 @@
 #define ALLSTEPSOUTPUT 0
 #define DTOUT1 1.0
 #define GAMMA (4./3.)
+#define NSTEPSTOP 1e200 //max n of steps
+#define NOUTSTOP 10 //max n of steps
 
 //#define EXPLICIT_RAD_SOURCE
 
@@ -28,10 +31,10 @@
 
 #define MASSCM 1.e11
 
-#define LTEFACTOR .1
+#define LTEFACTOR .01
 #define URFX 0.
 
-#define KAPPA 0.
+#define KAPPA 0.//1000.
 #define KAPPAES .1
 #define PERIODIC_XBC
 #define PERIODIC_YBC

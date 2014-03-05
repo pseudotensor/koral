@@ -44,7 +44,9 @@ pp[7]=URFX;
 pp[8]=0.;
 pp[9]=0.;
 
-
+#ifdef NCOMPTONIZATION
+pp[NF0]=calc_NFfromE(pp[EE0]);
+#endif
 
 prad_ff2lab(pp,pp,&geom);
 

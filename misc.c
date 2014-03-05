@@ -777,6 +777,9 @@ print_primitives(ldouble *p)
   printf("ur^1 = %.15e\n",p[FX0]);
   printf("ur^2 = %.15e\n",p[FY0]);
   printf("ur^3 = %.15e\n",p[FZ0]);
+#ifdef NCOMPTONIZATION
+  printf("nph = %.15e\n",p[NF0]);
+#endif
 #endif
    printf("\n");
 
@@ -806,6 +809,9 @@ print_conserved(ldouble *u)
   printf("R^t_1 = %.15e\n",u[FX0]);
   printf("R^t_2 = %.15e\n",u[FY0]);
   printf("R^t_3 = %.15e\n",u[FZ0]);
+#ifdef NCOMPTONIZATION
+  printf("nph u^t = %.15e\n",u[NF0]);
+#endif
 #endif
   printf("\n");
  

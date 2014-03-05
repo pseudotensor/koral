@@ -1025,12 +1025,10 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 #ifndef NCOMPTONIZATION
   if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]))
     return -1;
-
   *err0=my_max(my_max(err[0],err[1]),my_max(err[2],err[3]));
 #else
   if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]) || !isfinite(f[4]))
     return -1;
-
   *err0=my_max(my_max(my_max(err[0],err[1]),my_max(err[2],err[3])),err[4]);
 #endif
 
@@ -1041,12 +1039,20 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 int
 print_state_implicit_lab_4dprim (int iter, ldouble *x, ldouble *f,ldouble err)
 {
+#ifndef NCOMPTONIZATION
   printf ("iter = %3d x = % .13e % .13e % .13e % .13e "
 	  "e = %.10e f(x) = % .10e % .10e % .10e % .10e\n",
 	  iter,
 	  //	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
 	  x[0],x[1],x[2],x[3],err,f[0],f[1],f[2],f[3]);
-  return 0;
+#else 
+ printf ("iter = %3d x = % .13e % .13e % .13e % .13e % .13e "
+	  "e = %.10e f(x) = % .10e % .10e % .10e % .10e % .10e\n",
+	  iter,
+	  //	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
+	  x[0],x[1],x[2],x[3],x[4],err,f[0],f[1],f[2],f[3],f[4]);
+#endif
+   return 0;
 }
 
 /*****************************************/
@@ -1057,9 +1063,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 {
   int i1,i2,i3,iv,i,j;
   int mom_over_flag;
-  ldouble J[5][5],iJ[5][5]; //5 just in case NCOMPTONIZATION used
+  ldouble J[NRADVAR][NRADVAR],iJ[NRADVAR][NRADVAR]; 
   ldouble pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV]; 
-  ldouble f1[5],f2[5],f3[5],xxx[5],xxxbest[5],err,errbase,errbest;
+  ldouble f1[NRADVAR],f2[NRADVAR],f3[NRADVAR],xxx[NRADVAR],xxxbest[NRADVAR],err,errbase,errbest;
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   for(iv=0;iv<NV;iv++)
@@ -1213,6 +1219,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("rad temp: %e\n",Trad00); 
       printf("LTE temp: %e\n\n",TLTE) ;  
     }
+
+  //test
+  //verbose=1;
   
   /******************************************/
   /******************************************/
@@ -1259,18 +1268,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   if(whicheq==RADIMPLICIT_LTEEQ)
     MAXITER=150;
 
-  int sh,np;
+  int sh;
 
   if(whichprim==MHD) 
     sh=UU; //solving in hydro primitives
   else if(whichprim==RAD) 
     sh=EE0; //solving in rad primitives
-
-  #ifndef NCOMPTONIZATION
-  np=4;
-  #else
-  np=5;
-  #endif
 
   ldouble frdt = 1.0;
 
@@ -1287,12 +1290,19 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   if(verbose) 
     {
-      printf("\n===\n Trying imp lab 4d prim with dt : %f \n",dt);
+      printf("\n===\n Trying imp lab 4d prim with dt : %e \n",dt);
     }
 
   failed=0;
   iter=0;
   errbest=BIG;
+
+  int np;
+#ifdef NCOMPTONIZATION
+  np=5;
+#else
+  np=4;
+#endif
 
   do //main solver loop
     {	 
@@ -1303,10 +1313,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  ppp[i]=pp[i];
 	}	
       
-      for(i=0;i<np;i++)
+      for(i=0;i<4;i++)
 	{
 	  xxx[i]=ppp[i+sh];
 	}  
+      #ifdef NCOMPTONIZATION
+      xxx[4]=ppp[NF0];
+      #endif
       
       if(verbose>0)
 	{
@@ -1339,7 +1352,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	{
 	  errbest=err;
 	  for(j=0;j<np;j++)
-	    xxxbest[j]=xxx[j];
+	    xxxbest[j]=xxx[j];          
 	}
 	  
 
@@ -1368,11 +1381,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		//EPS of the geometrical mean
 		//helps solve large contrast problems
 		//but to be tested again!
-		//del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]);
+		//del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]); 
+		pp[j+sh]=ppp[j+sh]+del;
 	      }
-	    else if(j==5) //number of photons
+	    else if(j==4) //number of photons, only for NCOMPTONIZATION
 	      {
-		del=EPS*ppp[NF0];
+		del=sign*EPS*ppp[NF0]; 
+		pp[NF0]=ppp[NF0]+del;
 	      }	    
 	    else //decreasing velocity
 	      {
@@ -1380,9 +1395,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		if(ppp[j+sh]>=0.)
 		  del=sign*veleps; 
 		else
-		  del=-sign*veleps;
+		  del=-sign*veleps; 
+		pp[j+sh]=ppp[j+sh]+del;
 	      }	    
-	    pp[j+sh]=ppp[j+sh]+del;
+	   
 	      
 	    int fret=f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f2,params,&err);  
 	    
@@ -1406,10 +1422,16 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    //Jacobian matrix component
 	    for(i=0;i<np;i++)
 	      {
-		J[i][j]=(f2[i] - f1[i])/(pp[j+sh]-ppp[j+sh]);
+		if(j<4)
+		  J[i][j]=(f2[i] - f1[i])/(pp[j+sh]-ppp[j+sh]);
+		else
+		  J[i][j]=(f2[i] - f1[i])/(pp[NF0]-ppp[NF0]);		  
 	      }
 
-	    pp[j+sh]=ppp[j+sh];
+	    if(j<4) 
+	      pp[j+sh]=ppp[j+sh];
+	    else
+	      pp[NF0]=ppp[NF0];
 	    break;
 	  }
 
@@ -1461,8 +1483,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	 
       if(verbose) 
 	{
-	  if(verbose!=2) exit(0);
-	  getchar();
+	  //	  if(verbose!=2) exit(0);
+	  //getchar();
 	}
 
 
@@ -1473,7 +1495,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //original x
 	  for(i=0;i<np;i++)
 	    {
-	      xxx[i]=ppp[i+sh];
+	      if(i<4)
+		xxx[i]=ppp[i+sh];
+	      else
+		xxx[i]=ppp[NF0];		
 	    }
 
 	  //updating x
@@ -1489,6 +1514,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    {
 	      printf("\nsub> trying with xi=%e\n",xiapp);
 	      print_4vector(xxx);
+	      print_Nvector(&J[0][0],25);
 	    }
 
 	  mom_over_flag=0;
@@ -1531,7 +1557,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //update primitives
 	  for(i=0;i<np;i++)
 	    {
-	      pp[i+sh]=xxx[i];
+	      if(i<4)
+		pp[i+sh]=xxx[i];
+	      else
+		pp[NF0]=xxx[i];
 	    }
 
 	  if(whichprim==MHD)
@@ -1626,8 +1655,16 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
 	  for(i=1;i<np;i++)
 	    {
-	      f3[i]=pp[i+sh]-ppp[i+sh];
-	      f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
+	      if(i<4)
+		{
+		  f3[i]=pp[i+sh]-ppp[i+sh];
+		  f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
+		}
+	      if(i==5)
+		{
+		  f3[i]=pp[NF0]-ppp[NF0];
+		  f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[NF0])));	
+		}
 	    }
 
 	  if(verbose) {
@@ -1744,6 +1781,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   deltas[1]=uu[FX0]-(uu0[FX0]+dt*ms[FX0]);
   deltas[2]=uu[FY0]-(uu0[FY0]+dt*ms[FY0]);
   deltas[3]=uu[FZ0]-(uu0[FZ0]+dt*ms[FZ0]);
+
+#ifdef NCOMPTONIZATION
+  deltas[4]=uu[NF0]-(uu0[NF0]+dt*ms[NF0]);
+#endif
 
   if(verbose) print_4vector(deltas);
   
@@ -1961,9 +2002,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
-  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
   if(ret!=0)
-    {
+    { 
+      //test
+      //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,1,params,pp); 
+      //exit(0);    
+
       params[2]=RADIMPLICIT_FF;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
     }      
@@ -5671,7 +5716,7 @@ ldouble
 calc_nsource(ldouble *pp, void* ggg)
 {
   int i,j;
-
+      
 #ifdef NCOMPTONIZATION
   struct geometry *geom
     = (struct geometry *) ggg;
@@ -5685,11 +5730,12 @@ calc_nsource(ldouble *pp, void* ggg)
 #endif
 
   //velocities of the frames
+  ldouble ut[4];ut[1]=pp[VX];ut[2]=pp[VY];ut[3]=pp[VZ];
   ldouble uffcov[4],uffcon[4];
-  conv_vels_both(&pp[VX-1],uffcon,uffcov,VELPRIM,VEL4,gg,GG);
+  conv_vels_both(ut,uffcon,uffcov,VELPRIM,VEL4,gg,GG);
   ldouble urfcov[4],urfcon[4];
-  conv_vels_both(&pp[FX0-1],urfcon,urfcov,VELPRIM,VEL4,gg,GG);
-
+  ut[1]=pp[FX0];ut[2]=pp[FY0];ut[3]=pp[FZ0];
+  conv_vels_both(ut,urfcon,urfcov,VELPRIMRAD,VEL4,gg,GG);
   //radiative stress tensor in the lab frame
   ldouble Rij[4][4];
   calc_Rij(pp,ggg,Rij);
