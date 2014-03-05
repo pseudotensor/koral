@@ -47,7 +47,7 @@ main(int argc, char **argv)
   calc_metric();
 
   //opens the scalar file
-  sprintf(bufer,"analysis/scalars.dat",folder);
+  sprintf(bufer,"analysis/scalars.dat");
   fout_scalars=fopen(bufer,"w");
 
   //arrays for averaging of primitives

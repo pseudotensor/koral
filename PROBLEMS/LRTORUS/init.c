@@ -1,6 +1,6 @@
 int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
 
-ldouble rho,mx,my,mz,m,E,uint,pgas,Fx,Fy,Fz,pLTE,ell;  
+ldouble rho,mx,my,mz,m,E,uint,pdonut,Fx,Fy,Fz,pLTE,ell;  
 ldouble uu[NV], pp[NV],ppback[NV],T,uintorg;
 ldouble Vphi,Vr;
 ldouble D,W,eps,uT,uphi,uPhi;
@@ -35,7 +35,12 @@ if(rho<0.) //outside donut
 #endif
 
     uint=LT_KAPPA * pow(rho, LT_GAMMA) / (LT_GAMMA - 1.);
-    pgas = GAMMAM1 * uint;
+#ifdef PRECISEDONUT
+    pdonut = (LT_GAMMA-1.)*uint;
+#else
+    pdonut = GAMMAM1*uint;
+#endif
+
     ell*=-1.;
 
     ldouble ult,ulph,ucov[4],ucon[4];
@@ -64,7 +69,7 @@ if(rho<0.) //outside donut
 #ifdef RADIATION
     //distributing pressure
     ldouble P,aaa,bbb;
-    P=GAMMAM1*uint;
+    P=pdonut;
     //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
     aaa=4.*SIGMA_RAD/3.;
     bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;

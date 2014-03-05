@@ -205,6 +205,7 @@
 #endif
 
 #if(NTORUS==2) //for Yucong?
+#define PRECISEDONUT
 #define LT_KAPPA 5.e2
 #define EXPECTEDHR 0.4
 #define LT_XI 0.975
