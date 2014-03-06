@@ -826,8 +826,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //**********************************************************************
       //**********************************************************************
       //updating u - geometrical source terms
-ldouble ms[NV],val;
-#ifndef COUPLEMETRICWITHRADIMPLICIT
+      ldouble ms[NV],val;
       f_metric_source_term(ix,iy,iz,ms);
      		  
       for(iv=0;iv<NV;iv++)
@@ -836,8 +835,6 @@ ldouble ms[NV],val;
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	} 
-#endif
-
 
       /***************************/
       //testing if entropy increased after advection and calculating post-advection primitives

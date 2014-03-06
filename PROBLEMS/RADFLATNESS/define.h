@@ -14,11 +14,15 @@
 #define RESOUTPUT_ASCII
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
+
 #define ALLSTEPSOUTPUT 0
 #define DTOUT1 1.0
+#define SCAOUTPUT 1
+#define TESTCOMPTINSCALARS4FLAT
+
 #define GAMMA (4./3.)
 #define NSTEPSTOP 1e200 //max n of steps
-#define NOUTSTOP 10 //max n of steps
+#define NOUTSTOP 20 //max n of steps
 
 //#define EXPLICIT_RAD_SOURCE
 
@@ -34,8 +38,8 @@
 #define LTEFACTOR .01
 #define URFX 0.
 
-#define KAPPA 0.//1000.
-#define KAPPAES .1
+#define KAPPA .1
+#define KAPPAES 0.
 #define PERIODIC_XBC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC

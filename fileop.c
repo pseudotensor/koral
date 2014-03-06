@@ -455,8 +455,11 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									      //						      break;
 									    }
 
-
+									  #ifndef NCOMPTONIZATION
 									  Trad=calc_LTE_TfromE(E);
+									  #else
+									  Trad=calc_ncompt_Thatrad(pp,&geomout,E);
+									  #endif
 									  if(E<EEFLOOR || isnan(E)) E=EEFLOOR;
 
 

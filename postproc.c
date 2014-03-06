@@ -358,6 +358,9 @@ int calc_scalars(ldouble *scalars,ldouble t)
 {
   //adjust NSCALARS in problem.h
 
+  /*********************************************/
+  //base for BHDISK problems
+  /*********************************************/
 
   //total mass inside the domain (2nd column)
   scalars[0]=calc_totalmass();
@@ -402,6 +405,36 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   //MAD parameter (9)
   scalars[7]=Bflux/sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.;
+
+  /*********************************************/
+  //Tgas Trad Egas Erad for testing Comptonization
+  /*********************************************/
+
+#ifdef TESTCOMPTINSCALARS4FLAT
+  ldouble pp[NV];
+  int iv;
+  PLOOP(iv) pp[iv]=get_u(p,iv,0,0,0);
+  struct geometry geom;
+  fill_geometry(0,0,0,&geom);
+  ldouble ugas[4],Tgas,Trad1,Trad2,Rtt,Ehatrad;
+  int dominates;
+  calc_ff_Rtt(pp,&Rtt,ugas,&geom);
+  Ehatrad=-Rtt;
+  Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+  #ifndef NCOMPTONIZATION
+  Trad1=Trad2=calc_LTE_TfromE(Ehatrad);
+  #else
+  Trad1=calc_LTE_TfromE(Ehatrad);
+  Trad2=calc_ncompt_Thatrad(pp,&geom,Ehatrad);
+  #endif
+
+  scalars[0]=Tgas;
+  scalars[1]=Trad1;
+  scalars[2]=Trad2;
+  scalars[3]=pp[UU];
+  scalars[4]=Ehatrad;
+  scalars[5]=pp[NF0];
+#endif
 
   /*********************************************/
   //L1 ERRRORS for some problems
