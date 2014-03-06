@@ -763,7 +763,7 @@ solve_implicit_lab_1dprim(ldouble *uu0,ldouble *pp0,void *ggg,ldouble dt,ldouble
 //******* rad or hydro (whichprim) **************************************
 //**********************************************************************
 
-int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ldouble dt,void* ggg,ldouble *f,int *params,ldouble *err0)
+int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params,ldouble *err0)
 {
   int ret=0,i;
   struct geometry *geom
@@ -793,61 +793,49 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
   utcon[3]=pp[4];
   utcon[0]=0.;
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-  //conv_velscov(utcon,ucov,VELPRIM,VEL4,gg,GG);
 
   //correcting rho for MHD prims
   if(whichprim==MHD)
     {
-      ldouble rho = (uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
+      ldouble rho = (uu0[RHO])/gdetu/ucon[0];
       pp[RHO]=rho;
     }
-
-  //correcting number of photons for for RAD prims
-  //... ?
 
   //updating entropy
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
   //total inversion, but only whichprim part matters
-  //print_Nvector(pp,NVMHD);
   p2u(pp,uu,geom);
-  //print_Nvector(uu,NVMHD);
 
   //corresponding change in entropy
-  uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
+  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
 
   //opposite changes in the other quantities and inversion
   u2pret=0;
   if(whichprim==RAD)
     {
-      uu[RHO]=uu0[RHO]+dt*ms[RHO];
-      uu[1] = uu0[1]+dt*ms[1] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
-      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]-dt*ms[FX0]);
-      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]-dt*ms[FY0]);
-      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]-dt*ms[FZ0]);  
+      uu[RHO]=uu0[RHO];
+      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
 
       int rettemp=0;
-      //if(whicheq==RADIMPLICIT_ENERGYEQ)
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
       if(rettemp<0)
-	//if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
 
       if(rettemp<0) 
-	{
-	  //printf("rettemp: %d\n",rettemp);
 	  u2pret=-2; //to return error
-	}
+
       else u2pret=0;
     }
   if(whichprim==MHD)
     {
-      //print_NVvector(uu);
-
-      uu[EE0] = uu0[EE0]+dt*ms[EE0] - (uu[1]-uu0[1]-dt*ms[1]);
-      uu[FX0] = uu0[FX0]+dt*ms[FX0] - (uu[2]-uu0[2]-dt*ms[2]);
-      uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]-dt*ms[3]);
-      uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]-dt*ms[4]);
+      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 
       u2pret=u2p_rad(uu,pp,geom,corr);
     }   
@@ -865,8 +853,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
     {
       #ifdef NCOMPTONIZATION
       ldouble nsource=calc_nsource(pp,ggg);
-      f[4]=uu[NF0] - uu0[NF0] - dt * gdetu * nsource - dt*ms[NF0];
-      if(fabs(f[4])>SMALL) err[4]=fabs(f[4])/(fabs(uu[NF0])+fabs(uu0[NF0])+fabs(dt*gdetu*nsource)+fabs(dt*ms[NF0])); else err[4]=0.;
+      f[4]=uu[NF0] - uu0[NF0] - dt * gdetu * nsource;
+      if(fabs(f[4])>SMALL) err[4]=fabs(f[4])/(fabs(uu[NF0])+fabs(uu0[NF0])+fabs(dt*gdetu*nsource)); else err[4]=0.;
       #endif
 
       //radiative four-force
@@ -877,23 +865,23 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
       //errors in momenta - always in lab frame
       if(whichprim==MHD) //mhd-primitives
 	{
-	  f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1] - dt*ms[2];
-	  f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2] - dt*ms[3];
-	  f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3] - dt*ms[4];
+	  f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
+	  f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2];
+	  f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3];
 
-	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])+fabs(dt*ms[2])); else err[1]=0.;
-	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])+fabs(dt*ms[3])); else err[2]=0.;
-	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])+fabs(dt*ms[4])); else err[3]=0.;
+	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
+	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
 	}
       if(whichprim==RAD) //rad-primitives
 	{
-	  f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1] - dt*ms[FX0];
-	  f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2] - dt*ms[FY0];
-	  f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3] - dt*ms[FZ0];
+	  f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
+	  f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
+	  f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
 
-	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FX0])+fabs(dt*gdetu*Gi[1])+fabs(dt*ms[FX0])); else err[1]=0.;
-	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])+fabs(dt*ms[FY0])); else err[2]=0.;
-	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])+fabs(dt*ms[FZ0])); else err[3]=0.;
+	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FX0])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
+	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
 	}
 
       /***** LAB FRAME ENERGY/ENTROPY EQS *****/
@@ -903,16 +891,16 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 	    {
 	      if(whicheq==RADIMPLICIT_ENERGYEQ)
 		{
-		  f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0] - dt*ms[EE0];
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt*gdetu*Gi[0])+fabs(dt*ms[EE0])); else err[0]=0.;
+		  f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt*gdetu*Gi[0])); else err[0]=0.;
 
 		  ldouble bsq=0.;
 		  ldouble bcon[4],bcov[4];
 		  		}
 	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 		{
-  		  f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0] - dt*ms[ENTR];//but this works on hydro entropy and may fail!
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])+fabs(dt*ms[ENTR])); else err[0]=0.;
+  		  f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0];//but this works on hydro entropy and may fail!
+		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
 		}
 	      else
 		my_err("not implemented 3\n");
@@ -921,14 +909,13 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble *ms,ld
 	    {
 	      if(whicheq==RADIMPLICIT_ENERGYEQ)
 		{
-		  f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0] - dt*ms[UU];
-		  //printf("%e %e %e %e | %e\n",uu[UU] ,-uu0[UU],- dt * gdetu * Gi[0],- dt*ms[UU],f[0]);
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])+fabs(dt*ms[UU])); else err[0]=0.;
+		  f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0];
+		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
 		}
 	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 		{	  
-		  f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0] - dt*ms[ENTR];
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])+fabs(dt*ms[ENTR])); else err[0]=0.;
+		  f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0];
+		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
 		}      
 	      else
 		my_err("not implemented 4\n");
@@ -1089,12 +1076,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   gdet=geom->gdet; gdetu=gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
-#endif
-
-  ldouble ms[NV];
-  PLOOP(i) ms[i]=0.;
-#ifdef COUPLEMETRICWITHRADIMPLICIT
-  f_metric_source_term_arb(pp0,geom,ms);
 #endif
   
   if(verbose) //dump the problematic case to file
@@ -1323,14 +1304,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       
       if(verbose>0)
 	{
-	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f1,params,&err);
+	  int ret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err);
 	  print_state_implicit_lab_4dprim (iter-1,xxx,f1,err); 
 	  if(ret<0) printf("f_lab_4dprim ret: %d\n",ret);
 	}
 
 
       //values at base state
-      if(f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f1,params,&err)<0) 
+      if(f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f1,params,&err)<0) 
 	{
 	  if(verbose>0) printf("base state\n");
 	  return -1;	  
@@ -1400,7 +1381,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      }	    
 	   
 	      
-	    int fret=f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f2,params,&err);  
+	    int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params,&err);  
 	    
 	    if(fret<0) 
 	      {
@@ -1568,7 +1549,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      //correct rho to follow new velocity (only for MHD primitives)
 	      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
 	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-	      pp[RHO]=(uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
+	      pp[RHO]=(uu0[RHO])/gdetu/ucon[0];
 	    }
 
 	  //updating entropy
@@ -1577,22 +1558,20 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  //updating the other set of quantities
 	  p2u(pp,uu,geom);
 
-	  uu[ENTR] = uu0[ENTR]+dt*ms[ENTR] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
+	  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
   
 	  int u2pret;
 	  //opposite changes in the other quantities and inversion
 	  if(whichprim==RAD)
 	    {
-	      uu[RHO]=uu0[RHO]+dt*ms[RHO];
-	      uu[1] = uu0[1]+dt*ms[1] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
-	      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]-dt*ms[FX0]);
-	      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]-dt*ms[FY0]);
-	      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]-dt*ms[FZ0]);
+	      uu[RHO]=uu0[RHO];
+	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
 
 	      int rettemp=0;
-	      //if(whicheq==RADIMPLICIT_ENERGYEQ)
 	      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-	      //if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	      if(rettemp<0)
 		rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
 
@@ -1605,10 +1584,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	  if(whichprim==MHD)
 	    {
-	      uu[EE0] = uu0[EE0]+dt*ms[EE0] - (uu[1]-uu0[1]-dt*ms[1]);
-	      uu[FX0] = uu0[FX0]+dt*ms[FX0] - (uu[2]-uu0[2]-dt*ms[2]);
-	      uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]-dt*ms[3]);
-	      uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]-dt*ms[4]);
+	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 	      u2pret=u2p_rad(uu,pp,geom,corr);
 	      //report on ceilings
 	      if(corr[0]>0)
@@ -1720,7 +1699,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     {
       ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
-      pp[RHO]=(uu0[RHO]+dt*ms[RHO])/gdetu/ucon[0];
+      pp[RHO]=(uu0[RHO])/gdetu/ucon[0];
     }
   //updating entropy
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
@@ -1730,17 +1709,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   int u2pret;
   if(whichprim==RAD)
     {
-      uu[RHO]=uu0[RHO]+dt*ms[RHO];
-      uu[1] = uu0[1]+dt*ms[1] - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
-      uu[2] = uu0[2]+dt*ms[2] - (uu[FX0]-uu0[FX0]-dt*ms[FX0]);
-      uu[3] = uu0[3]+dt*ms[3] - (uu[FY0]-uu0[FY0]-dt*ms[FY0]);
-      uu[4] = uu0[4]+dt*ms[4] - (uu[FZ0]-uu0[FZ0]-dt*ms[FZ0]);
-      uu[ENTR] = uu0[ENTR]+dt*ms[ENTR];// - (uu[EE0]-uu0[EE0]-dt*ms[EE0]);
+      uu[RHO]=uu0[RHO];
+      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+      uu[ENTR] = uu0[ENTR];
 
       int rettemp=0;
-      //if(whicheq==RADIMPLICIT_ENERGYEQ)
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-      //if(whicheq==RADIMPLICIT_ENTROPYEQ)
       if(rettemp<0)
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
       
@@ -1754,10 +1731,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
   if(whichprim==MHD)
     {
-      uu[EE0] = uu0[EE0]+dt*ms[EE0] - (uu[1]-uu0[1]-dt*ms[1]);
-      uu[FX0] = uu0[FX0]+dt*ms[FX0] - (uu[2]-uu0[2]-dt*ms[2]);
-      uu[FY0] = uu0[FY0]+dt*ms[FY0] - (uu[3]-uu0[3]-dt*ms[3]);
-      uu[FZ0] = uu0[FZ0]+dt*ms[FZ0] - (uu[4]-uu0[4]-dt*ms[4]);
+      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
       u2pret=u2p_rad(uu,pp,geom,corr);
 
       if(corr[0]>0) //if final solution hit ceiling, discard 
@@ -1777,13 +1754,13 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
   
   //returns corrections to radiative primitives
-  deltas[0]=uu[EE0]-(uu0[EE0]+dt*ms[EE0]);
-  deltas[1]=uu[FX0]-(uu0[FX0]+dt*ms[FX0]);
-  deltas[2]=uu[FY0]-(uu0[FY0]+dt*ms[FY0]);
-  deltas[3]=uu[FZ0]-(uu0[FZ0]+dt*ms[FZ0]);
+  deltas[0]=uu[EE0]-(uu0[EE0]);
+  deltas[1]=uu[FX0]-(uu0[FX0]);
+  deltas[2]=uu[FY0]-(uu0[FY0]);
+  deltas[3]=uu[FZ0]-(uu0[FZ0]);
 
 #ifdef NCOMPTONIZATION
-  deltas[4]=uu[NF0]-(uu0[NF0]+dt*ms[NF0]);
+  deltas[4]=uu[NF0]-(uu0[NF0]);
 #endif
 
   if(verbose) print_4vector(deltas);
@@ -1796,21 +1773,21 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       for(iv=0;iv<NV;iv++)
 	delapl[iv]=0.;
 
-      delapl[0]=dt*ms[0];
-      delapl[1]=-deltas[0]+dt*ms[1];
-      delapl[ENTR]=-deltas[0]+dt*ms[ENTR];
-      delapl[2]=-deltas[1]+dt*ms[2];
-      delapl[3]=-deltas[2]+dt*ms[3];
-      delapl[4]=-deltas[3]+dt*ms[4];
+      delapl[0]=0.;
+      delapl[1]=-deltas[0];
+      delapl[ENTR]=-deltas[0];
+      delapl[2]=-deltas[1];
+      delapl[3]=-deltas[2];
+      delapl[4]=-deltas[3];
 #ifdef MAGNFIELD
-      delapl[B1]=dt*ms[B1];
-      delapl[B2]=dt*ms[B2];
-      delapl[B3]=dt*ms[B3];
+      delapl[B1]=0.;
+      delapl[B2]=0.;
+      delapl[B3]=0.;
 #endif
-      delapl[EE0]=deltas[0]+dt*ms[EE0];
-      delapl[FX0]=deltas[1]+dt*ms[FX0];
-      delapl[FY0]=deltas[2]+dt*ms[FY0];
-      delapl[FZ0]=deltas[3]+dt*ms[FZ0];
+      delapl[EE0]=deltas[0];
+      delapl[FX0]=deltas[1];
+      delapl[FY0]=deltas[2];
+      delapl[FZ0]=deltas[3];
 
       for(iv=0;iv<NV;iv++)
 	{
@@ -1819,25 +1796,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
       int corr[2],fixup[2];
   
-      /*
-      int rettemp=0;
-      if(whicheq==RADIMPLICIT_ENERGYEQ)
-	rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-      if(whicheq==RADIMPLICIT_ENTROPYEQ)
-	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
-      */
-
-      /*
-      print_NVvector(uu);
-      corr[0]=u2p(uu,pp,geom,corr,fixup,0);
-      p2u(pp,uu,geom);
-      print_NVvector(uu);
-      getchar();
-      */
-
       print_conserved(uu);
       print_primitives(pp);
-
 
       calc_ff_Rtt(pp,&Rtt00,ugas00,geom);
       Tgas00=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
@@ -1846,41 +1806,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("Tgas: %e\n",Tgas00);
       printf("Trad: %e\n",Trad00);
       
-      /*
-      print_NVvector(pp);
-      print_NVvector(uu0);
-      print_NVvector(pp0);
-      printf("\nparams: %d %d %d %d\n\n",params[0],params[1],params[2],params[3]);
-      */
-
-      int fret=f_implicit_lab_4dprim(pp,uu0,pp0,ms,dt,geom,f2,params,&err);  
+      int fret=f_implicit_lab_4dprim(pp,uu0,pp0,dt,geom,f2,params,&err);  
 
       printf("err %e del0: %e\n",err,deltas[0]);
-
-      /*
-      ldouble duu[NV];
-      
-      PLOOP(i)
-	duu[i]=uu[i]-uu0[i];
-      //      print_NVvector(pp);
-      print_NVvector(duu);
-      
-      p2u(pp,uu,geom);
-
-      PLOOP(i)
-	duu[i]=uu[i]-uu0[i];
-      print_NVvector(duu);
-
-      
-      print_NVvector(uu);
-      corr[0]=u2p(uu,pp,geom,corr,fixup,0);
-      //p2u(pp,uu,geom);
-      print_NVvector(pp);
-
-
-getchar();
-      */
-      
      }
 
   //succeeded
@@ -3877,36 +3805,29 @@ apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
 {
   ldouble delapl[NV];
   int iv;  
-  ldouble ms[NV],pp0[NV];
+  ldouble pp0[NV];
 
   for(iv=0;iv<NV;iv++)
     {
-      ms[iv]=0.;
       delapl[iv]=0.;
       pp0[iv]=get_u(p,iv,ix,iy,iz);
     }
 
-#ifdef COUPLEMETRICWITHRADIMPLICIT
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
-  f_metric_source_term_arb(pp0,&geom,ms);
-#endif
- 
-  delapl[RHO]=dt*ms[RHO];
-  delapl[UU]=-del4[0]+dt*ms[UU];
-  delapl[VX]=-del4[1]+dt*ms[VX];
-  delapl[VY]=-del4[2]+dt*ms[VY];
-  delapl[VZ]=-del4[3]+dt*ms[VZ];
-  delapl[ENTR]=-del4[0]+dt*ms[ENTR];
+  delapl[RHO]=0.;
+  delapl[UU]=-del4[0];
+  delapl[VX]=-del4[1];
+  delapl[VY]=-del4[2];
+  delapl[VZ]=-del4[3];
+  delapl[ENTR]=-del4[0];
 #ifdef MAGNFIELD
-  delapl[B1]=dt*ms[B1];
-  delapl[B2]=dt*ms[B2];
-  delapl[B3]=dt*ms[B3];
+  delapl[B1]=0.;
+  delapl[B2]=0.;
+  delapl[B3]=0.;
 #endif
-  delapl[EE0]=del4[0]+dt*ms[EE0];
-  delapl[FX0]=del4[1]+dt*ms[FX0];
-  delapl[FY0]=del4[2]+dt*ms[FY0];
-  delapl[FZ0]=del4[3]+dt*ms[FZ0];
+  delapl[EE0]=del4[0];
+  delapl[FX0]=del4[1];
+  delapl[FY0]=del4[2];
+  delapl[FZ0]=del4[3];
 
   for(iv=0;iv<NV;iv++)
     {

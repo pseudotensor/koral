@@ -18,7 +18,10 @@ for(iz=0;iz<NZ;iz++)
 
 	    struct geometry geomBL;
 	    fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
- 
+	    
+	    int gix,giy,giz;
+	    mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+
 	    int iv;
 	    PLOOP(iv)
 	      pp[iv]=get_u(p,iv,ix,iy,iz);
@@ -52,7 +55,7 @@ for(iz=0;iz<NZ;iz++)
 		  }
 		    
 #else //normalizing wrt to the equatorial plane
-		if(geom.iy==NY/2)
+		if(giy==TNY/2)
 		  {
 #pragma omp critical
 		    if(pmag/ptot>maxbeta) 

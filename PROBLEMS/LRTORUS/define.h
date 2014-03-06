@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 //#define RESTARTGENERALINDICES
 
@@ -19,13 +19,17 @@
 /************************************/
 //magnetic choices
 /************************************/
+#define MAGNFIELD
+#define VECPOTGIVEN
+#define MAXBETA .01 //target pmag/pgas int the midplane
+#define GDETIN 1
+
+/************************************/
+//dynamo
+/************************************/
 //#define MIMICDYNAMO
 #define ALPHAFLIPSSIGN                                                        
 #define ALPHADYNAMO 0.03
-//#define MAGNFIELD
-#define GDETIN 1
-#define VECPOTGIVEN
-#define MAXBETA .01 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -82,11 +86,11 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
+#define MINX (log(4.6-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 300
-#define TNY 200
+#define TNX 120
+#define TNY 80
 #define TNZ 1
 //number of tiles
 #define NTX 4
@@ -119,7 +123,7 @@
 #define SIMOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/
@@ -127,7 +131,7 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 2
+#define NTORUS 7
 
 #if(NTORUS==7) //flat sigma
 #define LT_KAPPA 5.e2
@@ -139,6 +143,7 @@
 #define LT_RIN 22.
 #undef MAXBETA
 #define MAXBETA (1./10.) //eq.plane
+//#define BETANORMFACTOR 2.e-10
 #endif
 
 #if(NTORUS==6) //for not-so-hyper
