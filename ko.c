@@ -8,11 +8,9 @@ main(int argc, char **argv)
 {  
   mpi_myinit(argc,argv);
 
-#if(PROBLEM==60)
   //requires no rad. viscosity!
-  test_jon_solve_implicit_lab();
-  exit(0);
-#endif
+  //test_solve_implicit_lab();
+  //exit(0);
 
   ldouble tstart;
   int i; char folder[100],bufer[100];

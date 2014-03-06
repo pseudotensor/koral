@@ -7,14 +7,16 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM -1
+#define RESTARTNUM 0
 //#define RESTARTGENERALINDICES
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
-//#define COMPTONIZATION
+#define COMPTONIZATION
+#define NCOMPTONIZATION
+#define MAXDIFFTRADS 10.
 
 /************************************/
 //magnetic choices
@@ -111,7 +113,7 @@
 //#define OUTPUTPERCORE
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
-#define ALLSTEPSOUTPUT 0
+#define ALLSTEPSOUTPUT 1
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000

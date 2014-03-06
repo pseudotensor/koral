@@ -96,10 +96,10 @@
 //#define PRINTYGC_LEFT
 //#define PRINTYGC_RIGHT
 
-#define ALLSTEPSOUTPUT 1
+#define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define DTOUT1 0.1
+#define DTOUT1 0.5
 #define RADOUTPUTINZAMO
 #define SILOOUTPUT 1
 

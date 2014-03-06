@@ -82,6 +82,9 @@ if(rho<0.) //outside donut
 
     pp[UU]=my_max(uint,ppback[1]);
     pp[EE0]=my_max(E,ppback[EE0]);
+    #ifdef NCOMPTONIZATION
+    pp[NF0]=calc_NFfromE(pp[EE0]);
+    #endif
 
     pp[FX0]=Fx;
     pp[FY0]=Fy;

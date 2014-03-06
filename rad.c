@@ -174,6 +174,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 
 #ifdef NCOMPTONIZATION
   ldouble nsource=calc_nsource(pp,ggg);
+  //test
+  //nsource=0.;
   f[4]=uu[NF0] - uu0[NF0] - dt * gdetu * nsource;
   if(fabs(f[4])>SMALL) err[4]=fabs(f[4])/(fabs(uu[NF0])+fabs(uu0[NF0])+fabs(dt*gdetu*nsource)); else err[4]=0.;
 #endif
@@ -305,8 +307,9 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]) || !isfinite(f[4]))
     return -1;
   *err0=my_max(my_max(my_max(err[0],err[1]),my_max(err[2],err[3])),err[4]);
+  //test
+  //*err0=my_max(my_max(err[0],err[1]),my_max(err[2],err[3]));
 #endif
-
   
   return ret;
 } 
@@ -600,7 +603,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       errbase=err;	  
 
       //criterion of convergence on the error
-      // test - should be here, not later
       if(err<CONV)
 	{
 	  //if(verbose) print_NVvector(pp0);
@@ -631,18 +633,16 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		//EEE
 		
 		//uses EPS of the dominating quantity
+		/*
 		if(dominates==RAD)
 		  del=sign*EPS*ppp[EE0];
 		else
 		  del=sign*EPS*ppp[UU];	   
+		*/
 		
 		//EPS of the iterated quantity
 		del=sign*EPS*ppp[sh]; //minus avoids u2p_mhd errors when working on radiative
 
-		//EPS of the geometrical mean
-		//helps solve large contrast problems
-		//but to be tested again!
-		//del=sign*EPS*sqrt(ppp[EE0]*ppp[UU]); 
 		pp[j+sh]=ppp[j+sh]+del;
 	      }
 	    else if(j==4) //number of photons, only for NCOMPTONIZATION
@@ -774,8 +774,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(verbose)
 	    {
 	      printf("\nsub> trying with xi=%e\n",xiapp);
-	      print_4vector(xxx);
-	      print_Nvector(&J[0][0],25);
+	      print_Nvector(xxx,np);
+	      //print_Nvector(&J[0][0],25);
 	    }
 
 	  mom_over_flag=0;
@@ -929,7 +929,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(verbose) {
 	    //print_4vector(&ppp[sh]);
 	    //print_4vector(&pp[sh]);
-	    print_4vector(f3);
+	    //print_4vector(f3);
 	  }
 	  
 	  ldouble CONVREL=EPS;
@@ -1199,10 +1199,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //in pp00[] initial guess for solvers
   params[3]=0; //no overshooting check
 
-  //old method
-  //ret=solve_implicit_lab_4dcon(uu0,pp0,&geom,dt,deltas,verbose,pp);
-  //if(ret!=0) return -1;
- 
   //*********** 1th ************
   PLOOP(iv) 
   { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
@@ -1211,17 +1207,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
-
-  //test
-  //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,1,params,pp); 
-  //printf("2 %d %d %d\n",ix,iy,ret);
-  //getch();
-
   if(ret!=0)
     { 
       //test
-      //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,1,params,pp); 
-      //exit(0);    
+      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,1,params,pp); 
+      exit(0);    
 
       params[2]=RADIMPLICIT_FF;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
@@ -1492,6 +1482,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
     }
 
+  
 #ifdef COMPTONIZATION
   ldouble Ehatrad = Ruu;
   ldouble Thatrad;
@@ -1499,13 +1490,22 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   #ifdef NCOMPTONIZATION //number of photons conserved
 
   Thatrad = calc_ncompt_Thatrad(pp,ggg,Ehatrad);
-  
+  ldouble ThatradBB=calc_LTE_TfromE(Ehatrad);
+
+  //test
+  ldouble maxfac=MAXDIFFTRADS;
+  if(Thatrad>maxfac*ThatradBB) 
+    Thatrad=maxfac*ThatradBB;
+  if(Thatrad<1./maxfac*ThatradBB) 
+    Thatrad=1./maxfac*ThatradBB; 
+
   #else //thermal comptonization
   
   Thatrad = calc_LTE_TfromE(Ehatrad);
   
   #endif
 
+  
   for(i=0;i<4;i++)
     Gi[i]+=kappaes * Ehatrad * (4.*K_BOLTZ*(Thatrad - Tgas)/M_ELECTR) * (1. + 4.*K_BOLTZ*Tgas/M_ELECTR) * ucon[i]; 
 
@@ -1755,6 +1755,10 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
       pp[FZ0]=ut[3];
 
     }
+
+#ifdef NCOMPTONIZATION
+  pp[NF0]=calc_NFfromE(pp[EE0]);
+#endif
 #endif
   return 0;
 }
@@ -3569,6 +3573,14 @@ calc_nsource(ldouble *pp, void* ggg)
 
   //radiation temperature
   ldouble Thatrad = calc_ncompt_Thatrad_4vel(pp,ggg,Ehatrad,urfcon,uffcov);
+  //test
+  ldouble ThatradBB=calc_LTE_TfromE(Ehatrad);
+  ldouble maxfac=MAXDIFFTRADS;
+  if(Thatrad>maxfac*ThatradBB) 
+    Thatrad=maxfac*ThatradBB;
+  if(Thatrad<1./maxfac*ThatradBB) 
+    Thatrad=1./maxfac*ThatradBB; 
+
 
   //gas properties
   ldouble rho=pp[RHO];
@@ -3666,6 +3678,7 @@ int
 test_solve_implicit_lab()
 {
   FILE *in = fopen("imp.problem.0","r");
+
   int i1,i2,iv;
   ldouble uu0[NV],pp0[NV],pp[NV],dt;
   struct geometry geom;
@@ -3769,15 +3782,11 @@ test_solve_implicit_lab()
  
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_FF;
+  params[2]=RADIMPLICIT_LAB;
   params[3]=0; 
   solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-  params[0]=MHD;
-  params[1]=RADIMPLICIT_ENTROPYEQ;
-  params[2]=RADIMPLICIT_FF;
-  params[3]=0;
-  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  exit(1);
   
   
 }
