@@ -1980,71 +1980,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
 
-  //*********** 4th ************
-  if(ret!=0 && xi1>1. && xi2>1.) {
-    //failed, trying LTE state as initial guess
-    PLOOP(iv) 
-    {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-    params[1]=RADIMPLICIT_LTEEQ;
-    if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
-    ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-    if(ret!=0)
-      {
-	if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
-	ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-      }
-
-    if(ret==0) 
-      {
-	//LTE found, stored in pp00[]
-	PLOOP(iv) pp00[iv]=pp[iv];
-
-	//trying the energy/entropy solvers again
-	//*********** 41th ************
-	PLOOP(iv) 
-	{ pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-	params[1]=RADIMPLICIT_ENERGYEQ;
-	params[2]=RADIMPLICIT_LAB;
-	if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
-	ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-	if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
-
-	//*********** 42th ************
-	if(ret!=0) {
-	  PLOOP(iv) 
-	  {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-	  params[1]=RADIMPLICIT_ENERGYEQ;
-	  params[2]=RADIMPLICIT_LAB;
-	  if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
-	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
-	}
- 
-	//*********** 43th ************
-	if(ret!=0) {
-	  PLOOP(iv) 
-	  {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-	  params[1]=RADIMPLICIT_ENTROPYEQ;
-	  params[2]=RADIMPLICIT_FF;
-	  if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
-	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
-	}
-
-	//*********** 44th ************
-	if(ret!=0) {
-	  PLOOP(iv) 
-	  {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-	  params[1]=RADIMPLICIT_ENTROPYEQ;
-	  params[2]=RADIMPLICIT_FF;
-	  if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
-	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-	  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
-	} 
-      }      
-  }
-
 
   if(ret!=0)
     {
@@ -2057,8 +1992,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       //to regard as critical error only if far from starting with gammamax which already unphysical
       if(gammagas2<0.9*GAMMAMAXHD*GAMMAMAXHD && gammarad2<0.9*GAMMAMAXRAD*GAMMAMAXRAD)
 	{
-	  //return -1;
-	  
 	  #ifndef MPI
 	  fprintf(fout_fail,"%d > rad implicit > (%4d %4d %4d) (t=%.5e) (otpt=%d) > critical failure no. %d!\n",
 		  PROCID,geom.ix,geom.iy,geom.iz,global_time,nfout1,global_int_slot[GLOBALINTSLOT_NCRITFAILURES]);
@@ -2071,7 +2004,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  global_int_slot[GLOBALINTSLOT_NCRITFAILURES]++;
 	  //#pragma omp critical
 	  global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]++;
-	  if(global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]>1.e6)
+	  if(global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]>1.e3)
 	    {
 	      printf("exceeded # of critical failures (%d) - exiting.\n",
 		     global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]);
@@ -2105,636 +2038,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 }
 
 
-//**********************************************************************
-//* test routines
-//**********************************************************************
-
-int
-test_solve_implicit_lab()
-{
-  FILE *in = fopen("imp.problem.0","r");
-  int i1,i2,iv;
-  ldouble uu0[NV],pp0[NV],pp[NV],dt;
-  struct geometry geom;
-
-  for (i1=0;i1<NV;i1++)
-    iv=fscanf(in,"%lf",&uu0[i1]);
-  for (i1=0;i1<NV;i1++)
-    iv=fscanf(in,"%lf",&pp0[i1]);
-  for (i1=0;i1<4;i1++)
-    for (i2=0;i2<5;i2++)
-      iv=fscanf(in,"%lf ",&geom.gg[i1][i2]);
-  for (i1=0;i1<4;i1++)
-    for (i2=0;i2<5;i2++)
-      iv=fscanf(in,"%lf ",&geom.GG[i1][i2]);
-  iv=fscanf(in,"%lf ",&dt);
-  iv=fscanf(in,"%lf ",&geom.alpha);
-  iv=fscanf(in,"%lf ",&geom.gdet);
-  //for imp.problems > 21
-  for (i1=0;i1<4;i1++)
-    for (i2=0;i2<4;i2++)
-      iv=fscanf(in,"%lf ",&geom.tup[i1][i2]);
-  for (i1=0;i1<4;i1++)
-    for (i2=0;i2<4;i2++)
-      iv=fscanf(in,"%lf ",&geom.tlo[i1][i2]);
-
-  fclose(in);
-
-  geom.ix=geom.iy=geom.iz=0;
-
-  ldouble Rttcov[4]={uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]};
-  ldouble Rttcon[4];
-  indices_12(Rttcov,Rttcon,geom.GG);
-  //print_4vector(Rttcov);
-  //print_4vector(Rttcon);
-  ldouble vcon[4],ucon[4],ucov[4];
-
-  //converting to 4-velocity
-  vcon[1]=pp0[2];
-  vcon[2]=pp0[3];
-  vcon[3]=pp0[4];
-  vcon[0]=0.;  
-  conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
-  //conv_velscov(vcon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
-  //indices_21(ucon,ucov,geom.gg);
-  print_4vector(ucon);
-  print_4vector(ucov);
-
-   //converting to 4-velocity
-  /*
-  vcon[1]=pp0[FX0];
-  vcon[2]=pp0[FY0];
-  vcon[3]=pp0[FZ0];
-  vcon[0]=0.;  
-  conv_vels(vcon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-  indices_21(ucon,ucov,geom.gg);
-  print_4vector(ucon);
-  print_4vector(ucov);
-  */
-  /*
-  ldouble pp2[NV];
-  int i;
-  PLOOP(i) pp2[i]=pp0[i];
-  u2p_solver(uu0,pp2,&geom,U2P_HOT,2);
-  */
-
-  //print_metric(geom.gg);
-  //print_metric(geom.GG); 
-  //print_Nvector(uu0,NV);
-
-  //print_Nvector(pp0,NVMHD);
-  //p2u(pp0,uu0,&geom);
-  //getchar();
-  //print_Nvector(uu0,NVMHD);
-
-  /*
-  print_metric(geom.gg);
-  print_metric(geom.GG);
-  printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
-  getchar();
-  */
- 
-  /*
-  pp0[FX0]/=10.;
-  pp0[FY0]/=10.;
-  pp0[FZ0]/=10.;
-  */
-
-  p2u(pp0,uu0,&geom);
-
-  ldouble deltas[4];
-  int verbose=2;
-  int params[4];
-  
-  //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
-
-  //return solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
-
-  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
-  //  return solve_implicit_lab_4dcon(uu0,pp0,&geom,dt,deltas,verbose,pp);
-
-  
-
-  //$$$$$
-  params[0]=MHD;
-  params[1]=RADIMPLICIT_LTEEQ;
-  params[3]=0; //mom.overshoot check
-  //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  params[0]=MHD;
-  params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_FF;
-  params[3]=0; 
-  solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
-  params[0]=MHD;
-  params[1]=RADIMPLICIT_ENTROPYEQ;
-  params[2]=RADIMPLICIT_FF;
-  params[3]=0;
-  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-  
-  
-}
-
-int
-test_solve_implicit_backup()
-{
-  FILE *in = fopen("imp.problem.0","r");
-  int i1,i2,iv;
-  ldouble uu[NV],pp[NV],dt,ppret[NV];
-  struct geometry geom;
-
-  fill_geometry(0,0,0,&geom);
-
-  pp[RHO]=10.;
-  pp[UU]=1.e-1;
-  pp[VX]=0.;
-  pp[VY]=0.;
-  pp[VZ]=0.;
-  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
-  pp[B1]=0.;
-  pp[B2]=0.;
-  pp[B3]=0.;
-  pp[EE0]=1.e-10;
-  pp[FX0]=1.;
-  pp[FY0]=0.;
-  pp[FZ0]=0.;
-
-  dt=10.;
-
-  p2u(pp,uu,&geom);
-  
-  print_NVvector(uu);
-  print_NVvector(pp);
-
-  ldouble deltas[4];
-  int verbose=1;  int params[4];
-  
-  //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
-
-  //return solve_implicit_backup_core(uu,pp,&geom,dt,deltas,verbose);
-
-  solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
-
-  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
-
-  //return solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose,ppret);
-  
-  params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LAB;
-  params[3]=0; //mom.overshoot check
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params,ppret);
-
-  
-  params[1]=RADIMPLICIT_ENTROPYEQ;
-  params[2]=RADIMPLICIT_FF;
-  params[3]=1;
-  return solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params,ppret);
-  
-  
-}
-
-///**********************************************************************
-//* Jon test wrapper ************************************************************
-//**********************************************************************
-
-int
-test_jon_solve_implicit_lab()
-{
-  //NOGDET please
-
-  FILE *in = fopen("jon.problem.pre","r");
-  int i1,i2,iv,ifile;
-  ldouble uu[NV],pp[NV],pp0[NV],dt;
-  struct geometry geom;
-
-  for(ifile=1;ifile<=165;ifile++)
-    {
-      printf("\n            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n");
-      printf("            &&&&&&&&&&&& case %4d &&&&&&&&&&&&&\n",ifile);
-      printf("            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n\n");
-
-      for (i1=0;i1<NV;i1++)
-	iv=fscanf(in,"%lf",&uu[i1]);
-      for (i1=0;i1<NV;i1++)
-	iv=fscanf(in,"%lf",&pp[i1]);
-      for (i1=0;i1<4;i1++)
-	for (i2=0;i2<5;i2++)
-	  iv=fscanf(in,"%lf ",&geom.gg[i1][i2]);
-      for (i1=0;i1<4;i1++)
-	for (i2=0;i2<5;i2++)
-	  iv=fscanf(in,"%lf ",&geom.GG[i1][i2]);
-      iv=fscanf(in,"%lf ",&dt);
-      iv=fscanf(in,"%lf ",&geom.alpha);
-      iv=fscanf(in,"%lf ",&geom.gdet);
-
-      //      uu[EE0]/=1000.;
-
-      //fill missing parts
-      ldouble ucon[4];
-      ucon[1]=pp[VX];
-      ucon[2]=pp[VY];
-      ucon[3]=pp[VZ];
-      conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
-      geom.alpha=sqrt(-1./geom.GG[0][0]);
-      pp[5]=calc_Sfromu(pp[0],pp[1]);
-
-      //destroy magn field
-      //uu[B1]=uu[B2]=uu[B3]=pp[B1]=pp[B2]=pp[B3]=0.;
-
-      printf("\n...........................\nJon's input:\n\n");
-      print_Nvector(uu,NV);
-      print_Nvector(pp,NV);
-      //print_metric(geom.gg);
-      //print_metric(geom.GG);
-      //printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
-      //printf("ut: %e\n",ucon[0]);
-      int corr[2],fixup[2],u2pret,radcor;
-     
-      //test
-      /*
-      u2p_rad(uu,pp,&geom,&radcor);
-      printf("radcor: %d\n",radcor);
-      print_Nvector(pp,NV);
-      p2u_rad(pp,uu,&geom);
-      print_Nvector(uu,NV);
-      getchar();
-      */
-
-      //printf("inverting...\n");
-      u2pret=u2p_solver(uu,pp,&geom,U2P_HOT,0); //hd
-      if(u2pret<0) printf("u2pret mhd: (%d)\n",u2pret);
-      u2p_rad(uu,pp,&geom,&radcor); //rad
-      if(radcor!=0) printf("u2pcor rad: (%d)\n",radcor);
-      printf("\n..........................\nafter u2p_HOT:\n\n");
-      print_Nvector(pp,NV);
-
-      //compare change in entropy
-      ucon[1]=pp[VX];
-      ucon[2]=pp[VY];
-      ucon[3]=pp[VZ];
-      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-      ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
-      ldouble s2=exp(pp[ENTR]/pp[RHO]);
-
-      printf("\n..........................\nchange in entropy:\n\n");
-      printf("s(adv) | s(inv): %e | %e\n",s1,s2); 
-     
-      if(s2/s1 < 0.9 | u2pret<0.)
-	{ 
-	  printf("\n PROBLEM DETECTED IN ENTROPY OR U2P_HOT DID NOT SUCCEED!\n");
-	  u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); //hd
-	  if(u2pret<0) printf("u2pret mhd: (%d)\n",u2pret);
-	  printf("\n..........................\nafter u2p_ENTROPY:\n\n");
-	  print_Nvector(pp,NV);
-	}      
-      
-      printf("\n..........................\nafter p2u:\n\n");
-      p2u(pp,uu,&geom);
-      for (i1=0;i1<NV;i1++)
-	pp0[i1]=pp[i1];
-      print_Nvector(uu,NV);
-      print_Nvector(pp,NV);
-
-
-      getchar();
-   
-      ldouble deltas[4];
-      int verbose=1;
-      int params[4];
-      
-      solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
-      params[1]=RADIMPLICIT_ENERGYEQ;
-      params[2]=RADIMPLICIT_LAB;
-      params[3]=1;
-      ldouble ppret[NV];
-      solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params,ppret);
-      //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
-
-      getchar();
-    }
-
-  fclose(in);
-
-  return 0;
-}
-
-
-
-//**********************************************************************
-//******* solves implicitly gas - radiation interaction ****************
-//******* in the fluid frame, returns vector of deltas *****************
-//******* the explicit-implicit approximate approach *******************
-//******* used as the fail-safe backup method **************************
-//**********************************************************************
-int
-solve_implicit_ff(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
-{
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
-  
-  int iv,ret;
-  ldouble pp[NV],uu[NV];
-  for(iv=0;iv<NV;iv++)
-    {
-      pp[iv]=get_u(p,iv,ix,iy,iz); //primitives corresponding to zero-state  
-      uu[iv]=get_u(u,iv,ix,iy,iz);  
-    }
-
-  ret= solve_implicit_ff_core(uu,pp,&geom,dt,deltas,verbose);
-
-  return ret;
-}
-
-int
-solve_implicit_ff_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose)
-{
-  struct geometry *geom
-    = (struct geometry *) ggg;
-
-  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
-  gg=geom->gg;
-  GG=geom->GG;
-  gdet=geom->gdet; gdetu=gdet;
-#if (GDETIN==0) //gdet out of derivatives
-  gdetu=1.;
-#endif
-
-  int i1,i2,i3,iv;
-
-  ldouble pp[NV];
-  PLOOP(i1)
-    pp[i1]=pp0[i1];
-
-  if(verbose) print_NVvector(pp);
-
-  //transforming radiative primitives to ortonormal fluid frame
-  prad_lab2ff(pp,pp,geom);
-
-  if(verbose) print_NVvector(pp);
-  
-  //four-force in the fluid frame
-  ldouble Gi[4];
-  calc_Gi_ff(pp,Gi);
-  
-  //implicit flux:
-  ldouble rho=pp[RHO];
-  ldouble u0=pp[UU],u;  
-  ldouble E0=pp[EE0],E; 
-  ldouble Trad0=calc_LTE_TfromE(E0);
-  ldouble pr=(GAMMA-1.)*(u0);
-  ldouble Tgas0=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble xx=get_x(geom->ix,0);
-  ldouble yy=get_x(geom->iy,1);
-  ldouble zz=get_x(geom->iz,2);
-  ldouble kappa=calc_kappa(rho,Tgas0,xx,yy,zz);
-  ldouble chi=kappa+calc_kappaes(rho,Tgas0,xx,yy,zz);  
-  ldouble B = SIGMA_RAD*pow(Tgas0,4.)/Pi;
-
-  ldouble Fold[3]={pp[FX0],pp[FY0],pp[FZ0]};
-  ldouble Fnew[3];
-  Fnew[0]=Fold[0]/(1.+dt*chi); 
-  Fnew[1]=Fold[1]/(1.+dt*chi);
-  Fnew[2]=Fold[2]/(1.+dt*chi);
- 
-  deltas[1]=Fnew[0]-Fold[0];
-  deltas[2]=Fnew[1]-Fold[1];
-  deltas[3]=Fnew[2]-Fold[2];
-
-  //solving in parallel for E and u
-  E=E0;u=u0;
-  if(calc_LTE_ff(rho,&u,&E,kappa,dt,0)<0) 
-    return -1;
-
-  deltas[0]=E-pp[EE0];
-
-  ldouble Trad=calc_LTE_TfromE(E);
-  pr=(GAMMA-1.)*(u);
-  ldouble Tgas=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-
- if(verbose) printf("\nchanges:\n\n"
-		     " ug: %e -> %e\n Tg: %e -> %e\n EE: %e -> %e\n Tr: %e -> %e\n FX: %e -> %e\n FY: %e -> %e\n FZ: %e -> %e\n\n\n",
-		     u0,u,
-		     Tgas0,Tgas,
-		     E0,E,
-		     Trad0,Trad,
-		     Fold[0],Fnew[0],
-		     Fold[1],Fnew[1],
-		     Fold[2],Fnew[2]
-		     );
-
-  if(verbose) print_4vector(deltas);
-
-  trans2_on2cc(deltas,deltas,geom->tlo);
-  boost2_ff2lab(deltas,deltas,pp0,geom->gg,geom->GG);
-  indices_21(deltas,deltas,geom->gg);
-
-  if(verbose) print_4vector(deltas);
-
-  if(verbose)
-    {
-      ldouble delapl[NV],uu[NV];
-
-      int iv;
-      for(iv=0;iv<NV;iv++)
-	delapl[iv]=0.;
-
-      delapl[1]=-deltas[0];
-      delapl[2]=-deltas[1];
-      delapl[3]=-deltas[2];
-      delapl[4]=-deltas[3];
-      delapl[EE0]=deltas[0];
-      delapl[FX0]=deltas[1];
-      delapl[FY0]=deltas[2];
-      delapl[FZ0]=deltas[3];
-
-      for(iv=0;iv<NV;iv++)
-	{
-	  uu[iv]=uu0[iv]+delapl[iv];
-	}
-
-      print_NVvector(uu0);
-      print_Nvector(pp0,NV);
-
-
-      int corr[2],fixup[2];
-
-      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-      printf("\n@@@@@@@@ BACKUP IMPLICIT @@@@@@@@@@@@");
-      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
-  
-      u2p(uu,pp,geom,corr,fixup,0);
-      printf("%d %d\n",corr[0],corr[1]);
-
-      print_NVvector(uu);
-      print_Nvector(pp,NV);
-
-    }
-
-  return 0;
-
-}
-
-//**********************************************************************
-//******* very approximate but qualitatively good************************
-//**********************************************************************
-int
-solve_implicit_backup(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
-{
-  struct geometry geom;
-  fill_geometry(ix,iy,iz,&geom);
-  
-  int iv,ret;
-  ldouble pp[NV],uu[NV];
-  for(iv=0;iv<NV;iv++)
-    {
-      pp[iv]=get_u(p,iv,ix,iy,iz); //primitives corresponding to zero-state  
-      uu[iv]=get_u(u,iv,ix,iy,iz);  
-    }
-
-  ret= solve_implicit_backup_core(uu,pp,&geom,dt,deltas,verbose);
-
-  return ret;
-}
-
-int
-solve_implicit_backup_core(ldouble *uu0,ldouble *pp0,void* ggg,ldouble dt,ldouble* deltas,int verbose)
-{
-  struct geometry *geom
-    = (struct geometry *) ggg;
-
-  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
-  gg=geom->gg;
-  GG=geom->GG;
-  gdet=geom->gdet; gdetu=gdet;
-#if (GDETIN==0) //gdet out of derivatives
-  gdetu=1.;
-#endif
-
-  int i1,i2,i3,iv;
-
-  if(verbose)
-    {
-      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-      printf("\n@@@@@@@@ BACKUP IMPLICIT @@@@@@@@@@@@");
-      printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n");
-    }
-
-  ldouble pp[NV],uu[NV];
-  PLOOP(i1)
-  {
-    pp[i1]=pp0[i1];
-    uu[i1]=uu0[i1];
-  }	      
-
-  if(verbose) print_NVvector(pp);
-
-  //transforming radiative primitives to ortonormal fluid frame
-  prad_lab2ff(pp,pp,geom);
-
-  if(verbose) print_NVvector(pp);
-  
-  //implicit flux:
-  ldouble rho=pp[RHO];
-  ldouble u0=pp[UU],u;  
-  ldouble E0=pp[EE0],E;
-  ldouble Trad0=calc_LTE_TfromE(E0);
-  ldouble pr=(GAMMA-1.)*(u0);
-  ldouble Tgas0=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble xx=geom->xx;
-  ldouble yy=geom->yy;
-  ldouble zz=geom->zz;
-  ldouble kappa=calc_kappa(rho,Tgas0,xx,yy,zz);
-  ldouble chi=kappa+calc_kappaes(rho,Tgas0,xx,yy,zz);  
-
-  //solving in parallel for E and u using fixed kappa
-  u=u0;
-  E=E0;
-  if(calc_LTE_ff(rho,&u,&E,kappa,dt,0)<0) 
-    {
-      printf("calc_LTE_ff failed in backup\n");
-      return -1;
-    }
-  ldouble Trad=calc_LTE_TfromE(E);
-  pr=(GAMMA-1.)*(u);
-  ldouble Tgas=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-
-  //solving for new rad fluxes in fixed fluid frame of zero state
-  ldouble Fold[3]={pp[FX0],pp[FY0],pp[FZ0]};
-  ldouble Fnew[3];
-  Fnew[0]=Fold[0]/(1.+dt*chi); 
-  Fnew[1]=Fold[1]/(1.+dt*chi);
-  Fnew[2]=Fold[2]/(1.+dt*chi);
-
-  //fractional change of fluxes - velocities
-  ldouble deltavel;
-  deltavel=1./(1./(dt*chi) + 1.); //same for all of them
-
-  if(verbose) printf("\nchanges:\n\n"
-		     " ug: %e -> %e\n Tg: %e -> %e\n EE: %e -> %e\n Tr: %e -> %e\n FX: %e -> %e\n FY: %e -> %e\n FZ: %e -> %e\n deltavel: %e\n\n",
-		     u0,u,
-		     Tgas0,Tgas,
-		     E0,E,
-		     Trad0,Trad,
-		     Fold[0],Fnew[0],
-		     Fold[1],Fnew[1],
-		     Fold[2],Fnew[2],
-		     deltavel);
-
-  //at this point I know the target temperatures and fractional change in velocities
-  
-  //apply the change in velocities weighting by energy densities
-  for(i1=0;i1<3;i1++)
-    pp[VX+i1] = pp0[VX+i1] + deltavel * E0/(rho+u0+E0) * (pp0[FX0+i1] - pp0[VX+i1]);
-
-  //gas enden
-  pp[UU]=u;
-
-  //rad numbers calculated from energy/momentum conservation
-  p2u(pp,uu,geom);
-
-  //deltas[] defined with respect to RAD quantities so minus here
-  for(i1=0;i1<4;i1++)
-    deltas[i1]=-(uu[UU+i1]-uu0[UU+i1]);
-
-  if(verbose)
-    {
-      ldouble delapl[NV],uu[NV];
-
-      int iv;
-      for(iv=0;iv<NV;iv++)
-	delapl[iv]=0.;
-
-      delapl[1]=-deltas[0];
-      delapl[2]=-deltas[1];
-      delapl[3]=-deltas[2];
-      delapl[4]=-deltas[3];
-      delapl[EE0]=deltas[0];
-      delapl[FX0]=deltas[1];
-      delapl[FY0]=deltas[2];
-      delapl[FZ0]=deltas[3];
-
-      for(iv=0;iv<NV;iv++)
-	{
-	  uu[iv]=uu0[iv]+delapl[iv];
-	}
-
-      print_NVvector(uu0);
-      print_Nvector(pp0,NV);
-
-      int corr[2],fixup[2];
- 
-      u2p(uu,pp,geom,corr,fixup,0);
-      printf("%d %d\n",corr[0],corr[1]);
-
-      print_NVvector(uu);
-      print_Nvector(pp,NV);
-
-    }
-
-  return 0;
-
-}
 
 
 //**********************************************************************
@@ -2850,162 +2153,6 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   return ret;
 }
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-//numerical LTE solver used only by solve_implicit_ff()
-//TODO: to be replaced with something faster or abandoned
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-
-struct calc_LTE_ff_parameters
-{
-  ldouble rho,E,u,kappa,dt;
-  int verbose;
-};
-
-double
-f_calc_LTE_ff (double u, void *params)
-{
-  struct calc_LTE_ff_parameters *p 
-    = (struct calc_LTE_ff_parameters *) params;
-  
-  ldouble rho=p->rho;
-  ldouble Eold=p->E;
-  ldouble uold=p->u;
-  ldouble kappa=p->kappa;
-  ldouble dt=p->dt;
-  int verbose=p->verbose;
-
-  ldouble pr= (GAMMA-1.)*(ldouble)u;
-  ldouble T = pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
-  ldouble Enew=(Eold +4.*Pi*kappa*B*dt)/(1.+kappa*dt);
-
-  return u - uold - dt*(-4.*Pi*kappa*B + kappa*Enew);
-}
-     
-double
-df_calc_LTE_ff (double u, void *params)
-{  
-  struct calc_LTE_ff_parameters *p 
-    = (struct calc_LTE_ff_parameters *) params;
-
-  ldouble rho=p->rho;
-  ldouble Eold=p->E;
-  ldouble uold=p->u;
-  ldouble kappa=p->kappa;
-  ldouble dt=p->dt;
-  int verbose=p->verbose;
-
-  ldouble pr= (GAMMA-1.)*(ldouble)u;
-  ldouble T = pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
-  ldouble Enew=(Eold +4.*Pi*kappa*B*dt)/(1.+kappa*dt);
-
-  ldouble dBdu=4.*B/(ldouble)u;
-  ldouble dEdu=4.*Pi*kappa*dt*dBdu/(1.+dt*kappa);
-
-  ldouble dfdu=1.+dt*kappa*4.*Pi*dBdu-dt*kappa*dEdu;
-
-  return (double)dfdu;
-}
-     
-void
-fdf_calc_LTE_ff (double u, void *params, 
-	       double *y, double *dy)
-{ 
-   struct calc_LTE_ff_parameters *p 
-    = (struct calc_LTE_ff_parameters *) params;
-
-  ldouble rho=p->rho;
-  ldouble Eold=p->E;
-  ldouble uold=p->u;
-  ldouble kappa=p->kappa;
-  ldouble dt=p->dt;
-  int verbose=p->verbose;
-
-  ldouble pr= (GAMMA-1.)*(ldouble)u;
-  ldouble T = pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
-  ldouble Enew=(Eold +4.*Pi*kappa*B*dt)/(1.+kappa*dt);
-
-  ldouble dBdu=4.*B/(ldouble)u;
-  ldouble dEdu=4.*Pi*kappa*dt*dBdu/(1.+dt*kappa);
-
-  ldouble dfdu=1.+dt*kappa*4.*Pi*dBdu-dt*kappa*dEdu;
-  ldouble f=u - uold - dt*(-4.*Pi*kappa*B + kappa*Enew);
- 
-  *y = f;
-  *dy = dfdu;
-}
-
-//**********************************************************************
-//**********************************************************************
-//**********************************************************************
-int
-calc_LTE_ff(ldouble rho,ldouble *uint, ldouble *E,ldouble kappa,ldouble dt, int verbose)
-{
-  struct calc_LTE_ff_parameters cltep;
-  cltep.rho=rho;
-  cltep.u=*uint;
-  cltep.E=*E;
-  cltep.verbose=verbose;
-  cltep.kappa=kappa;
-
-  ldouble tlte = 1./cltep.kappa;
-
-  cltep.dt=(double)dt;
-
-  //solving for E
-  int status;
-  int iter = 0, max_iter = 100;
-  const gsl_root_fdfsolver_type *TT;
-  gsl_root_fdfsolver *s;
-  double x0, x = cltep.u;
-  gsl_function_fdf FDF;
-     
-  FDF.f = &f_calc_LTE_ff;
-  FDF.df = &df_calc_LTE_ff;
-  FDF.fdf = &fdf_calc_LTE_ff;
-  FDF.params = &cltep;
-  
-  TT = gsl_root_fdfsolver_newton;
-  s = gsl_root_fdfsolver_alloc (TT);
-  gsl_root_fdfsolver_set (s, &FDF, x);
-
-  do
-    {
-      iter++;
-      status = gsl_root_fdfsolver_iterate (s);
-      x0 = x;
-      x = gsl_root_fdfsolver_root (s);
-      status = gsl_root_test_delta (x, x0, 0, U2PRADPREC);
-    }
-  while (status == GSL_CONTINUE && iter < max_iter);
-     
-  if(iter>=max_iter) 
-    {
-      if(verbose) printf("lte error in calc_LTE_ff: %e %e %e %e\n",rho,*uint,*E,dt);
-      return -1;
-    }
-
-  gsl_root_fdfsolver_free (s);
-
-  *uint=x;
-  ldouble pp1 = (GAMMA-1.)*(x);
-  ldouble Ttu = pp1*MU_GAS*M_PROTON/K_BOLTZ/cltep.rho;
-  ldouble Bp1 = SIGMA_RAD*pow(Ttu,4.)/Pi;
-  *E=(cltep.E+4.*Pi*cltep.kappa*Bp1*dt)/(1.+cltep.kappa*dt);
-  
-  return 0;
-}
-//**********************************************************************
-//end of the numerical LTE solver
-//**********************************************************************
-
 
 //**********************************************************************
 //******* opacities ****************************************************
@@ -3855,31 +3002,6 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt)
 
   //indices_21(del4,del4,geom.gg);
 
-  apply_rad_source_del4(ix,iy,iz,del4);
-
-  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
-
-  return 0;
-}
-
-/************************************************************************/
-/******* implicit radiative source term in fluid frame and transported to lab  - backup method */
-/************************************************************************/
-int implicit_ff_rad_source_term(int ix,int iy, int iz,ldouble dt, int verbose)
-{
-  set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITFF); 
-
-  ldouble del4[4],delapl[NV];
-  int iv;
-  
-  if(solve_implicit_ff(ix,iy,iz,dt,del4,verbose)<0) 
-    {
-      //failure, keeping u[] intact, reporting
-      set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1); 
-      return -1;
-    }
-
- 
   apply_rad_source_del4(ix,iy,iz,del4);
 
   set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
@@ -5691,5 +4813,261 @@ calc_nsource(ldouble *pp, void* ggg)
 #else
   return 0;
 #endif
+}
+
+
+//**********************************************************************
+//* test routines
+//**********************************************************************
+
+int
+test_solve_implicit_lab()
+{
+  FILE *in = fopen("imp.problem.0","r");
+  int i1,i2,iv;
+  ldouble uu0[NV],pp0[NV],pp[NV],dt;
+  struct geometry geom;
+
+  for (i1=0;i1<NV;i1++)
+    iv=fscanf(in,"%lf",&uu0[i1]);
+  for (i1=0;i1<NV;i1++)
+    iv=fscanf(in,"%lf",&pp0[i1]);
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<5;i2++)
+      iv=fscanf(in,"%lf ",&geom.gg[i1][i2]);
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<5;i2++)
+      iv=fscanf(in,"%lf ",&geom.GG[i1][i2]);
+  iv=fscanf(in,"%lf ",&dt);
+  iv=fscanf(in,"%lf ",&geom.alpha);
+  iv=fscanf(in,"%lf ",&geom.gdet);
+  //for imp.problems > 21
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<4;i2++)
+      iv=fscanf(in,"%lf ",&geom.tup[i1][i2]);
+  for (i1=0;i1<4;i1++)
+    for (i2=0;i2<4;i2++)
+      iv=fscanf(in,"%lf ",&geom.tlo[i1][i2]);
+
+  fclose(in);
+
+  geom.ix=geom.iy=geom.iz=0;
+
+  ldouble Rttcov[4]={uu0[EE0],uu0[FX0],uu0[FY0],uu0[FZ0]};
+  ldouble Rttcon[4];
+  indices_12(Rttcov,Rttcon,geom.GG);
+  //print_4vector(Rttcov);
+  //print_4vector(Rttcon);
+  ldouble vcon[4],ucon[4],ucov[4];
+
+  //converting to 4-velocity
+  vcon[1]=pp0[2];
+  vcon[2]=pp0[3];
+  vcon[3]=pp0[4];
+  vcon[0]=0.;  
+  conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
+  //conv_velscov(vcon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
+  //indices_21(ucon,ucov,geom.gg);
+  print_4vector(ucon);
+  print_4vector(ucov);
+
+   //converting to 4-velocity
+  /*
+  vcon[1]=pp0[FX0];
+  vcon[2]=pp0[FY0];
+  vcon[3]=pp0[FZ0];
+  vcon[0]=0.;  
+  conv_vels(vcon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+  indices_21(ucon,ucov,geom.gg);
+  print_4vector(ucon);
+  print_4vector(ucov);
+  */
+  /*
+  ldouble pp2[NV];
+  int i;
+  PLOOP(i) pp2[i]=pp0[i];
+  u2p_solver(uu0,pp2,&geom,U2P_HOT,2);
+  */
+
+  //print_metric(geom.gg);
+  //print_metric(geom.GG); 
+  //print_Nvector(uu0,NV);
+
+  //print_Nvector(pp0,NVMHD);
+  //p2u(pp0,uu0,&geom);
+  //getchar();
+  //print_Nvector(uu0,NVMHD);
+
+  /*
+  print_metric(geom.gg);
+  print_metric(geom.GG);
+  printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
+  getchar();
+  */
+ 
+  /*
+  pp0[FX0]/=10.;
+  pp0[FY0]/=10.;
+  pp0[FZ0]/=10.;
+  */
+
+  p2u(pp0,uu0,&geom);
+
+  ldouble deltas[4];
+  int verbose=2;
+  int params[4];
+  
+  //return solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+  
+  //solve_implicit_lab_1dprim(uu,pp,&geom,dt,deltas,verbose,pp);
+  //  return solve_implicit_lab_4dcon(uu0,pp0,&geom,dt,deltas,verbose,pp);
+
+  
+
+  //$$$$$
+  params[0]=MHD;
+  params[1]=RADIMPLICIT_LTEEQ;
+  params[3]=0; //mom.overshoot check
+  //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+  params[0]=MHD;
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_FF;
+  params[3]=0; 
+  solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+  params[0]=MHD;
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[2]=RADIMPLICIT_FF;
+  params[3]=0;
+  return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  
+  
+}
+
+
+///**********************************************************************
+//* Jon test wrapper ************************************************************
+//**********************************************************************
+
+int
+test_jon_solve_implicit_lab()
+{
+  //NOGDET please
+
+  FILE *in = fopen("jon.problem.pre","r");
+  int i1,i2,iv,ifile;
+  ldouble uu[NV],pp[NV],pp0[NV],dt;
+  struct geometry geom;
+
+  for(ifile=1;ifile<=165;ifile++)
+    {
+      printf("\n            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n");
+      printf("            &&&&&&&&&&&& case %4d &&&&&&&&&&&&&\n",ifile);
+      printf("            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n\n");
+
+      for (i1=0;i1<NV;i1++)
+	iv=fscanf(in,"%lf",&uu[i1]);
+      for (i1=0;i1<NV;i1++)
+	iv=fscanf(in,"%lf",&pp[i1]);
+      for (i1=0;i1<4;i1++)
+	for (i2=0;i2<5;i2++)
+	  iv=fscanf(in,"%lf ",&geom.gg[i1][i2]);
+      for (i1=0;i1<4;i1++)
+	for (i2=0;i2<5;i2++)
+	  iv=fscanf(in,"%lf ",&geom.GG[i1][i2]);
+      iv=fscanf(in,"%lf ",&dt);
+      iv=fscanf(in,"%lf ",&geom.alpha);
+      iv=fscanf(in,"%lf ",&geom.gdet);
+
+      //      uu[EE0]/=1000.;
+
+      //fill missing parts
+      ldouble ucon[4];
+      ucon[1]=pp[VX];
+      ucon[2]=pp[VY];
+      ucon[3]=pp[VZ];
+      conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
+      geom.alpha=sqrt(-1./geom.GG[0][0]);
+      pp[5]=calc_Sfromu(pp[0],pp[1]);
+
+      //destroy magn field
+      //uu[B1]=uu[B2]=uu[B3]=pp[B1]=pp[B2]=pp[B3]=0.;
+
+      printf("\n...........................\nJon's input:\n\n");
+      print_Nvector(uu,NV);
+      print_Nvector(pp,NV);
+      //print_metric(geom.gg);
+      //print_metric(geom.GG);
+      //printf("%e %e %e\n",dt,geom.alpha,geom.gdet);
+      //printf("ut: %e\n",ucon[0]);
+      int corr[2],fixup[2],u2pret,radcor;
+     
+      //test
+      /*
+      u2p_rad(uu,pp,&geom,&radcor);
+      printf("radcor: %d\n",radcor);
+      print_Nvector(pp,NV);
+      p2u_rad(pp,uu,&geom);
+      print_Nvector(uu,NV);
+      getchar();
+      */
+
+      //printf("inverting...\n");
+      u2pret=u2p_solver(uu,pp,&geom,U2P_HOT,0); //hd
+      if(u2pret<0) printf("u2pret mhd: (%d)\n",u2pret);
+      u2p_rad(uu,pp,&geom,&radcor); //rad
+      if(radcor!=0) printf("u2pcor rad: (%d)\n",radcor);
+      printf("\n..........................\nafter u2p_HOT:\n\n");
+      print_Nvector(pp,NV);
+
+      //compare change in entropy
+      ucon[1]=pp[VX];
+      ucon[2]=pp[VY];
+      ucon[3]=pp[VZ];
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+      ldouble s1=exp(uu[ENTR]/ucon[0]/pp[RHO]);
+      ldouble s2=exp(pp[ENTR]/pp[RHO]);
+
+      printf("\n..........................\nchange in entropy:\n\n");
+      printf("s(adv) | s(inv): %e | %e\n",s1,s2); 
+     
+      if(s2/s1 < 0.9 | u2pret<0.)
+	{ 
+	  printf("\n PROBLEM DETECTED IN ENTROPY OR U2P_HOT DID NOT SUCCEED!\n");
+	  u2pret=u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); //hd
+	  if(u2pret<0) printf("u2pret mhd: (%d)\n",u2pret);
+	  printf("\n..........................\nafter u2p_ENTROPY:\n\n");
+	  print_Nvector(pp,NV);
+	}      
+      
+      printf("\n..........................\nafter p2u:\n\n");
+      p2u(pp,uu,&geom);
+      for (i1=0;i1<NV;i1++)
+	pp0[i1]=pp[i1];
+      print_Nvector(uu,NV);
+      print_Nvector(pp,NV);
+
+
+      getchar();
+   
+      ldouble deltas[4];
+      int verbose=1;
+      int params[4];
+      
+      solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+      params[1]=RADIMPLICIT_ENERGYEQ;
+      params[2]=RADIMPLICIT_LAB;
+      params[3]=1;
+      ldouble ppret[NV];
+      solve_implicit_lab_4dprim(uu,pp,&geom,dt,deltas,verbose,params,ppret);
+      //solve_implicit_lab_4dcon(uu,pp,&geom,dt,deltas,verbose);
+
+      getchar();
+    }
+
+  fclose(in);
+
+  return 0;
 }
 
