@@ -848,165 +848,129 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       return -1; //allows for entropy and radiation ceilings but does not update conserved 
     }
 
-  //regular energy/entropy inversion
-  if(whicheq!=RADIMPLICIT_LTEEQ)
-    {
-      #ifdef NCOMPTONIZATION
-      ldouble nsource=calc_nsource(pp,ggg);
-      f[4]=uu[NF0] - uu0[NF0] - dt * gdetu * nsource;
-      if(fabs(f[4])>SMALL) err[4]=fabs(f[4])/(fabs(uu[NF0])+fabs(uu0[NF0])+fabs(dt*gdetu*nsource)); else err[4]=0.;
-      #endif
+#ifdef NCOMPTONIZATION
+  ldouble nsource=calc_nsource(pp,ggg);
+  f[4]=uu[NF0] - uu0[NF0] - dt * gdetu * nsource;
+  if(fabs(f[4])>SMALL) err[4]=fabs(f[4])/(fabs(uu[NF0])+fabs(uu0[NF0])+fabs(dt*gdetu*nsource)); else err[4]=0.;
+#endif
 
-      //radiative four-force
-      ldouble Gi[4];
-      calc_Gi(pp,ggg,Gi); 
-      indices_21(Gi,Gi,gg);
+  //radiative four-force
+  ldouble Gi[4];
+  calc_Gi(pp,ggg,Gi); 
+  indices_21(Gi,Gi,gg);
   
-      //errors in momenta - always in lab frame
-      if(whichprim==MHD) //mhd-primitives
-	{
-	  f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
-	  f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2];
-	  f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3];
+  //errors in momenta - always in lab frame
+  if(whichprim==MHD) //mhd-primitives
+    {
+      f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
+      f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2];
+      f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3];
 
-	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
-	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
-	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
-	}
+      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
+      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
+    }
+  if(whichprim==RAD) //rad-primitives
+    {
+      f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
+      f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
+      f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
+
+      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FX0])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
+      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
+    }
+
+  /***** LAB FRAME ENERGY/ENTROPY EQS *****/
+  if(whichframe==RADIMPLICIT_LAB)
+    {      
       if(whichprim==RAD) //rad-primitives
 	{
-	  f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
-	  f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
-	  f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
-
-	  if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FX0])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
-	  if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
-	  if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
-	}
-
-      /***** LAB FRAME ENERGY/ENTROPY EQS *****/
-      if(whichframe==RADIMPLICIT_LAB)
-	{      
-	  if(whichprim==RAD) //rad-primitives
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
 	    {
-	      if(whicheq==RADIMPLICIT_ENERGYEQ)
-		{
-		  f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt*gdetu*Gi[0])); else err[0]=0.;
+	      f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt*gdetu*Gi[0])); else err[0]=0.;
 
-		  ldouble bsq=0.;
-		  ldouble bcon[4],bcov[4];
-		  		}
-	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
-		{
-  		  f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0];//but this works on hydro entropy and may fail!
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
-		}
-	      else
-		my_err("not implemented 3\n");
+	      ldouble bsq=0.;
+	      ldouble bcon[4],bcov[4];
 	    }
-	  if(whichprim==MHD) //hydro-primitives
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	    {
-	      if(whicheq==RADIMPLICIT_ENERGYEQ)
-		{
-		  f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0];
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
-		}
-	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
-		{	  
-		  f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0];
-		  if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
-		}      
-	      else
-		my_err("not implemented 4\n");
+	      f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0];//but this works on hydro entropy and may fail!
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
 	    }
+	  else
+	    my_err("not implemented 3\n");
 	}
-
-      /***** FF FRAME ENERGY/ENTROPY EQS *****/
-      if(whichframe==RADIMPLICIT_FF)
+      if(whichprim==MHD) //hydro-primitives
 	{
-
-	  ldouble uconf[4],Rtt0,Rtt;
-	  //zero - state 
-	  calc_ff_Rtt(pp0,&Rtt0,uconf,geom);
-	  //new state
-	  calc_ff_Rtt(pp,&Rtt,uconf,geom);
-      
-	  ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
-	  ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
-	  ldouble Ehat = -Rtt;
-	  ldouble Ehat0 = -Rtt0;
-	  ldouble dtau=dt/uconf[0];
-	  ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
-
-	  //fluid frame energy equation:
-	  if(whichprim==RAD) //rad-primitives
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
 	    {
-	      if(whicheq==RADIMPLICIT_ENERGYEQ)
-		{
-		  f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
-		  err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
-		}
-	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
-		{
-		  pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
-		  f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-		  err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
-		}
-	      else
-		my_err("not implemented 2\n");	 
-	    
+	      f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
 	    }
-	  if(whichprim==MHD) //mhd-
-	    {
-	      if(whicheq==RADIMPLICIT_ENERGYEQ)
-		{
-		  f[0]=pp[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-		  err[0]=fabs(f[0])/(fabs(pp[UU]) + fabs(pp0[UU]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
-		}
-	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
-		{
-		  pp0[ENTR]= calc_Sfromu(pp0[RHO],pp0[UU]);
-		  pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
-		  f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-		  err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
-		}
-	      else
-		my_err("not implemented 2\n");	  
-	    }
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    {	  
+	      f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	    }      
+	  else
+	    my_err("not implemented 4\n");
 	}
     }
-  else //searching for full LTE (whicheq==RADIMPLICIT_LTEEQ)
-    {
-      //what about number of photons?
 
-      ldouble uconf[4],Rtt;
+  /***** FF FRAME ENERGY/ENTROPY EQS *****/
+  if(whichframe==RADIMPLICIT_FF)
+    {
+
+      ldouble uconf[4],Rtt0,Rtt;
+      //zero - state 
+      calc_ff_Rtt(pp0,&Rtt0,uconf,geom);
       //new state
       calc_ff_Rtt(pp,&Rtt,uconf,geom);
+      
       ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
       ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
       ldouble Ehat = -Rtt;
+      ldouble Ehat0 = -Rtt0;
+      ldouble dtau=dt/uconf[0];
+      ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
 
-      ldouble vEhat=(Ehat);
-      ldouble vB=(4.*Pi*B);
-
-      f[0]=vEhat-vB; 
-
-      err[0]=fabs(f[0])/(fabs(vEhat)+fabs(vB));
-
-      f[1]=pp[FX0]-pp[VX];      
-      f[2]=pp[FY0]-pp[VY];
-      f[3]=pp[FZ0]-pp[VZ];
-
-      //this one avoid spending too much time around only one zero vel component
-      ldouble velnorm=my_max3((fabs(pp[FX0])+fabs(pp[VX]))*sqrt(geom->gg[1][1]),
-			      (fabs(pp[FY0])+fabs(pp[VY]))*sqrt(geom->gg[2][2]),
-			      (fabs(pp[FZ0])+fabs(pp[VZ]))*sqrt(geom->gg[3][3]));
-      
-      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(velnorm); else err[1]=0.;
-      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(velnorm); else err[2]=0.;
-      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(velnorm); else err[3]=0.;
-      
+      //fluid frame energy equation:
+      if(whichprim==RAD) //rad-primitives
+	{
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    {
+	      f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	    }
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    {
+	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
+	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	    }
+	  else
+	    my_err("not implemented 2\n");	 
+	    
+	}
+      if(whichprim==MHD) //mhd-
+	{
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    {
+	      f[0]=pp[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[UU]) + fabs(pp0[UU]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	    }
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    {
+	      pp0[ENTR]= calc_Sfromu(pp0[RHO],pp0[UU]);
+	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
+	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	    }
+	  else
+	    my_err("not implemented 2\n");	  
+	}
     }
 
 #ifndef NCOMPTONIZATION
@@ -1144,7 +1108,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       if(params[1]==RADIMPLICIT_ENTROPYEQ)
 	printf("entropy eq.\n");
       if(params[1]==RADIMPLICIT_LTEEQ)
-	printf("LTE eq.\n");
+	printf("LTE eq. - no longer supported\n");
       if(params[2]==RADIMPLICIT_FF)
 	printf("fluid\n");
       if(params[2]==RADIMPLICIT_LAB)
@@ -1245,9 +1209,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   ldouble CONV = RADIMPCONV;
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
-
-  if(whicheq==RADIMPLICIT_LTEEQ)
-    MAXITER=150;
 
   int sh;
 
@@ -3377,15 +3338,6 @@ calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
   ldouble Tgas=calc_PEQ_Tfromurho(ugas,pp[RHO]);
 
   ldouble cbrtnaw=cbrt(9.*A + Sqrt(3.)*Sqrt(27.*Power(A,2.) - 256.*Power(A,3.)*Power(C,3.)));
-  //troublesome
-  /*
-  ldouble ugasLTE=-Sqrt((4*cbrt(2./3.)*C)/
-		  cbrtnaw +  cbrtnaw/
-		   (cbrt(2.*3.*3.)*A))/2. +
-    Sqrt((-4*cbrt(2./3.)*C)/cbrtnaw - cbrtnaw/(cbrt(2.*3.*3.)*A) +
-	 2./(A*Sqrt((4*cbrt(2./3.)*C)/cbrtnaw + cbrtnaw/(cbrt(2.*3.*3.)*A))))/2.;
-  */
-  
   ldouble ugasLTE=0.;
 
   gsl_complex z0,z1,z2,z3;
@@ -3420,13 +3372,6 @@ calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg)
   ldouble EffLTE = -C - ugasLTE;
   ldouble TradLTE=calc_LTE_TfromE(EffLTE);
   ldouble TgasLTE=calc_PEQ_Tfromurho(ugasLTE,pp[RHO]);
-
-  /*
-  printf("Trad: %e -> %e\nTgas: %e -> %e\nurad: %e -> %e\nugas: %e -> %e\n\n",
-	 Trad,TradLTE,Tgas,TgasLTE,
-	 Eff,EffLTE,ugas,ugasLTE)
-    ;getchar();
-  */  
 
   //updates only uint gas
   ppLTE[UU]=ugasLTE;
@@ -4817,7 +4762,17 @@ calc_nsource(ldouble *pp, void* ggg)
 
 
 //**********************************************************************
-//* test routines
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//************** tests *************************************************
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //**********************************************************************
 
 int
@@ -4924,12 +4879,7 @@ test_solve_implicit_lab()
 
   
 
-  //$$$$$
-  params[0]=MHD;
-  params[1]=RADIMPLICIT_LTEEQ;
-  params[3]=0; //mom.overshoot check
-  //return solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-
+ 
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_FF;
