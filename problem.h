@@ -74,7 +74,7 @@
 //71 MBBBLOB - rad blobs with magn field
 //72 BOWSHOCK - bow shock in wind tunnel
 
-#define PROBLEM 27
+#define PROBLEM 59
 
 #if(PROBLEM==72)
 

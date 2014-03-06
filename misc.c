@@ -397,6 +397,9 @@ inverse_matrix(ldouble *a, ldouble *ia, int N)
   gsl_permutation_free(p);
   */
 
+  //exit(0);
+  //printf("inversing... ");
+
   gsl_matrix *m
     = gsl_matrix_alloc (N, N);
   gsl_matrix *im
@@ -417,6 +420,10 @@ inverse_matrix(ldouble *a, ldouble *ia, int N)
     for(j=0;j<N;j++)
       ia[i*N+j]=gsl_matrix_get(im,i,j);
 
+  gsl_matrix_free(m);
+  gsl_matrix_free(im);
+  gsl_permutation_free(p);
+  //printf("done! \n");
   /*
   gsl_matrix *im
     = gsl_matrix_alloc (N, N);

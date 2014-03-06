@@ -564,6 +564,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   np=4;
 #endif
 
+
   do //main solver loop
     {	 
       iter++;
@@ -950,7 +951,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     }
   while(1); //main solver loop
 
-
   if(iter>MAXITER || failed==1)
     {
       if(verbose)
@@ -984,7 +984,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
   p2u(pp,uu,geom);
-
+  
   int u2pret;
   if(whichprim==RAD)
     {
@@ -1041,7 +1041,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 #ifdef NCOMPTONIZATION
   deltas[4]=uu[NF0]-(uu0[NF0]);
 #endif
-
+  
   if(verbose) print_4vector(deltas);
   
   if(verbose)
@@ -1209,7 +1209,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
   if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
+
+  //test
+  //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,1,params,pp); 
+  //printf("2 %d %d %d\n",ix,iy,ret);
+  //getch();
+
   if(ret!=0)
     { 
       //test
@@ -2212,7 +2219,8 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt)
 /************************************************************************/
 int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
 {
-  ldouble del4[4],delapl[NV];
+  
+  ldouble del4[NRADVAR],delapl[NV];
   int iv;
   int verbose=1;
 

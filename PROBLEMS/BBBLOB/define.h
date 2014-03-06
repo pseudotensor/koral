@@ -72,13 +72,14 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define TNX 100
-#define TNY 100
+
+#define TNX 50
+#define TNY 50
 #define TNZ 1
 
 //# of tiles
-#define NTX 3
-#define NTY 2
+#define NTX 1
+#define NTY 1
 #define NTZ 1
 
 //#define SPECIFIC_BC
@@ -95,7 +96,7 @@
 //#define PRINTYGC_LEFT
 //#define PRINTYGC_RIGHT
 
-#define ALLSTEPSOUTPUT 0
+#define ALLSTEPSOUTPUT 1
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define DTOUT1 0.1

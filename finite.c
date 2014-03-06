@@ -378,11 +378,12 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
- 
+
   //calculates the primitives
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
+
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
@@ -912,7 +913,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 int
 op_implicit(ldouble t, ldouble dt,ldouble *ubase) 
 {
-  int ix,iy,iz,iv,ii;
+  int ix,iy,iz,ii;
   copy_u(1., u, ubase);
 
   //to count the average number of iteration in the implicit solver
@@ -928,7 +929,7 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
 #ifdef IMPLICIT_LAB_RAD_SOURCE
   
   //again over cells - source terms
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
