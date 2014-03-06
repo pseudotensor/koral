@@ -307,8 +307,6 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]) || !isfinite(f[4]))
     return -1;
   *err0=my_max(my_max(my_max(err[0],err[1]),my_max(err[2],err[3])),err[4]);
-  //test
-  //*err0=my_max(my_max(err[0],err[1]),my_max(err[2],err[3]));
 #endif
   
   return ret;
@@ -527,7 +525,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
  
   //4dprim
   ldouble EPS = 1.e-8;
-  ldouble CONV = RADIMPCONV;
+  ldouble CONV = RADIMPCONV;  
   ldouble MAXITER = 50;
   int corr[2],fixup[2];
 
@@ -884,7 +882,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  
 	  //if not decrease the applied fraction
-	  //test TTT
 	  if(xxx[0]<=0. && 1)
 	    {
 	      xiapp*=ppp[sh]/(ppp[sh]+fabs(xxx[0]));
@@ -1210,8 +1207,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(ret!=0)
     { 
       //test
-      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,1,params,pp); 
-      exit(0);    
+      //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,1,params,pp); 
+      //exit(0);    
 
       params[2]=RADIMPLICIT_FF;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
@@ -1482,7 +1479,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
     }
 
-  
+  //test
 #ifdef COMPTONIZATION
   ldouble Ehatrad = Ruu;
   ldouble Thatrad;
@@ -1493,11 +1490,13 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   ldouble ThatradBB=calc_LTE_TfromE(Ehatrad);
 
   //test
+  #ifdef MAXDIFFTRADS
   ldouble maxfac=MAXDIFFTRADS;
   if(Thatrad>maxfac*ThatradBB) 
     Thatrad=maxfac*ThatradBB;
   if(Thatrad<1./maxfac*ThatradBB) 
     Thatrad=1./maxfac*ThatradBB; 
+  #endif
 
   #else //thermal comptonization
   
@@ -3574,13 +3573,14 @@ calc_nsource(ldouble *pp, void* ggg)
   //radiation temperature
   ldouble Thatrad = calc_ncompt_Thatrad_4vel(pp,ggg,Ehatrad,urfcon,uffcov);
   //test
+  #ifdef MAXDIFFTRADS
   ldouble ThatradBB=calc_LTE_TfromE(Ehatrad);
   ldouble maxfac=MAXDIFFTRADS;
   if(Thatrad>maxfac*ThatradBB) 
     Thatrad=maxfac*ThatradBB;
   if(Thatrad<1./maxfac*ThatradBB) 
     Thatrad=1./maxfac*ThatradBB; 
-
+  #endif
 
   //gas properties
   ldouble rho=pp[RHO];
@@ -3596,7 +3596,7 @@ calc_nsource(ldouble *pp, void* ggg)
 
   //relative gamma rad-fluid rest frames
   ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
-  ldouble ndotrf = -ndotff/relgamma; //VERIFY!!!
+  ldouble ndotrf = -ndotff/relgamma; 
 
   return ndotrf; 
 #else

@@ -283,6 +283,7 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
 
   int verbose=0;
  
+
   calc_Rij_ff(pp1,Rij);  
   trans22_on2cc(Rij,Rij,tlo);  
   boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
@@ -297,10 +298,28 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   pp2[FY0]=gdetu*Rij[0][2];
   pp2[FZ0]=gdetu*Rij[0][3];
 
+  #ifdef NCOMPTONIZATION
+  ldouble nphff=pp1[NF0];
+  #endif 
+
   //convert to real primitives
   int corrected;
-
   u2p_rad(pp2,pp2,geom,&corrected);
+
+  #ifdef NCOMPTONIZATION
+  //velocities of the frames
+  ldouble ut[4];ut[1]=pp2[VX];ut[2]=pp2[VY];ut[3]=pp2[VZ];
+  ldouble uffcov[4],uffcon[4];
+  conv_vels_both(ut,uffcon,uffcov,VELPRIM,VEL4,gg,GG);
+  ldouble urfcov[4],urfcon[4];
+  ut[1]=pp2[FX0];ut[2]=pp2[FY0];ut[3]=pp2[FZ0];
+  conv_vels_both(ut,urfcon,urfcov,VELPRIMRAD,VEL4,gg,GG);
+
+  ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
+  ldouble nphrf = -nphff/relgamma;
+
+  pp2[NF0]=nphrf;
+  #endif
 
   return 0;
 } 

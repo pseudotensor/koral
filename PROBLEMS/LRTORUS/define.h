@@ -6,8 +6,8 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
-#define RESTARTNUM 0
+//#define RESTART
+#define RESTARTNUM 20
 //#define RESTARTGENERALINDICES
 
 /************************************/
@@ -16,7 +16,8 @@
 #define RADIATION
 #define COMPTONIZATION
 #define NCOMPTONIZATION
-#define MAXDIFFTRADS 10.
+#define RADIMPCONV 1.e-6
+#define MAXDIFFTRADS 1000.
 
 /************************************/
 //magnetic choices
@@ -88,11 +89,11 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(4.6-MKS1R0))
-#define MAXX (log(1000.-MKS1R0))
+#define MINX (log(1.6-MKS1R0))
+#define MAXX (log(300.-MKS1R0))
 //total resolution
-#define TNX 120
-#define TNY 80
+#define TNX 160
+#define TNY 100
 #define TNZ 1
 //number of tiles
 #define NTX 4
@@ -113,7 +114,7 @@
 //#define OUTPUTPERCORE
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
-#define ALLSTEPSOUTPUT 1
+#define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000

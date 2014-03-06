@@ -35,7 +35,7 @@
 
 #define MASSCM 1.e11
 
-#define LTEFACTOR .01
+#define LTEFACTOR 1.
 #define URFX 0.
 
 #define KAPPA .1

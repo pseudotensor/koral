@@ -84,14 +84,31 @@ if(rho<0.) //outside donut
     pp[EE0]=my_max(E,ppback[EE0]);
     #ifdef NCOMPTONIZATION
     pp[NF0]=calc_NFfromE(pp[EE0]);
+
+    
+
     #endif
 
     pp[FX0]=Fx;
     pp[FY0]=Fy;
     pp[FZ0]=Fz;
 
+    
+    
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
     prad_ff2lab(pp,pp,&geomBL);
+
+    /*
+    if(geom.ix==50 && geom.iy==TNY/2)
+      {
+	printf("%e %e\n",
+	       calc_ncompt_Thatrad(pp,&geom,pp[EE0]),
+	       calc_LTE_TfromE(pp[EE0])
+	       );
+	exit(0);
+      }
+    */
+
 #endif
 
     //transforming primitives from BL to MYCOORDS

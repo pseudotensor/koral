@@ -114,8 +114,8 @@
 #define TEMPZERO 1.e7
 #define TEMPBLOB1 1.e7
 #define TEMPBLOB2 1.e7
-#define VELXBLOB1 0.1
-#define VELXBLOB2 -0.1
+#define VELXBLOB1 0.
+#define VELXBLOB2 -0.
 #define VELYBLOB1 (VELXBLOB1*0.5)
 #define VELYBLOB2 (VELXBLOB2*0.25)
 #define XBLOB1 -.5
