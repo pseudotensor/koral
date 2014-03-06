@@ -1491,18 +1491,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 
   #ifdef NCOMPTONIZATION //number of photons conserved
 
-  ldouble nphrf = pp[NF(0)];
-  ldouble urfcon[4];
-  urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
-
-  ldouble relgamma = urfcon[0]*ucov[0] + urfcon[1]*ucov[1] +urfcon[2]*ucov[2] +urfcon[3]*ucov[3]; 
-  ldouble nphhat = - relgamma*nphrf;
-  Thatrad = 1./2.70118/K_BOLTZ * Ehatrad / nphhat;
-
+  Thatrad = calc_ncompt_Thatrad(pp,ggg,Ehatrad);
+  
   #else //thermal comptonization
   
   Thatrad = calc_LTE_TfromE(Ehatrad);
@@ -3570,11 +3560,7 @@ calc_nsource(ldouble *pp, void* ggg)
       Ehatrad+=Rij[i][j]*uffcov[i]*uffcov[j];
 
   //radiation temperature
-  ldouble nphrf = pp[NF0];
-  ldouble Thatrad;
-  ldouble relgamma = -(urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]); 
-  ldouble nphhat = relgamma*nphrf;
-  Thatrad = 1./2.70118/K_BOLTZ * Ehatrad / nphhat;
+  ldouble Thatrad = calc_ncompt_Thatrad_4vel(pp,ggg,Ehatrad,urfcon,uffcov);
 
   //gas properties
   ldouble rho=pp[RHO];
@@ -3595,6 +3581,61 @@ calc_nsource(ldouble *pp, void* ggg)
 #endif
 }
 
+//**********************************************************************
+//* calculates the radiation temperature using
+//* radiative energy density and the number of photons
+//* assumes four-velocities known
+//**********************************************************************
+ldouble
+calc_ncompt_Thatrad_4vel(ldouble *pp, void* ggg, ldouble Ehatrad, ldouble* urfcon, ldouble* uffcov)
+{
+  //number of photons in rad rest frame
+  ldouble nphrf = pp[NF(0)];
+
+  //relative gamma rad-fluid rest frames
+  ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
+
+  //ff quantities
+  ldouble nphhat = - relgamma*nphrf;
+  ldouble Thatrad = 1./2.70118/K_BOLTZ * Ehatrad / nphhat;
+
+  return Thatrad;
+
+}
+
+
+//**********************************************************************
+//* calculates the radiation temperature using
+//* radiative energy density and the number of photons
+//**********************************************************************
+ldouble
+calc_ncompt_Thatrad(ldouble *pp, void* ggg, ldouble Ehatrad)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+  
+  //the four-velocity of fluid in lab frame
+  ldouble uffcon[4],utcon[4],uffcov[4],vpr[3];
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  conv_vels_both(utcon,uffcon,uffcov,VELPRIM,VEL4,gg,GG);
+
+  //the four-velocity of radiation in lab frame
+  ldouble urfcon[4];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+
+  return calc_ncompt_Thatrad_4vel(pp,ggg,Ehatrad,urfcon,uffcov);
+
+}
 
 //**********************************************************************
 //**********************************************************************
