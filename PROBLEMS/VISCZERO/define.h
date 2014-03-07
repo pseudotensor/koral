@@ -6,8 +6,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 42
+#define RESTART
+#define RESTARTNUM 10
 #define RESTARTGENERALINDICES
 
 /************************************/
@@ -15,10 +15,10 @@
 /************************************/
 #define HDVISCOSITY NOVISCOSITY
 //#define RADVISCOSITY NOVISCOSITY
-//#define RADVISCOSITY SHEARVISCOSITY
-#define RADVISCMFPSPH
-#define RADVISCNUDAMP
-#define ALPHARADVISC 0.1
+#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCMFPSPH
+//#define RADVISCNUDAMP
+#define ALPHARADVISC .25
 #define MAXRADVISCVEL 1.
 //#define NUMRADWAVESPEEDS
 
@@ -105,7 +105,6 @@
 //#define MAXY (Pi-0.0025*Pi/2.)
 #define HALFTHETA
 #define MAXY (Pi/2.) //change in postinit.c
-
 
 
 #define MINZ -1.

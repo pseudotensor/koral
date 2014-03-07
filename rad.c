@@ -3596,8 +3596,11 @@ calc_nsource(ldouble *pp, void* ggg)
   ldouble ndotff = -kappa*Cn*(Ehatrad/Thatrad - 4.*M_PI*B/Tgas);
 
   //relative gamma rad-fluid rest frames
-  ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
-  ldouble ndotrf = -ndotff/relgamma; 
+  //ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
+  //ldouble ndotrf = -ndotff/relgamma; 
+
+  //the rate of change of number of photons invariant
+  ldouble ndotrf = ndotff;
 
   return ndotrf; 
 #else
