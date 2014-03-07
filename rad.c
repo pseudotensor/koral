@@ -1257,7 +1257,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(ret!=0)
     {
       //report failure, stop and rerun with verbose
-      //return -1;
+      return -1;
 
       //****
       //nothing worked - ask for fixup
@@ -2237,6 +2237,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
 	{
 	  printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\n",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
 	  solve_implicit_lab(ix,iy,iz,dt,del4,2);
+	  exit(0);
 	  getchar();
 	}
       //use the explicit-implicit backup method

@@ -6,44 +6,9 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 42
 #define RESTARTGENERALINDICES
-
-/************************************/
-//radiation choices
-/************************************/
-#define RADIATION
-#define COMPTONIZATION
-#define NCOMPTONIZATION
-#define RADIMPCONV 1.e-5
-#define MAXDIFFTRADS 1000.
-
-/************************************/
-//magnetic choices
-/************************************/
-#define MAGNFIELD
-#define VECPOTGIVEN
-#define MAXBETA .01 //target pmag/pgas int the midplane
-#define GDETIN 1
-
-/************************************/
-//dynamo
-/************************************/
-//#define MIMICDYNAMO
-#define ALPHAFLIPSSIGN                                                        
-#define ALPHADYNAMO 0.03
-
-/************************************/
-//reconstruction / Courant
-/************************************/
-#define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
-#define TSTEPLIM .6
-#define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
-#define SHUFFLELOOPS 0
-#define DOFIXUPS 1
 
 /************************************/
 //viscosity choices
@@ -56,6 +21,41 @@
 #define ALPHARADVISC 0.1
 #define MAXRADVISCVEL 1.
 //#define NUMRADWAVESPEEDS
+
+/************************************/
+//radiation choices
+/************************************/
+#define RADIATION
+//#define COMPTONIZATION
+//#define NCOMPTONIZATION
+//#define RADIMPCONV 1.e-5
+//#define MAXDIFFTRADS 1000.
+
+/************************************/
+//magnetic choices
+/************************************/
+//#define MAGNFIELD
+//#define VECPOTGIVEN
+//#define MAXBETA .01 //target pmag/pgas int the midplane
+
+/************************************/
+//dynamo
+/************************************/
+//#define MIMICDYNAMO
+//#define ALPHAFLIPSSIGN                                                        
+//#define ALPHADYNAMO 0.03
+
+/************************************/
+//reconstruction / Courant
+/************************************/
+#define INT_ORDER 1
+#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
+#define TSTEPLIM .6
+#define FLUXLIMITER 0
+#define MINMOD_THETA 1.5
+#define SHUFFLELOOPS 0
+#define DOFIXUPS 1
+#define GDETIN 1
 
 /************************************/
 //rmhd floors
@@ -89,11 +89,11 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
-#define MAXX (log(300.-MKS1R0))
+#define MINX (log(4.-MKS1R0))
+#define MAXX (log(100.-MKS1R0))
 //total resolution
-#define TNX 160
-#define TNY 100
+#define TNX 100
+#define TNY 40
 #define TNZ 1
 //number of tiles
 #define NTX 4
@@ -102,8 +102,12 @@
 #endif
 
 #define MINY (0.0025*Pi/2.)
-#define MAXY (Pi-0.0025*Pi/2.)
-//#define MAXY (Pi/2.) //change in postinit.c
+//#define MAXY (Pi-0.0025*Pi/2.)
+#define HALFTHETA
+#define MAXY (Pi/2.) //change in postinit.c
+
+
+
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
@@ -123,7 +127,7 @@
 #define RADOUTPUT 1
 #define SCAOUTPUT 1
 #define AVGOUTPUT 1
-#define SIMOUTPUT 1
+#define SIMOUTPUT 0
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 10.
@@ -134,93 +138,20 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 7
+#define NTORUS 2
 
-#if(NTORUS==7) //flat sigma
+#if(NTORUS==2) //for Yucong
 #define LT_KAPPA 5.e2
-#define EXPECTEDHR 0.4
-#define LT_XI 0.975
-#define LT_R1 30.
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 22.
-#undef MAXBETA
-#define MAXBETA (1./10.) //eq.plane
-//#define BETANORMFACTOR 2.e-10
-#endif
-
-#if(NTORUS==6) //for not-so-hyper
-#define LT_KAPPA 1.5e3
 #define EXPECTEDHR 0.4
 #define LT_XI 0.95
-#define LT_R1 16.
-#define LT_R2 200.
+#define LT_R1 12.5
+#define LT_R2 500.
+#ifdef RADIATION
 #define LT_GAMMA 4./3.
-//#define LT_RIN 10.25
-#define LT_RIN 10.6
-#undef MAXBETA
-#define MAXBETA (1./25.) //eq.plane
-#endif
-
-#if(NTORUS==5) //single toroidal loop
-
-#define EXPECTEDHR 0.4
-#define LT_KAPPA 1.e-2
-#define LT_XI 0.708
-#define LT_R1 42.
-#define LT_R2 1000.
+#else
 #define LT_GAMMA 5./3.
-#define LT_RIN 10.
-#undef MAXBETA
-#define MAXBETA (1./30.) //target pmag/pgas inside torus
-#define BETANORMFULL
-//#define BETANORMFACTOR 2.e-10
 #endif
-
-#if(NTORUS==4) //a=0 SANE, no rad, denser loops
-#define EXPECTEDHR 0.4
-#define LT_KAPPA 1.e-2
-#define LT_XI 0.708
-#define LT_R1 42.
-#define LT_R2 1000.
-#define LT_GAMMA 5./3.
-#define LT_RIN 10.
-#undef MAXBETA
-#define MAXBETA (1./30.) //target pmag/pgas inside torus
-#define BETANORMFULL
-#endif
-
-#if(NTORUS==3) //a=0 SANE, no rad!
-#define EXPECTEDHR 0.4
-#define LT_KAPPA 1.e-2
-#define LT_XI 0.708
-#define LT_R1 42.
-#define LT_R2 1000.
-#define LT_GAMMA 5./3.
-#define LT_RIN 10.
-#undef MAXBETA
-#define MAXBETA (1./30.) //target pmag/pgas inside torus
-#define BETANORMFULL
-#endif
-
-#if(NTORUS==1) //original (2nd koral paper)
-#define LT_KAPPA 1.5e3
-#define LT_XI 0.9
-#define LT_R1 31.75
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 15.
-#endif
-
-#if(NTORUS==2) //for Yucong?
-#define PRECISEDONUT
-#define LT_KAPPA 5.e2
-#define EXPECTEDHR 0.4
-#define LT_XI 0.975
-#define LT_R1 30.
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 22.
+#define LT_RIN 8.
 #endif
 
 #define RHOATMMIN  1.e-24

@@ -73,8 +73,23 @@
 //70 M1SHOCK - light beam penetrating absorbing medium, Monreal & Frank 08
 //71 MBBBLOB - rad blobs with magn field
 //72 BOWSHOCK - bow shock in wind tunnel
+//73 VISCZERO - tests of radiative diffusion to compare with ZERO solution
 
-#define PROBLEM 67
+#define PROBLEM 73
+
+#if(PROBLEM==73)
+
+#define PR_DEFINE "PROBLEMS/VISCZERO/define.h"
+#define PR_BC "PROBLEMS/VISCZERO/bc.c"
+#define PR_INIT "PROBLEMS/VISCZERO/init.c"
+#define PR_KAPPA "PROBLEMS/VISCZERO/kappa.c"
+#define PR_KAPPAES "PROBLEMS/VISCZERO/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/VISCZERO/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/VISCZERO/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/VISCZERO/dump.c"
+#define PR_TOOLS "PROBLEMS/VISCZERO/tools.c"
+
+#endif
 
 #if(PROBLEM==72)
 

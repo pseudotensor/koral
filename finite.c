@@ -2961,6 +2961,11 @@ correct_polaraxis()
 		      //rad density
 		      pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
 
+		      #ifdef NCOMPTONIZATION
+		      //no. of photons
+		      pp[NF0]=get_u(p,NF0,ix,iysrc,iz);
+		      #endif
+
 		      //rad velocities
 		      pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
 		      pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
@@ -3011,6 +3016,11 @@ correct_polaraxis()
 #ifdef RADIATION
 		      //rad density
 		      pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
+
+                      #ifdef NCOMPTONIZATION
+		      //no. of photons
+		      pp[NF0]=get_u(p,NF0,ix,iysrc,iz);
+		      #endif
 
 		      //rad velocities
 		      pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
@@ -3075,6 +3085,11 @@ correct_polaraxis()
 		  #ifdef RADIATION
 		  //rad density
 		  pp[EE0]=get_u(p,EE0,ixsrc,iy,iz);
+
+                  #ifdef NCOMPTONIZATION
+		  //no. of photons
+		  pp[NF0]=get_u(p,NF0,ixsrc,iy,iz);
+		  #endif
 
 		  //rad velocities
 		  pp[FY0]=get_u(p,FY0,ixsrc,iy,iz);
