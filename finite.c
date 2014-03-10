@@ -2983,6 +2983,7 @@ correct_polaraxis()
 		}
   
 	      //lower
+#ifndef HALFTHETA
 	      if(TJ==NTY-1)
 		{
 		  thaxis=get_xb(NY,1);
@@ -3037,6 +3038,7 @@ correct_polaraxis()
 		      }
 		    }
 		}
+#endif
 	    }
 	}
     }

@@ -14,12 +14,11 @@
 //viscosity choices
 /************************************/
 #define RADVISCOSITY SHEARVISCOSITY
-#define RADVISCMFPSPH
+#define RADVISCMFPCONST 2.
 #define RADVISCNUDAMP
-//#define RADVISCMAXVELDAMP
-#define ALPHARADVISC .5
-#define MAXRADVISCVEL 1.
-//#define NUMRADWAVESPEEDS
+#define RADVISCMAXVELDAMP
+#define ALPHARADVISC 1.
+#define MAXRADVISCVEL .5
 
 /************************************/
 //radiation choices
@@ -88,15 +87,15 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(4.-MKS1R0))
-#define MAXX (log(100.-MKS1R0))
+#define MINX (log(4.6-MKS1R0))
+#define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 100
-#define TNY 40
+#define TNX 120
+#define TNY 50
 #define TNZ 1
 //number of tiles
-#define NTX 4
-#define NTY 2
+#define NTX 8
+#define NTY 8
 #define NTZ 1
 #endif
 
@@ -119,7 +118,6 @@
 #define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
-#define NOUTSTOP 5000
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
 #define RADOUTPUT 1
@@ -129,7 +127,8 @@
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 10.
-#define DTOUT2 1000.
+#define DTOUT2 50.
+#define NOUTSTOP 50 //max n of outputs                                                                                                                                                                                        
 
 /************************************/
 //common physics / torus / atmosphere
