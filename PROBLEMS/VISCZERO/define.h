@@ -13,12 +13,11 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define HDVISCOSITY NOVISCOSITY
-//#define RADVISCOSITY NOVISCOSITY
 #define RADVISCOSITY SHEARVISCOSITY
-//#define RADVISCMFPSPH
-//#define RADVISCNUDAMP
-#define ALPHARADVISC .25
+#define RADVISCMFPSPH
+#define RADVISCNUDAMP
+//#define RADVISCMAXVELDAMP
+#define ALPHARADVISC .5
 #define MAXRADVISCVEL 1.
 //#define NUMRADWAVESPEEDS
 
