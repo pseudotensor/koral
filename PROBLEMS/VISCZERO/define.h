@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 10
 #define RESTARTGENERALINDICES
 
@@ -94,8 +94,8 @@
 #define TNY 50
 #define TNZ 1
 //number of tiles
-#define NTX 8
-#define NTY 8
+#define NTX 4
+#define NTY 2
 #define NTZ 1
 #endif
 
