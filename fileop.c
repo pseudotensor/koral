@@ -71,9 +71,9 @@ fprint_closefiles()
 {
 #ifndef MPI
   fclose(fout_scalars);
-  fclose(fout_fail);
-  return 0;
+  fclose(fout_fail);  
 #endif
+  return 0;
 }
 
 /*********************************************/
