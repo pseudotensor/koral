@@ -648,10 +648,13 @@ fprint_restartfile_mpi(ldouble t, char* folder)
 
   MPI_File_close( &cFile );
 
-  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
-  iv=system(bufor);
-  sprintf(bufor,"cp %s/res%04d.head %s/reslast.head",folder,nfout1,folder);
-  iv=system(bufor);
+  if(PROCID==0)
+    {
+      sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+      iv=system(bufor);
+      sprintf(bufor,"cp %s/res%04d.head %s/reslast.head",folder,nfout1,folder);
+      iv=system(bufor);
+    }
 
 #endif
   return 0;
@@ -696,11 +699,10 @@ fprint_restartfile_bin(ldouble t, char* folder)
 
   fclose(fout1);
 
-  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
-  iv=system(bufor);
-
   if(PROCID==0)
     {
+      sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+      iv=system(bufor);
       sprintf(bufor,"cp %s/res%04d.head %s/reslast.head",folder,nfout1,folder);
       iv=system(bufor);    
     }
