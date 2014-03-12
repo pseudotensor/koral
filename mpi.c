@@ -8,8 +8,7 @@ mpi_exchangedata()
   my_clock_gettime(&temp_clock);    
   mid1_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
 
-#ifdef MPI
-  
+#ifdef MPI  
   MPI_Request reqs[MPIMSGBUFSIZE];
   int nreqs=0;
   mpi_senddata(reqs,&nreqs);

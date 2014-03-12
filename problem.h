@@ -75,7 +75,7 @@
 //72 BOWSHOCK - bow shock in wind tunnel
 //73 VISCZERO - tests of radiative diffusion to compare with ZERO solution
 
-#define PROBLEM 73
+#define PROBLEM 72
 
 #if(PROBLEM==73)
 

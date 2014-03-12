@@ -10,10 +10,15 @@
 //#define RADIATION
 
 /************************************/
+//magnetic fields
+/************************************/
+//#define MAGNFIELD
+
+/************************************/
 //hydro choices
 /************************************/
 #define ALLOWENTROPYU2P 1
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 
 /************************************/
 //reconstruction / Courant
@@ -55,9 +60,12 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define NX 30 
-#define NY 30
-#define NZ 30
+#define TNX 30 
+#define TNY 30
+#define TNZ 30
+#define NTX 2
+#define NTY 2
+#define NTZ 2
 #define SPECIFIC_BC
 
 /************************************/

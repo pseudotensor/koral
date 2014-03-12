@@ -1459,6 +1459,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
 	      //at the corners
 	      //I commented it out to precalculate metric in the corners but may affect something, who knows? :)
+	      //It makes it calculate boundary conditions at the corners
 	      //if(if_outsidegc(ix,iy,iz)==1) continue;
 
 	      loop_2[Nloop_2][0]=ix;
@@ -2077,7 +2078,7 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
 #ifdef PERIODIC_ZBC
       iiz=iz;
       if(iz<0) iiz=iz+NZ;
-      if(iz>NZ-1) iiy=iz-NZ;
+      if(iz>NZ-1) iiz=iz-NZ;
       if(NZ<NG) iiz=0;
 #endif
 #ifdef COPY_ZBC
