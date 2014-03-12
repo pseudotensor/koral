@@ -2119,6 +2119,9 @@ int set_bc(ldouble t,int ifinit)
       iy=loop_2[ii][1];
       iz=loop_2[ii][2];
 
+      //to avoid corners here - treated later if necessary
+      if(if_outsidegc(ix,iy,iz)==1) continue;
+
       //type of BC
       int BCtype;
       if(ix<0) BCtype=XBCLO;
