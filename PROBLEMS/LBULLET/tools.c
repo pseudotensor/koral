@@ -1,18 +1,3 @@
-#include <stdio.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_integration.h>
-
-#define FTYPE double
-
-#define LT_BHSPIN 0.9
-#define LT_KAPPA 2.e3
-#define LT_XI 0.975
-#define LT_R1 30.
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 22.
-
 void compute_gd( FTYPE r, FTYPE th, FTYPE a, FTYPE *gdtt, FTYPE *gdtp, FTYPE *gdpp ) {
    FTYPE Sigma, tmp;
 
@@ -225,9 +210,8 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
    int worksize = 1000;   // workspace size
    gsl_function integrand;
    int intstatus;
-   
    R = r*sin(th);
-   if (R < LT_RIN) {*rhoout = 0.; return(0);}
+   if (R < LT_RIN) {*rhoout = -1.; return(0);}
 
    ///
    /// Parameters
@@ -302,67 +286,65 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
    hh = f3din*Agrav / (f3d*Agravin);
    eps = (-1 + hh)*pow(LT_GAMMA,-1);
 
-   if (eps < 0) rho = 0; else rho = pow((-1 + LT_GAMMA)*eps*pow(kappa,-1),pow(-1 + LT_GAMMA,-1));
+   if (eps < 0) rho = -1; else rho = pow((-1 + LT_GAMMA)*eps*pow(kappa,-1),pow(-1 + LT_GAMMA,-1));
 
    *rhoout = rho;
    *ell=l;
    *uuout = kappa * pow(rho, LT_GAMMA) / (LT_GAMMA - 1.);
+
+   //my_err("wfsg");
+   //printf("%e %e %e\n",rho,kappa,*uuout);
+   //exit(0);   getch();
 
    return(0);
 
 }
 
 
-
+/*
 int main() {
 
-   int nr = 60, nth = 36;
-   FTYPE Rin = 2., Rout = 500.;   // a = 0
+   int nr = 48, nth = 16;
+   FTYPE Rin = 1.6, Rout = 200.;   // a = 0
    //FTYPE Rin = 1.364, Rout = 2000.;   // a = 0.9
    FTYPE th1 = 0., th2 = M_PI_2;
    FTYPE dr = (Rout - Rin) / nr, dth = (th2 - th1) / nth;
    FTYPE factor;
    FTYPE r, th, rho, uu, ell;
    int i, j;
-   FILE *outfile, *radfile;
+   FILE*outfile;
 
 //    FTYPE R0 = 1.05, startx1 = -0.6736, dx1 = 0.0372985;
 
-   FTYPE a = LT_BHSPIN;
+   FTYPE a = 0.9;
    factor = log(Rout/Rin);
 
    outfile = fopen("slice.dat", "w");
-   radfile = fopen("radslice.dat","w");
-
-   FTYPE Sigma;
-
-   for (i=0; i<=nr; i++) 
-     {
-       r = Rin*exp((FTYPE)i/nr*factor);
-       printf("r: %.2f\n",r);
-
-       Sigma=0.;
-       for (j=0; j<=nth; j++) 
-	 {
-	   th = th1 + j*dth;
-	   if(th>M_PI) th-=0.01;
-
-	   init_dsandvels_limotorus(r, th, a, &rho, &uu, &ell);
-
-	   Sigma+=rho*r*dth;
-
-	   fprintf(outfile, "%g\t%g\t%g\t%g\t%g\n", r*sin(th), r*cos(th), rho, uu,ell);
-	 }
+//    fprintf(outfile, "variables = x, z, rho\n");
+//    fprintf(outfile, "zone t=rho, i=%i, j=%i, F=POINT\n", nr+1, nth+1);
+   for (j=0; j<=nth; j++) {
+     th = th1 + j*dth;
+     if(th>M_PI) th-=0.01;
+//       th = 1.;
+      for (i=0; i<=nr; i++) {
+//          r = Rin + i*dr;
+         r = Rin*exp((FTYPE)i/nr*factor);
+//          r = R0 + exp(startx1 + (i+0.5)*dx1);
+//          r = 70.;
+         init_dsandvels_limotorus(r, th, a, &rho, &uu, &ell);
+//          fprintf(outfile, "%g\t%g\t%g\n", r*sin(th), r*cos(th), rho);
+         fprintf(outfile, "%g\t%g\t%g\t%g\t%g\n", r, th, rho, uu,ell);
+      }
       fprintf(outfile, "\n");
-      fprintf(radfile,"%g %g %g\n",r,Sigma,ell);
-
-     }
-
+   }
    fclose(outfile);
-   fclose(radfile);
+
+//    th = M_PI_2*0.3;
+//    r = 350.;
+//    init_dsandvels_limotorus(r, th, a, &rho);
+//    printf("%f\n", rho);
 
    return(0);
 
 }
-
-//    intstatus = gsl_integration_qag(&integrand, lamin, lam, 1.e-7, 1.e-7, worksize, GSL_INTEG_GAUSS61, intwork, &lnf3d, &lnferr);
+*/

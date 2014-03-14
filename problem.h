@@ -74,10 +74,24 @@
 //71 MBBBLOB - rad blobs with magn field
 //72 BOWSHOCK - bow shock in wind tunnel
 //73 VISCZERO - tests of radiative diffusion to compare with ZERO solution
-//74 ERICTEST 
+//74 ERICTEST - tests for Eric
+//75 LBULLET - bullet through limo torus
 
-#define PROBLEM 74
+#define PROBLEM 75
 
+#if(PROBLEM==75)
+
+#define PR_DEFINE "PROBLEMS/LBULLET/define.h"
+#define PR_BC "PROBLEMS/LBULLET/bc.c"
+#define PR_INIT "PROBLEMS/LBULLET/init.c"
+#define PR_KAPPA "PROBLEMS/LBULLET/kappa.c"
+#define PR_KAPPAES "PROBLEMS/LBULLET/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/LBULLET/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/LBULLET/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/LBULLET/dump.c"
+#define PR_TOOLS "PROBLEMS/LBULLET/tools.c"
+
+#endif
 #if(PROBLEM==74)
 
 #define PR_DEFINE "PROBLEMS/ERICTEST/define.h"
