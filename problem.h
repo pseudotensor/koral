@@ -74,8 +74,23 @@
 //71 MBBBLOB - rad blobs with magn field
 //72 BOWSHOCK - bow shock in wind tunnel
 //73 VISCZERO - tests of radiative diffusion to compare with ZERO solution
+//74 ERICTEST 
 
-#define PROBLEM 72
+#define PROBLEM 74
+
+#if(PROBLEM==74)
+
+#define PR_DEFINE "PROBLEMS/ERICTEST/define.h"
+#define PR_BC "PROBLEMS/ERICTEST/bc.c"
+#define PR_INIT "PROBLEMS/ERICTEST/init.c"
+#define PR_KAPPA "PROBLEMS/ERICTEST/kappa.c"
+#define PR_KAPPAES "PROBLEMS/ERICTEST/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/ERICTEST/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/ERICTEST/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/ERICTEST/dump.c"
+#define PR_TOOLS "PROBLEMS/ERICTEST/tools.c"
+
+#endif
 
 #if(PROBLEM==73)
 
