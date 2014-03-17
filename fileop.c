@@ -650,9 +650,15 @@ fprint_restartfile_mpi(ldouble t, char* folder)
 
   if(PROCID==0)
     {
-      sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+      //sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+      sprintf(bufor,"rm %s/reslast.dat",folder);
       iv=system(bufor);
-      sprintf(bufor,"cp %s/res%04d.head %s/reslast.head",folder,nfout1,folder);
+      sprintf(bufor,"ln -s res%04d.dat %s/reslast.dat",nfout1,folder);
+      iv=system(bufor);
+      //sprintf(bufor,"cp %s/res%04d.head %s/reslast.head",folder,nfout1,folder);
+      sprintf(bufor,"rm %s/reslast.head",folder);
+      iv=system(bufor);
+      sprintf(bufor,"ln -s res%04d.head %s/reslast.head",nfout1,folder);
       iv=system(bufor);
     }
 
@@ -701,9 +707,15 @@ fprint_restartfile_bin(ldouble t, char* folder)
 
   if(PROCID==0)
     {
-      sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+      //sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder)
+      sprintf(bufor,"rm %s/reslast.dat",folder);
       iv=system(bufor);
-      sprintf(bufor,"cp %s/res%04d.head %s/reslast.head",folder,nfout1,folder);
+      sprintf(bufor,"ln -s res%04d.dat %s/reslast.dat",nfout1,folder);
+      iv=system(bufor);
+      //sprintf(bufor,"cp %s/res%04d.head %s/reslast.head",folder,nfout1,folder);
+      sprintf(bufor,"rm %s/reslast.head",folder);
+      iv=system(bufor);
+      sprintf(bufor,"ln -s res%04d.head %s/reslast.head",nfout1,folder);
       iv=system(bufor);    
     }
 
@@ -753,7 +765,10 @@ fprint_restartfile_ascii(ldouble t, char* folder)
 
   fclose(fout1);
 
-  sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+  //sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
+  sprintf(bufor,"rm %s/reslast.dat",folder);
+  iv=system(bufor);
+  sprintf(bufor,"ln -s res%04d.dat %s/reslast.dat",nfout1,folder);
   iv=system(bufor);
 
   return 0;

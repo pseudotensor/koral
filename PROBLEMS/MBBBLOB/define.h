@@ -1,6 +1,6 @@
 //test
-#define MAGNFIELD
-#define VECPOTGIVEN
+//#define MAGNFIELD
+//#define VECPOTGIVEN
 
 /************************************/
 //restart
