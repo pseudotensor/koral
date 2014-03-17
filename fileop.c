@@ -1543,7 +1543,7 @@ int fprint_simplecart(ldouble t, int nfile, char* folder,char* prefix)
 	       dx[2]=get_size_x(iz,2);
 	       ldouble gdet=geom.gdet;
 	       ldouble volume=dx[0]*dx[1]*dx[2]*gdet;
-	       trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,&geom,&geomout);
+	       trans_pall_coco(pp, pp, MYCOORDS,OUTCOORDS, geom.xxvec,&geom,&geomout);
 	       ldouble rho=rhoGU2CGS(pp[RHO]);
 	       ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
 	       ldouble tracer=pp[TRA];
@@ -1574,11 +1574,57 @@ int fprint_simplecart(ldouble t, int nfile, char* folder,char* prefix)
 
 	       fprintf(fout1,"%.5e %.5e %.5e ",geomcart.xx,geomcart.yy,geomcart.zz);
 
-	       fprintf(fout1,"%.5e %.5e %.5e ",rho,temp,tracer);
+	       fprintf(fout1,"%.5e %.5e ",rho,temp);
 
 	       fprintf(fout1,"%.5e %.5e %.5e ",vx,vy,vz);
 
-	       fprintf(fout1,"%.5e \n",volume);
+	       fprintf(fout1,"%.5e ",volume);
+
+	       #ifdef RADIATION
+	       ldouble Rtt,ehat,Rij[4][4];
+	       ldouble ugas[4],Fx,Fy,Fz;
+	       if(doingavg==0)
+		{
+		  calc_ff_Rtt(pp,&Rtt,ugas,&geomout);
+		  ehat=-Rtt;  
+		  calc_Rij(pp,&geomout,Rij); //calculates R^munu in OUTCOORDS
+		  indices_2221(Rij,Rij,geomout.gg);	      							  
+		}
+	      else
+		{
+		  ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
+		  int i,j;
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+		}
+
+	       //transform to cartesian
+	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
+		{
+		  ldouble r=geomsph.xx;
+		  ldouble th=geomsph.yy;
+		  ldouble ph=geomsph.zz;
+
+		  Rij[2][0]*=r;
+		  Rij[3][0]*=r*sin(th);
+
+		  Fx = sin(th)*cos(ph)*Rij[1][0] 
+		    + cos(th)*cos(ph)*Rij[2][0]
+		    - sin(ph)*Rij[3][0];
+
+		  Fy = sin(th)*sin(ph)*Rij[1][0] 
+		    + cos(th)*sin(ph)*Rij[2][0]
+		    + cos(ph)*Rij[3][0];
+
+		  Fz = cos(th)*Rij[1][0] 
+		    - sin(th)*Rij[2][0];
+		}
+	       
+	      fprintf(fout1,"%.5e %.5e %.5e %.5e",endenGU2CGS(ehat),fluxGU2CGS(Fx),fluxGU2CGS(Fy),fluxGU2CGS(Fz));
+#endif
+
+	      fprintf(fout1,"\n");
 	     }
 	 }
      }
@@ -1647,7 +1693,43 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 
 	       fprintf(fout1,"%.5e %.5e %.5e ",vel[1],vel[2],vel[3]);
 
-	       fprintf(fout1,"%.5e \n",volume);
+	       fprintf(fout1,"%.5e ",volume);
+
+	       #ifdef RADIATION
+	       ldouble Rtt,ehat,Rij[4][4];
+	       ldouble ugas[4],Fx,Fy,Fz;
+	       if(doingavg==0)
+		{
+		  calc_ff_Rtt(pp,&Rtt,ugas,&geomBL);
+		  ehat=-Rtt;  
+		  calc_Rij(pp,&geomBL,Rij); //calculates R^munu in OUTCOORDS
+		  indices_2221(Rij,Rij,geomBL.gg);	      							  
+		}
+	      else
+		{
+		  ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
+		  int i,j;
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+		}
+	       
+	       //flux
+	       Fx=Rij[1][0];
+	       Fy=Rij[2][0];
+	       Fz=Rij[3][0];
+
+	       //four fource
+	       //TODO if needed
+	       //calc_Gi(pp,&geomBL,Gi); 
+	       //indices_21(Gi,Gi,geomBL.gg);
+	       	       
+	       fprintf(fout1,"%.5e %.5e %.5e %.5e",endenGU2CGS(ehat),fluxGU2CGS(Fx),fluxGU2CGS(Fy),fluxGU2CGS(Fz));
+#endif
+
+	      fprintf(fout1,"\n");
+
+
 	     }
 	 }
      }
