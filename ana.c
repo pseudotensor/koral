@@ -96,7 +96,7 @@ main(int argc, char **argv)
       fprint_silofile(t,nfout1,"analysis","sil");
 #endif
 #endif
-#if(SIMOUTPUT==1)	  
+#if(SIMOUTPUT!=0)	  
       fprint_simplefile(t,nfout1,"analysis","sim");
 #endif
   

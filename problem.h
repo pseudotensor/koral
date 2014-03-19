@@ -77,7 +77,7 @@
 //74 ERICTEST - tests for Eric
 //75 LBULLET - bullet through limo torus
 
-#define PROBLEM 71
+#define PROBLEM 67
 
 #if(PROBLEM==75)
 

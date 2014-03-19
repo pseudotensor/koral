@@ -142,7 +142,7 @@ main(int argc, char **argv)
 #endif
 #endif
   
-#if(SIMOUTPUT==1)	  
+#if(SIMOUTPUT!=0)	  
   sprintf(prefix,"simavg%s%04d-",suffix,no1);
   fprint_simplecart(t,no2,"analysis",prefix);
 #endif

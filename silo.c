@@ -272,11 +272,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[2]=Tij[2][0];
 		  Tit[3]=Tij[3][0];
 
-		  //muBe[nodalindex]=Tij[1][0]/(rho[nodalindex]*vel[1])-1.;
-		  #ifdef MAGNFIELD
+		  //Bernoulli number
 		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
-				     GAMMA*uint[nodalindex]*vcov[0]+
-				     bsq[nodalindex])/rho[nodalindex]-1.;
+				     GAMMA*uint[nodalindex]*vcov[0])/rho[nodalindex]-1.;
+     		#ifdef MAGNFIELD
+		  muBe[nodalindex]+=-(bsq[nodalindex])/rho[nodalindex];
 
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
@@ -335,11 +335,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[2]=Tij[2][0];
 		  Tit[3]=Tij[3][0];
 
-		  #ifdef MAGNFIELD
-		  //		  muBe[nodalindex]=Tij[1][0]/(rho[nodalindex]*vel[1])-1.;
+
+		  //Bernoulli number
 		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
-				     GAMMA*uint[nodalindex]*vcov[0]+
-				     bsq[nodalindex])/rho[nodalindex]-1.;
+				     GAMMA*uint[nodalindex]*vcov[0])/rho[nodalindex]-1.;
+		  #ifdef MAGNFIELD
+		  muBe[nodalindex]+=-(bsq[nodalindex])/rho[nodalindex];
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
 		  //to calculate magn. field angle

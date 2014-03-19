@@ -1486,11 +1486,11 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
 /* wrapper for simple output */
 int fprint_simplefile(ldouble t, int nfile, char* folder,char* prefix)
 {
-#if (PROBLEM==55) //G2STATIC
+#if (SIMOUTPUT==1)
   fprint_simplecart(t,nfile,folder,prefix);
 #endif
 
-#ifdef BHDISK_PROBLEMTYPE
+#if (SIMOUTPUT==2)
   fprint_simplesph(t,nfile,folder,prefix);
 #endif
 
@@ -1720,11 +1720,31 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       Fz=Rij[3][0];
 
 	       //four fource
-	       //TODO if needed
-	       //calc_Gi(pp,&geomBL,Gi); 
-	       //indices_21(Gi,Gi,geomBL.gg);
+	       ldouble Gi[4],Giff[4]={0.,0.,0.,0.};
+	       ldouble Gic[4],Gicff[4]={0.,0.,0.,0.};
+	       calc_Gi(pp,&geomBL,Gi); 
+	       boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
+	       #ifdef COMPTONIZATION
+	       ldouble kappaes=calc_kappaes(rho,temp,-1.,-1.,-1.);  
+	       calc_Compt_Gi(pp,&geomBL,Gic,ehat,temp,kappaes,vel);
+	       boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
+               #endif 
+
+	       /*
+	       if(ix==NX/2 && iy==NY/2)
+		 {
+		   print_4vector(Gi);
+		   print_4vector(Giff);
+		   print_4vector(Gic);
+		   print_4vector(Gicff);
+		   getchar();
+		 }
+	       */
 	       	       
-	       fprintf(fout1,"%.5e %.5e %.5e %.5e",endenGU2CGS(ehat),fluxGU2CGS(Fx),fluxGU2CGS(Fy),fluxGU2CGS(Fz));
+	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",endenGU2CGS(ehat),fluxGU2CGS(Fx),fluxGU2CGS(Fy),fluxGU2CGS(Fz));
+	       
+	       ldouble conv=kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.);
+	       fprintf(fout1,"%.5e %.5e ",Giff[0]*conv,Gicff[0]*conv);
 #endif
 
 	      fprintf(fout1,"\n");

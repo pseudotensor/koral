@@ -28,10 +28,11 @@
 #define massGU2CGS(x)    (x/GGG*CCC*CCC*MASSCM)
 #define kappaCGS2GU(x)  (x/GGG*CCC*CCC/MASSCM)
 #define kappaGU2CGS(x)  (x*GGG/CCC/CCC*MASSCM)
-#define endenCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC)
-#define endenGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC)
-#define fluxCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC)
-#define fluxGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC)
+//verify
+#define endenCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC)
+#define endenGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC)
+#define fluxCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC/CCC)
+#define fluxGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC*CCC)
 
 //constants
 #define K_BOLTZ (1.3806488e-16 * GGG / CCC / CCC / CCC / CCC / MASSCM)
@@ -604,6 +605,7 @@ int calc_tautot(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tautot);
 int calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tauabs);
 int calc_Gi_ff(ldouble *pp, ldouble Gi[4]);
 int calc_Gi(ldouble *pp, void*,ldouble Gi[4]);
+int calc_Compt_Gi(ldouble *pp, void* ggg, ldouble *Gtc, ldouble Ehatrad, ldouble Tgas, ldouble kappaes, ldouble *ucon);
 int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int);
 int calc_rad_wavespeeds(ldouble *pp,void*,ldouble tautot[3],ldouble *aval,int verbose);
 int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval);

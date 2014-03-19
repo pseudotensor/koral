@@ -223,8 +223,7 @@ if(rho<0.) //outside donut
     }
      
     //    if(iy==NY/2) printf("%d %f %f > %e %e %e %e\n",iy,r,th,uchop,u_av_mid,u_av, u_av_chop);
-    //Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
-    Acov[3]=vpot;
+    Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
 
 #elif (NTORUS==6)
 

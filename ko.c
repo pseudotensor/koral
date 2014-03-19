@@ -135,7 +135,7 @@ main(int argc, char **argv)
       fprint_silofile(tstart,nfout1,folder,"sil");
 #endif
 #endif
-#if(SIMPLEOUTPUT==1)
+#if(SIMOUTPUT!=0)
       fprint_simplefile(tstart,nfout1,folder,"sim");
 #endif
       #endif

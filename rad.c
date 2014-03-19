@@ -1468,8 +1468,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Ruu+=Rij[i][j]*ucov[i]*ucov[j];
-
-
+  ldouble Ehatrad = Ruu;
+  
   ldouble Ru;
   for(i=0;i<4;i++)
     {
@@ -1479,9 +1479,31 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
     }
 
-  //test
 #ifdef COMPTONIZATION
-  ldouble Ehatrad = Ruu;
+  ldouble Gic[4];
+  calc_Compt_Gi(pp,ggg,Gic,Ehatrad,Tgas,kappaes,ucon);
+  for(i=0;i<4;i++)
+    Gi[i]+=Gic[i];
+#endif 
+
+  return 0;
+}
+
+/****************************************************/
+/***** Comptonization component of the **************/
+/***** energy transfer through G^t ******************/
+/****************************************************/
+int
+calc_Compt_Gi(ldouble *pp, void* ggg, ldouble *Gic, ldouble Ehatrad, ldouble Tgas, ldouble kappaes, ldouble *ucon)
+{
+#ifdef RADIATION
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+  
   ldouble Thatrad;
 
   #ifdef NCOMPTONIZATION //number of photons conserved
@@ -1504,14 +1526,16 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   
   #endif
 
-  
+  int i;
   for(i=0;i<4;i++)
-    Gi[i]+=kappaes * Ehatrad * (4.*K_BOLTZ*(Thatrad - Tgas)/M_ELECTR) * (1. + 4.*K_BOLTZ*Tgas/M_ELECTR) * ucon[i]; 
+    Gic[i]=kappaes * Ehatrad * (4.*K_BOLTZ*(Thatrad - Tgas)/M_ELECTR) * (1. + 4.*K_BOLTZ*Tgas/M_ELECTR) * ucon[i]; 
 
-#endif 
 
+#endif
   return 0;
+
 }
+
 
 /****************************************************/
 /***** radiative stress energy tensor ***************/

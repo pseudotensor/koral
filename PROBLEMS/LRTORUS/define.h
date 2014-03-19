@@ -6,8 +6,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM -1
+#define RESTART
+#define RESTARTNUM 600
 
 /************************************/
 //radiation choices
@@ -21,6 +21,9 @@
 #define MIMICDYNAMO
 #define ALPHAFLIPSSIGN                                                        
 #define ALPHADYNAMO 0.03
+#define BETASATURATED 0.1
+#define DAMPBETA 0.1
+#define ALPHABETA 1.
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
@@ -44,7 +47,7 @@
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
-#define ALPHARADVISC 0.1
+#define ALPHARADVISC 0.05
 #define MAXRADVISCVEL 1.
 
 /************************************/
@@ -79,15 +82,15 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(4.275-MKS1R0))
+#define MINX (log(1.275-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 164
-#define TNY 92
+#define TNX 264
+#define TNY 192
 #define TNZ 1
 //number of tiles
-#define NTX 4
-#define NTY 2
+#define NTX 22
+#define NTY 12
 #define NTZ 1
 #endif
 
@@ -135,7 +138,7 @@
 #define LT_RIN 22.
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (1./50.)
+#define MAXBETA (1./10.) //eq.plane
 #endif
 
 #if(NTORUS==6) //for not-so-hyper
