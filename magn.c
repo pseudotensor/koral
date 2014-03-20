@@ -791,10 +791,10 @@ mimic_dynamo(ldouble dt)
       if(isfinite(angle))
 	{
 	  //if(angle<-1.) angle=-1.;
-	  //facangle = my_max(0., 1.-4.*angle);
-	  facangle=step_function(0.25-angle,0.025); 
+	  facangle = my_max(0., 1.-4.*fabs(angle));
+	  //facangle= step_function(0.25-angle,0.025); 
 	}
-      facangle=1.; //override      
+      //facangle=1.; //override      
 
       //radius
       ldouble facradius = step_function(xxBL[1]-4.,1.);
@@ -815,6 +815,8 @@ mimic_dynamo(ldouble dt)
       ldouble beta = bsq/2./prermhd;
       ldouble betalim = BETASATURATED;
       ldouble facmagnetization = step_function(betalim-beta,.1*betalim);
+      //override
+      facmagnetization=1.;
 
       //the extra vector potential
       ldouble effalpha=ALPHADYNAMO;
