@@ -778,14 +778,6 @@ mimic_dynamo(ldouble dt)
       Omk = 1./(BHSPIN+sqrt(xxBL[1]*xxBL[1]*xxBL[1]));
       Pk = 2.*M_PI/Omk;
 
-      //lambda MRI
-      ldouble dth=get_size_x(iy,1);
-      ldouble lambda=calc_Qtheta(ix,iy,iz)*dth;
-      ldouble lambdaBL=lambda * sqrt(geom.gg[2][2]);
-      if(!isfinite(lambdaBL) || lambdaBL>1.e3*xxBL[1]) lambdaBL=1.e3*xxBL[1];
-      ldouble faclambda=step_function(1. - lambdaBL/(EXPECTEDHR * xxBL[1]),.1); 
-      faclambda=1.; //override
-
       //angle
       ldouble facangle=0.;
       if(isfinite(angle))
@@ -794,15 +786,11 @@ mimic_dynamo(ldouble dt)
 	  facangle = my_max(0., 1.-4.*fabs(angle));
 	  //facangle= step_function(0.25-angle,0.025); 
 	}
-      //facangle=1.; //override      
 
       //radius
       ldouble facradius = step_function(xxBL[1]-4.,1.);
 
-      //bsq/rho 
-      //ldouble facmagnetization = step_function(.1-bsq/get_u(p,RHO,ix,iy,iz),.01);     
-
-      //pmag/pre(gas+rad)
+      //pre(gas+rad)
       ldouble prermhd = GAMMAM1*get_u(p,UU,ix,iy,iz);
 #ifdef RADIATION
       ldouble Rtt,Ehat,uconr[4],prad;
@@ -811,13 +799,16 @@ mimic_dynamo(ldouble dt)
       prad=Ehat/3.;
       prermhd+=prad;		
 #endif
-
+      
+      //magnetic beta
       ldouble beta = bsq/2./prermhd;
-      ldouble betalim = BETASATURATED;
-      ldouble facmagnetization = step_function(betalim-beta,.1*betalim);
-      //override
-      facmagnetization=1.;
+      //bsq/rho 
+      ldouble betarho = bsq/2./get_u(p,RHO,ix,iy,iz);
 
+      ldouble facmag1 = step_function(1.-beta,0.1);      
+      ldouble facmag2 = step_function(.1-betarho,.01);
+
+      ldouble facmagnetization = my_min(facmag1,facmag2);					             
       //the extra vector potential
       ldouble effalpha=ALPHADYNAMO;
 
@@ -830,7 +821,6 @@ mimic_dynamo(ldouble dt)
 	* dt / Pk  * xxBL[1] * geom.gg[3][3] * Bphi
 	* facradius 
 	* facmagnetization 
-	* faclambda 
 	* facangle;
 
       //saving vector potential to ptemp1
@@ -843,7 +833,7 @@ mimic_dynamo(ldouble dt)
       ldouble dBphi = - ALPHABETA 
 	* my_max(0.,pow(1. - zH*zH,zHpow)) 
 	* dt / Pk 
-	* my_max(0.,beta - DAMPBETA) / BETASATURATED 
+	* my_max(0.,beta - BETASATURATED) / BETASATURATED 
 	* Bphi;
       set_u(p,B3,ix,iy,iz,Bphi+dBphi);
 #endif    

@@ -76,9 +76,23 @@
 //73 VISCZERO - tests of radiative diffusion to compare with ZERO solution
 //74 ERICTEST - tests for Eric
 //75 LBULLET - bullet through limo torus
+//76 ZEBRA
 
 #define PROBLEM 67
 
+#if(PROBLEM==76)
+
+#define PR_DEFINE "PROBLEMS/ZEBRA/define.h"
+#define PR_BC "PROBLEMS/ZEBRA/bc.c"
+#define PR_INIT "PROBLEMS/ZEBRA/init.c"
+#define PR_KAPPA "PROBLEMS/ZEBRA/kappa.c"
+#define PR_KAPPAES "PROBLEMS/ZEBRA/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/ZEBRA/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/ZEBRA/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/ZEBRA/dump.c"
+#define PR_TOOLS "PROBLEMS/ZEBRA/tools.c"
+
+#endif
 #if(PROBLEM==75)
 
 #define PR_DEFINE "PROBLEMS/LBULLET/define.h"
