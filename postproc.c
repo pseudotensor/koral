@@ -143,7 +143,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz); 
-		  indices_2221(Rij,Rij,geomBL.gg);
 
 		  Rrt = Rij[1][0];
 #endif

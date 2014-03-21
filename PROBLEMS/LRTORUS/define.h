@@ -6,14 +6,14 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
-#define RESTARTNUM -1
+//#define RESTART
 #define RESTARTGENERALINDICES
+#define RESTARTNUM 1000
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define COMPTONIZATION
 
 /************************************/
@@ -22,7 +22,7 @@
 #define MIMICDYNAMO
 #define ALPHAFLIPSSIGN                                                        
 #define ALPHADYNAMO 0.03
-#define BETASATURATED 0.1
+#define BETASATURATED 0.2
 #define DAMPBETA 0.1
 #define ALPHABETA 1.
 #define MAGNFIELD
@@ -44,14 +44,12 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define HDVISCOSITY NOVISCOSITY
-//#define RADVISCOSITY NOVISCOSITY
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
-#define ALPHARADVISC 0.1
+#define RADVISCMAXVELDAMP
+#define ALPHARADVISC 0.05
 #define MAXRADVISCVEL 1.
-//#define NUMRADWAVESPEEDS
 
 /************************************/
 //rmhd floors
@@ -75,7 +73,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
+#define BHSPIN 0.9
 
 /************************************/
 //coordinates / resolution
@@ -85,15 +83,15 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(5.6-MKS1R0))
+#define MINX (log(1.275-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 120//264
-#define TNY 70//132
+#define TNX 264
+#define TNY 192
 #define TNZ 1
 //number of tiles
-#define NTX 4
-#define NTY 2
+#define NTX 22
+#define NTY 16
 #define NTZ 1
 #endif
 
@@ -121,7 +119,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 100.
+#define DTOUT1 50.
 #define DTOUT2 1000.
 
 /************************************/
@@ -129,9 +127,36 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 5
+#define NTORUS 7
+
+#if(NTORUS==7) //flat sigma
+#define LT_KAPPA 3.e2
+#define EXPECTEDHR 0.4
+#define LT_XI 0.975
+#define LT_R1 30.
+#define LT_R2 200.
+#define LT_GAMMA 4./3.
+#define LT_RIN 22.
+#define BETANORMFULL
+#undef MAXBETA
+#define MAXBETA (1./10.) //eq.plane
+#endif
+
+#if(NTORUS==6) //for not-so-hyper
+#define LT_KAPPA 1.5e3
+#define EXPECTEDHR 0.4
+#define LT_XI 0.95
+#define LT_R1 16.
+#define LT_R2 200.
+#define LT_GAMMA 4./3.
+//#define LT_RIN 10.25
+#define LT_RIN 10.6
+#undef MAXBETA
+#define MAXBETA (1./25.) //eq.plane
+#endif
 
 #if(NTORUS==5) //single toroidal loop
+
 #define EXPECTEDHR 0.4
 #define LT_KAPPA 1.e-2
 #define LT_XI 0.708
@@ -140,7 +165,7 @@
 #define LT_GAMMA 5./3.
 #define LT_RIN 10.
 #undef MAXBETA
-#define MAXBETA (1./100.) //target pmag/pgas inside torus
+#define MAXBETA (1./30.) //target pmag/pgas inside torus
 #define BETANORMFULL
 //#define BETANORMFACTOR 2.e-10
 #endif

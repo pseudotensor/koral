@@ -5,13 +5,12 @@
 
 #define FTYPE double
 
-#define LT_BHSPIN 0.9
 #define LT_KAPPA 2.e3
-#define LT_XI 0.975
+#define LT_XI 0.91
 #define LT_R1 30.
 #define LT_R2 200.
 #define LT_GAMMA 4./3.
-#define LT_RIN 22.
+#define LT_RIN 15.
 
 void compute_gd( FTYPE r, FTYPE th, FTYPE a, FTYPE *gdtt, FTYPE *gdtp, FTYPE *gdpp ) {
    FTYPE Sigma, tmp;
@@ -316,7 +315,7 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
 
 int main() {
 
-   int nr = 60, nth = 36;
+   int nr = 30, nth = 16;
    FTYPE Rin = 2., Rout = 500.;   // a = 0
    //FTYPE Rin = 1.364, Rout = 2000.;   // a = 0.9
    FTYPE th1 = 0., th2 = M_PI_2;
@@ -328,7 +327,7 @@ int main() {
 
 //    FTYPE R0 = 1.05, startx1 = -0.6736, dx1 = 0.0372985;
 
-   FTYPE a = LT_BHSPIN;
+   FTYPE a = 0.9;
    factor = log(Rout/Rin);
 
    outfile = fopen("slice.dat", "w");
@@ -354,7 +353,7 @@ int main() {
 	   fprintf(outfile, "%g\t%g\t%g\t%g\t%g\n", r*sin(th), r*cos(th), rho, uu,ell);
 	 }
       fprintf(outfile, "\n");
-      fprintf(radfile,"%g %g %g\n",r,Sigma,ell);
+      fprintf(radfile,"%g %g\n",r,Sigma);
 
      }
 

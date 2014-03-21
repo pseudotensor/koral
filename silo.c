@@ -272,12 +272,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[2]=Tij[2][0];
 		  Tit[3]=Tij[3][0];
 
-		  //Bernoulli number
-		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
-				     GAMMA*uint[nodalindex]*vcov[0])/rho[nodalindex]-1.;
-     		#ifdef MAGNFIELD
-		  muBe[nodalindex]+=-(bsq[nodalindex])/rho[nodalindex];
 
+		  //Bernoulli number
+		  muBe[nodalindex]=-(rho[nodalindex]+
+				     GAMMA*uint[nodalindex])/rho[nodalindex]*vcov[0]-1.;
+		  #ifdef MAGNFIELD
+		  muBe[nodalindex]+=-bsq[nodalindex]/rho[nodalindex]*vcov[0];
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
 
@@ -324,23 +324,22 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
-		      Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
-			+ GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
-			+ get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		      Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(i,j),ix,iy,iz)
+			+ GAMMA*get_uavg(pavg,AVGUUUCONUCOV(i,j),ix,iy,iz)
+			+ get_uavg(pavg,AVGBSQUCONUCOV(i,j),ix,iy,iz)
 			+ delta(i,j)*(GAMMA*get_uavg(pavg,UU,ix,iy,iz) + 1./2.*get_uavg(pavg,AVGBSQ,ix,iy,iz))
-			- get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+			- get_uavg(pavg,AVGBCONBCOV(i,j),ix,iy,iz); 
 
 		  
 		  Tit[1]=Tij[1][0];
 		  Tit[2]=Tij[2][0];
 		  Tit[3]=Tij[3][0];
 
-
 		  //Bernoulli number
-		  muBe[nodalindex]=-(rho[nodalindex]*vcov[0]+
-				     GAMMA*uint[nodalindex]*vcov[0])/rho[nodalindex]-1.;
+		  muBe[nodalindex]=-(rho[nodalindex]+
+				     GAMMA*uint[nodalindex])/rho[nodalindex]*vcov[0]-1.;
 		  #ifdef MAGNFIELD
-		  muBe[nodalindex]+=-(bsq[nodalindex])/rho[nodalindex];
+		  muBe[nodalindex]+=-bsq[nodalindex]/rho[nodalindex]*vcov[0];
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
 		  //to calculate magn. field angle
