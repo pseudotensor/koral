@@ -695,7 +695,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
       /* Assign coordinates to coordinates array */
       coordinates[0] = nodex;
-      coordinates[1] = nodez; 
+      coordinates[1] = nodey;  //should work for spherical coordinates, but does it work in general?
     }
   else //3d
     {
