@@ -22,12 +22,7 @@
 #define B2 (NVHD+1)
 #define B3 (NVHD+2)
 
-//number of radiative quantities per fluid
-#ifndef NCOMPTONIZATION
-#define NRADVAR 4
-#else
-#define NRADVAR 5
-#endif
+
 
 //multi rad-fluid macros
 #define EE(nf) (NVMHD+nf*NRADVAR)

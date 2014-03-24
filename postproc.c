@@ -98,7 +98,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 	      
 	      //to BL     
-	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 
 	      ldouble dxph[3];
 	      ldouble xx1[4],xx2[4];
