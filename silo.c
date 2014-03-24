@@ -122,6 +122,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	  {  
 #ifdef PRINTXGC_RIGHT
 	  for(ix=NG;ix<nx+NG;ix++)
+#elif defined(PRINTXGC_LEFT)
+	  for(ix=-NG;ix<nx-NG;ix++)
 #else
    for(ix=0;ix<nx;ix++)
 #endif
@@ -188,6 +190,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      imx=ix;
 #ifdef PRINTXGC_RIGHT
 	      imx=ix-NG;
+#endif
+#ifdef PRINTXGC_LEFT
+	      imx=ix+NG;
 #endif
 #ifdef PRINTYGC_RIGHT
 	      imy=iy-NG;
@@ -440,6 +445,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 #ifdef PRINTXGC_RIGHT
 		  imx=ix-NG;
 #endif
+#ifdef PRINTXGC_LEFT
+		  imx=ix-NG;
+#endif
 #ifdef PRINTYGC_RIGHT
 		  imy=iy-NG;
 #endif
@@ -457,6 +465,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  imz=iz;imy=iy;imx=ix;
 #ifdef PRINTXGC_RIGHT
 		  imx=ix-NG;
+#endif
+#ifdef PRINTXGC_LEFT
+		  imx=ix+NG;
 #endif
 #ifdef PRINTYGC_RIGHT
 		  imy=iy-NG;
@@ -593,6 +604,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 #ifdef PRINTXGC_RIGHT
 		  imx=ix-NG;
 #endif
+#ifdef PRINTXGC_LEFT
+		  imx=ix+NG;
+#endif
 #ifdef PRINTYGC_RIGHT
 		  imy=iy-NG;
 #endif
@@ -695,7 +709,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
       /* Assign coordinates to coordinates array */
       coordinates[0] = nodex;
-      coordinates[1] = nodez; 
+      coordinates[1] = nodey;  //works for spherical-like coordinates
     }
   else //3d
     {

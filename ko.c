@@ -71,10 +71,12 @@ main(int argc, char **argv)
   int ifinit=1;
 #ifdef RESTART
   ifinit=fread_restartfile(RESTARTNUM,folder,&tstart);
-
-  //exchange initial state
-  mpi_exchangedata();
-  set_bc(tstart,1);
+  if(!ifinit)
+    {
+      //exchange initial state
+      mpi_exchangedata();
+      set_bc(tstart,1);
+    }
 #endif
 
   //no restart or no restart file
