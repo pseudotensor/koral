@@ -43,6 +43,10 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+  #ifdef COORDOUTPUT
+  fprint_coordfile("analysis","coord");
+  #endif
+
   //folder to write in
   char folder[100],bufor[100];
   sprintf(folder,"analysis");
@@ -101,6 +105,14 @@ main(int argc, char **argv)
 
   //average primitives and averaged quantities
   copy_u_core(1./ttot,pavgtot,pavg,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
+ 
+  //avarage of average files
+#ifdef AVGAVGOUTPUT
+  avgtime=1./ttot;
+  sprintf(bufor,"avgavg%04d-",no1);
+  nfout2=no2;
+  fprint_avgfile(0.,"analysis",bufor);
+#endif
 
   //rewrite primitives to p
   for(iz=0;iz<NZ;iz++)
@@ -123,7 +135,7 @@ main(int argc, char **argv)
     sprintf(suffix,"");
   else
     sprintf(suffix,"res");
-  
+ 
   
   //dumps dumps to analysis analysis
 #if(RADOUTPUT==1)
@@ -135,6 +147,7 @@ main(int argc, char **argv)
   sprintf(prefix,"outavg%s%04d-",suffix,no1);
   fprint_outfile(t,no2,0,"analysis",prefix);
 #endif
+
 #if(SILOOUTPUT==1)
 #ifndef NOSILO
   sprintf(prefix,"silavg%s%04d-",suffix,no1);

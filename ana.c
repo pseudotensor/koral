@@ -46,6 +46,10 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+  #ifdef COORDOUTPUT
+  fprint_coordfile("analysis","coord");
+  #endif
+
   //opens the scalar file
   sprintf(bufer,"analysis/scalars.dat");
   fout_scalars=fopen(bufer,"w");

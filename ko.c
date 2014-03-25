@@ -337,7 +337,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  
 	  //avg goes first so that what is later can use it
 	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
-	  fprint_avgfile(t,folder);
+	  fprint_avgfile(t,folder,"avg");
 	  avgtime=0.;
   
 	  nfout2++;

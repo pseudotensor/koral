@@ -318,6 +318,8 @@ int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 //fileop.c
 int save_avg(ldouble dt);
 
+int fprint_coordfile(char* folder,char* prefix);
+int fprint_coordBL(char* folder,char* prefix);
 int fprint_restartfile(ldouble t, char* folder);
 int fprint_restartfile_ascii(ldouble t, char* folder);
 int fprint_restartfile_bin(ldouble t, char* folder);
@@ -327,10 +329,10 @@ int fread_restartfile_bin(int,char *,ldouble*);
 int fread_restartfile_ascii(int,char *,ldouble*);
 int fread_restartfile_mpi(int,char *,ldouble*);
 
-int fprint_avgfile(ldouble t, char* folder);
-int fprint_avgfile_ascii(ldouble t, char* folder);
-int fprint_avgfile_bin(ldouble t, char* folder);
-int fprint_avgfile_mpi(ldouble t, char* folder);
+int fprint_avgfile(ldouble t, char* folder,char *);
+int fprint_avgfile_ascii(ldouble t, char* folder,char *);
+int fprint_avgfile_bin(ldouble t, char* folder,char *);
+int fprint_avgfile_mpi(ldouble t, char* folder,char *);
 int fread_avgfile(int,char *,ldouble*,ldouble *);
 int fread_avgfile_bin(int,char *,ldouble*,ldouble *);
 int fread_avgfile_ascii(int,char *,ldouble*,ldouble *);

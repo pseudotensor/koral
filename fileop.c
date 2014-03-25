@@ -724,7 +724,6 @@ fprint_restartfile_bin(ldouble t, char* folder)
 
 /*********************************************/
 /*********************************************/
-
 //serial writing in ascii per core 
 int
 fprint_restartfile_ascii(ldouble t, char* folder)
@@ -1075,11 +1074,11 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 /*********************************************/
 
 int
-fprint_avgfile(ldouble t, char* folder)
+fprint_avgfile(ldouble t, char* folder,char* prefix)
 {
   #ifdef RESOUTPUT_ASCII
 
-  fprint_avgfile_ascii(t,folder);
+  fprint_avgfile_ascii(t,folder,prefix);
 
   #else //binary output
 
@@ -1087,17 +1086,17 @@ fprint_avgfile(ldouble t, char* folder)
   
   #ifdef OUTPUTPERCORE //each process dumps independent files
   
-  fprint_avgfile_bin(t,folder); 
+  fprint_avgfile_bin(t,folder,prefix); 
 
   #else 
 
-  fprint_avgfile_mpi(t,folder);
+  fprint_avgfile_mpi(t,folder,prefix);
 
   #endif
 
   #else
 
-  fprint_avgfile_bin(t,folder); 
+  fprint_avgfile_bin(t,folder,prefix); 
 
   #endif
   #endif
@@ -1109,22 +1108,22 @@ fprint_avgfile(ldouble t, char* folder)
 /*********************************************/
 
 int //parallel output to a single file
-fprint_avgfile_mpi(ldouble t, char* folder)
+fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
 {
   #ifdef MPI
   char bufor[250];
   //header
   if(PROCID==0)
     {
-       sprintf(bufor,"%s/avg%04d.head",folder,nfout2);
-       fout1=fopen(bufor,"w"); 
-       sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
-       fprintf(fout1,"%s",bufor);
-       fclose(fout1);
+      sprintf(bufor,"%s/%s%04d.head",folder,prefix,nfout2);
+      fout1=fopen(bufor,"w"); 
+      sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
+      fprintf(fout1,"%s",bufor);
+      fclose(fout1);
     }
 
   //body
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
+  sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfout2);
 
   MPI_File cFile;
   MPI_Status status;
@@ -1167,22 +1166,22 @@ fprint_avgfile_mpi(ldouble t, char* folder)
 /*********************************************/
 
 int //serial binary output
-fprint_avgfile_bin(ldouble t, char* folder)
+fprint_avgfile_bin(ldouble t, char* folder,char *prefix)
 {
   char bufor[250];
   
   //header
   if(PROCID==0)
     {
-       sprintf(bufor,"%s/avg%04d.head",folder,nfout2);
-       fout1=fopen(bufor,"w"); 
-       sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
-       fprintf(fout1,"%s",bufor);
-       fclose(fout1);
+      sprintf(bufor,"%s/%s%04d.head",folder,prefix,nfout2);
+      fout1=fopen(bufor,"w"); 
+      sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
+      fprintf(fout1,"%s",bufor);
+      fclose(fout1);
     }
 
   //body
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
+  sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfout2);
   fout1=fopen(bufor,"wb"); 
 
   int ix,iy,iz,iv;
@@ -1209,21 +1208,21 @@ fprint_avgfile_bin(ldouble t, char* folder)
 
 //serial writing in ascii per core 
 int
-fprint_avgfile_ascii(ldouble t, char* folder)
+fprint_avgfile_ascii(ldouble t, char* folder,char *prefix)
 {
   char bufor[250];
 
   //header
   if(PROCID==0)
     {
-      sprintf(bufor,"%s/avg%04d.head",folder,nfout2);
+      sprintf(bufor,"%s/%s%04d.head",prefix,folder,nfout2);
       fout1=fopen(bufor,"w");
       sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
       fprintf(fout1,"%s",bufor);
       fclose(fout1);
     }
 
-  sprintf(bufor,"%s/avg%04d.dat",folder,nfout2);
+  sprintf(bufor,"%s/%s%04d.dat",prefix,folder,nfout2);
   fout1=fopen(bufor,"w");
 
   int ix,iy,iz,iv;
@@ -1479,6 +1478,67 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
 
   return 0;
 }
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* wrapper for coordinate output */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int fprint_coordfile(char* folder,char* prefix)
+{
+#if (COORDOUTPUT==1)
+  fprint_coordBL(folder,prefix);
+#endif
+  return 0;
+}
+
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints BL coordinates,  */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int fprint_coordBL(char* folder,char* prefix)
+ {
+   char bufor[50];
+   sprintf(bufor,"%s/%sBL.dat",folder,prefix);
+   FILE* fout1=fopen(bufor,"w");
+
+   int ix,iy,iz,iv;
+   ldouble pp[NV];
+   for(iz=0;iz<NZ;iz++)
+     {
+       for(iy=0;iy<NY;iy++)
+	 {
+	   for(ix=0;ix<NX;ix++)
+	     {
+	       struct geometry geom,geomBL;
+	       fill_geometry(ix,iy,iz,&geom);
+	       fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+	       ldouble r=geomBL.xx;
+	       ldouble th=geomBL.yy;
+	       ldouble ph=geomBL.zz;
+	     
+	       fprintf(fout1,"%d %d %d ",ix,iy,iz);
+
+	       fprintf(fout1,"%.5e %.5e %.5e ",r,th,ph);
+
+	       fprintf(fout1,"\n");
+	     }
+	 }
+     }
+
+   fflush(fout1);
+   fclose(fout1);
+
+   return 0;
+ }
+
 
 /*********************************************/
 /*********************************************/
