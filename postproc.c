@@ -51,7 +51,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
   int ix,iy,iz,iv,i,j;
   ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
   ldouble rhouconr,Tij[4][4],Rij[4][4],Trt,Rrt,bsq,bcon[4],bcov[4],Qtheta;
-  ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
+  ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
   ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
   ldouble Bangle1,Bangle2,brbphi;
@@ -145,6 +145,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz); 
 
 		  Rrt = Rij[1][0];
+		  Ehat = get_uavg(pavg,AVGEHAT,ix,iy,iz);
 #endif
 
 		}
@@ -183,6 +184,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  indices_2221(Rij,Rij,geomBL.gg);
 
 		  Rrt = Rij[1][0];
+
+		  ldouble Rtt,uconr[4];
+		  calc_ff_Rtt(&get_u(p,0,ix,iy,iz),&Rtt,uconr,&geomBL);
+		  Ehat=-Rtt; 		 		
 #endif
 		}
 
@@ -196,6 +201,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      ldouble qtheta=calc_Qtheta(ix,iy,iz);//2.*M_PI/Omega/dx[1]*fabs(bcon[2])/sqrt(rho);
 
 	      //to calculate magn. field angle
+	      //bsq and brbphi taken from avg if neeeded
 	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
 	      Bangle1+=rho*brbphi*dxph[1];
 	      Bangle2+=rho*bsq*dxph[1];
@@ -223,16 +229,13 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[27][ix]+=rho*temp*dxph[1];
 	      
 	      //rho-weighted beta (32)
-	      ldouble prermhd = GAMMAM1*get_u(p,UU,ix,iy,iz);
-              #ifdef RADIATION
-	      ldouble Rtt,Ehat,uconr[4],prad;
-	      calc_ff_Rtt(&get_u(p,0,ix,iy,iz),&Rtt,uconr,&geomBL);
-	      Ehat=-Rtt; 
-	      prad=Ehat/3.;
-	      prermhd+=prad;		
-              #endif
-	      ldouble beta=(prermhd+bsq/2.)/(bsq/2.);
-	      profiles[30][ix]+=rho*beta*dxph[1];
+	      ldouble prermhd = GAMMAM1*uint;
+	      #ifdef RADIATION
+	      prermhd+=Ehat/3.;
+	      #endif
+              
+	      ldouble ibeta=bsq/2./(prermhd+bsq/2.);
+	      profiles[30][ix]+=rho*ibeta*dxph[1];
 	      
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
