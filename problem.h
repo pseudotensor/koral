@@ -76,9 +76,24 @@
 //73 VISCZERO - tests of radiative diffusion to compare with ZERO solution
 //74 ERICTEST - tests for Eric
 //75 LBULLET - bullet through limo torus
-//76 ZEBRA
+//76 ZEBRA - Eric's tidal disks
+//77 EMPTY - empty problem
 
-#define PROBLEM 67
+#define PROBLEM 77
+
+#if(PROBLEM==77)
+
+#define PR_DEFINE "PROBLEMS/EMPTY/define.h"
+#define PR_BC "PROBLEMS/EMPTY/bc.c"
+#define PR_INIT "PROBLEMS/EMPTY/init.c"
+#define PR_KAPPA "PROBLEMS/EMPTY/kappa.c"
+#define PR_KAPPAES "PROBLEMS/EMPTY/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/EMPTY/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/EMPTY/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/EMPTY/dump.c"
+#define PR_TOOLS "PROBLEMS/EMPTY/tools.c"
+
+#endif
 
 #if(PROBLEM==76)
 
@@ -93,6 +108,7 @@
 #define PR_TOOLS "PROBLEMS/ZEBRA/tools.c"
 
 #endif
+
 #if(PROBLEM==75)
 
 #define PR_DEFINE "PROBLEMS/LBULLET/define.h"
@@ -106,6 +122,7 @@
 #define PR_TOOLS "PROBLEMS/LBULLET/tools.c"
 
 #endif
+
 #if(PROBLEM==74)
 
 #define PR_DEFINE "PROBLEMS/ERICTEST/define.h"
@@ -1155,7 +1172,7 @@
 #endif
 
 #ifndef DOFIXUPS
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 #endif
 
 #ifndef ALLOWENTROPYU2P
@@ -1368,6 +1385,7 @@
 #else //no RADIATION
 
 #define NV (NVMHD)
+#define NRADVAR 0
 #endif
 
 #ifndef GAMMA
@@ -1501,7 +1519,7 @@
 #endif
 
 #ifndef OUTOUTPUT
-#define OUTOUTPUT 1
+#define OUTOUTPUT 0
 #endif
 
 #ifndef SCAOUTPUT

@@ -2,10 +2,10 @@
 
 ifneq ($(SERIAL),1)
 CC=mpicc 
-CFLAGS= -O3 -L/usr/local/lib -I/usr/local/include -DMPI
+CFLAGS=-O3 -DMPI
 else
 CC=gcc 
-CFLAGS= -O3 -L/usr/local/lib -I/usr/local/include 
+CFLAGS=-O3
 endif
 
 LIBS=-lm -lgsl -lgslcblas -lsilo
