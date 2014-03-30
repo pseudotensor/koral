@@ -5,7 +5,7 @@ CC=mpicc
 CFLAGS=-O3 -DMPI
 else
 CC=gcc 
-CFLAGS=-O3
+CFLAGS=-O3 -fopenmp
 endif
 
 LIBS=-lm -lgsl -lgslcblas -lsilo

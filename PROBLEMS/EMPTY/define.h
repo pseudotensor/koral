@@ -25,10 +25,10 @@
 #define MAXY 1.
 #define MINZ 0.
 #define MAXZ 1. 
-#define TNX 30 
+#define TNX 60 
 #define TNY 30
 #define TNZ 1
-#define NTX 1
+#define NTX 2
 #define NTY 1
 #define NTZ 1
 #define SPECIFIC_BC
