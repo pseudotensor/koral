@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM -1
+//#define RESTART 
+#define RESTARTNUM 39
 
 /************************************/
 //radiation
@@ -23,20 +23,18 @@
 #define MAXX 1. 
 #define MINY 0.
 #define MAXY 1.
-#define MINZ 0.
-#define MAXZ 1. 
-#define TNX 60 //total number of cells in X
+#define MINZ -.5
+#define MAXZ .5 
+#define TNX 60 // Total number of cells in X 
 #define TNY 60
 #define TNZ 1
-#define NTX 2 //number of tiles in X
+#define NTX 1 //number of tiles in X 
 #define NTY 1
 #define NTZ 1
-
-//#define SPECIFIC_BC
-#define PERIODIC_XBC
-#define PERIODIC_YBC
-#define PERIODIC_ZBC
-
+#define SPECIFIC_BC
+//#define PERIODIC_XBC
+//#define PERIODIC_YBC
+//#define PERIODIC_ZBC
 /************************************/
 //output
 /************************************/
@@ -79,13 +77,20 @@
 /************************************/
 #define RHOAMB 1.
 #define UUAMB 1.e-3 //temp ~ uu/rho
-#define BCX 0.75
+#define FVX .01
+#define FVY .01
+#define BCX 0.8
 #define BCY 0.5
 #define BCZ 0.
-#define BRHO 100.
-#define BVX -.1
+#define BRHO 1000. //density 
+#define BVX -.01
 #define BVY 0.
 #define BVZ 0.
-#define BW 0.2
-
-
+#define BW 0.05 // width
+#define BC2X 100.2
+#define BC2Y 0.5
+#define BC2Z 0.
+#define BV2X .1
+#define BV2Y 0.
+#define BV2Z 0.
+#define WINDVX .1

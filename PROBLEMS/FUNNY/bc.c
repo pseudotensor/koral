@@ -13,6 +13,7 @@ fill_geometry(ix,iy,iz,&geom);
 //atmosphere
 if(BCtype==ZBCLO) 
   {
+   /*
    pp[RHO]=RHOAMB; 
    pp[UU]=UUAMB; 
    pp[VZ]=0.;
@@ -21,6 +22,7 @@ if(BCtype==ZBCLO)
    pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
    p2u(pp,uu,&geom);
+    */
    return 0;  
   }
 
@@ -28,25 +30,21 @@ if(BCtype==ZBCLO)
 //reflection:
 if(BCtype==XBCLO) 
   {
-    iix=-ix-1;
-    iiy=iy;
-    iiz=iz;
-    
-    for(iv=0;iv<=NV;iv++)
-      {
-	pp[iv]=get_u(p,iv,iix,iiy,iiz);
-      }
-
-    pp[VX]=-get_u(p,VX,iix,iiy,iiz);
+    pp[RHO]=RHOAMB; 
+    pp[UU]=UUAMB; 
+    pp[VZ]=0.;
+    pp[VY]=0.;
+    pp[VX]=WINDVX;
+    pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
     p2u(pp,uu,&geom);
     return 0;  
   }
 
-//reflection:
+//periodic:
 if(BCtype==YBCLO) 
   {
-    iiy=-iy-1;
+    iiy=iy+NY;
     iix=ix;
     iiz=iz;
     
@@ -55,8 +53,6 @@ if(BCtype==YBCLO)
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
 
-    pp[VY]=-get_u(p,VY,iix,iiy,iiz);
-
     p2u(pp,uu,&geom);
     return 0;  
   }
@@ -64,6 +60,7 @@ if(BCtype==YBCLO)
 //outflow:
 if(BCtype==XBCHI) 
   {
+    //iix=NX - (iz-NX) -1;
     iix=NX-1;
     iiy=iy;
     iiz=iz;
@@ -73,14 +70,16 @@ if(BCtype==XBCHI)
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
 
+    //pp[VX]=-get_u(p,VX,iix,iiy,iiz);
+
     p2u(pp,uu,&geom);
     return 0;  
   }
 
-//outflow:
+//periodic:
 if(BCtype==YBCHI) 
   {
-    iiy=NY-1;
+    iiy=iy-NY;
     iix=ix;
     iiz=iz;
     
