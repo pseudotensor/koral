@@ -78,8 +78,23 @@
 //75 LBULLET - bullet through limo torus
 //76 ZEBRA - Eric's tidal disks
 //77 EMPTY - empty problem
+//78 FUNNY - for Ronaldo & Grzesiek & not for Bhupendra
 
-#define PROBLEM 77
+#define PROBLEM 78
+
+#if(PROBLEM==78)
+
+#define PR_DEFINE "PROBLEMS/FUNNY/define.h"
+#define PR_BC "PROBLEMS/FUNNY/bc.c"
+#define PR_INIT "PROBLEMS/FUNNY/init.c"
+#define PR_KAPPA "PROBLEMS/FUNNY/kappa.c"
+#define PR_KAPPAES "PROBLEMS/FUNNY/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/FUNNY/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/FUNNY/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/FUNNY/dump.c"
+#define PR_TOOLS "PROBLEMS/FUNNY/tools.c"
+
+#endif
 
 #if(PROBLEM==77)
 

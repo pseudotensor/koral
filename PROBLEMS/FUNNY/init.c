@@ -17,7 +17,7 @@ ldouble dist = sqrt((geom.xx - BCX)*(geom.xx - BCX) +
 		    (geom.yy - BCY)*(geom.yy - BCY) + 
 		    (geom.zz - BCZ)*(geom.zz - BCZ)) ;
 pp[RHO]=RHOAMB + (BRHO - RHOAMB) * exp(-dist*dist / BW / BW);
-printf("%e %e %e\n",dist, exp(-dist*dist / BW / BW),(BRHO - RHOAMB) * exp(-dist*dist / BW / BW)); getch();
+//printf("%e %e %e\n",dist, exp(-dist*dist / BW / BW),(BRHO - RHOAMB) * exp(-dist*dist / BW / BW)); getch();
 pp[UU]=UUAMB;
 pp[VZ]=BVZ;
 pp[VY]=BVY;
