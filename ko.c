@@ -27,7 +27,10 @@ main(int argc, char **argv)
   doingavg=0;
 
   //print scalings GU->CGS and quit
-  //print_scalings();   
+  printf("0.9 -> eta=%e\n",1.-sqrt(1.-r_horizon_BL(0.9)/3./r_ISCO_BL(0.9)));
+  print_scalings();   
+
+
   
   //gsl errors off
   gsl_set_error_handler_off();

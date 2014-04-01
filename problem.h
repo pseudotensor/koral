@@ -79,8 +79,23 @@
 //76 ZEBRA - Eric's tidal disks
 //77 EMPTY - empty problem
 //78 FUNNY - for Ronaldo & Grzesiek & not for Bhupendra
+//79 SOFTBALL - Ron & Grz Bis
 
-#define PROBLEM 78
+#define PROBLEM 67
+
+#if(PROBLEM==79)
+
+#define PR_DEFINE "PROBLEMS/SOFTBALL/define.h"
+#define PR_BC "PROBLEMS/SOFTBALL/bc.c"
+#define PR_INIT "PROBLEMS/SOFTBALL/init.c"
+#define PR_KAPPA "PROBLEMS/SOFTBALL/kappa.c"
+#define PR_KAPPAES "PROBLEMS/SOFTBALL/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/SOFTBALL/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/SOFTBALL/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/SOFTBALL/dump.c"
+#define PR_TOOLS "PROBLEMS/SOFTBALL/tools.c"
+
+#endif
 
 #if(PROBLEM==78)
 
