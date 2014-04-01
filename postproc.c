@@ -41,6 +41,7 @@
 //rho-weighted magn.field angle <sqrt(grr gphph)b^r b^ph> / <bsq> (30)
 //scale-height (31)
 //rho-weighted beta (32)
+//rho-wighted prad/pgas (33)
 
 
 /*********************************************/
@@ -233,9 +234,18 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      #ifdef RADIATION
 	      prermhd+=Ehat/3.;
 	      #endif
-              
 	      ldouble ibeta=bsq/2./(prermhd+bsq/2.);
 	      profiles[30][ix]+=rho*ibeta*dxph[1];
+
+	      //rho-weighted prad/pgas (33)
+	      ldouble pregas = GAMMAM1*uint;
+	      #ifdef RADIATION
+	      ldouble prerad = Ehat/3.;
+	      profiles[31][ix]+=rho*prerad/pregas*dxph[1];
+	      #else
+	      profiles[31][ix]+=0.;
+	      #endif
+              
 	      
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
@@ -316,6 +326,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[27][ix]/=profiles[0][ix];
 	  profiles[29][ix]/=profiles[0][ix];
 	  profiles[30][ix]/=profiles[0][ix];
+	  profiles[31][ix]/=profiles[0][ix];
 	  profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
 
 	  Bangle1/=profiles[0][ix];
@@ -534,7 +545,9 @@ calc_totalmass()
 ldouble
 calc_mdotEdd()
 {
-  ldouble mcgs=1.09649*2.23e18*MASS; //g/s assuming eta=0.057
+  //TODO: change definition to account for the efficiency as a function of spin
+
+  ldouble mcgs=1.09649*2.23e18*MASS; //g/s assuming eta=0.057 
 
   //#ifdef CGSOUTPUT
   return mcgs;
