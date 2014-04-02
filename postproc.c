@@ -293,11 +293,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[19][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //rho-weighted minus radial velocity (4)
-	      profiles[2][ix]+=-utcon[1]*rho*dxph[1];
+	      profiles[2][ix]+=-rhouconr*dxph[1];
 
 	      //rho-weighted minus radial velocity in the inflow (24)
 	      if(utcon[1]<0.)
-		profiles[22][ix]+=-utcon[1]*rho*dxph[1];
+		profiles[22][ix]+=-rhouconr*dxph[1];
 
 	      //abs optical depth (7)
 	      profiles[5][ix]=tauabs;	
