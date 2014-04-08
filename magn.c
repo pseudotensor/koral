@@ -813,7 +813,7 @@ mimic_dynamo(ldouble dt)
       ldouble faczH = my_max(0.,pow(1. - zH*zH,zHpow));
       
       //ldouble facmagnetization = my_min(facmag1,facmag2);					             
-      ldouble facmagnetization = faczH;
+      ldouble facmagnetization = my_min(faczH,my_min(facmag1,facmag2));
 
       //the extra vector potential
       ldouble effalpha=ALPHADYNAMO;
@@ -839,6 +839,8 @@ mimic_dynamo(ldouble dt)
 	* dt / Pk 
 	* my_max(0.,beta - BETASATURATED) / BETASATURATED 
 	* Bphi;
+
+      if((dBphi+Bphi)*Bphi<0.) dBphi=-Bphi; //not to overshoot zero                                                                                   
       set_u(p,B3,ix,iy,iz,Bphi+dBphi);
 #endif    
 
