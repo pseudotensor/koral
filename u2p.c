@@ -188,7 +188,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   //negative uu[0] = rho u^t
   if(uu[0]/gdetu<GAMMAMAXHD*RHOFLOOR) 
     {
-      printf("%4d > %4d %4d %4d > NEGUU  > neg uu[0] - requesting fixup\n",PROCID,geom->ix,geom->iy,geom->iz);
+       int gix,giy,giz;
+       mpi_local2globalidx(geom->ix,geom->iy,geom->iz,&gix,&giy,&giz);
+       printf("%4d > %4d %4d %4d > NEGUU  > neg uu[0] - requesting fixup\n",PROCID,gix,giy,giz);
       pp[0]=RHOFLOOR; //used when not fixin up
       ret=-2; //to request fixup
       u2pret=0; //to skip solvers
