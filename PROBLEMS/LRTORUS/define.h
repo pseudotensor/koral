@@ -6,9 +6,9 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 1000
+#define RESTARTNUM 0
 
 /************************************/
 //radiation choices
@@ -20,10 +20,11 @@
 //magnetic choices
 /************************************/
 #define MIMICDYNAMO
+#define CALCSIGMAONTHEGO
 #define ALPHAFLIPSSIGN                                                        
 #define ALPHADYNAMO 0.03
+#define DAMPBETA
 #define BETASATURATED 0.2
-#define DAMPBETA 0.1
 #define ALPHABETA 1.
 #define MAGNFIELD
 #define GDETIN 1
@@ -44,7 +45,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
@@ -83,15 +84,15 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.275-MKS1R0))
+#define MINX (log(3.275-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
-#define TNX 264
-#define TNY 192
+#define TNX 80
+#define TNY 60
 #define TNZ 1
 //number of tiles
-#define NTX 22
-#define NTY 16
+#define NTX 1
+#define NTY 8
 #define NTZ 1
 #endif
 

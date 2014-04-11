@@ -473,6 +473,7 @@ void
 mpi_myinit(int argc, char *argv[])
 {
 #ifdef MPI
+  int i,j,k;
 
   //check for conflicts in declarations
   #ifndef OUTPUTPERCORE
@@ -484,6 +485,7 @@ mpi_myinit(int argc, char *argv[])
   #endif
   #endif
 
+  //initialize MPI
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &PROCID);
   MPI_Comm_size(MPI_COMM_WORLD, &NPROCS);
@@ -499,6 +501,78 @@ mpi_myinit(int argc, char *argv[])
 
   if(PROCID==0) printf("pid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
 	 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
+
+  //if one wants to know pressure scale height on the go, e.g., for MIMICDYNAMO, 
+  //then let's create two communicators, one corresponding to everything between 
+  //the eq.plane and the axis, and one to what is between given tile and the eq.plane
+  #ifdef CALCSIGMAONTHEGO
+
+  if(NTY % 2) //uneven number of tiles in theta
+    {
+      if(PROCID==0) printf("No. of tiles in theta must be even for CALCSIGMAONTHEGO.\n");
+      exit(-1);
+    }
+  if(TNZ>1) //3D?
+    {
+      if(PROCID==0) printf("CALCSIGMAONTHEGO not implemented for 3D.\n");
+      exit(-1);
+    }
+
+  /* Extract the total group handle */
+  MPI_Comm_group(MPI_COMM_WORLD, &mpi_all_group); 
+      
+  int ranks[NTY/2],nranks,pid;
+
+  //1st - everything between eq.plane and the tile in given quadrant
+
+  nranks=NTY/2;
+  if(TJ<NTY/2) //above eq.plane
+    for(i=0;i<nranks;i++)
+      {
+	pid=mpi_tile2procid(TI,i,TK);
+	ranks[i]=pid;
+      }
+  else //below eq.plane
+    for(i=0;i<nranks;i++)
+      {
+	pid=mpi_tile2procid(TI,NTY/2+i,TK);
+	ranks[i]=pid;
+      }
+
+  MPI_Group_incl(mpi_all_group, nranks, ranks, &mpi_inttotal_group[TI]);
+  MPI_Comm_create(MPI_COMM_WORLD, mpi_inttotal_group[TI], &mpi_inttotal_comm[TI]); 
+
+  //2nd - between given tile and eq.plane
+
+  if(TJ<NTY/2) //above eq.plane
+    {
+      nranks=NTY/2 - TJ - 1;
+      for(i=0;i<nranks;i++)
+      {
+	pid=mpi_tile2procid(TI,TJ+i+1,TK);
+	ranks[i]=pid;
+      }
+    }
+  else //below eq.plane
+    {
+      nranks=TJ - NTY/2;
+      for(i=0;i<nranks;i++)
+	{
+	  pid=mpi_tile2procid(TI,TJ-i-1,TK);
+	  ranks[i]=pid;
+	}
+    }
+
+  /*
+  if(PROCID==7){
+  printf("%d > %d > ",PROCID,nranks);
+  for(i=0;i<nranks;i++) printf("%d ",ranks[i]);
+  printf("\n");}
+  */
+
+  MPI_Group_incl(mpi_all_group, nranks, ranks, &mpi_intbelow_group[TI]);
+  MPI_Comm_create(MPI_COMM_WORLD, mpi_intbelow_group[TI], &mpi_intbelow_comm[TI]); 
+  #endif
 
 #else
   TI=TJ=TK=0;

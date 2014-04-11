@@ -636,9 +636,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
 #ifdef MPI
+MPI_Group mpi_all_group;
 #define MPI_LDOUBLE MPI_DOUBLE
-void
-mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
+void mpi_procid2tile(int procid, int* tilei, int* tilej, int* tilek);
 int mpi_tile2procid(int tilei, int tilej, int tilek);
 void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);
 void mpi_synchtiming(ldouble*);
@@ -649,10 +649,12 @@ int mpi_savedata();
 int mpi_isitBC(int BCtype);
 void mpi_myinit(int argc, char *argv[]);
 void mpi_myfinalize();
-void
-mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz);
-void
-mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz);
+void mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz);
+void mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz);
+#ifdef CALCSIGMAONTHEGO
+MPI_Group mpi_inttotal_group[NTX], mpi_intbelow_group[NTX]; 
+MPI_Comm mpi_inttotal_comm[NTX], mpi_intbelow_comm[NTX]; 
+#endif
 #endif
 
 #include "mnemonics.h"

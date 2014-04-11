@@ -1484,7 +1484,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   calc_Compt_Gi(pp,ggg,Gic,Ehatrad,Tgas,kappaes,ucon);
   //test
   ldouble xxBL[4];
-  coco_N(ggg->xxvec,xxBL,MYCOORDS,BLCOORDS);
+  coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
   ldouble fac=step_function(xxBL[1]-2.*r_horizon_BL(BHSPIN),0.1*r_horizon_BL(BHSPIN));
   for(i=0;i<4;i++)
     Gi[i]+=fac*Gic[i];

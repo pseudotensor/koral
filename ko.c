@@ -27,10 +27,8 @@ main(int argc, char **argv)
   doingavg=0;
 
   //print scalings GU->CGS and quit
-  printf("0.9 -> eff=%e\n",1.-sqrt(1.-2./3./r_ISCO_BL(0.9)));
-  print_scalings(); 
-
-
+  //printf("0.9 -> eff=%e\n",1.-sqrt(1.-2./3./r_ISCO_BL(0.9)));
+  //print_scalings(); 
   
   //gsl errors off
   gsl_set_error_handler_off();
