@@ -807,10 +807,23 @@ mimic_dynamo(ldouble dt)
 
       ldouble facmag1 = step_function(1.-beta,0.1);      
       ldouble facmag2 = step_function(.1-betarho,.01);
+      
+    
+#ifdef CALCHRONTHEGO //calculate HR on the go
+      int gix=ix+TOI;
+      if(gix<0) gix=0; 
+      if(gix>=TNX) gix=TNX-1;
+      ldouble HRDTHETA = scaleth_otg[gix];
+      HRDTHETA *= 2.; //because scale height/photosphere = 1/3 --- 0.55
+      if(HRDTHETA > 0.9*M_PI/2.) HRDTHETA=0.9*M_PI/2.; //to avoid the axis
+#else      
+      ldouble HRDTHETA = EXPECTEDHR * M_PI/2.;
+#endif
 
-      ldouble zH = (M_PI/2. - xxBL[2])/(M_PI/2.)/EXPECTEDHR;
+      ldouble zH = (M_PI/2. - xxBL[2])/HRDTHETA;
       ldouble zHpow = 1.;
       ldouble faczH = my_max(0.,pow(1. - zH*zH,zHpow));
+
       
       //ldouble facmagnetization = my_min(facmag1,facmag2);					             
       ldouble facmagnetization = my_min(faczH,my_min(facmag1,facmag2));
@@ -818,12 +831,13 @@ mimic_dynamo(ldouble dt)
       //the extra vector potential
       ldouble effalpha=ALPHADYNAMO;
 
+      //dynamo proportional to vertical gravity ~ z
       #ifdef ALPHAFLIPSSIGN
-      effalpha = - (M_PI/2. - xxBL[2])/(M_PI/2.) / (EXPECTEDHR/2.) * ALPHADYNAMO;
+      effalpha = - (M_PI/2. - xxBL[2])/(HRDTHETA/2.) * ALPHADYNAMO;  //2 to get average alpha = alphadynamo
       #endif
 
       ldouble Bphi=get_u(p,B3,ix,iy,iz);
-      Aphi = effalpha * EXPECTEDHR/0.4 
+      Aphi = effalpha * (HRDTHETA/(M_PI/2.)) / 0.4 
 	* dt / Pk  * xxBL[1] * geom.gg[3][3] * Bphi
 	* facradius 
 	* facmagnetization 

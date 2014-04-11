@@ -71,7 +71,9 @@ mpi_exchangedata()
 	}
       exit(-1.);
     }
-  */
+ */
+  //printf("%d > %e | %e\n",0,sigma_otg[0],scaleth_otg[0]);	  
+
 #endif
 
   my_clock_gettime(&temp_clock);    
@@ -542,11 +544,6 @@ mpi_myinit(int argc, char *argv[])
   #endif
   #endif
   #ifdef CALCHRONTHEGO
-  if(NTY % 2) //uneven number of tiles in theta
-    {
-      if(PROCID==0) printf("No. of tiles in theta must be even for CALCHRONTHEGO.\n");
-      exit(-1);
-    }
   if(TNZ>1) //3D?
     {
       if(PROCID==0) printf("CALCHRONTHEGO not implemented for 3D.\n");

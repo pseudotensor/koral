@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 0
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -92,7 +92,7 @@
 #define TNZ 1
 //number of tiles
 #define NTX 1
-#define NTY 8
+#define NTY 3
 #define NTZ 1
 #endif
 
