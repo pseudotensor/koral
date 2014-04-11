@@ -216,7 +216,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //surface density (2) (column)
 	      profiles[0][ix]+=rho*dxph[1];
 
-	      //numerator of scale heightz (31) (column)
+	      //numerator of scale height (31) (column)
 	      profiles[29][ix]+=rho*dxph[1]*pow(tan(fabs(M_PI/2.-xxBL[2])),2.);
 
 	      //surface density in the inflow (23)

@@ -17,6 +17,63 @@ mpi_exchangedata()
   mpi_savedata();  
 #endif
 
+#ifdef CALCHRONTHEGO
+  int ix,iy,iz,gix,giy,giz; struct geometry geom, geomBL;
+  ldouble sigma,scaleth,xxBL[4]; 
+  for(gix=0;gix<TNX;gix++)
+      sigma_otg_temp[gix]=scaleth_otg_temp[gix]=0.;
+  iz=0;
+  for(ix=0;ix<NX;ix++)
+    {
+      sigma=scaleth=0.;
+      for(iy=0;iy<NY;iy++)
+	{
+	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
+	  coco_N(geom.xxvec,xxBL,MYCOORDS,BLCOORDS);
+	  sigma+=get_u(p,RHO,ix,iy,iz)*geom.gdet;
+	  scaleth+=get_u(p,RHO,ix,iy,iz)*geom.gdet*(M_PI/2. - xxBL[2])*(M_PI/2. - xxBL[2]);
+	}
+      gix=ix+TOI;
+      
+      sigma_otg_temp[gix]=sigma;
+      scaleth_otg_temp[gix]=scaleth;
+    }
+
+#ifdef MPI
+  MPI_Allreduce(sigma_otg_temp, sigma_otg, TNX, MPI_LDOUBLE, MPI_SUM,
+                MPI_COMM_WORLD);
+  MPI_Allreduce(scaleth_otg_temp, scaleth_otg, TNX, MPI_LDOUBLE, MPI_SUM,
+                MPI_COMM_WORLD);
+#else
+  for(ix=0;ix<NX;ix++)
+    {
+      gix=ix+TOI;
+      sigma_otg[gix]=sigma_otg_temp[gix];
+      scaleth_otg[gix]=scaleth_otg_temp[gix];
+    }
+#endif
+  
+  for(ix=0;ix<NX;ix++)
+    {
+      gix=ix+TOI;
+      scaleth_otg[gix]=sqrt(scaleth_otg[gix]/sigma_otg[gix]);
+    }
+
+  /*
+  if(PROCID==7)
+    {
+      for(ix=0;ix<NX;ix++)
+	{
+	  gix=ix+TOI;
+	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
+	  coco_N(geom.xxvec,xxBL,MYCOORDS,BLCOORDS);
+	  printf("%d > %f > %e | %e\n",gix,xxBL[1],sigma_otg[gix],scaleth_otg[gix]);	  
+	}
+      exit(-1.);
+    }
+  */
+#endif
+
   my_clock_gettime(&temp_clock);    
   mid2_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
 
@@ -484,6 +541,18 @@ mpi_myinit(int argc, char *argv[])
   my_err("RESOUTPUT_ASCII requires MPI_OUTPUTPERCORE\n");exit(-1);
   #endif
   #endif
+  #ifdef CALCHRONTHEGO
+  if(NTY % 2) //uneven number of tiles in theta
+    {
+      if(PROCID==0) printf("No. of tiles in theta must be even for CALCHRONTHEGO.\n");
+      exit(-1);
+    }
+  if(TNZ>1) //3D?
+    {
+      if(PROCID==0) printf("CALCHRONTHEGO not implemented for 3D.\n");
+      exit(-1);
+    }
+  #endif
 
   //initialize MPI
   MPI_Init(&argc, &argv);
@@ -505,20 +574,22 @@ mpi_myinit(int argc, char *argv[])
   //if one wants to know pressure scale height on the go, e.g., for MIMICDYNAMO, 
   //then let's create two communicators, one corresponding to everything between 
   //the eq.plane and the axis, and one to what is between given tile and the eq.plane
-  #ifdef CALCSIGMAONTHEGO
+
+  //no longer needed - done through total r-arrays
+  /*
+  #ifdef CALCHRONTHEGO
 
   if(NTY % 2) //uneven number of tiles in theta
     {
-      if(PROCID==0) printf("No. of tiles in theta must be even for CALCSIGMAONTHEGO.\n");
+      if(PROCID==0) printf("No. of tiles in theta must be even for CALCHRONTHEGO.\n");
       exit(-1);
     }
   if(TNZ>1) //3D?
     {
-      if(PROCID==0) printf("CALCSIGMAONTHEGO not implemented for 3D.\n");
+      if(PROCID==0) printf("CALCHRONTHEGO not implemented for 3D.\n");
       exit(-1);
     }
 
-  /* Extract the total group handle */
   MPI_Comm_group(MPI_COMM_WORLD, &mpi_all_group); 
       
   int ranks[NTY/2],nranks,pid;
@@ -563,16 +634,10 @@ mpi_myinit(int argc, char *argv[])
 	}
     }
 
-  /*
-  if(PROCID==7){
-  printf("%d > %d > ",PROCID,nranks);
-  for(i=0;i<nranks;i++) printf("%d ",ranks[i]);
-  printf("\n");}
-  */
-
   MPI_Group_incl(mpi_all_group, nranks, ranks, &mpi_intbelow_group[TI]);
   MPI_Comm_create(MPI_COMM_WORLD, mpi_intbelow_group[TI], &mpi_intbelow_comm[TI]); 
   #endif
+*/
 
 #else
   TI=TJ=TK=0;

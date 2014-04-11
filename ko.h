@@ -129,6 +129,13 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
 int *cellflag,**loop_0,**loop_02,**loop_1,**loop_2,**loop_3,**loop_4,**loop_5,**loop_6;
 int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;
 
+#ifdef CALCHRONTHEGO
+ldouble sigma_otg[TNX];
+ldouble sigma_otg_temp[TNX];
+ldouble scaleth_otg[TNX];
+ldouble scaleth_otg_temp[TNX];
+#endif
+
 ldouble scalars[NSCALARS];
 int doingavg;
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
@@ -651,10 +658,12 @@ void mpi_myinit(int argc, char *argv[]);
 void mpi_myfinalize();
 void mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz);
 void mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz);
+/*
 #ifdef CALCSIGMAONTHEGO
 MPI_Group mpi_inttotal_group[NTX], mpi_intbelow_group[NTX]; 
 MPI_Comm mpi_inttotal_comm[NTX], mpi_intbelow_comm[NTX]; 
 #endif
+*/
 #endif
 
 #include "mnemonics.h"

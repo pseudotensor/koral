@@ -20,7 +20,7 @@
 //magnetic choices
 /************************************/
 #define MIMICDYNAMO
-#define CALCSIGMAONTHEGO
+#define CALCHRONTHEGO
 #define ALPHAFLIPSSIGN                                                        
 #define ALPHADYNAMO 0.03
 #define DAMPBETA
