@@ -58,22 +58,6 @@ mpi_exchangedata()
       gix=ix+TOI;
       scaleth_otg[gix]=sqrt(scaleth_otg[gix]/sigma_otg[gix]);
     }
-
-  /*
-  if(PROCID==7)
-    {
-      for(ix=0;ix<NX;ix++)
-	{
-	  gix=ix+TOI;
-	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
-	  coco_N(geom.xxvec,xxBL,MYCOORDS,BLCOORDS);
-	  printf("%d > %f > %e | %e\n",gix,xxBL[1],sigma_otg[gix],scaleth_otg[gix]);	  
-	}
-      exit(-1.);
-    }
- */
-  //printf("%d > %e | %e\n",0,sigma_otg[0],scaleth_otg[0]);	  
-
 #endif
 
   my_clock_gettime(&temp_clock);    

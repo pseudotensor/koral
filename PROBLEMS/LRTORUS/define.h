@@ -85,15 +85,15 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.3-MKS2R0))
+#define MINX (log(3.3-MKS2R0))
 #define MAXX (log(1000.-MKS2R0))
 //total resolution
 #define TNX 128
 #define TNY 80
 #define TNZ 1
 //number of tiles
-#define NTX 2
-#define NTY 1
+#define NTX 4
+#define NTY 4
 #define NTZ 1
 #endif
 

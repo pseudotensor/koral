@@ -545,15 +545,9 @@ calc_totalmass()
 ldouble
 calc_mdotEdd()
 {
-  //TODO: change definition to account for the efficiency as a function of spin
+  ldouble mcgs=1.09649*2.23e18*MASS*(0.057/etaNT); //g/s \propto 1/etaNT(a)
 
-  ldouble mcgs=1.09649*2.23e18*MASS; //g/s assuming eta=0.057 
-
-  //#ifdef CGSOUTPUT
   return mcgs;
-  //#else
-  //return 1.;
-  //#endif
 }
 
 //**********************************************************************
@@ -565,11 +559,7 @@ calc_lumEdd()
 {
   ldouble Lcgs=1.25e38*MASS; //erg/s
 
-  //#ifdef CGSOUTPUT
   return Lcgs;
-  //#else
-  //return 1.;
-  //#endif
 }
 
 //**********************************************************************

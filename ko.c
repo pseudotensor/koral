@@ -61,7 +61,7 @@ main(int argc, char **argv)
   calc_metric();
 
   //print scalings GU->CGS and quit
-  print_scalings(); exit(-1);
+  //print_scalings(); exit(-1);
   
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
@@ -88,14 +88,20 @@ main(int argc, char **argv)
       //exchange initial state
       if(PROCID==0) {printf("Sending initial data... ");fflush(stdout);}
       mpi_exchangedata();
-      if(PROCID==0) {printf("done!\n");fflush(stdout);}
       set_bc(tstart,1);
+      #ifdef MPI
+      MPI_Barrier(MPI_COMM_WORLD);
+      #endif
+      if(PROCID==0) {printf("done!\n");fflush(stdout);}
 #ifdef VECPOTGIVEN
       if(PROCID==0) {printf("Calculating magn. field... ");fflush(stdout);}
       calc_BfromA(p,1);
       //exchange magn. field calculated in domain
       set_bc(tstart,1);
       mpi_exchangedata();
+      #ifdef MPI
+      MPI_Barrier(MPI_COMM_WORLD);
+      #endif
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
 #endif
 
@@ -169,6 +175,7 @@ solve_the_problem(ldouble tstart, char* folder)
   ldouble dtoutavg = DTOUT2;
   int lasttout_floor;
   int lasttoutavg_floor;
+  int i,j;
   
   ldouble fprintf_time = 0.;
   int i1,i2,i3,ix,iy,iz,iv;
@@ -296,26 +303,35 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
    
 
-    
+      #ifdef RADIATION
       //average number of iterations in the implicit solver
-      ldouble avimpit[5];
+      ldouble avimpitloc[5],avimpit[5];
+      int impnumsloc[7],impnums[7];
       
-      
-      avimpit[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
-      avimpit[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
-      avimpit[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
-      avimpit[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
-      avimpit[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPLTE]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPLTE];
+      avimpitloc[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
+      avimpitloc[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
+      avimpitloc[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
+      avimpitloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
+      avimpitloc[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPLTE]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPLTE];
             
-      int impnums[7];
-      
-      impnums[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
-      impnums[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
-      impnums[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
-      impnums[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
-      impnums[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE];
-      impnums[5]=global_int_slot[GLOBALINTSLOT_NRADFIXUPS];
-      impnums[6]=global_int_slot[GLOBALINTSLOT_NCRITFAILURES]; 
+      impnumsloc[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
+      impnumsloc[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
+      impnumsloc[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
+      impnumsloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
+      impnumsloc[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE];
+      impnumsloc[5]=global_int_slot[GLOBALINTSLOT_NRADFIXUPS];
+      impnumsloc[6]=global_int_slot[GLOBALINTSLOT_NCRITFAILURES]; 
+
+      #ifdef MPI
+      MPI_Allreduce(impnumsloc, impnums, 7, MPI_INT, MPI_SUM,
+		    MPI_COMM_WORLD);  
+      MPI_Allreduce(avimpitloc, avimpit, 5, MPI_LDOUBLE, MPI_MAX,
+                   MPI_COMM_WORLD);  
+      #else
+      for(i=0;i<5;i++) avimpit[i]=avimpitloc[i];
+      for(i=0;i<7;i++) impnums[i]=impnumsloc[i];
+      #endif
+      #endif
       
       //save to avg arrays
       save_avg(dt);
@@ -324,7 +340,7 @@ solve_the_problem(ldouble tstart, char* folder)
       my_clock_gettime(&temp_clock);    
 
       end_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
-     
+
       //performance
       ldouble znps=TNX*TNY*TNZ/(end_time-start_time);
 
@@ -388,8 +404,8 @@ solve_the_problem(ldouble tstart, char* folder)
       //performance to screen only every second
       if(end_time-fprintf_time>1. && PROCID==0) 
 	{
-	  printf("%d : step (it #%6d) at t=%10.3e with dt=%.3e  (%.3f) (real time: %7.2f | %7.6f) znps: %.0f "
-		 ,PROCID,nstep,t,dt,max_ws_ph,end_time-start_time,2*maxmp_time,znps);
+	  printf("(%d) step #%6d t=%10.3e dt=%.3e (real time: %7.2f | %7.6f) znps: %.0f "
+		 ,PROCID,nstep,t,dt,end_time-start_time,2*maxmp_time,znps);
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],

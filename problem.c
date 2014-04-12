@@ -71,6 +71,11 @@ set_initial_profile()
 	    }
 	}
     }
+
+  #ifdef MPI
+      MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+
   if(PROCID==0) printf("done!\n");
 
   return 0;
@@ -92,7 +97,7 @@ int my_finger(ldouble t)
 }
 
 /*********************************************/
-/* suplementary routines
+/* suplementary routines */
 /* uses PROBLEMS/XXX/tools.c */   
 /*********************************************/
 #include PR_TOOLS
