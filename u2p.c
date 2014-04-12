@@ -416,7 +416,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 #ifdef RHOFLOOR_BH
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-  ldouble rr = xxBL[1] / r_horizon_BL(BHSPIN);
+  ldouble rr = xxBL[1] / rhorizonBL;
   ldouble rhofloor = RHOFLOOR_BH_NORM / sqrt(rr*rr*rr);
   if(pp[0]<rhofloor) 
     {

@@ -1302,19 +1302,11 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
     }
 
   //consistency check
-#ifdef SCHWARZSCHILD
-  if(get_x(-1,0)<=r_horizon_BL(0.))
+#if(MYCOORDS==BLCOORDS)
+  if(get_x(-1,0)<=rhorizonBL)
     {
       printf("ix %d > %f\n",-1,get_x(-1,0));
       my_err("-1 cell inside horizon\n");
-    }
-#endif
-#ifdef KERR
-  if(get_x(-1,0)<=r_horizon_BL(BHSPIN))
-    {
-      printf("ix %d > %f\n",-1,get_x(-1,0));
-      my_err("-1 cell inside horizon\n");
-
     }
 #endif
 

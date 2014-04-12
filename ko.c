@@ -26,10 +26,6 @@ main(int argc, char **argv)
   //this is not avg.c
   doingavg=0;
 
-  //print scalings GU->CGS and quit
-  //printf("0.9 -> eff=%e\n",1.-sqrt(1.-2./3./r_ISCO_BL(0.9)));
-  //print_scalings(); 
-  
   //gsl errors off
   gsl_set_error_handler_off();
   
@@ -64,6 +60,9 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+  //print scalings GU->CGS and quit
+  print_scalings(); exit(-1);
+  
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
 #include PR_PREPINIT
@@ -454,17 +453,20 @@ int
 print_scalings()
 {
   
-  printf("scalings (GU->CGS):\nrho: %.16e\nlen: %.16e\ntime: %.16e\nugas:"
-	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkappa: %.16e\n",
+  printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.16e\nlen: %.16e\ntime: %.16e\nugas:"
+	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkappa: %.16e\n\nrhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n",
+	 MASS,BHSPIN,
 	 rhoGU2CGS(1.),
 	 lenGU2CGS(1.),
 	 timeGU2CGS(1.),
 	 endenGU2CGS(1.),
 	 calc_PEQ_Tfromurho(1.,1.),
 	 K_BOLTZ/MU_GAS/M_PROTON,
-	 kappaCGS2GU(1.)
+	 kappaCGS2GU(1.),
+	 rhorizonBL,
+	 rISCOBL,
+	 etaNT
 	 );
-  exit(0);
   
   return 0;
 }

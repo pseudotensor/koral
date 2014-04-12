@@ -715,17 +715,6 @@ if(coords==MINKCOORDS) {
 ;
 }
 
-/*
- if(G[0][0]>0. || !isfinite(x3))
-   {
-     printf("problem in calc_metric\n");
-     printf("%e %e %e\n",
-	    x1,x2,x3);
-     print_4vector(xx);
-     print_metric(G);
-     getchar();     
-   }
-*/
   return 0;
 }
 
@@ -3135,6 +3124,14 @@ calc_metric()
       */
 
     }
+
+  //precalculating characteristic radii and parameters
+  //works for all metrics but makes sense only for BH problems
+  rhorizonBL = r_horizon_BL(BHSPIN);
+  rISCOBL = r_ISCO_BL(BHSPIN);
+  rmboundBL = r_mbound_BL(BHSPIN);
+  rphotonBL = r_photon_BL(BHSPIN);
+  etaNT = 1.-sqrt(1.-2./3./r_ISCO_BL(0.9));
 
   if(PROCID==0) printf("done!\n");
   

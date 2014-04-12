@@ -144,6 +144,9 @@ int **gcidx;
 FILE *fout1,*fout_scalars,*fout_radprofiles,*fout_fail;
 int nfout1,nfout2;
 
+//precalculated metric parameters
+ldouble rhorizonBL,rISCOBL,rmboundBL,rphotonBL,etaNT;
+
 //some macros
 #define my_max(x,y) (x>y?x:y)
 #define my_max3(x,y,z) (x>my_max(y,z)?x:my_max(y,z))

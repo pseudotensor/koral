@@ -772,7 +772,7 @@ mimic_dynamo(ldouble dt)
       coco_N(geom.xxvec,xxBL,MYCOORDS, BLCOORDS);
 
       //to avoid BH
-      if(xxBL[1]<1.0001*r_horizon_BL(BHSPIN)) continue;
+      if(xxBL[1]<1.0001*rhorizonBL) continue;
 
       //dynamo formula
       Omk = 1./(BHSPIN+sqrt(xxBL[1]*xxBL[1]*xxBL[1]));

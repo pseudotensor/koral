@@ -1485,7 +1485,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
   //test
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-  ldouble fac=step_function(xxBL[1]-2.*r_horizon_BL(BHSPIN),0.1*r_horizon_BL(BHSPIN));
+  ldouble fac=step_function(xxBL[1]-2.*rhorizonBL,0.1*rhorizonBL);
   for(i=0;i<4;i++)
     Gi[i]+=fac*Gic[i];
 #endif 
@@ -2928,7 +2928,7 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
 #elif defined(RADVISCMFPSPH)
 
   ldouble xxBL[4];
-  ldouble rhor=r_horizon_BL(BHSPIN);
+  ldouble rhor=rhorizonBL;
   coco_N(geom->xxvec,xxBL,MYCOORDS, BLCOORDS);
   ldouble mfplim=xxBL[1];
   if(mfp>mfplim || chi<SMALL) mfp=mfplim; //Rcyl = Rsph

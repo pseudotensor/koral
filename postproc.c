@@ -381,7 +381,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   //accretion rate through horizon (3)
   ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
 
-  ldouble mdot=calc_mdot(r_horizon_BL(BHSPIN),0);
+  ldouble mdot=calc_mdot(rhorizonBL,0);
   scalars[1]=-mdot;
 
   //accretion rate through horizon in Edd. units (6)
@@ -413,7 +413,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   scalars[6]=calc_meantemp(rtemp);
 
   //magnetic flux through horizon parameter (5)
-  ldouble Bflux=calc_Bflux(r_horizon_BL(BHSPIN),0);
+  ldouble Bflux=calc_Bflux(rhorizonBL,0);
   scalars[3]=Bflux;
 
   //MAD parameter (9)
