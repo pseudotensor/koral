@@ -81,7 +81,7 @@
 //78 FUNNY - for Ronaldo & Grzesiek & not for Bhupendra
 //79 SOFTBALL - Ron & Grz Bis
 
-#define PROBLEM 67
+#define PROBLEM 79
 
 #if(PROBLEM==79)
 
@@ -1415,7 +1415,7 @@
 #else //no RADIATION
 
 #define NV (NVMHD)
-#define NRADVAR 0
+#define NRADVAR 4 //not used
 #endif
 
 #ifndef GAMMA

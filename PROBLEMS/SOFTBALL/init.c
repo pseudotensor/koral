@@ -15,31 +15,49 @@ fill_geometry_arb(ix,iy,iz,&geomcart,MINKCOORDS);
 ldouble pp[NV],uu[NV];
 
 /***********************************************/
-//ambient medium
-ldouble BCX = RBLOB;
-ldouble BCZ = 0.;
-ldouble dist = sqrt((geomcart.xx-BCX)*(geomcart.xx-BCX)+(geomcart.zz-BCZ)*(geomcart.zz-BCZ));
-//ldouble omega = sqrt(1./(RBLOB*RBLOB*RBLOB));
-ldouble omega = sqrt(1./(geom.xx*geom.xx*geom.xx));
-pp[RHO]=RHOAMB + (BRHO - RHOAMB) * exp(-dist*dist / BW / BW );
-pp[UU]=UUAMB;
-ldouble OMEGA1=sqrt(omega*omega/(-geom.gg[0][0])/(1+omega*omega*geom.gg[3][3]/geom.gg[0][0]));
-if(pp[RHO]>2.*RHOAMB)
+//angular momentum of the torus:
+ldouble L=6.;
+
+//ldouble W = (1./2.)*log(-(geom.gg[0][0]*geom.gg[3][3])/(geom.gg[3][3]+L*L*geom.gg[0][0]));
+//ldouble rin=4;
+//ldouble Win = 0.0; 
+//ldouble w=exp(-(W-Win));
+
+//OS: I didn't know how to manipulate the size of the torus in your formulae, so I used my old ones:
+ldouble podpierd=-(geom.GG[0][0]-2.*L*geom.GG[0][3]+L*L*geom.GG[3][3]);
+ldouble ut=-1./sqrt(podpierd);
+ut/=0.985; //determines the torus size, the closer to 1, the bigger the torus
+ldouble w=-1./ut;
+ldouble epsilon = (w-1.)/GAMMA;  //OS: dot after 1.
+
+if(epsilon>0.) //OS: interior of the torus
   {
+    ldouble kappa = 1.; //OS: entropy constant, 0.01 gave temperature < 1e5 what was a bit too low
+    //density
+    ldouble rho0=powl((GAMMA-1)*epsilon/kappa,1/(GAMMA-1)); //OS: without the if(w>1.) condition rho0 could be NaN
+    pp[RHO]=rho0;
+
+    //~pressure
+    ldouble uu0 = kappa * pow(rho0, GAMMA) / (GAMMA - 1.); //OS: you forgot to define pressure which must be consistent with the torus model
+    pp[UU]=uu0;
+
+    //angular velocity
+    ldouble omega = -L*(geom.gg[0][0]/geom.gg[3][3]);
+    ldouble OMEGA1=sqrt(-omega*omega/(geom.gg[0][0]+omega*omega*geom.gg[3][3]));
+
     pp[VZ]=OMEGA1;
     pp[VY]=0.;
     pp[VX]=0.;
+
+    //just in vase VELPRIM!=VEL4
+    conv_velsinprims(pp,VEL4,VELPRIM,geom.gg,geom.GG);
   }
- else
-   pp[VY]=pp[VX]=pp[VZ]=0.;
-
-//magn field
-#ifdef MAGNFIELD
-pp[B1]=pp[B2]=pp[B3]=0.; 
-
-pp[B3]=my_max(0.,pp[RHO]-.1*BRHO);
-    
-#endif
+ else //OS: atmosphere outside the torus
+   {
+     pp[RHO]=RHOAMB;
+     pp[UU]=UUAMB;
+     pp[VY]=pp[VX]=pp[VZ]=0.;
+   }
 
 /***********************************************/
 //calculate entropy from rho & uint
