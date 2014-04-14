@@ -53,10 +53,11 @@ mpi_exchangedata()
     }
 #endif
   
-  for(ix=0;ix<NX;ix++)
+  for(ix=-NGCX;ix<NX+NGCX;ix++)
     {
       gix=ix+TOI;
-      scaleth_otg[gix]=sqrt(scaleth_otg[gix]/sigma_otg[gix]);
+      if(gix>0 && gix<TNX)
+	scaleth_otg[gix]=sqrt(scaleth_otg[gix]/sigma_otg[gix]);
     }
 #endif
 
@@ -551,74 +552,6 @@ mpi_myinit(int argc, char *argv[])
 
   if(PROCID==0) printf("pid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
 	 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
-
-  //if one wants to know pressure scale height on the go, e.g., for MIMICDYNAMO, 
-  //then let's create two communicators, one corresponding to everything between 
-  //the eq.plane and the axis, and one to what is between given tile and the eq.plane
-
-  //no longer needed - done through total r-arrays
-  /*
-  #ifdef CALCHRONTHEGO
-
-  if(NTY % 2) //uneven number of tiles in theta
-    {
-      if(PROCID==0) printf("No. of tiles in theta must be even for CALCHRONTHEGO.\n");
-      exit(-1);
-    }
-  if(TNZ>1) //3D?
-    {
-      if(PROCID==0) printf("CALCHRONTHEGO not implemented for 3D.\n");
-      exit(-1);
-    }
-
-  MPI_Comm_group(MPI_COMM_WORLD, &mpi_all_group); 
-      
-  int ranks[NTY/2],nranks,pid;
-
-  //1st - everything between eq.plane and the tile in given quadrant
-
-  nranks=NTY/2;
-  if(TJ<NTY/2) //above eq.plane
-    for(i=0;i<nranks;i++)
-      {
-	pid=mpi_tile2procid(TI,i,TK);
-	ranks[i]=pid;
-      }
-  else //below eq.plane
-    for(i=0;i<nranks;i++)
-      {
-	pid=mpi_tile2procid(TI,NTY/2+i,TK);
-	ranks[i]=pid;
-      }
-
-  MPI_Group_incl(mpi_all_group, nranks, ranks, &mpi_inttotal_group[TI]);
-  MPI_Comm_create(MPI_COMM_WORLD, mpi_inttotal_group[TI], &mpi_inttotal_comm[TI]); 
-
-  //2nd - between given tile and eq.plane
-
-  if(TJ<NTY/2) //above eq.plane
-    {
-      nranks=NTY/2 - TJ - 1;
-      for(i=0;i<nranks;i++)
-      {
-	pid=mpi_tile2procid(TI,TJ+i+1,TK);
-	ranks[i]=pid;
-      }
-    }
-  else //below eq.plane
-    {
-      nranks=TJ - NTY/2;
-      for(i=0;i<nranks;i++)
-	{
-	  pid=mpi_tile2procid(TI,TJ-i-1,TK);
-	  ranks[i]=pid;
-	}
-    }
-
-  MPI_Group_incl(mpi_all_group, nranks, ranks, &mpi_intbelow_group[TI]);
-  MPI_Comm_create(MPI_COMM_WORLD, mpi_intbelow_group[TI], &mpi_intbelow_comm[TI]); 
-  #endif
-*/
 
 #else
   TI=TJ=TK=0;

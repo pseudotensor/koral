@@ -88,8 +88,8 @@
 #define MINX (log(3.3-MKS2R0))
 #define MAXX (log(1000.-MKS2R0))
 //total resolution
-#define TNX 128
-#define TNY 80
+#define TNX 80
+#define TNY 60
 #define TNZ 1
 //number of tiles
 #define NTX 4
@@ -123,7 +123,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/

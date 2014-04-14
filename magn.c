@@ -810,7 +810,7 @@ mimic_dynamo(ldouble dt)
       
     
 #ifdef CALCHRONTHEGO //calculate HR on the go
-      int gix=ix+TOI;
+      int gix=ix+TOI; //global radial index
       if(gix<0) gix=0; 
       if(gix>=TNX) gix=TNX-1;
       ldouble HRDTHETA = scaleth_otg[gix];
