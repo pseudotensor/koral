@@ -234,14 +234,17 @@ conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
 	  qsq+=u1[i]*u1[j]*gg[i][j];
+
       ldouble gamma2=(1.+qsq);
       ldouble alpha2=(-1./GG[0][0]);
 
+      ldouble alpgam=sqrt(alpha2*gamma2);
+      
       u1[0]=0.;
       indices_21(u1,u1cov,gg); //lowering indices in utilda
 
       for(i=0;i<4;i++)
-	utcov[i]=u1cov[i]-sqrt(alpha2*gamma2)*delta(0,i);
+	utcov[i]=u1cov[i]-alpgam*delta(0,i);
 
       indices_12(utcov,utcon,GG);
     }
