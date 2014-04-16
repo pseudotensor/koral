@@ -8,7 +8,19 @@ int //calculates only ucon, assumes ut unknown where applicable
 conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
   ldouble ucov[4];
-  conv_vels_core(u1,u2,ucov,which1,which2,gg,GG,0);
+
+  //TODO: if lapse needed
+  int i,j;
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=u1[i]*u1[j]*gg[i][j];
+
+  ldouble gamma2=(1.+qsq);
+  ldouble alpha2=(-1./GG[0][0]);
+  ldouble lapse=sqrt(alpha2*gamma2);
+
+  conv_vels_core(u1,u2,ucov,which1,which2,gg,GG,lapse,0);
   return 0;
 }
 
@@ -16,7 +28,19 @@ int //calculates only ucon, assumes ut known where applicable
 conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
   ldouble ucov[4];
-  conv_vels_core(u1,u2,ucov,which1,which2,gg,GG,1);
+
+  //TODO: if lapse needed			
+  int i,j;
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=u1[i]*u1[j]*gg[i][j];
+
+  ldouble gamma2=(1.+qsq);
+  ldouble alpha2=(-1./GG[0][0]);
+  ldouble lapse=sqrt(alpha2*gamma2);
+
+  conv_vels_core(u1,u2,ucov,which1,which2,gg,GG,lapse,1);
   return 0;
 }
 
@@ -25,10 +49,21 @@ conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
 {
   ldouble ucov[4];
 
+//TODO: if lapse needed
+  int i,j;
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=u1[i]*u1[j]*gg[i][j];
+
+  ldouble gamma2=(1.+qsq);
+  ldouble alpha2=(-1./GG[0][0]);
+  ldouble lapse=sqrt(alpha2*gamma2);
+
   //conv_vels(u1,u2con,VELPRIM,VEL4,gg,GG);
   //conv_velscov(u1,u2cov,VELPRIM,VEL4,gg,GG);
 
-  conv_vels_core(u1,u2con,u2cov,which1,which2,gg,GG,0);
+  conv_vels_core(u1,u2con,u2cov,which1,which2,gg,GG,lapse,0);
   return 0;
 }
 
@@ -39,7 +74,7 @@ conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
 //to contravariant u2con
 //and covariant u2cov (if which2==VEL4)
 int
-conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5],int utknown)
+conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5],ldouble lapse,int utknown)
 {
   int i,j;
   //  ldouble u2con[4],u2cov[4];
@@ -217,19 +252,9 @@ conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
   /*************** VELR -> VEL4 ***************/
   else if (which1==VELR && which2==VEL4)
     {
-      /*
-      ldouble qsq=0.;
-      for(i=1;i<4;i++)
-	for(j=1;j<4;j++)
-	  qsq+=u1[i]*u1[j]*gg[i][j];
-      ldouble gamma2=1.+qsq;
-      ldouble alpha2=-1./GG[0][0];
-      u2con[0]=sqrt(gamma2/alpha2);
-      for(i=1;i<4;i++)
-	u2con[i]=u1[i]+u2con[0]*GG[0][i]/GG[0][0];
-      */
-
       ldouble u1cov[4];
+      /*
+      
       ldouble qsq=0.;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
@@ -237,9 +262,10 @@ conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
 
       ldouble gamma2=(1.+qsq);
       ldouble alpha2=(-1./GG[0][0]);
+      */
 
       //TODO - this is precalculated in geometry structure! Should have passed geometry pointer instead of gg,GG
-      ldouble alpgam=sqrt(alpha2*gamma2);
+      ldouble alpgam=lapse;//sqrt(alpha2*gamma2);
       
       u1[0]=0.;
       //indices_21(u1,u1cov,gg); //lowering indices in utilda
