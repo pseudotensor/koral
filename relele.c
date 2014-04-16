@@ -238,15 +238,36 @@ conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
       ldouble gamma2=(1.+qsq);
       ldouble alpha2=(-1./GG[0][0]);
 
+      //TODO - this is precalculated in geometry structure! Should have passed geometry pointer instead of gg,GG
       ldouble alpgam=sqrt(alpha2*gamma2);
       
       u1[0]=0.;
-      indices_21(u1,u1cov,gg); //lowering indices in utilda
+      //indices_21(u1,u1cov,gg); //lowering indices in utilda
+
+      int i,k;
+      for(i=0;i<4;i++)
+	{
+	  u1cov[i]=0.;
+	  for(k=0;k<4;k++)
+	    {
+	      u1cov[i]+=u1[k]*gg[i][k];
+	    }	  
+	}
 
       for(i=0;i<4;i++)
 	u2cov[i]=u1cov[i]-alpgam*delta(0,i);
 
-      indices_12(u2cov,u2con,GG);
+      //indices_12(u2cov,u2con,GG);
+      for(i=0;i<4;i++)
+	{
+	  u2con[i]=0.;
+	  for(k=0;k<4;k++)
+	    {
+	      u2con[i]+=u2cov[k]*GG[i][k];
+	    }	  
+	}
+
+
     }
   /*************** VELR -> VEL3 ***************/
   else if (which1==VELR && which2==VEL3)
