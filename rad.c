@@ -526,7 +526,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //4dprim
   ldouble EPS = 1.e-8;
   ldouble CONV = RADIMPCONV;  
-  ldouble MAXITER = 50;
+  ldouble MAXITER = RADIMPMAXITER;
   int corr[2],fixup[2];
 
   int sh;

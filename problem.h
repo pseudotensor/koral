@@ -1604,6 +1604,10 @@
 #define RADIMPCONV 1.e-8
 #endif
 
+#ifndef RADIMPMAXITER
+#define RADIMPMAXITER 20
+#endif
+
 #define NUMEPSILON DBL_EPSILON
 
 /*********************/
