@@ -78,10 +78,10 @@ conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
 //to contravariant u2con
 //and covariant u2cov (if which2==VEL4)
 int
-conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5],ldouble alpgam,int utknown)
+conv_vels_core(ldouble *u1,ldouble *u2conout,ldouble *u2covout,int which1,int which2,ldouble gg[][5],ldouble GG[][5],ldouble alpgam,int utknown)
 {
   int i,j;
-  //  ldouble u2con[4],u2cov[4];
+  ldouble u2con[4],u2cov[4];
   int verbose=0;
   if(verbose)
     {
@@ -320,24 +320,20 @@ conv_vels_core(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
       return -1;
     }
 
-  /*
+  
 
   //write to index 0 only when needed
-  if(which2==VEL4)
-    u2con[0]=utcon[0];
 
-  u2con[1]=utcon[1];
-  u2con[2]=utcon[2];
-  u2con[3]=utcon[3];
+  u2conout[0]=u2con[0];
+  u2conout[1]=u2con[1];
+  u2conout[2]=u2con[2];
+  u2conout[3]=u2con[3];
 
-  if(which2==VEL4)
-    {
-      u2cov[0]=utcov[0];
-      u2cov[1]=utcov[1];
-      u2cov[2]=utcov[2];
-      u2cov[3]=utcov[3];
-    }
-  */
+  u2covout[0]=u2cov[0];
+  u2covout[1]=u2cov[1];
+  u2covout[2]=u2cov[2];
+  u2covout[3]=u2cov[3];
+  
   if(verbose)
     {
       print_4vector(u2con);      

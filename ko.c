@@ -61,7 +61,7 @@ main(int argc, char **argv)
   calc_metric();
 
   //print scalings GU->CGS and quit
-  //print_scalings(); exit(-1);
+  print_scalings(); exit(-1);
   
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
@@ -469,10 +469,12 @@ int
 print_scalings()
 {
   
-  printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.16e\nlen: %.16e\ntime: %.16e\nugas:"
-	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkappa: %.16e\n\nrhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n",
+  printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.16e\nmdot: %.16e\nsigma: %.16e\nlen: %.16e\ntime: %.16e\nugas:"
+	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkappa: %.16e\n\nrhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\nmdotEdd: %.16e\n",
 	 MASS,BHSPIN,
 	 rhoGU2CGS(1.),
+	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.),
+	 rhoGU2CGS(1.)*lenGU2CGS(1.),
 	 lenGU2CGS(1.),
 	 timeGU2CGS(1.),
 	 endenGU2CGS(1.),
@@ -481,7 +483,8 @@ print_scalings()
 	 kappaCGS2GU(1.),
 	 rhorizonBL,
 	 rISCOBL,
-	 etaNT
+	 etaNT,
+	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)/calc_mdotEdd()
 	 );
   
   return 0;

@@ -2933,8 +2933,8 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   ldouble mfplim=xxBL[1];
   if(mfp>mfplim || chi<SMALL) mfp=mfplim; //Rcyl = Rsph
   if(mfp<0. || !isfinite(mfp)) mfp=0.;
-  mfp*=step_function(xxBL[1]-1.5*rhor,0.1*rhor);
-  if(xxBL[1]<=rhor) mfp=0.;
+  mfp*=step_function(xxBL[1]-1.5*rhor,0.01*rhor);
+  if(xxBL[1]<=1.25*rhor) mfp=0.;
 
 #else
 

@@ -7,8 +7,8 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTGENERALINDICES
-#define RESTARTNUM 0
+//#define RESTARTGENERALINDICES
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -22,10 +22,10 @@
 #define MIMICDYNAMO
 #define CALCHRONTHEGO
 #define ALPHAFLIPSSIGN                                                        
-#define ALPHADYNAMO 0.1
+#define ALPHADYNAMO 0.314
 #define DAMPBETA
 #define BETASATURATED 0.1
-#define ALPHABETA 1.
+#define ALPHABETA 6.28
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
@@ -80,20 +80,20 @@
 //coordinates / resolution
 /************************************/
 #define myMKS2COORDS
-#define MKS2R0 0.
-#define MKS2H0 0.7
+#define MKS2R0 1.
+#define MKS2H0 0.6
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(3.3-MKS2R0))
-#define MAXX (log(1000.-MKS2R0))
+#define MINX (log(1.325-MKS2R0))
+#define MAXX (log(5000.-MKS2R0))
 //total resolution
-#define TNX 80
-#define TNY 60
+#define TNX 140
+#define TNY 100
 #define TNZ 1
 //number of tiles
-#define NTX 4
-#define NTY 4
+#define NTX 24
+#define NTY 24
 #define NTZ 1
 #endif
 
@@ -114,8 +114,8 @@
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
-#define NSTEPSTOP 30
-#define NOUTSTOP 1e10
+#define NSTEPSTOP 1.e10
+#define NOUTSTOP 5000
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
 #define RADOUTPUT 1
@@ -123,7 +123,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 50.
 #define DTOUT2 1000.
 
 /************************************/
@@ -131,10 +131,10 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 7
+#define NTORUS 8
 
-#if(NTORUS==7) //flat sigma
-#define LT_KAPPA 1100.
+#if(NTORUS==8) //flat sigma
+#define LT_KAPPA 500.
 #define EXPECTEDHR 0.1
 #define LT_XI 0.975
 #define LT_R1 30.
@@ -143,7 +143,7 @@
 #define LT_RIN 22.
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (1./10.) //eq.plane
+#define MAXBETA (1./10.)
 #endif
 
 #if(NTORUS==6) //for not-so-hyper

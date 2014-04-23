@@ -757,14 +757,13 @@ mimic_dynamo(ldouble dt)
       set_u(ptemp1,B2,ix,iy,iz,0.);
       set_u(ptemp1,B3,ix,iy,iz,0.);
 
-      ldouble Aphi,Pk,Omk;
+      ldouble Aphi,Pk,Omk,Om;
       ldouble xxBL[4],bcon[4],bcov[4],Bp;
       ldouble ucon[4],ucov[4];
       int j;
       ldouble angle,bbphi,bsq;
 
       //magnetic field angle
-      //calc_angle_bpbphibsq(ix,iy,iz,&bbphi,&bsq);
       calc_angle_brbphibsq(ix,iy,iz,&bbphi,&bsq);
       angle=-bbphi/bsq;
 
@@ -774,21 +773,35 @@ mimic_dynamo(ldouble dt)
       //to avoid BH
       if(xxBL[1]<1.0001*rhorizonBL) continue;
 
-      //dynamo formula
+      //local four-velocity
+
+      /*
+      ucon[0]=0;
+      ucon[1]=get_u(p,VX,ix,iy,iz);
+      ucon[2]=get_u(p,VY,ix,iy,iz);
+      ucon[3]=get_u(p,VZ,ix,iy,iz);
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+      Om = ucon[3]/ucon[0];
+      */
+
+      //timescale
       Omk = 1./(BHSPIN+sqrt(xxBL[1]*xxBL[1]*xxBL[1]));
       Pk = 2.*M_PI/Omk;
+
+      //local omega based
+      //Pk = 2.*M_PI/Om;
 
       //angle
       ldouble facangle=0.;
       if(isfinite(angle))
 	{
-	  //if(angle<-1.) angle=-1.;
-	  facangle = my_max(0., 1.-4.*fabs(angle));
+	  if(angle<-1.) angle=-1.;
+	  facangle = my_max(0., 1.-4.*(angle));
 	  //facangle= step_function(0.25-angle,0.025); 
 	}
 
       //radius
-      ldouble facradius = step_function(xxBL[1]-4.,1.);
+      ldouble facradius = step_function(xxBL[1]-1.5*rISCOBL,.1*rISCOBL);
 
       //pre(gas+rad)
       ldouble prermhd = GAMMAM1*get_u(p,UU,ix,iy,iz);
@@ -814,7 +827,7 @@ mimic_dynamo(ldouble dt)
       if(gix<0) gix=0; 
       if(gix>=TNX) gix=TNX-1;
       ldouble HRDTHETA = scaleth_otg[gix];
-      HRDTHETA *= 2.; //because scale height/photosphere = 1/3 --- 0.55
+      //HRDTHETA *= 2.; //because scale height/photosphere = 1/3 --- 0.55
       if(HRDTHETA > 0.9*M_PI/2.) HRDTHETA=0.9*M_PI/2.; //to avoid the axis
 #else      
       ldouble HRDTHETA = EXPECTEDHR * M_PI/2.;
@@ -825,8 +838,9 @@ mimic_dynamo(ldouble dt)
       ldouble faczH = my_max(0.,pow(1. - zH*zH,zHpow));
 
       
-      //ldouble facmagnetization = my_min(facmag1,facmag2);					             
-      ldouble facmagnetization = my_min(faczH,my_min(facmag1,facmag2));
+      //ldouble facmagnetization = my_min(facmag1,facmag2);		       
+      //ldouble facmagnetization = my_min(faczH,my_min(facmag1,facmag2));
+      ldouble facmagnetization = faczH;
 
       //the extra vector potential
       ldouble effalpha=ALPHADYNAMO;
