@@ -407,11 +407,13 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //* MPI ****************************************************************
   //**********************************************************************
  
-  mpi_exchangedata();
+  mpi_exchangedata();  
  
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
+
+  calc_avgs_throughout();
 
   //projects primitives onto ghost cells at the boundaries of the total domain
   //or calulates conserved from exchanged primitives

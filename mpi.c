@@ -1,27 +1,15 @@
 #include "ko.h"
 
-int 
-mpi_exchangedata()
+int
+calc_avgs_throughout()
 {
-  //time mark
-  struct timespec temp_clock;
-  my_clock_gettime(&temp_clock);    
-  mid1_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
-
-#ifdef MPI  
-  MPI_Request reqs[MPIMSGBUFSIZE];
-  int nreqs=0;
-  mpi_senddata(reqs,&nreqs);
-  mpi_recvdata(reqs,&nreqs);
-  MPI_Waitall(nreqs, reqs, MPI_STATUSES_IGNORE);
-  mpi_savedata();  
-#endif
-
+  /***************************/
+  //scale height at each radius
 #ifdef CALCHRONTHEGO
   int ix,iy,iz,gix,giy,giz; struct geometry geom, geomBL;
   ldouble sigma,scaleth,xxBL[4]; 
   for(gix=0;gix<TNX;gix++)
-      sigma_otg_temp[gix]=scaleth_otg_temp[gix]=0.;
+    sigma_otg_temp[gix]=scaleth_otg_temp[gix]=0.;
   iz=0;
   for(ix=0;ix<NX;ix++)
     {
@@ -41,9 +29,9 @@ mpi_exchangedata()
 
 #ifdef MPI
   MPI_Allreduce(sigma_otg_temp, sigma_otg, TNX, MPI_LDOUBLE, MPI_SUM,
-                MPI_COMM_WORLD);
+		MPI_COMM_WORLD);
   MPI_Allreduce(scaleth_otg_temp, scaleth_otg, TNX, MPI_LDOUBLE, MPI_SUM,
-                MPI_COMM_WORLD);
+		MPI_COMM_WORLD);
 #else
   for(ix=0;ix<NX;ix++)
     {
@@ -53,13 +41,35 @@ mpi_exchangedata()
     }
 #endif
   
-  for(ix=-NGCX;ix<NX+NGCX;ix++)
-    {
-      gix=ix+TOI;
-      if(gix>0 && gix<TNX)
-	scaleth_otg[gix]=sqrt(scaleth_otg[gix]/sigma_otg[gix]);
-    }
+for(ix=-NGCX;ix<NX+NGCX;ix++)
+  {
+    gix=ix+TOI;
+    if(gix>0 && gix<TNX)
+      scaleth_otg[gix]=sqrt(scaleth_otg[gix]/sigma_otg[gix]);
+  }
 #endif
+  /***************************/
+
+return 0;
+}
+
+int 
+mpi_exchangedata()
+{
+  //time mark
+  struct timespec temp_clock;
+  my_clock_gettime(&temp_clock);    
+  mid1_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
+
+#ifdef MPI  
+  MPI_Request reqs[MPIMSGBUFSIZE];
+  int nreqs=0;
+  mpi_senddata(reqs,&nreqs);
+  mpi_recvdata(reqs,&nreqs);
+  MPI_Waitall(nreqs, reqs, MPI_STATUSES_IGNORE);
+  mpi_savedata();  
+#endif
+
 
   my_clock_gettime(&temp_clock);    
   mid2_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;

@@ -645,6 +645,8 @@ ldouble calc_Qtheta(int ix, int iy, int iz);
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
+int calc_avgs_throughout();
+
 #ifdef MPI
 MPI_Group mpi_all_group;
 #define MPI_LDOUBLE MPI_DOUBLE
