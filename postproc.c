@@ -203,7 +203,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //to calculate magn. field angle
 	      //bsq and brbphi taken from avg if neeeded
-	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq);
+	      ldouble bfake[4];
+	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq,bfake,bfake);
 	      Bangle1+=rho*brbphi*dxph[1];
 	      Bangle2+=rho*bsq*dxph[1];
 

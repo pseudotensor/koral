@@ -550,7 +550,7 @@ calc_Qtheta(int ix, int iy, int iz)
 
 //calculates sqrt(g_rr g_phph) b^r b^phi and b^2
 int
-calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
+calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq, ldouble *bcon,ldouble *bcov)
 {
   int i;
 
@@ -559,7 +559,7 @@ calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
   struct geometry geomBL;
   fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
-  ldouble pp[NV],bcon[4],bcov[4];
+  ldouble pp[NV];
 
   if(doingavg)
     {
@@ -595,7 +595,7 @@ calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq)
 //calculates b^p b^phi and b^2
 //here cannot work on averages (bpoloidal bphi is not averaged)
 int
-calc_angle_bpbphibsq(int ix, int iy, int iz, ldouble *bpbphi, ldouble *bsq)
+calc_angle_bpbphibsq(int ix, int iy, int iz, ldouble *bpbphi, ldouble *bsq, ldouble *bcon, ldouble *bcov)
 {
   int i;
 
@@ -604,7 +604,7 @@ calc_angle_bpbphibsq(int ix, int iy, int iz, ldouble *bpbphi, ldouble *bsq)
   struct geometry geomBL;
   fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
-  ldouble pp[NV],bcon[4],bcov[4];
+  ldouble pp[NV];
   PLOOP(i)
     pp[i]=get_u(p,i,ix,iy,iz);
 	      
@@ -763,8 +763,8 @@ mimic_dynamo(ldouble dt)
       int j;
       ldouble angle,bbphi,bsq;
 
-      //magnetic field angle
-      calc_angle_brbphibsq(ix,iy,iz,&bbphi,&bsq);
+      //magnetic field angle      
+      calc_angle_brbphibsq(ix,iy,iz,&bbphi,&bsq,bcon,bcov);
       angle=-bbphi/bsq;
 
       //BL radius
@@ -862,14 +862,42 @@ mimic_dynamo(ldouble dt)
 
 //damping azimuthal component of magnetic field if beta exceeds DAMPBETA
 #ifdef DAMPBETA      
+      
+      ldouble bphi,dbphi,Bcon[4];
+      
+      bphi = bcon[3];
+
+      dbphi = - ALPHABETA 
+	* facradius
+	* faczH
+	* dt / Pk 
+	* my_max(0.,beta - BETASATURATED) / BETASATURATED 
+	* bphi;
+
+      if((dbphi+bphi)*bphi<0.) dbphi=-bphi; //not to overshoot zero
+
+      dbphi=0.;
+      
+      bcon[3]=bphi+dbphi;
+
+      calc_Bcon_prim(&get_u(p,0,ix,iy,iz), bcon, Bcon, &geom);
+
+      //set_u(p,B3,ix,iy,iz,Bcon[3]);
+
+      //printf("%d %d > %e %e %e %e %e\n",ix,iy,bphi,dbphi,bcon[3],Bcon[3],get_u(p,B3,ix,iy,iz));
+      
+      /*
       ldouble dBphi = - ALPHABETA 
+	* facradius
 	* faczH
 	* dt / Pk 
 	* my_max(0.,beta - BETASATURATED) / BETASATURATED 
 	* Bphi;
 
-      if((dBphi+Bphi)*Bphi<0.) dBphi=-Bphi; //not to overshoot zero                                                                                   
-      set_u(p,B3,ix,iy,iz,Bphi+dBphi);
+      if((dBphi+Bphi)*Bphi<0.) dBphi=-Bphi; //not to overshoot zero 
+                                                              
+      set_u(p,B3,ix,iy,iz,Bphi+dBphi);    
+      */
 #endif    
 
 
