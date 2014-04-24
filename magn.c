@@ -862,7 +862,7 @@ mimic_dynamo(ldouble dt)
 
 //damping azimuthal component of magnetic field if beta exceeds DAMPBETA
 #ifdef DAMPBETA      
-      
+            
       ldouble bphi,dbphi,Bcon[4];
       
       bphi = bcon[3];
@@ -881,8 +881,8 @@ mimic_dynamo(ldouble dt)
       bcon[3]=bphi+dbphi;
 
       calc_Bcon_prim(&get_u(p,0,ix,iy,iz), bcon, Bcon, &geom);
-
-      //set_u(p,B3,ix,iy,iz,Bcon[3]);
+      
+      set_u(p,B3,ix,iy,iz,Bcon[3]);
 
       //printf("%d %d > %e %e %e %e %e\n",ix,iy,bphi,dbphi,bcon[3],Bcon[3],get_u(p,B3,ix,iy,iz));
       

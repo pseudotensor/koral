@@ -74,7 +74,8 @@ main(int argc, char **argv)
   if(!ifinit)
     {
       //exchange initial state
-      mpi_exchangedata();
+      mpi_exchangedata();  
+      calc_avgs_throughout();
       set_bc(tstart,1);
     }
 #endif
@@ -88,6 +89,7 @@ main(int argc, char **argv)
       //exchange initial state
       if(PROCID==0) {printf("Sending initial data... ");fflush(stdout);}
       mpi_exchangedata();
+      calc_avgs_throughout();
       set_bc(tstart,1);
       #ifdef MPI
       MPI_Barrier(MPI_COMM_WORLD);
@@ -99,6 +101,7 @@ main(int argc, char **argv)
       //exchange magn. field calculated in domain
       set_bc(tstart,1);
       mpi_exchangedata();
+      calc_avgs_throughout();
       #ifdef MPI
       MPI_Barrier(MPI_COMM_WORLD);
       #endif

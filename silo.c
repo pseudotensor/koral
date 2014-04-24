@@ -15,7 +15,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 {
   char bufor[50];
   sprintf(bufor,"%s/%s%04d.silo",folder,prefix,num);
- 
+
+  mpi_exchangedata();
+  calc_avgs_throughout();
+
   DBfile *file = NULL;/* The Silo file pointer */
   char *coordnames[3];/* Names of the coordinates */
   ldouble *nodex;/* The coordinate arrays */
@@ -82,7 +85,6 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 
   #ifdef MIMICDYNAMO
-  mpi_exchangedata();
   set_bc(time,0);
   mimic_dynamo(1.); 
   ldouble *Bxdyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
