@@ -882,6 +882,8 @@ mimic_dynamo(ldouble dt)
       if(dbphi!=0. && fabs(bcon[1])>1.e-30)
 	{
 	  print_4vector(bcon);
+print_4vector(&get_u(p,B1-1,ix,iy,iz));
+
 	}
       */
 
@@ -889,7 +891,7 @@ mimic_dynamo(ldouble dt)
       Bcon[2]=get_u(p,B2,ix,iy,iz);
       Bcon[3]=get_u(p,B3,ix,iy,iz);
 
-      Bcon[3]=(bcon[3]*ucon[0]-(Bcon[1]*ucov[1]-Bcon[2]*ucov[2])*ucon[3])/
+      Bcon[3]=(bcon[3]*ucon[0]-(Bcon[1]*ucov[1]+Bcon[2]*ucov[2])*ucon[3])/
 	(1.+ucon[3]*ucov[3]);
 
       set_u(p,B3,ix,iy,iz,Bcon[3]);
