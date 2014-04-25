@@ -773,16 +773,7 @@ mimic_dynamo(ldouble dt)
       //to avoid BH
       if(xxBL[1]<1.0001*rhorizonBL) continue;
 
-      //local four-velocity
-
-      /*
-      ucon[0]=0;
-      ucon[1]=get_u(p,VX,ix,iy,iz);
-      ucon[2]=get_u(p,VY,ix,iy,iz);
-      ucon[3]=get_u(p,VZ,ix,iy,iz);
-      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-      Om = ucon[3]/ucon[0];
-      */
+      
 
       //timescale
       Omk = 1./(BHSPIN+sqrt(xxBL[1]*xxBL[1]*xxBL[1]));
@@ -862,7 +853,13 @@ mimic_dynamo(ldouble dt)
 
 //damping azimuthal component of magnetic field if beta exceeds DAMPBETA
 #ifdef DAMPBETA      
-            
+      //local four-velocity
+      ucon[0]=0;
+      ucon[1]=get_u(p,VX,ix,iy,iz);
+      ucon[2]=get_u(p,VY,ix,iy,iz);
+      ucon[3]=get_u(p,VZ,ix,iy,iz);
+      conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
+      
       ldouble bphi,dbphi,Bcon[4];
       
       bphi = bcon[3];
@@ -876,13 +873,42 @@ mimic_dynamo(ldouble dt)
 
       if((dbphi+bphi)*bphi<0.) dbphi=-bphi; //not to overshoot zero
 
-      dbphi=0.;
-      
-      bcon[3]=bphi+dbphi;
+      //dbphi=-1.e-5*bphi;
 
+      bphi+=dbphi;
+      bcon[3]=bphi;
+
+      /*
+      if(dbphi!=0. && fabs(bcon[1])>1.e-30)
+	{
+	  print_4vector(bcon);
+	}
+      */
+
+      Bcon[1]=get_u(p,B1,ix,iy,iz);
+      Bcon[2]=get_u(p,B2,ix,iy,iz);
+      Bcon[3]=get_u(p,B3,ix,iy,iz);
+
+      Bcon[3]=(bcon[3]*ucon[0]-(Bcon[1]*ucov[1]-Bcon[2]*ucov[2])*ucon[3])/
+	(1.+ucon[3]*ucov[3]);
+
+      set_u(p,B3,ix,iy,iz,Bcon[3]);
+
+      /*
+      if(dbphi!=0. && fabs(bcon[1])>1.e-30)
+	{
+	  print_4vector(Bcon);
+	  calc_bcon_prim(&get_u(p,0,ix,iy,iz), bcon, &geom);
+	  print_4vector(bcon);
+	  getchar();
+	}
+      */
+
+      /*
       calc_Bcon_prim(&get_u(p,0,ix,iy,iz), bcon, Bcon, &geom);
       
       set_u(p,B3,ix,iy,iz,Bcon[3]);
+      */
 
       //printf("%d %d > %e %e %e %e %e\n",ix,iy,bphi,dbphi,bcon[3],Bcon[3],get_u(p,B3,ix,iy,iz));
       

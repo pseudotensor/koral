@@ -408,13 +408,13 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
  
   mpi_exchangedata();  
- 
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
-
   calc_avgs_throughout();
 
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+  
   //projects primitives onto ghost cells at the boundaries of the total domain
   //or calulates conserved from exchanged primitives
   set_bc(t,0);
@@ -895,6 +895,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
  
   //correlates ghost cells
   mpi_exchangedata();
+  calc_avgs_throughout();
   set_bc(t,0);
 
   //mimics dynamo
