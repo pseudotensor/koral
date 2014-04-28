@@ -646,6 +646,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
 int calc_avgs_throughout();
+int mpi_exchangedata();
 
 #ifdef MPI
 MPI_Group mpi_all_group;
@@ -656,7 +657,6 @@ void mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok);
 void mpi_synchtiming(ldouble*);
 int mpi_senddata(MPI_Request *reqs, int *nreqs);
 int mpi_recvdata(MPI_Request *reqs, int *nreqs);
-int mpi_exchangedata();
 int mpi_savedata();
 int mpi_isitBC(int BCtype);
 void mpi_myinit(int argc, char *argv[]);
