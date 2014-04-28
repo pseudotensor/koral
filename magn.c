@@ -860,11 +860,23 @@ mimic_dynamo(ldouble dt)
       ucon[3]=get_u(p,VZ,ix,iy,iz);
       conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
       
+      ldouble facvel=1.;
+
+      /*
+      //radial velocity of reference
+      ldouble alpaim = BETASATURATED * 0.25 * 2.;
+      ldouble vrref = -alpaim * 0.3 * 0.3 / sqrt(xxBL[1]);
+      if(ucon[1]<vrref) //amplify damping when radial velocity large
+	{
+	  facvel=ucon[1]/vrref;
+	}
+      */
       ldouble bphi,dbphi,Bcon[4];
       
       bphi = bcon[3];
 
       dbphi = - ALPHABETA 
+	* facvel
 	* facradius
 	* faczH
 	* dt / Pk 
