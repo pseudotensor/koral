@@ -792,7 +792,7 @@ mimic_dynamo(ldouble dt)
 	}
 
       //radius
-      ldouble facradius = step_function(xxBL[1]-1.*rISCOBL,.1*rISCOBL);
+      ldouble facradius = step_function(xxBL[1]-1.*rhorizonBL,.1*rhorizonBL);
 
       //pre(gas+rad)
       ldouble prermhd = GAMMAM1*get_u(p,UU,ix,iy,iz);
@@ -854,6 +854,7 @@ mimic_dynamo(ldouble dt)
 //damping azimuthal component of magnetic field if beta exceeds DAMPBETA
 #ifdef DAMPBETA      
       //local four-velocity
+      /*
       ucon[0]=0;
       ucon[1]=get_u(p,VX,ix,iy,iz);
       ucon[2]=get_u(p,VY,ix,iy,iz);
@@ -861,7 +862,7 @@ mimic_dynamo(ldouble dt)
       conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
       
       ldouble facvel=1.;
-
+      */
       /*
       //radial velocity of reference
       ldouble alpaim = BETASATURATED * 0.25 * 2.;
@@ -874,6 +875,10 @@ mimic_dynamo(ldouble dt)
       ldouble bphi,dbphi,Bcon[4];
       
       bphi = bcon[3];
+
+      //double range for damping
+      zH/=2.;
+      faczH = my_max(0.,pow(1. - zH*zH,zHpow));
 
       dbphi = - ALPHABETA 
 	* facvel
@@ -905,6 +910,16 @@ print_4vector(&get_u(p,B1-1,ix,iy,iz));
 
       Bcon[3]=(bcon[3]*ucon[0]-(Bcon[1]*ucov[1]+Bcon[2]*ucov[2])*ucon[3])/
 	(1.+ucon[3]*ucov[3]);
+
+      ldouble Bphinew=Bcon[3];
+      const ldouble maxBphichange=1.e-1;
+      ldouble facdamp=1.;
+      ldouble Bphichange=fabs((Bphinew-Bphi)/Bphi);
+
+      if (Bphichange>maxBphichange)
+        facdamp=maxBphichange/Bphichange;
+
+      Bcon[3]=Bphi + (Bphinew-Bphi)*facdamp;
 
       set_u(p,B3,ix,iy,iz,Bcon[3]);
 

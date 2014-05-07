@@ -1,26 +1,64 @@
-#define U2PRADPREC 1.e-7
-#define RADFORCEPREC 1.e-7
-#define U2PPREC 1.e-7
+/************************************/
+//restart
+/************************************/
+//#define RESTART
+#define RESTARTNUM -1
 
-#define TMAX 1.e10
-#define RADIATION
-#define MYCOORDS SCHWCOORDS
+/************************************/
+//radiation
+/************************************/
+//#define RADIATION
+//#define RADOUTPUTINZAMO
 
-#define RK3STEPPING
+/************************************/
+//coordinates / resolution
+/************************************/
+#define MKS1R0 0.
+#define MYCOORDS MKS1COORDS
 
-#define NX 112
-#define NY 1
-#define NZ 1
+#define MINX (log(2.15-MKS1R0))
+#define MAXX (log(1000.-MKS1R0))
 
-#define TSTEPLIM .5
-#define INITTSTEPLIM (TSTEPLIM/10.)
+#define MINY .99*Pi/2.
+#define MAXY 1.01*Pi/2.
+#define MINZ -1.
+#define MAXZ 1.
+
+#define TNX 120 
+#define TNY 1
+#define TNZ 1
+#define NTX 1
+#define NTY 1
+#define NTZ 1
+
+#define SPECIFIC_BC
+
+/************************************/
+//reconstruction / Courant
+/************************************/
 #define INT_ORDER 1
+#define TIMESTEPPING RK2IMEX 
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
-#define DTOUT1 1.e1
-#define ALLSTEPSOUTPUT 0
-#define VERBOSE0 0
+#define MINMOD_THETA 1.5
+#define SHUFFLELOOPS 0
+#define DOFIXUPS 1
 
+/************************************/
+//output
+/************************************/
+#define SILOOUTPUT 0 //to silo file
+#define OUTOUTPUT 1 //to out file
+#define ALLSTEPSOUTPUT 0 //whether to output every step
+#define NSTEPSTOP 1.e10 //stop after this number of steps
+#define NOUTSTOP 5000 //stop after this number of outputs
+#define DTOUT1 1.e2 //res
+#define DTOUT2 1.e50 //avg
+#define TMAX 1.e10 //time to stop
+
+/************************************/
+//test specific
+/************************************/
 #define TESTNO 2
 
 #if (TESTNO==1)
@@ -52,27 +90,5 @@
 #define RHOAMB 1.e-25
 #define TAMB 1.e5
 #define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
-#undef MUGAS
-
 #define MUGAS .5
 
-#define MINX 3.5
-#define MAXX 2e3
-
-#define LOGXGRID
-
-#define LOGPAR1 2.2
-#define LOGPAR2 2.
-
-#define MINY .99*Pi/2.
-#define MAXY 1.01*Pi/2.
-#define MINZ -1.
-#define MAXZ 1.
-#define RHOFLOOR 1.e-50
-#define UFLOOR 1.e-65
-#define SPECIFIC_BC
-
-#define EFLOOR 1.e-40
-#define CGSOUTPUT
-
-#define RADOUTPUTINZAMO

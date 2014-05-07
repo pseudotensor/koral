@@ -54,10 +54,11 @@ if(ix>=NX) //analytical solution at rout only
     pp[7]=Fx;
     pp[8]=Fy;
     pp[9]=Fz;
-#endif
+
       
     prad_ff2lab(pp,pp,&geom);
-    p2u(pp,uu,gg,GG);
+#endif
+    p2u(pp,uu,&geom);
      
     return 0.;
   }
@@ -144,7 +145,7 @@ if(ix>=NX) //analytical solution at rout only
      pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.;
      */
      
-     p2u(pp,uu,gg,GG);
+     p2u(pp,uu,&geom);
      return 0;
    }
 

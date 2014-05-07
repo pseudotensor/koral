@@ -49,7 +49,11 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
+#ifdef RADIATION
 	  "plot \"%s\" u 1:20 w lp ls 2 pt 7 ps .5  ti \"E_rad\"\n"
+#else
+	  "plot \"%s\" u 1:(1) w lp ls 2 pt 7 ps .5  ti \"nothing\"\n"
+#endif
 
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -60,7 +64,11 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
+#ifdef RADIATION
 	  "plot \"%s\" u 1:($21+1.e-80) w lp ls 2 pt 7 ps .5  ti \"Fx\"\n"
+#else
+	  "plot \"%s\" u 1:(1) w lp ls 2 pt 7 ps .5  ti \"nothing\"\n"
+#endif
 
 	  "set lmargin at screen 0.07\n"
 	  "set rmargin at screen 0.33\n"

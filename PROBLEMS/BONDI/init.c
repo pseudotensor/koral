@@ -1,16 +1,4 @@
 
-/*
-  int
-  set_initial_profile()
-  {
-  int ix,iy,iz;
-  for(iz=0;iz<NZ;iz++)
-  {
-  for(iy=0;iy<NY;iy++)
-  {
-  for(ix=0;ix<NX;ix++)
-  {
-*/
 
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
@@ -72,11 +60,10 @@ pp[6]=E;
 pp[7]=Fx;
 pp[8]=Fy;
 pp[9]=Fz; 
-#endif	    
-
-
 prad_ff2lab(pp,pp,&geom);  
-p2u(pp,uu,gg,GG);	 
+
+#endif	    
+p2u(pp,uu,&geom);	 
 
 
 /***********************************************/
