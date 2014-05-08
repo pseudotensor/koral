@@ -13,7 +13,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define COMPTONIZATION
 
 /************************************/
@@ -47,11 +47,11 @@
 /************************************/
 #define HDVISCOSITY NOVISCOSITY
 //#define RADVISCOSITY NOVISCOSITY
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define ALPHARADVISC 0.1
-#define MAXRADVISCVEL 1.
+#define MAXRADVISCVEL .5
 //#define NUMRADWAVESPEEDS
 
 /************************************/
@@ -120,6 +120,8 @@
 #define RADOUTPUT 1
 #define SCAOUTPUT 1
 #define AVGOUTPUT 1
+#define AVGAVGOUTPUT 1
+#define COORDOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 1.
