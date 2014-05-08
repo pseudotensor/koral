@@ -854,7 +854,7 @@ mimic_dynamo(ldouble dt)
 //damping azimuthal component of magnetic field if beta exceeds DAMPBETA
 #ifdef DAMPBETA      
       //local four-velocity
-      /*
+      
       ucon[0]=0;
       ucon[1]=get_u(p,VX,ix,iy,iz);
       ucon[2]=get_u(p,VY,ix,iy,iz);
@@ -862,7 +862,7 @@ mimic_dynamo(ldouble dt)
       conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
       
       ldouble facvel=1.;
-      */
+      
       /*
       //radial velocity of reference
       ldouble alpaim = BETASATURATED * 0.25 * 2.;
