@@ -16,6 +16,11 @@ ldouble xx=get_x(ix,0);
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
+
+struct geometry geomBL;
+fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+
+
 /**********************/
 
 //radius
@@ -25,15 +30,15 @@ if(ix>=NX) //analytical solution at rout only
     ldouble Fx,Fy,Fz,rho,rho0,Tgas0,E,uint,ur,Tgas,Trad,r,prad,pgas,ut,vx;
 
     //at outern boundary
-    r=MAXX;
-    ur=-sqrtl(2./r);
+    r=RMAX;
+    ur=-sqrt(2./r);
     rho0=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
     Tgas0=TGAS0;
             
     //at given cell
-    r=xx;
-    ur=-sqrtl(2./r);
-    ut=sqrtl((-1.-ur*ur*gg[1][1])/gg[0][0]);
+    r=geomBL.xx;
+    ur=-sqrt(2./r);
+    ut=sqrt((-1.-ur*ur*gg[1][1])/gg[0][0]);
     vx=ur/ut;
     rho=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
     Tgas=Tgas0*pow(rho/rho0,GAMMA-1.);      
@@ -101,9 +106,9 @@ if(ix>=NX) //analytical solution at rout only
 
 	 //following ~r**-1.5 scaling
 	 if(iv==0)
-	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*powl(rsrc/rbc,1.5);
+	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*pow(rsrc/rbc,1.5);
 	 if(iv==1)
-	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*powl(rsrc/rbc,1.5*GAMMA);
+	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*pow(rsrc/rbc,1.5*GAMMA);
 	 if(iv==2)
 	   pp[iv]=vx;
 	 */
@@ -118,8 +123,8 @@ if(ix>=NX) //analytical solution at rout only
      ldouble Vinfall=sqrtl(2./rbc)*(1.-2./rbc);
      ldouble Dratio=((rsrc*rsrc*sqrtl(2./rsrc*(1.-2./rsrc)))) /
      ((rbc*rbc*sqrtl(2./rbc*(1.-2./rbc))));
-     ldouble Eratio=(powl(rsrc*rsrc*sqrt(2./rsrc),GAMMA)*powl(1.-2./rsrc,(GAMMA+1.)/4.)) /
-     (powl(rbc*rbc*sqrt(2./rbc),GAMMA)*powl(1.-2./rbc,(GAMMA+1.)/4.));
+     ldouble Eratio=(pow(rsrc*rsrc*sqrt(2./rsrc),GAMMA)*pow(1.-2./rsrc,(GAMMA+1.)/4.)) /
+     (pow(rbc*rbc*sqrt(2./rbc),GAMMA)*pow(1.-2./rbc,(GAMMA+1.)/4.));
      ldouble rhosrc=get_u(p,0,iix,iiy,iiz);
      ldouble uintsrc=get_u(p,1,iix,iiy,iiz);
      ldouble Vsrc=get_u(p,2,iix,iiy,iiz);
@@ -139,7 +144,7 @@ if(ix>=NX) //analytical solution at rout only
      //analytical solution
      ldouble r=get_x(ix,0);
      ldouble D=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
-     ldouble E=PAR_E/(powl(r*r*sqrt(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
+     ldouble E=PAR_E/(pow(r*r*sqrt(2./r),GAMMA)*pow(1.-2./r,(GAMMA+1.)/4.));
      ldouble V=sqrtl(2./r)*(1.-2./r);
      ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
      ldouble rho=D/W;

@@ -25,18 +25,18 @@ ldouble pp[NV],T;
 ldouble rho0,Tgas0,ur,Tgas,Trad,r,rcm,prad,pgas,vx,ut;
 
 //at outern boundary
-r=MAXX;
-ur=-sqrtl(2./r);
+r=RMAX;
+ur=-sqrt(2./r);
 rho0=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
 Tgas0=TGAS0;
             
 //at given cell
-r=xx;
-ur=-sqrtl(2./r);    
-ut=sqrtl((-1.-ur*ur*gg[1][1])/gg[0][0]);
-vx=ur/ut;  
+r=geomBL.xx;
+ur=-sqrt(2./r);    
+printf("%d %e %e\n",ix,r,ur);
+
 rho=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
-Tgas=Tgas0*powl(rho/rho0,GAMMA-1.);      
+Tgas=Tgas0*pow(rho/rho0,GAMMA-1.);      
 
 uint=calc_PEQ_ufromTrho(Tgas,rho);
 
@@ -46,11 +46,11 @@ E=prad*3.;
 
 //four-vel in BL
 ldouble ucon[4]={0.,ur,0.,0.};
-conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
 //rad. four-vel in BL
 ldouble urfcon[4]={0.,0.,0.,0.};
-conv_vels_ut(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+conv_vels(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
 
 pp[0]=rho;

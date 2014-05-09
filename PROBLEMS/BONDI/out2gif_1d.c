@@ -102,7 +102,13 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"vx\""
+#ifndef MKS1COORDS
 	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname);
+#else
+,fname2,t,t/CCC,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),fname,fname,fname,fname,fname,fname,fname,fname);
+#endif
+
+
 
 
 

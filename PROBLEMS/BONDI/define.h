@@ -15,9 +15,15 @@
 /************************************/
 #define MKS1R0 0.
 #define MYCOORDS MKS1COORDS
+#define OUTCOORDS BLCOORDS
+#define PRINTXGC_LEFT
+#define PRINTXGC_RIGHT
 
-#define MINX (log(2.15-MKS1R0))
-#define MAXX (log(1000.-MKS1R0))
+#define RMIN 2.15
+#define RMAX 1000.
+
+#define MINX (log(RMIN-MKS1R0))
+#define MAXX (log(RMAX-MKS1R0))
 
 #define MINY .99*Pi/2.
 #define MAXY 1.01*Pi/2.
