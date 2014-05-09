@@ -3,6 +3,10 @@
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
+struct geometry geomBL;
+fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+
+
 ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
 ldouble uu[NV];
@@ -40,28 +44,26 @@ pgas=K_BOLTZ*rho*Tgas/MU_GAS/M_PROTON;
 prad=PRADGAS*pgas;
 E=prad*3.;
 
+//four-vel in BL
+ldouble ucon[4]={0.,ur,0.,0.};
+conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
-Fz=Fy=Fx=0.;
+//rad. four-vel in BL
+ldouble urfcon[4]={0.,0.,0.,0.};
+conv_vels_ut(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+
+
 pp[0]=rho;
 pp[1]=uint;
-pp[2]=vx;
-
-/*
-  pp[0]=RHOAMB;
-  pp[1]=calc_PEQ_ufromTrho(TAMB,RHOAMB);
-  pp[3]=0.;
-*/
-
-pp[3]=0.;
-pp[4]=0.;
+pp[2]=ucon[1];
+pp[3]=ucon[2];
+pp[4]=ucon[3];
 pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
 pp[6]=E;
-pp[7]=Fx;
-pp[8]=Fy;
-pp[9]=Fz; 
-prad_ff2lab(pp,pp,&geom);  
-
+pp[7]=urfcon[1];
+pp[8]=urfcon[2];
+pp[9]=urfcon[3]; 
 #endif	    
 p2u(pp,uu,&geom);	 
 
@@ -76,10 +78,3 @@ for(iv=0;iv<NV;iv++)
     set_u(p,iv,ix,iy,iz,pp[iv]);
   }
 
-//entropy
-update_entropy(ix,iy,iz,0);
-
-//if(isnan(get_u(p,5,ix,iy,iz))) {printf("pr: %d %d %d S: %Le\n",ix,iy,iz,0.);getchar();}
-
-//mark initialy succesfull u2p_hot step
-set_cflag(0,ix,iy,iz,0);

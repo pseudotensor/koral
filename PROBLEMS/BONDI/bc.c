@@ -42,22 +42,28 @@ if(ix>=NX) //analytical solution at rout only
     prad=PRADGAS*pgas;
     E=prad*3.;
 
-    Fz=Fy=Fx=0.;
+    //four-vel in BL
+    ldouble ucon[4]={0.,ur,0.,0.};
+    conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+
+    //rad. four-vel in BL
+    ldouble urfcon[4]={0.,0.,0.,0.};
+    conv_vels_ut(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+
+
     pp[0]=rho;
     pp[1]=uint;
-    pp[2]=vx;
-    pp[3]=0.;
-    pp[4]=0.;
+    pp[2]=ucon[1];
+    pp[3]=ucon[2];
+    pp[4]=ucon[3];
     pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
     pp[6]=E;
-    pp[7]=Fx;
-    pp[8]=Fy;
-    pp[9]=Fz;
+    pp[7]=urfcon[1];
+    pp[8]=urfcon[2];
+    pp[9]=urfcon[3]; 
+#endif	    
 
-      
-    prad_ff2lab(pp,pp,&geom);
-#endif
     p2u(pp,uu,&geom);
      
     return 0.;
@@ -82,15 +88,10 @@ if(ix>=NX) //analytical solution at rout only
 
      ldouble Fx,Fy,Fz,rho,rho0,Tgas0,E,uint,ur,Tgas,Trad,r,prad,pgas,ut,vx;
 
-     //at outern boundary
-     r=rbc;
-     ur=-sqrtl(2./r);      
-     ut=sqrtl((-1.-ur*ur*gg[1][1])/gg[0][0]);
-     vx=ur/ut;
-
      //copying primitives with gdet taken into account
      for(iv=0;iv<NV;iv++)
        { 
+	 /*
 	 if(iv==2 || iv==7)
 	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*(1.-(rsrc-rbc)/(.5*(rsrc+rbc)));
 	 else if(iv==3 || iv==4 || iv==8 || iv==9)
@@ -105,9 +106,10 @@ if(ix>=NX) //analytical solution at rout only
 	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*powl(rsrc/rbc,1.5*GAMMA);
 	 if(iv==2)
 	   pp[iv]=vx;
-	  
+	 */
+
 	 //unchanged primitives
-	 //	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
 
        }
 
