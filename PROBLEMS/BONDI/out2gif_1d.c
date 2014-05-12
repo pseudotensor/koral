@@ -17,6 +17,7 @@
 	  "set style line 12 lw 2 lc 5 lt 3\n"
 	  "set style line 13 lw 2 lc 0 lt 3\n"
 	  "set style line 14 lw 2 lc 7 lt 3\n"
+	  "set style line 100 lw 2 lc -1 lt 3\n"
 	  "set term gif large size 1200,600\n"
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
@@ -37,7 +38,8 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($14) w lp ls 1 pt 7 ps .5 ti \"rho\"\n"
+	  "plot \"%s\" u 1:($14) w lp ls 1 pt 7 ps .5 ti \"rho\", "
+"\"dumps/out0000.dat\" u 1:($14) w l ls 100 ti \"hydro Bondi\"\n"
 
 	  "set lmargin at screen 0.40\n"
 	  "set rmargin at screen 0.66\n"
@@ -50,7 +52,7 @@
 	  "set ylabel \"\"\n"
 	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
 #ifdef RADIATION
-	  "plot \"%s\" u 1:20 w lp ls 2 pt 7 ps .5  ti \"E_rad\"\n"
+	  "plot \"%s\" u 1:26 w lp ls 2 pt 7 ps .5  ti \"tau_tot\"\n"
 #else
 	  "plot \"%s\" u 1:(1) w lp ls 2 pt 7 ps .5  ti \"nothing\"\n"
 #endif
@@ -64,10 +66,14 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-#ifdef RADIATION
+#ifdef RADIATION 
+	   "unset log y\n"
 	  "plot \"%s\" u 1:($21+1.e-80) w lp ls 2 pt 7 ps .5  ti \"Fx\"\n"
-#else
-	  "plot \"%s\" u 1:(1) w lp ls 2 pt 7 ps .5  ti \"nothing\"\n"
+"set log y\n"
+#else	  
+	   "unset log y\n"
+	   "plot \"%s\" u 1:(-$14*$1*$1*$16) w lp ls 2 pt 7 ps .5  ti \"mdot\"\n"
+	   "set log y\n"
 #endif
 
 	  "set lmargin at screen 0.07\n"
@@ -91,8 +97,11 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
+#ifdef RADIATION
 	  "plot \"%s\" u 1:24 w p ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:25 w l lc 9 lw 2 ti \"Trad\"\n"
-
+#else
+	  "plot \"%s\" u 1:24 w p ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:24 w l lc 9 lw 2 ti \"Tgas\"\n"
+#endif
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
 	  "set bmargin at screen .5\n"
@@ -101,11 +110,12 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"vx\""
+	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"vx\", \"%s\" u 1:($28) w l lc 9 lw 2 ti \"cs\", "
+"\"dumps/out0000.dat\" u 1:(-$16) w l ls 100 ti \"hydro Bondi\" "
 #ifndef MKS1COORDS
-	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname);
+	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname,fname,fname);
 #else
-,fname2,t,t/CCC,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),fname,fname,fname,fname,fname,fname,fname,fname);
+,fname2,t,t/CCC,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),fname,fname,fname,fname,fname,fname,fname,fname,fname,fname);
 #endif
 
 

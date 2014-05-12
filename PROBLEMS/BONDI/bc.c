@@ -27,34 +27,19 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 //  if(ix>=NX || ix<0) //analytical solution on both sides
 if(ix>=NX) //analytical solution at rout only
   {
-    ldouble Fx,Fy,Fz,rho,rho0,Tgas0,E,uint,ur,Tgas,Trad,r,prad,pgas,ut,vx;
+    ldouble rho,uint,ur,E;
 
-    //at outern boundary
-    r=RMAX;
-    ur=-sqrt(2./r);
-    rho0=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
-    Tgas0=TGAS0;
-            
-    //at given cell
-    r=geomBL.xx;
-    ur=-sqrt(2./r);
-    ut=sqrt((-1.-ur*ur*gg[1][1])/gg[0][0]);
-    vx=ur/ut;
-    rho=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
-    Tgas=Tgas0*pow(rho/rho0,GAMMA-1.);      
-    uint=calc_PEQ_ufromTrho(Tgas,rho);
-    pgas=K_BOLTZ*rho*Tgas/MU_GAS/M_PROTON;
-    prad=PRADGAS*pgas;
-    E=prad*3.;
+    rho=get_u(pproblem1,RHO,ix,iy,iz);
+    uint=get_u(pproblem1,UU,ix,iy,iz);
+    ur=get_u(pproblem1,VX,ix,iy,iz);
 
     //four-vel in BL
     ldouble ucon[4]={0.,ur,0.,0.};
-    conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+    conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
     //rad. four-vel in BL
     ldouble urfcon[4]={0.,0.,0.,0.};
-    conv_vels_ut(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
-
+    conv_vels(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
     pp[0]=rho;
     pp[1]=uint;
@@ -63,13 +48,18 @@ if(ix>=NX) //analytical solution at rout only
     pp[4]=ucon[3];
     pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
+    E=get_u(pproblem1,EE0,ix,iy,iz);
     pp[6]=E;
     pp[7]=urfcon[1];
     pp[8]=urfcon[2];
     pp[9]=urfcon[3]; 
-#endif	    
+#endif	 
 
     p2u(pp,uu,&geom);
+
+    //transforming primitives from BL to MYCOORDS
+    trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
+
      
     return 0.;
   }

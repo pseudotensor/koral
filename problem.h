@@ -853,6 +853,7 @@
 #if(PROBLEM==7)
 
 #define PR_DEFINE "PROBLEMS/BONDI/define.h"
+#define PR_PREPINIT "PROBLEMS/BONDI/prepinit.c"
 #define PR_BC "PROBLEMS/BONDI/bc.c"
 #define PR_INIT "PROBLEMS/BONDI/init.c"
 #define PR_KAPPA "PROBLEMS/BONDI/kappa.c"

@@ -295,6 +295,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  //within domain:
 									  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 						  
+
+
 									  struct geometry geom;
 									  fill_geometry(ix,iy,iz,&geom);
 
@@ -323,6 +325,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									      if((OUTCOORDS==KERRCOORDS || OUTCOORDS==BLCOORDS) && xx<1.*rhorizonBL) continue;
 #endif
 									    }
+
+
 
 									  xxx[0]=t;
 									  xxx[1]=xx;
@@ -368,10 +372,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 #ifdef RADIATION
 									      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 #endif
-									      printf("%d %e > ",ix,pp[2]);
 									      trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
-									      printf("%e \n",ix,pp[2]);
-
+									      
 									      //from now on geom,gg, GG, tup, etc. defined in OUTCOORDS!
 									      fill_geometry_arb(ix,iy,iz,&geom,OUTCOORDS);
 									      for(i=0;i<4;i++)
@@ -463,7 +465,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  Trad=calc_ncompt_Thatrad(pp,&geomout,E);
 									  #endif
 									  if(E<EEFLOOR || isnan(E)) E=EEFLOOR;
-
+									  
 
 									  /******************/
 									  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
