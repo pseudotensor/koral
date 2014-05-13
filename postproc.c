@@ -546,7 +546,11 @@ calc_totalmass()
 ldouble
 calc_mdotEdd()
 {
+#if (PROBLEM==7) //spherical bondi
+  ldouble mcgs=2.23/16.*1e18*MASS; //g/s
+#else
   ldouble mcgs=1.09649*2.23e18*MASS*(0.057/etaNT); //g/s \propto 1/etaNT(a)
+#endif
 
   return mcgs;
 }

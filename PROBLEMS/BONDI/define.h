@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+//efine RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -10,6 +10,7 @@
 #define RADIATION
 //#define RADOUTPUTINZAMO
 #define RADOUTPUTVELS
+
 /************************************/
 //coordinates / resolution
 /************************************/
@@ -67,10 +68,11 @@
 //test specific
 /************************************/
 #define TESTNO 0
+#define ERADRES 1.e-10
 
 #if (TESTNO==0)
 #define RBONDI 100.
-#define PRADGAS 1.e-2
+#define PRADGAS 1.e-10 //keep small, verify convergence!
 #define MDOT 1.e2
 #endif
 

@@ -10,7 +10,7 @@
    fprintf(fgnu,
 	  "set style line 1 lw 2 lc 1 lt 1\n"
 	  "set style line 2 lw 2 lc 2 lt 1 pt 7 ps .5 \n"
-	  "set style line 3 lw 2 lc 3 lt 1\n"
+	  "set style line 3 lw 2 lc 3 lt 1 pt 7 ps .5 \n"
 	  "set style line 4 lw 2 lc 4 lt 1 pt 7 ps .5 \n"
 	  "set style line 10 lw 2 lc 3 lt 3\n"
 	  "set style line 11 lw 2 lc 4 lt 3\n"
@@ -26,9 +26,9 @@
 	  "set autoscale\n" 
 	   "set log\n"
 #ifdef RADIATION
-	  "set label \"t=%.2e (%.2e s) (Prad/Pgas)_out=%.2e (Mdot/Mdot_Edd)_out=%.2e Rmin=%.0f Rmax=%.0f RBondi_init=%.0f\" at screen .18, .98\n"
+	  "set label \"t=%.2e (%.2e s) (Prad/Pgas)_out=%.2e (Mdot/Mdot_Edd)_out=%.2e Rmin=%.0f Rmax=%.0f RBondi_init=%.0f\" at screen .13, .98\n"
 #else
-	  "set label \"t=%.2e (%.2e s) (Prad/Pgas)_out=0*%.2e (Mdot/Mdot_Edd)_out=%.2e Rmin=%.0f Rmax=%.0f RBondi_init=%.0f\" at screen .18, .98\n"
+	  "set label \"t=%.2e (%.2e s) (Prad/Pgas)_out=0*%.2e (Mdot/Mdot_Edd)_out=%.2e Rmin=%.0f Rmax=%.0f RBondi_init=%.0f\" at screen .13, .98\n"
 #endif
 
 	  "set lmargin at screen 0.07\n"
@@ -71,7 +71,8 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	   "unset log y\n"
-	   "plot \"%s\" u 1:(-$14*$1*$1*$16) w l ls 3   ti \"mdot\"\n"
+	   "plot \"%s\" u 1:(-4.*3.1416*$14*$1*$1*$16*%e) w lp ls 3   ti \"Mdot/Mdot_init\","
+	   " \"%s\" u 1:(-$16/$28) w lp ls 4 ti \"Mach number\"\n"
 	   "set log y\n"
 
 	  "set lmargin at screen 0.07\n"
@@ -114,21 +115,26 @@
 	  "set tmargin at screen .9\n"
 	  "set format x \"\"\n"
 	  "set format y \"%%.1e\"\n" 
-	   "set key bottom right\n"
+	   "set key bottom left\n"
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "unset log y\n"
+	   //"unset log y\n"
 #ifdef RADIATION
-	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"gas vr\", \"%s\" u 1:(-$28) w l ls 3 ti \"-cs\", "
-" \"%s\" u 1:(($21+1.e-80)) w lp ls 2   ti \"radiation vr\", "
-" \"dumps/out0000.dat\" u 1:($16) w l ls 100 ti \"gas vr hydro Bondi\" "
+	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"gas -vr\",  "
+" \"%s\" u 1:(-($21+1.e-3)) w lp ls 2   ti \"radiation -vr\", "
+" \"%s\" u 1:(($21+1.e-3)) w lp ls 2 lc 3  ti \"radiation vr\", "
+" \"dumps/out0000.dat\" u 1:(-$16) w l ls 100 ti \"gas -vr hydro Bondi\" "
 #else
-	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"gas vr\", \"%s\" u 1:(-$28) w l ls 3 ti \"-cs\", "
+	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"gas vr\", "
 " \"%s\" u 1:($16) w lp ls 2 pt 7 ps .5  ti \"gas vr\", "
-" \"dumps/out0000.dat\" u 1:($16) w l ls 100 ti \"gas vr hydro Bondi\" "
+" \"%s\" u 1:($16) w lp ls 2 pt 7 ps .5  ti \"gas vr\", "
+" \"dumps/out0000.dat\" u 1:(-$16) w l ls 100 ti \"gas -vr hydro Bondi\" "
 #endif
 
-,fname2,t,t/CCC,PRADGAS,MDOT,RMIN,RMAX,RBONDI,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),fname,fname,fname,fname,fname,fname,fname,fname,fname,fname,fname);
+,fname2,t,t/CCC,PRADGAS,MDOT,RMIN,RMAX,RBONDI,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),
+fname,fname,fname,
+	   rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)/calc_mdotEdd()/MDOT,
+fname,fname,fname,fname,fname,fname,fname,fname);
 
 
 
