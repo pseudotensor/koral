@@ -9,9 +9,9 @@
 /****************************************/
    fprintf(fgnu,
 	  "set style line 1 lw 2 lc 1 lt 1\n"
-	  "set style line 2 lw 2 lc 2 lt 1\n"
+	  "set style line 2 lw 2 lc 2 lt 1 pt 7 ps .5 \n"
 	  "set style line 3 lw 2 lc 3 lt 1\n"
-	  "set style line 4 lw 2 lc 4 lt 1\n"
+	  "set style line 4 lw 2 lc 4 lt 1 pt 7 ps .5 \n"
 	  "set style line 10 lw 2 lc 3 lt 3\n"
 	  "set style line 11 lw 2 lc 4 lt 3\n"
 	  "set style line 12 lw 2 lc 5 lt 3\n"
@@ -25,7 +25,11 @@
 	  "set multiplot\n"
 	  "set autoscale\n" 
 	   "set log\n"
-	  "set label \"t=%.2e (%.2e s)\" at screen .48, .98\n"
+#ifdef RADIATION
+	  "set label \"t=%.2e (%.2e s) (Prad/Pgas)_out=%.2e (Mdot/Mdot_Edd)_out=%.2e Rmin=%.0f Rmax=%.0f RBondi_init=%.0f\" at screen .18, .98\n"
+#else
+	  "set label \"t=%.2e (%.2e s) (Prad/Pgas)_out=0*%.2e (Mdot/Mdot_Edd)_out=%.2e Rmin=%.0f Rmax=%.0f RBondi_init=%.0f\" at screen .18, .98\n"
+#endif
 
 	  "set lmargin at screen 0.07\n"
 	  "set rmargin at screen 0.33\n"
@@ -38,8 +42,8 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($14) w lp ls 1 pt 7 ps .5 ti \"rho\", "
-"\"dumps/out0000.dat\" u 1:($14) w l ls 100 ti \"hydro Bondi\"\n"
+	  "plot \"%s\" u 1:($14) w lp ls 4 ti \"rho\", "
+"\"dumps/out0000.dat\" u 1:($14) w l ls 100 ti \"rho hydro Bondi\"\n"
 
 	  "set lmargin at screen 0.40\n"
 	  "set rmargin at screen 0.66\n"
@@ -52,7 +56,7 @@
 	  "set ylabel \"\"\n"
 	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
 #ifdef RADIATION
-	  "plot \"%s\" u 1:26 w lp ls 2 pt 7 ps .5  ti \"tau_tot\"\n"
+	  "plot \"%s\" u 1:26 w lp ls 2 ti \"kappa_tot\"\n"
 #else
 	  "plot \"%s\" u 1:(1) w lp ls 2 pt 7 ps .5  ti \"nothing\"\n"
 #endif
@@ -66,15 +70,9 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-#ifdef RADIATION 
 	   "unset log y\n"
-	  "plot \"%s\" u 1:($21+1.e-80) w lp ls 2 pt 7 ps .5  ti \"Fx\"\n"
-"set log y\n"
-#else	  
-	   "unset log y\n"
-	   "plot \"%s\" u 1:(-$14*$1*$1*$16) w lp ls 2 pt 7 ps .5  ti \"mdot\"\n"
+	   "plot \"%s\" u 1:(-$14*$1*$1*$16) w l ls 3   ti \"mdot\"\n"
 	   "set log y\n"
-#endif
 
 	  "set lmargin at screen 0.07\n"
 	  "set rmargin at screen 0.33\n"
@@ -86,7 +84,13 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  //	  "set log y\n"
-	  "plot \"%s\" u 1:15 w lp ls 3 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:20 w lp ls 7 pt 7 ps .5 ti \"E_rad\"\n"
+#ifdef RADIATION
+	  "plot \"%s\" u 1:15 w lp ls 4 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:20 w lp ls 2 ti \"E_rad\", "
+"\"dumps/out0000.dat\" u 1:($15) w l ls 100 ti \"u_int hydro Bondi\"\n"
+#else
+	  "plot \"%s\" u 1:15 w lp ls 4 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:15 w lp ls 4 ti \"u_int\", "
+"\"dumps/out0000.dat\" u 1:($15) w l ls 100 ti \"u_int hydro Bondi\"\n"
+#endif
 	  //	  "unset log y\n"
 
 	  "set lmargin at screen 0.40\n"
@@ -98,9 +102,11 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 #ifdef RADIATION
-	  "plot \"%s\" u 1:24 w p ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:25 w l lc 9 lw 2 ti \"Trad\"\n"
+	  "plot \"%s\" u 1:24 w lp ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:25 w lp ls 2 ti \"Trad\", "
+"\"dumps/out0000.dat\" u 1:($24) w l ls 100 ti \"T_gas hydro Bondi\"\n"
 #else
-	  "plot \"%s\" u 1:24 w p ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:24 w l lc 9 lw 2 ti \"Tgas\"\n"
+	  "plot \"%s\" u 1:24 w lp ls 4 pt 7 ti \"Tgas\", \"%s\" u 1:24 w lp ls 4 ti \"Tgas\", "
+"\"dumps/out0000.dat\" u 1:($24) w l ls 100 ti \"T_gas hydro Bondi\"\n"
 #endif
 	  "set lmargin at screen 0.73\n"
 	  "set rmargin at screen 0.99\n"
@@ -108,15 +114,21 @@
 	  "set tmargin at screen .9\n"
 	  "set format x \"\"\n"
 	  "set format y \"%%.1e\"\n" 
+	   "set key bottom right\n"
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"vx\", \"%s\" u 1:($28) w l lc 9 lw 2 ti \"cs\", "
-"\"dumps/out0000.dat\" u 1:(-$16) w l ls 100 ti \"hydro Bondi\" "
-#ifndef MKS1COORDS
-	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname,fname,fname,fname);
+	  "unset log y\n"
+#ifdef RADIATION
+	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"gas vr\", \"%s\" u 1:(-$28) w l ls 3 ti \"-cs\", "
+" \"%s\" u 1:(($21+1.e-80)) w lp ls 2   ti \"radiation vr\", "
+" \"dumps/out0000.dat\" u 1:($16) w l ls 100 ti \"gas vr hydro Bondi\" "
 #else
-,fname2,t,t/CCC,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),fname,fname,fname,fname,fname,fname,fname,fname,fname,fname);
+	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"gas vr\", \"%s\" u 1:(-$28) w l ls 3 ti \"-cs\", "
+" \"%s\" u 1:($16) w lp ls 2 pt 7 ps .5  ti \"gas vr\", "
+" \"dumps/out0000.dat\" u 1:($16) w l ls 100 ti \"gas vr hydro Bondi\" "
 #endif
+
+,fname2,t,t/CCC,PRADGAS,MDOT,RMIN,RMAX,RBONDI,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),fname,fname,fname,fname,fname,fname,fname,fname,fname,fname,fname);
 
 
 

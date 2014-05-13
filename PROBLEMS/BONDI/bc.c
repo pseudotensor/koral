@@ -102,45 +102,11 @@ if(ix>=NX) //analytical solution at rout only
 	 if(iv==2)
 	   pp[iv]=vx;
 	 */
-
-	 //unchanged primitives
+	
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
 
        }
 
-     /*  
-     //free-fall acc.to analytical solution from the ix=0 cell
-     ldouble Vinfall=sqrtl(2./rbc)*(1.-2./rbc);
-     ldouble Dratio=((rsrc*rsrc*sqrtl(2./rsrc*(1.-2./rsrc)))) /
-     ((rbc*rbc*sqrtl(2./rbc*(1.-2./rbc))));
-     ldouble Eratio=(pow(rsrc*rsrc*sqrt(2./rsrc),GAMMA)*pow(1.-2./rsrc,(GAMMA+1.)/4.)) /
-     (pow(rbc*rbc*sqrt(2./rbc),GAMMA)*pow(1.-2./rbc,(GAMMA+1.)/4.));
-     ldouble rhosrc=get_u(p,0,iix,iiy,iiz);
-     ldouble uintsrc=get_u(p,1,iix,iiy,iiz);
-     ldouble Vsrc=get_u(p,2,iix,iiy,iiz);
-     ldouble Wsrc=1./sqrtl(1.-Vsrc*Vsrc*ggsrc[1][1]);
-     ldouble Dsrc=rhosrc*Wsrc;
-     ldouble Esrc=uintsrc*Wsrc;
-     ldouble V=Vsrc*(sqrtl(2./rbc)*(1.-2./rbc))/(sqrtl(2./rsrc)*(1.-2./rsrc));
-     ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
-     ldouble D=Dsrc*Dratio;
-     ldouble E=Esrc*Eratio;
-     ldouble rho=D/W;
-     ldouble uint=E/W;      
-     pp[0]=rho; pp[1]=uint; pp[2]=V; pp[3]=pp[4]=0.;
-     */
-      
-     /*
-     //analytical solution
-     ldouble r=get_x(ix,0);
-     ldouble D=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
-     ldouble E=PAR_E/(pow(r*r*sqrt(2./r),GAMMA)*pow(1.-2./r,(GAMMA+1.)/4.));
-     ldouble V=sqrtl(2./r)*(1.-2./r);
-     ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
-     ldouble rho=D/W;
-     ldouble uint=E/W;
-     pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.;
-     */
      
      p2u(pp,uu,&geom);
      return 0;

@@ -30,7 +30,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 100
+#define TNX 50
 #define TNY 1
 #define TNZ 1
 #define NTX 1
