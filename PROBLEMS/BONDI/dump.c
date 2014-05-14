@@ -11,6 +11,9 @@ ldouble cs  = sqrt(GAMMA*pp[UU]*GAMMAM1/pp[RHO]);
 
 v5 = cs;
 
+v6 = calc_lum(xxvecout[1],1)/calc_lumEdd()*(rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*velGU2CGS(1.)*velGU2CGS(1.));
+
+
 v1=Tgas;
 v2=Trad;
 

@@ -18,6 +18,7 @@
 	  "set style line 13 lw 2 lc 0 lt 3\n"
 	  "set style line 14 lw 2 lc 7 lt 3\n"
 	  "set style line 100 lw 2 lc -1 lt 3\n"
+	  "set style line 101 lw 1 lc -1 lt 3\n"
 	  "set term gif large size 1200,600\n"
 	  "set output \"%s\"\n"
 	  "set size 1,1\n"
@@ -42,8 +43,12 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	  "plot \"%s\" u 1:($14) w lp ls 4 ti \"rho\", "
-"\"dumps/out0000.dat\" u 1:($14) w l ls 100 ti \"rho hydro Bondi\"\n"
+#ifdef RADIATION
+	  "plot \"%s\" u 1:($29) w lp ls 4 ti \"luminosity\"\n"
+#else
+	  "plot \"%s\" u 1:($14) w lp ls 4 ti \"nothing\"\n"
+#endif
+
 
 	  "set lmargin at screen 0.40\n"
 	  "set rmargin at screen 0.66\n"
@@ -56,7 +61,7 @@
 	  "set ylabel \"\"\n"
 	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
 #ifdef RADIATION
-	  "plot \"%s\" u 1:26 w lp ls 2 ti \"kappa_tot\"\n"
+	  "plot \"%s\" u 1:($1*$26) w lp ls 2 ti \"tau_tot\"\n"
 #else
 	  "plot \"%s\" u 1:(1) w lp ls 2 pt 7 ps .5  ti \"nothing\"\n"
 #endif
@@ -86,11 +91,17 @@
 	  "set ylabel \"\"\n"
 	  //	  "set log y\n"
 #ifdef RADIATION
-	  "plot \"%s\" u 1:15 w lp ls 4 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:20 w lp ls 2 ti \"E_rad\", "
-"\"dumps/out0000.dat\" u 1:($15) w l ls 100 ti \"u_int hydro Bondi\"\n"
+	  "plot \"%s\" u 1:14 w lp ls 4 pt 7 ps .5 ti \"rho\","
+" \"%s\" u 1:15 w lp ls 3 ti \"u_int\", "
+" \"%s\" u 1:20 w lp ls 2 ti \"E_rad\", "
+"\"dumps/out0000.dat\" u 1:($14) w l ls 100 ti \"rho hydro Bondi\","
+"\"dumps/out0000.dat\" u 1:($15) w l ls 101 lt 1 ti \"u_int hydro Bondi\"\n"
 #else
-	  "plot \"%s\" u 1:15 w lp ls 4 pt 7 ps .5 ti \"u_int\", \"%s\" u 1:15 w lp ls 4 ti \"u_int\", "
-"\"dumps/out0000.dat\" u 1:($15) w l ls 100 ti \"u_int hydro Bondi\"\n"
+	  "plot \"%s\" u 1:14 w lp ls 4 pt 7 ps .5 ti \"rho\","
+" \"%s\" u 1:15 w lp ls 3 ti \"u_int\", "
+" \"%s\" u 1:20 w lp ls 2 ti \"u_int\", "
+"\"dumps/out0000.dat\" u 1:($14) w l ls 100 ti \"rho hydro Bondi\","
+"\"dumps/out0000.dat\" u 1:($15) w l ls 101 lt 1 ti \"u_int hydro Bondi\"\n"
 #endif
 	  //	  "unset log y\n"
 
@@ -121,11 +132,11 @@
 	   //"unset log y\n"
 #ifdef RADIATION
 	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"gas -vr\",  "
-" \"%s\" u 1:(-($21+1.e-3)) w lp ls 2   ti \"radiation -vr\", "
+	   " \"%s\" u 1:(-($21+1.e-3)) w lp ls 2   ti \"radiation -vr\", "
 " \"%s\" u 1:(($21+1.e-3)) w lp ls 2 lc 3  ti \"radiation vr\", "
 " \"dumps/out0000.dat\" u 1:(-$16) w l ls 100 ti \"gas -vr hydro Bondi\" "
 #else
-	  "plot \"%s\" u 1:($16) w lp ls 4 pt 7 ti \"gas vr\", "
+	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"gas vr\", "
 " \"%s\" u 1:($16) w lp ls 2 pt 7 ps .5  ti \"gas vr\", "
 " \"%s\" u 1:($16) w lp ls 2 pt 7 ps .5  ti \"gas vr\", "
 " \"dumps/out0000.dat\" u 1:(-$16) w l ls 100 ti \"gas -vr hydro Bondi\" "
@@ -134,7 +145,7 @@
 ,fname2,t,t/CCC,PRADGAS,MDOT,RMIN,RMAX,RBONDI,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),
 fname,fname,fname,
 	   rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)/calc_mdotEdd()/MDOT,
-fname,fname,fname,fname,fname,fname,fname,fname);
+fname,fname,fname,fname,fname,fname,fname,fname,fname);
 
 
 

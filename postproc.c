@@ -575,9 +575,6 @@ calc_lumEdd()
 ldouble
 calc_lum(ldouble radius,int type)
 {
-#ifndef BHDISK_PROBLEMTYPE
-    return -1.; //no BH
-#endif
 
 #ifdef RADIATION
 
@@ -597,6 +594,105 @@ calc_lum(ldouble radius,int type)
     }
 
   ldouble lum=0.,tau=0.;
+
+  if(NY==1 && NZ==1) //spherical symmetry
+    {
+      iz=0; 
+      iy=0;
+
+      for(iv=0;iv<NV;iv++)
+	pp[iv]=get_u(p,iv,ix,iy,iz);
+
+      struct geometry geomBL;
+      fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
+  
+      if(doingavg)
+	{
+	  PLOOP(iv)
+	    pp[iv]=get_uavg(pavg,iv,ix,iy,iz);
+
+	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+
+	  ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	  ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
+	  if(type==0) //R^r_t outside photosphere
+	    {
+	      Fr=0.;
+	    }
+	  else if(type==1) //R^r_t everywhere
+	    {
+	      //ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+	      //indices_2221(Rij,Rij,geomBL.gg);
+		  
+	      Fr=-Rij[1][0];// + ehat*uconr);
+	      if(Fr<0.) Fr=0.;
+	    }
+	  else if(type==2) //R^r_t everywhere in outflow
+	    {
+	      //ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+	      //indices_2221(Rij,Rij,geomBL.gg);
+		  
+	      Fr=-Rij[1][0];// + ehat*uconr);
+	      if(uconr<0. || Fr<0.) Fr=0.;
+	    }
+	  else
+	    Fr=0.;
+
+	  lum=geomBL.gdet*Fr*4.*M_PI;
+	}
+      else
+	{
+	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  
+	  ucongas[1]=pp[2];
+	  ucongas[2]=pp[3];
+	  ucongas[3]=pp[4];	      
+	  conv_vels(ucongas,ucongas,VELPRIM,VEL4,geom.gg,geom.GG);
+
+	      
+	  if(type==0) //R^r_t outside photosphere
+	    {
+	      Fr=0.;
+	    }
+	  else if(type==1) //R^r_t in the outflow region
+	    {
+	      //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
+	      //ehat=-Rtt;
+	      calc_Rij(pp,&geom,Rij); 
+	      indices_2221(Rij,Rij,geom.gg);
+	      Fr=-Rij[1][0];// + ehat*ucongas[1];
+	      if(Fr<0.)
+	      Fr=0.;
+	    }
+	  else if(type==2) //R^r_t in the outflow region
+	    {
+	      //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
+	      //ehat=-Rtt;
+	      calc_Rij(pp,&geom,Rij); 
+	      indices_2221(Rij,Rij,geom.gg);
+	      Fr=-Rij[1][0];// + ehat*ucongas[1];
+	      if(Fr<0. || ucongas[1]<0.)
+		Fr=0.;
+	    }
+	  else
+	    Fr=0.;
+
+	  lum=geom.gdet*Fr*4.*M_PI;
+
+	  //printf("%e %e %e %e\n",xxBL[1],Fr,geom.gdet,lum);
+	}
+      
+      return lum;
+    }	  
+
 
   if(NZ==1) //phi-symmetry
     {
@@ -655,7 +751,18 @@ calc_lum(ldouble radius,int type)
 		  Fr=-Rij[1][0];
 		  if(Fr<0.) Fr=0.;
 		}
-	      else if(type==1) //R^r_t everywhere in outflow
+	      else if(type==1) //R^r_t everywhere
+		{
+		  //ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+		  //indices_2221(Rij,Rij,geomBL.gg);
+		  
+		  Fr=-Rij[1][0];// + ehat*uconr);
+		  if(Fr<0.) Fr=0.;
+		}
+	      else if(type==2) //R^r_t everywhere in outflow
 		{
 		  //ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
 		  for(i=0;i<4;i++)
@@ -695,14 +802,23 @@ calc_lum(ldouble radius,int type)
 		  Fr=-Rij[1][0];
 		  if(Fr<0.) Fr=0.;
 		}
-	      else if(type==1) //R^r_t in the outflow region
+	      else if(type==1) //R^r_t everywhere
 		{
 		  //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
 		  //ehat=-Rtt;
 		  calc_Rij(pp,&geom,Rij); 
 		  indices_2221(Rij,Rij,geom.gg);
 		  Fr=-Rij[1][0];// + ehat*ucongas[1];
-		  if(ucongas[1]<0.)
+		  if(Fr<0.) Fr=0.;
+		}
+	      else if(type==2) //R^r_t in the outflow region
+		{
+		  //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
+		  //ehat=-Rtt;
+		  calc_Rij(pp,&geom,Rij); 
+		  indices_2221(Rij,Rij,geom.gg);
+		  Fr=-Rij[1][0];// + ehat*ucongas[1];
+		  if(Fr<0. || ucongas[1]<0.)
 		    Fr=0.;
 		}
 	      else
