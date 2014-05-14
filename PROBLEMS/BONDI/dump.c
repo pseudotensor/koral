@@ -10,9 +10,12 @@ fprint_profiles(ldouble t, ldouble totmass)
 ldouble cs  = sqrt(GAMMA*pp[UU]*GAMMAM1/pp[RHO]);
 
 v5 = cs;
-
 v6 = calc_lum(xxvecout[1],1)/calc_lumEdd()*(rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*velGU2CGS(1.)*velGU2CGS(1.));
 
+ldouble Rij[4][4];
+calc_Rij(pp,&geom,Rij); 
+indices_2221(Rij,Rij,geom.gg);
+v7=-Rij[1][0]*sqrt(geom.gg[1][1]);//ortonormal flux
 
 v1=Tgas;
 v2=Trad;

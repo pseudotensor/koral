@@ -91,13 +91,13 @@
 	  "set ylabel \"\"\n"
 	  //	  "set log y\n"
 #ifdef RADIATION
-	  "plot \"%s\" u 1:14 w lp ls 4 pt 7 ps .5 ti \"rho\","
+	  "plot \"%s\" u 1:($14) w lp ls 4 pt 7 ps .5 ti \"rho\","
 " \"%s\" u 1:15 w lp ls 3 ti \"u_int\", "
 " \"%s\" u 1:20 w lp ls 2 ti \"E_rad\", "
 "\"dumps/out0000.dat\" u 1:($14) w l ls 100 ti \"rho hydro Bondi\","
 "\"dumps/out0000.dat\" u 1:($15) w l ls 101 lt 1 ti \"u_int hydro Bondi\"\n"
 #else
-	  "plot \"%s\" u 1:14 w lp ls 4 pt 7 ps .5 ti \"rho\","
+	  "plot \"%s\" u 1:($14) w lp ls 4 pt 7 ps .5 ti \"rho\","
 " \"%s\" u 1:15 w lp ls 3 ti \"u_int\", "
 " \"%s\" u 1:20 w lp ls 2 ti \"u_int\", "
 "\"dumps/out0000.dat\" u 1:($14) w l ls 100 ti \"rho hydro Bondi\","
@@ -142,7 +142,7 @@
 " \"dumps/out0000.dat\" u 1:(-$16) w l ls 100 ti \"gas -vr hydro Bondi\" "
 #endif
 
-,fname2,t,t/CCC,PRADGAS,MDOT,RMIN,RMAX,RBONDI,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),
+,fname2,t,t/CCC,0.,MDOT,RMIN,RMAX,0.,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),
 fname,fname,fname,
 	   rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)/calc_mdotEdd()/MDOT,
 fname,fname,fname,fname,fname,fname,fname,fname,fname);

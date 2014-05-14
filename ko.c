@@ -61,7 +61,7 @@ main(int argc, char **argv)
   calc_metric();
 
   //print scalings GU->CGS and quit
-  //  print_scalings(); exit(-1);
+  //print_scalings(); exit(-1);
   
   //precalculating problem related numbers
 #ifdef PR_PREPINIT

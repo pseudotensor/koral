@@ -79,6 +79,13 @@ if(ix>=NX) //analytical solution at rout only
     pp[7]=ucon[1];
     pp[8]=ucon[2];
     pp[9]=ucon[3]; 
+
+#ifdef LIKEINFRAGILE
+    pp[6]=get_u(pproblem1,EE0,ix,iy,iz);
+    pp[7]=get_u(pproblem1,FX0,ix,iy,iz);
+    pp[8]=get_u(pproblem1,FY0,ix,iy,iz);
+    pp[9]=get_u(pproblem1,FZ0,ix,iy,iz);
+#endif
 #endif	 
     
     //transforming primitives from BL to MYCOORDS

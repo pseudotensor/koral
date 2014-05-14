@@ -1,14 +1,14 @@
 /************************************/
 //restart
 /************************************/
-//efine RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
 //radiation
 /************************************/
 #define RADIATION
-//#define RADOUTPUTINZAMO
+//#define RADOUTPUTINFF
 #define RADOUTPUTVELS
 
 /************************************/
@@ -20,7 +20,7 @@
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 10.
+#define RMIN 2.
 #define RMAX 20000.
 
 #define MINX (log(RMIN-MKS1R0))
@@ -31,7 +31,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 75
+#define TNX 256
 #define TNY 1
 #define TNZ 1
 #define NTX 1
@@ -51,6 +51,8 @@
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
 #define U2PCONV 1.e-12
+#define RADIMPCONV 1.e-12
+#define RADIMPMAXITER 25
 
 /************************************/
 //output
@@ -67,14 +69,14 @@
 /************************************/
 //test specific
 /************************************/
-#define TESTNO 0
+#define TESTNO 3
 #define ERADRES 1.e-10
+#define PRADGASINIT 1.e-10 
+#define RBONDI 0.
 
 #if (TESTNO==0)
-#define RBONDI 1000000000.
-#define PRADGAS 1.e-10 //keep small, verify convergence!
 #define MDOT 1.e1
-#define TGAS0 1.e9
+#define TGAS0 1.e7
 #endif
 
 #if (TESTNO==1)
@@ -90,10 +92,9 @@
 #endif
 
 #if (TESTNO==3)
-//#define PRADGAS 1.2e-1
-#define PRADGAS 1.e-10
-//#define TGAS0 1e7
-#define RBONDI 1000.
+//#define LIKEINFRAGILE
+#define PRADGAS 1.2e-1
+#define TGAS0 1e7
 #define MDOT 10.
 #endif
 
@@ -104,10 +105,12 @@
 #endif 
 
 #define MASS 3.
-#define MDOTEDD 2.23/16.*1e18*MASS //cm/s
+#define BHSPIN 0.
+#define MDOTEDD 2.23/16.*1.e18*MASS //cm/s
 #define RHOAMB 1.e-25
 #define TAMB 1.e5
 #define BONDIGAMMA (0.9*5./3.)
-#define GAMMA (5./3.)//(long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
+#define GAMMA (5./3.)
+//#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 #define MUGAS .5
 
