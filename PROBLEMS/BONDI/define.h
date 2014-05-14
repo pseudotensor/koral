@@ -107,7 +107,7 @@
 #define MDOTEDD 2.23/16.*1e18*MASS //cm/s
 #define RHOAMB 1.e-25
 #define TAMB 1.e5
-#define BONDIGAMMA (0.99*5./3.)
+#define BONDIGAMMA (0.9*5./3.)
 #define GAMMA (5./3.)//(long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 #define MUGAS .5
 
