@@ -81,7 +81,7 @@
 //78 FUNNY - for Ronaldo & Grzesiek & not for Bhupendra
 //79 SOFTBALL - Ron & Grz Bis
 
-#define PROBLEM 7
+#define PROBLEM 67
 
 #if(PROBLEM==79)
 
@@ -1449,6 +1449,10 @@
 
 #ifndef NRADPROFILES
 #define NRADPROFILES 32
+#endif
+
+#ifndef NANARELRADPROFILES
+#define NANARELRADPROFILES 2
 #endif
 
 #ifndef OUTVEL

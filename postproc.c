@@ -203,8 +203,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //to calculate magn. field angle
 	      //bsq and brbphi taken from avg if neeeded
-	      ldouble bfake[4];
-	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq,bfake,bfake);
+	      ldouble bconfake[4],bcovfake[4],bsqfake;
+	      calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsqfake,bconfake,bcovfake);
 	      Bangle1+=rho*brbphi*dxph[1];
 	      Bangle2+=rho*bsq*dxph[1];
 
@@ -1201,4 +1201,141 @@ calc_Bflux(ldouble radius,int type)
 #else
   return -1;
 #endif
+}
+
+/*********************************************/
+//calculates quantites with respect to the averaged solution
+//and projects them on the equatorial plane
+/*********************************************/
+int calc_anarelradialprofiles(ldouble profiles[][NX])
+{
+  //adjust NRADPROFILES in problem.h
+
+  int ix,iy,iz,iv,i,j;
+  ldouble rhoavg,uintavg,tempavg,uconavg[4],utconavg[4],bconavg[4],ppavg[NV],bsqavg;
+  ldouble rho,uint,temp,ucon[4],ucov[4],bcon[4],bcov[4],bsq;
+  ldouble Tij[4][4],alpha,pp[NV],Rij[4][4],Ehat,urcon[4];
+
+  //loop over radius
+  for(ix=0;ix<NX;ix++)
+    {
+      //vertically integrated/averaged profiles
+
+      for(iv=0;iv<NANARELRADPROFILES;iv++)
+	profiles[iv][ix]=0.;
+      
+ #ifdef BHDISK_PROBLEMTYPE
+     if(NZ==1) //phi-symmetry
+	{
+	  iz=0;
+	  for(iy=0;iy<NY;iy++)
+	    {
+	      struct geometry geom;
+	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
+
+	      struct geometry geomBL;
+	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	      
+	      ldouble dxph[3],dx[3];
+	      ldouble xx1[4],xx2[4];
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[0]=fabs(xx2[1]-xx1[1]);
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[1]=fabs(xx2[2]-xx1[2]);
+	      dx[2]=2.*M_PI;
+	      dxph[0]=dx[0]*sqrt(geomBL.gg[1][1]);
+	      dxph[1]=dx[1]*sqrt(geomBL.gg[2][2]);
+	      dxph[2]=dx[2]*sqrt(geomBL.gg[3][3]);
+	      
+	      /*******************************/
+	      //averaged quantities (always VEL4 BL!)
+	      rhoavg=get_uavg(pavg,RHO,ix,iy,iz);
+	      uintavg=get_uavg(pavg,UU,ix,iy,iz);
+	      bsqavg=get_uavg(pavg,AVGBSQ,ix,iy,iz);
+	      bconavg[0]=get_uavg(pavg,AVGBCON(0),ix,iy,iz);
+	      bconavg[1]=get_uavg(pavg,AVGBCON(1),ix,iy,iz);
+	      bconavg[2]=get_uavg(pavg,AVGBCON(2),ix,iy,iz);
+	      bconavg[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
+	      uconavg[0]=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      uconavg[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      uconavg[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      uconavg[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      conv_vels(uconavg,utconavg,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+	      ppavg[RHO]=rhoavg;
+	      ppavg[UU]=uintavg;
+	      ppavg[VX]=utconavg[1];
+	      ppavg[VY]=utconavg[2];
+	      ppavg[VZ]=utconavg[3];
+	      //magnetic field etc. empty!
+
+	      /*******************************/
+	      //snapshot quantities (always VEL4 BL!)
+	      //use old ones instead
+	      for(iv=0;iv<NV;iv++)
+		  pp[iv]=get_u(p,iv,ix,iy,iz);
+	      //to BL     
+	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+	      rho=pp[0];
+	      uint=pp[1];
+	      ucon[1]=pp[2];
+	      ucon[2]=pp[3];
+	      ucon[3]=pp[4];
+	      conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+		  
+              #ifdef MAGNFIELD
+	      calc_bcon_prim(pp,bcon,&geomBL);
+	      indices_21(bcon,bcov,geomBL.gg); 
+	      bsq = dot(bcon,bcov); 
+              #endif
+
+              #ifdef RADIATION
+	      calc_Rij(pp,&geomBL,Rij);
+	      indices_2221(Rij,Rij,geomBL.gg);
+	      calc_ff_Rtt(pp,&Ehat,urcon,&geomBL);
+	      Ehat*=-1.;
+              #endif
+
+
+	      /*******************************/
+	      //calculating alpha
+	      
+	      //stress energy tensor in lab frame
+	      calc_Tij(pp,&geomBL,Tij);
+
+	      //boosting it from lab frame to the average comoving frame
+	      boost22_lab2ff(Tij,Tij,ppavg,geomBL.gg,geomBL.GG);
+
+	      //pressure
+	      ldouble ptot = GAMMAM1*uint + 1./3.*Ehat;
+	      alpha=sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij[1][3]/ptot;
+	      
+	      /*******************************/
+	      //vertical integrals
+	      //within scale-height
+	      if(fabs(geomBL.yy-M_PI/2.) < scaleth_otg[ix])
+		{
+		  //surface density (2nd column)
+		  profiles[2-2][ix]+=rho*dxph[1];
+		  
+		  //alpha (3) 
+		  profiles[3-2][ix]+=alpha*rho*dxph[1];
+		}
+
+	    }
+
+	  //normalizing by sigma
+	  profiles[1][ix]/=profiles[0][ix];
+	 
+	}
+
+#endif
+    }
+
+  return 0;
 }

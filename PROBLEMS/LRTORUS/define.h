@@ -7,19 +7,19 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM -1
+#define RESTARTNUM 0
 //#define RESTARTGENERALINDICES
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
+//#define MIMICDYNAMO
 #define CALCHRONTHEGO
 #define ALPHAFLIPSSIGN                                                        
 #define ALPHADYNAMO 0.314
@@ -47,7 +47,7 @@
 /************************************/
 #define HDVISCOSITY NOVISCOSITY
 //#define RADVISCOSITY NOVISCOSITY
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define ALPHARADVISC 0.1
@@ -86,7 +86,7 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.6-MKS1R0))
+#define MINX (log(4.6-MKS1R0))
 #define MAXX (log(1000.-MKS1R0))
 //total resolution
 #define TNX 140
@@ -121,11 +121,12 @@
 #define SCAOUTPUT 1
 #define AVGOUTPUT 1
 #define AVGAVGOUTPUT 1
+#define ANARELRADOUTPUT 1
 #define COORDOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 1.
-#define DTOUT2 1000.
+#define DTOUT2 10.
 
 /************************************/
 //common physics / torus / atmosphere

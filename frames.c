@@ -595,6 +595,16 @@ calc_Lorentz_ff2lab(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble L[][4])
   return 0;
 }
 
+/************************************************************/
+//boosting tensor using Lorentz boost L
+/************************************************************/
+int
+boost22_core(ldouble T1[][4],ldouble T2[][4],ldouble L[][4])
+{
+  //TODO
+}
+
+
 /*****************************************************************/
 /*****************************************************************/
 /*****************************************************************/
@@ -620,15 +630,6 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
       for(j=0;j<4;j++)
 	{
 	  Tt[i][j]=T1[i][j]*alpha;
-	}
-    }
-  
-  //multiplying by lapse to express T1 in ZAMO
-  for(i=0;i<4;i++)
-    {
-      for(j=0;j<4;j++)
-	{
-	  Tt[i][j]=T1[i][j];
 	}
     }
   

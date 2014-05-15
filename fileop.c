@@ -185,6 +185,42 @@ fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
 /*********************************************/
 /*********************************************/
 /*********************************************/
+/* prints radial profiles to anarelradNNNN.dat
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int
+fprint_anarelradprofiles(ldouble t, int nfile, char* folder, char* prefix, ldouble profiles[][NX])
+{
+#ifdef BHDISK_PROBLEMTYPE 
+      char bufor[50],bufor2[50];
+      sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
+
+      fout_radprofiles=fopen(bufor,"w");
+
+      int ix,iv;
+      //printing radial profiles  
+      for(ix=0;ix<NX;ix++)
+	{
+	  ldouble xx[4],xxout[4];
+	  get_xx(ix,0,0,xx);
+	  coco_N(xx,xxout,MYCOORDS,BLCOORDS); 
+	  if(xxout[1]<rhorizonBL) continue;
+	  fprintf(fout_radprofiles,"%e ",xxout[1]);
+	  for(iv=0;iv<NANARELRADPROFILES;iv++)
+	    fprintf(fout_radprofiles,"%e ",profiles[iv][ix]);
+	  fprintf(fout_radprofiles,"\n");
+	}
+      fclose(fout_radprofiles);
+#endif
+  
+  return 0;
+}
+ 
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
 /* prints dumps to files outNNNN.dat and calls gnuplot */
 /* codeprim == 1 - prints out code primitives, only coordinates converted to OUTCOORDS */
 /* codeprim == 0 - prints ZAMO frame etc primitives - post processing, called by ana.c */
