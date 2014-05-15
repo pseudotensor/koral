@@ -148,6 +148,7 @@ main(int argc, char **argv)
 #endif
 #if(SIMOUTPUT!=0)
       fprint_simplefile(tstart,nfout1,folder,"sim");
+
 #endif
       #endif
 
@@ -395,6 +396,9 @@ solve_the_problem(ldouble tstart, char* folder)
 #ifndef NOSILO
 	  fprint_silofile(t,nfout1,folder,"sil");
 #endif
+#endif
+#if(SIMOUTPUT!=0)
+	   fprint_simplefile(tstart,nfout1,folder,"sim");
 #endif
 	  #endif
 	  

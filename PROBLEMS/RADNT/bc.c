@@ -124,6 +124,7 @@ if(ix>=NX) //analytical solution at rout only
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
+     /*
      pp[0]=get_u(p,0,iix,iiy,iiz)*pow(r/r0,-1.5);
      pp[1]=get_u(p,1,iix,iiy,iiz)*pow(r/r0,-2.5);
 
@@ -148,7 +149,7 @@ if(ix>=NX) //analytical solution at rout only
      //testing if interpolated primitives make sense
      //     check_floors_hd(pp,VELPRIM,gg,GG);
      //end of floor section
-
+     */
      p2u(pp,uu,&geom);
      return 0;
    }
@@ -207,7 +208,9 @@ if(iy>=NY) //equatorial plane
 	//Keplerian gas
 	ldouble Om=1./pow(rBL,1.5)*OMSCALE;
 	
+	//ldouble ucon[4]={0.,0.,-0.5/rBL,Om};
 	ldouble ucon[4]={0.,0.,0.,Om};
+
 	conv_vels(ucon,ucon,VEL3,VELPRIM,ggBL,GGBL);
 		
 	pp[2]=ucon[1];
@@ -216,7 +219,7 @@ if(iy>=NY) //equatorial plane
 	
 	prad_ff2lab(pp,pp,&geomBL);
 	
-	trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,ggBL,GGBL,gg,GG);
+	trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecBL,&geomBL,&geom);
       }
     
 

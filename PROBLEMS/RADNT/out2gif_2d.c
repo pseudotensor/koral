@@ -25,7 +25,7 @@ maxy= 1.*get_xb(NX,0);
 	  "set log cb\n"
 	  "set log z\n"
 	  "set cbrange [1.e-15:1.e-11]\n"
-	  "set cntrparam levels discrete 1.e-15,3.e-15,1.e-14,3.e-14,6.e-14,1.e-13,3.e-13,6.e-13,1.e-12,3.e-12,6.e-12,1.e-11\n"
+	  "set cntrparam levels discrete 1.e-15,3.e-15,1.e-14,3.e-14,6.e-14,1.e-13,3.e-13,6.e-13,1.e-12,3.e-12,6.e-12,1.e-11,1.e-11,2.e-11,4.e-11,8.e-11\n"
 	  "splot \"%s\" u (($1)*sin($2)):(($1)*cos($2)):($20) w l\n"
 	  "unset dgrid3d\n"
 	  "unset log z\n"
