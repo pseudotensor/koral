@@ -42,6 +42,7 @@
 //scale-height (31)
 //rho-weighted beta (32)
 //rho-wighted prad/pgas (33)
+//alpha (34)
 
 
 /*********************************************/
@@ -49,13 +50,17 @@ int calc_radialprofiles(ldouble profiles[][NX])
 {
   //adjust NRADPROFILES in problem.h
 
+  //calculates scale-height etc.
+  calc_avgs_throughout();     
+
   int ix,iy,iz,iv,i,j;
   ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
-  ldouble rhouconr,Tij[4][4],Rij[4][4],Trt,Rrt,bsq,bcon[4],bcov[4],Qtheta;
+  ldouble rhouconr,Tij[4][4],Tij21[4][4],Rij[4][4],Trt,Rrt,bsq,bcon[4],bcov[4],Qtheta;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
   ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
   ldouble Bangle1,Bangle2,brbphi;
+  ldouble Sigmagdet;
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -66,6 +71,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	profiles[iv][ix]=0.;
       
       Bangle1=Bangle2=0.;
+      Sigmagdet=0.;
 
       for(iv=0;iv<NAVGVARS;iv++)
 	avgsums[iv][ix]=0.;
@@ -176,9 +182,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  rhouconr=rho*utcon[1];
 
 		  calc_Tij(pp,&geomBL,Tij);
-		  indices_2221(Tij,Tij,geomBL.gg);
+		  indices_2221(Tij,Tij21,geomBL.gg);
 
-		  Trt = Tij[1][0];
+		  Trt = Tij21[1][0];
 
 #ifdef RADIATION
 		  calc_Rij(pp,&geomBL,Rij);
@@ -191,6 +197,18 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  Ehat=-Rtt; 		 		
 #endif
 		}
+
+
+	      ldouble pregas = GAMMAM1*uint;
+	      ldouble ptot = pregas;
+	      #ifdef RADIATION
+	      ldouble prerad = Ehat/3.;
+	      ptot+=prerad;
+	      #endif
+	      
+	      //alpha 
+	      boost22_lab2ff(Tij,Tij,pp,geomBL.gg,geomBL.GG);
+	      ldouble alpha=sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij[1][3]/ptot;
 
 	      //temparature
 	      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
@@ -213,6 +231,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      ldouble tautotloc = utcon[0]*calc_kappaes(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
 	      tautot+=tautotloc*dxph[1];
 	      tauabs+=tauabsloc*dxph[1];	
+
+	      //alpha (34) (column)
+	      profiles[32][ix]+=alpha*rho*dxph[1];
 
 	      //surface density (2) (column)
 	      profiles[0][ix]+=rho*dxph[1];
@@ -239,17 +260,18 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[30][ix]+=rho*ibeta*dxph[1];
 
 	      //rho-weighted prad/pgas (33)
-	      ldouble pregas = GAMMAM1*uint;
 	      #ifdef RADIATION
-	      ldouble prerad = Ehat/3.;
 	      profiles[31][ix]+=rho*prerad/pregas*dxph[1];
 	      #else
 	      profiles[31][ix]+=0.;
 	      #endif
               
-	      
+    
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
+
+	      //temporary surface density to normalize what is above
+	      Sigmagdet+=rho*dx[1]*dx[2]*geomBL.gdet;
 
 	      //total mhd energy flux (14)
 	      profiles[12][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
@@ -294,11 +316,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[19][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //rho-weighted minus radial velocity (4)
-	      profiles[2][ix]+=-rhouconr*dxph[1];
+	      //profiles[2][ix]+=-rhouconr*dxph[1];
 
 	      //rho-weighted minus radial velocity in the inflow (24)
-	      if(utcon[1]<0.)
-		profiles[22][ix]+=-rhouconr*dxph[1];
+	      //if(utcon[1]<0.)
+	      //profiles[22][ix]+=-rhouconr*dxph[1];
 
 	      //abs optical depth (7)
 	      profiles[5][ix]=tauabs;	
@@ -319,15 +341,19 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	    }
 
 
+	  //to get velocities
+	  //profiles[2][ix]/=profiles[0][ix];
+	  profiles[2][ix]=profiles[1][ix]/Sigmagdet;
+	  profiles[22][ix]=profiles[10][ix]/Sigmagdet;
 
 	  //normalizing by sigma
-	  profiles[2][ix]/=profiles[0][ix];
 	  profiles[22][ix]/=profiles[21][ix];
 	  profiles[26][ix]/=profiles[0][ix];
 	  profiles[27][ix]/=profiles[0][ix];
 	  profiles[29][ix]/=profiles[0][ix];
 	  profiles[30][ix]/=profiles[0][ix];
 	  profiles[31][ix]/=profiles[0][ix];
+	  profiles[32][ix]/=profiles[0][ix];
 	  profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
 
 	  Bangle1/=profiles[0][ix];
@@ -1309,7 +1335,10 @@ int calc_anarelradialprofiles(ldouble profiles[][NX])
 	      calc_Tij(pp,&geomBL,Tij);
 
 	      //boosting it from lab frame to the average comoving frame
-	      boost22_lab2ff(Tij,Tij,ppavg,geomBL.gg,geomBL.GG);
+	      //what if there are secular trends? 
+	      //one should take avg from around snapshot file
+	      //or do as Penna+12 did, i.e., take averaged phi velocity=VZ
+	      boost22_lab2ff(Tij,Tij,pp,geomBL.gg,geomBL.GG);
 
 	      //pressure
 	      ldouble ptot = GAMMAM1*uint + 1./3.*Ehat;
@@ -1322,15 +1351,23 @@ int calc_anarelradialprofiles(ldouble profiles[][NX])
 		{
 		  //surface density (2nd column)
 		  profiles[2-2][ix]+=rho*dxph[1];
+
+		  //alpha numerator (3) (sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij[1][3]) 
+		  profiles[3-2][ix]+=sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij[1][3]*rho*dxph[1];
 		  
-		  //alpha (3) 
-		  profiles[3-2][ix]+=alpha*rho*dxph[1];
+		  //alpha denominator (4) (ptot)
+		  profiles[4-2][ix]+=ptot*rho*dxph[1];
+		  
+		  //direct alpha (5) 
+		  profiles[5-2][ix]+=alpha*rho*dxph[1];
 		}
 
 	    }
 
 	  //normalizing by sigma
 	  profiles[1][ix]/=profiles[0][ix];
+	  profiles[2][ix]/=profiles[0][ix];
+	  profiles[3][ix]/=profiles[0][ix];
 	 
 	}
 

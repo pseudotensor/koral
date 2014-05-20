@@ -3131,7 +3131,7 @@ calc_metric()
   rISCOBL = r_ISCO_BL(BHSPIN);
   rmboundBL = r_mbound_BL(BHSPIN);
   rphotonBL = r_photon_BL(BHSPIN);
-  etaNT = 1.-sqrt(1.-2./3./r_ISCO_BL(0.9));
+  etaNT = 1.-sqrt(1.-2./3./r_ISCO_BL(BHSPIN));
 
   if(PROCID==0) printf("done!\n");
   

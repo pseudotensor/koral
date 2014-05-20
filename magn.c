@@ -854,24 +854,13 @@ mimic_dynamo(ldouble dt)
 //damping azimuthal component of magnetic field if beta exceeds DAMPBETA
 #ifdef DAMPBETA      
       //local four-velocity
-      
+      /*     
       ucon[0]=0;
       ucon[1]=get_u(p,VX,ix,iy,iz);
       ucon[2]=get_u(p,VY,ix,iy,iz);
       ucon[3]=get_u(p,VZ,ix,iy,iz);
       conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
       
-      ldouble facvel=1.;
-      
-      /*
-      //radial velocity of reference
-      ldouble alpaim = BETASATURATED * 0.25 * 2.;
-      ldouble vrref = -alpaim * 0.3 * 0.3 / sqrt(xxBL[1]);
-      if(ucon[1]<vrref) //amplify damping when radial velocity large
-	{
-	  facvel=ucon[1]/vrref;
-	}
-      */
       ldouble bphi,dbphi,Bcon[4];
       
       bphi = bcon[3];
@@ -890,19 +879,9 @@ mimic_dynamo(ldouble dt)
 
       if((dbphi+bphi)*bphi<0.) dbphi=-bphi; //not to overshoot zero
 
-      //dbphi=-1.e-5*bphi;
-
+     
       bphi+=dbphi;
       bcon[3]=bphi;
-
-      /*
-      if(dbphi!=0. && fabs(bcon[1])>1.e-30)
-	{
-	  print_4vector(bcon);
-print_4vector(&get_u(p,B1-1,ix,iy,iz));
-
-	}
-      */
 
       Bcon[1]=get_u(p,B1,ix,iy,iz);
       Bcon[2]=get_u(p,B2,ix,iy,iz);
@@ -922,26 +901,9 @@ print_4vector(&get_u(p,B1-1,ix,iy,iz));
       Bcon[3]=Bphi + (Bphinew-Bphi)*facdamp;
 
       set_u(p,B3,ix,iy,iz,Bcon[3]);
-
-      /*
-      if(dbphi!=0. && fabs(bcon[1])>1.e-30)
-	{
-	  print_4vector(Bcon);
-	  calc_bcon_prim(&get_u(p,0,ix,iy,iz), bcon, &geom);
-	  print_4vector(bcon);
-	  getchar();
-	}
-      */
-
-      /*
-      calc_Bcon_prim(&get_u(p,0,ix,iy,iz), bcon, Bcon, &geom);
+*/
       
-      set_u(p,B3,ix,iy,iz,Bcon[3]);
-      */
-
-      //printf("%d %d > %e %e %e %e %e\n",ix,iy,bphi,dbphi,bcon[3],Bcon[3],get_u(p,B3,ix,iy,iz));
       
-      /*
       ldouble dBphi = - ALPHABETA 
 	* facradius
 	* faczH
@@ -952,7 +914,7 @@ print_4vector(&get_u(p,B1-1,ix,iy,iz));
       if((dBphi+Bphi)*Bphi<0.) dBphi=-Bphi; //not to overshoot zero 
                                                               
       set_u(p,B3,ix,iy,iz,Bphi+dBphi);    
-      */
+      
 #endif    
 
 
