@@ -126,6 +126,9 @@ main(int argc, char **argv)
 	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 	}
 
+  //calculates scaleheight etc.
+  calc_avgs_throughout();
+
   //projects on ghost cells
   set_bc(t,0);
 

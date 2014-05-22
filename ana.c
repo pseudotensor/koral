@@ -78,6 +78,9 @@ main(int argc, char **argv)
       //reading restart file
       readret=fread_restartfile(ifile,folder,&t);
       nfout1=ifile;
+
+      //calculates scaleheight etc.
+      calc_avgs_throughout();
       
       //sets bc
       set_bc(t,0);

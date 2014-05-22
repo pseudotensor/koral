@@ -2408,7 +2408,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
       
       iix=ix;iiy=iy;iiz=iz;
 
-      //left
+      //left (because ix as a face index corresponds to face between ix-1 and ix cells)
       if(geom->ifacedim==0)
 	iix=ix-1;
       if(geom->ifacedim==1)

@@ -664,6 +664,8 @@ fprint_restartfile_mpi(ldouble t, char* folder)
     pos=PROCID*NX*NY*NZ*(3*sizeof(int)+NV*sizeof(ldouble));
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
+  //what is below should be combined into less MPI_File_writes
+
   int ix,iy,iz,iv;
   int gix,giy,giz;
   ldouble pp[NV];

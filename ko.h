@@ -176,6 +176,7 @@ int print_scalings(void);
 //postproc.c
 ldouble calc_resmri(ldouble);
 ldouble calc_meantemp(ldouble);
+ldouble calc_scaleheight(ldouble);
 int calc_scalars(ldouble*,ldouble);
 ldouble calc_Bflux(ldouble radius,int type);
 ldouble calc_mdotEdd();

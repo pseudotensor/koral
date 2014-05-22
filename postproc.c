@@ -104,9 +104,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      struct geometry geomBL;
 	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 	      
-	      //to BL     
-	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
-
+	     
 	      ldouble dxph[3];
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
@@ -157,7 +155,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 		}
 	      else
-		{
+		{ 
+		  //to BL, res-files in MYCOORDS
+		  trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+
 		  rho=pp[0];
 		  uint=pp[1];
 		  utcon[1]=pp[2];
@@ -210,7 +211,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      boost22_lab2ff(Tij,Tij,pp,geomBL.gg,geomBL.GG);
 	      ldouble alpha=sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij[1][3]/ptot;
 
-	      //temparature
+	      //temperature
 	      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
 
 	      //angular velocity
@@ -239,7 +240,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[0][ix]+=rho*dxph[1];
 
 	      //numerator of scale height (31) (column)
-	      profiles[29][ix]+=rho*dxph[1]*pow(tan(fabs(M_PI/2.-xxBL[2])),2.);
+	      //profiles[29][ix]+=rho*dxph[1]*pow(tan(fabs(M_PI/2.-xxBL[2])),2.);
 
 	      //surface density in the inflow (23)
 	      if(utcon[1]<0.)
@@ -350,12 +351,13 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[22][ix]/=profiles[21][ix];
 	  profiles[26][ix]/=profiles[0][ix];
 	  profiles[27][ix]/=profiles[0][ix];
-	  profiles[29][ix]/=profiles[0][ix];
+	  //profiles[29][ix]/=profiles[0][ix];
 	  profiles[30][ix]/=profiles[0][ix];
 	  profiles[31][ix]/=profiles[0][ix];
 	  profiles[32][ix]/=profiles[0][ix];
-	  profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
-
+	  //profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
+	  profiles[29][ix]=scaleth_otg[ix]; //scale height
+	  
 	  Bangle1/=profiles[0][ix];
 	  Bangle2/=profiles[0][ix];
 
@@ -433,7 +435,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   scalars[5]=calc_resmri(rmri);
 
   //rho-weighted temperature at rtemp (8)
-  ldouble rtemp=xxBL[1]/2.;
+  ldouble rtemp=15.;
 #if(PROBLEM==69) //INJDISK
   rtemp=20.;
 #endif
@@ -445,6 +447,11 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   //MAD parameter (9)
   scalars[7]=Bflux/sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.;
+
+  //scaleheight at rtemp (8)
+  ldouble rscale=15.;
+  scalars[8]=calc_scaleheight(rscale);
+ 
 
   /*********************************************/
   //Tgas Trad Egas Erad for testing Comptonization
@@ -958,6 +965,33 @@ calc_meantemp(ldouble radius)
     }
   else
     return -1.;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates mean temperature at rmri
+ldouble
+calc_scaleheight(ldouble radius)
+{
+#ifndef BHDISK_PROBLEMTYPE
+  return -1.; //no disk no cry
+#endif
+
+
+  int ix,iy,iz,iv;
+  ldouble xx[4],xxBL[4],dx[3];
+  ldouble mtemp=0.,sigma=0.,rho,ugas;
+ 
+  //search for appropriate radial index
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
+
+  return scaleth_otg[ix];
 }
 
 //**********************************************************************
