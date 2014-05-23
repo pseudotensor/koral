@@ -70,6 +70,7 @@ main(int argc, char **argv)
   ttot=0.;
   t=global_time;
 
+  dointpostproc=1;
   int ix,iy,iz,iv;
   ldouble pp[NV],uu[NV];
   

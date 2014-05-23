@@ -30,6 +30,7 @@ main(int argc, char **argv)
 
   int i;
   doingavg=0;
+  doingpostproc=1;
 
   //currently gsl is not used
   gsl_set_error_handler_off();

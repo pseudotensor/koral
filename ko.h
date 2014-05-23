@@ -139,6 +139,7 @@ ldouble scaleth_otg_temp[TNX];
 
 ldouble scalars[NSCALARS];
 int doingavg;
+int doingpostproc;
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
 ldouble inputarg[10];
 int **gcidx;

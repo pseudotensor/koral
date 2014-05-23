@@ -25,6 +25,8 @@ main(int argc, char **argv)
 
   //this is not avg.c
   doingavg=0;
+  //neither ana.c anarel.c ...
+  doingpostproc=0;
 
   //gsl errors off
   gsl_set_error_handler_off();

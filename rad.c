@@ -2567,19 +2567,24 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
 {
   int i,j,k,iv;
 
-  struct geometry *geom
+  struct geometry *geomin
     = (struct geometry *) ggg;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
-  gg=geom->gg;
-  GG=geom->GG;
-  tlo=geom->tlo;
-  tup=geom->tup;
-  
   int ix,iy,iz;
-  ix=geom->ix;
-  iy=geom->iy;
-  iz=geom->iz;
+  ix=geomin->ix;
+  iy=geomin->iy;
+  iz=geomin->iz;
+
+  //lets get geometry again, just in case geomin is not in internal coordinates, like in postprocessing
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+ ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  gg=geom.gg;
+  GG=geom.GG;
+  tlo=geom.tlo;
+  tup=geom.tup;
+
   //let's start with derivatives
   ldouble du[4][4]; //du_i,j
   ldouble du2[4][4]; //du^i,j
@@ -2657,7 +2662,10 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
   get_xx(ix,iy,iz,xxvec);
   for(iv=0;iv<NV;iv++)
     {
-      pp[iv]=pp0[iv];
+      if(doingpostproc) //when doing postproc.c
+	pp[iv]=get_u(p,iv,ix,iy,iz);
+      else
+	pp[iv]=pp0[iv];
     }
   utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
   conv_vels_both(utcon,ucon,ucov,whichvel,VEL4,gg,GG);  
@@ -2891,6 +2899,11 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
 
   S[0][0]=-1./ucon[0]*(ucon[1]*S[1][0]+ucon[2]*S[2][0]+ucon[3]*S[3][0]);
 
+  //TODO :
+  if(doingpostproc)
+    {
+      //convert S to BLCOORDS!!!
+    }
 
   return 0;
 }

@@ -43,6 +43,7 @@
 //rho-weighted beta (32)
 //rho-wighted prad/pgas (33)
 //alpha (34)
+//rad. viscosity energy flux (35)
 
 
 /*********************************************/
@@ -55,7 +56,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
   int ix,iy,iz,iv,i,j;
   ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
-  ldouble rhouconr,Tij[4][4],Tij21[4][4],Rij[4][4],Trt,Rrt,bsq,bcon[4],bcov[4],Qtheta;
+  ldouble rhouconr,Tij[4][4],Tij21[4][4],Rij[4][4],Rviscij[4][4],Trt,Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
   ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
@@ -84,8 +85,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  iz=0;
 	  for(iy=0;iy<NY;iy++)
 	    {
-	      //calc_primitives_local(ix,iy,iz,pp);
-	      //use old ones instead
 	      for(iv=0;iv<NV;iv++)
 		{
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
@@ -151,6 +150,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 		  Rrt = Rij[1][0];
 		  Ehat = get_uavg(pavg,AVGEHAT,ix,iy,iz);
+
+		  int derdir[3]={0,0,0};
+		  calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
+      
+		  Rviscrt = Rviscij[1][0];
 #endif
 
 		}
@@ -195,7 +199,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 		  ldouble Rtt,uconr[4];
 		  calc_ff_Rtt(&get_u(p,0,ix,iy,iz),&Rtt,uconr,&geomBL);
-		  Ehat=-Rtt; 		 		
+		  Ehat=-Rtt; 	
+
+		  int derdir[3]={0,0,0}; 
+		  calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
+      
+		  Rviscrt = Rviscij[1][0];
 #endif
 		}
 
@@ -291,6 +300,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
+
+	      //rad viscosity energy flux (35)
+	      profiles[33][ix]+=(-Rviscrt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //opt. thin rad energy flux (26)
 	      if(tautot<1.)

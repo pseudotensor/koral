@@ -26,6 +26,8 @@ main(int argc, char **argv)
       doingavg=atoi(argv[4]);
     }
 
+  doingpostproc=1;
+
   int i;
 
   //currently gsl is not used
