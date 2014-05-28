@@ -391,9 +391,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  //outflow accretion rate at given radius (11)
 	  profiles[9][ix]=fabs(calc_mdot(xxBL[1],2));
 	  //luminosity at given radius (12)
-	  profiles[10][ix]=calc_lum(xxBL[1],0);
+	  ldouble radlum,totallum;
+	  calc_lum(xxBL[1],0,&radlum,&totallum);
+	  profiles[10][ix]=radlum;
 	  //luminosity at given radius (22)
-	  profiles[20][ix]=calc_lum(xxBL[1],1);
+	  calc_lum(xxBL[1],1,&radlum,&totallum);
+	  profiles[20][ix]=radlum;
 	  //location of the photosphere (13)
 	  profiles[11][ix]=calc_photloc(ix);
 
@@ -432,12 +435,18 @@ int calc_scalars(ldouble *scalars,ldouble t)
   get_xx(NX-1,0,0,xx);
   coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
-  //luminosity (4) rlum
-  ldouble rlum=xxBL[1]/2.;
+  //luminosities (4) rlum
+  ldouble rlum=15.;
 #if(PROBLEM==69) //INJDISK
   rlum=2./3.*DISKRCIR;
 #endif
-  scalars[2]=calc_lum(rlum,0);
+  ldouble radlum,totallum;
+  calc_lum(rlum,0,&radlum,&totallum);
+  //radiative luminosity at rlum
+  scalars[2]=radlum;
+  //total energy at infinity (rho ur + Trt + Rrt)
+  scalars[10]=totallum;
+  
 
   //mri resolution parameter Q_theta (7) at rmri
   ldouble rmri=xxBL[1]/2.;
@@ -454,13 +463,18 @@ int calc_scalars(ldouble *scalars,ldouble t)
   scalars[6]=calc_meantemp(rtemp);
 
   //magnetic flux through horizon parameter (5)
-  ldouble Bflux=calc_Bflux(rhorizonBL,0);
+  ldouble Bfluxquad;
+  ldouble Bflux;
+  calc_Bflux(rhorizonBL,0.,&Bflux,&Bfluxquad);
   scalars[3]=Bflux;
 
   //MAD parameter (9)
   scalars[7]=Bflux/sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.;
 
-  //scaleheight at rtemp (8)
+  //MAD-quad parameter (11)
+  scalars[9]=(Bfluxquad/sqrt(fabs(mdot))*sqrt(4.*M_PI)/2.);
+
+  //scaleheight at rtemp (10)
   ldouble rscale=15.;
   scalars[8]=calc_scaleheight(rscale);
  
@@ -617,16 +631,15 @@ calc_lumEdd()
 //**********************************************************************
 //calculates luminosity by integrating positive flux from the axis up to tau=1 surface
 //normalized to total sphere, taken at radius radius
-ldouble
-calc_lum(ldouble radius,int type)
+int
+calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 {
 
-#ifdef RADIATION
 
     int ix,iy,iz,iv,i,j;
-    ldouble xx[4],xxBL[4],dx[3],pp[NV],Fr;
+    ldouble xx[4],xxBL[4],dx[3],pp[NV],Rrt,rhour,Tij[4][4],Trt;
     ldouble Rij[4][4],Rtt,ehat,ucongas[4];
-    ldouble tautot[3];
+    ldouble tautot[3],tau=0.;
     ldouble gdet;
 
  
@@ -638,7 +651,7 @@ calc_lum(ldouble radius,int type)
       if(xxBL[1]>radius) break;
     }
 
-  ldouble lum=0.,tau=0.;
+  ldouble lum=0.,jet=0.;
 
   if(NY==1 && NZ==1) //spherical symmetry
     {
@@ -662,36 +675,44 @@ calc_lum(ldouble radius,int type)
 
 	  ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 	  ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
+	  rhour=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+	  Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
+		    + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+
+#ifdef RADIATION
+
 	  if(type==0) //R^r_t outside photosphere
 	    {
-	      Fr=0.;
+	      Rrt=0.;
 	    }
 	  else if(type==1) //R^r_t everywhere
 	    {
-	      //ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
-	      //indices_2221(Rij,Rij,geomBL.gg);
 		  
-	      Fr=-Rij[1][0];// + ehat*uconr);
-	      if(Fr<0.) Fr=0.;
+	      Rrt=Rij[1][0];// + ehat*uconr);
+	      if(Rrt<0.) Rrt=0.;
 	    }
 	  else if(type==2) //R^r_t everywhere in outflow
 	    {
-	      //ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 		  Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
-	      //indices_2221(Rij,Rij,geomBL.gg);
 		  
-	      Fr=-Rij[1][0];// + ehat*uconr);
-	      if(uconr<0. || Fr<0.) Fr=0.;
+	      Rrt=Rij[1][0];// + ehat*uconr);
+	      if(uconr<0. || Rrt<0.) Rrt=0.;
 	    }
 	  else
-	    Fr=0.;
+	    Rrt=0.;
+#else
+	  Rrt=0.;
+#endif
 
-	  lum=geomBL.gdet*Fr*4.*M_PI;
+	  lum=-geomBL.gdet*Rrt*4.*M_PI;
+	  jet=geomBL.gdet*(Trt+rhour+Rrt)*4.*M_PI;
 	}
       else
 	{
@@ -702,10 +723,17 @@ calc_lum(ldouble radius,int type)
 	  ucongas[3]=pp[4];	      
 	  conv_vels(ucongas,ucongas,VELPRIM,VEL4,geom.gg,geom.GG);
 
-	      
+	  rhour = pp[RHO]*ucongas[1];
+	  
+	  calc_Tij(pp,&geom,Tij);
+	  indices_2221(Tij,Tij,geom.gg);
+	  Trt=Tij[1][0];
+
+
+#ifdef RADIATION	      
 	  if(type==0) //R^r_t outside photosphere
 	    {
-	      Fr=0.;
+	      Rrt=0.;
 	    }
 	  else if(type==1) //R^r_t in the outflow region
 	    {
@@ -713,9 +741,9 @@ calc_lum(ldouble radius,int type)
 	      //ehat=-Rtt;
 	      calc_Rij(pp,&geom,Rij); 
 	      indices_2221(Rij,Rij,geom.gg);
-	      Fr=-Rij[1][0];// + ehat*ucongas[1];
-	      if(Fr<0.)
-	      Fr=0.;
+	      Rrt=Rij[1][0];// + ehat*ucongas[1];
+	      if(Rrt<0.)
+	      Rrt=0.;
 	    }
 	  else if(type==2) //R^r_t in the outflow region
 	    {
@@ -723,19 +751,25 @@ calc_lum(ldouble radius,int type)
 	      //ehat=-Rtt;
 	      calc_Rij(pp,&geom,Rij); 
 	      indices_2221(Rij,Rij,geom.gg);
-	      Fr=-Rij[1][0];// + ehat*ucongas[1];
-	      if(Fr<0. || ucongas[1]<0.)
-		Fr=0.;
+	      Rrt=Rij[1][0];// + ehat*ucongas[1];
+	      if(Rrt<0. || ucongas[1]<0.)
+		Rrt=0.;
 	    }
 	  else
-	    Fr=0.;
+	    Rrt=0.;
+#else
+	  Rrt=0.;
+#endif
 
-	  lum=geom.gdet*Fr*4.*M_PI;
+	  lum=-geom.gdet*Rrt*4.*M_PI;
+	  jet=geom.gdet*(rhour+Trt+Rrt)*4.*M_PI;
 
-	  //printf("%e %e %e %e\n",xxBL[1],Fr,geom.gdet,lum);
+	  //printf("%e %e %e %e\n",xxBL[1],Rrt,geom.gdet,lum);
 	}
-      
-      return lum;
+
+      *radlum=lum;
+      *totallum=jet;
+      return 0.;
     }	  
 
 
@@ -783,45 +817,51 @@ calc_lum(ldouble radius,int type)
 
 	      ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 	      ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
+	      rhour=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+	      
+		  Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
+		    + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
 
 	      tau+=ucont*tautot[1];
 
+	      #ifdef RADIATION
 	      if(type==0) //R^r_t outside photosphere
 		{
 		  if(tau>1.) break;
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
-		  //indices_2221(Rij,Rij,geomBL.gg);
-		  Fr=-Rij[1][0];
-		  if(Fr<0.) Fr=0.;
+		  Rrt=Rij[1][0];
+		  if(Rrt<0.) Rrt=0.;
 		}
 	      else if(type==1) //R^r_t everywhere
 		{
-		  //ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
-		  //indices_2221(Rij,Rij,geomBL.gg);
 		  
-		  Fr=-Rij[1][0];// + ehat*uconr);
-		  if(Fr<0.) Fr=0.;
+		  Rrt=Rij[1][0];// + ehat*uconr);
+		  if(Rrt<0.) Rrt=0.;
 		}
 	      else if(type==2) //R^r_t everywhere in outflow
 		{
-		  //ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
-		  //indices_2221(Rij,Rij,geomBL.gg);
 		  
-		  Fr=-Rij[1][0];// + ehat*uconr);
-		  if(uconr<0. || Fr<0.) Fr=0.;
+		  Rrt=Rij[1][0];// + ehat*uconr);
+		  if(uconr<0. || Rrt<0.) Rrt=0.;
 		}
 	      else
-		Fr=0.;
+		Rrt=0.;
+	      #else
+	      Rrt=0.;
+	      #endif
 
-	      lum+=geomBL.gdet*Fr*dxBL[1]*dxBL[2];
+	      lum+=-geomBL.gdet*Rrt*dxBL[1]*dxBL[2];
+	      jet+=geomBL.gdet*(rhour+Rrt+Rrt)*dxBL[1]*dxBL[2];
 	    }
 	  else
 	    {
@@ -835,8 +875,15 @@ calc_lum(ldouble radius,int type)
 	      ucongas[3]=pp[4];	      
 	      conv_vels(ucongas,ucongas,VELPRIM,VEL4,geom.gg,geom.GG);
 
+	      rhour = pp[RHO]*ucongas[1];
+	  
+	      calc_Tij(pp,&geom,Tij);
+	      indices_2221(Tij,Tij,geom.gg);
+	      Trt=Tij[1][0];
+
 	      tau+=ucongas[0]*tautot[1];
 	      
+#ifdef RADIATION
 	      if(type==0) //R^r_t outside photosphere
 		{
 		  if(tau>1.) break;	  
@@ -844,8 +891,8 @@ calc_lum(ldouble radius,int type)
 		  //prad_lab2on(pp,pp,&geomBL);
 		  calc_Rij(pp,&geom,Rij); 
 		  indices_2221(Rij,Rij,geom.gg);
-		  Fr=-Rij[1][0];
-		  if(Fr<0.) Fr=0.;
+		  Rrt=Rij[1][0];
+		  if(Rrt<0.) Rrt=0.;
 		}
 	      else if(type==1) //R^r_t everywhere
 		{
@@ -853,8 +900,8 @@ calc_lum(ldouble radius,int type)
 		  //ehat=-Rtt;
 		  calc_Rij(pp,&geom,Rij); 
 		  indices_2221(Rij,Rij,geom.gg);
-		  Fr=-Rij[1][0];// + ehat*ucongas[1];
-		  if(Fr<0.) Fr=0.;
+		  Rrt=Rij[1][0];// + ehat*ucongas[1];
+		  if(Rrt<0.) Rrt=0.;
 		}
 	      else if(type==2) //R^r_t in the outflow region
 		{
@@ -862,32 +909,38 @@ calc_lum(ldouble radius,int type)
 		  //ehat=-Rtt;
 		  calc_Rij(pp,&geom,Rij); 
 		  indices_2221(Rij,Rij,geom.gg);
-		  Fr=-Rij[1][0];// + ehat*ucongas[1];
-		  if(Fr<0. || ucongas[1]<0.)
-		    Fr=0.;
+		  Rrt=Rij[1][0];// + ehat*ucongas[1];
+		  if(Rrt<0. || ucongas[1]<0.)
+		    Rrt=0.;
 		}
 	      else
-		Fr=0.;
+		Rrt=0.;
+	      #else
+	      Rrt=0.;
+	      #endif
 
-	      lum+=gdet*Fr*dx[1]*dx[2];
+	      lum+=-gdet*Rrt*dx[1]*dx[2];
+	      jet+=gdet*(rhour+Trt+Rrt)*dx[1]*dx[2];
 	    }
 
 	  //#ifdef CGSOUTPUT
 	  //never!
-	  //Fr=fluxGU2CGS(Fr);
+	  //Rrt=fluxGU2CGS(Rrt);
 	  //dx[1]=lenGU2CGS(dx[1]);
 	  //dx[2]=lenGU2CGS(dx[2]);
 	  //#endif		  
 
 
-	  //printf("%e %e %e -> %e\n",Fr,gdet,dx[1],dx[2],lum);getch();
+	  //printf("%e %e %e -> %e\n",Rrt,gdet,dx[1],dx[2],lum);getch();
 	}
       
-      return lum;
+      *radlum=lum;
+      *totallum=jet;
+      return 0.;
     }
   else
 
-#endif
+
     return -1;
 }
 //**********************************************************************
@@ -1202,16 +1255,20 @@ calc_mdot(ldouble radius,int type)
 //calculates magnetic flux through r=radius within range of thetas
 //normalized to 2pi in phi
 //type == 0 (default)
-ldouble
-calc_Bflux(ldouble radius,int type)
+int
+calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 {
+  *Bflux=*Bfluxquad=0.;
+  
   if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS)
-    return -1.; //no BH
+    {
+      return -1.; //no BH
+    }
 
   #ifdef MAGNFIELD
 
   int ix,iy,iz,iv;
-  ldouble xx[4],xxBL[4],dx[3],Psi,rho,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
+  ldouble xx[4],xxBL[4],dx[3],Psi,Psiquad,rho,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -1222,6 +1279,7 @@ calc_Bflux(ldouble radius,int type)
     }
 
   Psi=0.;
+  Psiquad=0.;
 
   if(NZ==1) //phi-symmetry
     {
@@ -1235,7 +1293,8 @@ calc_Bflux(ldouble radius,int type)
 	  dx[1]=get_size_x(iy,1);
 	  dx[2]=get_size_x(iz,2);
 
-	  //coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  get_xx(ix,0,0,xx);
+	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
 	  struct geometry geom;
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
@@ -1247,7 +1306,7 @@ calc_Bflux(ldouble radius,int type)
 	  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 	  */
 
-	  ldouble Br=fabs(pp[B1]);
+	  ldouble Br=pp[B1];
 
 	  dx[1]=dx[1];//*sqrt(geom.gg[2][2]);
 	  dx[2]=2.*M_PI;//*sqrt(geom.gg[3][3]);
@@ -1261,7 +1320,10 @@ calc_Bflux(ldouble radius,int type)
 
 	  
 	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
-	    Psi+=geom.gdet*Br*dx[1]*dx[2];
+	    Psi+=geom.gdet*fabs(Br)*dx[1]*dx[2];
+	  
+	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
+	    Psiquad+=geom.gdet*Br*my_sign(xxBL[1]-M_PI/2.)*dx[1]*dx[2];
 	  
 
 	}
@@ -1269,7 +1331,10 @@ calc_Bflux(ldouble radius,int type)
   else
     return -1;
 
-  return Psi;
+  *Bflux = Psi;
+
+  *Bfluxquad = Psiquad;
+  
 #else
   return -1;
 #endif

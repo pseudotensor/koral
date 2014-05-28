@@ -1432,7 +1432,7 @@
 #endif
 
 #ifndef NSCALARS
-#define NSCALARS 9
+#define NSCALARS 11
 #endif
 
 #ifndef NAVGVARS
