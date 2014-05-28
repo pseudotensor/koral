@@ -814,11 +814,11 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
 	  Krzys[mu][kappa][mu]+=(D[kappa]-Ck)*Wk[mu];
 	  Krzys[mu][mu][kappa]=Krzys[mu][kappa][mu];
 
-	  
+	  /*
 	  if(ix==10) {printf("%f %f > %d %d %d >  %e %e %e | %e -> %e\n",get_x(ix,0),get_x(iy,1),
 			     mu,kappa,mu,
 			     D[kappa],Ck,Wk[mu],Krzys_org[mu][kappa][mu],Krzys[mu][kappa][mu]); getchar();}
-	  
+	  */
 	  
 	}
     }

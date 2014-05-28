@@ -2,7 +2,7 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM -1
+#define RESTARTNUM 90
 
 //#define CURVETEST
 //#define MODYFIKUJKRZYSIE 0
