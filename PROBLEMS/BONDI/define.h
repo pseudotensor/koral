@@ -4,8 +4,10 @@
 #define RESTART
 #define RESTARTNUM -1
 
-#define CURVETEST
-#define MODYFIKUJKRZYSIE 0
+//#define CURVETEST
+//#define MODYFIKUJKRZYSIE 0
+#define GDETIN 1
+
 /************************************/
 //radiation
 /************************************/

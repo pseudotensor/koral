@@ -323,7 +323,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		    sum1+=gdetu*Tij[k][l]*Kr[l][0][k];
 		    sum2+=gdetu*Rij[k][l]*Kr[l][0][k];
 		    if(ix==10){
-		      printf("%d %d %d: %e %e\n",ix,k,l,gdetu*Tij[k][l]*Kr[l][0][k],sum1);
+		      printf("%d > %d %d %d: %e %e %e %e\n",ix,l,1,k,Tij[k][l],gdetu*Kr[l][1][k],gdetu*Tij[k][l]*Kr[l][0][k],sum1);
 		    }
 		  }
 
