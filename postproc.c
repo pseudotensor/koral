@@ -56,7 +56,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
   int ix,iy,iz,iv,i,j;
   ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
-  ldouble rhouconr,Tij[4][4],Tij21[4][4],Rij[4][4],Rviscij[4][4],Trt,Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
+  ldouble rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
   ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
@@ -79,7 +79,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
       tautot=tauabs=0.;
 
- #ifdef BHDISK_PROBLEMTYPE
+      // #ifdef BHDISK_PROBLEMTYPE
      if(NZ==1) //phi-symmetry
 	{
 	  iz=0;
@@ -137,11 +137,16 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  utcon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+		  
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
 
-		  Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
-		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
-		    + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
-		    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+		  Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(i,j),ix,iy,iz)
+		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(i,j),ix,iy,iz)
+		    + get_uavg(pavg,AVGBSQUCONUCOV(i,j),ix,iy,iz)
+		    - get_uavg(pavg,AVGBCONBCOV(i,j),ix,iy,iz); 
+
+		  Trt=Tij[1][0];
 
 #ifdef RADIATION  
 		  for(i=0;i<4;i++)
@@ -186,10 +191,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 		  rhouconr=rho*utcon[1];
 
-		  calc_Tij(pp,&geomBL,Tij);
-		  indices_2221(Tij,Tij21,geomBL.gg);
+		  calc_Tij(pp,&geomBL,Tij22);
+		  indices_2221(Tij22,Tij,geomBL.gg);
 
-		  Trt = Tij21[1][0];
+		  Trt = Tij[1][0];
 
 #ifdef RADIATION
 		  calc_Rij(pp,&geomBL,Rij);
@@ -217,7 +222,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      #endif
 	      
 	      //alpha 
-	      boost22_lab2ff(Tij,Tij,pp,geomBL.gg,geomBL.GG);
+	      boost22_lab2ff(Tij22,Tij22,pp,geomBL.gg,geomBL.GG);
 	      ldouble alpha=sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij[1][3]/ptot;
 
 	      //temperature
@@ -280,6 +285,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 
+
 	      //temporary surface density to normalize what is above
 	      Sigmagdet+=rho*dx[1]*dx[2]*geomBL.gdet;
 
@@ -300,6 +306,33 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
+
+#ifdef CURVETEST
+	      ldouble gdetu,gdet=geomBL.gdet;
+	      gdetu=gdet;
+
+	      ldouble sum1=0.,sum2=0.;
+	      int k,l;
+	      //terms with Christoffels
+	      ldouble Kr[4][4][4];
+	      calc_Krzysie_arb(geomBL.xxvec,Kr,BLCOORDS);
+	      for(k=0;k<4;k++)
+		for(l=0;l<4;l++)
+		  {
+
+		    sum1+=gdetu*Tij[k][l]*Kr[l][0][k];
+		    sum2+=gdetu*Rij[k][l]*Kr[l][0][k];
+		    if(ix==10){
+		      printf("%d %d %d: %e %e\n",ix,k,l,gdetu*Tij[k][l]*Kr[l][0][k],sum1);
+		    }
+		  }
+
+
+	      profiles[13][ix]=sum1*dx[1]*dx[2];
+	      profiles[14][ix]=sum2*dx[1]*dx[2];
+
+#endif
+
 
 	      //rad viscosity energy flux (35)
 	      profiles[33][ix]+=(-Rviscrt)*dx[1]*dx[2]*geomBL.gdet;
@@ -402,7 +435,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	}
 
-#endif
+     //#endif
     }
 
   return 0;

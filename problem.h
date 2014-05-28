@@ -1436,15 +1436,15 @@
 #endif
 
 #ifndef NAVGVARS
-#ifdef BHDISK_PROBLEMTYPE
+//#ifdef BHDISK_PROBLEMTYPE
 #ifdef RADIATION
 #define NAVGVARS (142)
 #else
 #define NAVGVARS (109)
 #endif
-#else
-#define NAVGVARS (0)
-#endif
+//#else
+//#define NAVGVARS (0)
+//#endif
 #endif
 
 #ifndef NRADPROFILES

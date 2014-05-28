@@ -257,7 +257,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   calc_Tij(pp,&geomout,Tij);
   indices_2221(Tij,Tij,gg);
 
-#ifdef BHDISK_PROBLEMTYPE
+  //#ifdef BHDISK_PROBLEMTYPE
   //avg already in OUTCOORDS
   avg[AVGBSQ]=bsq;
   for(iv=0;iv<4;iv++)
@@ -325,7 +325,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 
 #endif
 
-#endif
+  //#endif
 
   return 0.;
 }

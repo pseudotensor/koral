@@ -1,9 +1,11 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTNUM -1
 
+#define CURVETEST
+#define MODYFIKUJKRZYSIE 0
 /************************************/
 //radiation
 /************************************/
@@ -15,12 +17,13 @@
 //coordinates / resolution
 /************************************/
 #define MKS1R0 0.
+//#define MYCOORDS MKS1COORDS
 #define MYCOORDS MKS1COORDS
 #define OUTCOORDS BLCOORDS
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 2.
+#define RMIN 1.6
 #define RMAX 20000.
 
 #define MINX (log(RMIN-MKS1R0))
@@ -31,7 +34,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 256
+#define TNX 128
 #define TNY 1
 #define TNZ 1
 #define NTX 1
@@ -59,24 +62,26 @@
 /************************************/
 #define SILOOUTPUT 0 //to silo file
 #define OUTOUTPUT 1 //to out file
+#define AVGOUTPUT 1
+#define RADOUTPUT 1
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 1000 //stop after this number of outputs
-#define DTOUT1 1.e3 //res
-#define DTOUT2 1.e4 //avg
+#define DTOUT1 1.e2 //res
+#define DTOUT2 1.e2 //avg
 #define TMAX 1.e10 //time to stop
 
 /************************************/
 //test specific
 /************************************/
-#define TESTNO 3
+#define TESTNO 0
 #define ERADRES 1.e-10
 #define PRADGASINIT 1.e-10 
 #define RBONDI 0.
 
 #if (TESTNO==0)
-#define MDOT 1.e1
-#define TGAS0 1.e7
+#define MDOT 1.e3
+#define TGAS0 1.e8
 #endif
 
 #if (TESTNO==1)

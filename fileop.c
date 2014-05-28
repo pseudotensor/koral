@@ -148,7 +148,7 @@ fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder)
 int
 fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
 {
-#ifdef BHDISK_PROBLEMTYPE 
+  //#ifdef BHDISK_PROBLEMTYPE 
       char bufor[50],bufor2[50];
       sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
 
@@ -176,7 +176,7 @@ fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
 	  fprintf(fout_radprofiles,"\n");
 	}
       fclose(fout_radprofiles);
-#endif
+      //#endif
   
   return 0;
 }
