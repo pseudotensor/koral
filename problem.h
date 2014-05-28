@@ -81,7 +81,7 @@
 //78 FUNNY - for Ronaldo & Grzesiek & not for Bhupendra
 //79 SOFTBALL - Ron & Grz Bis
 
-#define PROBLEM 67
+#define PROBLEM 7
 
 #if(PROBLEM==79)
 

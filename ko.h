@@ -130,12 +130,11 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
 int *cellflag,**loop_0,**loop_02,**loop_1,**loop_2,**loop_3,**loop_4,**loop_5,**loop_6;
 int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;
 
-#ifdef CALCHRONTHEGO
 ldouble sigma_otg[TNX];
 ldouble sigma_otg_temp[TNX];
 ldouble scaleth_otg[TNX];
 ldouble scaleth_otg_temp[TNX];
-#endif
+
 
 ldouble scalars[NSCALARS];
 int doingavg;
