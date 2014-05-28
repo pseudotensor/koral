@@ -29,10 +29,10 @@
 #define kappaCGS2GU(x)  (x/GGG*CCC*CCC/MASSCM)
 #define kappaGU2CGS(x)  (x*GGG/CCC/CCC*MASSCM)
 //verify
-#define endenCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC)
-#define endenGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC)
-#define fluxCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC/CCC)
-#define fluxGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC*CCC)
+#define endenCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC)
+#define endenGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC)
+#define fluxCGS2GU(x) (x*GGG*MASSCM*MASSCM/CCC/CCC/CCC/CCC/CCC)
+#define fluxGU2CGS(x) (x/GGG/MASSCM/MASSCM*CCC*CCC*CCC*CCC*CCC)
 
 //constants
 #define K_BOLTZ (1.3806488e-16 * GGG / CCC / CCC / CCC / CCC / MASSCM)
@@ -178,14 +178,14 @@ ldouble calc_resmri(ldouble);
 ldouble calc_meantemp(ldouble);
 ldouble calc_scaleheight(ldouble);
 int calc_scalars(ldouble*,ldouble);
-ldouble calc_Bflux(ldouble radius,int type);
+int calc_Bflux(ldouble radius,int type,ldouble*,ldouble*);
 ldouble calc_mdotEdd();
 ldouble calc_lumEdd();
 int calc_radialprofiles(ldouble profiles[][NX]);
 int calc_anarelradialprofiles(ldouble profiles[][NX]);
 ldouble calc_totalmass();
 ldouble calc_mdot(ldouble radius,int);
-ldouble calc_lum(ldouble radius,int);
+int calc_lum(ldouble radius,int,ldouble*,ldouble*);
 ldouble calc_photloc(int ix);
 
 //misc§<.c
