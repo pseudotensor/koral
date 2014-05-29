@@ -2,16 +2,17 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 90
+#define RESTARTNUM 100
 
 //#define CURVETEST
-//#define MODYFIKUJKRZYSIE 0
-#define GDETIN 1
+//#define CURVETEST2
+#define MODYFIKUJKRZYSIE 0
+//#define GDETIN 1
 
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define RADOUTPUTINFF
 #define RADOUTPUTVELS
 
@@ -19,7 +20,7 @@
 //coordinates / resolution
 /************************************/
 #define MKS1R0 0.
-//#define MYCOORDS MKS1COORDS
+//#define MYCOORDS MKER1COORDS
 #define MYCOORDS MKS1COORDS
 #define OUTCOORDS BLCOORDS
 #define PRINTXGC_LEFT

@@ -44,7 +44,7 @@ for(iz=0;iz<NZ;iz++)
 	    
 	    set_u(pproblem1,RHO,ix,iy,iz,rho);
 	    set_u(pproblem1,UU,ix,iy,iz,uint);
-	    set_u(pproblem1,VX,ix,iy,iz,ur);
+	    set_u(pproblem1,VX,ix,iy,iz,ur); //overwritten in init.c
 	    set_u(pproblem1,VY,ix,iy,iz,0.);
 	    set_u(pproblem1,VZ,ix,iy,iz,0.);
 #ifdef RADIATION
@@ -54,7 +54,7 @@ for(iz=0;iz<NZ;iz++)
 	    E=PRADGAS * GAMMAM1*uint*3.;
 #endif
 	    set_u(pproblem1,EE0,ix,iy,iz,E);
-	    set_u(pproblem1,FX0,ix,iy,iz,0.);
+	    set_u(pproblem1,FX0,ix,iy,iz,0.); //overwritten in init.c
 	    set_u(pproblem1,FY0,ix,iy,iz,0.);
 	    set_u(pproblem1,FZ0,ix,iy,iz,0.);
 #endif

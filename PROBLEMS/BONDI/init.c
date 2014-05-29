@@ -77,7 +77,7 @@ ldouble ucon[4]={0.,ur,0.,0.};
 conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
 //rad. four-vel in BL
-ldouble urfcon[4]={0.,0.,0.,0.};
+ldouble urfcon[4]={0.,ur,0.,0.}; //initialy radiative field is residual so this is not important, ur because zero would not be allowed under the horizon
 conv_vels(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
 pp[0]=rho;
