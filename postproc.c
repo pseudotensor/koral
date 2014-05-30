@@ -323,7 +323,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		    sum1+=gdetu*Tij[k][l]*Kr[l][0][k];
 		    sum2+=gdetu*Rij[k][l]*Kr[l][0][k];
 		    if(ix==10){
-		      printf("%d > %d %d %d: %e %e %e %e\n",ix,l,0,k,Tij[k][l],gdetu*Kr[l][0][k],gdetu*Tij[k][l]*Kr[l][0][k],sum1);
+		      printf("%d > %d %d %d: %e %e %e %e\n",ix,l,1,k,Tij[k][l],gdetu*Kr[l][1][k],gdetu*Tij[k][l]*Kr[l][0][k],sum1);
 		    }
 		  }
 
@@ -475,9 +475,10 @@ int calc_scalars(ldouble *scalars,ldouble t)
 #endif
   ldouble radlum,totallum;
   calc_lum(rlum,0,&radlum,&totallum);
-  //radiative luminosity at rlum
+  //radiative luminosity at rlum outside photosphere
   scalars[2]=radlum;
-  //total energy at infinity (rho ur + Trt + Rrt)
+  //total energy at infinity (rho ur + Trt + Rrt) (12)
+  calc_lum(rlum,1,&radlum,&totallum);
   scalars[10]=totallum;
   
 
@@ -1326,37 +1327,26 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 	  dx[1]=get_size_x(iy,1);
 	  dx[2]=get_size_x(iz,2);
 
-	  get_xx(ix,0,0,xx);
+	  get_xx(ix,iy,iz,xx);
 	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
 	  struct geometry geom;
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
-	  /*
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
-	  trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
-	  */
-
 	  ldouble Br=pp[B1];
 
-	  dx[1]=dx[1];//*sqrt(geom.gg[2][2]);
-	  dx[2]=2.*M_PI;//*sqrt(geom.gg[3][3]);
-
-	  //#ifdef CGSOUTPUT
-	  //always
-	  //Br=sqrt(endenGU2CGS(1.))*Br/CCC;
-	  //dx[1]=lenGU2CGS(dx[1]);
-	  //dx[2]=lenGU2CGS(dx[2]);
-	  //#endif
+	  dx[1]=dx[1];
+	  dx[2]=2.*M_PI;
 
 	  
 	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
 	    Psi+=geom.gdet*fabs(Br)*dx[1]*dx[2];
 	  
 	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
-	    Psiquad+=geom.gdet*Br*my_sign(xxBL[1]-M_PI/2.)*dx[1]*dx[2];
+	    Psiquad+=geom.gdet*Br*my_sign(geomBL.yy-M_PI/2.)*dx[1]*dx[2];
 	  
 
 	}
@@ -1367,7 +1357,7 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
   *Bflux = Psi;
 
   *Bfluxquad = Psiquad;
-  
+  return 0;
 #else
   return -1;
 #endif
