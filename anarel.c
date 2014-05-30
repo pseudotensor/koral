@@ -78,7 +78,7 @@ main(int argc, char **argv)
   for(ifile=no1avg;ifile<=no2avg;ifile+=nostepavg)
     {
       //reading avg file
-      readret=fread_avgfile(ifile,"dumps",pavg,&dt);
+      readret=fread_avgfile(ifile,"dumps",pavg,&dt,&t);
 
       add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
 	

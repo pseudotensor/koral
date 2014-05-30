@@ -91,7 +91,7 @@ main(int argc, char **argv)
 
       //dumps dumps to analysis analysis
 #if(SCAOUTPUT==1)
-      fprint_scalars(t,scalars,NSCALARS,"analysis");
+      fprint_scalars(t,scalars,NSCALARS);
 #endif
 #if(RADOUTPUT==1)
       fprint_radprofiles(t,nfout1,"analysis","rad");

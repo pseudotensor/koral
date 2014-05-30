@@ -468,14 +468,14 @@ int calc_scalars(ldouble *scalars,ldouble t)
   get_xx(NX-1,0,0,xx);
   coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
-  //luminosities (4) rlum
+  //luminosities 
   ldouble rlum=15.;
 #if(PROBLEM==69) //INJDISK
   rlum=2./3.*DISKRCIR;
 #endif
   ldouble radlum,totallum;
   calc_lum(rlum,0,&radlum,&totallum);
-  //radiative luminosity at rlum outside photosphere
+  //radiative luminosity at rlum outside photosphere (4)
   scalars[2]=radlum;
   //total energy at infinity (rho ur + Trt + Rrt) (12)
   calc_lum(rlum,1,&radlum,&totallum);
@@ -804,10 +804,8 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
       *radlum=lum;
       *totallum=jet;
       return 0.;
-    }	  
-
-
-  if(NZ==1) //phi-symmetry
+    }
+  else if(NZ==1) //phi-symmetry only
     {
       iz=0; 
       for(iy=0;iy<NY;iy++)
@@ -878,6 +876,8 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		  
 		  Rrt=Rij[1][0];// + ehat*uconr);
 		  if(Rrt<0.) Rrt=0.;
+
+		  
 		}
 	      else if(type==2) //R^r_t everywhere in outflow
 		{
@@ -1173,26 +1173,11 @@ calc_mdot(ldouble radius,int type)
       iz=0;
       for(iy=0;iy<NY;iy++)
 	{
-	  for(iv=0;iv<NVMHD;iv++)
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
-
-	  get_xx(ix,iy,iz,xx);
-	  dx[0]=get_size_x(ix,0);
-	  dx[1]=get_size_x(iy,1);
-	  dx[2]=get_size_x(iz,2);
-	  pick_g(ix,iy,iz,gg);
-	  pick_G(ix,iy,iz,GG);
-
-	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-
 	  struct geometry geom;
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
-
 	  
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-	  
-	  
 
 	  if(doingavg)
 	    {
@@ -1215,17 +1200,22 @@ calc_mdot(ldouble radius,int type)
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
 	      dx[2]=2.*M_PI;
-	      /*
-	      dxph[0]=get_size_x(ix,0)*sqrt(geom.gg[1][1]);
-	      dxph[1]=get_size_x(iy,1)*sqrt(geom.gg[2][2]);
-	      dxph[2]=get_size_x(iz,2)*sqrt(geom.gg[3][3]);
-	      dx[0]=dxph[0]/sqrt(geomBL.gg[1][1]);
-	      dx[1]=dxph[1]/sqrt(geomBL.gg[2][2]);
-	      dx[2]=dxph[2]/sqrt(geomBL.gg[3][3]);
-	      */
 	    }
 	  else
 	    {
+	      for(iv=0;iv<NVMHD;iv++)
+		pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	      get_xx(ix,iy,iz,xx);
+	      dx[0]=get_size_x(ix,0);
+	      dx[1]=get_size_x(iy,1);
+	      dx[2]=get_size_x(iz,2);
+	      pick_g(ix,iy,iz,gg);
+	      pick_G(ix,iy,iz,GG);
+
+	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	      
+
 	      rho=pp[0];
 	      ucon[1]=pp[2];
 	      ucon[2]=pp[3];
@@ -1320,33 +1310,80 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
       iz=0;
       for(iy=0;iy<NY;iy++)
 	{
-	  for(iv=0;iv<NVMHD;iv++)
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
-
-	  dx[0]=get_size_x(ix,0);
-	  dx[1]=get_size_x(iy,1);
-	  dx[2]=get_size_x(iz,2);
-
-	  get_xx(ix,iy,iz,xx);
-	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-
 	  struct geometry geom;
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
-
+	  
 	  struct geometry geomBL;
 	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	  
 
-	  ldouble Br=pp[B1];
+	  if(doingavg)
+	    {
+	      ldouble bcon[4]={get_uavg(pavg,AVGBCON(0),ix,iy,iz),
+			       get_uavg(pavg,AVGBCON(1),ix,iy,iz),
+			       get_uavg(pavg,AVGBCON(2),ix,iy,iz),
+			       get_uavg(pavg,AVGBCON(3),ix,iy,iz)};
+	      
+	      ldouble ucon[4];
 
-	  dx[1]=dx[1];
-	  dx[2]=2.*M_PI;
+	      ucon[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      ucon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      ucon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
+
+	      //Bcon[1]
+	      ldouble Br = bcon[1]*ucon[0] - bcon[0]*ucon[1];
+	      
+	      ldouble xx1[4],xx2[4];
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[0]=fabs(xx2[1]-xx1[1]);
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[1]=fabs(xx2[2]-xx1[2]);
+	      dx[2]=2.*M_PI;
+
+	      if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
+		Psi+=geomBL.gdet*fabs(Br)*dx[1]*dx[2];
+	  
+	      if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
+		Psiquad+=geomBL.gdet*Br*my_sign(geomBL.yy-M_PI/2.)*dx[1]*dx[2];
+
+	    }
+	  else
+	    {
+	      for(iv=0;iv<NVMHD;iv++)
+		pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	      dx[0]=get_size_x(ix,0);
+	      dx[1]=get_size_x(iy,1);
+	      dx[2]=get_size_x(iz,2);
+
+	      get_xx(ix,iy,iz,xx);
+	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+
+	      struct geometry geom;
+	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
+
+	      struct geometry geomBL;
+	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+	      ldouble Br=pp[B1];
+
+	      dx[1]=dx[1];
+	      dx[2]=2.*M_PI;
 
 	  
-	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
-	    Psi+=geom.gdet*fabs(Br)*dx[1]*dx[2];
+	      if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
+		Psi+=geom.gdet*fabs(Br)*dx[1]*dx[2];
 	  
-	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
-	    Psiquad+=geom.gdet*Br*my_sign(geomBL.yy-M_PI/2.)*dx[1]*dx[2];
+	      if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
+		Psiquad+=geom.gdet*Br*my_sign(geomBL.yy-M_PI/2.)*dx[1]*dx[2];
+	    }
 	  
 
 	}

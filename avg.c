@@ -12,10 +12,10 @@ main(int argc, char **argv)
   #endif
 
   //which files to read
-  int no1,no2,nostep;
-  if(argc!=5)
+  int no1,no2,nostep,procotg;
+  if(argc!=6)
     {
-      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep doingavg\n");
+      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep doingavg procotg\n");
       return -1;
     }
   else
@@ -24,6 +24,7 @@ main(int argc, char **argv)
       no2=atof(argv[2]);
       nostep=atof(argv[3]);
       doingavg=atoi(argv[4]);
+      procotg=atoi(argv[5]);      
     }
 
   doingpostproc=1;
@@ -53,9 +54,13 @@ main(int argc, char **argv)
   char folder[100],bufor[100];
   sprintf(folder,"analysis");
 
-  //opens the scalar file
-  sprintf(bufor,"%s/avgscalars.dat",folder);
-  fout_scalars=fopen(bufor,"w");
+  if(procotg)
+    {
+      //opens the scalar file
+      sprintf(bufor,"%s/avgscalars.dat",folder);
+      fout_scalars=fopen(bufor,"w");
+    }
+
 
   //arrays for averaging of primitives
   ldouble *pavgtot=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
@@ -85,7 +90,7 @@ main(int argc, char **argv)
       if(doingavg)
 	{
 	  //reading avg file
-	  readret=fread_avgfile(ifile,"dumps",pavg,&dt);
+	  readret=fread_avgfile(ifile,"dumps",pavg,&dt,&t);
 	}
       else
 	{
@@ -98,6 +103,20 @@ main(int argc, char **argv)
 	      for(ix=0;ix<NX;ix++)
 		for(iv=0;iv<NV;iv++)
 		  set_uavg(pavg,iv,ix,iy,iz,get_u(p,iv,ix,iy,iz));
+	}
+
+      if(procotg)
+	{
+	  //calculates scaleheight etc.
+	  calc_avgs_throughout();
+	  
+	  //sets bc
+	  set_bc(t,0);
+	  
+	  //calculate scalars
+	  calc_scalars(scalars,t);
+
+	  fprint_scalars(t,scalars,NSCALARS);
 	}
 
       add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));

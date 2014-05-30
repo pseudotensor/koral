@@ -135,7 +135,7 @@ main(int argc, char **argv)
       //dumps dumps only for shared memory
       #ifndef MPI
 #if(SCAOUTPUT==1)
-      fprint_scalars(tstart,scalars,NSCALARS,folder);
+      fprint_scalars(tstart,scalars,NSCALARS);
 #endif
 #if(RADOUTPUT==1)
       fprint_radprofiles(tstart,nfout1,folder,"rad");
@@ -386,7 +386,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  //dumps dumps
 	  #ifndef MPI //comment if you want .silo etc files per core for OUTPUTPERCORE
 #if(SCAOUTPUT==1)
-	  fprint_scalars(t,scalars,NSCALARS,folder);
+	  fprint_scalars(t,scalars,NSCALARS);
 #endif
 #if(RADOUTPUT==1)
 	  fprint_radprofiles(t,nfout1,folder,"rad");

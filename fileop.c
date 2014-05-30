@@ -123,7 +123,7 @@ fprint_gridfile(char* folder)
 /*********************************************/
 /*********************************************/
 int
-fprint_scalars(ldouble t, ldouble *scalars, int nscalars, char* folder)
+fprint_scalars(ldouble t, ldouble *scalars, int nscalars)
 {
   #ifndef MPI
   int iv;
@@ -1301,13 +1301,13 @@ fprint_avgfile_ascii(ldouble t, char* folder,char *prefix)
 
 
 int
-fread_avgfile(int nout1, char* folder,ldouble *pavg, ldouble *dt)
+fread_avgfile(int nout1, char* folder,ldouble *pavg, ldouble *dt,ldouble *t)
 {
   char bufor[250];
 
   #ifdef RESOUTPUT_ASCII
 
-  fread_avgfile_ascii(nout1,folder,pavg,dt);
+  fread_avgfile_ascii(nout1,folder,pavg,dt,t);
 
   #else //binary output
 
@@ -1315,17 +1315,17 @@ fread_avgfile(int nout1, char* folder,ldouble *pavg, ldouble *dt)
   
   #ifdef OUTPUTPERCORE //each process dumps independent files
   
-  fread_avgfile_bin(nout1,folder,pavg,dt);
+  fread_avgfile_bin(nout1,folder,pavg,dt,t);
 
   #else //MPI-IO, each process writes in parallel to the same file
 
-  fread_avgfile_mpi(nout1,folder,pavg,dt);
+  fread_avgfile_mpi(nout1,folder,pavg,dt,t);
   
   #endif
 
   #else //no MPI
 
-  fread_avgfile_bin(nout1,folder,pavg,dt);
+  fread_avgfile_bin(nout1,folder,pavg,dt,t);
 
   #endif
   #endif
@@ -1337,7 +1337,7 @@ fread_avgfile(int nout1, char* folder,ldouble *pavg, ldouble *dt)
 /*********************************************/
 
 int 
-fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
+fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
 {
   //opening dump file
   int ret;
@@ -1363,7 +1363,7 @@ fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
   if(PROCID==0) printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
 	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
-
+  *t=.5*(ldpar[0]+ldpar[1]);
  *dt=ldpar[2];
  
   fclose(fdump);
@@ -1395,7 +1395,7 @@ fread_avgfile_ascii(int nout1, char *folder,ldouble *pavg, ldouble *dt)
 /*********************************************/
 
 int 
-fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
+fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
 {
   int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
   char fname[40],fnamehead[40];
@@ -1421,6 +1421,7 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   if(PROCID==0) printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
 	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
   
+  *t=.5*(ldpar[0]+ldpar[1]);
   *dt=ldpar[2];
   fclose(fdump);
  
@@ -1451,7 +1452,7 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt)
 /*********************************************/
 
 int 
-fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
+fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
 {
    #ifdef MPI
   int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
@@ -1472,7 +1473,7 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt)
   ret=fscanf(fdump,"## %d %lf %lf %lf\n",&intpar[0],&ldpar[0],&ldpar[1],&ldpar[2]);
   if(PROCID==0) printf("avg file (%s) read no. %d at times: %.6e to %.6e (dt=%.6e)\n",
 	 fname,intpar[0],ldpar[0],ldpar[1],ldpar[2]); 
-  
+  *t=.5*(ldpar[0]+ldpar[1]);
   *dt=ldpar[2];
   fclose(fdump);
 
