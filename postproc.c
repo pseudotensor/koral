@@ -44,6 +44,7 @@
 //rho-wighted prad/pgas (33)
 //alpha (34)
 //rad. viscosity energy flux (35)
+//rho-weighted minus radial velocity in the outflow (36)
 
 
 /*********************************************/
@@ -301,7 +302,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[13][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //jet mhd energy flux (16)
-	      if(utcon[1]>0. && bsq>rho)
+	      if(utcon[1]>0. &&bsq > rho)
 		profiles[14][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //total rad energy flux (17)
@@ -346,7 +347,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[16][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //jet rad energy flux (19)
-	      if(utcon[1]>0. && bsq>rho)
+	      if(utcon[1] >0. && bsq>rho)
 		profiles[17][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 	      
 	      //outflowin mass flux (20)
@@ -358,7 +359,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[25][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //jet mass flux (21)
-	      if(utcon[1]>0. && bsq>rho)
+	      if(utcon[1] >0. && bsq>rho)
 		profiles[19][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //rho-weighted minus radial velocity (4)
@@ -387,11 +388,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	    }
 
 
-	  //to get velocities
-	  //profiles[2][ix]/=profiles[0][ix];
-	  profiles[2][ix]=profiles[1][ix]/Sigmagdet;
-	  profiles[22][ix]=profiles[10][ix]/Sigmagdet;
-
+	 
 	  //normalizing by sigma
 	  profiles[22][ix]/=profiles[21][ix];
 	  profiles[26][ix]/=profiles[0][ix];
@@ -423,6 +420,13 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[8][ix]=fabs(calc_mdot(xxBL[1],1));
 	  //outflow accretion rate at given radius (11)
 	  profiles[9][ix]=fabs(calc_mdot(xxBL[1],2));
+
+	  //to get velocities
+	  profiles[2][ix]=profiles[1][ix]/Sigmagdet;
+	  profiles[22][ix]=profiles[8][ix]/Sigmagdet;
+	  profiles[34][ix]=profiles[9][ix]/Sigmagdet;
+
+
 	  //luminosity at given radius (12)
 	  ldouble radlum,totallum;
 	  calc_lum(xxBL[1],0,&radlum,&totallum);

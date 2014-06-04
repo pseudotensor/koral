@@ -787,7 +787,7 @@ mimic_dynamo(ldouble dt)
       if(isfinite(angle))
 	{
 	  if(angle<-1.) angle=-1.;
-	  facangle = my_max(0., 1.-4.*(angle));
+	  facangle = my_max(0., (0.25-angle)/0.25);
 	  //facangle= step_function(0.25-angle,0.025); 
 	}
 
