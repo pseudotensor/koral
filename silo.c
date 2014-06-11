@@ -517,7 +517,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      #ifdef RADIATION
 
-	      ldouble Rtt,ehat,ugas[4],urad[4],rvel[4],Rij[4][4],Gi[4];
+	      ldouble Rtt,ehat,ugas[4],urad[4],rvel[4],Rij[4][4],Rij22[4][4],Gi[4];
 
 	      ldouble tauabsloc = vcon[0]*calc_kappa(rho[nodalindex],temploc,geomout.xx,geomout.yy,geomout.zz);
 	      ldouble tauscaloc = vcon[0]*calc_kappaes(rho[nodalindex],temploc,geomout.xx,geomout.yy,geomout.zz);
@@ -554,6 +554,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  
 		}
 
+	      indices_2122(Rij,Rij22,geomout.GG);
+
 	      //correcting rad-velocities basing on <R^t_mu>
 	      int radcorr;
 	      //print_primitives(pp);
@@ -577,9 +579,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      Erad[nodalindex]=Rij[0][0];
 	      Nph[nodalindex]=pp[NF0];
 
-	      Fx[nodalindex]=Rij[1][0];
-	      Fy[nodalindex]=Rij[2][0];
-	      Fz[nodalindex]=Rij[3][0];
+	      Fx[nodalindex]=Rij22[1][0];
+	      Fy[nodalindex]=Rij22[2][0];
+	      Fz[nodalindex]=Rij22[3][0];
 
 	      urad[1]=pp[FX0];
 	      urad[2]=pp[FY0];
@@ -634,6 +636,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Rij[2][0]*=r;
 		  Rij[3][0]*=r*sin(th);
 
+		  //Rij22?
+
 		  Fx[nodalindex] = sin(th)*cos(ph)*Rij[1][0] 
 		    + cos(th)*cos(ph)*Rij[2][0]
 		    - sin(ph)*Rij[3][0];
@@ -666,7 +670,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 			 xxvec[1],xxvec[2],xxvec[3],
 			 xxveccar[1],xxveccar[2],xxveccar[3],
 			 //			 urad[1],urad[2],urad[3],
-			 //Rij[0][1],Rij[0][2],Rij[0][3]
+			 //Rij[0][1],Rij[0][2],ij[0][3]
 			 uradx[nodalindex],urady[nodalindex],uradz[nodalindex],
 			 Fx[nodalindex],Fy[nodalindex],Fz[nodalindex]
 			 );getchar();

@@ -80,8 +80,23 @@
 //77 EMPTY - empty problem
 //78 FUNNY - for Ronaldo & Grzesiek & not for Bhupendra
 //79 SOFTBALL - Ron & Grz Bis
+//80 GENCLOSURE - tests of closures
 
-#define PROBLEM 67
+#define PROBLEM 80
+
+#if(PROBLEM==80)
+
+#define PR_DEFINE "PROBLEMS/GENCLOSURE/define.h"
+#define PR_BC "PROBLEMS/GENCLOSURE/bc.c"
+#define PR_INIT "PROBLEMS/GENCLOSURE/init.c"
+#define PR_KAPPA "PROBLEMS/GENCLOSURE/kappa.c"
+#define PR_KAPPAES "PROBLEMS/GENCLOSURE/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/GENCLOSURE/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/GENCLOSURE/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/GENCLOSURE/dump.c"
+#define PR_TOOLS "PROBLEMS/GENCLOSURE/tools.c"
+
+#endif
 
 #if(PROBLEM==79)
 
