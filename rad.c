@@ -1543,7 +1543,7 @@ calc_Compt_Gi(ldouble *pp, void* ggg, ldouble *Gic, ldouble Ehatrad, ldouble Tga
 
 /****************************************************/
 /***** radiative stress energy tensor ***************/
-/***** M1 only here *********************************/
+/***** M1 (or other closure) only here **************/
 /****************************************************/
 int
 calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
@@ -1556,14 +1556,14 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
   gg=geom->gg;
   GG=geom->GG;
   
-  ldouble Erf;
   int verbose=0;
   int i,j;
+  
+#if(RADCLOSURE==M1CLOSURE) //standard M1
+
+  //covariant formulation of M1
+  ldouble Erf; //radiative energy density in the radiation rest frame
   ldouble urfcon[4];
-
-  //covariant formulation
-
-  //radiative energy density in the radiation rest frame
   Erf=pp[EE0];
   urfcon[0]=0.;
   urfcon[1]=pp[FX0];
@@ -1575,6 +1575,60 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+
+#elif (RADCLOSURE==M1ORTOCLOSURE) //M1 but going through ortonormal frame - for tests
+
+  //BLCOORDS metric corresponding to geom.
+  struct geometry geomBL;
+  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->idim,&geomBL,BLCOORDS);
+
+  //covariant formulation of M1
+  ldouble Erf; //radiative energy density in the radiation rest frame
+  ldouble urfcon[4],ppBL[NV],ppt[NV];
+  Erf=pp[EE0];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+  //lab frame stress energy tensor:
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+
+  //here convert to BLCOORDS
+  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, BLCOORDS);
+
+  //primitives to BL
+  trans_pall_coco(pp, ppBL, MYCOORDS, BLCOORDS, geom->xxvec,geom,&geomBL);
+
+  //to fluid frame
+  boost22_lab2ff(Rij,Rij,ppBL,geomBL.gg,geomBL.GG);
+
+  //to ortonormal
+  trans22_cc2on(Rij,Rij,geomBL.tup);
+
+  PLOOP(i) ppt[i]=pp[i];
+  pp[FX0]=Rij[1][0];
+  pp[FY0]=Rij[2][0];
+  pp[FZ0]=Rij[3][0];
+  pp[EE0]=Rij[0][0];
+
+  calc_Rij_ff(pp,Rij);
+
+  //to code coordinates
+  trans22_on2cc(Rij,Rij,geomBL.tlo);
+
+  //to lab frame
+  boost22_lab2ff(Rij,Rij,ppBL,geomBL.gg,geomBL.GG);
+
+  //here convert to MYCOORDS
+  trans22_coco(geomBL.xxvec, Rij, Rij, BLCOORDS, MYCOORDS);
+
+  //done
+#endif
+
 
   #endif
   return 0;
@@ -2362,9 +2416,9 @@ calc_LTE_temp(ldouble *pp,void *ggg,int verbose)
 
 //***************************************
 // calculates radiative tensor at faces or centers
-// returns total, pure M1, visc ~ R^i_j
+// returns total, pure and visc ~ R^i_j
 //***************************************
-int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4])
+int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[][4], ldouble Rijvisc[][4])
 {    
 
 #ifdef RADIATION
@@ -2385,12 +2439,12 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
   gdetu=1.;
 #endif
 
-  calc_Rij(pp,ggg,RijM1); //regular M1 R^ij
-  indices_2221(RijM1,RijM1,gg); //R^i_j
+  calc_Rij(pp,ggg,Rij0); //regular 0 R^ij
+  indices_2221(Rij0,Rij0,gg); //R^i_j
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       {
-	Rij[i][j]=RijM1[i][j];
+	Rij[i][j]=Rij0[i][j];
 	Rijvisc[i][j]=0.;
       }
 
@@ -2434,7 +2488,6 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
       calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc2,derdir);
       indices_2221(Rvisc2,Rvisc2,geomcent.gg); //R^i_j
       
-      //adding up to M1 tensor
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
 	  {
@@ -2448,7 +2501,6 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
       int derdir[3]={0,0,0};
       calc_Rij_visc(pp,ggg,Rijvisc,derdir);
       indices_2221(Rijvisc,Rijvisc,gg); //R^i_j
-      //adding up to M1 tensor
     }  
 
   /**********************************/
@@ -2501,8 +2553,8 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1
 	Rij[i][j]+=Rijvisc[i][j];
       }
 
-#endif
-#endif
+#endif //SHEARVISCOSITY
+#endif //RADIATION
 
   return 0;
 }
@@ -2526,8 +2578,8 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   gdetu=1.;
 #endif
 
-  ldouble Rij[4][4],RijM1[4][4],Rijvisc[4][4];
-  f_flux_prime_rad_total(pp,ggg,Rij,RijM1,Rijvisc);
+  ldouble Rij[4][4],Rij0[4][4],Rijvisc[4][4];
+  f_flux_prime_rad_total(pp,ggg,Rij,Rij0,Rijvisc);
 
   //fluxes to ff[EE0+]
 

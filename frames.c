@@ -215,8 +215,8 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   return 0;
 } 
 
-//*****************************************************************/
-/********** radiative primitives lab -> (E,F^i) in fluid frame *********/
+//****************************************************************/
+/********** radiative primitives lab -> (E,F^i) in fluid frame ***/
 /*****************************************************************/
 int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
 {

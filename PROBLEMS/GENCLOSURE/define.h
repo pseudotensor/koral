@@ -11,8 +11,9 @@
 //radiation choices
 /************************************/
 #define RADIATION
+#define RADCLOSURE M1ORTOCLOSURE
 //#define NCOMPTONIZATION
-#define COMPTONIZATION
+//#define COMPTONIZATION
 
 /************************************/
 //hydro choices

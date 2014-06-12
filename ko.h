@@ -440,6 +440,7 @@ int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,l
 
 int fill_geometry(int ix,int iy,int iz,void *geom);
 int fill_geometry_face(int ix,int iy,int iz,int,void *geom);
+int fill_geometry_face_arb(int ix,int iy,int iz,int,void *geom,int);
 int fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS);
 int calc_metric();
 int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int);

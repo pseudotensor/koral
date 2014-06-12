@@ -40,6 +40,12 @@
 #define FZ0 FZ(0)
 #define NF0 NF(0)
 
+//radiative closures
+#define M1CLOSURE 0
+#define EDDCLOSURE 1
+#define VETCLOSURE 2
+#define M1ORTOCLOSURE 3
+
 //u2p inversion types
 #define U2P_HOT 0
 #define U2P_ENTROPY 1

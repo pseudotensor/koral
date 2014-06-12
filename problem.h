@@ -82,7 +82,7 @@
 //79 SOFTBALL - Ron & Grz Bis
 //80 GENCLOSURE - tests of closures
 
-#define PROBLEM 7
+#define PROBLEM 80
 
 #if(PROBLEM==80)
 
@@ -1725,4 +1725,8 @@
 #ifndef OUTPUTPERCORE
 #define OUTPUTPERCORE
 #endif
+#endif
+
+#ifndef RADCLOSURE
+#define RADCLOSURE M1CLOSURE
 #endif

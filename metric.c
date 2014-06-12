@@ -1686,6 +1686,45 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//fills geometry structure for face ix,iy,iz in idim in arbitrary metric
+int 
+fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
+{
+  struct geometry *ggg 
+    = (struct geometry *) geom;
+
+  ldouble xxvec[4],xxvecBL[4];
+
+  get_xx(ix,iy,iz,xxvec);
+  coco_N(xxvec,xxvecBL,MYCOORDS,COORDS);
+
+  calc_g_arb(xxvecBL,ggg->gg,COORDS);
+  calc_G_arb(xxvecBL,ggg->GG,COORDS);
+
+  calc_tetrades(ggg->gg,ggg->tup,ggg->tlo,COORDS);
+  calc_ZAMOes(ggg->gg,ggg->eup,ggg->elo,COORDS);
+
+  ggg->alpha=sqrt(-1./ggg->GG[0][0]);
+  ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+
+  ggg->xxvec[0]=0.;
+  ggg->xxvec[1]=xxvecBL[1];
+  ggg->xxvec[2]=xxvecBL[2];
+  ggg->xxvec[3]=xxvecBL[3];  
+
+  ggg->xx=xxvecBL[1];
+  ggg->yy=xxvecBL[2];
+  ggg->zz=xxvecBL[3];
+  
+  ggg->gdet=ggg->gg[3][4];
+
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //calculates orthonormal tetrad
 //so far limited to grt.neq.0
 int
