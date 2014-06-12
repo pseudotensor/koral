@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM 100
 
 //#define CURVETEST
@@ -26,7 +26,7 @@
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 1.6
+#define RMIN 2.6
 #define RMAX 20000.
 
 #define MINX (log(RMIN-MKS1R0))
@@ -37,7 +37,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 1
@@ -84,7 +84,7 @@
 
 #if (TESTNO==0)
 #define MDOT 1.e3
-#define TGAS0 1.e8
+#define TGAS0 1.e9
 #endif
 
 #if (TESTNO==1)

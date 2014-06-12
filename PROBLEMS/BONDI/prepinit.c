@@ -19,6 +19,10 @@ ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAX * RMAX);
 
 ldouble uintout = calc_PEQ_ufromTrho(TGAS0,rhoout);
 
+//as Jerry suggested
+//csout = sqrt(2./RMAX);
+//uintout = csout * csout * rhoout / GAMMA / GAMMAM1;
+
 int ix,iy,iz;
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
 for(iz=0;iz<NZ;iz++)
