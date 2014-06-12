@@ -1575,16 +1575,17 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+  
 
 #elif (RADCLOSURE==M1ORTOCLOSURE) //M1 but going through ortonormal frame - for tests
 
-  //BLCOORDS metric corresponding to geom.
-  struct geometry geomBL;
-  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->idim,&geomBL,BLCOORDS);
+  //RADCLOSURECOORDS metric corresponding to geom.
+  struct geometry geom2;
+  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
 
   //covariant formulation of M1
   ldouble Erf; //radiative energy density in the radiation rest frame
-  ldouble urfcon[4],ppBL[NV],ppt[NV];
+  ldouble urfcon[4],pp2[NV],ppt[NV];
   Erf=pp[EE0];
   urfcon[0]=0.;
   urfcon[1]=pp[FX0];
@@ -1596,38 +1597,105 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+  
+  /*
+  if(geom->ix=NX/4 && geom->iy==NY/4) 
+    {
+  printf("%d %d %d %d\n",geom->ix,geom->iy,geom->iz,geom->ifacedim);
+  print_tensor(Rij);
+    }
+  */
 
-  //here convert to BLCOORDS
-  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, BLCOORDS);
+  //here convert to RADCLOSURECOORDS
+  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, RADCLOSURECOORDS);
 
-  //primitives to BL
-  trans_pall_coco(pp, ppBL, MYCOORDS, BLCOORDS, geom->xxvec,geom,&geomBL);
+  //primitives to 2
+  trans_pall_coco(pp, pp2, MYCOORDS, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
 
   //to fluid frame
-  boost22_lab2ff(Rij,Rij,ppBL,geomBL.gg,geomBL.GG);
+  boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
 
   //to ortonormal
-  trans22_cc2on(Rij,Rij,geomBL.tup);
+  trans22_cc2on(Rij,Rij,geom2.tup);
 
   PLOOP(i) ppt[i]=pp[i];
-  pp[FX0]=Rij[1][0];
-  pp[FY0]=Rij[2][0];
-  pp[FZ0]=Rij[3][0];
-  pp[EE0]=Rij[0][0];
+  ppt[FX0]=Rij[1][0];
+  ppt[FY0]=Rij[2][0];
+  ppt[FZ0]=Rij[3][0];
+  ppt[EE0]=Rij[0][0];
 
-  calc_Rij_ff(pp,Rij);
+  calc_Rij_ff(ppt,Rij);
 
   //to code coordinates
-  trans22_on2cc(Rij,Rij,geomBL.tlo);
+  trans22_on2cc(Rij,Rij,geom2.tlo);
 
   //to lab frame
-  boost22_lab2ff(Rij,Rij,ppBL,geomBL.gg,geomBL.GG);
+  boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
 
   //here convert to MYCOORDS
-  trans22_coco(geomBL.xxvec, Rij, Rij, BLCOORDS, MYCOORDS);
+  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
+
+  /*
+  if(geom->ix=NX/4 && geom->iy==NY/4) 
+    {
+  print_tensor(Rij);
+  getch();
+    }
+  */
+
+  //done
+
+#elif (RADCLOSURE==EDDCLOSURE) //Edd going through ortonormal frame
+
+  //RADCLOSURECOORDS metric corresponding to geom.
+  struct geometry geom2;
+  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
+
+  //covariant formulation of M1
+  ldouble Erf; //radiative energy density in the radiation rest frame
+  ldouble urfcon[4],pp2[NV],ppt[NV];
+  Erf=pp[EE0];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+  //lab frame stress energy tensor:
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+  
+  //here convert to RADCLOSURECOORDS
+  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, RADCLOSURECOORDS);
+
+  //primitives to 2
+  trans_pall_coco(pp, pp2, MYCOORDS, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
+
+  //to fluid frame
+  boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
+
+  //to ortonormal
+  trans22_cc2on(Rij,Rij,geom2.tup);
+
+  //Edd closure
+  Rij[1][1]=Rij[2][2]=Rij[3][3]=1./3.*Rij[0][0];
+  Rij[1][2]=Rij[2][1]=0.;
+  Rij[1][3]=Rij[3][1]=0.;
+  Rij[2][3]=Rij[3][2]=0.;
+
+  //to code coordinates
+  trans22_on2cc(Rij,Rij,geom2.tlo);
+
+  //to lab frame
+  boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
+
+  //here convert to MYCOORDS
+  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
 
   //done
 #endif
+
 
 
   #endif
@@ -1977,6 +2045,133 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
       aval[dim*2+0]=axl;
       aval[dim*2+1]=axr;
     }
+
+//**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+  //numerical calculation of wavespeeds as eigenvalues of the 
+  //flux Jacobi matrix - slow, but required for arbitrary closures
+  //may not work properly with WAVESPEEDSATFACES
+  //what is below assumes geometry at cell center
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+#ifdef NUMRADWAVESPEEDS
+  int ix,iy,iz;
+  int idim,corr;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+
+  ldouble uu0[NV],uu[NV],pp0[NV],ff[NV],ff0[NV],JJ[3][4][4],JJpure[3][4][4],JJvisc[3][4][4],del;
+  ldouble EPS=1.e-8;
+  ldouble Rij[4][4],Rijpure[4][4],Rijvisc[4][4];
+  ldouble Rij0[4][4],Rijpure0[4][4],Rijvisc0[4][4];
+
+  PLOOP(i)
+    pp0[i]=pp[i];
+  p2u(pp0,uu0,ggg);
+  PLOOP(i)
+    uu[i]=uu0[i];
+
+  if(verbose)
+    {
+      print_4vector(&pp0[EE0]);
+      print_4vector(&uu0[EE0]);
+    }
+
+  //**********************************************************************
+  //zero state 
+  f_flux_prime_rad_total(pp0,ggg,Rij0,Rijpure0,Rijvisc0);
+
+  //**********************************************************************
+   
+  //calculating approximate Jacobian by numerical differentiation
+  for(j=0;j<4;j++)
+    {
+      if(j==0) //energy density
+	{
+	  del = EPS*uu[EE0];
+	}
+      else //radiative momenta
+	{
+	  del = -EPS*fabs(uu[EE0])*my_sign(uu0[j+EE0]);
+	}
+	  
+      uu[j+EE0]=uu0[j+EE0]+del;
+
+      if(verbose>1) { printf("%d: ",j);print_4vector(&uu[EE0]); }
+
+      u2p_rad(uu,pp,ggg,&corr);
+
+      if(verbose>0 && corr==1) printf("rad corrected at %d | %d %d \n",j,geom->ix,geom->iy);
+
+      /*
+      if( if_indomain(geom->ix,geom->iy,geom->iz) && corr==1) 
+	{
+	  printf("rad corrected at %d | %d %d \n",j,geom->ix,geom->iy);
+	  getch();
+	}
+      */
+
+      //perturbed state
+      f_flux_prime_rad_total(pp,ggg,Rij,Rijpure,Rijvisc);
+
+      //the Jacobi matrices
+      ldouble fl,fl0;
+      for(idim=0;idim<3;idim++)
+	{
+	  for(i=0;i<4;i++)
+	    {
+	      //total
+	      fl=gdetu*Rij[idim+1][i];
+	      fl0=gdetu*Rij0[idim+1][i];
+	      JJ[idim][i][j]=(fl - fl0)/del;	      
+	    }
+	}
+
+      uu[j+EE0]=uu0[j+EE0];
+      pp[j+EE0]=pp0[j+EE0];
+    }
+
+  //**********************************************************************
+  //Jacobians in JJ[idim][][]
+  //print_Nvector(aval,6);
+
+ for(idim=0;idim<3;idim++)
+    {
+      if(idim==1 && NY==1) continue;
+      if(idim==2 && NZ==1) continue;
+      //regular rad velocity, calculated analytically in the begining
+      ldouble axl0,axr0;
+      axl0=aval[idim*2+0];
+      axr0=aval[idim*2+1];
+
+      //total wavespeeds
+      ldouble evmax,ev[4];
+      evmax=calc_eigen_4x4(JJ[idim],ev);
+       
+      //**********************************************************************
+      //numerical velocities
+      ldouble axl=my_min_N(ev,4);
+      ldouble axr=my_max_N(ev,4);
+      
+      //wavespeed limiter based on the optical depth to avoid diffusion, somewhat arbitrary
+      
+#ifndef SKIPRADWAVESPEEDLIMITER
+      axl/=(1.+tautot[idim]);
+      axr/=(1.+tautot[idim]);
+#endif
+
+      aval[idim*2+0]=axl;
+      aval[idim*2+1]=axr;
+    }
+
+ //print_Nvector(aval,6);
+ //getch();
+
+#endif
+
 
   return 0;
 }

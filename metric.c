@@ -1667,6 +1667,7 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
 
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+  ggg->ifacedim=-1;
 
   ggg->xxvec[0]=0.;
   ggg->xxvec[1]=xxvecBL[1];
@@ -1696,6 +1697,14 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   ldouble xxvec[4],xxvecBL[4];
 
   get_xx(ix,iy,iz,xxvec);
+  
+  if(idim==0) //x-face
+    xxvec[0]=get_xb(ix,0);
+  if(idim==1) //y-face
+    xxvec[1]=get_xb(iy,1);
+  if(idim==2) //z-face
+    xxvec[2]=get_xb(iz,2);
+
   coco_N(xxvec,xxvecBL,MYCOORDS,COORDS);
 
   calc_g_arb(xxvecBL,ggg->gg,COORDS);
@@ -1705,7 +1714,7 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   calc_ZAMOes(ggg->gg,ggg->eup,ggg->elo,COORDS);
 
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
-  ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
+  ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz; ggg->ifacedim=idim;
 
   ggg->xxvec[0]=0.;
   ggg->xxvec[1]=xxvecBL[1];

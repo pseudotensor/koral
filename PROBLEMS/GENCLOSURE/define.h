@@ -5,13 +5,17 @@
 //restart
 /************************************/
 //#define RESTART
-//#define RESTARTNUM -1
+#define RESTARTNUM 111
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
-#define RADCLOSURE M1ORTOCLOSURE
+#define RADCLOSURE M1CLOSURE//M1ORTOCLOSURE
+#define RADCLOSURECOORDS MINKCOORDS
+//#define NUMRADWAVESPEEDS
+//#define SKIPRADWAVESPEEDLIMITER
+//#define SKIPRADSOURCE
 //#define NCOMPTONIZATION
 //#define COMPTONIZATION
 
@@ -28,7 +32,7 @@
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define GDETIN 0
 
 /************************************/
@@ -66,10 +70,10 @@
 /************************************/
 
 #define MYCOORDS MINKCOORDS
-#define MINX -1.
-#define MAXX 1. 
-#define MINY -1.
-#define MAXY 1.
+#define MINX .1
+#define MAXX (M_PI-0.1)
+#define MINY .1
+#define MAXY (M_PI-0.1)
 #define MINZ -1.
 #define MAXZ 1. 
 
@@ -99,7 +103,7 @@
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define DTOUT1 0.5
+#define DTOUT1 0.1
 #define RADOUTPUTINZAMO
 #define SILOOUTPUT 1
 
@@ -118,12 +122,12 @@
 #define VELXBLOB2 -0.
 #define VELYBLOB1 (VELXBLOB1*0.5)
 #define VELYBLOB2 (VELXBLOB2*0.25)
-#define XBLOB1 -.5
-#define XBLOB2 .5
-#define YBLOB1 -.5
-#define YBLOB2 .5
-#define SIZEBLOB1 .1
-#define SIZEBLOB2 .1
+#define XBLOB1 (MINX+0.25*(MAXX-MINX))
+#define XBLOB2 (MINX+0.75*(MAXX-MINX))
+#define YBLOB1 (MINY+0.25*(MAXY-MINY))
+#define YBLOB2 (MINY+0.75*(MAXY-MINY))
+#define SIZEBLOB1 (.05*(MAXX-MINX))
+#define SIZEBLOB2 (.05*(MAXX-MINX))
 
 
 

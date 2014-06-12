@@ -62,8 +62,26 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+  //**************
+  //tests
+  //**************
+  /*
+  ldouble pp[NV]={1.,1.,0.5,0.,0.,-1.,1.,.5,0.,0.};  
+  struct geometry geom; ldouble Rij[4][4];
+  fill_geometry(0,0,0,&geom);
+  calc_Rij(pp,&geom,Rij);
+  indices_2221(Rij,Rij,geom.gg);
+  print_tensor(Rij);
+  exit(-1);
+  */
+  
   //print scalings GU->CGS and quit
   //print_scalings(); exit(-1);
+
+  //**************
+  //end of tests
+  //**************
+
   
   //precalculating problem related numbers
 #ifdef PR_PREPINIT
