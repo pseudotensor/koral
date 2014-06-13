@@ -1576,124 +1576,14 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
     for(j=0;j<4;j++)
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
   
+#elif (RADCLOSURE==M1ORTOCLOSURE) // M1 closure but going through ortonormal frame - for test
 
-#elif (RADCLOSURE==M1ORTOCLOSURE) //M1 but going through ortonormal frame - for tests
-
-  //RADCLOSURECOORDS metric corresponding to geom.
-  struct geometry geom2;
-  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
-
-  //covariant formulation of M1
-  ldouble Erf; //radiative energy density in the radiation rest frame
-  ldouble urfcon[4],pp2[NV],ppt[NV];
-  Erf=pp[EE0];
-  urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
-  //lab frame stress energy tensor:
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
-  
-  /*
-  if(geom->ix=NX/4 && geom->iy==NY/4) 
-    {
-  printf("%d %d %d %d\n",geom->ix,geom->iy,geom->iz,geom->ifacedim);
-  print_tensor(Rij);
-    }
-  */
-
-  //here convert to RADCLOSURECOORDS
-  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, RADCLOSURECOORDS);
-
-  //primitives to 2
-  trans_pall_coco(pp, pp2, MYCOORDS, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
-
-  //to fluid frame
-  boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
-
-  //to ortonormal
-  trans22_cc2on(Rij,Rij,geom2.tup);
-
-  PLOOP(i) ppt[i]=pp[i];
-  ppt[FX0]=Rij[1][0];
-  ppt[FY0]=Rij[2][0];
-  ppt[FZ0]=Rij[3][0];
-  ppt[EE0]=Rij[0][0];
-
-  calc_Rij_ff(ppt,Rij);
-
-  //to code coordinates
-  trans22_on2cc(Rij,Rij,geom2.tlo);
-
-  //to lab frame
-  boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
-
-  //here convert to MYCOORDS
-  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
-
-  /*
-  if(geom->ix=NX/4 && geom->iy==NY/4) 
-    {
-  print_tensor(Rij);
-  getch();
-    }
-  */
-
-  //done
+  radclosure_M1orto(pp,geom,Rij);
 
 #elif (RADCLOSURE==EDDCLOSURE) //Edd going through ortonormal frame
 
-  //RADCLOSURECOORDS metric corresponding to geom.
-  struct geometry geom2;
-  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
+  radclosure_Edd(pp,geom,Rij);
 
-  //covariant formulation of M1
-  ldouble Erf; //radiative energy density in the radiation rest frame
-  ldouble urfcon[4],pp2[NV],ppt[NV];
-  Erf=pp[EE0];
-  urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
-  //lab frame stress energy tensor:
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
-  
-  //here convert to RADCLOSURECOORDS
-  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, RADCLOSURECOORDS);
-
-  //primitives to 2
-  trans_pall_coco(pp, pp2, MYCOORDS, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
-
-  //to fluid frame
-  boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
-
-  //to ortonormal
-  trans22_cc2on(Rij,Rij,geom2.tup);
-
-  //Edd closure
-  Rij[1][1]=Rij[2][2]=Rij[3][3]=1./3.*Rij[0][0];
-  Rij[1][2]=Rij[2][1]=0.;
-  Rij[1][3]=Rij[3][1]=0.;
-  Rij[2][3]=Rij[3][2]=0.;
-
-  //to code coordinates
-  trans22_on2cc(Rij,Rij,geom2.tlo);
-
-  //to lab frame
-  boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
-
-  //here convert to MYCOORDS
-  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
-
-  //done
 #endif
 
 
@@ -3612,3 +3502,126 @@ test_jon_solve_implicit_lab()
   return 0;
 }
 
+
+/************** M1 closure but going through ortonormal frame - for tests **************/
+int
+radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4])
+{
+  int i,j;
+
+  //MYCOORDS geometry
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  //RADCLOSURECOORDS metric corresponding to geom
+  struct geometry geom2;
+  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
+
+  //covariant formulation of M1
+  ldouble Erf; //radiative energy density in the radiation rest frame
+  ldouble urfcon[4],pp2[NV],ppt[NV];
+  Erf=pp[EE0];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+  //lab frame stress energy tensor:
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom->GG[i][j];
+
+  //here convert to RADCLOSURECOORDS
+  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, RADCLOSURECOORDS);
+
+  //primitives to 2
+  trans_pall_coco(pp, pp2, MYCOORDS, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
+
+  //to fluid frame
+  boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
+
+  //to ortonormal
+  trans22_cc2on(Rij,Rij,geom2.tup);
+
+  PLOOP(i) ppt[i]=pp[i];
+  ppt[FX0]=Rij[1][0];
+  ppt[FY0]=Rij[2][0];
+  ppt[FZ0]=Rij[3][0];
+  ppt[EE0]=Rij[0][0];
+
+  //M1 in ortonormal frame
+  calc_Rij_ff(ppt,Rij);
+
+  //to code coordinates
+  trans22_on2cc(Rij,Rij,geom2.tlo);
+
+  //to lab frame
+  boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
+
+  //here convert to MYCOORDS
+  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
+
+  //done
+  return 0;
+}
+
+/************** Eddington closure going through ortonormal frame **************/
+int
+radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
+{
+  int i,j;
+
+  //MYCOORDS geometry
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  //RADCLOSURECOORDS metric corresponding to geom.
+  struct geometry geom2;
+  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
+
+  //covariant formulation of M1
+  ldouble Erf; //radiative energy density in the radiation rest frame
+  ldouble urfcon[4],pp2[NV],ppt[NV];
+  Erf=pp[EE0];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+  //lab frame stress energy tensor:
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom->GG[i][j];
+  
+  //here convert to RADCLOSURECOORDS
+  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, RADCLOSURECOORDS);
+
+  //primitives to 2
+  trans_pall_coco(pp, pp2, MYCOORDS, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
+
+  //to fluid frame
+  boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
+
+  //to ortonormal
+  trans22_cc2on(Rij,Rij,geom2.tup);
+
+  //Edd closure
+  Rij[1][1]=Rij[2][2]=Rij[3][3]=1./3.*Rij[0][0];
+  Rij[1][2]=Rij[2][1]=0.;
+  Rij[1][3]=Rij[3][1]=0.;
+  Rij[2][3]=Rij[3][2]=0.;
+
+  //to code coordinates
+  trans22_on2cc(Rij,Rij,geom2.tlo);
+
+  //to lab frame
+  boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
+
+  //here convert to MYCOORDS
+  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
+
+  //done
+  return 0;
+}
