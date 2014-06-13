@@ -3694,9 +3694,18 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
 
       //all is well, rad.field and coordinates in rad & coords
       
+      //opacities at the center
+      ldouble rho=pp[RHO];
+      ldouble u=pp[UU];  
+      ldouble pr=(GAMMA-1.)*(u);
+      ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+      ldouble kappa=calc_kappa(rho,T,geom0->xx,geom0->yy,geom0->zz);
+      ldouble kappaes=calc_kappaes(rho,T,geom0->xx,geom0->yy,geom0->zz);
+      ldouble opacities[2]={kappa,kappaes};
+
       //VET
       ldouble VET[3][3];
-      //ZERO_bbox(rad,coords,VET);
+      //ZERO_bbox(rad,coords,opacities,VET);
 
       //first, let us calculate enden & fluxes in RADCLOSURECOORDS
       //using covariant formulation of M1 to recover R^mu_t from primitives

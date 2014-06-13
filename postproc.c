@@ -773,7 +773,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	    {
 	      Rrt=0.;
 	    }
-	  else if(type==1) //R^r_t in the outflow region
+	  else if(type==1) //sum of positive R^r_t everywhere
 	    {
 	      //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
 	      //ehat=-Rtt;
@@ -792,6 +792,12 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      Rrt=Rij[1][0];// + ehat*ucongas[1];
 	      if(Rrt<0. || ucongas[1]<0.)
 		Rrt=0.;
+	    }
+	  else if(type==3) //sum of R^r_t everywhere
+	    {
+	      calc_Rij(pp,&geom,Rij); 
+	      indices_2221(Rij,Rij,geom.gg);
+	      Rrt=Rij[1][0];// + ehat*ucongas[1];	      
 	    }
 	  else
 	    Rrt=0.;
@@ -872,7 +878,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		  Rrt=Rij[1][0];
 		  if(Rrt<0.) Rrt=0.;
 		}
-	      else if(type==1) //R^r_t everywhere
+	      else if(type==1) //positive R^r_t everywhere
 		{
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
@@ -891,6 +897,15 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		  
 		  Rrt=Rij[1][0];// + ehat*uconr);
 		  if(uconr<0. || Rrt<0.) Rrt=0.;
+		}
+	      else if(type==3) //any R^r_t everywhere
+		{
+		  for(i=0;i<4;i++)
+		    for(j=0;j<4;j++)
+		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+		  
+		  Rrt=Rij[1][0];// + ehat*uconr);
+		  
 		}
 	      else
 		Rrt=0.;

@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 100
+#define RESTART
+#define RESTARTNUM 10
 
 //#define CURVETEST
 //#define CURVETEST2
@@ -12,7 +12,8 @@
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
+//#define COMPTONIZATION
 //#define RADOUTPUTINFF
 #define RADOUTPUTVELS
 
@@ -26,8 +27,8 @@
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 10.
-#define RMAX 1000000.
+#define RMIN 3.
+#define RMAX 10000.
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -82,7 +83,7 @@
 #define PRADGASINIT 1.e-10 
 
 #if (TESTNO==-1)
-#define MDOT 1.e2
+#define MDOT 1.e1
 #define GAMMA (5./3.)
 #define BONDIGAMMA GAMMA
 #define RBONDI 1.
