@@ -82,7 +82,7 @@
 //79 SOFTBALL - Ron & Grz Bis
 //80 GENCLOSURE - tests of closures
 
-#define PROBLEM 7
+#define PROBLEM 80
 
 #if(PROBLEM==80)
 
@@ -1735,3 +1735,12 @@
 #define RADCLOSURECOORDS MYCOORDS
 #endif
 
+//ZERO short solver
+
+#ifndef NUMANGLES
+#define NUMANGLES 80 		//Must be equal to number of lines in angle grid file
+#endif
+
+#ifndef NUMDUALANGLES
+#define NUMDUALANGLES 156 	//Must be equal to number of lines in dual angle grid file
+#endif

@@ -598,6 +598,7 @@ int calc_Rij_visc(ldouble *pp, void* ggg, ldouble T[][4],int *);
 int calc_Rij_total(ldouble *pp, void* ggg, ldouble R[][4]);
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int calc_Rij(ldouble *pp, void*, ldouble Rij[][4]);
+int calc_Rij_M1(ldouble *pp, void*, ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
 int radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4]);
 int radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4]);
@@ -656,6 +657,17 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 //mpi.c
 int calc_avgs_throughout();
 int mpi_exchangedata();
+
+//zeroshort.c
+int ZEROtest_oldmain();
+int zero_readangles();
+void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][4], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3]);
+double angGridCoords[NUMANGLES][3];  		//Store xyz locations of angle grid
+double angDualGridCoords[NUMDUALANGLES][3]; 	//Store xyz locations of dual angle grid
+int dualAdjacency[NUMDUALANGLES][3]; 		//Store index information for adjacent angles
+int intersectGridIndices[NUMANGLES][3][4];	//indices for gridLoc of 4 points bounding intersection
+double intersectGridWeights[NUMANGLES][4];	//weights corresponding to 4 points bounding intersection
+double intersectDistances[NUMANGLES];		//distance to intersection point from center
 
 #ifdef MPI
 MPI_Group mpi_all_group;

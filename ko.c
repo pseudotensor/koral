@@ -62,7 +62,14 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
-  //**************
+  //prepare angular grid for radiative solver
+#ifdef RADIATION
+#if(RADCLOSURE==VETCLOSURE)
+  zero_readangles();
+#endif
+#endif
+
+    //**************
   //tests
   //**************
   /*

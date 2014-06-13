@@ -1540,6 +1540,43 @@ calc_Compt_Gi(ldouble *pp, void* ggg, ldouble *Gic, ldouble Ehatrad, ldouble Tga
 
 }
 
+/****************************************************/
+/***** radiative stress energy tensor ***************/
+/***** pure M1 only here **************/
+/****************************************************/
+int
+calc_Rij_M1(ldouble *pp, void* ggg, ldouble Rij[][4])
+{
+#ifdef RADIATION
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+  
+  int verbose=0;
+  int i,j;
+
+  //covariant formulation of M1
+  ldouble Erf; //radiative energy density in the radiation rest frame
+  ldouble urfcon[4];
+  Erf=pp[EE0];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+  //lab frame stress energy tensor:
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+
+#endif
+  return 0;
+}
+
 
 /****************************************************/
 /***** radiative stress energy tensor ***************/
@@ -1561,20 +1598,7 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
   
 #if(RADCLOSURE==M1CLOSURE) //standard M1
 
-  //covariant formulation of M1
-  ldouble Erf; //radiative energy density in the radiation rest frame
-  ldouble urfcon[4];
-  Erf=pp[EE0];
-  urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
-  //lab frame stress energy tensor:
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*GG[i][j];
+  calc_Rij_M1(pp,ggg,Rij);
   
 #elif (RADCLOSURE==M1ORTOCLOSURE) // M1 closure but going through ortonormal frame - for test
 
@@ -3654,6 +3678,8 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
   ldouble rad[3][3][3][4];
   //array holding coordinates for ZERO
   ldouble coords[3][3][3][4];
+  //array holding coordinates for ZERO
+  ldouble source[3][3][3][4];
   //temporary primitives
   ldouble ppt[NV];
   //temporary velocities
@@ -3662,6 +3688,7 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
   struct geometry geom,geom2;
   //indices
   int ix,iy,iz;
+  ldouble rho,uint,pre,Tgas,Elab,alpha,sigma,RijM1[4][4];
 
   if(geom0->ifacedim < 0.) //cell-centered for calculating wavespeeds
     {
@@ -3670,10 +3697,31 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
 	  for(k=-1;k<=1;k++)
 	    {
 	      ix=geom0->ix+i;
-	      iy=geom0->iy+j;
-	      iz=geom0->iz+k;
+	      if(NY>1) 
+		iy=geom0->iy+j;
+	      else 
+		iy=geom0->iy;
+	      if(NZ>1)
+		iz=geom0->iz+k;
+	      else
+		iz=geom0->iz;
 
 	      fill_geometry(ix,iy,iz,&geom);
+
+	      rho=get_u(p,RHO,ix,iy,iz);
+	      uint=get_u(p,UU,ix,iy,iz);
+	      pre=(GAMMA-1.)*(uint);
+	      Tgas=pre*MU_GAS*M_PROTON/K_BOLTZ/rho;
+	      alpha=calc_kappa(rho,Tgas,geom.xx,geom.yy,geom.zz);
+	      sigma=calc_kappaes(rho,Tgas,geom.xx,geom.yy,geom.zz);
+	      
+	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
+	      Elab=RijM1[0][0];
+     
+	      source[i+1][j+1][k+1][0]=Tgas;
+	      source[i+1][j+1][k+1][1]=Elab;
+	      source[i+1][j+1][k+1][2]=alpha;
+	      source[i+1][j+1][k+1][3]=sigma;
 	      
 	      //converting velocity
 	      ucon[0]=0.;
@@ -3683,7 +3731,7 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
 	      trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
       
 	      //saving rad. field to memory
-	      rad[i+1][j+1][k+1][0]=get_u(p,EE0,ix,iy,iz); //energy density insensitive to coordinates
+	      rad[i+1][j+1][k+1][0]=get_u(p,EE0,ix,iy,iz); //energy density insensitive to coordinates, radiation rest frame
 	      rad[i+1][j+1][k+1][1]=ucon[1]; //u^i in RADCLOSURECOORDS, non-ortonormal
  	      rad[i+1][j+1][k+1][2]=ucon[2]; //u^i in RADCLOSURECOORDS, non-ortonormal
 	      rad[i+1][j+1][k+1][3]=ucon[3]; //u^i in RADCLOSURECOORDS, non-ortonormal
@@ -3699,13 +3747,37 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
       ldouble u=pp[UU];  
       ldouble pr=(GAMMA-1.)*(u);
       ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-      ldouble kappa=calc_kappa(rho,T,geom0->xx,geom0->yy,geom0->zz);
-      ldouble kappaes=calc_kappaes(rho,T,geom0->xx,geom0->yy,geom0->zz);
-      ldouble opacities[2]={kappa,kappaes};
-
+      
       //VET
       ldouble VET[3][3];
-      //ZERO_bbox(rad,coords,opacities,VET);
+
+      //debug
+      for(i=0;i<3;i++)
+	for(j=0;j<3;j++)
+	  for(k=0;k<3;k++)
+	    {
+	      printf(">>> %d %d %d\n",i-1,j-1,k-1);
+	      for(l=0;l<4;l++)
+		printf("%e ",rad[i][j][k][l]);
+	      printf("\n");
+	      for(l=0;l<4;l++)
+		printf("%e ",source[i][j][k][l]);
+	      printf("\n");
+	    }
+
+      //provide timestep!
+      ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET);
+
+      printf(">>>>>>> VET \n");
+      for (i = 0; i < 3; i++)
+	{
+	  for (j = 0; j < 3; j++)
+	    {
+	      printf("%e ", VET[i][j]);
+	    }
+	  printf("\n");
+	}
+      if(geom0->ix==1 &&geom0->iy==1)  exit(-1);
 
       //first, let us calculate enden & fluxes in RADCLOSURECOORDS
       //using covariant formulation of M1 to recover R^mu_t from primitives
