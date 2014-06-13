@@ -11,6 +11,9 @@ fill_geometry(ix,iy,iz,&geom);
 struct geometry geoml;
 fill_geometry(NX-1,iy,iz,&geoml);
 
+struct geometry geomr;
+fill_geometry(0,iy,iz,&geomr);
+
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
@@ -33,14 +36,15 @@ if(ix>=NX) //analytical solution at rout only
     rhol=get_u(p,RHO,NX-1,iy,iz);
     ldouble uconl[4]={0.,url,0.,0.};
     conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
-    trans2_coco(geoml.xxvec,uconl,uconl,MYCOORDS,BLCOORDS);
-    ldouble mdot=rhol*uconl[1]*geomBLl.xx*geomBLl.xx;
 
-    //BL velocity in the ghost cell
+    //trans2_coco(geoml.xxvec,uconl,uconl,MYCOORDS,BLCOORDS);
+    //ldouble mdot=rhol*uconl[1]*geomBLl.xx*geomBLl.xx;
+    ldouble mdot=rhol*uconl[1]*geoml.gdet;
+
+    //velocity in the ghost cell
     ldouble ucon[4]={0.,0.,0.,0.};
-    ucon[1]=mdot/rho/geomBL.xx/geomBL.xx;
-    conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
-
+    ucon[1]=mdot/rho/geom.gdet;
+    conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
     
     pp[0]=rho;
     pp[1]=uint;
@@ -86,10 +90,12 @@ if(ix>=NX) //analytical solution at rout only
     pp[8]=get_u(pproblem1,FY0,ix,iy,iz);
     pp[9]=get_u(pproblem1,FZ0,ix,iy,iz);
 #endif
+
+    //transforming rad primitives from BL to MYCOORDS
+    trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
+    
 #endif	 
     
-    //transforming primitives from BL to MYCOORDS
-    trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
     p2u(pp,uu,&geom);
  
     //printf("%d > %e %e %e %e\n",ix,url,uconl[1],ucon[1],pp[VX]);getch();
@@ -97,45 +103,31 @@ if(ix>=NX) //analytical solution at rout only
   }
  else if(ix<0) //outflow near BH
    {
-     ldouble gdet=get_g(g,3,4,ix,iy,iz);  
-     ldouble gg[4][5],eup[4][4],elo[4][4],ggsrc[4][5];
-
      iix=0;
      iiy=iy;
      iiz=iz;
-     pick_g(ix,iy,iz,gg);
-     pick_T(emuup,ix,iy,iz,eup);
-     pick_T(emulo,ix,iy,iz,elo);
-
-     pick_g(iix,iiy,iiz,ggsrc);
-     gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-     gdet_bc=get_g(g,3,4,ix,iy,iz);        
-     ldouble rsrc=get_x(iix,0);
-     ldouble rbc=get_x(ix,0);
-
-     ldouble Fx,Fy,Fz,rho,rho0,Tgas0,E,uint,ur,Tgas,Trad,r,prad,pgas,ut,vx;
-
+   
      //copying primitives with gdet taken into account
      for(iv=0;iv<NV;iv++)
        { 
-	 /*
-	 if(iv==2 || iv==7)
-	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*(1.-(rsrc-rbc)/(.5*(rsrc+rbc)));
-	 else if(iv==3 || iv==4 || iv==8 || iv==9)
-	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*(1.+(rsrc-rbc)/(.5*(rsrc+rbc)));
-	 else 
-	   pp[iv]=get_u(p,iv,iix,iiy,iiz);//gdet_src/gdet_bc;
-
-	 //following ~r**-1.5 scaling
-	 if(iv==0)
-	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*pow(rsrc/rbc,1.5);
-	 if(iv==1)
-	   pp[iv]=get_u(p,iv,iix,iiy,iiz)*pow(rsrc/rbc,1.5*GAMMA);
-	 if(iv==2)
-	   pp[iv]=vx;
-	 */
+	 if(iv==VX)
+	   {
+	     //first cell
+	     ldouble urr=get_u(p,VX,0,iy,iz);
+	     ldouble rhor=get_u(p,RHO,0,iy,iz);
+	     ldouble rho=get_u(p,RHO,ix,iy,iz);
+	     ldouble uconr[4]={0.,urr,0.,0.};
+	     conv_vels(uconr,uconr,VELPRIM,VEL4,geomr.gg,geomr.GG);
+	     ldouble mdot=rhor*uconr[1]*geomr.gdet;
+	     uconr[1]=mdot/rho/geom.gdet;
+	     conv_vels(uconr,uconr,VEL4,VELPRIM,geom.gg,geom.GG);
+	     pp[VX]=uconr[1];
+	   }
+	 else
+	   {
 	
-	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	     pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	   }
 
        }
 

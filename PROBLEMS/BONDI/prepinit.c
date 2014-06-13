@@ -1,230 +1,164 @@
 
 //precalculates hydro Bondi solution, saves it to pproblem1
 
-
-
-//uses MDOT and TGAS at the outer boundary
-
-ldouble csout = calc_PEQ_csfromT(TGAS0);
-ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
-ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
-
-//eq (14.3.16) from Shapiro & Teukolsky
-//mdot = 4 pi 0.25 (GM)^2 rho_inf / cs_inf
-//ldouble rhoout = mdotout*csout / (4.*M_PI*0.25);
-//ldouble urout = -mdotout / (4.*M_PI *rhoout* RMAX * RMAX);
-
-ldouble urout = -sqrt(2./RMAX);
-ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAX * RMAX);
-
-ldouble uintout = calc_PEQ_ufromTrho(TGAS0,rhoout);
-
-//as Jerry suggested
-//csout = sqrt(2./RMAX);
-//uintout = csout * csout * rhoout / GAMMA / GAMMAM1;
-
-int ix,iy,iz;
-#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
-for(iz=0;iz<NZ;iz++)
+if(1) //uses MDOT and TGAS at the outer boundary
   {
-    for(iy=0;iy<NY;iy++)
+    //ldouble csout = calc_PEQ_csfromT(TGAS0);
+    ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
+    ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
+
+    //eq (14.3.16) from Shapiro & Teukolsky
+    //mdot = 4 pi 0.25 (GM)^2 rho_inf / cs_inf
+    //ldouble rhoout = mdotout*csout / (4.*M_PI*0.25);
+    //ldouble urout = -mdotout / (4.*M_PI *rhoout* RMAX * RMAX);
+
+    ldouble urout = -sqrt(1./2./RMAX);
+    ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAX * RMAX);
+    //ldouble uintout = calc_PEQ_ufromTrho(TGAS0,rhoout);
+
+    //as Jerry suggested
+    //cs2 = GM/2R for gamma=5/3
+    ldouble csout = sqrt(1./2./RMAX);
+    ldouble uintout = csout * csout * rhoout / GAMMA / GAMMAM1;
+
+    int ix,iy,iz;
+#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
+    for(iz=0;iz<NZ;iz++)
       {
-	for(ix=-NGCX;ix<NX+NGCX;ix++)
+	for(iy=0;iy<NY;iy++)
 	  {
-	    struct geometry geom;
-	    fill_geometry(ix,iy,iz,&geom);
+	    for(ix=-NGCX;ix<NX+NGCX;ix++)
+	      {
+		struct geometry geom;
+		fill_geometry(ix,iy,iz,&geom);
 
-	    struct geometry geomBL;
-	    fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+		struct geometry geomBL;
+		fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 	    
 
-	    //at given cell
-	    ldouble R=geomBL.xx;
-	    ldouble rho = rhoout * pow(R/RMAX,-3./2.);
-	    ldouble ur = urout * sqrt(RMAX/R);
-	    ldouble uint = uintout * pow(R/RMAX, -3./2.*GAMMA);
+		//at given cell
+		ldouble R=geomBL.xx;
+		ldouble rho = rhoout * pow(R/RMAX,-3./2.);
+		ldouble ur = urout * sqrt(RMAX/R);
+		ldouble uint = uintout * pow(R/RMAX, -3./2.*GAMMA);
 	    
 	    
-	    set_u(pproblem1,RHO,ix,iy,iz,rho);
-	    set_u(pproblem1,UU,ix,iy,iz,uint);
-	    set_u(pproblem1,VX,ix,iy,iz,ur); //overwritten in init.c
-	    set_u(pproblem1,VY,ix,iy,iz,0.);
-	    set_u(pproblem1,VZ,ix,iy,iz,0.);
+		set_u(pproblem1,RHO,ix,iy,iz,rho);
+		set_u(pproblem1,UU,ix,iy,iz,uint);
+		set_u(pproblem1,VX,ix,iy,iz,ur); //overwritten in init.c
+		set_u(pproblem1,VY,ix,iy,iz,0.);
+		set_u(pproblem1,VZ,ix,iy,iz,0.);
 #ifdef RADIATION
-	    ldouble E=PRADGASINIT * GAMMAM1*uint*3.;
+		ldouble E=PRADGASINIT * GAMMAM1*uint*3.;
 
 #ifdef LIKEINFRAGILE
-	    E=PRADGAS * GAMMAM1*uint*3.;
+		E=PRADGAS * GAMMAM1*uint*3.;
 #endif
-	    set_u(pproblem1,EE0,ix,iy,iz,E);
-	    set_u(pproblem1,FX0,ix,iy,iz,0.); //overwritten in init.c
-	    set_u(pproblem1,FY0,ix,iy,iz,0.);
-	    set_u(pproblem1,FZ0,ix,iy,iz,0.);
+		set_u(pproblem1,EE0,ix,iy,iz,E);
+		set_u(pproblem1,FX0,ix,iy,iz,0.); //overwritten in init.c
+		set_u(pproblem1,FY0,ix,iy,iz,0.);
+		set_u(pproblem1,FZ0,ix,iy,iz,0.);
 #endif
 
 
-	  }
-      }
-  }
-
-
-/*
-int ix,iy,iz;
-ldouble csout = calc_PEQ_csfromT(TGAS0);
-ldouble Rbondi = 1./(2.*csout*csout);
-Rbondi=RBONDI;
-
-
-int
-func (double r, const double y[], double f[],
-      void *params)
-{
-  ldouble v=y[0];
-
-  ldouble Be=(5.-3.*BONDIGAMMA)/(4.*(BONDIGAMMA-1.))/RBONDI;
-  
-  ldouble cs2=(BONDIGAMMA-1.)*(Be+1./r-1./2.*v*v);
-
-  ldouble dvdr=v/(v*v - cs2)*(2./r*cs2-1./r/r);
-
-  //printf("%e %e %e %e\n",r,v,dvdr,cs2);getch();
-  
-  f[0] = dvdr;
-
-  return GSL_SUCCESS;
-}
-
-
-
-#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
-for(iz=0;iz<NZ;iz++)
-  {
-    for(iy=0;iy<NY;iy++)
-      {
-	for(ix=-NGCX;ix<NX+NGCX;ix++)
-	  {
-	    ldouble rho,E,uint,Tgas,Trad,r,prad,pgas,ut,vx,Be,Kappa,urs,cs2;
-
-	    struct geometry geom;
-	    fill_geometry(ix,iy,iz,&geom);
-
-	    struct geometry geomBL;
-	    fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
-
-	    //initial point
-	    //at RBONDI
-	    r=RMAX;
-	    Be=(5.-3.*BONDIGAMMA)/(4.*(BONDIGAMMA-1.))/Rbondi;
-	    urs=-sqrt(1./2./Rbondi);
-
-	    gsl_odeiv2_system sys = {func, NULL, 1, NULL};
-
-	     int i;
-	    double r0=Rbondi, r1 = geomBL.xx, ur;
-	    if(r1>RBONDI)
-	      ur=(1.-1.e-6)*urs;
-	    else
-	      ur=(1.+1.e-6)*urs;
-
-	    gsl_odeiv2_driver * d = 
-	      gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4,
-					     my_sign(r1-r0)*1e-6, 1e-6, 0.0);
-	    int status = gsl_odeiv2_driver_apply (d, &r0, r1, &ur);
-
-	    if (status != GSL_SUCCESS)
-	      {
-		printf ("error, return value=%d\n", status);
-		break;
 	      }
-	  
-	    gsl_odeiv2_driver_free (d);
-
-	    //at given cell
-	    r=geomBL.xx;
-	    rho=rhoCGS2GU(-MDOT*calc_mdotEdd()/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
-	    cs2=(BONDIGAMMA-1.)*(Be+1./r-1./2.*ur*ur);
-	    pgas=rho/BONDIGAMMA*cs2;
-	    uint=pgas/(BONDIGAMMA-1.);
-	    prad=PRADGAS*pgas;
-	    E=prad*3.;
-
-	    set_u(pproblem1,RHO,ix,iy,iz,rho);
-	    set_u(pproblem1,UU,ix,iy,iz,uint);
-	    set_u(pproblem1,VX,ix,iy,iz,ur);
-	    set_u(pproblem1,VY,ix,iy,iz,0.);
-	    set_u(pproblem1,VZ,ix,iy,iz,0.);
-#ifdef RADIATION
-	    set_u(pproblem1,EE0,ix,iy,iz,E);
-	    set_u(pproblem1,FX0,ix,iy,iz,0.);
-	    set_u(pproblem1,FY0,ix,iy,iz,0.);
-	    set_u(pproblem1,FZ0,ix,iy,iz,0.);
-#endif
-
-
 	  }
       }
   }
-*/
-/*
+ else //numerical solution of the Bondi problem for given BONDIGAMMA & RBONDI & MDOT
+   {
+     int ix,iy,iz;
+     ldouble Rbondi=RBONDI;
 
 
-//uses MDOT and TGAS at the outer boundary
+     int
+       func (double r, const double y[], double f[],
+	     void *params)
+     {
+       ldouble v=y[0];
 
-ldouble csout = calc_PEQ_csfromT(TGAS0);
-ldouble Rbondi = 1./(2.*csout*csout);
-printf("Bondi at: %f\n",Rbondi);
-ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
-ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
+       ldouble Be=(5.-3.*BONDIGAMMA)/(4.*(BONDIGAMMA-1.))/RBONDI;
+  
+       ldouble cs2=(BONDIGAMMA-1.)*(Be+1./r-1./2.*v*v);
 
-//eq (14.3.16) from Shapiro & Teukolsky
-//mdot = 4 pi 0.25 (GM)^2 rho_inf / cs_inf
-//ldouble rhoout = mdotout*csout / (4.*M_PI*0.25);
-//ldouble urout = -mdotout / (4.*M_PI *rhoout* RMAX * RMAX);
+       ldouble dvdr=v/(v*v - cs2)*(2./r*cs2-1./r/r);
 
-ldouble urout = -sqrt(1./2./RMAX);
-ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAX * RMAX);
+       //printf("%e %e %e %e\n",r,v,dvdr,cs2);getch();
+  
+       f[0] = dvdr;
 
-ldouble uintout = calc_PEQ_ufromTrho(TGAS0,rhoout);
+       return GSL_SUCCESS;
+     }
 
-int ix,iy,iz;
+
+
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
-for(iz=0;iz<NZ;iz++)
-  {
-    for(iy=0;iy<NY;iy++)
-      {
-	for(ix=-NGCX;ix<NX+NGCX;ix++)
-	  {
-	    struct geometry geom;
-	    fill_geometry(ix,iy,iz,&geom);
+     for(iz=0;iz<NZ;iz++)
+       {
+	 for(iy=0;iy<NY;iy++)
+	   {
+	     for(ix=-NGCX;ix<NX+NGCX;ix++)
+	       {
+		 ldouble rho,E,uint,Tgas,Trad,r,prad,pgas,ut,vx,Be,Kappa,urs,cs2;
 
-	    struct geometry geomBL;
-	    fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+		 struct geometry geom;
+		 fill_geometry(ix,iy,iz,&geom);
 
-	    
+		 struct geometry geomBL;
+		 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
-	    //at given cell
-	    ldouble R=geomBL.xx;
-	    ldouble rho = rhoout * pow(R/RMAX,-3./2.);
-	    ldouble ur = urout * sqrt(RMAX/R);
-	    ldouble uint = uintout * pow(R/RMAX, -3./2.*GAMMA);
-	    
-	    
-	    set_u(pproblem1,RHO,ix,iy,iz,rho);
-	    set_u(pproblem1,UU,ix,iy,iz,uint);
-	    set_u(pproblem1,VX,ix,iy,iz,ur);
-	    set_u(pproblem1,VY,ix,iy,iz,0.);
-	    set_u(pproblem1,VZ,ix,iy,iz,0.);
+		 //initial point
+		 //at RBONDI
+		 r=RMAX;
+		 Be=(5.-3.*BONDIGAMMA)/(4.*(BONDIGAMMA-1.))/Rbondi;
+		 urs=-sqrt(1./2./Rbondi);
+
+		 gsl_odeiv2_system sys = {func, NULL, 1, NULL};
+
+		 int i;
+		 double r0=Rbondi, r1 = geomBL.xx, ur;
+		 if(r1>RBONDI)
+		   ur=(1.-1.e-6)*urs;
+		 else
+		   ur=(1.+1.e-6)*urs;
+
+		 gsl_odeiv2_driver * d = 
+		   gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4,
+						  my_sign(r1-r0)*1e-6, 1e-6, 0.0);
+		 int status = gsl_odeiv2_driver_apply (d, &r0, r1, &ur);
+
+		 if (status != GSL_SUCCESS)
+		   {
+		     printf ("error, return value=%d\n", status);
+		     break;
+		   }
+	  
+		 gsl_odeiv2_driver_free (d);
+
+		 //at given cell
+		 r=geomBL.xx;
+		 rho=rhoCGS2GU(-MDOT*calc_mdotEdd()/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
+		 cs2=(BONDIGAMMA-1.)*(Be+1./r-1./2.*ur*ur);
+		 pgas=rho/BONDIGAMMA*cs2;
+		 uint=pgas/(BONDIGAMMA-1.);
+		 prad=PRADGASINIT*pgas;
+		 E=prad*3.;
+
+		 set_u(pproblem1,RHO,ix,iy,iz,rho);
+		 set_u(pproblem1,UU,ix,iy,iz,uint);
+		 set_u(pproblem1,VX,ix,iy,iz,ur);
+		 set_u(pproblem1,VY,ix,iy,iz,0.);
+		 set_u(pproblem1,VZ,ix,iy,iz,0.);
 #ifdef RADIATION
-	    ldouble E=PRADGAS * GAMMAM1*uint*3.;
-	    set_u(pproblem1,EE0,ix,iy,iz,E);
-	    set_u(pproblem1,FX0,ix,iy,iz,0.);
-	    set_u(pproblem1,FY0,ix,iy,iz,0.);
-	    set_u(pproblem1,FZ0,ix,iy,iz,0.);
+		 set_u(pproblem1,EE0,ix,iy,iz,E);
+		 set_u(pproblem1,FX0,ix,iy,iz,0.);
+		 set_u(pproblem1,FY0,ix,iy,iz,0.);
+		 set_u(pproblem1,FZ0,ix,iy,iz,0.);
 #endif
 
 
-	  }
-      }
-  }
-*/
+	       }
+	   }
+       }
+   }
