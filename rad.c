@@ -1584,6 +1584,10 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 
   radclosure_Edd(pp,geom,Rij);
 
+#elif (RADCLOSURE==VETCLOSURE) //Yucong's ZERO solver
+
+  radclosure_VET(pp,geom,Rij);
+
 #endif
 
 
@@ -3515,7 +3519,10 @@ radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4])
 
   //RADCLOSURECOORDS metric corresponding to geom
   struct geometry geom2;
-  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
+  if(geom->ifacedim < 0.) //cell-centered for calculating wavespeeds
+    fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDS);
+  else //faces for calculating fluxes
+    fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
 
   //covariant formulation of M1
   ldouble Erf; //radiative energy density in the radiation rest frame
@@ -3578,7 +3585,10 @@ radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
 
   //RADCLOSURECOORDS metric corresponding to geom.
   struct geometry geom2;
-  fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
+  if(geom->ifacedim < 0.) //cell-centered for calculating wavespeeds
+    fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDS);
+  else //faces for calculating fluxes
+    fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
 
   //covariant formulation of M1
   ldouble Erf; //radiative energy density in the radiation rest frame
@@ -3621,6 +3631,119 @@ radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
 
   //here convert to MYCOORDS
   trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
+
+  //done
+  return 0;
+}
+
+/************** Variable Eddington Tensor closure ***********************************/
+/************** going through ortonormal frame **************************************/
+/************** providing primitives at the face and for the neighbors **************/
+/************** calling Yucong's rad-transfer solver ********************************/
+
+int
+radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
+{
+  int i,j,k,l,m;
+
+  //MYCOORDS geometry
+  struct geometry *geom0
+    = (struct geometry *) ggg;
+
+  //array holding radiative properties for ZERO
+  ldouble rad[3][3][3][4];
+  //array holding coordinates for ZERO
+  ldouble coords[3][3][3][4];
+  //temporary primitives
+  ldouble ppt[NV];
+  //temporary velocities
+  ldouble ucon[4],ucon2[4];
+  //structs of eometry
+  struct geometry geom,geom2;
+  //indices
+  int ix,iy,iz;
+
+  if(geom0->ifacedim < 0.) //cell-centered for calculating wavespeeds
+    {
+      for(i=-1;i<=1;i++) //loop over cell centers
+	for(j=-1;j<=1;j++)
+	  for(k=-1;k<=1;k++)
+	    {
+	      ix=geom0->ix+i;
+	      iy=geom0->iy+j;
+	      iz=geom0->iz+k;
+
+	      fill_geometry(ix,iy,iz,&geom);
+	      
+	      //converting velocity
+	      ucon[0]=0.;
+	      for(l=1;l<4;l++)
+		ucon[l]=get_u(p,EE0+l,ix,iy,iz);
+	      conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+	      trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
+      
+	      //saving rad. field to memory
+	      rad[i+1][j+1][k+1][0]=get_u(p,EE0,ix,iy,iz); //energy density insensitive to coordinates
+	      rad[i+1][j+1][k+1][1]=ucon[1]; //u^i in RADCLOSURECOORDS, non-ortonormal
+ 	      rad[i+1][j+1][k+1][2]=ucon[2]; //u^i in RADCLOSURECOORDS, non-ortonormal
+	      rad[i+1][j+1][k+1][3]=ucon[3]; //u^i in RADCLOSURECOORDS, non-ortonormal
+
+	      //saving coordinates
+	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
+	    }
+
+      //all is well, rad.field and coordinates in rad & coords
+      
+      //VET
+      ldouble VET[3][3];
+      //ZERO_bbox(rad,coords,VET);
+
+      //first, let us calculate enden & fluxes in RADCLOSURECOORDS
+      //using covariant formulation of M1 to recover R^mu_t from primitives
+      ldouble Erf; //radiative energy density in the radiation rest frame
+      ldouble urfcon[4],pp2[NV],ppt[NV],RijM1[4][4];
+      Erf=pp[EE0];
+      urfcon[0]=0.;
+      urfcon[1]=pp[FX0];
+      urfcon[2]=pp[FY0];
+      urfcon[3]=pp[FZ0];
+      //converting to lab four-velocity
+      conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom0->gg,geom0->GG);
+      //lab frame stress energy tensor:
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  RijM1[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom0->GG[i][j];
+      //converting to RADCLOSURECOORDS
+      trans22_coco(geom0->xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+
+      //rewriting fluxes
+      for(i=0;i<4;i++)
+	{
+	  Rij[0][i]=RijM1[0][i];
+	  Rij[i][0]=RijM1[i][0];
+	}
+
+      //rewriting the pressure part with VET
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  Rij[i][j]=Rij[0][0]*VET[i-1][j-1];
+
+      //zeroing the trace of R^mu_nu
+      indices_2221(Rij,Rij,geom0->gg);
+      ldouble traceP=Rij[1][1]+Rij[2][2]+Rij[3][3];
+      ldouble factrace = -Rij[0][0]/traceP;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  Rij[i][j]*=factrace;
+      indices_2122(Rij,Rij,geom0->GG);
+
+      //done
+    }
+  else
+    {
+      my_err("VET at faces not implemented yet.\n");
+    }
+    
 
   //done
   return 0;
