@@ -126,6 +126,8 @@ int
 fprint_scalars(ldouble t, ldouble *scalars, int nscalars)
 {
   #ifndef MPI
+  calc_scalars(scalars,t);
+
   int iv;
   //printing scalars
   fprintf(fout_scalars,"%e ",t);

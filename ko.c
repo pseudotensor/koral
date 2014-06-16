@@ -69,17 +69,17 @@ main(int argc, char **argv)
 #endif
 #endif
 
-    //**************
+  //**************
   //tests
   //**************
   /*
-  ldouble pp[NV]={1.,1.,0.5,0.,0.,-1.,1.,.5,0.,0.};  
-  struct geometry geom; ldouble Rij[4][4];
-  fill_geometry(0,0,0,&geom);
-  calc_Rij(pp,&geom,Rij);
-  indices_2221(Rij,Rij,geom.gg);
-  print_tensor(Rij);
-  exit(-1);
+    ldouble pp[NV]={1.,1.,0.5,0.,0.,-1.,1.,.5,0.,0.};  
+    struct geometry geom; ldouble Rij[4][4];
+    fill_geometry(0,0,0,&geom);
+    calc_Rij(pp,&geom,Rij);
+    indices_2221(Rij,Rij,geom.gg);
+    print_tensor(Rij);
+    exit(-1);
   */
   
   //print scalings GU->CGS and quit
@@ -112,6 +112,7 @@ main(int argc, char **argv)
     {
       //or initialize new problem
       set_initial_profile();
+
       tstart=0.;
       //exchange initial state
       if(PROCID==0) {printf("Sending initial data... ");fflush(stdout);}
@@ -150,13 +151,11 @@ main(int argc, char **argv)
   copy_u(0.,p,pavg);
   avgtime=0.;
 
-  //calculates initial scalars
-  calc_scalars(scalars,tstart);
-
   //prints initial profiles to out0000.dat
   if(ifinit==1)
     {
-      fprint_restartfile(tstart,folder);			
+      fprint_restartfile(tstart,folder);
+			
       //dumps dumps only for shared memory
       #ifndef MPI
 #if(SCAOUTPUT==1)
@@ -402,9 +401,6 @@ solve_the_problem(ldouble tstart, char* folder)
 	  //projects primitives onto ghost cells
 	  set_bc(t,0);
 
-	  //calculate scalars
-	  calc_scalars(scalars,t);
-	  
 	  //restart files
 	  fprint_restartfile(t,folder);
 

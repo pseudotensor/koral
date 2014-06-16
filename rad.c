@@ -3668,6 +3668,7 @@ radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
 int
 radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
 {
+  int verbose=1;
   int i,j,k,l,m;
 
   //MYCOORDS geometry
@@ -3751,33 +3752,43 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
       //VET
       ldouble VET[3][3];
 
-      //debug
-      for(i=0;i<3;i++)
-	for(j=0;j<3;j++)
-	  for(k=0;k<3;k++)
-	    {
-	      printf(">>> %d %d %d\n",i-1,j-1,k-1);
-	      for(l=0;l<4;l++)
-		printf("%e ",rad[i][j][k][l]);
-	      printf("\n");
-	      for(l=0;l<4;l++)
-		printf("%e ",source[i][j][k][l]);
-	      printf("\n");
-	    }
+      if(verbose)
+	{
+	  printf("******************************************\n");
+	  printf("*** %d %d %d \n",geom0->ix, geom0->iy, geom0->iz); 
+	  printf("******************************************\n");
 
-      //provide timestep!
+	  //debug
+	  for(i=0;i<3;i++)
+	    for(j=0;j<3;j++)
+	      for(k=1;k<2;k++)
+		{
+		  printf(">>> %d %d %d\n",i-1,j-1,k-1);
+		  for(l=0;l<4;l++)
+		    printf("%e ",rad[i][j][k][l]);
+		  printf("\n");
+		  for(l=0;l<4;l++)
+		    printf("%e ",source[i][j][k][l]);
+		  printf("\n");
+		}
+	}
+      
+      //calling Yucong's solver
       ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET);
 
-      printf(">>>>>>> VET \n");
-      for (i = 0; i < 3; i++)
+      if(verbose)
 	{
-	  for (j = 0; j < 3; j++)
+	  printf(">>>>>>> VET \n");
+	  for (i = 0; i < 3; i++)
 	    {
-	      printf("%e ", VET[i][j]);
+	      for (j = 0; j < 3; j++)
+		{
+		  printf("%e ", VET[i][j]);
+		}
+	      printf("\n");
 	    }
-	  printf("\n");
+	  if(geom0->ix==0 &&geom0->iy==0 || 1)  getch();
 	}
-      if(geom0->ix==1 &&geom0->iy==1)  exit(-1);
 
       //first, let us calculate enden & fluxes in RADCLOSURECOORDS
       //using covariant formulation of M1 to recover R^mu_t from primitives
