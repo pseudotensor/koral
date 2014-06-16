@@ -4,7 +4,7 @@
 #include <time.h>
 #include "ko.h"
 
-#define GRID_SPACING 0.0588        //distance between adjacent grid cells (grid is assumed cubic with equal spacing in all directions)
+#define GRID_SPACING get_size_x(0,0)        //distance between adjacent grid cells (grid is assumed cubic with equal spacing in all directions)
 #define LIGHT_C 1.		//Speed of light in code units
 #define STEFAN_BOLTZMANN SIGMA_RAD //stefan boltzmann constant in code units
 #define PI 3.14159265358979

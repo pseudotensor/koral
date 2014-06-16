@@ -5,7 +5,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 111
+#define RESTARTNUM 30
 
 /************************************/
 //radiation choices
@@ -30,7 +30,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .6
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define GDETIN 0
@@ -57,7 +57,7 @@
 #define EEUURATIOMAX 1.e20
 #define ERADLIMIT 1.e-50
 #define RHOFLOOR 1.e-50
-#define GAMMAMAXRAD 200.
+#define GAMMAMAXRAD 20.
 
 /************************************/
 //blackhole
@@ -77,8 +77,8 @@
 #define MINZ -1.
 #define MAXZ 1. 
 
-#define TNX 50
-#define TNY 50
+#define TNX 60
+#define TNY 60
 #define TNZ 1
 
 //# of tiles
@@ -111,7 +111,7 @@
 //problem params
 /************************************/
 #define RRR
-#define GAMMA (4./3.)
+#define GAMMA (5./3.)
 #define RHOZERO 0.01
 #define BLOBMAG1 1.e4
 #define BLOBMAG2 1.e4

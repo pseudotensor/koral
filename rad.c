@@ -3666,14 +3666,17 @@ radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
 /************** calling Yucong's rad-transfer solver ********************************/
 
 int
-radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
+radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 {
-  int verbose=1;
+  int verbose=0;
+
   int i,j,k,l,m;
 
   //MYCOORDS geometry
   struct geometry *geom0
     = (struct geometry *) ggg;
+
+  //if(geom0->ix==15 && geom0->iy==20) verbose=1;
 
   //array holding radiative properties for ZERO
   ldouble rad[3][3][3][4];
@@ -3689,13 +3692,14 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
   struct geometry geom,geom2;
   //indices
   int ix,iy,iz;
-  ldouble rho,uint,pre,Tgas,Elab,alpha,sigma,RijM1[4][4];
+  ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
 
-  if(geom0->ifacedim < 0.) //cell-centered for calculating wavespeeds
-    {
-      for(i=-1;i<=1;i++) //loop over cell centers
-	for(j=-1;j<=1;j++)
-	  for(k=-1;k<=1;k++)
+  for(i=-1;i<=1;i++) //loop over cell centers
+    for(j=-1;j<=1;j++)
+      for(k=-1;k<=1;k++)
+	{
+	  ucon[0]=0.;
+	  if(geom0->ifacedim < 0.) //cell-centered for calculating wavespeeds
 	    {
 	      ix=geom0->ix+i;
 	      if(NY>1) 
@@ -3707,52 +3711,147 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
 	      else
 		iz=geom0->iz;
 
-	      fill_geometry(ix,iy,iz,&geom);
+	      fill_geometry(ix,iy,iz,&geom); //equals geom0
 
+	      //reading from memory
 	      rho=get_u(p,RHO,ix,iy,iz);
 	      uint=get_u(p,UU,ix,iy,iz);
-	      pre=(GAMMA-1.)*(uint);
-	      Tgas=pre*MU_GAS*M_PROTON/K_BOLTZ/rho;
-	      alpha=calc_kappa(rho,Tgas,geom.xx,geom.yy,geom.zz);
-	      sigma=calc_kappaes(rho,Tgas,geom.xx,geom.yy,geom.zz);
-	      
-	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
-	      Elab=RijM1[0][0];
-     
-	      source[i+1][j+1][k+1][0]=Tgas;
-	      source[i+1][j+1][k+1][1]=Elab;
-	      source[i+1][j+1][k+1][2]=alpha;
-	      source[i+1][j+1][k+1][3]=sigma;
-	      
-	      //converting velocity
-	      ucon[0]=0.;
-	      for(l=1;l<4;l++)
-		ucon[l]=get_u(p,EE0+l,ix,iy,iz);
-	      conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
-	      trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
-      
-	      //saving rad. field to memory
-	      rad[i+1][j+1][k+1][0]=get_u(p,EE0,ix,iy,iz); //energy density insensitive to coordinates, radiation rest frame
-	      rad[i+1][j+1][k+1][1]=ucon[1]; //u^i in RADCLOSURECOORDS, non-ortonormal
- 	      rad[i+1][j+1][k+1][2]=ucon[2]; //u^i in RADCLOSURECOORDS, non-ortonormal
-	      rad[i+1][j+1][k+1][3]=ucon[3]; //u^i in RADCLOSURECOORDS, non-ortonormal
+	      for(l=1;l<4;l++) ucon[l]=get_u(p,EE0+l,ix,iy,iz);
+	      Erad=get_u(p,EE0,ix,iy,iz);
 
-	      //saving coordinates
+	      //coordinates
 	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
-	    }
-    }
-  else
-    {
-      my_err("VET at faces not implemented yet.\n");
-    }
 
-  //all is well, rad.field and coordinates in rad & coords
-      
-  //opacities at the center
-  ldouble rho=pp[RHO];
-  ldouble u=pp[UU];  
-  ldouble pr=(GAMMA-1.)*(u);
-  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+	      //stress energy tensor
+	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);	  
+	    }
+	  else //when calculating fluxes at cell faces
+	    {
+	      if(i==0 && j==0 && k==0) //the face
+		{
+		  //primitives
+		  rho=pp0[RHO];
+		  uint=pp0[UU];
+		  for(l=1;l<4;l++) ucon[l]=pp0[EE0+l];
+		  //coordinates
+		  coco_N(geom0->xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
+		  //geometry
+		  fill_geometry_face(geom0->ix,geom0->iy,geom0->iz,geom0->ifacedim,&geom); //should correspond to geom0		      
+		  //stress energy tensor
+		  calc_Rij_M1(pp0,&geom,RijM1);	  
+		}
+	      else if((i==0 && geom0->ifacedim==0) || 
+		      (j==0 && geom0->ifacedim==1) ||
+		      (k==0 && geom0->ifacedim==2))   //faces above/below - interpolated
+		{
+		  ix=geom0->ix+i; 		      
+		  if(NY>1) iy=geom0->iy+j;
+		  else iy=geom0->iy;
+		  if(NZ>1) iz=geom0->iz+k;
+		  else iz=geom0->iz;
+		  if(geom0->ifacedim==0)
+		    PLOOP(l) ppt[l]=.5*(get_u(p,l,ix-1,iy,iz)+get_u(p,l,ix,iy,iz));
+		  if(geom0->ifacedim==1)
+		    PLOOP(l) ppt[l]=.5*(get_u(p,l,ix,iy-1,iz)+get_u(p,l,ix,iy,iz));
+		  if(geom0->ifacedim==2)
+		    PLOOP(l) ppt[l]=.5*(get_u(p,l,ix,iy,iz-1)+get_u(p,l,ix,iy,iz));
+
+		  rho=ppt[RHO];
+		  uint=ppt[UU];
+		  Erad=ppt[EE0];
+		  for(l=1;l<4;l++) ucon[l]=ppt[EE0+l];
+		  fill_geometry_face(ix,iy,iz,geom0->ifacedim,&geom);
+		  coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
+		  calc_Rij_M1(ppt,&geom,RijM1);
+		}
+	      else  //simply cell centers from the neighbours
+		{	      
+		  if(geom0->ifacedim == 0) //x-face
+		    {
+		      if(i==-1) ix=geom0->ix-1; 
+		      else if(i==1) ix=geom0->ix; 		      
+		      if(NY>1) iy=geom0->iy+j;
+		      else iy=geom0->iy;
+		      if(NZ>1) iz=geom0->iz+k;
+		      else iz=geom0->iz;
+		    }
+		  if(geom0->ifacedim == 1) //y-face
+		    {
+		      ix=geom0->ix+i;
+		      if(NY>1) 
+			{
+			  if(j==-1) iy=geom0->iy-1; 
+			  else if(j==1) iy=geom0->iy; 		      
+			}
+		      else
+			iy=geom0->iy;
+		      if(NZ>1) iz=geom0->iz+k;
+		      else iz=geom0->iz;
+		    }
+		  if(geom0->ifacedim == 2) //z-face
+		    {
+		      ix=geom0->ix+i;
+		      if(NY>1) iy=geom0->iy+j;
+		      else iy=geom0->iy;
+		      if(NZ>1) 
+			{
+			  if(k==-1) iz=geom0->iz-1; 
+			  else if(k==1) iz=geom0->iz; 
+			}
+		      else
+			iz=geom0->iz;
+		    }
+		  PLOOP(l) ppt[l]=get_u(p,l,ix,iy,iz);
+		  rho=ppt[RHO];
+		  uint=ppt[UU];
+		  Erad=ppt[EE0];
+		  for(l=1;l<4;l++) ucon[l]=ppt[EE0+l];
+		  fill_geometry(ix,iy,iz,&geom);
+		  coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
+		  calc_Rij_M1(ppt,&geom,RijM1);	
+		}
+	    }
+
+	  //postprocessing, passing by
+	  pre=(GAMMA-1.)*(uint);
+	  Tgas=pre*MU_GAS*M_PROTON/K_BOLTZ/rho;
+	  alpha=calc_kappa(rho,Tgas,geom.xx,geom.yy,geom.zz);
+	  sigma=calc_kappaes(rho,Tgas,geom.xx,geom.yy,geom.zz);
+	  #ifdef SKIPRADSOURCE
+	  alpha=sigma=0.;
+	  #endif
+	  Elab=RijM1[0][0];
+     
+	  source[i+1][j+1][k+1][0]=Tgas;
+	  source[i+1][j+1][k+1][1]=Elab;
+	  source[i+1][j+1][k+1][2]=alpha;
+	  source[i+1][j+1][k+1][3]=sigma;
+	      
+	  //converting velocity
+	  conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+	  //TODO: temporary
+	  //cap on valocities
+	  ldouble beta=sqrt(ucon[0]*ucon[0]-1.);
+	  ldouble maxradbeta = 0.99;
+	  if(beta>maxradbeta)
+	    {
+	      ucon[1]*=(maxradbeta/beta);
+	      ucon[2]*=(maxradbeta/beta);
+	      ucon[3]*=(maxradbeta/beta);	      
+	    }
+	  conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
+	  
+	  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
+	  
+	  //saving rad. field to memory
+	  rad[i+1][j+1][k+1][0]=Erad; //energy density insensitive to coordinates, radiation rest frame
+	  rad[i+1][j+1][k+1][1]=ucon[1]; //u^i in RADCLOSURECOORDS, non-ortonormal
+	  rad[i+1][j+1][k+1][2]=ucon[2]; //u^i in RADCLOSURECOORDS, non-ortonormal
+	  rad[i+1][j+1][k+1][3]=ucon[3]; //u^i in RADCLOSURECOORDS, non-ortonormal
+
+	}
+
+  //all is well, rad.field and coordinates in rad & coords & source
       
   //VET
   ldouble VET[3][3];
@@ -3760,7 +3859,7 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
   if(verbose)
     {
       printf("******************************************\n");
-      printf("*** %d %d %d \n",geom0->ix, geom0->iy, geom0->iz); 
+      printf("*** %d %d %d | %d \n",geom0->ix, geom0->iy, geom0->iz, geom0->ifacedim); 
       printf("******************************************\n");
 
       //debug
@@ -3796,19 +3895,7 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
 
   //first, let us calculate enden & fluxes in RADCLOSURECOORDS
   //using covariant formulation of M1 to recover R^mu_t from primitives
-  ldouble Erf; //radiative energy density in the radiation rest frame
-  ldouble urfcon[4],pp2[NV],ppt[NV],RijM1[4][4];
-  Erf=pp[EE0];
-  urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom0->gg,geom0->GG);
-  //lab frame stress energy tensor:
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      RijM1[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom0->GG[i][j];
+  calc_Rij_M1(pp0,geom0,RijM1);	  
   //converting to RADCLOSURECOORDS
   trans22_coco(geom0->xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
 
@@ -3823,6 +3910,9 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
       Rij[i][j]=Rij[0][0]*VET[i-1][j-1];
+  
+  //converting back to MYCOORDS
+  trans22_coco(&coords[1][1][1][0], Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
 
   //zeroing the trace of R^mu_nu
   indices_2221(Rij,Rij,geom0->gg);
@@ -3844,7 +3934,7 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
 	    }
 	  printf("\n");
 	}
-      if(geom0->ix==0 &&geom0->iy==0 || 1)  getch();
+      getch();
     }
   //done
     
