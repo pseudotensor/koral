@@ -3740,103 +3740,113 @@ radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4])
 	      //saving coordinates
 	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
 	    }
-
-      //all is well, rad.field and coordinates in rad & coords
-      
-      //opacities at the center
-      ldouble rho=pp[RHO];
-      ldouble u=pp[UU];  
-      ldouble pr=(GAMMA-1.)*(u);
-      ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-      
-      //VET
-      ldouble VET[3][3];
-
-      if(verbose)
-	{
-	  printf("******************************************\n");
-	  printf("*** %d %d %d \n",geom0->ix, geom0->iy, geom0->iz); 
-	  printf("******************************************\n");
-
-	  //debug
-	  for(i=0;i<3;i++)
-	    for(j=0;j<3;j++)
-	      for(k=1;k<2;k++)
-		{
-		  printf(">>> %d %d %d\n",i-1,j-1,k-1);
-		  for(l=0;l<4;l++)
-		    printf("%e ",rad[i][j][k][l]);
-		  printf("\n");
-		  for(l=0;l<4;l++)
-		    printf("%e ",source[i][j][k][l]);
-		  printf("\n");
-		}
-	}
-      
-      //calling Yucong's solver
-      ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET);
-
-      if(verbose)
-	{
-	  printf(">>>>>>> VET \n");
-	  for (i = 0; i < 3; i++)
-	    {
-	      for (j = 0; j < 3; j++)
-		{
-		  printf("%e ", VET[i][j]);
-		}
-	      printf("\n");
-	    }
-	  if(geom0->ix==0 &&geom0->iy==0 || 1)  getch();
-	}
-
-      //first, let us calculate enden & fluxes in RADCLOSURECOORDS
-      //using covariant formulation of M1 to recover R^mu_t from primitives
-      ldouble Erf; //radiative energy density in the radiation rest frame
-      ldouble urfcon[4],pp2[NV],ppt[NV],RijM1[4][4];
-      Erf=pp[EE0];
-      urfcon[0]=0.;
-      urfcon[1]=pp[FX0];
-      urfcon[2]=pp[FY0];
-      urfcon[3]=pp[FZ0];
-      //converting to lab four-velocity
-      conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom0->gg,geom0->GG);
-      //lab frame stress energy tensor:
-      for(i=0;i<4;i++)
-	for(j=0;j<4;j++)
-	  RijM1[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom0->GG[i][j];
-      //converting to RADCLOSURECOORDS
-      trans22_coco(geom0->xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
-
-      //rewriting fluxes
-      for(i=0;i<4;i++)
-	{
-	  Rij[0][i]=RijM1[0][i];
-	  Rij[i][0]=RijM1[i][0];
-	}
-
-      //rewriting the pressure part with VET
-      for(i=1;i<4;i++)
-	for(j=1;j<4;j++)
-	  Rij[i][j]=Rij[0][0]*VET[i-1][j-1];
-
-      //zeroing the trace of R^mu_nu
-      indices_2221(Rij,Rij,geom0->gg);
-      ldouble traceP=Rij[1][1]+Rij[2][2]+Rij[3][3];
-      ldouble factrace = -Rij[0][0]/traceP;
-      for(i=1;i<4;i++)
-	for(j=1;j<4;j++)
-	  Rij[i][j]*=factrace;
-      indices_2122(Rij,Rij,geom0->GG);
-
-      //done
     }
   else
     {
       my_err("VET at faces not implemented yet.\n");
     }
-    
 
+  //all is well, rad.field and coordinates in rad & coords
+      
+  //opacities at the center
+  ldouble rho=pp[RHO];
+  ldouble u=pp[UU];  
+  ldouble pr=(GAMMA-1.)*(u);
+  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
+      
+  //VET
+  ldouble VET[3][3];
+
+  if(verbose)
+    {
+      printf("******************************************\n");
+      printf("*** %d %d %d \n",geom0->ix, geom0->iy, geom0->iz); 
+      printf("******************************************\n");
+
+      //debug
+      for(i=0;i<3;i++)
+	for(j=0;j<3;j++)
+	  for(k=1;k<2;k++)
+	    {
+	      printf(">>> %d %d %d\n",i-1,j-1,k-1);
+	      for(l=0;l<4;l++)
+		printf("%e ",rad[i][j][k][l]);
+	      printf("\n");
+	      for(l=0;l<4;l++)
+		printf("%e ",source[i][j][k][l]);
+	      printf("\n");
+	    }
+    }
+      
+  //calling Yucong's solver
+  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET);
+
+  if(verbose)
+    {
+      printf(">>>>>>> VET \n");
+      for (i = 0; i < 3; i++)
+	{
+	  for (j = 0; j < 3; j++)
+	    {
+	      printf("%e ", VET[i][j]);
+	    }
+	  printf("\n");
+	}
+    }
+
+  //first, let us calculate enden & fluxes in RADCLOSURECOORDS
+  //using covariant formulation of M1 to recover R^mu_t from primitives
+  ldouble Erf; //radiative energy density in the radiation rest frame
+  ldouble urfcon[4],pp2[NV],ppt[NV],RijM1[4][4];
+  Erf=pp[EE0];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  //converting to lab four-velocity
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom0->gg,geom0->GG);
+  //lab frame stress energy tensor:
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      RijM1[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom0->GG[i][j];
+  //converting to RADCLOSURECOORDS
+  trans22_coco(geom0->xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+
+  //rewriting fluxes
+  for(i=0;i<4;i++)
+    {
+      Rij[0][i]=RijM1[0][i];
+      Rij[i][0]=RijM1[i][0];
+    }
+
+  //rewriting the pressure part with VET
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      Rij[i][j]=Rij[0][0]*VET[i-1][j-1];
+
+  //zeroing the trace of R^mu_nu
+  indices_2221(Rij,Rij,geom0->gg);
+  ldouble traceP=Rij[1][1]+Rij[2][2]+Rij[3][3];
+  ldouble factrace = -Rij[0][0]/traceP;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      Rij[i][j]*=factrace;
+  indices_2122(Rij,Rij,geom0->GG);
+
+  if(verbose)
+    {
+      printf(">>>>>>> Rij\n");
+      for (i = 0; i < 4; i++)
+	{
+	  for (j = 0; j < 4; j++)
+	    {
+	      printf("%e ", Rij[i][j]);
+	    }
+	  printf("\n");
+	}
+      if(geom0->ix==0 &&geom0->iy==0 || 1)  getch();
+    }
   //done
+    
   return 0;
 }

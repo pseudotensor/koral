@@ -2231,8 +2231,6 @@ int set_bc(ldouble t,int ifinit)
       fill_geometry(-1,-1,iz,&geom);
       p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
 
-      //printf("Rerer\n");fflush(stdout);getch();
-
     }
 
   if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
