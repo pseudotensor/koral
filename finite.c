@@ -2231,7 +2231,7 @@ int set_bc(ldouble t,int ifinit)
       fill_geometry(-1,-1,iz,&geom);
       p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
 
-      printf("Rerer\n");
+      //printf("Rerer\n");fflush(stdout);getch();
 
     }
 

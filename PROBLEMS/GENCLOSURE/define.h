@@ -11,7 +11,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-#define RADCLOSURE VETCLOSURE
+#define RADCLOSURE M1CLOSURE
 #define RADCLOSURECOORDS MINKCOORDS
 #define NUMRADWAVESPEEDS
 #define SKIPRADWAVESPEEDLIMITER

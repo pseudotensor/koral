@@ -1710,7 +1710,7 @@
 #endif
 
 #ifndef MPI4CORNERS
-#ifdef MAGNFIELD
+//#ifdef MAGNFIELD //always fill corners
 #define MPI4CORNERS
 #undef MPIMSGBUFSIZE
 #if (TNX>1 && TNY>1 && TNY>1) //3d
@@ -1718,7 +1718,7 @@
 #else //2d
 #define MPIMSGBUFSIZE 20
 #endif
-#endif
+//#endif
 #endif
 
 #ifndef MPI
