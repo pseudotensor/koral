@@ -533,7 +533,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  //rvel[2]=pp[FY0];
 		  //rvel[3]=pp[FZ0];
 		  //conv_vels(rvel,rvel,VELPRIM,VEL4,geomout.gg,geomout.GG);
-		  calc_Rij(pp,&geomout,Rij); //calculates R^munu in OUTCOORDS
+		  calc_Rij_M1(pp,&geomout,Rij); //calculates R^munu in OUTCOORDS
 		  indices_2221(Rij,Rij,geomout.gg);
 
 		  
@@ -576,7 +576,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      indices_21(Gi,Gi,geomout.gg);
 	      
 	      Ehat[nodalindex]=ehat;
-	      Erad[nodalindex]=Rij[0][0];
+	      Erad[nodalindex]=Rij22[0][0];
 	      Nph[nodalindex]=pp[NF0];
 
 	      Fx[nodalindex]=Rij22[1][0];
@@ -732,14 +732,18 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
       coordinates[2] = nodez;
     }      
      
+  DBoptlist *optList = DBMakeOptlist(3);
+  float ftime=(float)time;
+  DBAddOption(optList, DBOPT_DTIME, (void*)&time);
+  DBAddOption(optList, DBOPT_TIME, (void*)&ftime);
+  DBAddOption(optList, DBOPT_CYCLE, (void*)&nstep);
+
+
   /* Write out the mesh to the file */
   DBPutQuadmesh(file, "mesh1", coordnames, coordinates,
-  		dimensions, ndim, DB_DOUBLE, DB_NONCOLLINEAR, NULL);
+  		dimensions, ndim, DB_DOUBLE, DB_NONCOLLINEAR, optList);
 
   /* Write scalars */
-  DBoptlist *optList = DBMakeOptlist(1);
-
-  DBAddOption(optList, DBOPT_DTIME, (void*)&time);
 
   DBPutQuadvar1(file, "rho","mesh1", rho,
   		dimensions, ndim, NULL, 0, 

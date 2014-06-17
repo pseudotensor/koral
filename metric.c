@@ -1574,6 +1574,7 @@ fill_geometry(int ix,int iy,int iz,void *geom)
   ggg->yy=ggg->xxvec[2];
   ggg->zz=ggg->xxvec[3];
   ggg->gdet=ggg->gg[3][4];
+  ggg->coords=MYCOORDS;
 
   return 0;
 }
@@ -1592,6 +1593,7 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
   pick_Gb(ix,iy,iz,idim,ggg->GG);
 
   ggg->ifacedim = idim;
+  ggg->coords=MYCOORDS;
 
   if(idim==0)
     {
@@ -1679,6 +1681,8 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
   ggg->zz=xxvecBL[3];
   
   ggg->gdet=ggg->gg[3][4];
+  ggg->coords=COORDS;
+
 
   return 0;
 }
@@ -1726,6 +1730,7 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   ggg->zz=xxvecBL[3];
   
   ggg->gdet=ggg->gg[3][4];
+  ggg->coords=COORDS;
 
   return 0;
 }

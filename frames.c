@@ -232,7 +232,7 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
   ldouble Rij[4][4];
   int i,j;  
 
-  calc_Rij(pp1,ggg,Rij);
+  calc_Rij_M1(pp1,ggg,Rij);
 
   boost22_lab2ff(Rij,Rij,pp1,gg,GG);
 

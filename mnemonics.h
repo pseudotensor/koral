@@ -45,6 +45,7 @@
 #define EDDCLOSURE 1
 #define VETCLOSURE 2
 #define M1ORTOCLOSURE 3
+#define MINERBOCLOSURE 4
 
 //u2p inversion types
 #define U2P_HOT 0

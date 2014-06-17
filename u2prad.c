@@ -463,6 +463,13 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	  return -1;
 	}
 
+      //test
+      if(*corrected)
+	{
+	  printf("rad u2p corrected at %d %d \n",geom->ix,geom->iy);
+	  //getch();
+	}
+
       conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
 
       //new primitives
@@ -815,23 +822,7 @@ u2p_rad_urf_old(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 #endif
 
       conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
-  
-      /*
-   if(debug==1 && verbose)
-     {
-#ifndef LABRADFLUXES
-       ldouble Rij[4][4];
-       calc_Rij(pp,ggg,Rij);
-       trans22_cc2on(Rij,Rij,tup);
-       ldouble Avv[4]={Rij[0][0],Rij[0][1], Rij[0][2],Rij[0][3]};
-       print_4vector(Avv);
-       printf("F/E: %e %e %e f:%e\n",Avv[1]/Avv[0],Avv[2]/Avv[0],Avv[3]/Avv[0],sqrt(Avv[1]*Avv[1]+Avv[2]*Avv[2]+Avv[3]*Avv[3])/Avv[0]);
-#endif
 
-       getchar();
-       }
-      */
-      
       //new primitives
       pp[EE(irf)]=Erf;
       pp[FX(irf)]=urfcon[1];

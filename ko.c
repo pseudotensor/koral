@@ -235,7 +235,7 @@ solve_the_problem(ldouble tstart, char* folder)
   //copy_u(1.,p,ptm2); ttm2=t;
 
   //main time loop
-  int nstep=0;
+  nstep=0;
 
   while (t < t1 && nfout1<=NOUTSTOP && i1<NSTEPSTOP)
     {    

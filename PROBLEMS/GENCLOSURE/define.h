@@ -5,19 +5,32 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 30
+#define RESTARTNUM 25
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
-#define RADCLOSURE VETCLOSURE
+#define RADCLOSURE MINERBOCLOSURE
 #define RADCLOSURECOORDS MINKCOORDS
-#define NUMRADWAVESPEEDS
+//#define NUMRADWAVESPEEDS
 #define SKIPRADWAVESPEEDLIMITER
 //#define SKIPRADSOURCE
 //#define NCOMPTONIZATION
 //#define COMPTONIZATION
+
+/************************************/
+//rhd floors
+/************************************/
+#define UURHORATIOMIN 1.e-15
+#define UURHORATIOMAX 1.e2
+#define EERHORATIOMIN 1.e-20
+#define EERHORATIOMAX 1.e20
+#define EEUURATIOMIN 1.e-20
+#define EEUURATIOMAX 1.e20
+#define ERADLIMIT 1.e-50
+#define RHOFLOOR 1.e-50
+#define GAMMAMAXRAD 200.
 
 /************************************/
 //hydro choices
@@ -46,18 +59,6 @@
 //#define ALPHARADVISC 1.
 //#define ENFORCERADWAVESPEEDS
 
-/************************************/
-//rhd floors
-/************************************/
-#define UURHORATIOMIN 1.e-15
-#define UURHORATIOMAX 1.e2
-#define EERHORATIOMIN 1.e-20
-#define EERHORATIOMAX 1.e20
-#define EEUURATIOMIN 1.e-20
-#define EEUURATIOMAX 1.e20
-#define ERADLIMIT 1.e-50
-#define RHOFLOOR 1.e-50
-#define GAMMAMAXRAD 20.
 
 /************************************/
 //blackhole
@@ -87,8 +88,8 @@
 #define NTZ 1
 
 //#define SPECIFIC_BC
-#define COPY_XBC
-#define COPY_YBC
+#define PERIODIC_XBC
+#define PERIODIC_YBC
 #define COPY_ZBC
 #define SHUFFLELOOPS 0
 

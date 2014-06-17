@@ -1608,6 +1608,10 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 
   radclosure_Edd(pp,geom,Rij);
 
+#elif (RADCLOSURE==MINERBOCLOSURE) //Edd upto f=1/3, causal above
+
+  radclosure_Minerbo(pp,geom,Rij);
+
 #elif (RADCLOSURE==VETCLOSURE) //Yucong's ZERO solver
 
   radclosure_VET(pp,geom,Rij);
@@ -1717,6 +1721,66 @@ calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
   return 0;
 }
 
+//**********************************************************************
+//******* takes E and F^i from primitives (artificial) **********************
+//******* and calculates radiation stress ******************************
+//******* tensor R^ij in fluid frame using Minerbo closure scheme ***********
+//******* reference: Levermore 1984, makes Eddington causal ***********
+//**********************************************************************
+int
+calc_Rij_Minerbo_ff(ldouble *pp, ldouble Rij[][4])
+{
+  int irf=0;
+  ldouble E=pp[EE(irf)];
+  ldouble F[3]={pp[FX(irf)],pp[FY(irf)],pp[FZ(irf)]};
+
+  ldouble nx,ny,nz,nlen,f;
+
+  nx=F[0]/E;
+  ny=F[1]/E;
+  nz=F[2]/E;
+
+  nlen=sqrt(nx*nx+ny*ny+nz*nz);
+  
+  if(nlen>=1.)
+    f=1.;
+  else if(nlen<1.3)
+    f=1./3.;
+  else
+    f=.5*(1.-f)*(1.-f)+f*f;
+
+  if(nlen>0) 
+    {
+      nx/=nlen;
+      ny/=nlen;
+      nz/=nlen;
+    }
+  else
+    {
+      ;
+    }
+ 
+  Rij[0][0]=E;
+  Rij[0][1]=Rij[1][0]=F[0];
+  Rij[0][2]=Rij[2][0]=F[1];
+  Rij[0][3]=Rij[3][0]=F[2];
+
+  Rij[1][1]=E*(.5*(1.-f) + .5*(3.*f - 1.)*nx*nx);
+  Rij[1][2]=E*(.5*(3.*f - 1.)*nx*ny);
+  Rij[1][3]=E*(.5*(3.*f - 1.)*nx*nz);
+
+  Rij[2][1]=E*(.5*(3.*f - 1.)*ny*nx);
+  Rij[2][2]=E*(.5*(1.-f) + .5*(3.*f - 1.)*ny*ny);
+  Rij[2][3]=E*(.5*(3.*f - 1.)*ny*nz);
+
+  Rij[3][1]=E*(.5*(3.*f - 1.)*nz*nx);
+  Rij[3][2]=E*(.5*(3.*f - 1.)*nz*ny);
+  Rij[3][3]=E*(.5*(1.-f) + .5*(3.*f - 1.)*nz*nz);
+
+  return 0;
+}
+
+//**********************************************************************
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
@@ -3564,10 +3628,10 @@ radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4])
       Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom->GG[i][j];
 
   //here convert to RADCLOSURECOORDS
-  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, RADCLOSURECOORDS);
+  trans22_coco(geom->xxvec, Rij, Rij, geom->coords, RADCLOSURECOORDS);
 
   //primitives to 2
-  trans_pall_coco(pp, pp2, MYCOORDS, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
+  trans_pall_coco(pp, pp2, geom->coords, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
 
   //to fluid frame
   boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
@@ -3591,7 +3655,7 @@ radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4])
   boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
 
   //here convert to MYCOORDS
-  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
+  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, geom->coords);
 
   //done
   return 0;
@@ -3602,6 +3666,7 @@ int
 radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
 {
   int i,j;
+  ldouble pp2[NV],ppt[NV];
 
   //MYCOORDS geometry
   struct geometry *geom
@@ -3614,26 +3679,69 @@ radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
   else //faces for calculating fluxes
     fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
 
-  //covariant formulation of M1
-  ldouble Erf; //radiative energy density in the radiation rest frame
-  ldouble urfcon[4],pp2[NV],ppt[NV];
-  Erf=pp[EE0];
-  urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
-  //converting to lab four-velocity
-  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
-  //lab frame stress energy tensor:
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      Rij[i][j]=4./3.*Erf*urfcon[i]*urfcon[j]+1./3.*Erf*geom->GG[i][j];
+  //covariant formulation of M1 to recover R^tmu
+  calc_Rij_M1(pp,geom,Rij);
   
   //here convert to RADCLOSURECOORDS
-  trans22_coco(geom->xxvec, Rij, Rij, MYCOORDS, RADCLOSURECOORDS);
+  trans22_coco(geom->xxvec, Rij, Rij, geom->coords, RADCLOSURECOORDS);
 
   //primitives to 2
-  trans_pall_coco(pp, pp2, MYCOORDS, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
+  trans_pall_coco(pp, pp2, geom->coords, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
+
+  //to fluid frame
+  boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
+
+  //to ortonormal
+  trans22_cc2on(Rij,Rij,geom2.tup);
+
+  PLOOP(i) ppt[i]=pp[i];
+  ppt[FX0]=Rij[1][0];
+  ppt[FY0]=Rij[2][0];
+  ppt[FZ0]=Rij[3][0];
+  ppt[EE0]=Rij[0][0];
+
+  //Minerbo in ortonormal frame
+  calc_Rij_Minerbo_ff(ppt,Rij);
+
+  //to code coordinates
+  trans22_on2cc(Rij,Rij,geom2.tlo);
+
+  //to lab frame
+  boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
+
+  //here convert to MYCOORDS
+  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, geom->coords);
+
+  //done
+  return 0;
+}
+
+/************** Minerbo closure going through ortonormal frame **************/
+int
+radclosure_Minerbo(ldouble *pp, void *ggg, ldouble Rij[][4])
+{
+  int i,j;
+  ldouble pp2[NV];
+
+  //MYCOORDS geometry
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  //RADCLOSURECOORDS metric corresponding to geom.
+  struct geometry geom2;
+  if(geom->ifacedim < 0.) //cell-centered for calculating wavespeeds
+    fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDS);
+  else //faces for calculating fluxes
+    fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
+
+  //covariant formulation of M1 to recover R^tmu
+  calc_Rij_M1(pp,geom,Rij);
+  
+  //here convert to RADCLOSURECOORDS
+  trans22_coco(geom->xxvec, Rij, Rij, geom->coords, RADCLOSURECOORDS);
+
+  //primitives to 2
+  trans_pall_coco(pp, pp2, geom->coords, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
 
   //to fluid frame
   boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
@@ -3654,7 +3762,7 @@ radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
   boost22_ff2lab(Rij,Rij,pp2,geom2.gg,geom2.GG);
 
   //here convert to MYCOORDS
-  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
+  trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, geom->coords);
 
   //done
   return 0;
@@ -3672,7 +3780,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   int i,j,k,l,m;
 
-  //MYCOORDS geometry
+  //assumes MYCOORDS geometry!
   struct geometry *geom0
     = (struct geometry *) ggg;
 
@@ -3828,9 +3936,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  source[i+1][j+1][k+1][3]=sigma;
 	      
 	  //converting velocity
-	  conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
-	  //TODO: temporary
-	  //cap on valocities
+	  conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom.gg,geom.GG);	   
+	  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
+
+	  //cap on valocities not too abuse ZERO solver
 	  ldouble beta=sqrt(ucon[0]*ucon[0]-1.);
 	  ldouble maxradbeta = 0.99;
 	  if(beta>maxradbeta)
@@ -3839,9 +3948,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	      ucon[2]*=(maxradbeta/beta);
 	      ucon[3]*=(maxradbeta/beta);	      
 	    }
-	  conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG);
-	  
-	  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
+	  //conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG); //ut not used anymore
 	  
 	  //saving rad. field to memory
 	  rad[i+1][j+1][k+1][0]=Erad; //energy density insensitive to coordinates, radiation rest frame
@@ -3922,7 +4029,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
     for(j=1;j<4;j++)
       Rij[i][j]*=factrace;
   indices_2122(Rij,Rij,geom0->GG);
-
+  
   if(verbose)
     {
       printf(">>>>>>> Rij\n");

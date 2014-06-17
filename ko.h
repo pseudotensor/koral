@@ -102,6 +102,7 @@ ldouble global_tstepdenmax;
 ldouble start_time, end_time, mid1_time, mid2_time, maxmp_time;
 
 ldouble avgtime,dt;
+int nstep;
 int global_int_slot[NGLOBALINTSLOT];
 ldouble max_ws[3],max_dt,ttm1,ttm2,max_ws_ph;
 ldouble tstepdenmax;
@@ -155,6 +156,7 @@ ldouble rhorizonBL,rISCOBL,rmboundBL,rphotonBL,etaNT;
 //geometry structure
 struct geometry
 {
+  int coords;
   int ix,iy,iz;
   int ifacedim; //-1 - cell center, 0 - x face, 1 - y face, 2 - z face
   ldouble xxvec[4];
@@ -600,7 +602,9 @@ int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],in
 int calc_Rij(ldouble *pp, void*, ldouble Rij[][4]);
 int calc_Rij_M1(ldouble *pp, void*, ldouble Rij[][4]);
 int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
+int calc_Rij_Minerbo_ff(ldouble *pp, ldouble  Rij[][4]);
 int radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4]);
+int radclosure_Minerbo(ldouble *pp, void *ggg, ldouble Rij[][4]);
 int radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4]);
 int radclosure_VET(ldouble *pp, void *ggg, ldouble Rij[][4]);
 int solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int);
