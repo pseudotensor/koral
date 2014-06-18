@@ -3796,7 +3796,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //temporary primitives
   ldouble ppt[NV];
   //temporary velocities
-  ldouble ucon[4],ucon2[4];
+  ldouble ucon[4],ucon2[4],beta0;
   //structs of eometry
   struct geometry geom,geom2;
   //indices
@@ -3841,12 +3841,12 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 		  //primitives
 		  rho=pp0[RHO];
 		  uint=pp0[UU];
+		  Erad=pp0[EE0];
 		  for(l=1;l<4;l++) ucon[l]=pp0[EE0+l];
 		  //coordinates
 		  coco_N(geom0->xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
 		  //geometry
-		  fill_geometry_face(geom0->ix,geom0->iy,geom0->iz,geom0->ifacedim,&geom); //should correspond to geom0		      
-		  //stress energy tensor
+		  fill_geometry_face(geom0->ix,geom0->iy,geom0->iz,geom0->ifacedim,&geom); //should correspond to geom0		    		  //stress energy tensor
 		  calc_Rij_M1(pp0,&geom,RijM1);	  
 		}
 	      else if((i==0 && geom0->ifacedim==0) || 
@@ -3941,7 +3941,8 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
 
 	  //cap on valocities not too abuse ZERO solver
-	  ldouble beta=sqrt(ucon[0]*ucon[0]-1.);
+	  ldouble beta=1.-1./sqrt(ucon[0]*ucon[0]);
+	  if(i==0 && j==0 && k==0) beta0=beta;
 	  ldouble maxradbeta = 0.99;
 	  if(beta>maxradbeta)
 	    {
@@ -3964,10 +3965,17 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //VET
   ldouble VET[3][3];
 
+  //calling Yucong's solver
+  ldouble I_return[NUMANGLES];
+  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return);
+
+  if((VET[0][0]+VET[1][1]+VET[2][2]<0.9))
+    verbose=1;
+
   if(verbose)
     {
       printf("******************************************\n");
-      printf("*** %d %d %d | %d \n",geom0->ix, geom0->iy, geom0->iz, geom0->ifacedim); 
+      printf("*** %d %d %d | %d | %f\n",geom0->ix, geom0->iy, geom0->iz, geom0->ifacedim, beta0); 
       printf("******************************************\n");
 
       //debug
@@ -3983,10 +3991,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 		printf("%e ",source[i][j][k][l]);
 	      printf("\n");
 	    }
-    }
-      
-  //calling Yucong's solver
-  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET);
+    }      
 
   if(verbose)
     {
@@ -4014,10 +4019,13 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
       Rij[i][0]=RijM1[i][0];
     }
 
-  //rewriting the pressure part with VET
+  //rewriting the pressure part with VET and mixing with M1
+  ldouble fzero=step_function(.75-beta0,.1);
+
+
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
-      Rij[i][j]=Rij[0][0]*VET[i-1][j-1];
+      Rij[i][j]=fzero*Rij[0][0]*VET[i-1][j-1]+(1.-fzero)*RijM1[i][j];
   
   //converting back to MYCOORDS
   trans22_coco(&coords[1][1][1][0], Rij, Rij, RADCLOSURECOORDS, MYCOORDS);

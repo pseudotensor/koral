@@ -11,9 +11,9 @@
 //radiation choices
 /************************************/
 #define RADIATION
-#define RADCLOSURE MINERBOCLOSURE
+#define RADCLOSURE VETCLOSURE
 #define RADCLOSURECOORDS MINKCOORDS
-#define NUMRADWAVESPEEDS
+//#define NUMRADWAVESPEEDS
 #define SKIPRADWAVESPEEDLIMITER
 #define SKIPRADSOURCE
 //#define NCOMPTONIZATION
@@ -88,8 +88,8 @@
 #define NTZ 1
 
 //#define SPECIFIC_BC
-#define PERIODIC_XBC
-#define PERIODIC_YBC
+#define COPY_XBC
+#define COPY_YBC
 #define COPY_ZBC
 #define SHUFFLELOOPS 0
 

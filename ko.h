@@ -665,7 +665,7 @@ int mpi_exchangedata();
 //zeroshort.c
 int ZEROtest_oldmain();
 int zero_readangles();
-void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][4], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3]);
+void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][4], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES]);
 double angGridCoords[NUMANGLES][3];  		//Store xyz locations of angle grid
 double angDualGridCoords[NUMDUALANGLES][3]; 	//Store xyz locations of dual angle grid
 int dualAdjacency[NUMDUALANGLES][3]; 		//Store index information for adjacent angles
