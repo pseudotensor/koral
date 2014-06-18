@@ -3785,10 +3785,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   struct geometry *geom0
     = (struct geometry *) ggg;
 
-  //if(geom0->ix==15 && geom0->iy==20) verbose=1;
+  //  if(geom0->ix==15 && geom0->iy==15) verbose=1;
 
   //array holding radiative properties for ZERO
-  ldouble rad[3][3][3][4];
+  ldouble rad[3][3][3][5];
   //array holding coordinates for ZERO
   ldouble coords[3][3][3][4];
   //array holding coordinates for ZERO
@@ -3943,12 +3943,13 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  //cap on valocities not too abuse ZERO solver
 	  ldouble beta=1.-1./sqrt(ucon[0]*ucon[0]);
 	  if(i==0 && j==0 && k==0) beta0=beta;
-	  ldouble maxradbeta = 0.99;
+	  ldouble maxradbeta = 0.9;
 	  if(beta>maxradbeta)
 	    {
 	      ucon[1]*=(maxradbeta/beta);
 	      ucon[2]*=(maxradbeta/beta);
-	      ucon[3]*=(maxradbeta/beta);	      
+	      ucon[3]*=(maxradbeta/beta);
+	      beta=0.9;
 	    }
 	  //conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG); //ut not used anymore
 	  
@@ -3957,6 +3958,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  rad[i+1][j+1][k+1][1]=ucon[1]; //u^i in RADCLOSURECOORDS, non-ortonormal
 	  rad[i+1][j+1][k+1][2]=ucon[2]; //u^i in RADCLOSURECOORDS, non-ortonormal
 	  rad[i+1][j+1][k+1][3]=ucon[3]; //u^i in RADCLOSURECOORDS, non-ortonormal
+  	  rad[i+1][j+1][k+1][4]=beta; //u^i in RADCLOSURECOORDS, non-ortonormal
 
 	}
 
@@ -3967,14 +3969,16 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   //calling Yucong's solver
   ldouble I_return[NUMANGLES];
+  
   ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, 0);
 
   if((VET[0][0]+VET[1][1]+VET[2][2]<0.9))
     {
       ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, 1);
-
+ 
       verbose=1;
     }
+  
 
   if(verbose)
     {
@@ -4025,8 +4029,11 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   //rewriting the pressure part with VET and mixing with M1
   ldouble fzero=step_function(.75-beta0,.1);
-
-
+  if(beta0>0.9)
+    fzero=0.;
+  else
+    fzero=1.;
+  
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
       Rij[i][j]=fzero*Rij[0][0]*VET[i-1][j-1]+(1.-fzero)*RijM1[i][j];
@@ -4054,7 +4061,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	    }
 	  printf("\n");
 	}
-      getch();
+      //getch();
     }
   //done
     

@@ -527,14 +527,14 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	    {
 	      fill_geometry_face(ix,iy,iz,0,&geom);
 	      check_floors_mhd(fd_pl,VELPRIM,&geom);
-	      f_flux_prime(fd_pl,0,ix,iy,iz,ffl);
+	      f_flux_prime(fd_pl,0,ix,iy,iz,ffl,1); //right biased
 	    }
 
 	  if(ix<NX)
 	    {
 	      fill_geometry_face(ix+1,iy,iz,0,&geom);
 	      check_floors_mhd(fd_pr,VELPRIM,&geom);
-	      f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr);   	  
+	      f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr,0); //left biased   	  
 	    }
 
 	  //saving to memory
@@ -597,14 +597,14 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	    {
 	      fill_geometry_face(ix,iy,iz,1,&geom);
 	      check_floors_mhd(fd_pl,VELPRIM,&geom);
-	      f_flux_prime(fd_pl,1,ix,iy,iz,ffl);
+	      f_flux_prime(fd_pl,1,ix,iy,iz,ffl,1);
 	    }
 
 	  if(iy<NY)
 	    {
 	      fill_geometry_face(ix,iy+1,iz,1,&geom);
 	      check_floors_mhd(fd_pr,VELPRIM,&geom);
-	      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr);   	          
+	      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr,0);   	          
 	    }
 
 	  //saving to memory
@@ -666,14 +666,14 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	    {
 	      fill_geometry_face(ix,iy,iz,2,&geom);
 	      check_floors_mhd(fd_pl,VELPRIM,&geom);
-	      f_flux_prime(fd_pl,2,ix,iy,iz,ffl);
+	      f_flux_prime(fd_pl,2,ix,iy,iz,ffl,0);
 	    }
 
 	  if(iz<NZ)
 	    {
 	      fill_geometry_face(ix,iy,iz+1,2,&geom);
 	      check_floors_mhd(fd_pr,VELPRIM,&geom);
-	      f_flux_prime(fd_pr,2,ix,iy,iz+1,ffr);   	          
+	      f_flux_prime(fd_pr,2,ix,iy,iz+1,ffr,1);   	          
 	    }
 	  
 

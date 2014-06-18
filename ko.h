@@ -398,7 +398,7 @@ int calc_wavespeeds_lr_faces( int,int,int,int, ldouble*,ldouble*);
 int max_eigen_lr_Jac(ldouble *,ldouble*,int,void*,ldouble*,ldouble*);
 int calc_Jac_num(ldouble *xx,ldouble *ujac, int idim,void *parameters,ldouble *fd_jac);
 int set_initial_profile();
-int f_flux_prime(ldouble *uu, int,int,int,int,ldouble *ff);
+int f_flux_prime(ldouble *uu, int,int,int,int,ldouble *ff,int lr);
 ldouble f_diffusion_prime(ldouble *uu, ldouble *du, int iv,int,void*);
 ldouble f_grav_potential(ldouble,ldouble,ldouble);
 ldouble f_der_grav_potential(ldouble,ldouble,ldouble,int);
@@ -665,7 +665,7 @@ int mpi_exchangedata();
 //zeroshort.c
 int ZEROtest_oldmain();
 int zero_readangles();
-void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][4], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose);
+void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose);
 double angGridCoords[NUMANGLES][3];  		//Store xyz locations of angle grid
 double angDualGridCoords[NUMDUALANGLES][3]; 	//Store xyz locations of dual angle grid
 int dualAdjacency[NUMDUALANGLES][3]; 		//Store index information for adjacent angles

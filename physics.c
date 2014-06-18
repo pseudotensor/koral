@@ -460,7 +460,7 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
 //***************************************
 // calculates fluxes at faces
 //***************************************
-int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
+int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int lr)
 {  
 
   int iv;
@@ -539,6 +539,20 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff)
 
   //radiation
 #ifdef RADIATION
+
+  if(RADCLOSURE==VETCLOSURE)
+    {
+      //picking up metric from a cell center correspondingly to left/right biased fluxes
+      if(lr==0)//left biased
+	{
+	  if(idim==0) ix--;
+	  if(idim==1) iy--;
+	  if(idim==2) iz--;
+	}
+	
+      fill_geometry(ix,iy,iz,&geom);
+    }
+ 
   f_flux_prime_rad(pp,idim,&geom,ff);
 #endif
 
