@@ -175,7 +175,7 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   int verbose=0;
  
 
-  calc_Rij_ff(pp1,Rij);  
+  calc_Rij_M1_ff(pp1,Rij);  
   trans22_on2cc(Rij,Rij,tlo);  
   boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
   indices_2221(Rij,Rij,gg);  
@@ -273,7 +273,7 @@ int prad_on2lab(ldouble *pp1, ldouble *pp2, void* ggg)
 
   int verbose=0;
  
-  calc_Rij_ff(pp1,Rij);  
+  calc_Rij_M1_ff(pp1,Rij);  
   trans22_on2cc(Rij,Rij,tlo);  
   indices_2221(Rij,Rij,gg);  
 
@@ -336,7 +336,7 @@ int prad_ff2zamo(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   ldouble Rij[4][4];
   int i,j;
 
-  calc_Rij_ff(pp1,Rij);
+  calc_Rij_M1_ff(pp1,Rij);
   boost22_ff2zamo(Rij,Rij,pp1,gg,GG,eup);
 
   for(i=0;i<NVMHD;i++)
@@ -360,7 +360,7 @@ int prad_zamo2ff(ldouble *pp1, ldouble *pp2, ldouble gg[][5], ldouble GG[][5], l
   int i,j;
 
   //infact, closure in ZAMO flat space
-  calc_Rij_ff(pp1,Rij);
+  calc_Rij_M1_ff(pp1,Rij);
   boost22_zamo2ff(Rij,Rij,pp1,gg,GG,eup);
 
   for(i=0;i<NVMHD;i++)

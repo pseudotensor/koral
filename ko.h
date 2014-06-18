@@ -601,7 +601,7 @@ int calc_Rij_total(ldouble *pp, void* ggg, ldouble R[][4]);
 int set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype);
 int calc_Rij(ldouble *pp, void*, ldouble Rij[][4]);
 int calc_Rij_M1(ldouble *pp, void*, ldouble Rij[][4]);
-int calc_Rij_ff(ldouble *pp, ldouble  Rij[][4]);
+int calc_Rij_M1_ff(ldouble *pp, ldouble  Rij[][4]);
 int calc_Rij_Minerbo_ff(ldouble *pp, ldouble  Rij[][4]);
 int radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4]);
 int radclosure_Minerbo(ldouble *pp, void *ggg, ldouble Rij[][4]);

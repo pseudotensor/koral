@@ -1669,7 +1669,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
 //******* tensor R^ij in fluid frame using M1 closure scheme ***********
 //**********************************************************************
 int
-calc_Rij_ff(ldouble *pp, ldouble Rij[][4])
+calc_Rij_M1_ff(ldouble *pp, ldouble Rij[][4])
 {
   int irf=0;
   ldouble E=pp[EE(irf)];
@@ -1744,10 +1744,10 @@ calc_Rij_Minerbo_ff(ldouble *pp, ldouble Rij[][4])
   
   if(nlen>=1.)
     f=1.;
-  else if(nlen<1.3)
+  else if(nlen<1./3.)
     f=1./3.;
   else
-    f=.5*(1.-f)*(1.-f)+f*f;
+    f=.5*(1.-nlen)*(1.-nlen)+nlen*nlen;
 
   if(nlen>0) 
     {
@@ -3646,7 +3646,7 @@ radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4])
   ppt[EE0]=Rij[0][0];
 
   //M1 in ortonormal frame
-  calc_Rij_ff(ppt,Rij);
+  calc_Rij_M1_ff(ppt,Rij);
 
   //to code coordinates
   trans22_on2cc(Rij,Rij,geom2.tlo);
@@ -3663,7 +3663,7 @@ radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4])
 
 /************** Eddington closure going through ortonormal frame **************/
 int
-radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
+radclosure_Minerbo(ldouble *pp, void *ggg, ldouble Rij[][4])
 {
   int i,j;
   ldouble pp2[NV],ppt[NV];
@@ -3702,6 +3702,7 @@ radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
 
   //Minerbo in ortonormal frame
   calc_Rij_Minerbo_ff(ppt,Rij);
+  //calc_Rij_M1_ff(ppt,Rij);
 
   //to code coordinates
   trans22_on2cc(Rij,Rij,geom2.tlo);
@@ -3718,7 +3719,7 @@ radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
 
 /************** Minerbo closure going through ortonormal frame **************/
 int
-radclosure_Minerbo(ldouble *pp, void *ggg, ldouble Rij[][4])
+radclosure_Edd(ldouble *pp, void *ggg, ldouble Rij[][4])
 {
   int i,j;
   ldouble pp2[NV];

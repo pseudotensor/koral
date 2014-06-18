@@ -464,11 +464,13 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 	}
 
       //test
+      /*
       if(*corrected)
 	{
 	  printf("rad u2p corrected at %d %d \n",geom->ix,geom->iy);
 	  //getch();
 	}
+      */
 
       conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
 
@@ -894,7 +896,7 @@ int f_u2prad_num(ldouble *uu,ldouble *pp, void* ggg,ldouble *f)
 
   ldouble Rij[4][4];
 
-  calc_Rij_ff(pp,Rij);  
+  calc_Rij_M1_ff(pp,Rij);  
   trans22_on2cc(Rij,Rij,tlo);  
   boost22_ff2lab(Rij,Rij,pp,gg,GG); 
   indices_2221(Rij,Rij,gg);  
