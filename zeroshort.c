@@ -369,7 +369,7 @@ double I_Solve(double S0, double S1, double I1, double dtau)
 
 
 
-void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][4], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES])
+void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][4], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose)
 {
 	//Note:  M1 data has format:   E, v0, v1, v2
 
@@ -543,7 +543,10 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][4], double source_Da
 		I_return[probeAng] = I_time[probeAng];
 
 
-//		printf("%d - %e\n", probeAng, I_time[probeAng]);
+		if (verbose)
+		  {
+		    printf("%d - %e %e %e %e %e\n", probeAng, interp_M1_Data[0], mu, gamma, beta, I_boundary);
+		  }
 
 
 	}
@@ -662,7 +665,7 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][4], double source_Da
 
 
 
-void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES])
+void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose)
 {
 	//Note:  M1 data has format:   E, v0, v1, v2
 
@@ -929,7 +932,7 @@ int ZEROtest_oldmain()
 
 
 
-	ZERO_shortChar(0.5, M1_Data, source_Data, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, eddingtonFactor, I_return);
+	ZERO_shortChar(0.5, M1_Data, source_Data, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, eddingtonFactor, I_return, 0);
 
 //	ZERO_shortCharI(0.5, I_Data, source_Data, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, eddingtonFactor, I_return);
 

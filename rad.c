@@ -3967,10 +3967,14 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   //calling Yucong's solver
   ldouble I_return[NUMANGLES];
-  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return);
+  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, 0);
 
   if((VET[0][0]+VET[1][1]+VET[2][2]<0.9))
-    verbose=1;
+    {
+      ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, 1);
+
+      verbose=1;
+    }
 
   if(verbose)
     {
