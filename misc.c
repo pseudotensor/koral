@@ -680,6 +680,108 @@ calc_eigen_3x3symm(ldouble g[][3], ldouble *ev)
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
+//verifies the eigenvalues are positive, resets negative to zeros if not
+int
+make_matrixposdef_3x3symm(ldouble g[][3])
+{
+  int verbose=0;
+
+  double matrix[]={g[0][0],g[0][1],g[0][2],
+		   g[1][0],g[1][1],g[1][2],
+		   g[2][0],g[2][1],g[2][2]};		       
+
+  gsl_matrix_view m = gsl_matrix_view_array (matrix, 3, 3);     
+  gsl_vector *evals = gsl_vector_alloc (3);
+  gsl_matrix *evecs = gsl_matrix_alloc(3,3); //matrix of eigenvectors
+  gsl_eigen_symmv_workspace * w = gsl_eigen_symmv_alloc (3);       
+  gsl_eigen_symmv (&m.matrix, evals, evecs, w);     
+  gsl_eigen_symmv_free (w);
+
+  int i,j;
+
+  if(gsl_vector_get(evals,0)>=0. && gsl_vector_get(evals,1)>=0. && gsl_vector_get(evals,2)>=0.) return 0; //all is well
+
+  ldouble maxev=my_max(my_max(fabs(gsl_vector_get(evals,0)),fabs(gsl_vector_get(evals,1))),fabs(gsl_vector_get(evals,2)));
+  if(maxev<0.) printf("no positive e-v\n");
+
+  //zeroing negative eigenvalues
+  ldouble zero=0.;
+  if(gsl_vector_get(evals,0)<0.)
+    gsl_vector_set(evals,0,zero*maxev);
+  if(gsl_vector_get(evals,1)<0.)
+    gsl_vector_set(evals,1,zero*maxev);
+  if(gsl_vector_get(evals,2)<0.)
+    gsl_vector_set(evals,2,zero*maxev);
+
+  ldouble aP[3*3],aiP[3*3];
+
+  gsl_matrix *D = gsl_matrix_alloc(3,3);
+  for(i = 0; i < 3; i++)
+    for(j = 0; j < 3; j++)
+      {
+	if(i==j)
+	  gsl_matrix_set(D, i,j,gsl_vector_get(evals,i));
+	else
+	  gsl_matrix_set(D, i,j,0.);
+
+	aP[i*3+j]=gsl_matrix_get(evecs, i, j);
+     }
+	  
+  inverse_matrix(aP,aiP,3);
+
+  gsl_matrix_view P = gsl_matrix_view_array (aP, 3, 3);
+  gsl_matrix_view iP = gsl_matrix_view_array (aiP, 3, 3);
+  gsl_matrix *PD = gsl_matrix_alloc(3,3);
+
+  gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,
+                  1.0, &P.matrix, D,
+                  0.0, PD);
+  gsl_blas_dgemm (CblasNoTrans, CblasNoTrans,
+                  1.0, PD, &iP.matrix,
+                  0.0, &P.matrix);
+
+  //returning modified matrix
+  for(i = 0; i < 3; i++)
+    for(j = 0; j < 3; j++)
+      g[i][j]=gsl_matrix_get(&P.matrix, i, j);
+
+  //verbose
+  /*
+  for(i = 0; i < 3; i++)
+    printf("%e ",gsl_vector_get(evals,i));
+  printf("\n");
+  printf("\n");
+	 
+  for(i = 0; i < 3; i++)
+    {
+      for(j = 0; j < 3; j++)
+	printf("%e ",g[i][j]);
+
+      printf("\n");
+    }
+  printf("\n");
+  for(i = 0; i < 3; i++)
+    {
+      for(j = 0; j < 3; j++)
+	printf("%e ",gsl_matrix_get(&P.matrix,i,j));
+
+      printf("\n");
+    }
+
+  getch();
+  */
+
+  gsl_vector_free (evals);
+  gsl_matrix_free (evecs);
+  gsl_matrix_free (D);
+  gsl_matrix_free (PD);
+ 
+  return 1;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
 //calculates eigen values of a symmetric 4x4 matrix
 ldouble
 calc_eigen_4x4symm(ldouble g[][4], ldouble *ev)

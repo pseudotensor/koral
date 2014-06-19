@@ -5,7 +5,7 @@
 //restart
 /************************************/
 //#define RESTART
-#define RESTARTNUM 8
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -88,8 +88,8 @@
 #define NTZ 1
 
 //#define SPECIFIC_BC
-#define COPY_XBC
-#define COPY_YBC
+#define PERIODIC_XBC
+#define PERIODIC_YBC
 #define COPY_ZBC
 #define SHUFFLELOOPS 0
 

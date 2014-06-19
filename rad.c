@@ -4018,15 +4018,52 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   for(i=0;i<3;i++)
     for(j=0;j<3;j++)
       Tff[i][j]=(Rij[i+1][j+1]/Rij[0][0]-fvec[i]*fvec[j]);
-  calc_eigen_3x3symm(Tff, Tffev); //optimize!
 
-  if(Tffev[0]<0. || Tffev[1]<0. || Tffev[2]<0.)
+  if(0) //revert to M1 when problems
     {
-      //using M1 if VET not causal - brutal and full of zasadzkas?
-      for(i=1;i<4;i++)
-	for(j=1;j<4;j++)
-	  Rij[i][j]=RijM1[i][j];
-      //printf("used M1 at #%d at %d %d\n",nstep,geom0->ix,geom0->iy);
+      calc_eigen_3x3symm(Tff, Tffev); //optimize!
+
+      if(Tffev[0]<0. || Tffev[1]<0. || Tffev[2]<0.)
+	{
+	  //using M1 if VET not causal - brutal and full of zasadzkas?
+	  for(i=1;i<4;i++)
+	    for(j=1;j<4;j++)
+	      Rij[i][j]=RijM1[i][j];
+	  //printf("used M1 at #%d at %d %d with beta=%.6f\n",nstep,geom0->ix,geom0->iy,beta0);
+	}
+    }
+
+  if(1) //revert gradually to M1 when problems
+    {
+      fzero=1.;
+      do
+	{
+	  for(i=1;i<4;i++)
+	    for(j=1;j<4;j++)
+	      Rij[i][j]=fzero*Rij[0][0]*VET[i-1][j-1]+(1.-fzero)*RijM1[i][j];
+	  for(i=0;i<3;i++)
+	    for(j=0;j<3;j++)
+	      Tff[i][j]=(Rij[i+1][j+1]/Rij[0][0]-fvec[i]*fvec[j]);
+
+	  calc_eigen_3x3symm(Tff, Tffev); //optimize!
+	  
+	  fzero-=0.1;
+	}
+      while(Tffev[0]<0. || Tffev[1]<0. || Tffev[2]<0.);
+      for(i=0;i<3;i++)
+	for(j=0;j<3;j++)
+	  Rij[i+1][j+1]=(Tff[i][j]+fvec[i]*fvec[j])*Rij[0][0];    
+      //if(fzero<0.9) printf("used %f of M1 at #%d at %d %d with beta=%.6f\n",1.-(fzero+0.1),nstep,geom0->ix,geom0->iy,beta0);
+   }
+
+ if(0) //try to make matrix positive definite by zeroing eigenvalues
+    {
+      if(make_matrixposdef_3x3symm(Tff)==1) //Tff modified
+	{
+	  for(i=0;i<3;i++)
+	    for(j=0;j<3;j++)
+	      Rij[i+1][j+1]=(Tff[i][j]+fvec[i]*fvec[j])*Rij[0][0];    
+	}
     }
 
   //converting back to MYCOORDS

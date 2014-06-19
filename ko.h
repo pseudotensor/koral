@@ -84,7 +84,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_multiroots.h>
 #include <gsl/gsl_odeiv2.h>
-
+#include <gsl/gsl_blas.h>
 
 
 #ifdef PR_DEFS
@@ -202,6 +202,7 @@ int print_Nvector(ldouble v[4],int);
 ldouble calc_eigen_4x4(ldouble g[][4], ldouble *ev);
 ldouble calc_eigen_4x4symm(ldouble g[][4], ldouble *ev);
 ldouble calc_eigen_3x3symm(ldouble g[][3], ldouble *ev);
+int make_matrixposdef_3x3symm(ldouble g[][3]);
 ldouble my_atan2(ldouble y, ldouble x);
 void shuffle_loop(int **array, size_t n);
 ldouble step_function(ldouble x,ldouble k);
