@@ -3970,13 +3970,14 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ldouble VET[3][3];
 
   //calling Yucong's solver
-  ldouble I_return[NUMANGLES];
+  ldouble I_return[NUMANGLES];			
+  ldouble F_return[3];
   
-  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, 0);
+  ZERO_shortChar(0.*dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
 
   if((VET[0][0]+VET[1][1]+VET[2][2]<0.9))
     {
-      ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, 1); 
+      ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 1); 
       verbose=1;
     }
  
@@ -4015,11 +4016,23 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
       if(Tffev[0]<0. || Tffev[1]<0. || Tffev[2]<0.)
 	{
+	  /*
+	  printf("1> %e %e %e\n",Tffev[0],Tffev[1],Tffev[2]);
+
+	  for(i=0;i<3;i++)
+	    for(j=0;j<3;j++)
+	      Tff[i][j]=VET[i][j]-F_return[i]*F_return[j];
+
+	  calc_eigen_3x3symm(Tff, Tffev);
+	    
+	  printf("2> %e %e %e\n",Tffev[0],Tffev[1],Tffev[2]);
+	  */
 	  //using M1 if VET not causal - brutal and full of zasadzkas?
 	  for(i=1;i<4;i++)
 	    for(j=1;j<4;j++)
 	      Rij[i][j]=RijM1[i][j];
-	  printf("used M1 at #%d at %d %d with beta=%.6f\n",nstep,geom0->ix,geom0->iy,beta0);
+	  //printf("used M1 at #%d at %d %d with beta=%.6f\n",nstep,geom0->ix,geom0->iy,beta0);
+	  //getch();
 	}
     }
 

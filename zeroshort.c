@@ -368,7 +368,7 @@ double I_Solve(double S0, double S1, double I1, double dtau)
 
 
 
-void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose)
+void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES], double F_return[3],int verbose)
 {
   //Note:  M1 data has format:   E, v0, v1, v2
 
@@ -576,6 +576,8 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
   //intialize Pressure tensor P_ij
   for (q=0; q < 3; q++)
     {
+      F_return[q]=0;
+
       for (r=0; r < 3; r++)
 	{
 	  P[q][r] = 0.;
@@ -636,6 +638,10 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 
 
 	      P[q][r] += I_time[probeAng]*cos1*cos2*dOmega;
+	      if (r==0)
+		{
+		  F_return[q] += I_time[probeAng]*cos1*dOmega;
+		}
 	    }
 	}
     }
@@ -652,6 +658,7 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 
 
   //Set eddington tensor as P_ij/E
+  // Normalize flux by E
   for (q=0; q < 3; q++)
     {
       for (r=0; r < 3; r++)
@@ -666,6 +673,9 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 	      eddingtonFactor[q][r] = 0.;
 	    }
 	    
+
+	  
+
 	    /*
 	  //test
 	  if(q==r)
@@ -674,6 +684,8 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 	    eddingtonFactor[q][r] = 0.;
 	  */
 	}
+
+      F_return[q] = F_return[q]/E;
     }
 
 }
