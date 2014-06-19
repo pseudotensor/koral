@@ -455,7 +455,7 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 	  double bmax=1-beta*mu_max;
 	  double bmin=1-beta*mu_min;
 
-            I_Data[1][1][1][probeAng] = M1_Data[1][1][1][0]/bm/bm/bm/bm/gamma2/gamma2;
+	  I_Data[1][1][1][probeAng] = M1_Data[1][1][1][0]/bm/bm/bm/bm/gamma2/gamma2;
 
       //I_Data[1][1][1][probeAng] = M1_Data[1][1][1][0]/gamma2/gamma2/beta/3.0*(1.0/bmax/bmax/bmax - 1.0/bmin/bmin/bmin)/(mu_max - mu_min);
 

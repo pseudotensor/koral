@@ -3976,14 +3976,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   if((VET[0][0]+VET[1][1]+VET[2][2]<0.9))
     {
-      ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, 1);
- 
+      ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, 1); 
       verbose=1;
     }
-  
-
  
-
   //first, let us calculate enden & fluxes in RADCLOSURECOORDS
   //using covariant formulation of M1 to recover R^mu_t from primitives
   calc_Rij_M1(pp0,geom0,RijM1);	  
@@ -3999,13 +3995,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   
   //rewriting the pressure part with VET and mixing with M1
   ldouble fzero;
-  /*
-  fzero=step_function(.75-beta0,.1);
-  if(beta0>0.9)
-    fzero=0.;
-  else
-    fzero=1.;
-  */
+  //  fzero=step_function(.75-beta0,.1);
   fzero=1.;
   
   for(i=1;i<4;i++)
@@ -4019,7 +4009,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
     for(j=0;j<3;j++)
       Tff[i][j]=(Rij[i+1][j+1]/Rij[0][0]-fvec[i]*fvec[j]);
 
-  if(0) //revert to M1 when problems
+  if(1) //revert to M1 when problems
     {
       calc_eigen_3x3symm(Tff, Tffev); //optimize!
 
@@ -4029,11 +4019,11 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  for(i=1;i<4;i++)
 	    for(j=1;j<4;j++)
 	      Rij[i][j]=RijM1[i][j];
-	  //printf("used M1 at #%d at %d %d with beta=%.6f\n",nstep,geom0->ix,geom0->iy,beta0);
+	  printf("used M1 at #%d at %d %d with beta=%.6f\n",nstep,geom0->ix,geom0->iy,beta0);
 	}
     }
 
-  if(1) //revert gradually to M1 when problems
+  if(0) //revert gradually to M1 when problems
     {
       fzero=1.;
       do
@@ -4053,7 +4043,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
       for(i=0;i<3;i++)
 	for(j=0;j<3;j++)
 	  Rij[i+1][j+1]=(Tff[i][j]+fvec[i]*fvec[j])*Rij[0][0];    
-      //if(fzero<0.9) printf("used %f of M1 at #%d at %d %d with beta=%.6f\n",1.-(fzero+0.1),nstep,geom0->ix,geom0->iy,beta0);
+      if(fzero<0.9) printf("used %f of M1 at #%d at %d %d with beta=%.6f\n",1.-(fzero+0.1),nstep,geom0->ix,geom0->iy,beta0);
    }
 
  if(0) //try to make matrix positive definite by zeroing eigenvalues
