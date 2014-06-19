@@ -648,6 +648,40 @@ void shuffle_loop(int **array, size_t n)
 //**********************************************************************
 //calculates eigen values of a symmetric 4x4 matrix
 ldouble
+calc_eigen_3x3symm(ldouble g[][3], ldouble *ev)
+{
+  int verbose=0;
+
+  double matrix[]={g[0][0],g[0][1],g[0][2],
+		   g[1][0],g[1][1],g[1][2],
+		   g[2][0],g[2][1],g[2][2]};		       
+
+  gsl_matrix_view m = gsl_matrix_view_array (matrix, 3, 3);     
+  gsl_vector *eval = gsl_vector_alloc (3);
+  gsl_eigen_symm_workspace * w = gsl_eigen_symm_alloc (3);       
+  gsl_eigen_symm (&m.matrix, eval, w);     
+  gsl_eigen_symm_free (w);
+       
+  int i,j;
+     
+  for (i = 0; i < 3; i++)
+    {
+      double eval_i 
+	= gsl_vector_get (eval, i);
+
+      ev[i]=eval_i;
+    }
+
+  gsl_vector_free (eval);
+
+  return my_max(my_max(fabs(ev[0]),fabs(ev[1])),fabs(ev[2]));
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates eigen values of a symmetric 4x4 matrix
+ldouble
 calc_eigen_4x4symm(ldouble g[][4], ldouble *ev)
 {
   int verbose=0;

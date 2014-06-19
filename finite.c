@@ -478,7 +478,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //x 'sweep'
 
 #ifdef MPI4CORNERS
-      if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1)
+      if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1) //needed to calculate face fluxes for flux-CT divB enforcement
 #else
       if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
 #endif
@@ -521,8 +521,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 		}
 	    }
 	 		
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
-	  
+
 	  if(ix>=0) //no need to calculate at left face of first GC
 	    {
 	      fill_geometry_face(ix,iy,iz,0,&geom);
@@ -536,6 +535,8 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	      check_floors_mhd(fd_pr,VELPRIM,&geom);
 	      f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr,0); //left biased   	  
 	    }
+
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
 
 	  //saving to memory
 	  for(i=0;i<NV;i++)
@@ -2231,6 +2232,12 @@ int set_bc(ldouble t,int ifinit)
       fill_geometry(-1,-1,iz,&geom);
       p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
 
+      //averaging <(-2,-1),(-1,-2)> -> (-2,-2)
+      PLOOP(iv)
+	set_u(p,iv,-2,-2,iz,.5*(get_u(p,iv,-2,-1,iz)+get_u(p,iv,-1,-2,iz)));
+      fill_geometry(-2,-2,iz,&geom);
+      p2u(&get_u(p,0,-2,-2,iz),&get_u(u,0,-2,-2,iz),&geom);
+
     }
 
   if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
@@ -2253,6 +2260,11 @@ int set_bc(ldouble t,int ifinit)
 	set_u(p,iv,-1,NY,iz,.5*(get_u(p,iv,-1,NY-1,iz)+get_u(p,iv,0,NY,iz)));
       fill_geometry(-1,NY,iz,&geom);
       p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
+
+      PLOOP(iv)
+	set_u(p,iv,-2,NY+1,iz,.5*(get_u(p,iv,-2,NY,iz)+get_u(p,iv,-1,NY+1,iz)));
+      fill_geometry(-2,NY+1,iz,&geom);
+      p2u(&get_u(p,0,-2,NY+1,iz),&get_u(u,0,-2,NY+1,iz),&geom);
    }
 
   if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1)
@@ -2275,6 +2287,11 @@ int set_bc(ldouble t,int ifinit)
       fill_geometry(NX,-1,iz,&geom);
       p2u(&get_u(p,0,NX,-1,iz),&get_u(u,0,NX,-1,iz),&geom);
 
+      PLOOP(iv)
+	set_u(p,iv,NX+1,-2,iz,.5*(get_u(p,iv,NX,-2,iz)+get_u(p,iv,NX+1,-1,iz)));
+      fill_geometry(NX+1,-2,iz,&geom);
+      p2u(&get_u(p,0,NX+1,-2,iz),&get_u(u,0,NX+1,-2,iz),&geom);
+
     }
 
  if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1)
@@ -2296,7 +2313,14 @@ int set_bc(ldouble t,int ifinit)
 	set_u(p,iv,NX,NY,iz,.5*(get_u(p,iv,NX-1,NY,iz)+get_u(p,iv,NX,NY-1,iz)));
       fill_geometry(NX,NY,iz,&geom);
       p2u(&get_u(p,0,NX,NY,iz),&get_u(u,0,NX,NY,iz),&geom);
+
+      PLOOP(iv)
+	set_u(p,iv,NX+1,NY+1,iz,.5*(get_u(p,iv,NX,NY+1,iz)+get_u(p,iv,NX+1,NY,iz)));
+      fill_geometry(NX+1,NY+1,iz,&geom);
+      p2u(&get_u(p,0,NX+1,NY+1,iz),&get_u(u,0,NX+1,NY+1,iz),&geom);
     }
+
+ //third dimension!!!
 
  ldouble uval[NV],pval[NV];
  iz=0;

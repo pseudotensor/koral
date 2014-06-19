@@ -3785,7 +3785,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   struct geometry *geom0
     = (struct geometry *) ggg;
 
-  //  if(geom0->ix==15 && geom0->iy==15) verbose=1;
+  //if(geom0->ix==20 && geom0->iy==15) verbose=1;
 
   //array holding radiative properties for ZERO
   ldouble rad[3][3][3][5];
@@ -3962,6 +3962,8 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
 	}
 
+  //if(beta0>0.5) verbose=1;
+
   //all is well, rad.field and coordinates in rad & coords & source
       
   //VET
@@ -3979,6 +3981,71 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
       verbose=1;
     }
   
+
+ 
+
+  //first, let us calculate enden & fluxes in RADCLOSURECOORDS
+  //using covariant formulation of M1 to recover R^mu_t from primitives
+  calc_Rij_M1(pp0,geom0,RijM1);	  
+  //converting to RADCLOSURECOORDS
+  trans22_coco(geom0->xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+
+  //rewriting fluxes
+  for(i=0;i<4;i++)
+    {
+      Rij[0][i]=RijM1[0][i];
+      Rij[i][0]=RijM1[i][0];
+    }
+  
+  //rewriting the pressure part with VET and mixing with M1
+  ldouble fzero;
+  /*
+  fzero=step_function(.75-beta0,.1);
+  if(beta0>0.9)
+    fzero=0.;
+  else
+    fzero=1.;
+  */
+  fzero=1.;
+  
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      Rij[i][j]=fzero*Rij[0][0]*VET[i-1][j-1]+(1.-fzero)*RijM1[i][j];
+
+  //verifying causality
+  ldouble fvec[3]={Rij[0][1]/Rij[0][0],Rij[0][2]/Rij[0][0],Rij[0][3]/Rij[0][0]};
+  ldouble Tff[3][3],Tffev[3];
+  for(i=0;i<3;i++)
+    for(j=0;j<3;j++)
+      Tff[i][j]=(Rij[i+1][j+1]/Rij[0][0]-fvec[i]*fvec[j]);
+  calc_eigen_3x3symm(Tff, Tffev); //optimize!
+
+  if(Tffev[0]<0. || Tffev[1]<0. || Tffev[2]<0.)
+    {
+      //using M1 if VET not causal - brutal and full of zasadzkas?
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  Rij[i][j]=RijM1[i][j];
+      //printf("used M1 at #%d at %d %d\n",nstep,geom0->ix,geom0->iy);
+    }
+
+  //converting back to MYCOORDS
+  trans22_coco(&coords[1][1][1][0], Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
+
+  //zeroing the trace of R^mu_nu
+  indices_2221(Rij,Rij,geom0->gg);
+  ldouble traceP=Rij[1][1]+Rij[2][2]+Rij[3][3];
+  ldouble factrace = -Rij[0][0]/traceP;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      Rij[i][j]*=factrace;
+  indices_2122(Rij,Rij,geom0->GG);
+   
+  /************* verbose part ******************/
+ 
+
+
+  //if(Tffev[0]<0. || Tffev[1]<0. || Tffev[2]<0.)  verbose=1;
 
   if(verbose)
     {
@@ -3999,10 +4066,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 		printf("%e ",source[i][j][k][l]);
 	      printf("\n");
 	    }
-    }      
-
-  if(verbose)
-    {
+   
       printf(">>>>>>> VET \n");
       for (i = 0; i < 3; i++)
 	{
@@ -4012,46 +4076,31 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	    }
 	  printf("\n");
 	}
-    }
-
-  //first, let us calculate enden & fluxes in RADCLOSURECOORDS
-  //using covariant formulation of M1 to recover R^mu_t from primitives
-  calc_Rij_M1(pp0,geom0,RijM1);	  
-  //converting to RADCLOSURECOORDS
-  trans22_coco(geom0->xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
-
-  //rewriting fluxes
-  for(i=0;i<4;i++)
-    {
-      Rij[0][i]=RijM1[0][i];
-      Rij[i][0]=RijM1[i][0];
-    }
-
-  //rewriting the pressure part with VET and mixing with M1
-  ldouble fzero=step_function(.75-beta0,.1);
-  if(beta0>0.9)
-    fzero=0.;
-  else
-    fzero=1.;
-  
-  for(i=1;i<4;i++)
-    for(j=1;j<4;j++)
-      Rij[i][j]=fzero*Rij[0][0]*VET[i-1][j-1]+(1.-fzero)*RijM1[i][j];
-  
-  //converting back to MYCOORDS
-  trans22_coco(&coords[1][1][1][0], Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
-
-  //zeroing the trace of R^mu_nu
-  indices_2221(Rij,Rij,geom0->gg);
-  ldouble traceP=Rij[1][1]+Rij[2][2]+Rij[3][3];
-  ldouble factrace = -Rij[0][0]/traceP;
-  for(i=1;i<4;i++)
-    for(j=1;j<4;j++)
-      Rij[i][j]*=factrace;
-  indices_2122(Rij,Rij,geom0->GG);
-  
-  if(verbose)
-    {
+   
+      printf(">>>>>>> f vector\n");
+      for (j = 0; j < 3; j++)
+	{
+	  printf("%e ", fvec[j]);
+	}
+      printf("\n");
+      printf(">>>>>>> T-ff eigenvalues\n");
+      for (j = 0; j < 3; j++)
+	{
+	  printf("%e ", Tffev[j]);
+	}
+      printf("\n");
+   
+      printf(">>>>>>> T-ff\n");
+      for (i = 0; i < 3; i++)
+	{
+	  for (j = 0; j < 3; j++)
+	    {
+	      printf("%e ", Tff[i][j]);
+	    }
+	  printf("\n");
+	}
+      
+   
       printf(">>>>>>> Rij\n");
       for (i = 0; i < 4; i++)
 	{
@@ -4061,8 +4110,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	    }
 	  printf("\n");
 	}
-      //getch();
+      getch();
     }
+
+  /************* verbose part ******************/
   //done
     
   return 0;
