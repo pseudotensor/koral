@@ -1569,9 +1569,19 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       dxdx_MKS12KS(xx,dxdx);
       multiply22(T1,T2,dxdx);
     }
+  else if(CO1==MKS2COORDS && CO2==KSCOORDS)
+    {
+      dxdx_MKS22KS(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
   else if(CO1==KSCOORDS && CO2==MKS1COORDS)
     {
       dxdx_KS2MKS1(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+    }
+  else if(CO1==KSCOORDS && CO2==MKS2COORDS)
+    {
+      dxdx_KS2MKS2(xx,dxdx);
       multiply22(T1,T2,dxdx);
     }
   else if(CO1==MCYL1COORDS && CO2==CYLCOORDS)
@@ -1602,6 +1612,14 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       dxdx_KS2BL(xx2,dxdx);
       multiply22(T2,T2,dxdx);
     }
+  else if (CO1==MKS2COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+    {
+      dxdx_MKS22KS(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+      coco_N(xx,xx2,CO1,KSCOORDS);
+      dxdx_KS2BL(xx2,dxdx);
+      multiply22(T2,T2,dxdx);
+    }
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
     {
       dxdx_BL2KS(xx,dxdx);
@@ -1610,8 +1628,19 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       dxdx_KS2MKS1(xx2,dxdx);
       multiply22(T2,T2,dxdx);  
     }
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS2COORDS)
+    {
+      dxdx_BL2KS(xx,dxdx);
+      multiply22(T1,T2,dxdx);
+      coco_N(xx,xx2,CO1,KSCOORDS);
+      dxdx_KS2MKS2(xx2,dxdx);
+      multiply22(T2,T2,dxdx);  
+    }
   else
-    my_err("transformation not implemented in trans22_coco()\n");
+    {
+    printf("transformation not implemented in trans22_coco() %d -> %d\n",CO1,CO2);
+    getch();
+    }
 
   return 0;
 }

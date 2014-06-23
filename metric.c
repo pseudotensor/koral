@@ -1703,11 +1703,11 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   get_xx(ix,iy,iz,xxvec);
   
   if(idim==0) //x-face
-    xxvec[0]=get_xb(ix,0);
+    xxvec[1]=get_xb(ix,0);
   if(idim==1) //y-face
-    xxvec[1]=get_xb(iy,1);
+    xxvec[2]=get_xb(iy,1);
   if(idim==2) //z-face
-    xxvec[2]=get_xb(iz,2);
+    xxvec[3]=get_xb(iz,2);
 
   coco_N(xxvec,xxvecBL,MYCOORDS,COORDS);
 
@@ -2481,18 +2481,18 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       coco_BL2KS(x2,x2);
       coco_KS2MKS2(x2,x2);
     }
- else if (CO1==KSCOORDS & CO2==MINKCOORDS)
+ else if (CO1==KSCOORDS && CO2==MINKCOORDS)
     {      
       coco_KS2BL(x1,x2);
       coco_SPH2MINK(x2,x2);
     }
-  else if (CO1==MKS1COORDS & CO2==MINKCOORDS)
+  else if (CO1==MKS1COORDS && CO2==MINKCOORDS)
     {
       coco_MKS12KS(x1,x2);
       coco_KS2BL(x2,x2);
       coco_SPH2MINK(x2,x2);
     }
-  else if (CO1==MKS2COORDS & CO2==MINKCOORDS)
+  else if (CO1==MKS2COORDS && CO2==MINKCOORDS)
     {
       coco_MKS22KS(x1,x2);
       coco_KS2BL(x2,x2);

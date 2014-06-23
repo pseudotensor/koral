@@ -6,27 +6,30 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 1
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
+//#define RADCLOSURE MINERBOCLOSURE
+#define RADCLOSUREMIXATBH
+#define RADCLOSURECOORDS BLCOORDS
 #define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
+//#define MIMICDYNAMO
 #define ALPHAFLIPSSIGN                                                        
 #define CALCHRONTHEGO
 #define ALPHADYNAMO 0.314
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-#define MAGNFIELD
+//#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -45,7 +48,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
@@ -74,22 +77,23 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.9
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS2COORDS
+#define myMKS1COORDS
+#define MKS1R0 0.
 #define MKS2R0 1.
 #define MKS2H0 0.6
 
-#ifdef myMKS2COORDS //modified Kerr-Shild
-#define MYCOORDS MKS2COORDS
-#define MINX (log(1.85-MKS2R0))
-#define MAXX (log(5000.-MKS2R0))
+#ifdef myMKS1COORDS //modified Kerr-Shild
+#define MYCOORDS MKS1COORDS
+#define MINX (log(1.5-MKS1R0))
+#define MAXX (log(500.-MKS1R0))
 //total resolution
-#define TNX 264 //33*8
-#define TNY 224 //28*8
+#define TNX 128 //33*8
+#define TNY 64 //28*8
 #define TNZ 1
 //number of tiles
 #define NTX 33
@@ -97,10 +101,10 @@
 #define NTZ 1
 #endif
 
-//#define MINY (0.0025*Pi/2.)
-//#define MAXY (Pi-0.0025*Pi/2.)
-#define MINY (0.001)
-#define MAXY (1.-0.001)
+#define MINY (0.0025*Pi/2.)
+#define MAXY (Pi-0.0025*Pi/2.)
+//#define MINY (0.001)
+//#define MAXY (1.-0.001)
 //#define MAXY (Pi/2.) //change in postinit.c
 #define MINZ -1.
 #define MAXZ 1.
@@ -125,7 +129,7 @@
 #define ANARELRADOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/

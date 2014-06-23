@@ -1618,6 +1618,30 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 
 #endif
 
+#ifdef RADCLOSUREMIXATBH //reverts to fully-covariant M1 close and inside the horizon
+  
+  ldouble RijM1[4][4];
+  calc_Rij_M1(pp,ggg,RijM1);
+  
+  ldouble xxBL[4],facM1; 
+  coco_N(geom->xxvec,xxBL,MYCOORDS, BLCOORDS);
+  if(xxBL[1]>1.1*rhorizonBL)
+    {
+      facM1=1.-step_function(xxBL[1]-2.*rhorizonBL,.1*rhorizonBL);
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  Rij[i][j]=facM1*RijM1[i][j]+(1.-facM1)*Rij[i][j];
+    }
+  else
+    {
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  Rij[i][j]=RijM1[i][j];
+    }
+  
+#endif
+
+
 
 
   #endif
@@ -3682,9 +3706,13 @@ radclosure_Minerbo(ldouble *pp, void *ggg, ldouble Rij[][4])
   //covariant formulation of M1 to recover R^tmu
   calc_Rij_M1(pp,geom,Rij);
   
+  //if(geom->ix=80 && geom->iy==NY/2)    print_tensor(Rij);
+
   //here convert to RADCLOSURECOORDS
   trans22_coco(geom->xxvec, Rij, Rij, geom->coords, RADCLOSURECOORDS);
 
+  //if(geom->ix=80 && geom->iy==NY/2)    print_tensor(Rij);
+  
   //primitives to 2
   trans_pall_coco(pp, pp2, geom->coords, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
 
@@ -3712,6 +3740,23 @@ radclosure_Minerbo(ldouble *pp, void *ggg, ldouble Rij[][4])
 
   //here convert to MYCOORDS
   trans22_coco(geom2.xxvec, Rij, Rij, RADCLOSURECOORDS, geom->coords);
+
+  //if(geom->ix=80 && geom->iy==NY/2)   print_tensor(Rij);
+
+  //test
+  /*
+  if(geom->ix==80 && geom->iy==NY/2 && geom->ifacedim>=0)
+    {
+      printf("%d %d %d\n",geom->ix,geom->iy,geom->ifacedim);
+      print_4vector(geom->xxvec);
+      print_4vector(geom2.xxvec);
+      coco_N(geom->xxvec,geom2.xxvec,MYCOORDS,RADCLOSURECOORDS);
+      print_4vector(geom2.xxvec);
+      coco_N(geom2.xxvec,geom->xxvec,RADCLOSURECOORDS,geom->coords);
+      print_4vector(geom->xxvec);
+      getch();
+    }
+  */
 
   //done
   return 0;
