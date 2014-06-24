@@ -683,6 +683,7 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 void initAngIndex(double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int angGridIndexSort[NUMANGLES][3], int angDualGridIndexSort[NUMANGLES][3]);
 void splitAngGrid(int numAvailAnglesInit, int angGridIndexInit[NUMANGLES][3], int iter, double angGridCoords[NUMANGLES][3], struct bsptree **node);
 void splitDualAngGrid(int numAvailAnglesInit, int angGridIndexInit[NUMDUALANGLES][3], int iter, double angGridCoords[NUMDUALANGLES][3], struct bsptree **node);
+void transformI(double I_return[NUMANGLES], double F_final[3], double fFinal, struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3]);
 
 double angGridCoords[NUMANGLES][3];  		//Store xyz locations of angle grid
 double angDualGridCoords[NUMDUALANGLES][3]; 	//Store xyz locations of dual angle grid

@@ -44,7 +44,7 @@ pp[FX0]=pp[FY0]=pp[FZ0]=0.;
 
 //test
 //pp[EE0]=1.;
-//pp[FX0]=0.005;
+//pp[FX0]=0.57735;
 
 #ifdef NCOMPTONIZATION
 pp[NF0]=calc_NFfromE(pp[EE0]);

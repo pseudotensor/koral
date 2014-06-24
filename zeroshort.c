@@ -1179,10 +1179,10 @@ void initAngIndex(double angGridCoords[NUMANGLES][3], double angDualGridCoords[N
 }
 
 
-void transformI(double I_start[NUMANGLES], double I_return[NUMANGLES], double F_final[3], double fFinal, struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3])
+void transformI(double I_return[NUMANGLES], double F_final[3], double fFinal, struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3])
 {
 	int i,j,p,l;
-//	double I_start[NUMANGLES];
+	double I_start[NUMANGLES];
 	double res[3];
 
 	double F_start[3], F_start_norm[3], F_final_norm[3], Fmag_start, Fmag_final;
@@ -1195,12 +1195,14 @@ void transformI(double I_start[NUMANGLES], double I_return[NUMANGLES], double F_
 
 	for (i=0; i < NUMANGLES; i++)
 	{
-//		I_start[i] = I_return[i];
+		I_start[i] = I_return[i];
+		//printf("%e\n", I_start[i]);
 		I_return[i] = 0.;
 	}
 
+	//printf("%e %e %e\n", F_final[0], F_final[1], F_final[2]);
 
-
+	Estart=0.;
 	//Calculate net flux direction
 	for (l=0; l < 3; l++)
 	{
@@ -1209,6 +1211,7 @@ void transformI(double I_start[NUMANGLES], double I_return[NUMANGLES], double F_
 
 	for (p=0; p < NUMANGLES; p++)
 	{
+	  //if(p<10) printf("%e\n", I_start[p]);
 		for (l=0; l < 3; l++)
 		{
 			F_start[l] += I_start[p]*angGridCoords[p][l];
@@ -1234,7 +1237,22 @@ void transformI(double I_start[NUMANGLES], double I_return[NUMANGLES], double F_
 
 	stretchFactor = sqrt(fabs((fFinal*fFinal - fFinal*fFinal*fStart*fStart)/(fStart*fStart - fFinal*fFinal*fStart*fStart)));
 
-	printf("SF = %e | Estart = %e, Fstart = %e, Ffinal = %e | F/E = %e\n", stretchFactor,Estart,  Fmag_start, Fmag_final, Fmag_start/Estart);
+
+	//printf("Fstart = %e %e %e\n", F_start[0], F_start[1], F_start[2]);
+
+	//printf("SF = %e | Estart = %e, Fstart = %e, Ffinal = %e | F/E = %e\n", stretchFactor,Estart,  Fmag_start, Fmag_final, Fmag_start/Estart);
+
+	if(!isfinite(stretchFactor) || stretchFactor<1.e-15) 
+	  {
+	    
+	    for (i=0; i < NUMANGLES; i++)
+
+		I_return[i] = I_start[i];
+	
+
+	    return;
+	   
+	  }
 
 	//Calculate rotation matrix
 	calc_rot_M(F_start_norm, F_final_norm, rotM);
@@ -1381,6 +1399,7 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
   //Fill out source function and intensity field for cube
 
   double beta[3][3][3];
+  double ffzero;
   int i,j,k;
   for (i=0; i<3; i++)
     {
@@ -1410,7 +1429,8 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 				 M1_Data[i][j][k][2]*M1_Data[i][j][k][2] + 
 				 M1_Data[i][j][k][3]*M1_Data[i][j][k][3]);
 
-	     double ff = fmag / M1_Data[i][j][k][0]; //F/E using input argument
+	      double ff = fmag / M1_Data[i][j][k][0]; //F/E using input argument
+	      if(i==1 && j==1 && k==1) ffzero=ff;
 	      if(ff<1.e-2) 
 		beta[i][j][k]=3.*ff/4.;
 	      else
@@ -1459,27 +1479,48 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
       double bmax=1-beta[1][1][1]*mu_max;
       double bmin=1-beta[1][1][1]*mu_min;
 
-      I_Data[1][1][1][probeAng] = M1_Data[1][1][1][0]/bm/bm/bm/bm/gamma2/gamma2;
+      //Factor 2 is to convert E_iso to I_iso, since I_iso = E_iso/4pi, where we also absorb *2pi factor for phi integral
+      I_Data[1][1][1][probeAng] = M1_Data[1][1][1][4]/NUMANGLES/bm/bm/bm/bm/gamma2/gamma2;
       Estart += I_Data[1][1][1][probeAng];
 
+      //if(probeAng<10) printf("%e\n", I_start[probeAng]);
       for (j=0; j<3; j++)
 	{
-	  Fstart[j]=I_Data[1][1][1][probeAng]*angGridCoords[probeAng][j];
+
+	  Fstart[j]+=I_Data[1][1][1][probeAng]*angGridCoords[probeAng][j];
 	}
 
       //I_Data[1][1][1][probeAng] = M1_Data[1][1][1][0]/gamma2/gamma2/beta/3.0*(1.0/bmax/bmax/bmax - 1.0/bmin/bmin/bmin)/(mu_max - mu_min);
 
     }
 
+  double Ffinal[3];
+  
   /*
-  printf("INPT: F/E = (%e, %e, %e) beta1 = (%e) beta2 = (%e)\n", M1_Data[1][1][1][1]/M1_Data[1][1][1][0], 
+  printf("INPT: Elab = (%e)  Erad = (%e)\n", M1_Data[1][1][1][0],M1_Data[1][1][1][4]);
+
+  printf("INPT: F/E = (%e, %e, %e) beta1 = (%e)\n", M1_Data[1][1][1][1]/M1_Data[1][1][1][0], 
 	 M1_Data[1][1][1][2]/M1_Data[1][1][1][0],
-	 M1_Data[1][1][1][3]/M1_Data[1][1][1][0],beta[1][1][1],M1_Data[1][1][1][4]);
+	 M1_Data[1][1][1][3]/M1_Data[1][1][1][0],beta[1][1][1]);
   printf("ZERO: F/E = (%e, %e, %e)\n", Fstart[0]/Estart, Fstart[1]/Estart, Fstart[2]/Estart);
-  getch();
   */
 
+  transformI(&I_Data[1][1][1][0], &M1_Data[1][1][1][1], ffzero, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 
+  /*
+  Estart=0.;Fstart[0]=Fstart[1]=Fstart[2]=0.;
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+      Estart += I_Data[1][1][1][probeAng];
+      for (j=0; j<3; j++)
+	{
+	  Fstart[j]+=I_Data[1][1][1][probeAng]*angGridCoords[probeAng][j];
+	}
+    }
+  */
+  //printf("ZERO: F/E = (%e, %e, %e)\n", Fstart[0]/Estart, Fstart[1]/Estart, Fstart[2]/Estart);
+  //getch();
+  
 
   
 
@@ -1541,7 +1582,7 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 	  double bmin=1.-betahere*mu_min;
 
 
-	  I_Data[intersect_i][intersect_j][intersect_k][probeAng] = M1_Data[intersect_i][intersect_j][intersect_k][0]/bm/bm/bm/bm/gamma2/gamma2;
+	  I_Data[intersect_i][intersect_j][intersect_k][probeAng] = M1_Data[intersect_i][intersect_j][intersect_k][4]/2.0/bm/bm/bm/bm/gamma2/gamma2;
 	  //I_Data[intersect_i][intersect_j][intersect_k][probeAng] = M1_Data[intersect_i][intersect_j][intersect_k][0]/gamma2/gamma2/beta/3.0*(1.0/bmax/bmax/bmax - 1.0/bmin/bmin/bmin)/(mu_max - mu_min);
 	   
 	  interp_I += I_Data[intersect_i][intersect_j][intersect_k][probeAng]*intersectGridWeights[probeAng][p];
@@ -1981,23 +2022,23 @@ int ZEROtest_oldmain()
 	Ffinal[2]=0.0;
 
 
-	transformI(I_start, I_return, Ffinal, 0.7, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+	transformI(I_start, Ffinal, 0.7, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 
 
 
 	double Fnew[3] = {0.,0.,0.}, Efinal=0.;
 
 	for (p=0; p < NUMANGLES; p++)
-	{
-		Efinal += I_return[p];
-//		Efinal += I_start[p];
+	  {
+	    //Efinal += I_return[p];
+	    Efinal += I_start[p];
 
-		for (l=0; l < 3; l++)
-		{
-			Fnew[l] += I_return[p]*angGridCoords[p][l];
-//			Fnew[l] += I_start[p]*angGridCoords[p][l];
-		}		
-	}
+	    for (l=0; l < 3; l++)
+	      {
+		//Fnew[l] += I_return[p]*angGridCoords[p][l];
+		Fnew[l] += I_start[p]*angGridCoords[p][l];
+	      }		
+	  }
 
 	double Fnorm = sqrt(Fnew[0]*Fnew[0] + Fnew[1]*Fnew[1] + Fnew[2]*Fnew[2]);
 

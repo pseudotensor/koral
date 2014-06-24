@@ -4004,7 +4004,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	 
 	  
 	  //saving rad. field to memory
-	  rad[i+1][j+1][k+1][0]=Elab; //energy density insensitive to coordinates, radiation rest frame
+	  rad[i+1][j+1][k+1][0]=Elab; //energy density in lab frame
 	  /*
 	  rad[i+1][j+1][k+1][1]=ucon[1]; //u^i in RADCLOSURECOORDS, non-ortonormal
 	  rad[i+1][j+1][k+1][2]=ucon[2]; //u^i in RADCLOSURECOORDS, non-ortonormal
@@ -4014,7 +4014,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  rad[i+1][j+1][k+1][2]=RijM1[0][2]; 
 	  rad[i+1][j+1][k+1][3]=RijM1[0][3]; 
 
-  	  rad[i+1][j+1][k+1][4]=beta; //u^i in RADCLOSURECOORDS, non-ortonormal
+  	  rad[i+1][j+1][k+1][4]=Erad; //energy density in radiation rest frame
 
 	}
 
@@ -4029,7 +4029,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ldouble I_return[NUMANGLES];			
   ldouble F_return[3];
   
-  ZERO_shortChar(0.*dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
+  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
 
   if((VET[0][0]+VET[1][1]+VET[2][2]<0.9))
     {
