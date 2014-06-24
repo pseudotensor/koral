@@ -8,9 +8,13 @@ main(int argc, char **argv)
 {  
   mpi_myinit(argc,argv);
 
-  //requires no rad. viscosity!
-  //test_solve_implicit_lab();
-  //exit(0);
+  //tests
+  /*
+  ldouble temp;
+  for(temp=1.e1;temp<1.e10;temp*=1.1)
+    printf("%e %e\n",temp,opacity_BellLin(1.e-7,temp));
+  exit(0);
+  */
 
   ldouble tstart;
   int i; char folder[100],bufer[100];

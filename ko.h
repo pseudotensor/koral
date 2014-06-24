@@ -225,6 +225,7 @@ int convert_out2gif_1d(char *fname,char*,int niter,ldouble t);
 int convert_out2gif_2d(char *fname,char*,int niter,ldouble t);
 int getch(void);
 int dosthelse(void);
+ldouble opacity_BellLin(ldouble rhoc, ldouble Tc);
 
 //finite.c
 

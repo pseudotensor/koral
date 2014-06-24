@@ -8,28 +8,29 @@
 /************************************/
 //#define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 1
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
+//#define OPACBELLLIN
 //#define RADCLOSURE MINERBOCLOSURE
-#define RADCLOSUREMIXATBH
-#define RADCLOSURECOORDS BLCOORDS
+//#define RADCLOSUREMIXATBH
+//#define RADCLOSURECOORDS BLCOORDS
 #define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
+#define MIMICDYNAMO
 #define ALPHAFLIPSSIGN                                                        
 #define CALCHRONTHEGO
 #define ALPHADYNAMO 0.314
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-//#define MAGNFIELD
+#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -48,7 +49,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
@@ -76,7 +77,7 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 10.
+#define MASS 1.e6
 #define BHSPIN 0.0
 
 /************************************/
@@ -89,7 +90,7 @@
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS MKS1COORDS
-#define MINX (log(1.5-MKS1R0))
+#define MINX (log(4.5-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
 //total resolution
 #define TNX 128 //33*8
@@ -140,7 +141,7 @@
 #define NTORUS 7
 
 #if(NTORUS==7) //flat sigma
-#define LT_KAPPA 3.e2
+#define LT_KAPPA 1.e1
 #define EXPECTEDHR 0.3
 #define LT_XI 0.975
 #define LT_R1 30.
@@ -226,4 +227,4 @@
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+#define ERADATMMIN  (calc_LTE_EfromT(1.e3)/10)

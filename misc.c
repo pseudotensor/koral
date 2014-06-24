@@ -996,3 +996,47 @@ struct timespec *ts
 #endif
   return 0;
 }
+
+
+//frequency integrated opacity after appendix of Bell & Lin (ApJ, 427, 987, 1994)
+ldouble
+opacity_BellLin(ldouble rhoc, ldouble Tc)
+{
+  ldouble X=0.75;
+  ldouble Z=0.02;
+      
+  //electron scattering
+  ldouble opaces=0.2*(1.0+X);
+
+  //Bound-free and free-free - Kramers?
+  //opacKr=4.d25*(1.d0+X)*(Z+1.d-3)*rhoc/Tc**3.5
+  ldouble opacKr=1.5e20*rhoc/Tc/Tc/sqrt(Tc);
+
+  //H-scattering
+  //opacHm=1.1d-25*sqrt(Z*rhoc)*Tc**7.7
+  //opacHm=1.d-13*rhoc**0.333333*Tc**4
+  ldouble opacHm=1.e-36*cbrt(rhoc)*Tc*Tc*Tc*Tc*Tc*Tc*Tc*Tc*Tc*Tc;
+
+  //molecules
+  //opacmol=0.1d0*Z
+  ldouble opacmol=1.e-8*cbrt(rhoc*rhoc)*Tc*Tc*Tc;
+
+  //evaporation of metal grains
+  ldouble Tc24=Tc*Tc; Tc24*=Tc24; Tc24*=Tc24; Tc24*=Tc24*Tc24;
+  ldouble opacmetevap=2.e81*rhoc/Tc24;
+
+  //metal grains
+  ldouble opacmet=0.1*sqrt(Tc);
+
+  //evaporation of ice grains
+  ldouble opaciceevap=2.e16/Tc/Tc/Tc/Tc/Tc/Tc/Tc;
+  
+  //ice grains
+  ldouble opacice=2.e-4*Tc*Tc;
+
+  ldouble opacity=1.e0/((1.e0/(opacHm+opacmol))+(1.e0/(opaces+opacKr)))
+    +1.e0/(1.e0/opacice+1.e0/opaciceevap)
+    +1.e0/(1.e0/opacmet+1.e0/opacmetevap);
+  
+  return opacity;
+}
