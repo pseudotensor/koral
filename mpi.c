@@ -10,16 +10,18 @@ calc_avgs_throughout()
   ldouble sigma,scaleth,xxBL[4]; 
   for(gix=0;gix<TNX;gix++)
     sigma_otg_temp[gix]=scaleth_otg_temp[gix]=0.;
-  iz=0;
   for(ix=0;ix<NX;ix++)
     {
       sigma=scaleth=0.;
       for(iy=0;iy<NY;iy++)
 	{
-	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
-	  coco_N(geom.xxvec,xxBL,MYCOORDS,BLCOORDS);
-	  sigma+=get_u(p,RHO,ix,iy,iz)*geom.gdet;
-	  scaleth+=get_u(p,RHO,ix,iy,iz)*geom.gdet*(M_PI/2. - xxBL[2])*(M_PI/2. - xxBL[2]);
+	  for(iz=0;iz<NY;iz++)
+	    {
+	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
+	      coco_N(geom.xxvec,xxBL,MYCOORDS,BLCOORDS);
+	      sigma+=get_u(p,RHO,ix,iy,iz)*geom.gdet;
+	      scaleth+=get_u(p,RHO,ix,iy,iz)*geom.gdet*(M_PI/2. - xxBL[2])*(M_PI/2. - xxBL[2]);
+	    }
 	}
       gix=ix+TOI;
       

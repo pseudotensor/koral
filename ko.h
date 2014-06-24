@@ -83,9 +83,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_multiroots.h>
-#include <gsl/gsl_odeiv2.h>
 #include <gsl/gsl_blas.h>
-
+//#include <gsl/gsl_odeiv2.h>
 
 #ifdef PR_DEFS
 #include PR_DEFS
@@ -666,9 +665,25 @@ int calc_avgs_throughout();
 int mpi_exchangedata();
 
 //zeroshort.c
+//Define what is contained in each node
+struct bsptree
+{
+	int angIndex;  //specify which angle index this node corresponds to
+	int iter;	//specify which axis we do the median cutting
+
+	struct bsptree *lower;
+	struct bsptree *upper;
+};
+
 int ZEROtest_oldmain();
 int zero_readangles();
+struct bsptree *angGridRoot;
+struct bsptree *angDualGridRoot;
 void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],double* ,int verbose);
+void initAngIndex(double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int angGridIndexSort[NUMANGLES][3], int angDualGridIndexSort[NUMANGLES][3]);
+void splitAngGrid(int numAvailAnglesInit, int angGridIndexInit[NUMANGLES][3], int iter, double angGridCoords[NUMANGLES][3], struct bsptree **node);
+void splitDualAngGrid(int numAvailAnglesInit, int angGridIndexInit[NUMDUALANGLES][3], int iter, double angGridCoords[NUMDUALANGLES][3], struct bsptree **node);
+
 double angGridCoords[NUMANGLES][3];  		//Store xyz locations of angle grid
 double angDualGridCoords[NUMDUALANGLES][3]; 	//Store xyz locations of dual angle grid
 int dualAdjacency[NUMDUALANGLES][3]; 		//Store index information for adjacent angles

@@ -290,8 +290,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 		  //to calculate magn. field angle
 		  ldouble brbphi,bsq,bfake[4];
+		  #ifdef BHDISK_PROBLEMTYPE
 		  calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq,bfake,bfake);
 		  Bangle[nodalindex]=-brbphi/bsq;
+		  #else
+		  Bangle[nodalindex]=-1.;
+		  #endif
 
 		  if(ix==0 || (NY>1 && iy==0) || (NZ>1 && iz==0)) //divB left-biased
 		    divB[nodalindex]=0;
@@ -351,9 +355,13 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
 		  //to calculate magn. field angle
 		  ldouble brbphi,bsq,bfake[4];
+		  #ifdef BHDISK_PROBLEMTYPE
 		  calc_angle_brbphibsq(ix,iy,iz,&brbphi,&bsq,bfake,bfake);
 		  Bangle[nodalindex]=-brbphi/bsq;
-
+		  #else
+		  Bangle[nodalindex]=-1.;
+		  #endif
+		  
 		  if(ix==0 || (NY>1 && iy==0) || (NZ>1 && iz==0)) //divB left-biased
 		    divB[nodalindex]=0;
 		  else

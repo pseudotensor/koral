@@ -3980,15 +3980,18 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  source[i+1][j+1][k+1][1]=Elab;
 	  source[i+1][j+1][k+1][2]=alpha;
 	  source[i+1][j+1][k+1][3]=sigma;
-	      
+	  
+	  
 	  //converting velocity
 	  conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom.gg,geom.GG);	   
 	  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
-
+	  
+	  
 	  //cap on valocities not too abuse ZERO solver
-	  ldouble beta=1.-1./sqrt(ucon[0]*ucon[0]);
+	  ldouble beta=sqrt(1.-1./(ucon[0]*ucon[0]));
 	  if(i==0 && j==0 && k==0) beta0=beta;
-	  ldouble maxradbeta = 0.9;
+	  /*
+	    ldouble maxradbeta = 0.9;
 	  if(beta>maxradbeta)
 	    {
 	      ucon[1]*=(maxradbeta/beta);
@@ -3997,12 +4000,20 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	      beta=0.9;
 	    }
 	  //conv_vels(ucon,ucon,VEL4,VEL4,geom.gg,geom.GG); //ut not used anymore
+	  */
+	 
 	  
 	  //saving rad. field to memory
-	  rad[i+1][j+1][k+1][0]=Erad; //energy density insensitive to coordinates, radiation rest frame
+	  rad[i+1][j+1][k+1][0]=Elab; //energy density insensitive to coordinates, radiation rest frame
+	  /*
 	  rad[i+1][j+1][k+1][1]=ucon[1]; //u^i in RADCLOSURECOORDS, non-ortonormal
 	  rad[i+1][j+1][k+1][2]=ucon[2]; //u^i in RADCLOSURECOORDS, non-ortonormal
 	  rad[i+1][j+1][k+1][3]=ucon[3]; //u^i in RADCLOSURECOORDS, non-ortonormal
+	  */
+	  rad[i+1][j+1][k+1][1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDS, non-ortonormal
+	  rad[i+1][j+1][k+1][2]=RijM1[0][2]; 
+	  rad[i+1][j+1][k+1][3]=RijM1[0][3]; 
+
   	  rad[i+1][j+1][k+1][4]=beta; //u^i in RADCLOSURECOORDS, non-ortonormal
 
 	}
@@ -4043,6 +4054,8 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ldouble fzero;
   //  fzero=step_function(.75-beta0,.1);
   fzero=1.;
+  if(beta0>0.9)
+    fzero=0.;
   
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
@@ -4055,13 +4068,13 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
     for(j=0;j<3;j++)
       Tff[i][j]=(Rij[i+1][j+1]/Rij[0][0]-fvec[i]*fvec[j]);
 
-  if(1) //revert to M1 when problems
+  if(0) //revert to M1 when problems
     {
       calc_eigen_3x3symm(Tff, Tffev); //optimize!
 
       if(Tffev[0]<0. || Tffev[1]<0. || Tffev[2]<0.)
 	{
-	  /*
+	  
 	  printf("1> %e %e %e\n",Tffev[0],Tffev[1],Tffev[2]);
 
 	  for(i=0;i<3;i++)
@@ -4071,13 +4084,14 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  calc_eigen_3x3symm(Tff, Tffev);
 	    
 	  printf("2> %e %e %e\n",Tffev[0],Tffev[1],Tffev[2]);
-	  */
+	  
 	  //using M1 if VET not causal - brutal and full of zasadzkas?
 	  for(i=1;i<4;i++)
 	    for(j=1;j<4;j++)
 	      Rij[i][j]=RijM1[i][j];
-	  //printf("used M1 at #%d at %d %d with beta=%.6f\n",nstep,geom0->ix,geom0->iy,beta0);
-	  //getch();
+
+	  printf("used M1 at #%d at %d %d with beta=%.6f\n",nstep,geom0->ix,geom0->iy,beta0);
+	  getch();
 	}
     }
 

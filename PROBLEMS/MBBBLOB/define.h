@@ -1,11 +1,11 @@
 //test
 //#define MAGNFIELD
-//#define VECPOTGIVEN
+#define VECPOTGIVEN
 
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -71,9 +71,9 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1. 
-#define TNX 100
-#define TNY 100
-#define TNZ 1
+#define TNX 30
+#define TNY 30
+#define TNZ 30
 
 //# of tiles
 #define NTX 2
@@ -114,14 +114,18 @@
 #define TEMPZERO 1.e7
 #define TEMPBLOB1 1.e7
 #define TEMPBLOB2 1.e7
-#define VELXBLOB1 0.1
-#define VELXBLOB2 -0.1
+#define VELXBLOB1 0.01
+#define VELXBLOB2 -0.01
 #define VELYBLOB1 (VELXBLOB1*0.5)
 #define VELYBLOB2 (VELXBLOB2*0.25)
+#define VELZBLOB1 (VELXBLOB1*0.)
+#define VELZBLOB2 (VELXBLOB2*0.)
 #define XBLOB1 -.5
 #define XBLOB2 .5
 #define YBLOB1 -.5
 #define YBLOB2 .5
+#define ZBLOB1 0.
+#define ZBLOB2 0.
 #define SIZEBLOB1 .1
 #define SIZEBLOB2 .1
 

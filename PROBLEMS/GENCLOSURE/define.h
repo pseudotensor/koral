@@ -88,8 +88,8 @@
 #define NTZ 1
 
 //#define SPECIFIC_BC
-#define PERIODIC_XBC
-#define PERIODIC_YBC
+#define COPY_XBC
+#define COPY_YBC
 #define COPY_ZBC
 #define SHUFFLELOOPS 0
 

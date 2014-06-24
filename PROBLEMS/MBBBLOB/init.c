@@ -17,8 +17,8 @@ pp[VX]=0.;
 pp[VY]=0.;
 pp[VZ]=0.;
 
-ldouble w1=exp(-((geom.xx-XBLOB1)*(geom.xx-XBLOB1) + (geom.yy-YBLOB1)*(geom.yy-YBLOB1) )/SIZEBLOB1/SIZEBLOB1);
-ldouble w2=exp(-((geom.xx-XBLOB2)*(geom.xx-XBLOB2) + (geom.yy-YBLOB2)*(geom.yy-YBLOB2) )/SIZEBLOB2/SIZEBLOB2);
+ldouble w1=exp(-((geom.xx-XBLOB1)*(geom.xx-XBLOB1) + (geom.yy-YBLOB1)*(geom.yy-YBLOB1) + (geom.zz-ZBLOB1)*(geom.zz-ZBLOB1) )/SIZEBLOB1/SIZEBLOB1);
+ldouble w2=exp(-((geom.xx-XBLOB2)*(geom.xx-XBLOB2) + (geom.yy-YBLOB2)*(geom.yy-YBLOB2) + (geom.zz-ZBLOB2)*(geom.zz-ZBLOB2) )/SIZEBLOB2/SIZEBLOB2);
 
 
 pp[RHO]*=(1. + BLOBMAG1*w1 + BLOBMAG2*w2);
@@ -35,6 +35,10 @@ if(w1>0.01 && w2>0.01) pp[VX]=.5*(VELXBLOB1+VELXBLOB2);
 if(w1>0.01 && w2>0.01) pp[VY]=.5*(VELYBLOB1+VELYBLOB2);
  else if(w1>0.01) pp[VY]=VELYBLOB1;
  else if(w2>0.01) pp[VY]=VELYBLOB2;
+
+if(w1>0.01 && w2>0.01) pp[VZ]=.5*(VELZBLOB1+VELZBLOB2);
+ else if(w1>0.01) pp[VZ]=VELZBLOB1;
+ else if(w2>0.01) pp[VZ]=VELZBLOB2;
 
 #ifdef RADIATION
 ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);

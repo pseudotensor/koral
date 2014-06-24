@@ -82,7 +82,7 @@
 //79 SOFTBALL - Ron & Grz Bis
 //80 GENCLOSURE - tests of closures
 
-#define PROBLEM 67
+#define PROBLEM 80
 
 #if(PROBLEM==80)
 
@@ -1709,8 +1709,8 @@
 #define MPIMSGBUFSIZE 12
 #endif
 
-#ifndef MPI4CORNERS
-//#ifdef MAGNFIELD //always fill corners
+#ifndef MPI4CORNERS //required by MAGNFIELD and VETCLOSURE
+//#ifdef MAGNFIELD //always fill corners? 
 #define MPI4CORNERS
 #undef MPIMSGBUFSIZE
 #if (TNX>1 && TNY>1 && TNY>1) //3d

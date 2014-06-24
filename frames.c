@@ -1525,7 +1525,10 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       multiply2(u2,u2,dxdx);  
     }
   else
-    my_err("transformation not implemented in trans2_coco()\n");
+    {
+      printf("transformation not implemented in trans2_coco(): %d -> %d\n",CO1,CO2);
+      getch();
+    }
 
   return 0;
 }

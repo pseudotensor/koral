@@ -70,6 +70,7 @@ main(int argc, char **argv)
 #ifdef RADIATION
 #if(RADCLOSURE==VETCLOSURE)
   zero_readangles();
+  //ZEROtest_oldmain();
 #endif
 #endif
 
