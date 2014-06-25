@@ -1377,7 +1377,47 @@ void transformI(double I_return[NUMANGLES], double F_final[3], double fFinal, st
 }
 
 
+void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
+{
+  
+  double fmag = sqrt(M1_Data[1]*M1_Data[1] + 
+		     M1_Data[2]*M1_Data[2] + 
+		     M1_Data[3]*M1_Data[3]);
 
+  double ff = fmag / M1_Data[0]; //F/E using input argument
+  double beta;
+
+  if(ff<1.e-2) 
+    beta=3.*ff/4.;
+  else
+    beta=(4.-sqrt(16.-12.*ff*ff))/2./ff;	    
+
+  if(fmag<SMALL)
+    fmag=1.;
+
+  double f_norm[3];
+  f_norm[0] = M1_Data[1]/fmag;
+  f_norm[1] = M1_Data[2]/fmag;
+  f_norm[2] = M1_Data[3]/fmag;
+
+  double gamma2 = 1.0/(1.0-beta*beta);
+
+  int probeAng;
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+
+      double mu= f_norm[0]*angGridCoords[probeAng][0] + f_norm[1]*angGridCoords[probeAng][1] + f_norm[2]*angGridCoords[probeAng][2];
+		      
+      if(beta<SMALL)
+	mu=1.;
+
+      double bm=1-beta*mu;
+      //Factor 2 is to convert E_iso to I_iso, since I_iso = E_iso/4pi, where we also absorb *2pi factor for phi integral
+      I_return[probeAng] = M1_Data[4]/NUMANGLES/bm/bm/bm/bm/gamma2/gamma2;
+    }
+
+  return;
+}
 
 
 
