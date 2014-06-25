@@ -1545,7 +1545,7 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
   printf("ZERO: F/E = (%e, %e, %e)\n", Fstart[0]/Estart, Fstart[1]/Estart, Fstart[2]/Estart);
   */
 
-  transformI(&I_Data[1][1][1][0], &M1_Data[1][1][1][1], ffzero, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+  //transformI(&I_Data[1][1][1][0], &M1_Data[1][1][1][1], ffzero, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 
   /*
   Estart=0.;Fstart[0]=Fstart[1]=Fstart[2]=0.;
@@ -1792,8 +1792,6 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 
 void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose)
 {
-  //Note:  M1 data has format:   E, v0, v1, v2
-
   double S[3][3][3];  //radiative source function
 
   double I_ray[NUMANGLES];  //intensity field evaluated at the center, for time independent problem

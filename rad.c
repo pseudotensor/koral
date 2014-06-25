@@ -3834,6 +3834,8 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   //array holding radiative properties for ZERO
   ldouble rad[3][3][3][5];
+  //array holding specific intensities for ZERO
+  ldouble intensities[3][3][3][NUMANGLES];
   //array holding coordinates for ZERO
   ldouble coords[3][3][3][4];
   //array holding coordinates for ZERO
@@ -3868,19 +3870,37 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	      fill_geometry(ix,iy,iz,&geom); //equals geom0
 
 	      //reading from memory
-	      rho=get_u(p,RHO,ix,iy,iz);
-	      uint=get_u(p,UU,ix,iy,iz);
-	      for(l=1;l<4;l++) ucon[l]=get_u(p,EE0+l,ix,iy,iz);
-	      Erad=get_u(p,EE0,ix,iy,iz);
+	      if(i==0 && j==0 && k==0)
+		{
+		  rho=pp0[RHO];
+		  uint=pp0[UU];
+		  for(l=1;l<4;l++) ucon[l]=pp0[EE0+l];
+		  Erad=pp0[EE0];
+		}
+	      else
+		{
+		  rho=get_u(p,RHO,ix,iy,iz);
+		  uint=get_u(p,UU,ix,iy,iz);
+		  for(l=1;l<4;l++) ucon[l]=get_u(p,EE0+l,ix,iy,iz);
+		  Erad=get_u(p,EE0,ix,iy,iz);
+		}
 
 	      //coordinates
 	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
 
 	      //stress energy tensor
-	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);	  
+	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
+
+	      //intensities
+	      
+	      for(l=0;l<NUMANGLES;l++)
+		intensities[i+1][j+1][k+1][l]=Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][l];
+	      
 	    }
 	  else //when calculating fluxes at cell faces
 	    {
+	      //currently not used
+	      my_err("VET at faces? No....\n");
 	      if(i==0 && j==0 && k==0) //the face
 		{
 		  //primitives
@@ -3891,8 +3911,8 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 		  //coordinates
 		  coco_N(geom0->xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
 		  //geometry
-		  fill_geometry_face(geom0->ix,geom0->iy,geom0->iz,geom0->ifacedim,&geom); //should correspond to geom0		    		  //stress energy tensor
-		  calc_Rij_M1(pp0,&geom,RijM1);	  
+		  fill_geometry_face(geom0->ix,geom0->iy,geom0->iz,geom0->ifacedim,&geom); //should correspond to geom0		     //stress energy tensor
+		  calc_Rij_M1(pp0,&geom,RijM1);		  
 		}
 	      else if((i==0 && geom0->ifacedim==0) || 
 		      (j==0 && geom0->ifacedim==1) ||
@@ -4016,6 +4036,17 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 
   	  rad[i+1][j+1][k+1][4]=Erad; //energy density in radiation rest frame
 
+
+
+	  if(i==0 && j==0 && k==0)
+	    {
+	      double fmag = sqrt(rad[i+1][j+1][k+1][1]*rad[i+1][j+1][k+1][1] + 
+				 rad[i+1][j+1][k+1][2]*rad[i+1][j+1][k+1][2] + 
+				 rad[i+1][j+1][k+1][3]*rad[i+1][j+1][k+1][3]);
+	      double ff = fmag / rad[i+1][j+1][k+1][0];
+	      
+	      transformI(&intensities[i+1][j+1][k+1][0], &rad[i+1][j+1][k+1][1], ff, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+	    }
 	}
 
   //if(beta0>0.5) verbose=1;
@@ -4029,13 +4060,18 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ldouble I_return[NUMANGLES];			
   ldouble F_return[3];
   
-  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
+  //ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
 
+  ZERO_shortCharI(dt, intensities, source, 
+  angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
+  VET, I_return, 0);
+  /*
   if((VET[0][0]+VET[1][1]+VET[2][2]<0.9))
     {
       ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 1); 
       verbose=1;
     }
+  */
  
   //first, let us calculate enden & fluxes in RADCLOSURECOORDS
   //using covariant formulation of M1 to recover R^mu_t from primitives
@@ -4215,5 +4251,148 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   /************* verbose part ******************/
   //done
     
+  return 0;
+}
+
+//decomposes M1 beam into intensities
+int
+calc_M1intensities()
+{
+  int ix,iy,iz,ii;
+#pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
+  for(ii=0;ii<Nloop_6;ii++) //domain plus layer of one
+    {
+      ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
+      struct geometry geom;
+      ldouble ucon[4], M1[5];
+      ix=loop_6[ii][0];
+      iy=loop_6[ii][1];
+      iz=loop_6[ii][2]; 
+
+      fill_geometry(ix,iy,iz,&geom); 
+
+      //stress energy tensor
+      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
+      Erad=get_u(p,EE0,ix,iy,iz);
+      Elab=RijM1[0][0];
+
+      //input
+      M1[0]=Elab;
+
+      M1[1]=RijM1[0][1];
+      M1[2]=RijM1[0][2];
+      M1[3]=RijM1[0][3];
+      M1[4]=Erad;
+      
+      //intensities
+      ZERO_decomposeM1(M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+    }
+
+  return 0;
+}
+
+//evolves intensities using ZERO and makes them consistent with M1 fluxes
+int
+update_intensities()
+{
+  int ii;
+
+  //making backup acting as the previous time step
+#pragma omp parallel for private(ii) schedule (static)
+  for(ii=0;ii<Nloop_6;ii++) //domain only
+    {
+      int i,j,ix,iy,iz;
+      ix=loop_6[ii][0];
+      iy=loop_6[ii][1];
+      iz=loop_6[ii][2];
+      for(i=0;i<NUMANGLES;i++)
+	Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][i]=Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][i];
+    }
+     
+  //updating using ZERO
+#pragma omp parallel for private(ii) schedule (static)
+  for(ii=0;ii<Nloop_0;ii++) //domain only
+    {
+      int ix,ix0,iy,iy0,iz,iz0,i,j,k,l;
+      //array holding radiative properties for ZERO
+      ldouble rad[3][3][3][5],VET[3][3];
+      //array holding specific intensities for ZERO
+      ldouble intensities[3][3][3][NUMANGLES];
+      //array holding coordinates for ZERO
+      ldouble coords[3][3][3][4];
+      //array holding coordinates for ZERO
+      ldouble source[3][3][3][4];
+      ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
+      struct geometry geom;
+      ldouble ucon[4], M1[5];
+      ix0=loop_0[ii][0];
+      iy0=loop_0[ii][1];
+      iz0=loop_0[ii][2]; 
+
+      for(i=-1;i<=1;i++) //loop over cell centers
+	for(j=-1;j<=1;j++)
+	  for(k=-1;k<=1;k++)
+	    {
+	      ucon[0]=0.;
+	      ix=ix0+i;
+	      iy=iy0+j;
+	      iz=iz0+i;
+	   
+	      fill_geometry(ix,iy,iz,&geom); //equals geom0
+
+	      rho=get_u(p,RHO,ix,iy,iz);
+	      uint=get_u(p,UU,ix,iy,iz);
+	      for(l=1;l<4;l++) ucon[l]=get_u(p,EE0+l,ix,iy,iz);
+	      Erad=get_u(p,EE0,ix,iy,iz);
+
+	      //coordinates
+	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
+
+	      //stress energy tensor
+	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
+
+	      //intensities	      
+	      for(l=0;l<NUMANGLES;l++)
+		intensities[i+1][j+1][k+1][l]=Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][l];
+
+	      //postprocessing, passing by
+	      pre=(GAMMA-1.)*(uint);
+	      Tgas=pre*MU_GAS*M_PROTON/K_BOLTZ/rho;
+	      alpha=calc_kappa(rho,Tgas,geom.xx,geom.yy,geom.zz);
+	      sigma=calc_kappaes(rho,Tgas,geom.xx,geom.yy,geom.zz);
+#ifdef SKIPRADSOURCE
+	      alpha=sigma=0.;
+#endif
+	      Elab=RijM1[0][0];
+     
+	      source[i+1][j+1][k+1][0]=Tgas;
+	      source[i+1][j+1][k+1][1]=Elab;
+	      source[i+1][j+1][k+1][2]=alpha;
+	      source[i+1][j+1][k+1][3]=sigma;
+	  
+	      //saving rad. field to memory
+	      rad[i+1][j+1][k+1][0]=Elab; //energy density in lab frame
+	      rad[i+1][j+1][k+1][1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDS, non-ortonormal
+	      rad[i+1][j+1][k+1][2]=RijM1[0][2]; 
+	      rad[i+1][j+1][k+1][3]=RijM1[0][3]; 	      
+	      rad[i+1][j+1][k+1][4]=Erad; //
+	    }
+
+      //running ZERO
+      ZERO_shortCharI(dt, intensities, source, 
+		      angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
+		      VET, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
+        
+      //rotating, adjusting fluxes
+      i=j=k=0;
+      double fmag = sqrt(rad[i+1][j+1][k+1][1]*rad[i+1][j+1][k+1][1] + 
+				 rad[i+1][j+1][k+1][2]*rad[i+1][j+1][k+1][2] + 
+				 rad[i+1][j+1][k+1][3]*rad[i+1][j+1][k+1][3]);
+      double ff = fmag / rad[i+1][j+1][k+1][0];
+
+      //transformI(&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][1], ff, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+
+    }
+
   return 0;
 }

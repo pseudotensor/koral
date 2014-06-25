@@ -416,7 +416,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
   
   //projects primitives onto ghost cells at the boundaries of the total domain
-  //or calulates conserved from exchanged primitives
+  //or calculates conserved from exchanged primitives
   set_bc(t,0);
 
   //**********************************************************************
@@ -437,6 +437,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
+
     }
   //**********************************************************************
   //**********************************************************************

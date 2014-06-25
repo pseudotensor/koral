@@ -103,6 +103,10 @@ main(int argc, char **argv)
   int ifinit=1;
 #ifdef RESTART
   ifinit=fread_restartfile(RESTARTNUM,folder,&tstart);
+  //todo: read intensities from file!
+#ifdef RADSTARTWITHM1INTENSITIES
+  calc_M1intensities();
+#endif
   if(!ifinit)
     {
       //exchange initial state
@@ -139,6 +143,9 @@ main(int argc, char **argv)
       MPI_Barrier(MPI_COMM_WORLD);
       #endif
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
+#endif
+#ifdef RADSTARTWITHM1INTENSITIES
+      calc_M1intensities();
 #endif
 
 #ifdef PR_POSTINIT
@@ -325,8 +332,16 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
      else 
        my_err("wrong time stepping specified\n");
-
+      
+      //**********************************************************************
+      //************************* updating intensities *************************
+      //**********************************************************************
  
+#if(RADCLOSURE==VETCLOSURE)
+      update_intensities();
+#endif
+
+
       //**********************************************************************
       //************************* finger  ************************************
       //**********************************************************************
