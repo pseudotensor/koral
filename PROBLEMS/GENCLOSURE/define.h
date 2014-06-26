@@ -44,9 +44,9 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .5
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define GDETIN 0
 
 /************************************/
@@ -79,8 +79,8 @@
 #define MINZ -1.
 #define MAXZ 1. 
 
-#define TNX 60
-#define TNY 60
+#define TNX 40
+#define TNY 40
 #define TNZ 1
 
 //# of tiles
@@ -97,9 +97,9 @@
 /************************************/
 //output
 /************************************/
-//#define PRINTXGC_LEFT
+#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
-//#define PRINTYGC_LEFT
+#define PRINTYGC_LEFT
 //#define PRINTYGC_RIGHT
 
 #define ALLSTEPSOUTPUT 0
@@ -115,11 +115,11 @@
 #define RRR
 #define GAMMA (5./3.)
 #define RHOZERO 0.01
-#define BLOBMAG1 1.e4
-#define BLOBMAG2 1.e4
+#define BLOBMAG1 0.e4
+#define BLOBMAG2 0.e4
 #define TEMPZERO 1.e7
-#define TEMPBLOB1 1.e8
-#define TEMPBLOB2 1.e8
+#define TEMPBLOB1 1.e7
+#define TEMPBLOB2 1.e7
 #define VELXBLOB1 0.
 #define VELXBLOB2 -0.
 #define VELYBLOB1 (VELXBLOB1*0.5)

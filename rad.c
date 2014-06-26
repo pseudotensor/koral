@@ -3830,7 +3830,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   struct geometry *geom0
     = (struct geometry *) ggg;
 
-  //if(geom0->ix==20 && geom0->iy==15) verbose=1;
+  //if(geom0->ix==0 && geom0->iy==0) verbose=1;
 
   //array holding radiative properties for ZERO
   ldouble rad[3][3][3][5];
@@ -3876,6 +3876,8 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 		  uint=pp0[UU];
 		  for(l=1;l<4;l++) ucon[l]=pp0[EE0+l];
 		  Erad=pp0[EE0];
+		  //stress energy tensor
+		  calc_Rij_M1(pp0,&geom,RijM1);		  
 		}
 	      else
 		{
@@ -3883,18 +3885,17 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 		  uint=get_u(p,UU,ix,iy,iz);
 		  for(l=1;l<4;l++) ucon[l]=get_u(p,EE0+l,ix,iy,iz);
 		  Erad=get_u(p,EE0,ix,iy,iz);
+		  //stress energy tensor
+		  calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
 		}
 
 	      //coordinates
 	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
-
-	      //stress energy tensor
-	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
-
-	      //intensities
 	      
+	      //intensities	      
 	      for(l=0;l<NUMANGLES;l++)
 		intensities[i+1][j+1][k+1][l]=Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][l];
+
 	      
 	    }
 	  else //when calculating fluxes at cell faces
@@ -4025,11 +4026,6 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  
 	  //saving rad. field to memory
 	  rad[i+1][j+1][k+1][0]=Elab; //energy density in lab frame
-	  /*
-	  rad[i+1][j+1][k+1][1]=ucon[1]; //u^i in RADCLOSURECOORDS, non-ortonormal
-	  rad[i+1][j+1][k+1][2]=ucon[2]; //u^i in RADCLOSURECOORDS, non-ortonormal
-	  rad[i+1][j+1][k+1][3]=ucon[3]; //u^i in RADCLOSURECOORDS, non-ortonormal
-	  */
 	  rad[i+1][j+1][k+1][1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDS, non-ortonormal
 	  rad[i+1][j+1][k+1][2]=RijM1[0][2]; 
 	  rad[i+1][j+1][k+1][3]=RijM1[0][3]; 
@@ -4037,8 +4033,11 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   	  rad[i+1][j+1][k+1][4]=Erad; //energy density in radiation rest frame
 
 
+	  //test
+	  //ZERO_decomposeM1(&rad[i+1][j+1][k+1][0], &intensities[i+1][j+1][k+1][0]);    
 
-	  if(i==0 && j==0 && k==0)
+	  //making intensities consistent with flux at the center
+	  //if(i==0 && j==0 && k==0) //overhead
 	    {
 	      double fmag = sqrt(rad[i+1][j+1][k+1][1]*rad[i+1][j+1][k+1][1] + 
 				 rad[i+1][j+1][k+1][2]*rad[i+1][j+1][k+1][2] + 
@@ -4047,6 +4046,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	      
 	      transformI(&intensities[i+1][j+1][k+1][0], &rad[i+1][j+1][k+1][1], ff, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 	    }
+	  
 	}
 
   //if(beta0>0.5) verbose=1;
@@ -4059,19 +4059,21 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //calling Yucong's solver
   ldouble I_return[NUMANGLES];			
   ldouble F_return[3];
-  
-  //ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
 
+  /*
+  //uses global dt - not the one in op_explicit!  
+  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
+  */
+  
   ZERO_shortCharI(dt, intensities, source, 
   angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
   VET, I_return, 0);
+  
   /*
-  if((VET[0][0]+VET[1][1]+VET[2][2]<0.9))
-    {
-      ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 1); 
-      verbose=1;
-    }
+  VET[1][1]=VET[0][0]=VET[2][2]=1./3.;
+  VET[0][1]=VET[0][2]=VET[1][0]=VET[1][2]=VET[2][0]=VET[2][1]=0.;
   */
+ 
  
   //first, let us calculate enden & fluxes in RADCLOSURECOORDS
   //using covariant formulation of M1 to recover R^mu_t from primitives
@@ -4200,6 +4202,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	      for(l=0;l<4;l++)
 		printf("%e ",source[i][j][k][l]);
 	      printf("\n");
+	      for(l=0;l<NUMANGLES;l++)
+		printf("%e ",intensities[i][j][k][l]);
+	      printf("\n");
+	      
 	    }
    
       printf(">>>>>>> VET \n");
@@ -4278,7 +4284,6 @@ calc_M1intensities()
 
       //input
       M1[0]=Elab;
-
       M1[1]=RijM1[0][1];
       M1[2]=RijM1[0][2];
       M1[3]=RijM1[0][3];
@@ -4286,6 +4291,13 @@ calc_M1intensities()
       
       //intensities
       ZERO_decomposeM1(M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+
+      /*
+      int i;      printf("%d %d\n",ix,iy);
+      for(i=0;i<NUMANGLES;i++)
+	printf("%d %e \n",i,Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][i]);
+      getch();
+      */
     }
 
   return 0;
@@ -4299,7 +4311,7 @@ update_intensities()
 
   //making backup acting as the previous time step
 #pragma omp parallel for private(ii) schedule (static)
-  for(ii=0;ii<Nloop_6;ii++) //domain only
+  for(ii=0;ii<Nloop_6;ii++) //domain + 1 layer only
     {
       int i,j,ix,iy,iz;
       ix=loop_6[ii][0];
@@ -4336,7 +4348,7 @@ update_intensities()
 	      ucon[0]=0.;
 	      ix=ix0+i;
 	      iy=iy0+j;
-	      iz=iz0+i;
+	      iz=iz0+k;
 	   
 	      fill_geometry(ix,iy,iz,&geom); //equals geom0
 
@@ -4379,10 +4391,13 @@ update_intensities()
 	    }
 
       //running ZERO
+      
+      
       ZERO_shortCharI(dt, intensities, source, 
 		      angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
 		      VET, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
-        
+      
+
       //rotating, adjusting fluxes
       i=j=k=0;
       double fmag = sqrt(rad[i+1][j+1][k+1][1]*rad[i+1][j+1][k+1][1] + 

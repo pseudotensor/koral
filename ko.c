@@ -338,7 +338,7 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
  
 #if(RADCLOSURE==VETCLOSURE)
-      update_intensities();
+      //update_intensities();
 #endif
 
 

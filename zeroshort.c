@@ -1377,6 +1377,7 @@ void transformI(double I_return[NUMANGLES], double F_final[3], double fFinal, st
 }
 
 
+//decomposes M1 beam into intensities, uses energy densities and fluxes as the input
 void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
 {
   
@@ -1384,7 +1385,7 @@ void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
 		     M1_Data[2]*M1_Data[2] + 
 		     M1_Data[3]*M1_Data[3]);
 
-  double ff = fmag / M1_Data[0]; //F/E using input argument
+  double ff = fmag / M1_Data[0]; //F/Elab using input argument
   double beta;
 
   if(ff<1.e-2) 
@@ -1408,11 +1409,12 @@ void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
 
       double mu= f_norm[0]*angGridCoords[probeAng][0] + f_norm[1]*angGridCoords[probeAng][1] + f_norm[2]*angGridCoords[probeAng][2];
 		      
-      if(beta<SMALL)
+      if(beta<1.e-5)
 	mu=1.;
 
-      double bm=1-beta*mu;
+      double bm=1.-beta*mu;
       //Factor 2 is to convert E_iso to I_iso, since I_iso = E_iso/4pi, where we also absorb *2pi factor for phi integral
+      //M1_Data[4] holds radiation rest frame
       I_return[probeAng] = M1_Data[4]/NUMANGLES/bm/bm/bm/bm/gamma2/gamma2;
     }
 
