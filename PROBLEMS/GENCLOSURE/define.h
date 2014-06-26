@@ -115,11 +115,11 @@
 #define RRR
 #define GAMMA (5./3.)
 #define RHOZERO 0.01
-#define BLOBMAG1 0.e4
-#define BLOBMAG2 0.e4
+#define BLOBMAG1 1.e4
+#define BLOBMAG2 1.e4
 #define TEMPZERO 1.e7
-#define TEMPBLOB1 1.e7
-#define TEMPBLOB2 1.e7
+#define TEMPBLOB1 1.e8
+#define TEMPBLOB2 1.e8
 #define VELXBLOB1 0.
 #define VELXBLOB2 -0.
 #define VELYBLOB1 (VELXBLOB1*0.5)
