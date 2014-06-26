@@ -422,6 +422,15 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
+
+#if(RADCLOSURE==VETCLOSURE)
+  //update_intensities();
+#endif
+
+
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
 	
   int superverbose=0;
 
@@ -1584,17 +1593,17 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
       
   //**********************************************************************
   //**********************************************************************
-  //all corners
+  //domain + ghost cells + corners
   
   Nloop_5=0;
   loop_5=(int **)malloc(sizeof(int*));
   loop_5[0]=(int *)malloc(3*sizeof(int));
 
-   for(ix=-NGCX;ix<=NX+NGCX;ix++)
+   for(ix=-NGCX;ix<NX+NGCX;ix++)
     {
-      for(iy=-NGCY;iy<=NY+NGCY;iy++)
+      for(iy=-NGCY;iy<NY+NGCY;iy++)
 	{
-	  for(iz=-NGCZ;iz<=NZ+NGCZ;iz++)
+	  for(iz=-NGCZ;iz<NZ+NGCZ;iz++)
 	    {	
 	      loop_5[Nloop_5][0]=ix;
 	      loop_5[Nloop_5][1]=iy;

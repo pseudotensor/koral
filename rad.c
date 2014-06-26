@@ -3830,7 +3830,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   struct geometry *geom0
     = (struct geometry *) ggg;
 
-  //if(geom0->ix==0 && geom0->iy==0) verbose=1;
+  //if(geom0->ix==-1 && geom0->iy==0) verbose=1;
 
   //array holding radiative properties for ZERO
   ldouble rad[3][3][3][5];
@@ -4037,8 +4037,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  //ZERO_decomposeM1(&rad[i+1][j+1][k+1][0], &intensities[i+1][j+1][k+1][0]);    
 
 	  //making intensities consistent with flux at the center
-	  //if(i==0 && j==0 && k==0) //overhead
+	  if(i==0 && j==0 && k==0) 
 	    {
+	      ZERO_decomposeM1(&rad[i+1][j+1][k+1][0], &intensities[i+1][j+1][k+1][0]);    
+
 	      double fmag = sqrt(rad[i+1][j+1][k+1][1]*rad[i+1][j+1][k+1][1] + 
 				 rad[i+1][j+1][k+1][2]*rad[i+1][j+1][k+1][2] + 
 				 rad[i+1][j+1][k+1][3]*rad[i+1][j+1][k+1][3]);
@@ -4205,6 +4207,9 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	      for(l=0;l<NUMANGLES;l++)
 		printf("%e ",intensities[i][j][k][l]);
 	      printf("\n");
+	      for(l=0;l<NUMANGLES;l++)
+		printf("%e ",Ibeam[geom0->ix+i-1+NGCX][geom0->iy+j-1+NGCY][geom0->iz+k-1+NGCZ][l]);
+	      printf("\n");
 	      
 	    }
    
@@ -4266,14 +4271,14 @@ calc_M1intensities()
 {
   int ix,iy,iz,ii;
 #pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
-  for(ii=0;ii<Nloop_6;ii++) //domain plus layer of one
+  for(ii=0;ii<Nloop_5;ii++) //domain plus layer of one
     {
       ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
       struct geometry geom;
       ldouble ucon[4], M1[5];
-      ix=loop_6[ii][0];
-      iy=loop_6[ii][1];
-      iz=loop_6[ii][2]; 
+      ix=loop_5[ii][0];
+      iy=loop_5[ii][1];
+      iz=loop_5[ii][2]; 
 
       fill_geometry(ix,iy,iz,&geom); 
 
@@ -4311,12 +4316,12 @@ update_intensities()
 
   //making backup acting as the previous time step
 #pragma omp parallel for private(ii) schedule (static)
-  for(ii=0;ii<Nloop_6;ii++) //domain + 1 layer only
+  for(ii=0;ii<Nloop_5;ii++) //domain + 1 layer only
     {
       int i,j,ix,iy,iz;
-      ix=loop_6[ii][0];
-      iy=loop_6[ii][1];
-      iz=loop_6[ii][2];
+      ix=loop_5[ii][0];
+      iy=loop_5[ii][1];
+      iz=loop_5[ii][2];
       for(i=0;i<NUMANGLES;i++)
 	Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][i]=Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][i];
     }
@@ -4392,18 +4397,20 @@ update_intensities()
 
       //running ZERO
       
-      
+      /*
       ZERO_shortCharI(dt, intensities, source, 
 		      angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
 		      VET, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
+      */
       
+      //test
+      //ZERO_decomposeM1(&rad[1][1][1][0], &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0]);
 
       //rotating, adjusting fluxes
-      i=j=k=0;
-      double fmag = sqrt(rad[i+1][j+1][k+1][1]*rad[i+1][j+1][k+1][1] + 
-				 rad[i+1][j+1][k+1][2]*rad[i+1][j+1][k+1][2] + 
-				 rad[i+1][j+1][k+1][3]*rad[i+1][j+1][k+1][3]);
-      double ff = fmag / rad[i+1][j+1][k+1][0];
+      double fmag = sqrt(rad[1][1][1][1]*rad[1][1][1][1] + 
+				 rad[1][1][1][2]*rad[1][1][1][2] + 
+				 rad[1][1][1][3]*rad[1][1][1][3]);
+      double ff = fmag / rad[1][1][1][0];
 
       //transformI(&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][1], ff, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 
