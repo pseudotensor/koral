@@ -15,7 +15,110 @@
 
 //------------  Subroutines to setup BSP tree data structure  -------------------------
 
+struct solverarg
+{
+  double F_Start_forward;
+  double F_Start_backward;
+  double *Intensities;			
+  double *F_final_norm;
+  double fFinal;
+  double *cosang;
+};
 
+/**********************/
+double
+f_stretchFactor (double k, void *argsin)
+{
+  struct solverarg *args
+    = (struct solverarg *) argsin;
+
+  double sumplus,summinus;
+  sumplus=summinus=0.;
+
+  int p;
+  for(p=0;p<NUMANGLES;p++)
+    {
+      if(args->cosang[p]>0.)
+	sumplus+=args->Intensities[p]*sqrt(1.+(k*k-1.)*args->cosang[p]*args->cosang[p]);
+      else
+	summinus+=args->Intensities[p]*sqrt(1.+(1./k/k-1.)*args->cosang[p]*args->cosang[p]);
+    }
+  
+  /*
+  return 
+    (k*args->F_Start_forward + 1./k*args->F_Start_backward)/
+    (sumplus + summinus);
+  */
+
+  return args->fFinal - 
+    (k*args->F_Start_forward + 1./k*args->F_Start_backward)/
+    (sumplus + summinus);
+}
+
+
+double
+calc_stretchFactor(void *argsin)
+{
+
+  int status;
+  int iter = 0, max_iter = 100;
+  const gsl_root_fsolver_type *T;
+  gsl_root_fsolver *solv;
+  double s = 1.;
+  double s_lo = 1.e-3, s_hi = 1.e3;
+  gsl_function F;
+
+  /*
+  for(s=1.e-5;s<1.e5;s*=1.1)
+    {
+      printf("%e %e\n",s,f_stretchFactor(s, argsin));
+    }
+
+  exit(1);
+  */
+
+  F.function = &f_stretchFactor;
+  F.params = argsin;
+
+  T = gsl_root_fsolver_brent;
+  solv = gsl_root_fsolver_alloc (T);
+  gsl_root_fsolver_set (solv, &F, s_lo, s_hi);
+  
+  /*
+  printf ("using %s method\n", 
+          gsl_root_fsolver_name (solv));
+
+  printf ("%5s [%9s, %9s] %9s %9s\n",
+          "iter", "lower", "upper", "root", 
+           "err(est)");
+  */
+
+  do
+    {
+      iter++;
+      status = gsl_root_fsolver_iterate (solv);
+      s = gsl_root_fsolver_root (solv);
+      s_lo = gsl_root_fsolver_x_lower (solv);
+      s_hi = gsl_root_fsolver_x_upper (solv);
+      status = gsl_root_test_interval (s_lo, s_hi,
+                                       0, 0.0001);
+      
+      /*
+      if (status == GSL_SUCCESS)
+        printf ("Converged:\n");
+
+      printf ("%5d [%.7f, %.7f] %.7f %.7f\n",
+              iter, s_lo, s_hi,
+              s,   
+              s_hi - s_lo);
+      */
+    }
+  while (status == GSL_CONTINUE && iter < max_iter);
+
+  gsl_root_fsolver_free (solv);
+
+  return s;
+}
 
 
 struct bsptree* create_node(int angVal, int iterVal)
@@ -1923,6 +2026,280 @@ void transformI_org(double I_return[NUMANGLES], double M1_input[5], struct bsptr
 }
 
 
+
+void transformI_num(double I_return[NUMANGLES], double M1_input[5], struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3])
+{
+  double F_final[3],Efinal,Efinalrad;
+  F_final[0]=M1_input[1];
+  F_final[1]=M1_input[2];
+  F_final[2]=M1_input[3];
+  Efinal=M1_input[0];
+  Efinalrad=M1_input[4];
+
+  int i,j,p,l;
+  double I_start[NUMANGLES];
+  double res[3];
+
+  double F_start[3], F_start_norm[3], F_final_norm[3], Fmag_start, Fmag_final, F_stretch;
+  double fStart, F_Start_forward, F_Start_backward, fFinal, Estart;
+  double stretchFactor;
+
+  double rotM[3][3];
+  double transformAng[NUMANGLES][3];
+
+
+  for (i=0; i < NUMANGLES; i++)
+    {
+      I_start[i] = I_return[i];
+      //printf("%e\n", I_start[i]);
+      I_return[i] = 0.;
+    }
+
+  //printf("%e %e %e\n", F_final[0], F_final[1], F_final[2]);
+
+  Estart=0.;
+  //Calculate net flux direction
+  for (l=0; l < 3; l++)
+    {
+      F_start[l] = 0.;
+    }
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+      //if(p<10) printf("%e\n", I_start[p]);
+      for (l=0; l < 3; l++)
+	{
+	  F_start[l] += I_start[p]*angGridCoords[p][l];
+	}
+      Estart += I_start[p];
+    }
+
+  //	printf("start: %e %e %e || %e\n", F_start[0], F_start[1], F_start[2], Estat);
+  //	printf("F start: %e %e %e || %e\n", F_start[0], F_start[1], F_start[2], sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]));
+
+
+
+
+  Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
+  Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
+
+  if (Fmag_final/Efinal < 1.0e-10)
+    {
+      for (p=0; p<NUMANGLES; p++)
+	{
+	  I_return[p] = Efinal/NUMANGLES;
+	}
+      //	    printf("%e %e\n",I_start[0],I_return[0]);
+      return;
+    }
+
+  for (l=0; l < 3; l++)
+    {
+      F_start_norm[l] = F_start[l]/Fmag_start;
+      F_final_norm[l] = F_final[l]/Fmag_final;
+    }
+
+  if (Fmag_start/Estart < 1.0e-10)
+    {
+      Fmag_start = 1.0;   //Careful about renormalizing data when Fmag_start = 0
+
+      F_start_norm[0]=1.0;
+      F_start_norm[1]=0.0;
+      F_start_norm[2]=0.0;
+    }
+
+  
+  F_Start_forward = 0.;
+  F_Start_backward = 0.;
+  double cosang[NUMANGLES];
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+
+
+      cosang[p] = angGridCoords[p][0]*F_start_norm[0] + angGridCoords[p][1]*F_start_norm[1] + angGridCoords[p][2]*F_start_norm[2];
+
+      if (cosang[p] > 0.)
+	{
+	  F_Start_forward += I_start[p]*cosang[p]; //positive fluxes in direction of net flux
+	}
+      else
+	{
+	 
+	  F_Start_backward += I_start[p]*cosang[p]; //negative fluxes "" ""
+	}
+    }
+
+
+
+  fStart = Fmag_start/Estart;
+  fFinal = Fmag_final/Efinal;
+
+  struct solverarg args;
+
+  args.F_Start_forward=F_Start_forward;
+  args.F_Start_backward=F_Start_backward;
+  args.Intensities = &I_start[0];
+  args.F_final_norm = &F_final_norm[0];
+  args.fFinal = fFinal;
+  args.cosang = &cosang[0];
+  
+  stretchFactor = calc_stretchFactor(&args);
+  //exit(1);
+
+  F_stretch = fabs(stretchFactor*F_Start_forward + F_Start_backward/stretchFactor);
+
+  //printf("%e %e %e\n", stretchFactor, F_Start_forward, F_Start_backward);
+
+
+  //stretchFactor = sqrt(fabs((fFinal*fFinal - fFinal*fFinal*fStart*fStart)/(fStart*fStart - fFinal*fFinal*fStart*fStart)));
+
+
+  //printf("Fstart = %e %e %e\n", F_start[0], F_start[1], F_start[2]);
+
+  //printf("SF = %e | Estart = %e, Fstart = %e, Ffinal = %e | F/E = %e\n", stretchFactor,Estart,  Fmag_start, Fmag_final, Fmag_start/Estart);
+
+  if(!isfinite(stretchFactor) || stretchFactor<1.e-15) 
+    {
+	    
+      for (i=0; i < NUMANGLES; i++)
+
+	I_return[i] = I_start[i];
+	
+
+      return;
+	   
+    }
+
+  //Calculate rotation matrix
+  calc_rot_M(F_start_norm, F_final_norm, rotM);
+
+  //	printf("start: %e %e %e\nfinish: %e %e %e\n", F_norm[0], F_norm[1], F_norm[2], F_final[0], F_final[1], F_final[2]);
+
+
+
+
+  int probeAng;
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+
+      //Apply Rotation Matrix to some initial intesity distribution
+
+      for (i=0; i < 3; i++)
+	{
+	  transformAng[probeAng][i]=0;
+	  for (j=0; j < 3; j++)
+	    {
+	      transformAng[probeAng][i] += rotM[i][j]*angGridCoords[probeAng][j];
+	    }
+	}
+
+
+
+
+      //		printf("%e %e %e\n", angGridCoords[probeAng][0], angGridCoords[probeAng][1], angGridCoords[probeAng][2]);
+      //		printf("%e %e %e\n", transformAng[probeAng][0], transformAng[probeAng][1], transformAng[probeAng][2]);
+
+
+      //Keep track of component of E^2 that remains unchanged
+
+
+      //Stretch initial intensity distrubution parallel to Ffinal
+
+      //First, calculate parallel component of I
+      double n_parallel[3], n_perp[3], n_final[3];
+      double dotprod = 0., n_norm = 0.;
+
+
+      for (l=0; l < 3; l++)
+	{
+	  dotprod += transformAng[probeAng][l]*F_final_norm[l];
+	}
+
+
+      for (l=0; l < 3; l++)
+	{
+	  n_parallel[l] = dotprod*F_final_norm[l];
+	  n_perp[l] = transformAng[probeAng][l] - n_parallel[l];
+
+	  if (dotprod > 0)
+	    {
+	      n_parallel[l] = n_parallel[l]*stretchFactor;
+	    }
+	  else
+	    {
+	      n_parallel[l] = n_parallel[l]/stretchFactor;
+	    }
+	  n_final[l] = n_perp[l] + n_parallel[l];
+
+	}
+
+
+
+      n_norm = sqrt(n_final[0]*n_final[0] + n_final[1]*n_final[1] + n_final[2]*n_final[2]);
+
+
+      //		printf("%e\n", n_norm);
+
+      for (l=0; l < 3; l++)
+	{
+	  n_final[l] = n_final[l]/n_norm;
+	}
+
+
+      //		printf("%e %e %e\n", n_final[0], n_final[1], n_final[2]);
+
+
+      //		printf("n final = %e %e %e | %e\n", n_final[0], n_final[1], n_final[2], sqrt(n_final[0]*n_final[0] + n_final[1]*n_final[1] + n_final[2]*n_final[2]));
+
+
+
+
+
+      //		struct bsptree *bspCurrentLoc = angDualGridRoot;
+      double bestDistance = 1.0e10;
+      int bestIndex = 0;
+
+
+      bspGetNearestDualNeighbor(n_final, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
+      //	bestIndex = get_angDualIndex(n_final, angDualGridCoords);
+
+      int angNeighborIndex[3];
+      double interpCoeffs[3];
+
+      for (l=0; l < 3; l++)
+	{
+	  angNeighborIndex[l] = dualAdjacency[bestIndex][l];
+	}
+
+
+      //		printf("Best Angle: %d, %e %e %e\n", bestIndex, angDualGridCoords[bestIndex][0], angDualGridCoords[bestIndex][1], angDualGridCoords[bestIndex][2]);
+
+
+      linComb(n_final, angGridCoords, angNeighborIndex, interpCoeffs);
+
+      for (p=0; p < 3; p++)
+	{
+	  //			printf("%d %d | %e %e %e \n", bestIndex, angNeighborIndex[p], n_norm, I_start[probeAng], interpCoeffs[p]);
+
+	  I_return[angNeighborIndex[p]] += n_norm*I_start[probeAng]*interpCoeffs[p];
+	}
+
+      //		printf("\n");
+
+    }
+
+
+
+  double rescaleFactor = Fmag_final/F_stretch;
+  //Renormalize to get correct fluxes
+  for (p=0; p < NUMANGLES; p++)
+    {
+      I_return[p] = I_return[p]*rescaleFactor;
+    }
+}
+
+
 //decomposes M1 beam into intensities, uses energy densities and fluxes as the input
 void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
 {
@@ -2604,9 +2981,9 @@ int ZEROtest_oldmain()
 
 	for (p=0; p < NUMANGLES; p++)
 	{
-		if (p<25 || p>65 )
+	  if (1 || p<25)
 		{
-			I_start[p]=.1;
+			I_start[p]=1.;
 		}
 		else
 		{
@@ -2617,9 +2994,9 @@ int ZEROtest_oldmain()
 
 	double M1data[5];
 
-	M1data[0]=10.;
+	M1data[0]=80.;
 	M1data[1]=0.;
-	M1data[2]=4.;
+	M1data[2]=70.;
 	M1data[3]=0.;
 
 	//rotating, adjusting fluxes
@@ -2715,6 +3092,7 @@ int ZEROtest_oldmain()
 }
 void transformI(double I_return[NUMANGLES], double M1_input[5], struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3])
 {
-  transformI_org(I_return, M1_input, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+  transformI_num(I_return, M1_input, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
   return;
 }
+

@@ -46,7 +46,7 @@
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define GDETIN 0
 
 /************************************/
@@ -79,8 +79,8 @@
 #define MINZ -1.
 #define MAXZ 1. 
 
-#define TNX 40
-#define TNY 40
+#define TNX 200
+#define TNY 200
 #define TNZ 1
 
 //# of tiles
@@ -97,9 +97,9 @@
 /************************************/
 //output
 /************************************/
-#define PRINTXGC_LEFT
+//#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
-#define PRINTYGC_LEFT
+//#define PRINTYGC_LEFT
 //#define PRINTYGC_RIGHT
 
 #define ALLSTEPSOUTPUT 0
@@ -124,12 +124,12 @@
 #define VELXBLOB2 -0.
 #define VELYBLOB1 (VELXBLOB1*0.5)
 #define VELYBLOB2 (VELXBLOB2*0.25)
-#define XBLOB1 (MINX+0.25*(MAXX-MINX))
-#define XBLOB2 (MINX+0.75*(MAXX-MINX))
-#define YBLOB1 (MINY+0.25*(MAXY-MINY))
-#define YBLOB2 (MINY+0.75*(MAXY-MINY))
-#define SIZEBLOB1 (.05*(MAXX-MINX))
-#define SIZEBLOB2 (.05*(MAXX-MINX))
+#define XBLOB1 (MINX+0.35*(MAXX-MINX))
+#define XBLOB2 (MINX+0.65*(MAXX-MINX))
+#define YBLOB1 (MINY+0.35*(MAXY-MINY))
+#define YBLOB2 (MINY+0.65*(MAXY-MINY))
+#define SIZEBLOB1 (.025*(MAXX-MINX))
+#define SIZEBLOB2 (.025*(MAXX-MINX))
 
 
 

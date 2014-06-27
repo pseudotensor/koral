@@ -9,6 +9,7 @@ main(int argc, char **argv)
   mpi_myinit(argc,argv);
 
   //tests
+
   /*
   ldouble temp;
   for(temp=1.e1;temp<1.e10;temp*=1.1)
@@ -33,7 +34,7 @@ main(int argc, char **argv)
   doingpostproc=0;
 
   //gsl errors off
-  gsl_set_error_handler_off();
+  //gsl_set_error_handler_off();
   
   //random number gen. initialization
   srand ( time(NULL) );

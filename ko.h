@@ -692,6 +692,8 @@ void transformI_M1(double I_return[NUMANGLES], double*, struct bsptree *angDualG
 void transformI_rot(double I_return[NUMANGLES], double*, struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3]);
 void transformI_org(double I_return[NUMANGLES], double*, struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3]);
 void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES]);
+double
+calc_stretchFactor(void *argsin);
 
 
 double Ibeam[SX][SY][SZ][NUMANGLES];                //specific intensities at cell centers
