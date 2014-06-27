@@ -1744,3 +1744,7 @@
 #ifndef NUMDUALANGLES
 #define NUMDUALANGLES 156 	//Must be equal to number of lines in dual angle grid file
 #endif
+
+#if (RADCLOSURE==VETCLOSURE)
+#define EVOLVEINTENSITIES
+#endif

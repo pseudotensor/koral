@@ -337,7 +337,7 @@ solve_the_problem(ldouble tstart, char* folder)
       //************************* updating intensities *************************
       //**********************************************************************
  
-#if(RADCLOSURE==VETCLOSURE)
+#ifdef EVOLVEINTENSITIES
       update_intensities();
 #endif
 

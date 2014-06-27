@@ -2097,6 +2097,11 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
   for(iv=0;iv<NV;iv++)
     pval[iv]=get_u(p,iv,iix,iiy,iiz);
 
+  #ifdef EVOLVEINTENSITIES
+  for(iv=0;iv<NUMANGLES;iv++)
+    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][iv];
+  #endif
+
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
   p2u(pval,uval,&geom);
