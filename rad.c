@@ -4039,14 +4039,14 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  //making intensities consistent with flux at the center
 	  if(i==0 && j==0 && k==0) 
 	    {
-	      ZERO_decomposeM1(&rad[i+1][j+1][k+1][0], &intensities[i+1][j+1][k+1][0]);    
+	      //ZERO_decomposeM1(&rad[i+1][j+1][k+1][0], &intensities[i+1][j+1][k+1][0]);    
 
 	      double fmag = sqrt(rad[i+1][j+1][k+1][1]*rad[i+1][j+1][k+1][1] + 
 				 rad[i+1][j+1][k+1][2]*rad[i+1][j+1][k+1][2] + 
 				 rad[i+1][j+1][k+1][3]*rad[i+1][j+1][k+1][3]);
 	      double ff = fmag / rad[i+1][j+1][k+1][0];
 	      
-	      //transformI(&intensities[i+1][j+1][k+1][0], &rad[i+1][j+1][k+1][1], rad[i+1][j+1][k+1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+	      transformI(&intensities[i+1][j+1][k+1][0], &rad[i+1][j+1][k+1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 	    }
 	  
 	}
@@ -4067,7 +4067,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
   */
   
-  ZERO_shortCharI(dt, intensities, source, 
+  ZERO_shortCharI(0.*dt, intensities, source, 
   angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
   VET, I_return, 0);
   
@@ -4397,14 +4397,13 @@ update_intensities()
 
       //running ZERO
       
-      /*
+      
       ZERO_shortCharI(dt, intensities, source, 
 		      angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
 		      VET, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
-      */
-      
+            
       //test
-      ZERO_decomposeM1(&rad[1][1][1][0], &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0]);
+      //ZERO_decomposeM1(&rad[1][1][1][0], &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0]);
 
       //rotating, adjusting fluxes
       double fmag = sqrt(rad[1][1][1][1]*rad[1][1][1][1] + 
@@ -4412,7 +4411,7 @@ update_intensities()
 				 rad[1][1][1][3]*rad[1][1][1][3]);
       double ff = fmag / rad[1][1][1][0];
 
-      transformI(&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][1], rad[1][1][1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+      //transformI(&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 
     }
 
