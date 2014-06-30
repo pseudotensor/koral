@@ -2141,6 +2141,7 @@ void transformI_num(double I_return[NUMANGLES], double M1_input[5], struct bsptr
       F_final_norm[l] = F_final[l]/Fmag_final;
     }
 
+  /*
   if (Fmag_start/Estart < 1.0e-2)
     {
       Fmag_start = 1.0;   //Careful about renormalizing data when Fmag_start = 0
@@ -2148,6 +2149,44 @@ void transformI_num(double I_return[NUMANGLES], double M1_input[5], struct bsptr
       F_start_norm[0]=1.0;
       F_start_norm[1]=0.0;
       F_start_norm[2]=0.0;
+    }
+  */
+
+  if (Fmag_start/Estart < 1.0e-2)
+    {
+      //Calculate starting flux after reflecting half the rays about origin
+
+      F_start_norm[0]=0.0;
+      F_start_norm[1]=0.0;
+      F_start_norm[2]=0.0;
+
+      for (l=0; l < NUMANGLES; l++)
+	{
+	  if (angGridCoords[l][0] < 0) //reflect half the rays about origin
+	    {
+	      for (p=0; p < 3; p++)
+		{
+		  F_start_norm[p] += I_start[l]*(-angGridCoords[l][p]);
+		}
+	    }
+	  else
+	    {
+	      for (p=0; p < 3; p++)
+		{
+		  F_start_norm[p] += I_start[l]*angGridCoords[l][p];
+		}
+	    }
+	}
+
+      double tempMag = sqrt(F_start_norm[0]*F_start_norm[0] +
+			    F_start_norm[1]*F_start_norm[1] + F_start_norm[2]*F_start_norm[2]);
+
+      for (p=0; p < 3; p++)
+	{
+	  F_start_norm[p] = F_start_norm[p]/tempMag;
+
+	}
+
     }
 
   

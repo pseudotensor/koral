@@ -46,7 +46,7 @@
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define GDETIN 0
 
 /************************************/
@@ -79,8 +79,8 @@
 #define MINZ -1.
 #define MAXZ 1. 
 
-#define TNX 40
-#define TNY 40
+#define TNX 50
+#define TNY 50
 #define TNZ 1
 
 //# of tiles
@@ -103,15 +103,16 @@
 //#define PRINTYGC_RIGHT
 
 #define ALLSTEPSOUTPUT 0
-#define NSTEPSTOP 1e50
+#define NSTEPSTOP 1e29
 #define NOUTSTOP 5000
-#define DTOUT1 0.1
+#define DTOUT1 0.02
 #define RADOUTPUTINZAMO
 #define SILOOUTPUT 1
 
 /************************************/
 //problem params
 /************************************/
+//#define KEEPDOTS
 #define RRR
 #define GAMMA (5./3.)
 #define RHOZERO 0.01
@@ -128,8 +129,8 @@
 #define XBLOB2 (MINX+0.65*(MAXX-MINX))
 #define YBLOB1 (MINY+0.35*(MAXY-MINY))
 #define YBLOB2 (MINY+0.65*(MAXY-MINY))
-#define SIZEBLOB1 (.025*(MAXX-MINX))
-#define SIZEBLOB2 (.025*(MAXX-MINX))
+#define SIZEBLOB1 (.035*(MAXX-MINX))
+#define SIZEBLOB2 (.035*(MAXX-MINX))
 
 
 

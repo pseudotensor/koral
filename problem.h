@@ -95,6 +95,7 @@
 #define PR_OUT2GIF_1D "PROBLEMS/GENCLOSURE/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/GENCLOSURE/dump.c"
 #define PR_TOOLS "PROBLEMS/GENCLOSURE/tools.c"
+#define PR_FINGER "PROBLEMS/GENCLOSURE/finger.c"
 
 #endif
 
