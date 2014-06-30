@@ -62,6 +62,47 @@ calc_stretchFactor(void *argsin)
 
   int status;
   int iter = 0, max_iter = 100;
+  double k = 1., kprev;				
+  double f,df;
+  
+  /*
+  for(k=-1.e5;k<-1.e-5;k/=1.1)
+    {
+      printf("%e %e\n",k,f_stretchFactor(k, argsin));
+    }
+
+  exit(1);
+  */
+
+  do
+    {
+      iter++;
+      if(iter>100)
+	{
+	  my_err("calc_stretchFactor() failed to find solution\n");
+	  exit(-1);
+	}
+
+      f=f_stretchFactor(k, argsin);
+      df=(f_stretchFactor(k+1.e-6*k, argsin) - f)/(1.e-6*k);
+
+      kprev=k;
+      k=k-f/df;      
+
+      //printf ("%5d %.7f %.7f\n", iter, k, k-kprev);
+      
+    }
+  while (fabs((k-kprev)/k)>1.e-3);
+
+  return k;
+}
+
+double
+calc_stretchFactor_gsl(void *argsin)
+{
+
+  int status;
+  int iter = 0, max_iter = 100;
   const gsl_root_fsolver_type *T;
   gsl_root_fsolver *solv;
   double s = 1.;
@@ -103,7 +144,7 @@ calc_stretchFactor(void *argsin)
       status = gsl_root_test_interval (s_lo, s_hi,
                                        0, 0.0001);
       
-      /*
+      
       if (status == GSL_SUCCESS)
         printf ("Converged:\n");
 
@@ -111,7 +152,7 @@ calc_stretchFactor(void *argsin)
               iter, s_lo, s_hi,
               s,   
               s_hi - s_lo);
-      */
+      
     }
   while (status == GSL_CONTINUE && iter < max_iter);
 
@@ -119,6 +160,7 @@ calc_stretchFactor(void *argsin)
 
   return s;
 }
+
 
 
 struct bsptree* create_node(int angVal, int iterVal)
@@ -2099,7 +2141,7 @@ void transformI_num(double I_return[NUMANGLES], double M1_input[5], struct bsptr
       F_final_norm[l] = F_final[l]/Fmag_final;
     }
 
-  if (Fmag_start/Estart < 1.0e-10)
+  if (Fmag_start/Estart < 1.0e-2)
     {
       Fmag_start = 1.0;   //Careful about renormalizing data when Fmag_start = 0
 
@@ -2981,7 +3023,7 @@ int ZEROtest_oldmain()
 
 	for (p=0; p < NUMANGLES; p++)
 	{
-	  if (1 || p<25)
+	  if (p<25)
 		{
 			I_start[p]=1.;
 		}
@@ -2996,7 +3038,7 @@ int ZEROtest_oldmain()
 
 	M1data[0]=80.;
 	M1data[1]=0.;
-	M1data[2]=70.;
+	M1data[2]=20.;
 	M1data[3]=0.;
 
 	//rotating, adjusting fluxes

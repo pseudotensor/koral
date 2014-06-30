@@ -4411,7 +4411,7 @@ update_intensities()
 				 rad[1][1][1][3]*rad[1][1][1][3]);
       double ff = fmag / rad[1][1][1][0];
 
-      if(global_time>.3) transformI(&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+      transformI(&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 
     }
 

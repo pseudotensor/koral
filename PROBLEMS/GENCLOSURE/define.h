@@ -79,8 +79,8 @@
 #define MINZ -1.
 #define MAXZ 1. 
 
-#define TNX 200
-#define TNY 200
+#define TNX 40
+#define TNY 40
 #define TNZ 1
 
 //# of tiles
