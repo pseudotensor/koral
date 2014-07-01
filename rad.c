@@ -3850,9 +3850,16 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   int ix,iy,iz;
   ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
 
+  /*
   for(i=-1;i<=1;i++) //loop over cell centers
     for(j=-1;j<=1;j++)
       for(k=-1;k<=1;k++)
+  */
+      //for(k=0;k<=0;k++)
+
+  for(i=0;i<=0;i++)
+    for(j=0;j<=0;j++)
+      for(k=0;k<=0;k++)
 	{
 	  ucon[0]=0.;
 	  if(geom0->ifacedim < 0.) //cell-centered for calculating wavespeeds
@@ -4067,16 +4074,14 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
   */
   
+  ZERO_calcVET(&intensities[1][1][1][0],VET,angGridCoords);
+  
+  /*
   ZERO_shortCharI(0.*dt, intensities, source, 
   angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
   VET, I_return, 0);
-  
-  /*
-  VET[1][1]=VET[0][0]=VET[2][2]=1./3.;
-  VET[0][1]=VET[0][2]=VET[1][0]=VET[1][2]=VET[2][0]=VET[2][1]=0.;
   */
- 
- 
+   
   //first, let us calculate enden & fluxes in RADCLOSURECOORDS
   //using covariant formulation of M1 to recover R^mu_t from primitives
   calc_Rij_M1(pp0,geom0,RijM1);	  

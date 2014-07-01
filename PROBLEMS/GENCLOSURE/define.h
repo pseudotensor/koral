@@ -79,8 +79,8 @@
 #define MINZ -1.
 #define MAXZ 1. 
 
-#define TNX 50
-#define TNY 50
+#define TNX 100
+#define TNY 100
 #define TNZ 1
 
 //# of tiles
@@ -103,7 +103,7 @@
 //#define PRINTYGC_RIGHT
 
 #define ALLSTEPSOUTPUT 0
-#define NSTEPSTOP 1e29
+#define NSTEPSTOP 1.e20
 #define NOUTSTOP 5000
 #define DTOUT1 0.02
 #define RADOUTPUTINZAMO

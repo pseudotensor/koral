@@ -366,9 +366,173 @@ int readAngleFiles(double angGridCoords[NUMANGLES][3], double angDualGridCoords[
 }
 
 
+// Subroutine to calculate the interpolation weights for a square 3x3x1 cubic grid
+// (Assuming symmetry in z)
 
+// We find the 2 bounding edges for each ray hitting the boundary, and their appropriate weights to use in interpolation later on
 
 void setupInterpWeights(double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES])
+{
+  int probeAng;
+  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
+    {
+
+      double posX, posY, posZ;
+      double minL = 0., maxL = 100.0;
+
+
+      //Bisect on ray to numerically find intersection location
+      int iter;
+      for (iter=0; iter < 50; iter++)
+	{
+
+
+	  posX = 1.0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][0]);
+	  posY = 1.0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][1]);
+	  posZ = 1.0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][2]);
+
+
+
+	  //bisect on path length to find nearest boundary intersection
+	  if ((posX > 2.0) || (posX < 0.0) || (posY > 2.0) || (posY < 0.0))
+	    {
+	      maxL = (minL+maxL)/2.0;
+	    }
+	  else
+	    {
+	      minL = (minL+maxL)/2.0;
+	    }
+
+
+	  // printf("%e %e (%e %e %e) (%e %e %e)\n", minL, maxL, posR0, posTh0, posPh0, posR, posTh, posPh);
+	  // printf("%e %e (%e %e %e)\n", minL, maxL, posX, posY, posZ);
+
+
+	}
+
+
+      posX = 1.0 + maxL * (-angGridCoords[probeAng][0]);
+      posY = 1.0 + maxL * (-angGridCoords[probeAng][1]);
+      posZ = 1.0 + maxL * (-angGridCoords[probeAng][2]);
+
+      int lowerXIndex = floor(posX), upperXIndex = lowerXIndex + 1;
+      int lowerYIndex = floor(posY), upperYIndex = lowerYIndex + 1;
+      int lowerZIndex = floor(posZ), upperZIndex = lowerZIndex + 1;
+
+      //Interpolation weight components
+      double w0_low, w0_high;
+      double w1_low, w1_high;
+
+
+
+      //Get interpolation weights for 4 bounding corners of cube intersection
+      if ((posX > 2.0) || (posX < 0.0))
+	{
+
+	  int realXIndex;
+
+
+	  if (posX > 2.0)
+	    {
+	      realXIndex = lowerXIndex;
+	    }
+	  if (posX < 0.0)
+	    {
+	      realXIndex = upperXIndex;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[probeAng][0][p] = realXIndex;
+	      intersectGridIndices[probeAng][2][p] = 1;  //Z index is always 1 (since we assume symmetry in Z)
+	    }
+	  intersectGridIndices[probeAng][1][0] = lowerYIndex;
+	  intersectGridIndices[probeAng][1][1] = lowerYIndex;
+	  intersectGridIndices[probeAng][1][2] = upperYIndex;
+	  intersectGridIndices[probeAng][1][3] = upperYIndex;
+
+	  w0_high = posY - floor(posY);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = 0.0;
+	  w1_low = 1.0;
+
+	}
+      else if ((posY > 2.0) || (posY < 0.0))
+	{
+	  int realYIndex;
+
+	  if (posY > 2.0)
+	    {
+	      realYIndex = lowerYIndex;
+	    }
+	  if (posY < 0.0)
+	    {
+	      realYIndex = upperYIndex;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[probeAng][1][p] = realYIndex;
+	      intersectGridIndices[probeAng][2][p] = 1;  //Z index is always 1 (since we assume symmetry in Z)
+	    }
+	  intersectGridIndices[probeAng][0][0] = lowerXIndex;
+	  intersectGridIndices[probeAng][0][1] = lowerXIndex;
+	  intersectGridIndices[probeAng][0][2] = upperXIndex;
+	  intersectGridIndices[probeAng][0][3] = upperXIndex;
+
+	  w0_high = posX - floor(posX);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = 0.0;
+	  w1_low = 1.0;
+
+	}
+      else
+	{
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[probeAng][2][p] = 1.0;  //Z index is always 1 (since we assume symmetry in Z)
+	    }
+	  intersectGridIndices[probeAng][0][0] = lowerXIndex;
+	  intersectGridIndices[probeAng][0][1] = lowerXIndex;
+	  intersectGridIndices[probeAng][0][2] = upperXIndex;
+	  intersectGridIndices[probeAng][0][3] = upperXIndex;
+
+	  intersectGridIndices[probeAng][1][0] = lowerYIndex;
+	  intersectGridIndices[probeAng][1][1] = upperYIndex;
+	  intersectGridIndices[probeAng][1][2] = lowerYIndex;
+	  intersectGridIndices[probeAng][1][3] = upperYIndex;
+
+	  w0_high = posX - floor(posX);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = posY - floor(posY);
+	  w1_low = 1.0 - w1_high;
+
+	}
+
+
+      intersectGridWeights[probeAng][0] = w0_low*w1_low;
+      intersectGridWeights[probeAng][1] = w0_low*w1_high;
+      intersectGridWeights[probeAng][2] = w0_high*w1_low;
+      intersectGridWeights[probeAng][3] = w0_high*w1_high;
+
+      intersectDistances[probeAng] = maxL*GRID_SPACING;
+
+
+
+      // printf("!! %e %e %e %e !!\n", w0_low, w0_high, w1_low, w1_high);
+      // printf("-- %e %e %e --\n", posX, posY, posZ);
+
+
+
+    } //end loop over angles
+
+
+}
+
+void setupInterpWeights_old(double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES])
 {
   int probeAng;
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
@@ -2343,7 +2507,7 @@ void transformI_num(double I_return[NUMANGLES], double M1_input[5], struct bsptr
 
 
       bspGetNearestDualNeighbor(n_final, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
-      //	bestIndex = get_angDualIndex(n_final, angDualGridCoords);
+      //bestIndex = get_angDualIndex(n_final, angDualGridCoords);
 
       int angNeighborIndex[3];
       double interpCoeffs[3];
@@ -2755,10 +2919,10 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
 	      cos2 = angGridCoords[probeAng][0]*targetDirection2[0] + angGridCoords[probeAng][1]*targetDirection2[1] + angGridCoords[probeAng][2]*targetDirection2[2];
 
 
-	      P[q][r] += I_time[probeAng]*cos1*cos2*dOmega;
+	      P[q][r] += I_time[probeAng]*cos1*cos2;
 	      if (r==0)
 		{
-		  F_return[q] += I_time[probeAng]*cos1*dOmega;
+		  F_return[q] += I_time[probeAng]*cos1;
 		}
 	    }
 	}
@@ -2768,7 +2932,7 @@ void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Da
   //Calculate E
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
     {
-      E += I_time[probeAng]*dOmega;
+      E += I_time[probeAng];
     }
 
 
@@ -2965,7 +3129,7 @@ void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double s
 	      cos2 = angGridCoords[probeAng][0]*targetDirection2[0] + angGridCoords[probeAng][1]*targetDirection2[1] + angGridCoords[probeAng][2]*targetDirection2[2];
 
 
-	      P[q][r] += I_time[probeAng]*cos1*cos2*dOmega;
+	      P[q][r] += I_time[probeAng]*cos1*cos2;
 	    }
 	}
     }
@@ -2974,7 +3138,7 @@ void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double s
   //Calculate E
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
     {
-      E += I_time[probeAng]*dOmega;
+      E += I_time[probeAng];
     }
 
 
@@ -3000,7 +3164,114 @@ void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double s
 
 }
 
+void
+ZERO_calcVET(double I_time[NUMANGLES], double eddingtonFactor[3][3], double angGridCoords[NUMANGLES][3])
+{
 
+  //Calculate radiative moments using our RT solution to intensity field
+
+  double dOmega = 4.0*PI/NUMANGLES;
+  double targetDirection1[3], targetDirection2[3];
+  double cos1, cos2;
+  double P[3][3], E = 0;
+  int probeAng;
+
+  //intialize Pressure tensor P_ij
+  int q,r;
+  for (q=0; q < 3; q++)
+    {
+      for (r=0; r < 3; r++)
+	{
+	  P[q][r] = 0.;
+	}
+    }
+
+  //Calculate P_ij by summing up contributions over all angles
+  for (q=0; q < 3; q++)
+    {
+      if (q == 0)
+	{
+	  targetDirection1[0] = 1.0;
+	  targetDirection1[1] = 0.0;
+	  targetDirection1[2] = 0.0;
+	}
+      if (q == 1)
+	{
+	  targetDirection1[0] = 0.0;
+	  targetDirection1[1] = 1.0;
+	  targetDirection1[2] = 0.0;
+	}
+      if (q == 2)
+	{
+	  targetDirection1[0] = 0.0;
+	  targetDirection1[1] = 0.0;
+	  targetDirection1[2] = 1.0;
+	}
+
+
+      for (r=0; r < 3; r++)
+	{
+	  if (r == 0)
+	    {
+	      targetDirection2[0] = 1.0;
+	      targetDirection2[1] = 0.0;
+	      targetDirection2[2] = 0.0;
+	    }
+	  if (r == 1)
+	    {
+	      targetDirection2[0] = 0.0;
+	      targetDirection2[1] = 1.0;
+	      targetDirection2[2] = 0.0;
+	    }
+	  if (r == 2)
+	    {
+	      targetDirection2[0] = 0.0;
+	      targetDirection2[1] = 0.0;
+	      targetDirection2[2] = 1.0;
+	    }
+
+
+	  int probeAng;
+	  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
+	    {
+
+	      cos1 = angGridCoords[probeAng][0]*targetDirection1[0] + angGridCoords[probeAng][1]*targetDirection1[1] + angGridCoords[probeAng][2]*targetDirection1[2];
+	      cos2 = angGridCoords[probeAng][0]*targetDirection2[0] + angGridCoords[probeAng][1]*targetDirection2[1] + angGridCoords[probeAng][2]*targetDirection2[2];
+
+
+	      P[q][r] += I_time[probeAng]*cos1*cos2;
+	    }
+	}
+    }
+	
+
+  //Calculate E
+  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
+    {
+      E += I_time[probeAng];
+    }
+
+
+  //	printf("E = %e  |  Pxx = %e\n", E, P[0][0]);
+
+
+  //Set eddington tensor as P_ij/E
+  for (q=0; q < 3; q++)
+    {
+      for (r=0; r < 3; r++)
+	{
+	  if (E > 0)
+	    {
+	      eddingtonFactor[q][r] = P[q][r]/E;
+	    }
+	  else
+	    {
+	      eddingtonFactor[q][r] = 0.;
+	    }
+	}
+    }
+return;
+}
 
 int zero_readangles()
 {
