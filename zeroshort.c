@@ -371,7 +371,7 @@ int readAngleFiles(double angGridCoords[NUMANGLES][3], double angDualGridCoords[
 
 // We find the 2 bounding edges for each ray hitting the boundary, and their appropriate weights to use in interpolation later on
 
-void setupInterpWeights(double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES])
+void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
 {
   int probeAng;
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
@@ -444,13 +444,13 @@ void setupInterpWeights(double angGridCoords[NUMANGLES][3], int intersectGridInd
 	  int p;
 	  for (p=0; p < 4; p++)
 	    {
-	      intersectGridIndices[probeAng][0][p] = realXIndex;
-	      intersectGridIndices[probeAng][2][p] = 1;  //Z index is always 1 (since we assume symmetry in Z)
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p] = realXIndex;
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p] = 1;  //Z index is always 1 (since we assume symmetry in Z)
 	    }
-	  intersectGridIndices[probeAng][1][0] = lowerYIndex;
-	  intersectGridIndices[probeAng][1][1] = lowerYIndex;
-	  intersectGridIndices[probeAng][1][2] = upperYIndex;
-	  intersectGridIndices[probeAng][1][3] = upperYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][0] = lowerYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][1] = lowerYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][2] = upperYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][3] = upperYIndex;
 
 	  w0_high = posY - floor(posY);
 	  w0_low = 1.0 - w0_high;
@@ -474,13 +474,13 @@ void setupInterpWeights(double angGridCoords[NUMANGLES][3], int intersectGridInd
 	  int p;
 	  for (p=0; p < 4; p++)
 	    {
-	      intersectGridIndices[probeAng][1][p] = realYIndex;
-	      intersectGridIndices[probeAng][2][p] = 1;  //Z index is always 1 (since we assume symmetry in Z)
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p] = realYIndex;
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p] = 1;  //Z index is always 1 (since we assume symmetry in Z)
 	    }
-	  intersectGridIndices[probeAng][0][0] = lowerXIndex;
-	  intersectGridIndices[probeAng][0][1] = lowerXIndex;
-	  intersectGridIndices[probeAng][0][2] = upperXIndex;
-	  intersectGridIndices[probeAng][0][3] = upperXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][3] = upperXIndex;
 
 	  w0_high = posX - floor(posX);
 	  w0_low = 1.0 - w0_high;
@@ -493,17 +493,17 @@ void setupInterpWeights(double angGridCoords[NUMANGLES][3], int intersectGridInd
 	  int p;
 	  for (p=0; p < 4; p++)
 	    {
-	      intersectGridIndices[probeAng][2][p] = 1.0;  //Z index is always 1 (since we assume symmetry in Z)
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p] = 1.0;  //Z index is always 1 (since we assume symmetry in Z)
 	    }
-	  intersectGridIndices[probeAng][0][0] = lowerXIndex;
-	  intersectGridIndices[probeAng][0][1] = lowerXIndex;
-	  intersectGridIndices[probeAng][0][2] = upperXIndex;
-	  intersectGridIndices[probeAng][0][3] = upperXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][3] = upperXIndex;
 
-	  intersectGridIndices[probeAng][1][0] = lowerYIndex;
-	  intersectGridIndices[probeAng][1][1] = upperYIndex;
-	  intersectGridIndices[probeAng][1][2] = lowerYIndex;
-	  intersectGridIndices[probeAng][1][3] = upperYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][0] = lowerYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][1] = upperYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][2] = lowerYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][3] = upperYIndex;
 
 	  w0_high = posX - floor(posX);
 	  w0_low = 1.0 - w0_high;
@@ -513,12 +513,12 @@ void setupInterpWeights(double angGridCoords[NUMANGLES][3], int intersectGridInd
 	}
 
 
-      intersectGridWeights[probeAng][0] = w0_low*w1_low;
-      intersectGridWeights[probeAng][1] = w0_low*w1_high;
-      intersectGridWeights[probeAng][2] = w0_high*w1_low;
-      intersectGridWeights[probeAng][3] = w0_high*w1_high;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] = w0_low*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] = w0_low*w1_high;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = w0_high*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
 
-      intersectDistances[probeAng] = maxL*GRID_SPACING;
+      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = maxL*GRID_SPACING;
 
 
 
@@ -532,7 +532,7 @@ void setupInterpWeights(double angGridCoords[NUMANGLES][3], int intersectGridInd
 
 }
 
-void setupInterpWeights_old(double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES])
+void setupInterpWeights_cart3D(int ix,int iy,int iz,double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
 {
   int probeAng;
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
@@ -603,17 +603,17 @@ void setupInterpWeights_old(double angGridCoords[NUMANGLES][3], int intersectGri
 	  int p;
 	  for (p=0; p < 4; p++)
 	    {
-	      intersectGridIndices[probeAng][0][p] = realXIndex;
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p] = realXIndex;
 	    }
-	  intersectGridIndices[probeAng][1][0] = lowerYIndex;
-	  intersectGridIndices[probeAng][1][1] = lowerYIndex;
-	  intersectGridIndices[probeAng][1][2] = upperYIndex;
-	  intersectGridIndices[probeAng][1][3] = upperYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][0] = lowerYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][1] = lowerYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][2] = upperYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][3] = upperYIndex;
 
-	  intersectGridIndices[probeAng][2][0] = lowerZIndex;
-	  intersectGridIndices[probeAng][2][1] = upperZIndex;
-	  intersectGridIndices[probeAng][2][2] = lowerZIndex;
-	  intersectGridIndices[probeAng][2][3] = upperZIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0] = lowerZIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1] = upperZIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2] = lowerZIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3] = upperZIndex;
 
 	  w0_high = posY - floor(posY);
 	  w0_low = 1.0 - w0_high;
@@ -639,17 +639,17 @@ void setupInterpWeights_old(double angGridCoords[NUMANGLES][3], int intersectGri
 	  int p;
 	  for (p=0; p < 4; p++)
 	    {
-	      intersectGridIndices[probeAng][1][p] = realYIndex;
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p] = realYIndex;
 	    }
-	  intersectGridIndices[probeAng][0][0] = lowerXIndex;
-	  intersectGridIndices[probeAng][0][1] = lowerXIndex;
-	  intersectGridIndices[probeAng][0][2] = upperXIndex;
-	  intersectGridIndices[probeAng][0][3] = upperXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][3] = upperXIndex;
 
-	  intersectGridIndices[probeAng][2][0] = lowerZIndex;
-	  intersectGridIndices[probeAng][2][1] = upperZIndex;
-	  intersectGridIndices[probeAng][2][2] = lowerZIndex;
-	  intersectGridIndices[probeAng][2][3] = upperZIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0] = lowerZIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1] = upperZIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2] = lowerZIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3] = upperZIndex;
 
 	  w0_high = posX - floor(posX);
 	  w0_low = 1.0 - w0_high;
@@ -675,17 +675,17 @@ void setupInterpWeights_old(double angGridCoords[NUMANGLES][3], int intersectGri
 	  int p;
 	  for (p=0; p < 4; p++)
 	    {
-	      intersectGridIndices[probeAng][2][p] = realZIndex;
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p] = realZIndex;
 	    }
-	  intersectGridIndices[probeAng][0][0] = lowerXIndex;
-	  intersectGridIndices[probeAng][0][1] = lowerXIndex;
-	  intersectGridIndices[probeAng][0][2] = upperXIndex;
-	  intersectGridIndices[probeAng][0][3] = upperXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperXIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][3] = upperXIndex;
 
-	  intersectGridIndices[probeAng][1][0] = lowerYIndex;
-	  intersectGridIndices[probeAng][1][1] = upperYIndex;
-	  intersectGridIndices[probeAng][1][2] = lowerYIndex;
-	  intersectGridIndices[probeAng][1][3] = upperYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][0] = lowerYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][1] = upperYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][2] = lowerYIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][3] = upperYIndex;
 
 	  w0_high = posX - floor(posX);
 	  w0_low = 1.0 - w0_high;
@@ -695,12 +695,12 @@ void setupInterpWeights_old(double angGridCoords[NUMANGLES][3], int intersectGri
 	}
 
 
-      intersectGridWeights[probeAng][0] = w0_low*w1_low;
-      intersectGridWeights[probeAng][1] = w0_low*w1_high;
-      intersectGridWeights[probeAng][2] = w0_high*w1_low;
-      intersectGridWeights[probeAng][3] = w0_high*w1_high;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] = w0_low*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] = w0_low*w1_high;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = w0_high*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
 
-      intersectDistances[probeAng] = maxL*GRID_SPACING;
+      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = maxL*GRID_SPACING;
 
 
 
@@ -2605,375 +2605,7 @@ void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
 
 
 
-void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES], double F_return[3],int verbose)
-{
-  //Note:  M1 data has format:   E, v0, v1, v2
-
-  double S[3][3][3];  //radiative source function
-  double I_Data[3][3][3][NUMANGLES]; //Radiative intensity at all boundary points
-  double f_norm[3][3][3][3]; //Normalized velocity 
-
-  double I_ray[NUMANGLES];  //intensity field evaluated at the center, for time independent problem
-  double I_time[NUMANGLES];  //"" "", for time-dependent problem
-
-
-  int q,r;
-  
-  //Fill out source function and intensity field for cube
-
-  double beta[3][3][3];
-  double ffzero;
-  int i,j,k;
-  for (i=0; i<3; i++)
-    {
-      for (j=0; j<3; j++)
-	{
-	  for (k=0; k<3; k++)
-	    {
-
-	      // SOURCE FUNCTION
-	      double alpha=source_Data[i][j][k][2], sigma=source_Data[i][j][k][3];
-	      double eps;
-
-	      if (alpha + sigma > 0)
-		{
-		  eps = alpha/(alpha+sigma);
-		}
-	      else
-		{
-		  eps = 1.0;
-		}
-
-	      double temp=source_Data[i][j][k][0];
-	      S[i][j][k]=eps*temp*temp*temp*temp*STEFAN_BOLTZMANN/PI + (1.0-eps)*source_Data[i][j][k][1]*LIGHT_C/4.0/PI;
-		
-
-	      double fmag = sqrt(M1_Data[i][j][k][1]*M1_Data[i][j][k][1] + 
-				 M1_Data[i][j][k][2]*M1_Data[i][j][k][2] + 
-				 M1_Data[i][j][k][3]*M1_Data[i][j][k][3]);
-
-	      double ff = fmag / M1_Data[i][j][k][0]; //F/E using input argument
-	      if(i==1 && j==1 && k==1) ffzero=ff;
-	      if(ff<1.e-2) 
-		beta[i][j][k]=3.*ff/4.;
-	      else
-		beta[i][j][k]=(4.-sqrt(16.-12.*ff*ff))/2./ff;	    
-
-	      if(fmag<SMALL)
-		fmag=1.;
-
-	      f_norm[i][j][k][0] = M1_Data[i][j][k][1]/fmag;
-	      f_norm[i][j][k][1] = M1_Data[i][j][k][2]/fmag;
-	      f_norm[i][j][k][2] = M1_Data[i][j][k][3]/fmag;
-	    }
-	}
-    }
-
-  double Estart = 0., Fstart[3] = {0., 0., 0.};
-
-  int probeAng;
- 
-  double gamma2 = 1.0/(1.0-beta[1][1][1]*beta[1][1][1]);
- 
-
-
-  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
-    {
-      double mu= f_norm[1][1][1][0]*angGridCoords[probeAng][0] + f_norm[1][1][1][1]*angGridCoords[probeAng][1] + f_norm[1][1][1][2]*angGridCoords[probeAng][2];
-		      
-      if(beta[1][1][1]<SMALL)
-	mu=1.;
-
-
-      double mu_max = mu + 0.1;
-      double mu_min = mu - 0.1;
-
-      if (mu_max > 1.0)
-	{
-	  mu_max = 1.0;
-	}
-      if (mu_min < -1.0)
-	{
-	  mu_min = -1.0;
-	}
-
-
-      double bm=1-beta[1][1][1]*mu;
-      double bmax=1-beta[1][1][1]*mu_max;
-      double bmin=1-beta[1][1][1]*mu_min;
-
-      //Factor 2 is to convert E_iso to I_iso, since I_iso = E_iso/4pi, where we also absorb *2pi factor for phi integral
-      I_Data[1][1][1][probeAng] = M1_Data[1][1][1][4]/NUMANGLES/bm/bm/bm/bm/gamma2/gamma2;
-      Estart += I_Data[1][1][1][probeAng];
-
-      //if(probeAng<10) printf("%e\n", I_start[probeAng]);
-      for (j=0; j<3; j++)
-	{
-
-	  Fstart[j]+=I_Data[1][1][1][probeAng]*angGridCoords[probeAng][j];
-	}
-
-      //I_Data[1][1][1][probeAng] = M1_Data[1][1][1][0]/gamma2/gamma2/beta/3.0*(1.0/bmax/bmax/bmax - 1.0/bmin/bmin/bmin)/(mu_max - mu_min);
-
-    }
-
-  double Ffinal[3];
-  
-  /*
-  printf("INPT: Elab = (%e)  Erad = (%e)\n", M1_Data[1][1][1][0],M1_Data[1][1][1][4]);
-
-  printf("INPT: F/E = (%e, %e, %e) beta1 = (%e)\n", M1_Data[1][1][1][1]/M1_Data[1][1][1][0], 
-	 M1_Data[1][1][1][2]/M1_Data[1][1][1][0],
-	 M1_Data[1][1][1][3]/M1_Data[1][1][1][0],beta[1][1][1]);
-  printf("ZERO: F/E = (%e, %e, %e)\n", Fstart[0]/Estart, Fstart[1]/Estart, Fstart[2]/Estart);
-  */
-
-  //transformI(&I_Data[1][1][1][0], &M1_Data[1][1][1][1], ffzero, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
-
-  /*
-  Estart=0.;Fstart[0]=Fstart[1]=Fstart[2]=0.;
-  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
-    {
-      Estart += I_Data[1][1][1][probeAng];
-      for (j=0; j<3; j++)
-	{
-	  Fstart[j]+=I_Data[1][1][1][probeAng]*angGridCoords[probeAng][j];
-	}
-    }
-  */
-  //printf("ZERO: F/E = (%e, %e, %e)\n", Fstart[0]/Estart, Fstart[1]/Estart, Fstart[2]/Estart);
-  //getch();
-  
-
-  
-
-
-
-
-  //Calculate solution to RT, given M1 radiation shapes
-  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
-    {
-
-      //	  printf("%d\n", probeAng);
-
-
-      //First, get interpolated M1 quantities along ray intersection boundary
-      double interp_I = 0.;
-      double interp_S = 0.;
-
-      int p;
-      for (p=0; p < 4; p++)
-	{
-	  int intersect_i = intersectGridIndices[probeAng][0][p];
-	  int intersect_j = intersectGridIndices[probeAng][1][p];
-	  int intersect_k = intersectGridIndices[probeAng][2][p];
-
-
-
-
-	  //INTENSITY FIELD2
-	  //Calculate angle factor between ray angle and M1 velocity at boundary (beta mu)
-
-	  double mu= f_norm[intersect_i][intersect_j][intersect_k][0]*angGridCoords[probeAng][0] + f_norm[intersect_i][intersect_j][intersect_k][1]*angGridCoords[probeAng][1] + f_norm[intersect_i][intersect_j][intersect_k][2]*angGridCoords[probeAng][2];
-
-			
-	  double betahere = beta[intersect_i][intersect_j][intersect_k];
-	  double gamma2 = 1.0/(1.0-betahere*betahere);
-
-	  if(betahere<SMALL)
-	    mu=1.;
-
-	  //Get radiative quantities
-
-	 
-
-	  double mu_max = mu + 0.1;
-	  double mu_min = mu - 0.1;
-
-	  if (mu_max > 1.0)
-	    {
-	      mu_max = 1.0;
-	    }
-	  if (mu_min < -1.0)
-	    {
-	      mu_min = -1.0;
-	    }
-
-
-	  double bm=1.-betahere*mu;
-	  double bmax=1.-betahere*mu_max;
-	  double bmin=1.-betahere*mu_min;
-
-
-	  I_Data[intersect_i][intersect_j][intersect_k][probeAng] = M1_Data[intersect_i][intersect_j][intersect_k][4]/2.0/bm/bm/bm/bm/gamma2/gamma2;
-	  //I_Data[intersect_i][intersect_j][intersect_k][probeAng] = M1_Data[intersect_i][intersect_j][intersect_k][0]/gamma2/gamma2/beta/3.0*(1.0/bmax/bmax/bmax - 1.0/bmin/bmin/bmin)/(mu_max - mu_min);
-	   
-	  interp_I += I_Data[intersect_i][intersect_j][intersect_k][probeAng]*intersectGridWeights[probeAng][p];
-	  interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[probeAng][p];
-
-
-	}
-
-
-
-
-
-
-      
-
-      double dtau = (source_Data[1][1][1][2]+source_Data[1][1][1][3]) * intersectDistances[probeAng];
-
-
-      double iray=I_Solve(S[1][1][1], interp_S, interp_I, dtau);   //SOLVED BY SHORT CHARACTERISTICS!;
-      I_ray[probeAng] = iray;
-      
-
-      double I_old = I_Data[1][1][1][probeAng];
-      I_time[probeAng] = I_old + (I_ray[probeAng] - I_old)/intersectDistances[probeAng] * LIGHT_C * delta_t; //apply time step
-      
-      I_return[probeAng] = I_time[probeAng];
-      
-      /*
-      if (verbose)
-	{
-	  printf("%d - %e %e\n", probeAng, interp_I, I_ray[probeAng]);
-	}
-      */
-       
-      
-    }
-
-
-  
-
-
-
-  //Calculate radiative moments using our RT solution to intensity field
-
-  double dOmega = 4.0*PI/NUMANGLES;
-  double targetDirection1[3], targetDirection2[3];
-  double cos1, cos2;
-  double P[3][3], E = 0;
-
-  //intialize Pressure tensor P_ij
-  for (q=0; q < 3; q++)
-    {
-      F_return[q]=0;
-
-      for (r=0; r < 3; r++)
-	{
-	  P[q][r] = 0.;
-	}
-    }
-
-  //Calculate P_ij by summing up contributions over all angles
-  for (q=0; q < 3; q++)
-    {
-      if (q == 0)
-	{
-	  targetDirection1[0] = 1.0;
-	  targetDirection1[1] = 0.0;
-	  targetDirection1[2] = 0.0;
-	}
-      if (q == 1)
-	{
-	  targetDirection1[0] = 0.0;
-	  targetDirection1[1] = 1.0;
-	  targetDirection1[2] = 0.0;
-	}
-      if (q == 2)
-	{
-	  targetDirection1[0] = 0.0;
-	  targetDirection1[1] = 0.0;
-	  targetDirection1[2] = 1.0;
-	}
-
-
-      for (r=0; r < 3; r++)
-	{
-	  if (r == 0)
-	    {
-	      targetDirection2[0] = 1.0;
-	      targetDirection2[1] = 0.0;
-	      targetDirection2[2] = 0.0;
-	    }
-	  if (r == 1)
-	    {
-	      targetDirection2[0] = 0.0;
-	      targetDirection2[1] = 1.0;
-	      targetDirection2[2] = 0.0;
-	    }
-	  if (r == 2)
-	    {
-	      targetDirection2[0] = 0.0;
-	      targetDirection2[1] = 0.0;
-	      targetDirection2[2] = 1.0;
-	    }
-
-
-	  int probeAng;
-	  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
-	    {
-
-	      cos1 = angGridCoords[probeAng][0]*targetDirection1[0] + angGridCoords[probeAng][1]*targetDirection1[1] + angGridCoords[probeAng][2]*targetDirection1[2];
-	      cos2 = angGridCoords[probeAng][0]*targetDirection2[0] + angGridCoords[probeAng][1]*targetDirection2[1] + angGridCoords[probeAng][2]*targetDirection2[2];
-
-
-	      P[q][r] += I_time[probeAng]*cos1*cos2;
-	      if (r==0)
-		{
-		  F_return[q] += I_time[probeAng]*cos1;
-		}
-	    }
-	}
-    }
-	
-
-  //Calculate E
-  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
-    {
-      E += I_time[probeAng];
-    }
-
-
-  //	printf("E = %e  |  Pxx = %e\n", E, P[0][0]);
-
-
-  //Set eddington tensor as P_ij/E
-  // Normalize flux by E
-  for (q=0; q < 3; q++)
-    {
-      for (r=0; r < 3; r++)
-	{
-	  
-	  if (E > 0)
-	    {
-	      eddingtonFactor[q][r] = P[q][r]/E;
-	    }
-	  else
-	    {
-	      eddingtonFactor[q][r] = 0.;
-	    }
-	    
-
-	  
-
-	    /*
-	  //test
-	  if(q==r)
-	    eddingtonFactor[q][r] = 1./3.;
-	  else
-	    eddingtonFactor[q][r] = 0.;
-	  */
-	}
-
-      F_return[q] = F_return[q]/E;
-    }
-
-}
-
-
-void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose)
+void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose)
 {
   double S[3][3][3];  //radiative source function
 
@@ -3030,22 +2662,22 @@ void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double s
 
       for (p=0; p < 4; p++)
 	{
-	  int intersect_i = intersectGridIndices[probeAng][0][p];
-	  int intersect_j = intersectGridIndices[probeAng][1][p];
-	  int intersect_k = intersectGridIndices[probeAng][2][p];
+	  int intersect_i = intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p];
+	  int intersect_j = intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p];
+	  int intersect_k = intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p];
 
 	  int q;
 	  for (q=0 ; q<NUMANGLES; q++)
 	    {
-	      interp_I[q] += I_Data[intersect_i][intersect_j][intersect_k][q]*intersectGridWeights[probeAng][p];
+	      interp_I[q] += I_Data[intersect_i][intersect_j][intersect_k][q]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
 	    }
-	  interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[probeAng][p];
+	  interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
 
 	}
-      double dtau = (source_Data[1][1][1][2]+source_Data[1][1][1][3]) * intersectDistances[probeAng];
+      double dtau = (source_Data[1][1][1][2]+source_Data[1][1][1][3]) * intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng];
 
       I_ray[probeAng] = I_Solve(S[1][1][1], interp_S, interp_I[probeAng], dtau);   //SOLVED BY SHORT CHARACTERISTICS!
-      I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[probeAng] * LIGHT_C * delta_t; //apply time step
+      I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t; //apply time step
       I_return[probeAng] = I_time[probeAng];
 
 
@@ -3280,19 +2912,33 @@ int zero_readangles()
 
 
   int readStatus = readAngleFiles(angGridCoords, angDualGridCoords, dualAdjacency);
-  setupInterpWeights(angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+
+  if(readStatus==-1) 
+    {
+      my_err("zero_readangles() failed. missing files best-xyz.dat, best-dualtri-xyz.dat, or best-dualtri-adjIndex.dat.\n");
+      exit(-1);
+    }
+
   initAngIndex(angGridCoords, angDualGridCoords, angGridIndexSort, angDualGridIndexSort);
   //Calculate decision trees for BSP angle lookup
   splitAngGrid(NUMANGLES, angGridIndexSort, 0, angGridCoords, &angGridRoot);
   splitDualAngGrid(NUMDUALANGLES, angDualGridIndexSort, 0, angDualGridCoords, &angDualGridRoot);
 
+  //Calculate interpolation weights
 
-
-  if(readStatus==-1) 
+  //making backup acting as the previous time step
+  int ii;
+#pragma omp parallel for private(ii) schedule (static)
+  for(ii=0;ii<Nloop_6;ii++) //domain + 1 layer 
     {
-      my_err("zero_readangles() failed. exiting.\n");
-      exit(-1);
-    }
+      int ix,iy,iz;
+      ix=loop_6[ii][0];
+      iy=loop_6[ii][1];
+      iz=loop_6[ii][2];
+
+      setupInterpWeights_cart2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+    }  
+
 
   return readStatus;
 }

@@ -681,8 +681,12 @@ int ZEROtest_oldmain();
 int zero_readangles();
 struct bsptree *angGridRoot;
 struct bsptree *angDualGridRoot;
-void ZERO_shortChar(double delta_t, double M1_Data[3][3][3][5], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],double* ,int verbose);
-void ZERO_shortCharI(double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[NUMANGLES][3][4], double intersectGridWeights[NUMANGLES][4], double intersectDistances[NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose);
+void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
+void setupInterpWeights_cart3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
+
+
+void ZERO_shortCharI(int,int,int,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose);
+
 void initAngIndex(double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int angGridIndexSort[NUMANGLES][3], int angDualGridIndexSort[NUMANGLES][3]);
 void splitAngGrid(int numAvailAnglesInit, int angGridIndexInit[NUMANGLES][3], int iter, double angGridCoords[NUMANGLES][3], struct bsptree **node);
 void splitDualAngGrid(int numAvailAnglesInit, int angGridIndexInit[NUMDUALANGLES][3], int iter, double angGridCoords[NUMDUALANGLES][3], struct bsptree **node);
@@ -703,9 +707,9 @@ double Ibeam2[SX][SY][SZ][NUMANGLES];                //specific intensities at c
 double angGridCoords[NUMANGLES][3];  		//Store xyz locations of angle grid
 double angDualGridCoords[NUMDUALANGLES][3]; 	//Store xyz locations of dual angle grid
 int dualAdjacency[NUMDUALANGLES][3]; 		//Store index information for adjacent angles
-int intersectGridIndices[NUMANGLES][3][4];	//indices for gridLoc of 4 points bounding intersection
-double intersectGridWeights[NUMANGLES][4];	//weights corresponding to 4 points bounding intersection
-double intersectDistances[NUMANGLES];		//distance to intersection point from center
+int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4];	//indices for gridLoc of 4 points bounding intersection
+double intersectGridWeights[SX][SY][SZ][NUMANGLES][4];	//weights corresponding to 4 points bounding intersection
+double intersectDistances[SX][SY][SZ][NUMANGLES];		//distance to intersection point from center
 
 
 #ifdef MPI

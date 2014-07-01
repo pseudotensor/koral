@@ -4064,25 +4064,9 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
       
   //VET
   ldouble VET[3][3];
-
-  //calling Yucong's solver
-  ldouble I_return[NUMANGLES];			
-  ldouble F_return[3];
-
-  /*
-  //uses global dt - not the one in op_explicit!  
-  ZERO_shortChar(dt, rad, source, angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, VET, I_return, F_return, 0);
-  */
-  
   ZERO_calcVET(&intensities[1][1][1][0],VET,angGridCoords);
   
-  /*
-  ZERO_shortCharI(0.*dt, intensities, source, 
-  angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
-  VET, I_return, 0);
-  */
-   
-  //first, let us calculate enden & fluxes in RADCLOSURECOORDS
+   //first, let us calculate enden & fluxes in RADCLOSURECOORDS
   //using covariant formulation of M1 to recover R^mu_t from primitives
   calc_Rij_M1(pp0,geom0,RijM1);	  
   //converting to RADCLOSURECOORDS
@@ -4321,7 +4305,7 @@ update_intensities()
 
   //making backup acting as the previous time step
 #pragma omp parallel for private(ii) schedule (static)
-  for(ii=0;ii<Nloop_5;ii++) //domain + 1 layer only
+  for(ii=0;ii<Nloop_5;ii++) //everything
     {
       int i,j,ix,iy,iz;
       ix=loop_5[ii][0];
@@ -4403,7 +4387,7 @@ update_intensities()
       //running ZERO
       
       
-      ZERO_shortCharI(dt, intensities, source, 
+      ZERO_shortCharI(ix0,iy0,iz0,dt, intensities, source, 
 		      angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
 		      VET, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
             
