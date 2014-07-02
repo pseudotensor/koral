@@ -77,11 +77,11 @@
 #define MAXX (M_PI-0.1)
 #define MINY .1
 #define MAXY (M_PI-0.1)
-#define MINZ -(M_PI/100.)
-#define MAXZ (M_PI/100.)
+#define MINZ (M_PI-(M_PI/10.))
+#define MAXZ (M_PI+(M_PI/10.))
 
-#define TNX 50
-#define TNY 50
+#define TNX 200
+#define TNY 200
 #define TNZ 1
 
 //# of tiles

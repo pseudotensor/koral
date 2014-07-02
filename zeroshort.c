@@ -43,13 +43,7 @@ f_stretchFactor (double k, void *argsin)
       else
 	summinus+=args->Intensities[p]*sqrt(1.+(1./k/k-1.)*args->cosang[p]*args->cosang[p]);
     }
-  
-  /*
-  return 
-    (k*args->F_Start_forward + 1./k*args->F_Start_backward)/
-    (sumplus + summinus);
-  */
-
+ 
   return args->fFinal - 
     (k*args->F_Start_forward + 1./k*args->F_Start_backward)/
     (sumplus + summinus);
@@ -73,13 +67,45 @@ calc_stretchFactor(void *argsin)
 
   exit(1);
   */
-
   do
     {
       iter++;
       if(iter>100)
 	{
-	  my_err("calc_stretchFactor() failed to find solution\n");
+	  struct solverarg *args
+	    = (struct solverarg *) argsin;
+	  printf("calc_stretchFactor() failed to find solution with F/E=%f\n",args->fFinal);
+	  
+	  /*
+	  int p;
+	  for(p=0;p<NUMANGLES;p++)
+	    printf("%d %e\n",p,args->Intensities[p]);
+
+	  double k;
+	  for(k=.5;k<1.;k*=1.01)
+	    {
+	    printf("%e %e\n",k,f_stretchFactor (k, argsin));
+
+	  
+	    int p;double sumplus,summinus;
+	    sumplus=summinus=0.;
+	    for(p=0;p<NUMANGLES;p++)
+	      {
+		if(args->cosang[p]>0.)
+		  sumplus+=args->Intensities[p]*sqrt(1.+(k*k-1.)*args->cosang[p]*args->cosang[p]);
+		else
+		  summinus+=args->Intensities[p]*sqrt(1.+(1./k/k-1.)*args->cosang[p]*args->cosang[p]);
+	      }
+  
+	    printf("%e %e %e %e %e\n",(k*args->F_Start_forward + 1./k*args->F_Start_backward),
+		   (sumplus + summinus),sumplus,summinus,
+		   args->fFinal - 
+		   (k*args->F_Start_forward + 1./k*args->F_Start_backward)/
+		   (sumplus + summinus));
+	    }
+	  */
+
+
 	  exit(-1);
 	}
 
@@ -89,9 +115,12 @@ calc_stretchFactor(void *argsin)
       kprev=k;
 
       dk=f/df;
+
+      
       if(fabs(dk)>.5*k)
 	if(dk>0.) dk=.5*k;
 	else dk=-.5*k;
+      
 
       k=k-dk;      
 
@@ -99,7 +128,8 @@ calc_stretchFactor(void *argsin)
       
     }
   while (fabs((k-kprev)/k)>1.e-3);
-
+  //while(iter<10);
+  
   return k;
 }
 
@@ -396,9 +426,6 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
   int l,m;
 
 
-
-  double coords_spherical[3][3];
-
   //Read in coordinates
   for (l=0; l < 3; l++)
     {
@@ -440,6 +467,18 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
   posY0 = posR0*sin(posTh0)*sin(posPh0);
   posZ0 = posR0*cos(posTh0);
 
+  /*
+  if(ix==NX/2 && iy==NY/2 && iz==0)
+    { 
+      for (l=0; l < 3; l++)
+	{
+	  for (m=0; m <3; m++)
+	    printf("%d %d %e\n", l,m,coord_limits[l][m]);
+	}
+      exit(1);
+
+    }
+  */
 
   int probeAng;
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
@@ -517,7 +556,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  lowerR=coord_limits[0][0];
 	  upperR=coord_limits[0][1];
 	}
-      else if ((posR < coord_limits[0][2]) && (posR > coord_limits[0][1]))
+      else 
 	{
 	  lowerRIndex = n1_central;
 	  upperRIndex = n1_central+1;
@@ -544,7 +583,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  lowerTh=coord_limits[1][0];
 	  upperTh=coord_limits[1][1];
 	}
-      else if ((posTh < coord_limits[1][2]) && (posTh > coord_limits[1][1]))
+      else
 	{
 	  lowerThIndex = n2_central;
 	  upperThIndex = n2_central+1;
@@ -572,7 +611,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  upperPh=coord_limits[2][1];
 
 	}
-      else if ((posPh < coord_limits[2][2]) && (posPh > coord_limits[2][1]))
+      else
 	{
 	  lowerPhIndex = n3_central;
 	  upperPhIndex = n3_central+1;
@@ -1077,7 +1116,6 @@ void setupInterpWeights_cart3D(int ix,int iy,int iz,double angGridCoords[NUMANGL
 double I_Solve(double S0, double S1, double I1, double dtau)
 {
   //Notation is: point 0 = local point, point 1 = far point, I1 = initial intensity at far point
-
   if (dtau > 1.0e-3)
     {
       double exptau=exp(-dtau);
@@ -2302,6 +2340,20 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	  for (q=0 ; q<NUMANGLES; q++)
 	    {
 	      interp_I[q] += I_Data[intersect_i][intersect_j][intersect_k][q]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
+
+	      
+	      if(interp_I[q]<0.) 
+		{
+		  printf("neg interp_I %e %e\n",
+			 I_Data[intersect_i][intersect_j][intersect_k][q],
+			 intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p]);
+		  exit(1);
+		}
+	      
+	            
+	      //if(!isfinite(interp_I[q]))
+	      //printf("%d %d > %d %d > %e %e\n",p,q,ix,iy,I_Data[intersect_i][intersect_j][intersect_k][q],intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p]);
+
 	    }
 	  interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
 
@@ -2309,10 +2361,16 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
       double dtau = (source_Data[1][1][1][2]+source_Data[1][1][1][3]) * intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng];
 
       I_ray[probeAng] = I_Solve(S[1][1][1], interp_S, interp_I[probeAng], dtau);   //SOLVED BY SHORT CHARACTERISTICS!
+
       I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t; //apply time step
+
+      
+      if(delta_t > intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng])
+	printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
+      
+
       I_return[probeAng] = I_time[probeAng];
-
-
+      
       //		printf("%d - %e\n", probeAng, I_time[probeAng]);
 
 
@@ -2853,6 +2911,7 @@ int transformI_Lagrange(int ix,int iy,int iz,double I_return[NUMANGLES], double 
 
 void transformI(int ix, int iy, int iz,double I_return[NUMANGLES], double M1_input[5])
 {
+  //  return;
   transformI_stretch(ix,iy,iz,I_return, M1_input);
 
   /*

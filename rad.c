@@ -3909,12 +3909,11 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   double ff = fmag / rad[0];
 
   //correct the beam pattern
-
-  //transformI(ix,iy,iz,&intensities[0], &rad[0]);
+  transformI(ix,iy,iz,&intensities[0], &rad[0]);
 
   //calculate VET
   ldouble VET[3][3];
-  //ZERO_calcVET(ix,iy,iz,&intensities[0],VET,angGridCoords);
+  ZERO_calcVET(ix,iy,iz,&intensities[0],VET,angGridCoords);
 
   //rewriting fluxes to output
   for(i=0;i<4;i++)
@@ -3925,9 +3924,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   
   //rewriting the pressure part with VET and mixing with M1
   ldouble fzero;
-  //  fzero=step_function(.75-beta0,.1);
-  fzero=0.;
-  if(beta0>0.9)
+  fzero=step_function(.925-ff,.015);
+  
+  //fzero=1.;
+  if(ff>0.95)
     fzero=0.;
   
   for(i=1;i<4;i++)
@@ -4148,7 +4148,17 @@ update_intensities()
 
 	      //intensities	      
 	      for(l=0;l<NUMANGLES;l++)
-		intensities[i+1][j+1][k+1][l]=Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][l];
+		{
+		  intensities[i+1][j+1][k+1][l]=Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][l];
+
+		  /*
+		  if(intensities[i+1][j+1][k+1][l]<0.)
+		    {
+		      printf("before zero neg\n");
+		      exit(1);
+		    }
+		  */
+		}
 
 	      //postprocessing, passing by
 	      pre=(GAMMA-1.)*(uint);
@@ -4174,12 +4184,23 @@ update_intensities()
 	    }
 
       //running ZERO
-      
+
+       
       ZERO_shortCharI(ix0,iy0,iz0,dt, intensities, source, 
 		      angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
 		      VET, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
-         
 
+      
+      /*
+      int p;
+      for(p=0;p<NUMANGLES;p++)
+	if(Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][p]<0.)
+	  {
+	    printf("negative after shortchari\n");
+	    exit(1);
+	  }
+      */
+      
       //rotating, adjusting fluxes
       double fmag = sqrt(rad[1][1][1][1]*rad[1][1][1][1] + 
 				 rad[1][1][1][2]*rad[1][1][1][2] + 

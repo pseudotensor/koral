@@ -72,6 +72,27 @@ main(int argc, char **argv)
 #ifdef RADIATION
 #if(RADCLOSURE==VETCLOSURE)
   zero_readangles();
+						
+  /*
+  int ix,iy,iz,j;
+  int sums[3][3];
+  sums[0][0]=sums[0][1]=sums[0][2]=0;
+  sums[1][0]=sums[1][1]=sums[1][2]=0;
+  sums[2][0]=sums[2][1]=sums[2][2]=0;
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      {
+	iz=0;
+	for(i=0;i<NUMANGLES;i++)
+	  for(j=0;j<4;j++)
+	    if(intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]<0.0)
+	      {	    
+		printf("%d %d > %d %d > %e\n",ix,iy,i,j,intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]);
+	      }
+      }
+  exit(1);
+  */
+
   //ZEROtest_oldmain();
 #endif
 #endif
