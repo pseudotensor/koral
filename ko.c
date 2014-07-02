@@ -105,8 +105,10 @@ main(int argc, char **argv)
 #ifdef RESTART
   ifinit=fread_restartfile(RESTARTNUM,folder,&tstart);
   //todo: read intensities from file!
+#if (RADCLOSURE==VETCLOSURE)
 #ifdef RADSTARTWITHM1INTENSITIES
   calc_M1intensities();
+#endif
 #endif
   if(!ifinit)
     {

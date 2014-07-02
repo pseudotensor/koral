@@ -1708,6 +1708,19 @@ get_xx(int ix,int iy,int iz,ldouble *xx)
   return 0;
 }
 
+//returns four-vector of coordinates
+//in arbitrary coordinates
+int 
+get_xx_arb(int ix,int iy,int iz,ldouble *xx,int COORDSOUT)
+{
+  ldouble xx0[4];
+  get_xx(ix,iy,iz,xx0);
+  
+  coco_N(xx0,xx,MYCOORDS,COORDSOUT);
+
+  return 0;
+}
+
 //sets cell center location
 int set_x(int ic, int idim,ldouble val)
 {  

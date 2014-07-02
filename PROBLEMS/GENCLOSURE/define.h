@@ -13,7 +13,6 @@
 #define RADIATION
 #define RADCLOSURE VETCLOSURE
 #define RADSTARTWITHM1INTENSITIES
-#define RADCLOSURECOORDS MINKCOORDS
 //#define NUMRADWAVESPEEDS
 #define SKIPRADWAVESPEEDLIMITER
 #define SKIPRADSOURCE
@@ -72,15 +71,17 @@
 /************************************/
 
 #define MYCOORDS MINKCOORDS
+#define RADCLOSURECOORDS MYCOORDS
+//#define SILO2D_XZPLANE
 #define MINX .1
 #define MAXX (M_PI-0.1)
 #define MINY .1
 #define MAXY (M_PI-0.1)
-#define MINZ -1.
-#define MAXZ 1. 
+#define MINZ -(M_PI/100.)
+#define MAXZ (M_PI/100.)
 
-#define TNX 100
-#define TNY 100
+#define TNX 50
+#define TNY 50
 #define TNZ 1
 
 //# of tiles

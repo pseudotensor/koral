@@ -365,6 +365,358 @@ int readAngleFiles(double angGridCoords[NUMANGLES][3], double angDualGridCoords[
   return 1;  //successfully read in all files!
 }
 
+// Subroutine to calculate the interpolation weights for a spherical 3x3x3 cuboid grid
+
+// We find the 4 bounding corners for each ray hitting the boundary, and their appropriate weights to use in interpolation later on
+
+// Assume existence of getCoord(n1, n2, n3) that returns the r, theta, phi coordinates at grid cell labeled n1, n2, n3
+
+
+
+void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
+{
+  int n1_central=ix,n2_central=iy,n3_central=iz; //use as central index, will loop over later
+  int delta_n1, delta_n2, delta_n3;
+
+  double coord_values[3];
+  double xxvec[4];
+  double coord_limits[3][3]; //store the coordinate boundaries in r,theta,phi
+  //indices are [coordinate r,th,phi][min,mid,max]
+
+
+  double posX0, posY0, posZ0; //Coordinates of central cell
+  double posR0, posTh0, posPh0;
+
+  int l,m;
+
+
+
+  double coords_spherical[3][3];
+
+  //Read in coordinates
+  for (l=0; l < 3; l++)
+    {
+      for (m=-1; m <= 1; m++)
+	{
+	  if (l==0)
+	    {
+	      delta_n1=m;
+	      delta_n2=0;
+	      delta_n3=0;
+	    }
+	  if (l==1)
+	    {
+	      delta_n1=0;
+	      delta_n2=m;
+	      delta_n3=0;
+	    }
+	  if (l==2)
+	    {
+	      delta_n1=0;
+	      delta_n2=0;
+	      delta_n3=m;
+	    }
+	  //getCoord(n1_central+delta_n1, n2_central+delta_n2, n3_central+delta_n3, coord_values);
+	  get_xx_arb(n1_central+delta_n1, n2_central+delta_n2, n3_central+delta_n3, xxvec, SPHCOORDS);
+	  coord_values[0]=xxvec[1];
+	  coord_values[1]=xxvec[2];
+	  coord_values[2]=xxvec[3];
+
+	  coord_limits[l][m+1]=coord_values[l];
+	}
+    }
+
+  posR0 = coord_limits[0][1];
+  posTh0 = coord_limits[1][1];
+  posPh0 = coord_limits[2][1];
+
+  posX0 = posR0*sin(posTh0)*cos(posPh0);
+  posY0 = posR0*sin(posTh0)*sin(posPh0);
+  posZ0 = posR0*cos(posTh0);
+
+
+  int probeAng;
+  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
+    {
+
+      double posX, posY, posZ;
+      double posR, posTh, posPh;
+
+      double minL = 0., maxL = 2.0*sqrt(coord_limits[0][2]*coord_limits[0][2] - coord_limits[0][0]*coord_limits[0][0]);
+
+
+      //Bisect on ray to numerically find intersection location
+      int iter;
+      for (iter=0; iter < 50; iter++)
+	{
+
+
+	  posX = posX0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][0]);
+	  posY = posY0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][1]);
+	  posZ = posZ0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][2]);
+
+
+	  posR = sqrt(posX*posX + posY*posY + posZ*posZ);
+	  posTh = atan2(posZ,sqrt(posX*posX + posY*posY));
+	  posPh = atan2(posX, posY);
+
+
+	  //bisect on path length to find nearest boundary intersection
+	  if ((posR > coord_limits[0][2]) || (posR < coord_limits[0][0]) || (posTh > coord_limits[1][2]) || (posTh < coord_limits[1][0]) || (posPh > coord_limits[2][2]) || (posPh < coord_limits[2][0]))
+	    {
+	      maxL = (minL+maxL)/2.0;
+	    }
+	  else
+	    {
+	      minL = (minL+maxL)/2.0;
+	    }
+
+
+	  // printf("%e %e (%e %e %e) (%e %e %e)\n", minL, maxL, posR0, posTh0, posPh0, posR, posTh, posPh);
+	  // printf("%e %e (%e %e %e)\n", minL, maxL, posX, posY, posZ);
+
+
+	}
+
+
+      posX = posX0 + maxL * (-angGridCoords[probeAng][0]);
+      posY = posY0 + maxL * (-angGridCoords[probeAng][1]);
+      posZ = posZ0 + maxL * (-angGridCoords[probeAng][2]);
+
+      posR = sqrt(posX*posX + posY*posY + posZ*posZ);
+      posTh = atan2(posZ,sqrt(posX*posX + posY*posY));
+      posPh = atan2(posX, posY);
+
+      double lowerR, lowerTh, lowerPh;
+      double lowerRIndex, lowerThIndex, lowerPhIndex;
+
+      double upperR, upperTh, upperPh;
+      double upperRIndex, upperThIndex, upperPhIndex;
+
+
+      //R Indices
+      if ((posR < coord_limits[0][0]) || (posR > coord_limits[0][2]))
+	{
+	  lowerRIndex = n1_central;
+	  upperRIndex = n1_central;
+
+	  lowerR=coord_limits[0][1];
+	  upperR=coord_limits[0][1];
+	}
+      else if ((posR < coord_limits[0][1]) && (posR > coord_limits[0][0]))
+	{
+	  lowerRIndex = n1_central-1;
+	  upperRIndex = n1_central;
+
+	  lowerR=coord_limits[0][0];
+	  upperR=coord_limits[0][1];
+	}
+      else if ((posR < coord_limits[0][2]) && (posR > coord_limits[0][1]))
+	{
+	  lowerRIndex = n1_central;
+	  upperRIndex = n1_central+1;
+
+	  lowerR=coord_limits[0][1];
+	  upperR=coord_limits[0][2];
+	}
+
+
+      //Theta Indices
+      if ((posTh < coord_limits[1][0]) || (posTh > coord_limits[1][2]))
+	{
+	  lowerThIndex = n2_central;
+	  upperThIndex = n2_central;
+
+	  lowerTh=coord_limits[1][1];
+	  upperTh=coord_limits[1][1];
+	}
+      else if ((posTh < coord_limits[1][1]) && (posTh > coord_limits[1][0]))
+	{
+	  lowerThIndex = n2_central-1;
+	  upperThIndex = n2_central;
+
+	  lowerTh=coord_limits[1][0];
+	  upperTh=coord_limits[1][1];
+	}
+      else if ((posTh < coord_limits[1][2]) && (posTh > coord_limits[1][1]))
+	{
+	  lowerThIndex = n2_central;
+	  upperThIndex = n2_central+1;
+
+	  lowerTh=coord_limits[1][1];
+	  upperTh=coord_limits[1][2];
+	}
+
+
+      //Phi Indices
+      if ((posPh < coord_limits[2][0]) || (posPh > coord_limits[2][2]))
+	{
+	  lowerPhIndex = n3_central;
+	  upperPhIndex = n3_central;
+
+	  lowerPh=coord_limits[2][1];
+	  upperPh=coord_limits[2][1];
+	}
+      else if ((posPh < coord_limits[2][1]) && (posPh > coord_limits[2][0]))
+	{
+	  lowerPhIndex = n3_central-1;
+	  upperPhIndex = n3_central;
+
+	  lowerPh=coord_limits[2][0];
+	  upperPh=coord_limits[2][1];
+
+	}
+      else if ((posPh < coord_limits[2][2]) && (posPh > coord_limits[2][1]))
+	{
+	  lowerPhIndex = n3_central;
+	  upperPhIndex = n3_central+1;
+
+	  lowerPh=coord_limits[2][1];
+	  upperPh=coord_limits[2][2];
+	}
+
+
+
+
+
+
+      //Interpolation weight components
+      double w0_low, w0_high;
+      double w1_low, w1_high;
+
+
+
+      //Get interpolation weights for 4 bounding corners of cube intersection
+      if ((posR > coord_limits[0][2]) || (posR < coord_limits[0][0]))
+	{
+
+	  int realRIndex;
+
+
+	  if (posR > coord_limits[0][2])
+	    {
+	      realRIndex = n1_central+1;
+	    }
+	  if (posR < coord_limits[0][0])
+	    {
+	      realRIndex = n1_central-1;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p] = realRIndex;
+	    }
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][0] = lowerThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][1] = lowerThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][2] = upperThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][3] = upperThIndex;
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1] = upperPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3] = upperPhIndex;
+
+	  w0_high = (posTh - lowerTh)/(upperTh - lowerTh);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = (posPh - lowerPh)/(upperPh - lowerPh);
+	  w1_low = 1.0 - w1_high;
+
+	}
+
+
+      if ((posTh > coord_limits[1][2]) || (posTh < coord_limits[1][0]))
+	{
+	  int realThIndex;
+
+	  if (posTh > coord_limits[1][2])
+	    {
+	      realThIndex = n2_central+1;
+	    }
+	  if (posTh < coord_limits[1][0])
+	    {
+	      realThIndex = n2_central-1;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p] = realThIndex;
+	    }
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][3] = upperRIndex;
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1] = upperPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3] = upperPhIndex;
+
+	  w0_high = (posR - lowerR)/(upperR - lowerR);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = (posPh - lowerPh)/(upperPh - lowerPh);
+	  w1_low = 1.0 - w1_high;
+
+	}
+
+
+      if ((posPh > coord_limits[2][2]) || (posPh < coord_limits[2][0]))
+	{
+	  int realPhIndex;
+
+	  if (posPh > coord_limits[2][2])
+	    {
+	      realPhIndex = n3_central+1;
+	    }
+	  if (posPh < coord_limits[2][0])
+	    {
+	      realPhIndex = n3_central-1;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p] = realPhIndex;
+	    }
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][3] = upperRIndex;
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][0] = lowerThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][1] = upperThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][2] = lowerThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][3] = upperThIndex;
+
+	  w0_high = (posR - lowerR)/(upperR - lowerR);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = (posTh - lowerTh)/(upperTh - lowerTh);
+	  w1_low = 1.0 - w1_high;
+
+	}
+
+
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] = w0_low*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] = w0_low*w1_high;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = w0_high*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
+
+      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = maxL;
+
+
+
+      // printf("!! %e %e %e %e !!\n", w0_low, w0_high, w1_low, w1_high);
+      // printf("-- %e %e %e --\n", posX, posY, posZ);
+
+
+
+    } //end loop over angles
+
+
+}
+
 
 // Subroutine to calculate the interpolation weights for a square 3x3x1 cubic grid
 // (Assuming symmetry in z)
@@ -2711,47 +3063,15 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
   //Calculate P_ij by summing up contributions over all angles
   for (q=0; q < 3; q++)
     {
-      if (q == 0)
-	{
-	  targetDirection1[0] = 1.0;
-	  targetDirection1[1] = 0.0;
-	  targetDirection1[2] = 0.0;
-	}
-      if (q == 1)
-	{
-	  targetDirection1[0] = 0.0;
-	  targetDirection1[1] = 1.0;
-	  targetDirection1[2] = 0.0;
-	}
-      if (q == 2)
-	{
-	  targetDirection1[0] = 0.0;
-	  targetDirection1[1] = 0.0;
-	  targetDirection1[2] = 1.0;
-	}
-
+      targetDirection1[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][0];
+      targetDirection1[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][1];
+      targetDirection1[2] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][2];
 
       for (r=0; r < 3; r++)
 	{
-	  if (r == 0)
-	    {
-	      targetDirection2[0] = 1.0;
-	      targetDirection2[1] = 0.0;
-	      targetDirection2[2] = 0.0;
-	    }
-	  if (r == 1)
-	    {
-	      targetDirection2[0] = 0.0;
-	      targetDirection2[1] = 1.0;
-	      targetDirection2[2] = 0.0;
-	    }
-	  if (r == 2)
-	    {
-	      targetDirection2[0] = 0.0;
-	      targetDirection2[1] = 0.0;
-	      targetDirection2[2] = 1.0;
-	    }
-
+	  targetDirection2[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][0];
+	  targetDirection2[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][1];
+	  targetDirection2[2] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][2];
 
 	  int probeAng;
 	  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
@@ -2797,7 +3117,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 }
 
 void
-ZERO_calcVET(double I_time[NUMANGLES], double eddingtonFactor[3][3], double angGridCoords[NUMANGLES][3])
+ZERO_calcVET(int ix, int iy, int iz,double I_time[NUMANGLES], double eddingtonFactor[3][3], double angGridCoords[NUMANGLES][3])
 {
 
   //Calculate radiative moments using our RT solution to intensity field
@@ -2821,48 +3141,16 @@ ZERO_calcVET(double I_time[NUMANGLES], double eddingtonFactor[3][3], double angG
   //Calculate P_ij by summing up contributions over all angles
   for (q=0; q < 3; q++)
     {
-      if (q == 0)
-	{
-	  targetDirection1[0] = 1.0;
-	  targetDirection1[1] = 0.0;
-	  targetDirection1[2] = 0.0;
-	}
-      if (q == 1)
-	{
-	  targetDirection1[0] = 0.0;
-	  targetDirection1[1] = 1.0;
-	  targetDirection1[2] = 0.0;
-	}
-      if (q == 2)
-	{
-	  targetDirection1[0] = 0.0;
-	  targetDirection1[1] = 0.0;
-	  targetDirection1[2] = 1.0;
-	}
-
+      targetDirection1[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][0];
+      targetDirection1[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][1];
+      targetDirection1[2] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][2];
 
       for (r=0; r < 3; r++)
 	{
-	  if (r == 0)
-	    {
-	      targetDirection2[0] = 1.0;
-	      targetDirection2[1] = 0.0;
-	      targetDirection2[2] = 0.0;
-	    }
-	  if (r == 1)
-	    {
-	      targetDirection2[0] = 0.0;
-	      targetDirection2[1] = 1.0;
-	      targetDirection2[2] = 0.0;
-	    }
-	  if (r == 2)
-	    {
-	      targetDirection2[0] = 0.0;
-	      targetDirection2[1] = 0.0;
-	      targetDirection2[2] = 1.0;
-	    }
-
-
+	  targetDirection2[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][0];
+	  targetDirection2[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][1];
+	  targetDirection2[2] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][2];
+ 
 	  int probeAng;
 	  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
 	    {
@@ -2936,7 +3224,62 @@ int zero_readangles()
       iy=loop_6[ii][1];
       iz=loop_6[ii][2];
 
-      setupInterpWeights_cart2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+      //tetrad
+      if(RADCLOSURECOORDS==MINKCOORDS)
+	{
+ 	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0]=1.;
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1]=0.;
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2]=0.;
+	 
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]=0.;
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]=1.;
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]=0.;
+
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0]=0.;
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1]=0.;
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2]=1.;
+	}
+
+      if(RADCLOSURECOORDS==SPHCOORDS)
+	{
+	  double xxsph[4],th,ph;
+	  get_xx_arb(ix,iy,iz,xxsph,SPHCOORDS);
+	  th=xxsph[2];
+	  ph=xxsph[3];
+
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0]=sin(th)*cos(ph);
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1]=sin(th)*sin(ph);
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2]=cos(th);
+	 
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]=cos(th)*cos(ph);
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]=cos(th)*sin(ph);
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]=-sin(th);
+
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0]=-sin(ph);
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1]=cos(ph);
+	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2]=0.;
+	}
+
+      //interpolation weights
+      if(MYCOORDS==MINKCOORDS)
+	{
+	  if(TNZ==1)
+	    setupInterpWeights_cart2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+	  else
+	    setupInterpWeights_cart3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+
+	 
+	}
+      else if(MYCOORDS==SPHCOORDS)
+	{
+	  setupInterpWeights_sph3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+	
+	  
+	}
+      else
+	{
+	  my_err("Coordinate system not supported for VET\n"); exit(-1);
+	}    
     }  
 
 
