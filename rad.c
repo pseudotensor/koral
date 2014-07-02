@@ -3909,7 +3909,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   double ff = fmag / rad[0];
 
   //correct the beam pattern
-  transformI(&intensities[0], &rad[0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+  transformI(ix,iy,iz,&intensities[0], &rad[0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 
   //calculate VET
   ldouble VET[3][3];
@@ -4178,7 +4178,7 @@ update_intensities()
 				 rad[1][1][1][3]*rad[1][1][1][3]);
       double ff = fmag / rad[1][1][1][0];
 
-      transformI(&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+      transformI(ix,iy,iz,&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
 
     }
 
