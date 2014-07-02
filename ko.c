@@ -12,8 +12,9 @@ main(int argc, char **argv)
 
   /*
   ldouble temp;
-  for(temp=1.e1;temp<1.e10;temp*=1.1)
-    printf("%e %e\n",temp,opacity_BellLin(1.e-7,temp));
+  for(temp=2.; temp>-10.;temp-=.1)
+    printf("%e %e\n",temp,my_atan2(1.,temp));
+    //  printf("%e %e\n",temp,opacity_BellLin(1.e-7,temp));
   exit(0);
   */
 

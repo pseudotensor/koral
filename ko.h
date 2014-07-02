@@ -694,9 +694,10 @@ void splitDualAngGrid(int numAvailAnglesInit, int angGridIndexInit[NUMDUALANGLES
 void
 ZERO_calcVET(int,int,int,double I_time[NUMANGLES], double eddingtonFactor[3][3], double angGridCoords[NUMANGLES][3]);
 
-void transformI(int,int,int,double I_return[NUMANGLES], double*, struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3]);
-void transformI_num(int,int,int,double I_return[NUMANGLES], double*, struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3]);
-void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES]);
+void transformI(int,int,int,double I_return[NUMANGLES], double*);
+void transformI_stretch(int,int,int,double I_return[NUMANGLES], double*);
+int transformI_Lagrange(int,int,int,double I_return[NUMANGLES], double*);
+void ZERO_decomposeM1(int,int,int,double M1_Data[5], double I_return[NUMANGLES]);
 double
 calc_stretchFactor(void *argsin);
 

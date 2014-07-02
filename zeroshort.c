@@ -381,7 +381,7 @@ int readAngleFiles(double angGridCoords[NUMANGLES][3], double angDualGridCoords[
 
 void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
 {
-  int n1_central=ix,n2_central=iy,n3_central=iz; //use as central index, will loop over later
+  int n1_central=1,n2_central=1,n3_central=1; //use as central index, will loop over later
   int delta_n1, delta_n2, delta_n3;
 
   double coord_values[3];
@@ -423,7 +423,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	      delta_n3=m;
 	    }
 	  //getCoord(n1_central+delta_n1, n2_central+delta_n2, n3_central+delta_n3, coord_values);
-	  get_xx_arb(n1_central+delta_n1, n2_central+delta_n2, n3_central+delta_n3, xxvec, SPHCOORDS);
+	  get_xx_arb(ix+delta_n1, iy+delta_n2, iz+delta_n3, xxvec, SPHCOORDS);
 	  coord_values[0]=xxvec[1];
 	  coord_values[1]=xxvec[2];
 	  coord_values[2]=xxvec[3];
@@ -463,8 +463,8 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 
 
 	  posR = sqrt(posX*posX + posY*posY + posZ*posZ);
-	  posTh = atan2(posZ,sqrt(posX*posX + posY*posY));
-	  posPh = atan2(posX, posY);
+	  posTh = my_atan2(sqrt(posX*posX + posY*posY),posZ);
+	  posPh = my_atan2(posY,posX);
 
 
 	  //bisect on path length to find nearest boundary intersection
@@ -490,8 +490,8 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
       posZ = posZ0 + maxL * (-angGridCoords[probeAng][2]);
 
       posR = sqrt(posX*posX + posY*posY + posZ*posZ);
-      posTh = atan2(posZ,sqrt(posX*posX + posY*posY));
-      posPh = atan2(posX, posY);
+      posTh = my_atan2(sqrt(posX*posX + posY*posY),posZ);
+      posPh = my_atan2(posY,posX);
 
       double lowerR, lowerTh, lowerPh;
       double lowerRIndex, lowerThIndex, lowerPhIndex;
@@ -1846,7 +1846,7 @@ void initAngIndex(double angGridCoords[NUMANGLES][3], double angDualGridCoords[N
 }
 
 
-void transformI_num(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5], struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3])
+void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
 {
   double F_final[3],Efinal,Efinalrad;
 
@@ -2169,7 +2169,7 @@ void transformI_num(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_
 
 
 //decomposes M1 beam into intensities, uses energy densities and fluxes as the input
-void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
+void ZERO_decomposeM1(int ix, int iy, int iz,double M1_Data[5], double I_return[NUMANGLES])
 {
   int probeAng;
   if(M1_Data[0]<SMALL)
@@ -2179,10 +2179,24 @@ void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
       return;
     }
 
+  double F_final[3];
 
-  double fmag = sqrt(M1_Data[1]*M1_Data[1] + 
-		     M1_Data[2]*M1_Data[2] + 
-		     M1_Data[3]*M1_Data[3]);
+  F_final[0]=M1_Data[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
+    +M1_Data[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
+    +M1_Data[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
+
+  F_final[1]=M1_Data[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1] 
+    +M1_Data[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]
+    +M1_Data[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1];
+
+  F_final[2]=M1_Data[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
+    +M1_Data[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
+    +M1_Data[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+
+
+  double fmag = sqrt(F_final[0]*F_final[0] + 
+		     F_final[1]*F_final[1] + 
+		     F_final[2]*F_final[2]);
 
   double ff = fmag / M1_Data[0]; //F/Elab using input argument
 
@@ -2202,9 +2216,9 @@ void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
     fmag=1.;
 
   double f_norm[3];
-  f_norm[0] = M1_Data[1]/fmag;
-  f_norm[1] = M1_Data[2]/fmag;
-  f_norm[2] = M1_Data[3]/fmag;
+  f_norm[0] = F_final[0]/fmag;
+  f_norm[1] = F_final[1]/fmag;
+  f_norm[2] = F_final[2]/fmag;
 
  
   for (probeAng=0; probeAng < NUMANGLES; probeAng++)
@@ -2216,10 +2230,8 @@ void ZERO_decomposeM1(double M1_Data[5], double I_return[NUMANGLES])
 	mu=1.;
 
       double bm=1.-beta*mu;
-   
-      
      
-	I_return[probeAng] = Erad/NUMANGLES/bm/bm/bm/bm/gamma2/gamma2;
+      I_return[probeAng] = Erad/NUMANGLES/bm/bm/bm/bm/gamma2/gamma2;
     }
 
   return;
@@ -2260,9 +2272,6 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	    }
 	}
     }
-
-
-
 
   //Calculate solution to RT, given intensity information from previous iteration
   int probeAng;
@@ -2593,7 +2602,7 @@ int ZEROtest_oldmain()
 
 	for (p=0; p < NUMANGLES; p++)
 	{
-	  if (p<25)
+	  if (1 || p<25)
 		{
 			I_start[p]=1.;
 		}
@@ -2608,7 +2617,7 @@ int ZEROtest_oldmain()
 
 	M1data[0]=80.;
 	M1data[1]=0.;
-	M1data[2]=20.;
+	M1data[2]=70.;
 	M1data[3]=0.;
 
 	//rotating, adjusting fluxes
@@ -2630,7 +2639,7 @@ int ZEROtest_oldmain()
 
 	printf("aim F/E: %e\n",ff);
 
-	transformI(0,0,0,I_start, M1data, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+	transformI(0,0,0,I_start, M1data);
 
 	double Fnew[3] = {0.,0.,0.}, Efinal=0.;
 
@@ -2700,11 +2709,162 @@ int ZEROtest_oldmain()
 
 //------------------------------------------------------------------------------------------------
 
-
 }
-void transformI(int ix, int iy, int iz,double I_return[NUMANGLES], double M1_input[5], struct bsptree *angDualGridRoot, double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int dualAdjacency[NUMDUALANGLES][3])
+
+
+
+// Use method of lagrange multipliers to determine correct tranformation
+
+int transformI_Lagrange(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
 {
-  transformI_num(ix,iy,iz,I_return, M1_input, angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+  double F_final[3],Efinal,Efinalrad;
+ 
+  F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
+
+  F_final[1]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1];
+
+  F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+ 
+  Efinal=M1_input[0];
+  Efinalrad=M1_input[4];
+
+  int i,j,p,l;
+  double I_start[NUMANGLES];
+
+  double F_start[3], Fmag_start, Fmag_final;
+  double Estart;
+
+  double target_vec[4], Lagrange_Multiplier[4];
+  double Lagrange_Matrix[4][4], inv_Lagrange_Matrix[4][4];
+
+
+
+  for (i=0; i < NUMANGLES; i++)
+    {
+      I_start[i] = I_return[i];
+      I_return[i] = 0.;
+    }
+
+
+  Estart=0.;
+  //Calculate net flux direction
+  for (l=0; l < 3; l++)
+    {
+      F_start[l] = 0.;
+    }
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+      //if(p<10) printf("%e\n", I_start[p]);
+      for (l=0; l < 3; l++)
+	{
+	  F_start[l] += I_start[p]*angGridCoords[p][l];
+	}
+      Estart += I_start[p];
+    }
+
+
+
+
+  Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
+  Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
+
+
+  target_vec[0]=Efinal-Estart;
+  target_vec[1]=F_final[0]-F_start[0];
+  target_vec[2]=F_final[1]-F_start[1];
+  target_vec[3]=F_final[2]-F_start[2];
+
+
+  //initialize various quantities to zero
+  for (i=0; i < 4; i++)
+    {
+      Lagrange_Multiplier[i]=0.;
+      for (j=0; j < 4; j++)
+	{
+	  Lagrange_Matrix[i][j]=0.;
+	  inv_Lagrange_Matrix[i][j]=0.;
+	}
+    }
+
+  //Calculate 4x4 matrix for Lagrange multiplier solution
+  for (l=0; l<NUMANGLES; l++)
+    {
+      Lagrange_Matrix[0][0] += 1.0;
+      Lagrange_Matrix[0][1] += angGridCoords[l][0];
+      Lagrange_Matrix[0][2] += angGridCoords[l][1];
+      Lagrange_Matrix[0][3] += angGridCoords[l][2];
+
+      Lagrange_Matrix[1][0] += angGridCoords[l][0];
+      Lagrange_Matrix[1][1] += angGridCoords[l][0]*angGridCoords[l][0];
+      Lagrange_Matrix[1][2] += angGridCoords[l][0]*angGridCoords[l][1];
+      Lagrange_Matrix[1][3] += angGridCoords[l][0]*angGridCoords[l][2];
+
+      Lagrange_Matrix[2][0] += angGridCoords[l][1];
+      Lagrange_Matrix[2][1] += angGridCoords[l][1]*angGridCoords[l][0];
+      Lagrange_Matrix[2][2] += angGridCoords[l][1]*angGridCoords[l][1];
+      Lagrange_Matrix[2][3] += angGridCoords[l][1]*angGridCoords[l][2];
+
+      Lagrange_Matrix[3][0] += angGridCoords[l][2];
+      Lagrange_Matrix[3][1] += angGridCoords[l][2]*angGridCoords[l][0];
+      Lagrange_Matrix[3][2] += angGridCoords[l][2]*angGridCoords[l][1];
+      Lagrange_Matrix[3][3] += angGridCoords[l][2]*angGridCoords[l][2];
+    }
+
+
+  //matrixInverse(Lagrange_Matrix, inv_Lagrange_Matrix);
+  inverse_44matrix(Lagrange_Matrix, inv_Lagrange_Matrix);
+
+
+  //Apply inverse matrix to get multipliers
+  for (i=0; i < 4; i++)
+    {
+      for (j=0; j < 4; j++)
+	{
+	  Lagrange_Multiplier[i] += inv_Lagrange_Matrix[i][j]*target_vec[j];
+	}
+    }
+
+
+  for(l=0; l < NUMANGLES; l++)
+    {
+      I_return[l] = I_start[l] + Lagrange_Multiplier[0] + angGridCoords[l][0]*Lagrange_Multiplier[1] + angGridCoords[l][1]*Lagrange_Multiplier[2] + angGridCoords[l][2]*Lagrange_Multiplier[3];
+
+      if(I_return[l]<0.) 
+	{
+	  for (i=0; i <= NUMANGLES; i++)
+	    {
+	      I_return[i]=I_start[i];
+	    }
+	  return -1;
+
+
+	}
+    }
+
+  return 0;
+}
+
+void transformI(int ix, int iy, int iz,double I_return[NUMANGLES], double M1_input[5])
+{
+  transformI_stretch(ix,iy,iz,I_return, M1_input);
+
+  /*
+  int ret;
+  ret=transformI_Lagrange(ix,iy,iz,I_return, M1_input);
+  
+  if(ret<0)
+  {
+  transformI_stretch(ix,iy,iz,I_return, M1_input);
+  }
+  */
+
   return;
 }
 

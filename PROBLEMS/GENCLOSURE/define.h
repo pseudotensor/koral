@@ -70,9 +70,9 @@
 //coordinates / resolution
 /************************************/
 
-#define MYCOORDS MINKCOORDS
+#define MYCOORDS SPHCOORDS
 #define RADCLOSURECOORDS MYCOORDS
-//#define SILO2D_XZPLANE
+#define SILO2D_XZPLANE
 #define MINX .1
 #define MAXX (M_PI-0.1)
 #define MINY .1

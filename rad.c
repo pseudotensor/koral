@@ -3909,11 +3909,12 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   double ff = fmag / rad[0];
 
   //correct the beam pattern
-  transformI(ix,iy,iz,&intensities[0], &rad[0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+
+  //transformI(ix,iy,iz,&intensities[0], &rad[0]);
 
   //calculate VET
   ldouble VET[3][3];
-  ZERO_calcVET(ix,iy,iz,&intensities[0],VET,angGridCoords);
+  //ZERO_calcVET(ix,iy,iz,&intensities[0],VET,angGridCoords);
 
   //rewriting fluxes to output
   for(i=0;i<4;i++)
@@ -3925,7 +3926,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //rewriting the pressure part with VET and mixing with M1
   ldouble fzero;
   //  fzero=step_function(.75-beta0,.1);
-  fzero=1.;
+  fzero=0.;
   if(beta0>0.9)
     fzero=0.;
   
@@ -4039,16 +4040,22 @@ calc_M1intensities()
   for(ii=0;ii<Nloop_5;ii++) //domain plus layer of one
     {
       ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
-      struct geometry geom;
+      struct geometry geom,geom2;
       ldouble ucon[4], M1[5];
       ix=loop_5[ii][0];
       iy=loop_5[ii][1];
       iz=loop_5[ii][2]; 
 
       fill_geometry(ix,iy,iz,&geom); 
-
+      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDS);
       //stress energy tensor
       calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
+
+      //here convert to RADCLOSURECOORDS
+      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+      //to ortonormal
+      trans22_cc2on(RijM1,RijM1,geom2.tup);
+
       Erad=get_u(p,EE0,ix,iy,iz);
       Elab=RijM1[0][0];
 
@@ -4060,7 +4067,7 @@ calc_M1intensities()
       M1[4]=Erad;
       
       //intensities
-      ZERO_decomposeM1(M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+      ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 
       /*
       int i;      printf("%d %d\n",ix,iy);
@@ -4167,10 +4174,11 @@ update_intensities()
 	    }
 
       //running ZERO
+      
       ZERO_shortCharI(ix0,iy0,iz0,dt, intensities, source, 
 		      angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, 
 		      VET, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
-            
+         
 
       //rotating, adjusting fluxes
       double fmag = sqrt(rad[1][1][1][1]*rad[1][1][1][1] + 
@@ -4178,7 +4186,7 @@ update_intensities()
 				 rad[1][1][1][3]*rad[1][1][1][3]);
       double ff = fmag / rad[1][1][1][0];
 
-      transformI(ix,iy,iz,&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][0], angDualGridRoot, angGridCoords, angDualGridCoords, dualAdjacency);
+      transformI(ix,iy,iz,&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][0]);
 
     }
 
