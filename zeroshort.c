@@ -548,7 +548,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  lowerR=coord_limits[0][1];
 	  upperR=coord_limits[0][1];
 	}
-      else if ((posR < coord_limits[0][1]) && (posR > coord_limits[0][0]))
+      else if ((posR <= coord_limits[0][1]) && (posR >= coord_limits[0][0]))
 	{
 	  lowerRIndex = n1_central-1;
 	  upperRIndex = n1_central;
@@ -575,7 +575,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  lowerTh=coord_limits[1][1];
 	  upperTh=coord_limits[1][1];
 	}
-      else if ((posTh < coord_limits[1][1]) && (posTh > coord_limits[1][0]))
+      else if ((posTh <= coord_limits[1][1]) && (posTh >= coord_limits[1][0]))
 	{
 	  lowerThIndex = n2_central-1;
 	  upperThIndex = n2_central;
@@ -602,7 +602,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  lowerPh=coord_limits[2][1];
 	  upperPh=coord_limits[2][1];
 	}
-      else if ((posPh < coord_limits[2][1]) && (posPh > coord_limits[2][0]))
+      else if ((posPh <= coord_limits[2][1]) && (posPh >= coord_limits[2][0]))
 	{
 	  lowerPhIndex = n3_central-1;
 	  upperPhIndex = n3_central;
@@ -739,6 +739,315 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  w0_low = 1.0 - w0_high;
 	  w1_high = (posTh - lowerTh)/(upperTh - lowerTh);
 	  w1_low = 1.0 - w1_high;
+
+	}
+
+
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] = w0_low*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] = w0_low*w1_high;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = w0_high*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
+
+      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = maxL;
+
+
+
+      // printf("!! %e %e %e %e !!\n", w0_low, w0_high, w1_low, w1_high);
+      // printf("-- %e %e %e --\n", posX, posY, posZ);
+
+
+
+    } //end loop over angles
+
+
+}
+
+// Subroutine to calculate the interpolation weights for a spherical 3x3x1 cuboid grid
+// Assumes symmetry in phi
+
+// We find the 4 bounding corners for each ray hitting the boundary, and their appropriate weights to use in interpolation later on
+
+// Assume existence of getCoord(n1, n2, n3) that returns the r, theta, phi coordinates at grid cell labeled n1, n2, n3
+
+
+
+void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
+{
+  int n1_central=1,n2_central=1,n3_central=1; //use as central index, will loop over later
+  int delta_n1, delta_n2, delta_n3;
+
+  double coord_values[3];
+  double xxvec[4];
+  double coord_limits[3][3]; //store the coordinate boundaries in r,theta,phi
+  //indices are [coordinate r,th,phi][min,mid,max]
+
+
+  double posX0, posY0, posZ0; //Coordinates of central cell
+  double posR0, posTh0, posPh0;
+
+  int l,m;
+
+
+  //Read in coordinates
+  for (l=0; l < 3; l++)
+    {
+      for (m=-1; m <= 1; m++)
+	{
+	  if (l==0)
+	    {
+	      delta_n1=m;
+	      delta_n2=0;
+	      delta_n3=0;
+	    }
+	  if (l==1)
+	    {
+	      delta_n1=0;
+	      delta_n2=m;
+	      delta_n3=0;
+	    }
+	  if (l==2)
+	    {
+	      delta_n1=0;
+	      delta_n2=0;
+	      delta_n3=m;
+	    }
+	  //getCoord(n1_central+delta_n1, n2_central+delta_n2, n3_central+delta_n3, coord_values);
+	  get_xx_arb(ix+delta_n1, iy+delta_n2, iz+delta_n3, xxvec, SPHCOORDS);
+	  coord_values[0]=xxvec[1];
+	  coord_values[1]=xxvec[2];
+	  coord_values[2]=xxvec[3];
+
+	  coord_limits[l][m+1]=coord_values[l];
+	}
+    }
+
+  posR0 = coord_limits[0][1];
+  posTh0 = coord_limits[1][1];
+  posPh0 = coord_limits[2][1];
+
+  coord_limits[2][0]=-1.0e10;
+  coord_limits[2][2]=1.0e10;
+
+
+  posX0 = posR0*sin(posTh0)*cos(posPh0);
+  posY0 = posR0*sin(posTh0)*sin(posPh0);
+  posZ0 = posR0*cos(posTh0);
+
+  /*
+  if(ix==NX/2 && iy==NY/2 && iz==0)
+    { 
+      for (l=0; l < 3; l++)
+	{
+	  for (m=0; m <3; m++)
+	    printf("%d %d %e\n", l,m,coord_limits[l][m]);
+	}
+      exit(1);
+
+    }
+  */
+
+  int probeAng;
+  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
+    {
+
+      double posX, posY, posZ;
+      double posR, posTh, posPh;
+
+      double minL = 0., maxL = 2.0*sqrt(coord_limits[0][2]*coord_limits[0][2] - coord_limits[0][0]*coord_limits[0][0]);
+
+
+      //Bisect on ray to numerically find intersection location
+      int iter;
+      for (iter=0; iter < 50; iter++)
+	{
+
+
+	  posX = posX0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][0]);
+	  posY = posY0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][1]);
+	  posZ = posZ0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][2]);
+
+
+	  posR = sqrt(posX*posX + posY*posY + posZ*posZ);
+	  posTh = my_atan2(sqrt(posX*posX + posY*posY),posZ);
+	  posPh = my_atan2(posY,posX);
+
+
+	  //bisect on path length to find nearest boundary intersection
+	  if ((posR > coord_limits[0][2]) || (posR < coord_limits[0][0]) || (posTh > coord_limits[1][2]) || (posTh < coord_limits[1][0]) )
+	    {
+	      maxL = (minL+maxL)/2.0;
+	    }
+	  else
+	    {
+	      minL = (minL+maxL)/2.0;
+	    }
+
+
+	  // printf("%e %e (%e %e %e) (%e %e %e)\n", minL, maxL, posR0, posTh0, posPh0, posR, posTh, posPh);
+	  // printf("%e %e (%e %e %e)\n", minL, maxL, posX, posY, posZ);
+
+
+	}
+
+
+      posX = posX0 + maxL * (-angGridCoords[probeAng][0]);
+      posY = posY0 + maxL * (-angGridCoords[probeAng][1]);
+      posZ = posZ0 + maxL * (-angGridCoords[probeAng][2]);
+
+      posR = sqrt(posX*posX + posY*posY + posZ*posZ);
+      posTh = my_atan2(sqrt(posX*posX + posY*posY),posZ);
+      posPh = my_atan2(posY,posX);
+
+      double lowerR, lowerTh, lowerPh;
+      double lowerRIndex, lowerThIndex, lowerPhIndex;
+
+      double upperR, upperTh, upperPh;
+      double upperRIndex, upperThIndex, upperPhIndex;
+
+
+      //R Indices
+      if ((posR < coord_limits[0][0]) || (posR > coord_limits[0][2]))
+	{
+	  lowerRIndex = n1_central;
+	  upperRIndex = n1_central;
+
+	  lowerR=coord_limits[0][1];
+	  upperR=coord_limits[0][1];
+	}
+      else if ((posR <= coord_limits[0][1]) && (posR >= coord_limits[0][0]))
+	{
+	  lowerRIndex = n1_central-1;
+	  upperRIndex = n1_central;
+
+	  lowerR=coord_limits[0][0];
+	  upperR=coord_limits[0][1];
+	}
+      else 
+	{
+	  lowerRIndex = n1_central;
+	  upperRIndex = n1_central+1;
+
+	  lowerR=coord_limits[0][1];
+	  upperR=coord_limits[0][2];
+	}
+
+
+      //Theta Indices
+      if ((posTh < coord_limits[1][0]) || (posTh > coord_limits[1][2]))
+	{
+	  lowerThIndex = n2_central;
+	  upperThIndex = n2_central;
+
+	  lowerTh=coord_limits[1][1];
+	  upperTh=coord_limits[1][1];
+	}
+      else if ((posTh <= coord_limits[1][1]) && (posTh >= coord_limits[1][0]))
+	{
+	  lowerThIndex = n2_central-1;
+	  upperThIndex = n2_central;
+
+	  lowerTh=coord_limits[1][0];
+	  upperTh=coord_limits[1][1];
+	}
+      else
+	{
+	  lowerThIndex = n2_central;
+	  upperThIndex = n2_central+1;
+
+	  lowerTh=coord_limits[1][1];
+	  upperTh=coord_limits[1][2];
+	}
+
+
+      //Phi Indices
+
+	lowerPhIndex = n3_central;
+	upperPhIndex = n3_central;
+
+
+
+
+
+
+
+
+      //Interpolation weight components
+      double w0_low, w0_high;
+      double w1_low, w1_high;
+
+
+
+      //Get interpolation weights for 4 bounding corners of cube intersection
+      if ((posR > coord_limits[0][2]) || (posR < coord_limits[0][0]))
+	{
+
+	  int realRIndex;
+
+
+	  if (posR > coord_limits[0][2])
+	    {
+	      realRIndex = n1_central+1;
+	    }
+	  if (posR < coord_limits[0][0])
+	    {
+	      realRIndex = n1_central-1;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p] = realRIndex;
+	    }
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][0] = lowerThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][1] = lowerThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][2] = upperThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][3] = upperThIndex;
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1] = upperPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3] = upperPhIndex;
+
+	  w0_high = (posTh - lowerTh)/(upperTh - lowerTh);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = 1.0;
+	  w1_low = 0.0;
+
+	}
+
+
+      if ((posTh > coord_limits[1][2]) || (posTh < coord_limits[1][0]))
+	{
+	  int realThIndex;
+
+	  if (posTh > coord_limits[1][2])
+	    {
+	      realThIndex = n2_central+1;
+	    }
+	  if (posTh < coord_limits[1][0])
+	    {
+	      realThIndex = n2_central-1;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p] = realThIndex;
+	    }
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][3] = upperRIndex;
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1] = upperPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3] = upperPhIndex;
+
+	  w0_high = (posR - lowerR)/(upperR - lowerR);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = 1.0;
+	  w1_low = 0.0;
 
 	}
 
@@ -2610,7 +2919,10 @@ int zero_readangles()
 	}
       else if(MYCOORDS==SPHCOORDS)
 	{
-	  setupInterpWeights_sph3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+	   if(TNZ==1)
+	     setupInterpWeights_sph2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+	   else
+	     setupInterpWeights_sph3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
 	
 	  
 	}
@@ -2903,9 +3215,10 @@ int transformI_Lagrange(int ix,int iy,int iz,double I_return[NUMANGLES], double 
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-  //if(global_time<.3) {transformI_stretch(ix,iy,iz,I0,M1_input);return;}
- 
+  transformI_stretch(ix,iy,iz,I0,M1_input);
+  return;
 
+  /*  
   double I1[NUMANGLES];
   int i,j;
   int ret,iter;
@@ -2947,8 +3260,9 @@ void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 	break;
     
     }
-
+  
 
   return;
+  */
 }
 

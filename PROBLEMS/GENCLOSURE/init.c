@@ -6,8 +6,8 @@ ldouble pp[NV],ppback[NV],T;
 /***********************************************/
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
-struct geometry geomBL;
-fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+struct geometry geomCART;
+fill_geometry_arb(ix,iy,iz,&geomCART,MINKCOORDS);
 
 /***********************************************/
 //background
@@ -17,8 +17,11 @@ pp[VX]=0.;
 pp[VY]=0.;
 pp[VZ]=0.;
 
-ldouble w1=exp(-((geom.xx-XBLOB1)*(geom.xx-XBLOB1) + (geom.yy-YBLOB1)*(geom.yy-YBLOB1) )/SIZEBLOB1/SIZEBLOB1);
-ldouble w2=exp(-((geom.xx-XBLOB2)*(geom.xx-XBLOB2) + (geom.yy-YBLOB2)*(geom.yy-YBLOB2) )/SIZEBLOB2/SIZEBLOB2);
+
+ldouble w1=exp(-((geomCART.xx-XBLOB1)*(geomCART.xx-XBLOB1) + (geomCART.zz-YBLOB1)*(geomCART.zz-YBLOB1) )/SIZEBLOB1/SIZEBLOB1);
+ldouble w2=exp(-((geomCART.xx-XBLOB2)*(geomCART.xx-XBLOB2) + (geomCART.zz-YBLOB2)*(geomCART.zz-YBLOB2) )/SIZEBLOB2/SIZEBLOB2);
+
+//printf("%d %d > %f %f %f > %f %f\n",ix,iy,geomCART.xx,geomCART.yy,geomCART.zz,XBLOB1,YBLOB1);getch();
 
 
 pp[RHO]*=(1. + BLOBMAG1*w1 + BLOBMAG2*w2);

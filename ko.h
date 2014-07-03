@@ -684,6 +684,7 @@ struct bsptree *angDualGridRoot;
 void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
 void setupInterpWeights_cart3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
 void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
+void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
 
 
 void ZERO_shortCharI(int,int,int,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose);

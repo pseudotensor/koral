@@ -12,6 +12,7 @@
 /************************************/
 #define RADIATION
 #define RADCLOSURE VETCLOSURE
+#define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
 //#define NUMRADWAVESPEEDS
 #define SKIPRADWAVESPEEDLIMITER
@@ -70,9 +71,9 @@
 //coordinates / resolution
 /************************************/
 
-#define MYCOORDS MINKCOORDS
+#define MYCOORDS SPHCOORDS
 #define RADCLOSURECOORDS MYCOORDS
-//#define SILO2D_XZPLANE
+#define SILO2D_XZPLANE
 #define MINX .1
 #define MAXX (M_PI-0.1)
 #define MINY .1
@@ -80,8 +81,8 @@
 #define MINZ (M_PI-(M_PI/10.))
 #define MAXZ (M_PI+(M_PI/10.))
 
-#define TNX 50
-#define TNY 50
+#define TNX 100
+#define TNY 100
 #define TNZ 1
 
 //# of tiles
@@ -126,10 +127,19 @@
 #define VELXBLOB2 -0.
 #define VELYBLOB1 (VELXBLOB1*0.5)
 #define VELYBLOB2 (VELXBLOB2*0.25)
+/*
+#if MYCOORDS==MINKCOORDS
 #define XBLOB1 (MINX+0.35*(MAXX-MINX))
 #define XBLOB2 (MINX+0.65*(MAXX-MINX))
 #define YBLOB1 (MINY+0.35*(MAXY-MINY))
 #define YBLOB2 (MINY+0.65*(MAXY-MINY))
+#elif MYCOORDS==SPHCOORDS
+*/
+#define XBLOB1 -1.25
+#define XBLOB2 -1.75
+#define YBLOB1 .75
+#define YBLOB2 -1.
+//#endif
 #define SIZEBLOB1 (.035*(MAXX-MINX))
 #define SIZEBLOB2 (.035*(MAXX-MINX))
 
