@@ -81,8 +81,25 @@
 //78 FUNNY - for Ronaldo & Grzesiek & not for Bhupendra
 //79 SOFTBALL - Ron & Grz Bis
 //80 GENCLOSURE - tests of closures
+//81 TWOBEAM - test of VET with two beams
 
-#define PROBLEM 80
+#define PROBLEM 81
+
+#if(PROBLEM==81)
+
+#define PR_DEFINE "PROBLEMS/TWOBEAM/define.h"
+#define PR_BC "PROBLEMS/TWOBEAM/bc.c"
+#define PR_INIT "PROBLEMS/TWOBEAM/init.c"
+#define PR_KAPPA "PROBLEMS/TWOBEAM/kappa.c"
+#define PR_KAPPAES "PROBLEMS/TWOBEAM/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/TWOBEAM/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/TWOBEAM/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/TWOBEAM/dump.c"
+#define PR_TOOLS "PROBLEMS/TWOBEAM/tools.c"
+#define PR_FINGER "PROBLEMS/TWOBEAM/finger.c"
+
+#endif
+
 
 #if(PROBLEM==80)
 

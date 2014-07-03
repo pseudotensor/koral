@@ -3924,10 +3924,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   
   //rewriting the pressure part with VET and mixing with M1
   ldouble fzero;
-  fzero=step_function(.925-ff,.015);
+  //fzero=step_function(.925-ff,.015);
   
-  //fzero=1.;
-  if(ff>0.95)
+  fzero=1.;
+  if(ff>0.999)
     fzero=0.;
   
   for(i=1;i<4;i++)

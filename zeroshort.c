@@ -303,8 +303,10 @@ int readAngleFiles(double angGridCoords[NUMANGLES][3], double angDualGridCoords[
 	}
 
       angGridCoords[count][0] = xval;
-      angGridCoords[count][1] = yval;
-      angGridCoords[count][2] = zval;
+      //      angGridCoords[count][1] = yval;
+      //      angGridCoords[count][2] = zval;
+      angGridCoords[count][1] = zval;
+      angGridCoords[count][2] = yval;
 
       dtot = sqrt(xval*xval + yval*yval + zval*zval);
 
@@ -340,8 +342,11 @@ int readAngleFiles(double angGridCoords[NUMANGLES][3], double angDualGridCoords[
 	}
 
       angDualGridCoords[count][0] = xval;
-      angDualGridCoords[count][1] = yval;
-      angDualGridCoords[count][2] = zval;
+      //      angDualGridCoords[count][1] = yval;
+      //      angDualGridCoords[count][2] = zval;
+      angDualGridCoords[count][1] = zval;
+      angDualGridCoords[count][2] = yval;
+
 
       dtot = sqrt(xval*xval + yval*yval + zval*zval);
 
@@ -1872,6 +1877,11 @@ void bspGetNearestNeighbor(double targetAng[3], double angGridCoords[NUMANGLES][
 
 void bspGetNearestDualNeighbor(double targetAng[3], double angGridCoords[NUMDUALANGLES][3], struct bsptree *bspCurrentLoc, double *bestDistance, int *bestIndex)
 {
+  //Abandon BSP nearest angle search
+  *bestIndex=get_angDualIndex(targetAng,angGridCoords);
+    return;
+
+
 		int currentAngIndex = bspCurrentLoc->angIndex;
 		int sortIndex = bspCurrentLoc->iter;
 		short doublecheck = 0, firstDecision = 0;
