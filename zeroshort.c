@@ -771,7 +771,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 
 
 
-void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
+void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double intersectGridPhi[SX][SY][SZ][NUMANGLES])
 {
   int n1_central=1,n2_central=1,n3_central=1; //use as central index, will loop over later
   int delta_n1, delta_n2, delta_n3;
@@ -897,6 +897,8 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
       posR = sqrt(posX*posX + posY*posY + posZ*posZ);
       posTh = my_atan2(sqrt(posX*posX + posY*posY),posZ);
       posPh = my_atan2(posY,posX);
+      intersectGridPhi[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = posPh - posPh0;
+
 
       double lowerR, lowerTh, lowerPh;
       double lowerRIndex, lowerThIndex, lowerPhIndex;
@@ -2587,7 +2589,8 @@ void ZERO_decomposeM1(int ix, int iy, int iz,double M1_Data[5], double I_return[
 
 
 
-void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4], double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double eddingtonFactor[3][3], double I_return[NUMANGLES],int verbose)
+void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4],
+		     double I_return[NUMANGLES],int verbose)
 {
   double S[3][3][3];  //radiative source function
 
@@ -2645,6 +2648,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	  int intersect_j = intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p];
 	  int intersect_k = intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p];
 
+
 	  int q;
 	  for (q=0 ; q<NUMANGLES; q++)
 	    {
@@ -2669,7 +2673,18 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	}
       double dtau = (source_Data[1][1][1][2]+source_Data[1][1][1][3]) * intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng];
 
-      I_ray[probeAng] = I_Solve(S[1][1][1], interp_S, interp_I[probeAng], dtau);   //SOLVED BY SHORT CHARACTERISTICS!
+	  double rotAng[3];
+	  double rotPhi = intersectGridPhi[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng];
+	  //printf("rotPhi %d : %f\n",probeAng,rotPhi);
+
+	  rotAng[0] = cos(rotPhi)*angGridCoords[probeAng][0] - sin(rotPhi)*angGridCoords[probeAng][1];
+	  rotAng[1] = sin(rotPhi)*angGridCoords[probeAng][0] + cos(rotPhi)*angGridCoords[probeAng][1];
+	  rotAng[2] = angGridCoords[probeAng][2];
+
+	  int bestAngIndex = get_angIndex(rotAng, angGridCoords);
+	  
+
+      I_ray[probeAng] = I_Solve(S[1][1][1], interp_S, interp_I[bestAngIndex], dtau);   //SOLVED BY SHORT CHARACTERISTICS!
 
       I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t; //apply time step
 
@@ -2684,83 +2699,6 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
 
     }
-
-
-
-
-
-
-  //Calculate radiative moments using our RT solution to intensity field
-
-  double dOmega = 4.0*PI/NUMANGLES;
-  double targetDirection1[3], targetDirection2[3];
-  double cos1, cos2;
-  double P[3][3], E = 0;
-
-  //intialize Pressure tensor P_ij
-  int q,r;
-  for (q=0; q < 3; q++)
-    {
-      for (r=0; r < 3; r++)
-	{
-	  P[q][r] = 0.;
-	}
-    }
-
-  //Calculate P_ij by summing up contributions over all angles
-  for (q=0; q < 3; q++)
-    {
-      targetDirection1[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][0];
-      targetDirection1[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][1];
-      targetDirection1[2] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][2];
-
-      for (r=0; r < 3; r++)
-	{
-	  targetDirection2[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][0];
-	  targetDirection2[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][1];
-	  targetDirection2[2] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][2];
-
-	  int probeAng;
-	  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
-	    {
-
-	      cos1 = angGridCoords[probeAng][0]*targetDirection1[0] + angGridCoords[probeAng][1]*targetDirection1[1] + angGridCoords[probeAng][2]*targetDirection1[2];
-	      cos2 = angGridCoords[probeAng][0]*targetDirection2[0] + angGridCoords[probeAng][1]*targetDirection2[1] + angGridCoords[probeAng][2]*targetDirection2[2];
-
-
-	      P[q][r] += I_time[probeAng]*cos1*cos2;
-	    }
-	}
-    }
-	
-
-  //Calculate E
-  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
-    {
-      E += I_time[probeAng];
-    }
-
-
-  //	printf("E = %e  |  Pxx = %e\n", E, P[0][0]);
-
-
-  //Set eddington tensor as P_ij/E
-  for (q=0; q < 3; q++)
-    {
-      for (r=0; r < 3; r++)
-	{
-	  if (E > 0)
-	    {
-	      eddingtonFactor[q][r] = P[q][r]/E;
-	    }
-	  else
-	    {
-	      eddingtonFactor[q][r] = 0.;
-	    }
-	}
-    }
-
-
 }
 
 void
@@ -2920,7 +2858,7 @@ int zero_readangles()
       else if(MYCOORDS==SPHCOORDS)
 	{
 	   if(TNZ==1)
-	     setupInterpWeights_sph2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+	     setupInterpWeights_sph2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, intersectGridPhi);
 	   else
 	     setupInterpWeights_sph3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
 	

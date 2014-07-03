@@ -81,8 +81,8 @@
 #define MINZ (M_PI-(M_PI/10.))
 #define MAXZ (M_PI+(M_PI/10.))
 
-#define TNX 100
-#define TNY 100
+#define TNX 50
+#define TNY 50
 #define TNZ 1
 
 //# of tiles
