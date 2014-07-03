@@ -2347,7 +2347,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 		  printf("neg interp_I %e %e\n",
 			 I_Data[intersect_i][intersect_j][intersect_k][q],
 			 intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p]);
-		  exit(1);
+		  //exit(1);
 		}
 	      
 	            
@@ -2889,40 +2889,65 @@ int transformI_Lagrange(int ix,int iy,int iz,double I_return[NUMANGLES], double 
 	}
     }
 
-
+  int isnegative=0;
   for(l=0; l < NUMANGLES; l++)
     {
       I_return[l] = I_start[l] + Lagrange_Multiplier[0] + angGridCoords[l][0]*Lagrange_Multiplier[1] + angGridCoords[l][1]*Lagrange_Multiplier[2] + angGridCoords[l][2]*Lagrange_Multiplier[3];
 
       if(I_return[l]<0.) 
-	{
-	  for (i=0; i <= NUMANGLES; i++)
-	    {
-	      I_return[i]=I_start[i];
-	    }
-	  return -1;
-
-
-	}
+	isnegative=1;	
     }
 
-  return 0;
+  return isnegative;
 }
 
-void transformI(int ix, int iy, int iz,double I_return[NUMANGLES], double M1_input[5])
+void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-  //  return;
-  transformI_stretch(ix,iy,iz,I_return, M1_input);
+  //if(global_time<.3) {transformI_stretch(ix,iy,iz,I0,M1_input);return;}
+ 
 
-  /*
-  int ret;
-  ret=transformI_Lagrange(ix,iy,iz,I_return, M1_input);
+  double I1[NUMANGLES];
+  int i,j;
+  int ret,iter;
   
-  if(ret<0)
-  {
-  transformI_stretch(ix,iy,iz,I_return, M1_input);
-  }
-  */
+  for(i=0;i<NUMANGLES;i++)
+    {
+      I1[i]=I0[i];
+    }
+  
+  for(iter=0;iter<1;iter++)
+    {
+      ret=transformI_Lagrange(ix,iy,iz,I0,M1_input);
+  
+      if(ret==1) //some intensities negative
+	{	  
+	  transformI_stretch(ix,iy,iz,I1,M1_input); //these are guaranteed to be positive
+	  double minf=1.e100,f; //I = f I0 + (1-f) I1 
+	  for(i=0;i<NUMANGLES;i++)
+	    {
+	      if(I0[i]<0.)
+		{
+		  f=I1[i]/(I1[i]-I0[i]);
+		  if(f<minf) minf=f;
+		}
+	    }
+
+	  if(minf<0.) minf=0.;
+	  if(minf>1.) minf=1.;
+
+	  // printf("combining with %f at %d %d\n",minf,ix,iy); 
+	  for(i=0;i<NUMANGLES;i++)
+	    {
+	      I0[i]=minf*I0[i] + (1.-minf)*I1[i];
+	      if(I0[i]<0.) I0[i]=0.;
+	      I1[i]=I0[i];
+	    }
+	}
+      else
+	break;
+    
+    }
+
 
   return;
 }
