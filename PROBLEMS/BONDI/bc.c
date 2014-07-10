@@ -35,7 +35,8 @@ if(ix>=NX) //analytical solution at rout only
     url=get_u(p,VX,NX-1,iy,iz);
     rhol=get_u(p,RHO,NX-1,iy,iz);
 
-    rho = rhol;
+    //rho = rhol;
+    rho=rho0;
 
     uint = uint0; //to keep pressure fixed
     if(calc_PEQ_Tfromurho(uint,rho) < TAMB) //too cold
@@ -98,6 +99,10 @@ if(ix>=NX) //analytical solution at rout only
     //transforming rad primitives from BL to MYCOORDS
     trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
     
+    #ifdef NCOMPTONIZATION
+    pp[NF0]=get_u(pproblem1,NF0,NX-1,iy,iz);
+    #endif
+
 #endif	 
     
     p2u(pp,uu,&geom);

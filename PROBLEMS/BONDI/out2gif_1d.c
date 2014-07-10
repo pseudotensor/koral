@@ -44,7 +44,7 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 #ifdef RADIATION
-	  "plot \"%s\" u 1:($29) w lp ls 4 ti \"luminosity\"\n"
+	  "plot \"%s\" u 1:($29+1.e-20) w lp ls 4 ti \"luminosity\"\n"
 #else
 	  "plot \"%s\" u 1:($14) w lp ls 4 ti \"nothing\"\n"
 #endif

@@ -48,6 +48,9 @@ if(1) //uses MDOT and TGAS at the outer boundary
 #ifdef LIKEINFRAGILE
 		E=PRADGAS * GAMMAM1*uint*3.;
 #endif
+#ifdef STARTATLTE
+		E=calc_LTE_Efromurho(uint,rho);
+#endif
 		set_u(pproblem1,EE0,ix,iy,iz,E);
 		set_u(pproblem1,FX0,ix,iy,iz,0.); //overwritten in init.c
 		set_u(pproblem1,FY0,ix,iy,iz,0.);

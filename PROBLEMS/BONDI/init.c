@@ -96,7 +96,12 @@ pp[9]=urfcon[3];
 
 //transforming primitives from BL to MYCOORDS
 trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-   
+
+#ifdef NCOMPTONIZATION
+pp[NF0]=calc_NFfromE(pp[EE0]);
+#endif
+
+
 p2u(pp,uu,&geom);	 
 
 

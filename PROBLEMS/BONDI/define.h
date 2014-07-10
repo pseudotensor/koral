@@ -7,8 +7,8 @@
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
-//#define COMPTONIZATION
+#define RADIATION
+#define NCOMPTONIZATION
 //#define RADOUTPUTINFF
 #define RADOUTPUTVELS
 
@@ -23,7 +23,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 10000.
+#define RMAX 1000.
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -66,8 +66,8 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 1000 //stop after this number of outputs
-#define DTOUT1 1.e2 //res
-#define DTOUT2 1.e2 //avg
+#define DTOUT1 1.e3 //res
+#define DTOUT2 1.e20 //avg
 #define TMAX 1.e10 //time to stop
 
 /************************************/
@@ -76,10 +76,11 @@
 #define TESTNO 0
 
 #if(TEST==0)
-#define MDOT 0.01
+#define GAMMA (5./3.)
+#define MDOT 1.e2
+//#define STARTATLTE
 #endif
 
-#define ERADRES 1.e-10
 #define PRADGASINIT 1.e-10 
 #define MASS 10.
 #define BHSPIN 0.

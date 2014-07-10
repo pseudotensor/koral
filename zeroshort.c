@@ -2100,23 +2100,35 @@ void linComb(double targetAng[3], double angGridCoords[NUMANGLES][3], int angInd
 
 
 
-/*
+
+	
 	// Conserve Intensity
 	interp_coeff[0]=lc1/(lc1+lc2+lc3);
 	interp_coeff[1]=lc2/(lc1+lc2+lc3);
 	interp_coeff[2]=lc3/(lc1+lc2+lc3);
-*/
+	
 
 
-
-
+	/*
 	// Conserve Flux
 	interp_coeff[0]=lc1;
 	interp_coeff[1]=lc2;
 	interp_coeff[2]=lc3;
+	*/
 
 
+	/*
+	//Minimize least squares for single scaling factor on individual weights
+	
+	double Efinal = 1.0; //assuming target angle is normalized to 1
+	double lsum = (lc1 + lc2 + lc3), lsum2 = (lc1*lc1+lc2*lc2+lc3*lc3);
+	double scaleFactor = (lsum*Efinal + lsum2)/(lsum*lsum + lsum2);
 
+	interp_coeff[0]=scaleFactor*lc1;
+	interp_coeff[1]=scaleFactor*lc2;
+	interp_coeff[2]=scaleFactor*lc3;
+	
+	*/
 /*	if (*c1 + *c2 + *c3 > 1.01)
 	{
 		printf("ERROR: weight mismatch -- %e %e %e!\n", *c1, *c2, *c3);
@@ -2887,148 +2899,6 @@ int zero_readangles()
 
 
 
-int ZEROtest_oldmain()
-
-{
-
-
-
-	double gridLoc[3][3][3][3];			//xyz locations of 3x3x3 cube
-	double M1_Data[3][3][3][5];			//E,v0,v1,v2 output from M1 scheme for cube
-	double source_Data[3][3][3][4];				//radiative source info for cube
-	double I_Data[3][3][3][NUMANGLES];
-
-	double eddingtonFactor[3][3];
-	double I_start[NUMANGLES], I_return[NUMANGLES];
-
-	
-
-
-
-
-
-	clock_t begin, end;
-
-	int i,j,k,l,p;
-
-
-
-
-
-
-//------------------------------------------------------------------------------------------------
-
-	for (p=0; p < NUMANGLES; p++)
-	{
-	  if (1 || p<25)
-		{
-			I_start[p]=1.;
-		}
-		else
-		{
-			I_start[p]=0.0;
-		}
-
-	}
-
-	double M1data[5];
-
-	M1data[0]=80.;
-	M1data[1]=0.;
-	M1data[2]=70.;
-	M1data[3]=0.;
-
-	//rotating, adjusting fluxes
-	double fmag = sqrt(M1data[1]*M1data[1] + 
-			   M1data[2]*M1data[2] + 
-			   M1data[3]*M1data[3]);
-	double ff = fmag / M1data[0];
-	double beta;
-	if(ff<1.e-2) 
-	  beta=3.*ff/4.;
-	else
-	  beta=(4.-sqrt(16.-12.*ff*ff))/2./ff;	    
-	
-	double gamma=1./sqrt(1.-beta*beta);
-
-	//Erad (Elab, beta)
-	M1data[4]=M1data[0]/(4./3.*gamma*gamma-1./3.);
-	
-
-	printf("aim F/E: %e\n",ff);
-
-	transformI(0,0,0,I_start, M1data);
-
-	double Fnew[3] = {0.,0.,0.}, Efinal=0.;
-
-	for (p=0; p < NUMANGLES; p++)
-	  {
-	    Efinal += I_start[p];
-
-	    for (l=0; l < 3; l++)
-	      {
-		Fnew[l] += I_start[p]*angGridCoords[p][l];
-	      }		
-
-	    //printf("%e ",I_start[p]);
-	  }
-	printf("\n");
-
-	double Fnorm = sqrt(Fnew[0]*Fnew[0] + Fnew[1]*Fnew[1] + Fnew[2]*Fnew[2]);
-
-	printf("Efinal = %e, Ffinal =  %e - %e %e %e | F/E = %e\n", Efinal, Fnorm, Fnew[0], Fnew[1], Fnew[2], Fnorm/Efinal);
-
-	FILE* fout1=fopen("beam.dat","w");
-	FILE* fout2=fopen("beam.gp","w");
-	fprintf(fout2,"set ylabel \"y\"\n",Fnew[0],Fnew[1],Fnew[2]);
-	fprintf(fout2,"set xlabel \"x\"\n",Fnew[0],Fnew[1],Fnew[2]);
-	fprintf(fout2,"set zlabel \"z\"\n",Fnew[0],Fnew[1],Fnew[2]);
-	fprintf(fout2,"set view equal xyz\n",Fnew[0],Fnew[1],Fnew[2]);
-	fprintf(fout2,"splot \"beam.dat\" u 1:2:3 w p pt 7 ps .1\n",Fnew[0],Fnew[1],Fnew[2]);
-	int ifzero=0;
-	double maxI=-1.;    
-	for (p=0; p < NUMANGLES; p++)
-	  if(maxI<I_start[p]) maxI=I_start[p];
-
-	for (p=0; p < NUMANGLES; p++)
-	  {
-	    ifzero=0;
-	    
-	    if(I_start[p]<3.e-5*maxI)
-	      {
-		ifzero=1;
-		I_start[p]=1.e-1*maxI;
-	      }
-	    
-
-	    for (l=0; l < 3; l++)
-	      {
-		Fnew[l] = I_start[p]*angGridCoords[p][l];
-	      }		
-
-	    fprintf(fout1,"%f %f %f\n",Fnew[0],Fnew[1],Fnew[2]);
-
-	    if(!ifzero)
-	      fprintf(fout2,"set arrow from 0,0,0 to %f,%f,%f front lw 2 lc 2\n",Fnew[0],Fnew[1],Fnew[2]);
-	    else	      
-	      fprintf(fout2,"set arrow from 0,0,0 to %f,%f,%f nohead front lw 1 lc 3\n",Fnew[0],Fnew[1],Fnew[2]);
-
-	    //fprintf(fout2,"set term pngcairo enhanced\n");
-	    //fprintf(fout2,"set output \"beam.png\"\n");
-	    //fprintf(fout2,"replot\n");
-	
-	  }
-	fclose(fout1);
-	fclose(fout2);
-	
-
-
-	exit(-1);
-
-//------------------------------------------------------------------------------------------------
-
-}
-
 
 
 // Use method of lagrange multipliers to determine correct tranformation
@@ -3161,56 +3031,630 @@ int transformI_Lagrange(int ix,int iy,int iz,double I_return[NUMANGLES], double 
   return isnegative;
 }
 
+
+
+//Do a linear search to find 4 nearest angles
+void get_4angIndex(double targetAng[3], double angGridCoords[NUMANGLES][3], int returnIndex[4])
+{
+  double dx, dy, dz, dtot2;
+  //double dmin = 1.0e10;
+  double dmax[4]={-1.0e10,-1.0e10,-1.0e10,-1.0e10};
+  int ibest[4] = {0,0,0,0};
+
+  int i_insert=0, i_shift=3;
+  int i;
+
+
+  for (i = 0; i < NUMANGLES; i++)
+    {
+
+
+
+      dtot2=targetAng[0]*angGridCoords[i][0] + targetAng[1]*angGridCoords[i][1] + targetAng[2]*angGridCoords[i][2];
+
+
+      i_insert=0;
+
+      while ((dmax[i_insert] > dtot2) && (i_insert < 4))
+	{
+	  i_insert++;
+	}
+
+
+      if (dtot2 > 0.9)
+	// printf("%d -- dp %15.13e\n",i, dtot2);
+
+	//shift old best values down by 1 index
+	for (i_shift = 3; i_shift > i_insert; i_shift--)
+	  {
+	    dmax[i_shift] = dmax[i_shift-1];
+	    ibest[i_shift] = ibest[i_shift-1];
+	  }
+
+
+      //commit the new best values
+      if (i_insert < 4)
+	{
+	  dmax[i_insert] = dtot2;
+	  ibest[i_insert] = i;
+	}
+
+    }
+
+
+  for (i=0; i<4; i++)
+    {
+      returnIndex[i]=ibest[i];
+    }
+  return;
+}
+
+
+
+
+
+
+
+// Get linear combination of 4 vectors such that E, Fx, Fy, Fz are conserved
+
+
+void quadComb(double startI[3], int basisIndex[4], double angGridCoords[NUMANGLES][3], double coeff[4])
+{
+  double M[4][4], invM[4][4];
+  double target_vec[4];
+
+  int i,j;
+
+
+  //Calculate conserved quantities
+  target_vec[0] = sqrt(startI[0]*startI[0] + startI[1]*startI[1] + startI[2]*startI[2]); //E
+  target_vec[1] = startI[0]; //Fx
+  target_vec[2] = startI[1]; //Fy
+  target_vec[3] = startI[2]; //Fz
+
+
+  //linear combination matrix
+  M[0][0] = 1.;
+  M[0][1] = 1.;
+  M[0][2] = 1.;
+  M[0][3] = 1.;
+
+  M[1][0] = angGridCoords[basisIndex[0]][0];
+  M[1][1] = angGridCoords[basisIndex[1]][0];
+  M[1][2] = angGridCoords[basisIndex[2]][0];
+  M[1][3] = angGridCoords[basisIndex[3]][0];
+
+  M[2][0] = angGridCoords[basisIndex[0]][1];
+  M[2][1] = angGridCoords[basisIndex[1]][1];
+  M[2][2] = angGridCoords[basisIndex[2]][1];
+  M[2][3] = angGridCoords[basisIndex[3]][1];
+
+  M[3][0] = angGridCoords[basisIndex[0]][2];
+  M[3][1] = angGridCoords[basisIndex[1]][2];
+  M[3][2] = angGridCoords[basisIndex[2]][2];
+  M[3][3] = angGridCoords[basisIndex[3]][2];
+
+
+  //get matrix inverse
+  //matrixInverse(M,invM);
+  inverse_44matrix(M,invM);
+
+
+
+  //apply matrix inverse to get linear combination
+  for (i=0; i < 4; i++)
+    {
+      coeff[i]=0.;
+      for (j=0; j < 4; j++)
+	{
+	  coeff[i] += invM[i][j]*target_vec[j];
+	}
+    }
+
+
+  return;
+
+}
+
+
+
+
+
+
+
+void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
+{
+  double F_final[3],Efinal,Efinalrad;
+  
+  F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
+
+  F_final[1]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1];
+
+  F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+  Efinal=M1_input[0];
+  Efinalrad=M1_input[4];
+
+  int i,j,p,l;
+  double I_start[NUMANGLES];
+  double res[3];
+
+  double F_start[3], F_start_norm[3], F_final_norm[3], Fmag_start, Fmag_final, F_stretch;
+  double fStart, F_Start_forward, F_Start_backward, fFinal, Estart;
+  double stretchFactor;
+
+  double rotM[3][3];
+  double transformAng[NUMANGLES][3];
+
+
+  for (i=0; i < NUMANGLES; i++)
+    {
+      I_start[i] = I_return[i];
+      I_return[i] = 0.;
+    }
+
+
+  Estart=0.;
+  //Calculate net flux direction
+  for (l=0; l < 3; l++)
+    {
+      F_start[l] = 0.;
+    }
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+      for (l=0; l < 3; l++)
+	{
+	  F_start[l] += I_start[p]*angGridCoords[p][l];
+	}
+      Estart += I_start[p];
+    }
+
+
+
+
+
+  Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
+  Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
+
+  if (Fmag_final/Efinal < 1.0e-10)
+    {
+      for (p=0; p<NUMANGLES; p++)
+	{
+	  I_return[p] = Efinal/NUMANGLES;
+	}
+      //    printf("%e %e\n",I_start[0],I_return[0]);
+      return;
+    }
+
+  for (l=0; l < 3; l++)
+    {
+      F_start_norm[l] = F_start[l]/Fmag_start;
+      F_final_norm[l] = F_final[l]/Fmag_final;
+    }
+
+
+
+  if (Fmag_start/Estart < 1.0e-2)
+    {
+
+      //Calculate starting flux after reflecting half the rays about origin
+
+      F_start_norm[0]=0.0;
+      F_start_norm[1]=0.0;
+      F_start_norm[2]=0.0;
+
+      for (l=0; l < NUMANGLES; l++)
+	{
+	  if (angGridCoords[l][0] < 0) //reflect half the rays about origin
+	    {
+	      for (p=0; p < 3; p++)
+		{
+		  F_start_norm[p] += I_start[l]*(-angGridCoords[l][p]);
+		}
+	    }
+	  else
+	    {
+	      for (p=0; p < 3; p++)
+		{
+		  F_start_norm[p] += I_start[l]*angGridCoords[l][p];
+		}
+	    }
+	}
+
+      double tempMag = sqrt(F_start_norm[0]*F_start_norm[0] +
+			    F_start_norm[1]*F_start_norm[1] + F_start_norm[2]*F_start_norm[2]);
+
+      for (p=0; p < 3; p++)
+	{
+	  F_start_norm[p] = F_start_norm[p]/tempMag;
+	}
+    }
+
+
+  F_Start_forward = 0.;
+  F_Start_backward = 0.;
+  double cosang[NUMANGLES];
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+
+
+      cosang[p] = angGridCoords[p][0]*F_start_norm[0] + angGridCoords[p][1]*F_start_norm[1] + angGridCoords[p][2]*F_start_norm[2];
+
+      if (cosang[p] > 0.)
+	{
+	  F_Start_forward += I_start[p]*cosang[p]; //positive fluxes in direction of net flux
+	}
+      else
+	{
+
+	  F_Start_backward += I_start[p]*cosang[p]; //negative fluxes "" ""
+	}
+    }
+
+
+
+  fStart = Fmag_start/Estart;
+  fFinal = Fmag_final/Efinal;
+
+  struct solverarg args;
+
+  args.F_Start_forward=F_Start_forward;
+  args.F_Start_backward=F_Start_backward;
+  args.Intensities = &I_start[0];
+  args.F_final_norm = &F_final_norm[0];
+  args.fFinal = fFinal;
+  args.cosang = &cosang[0];
+
+
+
+  int iter;
+  double testVal, sval=1.0;
+  double fval, dfds;
+  double deltas;
+
+  for (iter=0; iter < 10; iter++)
+    {
+      fval = f_stretchFactor(sval, &args);
+
+      dfds = (f_stretchFactor(sval+1.e-3, &args) - fval)/(1.e-3);
+
+      deltas = -fval/dfds;
+
+      if (fabs(deltas) > 0.5*sval)
+	{
+	  if (deltas < 0)
+	    {
+	      deltas = -0.5*sval;
+	    }
+	  else
+	    {
+	      deltas = 0.5*sval;
+	    }
+	}
+
+      sval = sval + deltas;
+
+    }
+
+  stretchFactor = sval;
+
+
+  F_stretch = fabs(stretchFactor*F_Start_forward + F_Start_backward/stretchFactor);
+
+
+  if(stretchFactor<1.e-15)
+    {
+ 
+      for (i=0; i < NUMANGLES; i++)
+	I_return[i] = I_start[i];
+      return;
+    }
+
+  //Calculate rotation matrix
+  calc_rot_M(F_start_norm, F_final_norm, rotM);
+
+  // printf("start: %e %e %e\nfinish: %e %e %e\n", F_norm[0], F_norm[1], F_norm[2], F_final[0], F_final[1], F_final[2]);
+
+
+
+
+  int probeAng;
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+
+      //Apply Rotation Matrix to some initial intesity distribution
+
+      for (i=0; i < 3; i++)
+	{
+	  transformAng[probeAng][i]=0;
+	  for (j=0; j < 3; j++)
+	    {
+	      transformAng[probeAng][i] += rotM[i][j]*angGridCoords[probeAng][j];
+	    }
+	}
+
+
+
+      //Stretch initial intensity distrubution parallel to Ffinal
+
+      //First, calculate parallel component of I
+      double n_parallel[3], n_perp[3], n_final[3];
+      double dotprod = 0., n_norm = 0.;
+
+
+      for (l=0; l < 3; l++)
+	{
+	  dotprod += transformAng[probeAng][l]*F_final_norm[l];
+	}
+
+
+      for (l=0; l < 3; l++)
+	{
+	  n_parallel[l] = dotprod*F_final_norm[l];
+	  n_perp[l] = transformAng[probeAng][l] - n_parallel[l];
+
+	  if (dotprod > 0)
+	    {
+	      n_parallel[l] = n_parallel[l]*stretchFactor;
+	    }
+	  else
+	    {
+	      n_parallel[l] = n_parallel[l]/stretchFactor;
+	    }
+	  n_final[l] = n_perp[l] + n_parallel[l];
+
+	}
+
+
+      int angNeighborIndex[4];
+      double interpCoeffs[4], finalAng[4]={0.,0.,0.,0.};
+
+      get_4angIndex(n_final,angGridCoords,angNeighborIndex);
+      quadComb(n_final,angNeighborIndex,angGridCoords,interpCoeffs);
+
+      for (p=0; p < 4; p++)
+	{
+	  I_return[angNeighborIndex[p]] += I_start[probeAng]*interpCoeffs[p];
+	}
+
+
+    }
+
+
+
+
+
+  double rescaleFactor;// = Fmag_final/F_stretch;
+ 
+  double E_intermediate=0.;
+
+  
+  //Zero all beams with negative intensities
+  //Figure out new rescale factor
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+      if (I_return[p] < 0)
+	{
+	  I_return[p]=0.;
+	}
+      E_intermediate += I_return[p];
+    }
+  
+
+  rescaleFactor = Efinal/E_intermediate;
+
+
+
+  //Renormalize to get correct energy density
+  for (p=0; p < NUMANGLES; p++)
+    {
+      I_return[p] = I_return[p]*rescaleFactor;
+    }
+}
+
+
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
   transformI_stretch(ix,iy,iz,I0,M1_input);
   return;
 
   /*  
-  double I1[NUMANGLES];
-  int i,j;
-  int ret,iter;
+      double I1[NUMANGLES];
+      int i,j;
+      int ret,iter;
   
-  for(i=0;i<NUMANGLES;i++)
-    {
+      for(i=0;i<NUMANGLES;i++)
+      {
       I1[i]=I0[i];
-    }
+      }
   
-  for(iter=0;iter<1;iter++)
-    {
+      for(iter=0;iter<1;iter++)
+      {
       ret=transformI_Lagrange(ix,iy,iz,I0,M1_input);
   
       if(ret==1) //some intensities negative
-	{	  
-	  transformI_stretch(ix,iy,iz,I1,M1_input); //these are guaranteed to be positive
-	  double minf=1.e100,f; //I = f I0 + (1-f) I1 
-	  for(i=0;i<NUMANGLES;i++)
-	    {
-	      if(I0[i]<0.)
-		{
-		  f=I1[i]/(I1[i]-I0[i]);
-		  if(f<minf) minf=f;
-		}
-	    }
+      {	  
+      transformI_stretch(ix,iy,iz,I1,M1_input); //these are guaranteed to be positive
+      double minf=1.e100,f; //I = f I0 + (1-f) I1 
+      for(i=0;i<NUMANGLES;i++)
+      {
+      if(I0[i]<0.)
+      {
+      f=I1[i]/(I1[i]-I0[i]);
+      if(f<minf) minf=f;
+      }
+      }
 
-	  if(minf<0.) minf=0.;
-	  if(minf>1.) minf=1.;
+      if(minf<0.) minf=0.;
+      if(minf>1.) minf=1.;
 
-	  // printf("combining with %f at %d %d\n",minf,ix,iy); 
-	  for(i=0;i<NUMANGLES;i++)
-	    {
-	      I0[i]=minf*I0[i] + (1.-minf)*I1[i];
-	      if(I0[i]<0.) I0[i]=0.;
-	      I1[i]=I0[i];
-	    }
-	}
+      // printf("combining with %f at %d %d\n",minf,ix,iy); 
+      for(i=0;i<NUMANGLES;i++)
+      {
+      I0[i]=minf*I0[i] + (1.-minf)*I1[i];
+      if(I0[i]<0.) I0[i]=0.;
+      I1[i]=I0[i];
+      }
+      }
       else
-	break;
+      break;
     
-    }
+      }
   
 
-  return;
+      return;
   */
 }
 
+
+
+
+int ZEROtest_oldmain()
+
+{
+
+
+
+	double gridLoc[3][3][3][3];			//xyz locations of 3x3x3 cube
+	double M1_Data[3][3][3][5];			//E,v0,v1,v2 output from M1 scheme for cube
+	double source_Data[3][3][3][4];				//radiative source info for cube
+	double I_Data[3][3][3][NUMANGLES];
+
+	double eddingtonFactor[3][3];
+	double I_start[NUMANGLES], I_return[NUMANGLES];
+
+	
+
+
+
+
+
+	clock_t begin, end;
+
+	int i,j,k,l,p;
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------
+
+	for (p=0; p < NUMANGLES; p++)
+	{
+	  if (1 || p<25)
+		{
+			I_start[p]=1.;
+		}
+		else
+		{
+			I_start[p]=0.0;
+		}
+
+	}
+
+	double M1data[5];
+
+	M1data[0]=80.;
+	M1data[1]=0.;
+	M1data[2]=10.;
+	M1data[3]=0.;
+
+	//rotating, adjusting fluxes
+	double fmag = sqrt(M1data[1]*M1data[1] + 
+			   M1data[2]*M1data[2] + 
+			   M1data[3]*M1data[3]);
+	double ff = fmag / M1data[0];
+	double beta;
+	if(ff<1.e-2) 
+	  beta=3.*ff/4.;
+	else
+	  beta=(4.-sqrt(16.-12.*ff*ff))/2./ff;	    
+	
+	double gamma=1./sqrt(1.-beta*beta);
+
+	//Erad (Elab, beta)
+	M1data[4]=M1data[0]/(4./3.*gamma*gamma-1./3.);
+	
+
+	printf("aim F/E: %e\n",ff);
+
+	transformI(0,0,0,I_start, M1data);
+
+	double Fnew[3] = {0.,0.,0.}, Efinal=0.;
+
+	for (p=0; p < NUMANGLES; p++)
+	  {
+	    Efinal += I_start[p];
+
+	    for (l=0; l < 3; l++)
+	      {
+		Fnew[l] += I_start[p]*angGridCoords[p][l];
+	      }		
+
+	    printf("%d %e \n",p,I_start[p]);
+	  }
+	printf("\n");
+
+	double Fnorm = sqrt(Fnew[0]*Fnew[0] + Fnew[1]*Fnew[1] + Fnew[2]*Fnew[2]);
+
+	printf("Efinal = %e, Ffinal =  %e - %e %e %e | F/E = %e\n", Efinal, Fnorm, Fnew[0], Fnew[1], Fnew[2], Fnorm/Efinal);
+
+	FILE* fout1=fopen("beam.dat","w");
+	FILE* fout2=fopen("beam.gp","w");
+	fprintf(fout2,"set ylabel \"y\"\n",Fnew[0],Fnew[1],Fnew[2]);
+	fprintf(fout2,"set xlabel \"x\"\n",Fnew[0],Fnew[1],Fnew[2]);
+	fprintf(fout2,"set zlabel \"z\"\n",Fnew[0],Fnew[1],Fnew[2]);
+	fprintf(fout2,"set view equal xyz\n",Fnew[0],Fnew[1],Fnew[2]);
+	fprintf(fout2,"splot \"beam.dat\" u 1:2:3 w p pt 7 ps .1\n",Fnew[0],Fnew[1],Fnew[2]);
+	int ifzero=0;
+	double maxI=-1.;    
+	for (p=0; p < NUMANGLES; p++)
+	  if(maxI<I_start[p]) maxI=I_start[p];
+
+	for (p=0; p < NUMANGLES; p++)
+	  {
+	    ifzero=0;
+	    
+	    if(I_start[p]<3.e-5*maxI)
+	      {
+		ifzero=1;
+		I_start[p]=1.e-1*maxI;
+	      }
+	    
+
+	    for (l=0; l < 3; l++)
+	      {
+		Fnew[l] = I_start[p]*angGridCoords[p][l];
+	      }		
+
+	    fprintf(fout1,"%f %f %f\n",Fnew[0],Fnew[1],Fnew[2]);
+
+	    if(!ifzero)
+	      fprintf(fout2,"set arrow from 0,0,0 to %f,%f,%f front lw 2 lc 2\n",Fnew[0],Fnew[1],Fnew[2]);
+	    else	      
+	      fprintf(fout2,"set arrow from 0,0,0 to %f,%f,%f nohead front lw 1 lc 3\n",Fnew[0],Fnew[1],Fnew[2]);
+
+	    //fprintf(fout2,"set term pngcairo enhanced\n");
+	    //fprintf(fout2,"set output \"beam.png\"\n");
+	    //fprintf(fout2,"replot\n");
+	
+	  }
+	fclose(fout1);
+	fclose(fout2);
+	
+
+
+	exit(-1);
+
+//------------------------------------------------------------------------------------------------
+
+}

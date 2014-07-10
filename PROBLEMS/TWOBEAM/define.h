@@ -11,8 +11,8 @@
 //radiation choices
 /************************************/
 #define RADIATION
-//#define RADCLOSURE VETCLOSURE
-//#define EVOLVEINTENSITIES
+#define RADCLOSURE VETCLOSURE
+#define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
 //#define NUMRADWAVESPEEDS
 #define SKIPRADWAVESPEEDLIMITER
