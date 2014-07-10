@@ -36,7 +36,7 @@
 
 #define NX 128
 
-#define NUMERO 1
+#define NUMERO 104
 
 #if (NUMERO==1) //sonic wave
 #define KAPPA 0.

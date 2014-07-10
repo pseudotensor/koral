@@ -375,14 +375,6 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 	ss[FZ0]+=gdetu*Rij[k][l]*get_gKr(l,3,k,ix,iy,iz);
       }
 
-  #ifdef CURVETEST2
-  if(ix==10)
-    {
-      printf("0. | %e %e %e | %e %e %e | %e\n",ss[1],ss[EE0],ss[1]+ss[EE0]
-	     //T[1][0]*get_gKr(0,0,1,ix,iy,iz),T[0][1]*get_gKr(1,0,0,ix,iy,iz),T[1][0]*get_gKr(0,0,1,ix,iy,iz)+T[0][1]*get_gKr(1,0,0,ix,iy,iz),
-	     ,gdetu*T[1][0]+gdetu*rho*ucon[1],gdetu*Rij[1][0],gdetu*T[1][0]+gdetu*rho*ucon[1]+gdetu*Rij[1][0],get_size_x(ix,0));
-    }
-  #endif
 
   //terms with dloggdet
 #if (GDETIN==0)

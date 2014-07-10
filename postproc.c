@@ -308,31 +308,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 
-#ifdef CURVETEST
-	      ldouble gdetu,gdet=geomBL.gdet;
-	      gdetu=gdet;
-
-	      ldouble sum1=0.,sum2=0.;
-	      int k,l;
-	      //terms with Christoffels
-	      ldouble Kr[4][4][4];
-	      calc_Krzysie_arb(geomBL.xxvec,Kr,BLCOORDS);
-	      for(k=0;k<4;k++)
-		for(l=0;l<4;l++)
-		  {
-
-		    sum1+=gdetu*Tij[k][l]*Kr[l][0][k];
-		    sum2+=gdetu*Rij[k][l]*Kr[l][0][k];
-		    if(ix==10){
-		      printf("%d > %d %d %d: %e %e %e %e\n",ix,l,1,k,Tij[k][l],gdetu*Kr[l][1][k],gdetu*Tij[k][l]*Kr[l][0][k],sum1);
-		    }
-		  }
-
-
-	      profiles[13][ix]=sum1*dx[1]*dx[2];
-	      profiles[14][ix]=sum2*dx[1]*dx[2];
-
-#endif
 
 
 	      //rad viscosity energy flux (35)

@@ -4,15 +4,10 @@
 //#define RESTART
 #define RESTARTNUM 10
 
-//#define CURVETEST
-//#define CURVETEST2
-#define MODYFIKUJKRZYSIE 0
-//#define GDETIN 1
-
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define COMPTONIZATION
 //#define RADOUTPUTINFF
 #define RADOUTPUTVELS
@@ -27,7 +22,7 @@
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 3.
+#define RMIN 10.
 #define RMAX 10000.
 
 #define MINX (log(RMIN-MKS1R0))
@@ -78,55 +73,19 @@
 /************************************/
 //test specific
 /************************************/
-#define TESTNO -1
+#define TESTNO 0
+
+#if(TEST==0)
+#define MDOT 0.01
+#endif
+
 #define ERADRES 1.e-10
 #define PRADGASINIT 1.e-10 
-
-#if (TESTNO==-1)
-#define MDOT 1.e1
-#define GAMMA (5./3.)
-#define BONDIGAMMA GAMMA
-#define RBONDI 1.
-#endif
-
-#if (TESTNO==0)
-#define MDOT 1.e2
-#define TGAS0 1.e9
-#define RBONDI 1000.
-#define BONDIGAMMA (49./30.)
-#define GAMMA BONDIGAMMA
-#endif
-
-#if (TESTNO==1)
-#define PRADGAS 1.2e-7
-#define TGAS0 1e5
-#define MDOT 10.
-#endif
-
-#if (TESTNO==2)
-#define PRADGAS 1.2e-4
-#define TGAS0 1.e6
-#define MDOT 10.
-#endif
-
-#if (TESTNO==3)
-//#define LIKEINFRAGILE
-#define PRADGAS 1.2e-1
-#define TGAS0 1e7
-#define MDOT 10.
-#endif
-
-#if (TESTNO==4)
-#define PRADGAS 1.2e-5
-#define TGAS0 1e6
-#define MDOT 100.
-#endif 
-
-#define MASS 3.
+#define MASS 10.
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s
 #define RHOAMB 1.e-25
-#define TAMB 1.e5
+#define TAMB 1.e6
+#define MUGAS 1.
 //#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
-#define MUGAS .5
 

@@ -26,22 +26,26 @@ fill_geometry_arb(NX-1,iy,iz,&geomBLl,KERRCOORDS);
 //radius
 if(ix>=NX) //analytical solution at rout only
   {
-    ldouble rho,uint,ur,url,rhol;
+    ldouble rho,rho0,uint,uint0,ur,url,rhol;
 
-    rho=get_u(pproblem1,RHO,ix,iy,iz);
-    uint=get_u(pproblem1,UU,ix,iy,iz);
+    rho0=get_u(pproblem1,RHO,ix,iy,iz);
+    uint0=get_u(pproblem1,UU,ix,iy,iz);
 
     //last but one cell
     url=get_u(p,VX,NX-1,iy,iz);
     rhol=get_u(p,RHO,NX-1,iy,iz);
+
+    rho = rhol;
+
+    uint = uint0; //to keep pressure fixed
+    if(calc_PEQ_Tfromurho(uint,rho) < TAMB) //too cold
+      uint = calc_PEQ_ufromTrho(TAMB,rho);
+
     ldouble uconl[4]={0.,url,0.,0.};
     conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
 
-    //trans2_coco(geoml.xxvec,uconl,uconl,MYCOORDS,BLCOORDS);
-    //ldouble mdot=rhol*uconl[1]*geomBLl.xx*geomBLl.xx;
+    //velocity in the ghost cell to keep mdot const
     ldouble mdot=rhol*uconl[1]*geoml.gdet;
-
-    //velocity in the ghost cell
     ldouble ucon[4]={0.,0.,0.,0.};
     ucon[1]=mdot/rho/geom.gdet;
     conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
@@ -75,7 +79,7 @@ if(ix>=NX) //analytical solution at rout only
     else
       {
 	ucon[1]=0.;
-	E=El;//ERADRES*get_u(p,UU,NX-1,iy,iz);
+	E=El;
       }
 
     conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);

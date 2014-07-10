@@ -7,15 +7,8 @@ if(1) //uses MDOT and TGAS at the outer boundary
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
 
-    //eq (14.3.16) from Shapiro & Teukolsky
-    //mdot = 4 pi 0.25 (GM)^2 rho_inf / cs_inf
-    //ldouble rhoout = mdotout*csout / (4.*M_PI*0.25);
-    //ldouble urout = -mdotout / (4.*M_PI *rhoout* RMAX * RMAX);
-
     ldouble urout = -sqrt(1./2./RMAX);
     ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAX * RMAX);
-    //ldouble uintout = calc_PEQ_ufromTrho(TGAS0,rhoout);
-
     //as Jerry suggested
     //cs2 = GM/2R for gamma=5/3
     ldouble csout = sqrt(1./2./RMAX);
@@ -68,6 +61,9 @@ if(1) //uses MDOT and TGAS at the outer boundary
   }
  else //numerical solution of the Bondi problem for given BONDIGAMMA & RBONDI & MDOT
    {
+     /*
+
+
      int ix,iy,iz;
      ldouble Rbondi=RBONDI;
 
@@ -161,4 +157,5 @@ if(1) //uses MDOT and TGAS at the outer boundary
 	       }
 	   }
        }
+     */
    }
