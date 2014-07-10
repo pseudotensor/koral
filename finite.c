@@ -391,6 +391,9 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       calc_primitives(ix,iy,iz,0);
     }
 
+
+
+
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -2164,7 +2167,7 @@ int set_bc(ldouble t,int ifinit)
 	{
 	  ldouble uval[NV],pval[NV];
 	  set_bc_core(ix,iy,iz,t,uval,pval,ifinit,BCtype);
-	  
+
 	  for(iv=0;iv<NV;iv++)
 	    {
 	      set_u(u,iv,ix,iy,iz,uval[iv]);
@@ -2172,6 +2175,7 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	}
     }
+
 
 #ifdef MPI4CORNERS
   //now calculate conserved in corners - 
@@ -2216,7 +2220,7 @@ int set_bc(ldouble t,int ifinit)
 	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 	    }
     }
-  
+
   //corners of the whole domain are never real BC so need to fill them with something
   int xlim,ylim,zlim;
   int lim,i,j;
@@ -2229,7 +2233,7 @@ int set_bc(ldouble t,int ifinit)
   iz=0;
 
   //total corners, filling one cell deep surfaces
-  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
+  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1 && NY>1)
     {
 
       for(i=0;i<NG-1;i++)
@@ -2268,8 +2272,9 @@ int set_bc(ldouble t,int ifinit)
       
 
     }
+  
 
-  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
+  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1 && NY>1)
     {
  
       for(i=0;i<NG-1;i++)
@@ -2297,7 +2302,7 @@ int set_bc(ldouble t,int ifinit)
       
    }
 
-  if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1)
+  if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1 && NY>1)
     {
      for(i=0;i<NG-1;i++)
 	{
@@ -2325,7 +2330,7 @@ int set_bc(ldouble t,int ifinit)
 
     }
 
- if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1)
+ if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1 && NY>1)
     {
       for(i=0;i<NG-1;i++)
 	{
@@ -2358,7 +2363,7 @@ int set_bc(ldouble t,int ifinit)
  iz=0;
 
  //corners in the midda - apply boundary condition on what is already in ghost cells
- if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==0)
+ if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==0 && NY>1)
     {
       for(i=-NG;i<0;i++)
 	for(j=-NG;j<0;j++)
@@ -2371,7 +2376,7 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	  }
     }
- if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==0)
+ if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==0 && NY>1)
     {
       for(i=-NG;i<0;i++)
 	for(j=NY;j<NY+NG;j++)
@@ -2384,7 +2389,7 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	  }
     }
- if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==0)
+ if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==0 && NY>1)
     {
       for(i=NX;i<NX+NG;i++)
 	for(j=-NG;j<0;j++)
@@ -2397,7 +2402,7 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	  }
     }
- if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==0)
+ if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==0 && NY>1)
     {
       for(i=NX;i<NX+NG;i++)
 	for(j=NY;j<NY+NG;j++)
@@ -2410,8 +2415,8 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	  }
     }
- if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(XBCLO)==0)
-    {
+ if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(XBCLO)==0 && NY>1)
+     {
       for(i=-NG;i<0;i++)
 	for(j=-NG;j<0;j++)
 	  {
@@ -2423,7 +2428,7 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	  }
     }
- if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(XBCHI)==0)
+ if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(XBCHI)==0 && NY>1)
     {
       for(i=NX;i<NX+NG;i++)
 	for(j=-NG;j<0;j++)
@@ -2436,7 +2441,7 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	  }
     }
- if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(XBCLO)==0)
+ if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(XBCLO)==0 && NY>1)
     {
       for(i=-NG;i<0;i++)
 	for(j=NY;j<NY+NG;j++)
@@ -2449,7 +2454,7 @@ int set_bc(ldouble t,int ifinit)
 	    }
 	  }
     }
- if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(XBCHI)==0)
+ if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(XBCHI)==0 && NY>1)
     {
       for(i=NX;i<NX+NG;i++)
 	for(j=NY;j<NY+NG;j++)

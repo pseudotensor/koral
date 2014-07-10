@@ -29,6 +29,7 @@
 #define RADOUTPUTINFF
 #define CALCL1_RMHDWAVE
 #define TIMESTEPPING RK2IMEX
+#define OUTOUTPUT 1
 
 #define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-14
