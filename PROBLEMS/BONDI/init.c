@@ -72,6 +72,11 @@ rho=get_u(pproblem1,RHO,ix,iy,iz);
 uint=get_u(pproblem1,UU,ix,iy,iz);
 ur=get_u(pproblem1,VX,ix,iy,iz);
 
+#ifdef INFLOW
+rho*=1.e-10;
+uint*=1.e-10;
+#endif
+
 //four-vel in BL
 ldouble ucon[4]={0.,ur,0.,0.};
 conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
@@ -87,7 +92,7 @@ pp[3]=ucon[2];
 pp[4]=ucon[3];
 pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
-E=get_u(pproblem1,EE0,ix,iy,iz);
+E=get_u(pproblem1,EE0,ix,iy,iz); //Erad already residual
 pp[6]=E;
 pp[7]=urfcon[1];
 pp[8]=urfcon[2];

@@ -1642,6 +1642,10 @@
 #define RADIMPCONV 1.e-8
 #endif
 
+#ifndef RADIMPEPS
+#define RADIMPEPS 1.e-8
+#endif
+
 #ifndef RADIMPMAXITER
 #define RADIMPMAXITER 25
 #endif

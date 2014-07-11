@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
-#define RESTARTNUM 10
+#define RESTART
+#define RESTARTNUM -1
 
 /************************************/
 //radiation
@@ -23,7 +23,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1000.
+#define RMAX 10000.
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -53,8 +53,9 @@
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
 #define U2PCONV 1.e-12
-#define RADIMPCONV 1.e-12
-#define RADIMPMAXITER 25
+#define RADIMPCONV 1.e-6
+#define RADIMPEPS 1.e-6
+#define RADIMPMAXITER 15
 
 /************************************/
 //output
@@ -66,7 +67,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 1000 //stop after this number of outputs
-#define DTOUT1 1.e3 //res
+#define DTOUT1 1.e4 //res
 #define DTOUT2 1.e20 //avg
 #define TMAX 1.e10 //time to stop
 
@@ -78,10 +79,10 @@
 #if(TEST==0)
 #define GAMMA (5./3.)
 #define MDOT 1.e2
-//#define STARTATLTE
+#define INFLOW
 #endif
 
-#define PRADGASINIT 1.e-10 
+#define PRADGASINIT 1.e-10
 #define MASS 10.
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s

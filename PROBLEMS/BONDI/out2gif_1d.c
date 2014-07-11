@@ -132,8 +132,8 @@
 	   //"unset log y\n"
 #ifdef RADIATION
 	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"gas -vr\",  "
-	   " \"%s\" u 1:(-($21+1.e-3)) w lp ls 2   ti \"radiation -vr\", "
-" \"%s\" u 1:(($21+1.e-3)) w lp ls 2 lc 3  ti \"radiation vr\", "
+	   " \"%s\" u 1:(-($21)) w lp ls 2   ti \"radiation -vr\", "
+" \"%s\" u 1:(($21)) w lp ls 2 lc 3  ti \"radiation vr\", "
 " \"dumps/out0000.dat\" u 1:(-$16) w l ls 100 ti \"gas -vr hydro Bondi\" "
 #else
 	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"gas vr\", "

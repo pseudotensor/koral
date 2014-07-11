@@ -35,7 +35,7 @@ main(int argc, char **argv)
   doingpostproc=0;
 
   //gsl errors off
-  //gsl_set_error_handler_off();
+  gsl_set_error_handler_off();
   
   //random number gen. initialization
   srand ( time(NULL) );

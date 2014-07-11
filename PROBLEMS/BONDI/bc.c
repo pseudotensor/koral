@@ -80,15 +80,17 @@ if(ix>=NX) //analytical solution at rout only
     else
       {
 	ucon[1]=0.;
-	E=El;
+	E=get_u(pproblem1,EE0,ix,iy,iz);
+    
       }
 
-    conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
-    pp[6]=E;
-    pp[7]=ucon[1];
-    pp[8]=ucon[2];
-    pp[9]=ucon[3]; 
+    conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geomBL.gg,geomBL.GG);
+    pp[EE0]=E;
+    pp[FX0]=ucon[1];
+    pp[FY0]=ucon[2];
+    pp[FZ0]=ucon[3]; 
 
+ 
 #ifdef LIKEINFRAGILE
     pp[6]=get_u(pproblem1,EE0,ix,iy,iz);
     pp[7]=get_u(pproblem1,FX0,ix,iy,iz);
@@ -98,7 +100,7 @@ if(ix>=NX) //analytical solution at rout only
 
     //transforming rad primitives from BL to MYCOORDS
     trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-    
+
     #ifdef NCOMPTONIZATION
     pp[NF0]=get_u(pproblem1,NF0,NX-1,iy,iz);
     #endif
