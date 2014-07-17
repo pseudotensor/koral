@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
-#define RESTARTNUM -1
+//efine RESTART
+#define RESTARTNUM 52
 
 /************************************/
 //radiation
@@ -36,7 +36,7 @@
 #define TNX 64
 #define TNY 1
 #define TNZ 1
-#define NTX 1
+#define NTX 6
 #define NTY 1
 #define NTZ 1
 

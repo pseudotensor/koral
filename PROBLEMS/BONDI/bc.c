@@ -58,9 +58,9 @@ if(ix>=NX) //analytical solution at rout only
     pp[0]=rho;
     pp[1]=uint;
     pp[2]=ucon[1];
-    //test
-    //pp[2]=get_u(pproblem1,VX,ix,iy,iz);
-   pp[3]=ucon[2];
+    //test - velocity fixed instead of flat mdot
+    pp[2]=get_u(pproblem1,VX,ix,iy,iz);
+    pp[3]=ucon[2];
     pp[4]=ucon[3];
     pp[5]=calc_Sfromu(rho,uint);
 
@@ -71,16 +71,24 @@ if(ix>=NX) //analytical solution at rout only
     //last but one cell
     url=get_u(p,FX0,NX-1,iy,iz);
     El=get_u(p,EE0,NX-1,iy,iz);
-
     #ifdef NCOMPTONIZATION
     Nf=get_u(p,NF0,NX-1,iy,iz);
     #endif
-
     uconl[0]=uconl[2]=uconl[3]=0.;
     uconl[1]=url;
     conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
+
+
+    //to have flat luminosity
+    ldouble Rijl[4][4];
+    calc_Rij(&get_u(p,0,NX-1,iy,iz),&geoml,Rijl); 
+    ldouble Rtr = Rijl[1][0]*geoml.gdet/geom.gdet;
+    E=Rtr/(4./3.*uconl[0]*uconl[1]+1./3.*geom.gg[0][1]);
+
+    //velocity to BL
     trans2_coco(geoml.xxvec,uconl,uconl,MYCOORDS,BLCOORDS);
 
+    
     //ghost cell
     ucon[0]=ucon[2]=ucon[3]=0.;
     if(uconl[1]>0.)
@@ -95,13 +103,16 @@ if(ix>=NX) //analytical solution at rout only
 	Nf=get_u(pproblem1,NF0,ix,iy,iz);
       }
 
-    conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geomBL.gg,geomBL.GG);
+    //velocity back to MYCOORDS
+    trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+    conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
+
     pp[EE0]=E;
     pp[FX0]=ucon[1];
     pp[FY0]=ucon[2];
     pp[FZ0]=ucon[3]; 
     #ifdef NCOMPTONIZATION
-    pp[NF0]=Nf;
+    pp[NF0]=Nf;//*geoml.gdet/geom.gdet;
     #endif
  
 #ifdef LIKEINFRAGILE
@@ -112,7 +123,7 @@ if(ix>=NX) //analytical solution at rout only
 #endif
 
     //transforming rad primitives from BL to MYCOORDS
-    trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
+    //trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
 
   
 

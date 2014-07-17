@@ -3274,6 +3274,7 @@ calc_nsource(ldouble *pp, void* ggg)
 
   //radiation temperature
   ldouble Thatrad = calc_ncompt_Thatrad_4vel(pp,ggg,Ehatrad,urfcon,uffcov);
+
   //test
   #ifdef MAXDIFFTRADS
   ldouble ThatradBB=calc_LTE_TfromE(Ehatrad);
@@ -3290,15 +3291,29 @@ calc_nsource(ldouble *pp, void* ggg)
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
-  ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
-  
-  //change in number of photons in fluid frame
-  ldouble Cn=1./2.70118/K_BOLTZ;
-  ldouble ndotff = -kappa*Cn*(Ehatrad/Thatrad - 4.*M_PI*B/Tgas);
+  ldouble kappagas=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  ldouble kapparad=calc_kappa(rho,Thatrad,-1.,-1.,-1.);
+
+ 
+  //number of photons in rad rest frame
+  ldouble nphrf = pp[NF(0)];
 
   //relative gamma rad-fluid rest frames
-  //ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
-  //ldouble ndotrf = -ndotff/relgamma; 
+  ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
+
+  //ff number of photons
+  ldouble nphhat = - relgamma*nphrf;
+  
+  //change in number of photons in fluid frame
+  
+  //original formulae
+  //ldouble Cn=1./2.70118/K_BOLTZ;
+  //ldouble ndotff = -kappa*Cn*(Ehatrad/Thatrad - 4.*M_PI*B/Tgas);
+
+  //C=8pi/c**3/h**3
+  ldouble C=60.*SIGMA_RAD/M_PI/M_PI/M_PI/M_PI/K_BOLTZ/K_BOLTZ/K_BOLTZ/K_BOLTZ;
+
+  ldouble ndotff=-(kapparad*Ehatrad/K_BOLTZ/Thatrad/(3.-2.449724*nphhat*nphhat*nphhat*nphhat/C/Ehatrad/Ehatrad/Ehatrad) - (4.*M_PI*kappagas*B/K_BOLTZ/Tgas/2.701178));
 
   //the rate of change of number of photons invariant
   ldouble ndotrf = ndotff;
@@ -3325,7 +3340,12 @@ calc_ncompt_Thatrad_4vel(ldouble *pp, void* ggg, ldouble Ehatrad, ldouble* urfco
 
   //ff quantities
   ldouble nphhat = - relgamma*nphrf;
-  ldouble Thatrad = 1./2.70118/K_BOLTZ * Ehatrad / nphhat;
+  
+  //C=8pi/c**3/h**3
+  ldouble C=60.*SIGMA_RAD/M_PI/M_PI/M_PI/M_PI/K_BOLTZ/K_BOLTZ/K_BOLTZ/K_BOLTZ;
+
+  //ldouble Thatrad = 1./2.70118/K_BOLTZ * Ehatrad / nphhat;
+  ldouble Thatrad = 1./K_BOLTZ*Ehatrad / nphhat / (3.-2.449724*nphhat*nphhat*nphhat*nphhat/C/Ehatrad/Ehatrad/Ehatrad);
 
   return Thatrad;
 
