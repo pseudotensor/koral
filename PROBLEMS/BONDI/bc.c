@@ -43,28 +43,39 @@ if(ix>=NX) //analytical solution at rout only
       uint = calc_PEQ_ufromTrho(TAMB,rho);
 
     ldouble uconl[4]={0.,url,0.,0.};
+    //test
+    //uconl[1]=-sqrt(1./2./RMAX);;//get_u(pproblem1,VX,ix,iy,iz);
     conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
 
     //velocity in the ghost cell to keep mdot const
     ldouble mdot=rhol*uconl[1]*geoml.gdet;
     ldouble ucon[4]={0.,0.,0.,0.};
     ucon[1]=mdot/rho/geom.gdet;
+    
+   
     conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
     
     pp[0]=rho;
     pp[1]=uint;
     pp[2]=ucon[1];
-    pp[3]=ucon[2];
+    //test
+    //pp[2]=get_u(pproblem1,VX,ix,iy,iz);
+   pp[3]=ucon[2];
     pp[4]=ucon[3];
     pp[5]=calc_Sfromu(rho,uint);
 
 #ifdef RADIATION
     //outflow / no inflow
-    ldouble El,E;
+    ldouble El,E,Nf;
     
     //last but one cell
     url=get_u(p,FX0,NX-1,iy,iz);
     El=get_u(p,EE0,NX-1,iy,iz);
+
+    #ifdef NCOMPTONIZATION
+    Nf=get_u(p,NF0,NX-1,iy,iz);
+    #endif
+
     uconl[0]=uconl[2]=uconl[3]=0.;
     uconl[1]=url;
     conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
@@ -81,7 +92,7 @@ if(ix>=NX) //analytical solution at rout only
       {
 	ucon[1]=0.;
 	E=get_u(pproblem1,EE0,ix,iy,iz);
-    
+	Nf=get_u(pproblem1,NF0,ix,iy,iz);
       }
 
     conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geomBL.gg,geomBL.GG);
@@ -89,7 +100,9 @@ if(ix>=NX) //analytical solution at rout only
     pp[FX0]=ucon[1];
     pp[FY0]=ucon[2];
     pp[FZ0]=ucon[3]; 
-
+    #ifdef NCOMPTONIZATION
+    pp[NF0]=Nf;
+    #endif
  
 #ifdef LIKEINFRAGILE
     pp[6]=get_u(pproblem1,EE0,ix,iy,iz);
@@ -101,9 +114,7 @@ if(ix>=NX) //analytical solution at rout only
     //transforming rad primitives from BL to MYCOORDS
     trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
 
-    #ifdef NCOMPTONIZATION
-    pp[NF0]=get_u(pproblem1,NF0,NX-1,iy,iz);
-    #endif
+  
 
 #endif	 
     

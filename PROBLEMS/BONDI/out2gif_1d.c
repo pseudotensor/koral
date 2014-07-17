@@ -75,7 +75,7 @@
 	  "set format y \"%%.1e\"\n" 
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
-	   "unset log y\n"
+	   "set log y\n"
 	   "plot \"%s\" u 1:(-4.*3.1416*$14*$1*$1*$16*%e) w lp ls 3   ti \"Mdot/Mdot_init\","
 	   " \"%s\" u 1:(-$16/$28) w lp ls 4 ti \"Mach number\"\n"
 	   "set log y\n"

@@ -1482,12 +1482,16 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 #ifdef COMPTONIZATION
   ldouble Gic[4];
   calc_Compt_Gi(pp,ggg,Gic,Ehatrad,Tgas,kappaes,ucon);
-  //test
+
+  ldouble fac=1.;
+  #ifdef DAMPCOMPTONIZATIONATBH
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-  ldouble fac=step_function(xxBL[1]-2.*rhorizonBL,0.1*rhorizonBL);
+  fac=step_function(xxBL[1]-2.*rhorizonBL,0.1*rhorizonBL);
+  #endif
   for(i=0;i<4;i++)
     Gi[i]+=fac*Gic[i];
+    
 #endif 
 
   return 0;

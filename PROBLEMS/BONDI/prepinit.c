@@ -57,7 +57,7 @@ if(1) //uses MDOT and TGAS at the outer boundary
 		set_u(pproblem1,FZ0,ix,iy,iz,0.);
 #endif
 
-
+		trans_pall_coco(&get_u(pproblem1,0,ix,iy,iz), &get_u(pproblem1,0,ix,iy,iz), BLCOORDS, MYCOORDS, geomBL.xxvec,&geomBL,&geom);
 	      }
 	  }
       }
