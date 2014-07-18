@@ -3213,13 +3213,13 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 
   if(PROBLEM==7) //BONDI
     {      
-      if(lastzone<0 || (lastzone==2 && (t-lastzonetime)>1.e6))
+      if(lastzone<0 || (lastzone==2 && (t-lastzonetime)>2.e1))
 	{
 	  printf("------------- flip to OUTER (1) ------------ \n");
 	  lastzonetime=t;
 	  zone=1;
 	}
-      if(lastzone==1 && (t-lastzonetime)>1.e7)
+      if(lastzone==1 && (t-lastzonetime)>2.e1)
 	{
 	  printf("------------- flip to INNER (2) ------------ \n");
 	  lastzonetime=t;
@@ -3228,17 +3228,17 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 
       if(zone==1)
 	{
-	  *ix1=NX/2-2;
+	  *ix1=2*NX/3-2;
 	  *ix2=NX;
 	}
 
       if(zone==2)
 	{
 	  *ix1=0;
-	  *ix2=NX/2+2;
+	  *ix2=2*NX/3+2;
 	}
 
-      //printf("%d %d | %d %d\n",lastzone,zone,*ix1,*ix2);
+      //printf("%d %d | %d %d | %e %e \n",lastzone,zone,*ix1,*ix2,lastzonetime,t);
     }
 
   return zone;

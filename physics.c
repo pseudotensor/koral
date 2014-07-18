@@ -659,4 +659,33 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
   return 0;
 }
 
+/*******************************************/
 
+ldouble calc_PEQ_rhofromTu(ldouble T,ldouble u)
+{
+  ldouble p=GAMMAM1*u;
+  ldouble rho = p/K_BOLTZ/T*MU_GAS*M_PROTON;
+
+  return rho;
+}
+
+ldouble calc_PEQ_csfromT(ldouble T)
+{
+  //ldouble p=K_BOLTZ*rho*T/MU_GAS/M_PROTON;	      
+  ldouble cs = sqrt(GAMMA*K_BOLTZ*T/MU_GAS/M_PROTON);
+  return cs;
+}
+
+ldouble calc_PEQ_ufromTrho(ldouble T,ldouble rho)
+{
+  ldouble p=K_BOLTZ*rho*T/MU_GAS/M_PROTON;	      
+  ldouble u=p/(GAMMA-1.);
+  return u;
+}
+
+ldouble calc_PEQ_Tfromurho(ldouble u,ldouble rho)
+{
+  ldouble p=u*(GAMMA-1.);
+  ldouble T=p/(K_BOLTZ*rho/MU_GAS/M_PROTON);
+  return T;
+}

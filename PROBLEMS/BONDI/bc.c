@@ -26,7 +26,7 @@ fill_geometry_arb(NX-1,iy,iz,&geomBLl,KERRCOORDS);
 //radius
 if(ix>=NX) //analytical solution at rout only
   {
-    ldouble rho,rho0,uint,uint0,ur,url,rhol;
+    ldouble rho,rho0,uint,uintl,uint0,ur,url,rhol;
 
     rho0=get_u(pproblem1,RHO,ix,iy,iz);
     uint0=get_u(pproblem1,UU,ix,iy,iz);
@@ -34,13 +34,22 @@ if(ix>=NX) //analytical solution at rout only
     //last but one cell
     url=get_u(p,VX,NX-1,iy,iz);
     rhol=get_u(p,RHO,NX-1,iy,iz);
+    uintl=get_u(p,UU,NX-1,iy,iz);
 
-    //rho = rhol;
-    rho=rho0;
+    rho=rho0; //default
+    uint = uint0; //to keep pressure fixed to initial hydro Bondi value
 
-    uint = uint0; //to keep pressure fixed
+    /*
     if(calc_PEQ_Tfromurho(uint,rho) < TAMB) //too cold
       uint = calc_PEQ_ufromTrho(TAMB,rho);
+    */
+
+    //copy temperature, adjust rho
+    /*
+    ldouble temp=calc_PEQ_Tfromurho(uintl,rhol);
+    if(temp<TAMB) temp=TAMB;    
+    rho = calc_PEQ_rhofromTu(temp,uint);
+    */
 
     ldouble uconl[4]={0.,url,0.,0.};
     //test

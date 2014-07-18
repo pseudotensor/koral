@@ -1896,26 +1896,7 @@ set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int at
 //**********************************************************************
 //suplementary routines for conversions
 //**********************************************************************
-ldouble calc_PEQ_csfromT(ldouble T)
-{
-  //ldouble p=K_BOLTZ*rho*T/MU_GAS/M_PROTON;	      
-  ldouble cs = sqrt(GAMMA*K_BOLTZ*T/MU_GAS/M_PROTON);
-  return cs;
-}
 
-ldouble calc_PEQ_ufromTrho(ldouble T,ldouble rho)
-{
-  ldouble p=K_BOLTZ*rho*T/MU_GAS/M_PROTON;	      
-  ldouble u=p/(GAMMA-1.);
-  return u;
-}
-
-ldouble calc_PEQ_Tfromurho(ldouble u,ldouble rho)
-{
-  ldouble p=u*(GAMMA-1.);
-  ldouble T=p/(K_BOLTZ*rho/MU_GAS/M_PROTON);
-  return T;
-}
 
 ldouble calc_NFfromT(ldouble T)
 {
