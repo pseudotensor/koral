@@ -107,6 +107,10 @@ ldouble max_ws[3],max_dt,ttm1,ttm2,max_ws_ph;
 ldouble tstepdenmax;
 ldouble min_dx,min_dy,min_dz;
 
+//for subzones
+ldouble lastzonetime;
+int lastzone;
+
 //tile specific
 int TI,TJ,TK; //tile order
 int TOI,TOJ,TOK; //indices of the tile origin
@@ -236,6 +240,7 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz);
 int op_explicit(ldouble t, ldouble dt,ldouble *);
 int op_implicit(ldouble t, ldouble dt,ldouble *ubase);
 int set_grid(ldouble*, ldouble*, ldouble*,ldouble*);
+int alloc_loops(int,ldouble,ldouble);
 int print_grid(ldouble,ldouble,ldouble);
 ldouble fd_flux_limiter(ldouble r);
 ldouble minmod_fd_flux_limiter(ldouble ,ldouble,ldouble);

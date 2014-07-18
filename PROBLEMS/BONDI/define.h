@@ -3,7 +3,7 @@
 /************************************/
 //efine RESTART
 #define RESTARTNUM 52
-
+#define RESTARTGENERALINDICES
 /************************************/
 //radiation
 /************************************/
@@ -19,11 +19,11 @@
 //#define MYCOORDS MKER1COORDS
 #define MYCOORDS MKS1COORDS
 #define OUTCOORDS BLCOORDS
-#define PRINTXGC_LEFT
-#define PRINTXGC_RIGHT
+//#define PRINTXGC_LEFT
+//#define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 10.
-#define RMAX 10000.
+#define RMIN 1000.
+#define RMAX 1.e6
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -33,10 +33,12 @@
 #define MINZ -1.
 #define MAXZ 1.
 
+#define SUBZONES
+
 #define TNX 64
 #define TNY 1
 #define TNZ 1
-#define NTX 6
+#define NTX 1
 #define NTY 1
 #define NTZ 1
 
@@ -67,7 +69,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e5 //res
+#define DTOUT1 1.e7 //res
 #define DTOUT2 1.e20 //avg
 #define TMAX 1.e10 //time to stop
 
@@ -78,7 +80,7 @@
 
 #if(TEST==0)
 #define GAMMA (5./3.)
-#define MDOT 1.e2
+#define MDOT 1.e4
 #define INFLOW
 #endif
 

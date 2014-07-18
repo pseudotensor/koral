@@ -1356,28 +1356,60 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	    }
 	}
     }  
-
+  
   *mindx=mdx;
   *mindy=mdy;
   *mindz=mdz;
   *maxdtfac=maxdt;
+}
   
-  //**********************************************************************
-  //**********************************************************************
-  //auxiliary arrays to speed up parallel for loops
-  //**********************************************************************
-  //**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//auxiliary arrays to speed up parallel for loops
+//**********************************************************************
+//**********************************************************************
+int
+alloc_loops(int init,ldouble t,ldouble dt)
+{
+  int ix,iy,iz,i,zone=-1;
+  int ix1,ix2,iy1,iy2,iz1,iz2;
+
+  //by default cover the whole domain
+  ix1=0;
+  iy1=0;
+  iz1=0;
+
+  ix2=NX;
+  iy2=NY;
+  iz2=NZ;  
+
+  if(!init)
+    {
+      #ifdef SUBZONES
+      zone = calc_subzones(t,dt,&ix1,&iy1,&iz1,&ix2,&iy2,&iz2);
+      
+      for(i=0;i<Nloop_0;i++) free(loop_0[i]); free(loop_0);
+      for(i=0;i<Nloop_02;i++) free(loop_02[i]); free(loop_02);
+      for(i=0;i<Nloop_1;i++) free(loop_1[i]); free(loop_1);
+      for(i=0;i<Nloop_2;i++) free(loop_2[i]); free(loop_2);
+      for(i=0;i<Nloop_3;i++) free(loop_3[i]); free(loop_3);
+      for(i=0;i<Nloop_4;i++) free(loop_4[i]); free(loop_4);
+      for(i=0;i<Nloop_5;i++) free(loop_5[i]); free(loop_5);
+      for(i=0;i<Nloop_6;i++) free(loop_6[i]); free(loop_6);
+      #endif
+    }
+  
 
   //inside domain only
   Nloop_0=0;
   loop_0=(int **)malloc(sizeof(int*));
   loop_0[0]=(int *)malloc(3*sizeof(int));
 
-  for(ix=0;ix<NX;ix++)
+  for(ix=ix1;ix<ix2;ix++)
     {
-      for(iy=0;iy<NY;iy++)
+      for(iy=iy1;iy<iy2;iy++)
 	{
-	  for(iz=0;iz<NZ;iz++)
+	  for(iz=iz1;iz<iz2;iz++)
 	    {	
 	      loop_0[Nloop_0][0]=ix;
 	      loop_0[Nloop_0][1]=iy;
@@ -1390,7 +1422,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 	    }
 	}
     }
-
+ 
   //shuffling:
 #if (SHUFFLELOOPS)
   shuffle_loop(loop_0,Nloop_0);
@@ -1415,11 +1447,11 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   loop_1=(int **)malloc(sizeof(int*));
   loop_1[0]=(int *)malloc(3*sizeof(int));
 
-  for(ix=-xlim;ix<NX+xlim;ix++)
+  for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
     {
-      for(iy=-ylim;iy<NY+ylim;iy++)
+      for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
 	{
-	  for(iz=-zlim;iz<NZ+zlim;iz++)
+	  for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
 	    {	
 	      //if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
 
@@ -1563,7 +1595,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 
   //**********************************************************************
   //**********************************************************************
-  //all corners of the domain 
+  //all corners of the domain - like in staggered grid
   
   Nloop_4=0;
   loop_4=(int **)malloc(sizeof(int*));
@@ -1596,7 +1628,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
       
   //**********************************************************************
   //**********************************************************************
-  //domain + ghost cells + corners
+  //domain + ghost cells + corners = total
   
   Nloop_5=0;
   loop_5=(int **)malloc(sizeof(int*));
@@ -1660,7 +1692,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 #endif
       
 
-  return 0;
+  return zone;
 }
 
 //**********************************************************************
@@ -2489,103 +2521,101 @@ cell_fixup_hd()
 
   //gets the neiboring the primitives
 #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static)
-  for(ix=0;ix<NX;ix++)
+  for(ii=0;ii<Nloop_0;ii++) //domain only
     {
-      for(iy=0;iy<NY;iy++)
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+
+      if(get_cflag(HDFIXUPFLAG,ix,iy,iz)==1)
 	{
-	  for(iz=0;iz<NZ;iz++)
-	    {	      
-	      if(get_cflag(HDFIXUPFLAG,ix,iy,iz)==1)
-		{
-		  //total fixups  
-		  struct geometry geom;
-		  fill_geometry(ix,iy,iz,&geom);
+	  //total fixups  
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
 
-		  ldouble ppn[6][NV],pp[NV],uu[NV];
+	  ldouble ppn[6][NV],pp[NV],uu[NV];
 
-		  //int gix,giy,giz;
-		  //mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  //int gix,giy,giz;
+	  //mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
 
-		  //should care about global but at the stage where it is called knowns not about the boundaries
+	  //should care about global but at the stage where it is called knowns not about the boundaries
 
-		  in=0; //number of successfull neighbors
+	  in=0; //number of successfull neighbors
 		  
-		  if(ix-1>=0 &&  get_cflag(HDFIXUPFLAG,ix-1,iy,iz)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
-		    }
+	  if(ix-1>=0 &&  get_cflag(HDFIXUPFLAG,ix-1,iy,iz)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
+	    }
 
-		  if(ix+1<NX && get_cflag(HDFIXUPFLAG,ix+1,iy,iz)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
-		    }
+	  if(ix+1<NX && get_cflag(HDFIXUPFLAG,ix+1,iy,iz)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
+	    }
 
-		  if(iy-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy-1,iz)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
-		    }
+	  if(iy-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy-1,iz)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
+	    }
 
-		  if(iy+1<NY && get_cflag(HDFIXUPFLAG,ix,iy+1,iz)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
-		    }
+	  if(iy+1<NY && get_cflag(HDFIXUPFLAG,ix,iy+1,iz)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
+	    }
 
-		  if(iz-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy,iz-1)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
-		    }
+	  if(iz-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy,iz-1)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
+	    }
 
-		  if(iz+1<NZ && get_cflag(HDFIXUPFLAG,ix,iy,iz+1)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
-		    }
+	  if(iz+1<NZ && get_cflag(HDFIXUPFLAG,ix,iy,iz+1)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
+	    }
 
-		  if((NZ==1 && NY==1 && in>=1) ||
-		     (NZ==1 && in>=2) ||
-		     (NY==1 && in>=1) ||
-		     in>3) //sufficient number of neighbors
-		    {
-		      for(iv=0;iv<NV;iv++)
-			{
-			  pp[iv]=0;
-			  for(ii=0;ii<in;ii++)
-			    pp[iv]+=ppn[ii][iv];
-			  pp[iv]/=(ldouble)in;  
-			}
-		      p2u(pp,uu,&geom);
-
-		      if(verbose>1) 
-			{
-			  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
-			}
-
-		      //save to updated arrays memory
-		      for(iv=0;iv<NVMHD;iv++)
-			{
-			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
-			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
-			}
-		    }
-		  else
-		    {
-		      #ifndef MPI
-		      fprintf(fout_fail,"%4d > %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup\n",PROCID,ix,iy,iz);
-		      #endif
-		      printf("%4d > %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup \n",PROCID,ix,iy,iz);
-		    }
+	  if((NZ==1 && NY==1 && in>=1) ||
+	     (NZ==1 && in>=2) ||
+	     (NY==1 && in>=1) ||
+	     in>3) //sufficient number of neighbors
+	    {
+	      for(iv=0;iv<NV;iv++)
+		{
+		  pp[iv]=0;
+		  for(ii=0;ii<in;ii++)
+		    pp[iv]+=ppn[ii][iv];
+		  pp[iv]/=(ldouble)in;  
 		}
+	      p2u(pp,uu,&geom);
+
+	      if(verbose>1) 
+		{
+		  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
+		}
+
+	      //save to updated arrays memory
+	      for(iv=0;iv<NVMHD;iv++)
+		{
+		  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
+		  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
+		}
+	    }
+	  else
+	    {
+#ifndef MPI
+	      fprintf(fout_fail,"%4d > %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup\n",PROCID,ix,iy,iz);
+#endif
+	      printf("%4d > %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup \n",PROCID,ix,iy,iz);
 	    }
 	}
     }
@@ -2614,152 +2644,150 @@ cell_fixup_rad()
 
   //gets the neighboring the primitives
 #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static)
-  for(ix=0;ix<NX;ix++)
+  for(ii=0;ii<Nloop_0;ii++) //domain only
     {
-      for(iy=0;iy<NY;iy++)
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+
+      if(get_cflag(RADFIXUPFLAG,ix,iy,iz)<0)
 	{
-	  for(iz=0;iz<NZ;iz++)
-	    {	      
-	      if(get_cflag(RADFIXUPFLAG,ix,iy,iz)<0)
+	  ldouble ppn[26][NV],pp[NV],uu[NV];
+
+	  //total fixups  
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom); 
+		  
+	  //int gix,giy,giz;
+	  //mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  //as above
+
+	  in=0; //number of successfull neighbors
+		  
+	  if(ix-1>=0 &&  get_cflag(RADFIXUPFLAG,ix-1,iy,iz)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
+	    }
+		  
+	  if(ix+1<NX && get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
+	    }
+
+	  if(iy-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
+	    }
+
+	  if(iy+1<NY && get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
+	    }
+
+	  if(iz-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
+	    }
+
+	  if(iz+1<NZ && get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0)
+	    {
+	      in++;
+	      for(iv=0;iv<NV;iv++)
+		ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
+	    }
+
+	  //try corners as well
+	  //unnecessary + typos
+	  //TODO: so far only for NZ==1
+	  /*
+	    if(NZ==1 && NY>1)
+	    {
+	    if(gix-1>=0 && giy-1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy-1,iz)==0)
+	    {
+	    in++;
+	    for(iv=0;iv<NV;iv++)
+	    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
+	    idx[in-1][0]=ix-1;
+	    idx[in-1][1]=iy-1;
+	    idx[in-1][2]=iz;
+	    }
+
+	    if(gix+1>=0 && giy-1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy-1,iz)==0)
+	    {
+	    in++;
+	    for(iv=0;iv<NV;iv++)
+	    ppn[in-1][iv]=get_u(p,iv,ix+1,iy-1,iz);
+	    idx[in-1][0]=ix+1;
+	    idx[in-1][1]=iy-1;
+	    idx[in-1][2]=iz;
+	    }
+
+	    if(gix+1>=0 && giy+1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy+1,iz)==0)
+	    {
+	    in++;
+	    for(iv=0;iv<NV;iv++)
+	    ppn[in-1][iv]=get_u(p,iv,ix+1,iy+1,iz);
+	    idx[in-1][0]=ix+1;
+	    idx[in-1][1]=iy+1;
+	    idx[in-1][2]=iz;
+	    }
+
+	    if(gix-1>=0 && giy+1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy+1,iz)==0)
+	    {
+	    in++;
+	    for(iv=0;iv<NV;iv++)
+	    ppn[in-1][iv]=get_u(p,iv,ix-1,iy+1,iz);
+	    idx[in-1][0]=ix-1;
+	    idx[in-1][1]=iy+1;
+	    idx[in-1][2]=iz;
+	    }			 
+	    }
+	  */
+		  
+	  if((NZ==1 && NY==1 && in>=1) ||
+	     (NZ==1 && in>=1) ||
+	     (NY==1 && in>=1) ||
+	     in>3) //sufficient number of neighbors
+	    {
+	      for(iv=0;iv<NV;iv++)
 		{
-		  ldouble ppn[26][NV],pp[NV],uu[NV];
-
-		  //total fixups  
-		  struct geometry geom;
-		  fill_geometry(ix,iy,iz,&geom); 
-		  
-		  //int gix,giy,giz;
-		  //mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
-		  //as above
-
-		  in=0; //number of successfull neighbors
-		  
-		  if(ix-1>=0 &&  get_cflag(RADFIXUPFLAG,ix-1,iy,iz)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
-		    }
-		  
-		  if(ix+1<NX && get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
-		    }
-
-		  if(iy-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
-		    }
-
-		  if(iy+1<NY && get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
-		    }
-
-		  if(iz-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
-		    }
-
-		  if(iz+1<NZ && get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0)
-		    {
-		      in++;
-		      for(iv=0;iv<NV;iv++)
-			ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
-		    }
-
-		  //try corners as well
-		  //unnecessary + typos
-		  //TODO: so far only for NZ==1
-		  /*
-		  if(NZ==1 && NY>1)
-		    {
-		      if(gix-1>=0 && giy-1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy-1,iz)==0)
-			{
-			  in++;
-			  for(iv=0;iv<NV;iv++)
-			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
-			  idx[in-1][0]=ix-1;
-			  idx[in-1][1]=iy-1;
-			  idx[in-1][2]=iz;
-			}
-
-		      if(gix+1>=0 && giy-1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy-1,iz)==0)
-			{
-			  in++;
-			  for(iv=0;iv<NV;iv++)
-			    ppn[in-1][iv]=get_u(p,iv,ix+1,iy-1,iz);
-			  idx[in-1][0]=ix+1;
-			  idx[in-1][1]=iy-1;
-			  idx[in-1][2]=iz;
-			}
-
-		      if(gix+1>=0 && giy+1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy+1,iz)==0)
-			{
-			  in++;
-			  for(iv=0;iv<NV;iv++)
-			    ppn[in-1][iv]=get_u(p,iv,ix+1,iy+1,iz);
-			  idx[in-1][0]=ix+1;
-			  idx[in-1][1]=iy+1;
-			  idx[in-1][2]=iz;
-			}
-
-		      if(gix-1>=0 && giy+1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy+1,iz)==0)
-			{
-			  in++;
-			  for(iv=0;iv<NV;iv++)
-			    ppn[in-1][iv]=get_u(p,iv,ix-1,iy+1,iz);
-			  idx[in-1][0]=ix-1;
-			  idx[in-1][1]=iy+1;
-			  idx[in-1][2]=iz;
-			}			 
-		    }
-		  */
-		  
-		  if((NZ==1 && NY==1 && in>=1) ||
-		     (NZ==1 && in>=1) ||
-		     (NY==1 && in>=1) ||
-		     in>3) //sufficient number of neighbors
-		    {
-		      for(iv=0;iv<NV;iv++)
-			{
-			  pp[iv]=0;
-			  for(ii=0;ii<in;ii++)
-			    pp[iv]+=ppn[ii][iv];
-			  pp[iv]/=(ldouble)in;  
-			}
-		      p2u(pp,uu,&geom);
+		  pp[iv]=0;
+		  for(ii=0;ii<in;ii++)
+		    pp[iv]+=ppn[ii][iv];
+		  pp[iv]/=(ldouble)in;  
+		}
+	      p2u(pp,uu,&geom);
 		      
-		      if(verbose>1 || 1) 
-			  printf("%4d > %4d %4d %4d > RADFIX > fixing up rad with %d neighbors\n",PROCID,ix,iy,iz,in);
+	      if(verbose>1 || 1) 
+		printf("%4d > %4d %4d %4d > RADFIX > fixing up rad with %d neighbors\n",PROCID,ix,iy,iz,in);
 
-		      //save to updated arrays memory
-		      //all the primitives!
-		      for(iv=0;iv<NV;iv++)
-			{
-			  //if(iv!=UU && iv!=EE0) continue; //why?
-			  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
-			  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
-			}
-		    }
-		  else
-		    {
-                      #ifndef MPI
-		      fprintf(fout_fail,"%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup\n",PROCID,ix,iy,iz);
-                      #endif
-		      printf("%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup \n",PROCID,ix,iy,iz);
-		    }
-		  
+	      //save to updated arrays memory
+	      //all the primitives!
+	      for(iv=0;iv<NV;iv++)
+		{
+		  //if(iv!=UU && iv!=EE0) continue; //why?
+		  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
+		  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
 		}
 	    }
+	  else
+	    {
+#ifndef MPI
+	      fprintf(fout_fail,"%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup\n",PROCID,ix,iy,iz);
+#endif
+	      printf("%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup \n",PROCID,ix,iy,iz);
+	    }
+		  
 	}
     }
 
@@ -3173,4 +3201,45 @@ correct_polaraxis()
 
 
   return 0; 
+}
+
+/*****************************************************************/
+/* determines the extent of the domain currently solved **********/
+/*****************************************************************/
+int
+calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2,int* iz2)
+{
+  int zone=lastzone;
+
+  if(PROBLEM==7) //BONDI
+    {      
+      if(lastzone<0 || (lastzone==2 && (t-lastzonetime)>1.e6))
+	{
+	  printf("------------- flip to OUTER (1) ------------ \n");
+	  lastzonetime=t;
+	  zone=1;
+	}
+      if(lastzone==1 && (t-lastzonetime)>1.e7)
+	{
+	  printf("------------- flip to INNER (2) ------------ \n");
+	  lastzonetime=t;
+	  zone=2;
+	}
+
+      if(zone==1)
+	{
+	  *ix1=NX/2-2;
+	  *ix2=NX;
+	}
+
+      if(zone==2)
+	{
+	  *ix1=0;
+	  *ix2=NX/2+2;
+	}
+
+      //printf("%d %d | %d %d\n",lastzone,zone,*ix1,*ix2);
+    }
+
+  return zone;
 }

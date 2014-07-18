@@ -60,7 +60,8 @@ main(int argc, char **argv)
   //sets the grid
   set_grid(&min_dx,&min_dy,&min_dz,&max_dt);
   //print_grid(min_dx,min_dy,min_dz);
-
+  alloc_loops(1,0.,0.);
+  
 #if(GRIDOUTPUT==1)
   fprint_gridfile(folder);
 #endif
@@ -243,6 +244,7 @@ solve_the_problem(ldouble tstart, char* folder)
   int lasttout_floor;
   int lasttoutavg_floor;
   int i,j;
+  int loopsallociter;
   
   ldouble fprintf_time = 0.;
   int i1,i2,i3,ix,iy,iz,iv;
@@ -273,6 +275,13 @@ solve_the_problem(ldouble tstart, char* folder)
 
   //main time loop
   nstep=0;
+  #ifdef SUBZONES
+  lastzone=-1;
+  lastzone=alloc_loops(0,t,dt);
+  loopsallociter=0;
+  lastzonetime=t;
+  #endif
+  
 
   while (t < t1 && nfout1<=NOUTSTOP && i1<NSTEPSTOP)
     {    
@@ -293,6 +302,17 @@ solve_the_problem(ldouble tstart, char* folder)
  
       if(t+dt>t1) {dt=t1-t;}
 
+      //reallocate loops to allow for sub-zones, but don't do it every step
+      #ifdef SUBZONES
+      loopsallociter++;
+      if(loopsallociter>100)
+	{
+	  lastzone=alloc_loops(0,t,dt);
+	  loopsallociter=0;
+	}
+      #endif
+
+    
       //reseting wavespeeds
       max_ws[0]=-1.;
       max_ws[1]=-1.;
