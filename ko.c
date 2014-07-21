@@ -377,6 +377,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
      else 
        my_err("wrong time stepping specified\n");
+
+      
       
       //**********************************************************************
       //************************* updating intensities *************************

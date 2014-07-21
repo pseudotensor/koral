@@ -96,7 +96,7 @@ if(rho<0.) //outside donut
 
 #if(NTORUS==3)
     //LIMOFIELD from a=0 SANE harm init.c
-    ldouble lambda = 2.5;
+    ldouble lambda = 20.5;
     ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
     ldouble rchop = 550.; //outer boundary of field loops
     ldouble u_av = pp[UU];
@@ -260,7 +260,7 @@ if(rho<0.) //outside donut
     Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
 
 #else //standard single poloidal loop
-    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/1.e-11,2.)-0.1,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
 #endif
 
     pp[B1]=Acov[1];

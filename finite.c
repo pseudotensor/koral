@@ -455,7 +455,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //**********************************************************************
   //**********************************************************************
 
-
+#ifndef SKIPEVOLUTION
   //interpolation and flux-calculation
 #pragma omp parallel for private(iy,iz,iv,ix,ii)  schedule (static) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
@@ -804,6 +804,10 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  if(isnan(val) || isinf(val)) {printf("i: %4d %4d %4d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
 	  
+
+	  #ifdef SKIPHDEVOLUTION
+	  if(iv>5)
+          #endif
 	  set_u(u,iv,ix,iy,iz,val);	
 
 	}
@@ -848,6 +852,9 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       for(iv=0;iv<NV;iv++)
 	{
 	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
+	  #ifdef SKIPHDEVOLUTION
+	  if(iv>5)
+          #endif
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	} 
@@ -898,7 +905,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 #endif //EXPLICIT_LAB
 #endif //SKIPRADSOURCE
 #endif //RADIATION
-
+#endif //SKIPEVOLUTION
    
    //**********************************************************************
    //* mimics alpha-dynamo in axisymmetric sims involvin MRI ***************

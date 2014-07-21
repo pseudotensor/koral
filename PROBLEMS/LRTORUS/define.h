@@ -23,7 +23,8 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
+#define MIMICDYNAMO
+//#define SKIPHDEVOLUTION //temp!
 #define ALPHAFLIPSSIGN                                                        
 #define CALCHRONTHEGO
 #define ALPHADYNAMO 0.314
@@ -49,7 +50,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
@@ -77,35 +78,34 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 1.e1
+#define MASS 3.e5
 #define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS1COORDS
-#define MKS1R0 0.
+#define myMKS2COORDS
 #define MKS2R0 1.
-#define MKS2H0 0.6
+#define MKS2H0 0.7
 
-#ifdef myMKS1COORDS //modified Kerr-Shild
-#define MYCOORDS MKS1COORDS
-#define MINX (log(4.5-MKS1R0))
-#define MAXX (log(500.-MKS1R0))
+#ifdef myMKS2COORDS //modified Kerr-Shild
+#define MYCOORDS MKS2COORDS
+#define MINX (log(20.-MKS2R0))
+#define MAXX (log(500.-MKS2R0))
+#define MINY (0.001)
+#define MAXY (1.-0.001)
 //total resolution
-#define TNX 92 //33*8
-#define TNY 64 //28*8
+#define TNX 128
+#define TNY 64
 #define TNZ 1
 //number of tiles
-#define NTX 4
-#define NTY 2
+#define NTX 1
+#define NTY 1
 #define NTZ 1
 #endif
 
-#define MINY (0.0025*Pi/2.)
-#define MAXY (Pi-0.0025*Pi/2.)
-//#define MINY (0.001)
-//#define MAXY (1.-0.001)
+//efine MINY (0.0025*Pi/2.)
+//efine MAXY (Pi-0.0025*Pi/2.)
 //#define MAXY (Pi/2.) //change in postinit.c
 #define MINZ -1.
 #define MAXZ 1.
@@ -119,7 +119,7 @@
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
-#define NSTEPSTOP 1e10
+#define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
@@ -130,7 +130,7 @@
 #define ANARELRADOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 50.
 #define DTOUT2 1000.
 
 /************************************/
@@ -138,11 +138,11 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 7
+#define NTORUS 8
 
-#if(NTORUS==7) //flat sigma
+#if(NTORUS==8) //flat sigma
 #define LT_KAPPA 1.e1
-#define EXPECTEDHR 0.3
+#define EXPECTEDHR 0.4
 #define LT_XI 0.975
 #define LT_R1 30.
 #define LT_R2 200.
@@ -150,7 +150,7 @@
 #define LT_RIN 22.
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (1./10.) //eq.plane
+#define MAXBETA (.1) //eq.plane
 #endif
 
 #if(NTORUS==6) //for not-so-hyper
