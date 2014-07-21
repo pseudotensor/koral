@@ -29,3 +29,4 @@ v3=tau[0];
 calc_tauabs(pp,xxx,dxx,tau);
 v4=tau[0];
 
+v4=calc_ncompt_nphlab(pp,&geomout);

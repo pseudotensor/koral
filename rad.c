@@ -3334,6 +3334,51 @@ calc_ncompt_Thatrad_4vel(ldouble *pp, void* ggg, ldouble Ehatrad, ldouble* urfco
 
 
 //**********************************************************************
+//* calculates radiation energy density in the fluid frame
+//* and calls more
+//**********************************************************************
+ldouble
+calc_ncompt_Thatrad_full(ldouble *pp, void* ggg)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  //radiative stress tensor in the lab frame
+  ldouble Rij[4][4];
+  calc_Rij(pp,ggg,Rij);
+
+  //the four-velocity of fluid 
+  ldouble uffcon[4],utcon[4],uffcov[4],vpr[3];
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  conv_vels_both(utcon,uffcon,uffcov,VELPRIM,VEL4,gg,GG);
+  
+  //R^ab u_a u_b = Erad in fluid frame
+  ldouble Ruu=0.;
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Ruu+=Rij[i][j]*uffcov[i]*uffcov[j];
+  ldouble Ehatrad = Ruu;
+  
+  //the four-velocity of radiation in lab frame
+  ldouble urfcon[4];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+
+  return calc_ncompt_Thatrad_4vel(pp,ggg,Ehatrad,urfcon,uffcov);
+
+}
+
+//**********************************************************************
 //* calculates the radiation temperature using
 //* radiative energy density and the number of photons
 //**********************************************************************
@@ -3363,6 +3408,46 @@ calc_ncompt_Thatrad(ldouble *pp, void* ggg, ldouble Ehatrad)
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
 
   return calc_ncompt_Thatrad_4vel(pp,ggg,Ehatrad,urfcon,uffcov);
+
+}
+
+
+//**********************************************************************
+//* calculates the number of photons in the lab frame
+//**********************************************************************
+ldouble
+calc_ncompt_nphlab(ldouble *pp, void* ggg)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+  
+  //four velocity of the lab frame
+  ldouble alpha=sqrt(-1./GG[0][0]);
+  ldouble ucon[4],ucov[4]={-alpha,0.,0.,0.};
+  indices_12(ucov,ucon,GG);
+
+  //the four-velocity of radiation in lab frame
+  ldouble urfcon[4];
+  urfcon[0]=0.;
+  urfcon[1]=pp[FX0];
+  urfcon[2]=pp[FY0];
+  urfcon[3]=pp[FZ0];
+  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+
+  //number of photons in rad rest frame
+  ldouble nphrf = pp[NF(0)];
+
+  //relative gamma rad-lab frames
+  ldouble relgamma = urfcon[0]*ucov[0] + urfcon[1]*ucov[1] +urfcon[2]*ucov[2] +urfcon[3]*ucov[3]; 
+
+  //lab
+  ldouble nphlab = - relgamma*nphrf;
+
+  return nphlab;
 
 }
 

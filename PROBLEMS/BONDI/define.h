@@ -4,6 +4,7 @@
 #define RESTART
 #define RESTARTNUM -1
 #define RESTARTGENERALINDICES
+
 /************************************/
 //radiation
 /************************************/
@@ -22,7 +23,7 @@
 //#define PRINTXGC_LEFT
 //#define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 50.
+#define RMIN 5.
 #define RMAX 1.e3
 
 #define MINX (log(RMIN-MKS1R0))
@@ -33,7 +34,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define SUBZONES
+//#define SUBZONES
 
 #define TNX 64
 #define TNY 1
@@ -80,7 +81,7 @@
 
 #if(TEST==0)
 #define GAMMA (5./3.)
-#define MDOT 1.e2
+#define MDOT 1.e-1
 #define INFLOW
 #endif
 

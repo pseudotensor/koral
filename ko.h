@@ -589,7 +589,9 @@ int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 //rad.c
 int update_intensities();
 int calc_M1intensities(void);
+ldouble calc_ncompt_nphlab(ldouble *pp, void* ggg);
 ldouble calc_ncompt_Thatrad(ldouble *pp, void* ggg,ldouble);
+ldouble calc_ncompt_Thatrad_full(ldouble *pp, void* ggg);
 ldouble calc_ncompt_Thatrad_4vel(ldouble *pp, void* ggg,ldouble,ldouble *,ldouble *);
 int calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *,ldouble *mfpret,ldouble *);
 int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff);
