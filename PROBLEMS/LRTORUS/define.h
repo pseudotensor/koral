@@ -6,24 +6,24 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define OPACBELLLIN
 //#define RADCLOSURE MINERBOCLOSURE
 //#define RADCLOSUREMIXATBH
 //#define RADCLOSURECOORDS BLCOORDS
-#define COMPTONIZATION
+//#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
+//#define MIMICDYNAMO
 #define ALPHAFLIPSSIGN                                                        
 #define CALCHRONTHEGO
 #define ALPHADYNAMO 0.314
@@ -49,7 +49,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
@@ -77,8 +77,8 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 1.e6
-#define BHSPIN 0.9
+#define MASS 1.e1
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -93,12 +93,12 @@
 #define MINX (log(4.5-MKS1R0))
 #define MAXX (log(500.-MKS1R0))
 //total resolution
-#define TNX 128 //33*8
+#define TNX 92 //33*8
 #define TNY 64 //28*8
 #define TNZ 1
 //number of tiles
-#define NTX 33
-#define NTY 28
+#define NTX 4
+#define NTY 2
 #define NTZ 1
 #endif
 
@@ -119,7 +119,7 @@
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
-#define NSTEPSTOP 1.e10
+#define NSTEPSTOP 1e10
 #define NOUTSTOP 5000
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0

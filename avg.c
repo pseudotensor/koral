@@ -42,6 +42,7 @@ main(int argc, char **argv)
 
   //sets the grid
   set_grid(&min_dx,&min_dy,&min_dz,&max_dt);
+  alloc_loops(1,0.,0.);
 
   //precalculates metric etc.
   calc_metric();

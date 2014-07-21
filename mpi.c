@@ -15,9 +15,9 @@ calc_avgs_throughout()
       sigma=scaleth=0.;
       for(iy=0;iy<NY;iy++)
 	{
-	  for(iz=0;iz<NY;iz++)
+	  for(iz=0;iz<NZ;iz++)
 	    {
-	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
+	      fill_geometry(ix,iy,iz,&geom);
 	      coco_N(geom.xxvec,xxBL,MYCOORDS,BLCOORDS);
 	      sigma+=get_u(p,RHO,ix,iy,iz)*geom.gdet;
 	      scaleth+=get_u(p,RHO,ix,iy,iz)*geom.gdet*(M_PI/2. - xxBL[2])*(M_PI/2. - xxBL[2]);
