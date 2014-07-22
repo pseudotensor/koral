@@ -79,11 +79,11 @@ uint*=1.e-10;
 
 //four-vel in BL
 ldouble ucon[4]={0.,ur,0.,0.};
-conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+//conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
 //rad. four-vel in BL
 ldouble urfcon[4]={0.,ur,0.,0.}; //initialy radiative field is residual so this is not important, ur because zero would not be allowed under the horizon
-conv_vels(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+//conv_vels(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
 
 pp[0]=rho;
 pp[1]=uint;
@@ -100,7 +100,7 @@ pp[9]=urfcon[3];
 #endif	 
 
 //transforming primitives from BL to MYCOORDS
-trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
+//trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
 
 #ifdef NCOMPTONIZATION
 pp[NF0]=calc_NFfromE(pp[EE0]);

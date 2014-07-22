@@ -36,41 +36,37 @@ if(ix>=NX) //analytical solution at rout only
     rhol=get_u(p,RHO,NX-1,iy,iz);
     uintl=get_u(p,UU,NX-1,iy,iz);
 
-    rho=rho0; //default
-    uint = uint0; //to keep pressure fixed to initial hydro Bondi value
-
-    /*
-    if(calc_PEQ_Tfromurho(uint,rho) < TAMB) //too cold
-      uint = calc_PEQ_ufromTrho(TAMB,rho);
-    */
-
-    //copy temperature, adjust rho
-    /*
+    rho=rho0; //default Bondi-like
+    uint = uint0; 
+    
+    #ifdef FIX_PRESSURE
+    //to keep pressure fixed to initial hydro Bondi value
+    //and copy temperature, adjust rho    
     ldouble temp=calc_PEQ_Tfromurho(uintl,rhol);
     if(temp<TAMB) temp=TAMB;    
     rho = calc_PEQ_rhofromTu(temp,uint);
-    */
+    #endif
 
+    //velocities
     ldouble uconl[4]={0.,url,0.,0.};
-    //test
-    //uconl[1]=-sqrt(1./2./RMAX);;//get_u(pproblem1,VX,ix,iy,iz);
+    ldouble ucon[4]={0.,0.,0.,0.};
     conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
-
     //velocity in the ghost cell to keep mdot const
     ldouble mdot=rhol*uconl[1]*geoml.gdet;
-    ldouble ucon[4]={0.,0.,0.,0.};
     ucon[1]=mdot/rho/geom.gdet;
-    
-   
     conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
     
     pp[0]=rho;
     pp[1]=uint;
     pp[2]=ucon[1];
-    //test - velocity fixed instead of flat mdot
-    pp[2]=get_u(pproblem1,VX,ix,iy,iz);
     pp[3]=ucon[2];
     pp[4]=ucon[3];
+    //test - velocity fixed instead of flat mdot
+    #ifdef FIX_VELBONDI
+    pp[2]=get_u(pproblem1,VX,ix,iy,iz);
+    pp[3]=get_u(pproblem1,VY,ix,iy,iz);
+    pp[4]=get_u(pproblem1,VZ,ix,iy,iz);
+    #endif
     pp[5]=calc_Sfromu(rho,uint);
 
 #ifdef RADIATION
@@ -116,12 +112,12 @@ if(ix>=NX) //analytical solution at rout only
     trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
     conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
-    pp[EE0]=E;
+    pp[EE0]=E*geoml.gdet/geom.gdet;
     pp[FX0]=ucon[1];
     pp[FY0]=ucon[2];
     pp[FZ0]=ucon[3]; 
     #ifdef NCOMPTONIZATION
-    pp[NF0]=Nf;//*geoml.gdet/geom.gdet;
+    pp[NF0]=Nf*geoml.gdet/geom.gdet;
     #endif
  
 #ifdef LIKEINFRAGILE

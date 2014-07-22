@@ -2,8 +2,8 @@
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM -1
 #define RESTARTGENERALINDICES
+#define RESTARTNUM -1
 
 /************************************/
 //radiation
@@ -20,11 +20,11 @@
 //#define MYCOORDS MKER1COORDS
 #define MYCOORDS MKS1COORDS
 #define OUTCOORDS BLCOORDS
-//#define PRINTXGC_LEFT
-//#define PRINTXGC_RIGHT
+#define PRINTXGC_LEFT
+#define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 5.
-#define RMAX 1.e3
+#define RMIN 10.
+#define RMAX 500.
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -34,16 +34,15 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-//#define SUBZONES
-
 #define TNX 64
 #define TNY 1
 #define TNZ 1
-#define NTX 1
+#define NTX 16
 #define NTY 1
 #define NTZ 1
 
 #define SPECIFIC_BC
+#define FIX_PRESSURE
 
 /************************************/
 //reconstruction / Courant
@@ -52,7 +51,7 @@
 #define TIMESTEPPING RK2IMEX 
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
 #define U2PCONV 1.e-12
@@ -81,7 +80,7 @@
 
 #if(TEST==0)
 #define GAMMA (5./3.)
-#define MDOT 1.e-1
+#define MDOT 1.e2
 #define INFLOW
 #endif
 
