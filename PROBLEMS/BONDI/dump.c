@@ -26,7 +26,10 @@ v2=Trad;
 ldouble tau[3],dxx[3]={1.,1.,1.};
 calc_tautot(pp,xxx,dxx,tau);
 v3=tau[0];
+
 calc_tauabs(pp,xxx,dxx,tau);
 v4=tau[0];
+
+
 
 v4=calc_ncompt_nphlab(pp,&geomout);

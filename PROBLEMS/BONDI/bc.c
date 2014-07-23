@@ -28,8 +28,23 @@ if(ix>=NX) //analytical solution at rout only
   {
     ldouble rho,rho0,uint,uintl,uint0,ur,url,rhol;
 
+    //calculating Bondi-related values at the boundary
+    ldouble RMAXout=RMAX;
+    ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
+    ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
+    ldouble urout = -sqrt(1./2./RMAXout);
+    ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAXout * RMAXout);
+    ldouble csout = sqrt(1./2./RMAXout);   //cs2 = GM/2R for gamma=5/3
+    ldouble uintout = csout * csout * rhoout / GAMMA / GAMMAM1;
+    ldouble Eout=PRADGASINIT * GAMMAM1*uintout*3.;
+
+    /*
     rho0=get_u(pproblem1,RHO,ix,iy,iz);
     uint0=get_u(pproblem1,UU,ix,iy,iz);
+    */
+
+    rho0=rhoout;
+    uint0=uintout;
 
     //last but one cell
     url=get_u(p,VX,NX-1,iy,iz);
@@ -46,6 +61,19 @@ if(ix>=NX) //analytical solution at rout only
     if(temp<TAMB) temp=TAMB;    
     rho = calc_PEQ_rhofromTu(temp,uint);
     #endif
+
+    #ifdef FIX_TEMPERATURE
+    //to keep temperature fixed
+    //and copy rho
+    rho = rhoout;
+    uint=calc_PEQ_ufromTrho(TAMB,rho);
+    //rho = calc_PEQ_rhofromTu(TAMB,uint0);
+    
+    //rho = rho0;
+    //uint *=10.;
+    #endif
+
+   
 
     //velocities
     ldouble uconl[4]={0.,url,0.,0.};
@@ -104,20 +132,20 @@ if(ix>=NX) //analytical solution at rout only
     else
       {
 	ucon[1]=0.;
-	E=get_u(pproblem1,EE0,ix,iy,iz);
-	Nf=get_u(pproblem1,NF0,ix,iy,iz);
+	E=Eout;
+	Nf=pp[NF0]=calc_NFfromE(Eout);
       }
 
     //velocity back to MYCOORDS
     trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
     conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
-    pp[EE0]=E*geoml.gdet/geom.gdet;
+    pp[EE0]=E*geomBLl.gdet/geomBL.gdet;
     pp[FX0]=ucon[1];
     pp[FY0]=ucon[2];
     pp[FZ0]=ucon[3]; 
     #ifdef NCOMPTONIZATION
-    pp[NF0]=Nf*geoml.gdet/geom.gdet;
+    pp[NF0]=Nf*geomBLl.gdet/geomBL.gdet;
     #endif
  
 #ifdef LIKEINFRAGILE

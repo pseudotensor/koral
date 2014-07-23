@@ -1,4 +1,4 @@
-
+ldouble  RMAXout=5.e4;
 //precalculates hydro Bondi solution, saves it to pproblem1
 
 if(1) //uses MDOT and TGAS at the outer boundary
@@ -7,11 +7,11 @@ if(1) //uses MDOT and TGAS at the outer boundary
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
 
-    ldouble urout = -sqrt(1./2./RMAX);
-    ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAX * RMAX);
+    ldouble urout = -sqrt(1./2./RMAXout);
+    ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAXout * RMAXout);
     //as Jerry suggested
     //cs2 = GM/2R for gamma=5/3
-    ldouble csout = sqrt(1./2./RMAX);
+    ldouble csout = sqrt(1./2./RMAXout);
     ldouble uintout = csout * csout * rhoout / GAMMA / GAMMAM1;
 
     int ix,iy,iz;
@@ -32,9 +32,9 @@ if(1) //uses MDOT and TGAS at the outer boundary
 
 		//at given cell
 		ldouble R=geomBL.xx;
-		ldouble rho = rhoout * pow(R/RMAX,-3./2.);
-		ldouble ur = urout * sqrt(RMAX/R);
-		ldouble uint = uintout * pow(R/RMAX, -3./2.*GAMMA);
+		ldouble rho = rhoout * pow(R/RMAXout,-3./2.);
+		ldouble ur = urout * sqrt(RMAXout/R);
+		ldouble uint = uintout * pow(R/RMAXout, -3./2.*GAMMA);
 	    
 	    
 		set_u(pproblem1,RHO,ix,iy,iz,rho);
@@ -52,6 +52,7 @@ if(1) //uses MDOT and TGAS at the outer boundary
 		E=calc_LTE_Efromurho(uint,rho);
 #endif
 		set_u(pproblem1,EE0,ix,iy,iz,E);
+		set_u(pproblem1,NF0,ix,iy,iz,calc_NFfromE(E));
 		set_u(pproblem1,FX0,ix,iy,iz,0.); //overwritten in init.c
 		set_u(pproblem1,FY0,ix,iy,iz,0.);
 		set_u(pproblem1,FZ0,ix,iy,iz,0.);
@@ -109,7 +110,7 @@ if(1) //uses MDOT and TGAS at the outer boundary
 
 		 //initial point
 		 //at RBONDI
-		 r=RMAX;
+		 r=RMAXout;
 		 Be=(5.-3.*BONDIGAMMA)/(4.*(BONDIGAMMA-1.))/Rbondi;
 		 urs=-sqrt(1./2./Rbondi);
 
