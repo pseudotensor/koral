@@ -146,8 +146,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 
       int rettemp=0;
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-      if(rettemp<0)
-	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+      //if(rettemp<0)
+      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
 
       if(rettemp<0) 
 	  u2pret=-2; //to return error
@@ -850,8 +850,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	      int rettemp=0;
 	      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-	      if(rettemp<0)
-		rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+	      //if(rettemp<0)
+	      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
 
 	      if(rettemp<0) u2pret=-2; //to return error if even entropy inversion failed
 	      else u2pret=0;	      
@@ -994,8 +994,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
       int rettemp=0;
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-      if(rettemp<0)
-	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+      //if(rettemp<0)
+      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
       
       if(rettemp<0) //to return error if neither entropy or energy inversion succeeded
 	u2pret=-2; 
@@ -1029,7 +1029,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       return -1;
     }
   
-  //returns corrections to radiative primitives
+  //returns corrections to radiative primitives - not used anymore
   deltas[0]=uu[EE0]-(uu0[EE0]);
   deltas[1]=uu[FX0]-(uu0[FX0]);
   deltas[2]=uu[FY0]-(uu0[FY0]);
