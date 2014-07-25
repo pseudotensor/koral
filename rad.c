@@ -496,7 +496,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     {
       if(-Rtt00<1.e-3*pp0[UU]) //rad sub-dominant
 	whichprim=RAD;
-      else //gas dominant
+      else //gas sub-dominant
 	whichprim=MHD; 
       params[0]=whichprim;  
     }
