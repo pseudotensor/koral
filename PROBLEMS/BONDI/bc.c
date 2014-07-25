@@ -30,6 +30,8 @@ if(ix>=NX) //analytical solution at rout only
 
     //calculating Bondi-related values at the boundary
     ldouble RMAXout=RMAX;
+
+    RMAXout=geomBL.xx;
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
     ldouble urout = -sqrt(1./2./RMAXout);

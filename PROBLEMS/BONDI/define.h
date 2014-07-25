@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 293
 
 /************************************/
 //radiation
@@ -23,7 +23,7 @@
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 50.
+#define RMIN 10.
 #define RMAX 100000.
 
 #define MINX (log(RMIN-MKS1R0))
@@ -34,7 +34,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 32
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 16
@@ -73,19 +73,19 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e5 //res
+#define DTOUT1 5.e5 //res
 #define DTOUT2 1.e20 //avg
 #define TMAX 1.e10 //time to stop
 
 /************************************/
 //test specific
-/************************************/
+/***********************************/
 #define TESTNO 0
 
 #if(TEST==0)
 #define GAMMA (5./3.)
-#define MDOT 1.e0
-#define INFLOW
+#define MDOT 1.e3
+//#define INFLOW
 #endif
 
 #define PRADGASINIT 1.e-10
@@ -93,7 +93,7 @@
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s
 #define RHOAMB 1.e-25
-#define TAMB 1.e6
+#define TAMB 1.e8
 #define MUGAS 1.
 //#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 

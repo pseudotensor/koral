@@ -73,8 +73,8 @@ uint=get_u(pproblem1,UU,ix,iy,iz);
 ur=get_u(pproblem1,VX,ix,iy,iz);
 
 #ifdef INFLOW
-rho*=1.e-10;
-uint*=1.e-10;
+rho*=1.e-3;
+uint*=1.e-3;
 #endif
 
 //four-vel in BL

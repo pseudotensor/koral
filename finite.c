@@ -3220,32 +3220,58 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 
   if(PROBLEM==7) //BONDI
     {      
-      if(lastzone<0 || (lastzone==2 && (t-lastzonetime)>1.e5))
+      double startzoningtime=1.e4;
+      int nzones=3;
+      int izones[3+1]={0,NX/2,4*NX/5,NX};
+      double rzones[3+1];
+      double dtzones[3];
+      int overlap=6,i,j;
+
+      //radii
+      double xxvec[4],xxvecBL[4];
+      for(i=0;i<nzones+1;i++)
 	{
-	  printf("------------- flip to OUTER (1) ------------ \n");
-	  lastzonetime=t;
-	  zone=1;
-	}
-      if(lastzone==1 && (t-lastzonetime)>2.e5)
-	{
-	  printf("------------- flip to INNER (2) ------------ \n");
-	  lastzonetime=t;
-	  zone=2;
+	  get_xx(izones[i],0,0,xxvec);
+	  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+	  rzones[i]=xxvecBL[1];
 	}
 
-      if(zone==1)
+      //dt for each zone
+      for(i=0;i<nzones;i++)
 	{
-	  *ix1=NX/2-2;
-	  *ix2=NX;
+	  //dtzones[i]=10.*(rzones[i+1]-rzones[i])/1.; //timestep limited by speed of light
+	  dtzones[i]=0.1*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
 	}
 
-      if(zone==2)
+      //real thing
+      if(t<startzoningtime) return -1;
+
+      if(lastzone<0) //start from the outermost
+	zone=nzones;
+      else
 	{
-	  *ix1=0;
-	  *ix2=NX/2+2;
+	  if(t-lastzonetime > dtzones[lastzone-1])
+	    {
+	      zone=lastzone-1;
+	      if(zone==0) zone=nzones;
+	      lastzonetime=t;
+	      printf("------------- fliping to ZONE %d ------------ \n",zone);
+	      printf("%d %d | %d %d | %e %e %e \n",lastzone,zone,
+		     izones[zone-1],izones[zone],
+		     lastzonetime,t,dtzones[zone-1]);
+	    }
+	  else
+	    zone=lastzone;
 	}
 
-      //printf("%d %d | %d %d | %e %e \n",lastzone,zone,*ix1,*ix2,lastzonetime,t);
+      *ix1=izones[zone-1];
+      *ix2=izones[zone];
+
+      if(zone>1) //not the innermost
+	*ix1=*ix1-overlap;
+      if(zone<nzones) //not the outermost
+	*ix2=*ix2+overlap;
+
     }
 
   return zone;
