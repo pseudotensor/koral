@@ -79,11 +79,11 @@
 //76 ZEBRA - Eric's tidal disks
 //77 EMPTY - empty problem
 //78 FUNNY - for Ronaldo & Grzesiek & not for Bhupendra
-//79 SOFTBALL - Ron & Grz Bis
+//79 SOFTBALL - Grzegorz's oscillating torus
 //80 GENCLOSURE - tests of closures
 //81 TWOBEAM - test of VET with two beams
 
-#define PROBLEM 7
+#define PROBLEM 79
 
 #if(PROBLEM==81)
 
@@ -127,6 +127,7 @@
 #define PR_OUT2GIF_1D "PROBLEMS/SOFTBALL/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/SOFTBALL/dump.c"
 #define PR_TOOLS "PROBLEMS/SOFTBALL/tools.c"
+#define PR_PREPINIT "PROBLEMS/SOFTBALL/prepinit.c"
 
 #endif
 

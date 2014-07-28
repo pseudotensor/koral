@@ -16,20 +16,20 @@ ldouble pp[NV],uu[NV];
 
 /***********************************************/
 //angular momentum of the torus:
-ldouble L=6.;
+ldouble L=3.8;
 
-//ldouble W = (1./2.)*log(-(geom.gg[0][0]*geom.gg[3][3])/(geom.gg[3][3]+L*L*geom.gg[0][0]));
+ldouble W = (1./2.)*log(-(geom.gg[0][0]*geom.gg[3][3])/(geom.gg[3][3]+L*L*geom.gg[0][0]));
 //ldouble rin=4;
-//ldouble Win = 0.0; 
-//ldouble w=exp(-(W-Win));
+ldouble Win = -0.0416192; 
+ldouble w=exp(-(W-Win));
 
 //OS: I didn't know how to manipulate the size of the torus in your formulae, so I used my old ones:
-ldouble podpierd=-(geom.GG[0][0]-2.*L*geom.GG[0][3]+L*L*geom.GG[3][3]);
-ldouble ut=-1./sqrt(podpierd);
-ut/=0.985; //determines the torus size, the closer to 1, the bigger the torus
-ldouble w=-1./ut;
+//ldouble podpierd=-(geom.GG[0][0]-2.*L*geom.GG[0][3]+L*L*geom.GG[3][3]);
+//ldouble ut=-1./sqrt(podpierd);
+//ut/=0.985; //determines the torus size, the closer to 1, the bigger the torus
+//ldouble w=-1./ut;
 ldouble epsilon = (w-1.)/GAMMA;  //OS: dot after 1.
-
+ldouble vmichel = get_u(pproblem1,0,ix,iy,iz);
 if(epsilon>0.) //OS: interior of the torus
   {
     ldouble kappa = 1.; //OS: entropy constant, 0.01 gave temperature < 1e5 what was a bit too low
@@ -49,7 +49,13 @@ if(epsilon>0.) //OS: interior of the torus
     pp[VY]=0.;
     pp[VX]=0.;
 
-    //just in vase VELPRIM!=VEL4
+    //superimposing vmichel
+    ldouble vmichel4vel[4]={0.,vmichel,0.,0.};
+    trans2_coco(geom.xxvec,vmichel4vel,vmichel4vel,BLCOORDS,MYCOORDS);
+    pp[VX]=vmichel4vel[1];
+    pp[VY]=vmichel4vel[2];
+
+    //just in case VELPRIM!=VEL4
     conv_velsinprims(pp,VEL4,VELPRIM,geom.gg,geom.GG);
   }
  else //OS: atmosphere outside the torus

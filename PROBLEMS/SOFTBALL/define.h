@@ -21,8 +21,8 @@
 /************************************/
 
 #define MYCOORDS KERRCOORDS
-#define RMIN 15
-#define RMAX 50.
+#define RMIN 4.
+#define RMAX 30.
 #define MINX RMIN
 #define MAXX RMAX 
 #define DTH .45
