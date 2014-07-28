@@ -42,7 +42,7 @@
 #define NTZ 1
 
 #define SUBZONES
-#define SUBZONESOVERLAP 3
+#define SUBZONESOVERLAP 5
 
 #define SPECIFIC_BC
 //#define FIX_PRESSURE

@@ -3354,12 +3354,11 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	  ldouble fac;
 	  //dtzones[i]=10.*(rzones[i+1]-rzones[i])/1.; //timestep limited by speed of light
 	  if(i==nzones-1)
-	    fac=2.;
+	    fac=1.;
 	  else
-	    fac=2.;
+	    fac=1.;
 
 	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
-
 
 	  //dtzones[i]=1.e10; //do not switch;
 	}
