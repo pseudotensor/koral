@@ -1378,7 +1378,7 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 int
 alloc_loops(int init,ldouble t,ldouble dt)
 {
-  int ix,iy,iz,i,zone=-1;
+  int ix,iy,iz,i,ii,jj,zone=-1;
   int ix1,ix2,iy1,iy2,iz1,iz2;
 
   //by default cover the whole domain
@@ -1405,6 +1405,33 @@ alloc_loops(int init,ldouble t,ldouble dt)
       
       if(zone==lastzone) //no need for reallocating arrays
 	return zone;
+      
+      //copy what is in current subdomain to u_bak_subzone
+      for(ii=0;ii<Nloop_0;ii++) //domain only
+	{
+	  ix=loop_0[ii][0];
+	  iy=loop_0[ii][1];
+	  iz=loop_0[ii][2]; 
+	  PLOOP(jj)
+	  {
+	    set_u(u_bak_subzone,jj,ix,iy,iz,get_u(u,jj,ix,iy,iz));
+	    set_u(p_bak_subzone,jj,ix,iy,iz,get_u(p,jj,ix,iy,iz));
+	  }
+	}
+
+      //restore ghost cells from u_bak_subzone
+      for(ii=0;ii<Nloop_2;ii++) //domain only
+	{
+	  ix=loop_0[ii][0];
+	  iy=loop_0[ii][1];
+	  iz=loop_0[ii][2]; 
+	  PLOOP(jj)
+	  {
+	    set_u(u,jj,ix,iy,iz,get_u(u_bak_subzone,jj,ix,iy,iz));
+	    set_u(p,jj,ix,iy,iz,get_u(p_bak_subzone,jj,ix,iy,iz));
+	  }
+	}
+      
 
       global_ix1=ix1;
       global_iy1=iy1;

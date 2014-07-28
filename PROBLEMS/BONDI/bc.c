@@ -8,16 +8,16 @@ struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
 struct geometry geoml;
-fill_geometry(NX-1,iy,iz,&geoml);
+fill_geometry(global_ix2-1,iy,iz,&geoml);
 
 struct geometry geomr;
-fill_geometry(0,iy,iz,&geomr);
+fill_geometry(global_ix1,iy,iz,&geomr);
 
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 struct geometry geomBLl;
-fill_geometry_arb(NX-1,iy,iz,&geomBLl,KERRCOORDS);
+fill_geometry_arb(global_ix2-1,iy,iz,&geomBLl,KERRCOORDS);
 
 
 /**********************/
@@ -141,20 +141,20 @@ if(ix>=NX) //total boundary, properties of the galaxy
     //printf("%d > %e %e %e %e\n",ix,url,uconl[1],ucon[1],pp[VX]);getch();
     return 0.;
   }
- else if(ix<0) //outflow near BH or at inner boundaries
+ else if(ix<global_ix1) //outflow near BH or at inner boundaries
    {
-     iix=0;
+     iix=global_ix1;
      iiy=iy;
      iiz=iz;
    
      //copying primitives with gdet taken into account
      for(iv=0;iv<NV;iv++)
        { 
-	 if(iv==VX)
+	 if(1 && iv==VX)
 	   {
 	     //first cell
-	     ldouble urr=get_u(p,VX,0,iy,iz);
-	     ldouble rhor=get_u(p,RHO,0,iy,iz);
+	     ldouble urr=get_u(p,VX,global_ix1,iy,iz);
+	     ldouble rhor=get_u(p,RHO,global_ix1,iy,iz);
 	     ldouble rho=get_u(p,RHO,ix,iy,iz);
 	     ldouble uconr[4]={0.,urr,0.,0.};
 	     conv_vels(uconr,uconr,VELPRIM,VEL4,geomr.gg,geomr.GG);

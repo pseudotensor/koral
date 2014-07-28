@@ -41,7 +41,7 @@
 #define NTY 1
 #define NTZ 1
 
-//#define SUBZONES
+#define SUBZONES
 
 #define SPECIFIC_BC
 //#define FIX_PRESSURE
@@ -73,7 +73,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e4 //res
+#define DTOUT1 5.e5 //res
 #define DTOUT2 1.e20 //avg
 #define TMAX 1.e10 //time to stop
 
