@@ -1,14 +1,14 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM 293
 
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define NCOMPTONIZATION
 //#define RADOUTPUTINFF
 #define RADOUTPUTVELS

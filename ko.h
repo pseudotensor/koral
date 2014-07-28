@@ -110,6 +110,9 @@ ldouble min_dx,min_dy,min_dz;
 //for subzones
 ldouble lastzonetime;
 int lastzone;
+int global_ix1,global_ix2;
+int global_iy1,global_iy2;
+int global_iz1,global_iz2;
 
 //tile specific
 int TI,TJ,TK; //tile order
@@ -119,7 +122,8 @@ int NPROCS;
 
 //arrays and stuff
 ldouble **msgbufs;
-ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak,*p_bak,*u_step1,*u_step2,
+ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak_fixup,*p_bak_fixup,
+  *u_step1,*u_step2,*u_bak_subzone,*p_bak_subzone,
   *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,*radviscfac,
   *dut0,*dut1,*dut2,*dut3,*uforget,*drt0,*drt1,*drt2,*drt3,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,

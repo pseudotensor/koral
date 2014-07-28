@@ -217,8 +217,10 @@ initialize_arrays()
   drt2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   drt3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
   uforget=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-  u_bak=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-  p_bak=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  u_bak_fixup=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  p_bak_fixup=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  u_bak_subzone=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  p_bak_subzone=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
   //wavespeeds hd and rad - max(al,ar)
   ahdx=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
@@ -346,8 +348,10 @@ free_arrays()
   free(drt2);
   free(drt3);
   free(uforget);
-  free(u_bak);
-  free(p_bak);
+  free(u_bak_fixup);
+  free(p_bak_fixup);
+  free(u_bak_subzone);
+  free(p_bak_subzone);
 
   free(aradx);
   free(arady);

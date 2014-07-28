@@ -4,7 +4,6 @@
 ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
 
-
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
@@ -24,14 +23,12 @@ fill_geometry_arb(NX-1,iy,iz,&geomBLl,KERRCOORDS);
 /**********************/
 
 //radius
-if(ix>=NX) //analytical solution at rout only
+if(ix>=NX) //total boundary, properties of the galaxy
   {
     ldouble rho,rho0,uint,uintl,uint0,ur,url,rhol;
 
     //calculating Bondi-related values at the boundary
-    ldouble RMAXout=RMAX;
-
-    RMAXout=geomBL.xx;
+    ldouble RMAXout=geomBL.xx;
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
     ldouble urout = -sqrt(1./2./RMAXout);
@@ -40,21 +37,15 @@ if(ix>=NX) //analytical solution at rout only
     ldouble uintout = csout * csout * rhoout / GAMMA / GAMMAM1;
     ldouble Eout=PRADGASINIT * GAMMAM1*uintout*3.;
 
-    /*
-    rho0=get_u(pproblem1,RHO,ix,iy,iz);
-    uint0=get_u(pproblem1,UU,ix,iy,iz);
-    */
-
     rho0=rhoout;
     uint0=uintout;
+    rho=rho0; 
+    uint = uint0; 
 
     //last but one cell
     url=get_u(p,VX,NX-1,iy,iz);
     rhol=get_u(p,RHO,NX-1,iy,iz);
     uintl=get_u(p,UU,NX-1,iy,iz);
-
-    rho=rho0; //default Bondi-like
-    uint = uint0; 
     
     #ifdef FIX_PRESSURE
     //to keep pressure fixed to initial hydro Bondi value
@@ -65,23 +56,17 @@ if(ix>=NX) //analytical solution at rout only
     #endif
 
     #ifdef FIX_TEMPERATURE
-    //to keep temperature fixed
-    //and copy rho
+    //to keep temperature fixed and copy rho
     rho = rhoout;
     uint=calc_PEQ_ufromTrho(TAMB,rho);
-    //rho = calc_PEQ_rhofromTu(TAMB,uint0);
-    
-    //rho = rho0;
-    //uint *=10.;
     #endif
-
-   
 
     //velocities
     ldouble uconl[4]={0.,url,0.,0.};
     ldouble ucon[4]={0.,0.,0.,0.};
     conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
-    //velocity in the ghost cell to keep mdot const
+
+    //by default fixed mdot
     ldouble mdot=rhol*uconl[1]*geoml.gdet;
     ucon[1]=mdot/rho/geom.gdet;
     conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
@@ -91,7 +76,8 @@ if(ix>=NX) //analytical solution at rout only
     pp[2]=ucon[1];
     pp[3]=ucon[2];
     pp[4]=ucon[3];
-    //test - velocity fixed instead of flat mdot
+
+    //velocity fixed instead of flat mdot
     #ifdef FIX_VELBONDI
     pp[2]=get_u(pproblem1,VX,ix,iy,iz);
     pp[3]=get_u(pproblem1,VY,ix,iy,iz);
@@ -99,10 +85,10 @@ if(ix>=NX) //analytical solution at rout only
     #endif
     pp[5]=calc_Sfromu(rho,uint);
 
-#ifdef RADIATION
+    #ifdef RADIATION
     //outflow / no inflow
-    ldouble El,E,Nf;
     
+    ldouble El,E,Nf;    
     //last but one cell
     url=get_u(p,FX0,NX-1,iy,iz);
     El=get_u(p,EE0,NX-1,iy,iz);
@@ -113,8 +99,7 @@ if(ix>=NX) //analytical solution at rout only
     uconl[1]=url;
     conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
 
-
-    //to have flat luminosity
+    //flat luminosity
     ldouble Rijl[4][4];
     calc_Rij(&get_u(p,0,NX-1,iy,iz),&geoml,Rijl); 
     ldouble Rtr = Rijl[1][0]*geoml.gdet/geom.gdet;
@@ -122,7 +107,6 @@ if(ix>=NX) //analytical solution at rout only
 
     //velocity to BL
     trans2_coco(geoml.xxvec,uconl,uconl,MYCOORDS,BLCOORDS);
-
     
     //ghost cell
     ucon[0]=ucon[2]=ucon[3]=0.;
@@ -149,18 +133,6 @@ if(ix>=NX) //analytical solution at rout only
     #ifdef NCOMPTONIZATION
     pp[NF0]=Nf*geomBLl.gdet/geomBL.gdet;
     #endif
- 
-#ifdef LIKEINFRAGILE
-    pp[6]=get_u(pproblem1,EE0,ix,iy,iz);
-    pp[7]=get_u(pproblem1,FX0,ix,iy,iz);
-    pp[8]=get_u(pproblem1,FY0,ix,iy,iz);
-    pp[9]=get_u(pproblem1,FZ0,ix,iy,iz);
-#endif
-
-    //transforming rad primitives from BL to MYCOORDS
-    //trans_prad_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-
-  
 
 #endif	 
     
@@ -169,7 +141,7 @@ if(ix>=NX) //analytical solution at rout only
     //printf("%d > %e %e %e %e\n",ix,url,uconl[1],ucon[1],pp[VX]);getch();
     return 0.;
   }
- else if(ix<0) //outflow near BH
+ else if(ix<0) //outflow near BH or at inner boundaries
    {
      iix=0;
      iiy=iy;

@@ -1390,11 +1390,32 @@ alloc_loops(int init,ldouble t,ldouble dt)
   iy2=NY;
   iz2=NZ;  
 
+  global_ix1=ix1;
+  global_iy1=iy1;
+  global_iz1=iz1;
+
+  global_ix2=ix2;
+  global_iy2=iy2;
+  global_iz2=iz2;
+
   if(!init)
     {
       #ifdef SUBZONES
       zone = calc_subzones(t,dt,&ix1,&iy1,&iz1,&ix2,&iy2,&iz2);
       
+      if(zone==lastzone) //no need for reallocating arrays
+	return zone;
+
+      global_ix1=ix1;
+      global_iy1=iy1;
+      global_iz1=iz1;
+
+      global_ix2=ix2;
+      global_iy2=iy2;
+      global_iz2=iz2;
+
+      //todo: restore ghostcells from ubak
+     
       for(i=0;i<Nloop_0;i++) free(loop_0[i]); free(loop_0);
       for(i=0;i<Nloop_02;i++) free(loop_02[i]); free(loop_02);
       for(i=0;i<Nloop_1;i++) free(loop_1[i]); free(loop_1);
@@ -2523,8 +2544,8 @@ cell_fixup_hd()
   int in,ii;
   int verbose=2;
 
-  copy_u(1.,u,u_bak);
-  copy_u(1.,p,p_bak);
+  copy_u(1.,u,u_bak_fixup);
+  copy_u(1.,p,p_bak_fixup);
 
   //gets the neiboring the primitives
 #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static)
@@ -2613,8 +2634,8 @@ cell_fixup_hd()
 	      //save to updated arrays memory
 	      for(iv=0;iv<NVMHD;iv++)
 		{
-		  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
-		  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
+		  set_u(u_bak_fixup,iv,ix,iy,iz,uu[iv]);
+		  set_u(p_bak_fixup,iv,ix,iy,iz,pp[iv]);
 		}
 	    }
 	  else
@@ -2628,8 +2649,8 @@ cell_fixup_hd()
     }
 
   //restoring to memory
-  copy_u(1.,u_bak,u);
-  copy_u(1.,p_bak,p);
+  copy_u(1.,u_bak_fixup,u);
+  copy_u(1.,p_bak_fixup,p);
 
   return 0;
 }
@@ -2646,8 +2667,8 @@ cell_fixup_rad()
   int in,ii;
   int verbose=0;
 
-  copy_u(1.,u,u_bak);
-  copy_u(1.,p,p_bak);
+  copy_u(1.,u,u_bak_fixup);
+  copy_u(1.,p,p_bak_fixup);
 
   //gets the neighboring the primitives
 #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static)
@@ -2783,8 +2804,8 @@ cell_fixup_rad()
 	      for(iv=0;iv<NV;iv++)
 		{
 		  //if(iv!=UU && iv!=EE0) continue; //why?
-		  set_u(u_bak,iv,ix,iy,iz,uu[iv]);
-		  set_u(p_bak,iv,ix,iy,iz,pp[iv]);
+		  set_u(u_bak_fixup,iv,ix,iy,iz,uu[iv]);
+		  set_u(p_bak_fixup,iv,ix,iy,iz,pp[iv]);
 		}
 	    }
 	  else
@@ -2799,8 +2820,8 @@ cell_fixup_rad()
     }
 
   //restoring to memory
-  copy_u(1.,u_bak,u);
-  copy_u(1.,p_bak,p);
+  copy_u(1.,u_bak_fixup,u);
+  copy_u(1.,p_bak_fixup,p);
 
   return 0;
 }
@@ -3221,8 +3242,9 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
   if(PROBLEM==7) //BONDI
     {      
       double startzoningtime=1.e4;
-      int nzones=3;
-      int izones[3+1]={0,NX/2,4*NX/5,NX};
+      int nzones=2;
+      //int izones[3+1]={0,NX/2,4*NX/5,NX};
+      int izones[2+1]={0,2*NX/3,NX};
       double rzones[3+1];
       double dtzones[3];
       int overlap=6,i,j;
