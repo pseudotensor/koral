@@ -3333,7 +3333,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       //test
       double startzoningtime=1.e4;
       int nzones=3;
-      int izones[3+1]={0,NX/2,4*NX/5,NX};
+      int izones[3+1]={0,2*NX/5,4*NX/5,NX};
       //int izones[2+1]={0,2*NX/3,NX};
       double rzones[3+1];
       double dtzones[3];
@@ -3369,7 +3369,10 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       if(lastzone<0) //start from the outermost
 	{	
 	  zone=nzones;
-
+	  printf("------------- fliping to ZONE %d ------------ \n",zone);
+	  printf("%d %d | %d %d | %e %e %e \n",lastzone,zone,
+		     izones[zone-1],izones[zone],
+		     lastzonetime,t,dtzones[zone-1]);
 	  //test
 	  //zone=1;
 	}
