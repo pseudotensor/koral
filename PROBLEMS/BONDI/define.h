@@ -1,9 +1,9 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 293
+#define RESTARTNUM -1
 
 /************************************/
 //radiation
@@ -42,6 +42,7 @@
 #define NTZ 1
 
 #define SUBZONES
+#define SUBZONESOVERLAP 3
 
 #define SPECIFIC_BC
 //#define FIX_PRESSURE
@@ -55,9 +56,9 @@
 #define TIMESTEPPING RK2IMEX 
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 1
+#define DOFIXUPS 0
 #define U2PCONV 1.e-12
 #define RADIMPCONV 1.e-6
 #define RADIMPEPS 1.e-6
@@ -73,7 +74,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 5.e5 //res
+#define DTOUT1 1.e6 //res
 #define DTOUT2 1.e20 //avg
 #define TMAX 1.e10 //time to stop
 

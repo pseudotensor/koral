@@ -1390,14 +1390,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
   iy2=NY;
   iz2=NZ;  
 
-  global_ix1=ix1;
-  global_iy1=iy1;
-  global_iz1=iz1;
-
-  global_ix2=ix2;
-  global_iy2=iy2;
-  global_iz2=iz2;
-
   if(!init)
     {
       #ifdef SUBZONES
@@ -1419,19 +1411,61 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  }
 	}
 
-      //restore ghost cells from u_bak_subzone
-      for(ii=0;ii<Nloop_2;ii++) //domain only
+      //make the transition in the overlapping region smooth
+      for(ii=0;ii<SUBZONESOVERLAP;ii++)
 	{
-	  ix=loop_0[ii][0];
-	  iy=loop_0[ii][1];
-	  iz=loop_0[ii][2]; 
+	  if(TNY>1 || TNZ>1) my_err("SUBZONES not implemented in 2D\n");
+	  ldouble val1,val2;
+	  int index;
+	  if(global_ix1>0) //lower boundary connects to another subzone
+	      {
+		index=global_ix1+SUBZONESOVERLAP-jj-1;
+		PLOOP(jj)
+		{
+		  val1=get_u(p,jj,index,iy,iz);
+		  val2=get_u(p_bak_subzone,jj,index,iy,iz);
+		  
+		  set_u(p,jj,index,iy,iz,
+		      val1*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
+		      val2*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)));
+		}
+		struct geometry geom;
+		fill_geometry(index,iy,iz,&geom);
+		p2u(&get_u(p,0,index,iy,iz),&get_u(u,0,index,iy,iz),&geom);		
+	      }
+
+	  if(global_ix2<NX) //upper boundary connects to another subzone
+	      {
+		index=global_ix2-SUBZONESOVERLAP+jj+1;
+		PLOOP(jj)
+		{
+		  val1=get_u(p,jj,index,iy,iz);
+		  val2=get_u(p_bak_subzone,jj,index,iy,iz);
+		  
+		  set_u(p,jj,index,iy,iz,
+		      val1*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
+		      val2*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)));
+		}
+		struct geometry geom;
+		fill_geometry(index,iy,iz,&geom);
+		p2u(&get_u(p,0,index,iy,iz),&get_u(u,0,index,iy,iz),&geom);		
+	      }
+	}
+
+      /*
+      //restore ghost cells from u_bak_subzone
+      for(ii=0;ii<Nloop_2;ii++) //gc only
+	{
+	  ix=loop_2[ii][0];
+	  iy=loop_2[ii][1];
+	  iz=loop_2[ii][2]; 
 	  PLOOP(jj)
 	  {
 	    set_u(u,jj,ix,iy,iz,get_u(u_bak_subzone,jj,ix,iy,iz));
 	    set_u(p,jj,ix,iy,iz,get_u(p_bak_subzone,jj,ix,iy,iz));
 	  }
 	}
-      
+      */
 
       global_ix1=ix1;
       global_iy1=iy1;
@@ -1453,7 +1487,14 @@ alloc_loops(int init,ldouble t,ldouble dt)
       for(i=0;i<Nloop_6;i++) free(loop_6[i]); free(loop_6);
       #endif
     }
-  
+
+  global_ix1=ix1;
+  global_iy1=iy1;
+  global_iz1=iz1;
+
+  global_ix2=ix2;
+  global_iy2=iy2;
+  global_iz2=iz2;
 
   //inside domain only
   Nloop_0=0;
@@ -3289,13 +3330,14 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 
   if(PROBLEM==7) //BONDI
     {      
+      //test
       double startzoningtime=1.e4;
-      int nzones=2;
-      //int izones[3+1]={0,NX/2,4*NX/5,NX};
-      int izones[2+1]={0,2*NX/3,NX};
+      int nzones=3;
+      int izones[3+1]={0,NX/2,4*NX/5,NX};
+      //int izones[2+1]={0,2*NX/3,NX};
       double rzones[3+1];
       double dtzones[3];
-      int overlap=6,i,j;
+      int overlap=SUBZONESOVERLAP,i,j;
 
       //radii
       double xxvec[4],xxvecBL[4];
@@ -3309,15 +3351,29 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       //dt for each zone
       for(i=0;i<nzones;i++)
 	{
+	  ldouble fac;
 	  //dtzones[i]=10.*(rzones[i+1]-rzones[i])/1.; //timestep limited by speed of light
-	  dtzones[i]=0.1*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
+	  if(i==nzones-1)
+	    fac=2.;
+	  else
+	    fac=2.;
+
+	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
+
+
+	  //dtzones[i]=1.e10; //do not switch;
 	}
 
       //real thing
       if(t<startzoningtime) return -1;
 
       if(lastzone<0) //start from the outermost
-	zone=nzones;
+	{	
+	  zone=nzones;
+
+	  //test
+	  //zone=1;
+	}
       else
 	{
 	  if(t-lastzonetime > dtzones[lastzone-1])
@@ -3329,6 +3385,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	      printf("%d %d | %d %d | %e %e %e \n",lastzone,zone,
 		     izones[zone-1],izones[zone],
 		     lastzonetime,t,dtzones[zone-1]);
+	      //getch();
 	    }
 	  else
 	    zone=lastzone;

@@ -280,6 +280,22 @@ solve_the_problem(ldouble tstart, char* folder)
   lastzone=alloc_loops(0,t,dt);
   loopsallociter=0;
   lastzonetime=t;
+
+  
+  set_bc(t,0);
+  int ii,jj;
+  for(ii=0;ii<Nloop_02;ii++) //domain + gc
+    {
+      ix=loop_02[ii][0];
+      iy=loop_02[ii][1];
+      iz=loop_02[ii][2]; 
+      PLOOP(jj)
+      {
+	set_u(u_bak_subzone,jj,ix,iy,iz,get_u(u,jj,ix,iy,iz));
+	set_u(p_bak_subzone,jj,ix,iy,iz,get_u(p,jj,ix,iy,iz));
+      }
+    }
+  
   #endif
   
 
@@ -458,6 +474,13 @@ solve_the_problem(ldouble tstart, char* folder)
 	  lasttoutavg_floor=floor(t/dtoutavg);	 
 	}
 #endif
+
+      /*
+      if(lastzone==1)
+	dtout=DTOUT1/100.;
+      else
+	dtout=DTOUT1;
+      */
 
       //snapshots
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)

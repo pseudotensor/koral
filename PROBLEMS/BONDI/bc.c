@@ -141,16 +141,46 @@ if(ix>=NX) //total boundary, properties of the galaxy
     //printf("%d > %e %e %e %e\n",ix,url,uconl[1],ucon[1],pp[VX]);getch();
     return 0.;
   }
- else if(ix<global_ix1) //outflow near BH or at inner boundaries
+/*
+ else if(ix>=global_ix2) //inner boundary
+  {
+ 
+    //last but one cell
+    ldouble url=get_u(p,VX,global_ix2-1,iy,iz);
+    ldouble rhol=get_u(p,RHO,global_ix2-1,iy,iz);
+    ldouble rho=get_u(p,RHO,ix,iy,iz);
+    
+    //velocities
+    ldouble uconl[4]={0.,url,0.,0.};
+    ldouble ucon[4]={0.,0.,0.,0.};
+    conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
+
+    //by default fixed mdot
+    ldouble mdot=rhol*uconl[1]*geoml.gdet;
+    ucon[1]=mdot/rho/geom.gdet;
+    conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+    
+    PLOOP(iv)
+      pp[iv]=get_u(p,iv,ix,iy,iz);
+
+    pp[VX]=ucon[1];
+ 
+    p2u(pp,uu,&geom);
+ 
+    return 0.;
+  }
+*/
+//else if(ix<global_ix1) //outflow near BH or at inner boundaries
+else if(ix<0) //outflow near BH or at inner boundaries
    {
-     iix=global_ix1;
+     iix=global_ix1; //==0
      iiy=iy;
      iiz=iz;
    
      //copying primitives with gdet taken into account
      for(iv=0;iv<NV;iv++)
        { 
-	 if(1 && iv==VX)
+	 if(0 && iv==VX)
 	   {
 	     //first cell
 	     ldouble urr=get_u(p,VX,global_ix1,iy,iz);
@@ -175,7 +205,19 @@ if(ix>=NX) //total boundary, properties of the galaxy
      p2u(pp,uu,&geom);
      return 0;
    }
+/*
+else if(ix<global_ix1) //at inner boundaries
+  {
+     
+    PLOOP(iv)
+      pp[iv]=get_u(p,iv,ix,iy,iz);
 
+    p2u(pp,uu,&geom);
+ 
+    return 0.;
+
+   }
+*/
 iix=ix;
 iiz=iz;
 iiy=iy;
