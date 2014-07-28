@@ -1516,11 +1516,11 @@ alloc_loops(int init,ldouble t,ldouble dt)
   loop_2=(int **)malloc(sizeof(int*));
   loop_2[0]=(int *)malloc(3*sizeof(int));
 
-  for(ix=-xlim;ix<NX+xlim;ix++)
+  for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
     {
-      for(iy=-ylim;iy<NY+ylim;iy++)
+      for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
 	{
-	  for(iz=-zlim;iz<NZ+zlim;iz++)
+	  for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
 	    {	 
 	      //within domain:
 	      if(if_indomain(ix,iy,iz)==1) continue;
@@ -1583,23 +1583,23 @@ alloc_loops(int init,ldouble t,ldouble dt)
   loop_3=(int **)malloc(sizeof(int*));
   loop_3[0]=(int *)malloc(3*sizeof(int));
 
-  for(ix=-xlim;ix<NX+xlim;ix++)
+  for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
     {
-      for(iy=-ylim;iy<NY+ylim;iy++)
+      for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
 	{
-	  for(iz=-zlim;iz<NZ+zlim;iz++)
+	  for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
 	    {	  
 	      //if outside the corners skip
 	      if(if_outsidegc(ix,iy,iz)==0) continue;
 
 	      //now check if in the surface layer of a corner
 	      int dix,diy,diz;
-	      if(ix<0) dix=-ix;
-	      else dix=ix-NX+1;
-	      if(iy<0) diy=-iy;
-	      else diy=iy-NY+1;
-	      if(iz<0) diz=-iz;
-	      else diz=iz-NZ+1;	      
+	      if(ix<ix1) dix=ix1-ix;
+	      else dix=ix-ix2+1;
+	      if(iy<iy1) diy=iy1-iy;
+	      else diy=iy-iy2+1;
+	      if(iz<iz1) diz=iz1-iz;
+	      else diz=iz-iz2+1;	      
 	      if(dix!=1 && diy!=1 && diz!=1) continue;
 
 	      //printf("%4d %4d %4d %d %d %d\n",ix,iy,iz,dix,diy,diz);
@@ -1629,13 +1629,13 @@ alloc_loops(int init,ldouble t,ldouble dt)
   loop_4=(int **)malloc(sizeof(int*));
   loop_4[0]=(int *)malloc(3*sizeof(int));
 
-  if(NY>1) ylim=NY; else ylim=0;
-  if(NZ>1) zlim=NZ; else zlim=0;
-  for(ix=0;ix<=NX;ix++)
+  if(NY>1) ylim=iy2; else ylim=iy1;
+  if(NZ>1) zlim=iz2; else zlim=iz1;
+  for(ix=ix1;ix<=ix2;ix++)
     {
-      for(iy=0;iy<=ylim;iy++)
+      for(iy=iy1;iy<=ylim;iy++)
 	{
-	  for(iz=0;iz<=zlim;iz++)
+	  for(iz=iz1;iz<=zlim;iz++)
 	    {	
 	      loop_4[Nloop_4][0]=ix;
 	      loop_4[Nloop_4][1]=iy;
@@ -1662,11 +1662,11 @@ alloc_loops(int init,ldouble t,ldouble dt)
   loop_5=(int **)malloc(sizeof(int*));
   loop_5[0]=(int *)malloc(3*sizeof(int));
 
-   for(ix=-NGCX;ix<NX+NGCX;ix++)
+   for(ix=-NGCX+ix1;ix<ix2+NGCX;ix++)
     {
-      for(iy=-NGCY;iy<NY+NGCY;iy++)
+      for(iy=-NGCY+iy1;iy<iy2+NGCY;iy++)
 	{
-	  for(iz=-NGCZ;iz<NZ+NGCZ;iz++)
+	  for(iz=-NGCZ+iz1;iz<iz2+NGCZ;iz++)
 	    {	
 	      loop_5[Nloop_5][0]=ix;
 	      loop_5[Nloop_5][1]=iy;
@@ -1696,11 +1696,11 @@ alloc_loops(int init,ldouble t,ldouble dt)
   if(NY>1) ylim=1 ; else ylim=0;
   if(NZ>1) zlim=1 ; else zlim=0;
 
-  for(ix=-1;ix<NX+1;ix++)
+  for(ix=-1+ix1;ix<ix2+1;ix++)
     {
-      for(iy=-ylim;iy<NY+ylim;iy++)
+      for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
 	{
-	  for(iz=-zlim;iz<=NZ+zlim;iz++)
+	  for(iz=-zlim+iz1;iz<=iz2+zlim;iz++)
 	    {
 	      loop_6[Nloop_6][0]=ix;
 	      loop_6[Nloop_6][1]=iy;
@@ -2091,14 +2091,34 @@ add_u_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble 
 int 
 if_indomain(int ix,int iy,int iz)
 {
+#ifdef SUBZONES
+  if(ix>=global_ix1 && ix<global_ix2 &&
+     iy>=global_iy1 && iy<global_iy2 && 
+     iz>=global_iz1 && iz<global_iz2) return 1;
+  else return 0;
+#else
   if(ix>=0 && ix<NX && iy>=0 && iy<NY && iz>=0 && iz<NZ) return 1;
   else return 0;
+#endif
 }
 
 //checks if cell outside both domain and ghostcells, i.e. if cells in corners
 int 
 if_outsidegc(int ix,int iy,int iz)
 {  
+#ifdef SUBZONES
+  if(((ix<global_ix1 || ix>=global_ix2) && 
+      (iy>=global_iy1 && iy<global_iy2) && (iz>=global_iz1 && iz<global_iz2)) || 
+     ((ix>=global_ix1 && ix<global_ix2) && 
+      (iy<global_iy1 || iy>=global_iy2) && (iz>=global_iz1 && iz<global_iz2)) || 
+     ((ix>=global_ix1 && ix<global_ix2) && 
+      (iy>=global_iy1 && iy<global_iy2) && (iz<global_iz1 || iz>=global_iz2)) ||
+     (ix>=global_ix1 && ix<global_ix2 && 
+      iy>=global_iy1 && iy<global_iy2 && iz>=global_iz1 && iz<global_iz2))
+    return 0;
+  else
+    return 1;
+#else
   if(((ix<0 || ix>=NX) && (iy>=0 && iy<NY) && (iz>=0 && iz<NZ)) || 
      ((ix>=0 && ix<NX) && (iy<0 || iy>=NY) && (iz>=0 && iz<NZ)) || 
      ((ix>=0 && ix<NX) && (iy>=0 && iy<NY) && (iz<0 || iz>=NZ)) ||
@@ -2106,6 +2126,7 @@ if_outsidegc(int ix,int iy,int iz)
     return 0;
   else
     return 1;
+#endif
 }
 
 //**********************************************************************
