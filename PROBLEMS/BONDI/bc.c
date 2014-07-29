@@ -170,7 +170,6 @@ if(ix>=NX) //total boundary, properties of the galaxy
     return 0.;
   }
 */
-//else if(ix<global_ix1) //outflow near BH or at inner boundaries
 else if(ix<0) //outflow near BH or at inner boundaries
    {
      iix=global_ix1; //==0
@@ -205,19 +204,23 @@ else if(ix<0) //outflow near BH or at inner boundaries
      p2u(pp,uu,&geom);
      return 0;
    }
-/*
-else if(ix<global_ix1) //at inner boundaries
-  {
+
+/*else if(ix<global_ix1) //outflow near BH or at inner boundaries
+ {
+     iix=global_ix1; 
+     iiy=iy;
+     iiz=iz;
+   
+     //copying primitives with gdet taken into account
+     for(iv=0;iv<NV;iv++)
+       { 
+	 if(iv<EE0) pp[iv]=get_u(p,iv,iix,iiy,iiz);
+       }
+
      
-    PLOOP(iv)
-      pp[iv]=get_u(p,iv,ix,iy,iz);
-
-    p2u(pp,uu,&geom);
- 
-    return 0.;
-
-   }
-*/
+     p2u(pp,uu,&geom);
+     return 0;
+     }*/
 iix=ix;
 iiz=iz;
 iiy=iy;

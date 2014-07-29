@@ -3,13 +3,14 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 53
+#define RESTARTNUM -1
 
 /************************************/
 //radiation
 /************************************/
 #define RADIATION
 #define NCOMPTONIZATION
+#define SKIPRADWAVESPEEDLIMITER
 //#define RADOUTPUTINFF
 #define RADOUTPUTVELS
 //#define SKIPRADSOURCE
@@ -36,7 +37,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 128
 #define TNY 1
 #define TNZ 1
 #define NTX 16
@@ -44,7 +45,7 @@
 #define NTZ 1
 
 #define SUBZONES
-#define SUBZONESOVERLAP 0
+#define SUBZONESOVERLAP 5
 
 #define SPECIFIC_BC
 //#define FIX_PRESSURE
@@ -56,7 +57,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX 
-#define TSTEPLIM .1
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
@@ -76,7 +77,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 5.e4 //res
+#define DTOUT1 1.e6 //res
 #define DTOUT2 1.e20 //avg
 #define TMAX 1.e10 //time to stop
 

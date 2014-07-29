@@ -328,7 +328,8 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
       //#pragma omp critical
       if(wsz>max_ws[2]) max_ws[2]=wsz;
       if(ws_ph>max_ws_ph) max_ws_ph=ws_ph;
-
+      
+      /*
       if(NZ>1 && NY>1)
 	tstepden=max_ws[0]/dx + max_ws[1]/dy + max_ws[2]/dz;
       else if(NZ==1 && NY>1)
@@ -337,6 +338,16 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 	tstepden=max_ws[0]/dx + max_ws[2]/dz;
       else
 	tstepden=max_ws[0]/dx;   
+      */
+      if(NZ>1 && NY>1)
+	tstepden=wsx/dx + wsy/dy + wsz/dz;
+      else if(NZ==1 && NY>1)
+	tstepden=wsx/dx + wsy/dy;
+      else if(NY==1 && NZ>1)
+	tstepden=wsx/dx + wsz/dz;
+      else
+	tstepden=wsx/dx;   
+
 
       //#pragma omp critical
       if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
@@ -448,9 +459,19 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       iz=loop_1[ii][2]; ldouble aaa[12];
 
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
+
+      /*
+      if(ix==51) 
+	{
+	print_Nvector(aaa,12);
+	getch();
+	}
+      */
+
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
 
     }
+
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -463,6 +484,8 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       ix=loop_1[ii][0];
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
+
+      
 
       //interpolating conserved quantities
       ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
@@ -808,11 +831,9 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  #ifdef SKIPHDEVOLUTION
 	  if(iv>5)
           #endif
+	
 	    //test
-#ifdef SKIP_SUBZONES
-	    if(ix>=global_ix1+2*SUBZONESOVERLAP && ix<global_ix2)
-#endif
-	      //if(ix>=4*NX/5)
+	    //if(ix>50)
 	      set_u(u,iv,ix,iy,iz,val);	
 
 	}
@@ -860,12 +881,10 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  #ifdef SKIPHDEVOLUTION
 	  if(iv>5)
           #endif
+	  
 	    //test
-#ifdef SKIP_SUBZONES
-	    if(ix>=global_ix1+2*SUBZONESOVERLAP && ix<global_ix2)
-#endif
-	      //if(ix>=4*NX/5)
-	  set_u(u,iv,ix,iy,iz,val);	
+	    //if(ix>50)
+	    set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	} 
 
@@ -971,11 +990,8 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
       
       calc_primitives(ix,iy,iz,0);
 
-      //test
-#ifdef SKIP_SUBZONES
-	    if(ix>=global_ix1+2*SUBZONESOVERLAP && ix<global_ix2)
-#endif
-	      //if(ix>=4*NX/5)
+     //test
+      //if(ix>50)
       implicit_lab_rad_source_term(ix,iy,iz,dt);
     } //source terms
 
@@ -1685,13 +1701,23 @@ alloc_loops(int init,ldouble t,ldouble dt)
   Nloop_3=0;
   loop_3=(int **)malloc(sizeof(int*));
   loop_3[0]=(int *)malloc(3*sizeof(int));
-
+  /*
   for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
     {
       for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
 	{
 	  for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
 	    {	  
+  */
+  //test
+ for(ix=-0;ix<NX+0;ix++)
+    {
+      for(iy=-ylim;iy<NY+ylim;iy++)
+	{
+	  for(iz=-zlim;iz<NZ+zlim;iz++)
+	    {
+	      /*
+		//test
 	      //if outside the corners skip
 	      if(if_outsidegc(ix,iy,iz)==0) continue;
 
@@ -1706,7 +1732,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	      if(dix!=1 && diy!=1 && diz!=1) continue;
 
 	      //printf("%4d %4d %4d %d %d %d\n",ix,iy,iz,dix,diy,diz);
-	      
+	      */
 	      loop_3[Nloop_3][0]=ix;
 	      loop_3[Nloop_3][1]=iy;
 	      loop_3[Nloop_3][2]=iz;
@@ -3366,10 +3392,10 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
   if(PROBLEM==7) //BONDI
     {      
       //test
-      double startzoningtime=1.e4;
-      int nzones=2;
-      //int izones[3+1]={0,2*NX/5,4*NX/5,NX};
-      int izones[2+1]={0,4*NX/5,NX};
+      double startzoningtime=1.e2;
+      int nzones=3;
+      int izones[3+1]={0,2*NX/5,4*NX/5,NX};
+      //int izones[2+1]={0,4*NX/5,NX};
       double rzones[3+1];
       double dtzones[3];
       int overlap=SUBZONESOVERLAP,i,j;
@@ -3391,7 +3417,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	  if(i==nzones-1)
 	    fac=1.;
 	  else
-	    fac=.1;
+	    fac=1;
 
 	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
 
