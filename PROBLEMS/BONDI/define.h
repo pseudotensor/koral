@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 53
 
 /************************************/
 //radiation
@@ -12,6 +12,8 @@
 #define NCOMPTONIZATION
 //#define RADOUTPUTINFF
 #define RADOUTPUTVELS
+//#define SKIPRADSOURCE
+//#define FLUXMETHOD HLL_FLUX
 
 /************************************/
 //coordinates / resolution
@@ -24,7 +26,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1000000.
+#define RMAX 1.e5
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -42,7 +44,7 @@
 #define NTZ 1
 
 #define SUBZONES
-#define SUBZONESOVERLAP 5
+#define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
 //#define FIX_PRESSURE
@@ -54,7 +56,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX 
-#define TSTEPLIM .6
+#define TSTEPLIM .1
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
@@ -74,7 +76,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 5.e7 //res
+#define DTOUT1 5.e4 //res
 #define DTOUT2 1.e20 //avg
 #define TMAX 1.e10 //time to stop
 
@@ -85,7 +87,7 @@
 
 #if(TEST==0)
 #define GAMMA (5./3.)
-#define MDOT 1.e2
+#define MDOT 1.e3
 //#define INFLOW
 #endif
 

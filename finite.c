@@ -808,7 +808,12 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  #ifdef SKIPHDEVOLUTION
 	  if(iv>5)
           #endif
-	  set_u(u,iv,ix,iy,iz,val);	
+	    //test
+#ifdef SKIP_SUBZONES
+	    if(ix>=global_ix1+2*SUBZONESOVERLAP && ix<global_ix2)
+#endif
+	      //if(ix>=4*NX/5)
+	      set_u(u,iv,ix,iy,iz,val);	
 
 	}
 
@@ -855,6 +860,11 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  #ifdef SKIPHDEVOLUTION
 	  if(iv>5)
           #endif
+	    //test
+#ifdef SKIP_SUBZONES
+	    if(ix>=global_ix1+2*SUBZONESOVERLAP && ix<global_ix2)
+#endif
+	      //if(ix>=4*NX/5)
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	} 
@@ -961,6 +971,11 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
       
       calc_primitives(ix,iy,iz,0);
 
+      //test
+#ifdef SKIP_SUBZONES
+	    if(ix>=global_ix1+2*SUBZONESOVERLAP && ix<global_ix2)
+#endif
+	      //if(ix>=4*NX/5)
       implicit_lab_rad_source_term(ix,iy,iz,dt);
     } //source terms
 
@@ -1425,9 +1440,19 @@ alloc_loops(int init,ldouble t,ldouble dt)
 		  val1=get_u(p,jj,index,iy,iz);
 		  val2=get_u(p_bak_subzone,jj,index,iy,iz);
 		  
-		  set_u(p,jj,index,iy,iz,
-		      val1*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
-		      val2*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)));
+		  if(val1>0. && val2>0.)
+		    set_u(p,jj,index,iy,iz,
+			  pow(10.,log10(val1)*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
+			      log10(val2)*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP))));
+		  else  if(val1<0. && val2<0.)
+		    set_u(p,jj,index,iy,iz,
+			  -pow(10.,log10(-val1)*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
+			       log10(-val2)*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP))));
+		  else 
+		    set_u(p,jj,index,iy,iz,
+			  (val1)*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
+			  (val2)*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)));
+		     
 		}
 		struct geometry geom;
 		fill_geometry(index,iy,iz,&geom);
@@ -1435,21 +1460,31 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	      }
 
 	  if(global_ix2<NX) //upper boundary connects to another subzone
+	    {
+	      index=global_ix2-SUBZONESOVERLAP+jj+1;
+	      PLOOP(jj)
 	      {
-		index=global_ix2-SUBZONESOVERLAP+jj+1;
-		PLOOP(jj)
-		{
-		  val1=get_u(p,jj,index,iy,iz);
-		  val2=get_u(p_bak_subzone,jj,index,iy,iz);
+		val1=get_u(p,jj,index,iy,iz);
+		val2=get_u(p_bak_subzone,jj,index,iy,iz);
 		  
+		if(val1>0. && val2>0.)
 		  set_u(p,jj,index,iy,iz,
-		      val1*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
-		      val2*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)));
-		}
-		struct geometry geom;
-		fill_geometry(index,iy,iz,&geom);
-		p2u(&get_u(p,0,index,iy,iz),&get_u(u,0,index,iy,iz),&geom);		
+			pow(10.,log10(val1)*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
+			    log10(val2)*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP))));
+		else if(val1<0. && val2<0.)
+		  set_u(p,jj,index,iy,iz,
+			-pow(10.,log10(-val1)*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
+			     log10(-val2)*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP))));
+		else
+		  set_u(p,jj,index,iy,iz,
+			(val1)*(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)+
+			(val2)*(1.-(double)((SUBZONESOVERLAP-ii-1)/SUBZONESOVERLAP)));
+		    
 	      }
+	      struct geometry geom;
+	      fill_geometry(index,iy,iz,&geom);
+	      p2u(&get_u(p,0,index,iy,iz),&get_u(u,0,index,iy,iz),&geom);		
+	    }
 	}
 
       /*
@@ -3332,9 +3367,9 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
     {      
       //test
       double startzoningtime=1.e4;
-      int nzones=3;
-      int izones[3+1]={0,2*NX/5,4*NX/5,NX};
-      //int izones[2+1]={0,2*NX/3,NX};
+      int nzones=2;
+      //int izones[3+1]={0,2*NX/5,4*NX/5,NX};
+      int izones[2+1]={0,4*NX/5,NX};
       double rzones[3+1];
       double dtzones[3];
       int overlap=SUBZONESOVERLAP,i,j;
@@ -3356,7 +3391,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	  if(i==nzones-1)
 	    fac=1.;
 	  else
-	    fac=1.;
+	    fac=.1;
 
 	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
 
@@ -3396,6 +3431,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       *ix1=izones[zone-1];
       *ix2=izones[zone];
 
+       
       if(zone>1) //not the innermost
 	*ix1=*ix1-overlap;
       if(zone<nzones) //not the outermost
