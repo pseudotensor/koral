@@ -1482,7 +1482,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 35
+#define NRADPROFILES 38
 #endif
 
 #ifndef NANARELRADPROFILES

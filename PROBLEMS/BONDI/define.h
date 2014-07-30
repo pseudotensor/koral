@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 129
+#define RESTARTNUM -1
 
 /************************************/
 //radiation
@@ -46,7 +46,7 @@
 #define NTZ 1
 
 #define SUBZONES
-#define SUBZONESOVERLAP 5
+#define SUBZONESOVERLAP 4
 
 #define SPECIFIC_BC
 //#define FIX_PRESSURE
@@ -60,7 +60,7 @@
 #define TIMESTEPPING RK2IMEX 
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 0
 #define U2PCONV 1.e-12
@@ -78,7 +78,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e60 //res
+#define DTOUT1 1.e10 //res
 #define DTOUT2 1.e20 //avg
 #define TMAX 1.e100 //time to stop
 
@@ -89,7 +89,7 @@
 
 #if(TEST==0)
 #define GAMMA (5./3.)
-#define MDOT 1.e3
+#define MDOT 1.e2
 //#define INFLOW
 #endif
 
@@ -98,7 +98,7 @@
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s
 #define RHOAMB 1.e-25
-#define TAMB 1.e8
+#define TAMB 1.e6
 #define MUGAS 1.
 //#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 

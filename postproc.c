@@ -56,6 +56,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
   calc_avgs_throughout();     
 
   int ix,iy,iz,iv,i,j;
+  ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
+  ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
   ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
   ldouble rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
@@ -63,6 +65,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
   ldouble avgsums[NV+NAVGVARS][NX];
   ldouble Bangle1,Bangle2,brbphi;
   ldouble Sigmagdet;
+  ldouble diffflux[NV];
+  ldouble fd_u0[NV],fd_up1[NV],fd_up2[NV],fd_um1[NV],fd_um2[NV];
+  ldouble fd_p0[NV],fd_pp1[NV],fd_pp2[NV],fd_pm1[NV],fd_pm2[NV],fd_pm3[NV],fd_pp3[NV];
+  ldouble fd_pl[NV],fd_pr[NV],fd_plm1[NV],fd_prm1[NV],fd_plp1[NV],fd_prp1[NV];
+  ldouble fd_ul[NV],fd_ur[NV],fd_ulm1[NV],fd_urm1[NV],fd_ulp1[NV],fd_urp1[NV];
+  ldouble du[NV],dul[NV],dur[NV],aaa[12],ahd,arad;
 
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -81,30 +89,24 @@ int calc_radialprofiles(ldouble profiles[][NX])
       tautot=tauabs=0.;
 
       // #ifdef BHDISK_PROBLEMTYPE
-     if(NZ==1) //phi-symmetry
+      if(NZ==1) //phi-symmetry
 	{
 	  iz=0;
 	  for(iy=0;iy<NY;iy++)
 	    {
-	      for(iv=0;iv<NV;iv++)
-		{
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
-		}
-
-	      get_xx(ix,iy,iz,xx);
-	      
+	      //metric
 	      pick_g(ix,iy,iz,gg);
 	      pick_G(ix,iy,iz,GG);
-
-	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
 	      struct geometry geom;
 	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
 	      struct geometry geomBL;
 	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-	      
-	     
+
+	      //coordinates
+	      get_xx(ix,iy,iz,xx);	      
+	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 	      ldouble dxph[3];
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
@@ -122,8 +124,75 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      dxph[1]=dx[1]*sqrt(geomBL.gg[2][2]);
 	      dxph[2]=dx[2]*sqrt(geomBL.gg[3][3]);
 
+	     	      
 
-	
+	      //primitives at the cell - either averaged or original
+	      for(iv=0;iv<NV;iv++)
+		{
+		  pp[iv]=get_u(p,iv,ix,iy,iz);
+		}
+	      
+	      
+	      //primitives at radial neighbours
+	      for(i=0;i<NV;i++)
+		{
+		  fd_p0[i]=get_u(p,i,ix,iy,iz);
+		  fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
+		  fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
+		  fd_pm2[i]=get_u(p,i,ix-2,iy,iz);
+		  fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
+		}
+
+	      //internal coordinates
+	      x0[0]=get_x(ix,0);
+
+	      x0l[0]=get_xb(ix,0);
+	      xm1[0]=get_x(ix-1,0);
+	      x0l[1]=xm1[1]=get_x(iy,1); 
+	      x0l[2]=xm1[2]=get_x(iz,2);
+
+	      x0r[0]=get_xb(ix+1,0);
+	      xp1[0]=get_x(ix+1,0);
+	      x0r[1]=xp1[1]=get_x(iy,1);
+	      x0r[2]=xp1[2]=get_x(iz,2);
+
+	      dx0=get_size_x(ix,0);    
+	      dxm1=get_size_x(ix-1,0);    
+	      dxp1=get_size_x(ix+1,0);  
+
+	      //interpolation to get left/right biased interpolated primtives
+	      avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2); 
+	      //INTORDER==1!
+	      avg2point(fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pp2,fd_plp1,fd_prp1,dxm1,dx0,dxp1,dxp2,dxp2);   
+	      avg2point(fd_pm2,fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_plm1,fd_prm1,dxm2,dxm2,dxm1,dx0,dxp1);   
+	      
+	      //to conserved
+	      p2u(fd_pl,fd_ul,&geom);
+	      p2u(fd_pr,fd_ur,&geom);
+	      p2u(fd_plp1,fd_ulp1,&geom);
+	      p2u(fd_prm1,fd_urm1,&geom);
+
+	      //gradient of conserved
+	      PLOOP(iv)
+	      {
+		dul[iv]=fd_ul[iv]-fd_urm1[iv];
+		dur[iv]=fd_ulp1[iv]-fd_ur[iv];
+		du[iv]=.5*(dul[iv]+dur[iv]);
+	      }
+	      
+	      //wavespeeds
+	      calc_wavespeeds_lr_pure(pp,&geom,aaa);
+	      ahd=my_max(fabs(aaa[0]),fabs(aaa[1]));
+	      arad=my_max(fabs(aaa[6]),fabs(aaa[7]));
+
+	      //diffusive flux
+	      PLOOP(iv)
+	      {
+		if(iv<NVMHD) diffflux[iv]=-ahd*du[iv];
+		else diffflux[iv]=-arad*du[iv];
+	      }
+	      				       
+	      
 	      if(doingavg)
 		{
 		  rho=get_uavg(pavg,RHO,ix,iy,iz);
@@ -286,6 +355,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 
+	      //diffusive flux for rhout (37)
+	      profiles[35][ix]+=-diffflux[RHO]*dx[1]*dx[2]*geomBL.gdet;
 
 	      //temporary surface density to normalize what is above
 	      Sigmagdet+=rho*dx[1]*dx[2]*geomBL.gdet;
@@ -293,6 +364,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //total mhd energy flux (14)
 	      profiles[12][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
+	      //diffusive flux for Trt (38)
+	      profiles[36][ix]+=-diffflux[UU]*dx[1]*dx[2]*geomBL.gdet;
+	      
 	      //opt thin mhd energy flux (25)
 	      if(tautot<1.)
 		profiles[23][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
@@ -308,8 +382,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 
-
-
+	      //diffusive flux for Rrt (39)
+	      profiles[37][ix]+=-diffflux[EE0]*dx[1]*dx[2]*geomBL.gdet;
+	      
 	      //rad viscosity energy flux (35)
 	      profiles[33][ix]+=(-Rviscrt)*dx[1]*dx[2]*geomBL.gdet;
 

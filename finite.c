@@ -1448,7 +1448,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  if(TNY>1 || TNZ>1) my_err("SUBZONES not implemented in 2D\n");
 	  ldouble val1,val2;
 	  int index;
-	  /*
+
 	  if(global_ix1>0) //lower boundary connects to another subzone
 	      {
 		index=global_ix1+SUBZONESOVERLAP-jj-1;
@@ -1475,7 +1475,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 		fill_geometry(index,iy,iz,&geom);
 		p2u(&get_u(p,0,index,iy,iz),&get_u(u,0,index,iy,iz),&geom);		
 	      }
-	  */
+
 	 
 	  if(global_ix2<NX) //upper boundary connects to another subzone
 	    {
@@ -3391,7 +3391,8 @@ int
 calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2,int* iz2)
 {
   int zone=currentzone;
-
+#ifdef SUBZONES
+  
   if(PROBLEM==7) //BONDI
     {      
       //test
@@ -3418,9 +3419,9 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	  ldouble fac;
 	  //dtzones[i]=10.*(rzones[i+1]-rzones[i])/1.; //timestep limited by speed of light
 	  if(i==nzones-1)
-	    fac=1.;
+	    fac=2.;
 	  else
-	    fac=1.;
+	    fac=2.;
 
 	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
 
@@ -3461,12 +3462,12 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       *ix2=izones[zone];
 
        
-      //if(zone>1) //not the innermost
-      //*ix1=*ix1-overlap;
+      if(zone>1) //not the innermost
+	*ix1=*ix1-overlap;
       if(zone<nzones) //not the outermost
 	*ix2=*ix2+overlap;
 
     }
-
+#endif
   return zone;
 }
