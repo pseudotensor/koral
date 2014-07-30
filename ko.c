@@ -245,6 +245,7 @@ solve_the_problem(ldouble tstart, char* folder)
   int lasttoutavg_floor;
   int i,j;
   int loopsallociter;
+  int spitoutput,lastzone;
   
   ldouble fprintf_time = 0.;
   int i1,i2,i3,ix,iy,iz,iv;
@@ -276,10 +277,10 @@ solve_the_problem(ldouble tstart, char* folder)
   //main time loop
   nstep=0;
   #ifdef SUBZONES
-  lastzone=-1;
-  lastzone=alloc_loops(0,t,dt);
+  currentzone=-1;
+  currentzone=alloc_loops(0,t,dt);
   loopsallociter=0;
-  lastzonetime=t;
+  currentzonetime=t;
 
   
   set_bc(t,0);
@@ -301,6 +302,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
   while (t < t1 && nfout1<=NOUTSTOP && i1<NSTEPSTOP)
     {    
+      spitoutput=0;
       global_time=t;
       nstep++;
       
@@ -323,7 +325,9 @@ solve_the_problem(ldouble tstart, char* folder)
       loopsallociter++;
       if(loopsallociter>100)
 	{
-	  lastzone=alloc_loops(0,t,dt);
+	  lastzone=currentzone;
+	  currentzone=alloc_loops(0,t,dt);
+	  if(lastzone==1 && currentzone!=1) spitoutput=1; //finished with the innermost one, output
 	  loopsallociter=0;
 	}
       #endif
@@ -475,15 +479,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
 #endif
 
-      /*
-      if(lastzone==1)
-	dtout=DTOUT1/100.;
-      else
-	dtout=DTOUT1;
-      */
-
       //snapshots
-      if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1)
+      if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1 || spitoutput==1)
 	{
 	  if(PROCID==0)
 	    printf("%d > snap file no #%6d dumped\n",PROCID,nfout1);

@@ -1426,7 +1426,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
       #ifdef SUBZONES
       zone = calc_subzones(t,dt,&ix1,&iy1,&iz1,&ix2,&iy2,&iz2);
       
-      if(zone==lastzone) //no need for reallocating arrays
+      if(zone==currentzone) //no need for reallocating arrays
 	return zone;
       
       //copy what is in current subdomain to u_bak_subzone
@@ -1448,6 +1448,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  if(TNY>1 || TNZ>1) my_err("SUBZONES not implemented in 2D\n");
 	  ldouble val1,val2;
 	  int index;
+	  /*
 	  if(global_ix1>0) //lower boundary connects to another subzone
 	      {
 		index=global_ix1+SUBZONESOVERLAP-jj-1;
@@ -1474,7 +1475,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 		fill_geometry(index,iy,iz,&geom);
 		p2u(&get_u(p,0,index,iy,iz),&get_u(u,0,index,iy,iz),&geom);		
 	      }
-
+	  */
+	 
 	  if(global_ix2<NX) //upper boundary connects to another subzone
 	    {
 	      index=global_ix2-SUBZONESOVERLAP+jj+1;
@@ -1501,6 +1503,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	      fill_geometry(index,iy,iz,&geom);
 	      p2u(&get_u(p,0,index,iy,iz),&get_u(u,0,index,iy,iz),&geom);		
 	    }
+	 
 	}
 
       /*
@@ -3387,7 +3390,7 @@ correct_polaraxis()
 int
 calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2,int* iz2)
 {
-  int zone=lastzone;
+  int zone=currentzone;
 
   if(PROBLEM==7) //BONDI
     {      
@@ -3417,7 +3420,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	  if(i==nzones-1)
 	    fac=1.;
 	  else
-	    fac=1;
+	    fac=1.;
 
 	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
 
@@ -3427,39 +3430,39 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       //real thing
       if(t<startzoningtime) return -1;
 
-      if(lastzone<0) //start from the outermost
+      if(currentzone<0) //start from the outermost
 	{	
 	  zone=nzones;
 	  printf("------------- fliping to ZONE %d ------------ \n",zone);
-	  printf("%d %d | %d %d | %e %e %e \n",lastzone,zone,
+	  printf("%d %d | %d %d | %e %e %e \n",currentzone,zone,
 		     izones[zone-1],izones[zone],
-		     lastzonetime,t,dtzones[zone-1]);
+		     currentzonetime,t,dtzones[zone-1]);
 	  //test
 	  //zone=1;
 	}
       else
 	{
-	  if(t-lastzonetime > dtzones[lastzone-1])
+	  if(t-currentzonetime > dtzones[currentzone-1])
 	    {
-	      zone=lastzone-1;
+	      zone=currentzone-1;
 	      if(zone==0) zone=nzones;
-	      lastzonetime=t;
+	      currentzonetime=t;
 	      printf("------------- fliping to ZONE %d ------------ \n",zone);
-	      printf("%d %d | %d %d | %e %e %e \n",lastzone,zone,
+	      printf("%d %d | %d %d | %e %e %e \n",currentzone,zone,
 		     izones[zone-1],izones[zone],
-		     lastzonetime,t,dtzones[zone-1]);
+		     currentzonetime,t,dtzones[zone-1]);
 	      //getch();
 	    }
 	  else
-	    zone=lastzone;
+	    zone=currentzone;
 	}
 
       *ix1=izones[zone-1];
       *ix2=izones[zone];
 
        
-      if(zone>1) //not the innermost
-	*ix1=*ix1-overlap;
+      //if(zone>1) //not the innermost
+      //*ix1=*ix1-overlap;
       if(zone<nzones) //not the outermost
 	*ix2=*ix2+overlap;
 

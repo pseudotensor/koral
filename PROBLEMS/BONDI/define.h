@@ -3,14 +3,15 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 129
 
 /************************************/
 //radiation
 /************************************/
 #define RADIATION
 #define NCOMPTONIZATION
-#define SKIPRADWAVESPEEDLIMITER
+//#define SKIPRADWAVESPEEDLIMITER
+//#define EXPLICIT_LAB_RAD_SOURCE
 //#define RADOUTPUTINFF
 #define RADOUTPUTVELS
 //#define SKIPRADSOURCE
@@ -27,7 +28,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e5
+#define RMAX 1.e7
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -37,7 +38,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 16
@@ -77,9 +78,9 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e6 //res
+#define DTOUT1 1.e60 //res
 #define DTOUT2 1.e20 //avg
-#define TMAX 1.e10 //time to stop
+#define TMAX 1.e100 //time to stop
 
 /************************************/
 //test specific

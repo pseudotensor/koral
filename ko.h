@@ -108,8 +108,8 @@ ldouble tstepdenmax;
 ldouble min_dx,min_dy,min_dz;
 
 //for subzones
-ldouble lastzonetime;
-int lastzone;
+ldouble currentzonetime;
+int currentzone;
 int global_ix1,global_ix2;
 int global_iy1,global_iy2;
 int global_iz1,global_iz2;
