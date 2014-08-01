@@ -294,6 +294,17 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
       avg[AVGBCONBCOV(iv,iv2)]=bcon[iv]*bcov[iv2];
   for(iv=0;iv<4;iv++)
     avg[AVGWUCON(iv)]=(rho+uint+bsq/2)*ucon[iv];
+for(iv=0;iv<4;iv++)
+    avg[AVGWUCON(iv)]=(rho+uint+bsq/2)*ucon[iv];
+
+  //fluxes - TODO: coordinates!!!
+  for(iv=0;iv<NV;iv++)
+    {
+      avg[AVGFLUXXL(iv)]=get_ub(flbx,iv,ix,iy,iz,0);
+      avg[AVGFLUXYL(iv)]=get_ub(flby,iv,ix,iy,iz,1);
+      avg[AVGFLUXZL(iv)]=get_ub(flbz,iv,ix,iy,iz,2);
+    }
+
    
 #ifdef RADIATION
   ldouble Rtt,Ehat,ugas[4];

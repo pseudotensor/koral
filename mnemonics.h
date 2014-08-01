@@ -150,12 +150,15 @@
 #define AVGBSQUCONUCOV(i,j) (NV+73+i*4+j)
 #define AVGBCONBCOV(i,j) (NV+89+i*4+j)
 #define AVGWUCON(i) (NV+105+i)
-#define AVGEHAT (NV+109)
-#define AVGRIJ(i,j) (NV+110+i*4+j)
-#define AVGEHATUCON(i) (NV+126+i)
-#define AVGEHATUCOV(i) (NV+130+i)
-#define AVGURFCON(i) (NV+134+i)
-#define AVGURFCOV(i) (NV+138+i)
+#define AVGFLUXXL(i) (NV+109+i)
+#define AVGFLUXYL(i) (NV+109+NV+i)
+#define AVGFLUXZL(i) (NV+109+2*NV+i)
+#define AVGEHAT (NV+3*NV+109)
+#define AVGRIJ(i,j) (4*NV+110+i*4+j)
+#define AVGEHATUCON(i) (4*NV+126+i)
+#define AVGEHATUCOV(i) (4*NV+130+i)
+#define AVGURFCON(i) (4*NV+134+i)
+#define AVGURFCOV(i) (4*NV+138+i)
 
 
 //MPI mnemonics

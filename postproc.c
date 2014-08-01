@@ -45,6 +45,9 @@
 //alpha (34)
 //rad. viscosity energy flux (35)
 //rho-weighted minus radial velocity in the outflow (36)
+//diffusive flux for rhout (37)
+//diffusive flux for rhout+Trt (38)
+//diffusive flux for Rrt (39)
 
 
 /*********************************************/
@@ -59,7 +62,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
   ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
   ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
   ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
-  ldouble rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
+  ldouble rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
   ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
@@ -101,8 +104,38 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      struct geometry geom;
 	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
+	      struct geometry geomm1;
+	      fill_geometry_arb(ix-1,iy,iz,&geomm1,MYCOORDS);
+
+	      struct geometry geomp1;
+	      fill_geometry_arb(ix+1,iy,iz,&geomp1,MYCOORDS);
+
 	      struct geometry geomBL;
 	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+	      struct geometry geomBLm1;
+	      fill_geometry_arb(ix-1,iy,iz,&geomBLm1,BLCOORDS);
+
+	      struct geometry geomBLp1;
+	      fill_geometry_arb(ix+1,iy,iz,&geomBLp1,BLCOORDS);
+
+	      struct geometry geoml;
+	      fill_geometry_face(ix,iy,iz,0,&geoml);
+
+	      struct geometry geomr;
+	      fill_geometry_face(ix+1,iy,iz,0,&geomr);	
+	      
+	      struct geometry geomBLl;
+	      fill_geometry_face_arb(ix,iy,iz,0,&geomBLl,BLCOORDS);
+
+	      struct geometry geomBLr;
+	      fill_geometry_face_arb(ix+1,iy,iz,0,&geomBLr,BLCOORDS);	      
+
+	      ldouble gdetuBL=geomBL.gdet;
+
+             #if (GDETIN==0) //gdet out of derivatives
+	     gdetuBL=1.;
+             #endif
 
 	      //coordinates
 	      get_xx(ix,iy,iz,xx);	      
@@ -124,9 +157,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      dxph[1]=dx[1]*sqrt(geomBL.gg[2][2]);
 	      dxph[2]=dx[2]*sqrt(geomBL.gg[3][3]);
 
-	     	      
-
-	      //primitives at the cell - either averaged or original
+	      //primitives at the cell - either averaged or original, in BL or MYCOORDS
 	      for(iv=0;iv<NV;iv++)
 		{
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
@@ -165,35 +196,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //INTORDER==1!
 	      avg2point(fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pp2,fd_plp1,fd_prp1,dxm1,dx0,dxp1,dxp2,dxp2);   
 	      avg2point(fd_pm2,fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_plm1,fd_prm1,dxm2,dxm2,dxm1,dx0,dxp1);   
-	      
-	      //to conserved
-	      p2u(fd_pl,fd_ul,&geom);
-	      p2u(fd_pr,fd_ur,&geom);
-	      p2u(fd_plp1,fd_ulp1,&geom);
-	      p2u(fd_prm1,fd_urm1,&geom);
-
-	      //gradient of conserved
-	      PLOOP(iv)
-	      {
-		dul[iv]=fd_ul[iv]-fd_urm1[iv];
-		dur[iv]=fd_ulp1[iv]-fd_ur[iv];
-		du[iv]=.5*(dul[iv]+dur[iv]);
-	      }
-	      
-	      //wavespeeds
-	      calc_wavespeeds_lr_pure(pp,&geom,aaa);
-	      ahd=my_max(fabs(aaa[0]),fabs(aaa[1]));
-	      arad=my_max(fabs(aaa[6]),fabs(aaa[7]));
-
-	      //diffusive flux
-	      PLOOP(iv)
-	      {
-		if(iv<NVMHD) diffflux[iv]=-ahd*du[iv];
-		else diffflux[iv]=-arad*du[iv];
-	      }
+		  
 	      				       
 	      
-	      if(doingavg)
+	      if(1 && doingavg)
 		{
 		  rho=get_uavg(pavg,RHO,ix,iy,iz);
 		  uint=get_uavg(pavg,UU,ix,iy,iz);
@@ -216,6 +222,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		    + get_uavg(pavg,AVGBSQUCONUCOV(i,j),ix,iy,iz)
 		    - get_uavg(pavg,AVGBCONBCOV(i,j),ix,iy,iz); 
 
+		  for(i=0;i<NV;i++)
+		    Fluxx[i]=get_uavg(pavg,AVGFLUXXL(1),ix,iy,iz);
+
 		  Trt=Tij[1][0];
 
 #ifdef RADIATION  
@@ -231,13 +240,25 @@ int calc_radialprofiles(ldouble profiles[][NX])
       
 		  Rviscrt = Rviscij[1][0];
 #endif
-
+		  
+		  //no need of transforming interpolated primitives to BL, already there
+		 
 		}
 	      else
 		{ 
 		  //to BL, res-files in MYCOORDS
 		  trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 
+		  //transforming interpolated primitives to BL, if not already there
+		  trans_pall_coco(fd_pm1,fd_pm1,MYCOORDS,BLCOORDS,xx,&geomm1,&geomBLm1);
+		  trans_pall_coco(fd_pp1,fd_pp1,MYCOORDS,BLCOORDS,xx,&geomp1,&geomBLp1);
+		  trans_pall_coco(fd_pl,fd_pl,MYCOORDS,BLCOORDS,xx,&geoml,&geomBLl);
+		  trans_pall_coco(fd_pr,fd_pr,MYCOORDS,BLCOORDS,xx,&geomr,&geomBLr);
+		  trans_pall_coco(fd_plp1,fd_plp1,MYCOORDS,BLCOORDS,xx,&geoml,&geomBLl);
+		  trans_pall_coco(fd_prm1,fd_prm1,MYCOORDS,BLCOORDS,xx,&geomr,&geomBLr);
+
+		
+	
 		  rho=pp[0];
 		  uint=pp[1];
 		  utcon[1]=pp[2];
@@ -248,14 +269,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  calc_bcon_prim(pp,bcon,&geomBL);
 		  indices_21(bcon,bcov,geomBL.gg); 
 		  bsq = dot(bcon,bcov); 
-
-		  /*
-		  if(iy==NY/2 && ix>NX/2)
-		    {printf("%d %d %e\n",ix,iy,bsq);
-		      print_primitives(pp);
-		      print_4vector(bcon);print_4vector(ucon);getch();
-		    }
-		  */
 #endif
 
 		  conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -281,7 +294,66 @@ int calc_radialprofiles(ldouble profiles[][NX])
       
 		  Rviscrt = Rviscij[1][0];
 #endif
+
 		}
+
+	      //estimating the diffusive flux
+	      //to conserved
+	      p2u(fd_pl,fd_ul,&geomBLl);
+	      p2u(fd_pr,fd_ur,&geomBLr);
+	      p2u(fd_plp1,fd_ulp1,&geomBLr);
+	      p2u(fd_prm1,fd_urm1,&geomBLl);
+
+	      //gradient of conserved
+	      PLOOP(iv)
+	      {
+		//getting rid of gdetu in conserved - integrated with gdet lateron
+		dul[iv]=fd_ul[iv]-fd_urm1[iv];
+		dur[iv]=fd_ulp1[iv]-fd_ur[iv];
+		du[iv]=.5*(dul[iv]+dur[iv]);
+		du[iv]/=gdetuBL;
+
+		//test - right face only
+		/*
+		du[iv]=dur[iv];
+		du[iv]/=gdetuBL; //de facto substracting ahd (getd_r (rho ut_rR - rho ut_rL))
+		*/
+	      }
+	      
+	      //test - right face only
+	      /*
+	      double ff1[NV],ff2[NV];
+	      f_flux_prime(fd_pr,0,ix+1,iy,iz,ff1,0); 
+	      f_flux_prime(fd_plp1,0,ix+1,iy,iz,ff2,0); 
+	      rhouconr=.5*(ff1[0]+ff2[0])/gdetuBL; //de facto plotting gdet_r * rhour_r
+	      Trt=.5*(ff1[1]-ff1[0]+ff2[1]-ff2[0])/gdetuBL; 
+	      //Trt=.5*(ff1[1]+ff2[1])/gdetuBL; 
+	      */
+
+	      //wavespeeds
+	      calc_wavespeeds_lr_pure(pp,&geomBL,aaa);
+	      ahd=my_max(fabs(aaa[0]),fabs(aaa[1]));
+	      arad=my_max(fabs(aaa[6]),fabs(aaa[7]));
+
+	      //test
+	      /*
+	      calc_wavespeeds_lr_pure(fd_pm1,&geomBLm1,aaa);
+	      ahd=my_max(ahd,my_max(fabs(aaa[0]),fabs(aaa[1])));
+	      arad=my_max(arad,my_max(fabs(aaa[6]),fabs(aaa[7])));
+	      */
+
+	      calc_wavespeeds_lr_pure(fd_pp1,&geomBLp1,aaa);
+	      ahd=my_max(ahd,my_max(fabs(aaa[0]),fabs(aaa[1])));
+	      arad=my_max(arad,my_max(fabs(aaa[6]),fabs(aaa[7])));
+
+	      //diffusive flux
+	      PLOOP(iv)
+	      {
+		if(iv<NVMHD) diffflux[iv]=-0.5*ahd*du[iv];
+		else diffflux[iv]=-0.5*arad*du[iv];
+	      }
+
+	      //TODO: copy to Ffluxx[]
 
 
 	      ldouble pregas = GAMMAM1*uint;
@@ -356,7 +428,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 
 	      //diffusive flux for rhout (37)
-	      profiles[35][ix]+=-diffflux[RHO]*dx[1]*dx[2]*geomBL.gdet;
+	      //profiles[35][ix]+=-diffflux[RHO]*dx[1]*dx[2]*geomBL.gdet;
+	      profiles[35][ix]+=-Fluxx[1]*dx[1]*dx[2];
 
 	      //temporary surface density to normalize what is above
 	      Sigmagdet+=rho*dx[1]*dx[2]*geomBL.gdet;

@@ -1472,9 +1472,9 @@
 #ifndef NAVGVARS
 //#ifdef BHDISK_PROBLEMTYPE
 #ifdef RADIATION
-#define NAVGVARS (142)
+#define NAVGVARS (142+3*NV)
 #else
-#define NAVGVARS (109)
+#define NAVGVARS (109+3*NV)
 #endif
 //#else
 //#define NAVGVARS (0)

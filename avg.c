@@ -143,7 +143,7 @@ main(int argc, char **argv)
 	{
 	  for(iv=0;iv<NV;iv++)
 	    set_u(p,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz));
-	  struct geometry geom;
+	  struct geometry geom; //but what if pavg was written in BL?
 	  fill_geometry(ix,iy,iz,&geom);
 	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 	}
