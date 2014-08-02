@@ -45,9 +45,10 @@
 //alpha (34)
 //rad. viscosity energy flux (35)
 //rho-weighted minus radial velocity in the outflow (36)
-//diffusive flux for rhout (37)
-//diffusive flux for rhout+Trt (38)
-//diffusive flux for Rrt (39)
+//conserved flux rho ur transformed to BLCOORDS (37)
+//conserved flux rho ur in MYCOORDS (38)
+//conserved flux rhout+Trt in MYCOORDS (39)
+//conserved flux for Rrt int MYCOORDS(40)
 
 
 /*********************************************/
@@ -61,7 +62,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
   int ix,iy,iz,iv,i,j;
   ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
   ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
-  ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,uint,temp,ucon[4],utcon[4],ucon3[4];
+  ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,ucon[4],utcon[4],ucon3[4];
   ldouble rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
   ldouble tautot,tautotloc,tauabs,tauabsloc;
@@ -213,6 +214,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  utcon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+		  rhouconrcons=get_uavg(pavg,AVGRHOURDIFF,ix,iy,iz);
 		  
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
@@ -223,7 +225,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		    - get_uavg(pavg,AVGBCONBCOV(i,j),ix,iy,iz); 
 
 		  for(i=0;i<NV;i++)
-		    Fluxx[i]=get_uavg(pavg,AVGFLUXXL(1),ix,iy,iz);
+		    Fluxx[i]=get_uavg(pavg,AVGFLUXXL(i),ix,iy,iz);
 
 		  Trt=Tij[1][0];
 
@@ -272,7 +274,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 #endif
 
 		  conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-		  rhouconr=rho*utcon[1];
+		  rhouconr=rhouconrcons=rho*utcon[1];
 
 		  calc_Tij(pp,&geomBL,Tij22);
 		  indices_2221(Tij22,Tij,geomBL.gg);
@@ -336,11 +338,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      arad=my_max(fabs(aaa[6]),fabs(aaa[7]));
 
 	      //test
-	      /*
 	      calc_wavespeeds_lr_pure(fd_pm1,&geomBLm1,aaa);
 	      ahd=my_max(ahd,my_max(fabs(aaa[0]),fabs(aaa[1])));
 	      arad=my_max(arad,my_max(fabs(aaa[6]),fabs(aaa[7])));
-	      */
 
 	      calc_wavespeeds_lr_pure(fd_pp1,&geomBLp1,aaa);
 	      ahd=my_max(ahd,my_max(fabs(aaa[0]),fabs(aaa[1])));
@@ -352,9 +352,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		if(iv<NVMHD) diffflux[iv]=-0.5*ahd*du[iv];
 		else diffflux[iv]=-0.5*arad*du[iv];
 	      }
-
-	      //TODO: copy to Ffluxx[]
-
 
 	      ldouble pregas = GAMMAM1*uint;
 	      ldouble ptot = pregas;
@@ -427,18 +424,21 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 
-	      //diffusive flux for rhout (37)
-	      //profiles[35][ix]+=-diffflux[RHO]*dx[1]*dx[2]*geomBL.gdet;
-	      profiles[35][ix]+=-Fluxx[1]*dx[1]*dx[2];
+	      //conserved flux (rhour) transformed to BLCOORDS (may be imprecise) (37)
+	      profiles[35][ix]+=-rhouconrcons*dx[1]*dx[2];
 
+	      //conserved flux (rhour) in MYCOORDS (38)
+	      profiles[36][ix]+=-Fluxx[RHO]*dx[1]*dx[2];
+
+	      //conserved flux for Trt (39) in MYCOORDS 
+	      profiles[37][ix]+=-Fluxx[UU]*dx[1]*dx[2];
+	      
 	      //temporary surface density to normalize what is above
 	      Sigmagdet+=rho*dx[1]*dx[2]*geomBL.gdet;
 
 	      //total mhd energy flux (14)
 	      profiles[12][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
-	      //diffusive flux for Trt (38)
-	      profiles[36][ix]+=-diffflux[UU]*dx[1]*dx[2]*geomBL.gdet;
 	      
 	      //opt thin mhd energy flux (25)
 	      if(tautot<1.)
@@ -455,8 +455,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 
-	      //diffusive flux for Rrt (39)
-	      profiles[37][ix]+=-diffflux[EE0]*dx[1]*dx[2]*geomBL.gdet;
+	      //conserved flux for Rrt in MYCOORDS (40)
+	      profiles[38][ix]+=-Fluxx[EE0]*dx[1]*dx[2];
 	      
 	      //rad viscosity energy flux (35)
 	      profiles[33][ix]+=(-Rviscrt)*dx[1]*dx[2]*geomBL.gdet;

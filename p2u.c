@@ -215,7 +215,12 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   fill_geometry(ix,iy,iz,&geom);
   struct geometry geomout;
   fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
+ struct geometry geoml;
+ fill_geometry_face(ix,iy,iz,0,&geom);
+  struct geometry geomoutl;
+  fill_geometry_face_arb(ix,iy,iz,0,&geomout,OUTCOORDS);
 
+ 
   int iv,iv2;ldouble pp[NV],uu[NV];
   for(iv=0;iv<NV;iv++)
     {
@@ -294,10 +299,11 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
       avg[AVGBCONBCOV(iv,iv2)]=bcon[iv]*bcov[iv2];
   for(iv=0;iv<4;iv++)
     avg[AVGWUCON(iv)]=(rho+uint+bsq/2)*ucon[iv];
-for(iv=0;iv<4;iv++)
+  for(iv=0;iv<4;iv++)
     avg[AVGWUCON(iv)]=(rho+uint+bsq/2)*ucon[iv];
 
-  //fluxes - TODO: coordinates!!!
+  //fluxes at faces, including the diffusive part
+  //conserved fluxes at left face in MYCOORDS
   for(iv=0;iv<NV;iv++)
     {
       avg[AVGFLUXXL(iv)]=get_ub(flbx,iv,ix,iy,iz,0);
@@ -305,6 +311,26 @@ for(iv=0;iv<4;iv++)
       avg[AVGFLUXZL(iv)]=get_ub(flbz,iv,ix,iy,iz,2);
     }
 
+  //converting rest-mass flux to BLCOORDS 
+  ldouble vector[4];
+  //primitives and conserved at left faces - used to fill missing time-component
+  ldouble uface[NV],pface[NV],fd_uLl[NV],fd_uRl[NV];
+  int i;
+  for(i=0;i<NV;i++)
+    {
+      fd_uLl[i]=get_ub(pbLx,i,ix,iy,iz,0);
+      fd_uRl[i]=get_ub(pbRx,i,ix,iy,iz,0);
+      pface[i]=.5*(fd_uLl[i]+fd_uRl[i]);
+    }
+  p2u(pface,uface,&geoml);
+
+  //rest-mass flux in radius
+  vector[0]=uface[RHO]; //rho ut gdet
+  vector[1]=get_ub(flbx,iv,ix,iy,iz,0); //rho ur gdet
+  vector[2]=0.; //unimportant within Kerr-Shield
+  vector[3]=0.;
+  //trans2_coco(geoml.xxvec,vector,vector,MYCOORDS, OUTCOORDS);
+  avg[AVGRHOURDIFF]=vector[1];
    
 #ifdef RADIATION
   ldouble Rtt,Ehat,ugas[4];

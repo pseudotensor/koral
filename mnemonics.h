@@ -153,12 +153,13 @@
 #define AVGFLUXXL(i) (NV+109+i)
 #define AVGFLUXYL(i) (NV+109+NV+i)
 #define AVGFLUXZL(i) (NV+109+2*NV+i)
-#define AVGEHAT (NV+3*NV+109)
-#define AVGRIJ(i,j) (4*NV+110+i*4+j)
-#define AVGEHATUCON(i) (4*NV+126+i)
-#define AVGEHATUCOV(i) (4*NV+130+i)
-#define AVGURFCON(i) (4*NV+134+i)
-#define AVGURFCOV(i) (4*NV+138+i)
+#define AVGRHOURDIFF (NV+109+3*NV)
+#define AVGEHAT (NV+3*NV+110)
+#define AVGRIJ(i,j) (4*NV+111+i*4+j)
+#define AVGEHATUCON(i) (4*NV+127+i)
+#define AVGEHATUCOV(i) (4*NV+131+i)
+#define AVGURFCON(i) (4*NV+135+i)
+#define AVGURFCOV(i) (4*NV+139+i)
 
 
 //MPI mnemonics

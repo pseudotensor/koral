@@ -1472,9 +1472,9 @@
 #ifndef NAVGVARS
 //#ifdef BHDISK_PROBLEMTYPE
 #ifdef RADIATION
-#define NAVGVARS (142+3*NV)
+#define NAVGVARS (143+3*NV)
 #else
-#define NAVGVARS (109+3*NV)
+#define NAVGVARS (110+3*NV)
 #endif
 //#else
 //#define NAVGVARS (0)
@@ -1482,7 +1482,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 38
+#define NRADPROFILES 39
 #endif
 
 #ifndef NANARELRADPROFILES

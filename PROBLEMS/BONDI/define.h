@@ -4,11 +4,12 @@
 #define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
+#define MODYFIKUJKRZYSIE 0
 
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define NCOMPTONIZATION
 //#define SKIPRADWAVESPEEDLIMITER
 //#define EXPLICIT_LAB_RAD_SOURCE
@@ -21,9 +22,8 @@
 //coordinates / resolution
 /************************************/
 #define MKS1R0 0.
-//#define MYCOORDS MKER1COORDS
-//#define MYCOORDS MKS1COORDS
-#define MYCOORDS BLCOORDS
+#define MYCOORDS MKS1COORDS
+//#define MYCOORDS BLCOORDS
 #define OUTCOORDS BLCOORDS
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
@@ -31,11 +31,11 @@
 #define RMIN 10.
 #define RMAX 1.e2
 
-#define MINX RMIN
-#define MAXX RMAX
+///#define MINX RMIN
+//#define MAXX RMAX
 
-//#define MINX (log(RMIN-MKS1R0))
-//#define MAXX (log(RMAX-MKS1R0))
+#define MINX (log(RMIN-MKS1R0))
+#define MAXX (log(RMAX-MKS1R0))
 
 
 #define MINY .99*Pi/2.

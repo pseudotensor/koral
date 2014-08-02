@@ -824,6 +824,9 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
 	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
 
+	  //test
+	  //if(ix==10) printf("%e %e | %e %e\n",get_u(u,1,ix,iy,iz),t_der[1]*dt,get_u(u,0,ix,iy,iz),t_der[0]*dt);
+
 	  if(isnan(val) || isinf(val)) {printf("i: %4d %4d %4d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
 	  
@@ -874,7 +877,10 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //updating u - geometrical source terms
       ldouble ms[NV],val;
       f_metric_source_term(ix,iy,iz,ms);
-     		  
+
+      //test - force energy flux not affected by Christoffels
+      //ms[1]=0.;
+
       for(iv=0;iv<NV;iv++)
 	{
 	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
@@ -883,8 +889,9 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
           #endif
 	  
 	    //test
-	    //if(ix>50)
-	    set_u(u,iv,ix,iy,iz,val);	
+	    //if(ix==10) printf("> %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),ms[EE0]*dt,get_u(u,1,ix,iy,iz),ms[1]*dt);
+
+	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	} 
 
