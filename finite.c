@@ -825,7 +825,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
 
 	  //test
-	  //if(ix==10) printf("%e %e | %e %e\n",get_u(u,1,ix,iy,iz),t_der[1]*dt,get_u(u,0,ix,iy,iz),t_der[0]*dt);
+	  if(ix==10) printf("adv > %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),t_der[EE0]*dt,get_u(u,1,ix,iy,iz),t_der[1]*dt);
 
 	  if(isnan(val) || isinf(val)) {printf("i: %4d %4d %4d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
@@ -889,7 +889,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
           #endif
 	  
 	    //test
-	    //if(ix==10) printf("> %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),ms[EE0]*dt,get_u(u,1,ix,iy,iz),ms[1]*dt);
+	    //if(ix==10) printf("metric > %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),ms[EE0]*dt,get_u(u,1,ix,iy,iz),ms[1]*dt);
 
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
