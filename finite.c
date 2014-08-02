@@ -460,14 +460,6 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
 
-      /*
-      if(ix==51) 
-	{
-	print_Nvector(aaa,12);
-	getch();
-	}
-      */
-
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
 
     }
@@ -825,7 +817,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
 
 	  //test
-	  if(ix==10) printf("adv > %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),t_der[EE0]*dt,get_u(u,1,ix,iy,iz),t_der[1]*dt);
+	  //if(ix==10) printf("adv > %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),t_der[EE0]*dt,get_u(u,1,ix,iy,iz),t_der[1]*dt);
 
 	  if(isnan(val) || isinf(val)) {printf("i: %4d %4d %4d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
