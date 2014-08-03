@@ -329,7 +329,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   vector[1]=get_ub(flbx,iv,ix,iy,iz,0); //rho ur gdet
   vector[2]=0.; //unimportant within Kerr-Shield
   vector[3]=0.;
-  //trans2_coco(geoml.xxvec,vector,vector,MYCOORDS, OUTCOORDS);
+  trans2_coco(geoml.xxvec,vector,vector,MYCOORDS, OUTCOORDS);
   avg[AVGRHOURDIFF]=vector[1];
    
 #ifdef RADIATION

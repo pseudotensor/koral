@@ -1308,9 +1308,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     {
       ldouble duint = uu[UU]-get_u(u,UU,ix,iy,iz);
       ldouble derad = uu[EE0]-get_u(u,EE0,ix,iy,iz);
-      printf("rad > %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),derad,get_u(u,UU,ix,iy,iz),duint);
+      printf("rad > %e %e | %e %e | %e\n",get_u(u,EE0,ix,iy,iz),derad/dt,get_u(u,UU,ix,iy,iz),duint/dt,dt);
+      getchar();
     }
   */
+  
 
   PLOOP(iv)
   {

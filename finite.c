@@ -758,7 +758,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
-      
+
       ldouble fd_der[NV],t_der[NV],val,ms_der[NV],ss_der[NV],rho,uint,pp[NV],uu[NV],uuold[NV],duu[NV];
 	      
       ldouble gg[4][5],GG[4][5];
@@ -817,7 +817,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
 
 	  //test
-	  //if(ix==10) printf("adv > %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),t_der[EE0]*dt,get_u(u,1,ix,iy,iz),t_der[1]*dt);
+	  //if(ix==10 && iv==EE0) printf("adv > %e %e | %e %e | %e | %d %d %d\n",get_u(u,EE0,ix,iy,iz),t_der[EE0],get_u(u,1,ix,iy,iz),t_der[1],dt,ix,iy,iz);
 
 	  if(isnan(val) || isinf(val)) {printf("i: %4d %4d %4d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
@@ -872,17 +872,19 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 
       //test - force energy flux not affected by Christoffels
       //ms[1]=0.;
+      
+      //test
+      //if(ix==10) printf("metric > %e %e | %e %e | %e\n",get_u(u,EE0,ix,iy,iz),ms[EE0],get_u(u,1,ix,iy,iz),ms[1],dt);
+
+
 
       for(iv=0;iv<NV;iv++)
 	{
 	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
 	  #ifdef SKIPHDEVOLUTION
 	  if(iv>5)
-          #endif
+#endif
 	  
-	    //test
-	    //if(ix==10) printf("metric > %e %e | %e %e\n",get_u(u,EE0,ix,iy,iz),ms[EE0]*dt,get_u(u,1,ix,iy,iz),ms[1]*dt);
-
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	} 
