@@ -215,10 +215,10 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   fill_geometry(ix,iy,iz,&geom);
   struct geometry geomout;
   fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
- struct geometry geoml;
- fill_geometry_face(ix,iy,iz,0,&geom);
+  struct geometry geoml;
+  fill_geometry_face(ix,iy,iz,0,&geoml);
   struct geometry geomoutl;
-  fill_geometry_face_arb(ix,iy,iz,0,&geomout,OUTCOORDS);
+  fill_geometry_face_arb(ix,iy,iz,0,&geomoutl,OUTCOORDS);
 
  
   int iv,iv2;ldouble pp[NV],uu[NV];
@@ -227,7 +227,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
       uu[iv]=get_u(u,iv,ix,iy,iz); //conserved 
       pp[iv]=get_u(p,iv,ix,iy,iz); //primitives 
 
-      avg[iv]=pp[iv]; //first NV slots in pavg are regular primitives
+      avg[iv]=pp[iv]; //first NV slots in pavg are regular primitives in MYCOORDS!
    }
 
   //primitives to OUTCOORDS
@@ -329,7 +329,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   vector[1]=get_ub(flbx,iv,ix,iy,iz,0); //rho ur gdet
   vector[2]=0.; //unimportant within Kerr-Shield
   vector[3]=0.;
-  trans2_coco(geoml.xxvec,vector,vector,MYCOORDS, OUTCOORDS);
+  trans2_coco(geoml.xxvec,vector,vector,MYCOORDS, OUTCOORDS); //this does not work?
   avg[AVGRHOURDIFF]=vector[1];
    
 #ifdef RADIATION

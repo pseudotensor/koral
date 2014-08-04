@@ -83,6 +83,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
       for(iv=0;iv<NRADPROFILES;iv++)
 	profiles[iv][ix]=0.;
+
+      //outside horizon?
+      struct geometry geomBLtemp;
+      fill_geometry_arb(ix,0,0,&geomBLtemp,BLCOORDS);
+      if(geomBLtemp.xx<=1.1*rhorizonBL) continue; //to avoid working inside horizon
       
       Bangle1=Bangle2=0.;
       Sigmagdet=0.;
@@ -134,9 +139,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      ldouble gdetuBL=geomBL.gdet;
 
-             #if (GDETIN==0) //gdet out of derivatives
-	     gdetuBL=1.;
-             #endif
+#if (GDETIN==0) //gdet out of derivatives
+	      gdetuBL=1.;
+#endif
 
 	      //coordinates
 	      get_xx(ix,iy,iz,xx);	      
@@ -168,7 +173,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //primitives at radial neighbours
 	      for(i=0;i<NV;i++)
 		{
-		  fd_p0[i]=get_u(p,i,ix,iy,iz);
+		  fd_p0[i]=pp[i];
 		  fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
 		  fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
 		  fd_pm2[i]=get_u(p,i,ix-2,iy,iz);
@@ -198,9 +203,18 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      avg2point(fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pp2,fd_plp1,fd_prp1,dxm1,dx0,dxp1,dxp2,dxp2);   
 	      avg2point(fd_pm2,fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_plm1,fd_prm1,dxm2,dxm2,dxm1,dx0,dxp1);   
 		  
-	      				       
-	      
-	      if(1 && doingavg)
+	      //to BL, res-files and primitives in avg in MYCOORDS
+	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+
+	      //transforming interpolated primitives to BL
+	      trans_pall_coco(fd_pm1,fd_pm1,MYCOORDS,BLCOORDS,xx,&geomm1,&geomBLm1);
+	      trans_pall_coco(fd_pp1,fd_pp1,MYCOORDS,BLCOORDS,xx,&geomp1,&geomBLp1);
+	      trans_pall_coco(fd_pl,fd_pl,MYCOORDS,BLCOORDS,xx,&geoml,&geomBLl);
+	      trans_pall_coco(fd_pr,fd_pr,MYCOORDS,BLCOORDS,xx,&geomr,&geomBLr);
+	      trans_pall_coco(fd_plp1,fd_plp1,MYCOORDS,BLCOORDS,xx,&geoml,&geomBLl);
+	      trans_pall_coco(fd_prm1,fd_prm1,MYCOORDS,BLCOORDS,xx,&geomr,&geomBLr);
+
+	      if(doingavg)
 		{
 		  rho=get_uavg(pavg,RHO,ix,iy,iz);
 		  uint=get_uavg(pavg,UU,ix,iy,iz);
@@ -248,20 +262,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		}
 	      else
 		{ 
-		  //to BL, res-files in MYCOORDS
-		  trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
-
-		  //transforming interpolated primitives to BL, if not already there
-		  trans_pall_coco(fd_pm1,fd_pm1,MYCOORDS,BLCOORDS,xx,&geomm1,&geomBLm1);
-		  trans_pall_coco(fd_pp1,fd_pp1,MYCOORDS,BLCOORDS,xx,&geomp1,&geomBLp1);
-		  trans_pall_coco(fd_pl,fd_pl,MYCOORDS,BLCOORDS,xx,&geoml,&geomBLl);
-		  trans_pall_coco(fd_pr,fd_pr,MYCOORDS,BLCOORDS,xx,&geomr,&geomBLr);
-		  trans_pall_coco(fd_plp1,fd_plp1,MYCOORDS,BLCOORDS,xx,&geoml,&geomBLl);
-		  trans_pall_coco(fd_prm1,fd_prm1,MYCOORDS,BLCOORDS,xx,&geomr,&geomBLr);
-
-		
-	
-		  rho=pp[0];
+			  rho=pp[0];
 		  uint=pp[1];
 		  utcon[1]=pp[2];
 		  utcon[2]=pp[3];
@@ -427,11 +428,22 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //conserved flux (rhour) transformed to BLCOORDS (may be imprecise) (37)
 	      profiles[35][ix]+=-rhouconrcons*dx[1]*dx[2];
 
-	      //conserved flux (rhour) in MYCOORDS (38)
-	      profiles[36][ix]+=-Fluxx[RHO]*dx[1]*dx[2];
+	      
+	      //test
+	      //profiles[35][ix]+=get_uavg(pavg,AVGFLUXYL(EE0),ix,iy,iz)*get_size_x(ix,0)*dx[2]+
+	      //get_uavg(pavg,AVGFLUXYL(UU),ix,iy,iz)*get_size_x(ix,0)*dx[2];
+	      
+	      /*
+	      if(iy==0) {printf("%d %d > %e %e\n", ix,iy,
+			       get_uavg(pavg,AVGFLUXYL(EE0),ix,iy,iz),
+				get_uavg(pavg,AVGFLUXYL(UU),ix,iy,iz));getchar();}
+	      */
+
+	      //conserved flux (gdet rhour) in MYCOORDS (38)
+	      profiles[36][ix]+=-Fluxx[RHO]*get_size_x(iy,1)*dx[2];
 
 	      //conserved flux for Trt (39) in MYCOORDS 
-	      profiles[37][ix]+=-Fluxx[UU]*dx[1]*dx[2];
+	      profiles[37][ix]+=-Fluxx[UU]*get_size_x(iy,1)*dx[2];
 	      
 	      //temporary surface density to normalize what is above
 	      Sigmagdet+=rho*dx[1]*dx[2]*geomBL.gdet;
@@ -456,8 +468,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //conserved flux for Rrt in MYCOORDS (40)
-	      profiles[38][ix]+=-Fluxx[EE0]*dx[1]*dx[2];
-	      
+	      profiles[38][ix]+=-Fluxx[EE0]*get_size_x(iy,1)*dx[2];
+
 	      //rad viscosity energy flux (35)
 	      profiles[33][ix]+=(-Rviscrt)*dx[1]*dx[2]*geomBL.gdet;
 
