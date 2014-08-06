@@ -360,6 +360,15 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   if(ret==-1)
     {
       //printf("entropy used at %d %d, trying to counter-balance\n",geom->ix,geom->iy);
+
+      //verifying first if radiation is dominating over radiation
+      /*
+	ldouble uconf[4],Rtt;
+	calc_ff_Rtt(pp,&Rtt,uconf,geom);
+	ldouble Ehat = -Rtt;
+	if(Ehat>10.*pp[UU])
+	{
+      */
       ldouble uunew[NV],ppnew[NV];
       PLOOP(iv) uunew[iv]=uu[iv];
       p2u_mhd(pp,uunew,geom);
@@ -378,8 +387,9 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	}
       else
 	{
-	  printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+	  //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
 	}
+      //}
       //getch();
     }
 
