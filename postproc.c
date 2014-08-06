@@ -49,6 +49,7 @@
 //conserved flux rho ur in MYCOORDS (38)
 //conserved flux rhout+Trt in MYCOORDS (39)
 //conserved flux for Rrt int MYCOORDS(40)
+//surface density of energy = int (Ttt+rhout+Rtt) dz (41)
 
 
 /*********************************************/
@@ -63,7 +64,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
   ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
   ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
   ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,ucon[4],utcon[4],ucon3[4];
-  ldouble rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
+  ldouble rhoucont,enden,rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
   ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
   ldouble tautot,tautotloc,tauabs,tauabsloc;
   ldouble avgsums[NV+NAVGVARS][NX];
@@ -227,7 +228,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  utcon[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  utcon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+
 		  rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+		  rhoucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz);
+
 		  rhouconrcons=get_uavg(pavg,AVGRHOURDIFF,ix,iy,iz);
 		  
 		  for(i=0;i<4;i++)
@@ -242,12 +246,14 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		    Fluxx[i]=get_uavg(pavg,AVGFLUXXL(i),ix,iy,iz);
 
 		  Trt=Tij[1][0];
+		  enden = Tij[0][0]+rhoucont;
 
 #ifdef RADIATION  
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz); 
 
+		  enden += Rij[0][0];
 		  Rrt = Rij[1][0];
 		  Ehat = get_uavg(pavg,AVGEHAT,ix,iy,iz);
 
@@ -281,6 +287,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  indices_2221(Tij22,Tij,geomBL.gg);
 
 		  Trt = Tij[1][0];
+		  enden = Tij[0][0] + rho*utcon[0];
 
 #ifdef RADIATION
 		  calc_Rij(pp,&geomBL,Rij);
@@ -291,6 +298,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  ldouble Rtt,uconr[4];
 		  calc_ff_Rtt(&get_u(p,0,ix,iy,iz),&Rtt,uconr,&geomBL);
 		  Ehat=-Rtt; 	
+		  enden+=Rij[0][0];
 
 		  int derdir[3]={0,0,0}; 
 		  calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
@@ -393,6 +401,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //surface density (2) (column)
 	      profiles[0][ix]+=rho*dxph[1];
 
+	      //surface energy density (41)
+	      profiles[39][ix]+=enden*dxph[1];
+
 	      //numerator of scale height (31) (column)
 	      //profiles[29][ix]+=rho*dxph[1]*pow(tan(fabs(M_PI/2.-xxBL[2])),2.);
 
@@ -426,12 +437,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 
 	      //conserved flux (rhour) transformed to BLCOORDS (may be imprecise) (37)
-	      profiles[35][ix]+=-rhouconrcons*dx[1]*dx[2];
+	      //profiles[35][ix]+=-rhouconrcons*dx[1]*dx[2];
 
 	      
 	      //test
-	      //profiles[35][ix]+=get_uavg(pavg,AVGFLUXYL(EE0),ix,iy,iz)*get_size_x(ix,0)*dx[2]+
-	      //get_uavg(pavg,AVGFLUXYL(UU),ix,iy,iz)*get_size_x(ix,0)*dx[2];
+	      profiles[35][ix]+=get_uavg(pavg,AVGFLUXYL(EE0),ix,iy,iz)*get_size_x(ix,0)*dx[2]+
+		get_uavg(pavg,AVGFLUXYL(UU),ix,iy,iz)*get_size_x(ix,0)*dx[2];
 	      
 	      /*
 	      if(iy==0) {printf("%d %d > %e %e\n", ix,iy,
