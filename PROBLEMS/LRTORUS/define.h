@@ -6,7 +6,7 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
 
@@ -18,7 +18,7 @@
 //#define RADCLOSURE MINERBOCLOSURE
 //#define RADCLOSUREMIXATBH
 //#define RADCLOSURECOORDS BLCOORDS
-//#define COMPTONIZATION
+#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
@@ -130,7 +130,7 @@
 #define ANARELRADOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/

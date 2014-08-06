@@ -83,7 +83,7 @@
 //80 GENCLOSURE - tests of closures
 //81 TWOBEAM - test of VET with two beams
 
-#define PROBLEM 7
+#define PROBLEM 67
 
 #if(PROBLEM==81)
 
@@ -1482,7 +1482,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 39
+#define NRADPROFILES 40
 #endif
 
 #ifndef NANARELRADPROFILES

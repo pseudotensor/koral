@@ -229,6 +229,11 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
       {
 	ret=-1;
 	
+	if(verbose>2)
+	  {
+	    printf("u2p_entr     >>> %d %d <<< %d >>> %e > %e\n",geom->ix + TOI, geom->iy + TOJ,u2pret,u0,pp[1]);
+	  }
+
 	//************************************
 	//************************************
 	//************************************
@@ -238,10 +243,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
 
 
-	if(verbose>2)
-	  {
-	    printf("u2p_entr     >>> %d %d <<< %e > %e\n",geom->ix,u2pret,u0,pp[1]);
-	  }
+
     
 	if(u2pret<0)
 	  {
@@ -351,6 +353,37 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   //************************************
 
 #ifdef RADIATION
+
+  //trying to balance gain of energy because of entropy inversion
+  //by borrowing from the radiation field
+
+  if(ret==-1)
+    {
+      //printf("entropy used at %d %d, trying to counter-balance\n",geom->ix,geom->iy);
+      ldouble uunew[NV],ppnew[NV];
+      PLOOP(iv) uunew[iv]=uu[iv];
+      p2u_mhd(pp,uunew,geom);
+      //print_primitives(uu);
+      //print_primitives(uunew);
+      ldouble dugas = uunew[UU]-uu[UU];
+      uunew[EE0]-=dugas; //balancing with radiation      
+      int radcor;
+      u2p_rad(uunew,ppnew,geom,&radcor);
+      //printf("balanced and got: %d\n",radcor);
+      //print_primitives(uunew);
+ 
+      if(radcor==0) //there was enough energy to borrow from
+	{
+	  PLOOP(iv) uu[iv]=uunew[iv];
+	}
+      else
+	{
+	  printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+	}
+      //getch();
+    }
+
+
   u2p_rad(uu,pp,geom,&radcor);
 #endif
   
