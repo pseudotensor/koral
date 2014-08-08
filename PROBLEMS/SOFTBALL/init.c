@@ -8,6 +8,8 @@ struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 struct geometry geomcart;
 fill_geometry_arb(ix,iy,iz,&geomcart,MINKCOORDS);
+struct geometry geomBL;
+fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
 
 /***********************************************/
@@ -19,7 +21,7 @@ ldouble pp[NV],uu[NV];
 ldouble L=3.8;
 
 ldouble W = (1./2.)*log(-(geom.gg[0][0]*geom.gg[3][3])/(geom.gg[3][3]+L*L*geom.gg[0][0]));
-//ldouble rin=4;
+ldouble rin=4.5;
 ldouble Win = -0.0416192; 
 ldouble w=exp(-(W-Win));
 
@@ -30,7 +32,7 @@ ldouble w=exp(-(W-Win));
 //ldouble w=-1./ut;
 ldouble epsilon = (w-1.)/GAMMA;  //OS: dot after 1.
 ldouble vmichel = get_u(pproblem1,0,ix,iy,iz);
-if(epsilon>0.) //OS: interior of the torus
+if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
   {
     ldouble kappa = 1.; //OS: entropy constant, 0.01 gave temperature < 1e5 what was a bit too low
     //density
@@ -49,12 +51,14 @@ if(epsilon>0.) //OS: interior of the torus
     pp[VY]=0.;
     pp[VX]=0.;
 
+    
     //superimposing vmichel
     ldouble vmichel4vel[4]={0.,vmichel,0.,0.};
     trans2_coco(geom.xxvec,vmichel4vel,vmichel4vel,BLCOORDS,MYCOORDS);
     pp[VX]=vmichel4vel[1];
     pp[VY]=vmichel4vel[2];
 
+    
     //just in case VELPRIM!=VEL4
     conv_velsinprims(pp,VEL4,VELPRIM,geom.gg,geom.GG);
   }

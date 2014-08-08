@@ -76,7 +76,8 @@ for(ii=0;ii<Nloop_0;ii++) //domain only
     ldouble hru = kappa*GAMMA/(Gamma_mo)*powl((c1/(pp[VX]*powl(radius,2))),(Gamma_mo));
     ldouble fu  = powl((1+hru),2)*(1.-2.*1./radius+powl(pp[VX],2.)) - c3;
     ldouble dfdu = 2.*(1.+hru)*((1-GAMMA)*hru*(1.-2./radius+powl(pp[VX],2))+powl(pp[VX],2)*(1+hru))/pp[VX];
-    vmichel == fmax(powl(10,-5),pp[VX]-fu/dfdu);
+    //vmichel == fmax(powl(10,-5),pp[VX]-fu/dfdu);
+    vmichel = fmax(powl(10,-5),pp[VX]-fu/dfdu);
     set_u(pproblem1,0,ix,iy,iz,vmichel);
   }
 

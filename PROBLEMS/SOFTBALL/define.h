@@ -1,8 +1,8 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART 
-//#define RESTARTNUM 39
+#define RESTART 
+#define RESTARTNUM -1
 #define BHDISK_PROBLEMTYPE
 /************************************/
 //radiation
@@ -12,7 +12,7 @@
 /************************************/
 //magnetic fields
 /************************************/
-#define MAGNFIELD
+//#define MAGNFIELD
 #define VECPOTGIVEN //we provide vector potential
 #define MAXBETA .01 //target max pgas/pgas
 #define BETANORMFULL //normalize everywhere
@@ -21,8 +21,8 @@
 /************************************/
 
 #define MYCOORDS KERRCOORDS
-#define RMIN 4.
-#define RMAX 30.
+#define RMIN 3.5
+#define RMAX 20.
 #define MINX RMIN
 #define MAXX RMAX 
 #define DTH .45
@@ -57,7 +57,7 @@
 //reconstruction / stepping
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
