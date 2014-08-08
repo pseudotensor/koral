@@ -339,6 +339,7 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
       else
 	tstepden=max_ws[0]/dx;   
       */
+
       if(NZ>1 && NY>1)
 	tstepden=wsx/dx + wsy/dy + wsz/dz;
       else if(NZ==1 && NY>1)
@@ -1365,33 +1366,20 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
     }
 #endif
 
-  //minimal time step
-  for(ix=1;ix<=NX;ix++)
+  //minimal cell size
+  for(ix=0;ix<NX;ix++)
     {
-      for(iy=1;iy<=NY;iy++)
+      for(iy=0;iy<NY;iy++)
 	{
-	  for(iz=1;iz<=NZ;iz++)
+	  for(iz=0;iz<NZ;iz++)
 	    {
-	      xx[0]=0.;
-	      xx[1]=get_x(ix,0);
-	      xx[2]=get_x(iy,1);
-	      xx[3]=get_x(iz,2);
-	      calc_g(xx,gloc);
-
-	      dx=fabs(get_xb(ix,0)-get_xb(ix-1,0));
-	      dy=fabs(get_xb(iy,1)-get_xb(iy-1,1));
-	      dz=fabs(get_xb(iz,2)-get_xb(iz-1,2));
+	      dx=get_size_x(ix,0);
+	      dy=get_size_x(iy,1);
+	      dz=get_size_x(iz,2);
 
 	      if((dx<mdx || mdx<0.)) mdx=dx;
 	      if((dy<mdx || mdy<0.)) mdy=dy;
 	      if((dz<mdx || mdz<0.)) mdz=dz;
-	      
-	      //unused
-	      /*
-	      if((dx/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dx/sqrt(-gloc[0][0]);
-	      if((dy/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dy/sqrt(-gloc[0][0]);
-	      if((dz/sqrt(-gloc[0][0])<maxdt || maxdt<0.)) maxdt=dz/sqrt(-gloc[0][0]);
-	      */
 	    }
 	}
     }  

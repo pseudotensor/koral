@@ -6,9 +6,10 @@
 #define SKIPRADSOURCE
 
 #define RADVISCOSITY SHEARVISCOSITY
+#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
-#define ALPHARADVISC 0.0
+#define ALPHARADVISC 0.1
 #define MAXRADVISCVEL .5
 //#define ZEROTIMEINSHEAR
 
@@ -30,7 +31,7 @@
 #define IMAGETYPE "gif"
 
 #define OUTVEL VEL4
-#define DTOUT1 1.
+#define DTOUT1 10
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 2250.
@@ -44,14 +45,14 @@
 #define MKS1R0 0.
 #define MINX (log(2.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 100
+#define NX 50
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define NX 40
 #endif
 
-#define NY 50
+#define NY 30
 #define NZ 1
 
 

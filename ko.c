@@ -8,16 +8,6 @@ main(int argc, char **argv)
 {  
   mpi_myinit(argc,argv);
 
-  //tests
-
-  /*
-  ldouble temp;
-  for(temp=2.; temp>-10.;temp-=.1)
-    printf("%e %e\n",temp,my_atan2(1.,temp));
-    //  printf("%e %e\n",temp,opacity_BellLin(1.e-7,temp));
-  exit(0);
-  */
-
   ldouble tstart;
   int i; char folder[100],bufer[100];
   sprintf(folder,"%s","dumps");
@@ -69,47 +59,22 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
-  //prepare angular grid for radiative solver
 #ifdef RADIATION
+  //prepare angular grid for radiative solver
 #if(RADCLOSURE==VETCLOSURE)
-  zero_readangles();
-						
-  /*
-  int ix,iy,iz,j;
-  int sums[3][3];
-  sums[0][0]=sums[0][1]=sums[0][2]=0;
-  sums[1][0]=sums[1][1]=sums[1][2]=0;
-  sums[2][0]=sums[2][1]=sums[2][2]=0;
-  for(ix=0;ix<NX;ix++)
-    for(iy=0;iy<NY;iy++)
-      {
-	iz=0;
-	for(i=0;i<NUMANGLES;i++)
-	  for(j=0;j<4;j++)
-	    if(intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]<0.0)
-	      {	    
-		printf("%d %d > %d %d > %e\n",ix,iy,i,j,intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]);
-	      }
-      }
-  exit(1);
-  */
-
+  zero_readangles();						
   //ZEROtest_oldmain();
+#endif
+
+  //prepare arrays for accelerating radiative viscosity
+#if(RADVISCOSITY==SHEARVISCOSITY)
+  reset_radviscaccel();
 #endif
 #endif
 
   //**************
   //tests
   //**************
-  /*
-    ldouble pp[NV]={1.,1.,0.5,0.,0.,-1.,1.,.5,0.,0.};  
-    struct geometry geom; ldouble Rij[4][4];
-    fill_geometry(0,0,0,&geom);
-    calc_Rij(pp,&geom,Rij);
-    indices_2221(Rij,Rij,geom.gg);
-    print_tensor(Rij);
-    exit(-1);
-  */
   
   //print scalings GU->CGS and quit
   //print_scalings(); exit(-1);
@@ -317,6 +282,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
       //dt based on the estimate from the last midpoint
       dt=TSTEPLIM*1./tstepdenmax;
+      global_dt=dt;
  
       if(t+dt>t1) {dt=t1-t;}
 

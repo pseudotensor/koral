@@ -83,7 +83,7 @@
 //80 GENCLOSURE - tests of closures
 //81 TWOBEAM - test of VET with two beams
 
-#define PROBLEM 79
+#define PROBLEM 30
 
 #if(PROBLEM==81)
 

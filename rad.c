@@ -1672,10 +1672,14 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 int
 calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
 {
-  int i,j;
+  int i,j,ix,iy,iz;
   
   struct geometry *geom
    = (struct geometry *) ggg;
+
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
   
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -1684,20 +1688,57 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
       }
 
 #if (RADVISCOSITY==SHEARVISCOSITY)
-  ldouble shear[4][4];
-  ldouble nu;
-  calc_rad_shearviscosity(pp,ggg,shear,&nu,derdir);
+  //verify if recalculating shear velocity needed
+  int recalcvisc=1;
+  #ifdef ACCELRADVISCOSITY
+  if(radvisclasttime[ix+NGCX][iy+NGCY][iz+NGCZ]>0.)
+    {
+      ldouble dtlast = global_time - radvisclasttime[ix+NGCX][iy+NGCY][iz+NGCZ];
+      ldouble dtmin = global_dt;
+      ldouble radsizefrac = get_size_x(ix,0)*sqrt(get_g(g,1,1,ix,iy,iz)) 
+	/ (min_dx*sqrt(get_g(g,1,1,0,iy,iz)));
+      if(dtlast/dtmin < radsizefrac)
+	{
+	  recalcvisc=0.;
+	  /*
+	  if(iy==0)
+	    {
+	      printf("skipping recalculating Rijvisc at %d %d with radsizefrac = %e | %e %e %e %e\n",
+		     ix,iy,radsizefrac,global_time,radvisclasttime[ix+NGCX][iy+NGCY][iz+NGCZ],dtmin,dtlast/dtmin );
+	    }
+	  */
+	}
+    }
+  #endif
 
-  //radiation rest frame energy density :
-  ldouble Erad;
-  Erad=pp[EE0]; 
+  if(recalcvisc==1)
+    {
+      ldouble shear[4][4],nu;
+      calc_rad_shearviscosity(pp,ggg,shear,&nu,derdir);
+      
+      //radiation rest frame energy density :
+      ldouble Erad;
+      Erad=pp[EE0]; 
+      
+      //multiply by viscosity to get viscous tensor
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  {
+	    Rvisc[i][j]= -2. * nu * Erad * shear[i][j];
 
-  //multiply by viscosity to get viscous tensor
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      {
-	Rvisc[i][j]= -2. * nu * Erad * shear[i][j];
-      }
+	    Rijviscprev[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]=Rvisc[i][j];	      
+	  }
+
+      radvisclasttime[ix+NGCX][iy+NGCY][iz+NGCZ]=global_time;      
+    }
+  else
+    {
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  {
+	    Rvisc[i][j]=Rijviscprev[ix+NGCX][iy+NGCY][iz+NGCZ][i][j];	      
+	  }
+    }
 #endif //SHEARVISCOSITY
 
   return 0;
@@ -4322,3 +4363,17 @@ update_intensities()
 
   return 0;
 }
+
+//resetting accelerating arrays
+void
+reset_radviscaccel()
+{
+  int ix,iy,iz;
+  for(ix=0;ix<SX;ix++)
+    for(iy=0;iy<SY;iy++)
+      for(iz=0;iz<SZ;iz++)
+	{
+	  radvisclasttime[ix][iy][iz]=-1.;
+	}
+}
+
