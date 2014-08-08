@@ -385,6 +385,23 @@ solve_the_problem(ldouble tstart, char* folder)
       //************************* outputs ************************************
       //**********************************************************************
    
+      //counting the number of entropy inversions
+      int nentr,nentrloc=0,ii;
+      for(ii=0;ii<Nloop_0;ii++) //domain 
+	{
+	  ix=loop_0[ii][0];
+	  iy=loop_0[ii][1];
+	  iz=loop_0[ii][2]; 
+	  nentrloc+=get_cflag(ENTROPYFLAG,ix,iy,iz); 
+	}
+      #ifdef MPI
+      MPI_Allreduce(&nentrloc, &nentr, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
+      #else
+      nentr=nentrloc;
+      #endif
+      
+      
+
 
       #ifdef RADIATION
       //average number of iterations in the implicit solver
@@ -489,6 +506,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  printf("(%d) step #%6d t=%10.3e dt=%.3e (real time: %7.2f | %7.6f) znps: %.0f "
 		 ,PROCID,nstep,t,dt,end_time-start_time,2*maxmp_time,znps);
+	  printf("#: %d ",nentr);
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],

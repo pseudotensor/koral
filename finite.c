@@ -3386,9 +3386,9 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
     {      
       //test
       double startzoningtime=1.e2;
-      int nzones=3;
-      int izones[3+1]={0,2*NX/5,4*NX/5,NX};
-      //int izones[2+1]={0,4*NX/5,NX};
+      int nzones=2;
+      //int izones[3+1]={0,2*NX/5,4*NX/5,NX};
+      int izones[2+1]={0,3*NX/4,NX};
       double rzones[3+1];
       double dtzones[3];
       int overlap=SUBZONESOVERLAP,i,j;
@@ -3407,10 +3407,10 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	{
 	  ldouble fac;
 	  //dtzones[i]=10.*(rzones[i+1]-rzones[i])/1.; //timestep limited by speed of light
-	  if(i==nzones-1)
-	    fac=2.;
+	  if(i==nzones-1) //most outern
+	    fac=0.2;
 	  else
-	    fac=2.;
+	    fac=1.;
 
 	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
 
