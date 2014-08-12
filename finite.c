@@ -413,10 +413,10 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //fixup here hd after inversions
   cell_fixup_hd();
 
-  //correct the axis if needed
-#ifdef CORRECT_POLARAXIS
-  correct_polaraxis();
-#endif
+  //correct the axis if needed - now in ko.c
+  //#ifdef CORRECT_POLARAXIS
+  //correct_polaraxis();
+  //#endif
   
   //**********************************************************************
   //* MPI ****************************************************************

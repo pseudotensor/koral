@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 5
 
 /************************************/
 //radiation choices
@@ -40,7 +40,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
+#define TIMESTEPPING RK2//RK2HEUN//RK2IMEX 
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -95,7 +95,7 @@
 #define MINY (0.001)
 #define MAXY (1.-0.001)
 //total resolution
-#define TNX 128
+#define TNX 92
 #define TNY 64
 #define TNZ 1
 //number of tiles

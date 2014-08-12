@@ -10,7 +10,7 @@
 //radiation
 /************************************/
 #define RADIATION
-#define NCOMPTONIZATION
+//#define NCOMPTONIZATION
 //#define SKIPRADWAVESPEEDLIMITER
 //#define EXPLICIT_LAB_RAD_SOURCE
 //#define RADOUTPUTINFF

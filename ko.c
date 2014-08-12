@@ -315,6 +315,12 @@ solve_the_problem(ldouble tstart, char* folder)
     
       if(TIMESTEPPING==RK2IMEX)
 	{
+	  //0th
+	  //correct if needed
+          #ifdef CORRECT_POLARAXIS
+	  correct_polaraxis();
+          #endif
+	  //imex
 	  ldouble gamma=1.-1./sqrt(2.);
 	  op_implicit (t,dt*gamma,ut0); //U(n) in *ut0;  U(1) in *u
 	  add_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
@@ -332,6 +338,11 @@ solve_the_problem(ldouble tstart, char* folder)
      else if(TIMESTEPPING==RK2)
        { 
 	 //******************************* RK2 **********************************
+	 //0th
+	 //correct if needed
+         #ifdef CORRECT_POLARAXIS
+	 correct_polaraxis();
+         #endif
 	 //1st
 	 op_explicit (t,.5*dt,ut0); 
 	 op_implicit (t,.5*dt,ut3); 
@@ -347,8 +358,12 @@ solve_the_problem(ldouble tstart, char* folder)
      else if(TIMESTEPPING==RK2HEUN)
        { 
 	 //******************************* RK2 **********************************
-	 //1st
-	 //todo:
+	 //0th
+	 //correct if needed
+         #ifdef CORRECT_POLARAXIS
+	 correct_polaraxis();
+         #endif
+	 //1st	 
 	 op_explicit (t,1.*dt,ut0); 
 	 op_implicit (t,1.*dt,uforget); 
 	 add_u(1.,u,-1.,ut0,ut2); 
