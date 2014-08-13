@@ -8,17 +8,21 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 5
+#define RESTARTNUM 8
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
+
+#define RADIMPCONV 1.e-12
+#define U2PCONV 1.e-14
+
 //#define OPACBELLLIN
 //#define RADCLOSURE MINERBOCLOSURE
 //#define RADCLOSUREMIXATBH
 //#define RADCLOSURECOORDS BLCOORDS
-#define COMPTONIZATION
+//#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
@@ -90,12 +94,12 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(20.-MKS2R0))
-#define MAXX (log(500.-MKS2R0))
+#define MINX (log(1.5-MKS2R0))
+#define MAXX (log(100.-MKS2R0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
 //total resolution
-#define TNX 92
+#define TNX 64
 #define TNY 64
 #define TNZ 1
 //number of tiles
@@ -130,7 +134,7 @@
 #define ANARELRADOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/

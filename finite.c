@@ -2755,6 +2755,7 @@ cell_fixup_hd()
 	      if(verbose>1) 
 		{
 		  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
+		  getch();
 		}
 
 	      //save to updated arrays memory

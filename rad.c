@@ -267,6 +267,8 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
 	    {
+	      //to do:
+	      //this does not account for COMPTONIZATION!!!
 	      f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
 	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
@@ -1156,9 +1158,18 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   int corr[2],fixup[2],params[4],ret;
 
   //no, thank you, we will use pp as the guess, and keep to given uu
-  //u2p(uu,pp,&geom,corr,fixup,0);
-  //p2u(pp,uu,&geom);
+  ldouble ppexact[NV];
+  PLOOP(iv) ppexact[iv]=pp[iv];
+  u2p(uu,ppexact,&geom,corr,fixup,0);
 
+  /*
+  if(corr[0]==0 && corr[1]==0) //the conserved in-bounds, so use inverted primitives as the initial guess, otherwise use primitives from the beginning of the time step
+    {
+      PLOOP(iv) pp[iv]=ppexact[iv];
+    }
+  */
+
+  //p2u(pp,uu,&geom);
   /*
   print_primitives(pp);
   u2p(uu,pp,&geom,corr,fixup,0);
@@ -1180,11 +1191,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
   PLOOP(iv) 
   {
-    pp0[iv]=pp[iv];
+    pp0[iv]=ppexact[iv];
     uu0[iv]=uu[iv];
-    pp00[iv]=pp[iv];
+    pp00[iv]=ppexact[iv];
     uu00[iv]=uu[iv];
   }
+
+  //initial guess in pp[]
 
   //mostly for LTE solver - can be moved further once debug is done
   ldouble ugas0[4],Rtt0,Tgas0,Trad0,Ehat;
@@ -1215,8 +1228,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //in pp00[] initial guess for solvers
   params[3]=0; //no overshooting check
-
   //*********** 1th ************
+
   PLOOP(iv) 
   { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
   params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1224,6 +1237,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
+
   if(ret!=0)
     { 
       //test
@@ -1231,7 +1245,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       //exit(0);    
 
       params[2]=RADIMPLICIT_FF;
-      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+      //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
     }      
   if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
   
@@ -1246,11 +1260,22 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       if(ret!=0)
 	{
 	  params[2]=RADIMPLICIT_FF;
-	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+	  //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 	}      
       if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
  
+  //if energy failed then use physical uu0
+  p2u(ppexact,uu0,&geom);
+  PLOOP(iv) 
+  {
+    uu00[iv]=uu0[iv];
+    pp00[iv]=ppexact[iv];
+    pp0[iv]=pp00[iv];
+    pp[iv]=pp0[iv];
+  }
+    
+
   //*********** 3th ************
   if(ret!=0) {
       PLOOP(iv) 
