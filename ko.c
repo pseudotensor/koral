@@ -317,9 +317,9 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  //0th
 	  //correct if needed
-          #ifdef CORRECT_POLARAXIS
-	  correct_polaraxis();
-          #endif
+	  //#ifdef CORRECT_POLARAXIS
+	  //correct_polaraxis();
+	  //#endif
 	  //imex
 	  ldouble gamma=1.-1./sqrt(2.);
 	  op_implicit (t,dt*gamma,ut0); //U(n) in *ut0;  U(1) in *u
@@ -340,9 +340,9 @@ solve_the_problem(ldouble tstart, char* folder)
 	 //******************************* RK2 **********************************
 	 //0th
 	 //correct if needed
-         #ifdef CORRECT_POLARAXIS
-	 correct_polaraxis();
-         #endif
+	 //#ifdef CORRECT_POLARAXIS
+	 //correct_polaraxis();
+	 //#endif
 	 //1st
 	 op_explicit (t,.5*dt,ut0); 
 	 op_implicit (t,.5*dt,ut3); 

@@ -18,6 +18,7 @@
 #define MINMOD_THETA 1.
 
 #define ALLSTEPSOUTPUT 0
+#define OUTOUTPUT 1
 
 #define GAMMA (ldouble)(5./3.)
 #define MINX 0
@@ -30,7 +31,7 @@
 //#define EDDINGTON_APR
 #define KAPPAES 0.
 #define KAPPA 0.
-#define NX 200
+#define NX 100
 
 //efine RADIATION
 
@@ -70,7 +71,7 @@
 #define CC 1.e2
 #undef KAPPA
 #define KAPPA 0.01
-#define RHOFAC 1.
+#define RHOFAC 1.e-3
 #define DRRE (1.e-3*RHOFAC)
 #define DRIM 0.
 #define DVRE (9.99998e-6*RHOFAC)

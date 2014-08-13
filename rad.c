@@ -1154,8 +1154,28 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //(u2p checks against proper entropy evolution and uses entropy inversion if necessary
 
   int corr[2],fixup[2],params[4],ret;
+
+  //no, thank you, we will use pp as the guess, and keep to given uu
+  //u2p(uu,pp,&geom,corr,fixup,0);
+  //p2u(pp,uu,&geom);
+
+  /*
+  print_primitives(pp);
   u2p(uu,pp,&geom,corr,fixup,0);
+  print_conserved(uu);
+  print_primitives(pp);
   p2u(pp,uu,&geom);
+  print_conserved(uu);
+  print_primitives(pp);
+  u2p(uu,pp,&geom,corr,fixup,0);
+  print_conserved(uu);
+  print_primitives(pp);
+  p2u(pp,uu,&geom);
+  print_conserved(uu);
+  print_primitives(pp);
+  
+  getch();
+  */
 
   ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
   PLOOP(iv) 
@@ -1296,24 +1316,15 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       return 0; 
     }
 
+  //printf("%d > %d %d %d\n",ix,params[0],params[1],params[2]);
+
   //succeeded!
   //solution given in pp[]
 
-  //calculate deltas here
+  //get uu prom just returned pp
   p2u(pp,uu,&geom);
 
-  //test
-  /*
-  if(ix==10)
-    {
-      ldouble duint = uu[UU]-get_u(u,UU,ix,iy,iz);
-      ldouble derad = uu[EE0]-get_u(u,EE0,ix,iy,iz);
-      printf("rad > %e %e | %e %e | %e\n",get_u(u,EE0,ix,iy,iz),derad/dt,get_u(u,UU,ix,iy,iz),duint/dt,dt);
-      getchar();
-    }
-  */
-  
-
+  //save to memory consistent pp & uu
   PLOOP(iv)
   {
     set_u(p,iv,ix,iy,iz,pp[iv]);

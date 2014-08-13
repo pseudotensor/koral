@@ -395,16 +395,12 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
-
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
       calc_primitives(ix,iy,iz,0);
-    }
-
-
-
+    }  
 
   //**********************************************************************
   //**********************************************************************
@@ -414,9 +410,9 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   cell_fixup_hd();
 
   //correct the axis if needed - now in ko.c
-  //#ifdef CORRECT_POLARAXIS
-  //correct_polaraxis();
-  //#endif
+  #ifdef CORRECT_POLARAXIS
+  correct_polaraxis();
+  #endif
   
   //**********************************************************************
   //* MPI ****************************************************************
@@ -824,23 +820,15 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
 	  
 
+	  //saving new conserved to memory
 	  #ifdef SKIPHDEVOLUTION
 	  if(iv>5)
           #endif
-	
-	    //test
-	    //if(ix>50)
-	      set_u(u,iv,ix,iy,iz,val);	
+	    set_u(u,iv,ix,iy,iz,val);	 
 
 	}
 
     }     
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
-  
-  //hd fixup after advection step
-  //cell_fixup_hd();
 
   //**********************************************************************
   //**********************************************************************
@@ -862,23 +850,19 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       pick_g(ix,iy,iz,gg);
       pick_G(ix,iy,iz,GG);
       ldouble gdet=gg[3][4];
-      ldouble pp[NV],uu[NV];
+      ldouble uu[NV];
 	      	      
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
       //updating u - geometrical source terms
+      //using primitves currently in memory in *p
       ldouble ms[NV],val;
       f_metric_source_term(ix,iy,iz,ms);
 
       //test - force energy flux not affected by Christoffels
       //ms[1]=0.;
       
-      //test
-      //if(ix==10) printf("metric > %e %e | %e %e | %e\n",get_u(u,EE0,ix,iy,iz),ms[EE0],get_u(u,1,ix,iy,iz),ms[1],dt);
-
-
-
       for(iv=0;iv<NV;iv++)
 	{
 	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
@@ -894,7 +878,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //testing if entropy increased after advection and calculating post-advection primitives
       /***************************/
 
-      calc_primitives(ix,iy,iz,VERIFYENTROPYAFTERADVECTION);
+      //calc_primitives(ix,iy,iz,VERIFYENTROPYAFTERADVECTION);
     }
 
    //**********************************************************************
@@ -902,7 +886,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
    //**********************************************************************
   
    //hd fixup after advection and source
-   cell_fixup_hd();
+   //cell_fixup_hd();
 
    //**********************************************************************
    //**********************************************************************
@@ -927,6 +911,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       //no need for it - already updated
       //calc_primitives(ix,iy,iz,0);
 
+      //using primitives from *p, i.e., from the beginning of this timestep
       explicit_rad_source_term(ix,iy,iz,dt);
     } //source terms
 
@@ -990,14 +975,13 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
       
-      calc_primitives(ix,iy,iz,0);
-
-     //test
-      //if(ix>50)
+      //calc_primitives(ix,iy,iz,0);
+      
+      //uses values already in *p as the initial guess, i.e., values from the beginning of op_explicit
       implicit_lab_rad_source_term(ix,iy,iz,dt);
     } //source terms
 
-   //fixup here after source term 
+  //fixup here after source term 
   cell_fixup_rad();
 
 #endif //IMPLICIT_LAB_RAD_SOURCE
