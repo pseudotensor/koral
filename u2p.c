@@ -138,10 +138,14 @@ calc_primitives_local(int ix,int iy,int iz,ldouble *pp)
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
+u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
+
+  ldouble uu[NV];
+  int iv;
+  PLOOP(iv) uu[iv]=uu0[iv];
 
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
   gg=geom->gg;
@@ -181,7 +185,6 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
   
   //test
   ldouble ppold[NV];
-  int iv;
   PLOOP(iv)
     ppold[iv]=pp[iv];
 
@@ -354,7 +357,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 
 #ifdef RADIATION
 
-  /*
+  #ifdef BALANCEENTROPYWITHRADIATION
  //trying to balance gain of energy because of entropy inversion
   //by borrowing from the radiation field
 
@@ -382,7 +385,7 @@ u2p(ldouble *uu, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	  //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
 	}
     }
-  */
+  #endif
 
   u2p_rad(uu,pp,geom,&radcor);
 #endif

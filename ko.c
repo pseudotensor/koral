@@ -429,13 +429,14 @@ solve_the_problem(ldouble tstart, char* folder)
       avimpitloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
       avimpitloc[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPLTE]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPLTE];
             
-      impnumsloc[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
-      impnumsloc[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
-      impnumsloc[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
-      impnumsloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
-      impnumsloc[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE];
-      impnumsloc[5]=global_int_slot[GLOBALINTSLOT_NRADFIXUPS];
-      impnumsloc[6]=global_int_slot[GLOBALINTSLOT_NCRITFAILURES]; 
+      impnumsloc[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHDCONS];
+      impnumsloc[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRADCONS];
+      impnumsloc[2]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
+      impnumsloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
+      
+      impnumsloc[4]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
+      impnumsloc[5]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
+      impnumsloc[6]=global_int_slot[GLOBALINTSLOT_NIMPLTE]+global_int_slot[GLOBALINTSLOT_NRADFIXUPS]+global_int_slot[GLOBALINTSLOT_NCRITFAILURES];
 
       #ifdef MPI
       MPI_Allreduce(impnumsloc, impnums, 7, MPI_INT, MPI_SUM,

@@ -8,21 +8,22 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 8
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
+//#define BALANCEENTROPYWITHRADIATION
 
-#define RADIMPCONV 1.e-12
-#define U2PCONV 1.e-14
+#define RADIMPCONV 1.e-8
+#define U2PCONV 1.e-12
 
 //#define OPACBELLLIN
 //#define RADCLOSURE MINERBOCLOSURE
 //#define RADCLOSUREMIXATBH
 //#define RADCLOSURECOORDS BLCOORDS
-//#define COMPTONIZATION
+#define COMPTONIZATION
 
 /************************************/
 //magnetic choices

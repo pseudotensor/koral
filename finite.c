@@ -956,7 +956,7 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
   copy_u(1., u, ubase);
 
   //to count the average number of iteration in the implicit solver
-  for(ii=0;ii<GLOBALINTSLOT_ITERIMPLTE;ii++)
+  for(ii=0;ii<NGLOBALINTSLOT;ii++)
     global_int_slot[ii]=0.;
 
   /************************************************************************/

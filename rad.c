@@ -1092,44 +1092,34 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //succeeded
   //primitives vector returned to pp[]
 
-  //to calculate average number of succesful iterations
-
-  if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ)
+  //report on average number of iterations
+   if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ)
     {
       //#pragma omp critical //to make the counting precise
       global_int_slot[GLOBALINTSLOT_ITERIMPENERRAD]+=iter;
-      //#pragma omp critical
-      global_int_slot[GLOBALINTSLOT_NIMPENERRAD]+=1;
     }
   if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ)
     {
       //#pragma omp critical
       global_int_slot[GLOBALINTSLOT_ITERIMPENERMHD]+=iter;
-      //#pragma omp critical
-      global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+=1;
     }
   if(whichprim==RAD && whicheq==RADIMPLICIT_ENTROPYEQ)
     {
       //#pragma omp critical
       global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]+=iter;
-      //#pragma omp critical
-      global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]+=1;
     }
   if(whichprim==MHD && whicheq==RADIMPLICIT_ENTROPYEQ)
     {
       //#pragma omp critical
       global_int_slot[GLOBALINTSLOT_ITERIMPENTRMHD]+=iter;
-      //#pragma omp critical
-      global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]+=1;
     }
   if(whicheq==RADIMPLICIT_LTEEQ)
     {
       //#pragma omp critical
       global_int_slot[GLOBALINTSLOT_ITERIMPLTE]+=iter;
-      //#pragma omp critical
-      global_int_slot[GLOBALINTSLOT_NIMPLTE]+=1;
     }
 
+ 
   return 0;
 }
 
@@ -1156,37 +1146,17 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //(u2p checks against proper entropy evolution and uses entropy inversion if necessary
 
   int corr[2],fixup[2],params[4],ret;
+  int uinbound;
 
   //no, thank you, we will use pp as the guess, and keep to given uu
   ldouble ppexact[NV];
   PLOOP(iv) ppexact[iv]=pp[iv];
   u2p(uu,ppexact,&geom,corr,fixup,0);
 
-  /*
-  if(corr[0]==0 && corr[1]==0) //the conserved in-bounds, so use inverted primitives as the initial guess, otherwise use primitives from the beginning of the time step
-    {
-      PLOOP(iv) pp[iv]=ppexact[iv];
-    }
-  */
-
-  //p2u(pp,uu,&geom);
-  /*
-  print_primitives(pp);
-  u2p(uu,pp,&geom,corr,fixup,0);
-  print_conserved(uu);
-  print_primitives(pp);
-  p2u(pp,uu,&geom);
-  print_conserved(uu);
-  print_primitives(pp);
-  u2p(uu,pp,&geom,corr,fixup,0);
-  print_conserved(uu);
-  print_primitives(pp);
-  p2u(pp,uu,&geom);
-  print_conserved(uu);
-  print_primitives(pp);
-  
-  getch();
-  */
+  if(corr[0]==0 && corr[1]==0) //the conserved in-bounds
+    uinbound=1;
+  else
+    uinbound=0;
 
   ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
   PLOOP(iv) 
@@ -1225,6 +1195,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(verbose) printf("gammas: %e %e\n\n",sqrt(gammagas2),sqrt(gammarad2));
 
   //**** 0th ****
+  int beforecorrection=1;
+  ldouble enratiotreshold = 1.e-8;
 
   //in pp00[] initial guess for solvers
   params[3]=0; //no overshooting check
@@ -1233,23 +1205,88 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   PLOOP(iv) 
   { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LAB;
-  if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+  params[2]=RADIMPLICIT_LAB; //primitives not known, so only LAB
+  if(Ehat<enratiotreshold*pp0[UU]) params[0]=RAD; else params[0]=MHD;
 
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
 
-  if(ret!=0)
-    { 
-      //test
-      //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,1,params,pp); 
-      //exit(0);    
-
-      params[2]=RADIMPLICIT_FF;
-      //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-    }      
-  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
+  //now try with ppexact as the initial guess
+  if(0 && ret!=0)
+    {
+      PLOOP(iv) 
+      { pp0[iv]=ppexact[iv]; uu0[iv]=uu00[iv];  }
+      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
+    }
   
   //*********** 2th ************
+  if(ret!=0) {
+      PLOOP(iv) 
+      {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+      params[1]=RADIMPLICIT_ENERGYEQ;
+      params[2]=RADIMPLICIT_LAB;
+      if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
+
+      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+
+      if(0 && ret!=0)
+	{
+	  PLOOP(iv) 
+	  { pp0[iv]=ppexact[iv]; uu0[iv]=uu00[iv];  }
+	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
+	}
+    }
+ 
+
+  //***********************************************//
+  //***********************************************//
+  //***********************************************//
+
+  //test
+  //ret=-1; //to enforce working on corrected conserved
+
+
+
+  //if energy-lab failed then use corrected primitives/conserved - the old approach
+  if(ret!=0)
+    {
+      p2u(ppexact,uu0,&geom);
+      PLOOP(iv) 
+      {
+	uu00[iv]=uu0[iv];
+	pp00[iv]=ppexact[iv];
+	pp0[iv]=pp00[iv];
+	pp[iv]=pp0[iv];
+      }
+
+      beforecorrection=0;
+    }
+
+  //***********************************************//
+  //***********************************************//
+  //***********************************************//
+
+
+  //*********** 1.5th ************
+
+  if(ret!=0) {
+    PLOOP(iv) 
+    { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+    params[1]=RADIMPLICIT_ENERGYEQ;
+    params[2]=RADIMPLICIT_LAB;
+    if(Ehat<enratiotreshold*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+
+    ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
+    
+    if(ret!=0)
+      { 
+	PLOOP(iv) 
+	{ pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+	params[2]=RADIMPLICIT_FF;
+	ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+      }      
+  }
+  
+  //*********** 2.5th ************
   if(ret!=0) {
       PLOOP(iv) 
       {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
@@ -1259,32 +1296,21 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
       if(ret!=0)
 	{
+	  PLOOP(iv) 
+	  { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
 	  params[2]=RADIMPLICIT_FF;
-	  //ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 	}      
-      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
- 
-  //if energy failed then use physical uu0
-  p2u(ppexact,uu0,&geom);
-  PLOOP(iv) 
-  {
-    uu00[iv]=uu0[iv];
-    pp00[iv]=ppexact[iv];
-    pp0[iv]=pp00[iv];
-    pp[iv]=pp0[iv];
-  }
-    
 
   //*********** 3th ************
   if(ret!=0) {
       PLOOP(iv) 
       {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
       params[1]=RADIMPLICIT_ENTROPYEQ;
-      params[2]=RADIMPLICIT_FF;
-      if(Ehat<1.e-2*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+      params[2]=RADIMPLICIT_LAB;
+      if(Ehat<enratiotreshold*pp0[UU]) params[0]=RAD; else params[0]=MHD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
     }
 
   //*********** 4th ************
@@ -1292,12 +1318,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       PLOOP(iv) 
       {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
       params[1]=RADIMPLICIT_ENTROPYEQ;
-      params[2]=RADIMPLICIT_FF;
+      params[2]=RADIMPLICIT_LAB;
       if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-      if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
-    }
+  }
 
+  if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
 
   if(ret!=0)
     {
@@ -1341,12 +1367,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       return 0; 
     }
 
-  //printf("%d > %d %d %d\n",ix,params[0],params[1],params[2]);
-
   //succeeded!
   //solution given in pp[]
-
-  //get uu prom just returned pp
+  //get uu from just returned pp
   p2u(pp,uu,&geom);
 
   //save to memory consistent pp & uu
@@ -1355,6 +1378,41 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     set_u(p,iv,ix,iy,iz,pp[iv]);
     set_u(u,iv,ix,iy,iz,uu[iv]);
   }
+
+ //to calculate average number of succesful iterations
+  int whichprim=params[0];
+  int whicheq=params[1];
+  if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ)
+    {
+      //#pragma omp critical
+      if(beforecorrection==1)
+	global_int_slot[GLOBALINTSLOT_NIMPENERRADCONS]+=1;
+      else
+	global_int_slot[GLOBALINTSLOT_NIMPENERRAD]+=1;
+    }
+  if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ)
+    {
+      //#pragma omp critical
+      if(beforecorrection==1)
+	global_int_slot[GLOBALINTSLOT_NIMPENERMHDCONS]+=1;
+      else
+	global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+=1; 
+    }
+  if(whichprim==RAD && whicheq==RADIMPLICIT_ENTROPYEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]+=1;
+    }
+  if(whichprim==MHD && whicheq==RADIMPLICIT_ENTROPYEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]+=1;
+    }
+  if(whicheq==RADIMPLICIT_LTEEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_NIMPLTE]+=1;
+    }
 
   return 0;  
 }
