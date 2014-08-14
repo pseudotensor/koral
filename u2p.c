@@ -43,6 +43,9 @@ calc_primitives(int ix,int iy,int iz,int type)
   //converting to primitives
   u2p(uu,pp,&geom,corrected,fixups,type);
 
+  if(corrected[0]==1) //hd correction - entropy solver
+    set_cflag(ENTROPYFLAG,ix,iy,iz,1); 
+
   //imposing floors
 
   //************************************
@@ -243,11 +246,8 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	//entropy solver - conserving entropy
 	u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,0);  
 
-	set_cflag(ENTROPYFLAG,geom->ix,geom->iy,geom->iz,1); 
+	
 
-
-
-    
 	if(u2pret<0)
 	  {
 	    ret=-2;
@@ -363,7 +363,6 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 
   if(ret==-1)
     {
-      //verifying first if radiation is dominating over radiation
       ldouble uunew[NV],ppnew[NV];
       PLOOP(iv) uunew[iv]=uu[iv];
       p2u_mhd(pp,uunew,geom);
@@ -379,6 +378,7 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
       if(radcor==0) //there was enough energy to borrow from
 	{
 	  PLOOP(iv) uu[iv]=uunew[iv];
+	  //printf("entropy correction did work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
 	}
       else
 	{

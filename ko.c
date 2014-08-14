@@ -346,9 +346,11 @@ solve_the_problem(ldouble tstart, char* folder)
 	 //1st
 	 op_explicit (t,.5*dt,ut0); 
 	 op_implicit (t,.5*dt,ut3); 
+
 	 //2nd
 	 op_explicit (t,dt,ut1); 
 	 op_implicit (t,dt,ut3); 
+	 
 	 add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
 	 //together     
 	 t+=dt;    

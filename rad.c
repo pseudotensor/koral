@@ -1197,9 +1197,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //**** 0th ****
   int beforecorrection=1;
   ldouble enratiotreshold = 1.e-8;
+  ret=-1;
 
-  //in pp00[] initial guess for solvers
+  //in pp0[] initial guess for solvers
   params[3]=0; //no overshooting check
+
+  #ifndef BALANCEENTROPYWITHRADIATION
+  
   //*********** 1th ************
 
   PLOOP(iv) 
@@ -1236,7 +1240,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	}
     }
  
-
+  #endif
+  
   //***********************************************//
   //***********************************************//
   //***********************************************//

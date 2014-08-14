@@ -367,7 +367,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 {
   int ix,iy,iz,iv,ii;
 
-  copy_u(1.,u,ubase);
+  //copy_u(1.,u,ubase);
 
 
   //global
@@ -413,6 +413,8 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   #ifdef CORRECT_POLARAXIS
   correct_polaraxis();
   #endif
+
+  copy_u(1.,u,ubase);
   
   //**********************************************************************
   //* MPI ****************************************************************
