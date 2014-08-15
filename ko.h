@@ -237,6 +237,7 @@ ldouble opacity_BellLin(ldouble rhoc, ldouble Tc);
 
 //finite.c
 
+int calc_u2p();
 int correct_polaraxis();
 int solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase);
 int cell_fixup_rad();

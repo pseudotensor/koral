@@ -358,41 +358,19 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 }
 
 /***************************************************/
-/* the advective plus metric operator  *************/
-/* applied explicitly using Lax-Friedrcich fluxes **/
-/* starts from *u, copies to *ubase, updates *u, ***/
+/* calculates primitives from *u *******************/
+/* corrects them if needed, updates *u *************/
 /***************************************************/
 int
-op_explicit(ldouble t, ldouble dt,ldouble *ubase) 
+calc_u2p()
 {
-  int ix,iy,iz,iv,ii;
-
-  //copy_u(1.,u,ubase);
-
-
-  //global
-  max_ws[0]=max_ws[1]=max_ws[2]=-1.;
-
-  //local
-  ldouble max_lws[3];
-  max_lws[0]=max_lws[1]=max_lws[2]=-1.;
-
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
-
-  //determines treatment or not of ghost cells
-  int xlim,ylim,zlim;
-  if(NX>1) xlim=1; else xlim=0;  
-  if(NY>1) ylim=1; else ylim=0;
-  if(NZ>1) zlim=1; else zlim=0;
-  
+  int ix,iy,iz,ii;
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
 
   //calculates the primitives
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -409,13 +387,52 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
   //fixup here hd after inversions
   cell_fixup_hd();
 
-  //correct the axis if needed - now in ko.c
-  #ifdef CORRECT_POLARAXIS
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+  //correct the axis 
+#ifdef CORRECT_POLARAXIS
   correct_polaraxis();
-  #endif
+#endif
 
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+  return 0;
+}
+
+/***************************************************/
+/* the advective plus metric operator  *************/
+/* applied explicitly using Lax-Friedrcich fluxes **/
+/* starts from *u, copies to *ubase, updates *u, ***/
+/***************************************************/
+int
+op_explicit(ldouble t, ldouble dt,ldouble *ubase) 
+{
+  int ix,iy,iz,iv,ii;
+
+  //copies the initial state to *ubase
   copy_u(1.,u,ubase);
+
+  //global wavespeeds
+  max_ws[0]=max_ws[1]=max_ws[2]=-1.;
+ 
+  //local - not used anymore
+  ldouble max_lws[3];
+  max_lws[0]=max_lws[1]=max_lws[2]=-1.;
+
+  //**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+  //determines treatment or not of ghost cells
+  int xlim,ylim,zlim;
+  if(NX>1) xlim=1; else xlim=0;  
+  if(NY>1) ylim=1; else ylim=0;
+  if(NZ>1) zlim=1; else zlim=0;
   
+
   //**********************************************************************
   //* MPI ****************************************************************
   //**********************************************************************
@@ -977,9 +994,7 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
       
-      //calc_primitives(ix,iy,iz,0);
-      
-      //uses values already in *p as the initial guess, i.e., values from the beginning of op_explicit
+      //uses values already in *p as the initial guess
       implicit_lab_rad_source_term(ix,iy,iz,dt);
     } //source terms
 

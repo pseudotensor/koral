@@ -75,7 +75,8 @@ main(int argc, char **argv)
   //**************
   //tests
   //**************
-  
+  //test_solve_implicit_lab();
+
   //print scalings GU->CGS and quit
   //print_scalings(); exit(-1);
 
@@ -338,20 +339,43 @@ solve_the_problem(ldouble tstart, char* folder)
      else if(TIMESTEPPING==RK2)
        { 
 	 //******************************* RK2 **********************************
+
+	 #ifndef EXPIMPORDER
+
 	 //0th
-	 //correct if needed
-	 //#ifdef CORRECT_POLARAXIS
-	 //correct_polaraxis();
-	 //#endif
+	 calc_u2p();
+
+	 //1st
+	 op_implicit (t,.5*dt,ut0); 
+	 op_explicit (t,.5*dt,uforget); 
+
+	 //0th
+	 calc_u2p();
+
+	 //2nd
+	 op_implicit (t,dt,ut1); 
+	 op_explicit (t,dt,uforget); 
+
+	 #else
+
+	 //0th
+	 calc_u2p();
+
 	 //1st
 	 op_explicit (t,.5*dt,ut0); 
-	 op_implicit (t,.5*dt,ut3); 
+	 op_implicit (t,.5*dt,uforget); 
+	 
+	 //0th
+	 calc_u2p();
 
 	 //2nd
 	 op_explicit (t,dt,ut1); 
-	 op_implicit (t,dt,ut3); 
+	 op_implicit (t,dt,uforget); 
+	 
+	 #endif
 	 
 	 add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
+
 	 //together     
 	 t+=dt;    
 	 add_u(1.,ut0,1.,ut2,u);

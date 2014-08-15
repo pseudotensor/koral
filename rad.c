@@ -887,7 +887,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  if(xxx[0]<=0. && 1)
 	    {
 	      xiapp*=ppp[sh]/(ppp[sh]+fabs(xxx[0]));
-	      xiapp*=sqrt(EPS); //not to land too close to zero, but sometimes prevents from finding proper solution
+	      xiapp*=1.e-1;//sqrt(EPS); //not to land too close to zero, but sometimes prevents from finding proper solution
 	    }
 	  else //u2p error only
 	    {
@@ -1148,25 +1148,32 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   int corr[2],fixup[2],params[4],ret;
   int uinbound;
 
-  //no, thank you, we will use pp as the guess, and keep to given uu
+  ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
   ldouble ppexact[NV];
+  
+#ifdef EXPIMPORDER
+  //no, thank you, we will use pp as the guess, and keep to given uu
   PLOOP(iv) ppexact[iv]=pp[iv];
   u2p(uu,ppexact,&geom,corr,fixup,0);
+ 
 
   if(corr[0]==0 && corr[1]==0) //the conserved in-bounds
     uinbound=1;
   else
-    uinbound=0;
+    uinbound=0; 
+ #endif
 
-  ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
   PLOOP(iv) 
   {
-    pp0[iv]=ppexact[iv];
+    pp0[iv]=pp[iv];
     uu0[iv]=uu[iv];
-    pp00[iv]=ppexact[iv];
+    pp00[iv]=pp[iv];
     uu00[iv]=uu[iv];
   }
 
+  //otherwise assumes *u and *p consistent!
+
+ 
   //initial guess in pp[]
 
   //mostly for LTE solver - can be moved further once debug is done
@@ -1202,6 +1209,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //in pp0[] initial guess for solvers
   params[3]=0; //no overshooting check
 
+  #ifdef EXPIMPORDER
   #ifndef BALANCEENTROPYWITHRADIATION
   
   //*********** 1th ************
@@ -1215,7 +1223,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
 
   //now try with ppexact as the initial guess
-  if(0 && ret!=0)
+  if(ret!=0)
     {
       PLOOP(iv) 
       { pp0[iv]=ppexact[iv]; uu0[iv]=uu00[iv];  }
@@ -1232,7 +1240,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 
-      if(0 && ret!=0)
+      if(ret!=0)
 	{
 	  PLOOP(iv) 
 	  { pp0[iv]=ppexact[iv]; uu0[iv]=uu00[iv];  }
@@ -1242,18 +1250,27 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
  
   #endif
   
-  //***********************************************//
-  //***********************************************//
-  //***********************************************//
-
+ 
   //test
   //ret=-1; //to enforce working on corrected conserved
-
+  
 
 
   //if energy-lab failed then use corrected primitives/conserved - the old approach
+  
   if(ret!=0)
     {
+      //test 
+      if(ix>20 && iy<3*NY/4 && iy>NY/4)
+	{
+	  PLOOP(iv) 
+	  { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv];  }
+	  verbose=2;
+	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
+	  exit(0);
+	}
+
+
       p2u(ppexact,uu0,&geom);
       PLOOP(iv) 
       {
@@ -1265,6 +1282,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
       beforecorrection=0;
     }
+  #endif
 
   //***********************************************//
   //***********************************************//
@@ -1373,6 +1391,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     }
 
   //succeeded!
+
+  //but if succeeded with entropy - try to impose energy conservation!
+
+
   //solution given in pp[]
   //get uu from just returned pp
   p2u(pp,uu,&geom);
@@ -3710,7 +3732,7 @@ test_solve_implicit_lab()
   pp0[FZ0]/=10.;
   */
 
-  p2u(pp0,uu0,&geom);
+  //p2u(pp0,uu0,&geom);
 
   ldouble deltas[4];
   int verbose=2;
@@ -3722,8 +3744,20 @@ test_solve_implicit_lab()
   //  return solve_implicit_lab_4dcon(uu0,pp0,&geom,dt,deltas,verbose,pp);
 
   
+  //test
+  //pp0[UU]*=1000000000.;
 
- 
+  ldouble Gi[4];
+  ldouble temp;
+  for(temp=1.e0;temp<1.e10;temp*=1.2)
+    {
+      pp0[UU]=calc_PEQ_ufromTrho(temp,pp0[RHO]);
+      calc_Gi(pp0,&geom,Gi);
+      printf("%e %e\n",temp,Gi[0]);
+    }
+  exit(1);
+
+   
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
@@ -3769,9 +3803,7 @@ test_jon_solve_implicit_lab()
       iv=fscanf(in,"%lf ",&dt);
       iv=fscanf(in,"%lf ",&geom.alpha);
       iv=fscanf(in,"%lf ",&geom.gdet);
-
-      //      uu[EE0]/=1000.;
-
+      
       //fill missing parts
       ldouble ucon[4];
       ucon[1]=pp[VX];
@@ -3793,7 +3825,7 @@ test_jon_solve_implicit_lab()
       //printf("ut: %e\n",ucon[0]);
       int corr[2],fixup[2],u2pret,radcor;
      
-      //test
+      //
       /*
       u2p_rad(uu,pp,&geom,&radcor);
       printf("radcor: %d\n",radcor);

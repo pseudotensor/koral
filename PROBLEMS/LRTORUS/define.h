@@ -15,15 +15,16 @@
 /************************************/
 #define RADIATION
 //#define BALANCEENTROPYWITHRADIATION
+#define EXPIMPORDER
 
-#define RADIMPCONV 1.e-12
+#define RADIMPCONV 1.e-8
 #define U2PCONV 1.e-12
 
 //#define OPACBELLLIN
 //#define RADCLOSURE MINERBOCLOSURE
 //#define RADCLOSUREMIXATBH
 //#define RADCLOSURECOORDS BLCOORDS
-//#define COMPTONIZATION
+#define COMPTONIZATION
 
 /************************************/
 //magnetic choices

@@ -279,7 +279,7 @@ static int get_m1closure_urfconrel(int verbose,
   ldouble Erf=*Erfreturn; // get initial Erf
   ldouble Erfslow,Erffast;
   ldouble gammamax=GAMMAMAXRAD; 
-  int ii,jj,kk;
+  int ii,jj,kk,usingfast;
 
   //////////////////////
   //
@@ -348,7 +348,7 @@ static int get_m1closure_urfconrel(int verbose,
     Erffast=Erf;
     get_m1closure_gammarel2_cold(verbose,ggg,Avconfast,Avcovfast,&gammarel2fast,&delta,&numerator,&divisor,&Erffast,urfconrelfast);
 
-    int usingfast=1;
+    usingfast=1;
     // choose by which Avcov[0] is closest to original&&
     //    if( fabs(Avcovslow[0]-Avcov[0])>fabs(Avcovfast[0]-Avcov[0])){
     if( fabs(Avcovslow[0]-Avcov[0])>fabs(Avcovfast[0]-Avcov[0])){
@@ -389,11 +389,14 @@ static int get_m1closure_urfconrel(int verbose,
 
   if(!isfinite(Erf) || !isfinite(gammarel2) || !isfinite(urfconrel[0])|| !isfinite(urfconrel[1])|| !isfinite(urfconrel[2])|| !isfinite(urfconrel[3]) )
     {
-      if(verbose || 1)      
+      if(verbose)      
 	{
 	  int gix,giy,giz;
 	  mpi_local2globalidx(geom->ix,geom->iy,geom->iz,&gix,&giy,&giz);
-	  printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g : %d %d %d %d : %g %g %g %g\n",gix,giy,giz,Erf,gammarel2,urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
+	  printf("------------\nJONNAN: %e %e %e %e\n",Erf,*Erfreturn,Erfslow,Erffast);
+	  if(usingfast) printf("JONNAN: usingfast==1\n"); else printf("JONNAN: usingfast==0\n");
+	  
+	  printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g %g : %d %d %d %d : %g %g %g %g\n",gix,giy,giz,Erf,gammarel2,urfconrel[0],urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
 	}
       return -1;
   }
