@@ -359,7 +359,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 
 /***************************************************/
 /* calculates primitives from *u *******************/
-/* corrects them if needed, updates *u *************/
 /***************************************************/
 int
 calc_u2p()
@@ -387,6 +386,18 @@ calc_u2p()
   //fixup here hd after inversions
   cell_fixup_hd();
 
+
+  return 0;
+}
+
+/***************************************************/
+/* corrects them if needed, updates *u *************/
+/***************************************************/
+int
+do_finger()
+{
+  int ix,iy,iz,ii;
+  
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -401,6 +412,9 @@ calc_u2p()
 
   return 0;
 }
+
+
+
 
 /***************************************************/
 /* the advective plus metric operator  *************/
@@ -2772,7 +2786,7 @@ cell_fixup_hd()
 	      if(verbose>1) 
 		{
 		  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
-		  getch();
+		  //tch();
 		}
 
 	      //save to updated arrays memory

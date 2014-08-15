@@ -76,13 +76,14 @@
 #define ZBCHI 6
 
 //cell flags
-#define NFLAGS 5
+#define NFLAGS 6
 
 //boolean
 #define ENTROPYFLAG 0
 #define RADSOURCEWORKEDFLAG 1
 #define HDFIXUPFLAG 2
 #define RADFIXUPFLAG 3
+#define ENTROPYFLAG2 4
 
 //values for RADFIXUP
 #define RADSOURCETYPEFLAG 4

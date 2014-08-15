@@ -1145,12 +1145,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //inversion to get the right pp[]
   //(u2p checks against proper entropy evolution and uses entropy inversion if necessary
 
-  int corr[2],fixup[2],params[4],ret;
+  int corr[3],fixup[2],params[4],ret;
   int uinbound;
 
   ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
   ldouble ppexact[NV];
   
+  /*
 #ifdef EXPIMPORDER
   //no, thank you, we will use pp as the guess, and keep to given uu
   PLOOP(iv) ppexact[iv]=pp[iv];
@@ -1162,6 +1163,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   else
     uinbound=0; 
  #endif
+  */
 
   PLOOP(iv) 
   {
@@ -1202,12 +1204,14 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(verbose) printf("gammas: %e %e\n\n",sqrt(gammagas2),sqrt(gammarad2));
 
   //**** 0th ****
-  int beforecorrection=1;
+  int conserving=1;
   ldouble enratiotreshold = 1.e-8;
   ret=-1;
 
   //in pp0[] initial guess for solvers
   params[3]=0; //no overshooting check
+
+  /*
 
   #ifdef EXPIMPORDER
   #ifndef BALANCEENTROPYWITHRADIATION
@@ -1260,17 +1264,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   
   if(ret!=0)
     {
-      //test 
-      if(ix>20 && iy<3*NY/4 && iy>NY/4)
-	{
-	  PLOOP(iv) 
-	  { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv];  }
-	  verbose=2;
-	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
-	  exit(0);
-	}
-
-
       p2u(ppexact,uu0,&geom);
       PLOOP(iv) 
       {
@@ -1280,10 +1273,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	pp[iv]=pp0[iv];
       }
 
-      beforecorrection=0;
+      conserving=0;
     }
   #endif
-
+*/
   //***********************************************//
   //***********************************************//
   //***********************************************//
@@ -1324,26 +1317,28 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  params[2]=RADIMPLICIT_FF;
 	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 	}      
-    }
+  }
 
   //*********** 3th ************
   if(ret!=0) {
-      PLOOP(iv) 
-      {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-      params[1]=RADIMPLICIT_ENTROPYEQ;
-      params[2]=RADIMPLICIT_LAB;
-      if(Ehat<enratiotreshold*pp0[UU]) params[0]=RAD; else params[0]=MHD;
-      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-    }
+    conserving=0;// from now on
+
+    PLOOP(iv) 
+    {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+    params[1]=RADIMPLICIT_ENTROPYEQ;
+    params[2]=RADIMPLICIT_LAB;
+    if(Ehat<enratiotreshold*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+    ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+  }
 
   //*********** 4th ************
   if(ret!=0) {
-      PLOOP(iv) 
-      {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-      params[1]=RADIMPLICIT_ENTROPYEQ;
-      params[2]=RADIMPLICIT_LAB;
-      if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
-      ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+    PLOOP(iv) 
+    {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+    params[1]=RADIMPLICIT_ENTROPYEQ;
+    params[2]=RADIMPLICIT_LAB;
+    if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
+    ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
   }
 
   if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
@@ -1412,7 +1407,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ)
     {
       //#pragma omp critical
-      if(beforecorrection==1)
+      if(conserving==1)
 	global_int_slot[GLOBALINTSLOT_NIMPENERRADCONS]+=1;
       else
 	global_int_slot[GLOBALINTSLOT_NIMPENERRAD]+=1;
@@ -1420,7 +1415,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ)
     {
       //#pragma omp critical
-      if(beforecorrection==1)
+      if(conserving==1)
 	global_int_slot[GLOBALINTSLOT_NIMPENERMHDCONS]+=1;
       else
 	global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+=1; 
@@ -1499,7 +1494,7 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
 	  uu0[iv]+=delapl[iv];
 	}
 
-      int corr[2],fixup[2];
+      int corr[3],fixup[2];
 
       printf("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
       printf("\n@@@@@@@@ EXPLICIT @@@@@@@@@@@@");

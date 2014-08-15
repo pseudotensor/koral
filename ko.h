@@ -238,6 +238,7 @@ ldouble opacity_BellLin(ldouble rhoc, ldouble Tc);
 //finite.c
 
 int calc_u2p();
+int do_finger();
 int correct_polaraxis();
 int solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase);
 int cell_fixup_rad();
@@ -525,6 +526,7 @@ int conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],l
 int conv_vels_core(ldouble *u1,ldouble *u2,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5],ldouble,int);
 
 //u2p.c
+int count_entropy(int *,int*);
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
 int calc_primitives(int,int,int,int);
 int check_floors_mhd(ldouble *uu, int,void*);

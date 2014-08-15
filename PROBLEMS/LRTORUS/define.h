@@ -14,8 +14,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-//#define BALANCEENTROPYWITHRADIATION
-#define EXPIMPORDER
+#define BALANCEENTROPYWITHRADIATION
 
 #define RADIMPCONV 1.e-8
 #define U2PCONV 1.e-12
@@ -25,6 +24,8 @@
 //#define RADCLOSUREMIXATBH
 //#define RADCLOSURECOORDS BLCOORDS
 #define COMPTONIZATION
+//#define DAMPCOMPTONIZATIONATBH
+
 
 /************************************/
 //magnetic choices
@@ -46,12 +47,12 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2//RK2HEUN//RK2IMEX 
+#define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 1
+#define DOFIXUPS 0
 
 /************************************/
 //viscosity choices

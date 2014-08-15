@@ -212,6 +212,7 @@ solve_the_problem(ldouble tstart, char* folder)
   int i,j;
   int loopsallociter;
   int spitoutput,lastzone;
+  int nentr[4],nentr2[4];
   
   ldouble fprintf_time = 0.;
   int i1,i2,i3,ix,iy,iz,iv;
@@ -316,94 +317,79 @@ solve_the_problem(ldouble tstart, char* folder)
     
       if(TIMESTEPPING==RK2IMEX)
 	{
-	  //0th
-	  //correct if needed
-	  //#ifdef CORRECT_POLARAXIS
-	  //correct_polaraxis();
-	  //#endif
-	  //imex
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); 
+	  do_finger();
 	  ldouble gamma=1.-1./sqrt(2.);
+
 	  op_implicit (t,dt*gamma,ut0); //U(n) in *ut0;  U(1) in *u
 	  add_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
+
+	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); 
 	  op_explicit (t,dt,ut1); //U(1) in *ut1; 
 	  add_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
 	  add_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
+
+	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]);
 	  op_implicit (t,gamma*dt,uforget); //U(2) in *u
 	  add_u(1./(dt*gamma),u,-1./(dt*gamma),uforget,drt2); //R(U(2)) in *drt2;
+
+	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]);
 	  op_explicit (t,dt,ut2); //U(2) in *ut2; 
 	  add_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
+
 	  add_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
 	  add_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
 	  t+=dt;	 
 	}
-     else if(TIMESTEPPING==RK2)
-       { 
-	 //******************************* RK2 **********************************
+      else if(TIMESTEPPING==RK2)
+	{ 
+	  //******************************* RK2 **********************************
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();
 
-	 #ifndef EXPIMPORDER
-
-	 //0th
-	 calc_u2p();
-
-	 //1st
-	 op_implicit (t,.5*dt,ut0); 
-	 op_explicit (t,.5*dt,uforget); 
-
-	 //0th
-	 calc_u2p();
-
-	 //2nd
-	 op_implicit (t,dt,ut1); 
-	 op_explicit (t,dt,uforget); 
-
-	 #else
-
-	 //0th
-	 calc_u2p();
-
-	 //1st
-	 op_explicit (t,.5*dt,ut0); 
-	 op_implicit (t,.5*dt,uforget); 
+	  //1st
+	  op_explicit (t,.5*dt,ut0); 
+	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]);
+	  op_implicit (t,.5*dt,uforget); 
 	 
-	 //0th
-	 calc_u2p();
-
-	 //2nd
-	 op_explicit (t,dt,ut1); 
-	 op_implicit (t,dt,uforget); 
+	  //2nd
+	  nentr[2]=nentr2[2]=0;
+	  op_explicit (t,dt,ut1); 
+	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]);
+	  op_implicit (t,dt,uforget); 
 	 
-	 #endif
 	 
-	 add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
+	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
 
-	 //together     
-	 t+=dt;    
-	 add_u(1.,ut0,1.,ut2,u);
-	 //************************** end of RK2 **********************************
+	  //together     
+	  t+=dt;    
+	  add_u(1.,ut0,1.,ut2,u);
+	  //************************** end of RK2 **********************************
 	}
-     else if(TIMESTEPPING==RK2HEUN)
-       { 
-	 //******************************* RK2 **********************************
-	 //0th
-	 //correct if needed
-         #ifdef CORRECT_POLARAXIS
-	 correct_polaraxis();
-         #endif
-	 //1st	 
-	 op_explicit (t,1.*dt,ut0); 
-	 op_implicit (t,1.*dt,uforget); 
-	 add_u(1.,u,-1.,ut0,ut2); 
-	 //2nd
-	 op_explicit (t,dt,ut1); 
-	 op_implicit (t,dt,uforget); 
-	 add_u(1.,u,-1.,ut1,ut3); 
-	 //together     
-	 t+=dt;    
-	 add_u_3(1.,u,1./2.,ut2,1./2.,ut3,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
-	 //************************** end of RK2 **********************************
+      else if(TIMESTEPPING==RK2HEUN)
+	{ 
+	  //******************************* RK2 **********************************
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();
+
+	  //1st	 
+	  op_explicit (t,1.*dt,ut0); 
+	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]);
+	  op_implicit (t,1.*dt,uforget); 
+	  add_u(1.,u,-1.,ut0,ut2); 
+
+	  //2nd
+	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]);
+	  op_explicit (t,dt,ut1); 
+	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]);
+	  op_implicit (t,dt,uforget); 
+	  add_u(1.,u,-1.,ut1,ut3); 
+
+	  //together     
+	  t+=dt;    
+	  add_u_3(1.,u,1./2.,ut2,1./2.,ut3,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
+	  //************************** end of RK2 **********************************
 	}
-     else 
-       my_err("wrong time stepping specified\n");
+      else 
+	my_err("wrong time stepping specified\n");
 
       
       
@@ -426,20 +412,7 @@ solve_the_problem(ldouble tstart, char* folder)
       //************************* outputs ************************************
       //**********************************************************************
    
-      //counting the number of entropy inversions
-      int nentr,nentrloc=0,ii;
-      for(ii=0;ii<Nloop_0;ii++) //domain 
-	{
-	  ix=loop_0[ii][0];
-	  iy=loop_0[ii][1];
-	  iz=loop_0[ii][2]; 
-	  nentrloc+=get_cflag(ENTROPYFLAG,ix,iy,iz); 
-	}
-      #ifdef MPI
-      MPI_Allreduce(&nentrloc, &nentr, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
-      #else
-      nentr=nentrloc;
-      #endif
+ 
       
       
 
@@ -548,7 +521,13 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  printf("(%d) step #%6d t=%10.3e dt=%.3e (real time: %7.2f | %7.6f) znps: %.0f "
 		 ,PROCID,nstep,t,dt,end_time-start_time,2*maxmp_time,znps);
-	  printf("#: %d ",nentr);
+
+#ifdef BALANCEENTROPYWITHRADIATION
+	  printf("#: %d|%d %d|%d %d|%d %d|%d ",nentr[0],nentr2[0],nentr[1],nentr2[1],nentr[2],nentr2[2],nentr[3],nentr2[3]);
+#else
+	  printf("#: %d %d %d %d ",nentr[0],nentr[1],nentr[2],nentr[3]);
+#endif
+
 #ifdef RADIATION
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],

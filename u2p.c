@@ -29,7 +29,7 @@ calc_primitives(int ix,int iy,int iz,int type)
   gdetu=1.;
 #endif
 
-  int corrected[2]={0,0}, fixups[2]={0,0};
+  int corrected[3]={0,0,0}, fixups[2]={0,0};
 
   for(iv=0;iv<NV;iv++)
     {
@@ -39,12 +39,15 @@ calc_primitives(int ix,int iy,int iz,int type)
 
   //aux
   set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
-
+  set_cflag(ENTROPYFLAG2,ix,iy,iz,0); 
+ 
   //converting to primitives
   u2p(uu,pp,&geom,corrected,fixups,type);
 
   if(corrected[0]==1) //hd correction - entropy solver
     set_cflag(ENTROPYFLAG,ix,iy,iz,1); 
+  if(corrected[2]==1) //borrowing energy from radiation didn't work
+    set_cflag(ENTROPYFLAG2,ix,iy,iz,1); 
 
   //imposing floors
 
@@ -73,9 +76,6 @@ calc_primitives(int ix,int iy,int iz,int type)
   
   //************************************
   //update conserved to follow corrections on primitives
-  //or to be sane
-  //if(corrected[0]!=0 || corrected[1]!=0)
-
   p2u(pp,uu,&geom);
   
   for(iv=0;iv<NV;iv++)
@@ -141,7 +141,7 @@ calc_primitives_local(int ix,int iy,int iz,ldouble *pp)
 //**********************************************************************
 //high-level u2p solver
 int
-u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
+u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
@@ -363,6 +363,8 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 
   if(ret==-1)
     {
+      corrected[2]=0;
+  
       ldouble uunew[NV],ppnew[NV];
       PLOOP(iv) uunew[iv]=uu[iv];
       p2u_mhd(pp,uunew,geom);
@@ -382,6 +384,7 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[2],int fixups[2],int type)
 	}
       else
 	{
+	  corrected[2]=1; //entropy correction didn't work
 	  //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
 	}
     }
@@ -1340,3 +1343,29 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 }
 
+int count_entropy(int *n, int *n2)
+{
+
+  //counting the number of entropy inversions
+  int nentr,nentrloc=0,ii,ix,iy,iz;
+  int nentr2,nentrloc2=0;
+  for(ii=0;ii<Nloop_0;ii++) //domain 
+    {
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+      nentrloc+=get_cflag(ENTROPYFLAG,ix,iy,iz); 
+      nentrloc2+=get_cflag(ENTROPYFLAG2,ix,iy,iz); 
+    }
+#ifdef MPI
+  MPI_Allreduce(&nentrloc, &nentr, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
+  MPI_Allreduce(&nentrloc2, &nentr2, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
+#else
+  nentr=nentrloc;
+  nentr2=nentrloc2;
+#endif
+
+  *n = nentr;
+  *n2 = nentr2;
+  return 0;
+}
