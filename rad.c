@@ -182,7 +182,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 
   //radiative four-force
   ldouble Gi[4];
-  calc_Gi(pp,ggg,Gi); 
+  calc_Gi(pp,ggg,Gi,1); 
   indices_21(Gi,Gi,gg);
   
   //errors in momenta - always in lab frame
@@ -248,6 +248,9 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   /***** FF FRAME ENERGY/ENTROPY EQS *****/
   if(whichframe==RADIMPLICIT_FF)
     {
+      //recalculate the ff time component of four-force
+      calc_Gi(pp,ggg,Gi,0); 
+      indices_21(Gi,Gi,gg);
 
       ldouble uconf[4],Rtt0,Rtt;
       //zero - state 
@@ -269,14 +272,14 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	    {
 	      //to do:
 	      //this does not account for COMPTONIZATION!!!
-	      f[0]=Ehat - Ehat0 + kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	      f[0]=Ehat - Ehat0 + dt * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(dt * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	    {
 	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
-	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	      f[0]=pp[ENTR] - pp0[ENTR] - dt * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dt * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else
 	    my_err("not implemented 2\n");	 
@@ -286,15 +289,15 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
 	    {
-	      f[0]=pp[UU] - pp0[UU] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      err[0]=fabs(f[0])/(fabs(pp[UU]) + fabs(pp0[UU]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	      f[0]=pp[UU] - pp0[UU] - dt * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[UU]) + fabs(pp0[UU]) + fabs(dt * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	    {
 	      pp0[ENTR]= calc_Sfromu(pp0[RHO],pp0[UU]);
 	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
-	      f[0]=pp[ENTR] - pp0[ENTR] - kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	      f[0]=pp[ENTR] - pp0[ENTR] - dt * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dt * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else
 	    my_err("not implemented 2\n");	  
@@ -462,7 +465,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       printf("gamma rad: %e\n\n",sqrt(gamma2));
 
       ldouble Gi00[4],Gihat00[4];
-      calc_Gi(pp0, geom,Gi00);
+      calc_Gi(pp0, geom,Gi00,1);
        
       indices_21(Gi00,Gi00,geom->gg);
 
@@ -1453,7 +1456,7 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
 #endif
 
   ldouble Gi[4];
-  calc_Gi(pp,geom,Gi);
+  calc_Gi(pp,geom,Gi,1);
   indices_21(Gi,Gi,geom->gg);
   
   deltas[0]=-Gi[0]*dt*gdetu;
@@ -1509,7 +1512,7 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
       print_Nvector(pp0,NV);
 
       //print_Nvector(pp,NV);
-      //calc_Gi(pp,geom,Gi);
+      //calc_Gi(pp,geom,Gi,1);
       
       //print_4vector(Gi);
       //getchar();
@@ -1554,7 +1557,7 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 //****** and calculates contravariant four-force ***********************
 //**********************************************************************
 int
-calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
+calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
 {
   int i,j,k;
   struct geometry *geom
@@ -1570,9 +1573,16 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4])
 
   //the four-velocity of fluid in lab frame
   ldouble ucon[4],utcon[4],ucov[4],vpr[3];
-  utcon[1]=pp[2];
-  utcon[2]=pp[3];
-  utcon[3]=pp[4];
+  if(labframe==1) //transform ff definition to lab frame
+    {
+      utcon[1]=pp[2];
+      utcon[2]=pp[3];
+      utcon[3]=pp[4];
+
+    }
+  else
+    utcon[1]=utcon[2]=utcon[3]=0.; //return lab-frame four-force
+
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
 
   //gas properties
@@ -3742,7 +3752,7 @@ test_solve_implicit_lab()
   for(temp=1.e0;temp<1.e10;temp*=1.2)
     {
       pp0[UU]=calc_PEQ_ufromTrho(temp,pp0[RHO]);
-      calc_Gi(pp0,&geom,Gi);
+      calc_Gi(pp0,&geom,Gi,1);
       printf("%e %e\n",temp,Gi[0]);
     }
   exit(1);

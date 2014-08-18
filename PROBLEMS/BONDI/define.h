@@ -1,16 +1,17 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 60
 #define MODYFIKUJKRZYSIE 0
 
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
-//#define NCOMPTONIZATION
+#define RADIATION
+#define NCOMPTONIZATION 
+//#define MAXDIFFTRADS 1.e5
 //#define SKIPRADWAVESPEEDLIMITER
 //#define EXPLICIT_LAB_RAD_SOURCE
 //#define RADOUTPUTINFF
@@ -29,7 +30,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e3
+#define RMAX 1.e4
 
 ///#define MINX RMIN
 //#define MAXX RMAX
@@ -62,14 +63,14 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX 
+#define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 0
 #define U2PCONV 1.e-12
-#define RADIMPCONV 1.e-8
+#define RADIMPCONV 1.e-12
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 15
 
@@ -103,7 +104,7 @@
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s
 #define RHOAMB 1.e-25
-#define TAMB 1.e10
+#define TAMB (1.e9*(1.e4/RMAX))
 #define MUGAS 1.
 //#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 

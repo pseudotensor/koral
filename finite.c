@@ -1433,6 +1433,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
       if(zone==currentzone) //no need for reallocating arrays
 	return zone;
       
+      /*
       //copy what is in current subdomain to u_bak_subzone
       for(ii=0;ii<Nloop_0;ii++) //domain only
 	{
@@ -1446,7 +1447,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  }
 	}
       
-      /*
+      
       //make the transition in the overlapping region smooth
       for(ii=0;ii<SUBZONESOVERLAP;ii++)
 	{
@@ -1454,6 +1455,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  ldouble val1,val2;
 	  int index;
 
+	  
 	  if(global_ix1>0) //lower boundary connects to another subzone
 	      {
 		index=global_ix1+SUBZONESOVERLAP-jj-1;
@@ -1514,10 +1516,10 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
       
       //restore ghost cells from u_bak_subzone
-      
+
+      /*
       for(ii=0;ii<Nloop_2;ii++) //gc only
 	{
-	  
 	  ix=loop_2[ii][0];
 	  iy=loop_2[ii][1];
 	  iz=loop_2[ii][2]; 
@@ -1533,15 +1535,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  }
 	 
 	}
-     
-
-      global_ix1=ix1;
-      global_iy1=iy1;
-      global_iz1=iz1;
-
-      global_ix2=ix2;
-      global_iy2=iy2;
-      global_iz2=iz2;
+      */
+      
 
       //todo: restore ghostcells from ubak
      
@@ -3434,7 +3429,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	  ldouble fac;
 	  //dtzones[i]=10.*(rzones[i+1]-rzones[i])/1.; //timestep limited by speed of light
 	  if(i==nzones-1) //most outern
-	    fac=0.2;
+	    fac=1.;
 	  else
 	    fac=1.;
 

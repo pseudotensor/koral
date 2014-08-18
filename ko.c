@@ -248,7 +248,7 @@ solve_the_problem(ldouble tstart, char* folder)
   nstep=0;
   #ifdef SUBZONES
   currentzone=-1;
-  currentzone=alloc_loops(0,t,dt);
+  currentzone=alloc_loops(1,t,dt);
   loopsallociter=0;
   currentzonetime=t;
 
@@ -278,8 +278,8 @@ solve_the_problem(ldouble tstart, char* folder)
 
       //verify if broken
       if(global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]>1.e3 ||
-	 global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS] ||
-	 global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS])
+	 global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]>1.e3 ||
+	 global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]>1.e3)
 	{
 	  printf("exceeded # of failures (%d %d %d) - exiting.\n",
 		 global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES],global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS],global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]);
@@ -296,25 +296,36 @@ solve_the_problem(ldouble tstart, char* folder)
       //chooses the smalles timestep etc.
       mpi_synchtiming(&t);
 
+       //reallocate loops to allow for sub-zones, but don't do it every step
+      #ifdef SUBZONES
+      loopsallociter++;
+      if(loopsallociter>1000)
+	{
+	  lastzone=currentzone;
+	  currentzone=alloc_loops(0,t,dt);
+	  //test
+	  if(lastzone!=currentzone) //zone switched
+	    {
+	      //recomputes the timestep though wavespeeds
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+	      for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
+		{
+		  ix=loop_1[ii][0]; iy=loop_1[ii][1]; iz=loop_1[ii][2]; ldouble aaa[12],max_lws[3];
+		  calc_wavespeeds_lr(ix,iy,iz,aaa); save_wavespeeds(ix,iy,iz,aaa,max_lws);
+		}
+	    }
+	  if(lastzone==1 && currentzone!=1) spitoutput=1; //finished with the innermost one, output
+	  loopsallociter=0;
+	}
+      #endif
+
       //dt based on the estimate from the last midpoint
       dt=TSTEPLIM*1./tstepdenmax;
       global_dt=dt;
  
       if(t+dt>t1) {dt=t1-t;}
 
-      //reallocate loops to allow for sub-zones, but don't do it every step
-      #ifdef SUBZONES
-      loopsallociter++;
-      if(loopsallociter>100)
-	{
-	  lastzone=currentzone;
-	  currentzone=alloc_loops(0,t,dt);
-	  if(lastzone==1 && currentzone!=1) spitoutput=1; //finished with the innermost one, output
-	  loopsallociter=0;
-	}
-      #endif
-
-    
+   
       //reseting wavespeeds
       max_ws[0]=-1.;
       max_ws[1]=-1.;
@@ -328,7 +339,6 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
-    
       if(TIMESTEPPING==RK2IMEX)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
@@ -401,7 +411,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
       else 
 	my_err("wrong time stepping specified\n");
-
+      
       
       
       //**********************************************************************

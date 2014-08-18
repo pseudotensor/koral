@@ -1827,7 +1827,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       //four fource
 	       ldouble Gi[4],Giff[4]={0.,0.,0.,0.};
 	       ldouble Gic[4],Gicff[4]={0.,0.,0.,0.};
-	       calc_Gi(pp,&geomBL,Gi); 
+	       calc_Gi(pp,&geomBL,Gi,1); 
 	       boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
 	       #ifdef COMPTONIZATION
 	       ldouble kappaes=calc_kappaes(rho,temp,-1.,-1.,-1.);  

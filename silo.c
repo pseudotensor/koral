@@ -580,7 +580,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      //print_primitives(pp);getchar();
 	      
 	      //four fource
-	      calc_Gi(pp,&geomout,Gi); 
+	      calc_Gi(pp,&geomout,Gi,1); 
 	      indices_21(Gi,Gi,geomout.gg);
 	      
 	      Ehat[nodalindex]=ehat;
