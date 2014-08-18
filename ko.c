@@ -221,7 +221,10 @@ solve_the_problem(ldouble tstart, char* folder)
    
   i1=i2=0.;
   global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]=0; //counting number of critical failures
-    
+  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]=0; //and fixups requests
+  global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]=0; //and fixups requests
+
+
   lasttout_floor=floor(t/dtout); 
   lasttoutavg_floor=floor(t/dtoutavg);
  
@@ -272,6 +275,17 @@ solve_the_problem(ldouble tstart, char* folder)
       spitoutput=0;
       global_time=t;
       nstep++;
+
+      //verify if broken
+      if(global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]>1.e3 ||
+	 global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS] ||
+	 global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS])
+	{
+	  printf("exceeded # of failures (%d %d %d) - exiting.\n",
+		 global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES],global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS],global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]);
+	  exit(-1);
+	}
+
       
       //initial time mark
       my_clock_gettime(&temp_clock);
@@ -317,23 +331,22 @@ solve_the_problem(ldouble tstart, char* folder)
     
       if(TIMESTEPPING==RK2IMEX)
 	{
-	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); 
-	  do_finger();
 	  ldouble gamma=1.-1./sqrt(2.);
 
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();	  
 	  op_implicit (t,dt*gamma,ut0); //U(n) in *ut0;  U(1) in *u
 	  add_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
 
-	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); 
+	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	  op_explicit (t,dt,ut1); //U(1) in *ut1; 
 	  add_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
 	  add_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
 
-	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]);
+	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]); do_finger();
 	  op_implicit (t,gamma*dt,uforget); //U(2) in *u
 	  add_u(1./(dt*gamma),u,-1./(dt*gamma),uforget,drt2); //R(U(2)) in *drt2;
 
-	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]);
+	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
 	  op_explicit (t,dt,ut2); //U(2) in *ut2; 
 	  add_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
 
@@ -344,17 +357,16 @@ solve_the_problem(ldouble tstart, char* folder)
       else if(TIMESTEPPING==RK2)
 	{ 
 	  //******************************* RK2 **********************************
-	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();
-
 	  //1st
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();
 	  op_explicit (t,.5*dt,ut0); 
-	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]);
+	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	  op_implicit (t,.5*dt,uforget); 
 	 
 	  //2nd
 	  nentr[2]=nentr2[2]=0;
 	  op_explicit (t,dt,ut1); 
-	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]);
+	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
 	  op_implicit (t,dt,uforget); 
 	 
 	 
@@ -368,18 +380,17 @@ solve_the_problem(ldouble tstart, char* folder)
       else if(TIMESTEPPING==RK2HEUN)
 	{ 
 	  //******************************* RK2 **********************************
-	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();
-
 	  //1st	 
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();
 	  op_explicit (t,1.*dt,ut0); 
-	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]);
+	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	  op_implicit (t,1.*dt,uforget); 
 	  add_u(1.,u,-1.,ut0,ut2); 
 
 	  //2nd
-	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]);
+	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]); do_finger();
 	  op_explicit (t,dt,ut1); 
-	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]);
+	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
 	  op_implicit (t,dt,uforget); 
 	  add_u(1.,u,-1.,ut1,ut3); 
 

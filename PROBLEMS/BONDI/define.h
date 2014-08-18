@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
 #define MODYFIKUJKRZYSIE 0
@@ -9,7 +9,7 @@
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define NCOMPTONIZATION
 //#define SKIPRADWAVESPEEDLIMITER
 //#define EXPLICIT_LAB_RAD_SOURCE
@@ -29,7 +29,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e5
+#define RMAX 1.e3
 
 ///#define MINX RMIN
 //#define MAXX RMAX
@@ -51,12 +51,12 @@
 #define NTZ 1
 
 #define SUBZONES
-#define SUBZONESOVERLAP 4
+#define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
 //#define FIX_PRESSURE
 #define FIX_TEMPERATURE
-//#define FIX_VELBONDI
+#define FIX_VELBONDI
 
 /************************************/
 //reconstruction / Courant
@@ -83,7 +83,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e7 //res
+#define DTOUT1 1.e5 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
@@ -103,7 +103,7 @@
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s
 #define RHOAMB 1.e-25
-#define TAMB 1.e9
+#define TAMB 1.e10
 #define MUGAS 1.
 //#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 

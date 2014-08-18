@@ -19,6 +19,12 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 struct geometry geomBLl;
 fill_geometry_arb(global_ix2-1,iy,iz,&geomBLl,KERRCOORDS);
 
+struct geometry geomBLr;
+fill_geometry_arb(global_ix1,iy,iz,&geomBLr,KERRCOORDS);
+
+struct geometry geomBLrr;
+fill_geometry_arb(global_ix1+1,iy,iz,&geomBLrr,KERRCOORDS);
+
 
 /**********************/
 
@@ -172,14 +178,20 @@ if(ix>=NX) //total boundary, properties of the galaxy
 */
 else if(ix<0) //outflow near BH or at inner boundaries
    {
-     iix=global_ix1; //==0
+     iix=0;
      iiy=iy;
      iiz=iz;
+
+     ldouble r1,r2,r,v1,v2,v;
+     r1=log10(geomBLr.xx);
+     r2=log10(geomBLrr.xx);
+     r=log10(geomBL.xx);
    
      //copying primitives with gdet taken into account
      for(iv=0;iv<NV;iv++)
        { 
-	 if(0 && iv==VX)
+	 /*
+	 if(0 && iv==VX) // to have flat mdot
 	   {
 	     //first cell
 	     ldouble urr=get_u(p,VX,global_ix1,iy,iz);
@@ -194,10 +206,33 @@ else if(ix<0) //outflow near BH or at inner boundaries
 	   }
 	 else
 	   {
-	
 	     pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	   }
+	 */
+	 
+	 
+	 //logarithmic extrapolation
+	 v1=get_u(p,iv,global_ix1,iiy,iiz); 
+	 v2=get_u(p,iv,global_ix1+1,iiy,iiz);
 
+	 if(v1>0. && v2>0.)
+	   {
+	     v1=log10(v1);
+	     v2=log10(v2);
+	     v=v1 + (r-r1)/(r2-r1)*(v2-v1);
+	     pp[iv]=pow(10.,v);
+	   }
+	 else if (v1<0. && v2<0.)
+	   {
+	     v1=log10(-v1);
+	     v2=log10(-v2);
+	     v=v1 + (r-r1)/(r2-r1)*(v2-v1);
+	     pp[iv]=-pow(10.,v);
+	   }
+	 else
+	   pp[iv]=v1;
+
+	 //pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
      

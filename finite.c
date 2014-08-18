@@ -1013,7 +1013,7 @@ op_implicit(ldouble t, ldouble dt,ldouble *ubase)
     } //source terms
 
   //fixup here after source term 
-  cell_fixup_rad();
+  //cell_fixup_rad();
 
 #endif //IMPLICIT_LAB_RAD_SOURCE
 #endif //SKIPRADSOURCE
@@ -1445,11 +1445,12 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	    set_u(p_bak_subzone,jj,ix,iy,iz,get_u(p,jj,ix,iy,iz));
 	  }
 	}
-
+      
+      /*
       //make the transition in the overlapping region smooth
       for(ii=0;ii<SUBZONESOVERLAP;ii++)
 	{
-	  if(TNY>1 || TNZ>1) my_err("SUBZONES not implemented in 2D\n");
+	  if(TNY>1 || TNZ>1) my_err("SUBZONES not implemented in 3D\n");
 	  ldouble val1,val2;
 	  int index;
 
@@ -1509,21 +1510,30 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	    }
 	 
 	}
+      */
 
-      /*
+      
       //restore ghost cells from u_bak_subzone
+      
       for(ii=0;ii<Nloop_2;ii++) //gc only
 	{
+	  
 	  ix=loop_2[ii][0];
 	  iy=loop_2[ii][1];
 	  iz=loop_2[ii][2]; 
+
+	  //but skip restoring global ghost cells
+	  if(ix<0 || ix>=NX)
+	    continue;
+
 	  PLOOP(jj)
 	  {
 	    set_u(u,jj,ix,iy,iz,get_u(u_bak_subzone,jj,ix,iy,iz));
 	    set_u(p,jj,ix,iy,iz,get_u(p_bak_subzone,jj,ix,iy,iz));
 	  }
+	 
 	}
-      */
+     
 
       global_ix1=ix1;
       global_iy1=iy1;

@@ -1345,7 +1345,10 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   if(ret!=0)
     {
-      //report failure, stop and rerun with verbose
+      set_cflag(RADFIXUPFLAG,ix,iy,iz,-1);
+      global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]++;      
+
+      //report failure, stop and rerun with verbose, or accept what happened
       return -1;
 
       //****
@@ -1366,12 +1369,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  global_int_slot[GLOBALINTSLOT_NCRITFAILURES]++;
 	  //#pragma omp critical
 	  global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]++;
-	  if(global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]>1.e3)
-	    {
-	      printf("exceeded # of critical failures (%d) - exiting.\n",
-		     global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]);
-	      exit(-1);
-	    }
 	}
       else
 	{
@@ -1380,9 +1377,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	}
   
 
-      set_cflag(RADFIXUPFLAG,ix,iy,iz,-1);
-
-      return 0; 
+       return 0; 
     }
 
   //succeeded!

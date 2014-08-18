@@ -86,13 +86,19 @@ calc_primitives(int ix,int iy,int iz,int type)
 
   //sets the flags for fixups of unsuccessful cells
   if(fixups[0]>0)
-     set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
+    {
+      set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
+      global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
+    }
   else
     set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
 
   
   if(fixups[1]>0)
-    set_cflag(RADFIXUPFLAG,ix,iy,iz,-1); 
+    {
+      set_cflag(RADFIXUPFLAG,ix,iy,iz,-1); 
+      global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
+    }
   else
     set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
   
