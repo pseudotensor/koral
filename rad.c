@@ -1578,13 +1578,17 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       utcon[1]=pp[2];
       utcon[2]=pp[3];
       utcon[3]=pp[4];
-
+      conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
     }
   else
-    utcon[1]=utcon[2]=utcon[3]=0.; //return lab-frame four-force
+    {
+      ucon[1]=ucon[2]=ucon[3]=ucov[1]=ucov[2]=ucov[3]=0.;
+      ucon[0]=1.;
+      ucov[0]=-1.;
+      //return fluid frame four-force
+    }
 
-  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-
+ 
   //gas properties
   ldouble rho=pp[RHO];
   ldouble u=pp[1];

@@ -8,22 +8,22 @@ struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
 struct geometry geoml;
-fill_geometry(NX-1,iy,iz,&geoml);
+fill_geometry(global_ix2-1,iy,iz,&geoml);
 
 struct geometry geomr;
-fill_geometry(0,iy,iz,&geomr);
+fill_geometry(global_ix1,iy,iz,&geomr);
 
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 struct geometry geomBLl;
-fill_geometry_arb(NX-1,iy,iz,&geomBLl,KERRCOORDS);
+fill_geometry_arb(global_ix2-1,iy,iz,&geomBLl,KERRCOORDS);
 
 struct geometry geomBLr;
-fill_geometry_arb(0,iy,iz,&geomBLr,KERRCOORDS);
+fill_geometry_arb(global_ix1,iy,iz,&geomBLr,KERRCOORDS);
 
 struct geometry geomBLrr;
-fill_geometry_arb(1,iy,iz,&geomBLrr,KERRCOORDS);
+fill_geometry_arb(global_ix1+1,iy,iz,&geomBLrr,KERRCOORDS);
 
 
 /**********************/
@@ -187,7 +187,7 @@ else if(ix<0) //outflow near BH
 	 
 	 
 	 //logarithmic extrapolation
-	 
+	 /*
 	 v1=get_u(p,iv,global_ix1,iiy,iiz); 
 	 v2=get_u(p,iv,global_ix1+1,iiy,iiz);
 
@@ -208,15 +208,15 @@ else if(ix<0) //outflow near BH
 	 else
 	   pp[iv]=v1;
 	 
-
+	 */
 	 //override
-	 //pp[iv]=get_u(p,iv,0,iiy,iiz);
+	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
 
      //printf("%d %d %d > %e %e %e\n",ix,iy,iz,pp[NF0],get_u(p,NF0,0,0,0),get_u(p,NF0,1,0,0)); //getch();
-#ifdef NCOMPTONIZATION
-     pp[NF0]=get_u(p,NF0,0,iiy,iiz)*geomBLr.gdet/geomBL.gdet;
-#endif
+     //#ifdef NCOMPTONIZATION
+     //pp[NF0]=get_u(p,NF0,0,iiy,iiz)*geomBLr.gdet/geomBL.gdet;
+     //#endif
      
      p2u(pp,uu,&geom);
      return 0;

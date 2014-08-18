@@ -1433,7 +1433,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
       if(zone==currentzone) //no need for reallocating arrays
 	return zone;
       
-      /*
+      
       //copy what is in current subdomain to u_bak_subzone
       for(ii=0;ii<Nloop_0;ii++) //domain only
 	{
@@ -1512,7 +1512,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	    }
 	 
 	}
-      */
+      
 
       
       //restore ghost cells from u_bak_subzone
@@ -3407,9 +3407,9 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
     {      
       //test
       double startzoningtime=1.e2;
-      int nzones=2;
-      //int izones[3+1]={0,2*NX/5,4*NX/5,NX};
-      int izones[2+1]={0,3*NX/4,NX};
+      int nzones=3;
+      int izones[3+1]={0,2*NX/5,4*NX/5,NX};
+      //int izones[2+1]={0,3*NX/4,NX};
       double rzones[3+1];
       double dtzones[3];
       int overlap=SUBZONESOVERLAP,i,j;
