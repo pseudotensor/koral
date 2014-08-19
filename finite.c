@@ -64,7 +64,7 @@ ldouble DM4(ldouble W,ldouble X, ldouble Y, ldouble Z)
 }
 
 int
-avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble *ul,ldouble *ur,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2)
+avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble *ul,ldouble *ur,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2,ldouble diffpar)
 {
       
   ldouble r0[NV],rm1[NV],rp1[NV];
@@ -76,8 +76,8 @@ avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldoubl
 	{
 	  if(FLUXLIMITER==0)
 	    {	  
-	      ur[i]=u0[i]+.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
-	      ul[i]=u0[i]-.5*minmod_flux_limiter(MINMOD_THETA*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), MINMOD_THETA*(u0[i]-um1[i]));
+	      ur[i]=u0[i]+.5*minmod_flux_limiter(diffpar*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), diffpar*(u0[i]-um1[i]));
+	      ul[i]=u0[i]-.5*minmod_flux_limiter(diffpar*(up1[i]-u0[i]), .5*(up1[i]-um1[i]), diffpar*(u0[i]-um1[i]));
 	    }
 	  else
 	    {
@@ -526,6 +526,7 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
       ldouble ffl[NV],ffr[NV];
       ldouble gloc[4][5],gl[4][5],gr[4][5],Gl[4][5],Gr[4][5];
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
+      ldouble diffpar;
       struct geometry geom;
       int i;
 	      
@@ -579,7 +580,21 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 		}
 	    }
 	 		
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
+	  #ifdef REDUCEORDERWHENNEEDED
+	  ldouble t0,tp1,tm1,tmin;
+	  t0=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tp1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tm1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tmin=my_min(t0,my_min(tp1,tm1));
+	  if(tmin<REDUCEORDERTEMP)
+	    diffpar=1.;
+	  else
+	    diffpar=MINMOD_THETA;
+	  #else
+	  diffpar=MINMOD_THETA;
+	  #endif
+
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,diffpar);   
 
 	  if(ix>=0) //no need to calculate at left face of first GC
 	    {
@@ -649,7 +664,21 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 		}
 	    }
 
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
+          #ifdef REDUCEORDERWHENNEEDED
+	  ldouble t0,tp1,tm1,tmin;
+	  t0=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tp1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tm1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tmin=my_min(t0,my_min(tp1,tm1));
+	  if(tmin<REDUCEORDERTEMP)
+	    diffpar=1.;
+	  else
+	    diffpar=MINMOD_THETA;
+	  #else
+	  diffpar=MINMOD_THETA;
+	  #endif
+
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,diffpar);   
 	  
 	  if(iy>=0)
 	    {
@@ -718,7 +747,21 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 		}
 	    }
 
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2);   
+          #ifdef REDUCEORDERWHENNEEDED
+	  ldouble t0,tp1,tm1,tmin;
+	  t0=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tp1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tm1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
+	  tmin=my_min(t0,my_min(tp1,tm1));
+	  if(tmin<REDUCEORDERTEMP)
+	    diffpar=1.;
+	  else
+	    diffpar=MINMOD_THETA;
+	  #else
+	  diffpar=MINMOD_THETA;
+	  #endif
+
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,diffpar);   
 
 	  if(iz>=0)
 	    {

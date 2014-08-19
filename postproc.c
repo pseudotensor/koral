@@ -199,10 +199,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      dxp1=get_size_x(ix+1,0);  
 
 	      //interpolation to get left/right biased interpolated primtives
-	      avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2); 
+	      avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,MINMOD_THETA); 
 	      //INTORDER==1!
-	      avg2point(fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pp2,fd_plp1,fd_prp1,dxm1,dx0,dxp1,dxp2,dxp2);   
-	      avg2point(fd_pm2,fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_plm1,fd_prm1,dxm2,dxm2,dxm1,dx0,dxp1);   
+	      avg2point(fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pp2,fd_plp1,fd_prp1,dxm1,dx0,dxp1,dxp2,dxp2,MINMOD_THETA);   
+	      avg2point(fd_pm2,fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_plm1,fd_prm1,dxm2,dxm2,dxm1,dx0,dxp1,MINMOD_THETA);   
 		  
 	      //to BL, res-files and primitives in avg in MYCOORDS
 	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);

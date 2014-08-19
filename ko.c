@@ -343,7 +343,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
 
-	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();	  
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();	  
 	  op_implicit (t,dt*gamma,ut0); //U(n) in *ut0;  U(1) in *u
 	  add_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
 
@@ -368,7 +368,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	{ 
 	  //******************************* RK2 **********************************
 	  //1st
-	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	  op_explicit (t,.5*dt,ut0); 
 	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	  op_implicit (t,.5*dt,uforget); 
@@ -391,7 +391,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	{ 
 	  //******************************* RK2 **********************************
 	  //1st	 
-	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); do_finger();
+	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	  op_explicit (t,1.*dt,ut0); 
 	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	  op_implicit (t,1.*dt,uforget); 

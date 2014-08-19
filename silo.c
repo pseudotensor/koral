@@ -61,7 +61,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *muBe = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Qtheta = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *divB = (ldouble*)malloc(nx*ny*nz*sizeof(double));
-
+  ldouble *entropyinv = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+ 
   #ifdef TRACER
   ldouble *tracer = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   #endif 
@@ -257,6 +258,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      ldouble dpdr; //d/dr (gdet * p)
 	      ldouble gracen; //gdet T^k_l Gamma^l_kr
 	      ldouble w;//entalphy
+
+	      entropyinv[nodalindex]=(ldouble)get_cflag(ENTROPYFLAG3,ix,iy,iz);
 
 	      if(doingavg==0) //using snapshot date
 		{
@@ -754,6 +757,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   /* Write scalars */
 
   DBPutQuadvar1(file, "rho","mesh1", rho,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+  DBPutQuadvar1(file, "entropyinv","mesh1", entropyinv,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 

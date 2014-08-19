@@ -447,7 +447,7 @@ ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z);
 ldouble calc_ufromS(ldouble S,ldouble rho);
 ldouble calc_Sfromu(ldouble S,ldouble u);
 int
-avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble*,ldouble*,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2);
+avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble*,ldouble*,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2,ldouble);
 
 //problem.c
 ldouble calc_xb(int i,int idim);
@@ -527,6 +527,7 @@ int conv_vels_core(ldouble *u1,ldouble *u2,ldouble *u2cov,int which1,int which2,
 
 //u2p.c
 int count_entropy(int *,int*);
+int copy_entropycount();
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
 int calc_primitives(int,int,int,int);
 int check_floors_mhd(ldouble *uu, int,void*);

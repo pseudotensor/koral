@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 86
 
 /************************************/
 //radiation choices
@@ -53,6 +53,8 @@
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 0
+#define REDUCEORDERWHENNEEDED
+#define REDUCEORDERTEMP 1.e7
 
 /************************************/
 //viscosity choices

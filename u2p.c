@@ -1375,3 +1375,18 @@ int count_entropy(int *n, int *n2)
   *n2 = nentr2;
   return 0;
 }
+
+//backups entropy count to spit it into a silo file
+int copy_entropycount()
+{
+  int ii,ix,iy,iz;
+  for(ii=0;ii<Nloop_0;ii++) //domain 
+    {
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+      set_cflag(ENTROPYFLAG3,ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz));
+    }
+
+  return 0;
+}
