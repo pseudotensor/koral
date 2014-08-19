@@ -370,30 +370,41 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
   if(ret==-1)
     {
       corrected[2]=0;
-  
-      ldouble uunew[NV],ppnew[NV];
+      int radcor;      
+      ldouble uunew[NV],ppnew[NV],ehat,uconf[4];
+      //let's compare energy densisties
       PLOOP(iv) uunew[iv]=uu[iv];
-      p2u_mhd(pp,uunew,geom);
-      //print_primitives(uu);
-      //print_primitives(uunew);
-      ldouble dugas = uunew[UU]-uu[UU];
-      uunew[EE0]-=dugas; //balancing with radiation      
-      int radcor;
       u2p_rad(uunew,ppnew,geom,&radcor);
-      //printf("balanced and got: %d\n",radcor);
-      //print_primitives(uunew);
- 
-      if(radcor==0) //there was enough energy to borrow from
+      calc_ff_Rtt(ppnew,&ehat,uconf,geom);
+      ehat*=-1.;
+      
+      if(ehat>10.*pp[UU])
 	{
-	  PLOOP(iv) uu[iv]=uunew[iv];
-	  //printf("entropy correction did work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+
+	  PLOOP(iv) uunew[iv]=uu[iv];
+	  p2u_mhd(pp,uunew,geom);
+	  ldouble dugas = uunew[UU]-uu[UU];
+	  uunew[EE0]-=dugas; //balancing with radiation      
+	  u2p_rad(uunew,ppnew,geom,&radcor);
+ 
+	  if(radcor==0) //there was enough energy to borrow from
+	    {
+	      PLOOP(iv) uu[iv]=uunew[iv];
+	      //printf("entropy correction did work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+	    }
+	  else
+	    {
+	      corrected[2]=1; //entropy correction didn't work
+	      //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+	    }
 	}
-      else
+      else //not enough energy in radiation
 	{
 	  corrected[2]=1; //entropy correction didn't work
 	  //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
 	}
     }
+  
   #endif
 
   u2p_rad(uu,pp,geom,&radcor);
