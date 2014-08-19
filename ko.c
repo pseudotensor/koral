@@ -557,6 +557,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	  printf("\n");
 #endif
 
+	  fflush(stdout);
+
 	  fprintf_time=end_time;
 	  i2=i1;
 	}
