@@ -30,7 +30,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e5
+#define RMAX 1.e6
 
 ///#define MINX RMIN
 //#define MAXX RMAX
@@ -44,14 +44,14 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 32
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 16
 #define NTY 1
 #define NTZ 1
 
-//#define SUBZONES
+#define SUBZONES
 #define SUBZONESOVERLAP 4
 
 #define SPECIFIC_BC
@@ -70,7 +70,7 @@
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 0
 #define U2PCONV 1.e-12
-#define RADIMPCONV 1.e-12
+#define RADIMPCONV 1.e-8
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 15
 
@@ -84,7 +84,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e7 //res
+#define DTOUT1 1.e8 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
