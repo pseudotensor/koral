@@ -272,14 +272,14 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	    {
 	      //to do:
 	      //this does not account for COMPTONIZATION!!!
-	      f[0]=Ehat - Ehat0 + dt * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(dt * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	      f[0]=Ehat - Ehat0 + dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	    {
 	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
-	      f[0]=pp[ENTR] - pp0[ENTR] - dt * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dt * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	      f[0]=pp[ENTR] - pp0[ENTR] - dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else
 	    my_err("not implemented 2\n");	 
@@ -289,15 +289,15 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
 	    {
-	      f[0]=pp[UU] - pp0[UU] - dt * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      err[0]=fabs(f[0])/(fabs(pp[UU]) + fabs(pp0[UU]) + fabs(dt * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	      f[0]=pp[UU] - pp0[UU] - dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[UU]) + fabs(pp0[UU]) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
 	    {
 	      pp0[ENTR]= calc_Sfromu(pp0[RHO],pp0[UU]);
 	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
-	      f[0]=pp[ENTR] - pp0[ENTR] - dt * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
-	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dt * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	      f[0]=pp[ENTR] - pp0[ENTR] - dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
 	  else
 	    my_err("not implemented 2\n");	  
@@ -1625,7 +1625,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   #ifdef DAMPCOMPTONIZATIONATBH
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-  fac=step_function(xxBL[1]-2.*rhorizonBL,0.1*rhorizonBL);
+  fac=step_function(xxBL[1]-2.*rhorizonBL,0.5*rhorizonBL);
+  if(xxBL[1]<rhorizonBL) fac=0.;
   #endif
   for(i=0;i<4;i++)
     Gi[i]+=fac*Gic[i];
