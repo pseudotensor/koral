@@ -34,7 +34,10 @@ if(ix>=NX) //total boundary, properties of the galaxy
     ldouble rho,rho0,uint,uintl,uint0,ur,url,rhol;
 
     //calculating Bondi-related values at the boundary
-    ldouble RMAXout=geomBL.xx;
+    //ldouble RMAXout=geomBL.xx;
+    ldouble RMAXout=RMAX;
+
+
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
     ldouble urout = -sqrt(1./2./RMAXout);
@@ -89,6 +92,24 @@ if(ix>=NX) //total boundary, properties of the galaxy
     pp[3]=get_u(pproblem1,VY,ix,iy,iz);
     pp[4]=get_u(pproblem1,VZ,ix,iy,iz);
     #endif
+
+    #ifdef FIX_VELOUTBONDI //estimating the velocity outside the Bondi radius
+    ldouble Rbondi = 3.267e12 / TAMB;
+    ldouble vbondi = -sqrt(1./2./Rbondi);
+    ldouble vout = vbondi * (Rbondi/geomBL.xx) * (Rbondi/geomBL.xx);
+
+    ucon[1]=vout;
+    ucon[2]=ucon[3]=0.;
+    conv_vels(ucon,ucon,VEL3,VEL4,geomBL.gg,geomBL.GG);
+    trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+    conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+
+    pp[2]=ucon[1];
+    pp[3]=ucon[2];
+    pp[4]=ucon[3];
+
+    #endif
+
     pp[5]=calc_Sfromu(rho,uint);
 
     #ifdef RADIATION

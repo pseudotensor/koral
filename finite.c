@@ -3450,11 +3450,23 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
     {      
       //test
       double startzoningtime=1.e2;
-      int nzones=3;
-      int izones[3+1]={0,2*NX/5,4*NX/5,NX};
-      //int izones[2+1]={0,3*NX/4,NX};
-      double rzones[3+1];
-      double dtzones[3];
+      int nzones=NSUBZONES,izones[10+1]; //10 is the maximal number of zones handled
+      double rzones[10+1];
+      double dtzones[10];
+      if(nzones==3)
+	{
+	  izones[0]=0;
+	  izones[1]=1*NX/2;
+	  izones[2]=4*NX/5;
+	  izones[3]=NX;
+	}
+      if(nzones==2)
+	{
+	  izones[0]=0;
+	  izones[1]=1*NX/2;
+	  izones[2]=NX;
+	}
+      
       int overlap=SUBZONESOVERLAP,i,j;
 
       //radii

@@ -11,29 +11,19 @@
 /************************************/
 #define RADIATION
 #define NCOMPTONIZATION 
-//#define MAXDIFFTRADS 1.e5
-//#define SKIPRADWAVESPEEDLIMITER
-//#define EXPLICIT_LAB_RAD_SOURCE
-//#define RADOUTPUTINFF
 #define RADOUTPUTVELS
-//#define SKIPRADSOURCE
-//#define FLUXMETHOD HLL_FLUX
 
 /************************************/
 //coordinates / resolution
 /************************************/
 #define MKS1R0 0.
 #define MYCOORDS MKS1COORDS
-//#define MYCOORDS BLCOORDS
 #define OUTCOORDS BLCOORDS
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e7
-
-///#define MINX RMIN
-//#define MAXX RMAX
+#define RMAX 1.e4
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -52,12 +42,13 @@
 #define NTZ 1
 
 #define SUBZONES
+#define NSUBZONES 2
 #define SUBZONESOVERLAP 4
 
 #define SPECIFIC_BC
-//#define FIX_PRESSURE
 #define FIX_TEMPERATURE
-#define FIX_VELBONDI
+//#define FIX_VELBONDI
+#define FIX_VELOUTBONDI
 
 /************************************/
 //reconstruction / Courant
@@ -84,27 +75,22 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e8 //res
+#define DTOUT1 1.e5 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
 /************************************/
 //test specific
 /***********************************/
-#define TESTNO 0
-
-#if(TEST==0)
 #define GAMMA (5./3.)
 #define MDOT 1.e2
-//#define INFLOW
-#endif
+#define TAMB (5.*1.e9*(1.e4/RMAX))
 
 #define PRADGASINIT 1.e-10
 #define MASS 10.
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s
 #define RHOAMB 1.e-25
-#define TAMB (1.e9*(1.e4/RMAX))
 #define MUGAS 1.
 //#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 
