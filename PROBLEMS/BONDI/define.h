@@ -10,7 +10,7 @@
 //radiation
 /************************************/
 #define RADIATION
-//#define NCOMPTONIZATION 
+#define NCOMPTONIZATION 
 #define RADOUTPUTVELS
 #define LIKEINFRAGILE
 
