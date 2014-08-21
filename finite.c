@@ -3449,7 +3449,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
   if(PROBLEM==7) //BONDI
     {      
       //test
-      double startzoningtime=1.e2;
+      double startzoningtime=0.e2;
       int nzones=NSUBZONES,izones[10+1]; //10 is the maximal number of zones handled
       double rzones[10+1];
       double dtzones[10];
@@ -3463,7 +3463,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       if(nzones==2)
 	{
 	  izones[0]=0;
-	  izones[1]=1*NX/2;
+	  izones[1]=2*NX/3;
 	  izones[2]=NX;
 	}
       

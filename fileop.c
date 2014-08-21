@@ -338,7 +338,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  struct geometry geom;
 									  fill_geometry(ix,iy,iz,&geom);
 
-									  ldouble mx,my,mz,E,e,xx,yy,zz,phipot,xxx[4],dx[3],vv[10],a0,a1,a2,v1,v2,dphidx,v3,Tgas,Trad,v4,v5,v6,v7,Fx,Fy,Fz;
+									  ldouble mx,my,mz,E,e,xx,yy,zz,phipot,xxx[4],dx[3],vv[10],a0,a1,a2,v1,v2,dphidx,v3,Tgas,Trad,v4,v5,v6,v7,v8,v9,Fx,Fy,Fz;
 									  ldouble gg[4][5],GG[4][5];
 									  ldouble pp[NV],uu[NV];
 									  int i,j;
@@ -555,14 +555,16 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 										  );
 
 
-									  fprintf(fout1,"%.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
+									  fprintf(fout1,"%.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e %.6e\n",
 										  v1,     //24
 										  v2,     //25
 										  v3,     //26 
 										  v4,     //27
 										  v5,     //28
 										  v6,     //29 
-										  v7      //30 
+										  v7,     //30 
+										  v8,     //31 
+										  v9      //32 
 										  );
 
 									}

@@ -792,7 +792,7 @@ mimic_dynamo(ldouble dt)
 	}
 
       //radius
-      ldouble facradius = step_function(xxBL[1]-1.*rhorizonBL,.1*rhorizonBL);
+      ldouble facradius = step_function(xxBL[1]-1.*rISCOBL,.1*rISCOBL);
 
       //pre(gas+rad)
       ldouble prermhd = GAMMAM1*get_u(p,UU,ix,iy,iz);

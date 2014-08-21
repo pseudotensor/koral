@@ -249,8 +249,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   if(whichframe==RADIMPLICIT_FF)
     {
       //recalculate the ff time component of four-force
-      calc_Gi(pp,ggg,Gi,0); 
-      indices_21(Gi,Gi,gg);
+      calc_Gi(pp,ggg,Gi,0);  // Ghat^0 = - kappa 4 Pi B + ...
 
       ldouble uconf[4],Rtt0,Rtt;
       //zero - state 
@@ -1596,8 +1595,16 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
   ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  ldouble kappagas=kappa;
+  ldouble kapparad=kappa;
+
+  #ifdef NCOMPTONIZATION //adjust the Rosseland mean for the color temperature of radiation
+  ldouble Trad = calc_ncompt_Thatrad_full(pp,ggg);
+  kapparad *= Tgas*Tgas/Trad/Trad;
+  #endif
+
   ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);
-  ldouble chi=kappa+kappaes;
+  ldouble chi=kapparad+kappaes;
 
   //contravariant four-force in the lab frame
 
@@ -1614,7 +1621,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       Ru=0.;
       for(j=0;j<4;j++)
 	Ru+=Rij[i][j]*ucov[j];
-      Gi[i]=-chi*Ru - (kappaes*Ruu + kappa*4.*Pi*B)*ucon[i];
+      //test
+      Gi[i]=-chi*Ru - (kappaes*Ruu + kappagas*4.*Pi*B)*ucon[i];
     }
 
 #ifdef COMPTONIZATION
@@ -1675,7 +1683,9 @@ calc_Compt_Gi(ldouble *pp, void* ggg, ldouble *Gic, ldouble Ehatrad, ldouble Tga
 
   int i;
   for(i=0;i<4;i++)
-    Gic[i]=kappaes * Ehatrad * (4.*K_BOLTZ*(Thatrad - Tgas)/M_ELECTR) * (1. + 4.*K_BOLTZ*Tgas/M_ELECTR) * ucon[i]; 
+    Gic[i]=kappaes * Ehatrad * (4.*K_BOLTZ*(Thatrad - Tgas)/M_ELECTR) 
+      * (1. + 3.683 * K_BOLTZ * Tgas / M_ELECTR + 4. * K_BOLTZ * Tgas / M_ELECTR * K_BOLTZ * Tgas / M_ELECTR)
+      / (1. + 4.*K_BOLTZ*Tgas/M_ELECTR) * ucon[i]; 
 
 
 #endif
@@ -3486,7 +3496,7 @@ calc_nsource(ldouble *pp, void* ggg)
 }
 
 //**********************************************************************
-//* calculates the radiation temperature using
+//* calculates the radiation color temperature using
 //* radiative energy density and the number of photons
 //* assumes four-velocities known
 //**********************************************************************
@@ -3514,7 +3524,7 @@ calc_ncompt_Thatrad_4vel(ldouble *pp, void* ggg, ldouble Ehatrad, ldouble* urfco
 
 
 //**********************************************************************
-//* calculates radiation energy density in the fluid frame
+//* calculates radiation color temperature in the fluid frame
 //* and calls more
 //**********************************************************************
 ldouble
