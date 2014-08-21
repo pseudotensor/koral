@@ -3462,10 +3462,15 @@ calc_nsource(ldouble *pp, void* ggg)
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
-  ldouble kappagas=calc_kappa(rho,Tgas,-1.,-1.,-1.);
-  ldouble kapparad=calc_kappa(rho,Thatrad,-1.,-1.,-1.);
+  ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  ldouble kappagas=kappa;
+  ldouble kapparad=kappa;
 
- 
+  #ifdef NCOMPTONIZATION //adjust the Rosseland mean for the color temperature of radiation
+  ldouble Trad = calc_ncompt_Thatrad_full(pp,ggg);
+  kapparad *= Tgas*Tgas/Trad/Trad;
+  #endif
+
   //number of photons in rad rest frame
   ldouble nphrf = pp[NF(0)];
 
