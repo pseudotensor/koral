@@ -443,16 +443,23 @@ solve_the_problem(ldouble tstart, char* folder)
       ldouble avimpitloc[5],avimpit[5];
       int impnumsloc[7],impnums[7];
       
-      avimpitloc[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
-      avimpitloc[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
-      avimpitloc[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
-      avimpitloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
-      avimpitloc[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE]==0 ? 0. : (ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPLTE]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPLTE];
+      avimpitloc[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD]==0 ? 0. : 
+	(ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERMHD]
+	/((ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERMHDFF]);
+      avimpitloc[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD]==0 ? 0. : 
+	(ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENERRAD]
+	/((ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERRAD]+(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENERRADFF]);
+      avimpitloc[2]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]==0 ? 0. : 
+	(ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRMHD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
+      avimpitloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]==0 ? 0. : 
+	(ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
+      avimpitloc[4]=global_int_slot[GLOBALINTSLOT_NIMPLTE]==0 ? 0. : 
+	(ldouble)global_int_slot[GLOBALINTSLOT_ITERIMPLTE]/(ldouble)global_int_slot[GLOBALINTSLOT_NIMPLTE];
             
-      impnumsloc[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHDCONS];
-      impnumsloc[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRADCONS];
-      impnumsloc[2]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
-      impnumsloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
+      impnumsloc[0]=global_int_slot[GLOBALINTSLOT_NIMPENERMHD];
+      impnumsloc[1]=global_int_slot[GLOBALINTSLOT_NIMPENERRAD];
+      impnumsloc[2]=global_int_slot[GLOBALINTSLOT_NIMPENERMHDFF];
+      impnumsloc[3]=global_int_slot[GLOBALINTSLOT_NIMPENERRADFF];
       
       impnumsloc[4]=global_int_slot[GLOBALINTSLOT_NIMPENTRMHD];
       impnumsloc[5]=global_int_slot[GLOBALINTSLOT_NIMPENTRRAD];
@@ -615,7 +622,7 @@ print_scalings()
 {
   
   printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.16e\nmdot: %.16e\nsigma: %.16e\nlen: %.16e\ntime: %.16e\nenden:"
-	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkappa: %.16e\n\nrhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\nmdotEdd: %.16e\n",
+	 "%.16e\nT(1,1): %.16e\nkbt: %.16e\nkb/me: %.16e\nkappa: %.16e\n\nrhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\nmdotEdd: %.16e\n",
 	 MASS,BHSPIN,
 	 rhoGU2CGS(1.),
 	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.),
@@ -625,6 +632,7 @@ print_scalings()
 	 endenGU2CGS(1.),
 	 calc_PEQ_Tfromurho(1.,1.),
 	 K_BOLTZ/MU_GAS/M_PROTON,
+	 K_BOLTZ/M_ELECTR,
 	 kappaCGS2GU(1.),
 	 rhorizonBL,
 	 rISCOBL,

@@ -12,7 +12,6 @@
 #define RADIATION
 #define NCOMPTONIZATION 
 #define RADOUTPUTVELS
-#define LIKEINFRAGILE
 
 /************************************/
 //coordinates / resolution
@@ -24,7 +23,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e3
+#define RMAX 1.e5
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -35,7 +34,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 16
@@ -43,7 +42,7 @@
 #define NTZ 1
 
 #define SUBZONES
-#define NSUBZONES 3
+#define NSUBZONES 2
 #define SUBZONESOVERLAP 4
 
 #define SPECIFIC_BC
@@ -59,14 +58,14 @@
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 0
 #define U2PCONV 1.e-12
 #define RADIMPCONV 1.e-8
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 15
-
+#define GAMMAMAXRAD 10.
 /************************************/
 //output
 /************************************/
@@ -77,7 +76,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e2 //res
+#define DTOUT1 1.e5 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
@@ -86,14 +85,9 @@
 /***********************************/
 #define GAMMA (5./3.)
 #define MDOT 1.e2
-#define TAMB 1.e9//(5.*1.e9*(1.e4/RMAX))//2.e7
+#define TAMB 2.e8//(5.*1.e9*(1.e4/RMAX))
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
-#ifdef LIKEINFRAGILE
-#define PRADGAS 1.2e-4
-#undef GAMMA
-#define GAMMA (ldouble)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
-#endif
 
 #define PRADGASINIT 1.e-10
 #define MASS 10.
@@ -101,5 +95,5 @@
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s
 #define RHOAMB 1.e-25
 #define MUGAS 1.
-
+//#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
 

@@ -42,7 +42,7 @@ if(ix>=NX) //total boundary, properties of the galaxy
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
     ldouble urout = -sqrt(2./1./RMAXout);
     ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAXout * RMAXout);
-    ldouble csout = sqrt(1./2./RMAXout);   //cs2 = GM/2R for gamma=5/3 - why not 2GM/R ???
+    ldouble csout = sqrt(1./2./RMAXout);   //cs2 = GM/2R for gamma=5/3
     ldouble uintout = csout * csout * rhoout / GAMMA / GAMMAM1;
     ldouble Eout=PRADGASINIT * GAMMAM1*uintout*3.;
 

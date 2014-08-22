@@ -182,7 +182,7 @@ main(int argc, char **argv)
   
 #if(SIMOUTPUT!=0)	  
   sprintf(prefix,"simavg%s%04d-",suffix,no1);
-  fprint_simplecart(t,no2,"analysis",prefix);
+  fprint_simplefile(t,no2,"analysis",prefix);
 #endif
   
   return 0;

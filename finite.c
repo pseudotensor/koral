@@ -3503,8 +3503,6 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	  printf("%d %d | %d %d | %e %e %e \n",currentzone,zone,
 		     izones[zone-1],izones[zone],
 		     currentzonetime,t,dtzones[zone-1]);
-	  //test
-	  //zone=1;
 	}
       else
 	{

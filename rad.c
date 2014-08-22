@@ -269,8 +269,6 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 	{
 	  if(whicheq==RADIMPLICIT_ENERGYEQ)
 	    {
-	      //to do:
-	      //this does not account for COMPTONIZATION!!!
 	      f[0]=Ehat - Ehat0 + dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
 	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
@@ -1152,7 +1150,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   ldouble pp0[NV],pp00[NV],uu0[NV],uu00[NV];
   ldouble ppexact[NV];
-  
+
   /*
 #ifdef EXPIMPORDER
   //no, thank you, we will use pp as the guess, and keep to given uu
@@ -1206,8 +1204,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   if(verbose) printf("gammas: %e %e\n\n",sqrt(gammagas2),sqrt(gammarad2));
 
   //**** 0th ****
-  int conserving=1;
-  ldouble enratiotreshold = 1.e-6;
+  //int conserving=1;
+  ldouble enratiotreshold = 1.e-4;
   ret=-1;
 
   //in pp0[] initial guess for solvers
@@ -1323,8 +1321,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //*********** 3th ************
   if(ret!=0) {
-    conserving=0;// from now on
-
     PLOOP(iv) 
     {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
     params[1]=RADIMPLICIT_ENTROPYEQ;
@@ -1401,21 +1397,22 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
  //to calculate average number of succesful iterations
   int whichprim=params[0];
   int whicheq=params[1];
-  if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ)
+  int whereeq=params[2];
+  if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ && whereeq==RADIMPLICIT_LAB)
     {
-      //#pragma omp critical
-      if(conserving==1)
-	global_int_slot[GLOBALINTSLOT_NIMPENERRADCONS]+=1;
-      else
-	global_int_slot[GLOBALINTSLOT_NIMPENERRAD]+=1;
+      global_int_slot[GLOBALINTSLOT_NIMPENERRAD]+=1;
     }
-  if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ)
+  if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ && whereeq==RADIMPLICIT_FF)
     {
-      //#pragma omp critical
-      if(conserving==1)
-	global_int_slot[GLOBALINTSLOT_NIMPENERMHDCONS]+=1;
-      else
-	global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+=1; 
+      global_int_slot[GLOBALINTSLOT_NIMPENERRADFF]+=1;
+    }
+  if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ && whereeq==RADIMPLICIT_LAB)
+    {
+      global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+=1; 
+    }
+  if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ && whereeq==RADIMPLICIT_FF)
+    {
+      global_int_slot[GLOBALINTSLOT_NIMPENERMHDFF]+=1; 
     }
   if(whichprim==RAD && whicheq==RADIMPLICIT_ENTROPYEQ)
     {
@@ -1625,20 +1622,21 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappagas*4.*Pi*B)*ucon[i];
     }
 
-#ifdef COMPTONIZATION
+#if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
   ldouble Gic[4];
   calc_Compt_Gi(pp,ggg,Gic,Ehatrad,Tgas,kappaes,ucon);
 
   ldouble fac=1.;
+
   #ifdef DAMPCOMPTONIZATIONATBH
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-  fac=step_function(xxBL[1]-2.*rhorizonBL,0.5*rhorizonBL);
+  fac=step_function(xxBL[1]-1.1*rhorizonBL,0.01*rhorizonBL);
   if(xxBL[1]<rhorizonBL) fac=0.;
   #endif
+
   for(i=0;i<4;i++)
     Gi[i]+=fac*Gic[i];
-    
 #endif 
 
   return 0;
@@ -3373,8 +3371,8 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   ldouble mfplim=xxBL[1];
   if(mfp>mfplim || chi<SMALL) mfp=mfplim; //Rcyl = Rsph
   if(mfp<0. || !isfinite(mfp)) mfp=0.;
-  mfp*=step_function(xxBL[1]-1.5*rhor,0.01*rhor);
-  if(xxBL[1]<=1.25*rhor) mfp=0.;
+  mfp*=step_function(xxBL[1]-1.1*rhor,0.01*rhor);
+  if(xxBL[1]<=1.*rhor) mfp=0.;
 
 #else
 

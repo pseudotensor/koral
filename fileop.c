@@ -1798,7 +1798,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 
 	       fprintf(fout1,"%.5e %.5e ",rho,temp);
 
-	       fprintf(fout1,"%.5e %.5e %.5e ",vel[1],vel[2],vel[3]);
+	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",vel[0],vel[1],vel[2],vel[3]);
 
 	       fprintf(fout1,"%.5e ",volume);
 

@@ -1,4 +1,4 @@
-ldouble  RMAXout=RMAX;
+ldouble  RMAXout=5.e4;
 //precalculates hydro Bondi solution, saves it to pproblem1
 
 if(1) //uses MDOT and TGAS at the outer boundary
@@ -34,18 +34,7 @@ if(1) //uses MDOT and TGAS at the outer boundary
 		ldouble R=geomBL.xx;
 		ldouble rho = rhoout * pow(R/RMAXout,-3./2.);
 		ldouble ur = urout * sqrt(RMAXout/R);
-
-		ldouble ucon[4]={0.,ur,0.,0.};
-		conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
-		ur=ucon[1];
- 
-
 		ldouble uint = uintout * pow(R/RMAXout, -3./2.*GAMMA);
-
-
-#ifdef LIKEINFRAGILE
-		uint = calc_PEQ_ufromTrho(TAMB*pow(rho/rhoout,GAMMA-1.),rho);
-		#endif
 	    
 	    
 		set_u(pproblem1,RHO,ix,iy,iz,rho);
