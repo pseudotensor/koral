@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 86
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -16,14 +16,14 @@
 #define RADIATION
 #define BALANCEENTROPYWITHRADIATION
 
-#define RADIMPCONV 1.e-8
+#define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-12
 
 //#define OPACBELLLIN
 //#define RADCLOSURE MINERBOCLOSURE
 //#define RADCLOSUREMIXATBH
 //#define RADCLOSURECOORDS BLCOORDS
-//#define COMPTONIZATION
+#define COMPTONIZATION
 //#define DAMPCOMPTONIZATIONATBH
 
 
@@ -48,18 +48,18 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .6
+#define TSTEPLIM 2.
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 2.
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 #define REDUCEORDERWHENNEEDED
 #define REDUCEORDERTEMP 1.e7
 
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP

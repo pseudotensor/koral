@@ -2746,7 +2746,7 @@ cell_fixup_hd()
     return 0;
 
   int ix,iy,iz,iv;
-  int in,ii;
+  int in,ii,iii;
   int verbose=2;
 
   copy_u(1.,u,u_bak_fixup);
@@ -2825,16 +2825,20 @@ cell_fixup_hd()
 	      for(iv=0;iv<NV;iv++)
 		{
 		  pp[iv]=0;
-		  for(ii=0;ii<in;ii++)
-		    pp[iv]+=ppn[ii][iv];
+		  for(iii=0;iii<in;iii++)
+		    pp[iv]+=ppn[iii][iv];
 		  pp[iv]/=(ldouble)in;  
 		}
 	      p2u(pp,uu,&geom);
 
 	      if(verbose>1) 
 		{
+		  for(iii=0;iii<in;iii++)
+		    print_primitives(ppn[iii]);
+
+		  print_primitives(pp);
 		  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
-		  //tch();
+		  getch();
 		}
 
 	      //save to updated arrays memory
@@ -2870,7 +2874,7 @@ cell_fixup_rad()
     return 0;
 
   int ix,iy,iz,iv;
-  int in,ii;
+  int in,ii,iii;
   int verbose=0;
 
   copy_u(1.,u,u_bak_fixup);
@@ -2996,13 +3000,13 @@ cell_fixup_rad()
 	      for(iv=0;iv<NV;iv++)
 		{
 		  pp[iv]=0;
-		  for(ii=0;ii<in;ii++)
-		    pp[iv]+=ppn[ii][iv];
+		  for(iii=0;iii<in;iii++)
+		    pp[iv]+=ppn[iii][iv];
 		  pp[iv]/=(ldouble)in;  
 		}
 	      p2u(pp,uu,&geom);
 		      
-	      if(verbose>1 || 1) 
+	      if(verbose>1) 
 		printf("%4d > %4d %4d %4d > RADFIX > fixing up rad with %d neighbors\n",PROCID,ix,iy,iz,in);
 
 	      //save to updated arrays memory
