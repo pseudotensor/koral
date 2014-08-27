@@ -15,6 +15,7 @@
 /************************************/
 #define RADIATION
 #define BALANCEENTROPYWITHRADIATION
+#define BALANCERADCORRWITHGAS
 
 #define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-12
@@ -30,7 +31,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
+#define MIMICDYNAMO
 //#define SKIPHDEVOLUTION //temp!
 #define ALPHAFLIPSSIGN                                                        
 #define CALCHRONTHEGO
@@ -46,11 +47,11 @@
 /************************************/
 //reconstruction / Courant
 /************************************/
-#define INT_ORDER 1
+#define INT_ORDER 2
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM 2.
+#define TSTEPLIM 1.
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
 #define REDUCEORDERWHENNEEDED

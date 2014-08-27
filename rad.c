@@ -1293,6 +1293,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
     ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
     
+    #ifndef BASICRADIMPLICIT
     if(ret!=0)
       { 
 	PLOOP(iv) 
@@ -1300,6 +1301,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	params[2]=RADIMPLICIT_FF;
 	ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
       }      
+    #endif
   }
   
   //*********** 2.5th ************
@@ -1310,15 +1312,18 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       params[2]=RADIMPLICIT_LAB;
       if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+      #ifndef BASICRADIMPLICIT
       if(ret!=0)
 	{
 	  PLOOP(iv) 
 	  { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
 	  params[2]=RADIMPLICIT_FF;
 	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-	}      
+	}  
+      #endif
   }
 
+  #ifndef BASICRADIMPLICIT
   //*********** 3th ************
   if(ret!=0) {
     PLOOP(iv) 
@@ -1338,6 +1343,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
     ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
   }
+  #endif
 
   if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);
 
@@ -4489,7 +4495,8 @@ update_intensities()
       ZERO_shortCharI(ix0,iy0,iz0,dt, intensities, source, 
 		      &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
 
-      
+      //diffuse
+
       /*
       int p;
       for(p=0;p<NUMANGLES;p++)

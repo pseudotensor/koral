@@ -303,16 +303,18 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  lastzone=currentzone;
 	  currentzone=alloc_loops(0,t,dt);
-	  //test
 	  if(lastzone!=currentzone) //zone switched
 	    {
 	      //recomputes the timestep though wavespeeds
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+              #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
 	      for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
 		{
 		  ix=loop_1[ii][0]; iy=loop_1[ii][1]; iz=loop_1[ii][2]; ldouble aaa[12],max_lws[3];
 		  calc_wavespeeds_lr(ix,iy,iz,aaa); save_wavespeeds(ix,iy,iz,aaa,max_lws);
 		}
+              #ifdef OUTPUTAFTERSUBZONES
+	      if(lastzone!=currentzone) spitoutput=1;
+	      #endif	  
 	    }
 	  if(lastzone==1 && currentzone!=1) spitoutput=1; //finished with the innermost one, output
 	  loopsallociter=0;
@@ -343,21 +345,25 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
 
+	  copy_u(1.,u,ut0);
 	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();	  
-	  op_implicit (t,dt*gamma,ut0); //U(n) in *ut0;  U(1) in *u
+	  op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u
 	  add_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
 
+	  copy_u(1.,u,ut1);
 	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
-	  op_explicit (t,dt,ut1); //U(1) in *ut1; 
+	  op_explicit (t,dt); //U(1) in *ut1; 
 	  add_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
 	  add_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
 
+	  copy_u(1.,u,uforget);
 	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]); do_finger();
-	  op_implicit (t,gamma*dt,uforget); //U(2) in *u
+	  op_implicit (t,gamma*dt); //U(2) in *u
 	  add_u(1./(dt*gamma),u,-1./(dt*gamma),uforget,drt2); //R(U(2)) in *drt2;
 
+	  copy_u(1.,u,ut2);
 	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
-	  op_explicit (t,dt,ut2); //U(2) in *ut2; 
+	  op_explicit (t,dt); //U(2) in *ut2; 
 	  add_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
 
 	  add_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
@@ -368,16 +374,19 @@ solve_the_problem(ldouble tstart, char* folder)
 	{ 
 	  //******************************* RK2 **********************************
 	  //1st
+	  copy_u(1.,u,ut0);
 	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
-	  op_explicit (t,.5*dt,ut0); 
+	  op_explicit (t,.5*dt); 
 	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
-	  op_implicit (t,.5*dt,uforget); 
+	  op_implicit (t,.5*dt); 
 	 
 	  //2nd
 	  nentr[2]=nentr2[2]=0;
-	  op_explicit (t,dt,ut1); 
+	  copy_u(1.,u,ut1);
 	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
-	  op_implicit (t,dt,uforget); 
+	  op_explicit (t,dt); 
+	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	  op_implicit (t,dt); 
 	 
 	 
 	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
@@ -391,17 +400,19 @@ solve_the_problem(ldouble tstart, char* folder)
 	{ 
 	  //******************************* RK2 **********************************
 	  //1st	 
+	  copy_u(1.,u,ut0);
 	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
-	  op_explicit (t,1.*dt,ut0); 
+	  op_explicit (t,1.*dt); 
 	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
-	  op_implicit (t,1.*dt,uforget); 
+	  op_implicit (t,1.*dt); 
 	  add_u(1.,u,-1.,ut0,ut2); 
 
 	  //2nd
+	  copy_u(1.,u,ut1);
 	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]); do_finger();
-	  op_explicit (t,dt,ut1); 
+	  op_explicit (t,dt); 
 	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
-	  op_implicit (t,dt,uforget); 
+	  op_implicit (t,dt); 
 	  add_u(1.,u,-1.,ut1,ut3); 
 
 	  //together     

@@ -10,6 +10,7 @@
 //radiation
 /************************************/
 #define RADIATION
+#define BASICRADIMPLICIT
 #define NCOMPTONIZATION 
 #define RADOUTPUTVELS
 
@@ -42,13 +43,14 @@
 #define NTZ 1
 
 #define SUBZONES
-#define NSUBZONES 2
+#define OUTPUTAFTERSUBZONES
+#define NSUBZONES 3
 #define SUBZONESOVERLAP 4
 
 #define SPECIFIC_BC
 #define FIX_TEMPERATURE
-#define FIX_VELBONDI
-//#define FIX_VELOUTBONDI
+//#define FIX_VELBONDI
+#define FIX_VELOUTBONDI
 
 
 /************************************/
@@ -76,7 +78,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e50 //res
+#define DTOUT1 1.e40 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
@@ -85,7 +87,7 @@
 /***********************************/
 #define GAMMA (5./3.)
 #define MDOT 1.e2
-#define TAMB 2.e8//(5.*1.e9*(1.e4/RMAX))
+#define TAMB 1.e9//1.*1.e9*(1.e4/RMAX)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
 

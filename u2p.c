@@ -361,44 +361,43 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
   //************************************
   //************************************
 
+corrected[2]=0;
+  
 #ifdef RADIATION
-
   #ifdef BALANCEENTROPYWITHRADIATION
  //trying to balance gain of energy because of entropy inversion
   //by borrowing from the radiation field
 
   if(ret==-1)
     {
-      corrected[2]=0;
+      
       int radcor;      
       ldouble uunew[NV],ppnew[NV],ehat,uconf[4];
       //let's compare energy densisties
-      PLOOP(iv) uunew[iv]=uu[iv];
-      u2p_rad(uunew,ppnew,geom,&radcor);
-      calc_ff_Rtt(ppnew,&ehat,uconf,geom);
-      ehat*=-1.;
-      
-      if(ehat>10.*pp[UU])
-	{
+      PLOOP(iv) 
+      {uunew[iv]=uu[iv];ppnew[iv]=pp[iv];}
+      //u2p_rad(uunew,ppnew,geom,&radcor);
+      //calc_ff_Rtt(ppnew,&ehat,uconf,geom);
+      //ehat*=-1.;
 
-	  PLOOP(iv) uunew[iv]=uu[iv];
-	  p2u_mhd(pp,uunew,geom);
-	  ldouble dugas = uunew[UU]-uu[UU];
-	  uunew[EE0]-=dugas; //balancing with radiation      
-	  u2p_rad(uunew,ppnew,geom,&radcor);
+      
+      ldouble fac=1.;
+      //ldouble xxBL[4];
+      //coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
+      //fac=step_function(xxBL[1]-2.*rhorizonBL,0.2*rhorizonBL);
  
-	  if(radcor==0) //there was enough energy to borrow from
-	    {
-	      PLOOP(iv) uu[iv]=uunew[iv];
-	      //printf("entropy correction did work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
-	    }
-	  else
-	    {
-	      corrected[2]=1; //entropy correction didn't work
-	      //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
-	    }
+      PLOOP(iv) uunew[iv]=uu[iv];
+      p2u_mhd(pp,uunew,geom);
+      ldouble dugas = uunew[UU]-uu[UU];
+      uunew[EE0]-=fac*dugas; //balancing with radiation      
+      u2p_rad(uunew,ppnew,geom,&radcor);
+ 
+      if(radcor==0) //there was enough energy to borrow from
+	{
+	  PLOOP(iv) uu[iv]=uunew[iv];
+	  //printf("entropy correction did work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
 	}
-      else //not enough energy in radiation
+      else
 	{
 	  corrected[2]=1; //entropy correction didn't work
 	  //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
@@ -408,6 +407,37 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
   #endif
 
   u2p_rad(uu,pp,geom,&radcor);
+
+  #ifdef BALANCERADCORRWITHGAS
+  if(radcor!=0) //some type of radiative correction applied
+    {
+      ldouble uunew[NV],ppnew[NV];
+      PLOOP(iv) 
+      {uunew[iv]=uu[iv];ppnew[iv]=pp[iv];}
+      p2u(pp,uunew,geom);
+      ldouble durad = uunew[EE0]-uu[EE0];
+      uunew[UU]-=durad;
+      u2pret=u2p_solver(uunew,ppnew,geom,U2P_HOT,0); 
+      
+      if(u2pret==0) //there was enough energy to borrow from
+	{
+	  PLOOP(iv) 
+	  {
+	    uu[iv]=uunew[iv];
+	    pp[iv]=ppnew[iv];
+	  }
+	  printf("radcorr correction did work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+	}
+      else
+	{
+	  corrected[2]=1; //entropy correction didn't work
+	  printf("radcorr correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+	}
+    }
+
+  #endif
+
+
 #endif
   
   //************************************
@@ -462,7 +492,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
   //rho too small
   if(pp[0]<RHOFLOOR) 
     {
-      if(verbose) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix,geom->iy,pp[0]);
+      if(verbose) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix+TOI,geom->iy+TOJ,pp[0]);
       pp[0]=RHOFLOOR; 
       ret=-1; 
     }
@@ -476,7 +506,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
   ldouble rhofloor = RHOFLOOR_BH_NORM / sqrt(rr*rr*rr);
   if(pp[0]<rhofloor) 
     {
-      if(verbose) printf("hd_floors BH CASE 1 at %d %d (%e)\n",geom->ix,geom->iy,pp[0]);
+      if(verbose) printf("hd_floors BH CASE 1 at %d %d (%e)\n",geom->ix+TOI,geom->iy+TOJ,pp[0]);
       pp[0]=rhofloor;
       ret=-1; 
     }
@@ -486,7 +516,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
   //too cold
   if(pp[1]<UURHORATIOMIN*pp[0]) 
     {
-      if(verbose) {printf("hd_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);}//getchar();}
+      if(verbose) {printf("hd_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix+TOI,geom->iy+TOJ,geom->iz,pp[0],pp[1]);}//getchar();}
       pp[1]=UURHORATIOMIN*pp[0]; //increasing uint
       ret=-1;
     }
@@ -498,7 +528,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       pp[1]=UURHORATIOMAX*pp[0]; //decreasing uint
       //pp[0]=pp[1]/UURHORATIOMAX; //increasing rho
       ret=-1;      
-      if(verbose) printf("hd_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[0],pp[1]);
+      if(verbose) printf("hd_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix+TOI,geom->iy+TOJ,geom->iz,pp[0],pp[1]);
     }
 
   
@@ -520,7 +550,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 
   if(magpre>B2RHORATIOMAX*pp[RHO]) 
     {
-      if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[RHO],magpre);
+      if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix+TOI,geom->iy+TOJ,geom->iz,pp[RHO],magpre);
       ldouble f=magpre/(B2RHORATIOMAX*pp[RHO]);
 
 #if (B2RHOFLOORFRAME==ZAMOFRAME) //new mass in ZAMO
@@ -568,7 +598,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
   //independent check on ugas
   if(magpre>B2UURATIOMAX*pp[UU]) 
     {
-      if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[UU],magpre);
+      if(verbose) printf("mag_floors CASE 3 at (%d,%d,%d): %e %e\n",geom->ix+TOI,geom->iy+TOJ,geom->iz,pp[UU],magpre);
       pp[UU]*=magpre/(B2UURATIOMAX*pp[UU]);
       ret=-1;      
     }
@@ -596,7 +626,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 	  ret=-1;
 	  if(verbose)
 	    {
-	      printf("hd_floors CASE 4 at (%d,%d,%d): %e",geom->ix,geom->iy,geom->iz,sqrt(gamma2));
+	      printf("hd_floors CASE 4 at (%d,%d,%d): %e",geom->ix+TOI,geom->iy+TOJ,geom->iz,sqrt(gamma2));
 	      qsq=0.;
 	      for(i=1;i<4;i++)
 		for(j=1;j<4;j++)
@@ -1162,7 +1192,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     {
       return -150;
       printf("failed to find initial W for Etype: %d\n",Etype);
-      printf("at %d %d\n",geom->ix,geom->iy);
+      printf("at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
       print_NVvector(uu);
       print_NVvector(pp);
       getchar();
@@ -1228,7 +1258,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
       if(fabs(W)>BIG) 
 	{
-	  if(verbose>1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix,geom->iy,geom->iz); 
+	  if(verbose>1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz); 
 	  return -103;
 	}
 

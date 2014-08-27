@@ -34,9 +34,8 @@ if(ix>=NX) //total boundary, properties of the galaxy
     ldouble rho,rho0,uint,uintl,uint0,ur,url,rhol;
 
     //calculating Bondi-related values at the boundary
-    //ldouble RMAXout=geomBL.xx;
-    ldouble RMAXout=RMAX;
-
+    ldouble RMAXout=geomBL.xx;
+    //ldouble RMAXout=1.e4;
 
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;

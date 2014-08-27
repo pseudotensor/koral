@@ -422,13 +422,11 @@ do_finger()
 /* starts from *u, copies to *ubase, updates *u, ***/
 /***************************************************/
 int
-op_explicit(ldouble t, ldouble dt,ldouble *ubase) 
+op_explicit(ldouble t, ldouble dt) 
 {
   int ix,iy,iz,iv,ii;
 
-  //copies the initial state to *ubase
-  copy_u(1.,u,ubase);
-
+  
   //global wavespeeds
   max_ws[0]=max_ws[1]=max_ws[2]=-1.;
  
@@ -1026,11 +1024,10 @@ op_explicit(ldouble t, ldouble dt,ldouble *ubase)
 /* starts from *u, copies to *ubase, updates *u, ***/
 /***************************************************/
 int
-op_implicit(ldouble t, ldouble dt,ldouble *ubase) 
+op_implicit(ldouble t, ldouble dt) 
 {
   int ix,iy,iz,ii;
-  copy_u(1., u, ubase);
-
+  
   //to count the average number of iteration in the implicit solver
   for(ii=0;ii<NGLOBALINTSLOT;ii++)
     global_int_slot[ii]=0.;
@@ -2833,14 +2830,13 @@ cell_fixup_hd()
 
 	      if(verbose>1) 
 		{
-		  for(iii=0;iii<in;iii++)
-		    print_primitives(ppn[iii]);
-
-		  print_primitives(pp);
+		  //for(iii=0;iii<in;iii++)
+		  //print_primitives(ppn[iii]);
+		  //print_primitives(pp);
 		  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
-		  getch();
+		  //getch();
 		}
-
+	      
 	      //save to updated arrays memory
 	      for(iv=0;iv<NVMHD;iv++)
 		{

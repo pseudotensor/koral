@@ -430,8 +430,8 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   gdetu=1.;
 #endif
 
-  int irf,verbose=0;
-
+  int irf,verbose=0,iv;
+  
   //multi-rad-fluids
   for(irf=0;irf<NRF;irf++)
     {
