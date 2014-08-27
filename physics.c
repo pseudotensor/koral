@@ -161,7 +161,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   dx[1]=my_max(get_size_x(geom->iy,1)*sqrt(gg[2][2]),get_size_x(geom->iy+1,1)*sqrt(gg[2][2]));
   dx[2]=my_max(get_size_x(geom->iz,2)*sqrt(gg[3][3]),get_size_x(geom->iz+1,2)*sqrt(gg[3][3]));
   ldouble tautot[3];
-  calc_tautot(pp,xx,dx,tautot);
+  calc_tautot(pp,geom,dx,tautot);
 
   //M1
   calc_rad_wavespeeds(pp,geom,tautot,aval,verbose);

@@ -529,8 +529,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      #ifdef RADIATION
 
 	      ldouble Rtt,ehat,ugas[4],urad[4],rvel[4],Rij[4][4],Rij22[4][4],Gi[4];
-
-	      ldouble tauabsloc = vcon[0]*calc_kappa(pp,&geomout);
+	      ldouble k1,k2,k3,k4;
+	      ldouble tauabsloc = vcon[0]*calc_kappa(pp,&geomout,&k1,&k2,&k3,&k4);
 	      ldouble tauscaloc = vcon[0]*calc_kappaes(pp,&geomout);
 	      ldouble taueffloc = sqrt(tauabsloc*(tauabsloc+tauscaloc));
 

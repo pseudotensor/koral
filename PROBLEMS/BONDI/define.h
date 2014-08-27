@@ -11,6 +11,7 @@
 /************************************/
 #define RADIATION
 #define BASICRADIMPLICIT
+#define ALLOWRADCEILINGINIMPLICIT
 #define NCOMPTONIZATION 
 #define RADOUTPUTVELS
 
@@ -24,7 +25,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e5
+#define RMAX 1.e4
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -49,8 +50,8 @@
 
 #define SPECIFIC_BC
 #define FIX_TEMPERATURE
-//#define FIX_VELBONDI
-#define FIX_VELOUTBONDI
+#define FIX_VELBONDI
+//#define FIX_VELOUTBONDI
 
 
 /************************************/
@@ -86,8 +87,8 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e2
-#define TAMB 1.e9//1.*1.e9*(1.e4/RMAX)
+#define MDOT 1.e0
+#define TAMB 1.e9*(1.e4/RMAX)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
 

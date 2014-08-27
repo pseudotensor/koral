@@ -390,7 +390,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      Bangle2+=rho*bsq*dxph[1];
 
 	      //optical depths
-	      ldouble tauabsloc = utcon[0]*calc_kappa(pp,&geomBL);
+	      ldouble k1,k2,k3,k4;
+	      ldouble tauabsloc = utcon[0]*calc_kappa(pp,&geomBL,&k1,&k2,&k3,&k4);
 	      ldouble tautotloc = utcon[0]*calc_kappaes(pp,&geomBL);
 	      tautot+=tautotloc*dxph[1];
 	      tauabs+=tauabsloc*dxph[1];	
@@ -1001,7 +1002,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		pp[iv]=get_uavg(pavg,iv,ix,iy,iz);
 
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-	      calc_tautot(pp,xxBL,dxph,tautot);
+	      calc_tautot(pp,&geomBL,dxph,tautot);
 
 	      ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 	      ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
@@ -1067,7 +1068,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      
 
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-	      calc_tautot(pp,xxBL,dxph,tautot);
+	      calc_tautot(pp,&geomBL,dxph,tautot);
 
 	      ucongas[1]=pp[2];
 	      ucongas[2]=pp[3];
@@ -1295,7 +1296,7 @@ calc_photloc(int ix)
 	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
 
 	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-	  calc_tautot(pp,xxBL,dx,tautot);
+	  calc_tautot(pp,&geom,dx,tautot);
 	  tau+=tautot[1];
 	  if(tau>1.) break;
 	}

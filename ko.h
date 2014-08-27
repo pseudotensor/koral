@@ -442,7 +442,7 @@ int gsl_poly_complex_solve_quartic (double a, double b, double c, double d,
                                 gsl_complex * z0, gsl_complex * z1,
                                 gsl_complex * z2, gsl_complex * z3);
 ldouble f_der_hlle         (int ix,int iy,int iz, ldouble *fd_der);
-ldouble calc_kappa(ldouble*,void*);
+ldouble calc_kappa(ldouble*,void*,ldouble*,ldouble*,ldouble*,ldouble*);
 ldouble calc_kappaes(ldouble*,void*);
 ldouble calc_ufromS(ldouble S,ldouble rho);
 ldouble calc_Sfromu(ldouble S,ldouble u);
