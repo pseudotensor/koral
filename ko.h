@@ -442,8 +442,8 @@ int gsl_poly_complex_solve_quartic (double a, double b, double c, double d,
                                 gsl_complex * z0, gsl_complex * z1,
                                 gsl_complex * z2, gsl_complex * z3);
 ldouble f_der_hlle         (int ix,int iy,int iz, ldouble *fd_der);
-ldouble calc_kappa(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z);
-ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z);
+ldouble calc_kappa(ldouble*,void*);
+ldouble calc_kappaes(ldouble*,void*);
 ldouble calc_ufromS(ldouble S,ldouble rho);
 ldouble calc_Sfromu(ldouble S,ldouble u);
 int
@@ -651,9 +651,9 @@ int solve_LTE_ff(int ix,int iy,int iz,ldouble dt);
 int solve_LTE(int ix,int iy,int iz,ldouble dt);
 int solve_radforce_ff(int ix,int iy,int iz,ldouble dt);
 int solve_radforce(int ix,int iy,int iz,ldouble dt);
-ldouble calc_chi(ldouble *pp, ldouble *xx);
-int calc_tautot(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tautot);
-int calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dl, ldouble *tauabs);
+ldouble calc_chi(ldouble *pp,void*);
+int calc_tautot(ldouble *pp, void*, ldouble *dl, ldouble *tautot);
+int calc_tauabs(ldouble *pp, void*, ldouble *dl, ldouble *tauabs);
 int calc_Gi(ldouble *pp, void*,ldouble Gi[4],int);
 int calc_Compt_Gi(ldouble *pp, void* ggg, ldouble *Gtc, ldouble Ehatrad, ldouble Tgas, ldouble kappaes, ldouble *ucon);
 int calc_rad_Jac_eval(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval,int);

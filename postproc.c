@@ -390,8 +390,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      Bangle2+=rho*bsq*dxph[1];
 
 	      //optical depths
-	      ldouble tauabsloc = utcon[0]*calc_kappa(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
-	      ldouble tautotloc = utcon[0]*calc_kappaes(rho,temp,geomBL.xx,geomBL.yy,geomBL.zz);
+	      ldouble tauabsloc = utcon[0]*calc_kappa(pp,&geomBL);
+	      ldouble tautotloc = utcon[0]*calc_kappaes(pp,&geomBL);
 	      tautot+=tautotloc*dxph[1];
 	      tauabs+=tauabsloc*dxph[1];	
 

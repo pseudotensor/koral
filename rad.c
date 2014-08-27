@@ -7,14 +7,24 @@
 //******* opacities ****************************************************
 //**********************************************************************
 //absorption
-ldouble calc_kappa(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z)
+ldouble calc_kappa(ldouble *pp,void *ggg)
 {
+  struct geometry *geom
+    = (struct geometry *) ggg;
+  ldouble rho=pp[RHO];
+  ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+      
 #include PR_KAPPA //PROBLEMS/XXX/kappa.c
 }
 
 //scattering
-ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z)
+ldouble calc_kappaes(ldouble *pp,void *ggg)
 {  
+  struct geometry *geom
+    = (struct geometry *) ggg;
+  ldouble rho=pp[RHO];
+  ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+      
 #include PR_KAPPAES //PROBLEMS/XXX/kappaes.c
 }
 
@@ -22,16 +32,10 @@ ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z)
 //******* calculates total opacity over dx[] ***************************
 //**********************************************************************
 ldouble
-calc_chi(ldouble *pp, ldouble *xx)
+calc_chi(ldouble *pp,void *ggg)
 {
-  ldouble rho=pp[RHO];
-  ldouble u=pp[UU];  
-  ldouble pr=(GAMMA-1.)*(u);
-  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-
-  //xx[0] holds time
-  ldouble kappa=calc_kappa(rho,T,xx[1],xx[2],xx[3]);
-  ldouble chi=kappa+calc_kappaes(rho,T,xx[1],xx[2],xx[3]);
+  ldouble kappa=calc_kappa(pp,ggg);
+  ldouble chi=kappa+calc_kappaes(pp,ggg);
 
   return chi;
 }
@@ -40,16 +44,9 @@ calc_chi(ldouble *pp, ldouble *xx)
 //******* calculates total opacity over dx[] *****************************
 //*********************************************************************
 int
-calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
+calc_tautot(ldouble *pp, void *ggg, ldouble *dx, ldouble *tautot)
 {
-  ldouble rho=pp[RHO];
-  ldouble u=pp[UU];  
-  ldouble pr=(GAMMA-1.)*(u);
-  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-
-  //xx[0] holds time
-  ldouble kappa=calc_kappa(rho,T,xx[1],xx[2],xx[3]);
-  ldouble chi=kappa+calc_kappaes(rho,T,xx[1],xx[2],xx[3]);
+  ldouble chi=calc_chi(pp,ggg);
 
   tautot[0]=chi*dx[0];
   tautot[1]=chi*dx[1];
@@ -62,15 +59,9 @@ calc_tautot(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tautot)
 //******* calculates abs opacity over dx[] ***************************
 //**********************************************************************
 int
-calc_tauabs(ldouble *pp, ldouble *xx, ldouble *dx, ldouble *tauabs)
+calc_tauabs(ldouble *pp, void *ggg, ldouble *dx, ldouble *tauabs)
 {
-  ldouble rho=pp[RHO];
-  ldouble u=pp[1];  
-  ldouble pr=(GAMMA-1.)*(u);
-  ldouble T=pr*MU_GAS*M_PROTON/K_BOLTZ/rho;
-
-  //xx[0] holds time
-  ldouble kappa=calc_kappa(rho,T,xx[1],xx[2],xx[3]);
+  ldouble kappa=calc_kappa(pp,ggg);
 
   tauabs[0]=kappa*dx[0];
   tauabs[1]=kappa*dx[1];
@@ -262,7 +253,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       ldouble Ehat = -Rtt;
       ldouble Ehat0 = -Rtt0;
       ldouble dtau=dt/uconf[0];
-      ldouble kappaabs=calc_kappa(pp[RHO],T,geom->xx,geom->yy,geom->zz);
+      //ldouble kappaabs=calc_kappa(pp,geom);
 
       //fluid frame energy equation:
       if(whichprim==RAD) //rad-primitives
@@ -414,8 +405,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
   ldouble TLTE=0.;
 
-  ldouble kappa=calc_kappa(pp0[RHO],Tgas00,0.,0.,0.);
-  ldouble chi=kappa+calc_kappaes(pp0[RHO],Tgas00,0.,0.,0.);
+  ldouble kappa=calc_kappa(pp0,geom);
+  ldouble chi=kappa+calc_kappaes(pp0,geom);
   ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas00,4.)/pp0[UU]);
   ldouble xi2=chi*dt*(1.+(-Rtt00)/(pp0[RHO]+GAMMA*pp0[UU]));
   ldouble ucon[4];
@@ -476,8 +467,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       ldouble Trad=calc_LTE_TfromE(-Rtt);
       ldouble Tgas=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
       ldouble rho=pp0[RHO];
-      ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
-      ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);  
+      ldouble kappa=calc_kappa(pp0,geom);
+      ldouble kappaes=calc_kappaes(pp0,geom);
       printf("\n===========\nkappa: %e chi: %e\n===========\n",kappa,kappa+kappaes);
       printf("\nxi1: %e xi2: %e\n",xi1,xi2);
       
@@ -1184,8 +1175,8 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   Ehat=-Rtt0;
   Tgas0=calc_PEQ_Tfromurho(pp0[UU],pp0[RHO]);
   Trad0=calc_LTE_TfromE(Ehat);
-  ldouble kappa=calc_kappa(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
-  ldouble chi=kappa+calc_kappaes(pp0[RHO],Tgas0,geom.xx,geom.yy,geom.zz);
+  ldouble kappa=calc_kappa(pp0,&geom);
+  ldouble chi=kappa+calc_kappaes(pp0,&geom);
   ldouble xi1=kappa*dt*(1.+16.*SIGMA_RAD*pow(Tgas0,4.)/pp0[UU]);
   ldouble xi2=chi*dt*(1.+(-Rtt0)/(pp0[RHO]+GAMMA*pp0[UU]));
 
@@ -1597,16 +1588,20 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
-  ldouble kappa=calc_kappa(rho,Tgas,geom->xx,geom->yy,geom->zz);
+  ldouble kappa=calc_kappa(pp,geom);
   ldouble kappagas=kappa;
   ldouble kapparad=kappa;
 
   #ifdef NCOMPTONIZATION //adjust the Rosseland mean for the color temperature of radiation
   ldouble Trad = calc_ncompt_Thatrad_full(pp,ggg);
-  kapparad *= Tgas*Tgas/Trad/Trad;
+  ldouble zeta = Trad/Tgas;
+  kapparad *= 1./zeta/zeta/zeta;
+  ldouble logterm = log(1.+1.6*zeta);
+  kapparad *= logterm;
+  kappagas *= logterm;
   #endif
 
-  ldouble kappaes=calc_kappaes(rho,Tgas,geom->xx,geom->yy,geom->zz);
+  ldouble kappaes=calc_kappaes(pp,geom);
   ldouble chi=kapparad+kappaes;
 
   //contravariant four-force in the lab frame
@@ -3466,15 +3461,19 @@ calc_nsource(ldouble *pp, void* ggg)
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
-  ldouble kappa=calc_kappa(rho,Tgas,geom->xx,geom->yy,geom->zz);
+  ldouble kappa=calc_kappa(pp,geom);
   ldouble kappagas=kappa;
   ldouble kapparad=kappa;
 
-  #ifdef NCOMPTONIZATION //adjust the Rosseland mean for the color temperature of radiation
+  #ifdef NCOMPTONIZATION //adjust the measn for the color temperature of radiation
   ldouble Trad = calc_ncompt_Thatrad_full(pp,ggg);
-  kapparad *= Tgas*Tgas/Trad/Trad;
+  ldouble zeta = Trad/Tgas;
+  kapparad *= 1./zeta/zeta/zeta;
+  ldouble logterm = log(1.+1.6*zeta);
+  kapparad *= logterm;
+  kappagas *= logterm;
   #endif
-
+  
   //number of photons in rad rest frame
   ldouble nphrf = pp[NF(0)];
 
@@ -4176,8 +4175,8 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //postprocessing, passing by
   pre=(GAMMA-1.)*(uint);
   Tgas=pre*MU_GAS*M_PROTON/K_BOLTZ/rho;
-  alpha=calc_kappa(rho,Tgas,geom->xx,geom->yy,geom->zz);
-  sigma=calc_kappaes(rho,Tgas,geom->xx,geom->yy,geom->zz);
+  alpha=calc_kappa(pp0,geom);
+  sigma=calc_kappaes(pp0,geom);
 #ifdef SKIPRADSOURCE
   alpha=sigma=0.;
 #endif
@@ -4469,8 +4468,8 @@ update_intensities()
 	      //postprocessing, passing by
 	      pre=(GAMMA-1.)*(uint);
 	      Tgas=pre*MU_GAS*M_PROTON/K_BOLTZ/rho;
-	      alpha=calc_kappa(rho,Tgas,geom.xx,geom.yy,geom.zz);
-	      sigma=calc_kappaes(rho,Tgas,geom.xx,geom.yy,geom.zz);
+	      alpha=calc_kappa(&get_u(p,0,ix,iy,iz),&geom);
+	      sigma=calc_kappaes(&get_u(p,0,ix,iy,iz),&geom);
 #ifdef SKIPRADSOURCE
 	      alpha=sigma=0.;
 #endif

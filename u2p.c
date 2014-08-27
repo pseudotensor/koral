@@ -76,6 +76,7 @@ calc_primitives(int ix,int iy,int iz,int type)
   
   //************************************
   //update conserved to follow corrections on primitives
+
   p2u(pp,uu,&geom);
   
   for(iv=0;iv<NV;iv++)

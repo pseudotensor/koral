@@ -1832,7 +1832,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       calc_Gi(pp,&geomBL,Gi,1); 
 	       boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
 	       #ifdef COMPTONIZATION
-	       ldouble kappaes=calc_kappaes(rho,temp,-1.,-1.,-1.);  
+	       ldouble kappaes=calc_kappaes(pp,&geomBL);
 	       calc_Compt_Gi(pp,&geomBL,Gic,ehat,temp,kappaes,vel);
 	       boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
                #endif 
