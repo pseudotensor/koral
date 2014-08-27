@@ -8,14 +8,15 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 168
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
+//#define BASICRADIMPLICIT
 #define BALANCEENTROPYWITHRADIATION
-#define BALANCERADCORRWITHGAS
+//#define BALANCERADCORRWITHGAS
 
 #define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-12
@@ -31,8 +32,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
-//#define SKIPHDEVOLUTION //temp!
+//#define MIMICDYNAMO
 #define ALPHAFLIPSSIGN                                                        
 #define CALCHRONTHEGO
 #define ALPHADYNAMO 0.314
@@ -47,20 +47,21 @@
 /************************************/
 //reconstruction / Courant
 /************************************/
-#define INT_ORDER 2
+#define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM 1.
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
-#define REDUCEORDERWHENNEEDED
-#define REDUCEORDERTEMP 1.e7
+//#define REDUCEORDERWHENNEEDED
+//#define REDUCEORDERTEMP 1.e6
+//#define REDUCEORDERRADIUS 10.
 
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP

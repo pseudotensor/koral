@@ -1597,7 +1597,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
-  ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  ldouble kappa=calc_kappa(rho,Tgas,geom->xx,geom->yy,geom->zz);
   ldouble kappagas=kappa;
   ldouble kapparad=kappa;
 
@@ -1606,7 +1606,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   kapparad *= Tgas*Tgas/Trad/Trad;
   #endif
 
-  ldouble kappaes=calc_kappaes(rho,Tgas,-1.,-1.,-1.);
+  ldouble kappaes=calc_kappaes(rho,Tgas,geom->xx,geom->yy,geom->zz);
   ldouble chi=kapparad+kappaes;
 
   //contravariant four-force in the lab frame
@@ -3466,7 +3466,7 @@ calc_nsource(ldouble *pp, void* ggg)
   ldouble p= (GAMMA-1.)*(ldouble)u;
   ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
-  ldouble kappa=calc_kappa(rho,Tgas,-1.,-1.,-1.);
+  ldouble kappa=calc_kappa(rho,Tgas,geom->xx,geom->yy,geom->zz);
   ldouble kappagas=kappa;
   ldouble kapparad=kappa;
 

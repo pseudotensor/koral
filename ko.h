@@ -447,7 +447,7 @@ ldouble calc_kappaes(ldouble rho, ldouble T,ldouble x,ldouble y,ldouble z);
 ldouble calc_ufromS(ldouble S,ldouble rho);
 ldouble calc_Sfromu(ldouble S,ldouble u);
 int
-avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble*,ldouble*,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2,ldouble);
+avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble*,ldouble*,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2,int);
 
 //problem.c
 ldouble calc_xb(int i,int idim);

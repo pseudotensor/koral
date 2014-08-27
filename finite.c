@@ -64,12 +64,59 @@ ldouble DM4(ldouble W,ldouble X, ldouble Y, ldouble Z)
 }
 
 int
-avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble *ul,ldouble *ur,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2,ldouble diffpar)
+reduce_order_check(ldouble *pm2,ldouble *pm1,ldouble *p0,ldouble *pp1,ldouble *pp2,int ix,int iy,int iz)
 {
-      
+  int reconstrpar=0;
+#ifdef REDUCEORDERTEMP
+  ldouble t0,tp1,tm1,tmin;
+  t0=calc_PEQ_Tfromurho(p0[UU],p0[RHO]);
+  tp1=calc_PEQ_Tfromurho(pp1[UU],pp1[RHO]);
+  tm1=calc_PEQ_Tfromurho(pm1[UU],pm1[RHO]);
+  tmin=my_min(t0,my_min(tp1,tm1));	  
+  if(tmin<REDUCEORDERTEMP)
+    reconstrpar=1;
+#endif
+
+#ifdef REDUCEORDERRADIUS
+  ldouble xxBL[4];
+  get_xx_arb(ix,iy,iz,xxBL,BLCOORDS);
+  if(xxBL[1]<REDUCEORDERRADIUS)
+    reconstrpar=1;
+#endif
+  
+  return reconstrpar;
+}
+ 
+int
+avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble *ul,ldouble *ur,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2,int param)
+{
   ldouble r0[NV],rm1[NV],rp1[NV];
-  if(INT_ORDER==1) //linear
+
+  if(param!=0) //overrule the standard reconstruction
     {
+      int i;
+      if(param==1) //DONOR
+	{
+	  for(i=0;i<NV;i++)
+	    {
+	      ur[i]=u0[i];
+	      ul[i]=u0[i];
+	    }
+	}
+    }
+  else if(INT_ORDER==0) //DONOR
+    {
+      int i;
+
+      for(i=0;i<NV;i++)
+	{
+	  ur[i]=u0[i];
+	  ul[i]=u0[i];
+	}
+    }
+  else if(INT_ORDER==1) //linear
+    {
+      ldouble diffpar=MINMOD_THETA;
       int i;
 		     
       for(i=0;i<NV;i++)
@@ -524,7 +571,7 @@ op_explicit(ldouble t, ldouble dt)
       ldouble ffl[NV],ffr[NV];
       ldouble gloc[4][5],gl[4][5],gr[4][5],Gl[4][5],Gr[4][5];
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
-      ldouble diffpar;
+      int reconstrpar;
       struct geometry geom;
       int i;
 	      
@@ -577,22 +624,13 @@ op_explicit(ldouble t, ldouble dt)
 		  fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
 		}
 	    }
-	 		
-	  #ifdef REDUCEORDERWHENNEEDED
-	  ldouble t0,tp1,tm1,tmin;
-	  t0=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tp1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tm1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tmin=my_min(t0,my_min(tp1,tm1));
-	  if(tmin<REDUCEORDERTEMP)
-	    diffpar=1.;
-	  else
-	    diffpar=MINMOD_THETA;
-	  #else
-	  diffpar=MINMOD_THETA;
-	  #endif
 
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,diffpar);   
+	  reconstrpar=0;
+#ifdef REDUCEORDERWHENNEEDED
+	  reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
+#endif
+
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 
 	  if(ix>=0) //no need to calculate at left face of first GC
 	    {
@@ -661,22 +699,13 @@ op_explicit(ldouble t, ldouble dt)
 		  fd_pp2[i]=get_u(p,i,ix,iy+2,iz);
 		}
 	    }
+	  
+	  reconstrpar=0;
+#ifdef REDUCEORDERWHENNEEDED
+	  reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
+#endif
 
-          #ifdef REDUCEORDERWHENNEEDED
-	  ldouble t0,tp1,tm1,tmin;
-	  t0=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tp1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tm1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tmin=my_min(t0,my_min(tp1,tm1));
-	  if(tmin<REDUCEORDERTEMP)
-	    diffpar=1.;
-	  else
-	    diffpar=MINMOD_THETA;
-	  #else
-	  diffpar=MINMOD_THETA;
-	  #endif
-
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,diffpar);   
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 	  
 	  if(iy>=0)
 	    {
@@ -745,21 +774,12 @@ op_explicit(ldouble t, ldouble dt)
 		}
 	    }
 
-          #ifdef REDUCEORDERWHENNEEDED
-	  ldouble t0,tp1,tm1,tmin;
-	  t0=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tp1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tm1=calc_PEQ_Tfromurho(fd_p0[UU],fd_p0[RHO]);
-	  tmin=my_min(t0,my_min(tp1,tm1));
-	  if(tmin<REDUCEORDERTEMP)
-	    diffpar=1.;
-	  else
-	    diffpar=MINMOD_THETA;
-	  #else
-	  diffpar=MINMOD_THETA;
-	  #endif
+	  reconstrpar=0;
+#ifdef REDUCEORDERWHENNEEDED
+	  reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
+#endif
 
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,diffpar);   
+	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 
 	  if(iz>=0)
 	    {
