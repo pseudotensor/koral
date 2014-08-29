@@ -1643,11 +1643,11 @@
 #endif
 
 #ifndef RADIMPCONV
-#define RADIMPCONV 1.e-8
+#define RADIMPCONV 1.e-10
 #endif
 
 #ifndef RADIMPEPS
-#define RADIMPEPS 1.e-8
+#define RADIMPEPS 1.e-6
 #endif
 
 #ifndef RADIMPMAXITER

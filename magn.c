@@ -747,7 +747,7 @@ mimic_dynamo(ldouble dt)
       iy=loop_6[ii][1];
       iz=loop_6[ii][2]; 
 
-      calc_primitives(ix,iy,iz,0);
+      calc_primitives(ix,iy,iz,0,0);
 
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);

@@ -529,7 +529,7 @@ int conv_vels_core(ldouble *u1,ldouble *u2,ldouble *u2cov,int which1,int which2,
 int count_entropy(int *,int*);
 int copy_entropycount();
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
-int calc_primitives(int,int,int,int);
+int calc_primitives(int,int,int,int,int);
 int check_floors_mhd(ldouble *uu, int,void*);
 int u2p(ldouble *uu, ldouble *pp, void*,int*,int*,int);
 int u2p_hot(ldouble*,ldouble*,void*);

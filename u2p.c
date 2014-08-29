@@ -10,7 +10,7 @@
 //type: 0 - regular
 //1 - extra check for decreasing entropy
 int
-calc_primitives(int ix,int iy,int iz,int type)
+calc_primitives(int ix,int iy,int iz,int type,int setflags)
 {
   int verbose=0;
   int iv,u2pret,u2pretav;
@@ -38,15 +38,18 @@ calc_primitives(int ix,int iy,int iz,int type)
     }
 
   //aux
-  set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
-  set_cflag(ENTROPYFLAG2,ix,iy,iz,0); 
+  if(setflags)
+    {
+      set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
+      set_cflag(ENTROPYFLAG2,ix,iy,iz,0); 
+    }
  
   //converting to primitives
   u2p(uu,pp,&geom,corrected,fixups,type);
 
-  if(corrected[0]==1) //hd correction - entropy solver
+  if(corrected[0]==1 && setflags) //hd correction - entropy solver
     set_cflag(ENTROPYFLAG,ix,iy,iz,1); 
-  if(corrected[2]==1) //borrowing energy from radiation didn't work
+  if(corrected[2]==1 && setflags) //borrowing energy from radiation didn't work
     set_cflag(ENTROPYFLAG2,ix,iy,iz,1); 
 
   //imposing floors
@@ -86,22 +89,25 @@ calc_primitives(int ix,int iy,int iz,int type)
     }
 
   //sets the flags for fixups of unsuccessful cells
-  if(fixups[0]>0)
+  if(setflags)
     {
-      set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
-      global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
-    }
-  else
-    set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
+      if(fixups[0]>0)
+	{
+	  set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
+	  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
+	}
+      else
+	set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
 
   
-  if(fixups[1]>0)
-    {
-      set_cflag(RADFIXUPFLAG,ix,iy,iz,-1); 
-      global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
+      if(fixups[1]>0)
+	{
+	  set_cflag(RADFIXUPFLAG,ix,iy,iz,-1); 
+	  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
+	}
+      else
+	set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
     }
-  else
-    set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
   
 
   return 0;
@@ -369,28 +375,13 @@ corrected[2]=0;
  //trying to balance gain of energy because of entropy inversion
   //by borrowing from the radiation field
 
-  if(ret==-1)
-    {
-      
-      int radcor;      
-      ldouble uunew[NV],ppnew[NV],ehat,uconf[4];
-      //let's compare energy densisties
-      PLOOP(iv) 
-      {uunew[iv]=uu[iv];ppnew[iv]=pp[iv];}
-      //u2p_rad(uunew,ppnew,geom,&radcor);
-      //calc_ff_Rtt(ppnew,&ehat,uconf,geom);
-      //ehat*=-1.;
-
-      
-      ldouble fac=1.;
-      //ldouble xxBL[4];
-      //coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-      //fac=step_function(xxBL[1]-2.*rhorizonBL,0.2*rhorizonBL);
- 
+ if(ret==-1) //entropy u2p was used
+    {            
+      ldouble uunew[NV],ppnew[NV];
       PLOOP(iv) uunew[iv]=uu[iv];
-      p2u_mhd(pp,uunew,geom);
-      ldouble dugas = uunew[UU]-uu[UU];
-      uunew[EE0]-=fac*dugas; //balancing with radiation      
+      p2u_mhd(pp,uunew,geom); 
+      ldouble dugas = uunew[UU]-uu[UU]; //this much energy was introduced
+      uunew[EE0]-=dugas; //balancing with radiation      
       u2p_rad(uunew,ppnew,geom,&radcor);
  
       if(radcor==0) //there was enough energy to borrow from
@@ -1426,8 +1417,9 @@ int copy_entropycount()
     {
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
-      iz=loop_0[ii][2]; 
-      set_cflag(ENTROPYFLAG3,ix,iy,iz,get_cflag(ENTROPYFLAG,ix,iy,iz));
+      iz=loop_0[ii][2];
+      ldouble val=get_cflag(ENTROPYFLAG,ix,iy,iz);
+      set_cflag(ENTROPYFLAG3,ix,iy,iz,val);
     }
 
   return 0;

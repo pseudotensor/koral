@@ -145,7 +145,7 @@ if(ix>=NX) //total boundary, properties of the galaxy
       {
 	ucon[1]=0.;
 	E=Eout;
-	Nf=pp[NF0]=calc_NFfromE(Eout);
+	//Nf=pp[NF0]=calc_NFfromE(Eout);
       }
 
     //velocity back to MYCOORDS

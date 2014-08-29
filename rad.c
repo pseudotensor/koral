@@ -164,7 +164,13 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 
       u2pret=u2p_rad(uu,pp,geom,corr);
+
+      #ifdef NCOMPTONIZATION //urf unknown before p2u
+      pp[NF0]=ppin[NF0];
+      #endif
     }   
+
+ 
 
   if(corr[0]!=0 || corr[1]!=0) 
     ret=1;
@@ -738,7 +744,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       if(inverse_matrix(&J[0][0],&iJ[0][0],5)<0)
 	{
 	  failed=1;
-	  if(verbose) 
+	  if(verbose || 1) 
 	      printf("Jacobian 5x5 inversion failed\n");getchar();
 	  break;
 	}  
@@ -780,6 +786,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      //print_Nvector(&J[0][0],25);
 	    }
 
+	  /*
 	  mom_over_flag=0;
 	  //check if momenta overshoot
 	  ldouble ALLOWANCE; 
@@ -816,6 +823,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 		    }
 		}
 	    }
+	  */
 	
 	  //update primitives
 	  for(i=0;i<np;i++)
@@ -871,6 +879,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
 	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
 	      u2pret=u2p_rad(uu,pp,geom,corr);
+
+#ifdef NCOMPTONIZATION //urf unknown before p2u
+	      pp[NF0]=xxx[4];
+#endif
+
+
 	      //report on ceilings
 	      if(corr[0]>0)
 		{
@@ -900,7 +914,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      xiapp/=2.; 
 	    }
 
-	  if(xiapp<1.e-20) 
+	  if(xiapp<1.e-10) 
 	    {
 	      if(verbose) printf("damped unsuccesfully in implicit_4dprim\n");
 	      failed=1;
@@ -988,6 +1002,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //updating entropy
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
+#ifdef NCOMPTONIZATION //urf unknown before p2u
+  ldouble nf0bak=pp[NF0];
+#endif
+
   p2u(pp,uu,geom);
   
   int u2pret;
@@ -1020,6 +1038,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
       uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
       u2pret=u2p_rad(uu,pp,geom,corr);
+
+#ifdef NCOMPTONIZATION //urf unknown before p2u
+      pp[NF0]=nf0bak;
+#endif
+
 
       if(corr[0]>0) //if final solution hit ceiling, discard 
 	{
@@ -1291,6 +1314,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //***********************************************//
   //***********************************************//
 
+  int startwith;
+  if(Ehat<enratiotreshold*pp0[UU]) startwith=RAD; else startwith=MHD;
+#ifdef NCOMPTONIZATION //only RAD primitives work
+  //  startwith=RAD;
+#endif
 
   //*********** 1.5th ************
 
@@ -1299,7 +1327,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
     params[1]=RADIMPLICIT_ENERGYEQ;
     params[2]=RADIMPLICIT_LAB;
-    if(Ehat<enratiotreshold*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+    params[0]=startwith;
 
     ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
     
@@ -1314,6 +1342,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     #endif
   }
   
+  // #ifndef NCOMPTONIZATION
   //*********** 2.5th ************
   if(ret!=0) {
       PLOOP(iv) 
@@ -1332,6 +1361,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	}  
       #endif
   }
+  //#endif
 
   #ifndef BASICRADIMPLICIT
   //*********** 3th ************
@@ -1340,11 +1370,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
     params[1]=RADIMPLICIT_ENTROPYEQ;
     params[2]=RADIMPLICIT_LAB;
-    if(Ehat<enratiotreshold*pp0[UU]) params[0]=RAD; else params[0]=MHD;
+    params[0]=startwith;
     ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
   }
 
   //*********** 4th ************
+  //#ifndef NCOMPTONIZATION
   if(ret!=0) {
     PLOOP(iv) 
     {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
@@ -1353,6 +1384,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
     ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
   }
+  //#endif
   #endif
 
   if(ret==0) set_cflag(RADFIXUPFLAG,ix,iy,iz,0);

@@ -61,7 +61,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *muBe = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Qtheta = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *divB = (ldouble*)malloc(nx*ny*nz*sizeof(double));
-  ldouble *entropyinv = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  int *entropyinv = (int*)malloc(nx*ny*nz*sizeof(int));
  
   #ifdef TRACER
   ldouble *tracer = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -85,9 +85,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *phi = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 
 
-  #ifdef MIMICDYNAMO
-  set_bc(time,0);
-  mimic_dynamo(1.); 
+  #ifdef MIMICDYNAMO  
+  if(doingpostproc) 
+    {
+      set_bc(time,0);
+      mimic_dynamo(1.); 
+    }
   ldouble *Bxdyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bydyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bzdyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -259,7 +262,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      ldouble gracen; //gdet T^k_l Gamma^l_kr
 	      ldouble w;//entalphy
 
-	      entropyinv[nodalindex]=(ldouble)get_cflag(ENTROPYFLAG3,ix,iy,iz);
+	      entropyinv[nodalindex]=get_cflag(ENTROPYFLAG3,ix,iy,iz);
 
 	      if(doingavg==0) //using snapshot date
 		{
@@ -762,7 +765,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
   DBPutQuadvar1(file, "entropyinv","mesh1", entropyinv,
   		dimensions, ndim, NULL, 0, 
-		DB_DOUBLE, DB_NODECENT, optList);
+		DB_INT, DB_NODECENT, optList);
 
   DBPutQuadvar1(file, "uint","mesh1", uint,
   		dimensions, ndim, NULL, 0, 

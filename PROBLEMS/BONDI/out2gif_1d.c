@@ -62,7 +62,7 @@
 	  //	  "plot \"%s\" u 1:27 w lp ls 2 pt 7 ps .5  ti \"tau_abs\", \"%s\" u 1:26 w lp ls 3 pt 7 ps .5  ti \"tau_tot\"\n"
 #ifdef RADIATION
 	   //	  "plot \"%s\" u 1:($1*$26) w lp ls 2 ti \"tau_tot\"\n"
-	  "plot \"%s\" u 1:($27) w lp ls 2 ti \"nph\"\n"
+	  "plot \"%s\" u 1:($32) w lp ls 2 ti \"nph\"\n"
 #else
 	  "plot \"%s\" u 1:(1) w lp ls 2 pt 7 ps .5  ti \"nothing\"\n"
 #endif

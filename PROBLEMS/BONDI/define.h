@@ -10,8 +10,8 @@
 //radiation
 /************************************/
 #define RADIATION
-#define BASICRADIMPLICIT
 #define ALLOWRADCEILINGINIMPLICIT
+#define BASICRADIMPLICIT
 #define NCOMPTONIZATION 
 #define RADOUTPUTVELS
 
@@ -43,14 +43,15 @@
 #define NTY 1
 #define NTZ 1
 
-#define SUBZONES
+//#define SUBZONES
 #define OUTPUTAFTERSUBZONES
-#define NSUBZONES 3
-#define SUBZONESOVERLAP 4
+#define NSUBZONES 2
+#define SUBZONESOVERLAP 8
 
 #define SPECIFIC_BC
-#define FIX_TEMPERATURE
-#define FIX_VELBONDI
+//#define FIX_TEMPERATURE
+#define FIX_PRESSURE
+//#define FIX_VELBONDI
 //#define FIX_VELOUTBONDI
 
 
@@ -63,12 +64,12 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 #define U2PCONV 1.e-12
 #define RADIMPCONV 1.e-8
-#define RADIMPEPS 1.e-6
+#define RADIMPEPS 1.e-8
 #define RADIMPMAXITER 15
-#define GAMMAMAXRAD 10.
+#define GAMMAMAXRAD 50.
 /************************************/
 //output
 /************************************/
@@ -79,7 +80,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e40 //res
+#define DTOUT1 1.e3 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
@@ -87,7 +88,7 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e0
+#define MDOT 1.e2
 #define TAMB 1.e9*(1.e4/RMAX)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
