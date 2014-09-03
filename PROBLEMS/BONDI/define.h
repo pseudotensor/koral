@@ -75,8 +75,8 @@
 /************************************/
 #define SILOOUTPUT 0 //to silo file
 #define OUTOUTPUT 1 //to out file
-#define AVGOUTPUT 1
-#define RADOUTPUT 1
+#define AVGOUTPUT 0
+#define RADOUTPUT 0
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs

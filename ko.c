@@ -25,7 +25,7 @@ main(int argc, char **argv)
   doingpostproc=0;
 
   //gsl errors off
-  gsl_set_error_handler_off();
+  //gsl_set_error_handler_off();
   
   //random number gen. initialization
   srand ( time(NULL) );
@@ -50,8 +50,10 @@ main(int argc, char **argv)
   //sets the grid
   set_grid(&min_dx,&min_dy,&min_dz,&max_dt);
   //print_grid(min_dx,min_dy,min_dz);
+
+
   alloc_loops(1,0.,0.);
-  
+
 #if(GRIDOUTPUT==1)
   fprint_gridfile(folder);
 #endif
@@ -143,6 +145,8 @@ main(int argc, char **argv)
 #ifdef PR_POSTINIT
 #include PR_POSTINIT
 #endif
+
+
     }
 
   //prepares files  
@@ -159,7 +163,7 @@ main(int argc, char **argv)
   if(ifinit==1)
     {
       fprint_restartfile(tstart,folder);
-			
+
       //dumps dumps only for shared memory
       #ifndef MPI
 #if(SCAOUTPUT==1)
@@ -184,7 +188,7 @@ main(int argc, char **argv)
 
       nfout1++;
     }
-    
+
   //evolves
   solve_the_problem(tstart, folder);
 
@@ -268,8 +272,7 @@ solve_the_problem(ldouble tstart, char* folder)
     }
   
   #endif
-  
-
+ 
   while (t < t1 && nfout1<=NOUTSTOP && i1<NSTEPSTOP)
     {    
       spitoutput=0;
@@ -321,6 +324,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
       #endif
 
+
+
       //dt based on the estimate from the last midpoint
       dt=TSTEPLIM*1./tstepdenmax;
       global_dt=dt;
@@ -345,6 +350,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
 
+	  
 	  copy_u(1.,u,ut0);
 	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();	  
 	  op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u
@@ -423,7 +429,7 @@ solve_the_problem(ldouble tstart, char* folder)
       else 
 	my_err("wrong time stepping specified\n");
       
-      
+
       
       //**********************************************************************
       //************************* updating intensities *************************

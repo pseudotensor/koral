@@ -233,7 +233,7 @@ conv_vels_core(ldouble *u1,ldouble *u2conout,ldouble *u2covout,int which1,int wh
 		}
 	    }
 	  ldouble delta=b*b-4.*a*c;
-	  if(delta<0.) {("delta.lt.0 in VEL4->VELR\n");return -1;}
+	  if(delta<0.) {printf("delta.lt.0 in VEL4->VELR\n");return -1;}
 	  ldouble ut1,ut2;
 	  ut1=(-b-sqrt(delta))/2./a;
 	  ut2=(-b+sqrt(delta))/2./a;

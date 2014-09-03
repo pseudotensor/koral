@@ -306,11 +306,9 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
   if(ALLOWCOLDU2P)
     if(u2pret<0.)
       {
-	//***********************************
 	//cold RHD - assuming u=SMALL
 	ret=-2;
 	u2pret=u2p_solver(uu,pp,ggg,U2P_COLD,0);
-	//************************************
 
 	if(u2pret<0)
 	  if(verbose>0)

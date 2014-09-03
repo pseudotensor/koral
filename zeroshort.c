@@ -118,8 +118,10 @@ calc_stretchFactor(void *argsin)
 
       
       if(fabs(dk)>.5*k)
-	if(dk>0.) dk=.5*k;
-	else dk=-.5*k;
+	{
+	  if(dk>0.) dk=.5*k;
+	  else dk=-.5*k;
+	}
       
 
       k=k-dk;      
@@ -3610,11 +3612,11 @@ int ZEROtest_oldmain()
 
 	FILE* fout1=fopen("beam.dat","w");
 	FILE* fout2=fopen("beam.gp","w");
-	fprintf(fout2,"set ylabel \"y\"\n",Fnew[0],Fnew[1],Fnew[2]);
-	fprintf(fout2,"set xlabel \"x\"\n",Fnew[0],Fnew[1],Fnew[2]);
-	fprintf(fout2,"set zlabel \"z\"\n",Fnew[0],Fnew[1],Fnew[2]);
-	fprintf(fout2,"set view equal xyz\n",Fnew[0],Fnew[1],Fnew[2]);
-	fprintf(fout2,"splot \"beam.dat\" u 1:2:3 w p pt 7 ps .1\n",Fnew[0],Fnew[1],Fnew[2]);
+	fprintf(fout2,"set ylabel \"y\"\n");
+	fprintf(fout2,"set xlabel \"x\"\n");
+	fprintf(fout2,"set zlabel \"z\"\n");
+	fprintf(fout2,"set view equal xyz\n");
+	fprintf(fout2,"splot \"beam.dat\" u 1:2:3 w p pt 7 ps .1\n");
 	int ifzero=0;
 	double maxI=-1.;    
 	for (p=0; p < NUMANGLES; p++)

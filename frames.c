@@ -493,6 +493,7 @@ int
 boost22_core(ldouble T1[][4],ldouble T2[][4],ldouble L[][4])
 {
   //TODO
+  return 0;
 }
 
 

@@ -9,7 +9,7 @@
 #include <string.h>
 
 /*********************************************/
-/* writes silo file in dumps
+/* writes silo file in dumps */
 /*********************************************/
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 {

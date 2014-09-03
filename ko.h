@@ -683,8 +683,21 @@ ldouble calc_Qtheta(int ix, int iy, int iz);
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
+int
+mpi_isitBC(int BCtype);
+void
+mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz);
+void
+mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz);
 int calc_avgs_throughout();
 int mpi_exchangedata();
+void
+mpi_myinit(int argc, char *argv[]);
+void
+mpi_myfinalize();
+void
+mpi_synchtiming(ldouble *time);
+
 
 //zeroshort.c
 //Define what is contained in each node
@@ -697,6 +710,9 @@ struct bsptree
 	struct bsptree *upper;
 };
 
+int get_angDualIndex(double targetAng[3], double angGridCoords[NUMDUALANGLES][3]);
+
+void bspGetNearestDualNeighbor(double targetAng[3], double angGridCoords[NUMDUALANGLES][3], struct bsptree *bspCurrentLoc, double *bestDistance, int *bestIndex);
 int ZEROtest_oldmain();
 int zero_readangles();
 struct bsptree *angGridRoot;

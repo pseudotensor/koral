@@ -1064,7 +1064,7 @@ op_implicit(ldouble t, ldouble dt)
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
-      
+
       //uses values already in *p as the initial guess
       implicit_lab_rad_source_term(ix,iy,iz,dt);
     } //source terms
@@ -1460,6 +1460,8 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   *mindy=mdy;
   *mindz=mdz;
   *maxdtfac=maxdt;
+
+  return 0;
 }
   
 //**********************************************************************
