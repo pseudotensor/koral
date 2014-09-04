@@ -11,7 +11,7 @@ save_avg(ldouble dt)
 {
   int ix,iy,iz,iv,ii;
 
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+  #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];

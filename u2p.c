@@ -142,7 +142,7 @@ calc_primitives_local(int ix,int iy,int iz,ldouble *pp)
     }
 
   //converting to primitives
-  int corrected[2], fixups[2];
+  int corrected[3], fixups[2];
   u2p(uu,pp,&geom,corrected,fixups,0);
 
   return 0;

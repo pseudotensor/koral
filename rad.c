@@ -2433,7 +2433,6 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
       //apply_rad_source_del4(ix,iy,iz,del4);
     }
 
-
   return 0;
 }
 

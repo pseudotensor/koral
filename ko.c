@@ -309,7 +309,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  if(lastzone!=currentzone) //zone switched
 	    {
 	      //recomputes the timestep though wavespeeds
-              #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+	      #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
 	      for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
 		{
 		  ix=loop_1[ii][0]; iy=loop_1[ii][1]; iz=loop_1[ii][2]; ldouble aaa[12],max_lws[3];
@@ -625,7 +625,7 @@ test_maginv()
   p2u(pp,uu,&geom);
   print_NVvector(uu);
 
-  int aa[2],bb[2],ret;
+  int aa[3],bb[2],ret;
   pp[UU]*=1.1;
   ret=u2p(uu,pp,&geom,aa,bb,0);
   printf("u2p ret: %d\n",ret);

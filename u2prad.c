@@ -291,10 +291,12 @@ static int get_m1closure_urfconrel(int verbose,
   int nonfailure=gammarel2>=1.0 && Erf>ERADFLOOR && gammarel2<=gammamax*gammamax/GAMMASMALLLIMIT/GAMMASMALLLIMIT;
   // falilure1 : gammarel2 normal, but already Erf<ERADFLOOR (note for M1 that gammarel2>=1/4 for any reasonable chance for correct non-zero Erf
   int failure1=Avcon[0]<0.0 || (gammarel2>0.0 && gammarel2<=0.25 && delta>=0.0 && divisor!=0.0) || numerator==0.0 || (gammarel2>=1.0 && delta>=0.0 && divisor!=0.0 && Erf<ERADFLOOR);
+  //int failure1=Avcon[0]<0.0 || gammarel2>0.0 && gammarel2<=0.25 && delta>=0.0 && divisor!=0.0 || numerator==0.0 || gammarel2>=1.0 && delta>=0.0 && divisor!=0.0 && Erf<ERADFLOOR;
   // gamma probably around 1
   int failure2=gammarel2<1.0 && gammarel2>0.0 && delta>=0.0;
   // i.e. all else, so not really used below.
   int failure3=(gammarel2>gammamax*gammamax && Erf>=ERADFLOOR) || gammarel2<0.0 || delta<0.  || (divisor==0.0 && numerator==0.0) || (divisor==0.0 && numerator!=0.0);
+  //int failure3=gammarel2>gammamax*gammamax && Erf>=ERADFLOOR || gammarel2<0.0 || delta<0.  || divisor==0.0 && numerator==0.0 || divisor==0.0 && numerator!=0.0;
 
   // any failure
   int failure=!nonfailure || isinf(gammarel2) || isinf(Erf);

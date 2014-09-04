@@ -77,7 +77,7 @@
 #define OUTOUTPUT 1 //to out file
 #define AVGOUTPUT 0
 #define RADOUTPUT 0
-#define ALLSTEPSOUTPUT 0 //whether to output every step
+#define ALLSTEPSOUTPUT 1 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #define DTOUT1 1.e3 //res
