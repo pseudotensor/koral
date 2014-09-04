@@ -63,6 +63,10 @@ if(ix>=NX) //total boundary, properties of the galaxy
     rho = calc_PEQ_rhofromTu(temp,uint);
     #endif
 
+    #ifdef FIX_PRESSURERHO
+    rho = rhol;
+    #endif
+    
     #ifdef FIX_TEMPERATURE
     //to keep temperature fixed and copy rho
     rho = rhoout;

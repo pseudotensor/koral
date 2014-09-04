@@ -50,7 +50,7 @@
 
 #define SPECIFIC_BC
 //#define FIX_TEMPERATURE
-#define FIX_PRESSURE
+#define FIX_PRESSURERHO
 //#define FIX_VELBONDI
 //#define FIX_VELOUTBONDI
 
@@ -77,10 +77,10 @@
 #define OUTOUTPUT 1 //to out file
 #define AVGOUTPUT 0
 #define RADOUTPUT 0
-#define ALLSTEPSOUTPUT 1 //whether to output every step
+#define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e3 //res
+#define DTOUT1 1.e4 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
