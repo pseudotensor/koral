@@ -25,7 +25,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e4
+#define RMAX 1.e5
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -80,7 +80,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e4 //res
+#define DTOUT1 1.e5 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 

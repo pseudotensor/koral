@@ -25,7 +25,7 @@ main(int argc, char **argv)
   doingpostproc=0;
 
   //gsl errors off
-  //gsl_set_error_handler_off();
+  gsl_set_error_handler_off();
   
   //random number gen. initialization
   srand ( time(NULL) );
@@ -53,6 +53,9 @@ main(int argc, char **argv)
 
 
   alloc_loops(1,0.,0.);
+
+  //free(loop_0);
+  //free(loop_0);
 
 #if(GRIDOUTPUT==1)
   fprint_gridfile(folder);

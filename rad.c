@@ -108,7 +108,7 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   int whichframe=params[2];
 
   ldouble uu[NV],pp[NV],err[5]={0.,0.,0.,0.,0.};
-  int corr[2]={0,0},fixup[2]={0,0},u2pret,i1,i2;
+  int corr[3]={0,0,0},fixup[2]={0,0},u2pret,i1,i2;
 
   for(i=0;i<NV;i++) pp[i]=ppin[i];
   
