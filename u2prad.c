@@ -29,7 +29,8 @@ static int get_m1closure_gammarel2_cold(int verbose,
   FTYPE alpha=geom->alpha;
   int jj;
 
-  static FTYPE gctt, gn11, gn12,  gn13,  gn14,  gn22,  gn23,  gn24,  gn33,  gn34,  gn44,  Rtt,  Rtx,  Rty,  Rtz,  Rdtt,  Rdtx,  Rdty,  Rdtz;
+  //static
+  FTYPE gctt, gn11, gn12,  gn13,  gn14,  gn22,  gn23,  gn24,  gn33,  gn34,  gn44,  Rtt,  Rtx,  Rty,  Rtz,  Rdtt,  Rdtx,  Rdty,  Rdtz;
   gn11=GG[0][0];
   gn12=GG[0][1];
   gn13=GG[0][2];
@@ -119,7 +120,8 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
   // mathematica solution that avoids catastrophic cancellation when Rtt very small (otherwise above gives gamma2=1/2 oddly when gamma2=1) -- otherwise same as above
   // well, then had problems for R~1E-14 for some reason when near BH.  Couldn't quickly figure out, so use no replacement of gv11.
   // see u2p_inversion.nb
-  static ldouble gctt, gn11, gn12,  gn13,  gn14,  gn22,  gn23,  gn24,  gn33,  gn34,  gn44,  Rtt,  Rtx,  Rty,  Rtz,  Rdtt,  Rdtx,  Rdty,  Rdtz;
+  //static
+  ldouble gctt, gn11, gn12,  gn13,  gn14,  gn22,  gn23,  gn24,  gn33,  gn34,  gn44,  Rtt,  Rtx,  Rty,  Rtz,  Rdtt,  Rdtx,  Rdty,  Rdtz;
   gn11=GG[0][0];
   gn12=GG[0][1];
   gn13=GG[0][2];
