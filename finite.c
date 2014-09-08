@@ -1062,7 +1062,7 @@ op_implicit(ldouble t, ldouble dt)
 #ifdef IMPLICIT_LAB_RAD_SOURCE
   
   //again over cells - source terms
-  #pragma omp parallel for schedule (static)
+#pragma omp parallel for schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       int ix,iy,iz;
@@ -1605,7 +1605,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
       
 
       //todo: restore ghostcells from ubak
-     
+
       for(i=0;i<Nloop_0;i++) free(loop_0[i]); free(loop_0);
       for(i=0;i<Nloop_02;i++) free(loop_02[i]); free(loop_02);
       for(i=0;i<Nloop_1;i++) free(loop_1[i]); free(loop_1);
@@ -2236,7 +2236,7 @@ ldouble get_u_scalar(ldouble* uarr,int ix,int iy,int iz)
 //array multiplication
 //uu2=factor*uu1
 int 
-copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N )
+copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N )\
 {
   int i;
   #pragma omp parallel for private (i) 

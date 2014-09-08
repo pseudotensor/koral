@@ -63,7 +63,8 @@
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
-#define SHUFFLELOOPS 0
+#define SHUFFLELOOPS 0      
+
 #define DOFIXUPS 1
 #define U2PCONV 1.e-12
 #define RADIMPCONV 1.e-8
@@ -78,7 +79,7 @@
 #define AVGOUTPUT 0
 #define RADOUTPUT 0
 #define ALLSTEPSOUTPUT 0 //whether to output every step
-#define NSTEPSTOP 1.e10 //stop after this number of steps
+#define NSTEPSTOP 1e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #define DTOUT1 1.e5 //res
 #define DTOUT2 1.e40 //avg

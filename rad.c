@@ -575,6 +575,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   np=4;
 #endif
 
+  //test
 
   do //main solver loop
     {	 
@@ -741,13 +742,19 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  break;
 	}
 #else
-      if(inverse_matrix(&J[0][0],&iJ[0][0],5)<0)
+      int ret;
+#pragma omp critical //for some reason gsl-based inverse does not work on my mac with openmp
+      {
+       ret=inverse_matrix(&J[0][0],&iJ[0][0],5);
+      }
+      if(ret<0)
 	{
 	  failed=1;
 	  if(verbose || 1) 
-	      printf("Jacobian 5x5 inversion failed\n");getchar();
+	    printf("Jacobian 5x5 inversion failed\n");getchar();
 	  break;
-	}  
+	}
+      
 #endif     
 	 
       if(verbose) 
@@ -3724,7 +3731,7 @@ test_solve_implicit_lab()
 
   //p2u(pp0,uu0,&geom);
 
-  ldouble deltas[4];
+  ldouble deltas[NRADVAR];
   int verbose=2;
   int params[4];
   
@@ -3863,7 +3870,7 @@ test_jon_solve_implicit_lab()
 
       getchar();
    
-      ldouble deltas[4];
+      ldouble deltas[NRADVAR];
       int verbose=1;
       int params[4];
       
