@@ -4,18 +4,21 @@
 #define RESTART 
 #define RESTARTNUM -1
 #define BHDISK_PROBLEMTYPE
+//#define UNPERTURBED
+
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
 
 /************************************/
 //magnetic fields
 /************************************/
 //#define MAGNFIELD
-#define VECPOTGIVEN //we provide vector potential
-#define MAXBETA .01 //target max pgas/pgas
-#define BETANORMFULL //normalize everywhere
+//#define VECPOTGIVEN //we provide vector potential
+//#define MAXBETA .01 //target max pgas/pgas
+//#define BETANORMFULL //normalize everywhere
+
 /************************************/
 //coordinates / resolution
 /************************************/
@@ -25,21 +28,19 @@
 #define RMAX 20.
 #define MINX RMIN
 #define MAXX RMAX 
-#define DTH .45
+#define DTH .6
 #define MINY (M_PI/2.-DTH)
 #define MAXY (M_PI/2.+DTH)
 #define MINZ -1.
 #define MAXZ 1. 
-#define TNX 100 // Total number of cells in X 
-#define TNY 100
+#define TNX 60 // Total number of cells in X 
+#define TNY 40
 #define TNZ 1
 #define NTX 1 //number of tiles in X 
 #define NTY 1
 #define NTZ 1
 #define SPECIFIC_BC
-//#define PERIODIC_XBC
-//#define PERIODIC_YBC
-//#define PERIODIC_ZBC
+
 /************************************/
 //output
 /************************************/
@@ -50,7 +51,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 5000 //stop after this number of outputs
-#define DTOUT1 10. //res
+#define DTOUT1 1. //res
 #define DTOUT2 100 //avg
 
 /************************************/
@@ -83,5 +84,8 @@
 /************************************/
 //problem params
 /************************************/
-#define RHOAMB 1.e-10
+#define MASS 10.
+#define TORUSENTR 5.e2
+#define RHOAMB 1.e-30
 #define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho
+#define ERADATMMIN 1.e-30

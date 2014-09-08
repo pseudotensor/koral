@@ -49,10 +49,10 @@
 #define SUBZONESOVERLAP 8
 
 #define SPECIFIC_BC
-//#define FIX_TEMPERATURE
-#define FIX_PRESSURERHO
+#define FIX_TEMPERATURE
+//#define FIX_PRESSURERHO
 //#define FIX_VELBONDI
-//#define FIX_VELOUTBONDI
+#define FIX_VELOUTBONDI
 
 
 /************************************/

@@ -13,6 +13,16 @@ fill_geometry(ix,iy,iz,&geom);
 //atmosphere
 if(BCtype==XBCHI) 
   {
+
+    iix=NX-1;
+    iiy=iy;
+    iiz=iz;
+    
+    for(iv=0;iv<=NV;iv++)
+      {
+	pp[iv]=get_u(p,iv,iix,iiy,iiz);
+      }
+
    pp[RHO]=RHOAMB; 
    pp[UU]=UUAMB; 
    pp[VZ]=0.;

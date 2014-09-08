@@ -609,7 +609,11 @@ int calc_scalars(ldouble *scalars,ldouble t)
   //accretion rate through horizon (3)
   ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
 
-  ldouble mdot=calc_mdot(rhorizonBL,0);
+ ldouble rmdot=rhorizonBL;
+#if(PROBLEM==7) //BONDI
+  rmdot = RMIN;
+#endif
+  ldouble mdot=calc_mdot(rmdot,0);
   scalars[1]=-mdot;
 
   //accretion rate through horizon in Edd. units (6)
@@ -624,10 +628,13 @@ int calc_scalars(ldouble *scalars,ldouble t)
 #if(PROBLEM==69) //INJDISK
   rlum=2./3.*DISKRCIR;
 #endif
+#if(PROBLEM==7) //BONDI
+  rlum=RMAX;
+#endif
   ldouble radlum,totallum;
-  calc_lum(rlum,0,&radlum,&totallum);
-  //radiative luminosity at rlum outside photosphere (4)
-  scalars[2]=radlum;
+  calc_lum(rlum,3,&radlum,&totallum);
+  //radiative luminosity everywhere (4)
+  scalars[2]=radlum*mdotscale*CCC0*CCC0/calc_lumEdd();
   //total energy at infinity (rho ur + Trt + Rrt) (12)
   calc_lum(rlum,1,&radlum,&totallum);
   scalars[10]=totallum;
@@ -644,6 +651,9 @@ int calc_scalars(ldouble *scalars,ldouble t)
   ldouble rtemp=15.;
 #if(PROBLEM==69) //INJDISK
   rtemp=20.;
+#endif
+#if(PROBLEM==7) //BONDI
+  rtemp=RMAX;
 #endif
   scalars[6]=calc_meantemp(rtemp);
 
@@ -835,6 +845,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
       coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
       if(xxBL[1]>radius) break;
     }
+  if(ix==NX) ix=NX-1;
 
   ldouble lum=0.,jet=0.;
 
@@ -1317,10 +1328,6 @@ calc_photloc(int ix)
 ldouble
 calc_mdot(ldouble radius,int type)
 {
-#ifndef BHDISK_PROBLEMTYPE
-  return -1.; //no BH
-#endif
-
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3],mdot,gdet,rho,rhouconr,ucon[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5];
 
@@ -1414,20 +1421,11 @@ calc_mdot(ldouble radius,int type)
 	      
 	    }
 
-	 
-
-	  
-
-	  //#ifdef CGSOUTPUT
-	  //always
-
-	  /*
-	  rho=rhoGU2CGS(rho);
-	  ucon[1]=velGU2CGS(ucon[1]);
-	  dx[1]=lenGU2CGS(dx[1]);
-	  dx[2]=lenGU2CGS(dx[2]);
-	  */
-	  //#endif
+	  if(NY==1)
+	    {
+	      dx[1]=2.;
+	      dx[2]=2.*M_PI;
+	    }
 
 	  if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
 	    mdot+=gdet*rhouconr*dx[1]*dx[2];	     
