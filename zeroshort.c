@@ -105,7 +105,7 @@ calc_stretchFactor(void *argsin)
 	    }
 	  */
 
-
+	  getch();
 	  exit(-1);
 	}
 
@@ -2667,22 +2667,22 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
 
       for (p=0; p < 4; p++)
-	{
+      {
 	  int intersect_i = intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p];
 	  int intersect_j = intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p];
 	  int intersect_k = intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p];
 
 
 	  int q;
-	  for (q=0 ; q<NUMANGLES; q++)
-	    {
-	      interp_I[q] += I_Data[intersect_i][intersect_j][intersect_k][q]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
+	  //for (q=0 ; q<NUMANGLES; q++)
+	  //{
+	      interp_I[probeAng] += I_Data[intersect_i][intersect_j][intersect_k][probeAng]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
 
 	      
-	      if(interp_I[q]<0.) 
+	      if(interp_I[probeAng]<0.) 
 		{
 		  printf("neg interp_I %e %e\n",
-			 I_Data[intersect_i][intersect_j][intersect_k][q],
+			 I_Data[intersect_i][intersect_j][intersect_k][probeAng],
 			 intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p]);
 		  //exit(1);
 		}
@@ -2691,7 +2691,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	      //if(!isfinite(interp_I[q]))
 	      //printf("%d %d > %d %d > %e %e\n",p,q,ix,iy,I_Data[intersect_i][intersect_j][intersect_k][q],intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p]);
 
-	    }
+	     //} //end loop over q
 	  interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
 
 	}
@@ -2870,7 +2870,7 @@ int zero_readangles()
 	}
 
       //interpolation weights
-      if(MYCOORDS==MINKCOORDS)
+      if(RADCLOSURECOORDS==MINKCOORDS)
 	{
 	  if(TNZ==1)
 	    setupInterpWeights_cart2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
@@ -2879,7 +2879,7 @@ int zero_readangles()
 
 	 
 	}
-      else if(MYCOORDS==SPHCOORDS)
+      else if(RADCLOSURECOORDS==SPHCOORDS)
 	{
 	   if(TNZ==1)
 	     setupInterpWeights_sph2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, intersectGridPhi);

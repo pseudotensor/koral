@@ -82,8 +82,23 @@
 //79 SOFTBALL - Grzegorz's oscillating torus
 //80 GENCLOSURE - tests of closures
 //81 TWOBEAM - test of VET with two beams
+//82 VETTHIN - thin disk emission for VET tests
 
-#define PROBLEM 7
+#define PROBLEM 82
+
+#if(PROBLEM==82)
+
+#define PR_DEFINE "PROBLEMS/VETTHIN/define.h"
+#define PR_BC "PROBLEMS/VETTHIN/bc.c"
+#define PR_INIT "PROBLEMS/VETTHIN/init.c"
+#define PR_KAPPA "PROBLEMS/VETTHIN/kappa.c"
+#define PR_KAPPAES "PROBLEMS/VETTHIN/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/VETTHIN/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/VETTHIN/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/VETTHIN/dump.c"
+#define PR_TOOLS "PROBLEMS/VETTHIN/tools.c"
+
+#endif
 
 #if(PROBLEM==81)
 

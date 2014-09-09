@@ -920,7 +920,7 @@ op_explicit(ldouble t, ldouble dt)
 
 	  //saving new conserved to memory
 	  #ifdef SKIPHDEVOLUTION
-	  if(iv>5)
+	  if(iv>=NVMHD)
           #endif
 	    set_u(u,iv,ix,iy,iz,val);	 
 
@@ -965,9 +965,8 @@ op_explicit(ldouble t, ldouble dt)
 	{
 	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
 	  #ifdef SKIPHDEVOLUTION
-	  if(iv>5)
-#endif
-	  
+	  if(iv>=NVMHD)
+          #endif	  
 	  set_u(u,iv,ix,iy,iz,val);	
 	  uu[iv]=val;
 	} 

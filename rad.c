@@ -1608,7 +1608,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   #ifdef DAMPCOMPTONIZATIONATBH
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-  fac=step_function(xxBL[1]-1.1*rhorizonBL,0.01*rhorizonBL);
+  fac=step_function(xxBL[1]-1.2*rhorizonBL,0.1*rhorizonBL);
   if(xxBL[1]<rhorizonBL) fac=0.;
   #endif
 
@@ -3920,7 +3920,7 @@ radclosure_M1orto(ldouble *pp, void *ggg, ldouble Rij[][4])
   trans22_coco(geom->xxvec, Rij, Rij, geom->coords, RADCLOSURECOORDS);
 
   //primitives to 2
-  trans_pall_coco(pp, pp2, geom->coords, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
+  //trans_pall_coco(pp, pp2, geom->coords, RADCLOSURECOORDS, geom->xxvec,geom,&geom2);
 
   //to fluid frame - not in fluid frame!
   //boost22_lab2ff(Rij,Rij,pp2,geom2.gg,geom2.GG);
@@ -4128,12 +4128,12 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //stress energy tensor
   calc_Rij_M1(pp0,geom,RijM1);		  
   //converting to RADCLOSURECOORDS
-  trans22_coco(geom->xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+  trans22_coco(geom->xxvec, RijM1, RijM1, geom->coords, RADCLOSURECOORDS);
   //to ortonormal
   trans22_cc2on(RijM1,RijM1,geom2.tup);
 
   //coordinates
-  coco_N(geom->xxvec,&coords[0],MYCOORDS,RADCLOSURECOORDS);
+  coco_N(geom->xxvec,&coords[0],geom->coords,RADCLOSURECOORDS);
 	      
   //intensities	      
   for(l=0;l<NUMANGLES;l++)
@@ -4157,7 +4157,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  
   //converting velocity
   conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom->gg,geom->GG);	   
-  trans2_coco(geom->xxvec,ucon,ucon,MYCOORDS,RADCLOSURECOORDS);
+  trans2_coco(geom->xxvec,ucon,ucon,geom->coords,RADCLOSURECOORDS);
 	  
   //used to cap velocities not too abuse ZERO solver
   beta0=sqrt(1.-1./(ucon[0]*ucon[0]));
@@ -4173,6 +4173,17 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 		     rad[2]*rad[2] + 
 		     rad[3]*rad[3]);
   double ff = fmag / rad[0];
+
+  if(ff>1.) 
+    {
+      print_tensor(RijM1);
+      print_primitives(pp0);
+      print_4vector(ucon);
+      printf("%d %d %d\n",ix,geom->coords,geom2.coords);
+      print_4vector(geom2.xxvec);      
+      print_4vector(geom->xxvec);
+      getch();
+    }
 
   //correct the beam pattern
   transformI(ix,iy,iz,&intensities[0], &rad[0]);
@@ -4204,7 +4215,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   trans22_on2cc(Rij,Rij,geom2.tlo);
 
   //converting back to MYCOORDS
-  trans22_coco(&coords[0], Rij, Rij, RADCLOSURECOORDS, MYCOORDS);
+  trans22_coco(&coords[0], Rij, Rij, RADCLOSURECOORDS, geom->coords);
 
   //zeroing the trace of R^mu_nu
   indices_2221(Rij,Rij,geom->gg);
