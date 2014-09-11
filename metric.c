@@ -1696,6 +1696,7 @@ fill_geometry(int ix,int iy,int iz,void *geom)
   struct geometry *ggg 
     = (struct geometry *) geom;
 
+  ggg->par=-1;
   ggg->ifacedim = -1;
   pick_g(ix,iy,iz,ggg->gg);
   pick_G(ix,iy,iz,ggg->GG);
@@ -1731,6 +1732,7 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
   pick_gb(ix,iy,iz,idim,ggg->gg);
   pick_Gb(ix,iy,iz,idim,ggg->GG);
 
+  ggg->par=-1;
   ggg->ifacedim = idim;
   ggg->coords=MYCOORDS;
 
@@ -1856,6 +1858,7 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   calc_tetrades(ggg->gg,ggg->tup,ggg->tlo,COORDS);
   calc_ZAMOes(ggg->gg,ggg->eup,ggg->elo,COORDS);
 
+  ggg->par=-1;
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz; ggg->ifacedim=idim;
 

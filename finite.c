@@ -3261,7 +3261,7 @@ correct_polaraxis()
   int ix,iy,iz,iv,ic,iysrc,ixsrc;
 
   //spherical like coords
-  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
+  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
     {
       #pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static)
       for(ix=0;ix<NX;ix++)
@@ -3317,7 +3317,7 @@ correct_polaraxis()
 		      pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
 		      pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
 		      pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
-
+       
 #ifdef EVOLVEINTENSITIES
 		      for(iv=0;iv<NUMANGLES;iv++)
 			Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];

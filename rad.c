@@ -4095,7 +4095,11 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   struct geometry *geom
     = (struct geometry *) ggg;
   struct geometry geom2;
-  fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDS);
+
+  if(geom->ifacedim==-1) //cell center
+    fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDS);
+  else
+    fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
 
   //array holding radiative properties for ZERO
   ldouble rad[5];
@@ -4116,10 +4120,18 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //now we do it only at the center of a cell left/right from the face
 
   ucon[0]=0.;
+
+  //used to pick intensities and calc VET
   ix=geom->ix;
   iy=geom->iy;
   iz=geom->iz;
-  
+  if(geom->par==0) //left biased interpolation on face, lets use intensities on the left
+    {
+      if(geom->ifacedim==0) ix--;
+      if(geom->ifacedim==1) iy--;
+      if(geom->ifacedim==2) iz--;
+    }
+
   //reading from memory
   rho=pp0[RHO];
   uint=pp0[UU];

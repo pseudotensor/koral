@@ -177,6 +177,7 @@ struct geometry
   ldouble tup[4][4];
   ldouble elo[4][4];
   ldouble eup[4][4];
+  int par; //some parameter to be used by user
 };
 
 //main.c

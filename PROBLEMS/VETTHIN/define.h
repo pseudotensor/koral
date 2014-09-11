@@ -81,7 +81,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
-//#define CORRECT_POLARAXIS
+#define CORRECT_POLARAXIS
 #define NCCORRECTPOLAR 2
 
 #define GAMMA (4./3.)
