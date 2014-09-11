@@ -645,7 +645,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		}
 
 	      //transform to cartesian
-	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
+	      if (OUTCOORDS==SCHWCOORDS || OUTCOORDS==KERRCOORDS  || OUTCOORDS==BLCOORDS || OUTCOORDS==SPHCOORDS)
 		{
 		  Rij[2][0]*=r;
 		  Rij[3][0]*=r*sin(th);

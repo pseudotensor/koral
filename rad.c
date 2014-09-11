@@ -4174,17 +4174,6 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 		     rad[3]*rad[3]);
   double ff = fmag / rad[0];
 
-  if(ff>1.) 
-    {
-      print_tensor(RijM1);
-      print_primitives(pp0);
-      print_4vector(ucon);
-      printf("%d %d %d\n",ix,geom->coords,geom2.coords);
-      print_4vector(geom2.xxvec);      
-      print_4vector(geom->xxvec);
-      getch();
-    }
-
   //correct the beam pattern
   transformI(ix,iy,iz,&intensities[0], &rad[0]);
 
@@ -4206,6 +4195,9 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   fzero=1.;
   if(ff>0.999)
     fzero=0.;
+
+  //test
+  fzero=1.;
   
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)

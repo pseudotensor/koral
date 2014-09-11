@@ -1,10 +1,16 @@
-//#define RESTART
+#define RESTART
 #define RESTARTNUM -1
 
+
 #define RADIATION
+
+#define myVET
+
+#ifdef myVET
 #define RADCLOSURE VETCLOSURE
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
+#endif
 
 
 #define DOFIXUPS 1
@@ -25,6 +31,7 @@
 //#define myMKS1COORDS
 #define myMSPH1COORDS
 #define OMSCALE 1.
+//#define HOURGLASS
 
 #ifdef myMSPH1COORDS
 #define MYCOORDS MSPH1COORDS
@@ -53,15 +60,19 @@
 #define MKS1R0 0.
 #define MINX (log(2.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 50
+#define TNX 50
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
-#define NX 40
+#define TNX 40
 #endif
 
-#define NY 40
-#define NZ 1
+#define TNY 40
+#define TNZ 1
+
+#define NTX 4
+#define NTY 2
+#define NTZ 1
 
 
 #define MINY (0.02*Pi/4.)
@@ -70,7 +81,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
-#define CORRECT_POLARAXIS
+//#define CORRECT_POLARAXIS
 #define NCCORRECTPOLAR 2
 
 #define GAMMA (4./3.)

@@ -27,18 +27,19 @@ pick_T(emuup,ix,iy,iz,eup);
 pick_T(emulo,ix,iy,iz,elo);
 //working in SPH
 ldouble ggSPH[4][5],GGSPH[4][5];
-calc_g_arb(xxvecSPH,ggSPH,KERRCOORDS);
-calc_G_arb(xxvecSPH,GGSPH,KERRCOORDS);
+calc_g_arb(xxvecSPH,ggSPH,SPHCOORDS);
+calc_G_arb(xxvecSPH,GGSPH,SPHCOORDS);
 ldouble eupSPH[4][4],eloSPH[4][4];
 ldouble tupSPH[4][4],tloSPH[4][4];
-calc_tetrades(ggSPH,tupSPH,tloSPH,KERRCOORDS);
-calc_ZAMOes(ggSPH,eupSPH,eloSPH,KERRCOORDS);
+calc_tetrades(ggSPH,tupSPH,tloSPH,SPHCOORDS);
+calc_ZAMOes(ggSPH,eupSPH,eloSPH,SPHCOORDS);
 /**********************/
 
 
 //radius
 if(ix>=NX) //analytical solution at rout only
   {
+    /*
     ldouble podpierd=-(GGSPH[0][0]-2.*ELL*GGSPH[0][3]+ELL*ELL*GGSPH[3][3]);
     ldouble ut=-1./sqrt(podpierd);
     ut/=UTPOT;
@@ -61,11 +62,11 @@ if(ix>=NX) //analytical solution at rout only
 	set_radatmosphere(pp,xxvec,gg,GG,0);
 #endif
       }      
+    */
     
-    /*
     iix=NX-1;
     iiy=iy;
-    iix=iz;
+    iiz=iz;
 
     //copying MYCOORDS quantities
     for(iv=0;iv<NV;iv++)
@@ -73,10 +74,13 @@ if(ix>=NX) //analytical solution at rout only
 	//unchanged primitives
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
-    */
+    
+    if(pp[VX]<0.) pp[VX]=0.;
+    if(pp[FX0]<0.) pp[FX0]=0.;
    
     p2u(pp,uu,&geom); 
 
+    /*
     //calculate the intensities
     double RijM1[4][4];double M1[5];
     calc_Rij_M1(pp,&geom,RijM1);
@@ -89,7 +93,12 @@ if(ix>=NX) //analytical solution at rout only
     M1[4]=pp[EE0];
       
     ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
-   
+    */
+    int il;
+     for(il=0;il<NUMANGLES;il++)
+      {
+	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
+      }
     return 0.;
   }
  else if(ix<0) //outflow near BH
@@ -143,12 +152,18 @@ if(iy<0.) //spin axis
     p2u(pp,uu,&geom);
     
     //should reflect the intensities!!!!
+
+/*
     int il;
     for(il=0;il<NUMANGLES;il++)
       {
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
-      }
-
+	}
+*/
+#if(RADCLOSURE==VETCLOSURE)
+    double reflect_direction[3] = {1.,0.,0.};
+    reflectI(reflect_direction, &Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][0], &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+#endif   
     return 0;
   }
 
@@ -169,15 +184,25 @@ if(iy>=NY) //equatorial plane
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
 
+    /*
     int il;
     for(il=0;il<NUMANGLES;il++)
       {
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
       }
+    */
+
+#if(RADCLOSURE==VETCLOSURE)
+    double reflect_direction[3] = {0.,0.,1.};
+
+    reflectI(reflect_direction, &Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][0], &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+#endif
+
 
     //hot disk:
     ldouble rSPH=xxvecSPH[1];
     ldouble rin=6.;
+#ifndef HOURGLASS
     if(rSPH>rin) //hot boundary
       {
 
@@ -198,9 +223,10 @@ if(iy>=NY) //equatorial plane
 	
 	prad_ff2lab(pp,pp,&geomSPH);
 	
-	trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,xxvecSPH,&geomSPH,&geom);
+	trans_pall_coco(pp, pp, SPHCOORDS, MYCOORDS,xxvecSPH,&geomSPH,&geom);
 
 
+#if(RADCLOSURE==VETCLOSURE)
 	//calculate the intensities
 	double RijM1[4][4];double M1[5];
 	calc_Rij_M1(pp,&geom,RijM1);
@@ -218,9 +244,62 @@ if(iy>=NY) //equatorial plane
 	M1[4]=pp[EE0];
       
 	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+#endif
+	
+
+
+	
 
       }
-    
+
+#else
+   if(rSPH>10. && rSPH<15.) //hot boundary
+      {
+
+	pp[EE0]=calc_LTE_EfromT(1.e11)*(1.-sqrt(rin/rSPH))/pow(rSPH,3.);
+	pp[FZ0]=0.;
+	pp[FY0]=-1.*pp[EE0];
+	pp[FX0]=-1.*pp[EE0];
+	  
+	//Keplerian gas
+	ldouble Om=1./pow(rSPH,1.5)*OMSCALE;	
+	ldouble ucon[4]={0.,0.,0.,Om};	
+	conv_vels(ucon,ucon,VEL3,VELPRIM,ggSPH,GGSPH);		
+	pp[2]=ucon[1];
+	pp[3]=ucon[2];
+	pp[4]=ucon[3];	
+	
+	prad_ff2lab(pp,pp,&geomSPH);
+	
+	trans_pall_coco(pp, pp, SPHCOORDS, MYCOORDS,xxvecSPH,&geomSPH,&geom);
+
+#if(RADCLOSURE==VETCLOSURE)
+	//calculate the intensities
+	double RijM1[4][4];double M1[5];
+	calc_Rij_M1(pp,&geom,RijM1);
+	//converting to RADCLOSURECOORDS
+	trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+	//to ortonormal
+	trans22_cc2on(RijM1,RijM1,geomSPH.tup);
+	
+
+	//input
+	M1[0]=RijM1[0][0];
+	M1[1]=RijM1[0][1];
+	M1[2]=RijM1[0][2];
+	M1[3]=RijM1[0][3];
+	M1[4]=pp[EE0];
+      
+	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+#endif
+	
+
+
+	
+
+      }
+
+#endif 
     p2u(pp,uu,&geom); 
     return 0; 
   }

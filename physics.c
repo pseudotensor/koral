@@ -534,7 +534,9 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
 
   if(RADCLOSURE==VETCLOSURE)
     {
-      //picking up metric from a cell center correspondingly to left/right biased fluxes
+      //picking up metric and intensities from a cell center correspondingly to left/right biased fluxes
+   
+      //TODO
       if(lr==0)//left biased
 	{
 	  if(idim==0) ix--;
@@ -543,6 +545,7 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
 	}
 	
       fill_geometry(ix,iy,iz,&geom);
+      
     }
  
   f_flux_prime_rad(pp,idim,&geom,ff);

@@ -2881,7 +2881,7 @@ int zero_readangles()
 	}
       else if(RADCLOSURECOORDS==SPHCOORDS)
 	{
-	   if(TNZ==1)
+	   if(TNZ==1) 
 	     setupInterpWeights_sph2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, intersectGridPhi);
 	   else
 	     setupInterpWeights_sph3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
@@ -3660,3 +3660,91 @@ int ZEROtest_oldmain()
 //------------------------------------------------------------------------------------------------
 
 }
+
+
+
+//subroutine to reflection intensity distrubution about a plane with normal set by "reflect_direction"
+
+void reflectI(double reflect_direction[3], double I_start[NUMANGLES], double I_return[NUMANGLES])
+{
+	double reflect_mag = sqrt(reflect_direction[0]*reflect_direction[0] + reflect_direction[1]*reflect_direction[1] + reflect_direction[2]*reflect_direction[2]);
+
+	double startDirection[3];
+	double parallelDirection[3], perpendicularDirection[3];
+	double finalDirection[3];
+
+	double parallel_mag;
+
+
+	double reflect_normal[3];
+	int probeAng, l;
+
+
+	for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+	{
+		I_return[probeAng] = 0.;
+	}
+
+
+
+
+
+	//make sure to use normalized (unit length) direction vector in calculations
+	reflect_normal[0]=reflect_direction[0]/reflect_mag;
+	reflect_normal[1]=reflect_direction[1]/reflect_mag;
+	reflect_normal[2]=reflect_direction[2]/reflect_mag;
+
+
+	for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+	{
+
+		startDirection[0]=angGridCoords[probeAng][0];
+		startDirection[1]=angGridCoords[probeAng][1];
+		startDirection[2]=angGridCoords[probeAng][2];
+
+
+		//calculate component parallel to normal using dot product
+		parallel_mag = startDirection[0]*reflect_normal[0] + startDirection[1]*reflect_normal[1] + startDirection[2]*reflect_normal[2];
+
+		parallelDirection[0] = parallel_mag * reflect_normal[0];
+		parallelDirection[1] = parallel_mag * reflect_normal[1];
+		parallelDirection[2] = parallel_mag * reflect_normal[2];
+
+		perpendicularDirection[0] = startDirection[0]-parallelDirection[0];
+		perpendicularDirection[1] = startDirection[1]-parallelDirection[1];
+		perpendicularDirection[2] = startDirection[2]-parallelDirection[2];
+
+		finalDirection[0] = perpendicularDirection[0] - parallelDirection[0];
+		finalDirection[1] = perpendicularDirection[1] - parallelDirection[1];
+		finalDirection[2] = perpendicularDirection[2] - parallelDirection[2];
+
+
+//		printf("START: %e %e %e | FINISH: %e %e %e\n", startDirection[0], startDirection[1], startDirection[2], finalDirection[0], finalDirection[1], finalDirection[2]);
+
+		
+
+	      double bestDistance = 1.0e10;
+	      int bestIndex = 0;
+
+	      bspGetNearestDualNeighbor(finalDirection, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
+
+	      int angNeighborIndex[3];
+	      double interpCoeffs[3];
+
+	      for (l=0; l < 3; l++)
+		{
+		  angNeighborIndex[l] = dualAdjacency[bestIndex][l];
+		}
+
+	      linComb(finalDirection, angGridCoords, angNeighborIndex, interpCoeffs);
+
+
+		for (l=0; l<3; l++)
+		{
+			I_return[angNeighborIndex[l]] += I_start[probeAng]*interpCoeffs[l];	
+		}
+
+	}
+	
+}
+

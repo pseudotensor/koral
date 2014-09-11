@@ -712,8 +712,8 @@ struct bsptree
 	struct bsptree *upper;
 };
 
+void reflectI(double reflect_direction[3], double I_start[NUMANGLES], double I_return[NUMANGLES]); 
 int get_angDualIndex(double targetAng[3], double angGridCoords[NUMDUALANGLES][3]);
-
 void bspGetNearestDualNeighbor(double targetAng[3], double angGridCoords[NUMDUALANGLES][3], struct bsptree *bspCurrentLoc, double *bestDistance, int *bestIndex);
 int ZEROtest_oldmain();
 int zero_readangles();
