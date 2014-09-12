@@ -52,6 +52,12 @@ main(int argc, char **argv)
   fprint_coordfile("analysis","coord");
   #endif
 
+
+  //precalculating problem related numbers
+#ifdef PR_PREPINIT
+#include PR_PREPINIT
+#endif
+
   //opens the scalar file
   sprintf(bufer,"analysis/scalars.dat");
   fout_scalars=fopen(bufer,"w");

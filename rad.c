@@ -921,7 +921,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      xiapp/=2.; 
 	    }
 
-	  if(xiapp<1.e-10) 
+	  if(xiapp<1.e-2) 
 	    {
 	      if(verbose) printf("damped unsuccesfully in implicit_4dprim\n");
 	      failed=1;

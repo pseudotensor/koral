@@ -34,8 +34,8 @@ if(ix>=NX) //total boundary, properties of the galaxy
     ldouble rho,rho0,uint,uintl,uint0,ur,url,rhol;
 
     //calculating Bondi-related values at the boundary
-    ldouble RMAXout=geomBL.xx;
-    //ldouble RMAXout=1.e4;
+    //ldouble RMAXout=geomBL.xx;
+    ldouble RMAXout=RMAXOUT;
 
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
@@ -98,13 +98,14 @@ if(ix>=NX) //total boundary, properties of the galaxy
 
     #ifdef FIX_VELOUTBONDI //estimating the velocity outside the Bondi radius
     ldouble Rbondi = 3.267e12 / TAMB;
-    ldouble vbondi = -sqrt(2./Rbondi);
+    ldouble vbondi = -sqrt(1./2./Rbondi);
     ldouble vout = vbondi * (Rbondi/geomBL.xx) * (Rbondi/geomBL.xx);
 
     ucon[1]=vout;
     ucon[2]=ucon[3]=0.;
     conv_vels(ucon,ucon,VEL3,VEL4,geomBL.gg,geomBL.GG);
     trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+    //printf("%d > %e %e > %e %e\n",ix,ucon[1],vbondi,Rbondi,geomBL.xx);getch();
     conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
     pp[2]=ucon[1];
@@ -154,6 +155,8 @@ if(ix>=NX) //total boundary, properties of the galaxy
 
     //velocity back to MYCOORDS
     trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+    
+    
     conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
     pp[EE0]=E*geomBLl.gdet/geomBL.gdet;
@@ -168,7 +171,6 @@ if(ix>=NX) //total boundary, properties of the galaxy
     
     p2u(pp,uu,&geom);
  
-    //printf("%d > %e %e %e %e\n",ix,url,uconl[1],ucon[1],pp[VX]);getch();
     return 0.;
   }
 /*

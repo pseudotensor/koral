@@ -26,6 +26,7 @@
 #define PRINTINSIDEBH
 #define RMIN 10.
 #define RMAX 1.e5
+#define RMAXOUT 1.e5
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -43,16 +44,16 @@
 #define NTY 1
 #define NTZ 1
 
-//#define SUBZONES
+#define SUBZONES
 #define OUTPUTAFTERSUBZONES
 #define NSUBZONES 2
-#define SUBZONESOVERLAP 8
+#define SUBZONESOVERLAP 4
 
 #define SPECIFIC_BC
 #define FIX_TEMPERATURE
 //#define FIX_PRESSURERHO
-//#define FIX_VELBONDI
-#define FIX_VELOUTBONDI
+#define FIX_VELBONDI
+//#define FIX_VELOUTBONDI
 
 
 /************************************/
@@ -78,10 +79,11 @@
 #define OUTOUTPUT 1 //to out file
 #define AVGOUTPUT 0
 #define RADOUTPUT 0
+#define SCAOUTPUT 1
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e5 //res
+#define DTOUT1 1.e40 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
@@ -89,8 +91,8 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e2
-#define TAMB 1.e9*(1.e4/RMAX)
+#define MDOT 1.e0
+#define TAMB (1.e8*(1.e5/RMAXOUT))
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
 
