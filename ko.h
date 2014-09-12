@@ -177,6 +177,7 @@ struct geometry
   ldouble tup[4][4];
   ldouble elo[4][4];
   ldouble eup[4][4];
+  int par; //some parameter to be used by user
 };
 
 //main.c
@@ -473,6 +474,8 @@ int dxdx_KS2MKS2(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_MKS22KS(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_MCYL12CYL(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_CYL2MCYL1(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_MSPH12SPH(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_SPH2MSPH1(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_MKER12KER(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_KER2MKER1(ldouble *xx, ldouble dxdx[][4]);
 
@@ -710,8 +713,8 @@ struct bsptree
 	struct bsptree *upper;
 };
 
+void reflectI(double reflect_direction[3], double I_start[NUMANGLES], double I_return[NUMANGLES]); 
 int get_angDualIndex(double targetAng[3], double angGridCoords[NUMDUALANGLES][3]);
-
 void bspGetNearestDualNeighbor(double targetAng[3], double angGridCoords[NUMDUALANGLES][3], struct bsptree *bspCurrentLoc, double *bestDistance, int *bestIndex);
 int ZEROtest_oldmain();
 int zero_readangles();

@@ -81,6 +81,14 @@ if(coords==MCYL1COORDS) {
   return Sqrt(Power(exp(1.0),2*x1)*Power(Power(exp(1.0),x1) + R0,2));
  } 
 
+if(coords==MSPH1COORDS) {
+  ldouble R0=0.;
+#if(MYCOORDS==MSPH1COORDS)
+  R0=MKS1R0;
+#endif
+  return Sqrt(Power(exp(1.0),2*x1)*Power(Power(exp(1.0),x1) + R0,4)*Power(Sin(x2),2));
+ } 
+
 if(coords==MKER1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0=0.;
@@ -189,6 +197,18 @@ if(coords==MCYL1COORDS) {
 ;
  }
 
+if(coords==MSPH1COORDS) {
+  ldouble R0=0.;
+#if(MYCOORDS==MSPH1COORDS)
+  R0=MKS1R0;
+#endif
+;if(idim==0) return  (3*Power(exp(1.0),x1) + R0)/(Power(exp(1.0),x1) + R0)
+;if(idim==1) return  Cot(x2)
+;if(idim==2) return  0
+;
+
+ }
+
 if(coords==MKER1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0=0.;
@@ -273,6 +293,30 @@ if(coords==MCYL1COORDS) {
 ;g[3][1]= 0
 ;g[3][2]= 0
 ;g[3][3]= Power(Power(exp(1.0),x1) + R0,2)
+;
+#endif
+}
+
+if(coords==MSPH1COORDS) {
+#if(MYCOORDS==MSPH1COORDS)
+  ldouble R0;
+  R0=MKS1R0;
+;g[0][0]= -1
+;g[0][1]= 0
+;g[0][2]= 0
+;g[0][3]= 0
+;g[1][0]= 0
+;g[1][1]= Power(exp(1.0),2*x1)
+;g[1][2]= 0
+;g[1][3]= 0
+;g[2][0]= 0
+;g[2][1]= 0
+;g[2][2]= Power(Power(exp(1.0),x1) + R0,2)
+;g[2][3]= 0
+;g[3][0]= 0
+;g[3][1]= 0
+;g[3][2]= 0
+;g[3][3]= Power(Power(exp(1.0),x1) + R0,2)*Power(Sin(x2),2)
 ;
 #endif
 }
@@ -503,6 +547,33 @@ calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
 ;G[3][2]= 0
 ;G[3][3]= Power(Power(exp(1.0),x1) + R0,-2)
 ;
+
+  }
+
+  if(coords==MSPH1COORDS) {
+  ldouble R0=0.;
+#if(MYCOORDS==MSPH1COORDS)
+  R0=MKS1R0;
+#endif
+;G[0][0]= -1
+;G[0][1]= 0
+;G[0][2]= 0
+;G[0][3]= 0
+;G[1][0]= 0
+;G[1][1]= Power(exp(1.0),-2*x1)
+;G[1][2]= 0
+;G[1][3]= 0
+;G[2][0]= 0
+;G[2][1]= 0
+;G[2][2]= Power(Power(exp(1.0),x1) + R0,-2)
+;G[2][3]= 0
+;G[3][0]= 0
+;G[3][1]= 0
+;G[3][2]= 0
+;G[3][3]= Power(Csc(x2),2)/Power(Power(exp(1.0),x1) + R0,2)
+;
+
+
 
   }
 
@@ -899,6 +970,81 @@ calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int coords)
 ;Krzys[3][3][2]= 0
 ;Krzys[3][3][3]= 0
 ;
+  }
+
+
+  if(coords==MSPH1COORDS) {
+  ldouble R0=0.;
+#if(MYCOORDS==MSPH1COORDS)
+  R0=MKS1R0;
+#endif
+;Krzys[0][0][0]= 0
+;Krzys[0][0][1]= 0
+;Krzys[0][0][2]= 0
+;Krzys[0][0][3]= 0
+;Krzys[0][1][0]= 0
+;Krzys[0][1][1]= 0
+;Krzys[0][1][2]= 0
+;Krzys[0][1][3]= 0
+;Krzys[0][2][0]= 0
+;Krzys[0][2][1]= 0
+;Krzys[0][2][2]= 0
+;Krzys[0][2][3]= 0
+;Krzys[0][3][0]= 0
+;Krzys[0][3][1]= 0
+;Krzys[0][3][2]= 0
+;Krzys[0][3][3]= 0
+;Krzys[1][0][0]= 0
+;Krzys[1][0][1]= 0
+;Krzys[1][0][2]= 0
+;Krzys[1][0][3]= 0
+;Krzys[1][1][0]= 0
+;Krzys[1][1][1]= 1
+;Krzys[1][1][2]= 0
+;Krzys[1][1][3]= 0
+;Krzys[1][2][0]= 0
+;Krzys[1][2][1]= 0
+;Krzys[1][2][2]= -1 - R0/Power(exp(1.0),x1)
+;Krzys[1][2][3]= 0
+;Krzys[1][3][0]= 0
+;Krzys[1][3][1]= 0
+;Krzys[1][3][2]= 0
+;Krzys[1][3][3]= -(((Power(exp(1.0),x1) + R0)*Power(Sin(x2),2))/Power(exp(1.0),x1))
+;Krzys[2][0][0]= 0
+;Krzys[2][0][1]= 0
+;Krzys[2][0][2]= 0
+;Krzys[2][0][3]= 0
+;Krzys[2][1][0]= 0
+;Krzys[2][1][1]= 0
+;Krzys[2][1][2]= Power(exp(1.0),x1)/(Power(exp(1.0),x1) + R0)
+;Krzys[2][1][3]= 0
+;Krzys[2][2][0]= 0
+;Krzys[2][2][1]= Power(exp(1.0),x1)/(Power(exp(1.0),x1) + R0)
+;Krzys[2][2][2]= 0
+;Krzys[2][2][3]= 0
+;Krzys[2][3][0]= 0
+;Krzys[2][3][1]= 0
+;Krzys[2][3][2]= 0
+;Krzys[2][3][3]= -(Cos(x2)*Sin(x2))
+;Krzys[3][0][0]= 0
+;Krzys[3][0][1]= 0
+;Krzys[3][0][2]= 0
+;Krzys[3][0][3]= 0
+;Krzys[3][1][0]= 0
+;Krzys[3][1][1]= 0
+;Krzys[3][1][2]= 0
+;Krzys[3][1][3]= Power(exp(1.0),x1)/(Power(exp(1.0),x1) + R0)
+;Krzys[3][2][0]= 0
+;Krzys[3][2][1]= 0
+;Krzys[3][2][2]= 0
+;Krzys[3][2][3]= Cot(x2)
+;Krzys[3][3][0]= 0
+;Krzys[3][3][1]= Power(exp(1.0),x1)/(Power(exp(1.0),x1) + R0)
+;Krzys[3][3][2]= Cot(x2)
+;Krzys[3][3][3]= 0
+;
+
+
   }
 
   if(coords==MKER1COORDS) {
@@ -1550,6 +1696,7 @@ fill_geometry(int ix,int iy,int iz,void *geom)
   struct geometry *ggg 
     = (struct geometry *) geom;
 
+  ggg->par=-1;
   ggg->ifacedim = -1;
   pick_g(ix,iy,iz,ggg->gg);
   pick_G(ix,iy,iz,ggg->GG);
@@ -1585,6 +1732,7 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
   pick_gb(ix,iy,iz,idim,ggg->gg);
   pick_Gb(ix,iy,iz,idim,ggg->GG);
 
+  ggg->par=-1;
   ggg->ifacedim = idim;
   ggg->coords=MYCOORDS;
 
@@ -1710,6 +1858,7 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   calc_tetrades(ggg->gg,ggg->tup,ggg->tlo,COORDS);
   calc_ZAMOes(ggg->gg,ggg->eup,ggg->elo,COORDS);
 
+  ggg->par=-1;
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz; ggg->ifacedim=idim;
 
@@ -2230,6 +2379,72 @@ coco_CYL2MCYL1(ldouble *xCYL, ldouble *xMCYL1)
 //**********************************************************************
 //**********************************************************************
 //converts coordinates
+//for MSPH1 -> SPH
+int
+coco_MSPH12SPH(ldouble *xMSPH1, ldouble *xSPH)
+{
+  ldouble x0=xMSPH1[0];
+  ldouble x1=xMSPH1[1];
+  ldouble x2=xMSPH1[2];
+  ldouble x3=xMSPH1[3];
+  ldouble R0=0.;
+#if(MYCOORDS==MSPH1COORDS)
+  R0=MKS1R0;
+#endif
+  xSPH[0]
+    = x0
+    ;
+  xSPH[1]
+    = Power(exp(1.0),x1) + R0
+    ;
+  xSPH[2]
+    = x2
+    ;
+  xSPH[3]
+    = x3
+    ;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for SPH -> MSPH1
+int
+coco_SPH2MSPH1(ldouble *xSPH, ldouble *xMSPH1)
+{
+  ldouble SPHx0=xSPH[0];
+  ldouble SPHx1=xSPH[1];
+  ldouble SPHx2=xSPH[2];
+  ldouble SPHx3=xSPH[3];
+  ldouble R0=0.;
+
+#if(MYCOORDS==MSPH1COORDS)
+  R0=MKS1R0;
+#endif
+
+  xMSPH1[0]
+    = SPHx0
+    ;
+  xMSPH1[1]
+    = log(-R0 + SPHx1)
+    ;
+  xMSPH1[2]
+    = SPHx2
+    ;
+  xMSPH1[3]
+    = SPHx3
+    ;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
 //for MKER1 -> KER
 int
 coco_MKER12KER(ldouble *xMKER1, ldouble *xKER)
@@ -2430,6 +2645,10 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     coco_MCYL12CYL(x1,x2);
   else if (CO1==CYLCOORDS && CO2==MCYL1COORDS)
     coco_CYL2MCYL1(x1,x2);  
+  else if (CO1==MSPH1COORDS && (CO2==SPHCOORDS || CO2==SCHWCOORDS || CO2==KERRCOORDS))
+    coco_MSPH12SPH(x1,x2);
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MSPH1COORDS)
+    coco_SPH2MSPH1(x1,x2);  
   else if (CO1==MKER1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     coco_MKER12KER(x1,x2);
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MKER1COORDS)
@@ -2457,6 +2676,11 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MINKCOORDS)
     {
       coco_SPH2MINK(x1,x2);
+    }
+  else if (CO1==MSPH1COORDS && CO2==MINKCOORDS)
+    {
+      coco_MSPH12SPH(x1,x2);
+      coco_SPH2MINK(x2,x2);
     }
   else if (CO1==MINKCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
@@ -2711,6 +2935,60 @@ dxdx_MCYL12CYL(ldouble *xx, ldouble dxdx[][4])
   ldouble x3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
+  R0=MKS1R0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[1][1]=exp(x1);
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for SPH -> MSPH1
+int
+dxdx_SPH2MSPH1(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble SPHx0=xx[0];
+  ldouble SPHx1=xx[1];
+  ldouble SPHx2=xx[2];
+  ldouble SPHx3=xx[3];
+  ldouble R0=0.;
+#if(MYCOORDS==MSPH1COORDS)
+  R0=MKS1R0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[1][1]=1./(SPHx1-R0);
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for MSPH1 -> SPH
+int
+dxdx_MSPH12SPH(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble x0=xx[0];
+  ldouble x1=xx[1];
+  ldouble x2=xx[2];
+  ldouble x3=xx[3];
+  ldouble R0=0.;
+#if(MYCOORDS==MSPH1COORDS)
   R0=MKS1R0;
 #endif
 
