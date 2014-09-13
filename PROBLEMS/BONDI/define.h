@@ -25,7 +25,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 10.
-#define RMAX 1.e5
+#define RMAX 1.e4
 #define RMAXOUT 1.e5
 
 #define MINX (log(RMIN-MKS1R0))
@@ -54,6 +54,7 @@
 //#define FIX_PRESSURERHO
 #define FIX_VELBONDI
 //#define FIX_VELOUTBONDI
+#define INFLOW
 
 
 /************************************/
