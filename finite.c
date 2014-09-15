@@ -361,6 +361,8 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
     {      
       ldouble tstepden,ws_ph;
      
+      //TODO: this may not work in general!!!
+
       ws_ph=wsx*sqrt(get_g(g,1,1,ix,iy,iz));
       //#pragma omp critical
       if(wsx>max_ws[0]) max_ws[0]=wsx;
@@ -375,17 +377,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
       //#pragma omp critical
       if(wsz>max_ws[2]) max_ws[2]=wsz;
       if(ws_ph>max_ws_ph) max_ws_ph=ws_ph;
-      
-      /*
-      if(NZ>1 && NY>1)
-	tstepden=max_ws[0]/dx + max_ws[1]/dy + max_ws[2]/dz;
-      else if(NZ==1 && NY>1)
-	tstepden=max_ws[0]/dx + max_ws[1]/dy;
-      else if(NY==1 && NZ>1)
-	tstepden=max_ws[0]/dx + max_ws[2]/dz;
-      else
-	tstepden=max_ws[0]/dx;   
-      */
 
       if(NZ>1 && NY>1)
 	tstepden=wsx/dx + wsy/dy + wsz/dz;
@@ -396,6 +387,7 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
       else
 	tstepden=wsx/dx;   
 
+      set_u_scalar(cell_tsteps,ix,iy,iz,tstepden);
 
       //#pragma omp critical
       if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
@@ -424,10 +416,12 @@ calc_u2p()
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      calc_primitives(ix,iy,iz,0,1);
+      #ifdef SKIP_MSTEP
+      if(mstep_is_cell_active(ix,iy,iz)==0) 
+	continue;
+      #endif
 
-      //printf("%d> \n",ix,iy,iz);
-      //print_primitives(&get_u(p,0,ix,iy,iz));//getch();
+      calc_primitives(ix,iy,iz,0,1);
     }  
 
   //**********************************************************************
@@ -537,10 +531,14 @@ op_explicit(ldouble t, ldouble dt)
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
+      #ifdef SKIP_MSTEP
+      if(mstep_is_cell_active(ix,iy,iz)==0) 
+	continue;
+      #endif
+
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
 
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
-
     }
 
   //**********************************************************************
@@ -556,8 +554,7 @@ op_explicit(ldouble t, ldouble dt)
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
-      
-
+     
       //interpolating conserved quantities
       ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
       ldouble fd_r0[NV],fd_rm1[NV],fd_rp1[NV];
@@ -584,6 +581,8 @@ op_explicit(ldouble t, ldouble dt)
       //**********************************************************************
       //**********************************************************************
       //x 'sweep'
+
+      //TODO: is neighbour active
 
 #ifdef MPI4CORNERS
       if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1) //needed to calculate face fluxes for flux-CT divB enforcement
@@ -1024,6 +1023,11 @@ op_explicit(ldouble t, ldouble dt)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
+      #ifdef SKIP_MSTEP
+      if(mstep_is_cell_active(ix,iy,iz)==0) 
+	continue;
+      #endif
+
       ldouble gg[4][5],GG[4][5];
       ldouble tup[4][4],tlo[4][4];
       pick_T(tmuup,ix,iy,iz,tup);
@@ -1152,8 +1156,13 @@ op_implicit(ldouble t, ldouble dt)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
+      #ifdef SKIP_MSTEP
+      if(mstep_is_cell_active(ix,iy,iz)==0) 
+	continue;
+      #endif
+
       //uses values already in *p as the initial guess
-      implicit_lab_rad_source_term(ix,iy,iz,dt);
+      implicit_lab_rad_source_term(ix,iy,iz,dt*mstep_multiplier[mstep_cell_levels[ix][iy][iz]]);
     } //source terms
 
   //fixup here after source term 

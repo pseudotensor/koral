@@ -3,14 +3,14 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 167
+#define RESTARTNUM -1
 #define MODYFIKUJKRZYSIE 0
 
 /************************************/
 //define MSTEPS
 /************************************/
 #define MSTEP
-#define NUMMSTEPS 10
+#define NUMMSTEPLEVELS 20
 
 /************************************/
 //radiation

@@ -6,10 +6,11 @@
 int 
 main(int argc, char **argv)
 {  
-  mstep_test();
-  exit(0);
-
   mpi_myinit(argc,argv);
+  mstep_init();
+
+  //mstep_test();
+  // exit(0);
 
   ldouble tstart;
   int i; char folder[100],bufer[100];
@@ -279,7 +280,7 @@ solve_the_problem(ldouble tstart, char* folder)
   
   #endif
  
-  while (t < t1 && nfout1<=NOUTSTOP && i1<NSTEPSTOP)
+  while (t < t1 && nfout1<=NOUTSTOP && nstep<NSTEPSTOP)
     {    
       spitoutput=0;
       global_time=t;
@@ -335,6 +336,15 @@ solve_the_problem(ldouble tstart, char* folder)
       //dt based on the estimate from the last midpoint
       dt=TSTEPLIM*1./tstepdenmax;
       global_dt=dt;
+
+      #ifdef MSTEP
+      //adjusts the time levels if possible
+      if(nstep>1)
+	{
+	  mstep_update_levels();
+	  mstep_print_levels(); getch();
+	}
+      #endif
  
       if(t+dt>t1) {dt=t1-t;}
 
@@ -345,9 +355,6 @@ solve_the_problem(ldouble tstart, char* folder)
       max_ws[2]=-1.;
       max_ws_ph=-1.;
       tstepdenmax=-1.;
-
-      //iteration counter
-      i1++;
 
       //**********************************************************************
       //**********************************************************************
@@ -590,7 +597,6 @@ solve_the_problem(ldouble tstart, char* folder)
 	  fflush(stdout);
 
 	  fprintf_time=end_time;
-	  i2=i1;
 	}
     }
   return 0;

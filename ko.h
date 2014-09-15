@@ -125,7 +125,7 @@ int NPROCS;
 ldouble **msgbufs;
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak_fixup,*p_bak_fixup,
   *u_step1,*u_step2,*u_bak_subzone,*p_bak_subzone,
-  *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,
+  *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,*cell_tsteps,
   *dut0,*dut1,*dut2,*dut3,*uforget,*drt0,*drt1,*drt2,*drt3,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,
   *aradyr,*aradzr,*p,*pinit,*pproblem1,*pproblem2,*emf,*ptemp1,*pvecpot,
@@ -803,8 +803,8 @@ MPI_Comm mpi_inttotal_comm[NTX], mpi_intbelow_comm[NTX];
 
 //multisteps
 int mstep_cell_levels[NX][NY][NZ];
-int mstep_level_multiplier[NUMMSTEPS];
-int mstep_current_counts[NUMMSTEPS];
+int mstep_multiplier[NUMMSTEPLEVELS+1];
+int mstep_current_counts[NUMMSTEPLEVELS];
 
 //mstep.c
 int mstep_calc_level(ldouble,ldouble);
@@ -812,4 +812,9 @@ int mstep_is_cell_active(int,int,int);
 int mstep_is_level_active(int);
 int mstep_init();
 int mstep_iterate(void);
-int mstep_test(int ix, int iy, int iz);
+int mstep_test();
+int mstep_update_levels();
+int mstep_print_levels();
+int mstep_is_cell_or_neighbour_active(int ix, int iy, int iz,int idim);
+
+
