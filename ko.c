@@ -6,6 +6,9 @@
 int 
 main(int argc, char **argv)
 {  
+  mstep_test();
+  exit(0);
+
   mpi_myinit(argc,argv);
 
   ldouble tstart;

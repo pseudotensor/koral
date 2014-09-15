@@ -7,6 +7,12 @@
 #define MODYFIKUJKRZYSIE 0
 
 /************************************/
+//define MSTEPS
+/************************************/
+#define MSTEP
+#define NUMMSTEPS 10
+
+/************************************/
 //radiation
 /************************************/
 //#define RADIATION

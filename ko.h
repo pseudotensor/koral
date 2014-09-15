@@ -800,3 +800,16 @@ MPI_Comm mpi_inttotal_comm[NTX], mpi_intbelow_comm[NTX];
 #define SLOOP(j,k) for(j=1;j<NDIM;j++)for(k=1;k<NDIM;k++)
 /* loop over all Space dimensions; first rank loop */
 #define SLOOPA(j) for(j=1;j<NDIM;j++)
+
+//multisteps
+int mstep_cell_levels[NX][NY][NZ];
+int mstep_level_multiplier[NUMMSTEPS];
+int mstep_current_counts[NUMMSTEPS];
+
+//mstep.c
+int mstep_calc_level(ldouble,ldouble);
+int mstep_is_cell_active(int,int,int);
+int mstep_is_level_active(int);
+int mstep_init();
+int mstep_iterate(void);
+int mstep_test(int ix, int iy, int iz);
