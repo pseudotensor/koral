@@ -846,7 +846,7 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
 
-  //calculating the derivatives
+  //applying the corrections
   #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
@@ -873,46 +873,17 @@ op_explicit(ldouble t, ldouble dt)
 	  ldouble dy=get_size_x(iy,1);
 	  ldouble dz=get_size_x(iz,2);
 
-	  if(INT_ORDER==1 || INT_ORDER==2) //linear or parabolic
-	    {
-	      flxl=get_ub(flbx,iv,ix,iy,iz,0);
-	      flxr=get_ub(flbx,iv,ix+1,iy,iz,0);
-	      flyl=get_ub(flby,iv,ix,iy,iz,1);
-	      flyr=get_ub(flby,iv,ix,iy+1,iz,1);
-	      flzl=get_ub(flbz,iv,ix,iy,iz,2);
-	      flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
-	    }
-	  if(INT_ORDER==4) //MP5
-	    {
-	      if(1)
-		{
-		  //flux reconstruction based on 3-point stencil near the boundaries
-		  flxr=13./12*get_ub(flbx,iv,ix+1,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
-		  flxl=13./12*get_ub(flbx,iv,ix,iy,iz,0) -1./24. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0));
-		  flyr=13./12*get_ub(flby,iv,ix,iy+1,iz,1) -1./24. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
-		  flyl=13./12*get_ub(flby,iv,ix,iy,iz,1) -1./24. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1));
-		  flzr=13./12*get_ub(flbz,iv,ix,iy,iz+1,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
-		  flzl=13./12*get_ub(flbz,iv,ix,iy,iz,2) -1./24. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2));
-		}
-	      else
-		{
-		  //flux reconstruction based on 5-point stencil 			  
-		  flxr=1067./960.*get_ub(flbx,iv,ix+1,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0)) +3./640. *(get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+3,iy,iz,0));
-		  flxl=1067./960.*get_ub(flbx,iv,ix,iy,iz,0) -29./480. * (get_ub(flbx,iv,ix-1,iy,iz,0) + get_ub(flbx,iv,ix+1,iy,iz,0))+3./640. *(get_ub(flbx,iv,ix-2,iy,iz,0) + get_ub(flbx,iv,ix+2,iy,iz,0));
-		  flyr=1067./960.*get_ub(flby,iv,ix,iy+1,iz,1) -29./480. * (get_ub(flby,iv,ix,iy,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+3,iz,1));
-		  flyl=1067./960.*get_ub(flby,iv,ix,iy,iz,1) -29./480. * (get_ub(flby,iv,ix,iy-1,iz,1) + get_ub(flby,iv,ix,iy+1,iz,1))+3./640. *(get_ub(flby,iv,ix,iy-2,iz,1) + get_ub(flby,iv,ix,iy+2,iz,1));
-		  flzr=1067./960.*get_ub(flbz,iv,ix,iy,iz+1,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz,2) + get_ub(flbz,iv,ix,iy,iz+2,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+3,2));
-		  flzl=1067./960.*get_ub(flbz,iv,ix,iy,iz,2) -29./480. * (get_ub(flbz,iv,ix,iy,iz-1,2) + get_ub(flbz,iv,ix,iy,iz+1,2))+3./640. *(get_ub(flbz,iv,ix,iy,iz-2,2) + get_ub(flbz,iv,ix,iy,iz+2,2));
-		}
-	    }
+	  flxl=get_ub(flbx,iv,ix,iy,iz,0);
+	  flxr=get_ub(flbx,iv,ix+1,iy,iz,0);
+	  flyl=get_ub(flby,iv,ix,iy,iz,1);
+	  flyr=get_ub(flby,iv,ix,iy+1,iz,1);
+	  flzl=get_ub(flbz,iv,ix,iy,iz,2);
+	  flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
 		  
 	  //unsplit scheme
 	  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
 
 	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
-
-	  //test
-	  //if(ix==10 && iv==EE0) printf("adv > %e %e | %e %e | %e | %d %d %d\n",get_u(u,EE0,ix,iy,iz),t_der[EE0],get_u(u,1,ix,iy,iz),t_der[1],dt,ix,iy,iz);
 
 	  if(isnan(val) || isinf(val)) {printf("i: %4d %4d %4d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
 					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}

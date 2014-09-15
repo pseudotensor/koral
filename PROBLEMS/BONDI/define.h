@@ -9,7 +9,7 @@
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 #define NCOMPTONIZATION 
@@ -26,7 +26,7 @@
 #define PRINTINSIDEBH
 #define RMIN 10.
 #define RMAX 1.e4
-#define RMAXOUT 1.e5
+#define RMAXOUT 1.e4
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -44,17 +44,17 @@
 #define NTY 1
 #define NTZ 1
 
-#define SUBZONES
+//#define SUBZONES
 #define OUTPUTAFTERSUBZONES
 #define NSUBZONES 2
 #define SUBZONESOVERLAP 4
 
 #define SPECIFIC_BC
-#define FIX_TEMPERATURE
+//#define FIX_TEMPERATURE
 //#define FIX_PRESSURERHO
 #define FIX_VELBONDI
 //#define FIX_VELOUTBONDI
-#define INFLOW
+//#define INFLOW
 
 
 /************************************/
@@ -84,7 +84,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e10 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e40 //res
+#define DTOUT1 1.e4 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
@@ -104,4 +104,3 @@
 #define RHOAMB 1.e-25
 #define MUGAS 1.
 //#define GAMMA (long double)(1.+1./3.*((1.+PRADGAS)/(.5+PRADGAS)))
-
