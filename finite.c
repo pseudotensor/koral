@@ -842,12 +842,123 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
 
+  //applying the corrections
+
+  //**********************************************************************
+  //sweep over x-faces
+  //**********************************************************************
+
+  ldouble flux,dxl,dxr,vall,valr;
+#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux) schedule (static)
+  for(ix=0;ix<NX+1;ix++)
+    {
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {
+	      dxl=get_size_x(ix-1,0);
+	      dxr=get_size_x(ix,0);
+
+	      PLOOP(iv)
+	      {
+		flux=get_ub(flbx,iv,ix,iy,iz,0);
+		//left cell
+		vall=get_u(u,iv,ix-1,iy,iz)-flux/dxl*dt;
+		//right cell
+		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt;
+	
+#ifdef SKIPHDEVOLUTION
+		if(iv>=NVMHD)
+#endif
+		  {
+		    set_u(u,iv,ix-1,iy,iz,vall);
+		    set_u(u,iv,ix,iy,iz,valr);
+		  }	 
+	      }
+	    }
+	}
+    }
+  
+
+  //**********************************************************************
+  //sweep over y-faces
+  //**********************************************************************
+
+  
+  if(TNY>1)
+#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux) schedule (static)
+  for(iy=0;iy<NY+1;iy++)
+    {
+      for(ix=0;ix<NX;ix++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {
+	      dxl=get_size_x(iy-1,1);
+	      dxr=get_size_x(iy,1);
+
+	      PLOOP(iv)
+	      {
+		flux=get_ub(flby,iv,ix,iy,iz,1);
+		//left cell
+		vall=get_u(u,iv,ix,iy-1,iz)-flux/dxl*dt;
+		//right cell
+		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt;
+	
+#ifdef SKIPHDEVOLUTION
+		if(iv>=NVMHD)
+#endif
+		  {
+		    set_u(u,iv,ix,iy-1,iz,vall);
+		    set_u(u,iv,ix,iy,iz,valr);
+		  }	 
+	      }
+	    }
+	}
+    }
+
+  //**********************************************************************
+  //sweep over z-faces
+  //**********************************************************************
+  
+  if(TNZ>1)
+#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux) schedule (static)
+  for(iz=0;iz<NZ+1;iz++)
+    {
+      for(ix=0;ix<NX;ix++)
+	{
+	  for(iy=0;iy<NY;iy++)
+	    {
+	      dxl=get_size_x(iz-1,2);
+	      dxr=get_size_x(iz,2);
+
+	      PLOOP(iv)
+	      {
+		flux=get_ub(flbz,iv,ix,iy,iz,2);
+		//left cell
+		vall=get_u(u,iv,ix,iy,iz-1)-flux/dxl*dt;
+		//right cell
+		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt;
+	
+#ifdef SKIPHDEVOLUTION
+		if(iv>=NVMHD)
+#endif
+		  {
+		    set_u(u,iv,ix,iy,iz-1,vall);
+		    set_u(u,iv,ix,iy,iz,valr);
+		  }	 
+	      }
+	    }
+	}
+    }
+  
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
 
-  //applying the corrections
-  #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+
+  //original:
+  /*
+    #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -897,7 +1008,8 @@ op_explicit(ldouble t, ldouble dt)
 
 	}
 
-    }     
+    }
+  */ 
 
   //**********************************************************************
   //**********************************************************************
@@ -3548,3 +3660,4 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 #endif
   return zone;
 }
+

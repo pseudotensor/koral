@@ -84,7 +84,7 @@
 //81 TWOBEAM - test of VET with two beams
 //82 VETTHIN - thin disk emission for VET tests
 
-#define PROBLEM 7
+#define PROBLEM 81
 
 #if(PROBLEM==82)
 
