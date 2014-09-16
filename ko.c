@@ -341,8 +341,9 @@ solve_the_problem(ldouble tstart, char* folder)
       //adjusts the time levels if possible
       if(nstep>1)
 	{
+	  mstep_iterate();
 	  mstep_update_levels();
-	  //mstep_print_levels(); getch();
+	  //mstep_print_state(); getch();
 	}
       #endif
  
@@ -602,7 +603,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  for(ilev=ilevshow+1;ilev<NUMMSTEPLEVELS;ilev++) 
 	    nlev[ilevshow]+=nlev[ilev];
 	  printf(" +%d ",nlev[ilevshow]);
-	  getch();
+	  //getch();
 #endif
 
 	  printf("\n");

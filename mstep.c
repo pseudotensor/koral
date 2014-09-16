@@ -330,3 +330,21 @@ mstep_test()
 }
 
 
+/* tests */
+int
+mstep_print_state()
+{
+
+  int iter,i,j;
+
+  for(i=0;i<NUMMSTEPLEVELS;i++)
+    printf("%2d ",mstep_current_counts[i]);
+  printf("   |   ");
+  for(i=0;i<10;i++)
+    printf("%d ",mstep_is_cell_active(i,0,0));
+  printf("\n");
+ 
+  return 0;
+}
+
+

@@ -820,5 +820,6 @@ int mstep_is_face_active(int ix, int iy, int iz,int idim);
 ldouble mstep_get_cell_multiplier(int ix,int iy,int iz);
 ldouble mstep_get_face_multiplier(int ix,int iy,int iz,int dim);
 int mstep_count_levels(int* nlev);
+int mstep_print_state();
 
 
