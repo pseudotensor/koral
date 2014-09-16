@@ -24,7 +24,7 @@ mstep_init(void)
       mstep_current_counts[i]=0;
     }
 
-  ldouble pow2=1;
+  ldouble pow2=1.;
   for(i=0;i<NUMMSTEPLEVELS+1;i++)
     {
       mstep_multiplier[i]=pow2;
@@ -44,7 +44,7 @@ mstep_iterate(void)
   for(i=1;i<NUMMSTEPLEVELS;i++) //[0]=0 - always evolved
     {
       mstep_current_counts[i]++;
-      if(mstep_current_counts[i]==mstep_multiplier[i]) 
+      if(mstep_current_counts[i]==(int)mstep_multiplier[i]) 
 	mstep_current_counts[i]=0;
     }
   
@@ -182,6 +182,38 @@ mstep_is_cell_or_neighbour_active(int ix, int iy, int iz,int idim)
   return 0;
 }
 
+/* say if given face in dim is needed in this time step */
+int
+mstep_is_face_active(int ix, int iy, int iz,int idim)
+{
+  if(idim==0)
+    {
+      if(ix>0 && mstep_current_counts[mstep_cell_levels[ix-1][iy][iz]]==0)
+	return 1;
+      if(ix<NX && mstep_current_counts[mstep_cell_levels[ix][iy][iz]]==0)
+	return 1;
+    }
+
+  if(idim==1)
+    {
+      if(iy>0 && mstep_current_counts[mstep_cell_levels[ix][iy-1][iz]]==0)
+	return 1;
+      if(iy<NY && mstep_current_counts[mstep_cell_levels[ix][iy][iz]]==0)
+	return 1;
+    }
+
+  if(idim==2)
+    {
+      if(iz>0 && mstep_current_counts[mstep_cell_levels[ix][iy][iz-1]]==0)
+	return 1;
+      if(iz<NZ && mstep_current_counts[mstep_cell_levels[ix][iy][iz]]==0)
+	return 1;
+    }
+
+  //otherwise
+  return 0;
+}
+
 /* say if given level is evolved in this time step */
 int
 mstep_is_level_active(int level)
@@ -190,6 +222,61 @@ mstep_is_level_active(int level)
     return 1;
   else
     return 0;
+}
+
+/* gets time step multiplier for a given cell */
+ldouble
+mstep_get_cell_multiplier(int ix,int iy,int iz)
+{
+  return mstep_multiplier[mstep_cell_levels[ix][iy][iz]];
+}
+
+/* gets time step multiplier for a given face in idim, i.e., shorter from left/right */
+ldouble
+mstep_get_face_multiplier(int ix,int iy,int iz,int dim)
+{
+  ldouble ml,mr,m;
+  ml=mr=-1.;
+
+  if(dim==0)
+    {
+      if(ix>0)
+	ml=mstep_multiplier[mstep_cell_levels[ix-1][iy][iz]];
+      if(ix<NX)
+	mr=mstep_multiplier[mstep_cell_levels[ix][iy][iz]];
+    }
+  if(dim==1)
+    {
+      if(iy>0)
+	ml=mstep_multiplier[mstep_cell_levels[ix][iy-1][iz]];
+      if(iy<NY)
+	mr=mstep_multiplier[mstep_cell_levels[ix][iy][iz]];
+    }
+  if(dim==2)
+    {
+      if(iz>0)
+	ml=mstep_multiplier[mstep_cell_levels[ix][iy][iz-1]];
+      if(iz<NZ)
+	mr=mstep_multiplier[mstep_cell_levels[ix][iy][iz]];
+    }
+
+  if(ml<0. && mr<0.) 
+    {
+      printf("wrong multiplier in mstep_get_face_multiplier() for %d %d %d %d\n",ix,iy,iz,dim);
+      m=1.;
+    }
+  else if(ml<0.)
+    {
+      m=mr;
+    }
+  else if(mr<0.)
+    {
+      m=ml;
+    }
+  else
+    m=my_min(ml,mr);
+
+  return m;
 }
 
 /* tests */
@@ -204,7 +291,7 @@ mstep_test()
   int iter,i,j;
 
   for(i=0;i<NUMMSTEPLEVELS;i++)
-    printf("%2d ",mstep_multiplier[i]);
+    printf("%2.0f ",mstep_multiplier[i]);
   printf("|   ");
   for(i=0;i<4;i++)
     printf("%d ",mstep_cell_levels[i][0][0]);

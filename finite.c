@@ -416,7 +416,7 @@ calc_u2p()
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      #ifdef SKIP_MSTEP
+      #ifdef MSTEP
       if(mstep_is_cell_active(ix,iy,iz)==0) 
 	continue;
       #endif
@@ -531,7 +531,7 @@ op_explicit(ldouble t, ldouble dt)
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
-      #ifdef SKIP_MSTEP
+      #ifdef MSTEP
       if(mstep_is_cell_active(ix,iy,iz)==0) 
 	continue;
       #endif
@@ -570,249 +570,266 @@ op_explicit(ldouble t, ldouble dt)
       ldouble a0[2],am1[2],ap1[2],al,ar,amax,dx;  
       ldouble ffRl[NV],ffRr[NV],ffLl[NV],ffLr[NV];
       ldouble ffl[NV],ffr[NV];
-      ldouble gloc[4][5],gl[4][5],gr[4][5],Gl[4][5],Gr[4][5];
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
       int reconstrpar;
       struct geometry geom;
       int i;
-	      
-      pick_g(ix,iy,iz,gloc);
+
 
       //**********************************************************************
       //**********************************************************************
       //x 'sweep'
 
-      //TODO: is neighbour active
-
 #ifdef MPI4CORNERS
       if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1) //needed to calculate face fluxes for flux-CT divB enforcement
 #else
-      if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
+	if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
 #endif
-	{
-	  x0[0]=get_x(ix,0);
+	  {
+#ifdef MSTEP
+	    if(mstep_is_cell_or_neighbour_active(ix,iy,iz,0))
+#endif
+	      {
 
-	  x0l[0]=get_xb(ix,0);
-	  xm1[0]=get_x(ix-1,0);
-	  x0l[1]=xm1[1]=get_x(iy,1); 
-	  x0l[2]=xm1[2]=get_x(iz,2);
+		x0[0]=get_x(ix,0);
 
-	  x0r[0]=get_xb(ix+1,0);
-	  xp1[0]=get_x(ix+1,0);
-	  x0r[1]=xp1[1]=get_x(iy,1);
-	  x0r[2]=xp1[2]=get_x(iz,2);
+		x0l[0]=get_xb(ix,0);
+		xm1[0]=get_x(ix-1,0);
+		x0l[1]=xm1[1]=get_x(iy,1); 
+		x0l[2]=xm1[2]=get_x(iz,2);
 
-	  dx0=get_size_x(ix,0);    
-	  dxm1=get_size_x(ix-1,0);    
-	  dxp1=get_size_x(ix+1,0);    
+		x0r[0]=get_xb(ix+1,0);
+		xp1[0]=get_x(ix+1,0);
+		x0r[1]=xp1[1]=get_x(iy,1);
+		x0r[2]=xp1[2]=get_x(iz,2);
+
+		dx0=get_size_x(ix,0);    
+		dxm1=get_size_x(ix-1,0);    
+		dxp1=get_size_x(ix+1,0);    
 	  
-	  if(INT_ORDER>1)
-	    {
-	      dxm2=get_size_x(ix-2,0);    
-	      dxp2=get_size_x(ix+2,0);    
-	    }
+		if(INT_ORDER>1)
+		  {
+		    dxm2=get_size_x(ix-2,0);    
+		    dxp2=get_size_x(ix+2,0);    
+		  }
 	  
-	  for(i=0;i<NV;i++)
-	    {
-	      //resetting derivatives
-	      fd_der[i]=0.;
+		for(i=0;i<NV;i++)
+		  {
+		    //resetting derivatives
+		    fd_der[i]=0.;
 
-	      //primitives - to be interpolated
-	      fd_p0[i]=get_u(p,i,ix,iy,iz);
-	      fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
-	      fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
-	      if(INT_ORDER>1)
-		{
-		  fd_pm2[i]=get_u(p,i,ix-2,iy,iz);
-		  fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
-		}
-	    }
+		    //primitives - to be interpolated
+		    fd_p0[i]=get_u(p,i,ix,iy,iz);
+		    fd_pp1[i]=get_u(p,i,ix+1,iy,iz);
+		    fd_pm1[i]=get_u(p,i,ix-1,iy,iz);
+		    if(INT_ORDER>1)
+		      {
+			fd_pm2[i]=get_u(p,i,ix-2,iy,iz);
+			fd_pp2[i]=get_u(p,i,ix+2,iy,iz);
+		      }
+		  }
 
-	  reconstrpar=0;
+		reconstrpar=0;
 #ifdef REDUCEORDERWHENNEEDED
-	  reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
+		reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
 #endif
 
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
+		avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 
-	  if(ix>=0) //no need to calculate at left face of first GC
-	    {
-	      fill_geometry_face(ix,iy,iz,0,&geom);
-	      check_floors_mhd(fd_pl,VELPRIM,&geom);
-	      f_flux_prime(fd_pl,0,ix,iy,iz,ffl,1); //right biased
-	    }
+		if(ix>=0) //no need to calculate at left face of first GC
+		  {
+		    fill_geometry_face(ix,iy,iz,0,&geom);
+		    check_floors_mhd(fd_pl,VELPRIM,&geom);
+		    f_flux_prime(fd_pl,0,ix,iy,iz,ffl,1); //right biased
+		  }
 
-	  if(ix<NX)
-	    {
-	      fill_geometry_face(ix+1,iy,iz,0,&geom);
-	      check_floors_mhd(fd_pr,VELPRIM,&geom);
-	      f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr,0); //left biased   	  
-	    }
+		if(ix<NX)
+		  {
+		    fill_geometry_face(ix+1,iy,iz,0,&geom);
+		    check_floors_mhd(fd_pr,VELPRIM,&geom);
+		    f_flux_prime(fd_pr,0,ix+1,iy,iz,ffr,0); //left biased   	  
+		  }
 
-	  //saving to memory
-	  for(i=0;i<NV;i++)
-	    {
-	      set_ubx(pbRx,i,ix,iy,iz,fd_pl[i]);
-	      set_ubx(pbLx,i,ix+1,iy,iz,fd_pr[i]);
+		//saving to memory
+		for(i=0;i<NV;i++)
+		  {
+		    set_ubx(pbRx,i,ix,iy,iz,fd_pl[i]);
+		    set_ubx(pbLx,i,ix+1,iy,iz,fd_pr[i]);
 
-	      set_ubx(flRx,i,ix,iy,iz,ffl[i]);
-	      set_ubx(flLx,i,ix+1,iy,iz,ffr[i]);		  
-	    }
+		    set_ubx(flRx,i,ix,iy,iz,ffl[i]);
+		    set_ubx(flLx,i,ix+1,iy,iz,ffr[i]);		  
+		  }
+	      }
 	}
 
-      //**********************************************************************
-      //**********************************************************************
-      //y 'sweep'
+	    //**********************************************************************
+	    //**********************************************************************
+	    //y 'sweep'
   
- 
+
 #ifdef MPI4CORNERS
-      if(NY>1 && ix>=-1 && ix<NX+1 && iz>=-1 && iz<NZ+1)
+       if(NY>1 && ix>=-1 && ix<NX+1 && iz>=-1 && iz<NZ+1)
 #else
-      if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
+	 if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
 #endif
-	{    
-	  x0l[1]=get_xb(iy,1);
-	  xm1[1]=get_x(iy-1,1);
-	  x0l[0]=xm1[0]=get_x(ix,0); 
-	  x0l[2]=xm1[2]=get_x(iz,2);
+	   {    
+#ifdef MSTEP
+	     if(mstep_is_cell_or_neighbour_active(ix,iy,iz,1))
+#endif
+	       {
 
-	  x0r[1]=get_xb(iy+1,1);
-	  xp1[1]=get_x(iy+1,1);
-	  x0r[0]=xp1[0]=get_x(ix,0);
-	  x0r[2]=xp1[2]=get_x(iz,2);
+		 x0l[1]=get_xb(iy,1);
+		 xm1[1]=get_x(iy-1,1);
+		 x0l[0]=xm1[0]=get_x(ix,0); 
+		 x0l[2]=xm1[2]=get_x(iz,2);
 
-	  dx0=get_size_x(iy,1);    
-	  dxm1=get_size_x(iy-1,1);    
-  	  dxp1=get_size_x(iy+1,1);    
+		 x0r[1]=get_xb(iy+1,1);
+		 xp1[1]=get_x(iy+1,1);
+		 x0r[0]=xp1[0]=get_x(ix,0);
+		 x0r[2]=xp1[2]=get_x(iz,2);
+
+		 dx0=get_size_x(iy,1);    
+		  dxm1=get_size_x(iy-1,1);    
+		  dxp1=get_size_x(iy+1,1);    
 	
-	  if(INT_ORDER>1)
-	    {
-	      dxm2=get_size_x(iy-2,1);  
-	      dxp2=get_size_x(iy+2,1);
-	    }    
+		  if(INT_ORDER>1)
+		    {
+		      dxm2=get_size_x(iy-2,1);  
+		      dxp2=get_size_x(iy+2,1);
+		    }    
 		  
-	  for(i=0;i<NV;i++)
-	    {
-	      fd_p0[i]=get_u(p,i,ix,iy,iz);
-	      fd_pp1[i]=get_u(p,i,ix,iy+1,iz);
-	      fd_pm1[i]=get_u(p,i,ix,iy-1,iz);
-	      if(INT_ORDER>1)
-		{
-		  fd_pm2[i]=get_u(p,i,ix,iy-2,iz);
-		  fd_pp2[i]=get_u(p,i,ix,iy+2,iz);
-		}
-	    }
+		  for(i=0;i<NV;i++)
+		    {
+		      fd_p0[i]=get_u(p,i,ix,iy,iz);
+		      fd_pp1[i]=get_u(p,i,ix,iy+1,iz);
+		      fd_pm1[i]=get_u(p,i,ix,iy-1,iz);
+		      if(INT_ORDER>1)
+			{
+			  fd_pm2[i]=get_u(p,i,ix,iy-2,iz);
+			  fd_pp2[i]=get_u(p,i,ix,iy+2,iz);
+			}
+		    }
 	  
-	  reconstrpar=0;
+		  reconstrpar=0;
 #ifdef REDUCEORDERWHENNEEDED
-	  reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
+		  reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
 #endif
 
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
+		  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 	  
-	  if(iy>=0)
-	    {
-	      fill_geometry_face(ix,iy,iz,1,&geom);
-	      check_floors_mhd(fd_pl,VELPRIM,&geom);
-	      f_flux_prime(fd_pl,1,ix,iy,iz,ffl,1);
-	    }
+		  if(iy>=0)
+		    {
+		      fill_geometry_face(ix,iy,iz,1,&geom);
+		      check_floors_mhd(fd_pl,VELPRIM,&geom);
+		      f_flux_prime(fd_pl,1,ix,iy,iz,ffl,1);
+		    }
 
-	  if(iy<NY)
-	    {
-	      fill_geometry_face(ix,iy+1,iz,1,&geom);
-	      check_floors_mhd(fd_pr,VELPRIM,&geom);
-	      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr,0);   	          
-	    }
+		  if(iy<NY)
+		    {
+		      fill_geometry_face(ix,iy+1,iz,1,&geom);
+		      check_floors_mhd(fd_pr,VELPRIM,&geom);
+		      f_flux_prime(fd_pr,1,ix,iy+1,iz,ffr,0);   	          
+		    }
 
-	  //saving to memory
-	  for(i=0;i<NV;i++)
-	    {
-	      set_uby(pbRy,i,ix,iy,iz,fd_pl[i]);
-	      set_uby(pbLy,i,ix,iy+1,iz,fd_pr[i]);
+		  //saving to memory
+		  for(i=0;i<NV;i++)
+		    {
+		      set_uby(pbRy,i,ix,iy,iz,fd_pl[i]);
+		      set_uby(pbLy,i,ix,iy+1,iz,fd_pr[i]);
 
-	      set_uby(flRy,i,ix,iy,iz,ffl[i]);
-	      set_uby(flLy,i,ix,iy+1,iz,ffr[i]);		  
-	    }
-	}
+		      set_uby(flRy,i,ix,iy,iz,ffl[i]);
+		      set_uby(flLy,i,ix,iy+1,iz,ffr[i]);		  
+		    }
+		}
+	  }
 
-      //**********************************************************************
-      //**********************************************************************
-      //z 'sweep'	      
+	  //**********************************************************************
+	  //**********************************************************************
+	  //z 'sweep'
+
+	      
 #ifdef MPI4CORNERS
-      if(NZ>1 && ix>=-1 && ix<NX+1 && iy>=-1 && iy<NY+1)
+	     if(NZ>1 && ix>=-1 && ix<NX+1 && iy>=-1 && iy<NY+1)
 #else
-      if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
+	       if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
 #endif
-	{
-	  x0l[2]=get_xb(iz,2);
-	  xm1[2]=get_x(iz-1,2);
-	  x0l[0]=xm1[0]=get_x(ix,0); 
-	  x0l[1]=xm1[1]=get_x(iy,1);
+		 {
+#ifdef MSTEP
+		   if(mstep_is_cell_or_neighbour_active(ix,iy,iz,2))
+#endif
+		   {
+
+		    x0l[2]=get_xb(iz,2);
+		    xm1[2]=get_x(iz-1,2);
+		    x0l[0]=xm1[0]=get_x(ix,0); 
+		    x0l[1]=xm1[1]=get_x(iy,1);
   
-	  x0r[2]=get_xb(iz+1,2);
-	  xp1[2]=get_x(iz+1,2);
-	  x0r[0]=xp1[0]=get_x(ix,0);
-	  x0r[1]=xp1[1]=get_x(iy,1);
+		    x0r[2]=get_xb(iz+1,2);
+		    xp1[2]=get_x(iz+1,2);
+		    x0r[0]=xp1[0]=get_x(ix,0);
+		    x0r[1]=xp1[1]=get_x(iy,1);
 
-	  dx0=get_size_x(iz,2);    
-	  dxm1=get_size_x(iz-1,2);    
-	  dxp1=get_size_x(iz+1,2);
+		    dx0=get_size_x(iz,2);    
+		    dxm1=get_size_x(iz-1,2);    
+		    dxp1=get_size_x(iz+1,2);
     
-	  if(INT_ORDER>1)
-	    {
-	      dxm2=get_size_x(iz-2,2);    
-	      dxp2=get_size_x(iz+2,2);    
-	    }
+		    if(INT_ORDER>1)
+		      {
+			dxm2=get_size_x(iz-2,2);    
+			dxp2=get_size_x(iz+2,2);    
+		      }
 		 
-	  for(i=0;i<NV;i++)
-	    {
-	      fd_p0[i]=get_u(p,i,ix,iy,iz);
-	      fd_pp1[i]=get_u(p,i,ix,iy,iz+1);
-	      fd_pm1[i]=get_u(p,i,ix,iy,iz-1);
+		    for(i=0;i<NV;i++)
+		      {
+			fd_p0[i]=get_u(p,i,ix,iy,iz);
+			fd_pp1[i]=get_u(p,i,ix,iy,iz+1);
+			fd_pm1[i]=get_u(p,i,ix,iy,iz-1);
 
-	      if(INT_ORDER>1)
-		{
-		  fd_pm2[i]=get_u(p,i,ix,iy,iz-2);
-		  fd_pp2[i]=get_u(p,i,ix,iy,iz+2);
-		}
-	    }
+			if(INT_ORDER>1)
+			  {
+			    fd_pm2[i]=get_u(p,i,ix,iy,iz-2);
+			    fd_pp2[i]=get_u(p,i,ix,iy,iz+2);
+			  }
+		      }
 
-	  reconstrpar=0;
+		    reconstrpar=0;
 #ifdef REDUCEORDERWHENNEEDED
-	  reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
+		    reconstrpar = reduce_order_check(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,ix,iy,iz);
 #endif
 
-	  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
+		    avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 
-	  if(iz>=0)
-	    {
-	      fill_geometry_face(ix,iy,iz,2,&geom);
-	      check_floors_mhd(fd_pl,VELPRIM,&geom);
-	      f_flux_prime(fd_pl,2,ix,iy,iz,ffl,0);
-	    }
+		    if(iz>=0)
+		      {
+			fill_geometry_face(ix,iy,iz,2,&geom);
+			check_floors_mhd(fd_pl,VELPRIM,&geom);
+			f_flux_prime(fd_pl,2,ix,iy,iz,ffl,0);
+		      }
 
-	  if(iz<NZ)
-	    {
-	      fill_geometry_face(ix,iy,iz+1,2,&geom);
-	      check_floors_mhd(fd_pr,VELPRIM,&geom);
-	      f_flux_prime(fd_pr,2,ix,iy,iz+1,ffr,1);   	          
-	    }
+		    if(iz<NZ)
+		      {
+			fill_geometry_face(ix,iy,iz+1,2,&geom);
+			check_floors_mhd(fd_pr,VELPRIM,&geom);
+			f_flux_prime(fd_pr,2,ix,iy,iz+1,ffr,1);   	          
+		      }
 	  
 
-	  //saving to memory
-	  for(i=0;i<NV;i++)
-	    {
-	      set_ubz(pbRz,i,ix,iy,iz,fd_pl[i]);
-	      set_ubz(pbLz,i,ix,iy,iz+1,fd_pr[i]);
+		    //saving to memory
+		    for(i=0;i<NV;i++)
+		      {
+			set_ubz(pbRz,i,ix,iy,iz,fd_pl[i]);
+			set_ubz(pbLz,i,ix,iy,iz+1,fd_pr[i]);
 
-	      set_ubz(flRz,i,ix,iy,iz,ffl[i]);
-	      set_ubz(flLz,i,ix,iy,iz+1,ffr[i]);		  
-	    }
+			set_ubz(flRz,i,ix,iy,iz,ffl[i]);
+			set_ubz(flLz,i,ix,iy,iz+1,ffr[i]);		  
+		      }
 	  
-	}
+		  }
 
-
-    }
+	    }
+	    
+  }
+	    
   
   //**********************************************************************
   //**********************************************************************
@@ -834,6 +851,11 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
 
 #ifdef MAGNFIELD
+
+#ifdef MSTEP
+  my_err("Magnetic fields do not work with multistep yet. On todo list\n");
+#endif
+
   flux_ct(); //constrained transport to preserve div.B=0
 #endif
 
@@ -841,30 +863,36 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
 
-  //applying the corrections
+  //evolving the conserved quantities
 
   //**********************************************************************
   //sweep over x-faces
   //**********************************************************************
 
-  ldouble flux,dxl,dxr,vall,valr;
-#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux) schedule (static)
+  ldouble flux,dxl,dxr,vall,valr,m;
+#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux,m) schedule (static)
   for(ix=0;ix<NX+1;ix++)
     {
       for(iy=0;iy<NY;iy++)
 	{
 	  for(iz=0;iz<NZ;iz++)
 	    {
+#ifdef MSTEP
+	      if(mstep_is_face_active(ix,iy,iz,0)==0) 
+		continue;
+#endif
+
 	      dxl=get_size_x(ix-1,0);
 	      dxr=get_size_x(ix,0);
+	      m=mstep_get_face_multiplier(ix,iy,iz,0);
 
 	      PLOOP(iv)
 	      {
 		flux=get_ub(flbx,iv,ix,iy,iz,0);
 		//left cell
-		vall=get_u(u,iv,ix-1,iy,iz)-flux/dxl*dt;
+		vall=get_u(u,iv,ix-1,iy,iz)-flux/dxl*dt*m;
 		//right cell
-		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt;
+		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt*m;
 	
 #ifdef SKIPHDEVOLUTION
 		if(iv>=NVMHD)
@@ -885,23 +913,29 @@ op_explicit(ldouble t, ldouble dt)
 
   
   if(TNY>1)
-#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux,m) schedule (static)
   for(iy=0;iy<NY+1;iy++)
     {
       for(ix=0;ix<NX;ix++)
 	{
 	  for(iz=0;iz<NZ;iz++)
 	    {
+#ifdef MSTEP
+	      if(mstep_is_face_active(ix,iy,iz,1)==0) 
+		continue;
+#endif
+
 	      dxl=get_size_x(iy-1,1);
 	      dxr=get_size_x(iy,1);
+	      m=mstep_get_face_multiplier(ix,iy,iz,1);
 
 	      PLOOP(iv)
 	      {
 		flux=get_ub(flby,iv,ix,iy,iz,1);
 		//left cell
-		vall=get_u(u,iv,ix,iy-1,iz)-flux/dxl*dt;
+		vall=get_u(u,iv,ix,iy-1,iz)-flux/dxl*dt*m;
 		//right cell
-		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt;
+		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt*m;
 	
 #ifdef SKIPHDEVOLUTION
 		if(iv>=NVMHD)
@@ -920,23 +954,29 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   
   if(TNZ>1)
-#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux,m) schedule (static)
   for(iz=0;iz<NZ+1;iz++)
     {
       for(ix=0;ix<NX;ix++)
 	{
 	  for(iy=0;iy<NY;iy++)
 	    {
+#ifdef MSTEP
+	      if(mstep_is_face_active(ix,iy,iz,2)==0) 
+		continue;
+#endif
+
 	      dxl=get_size_x(iz-1,2);
 	      dxr=get_size_x(iz,2);
-
+	      m=mstep_get_face_multiplier(ix,iy,iz,2);
+ 
 	      PLOOP(iv)
 	      {
 		flux=get_ub(flbz,iv,ix,iy,iz,2);
 		//left cell
-		vall=get_u(u,iv,ix,iy,iz-1)-flux/dxl*dt;
+		vall=get_u(u,iv,ix,iy,iz-1)-flux/dxl*dt*m;
 		//right cell
-		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt;
+		valr=get_u(u,iv,ix,iy,iz)+flux/dxr*dt*m;
 	
 #ifdef SKIPHDEVOLUTION
 		if(iv>=NVMHD)
@@ -1023,7 +1063,7 @@ op_explicit(ldouble t, ldouble dt)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      #ifdef SKIP_MSTEP
+      #ifdef MSTEP
       if(mstep_is_cell_active(ix,iy,iz)==0) 
 	continue;
       #endif
@@ -1050,7 +1090,7 @@ op_explicit(ldouble t, ldouble dt)
       
       for(iv=0;iv<NV;iv++)
 	{
-	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt;
+	  val=get_u(u,iv,ix,iy,iz)+ms[iv]*dt*mstep_get_cell_multiplier(ix,iy,iz);
 	  #ifdef SKIPHDEVOLUTION
 	  if(iv>=NVMHD)
           #endif	  
@@ -1092,8 +1132,13 @@ op_explicit(ldouble t, ldouble dt)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
+      #ifdef MSTEP
+      if(mstep_is_cell_active(ix,iy,iz)==0) 
+	continue;
+      #endif
+
       //using primitives from *p, i.e., from the beginning of this timestep
-      explicit_rad_source_term(ix,iy,iz,dt);
+      explicit_rad_source_term(ix,iy,iz,dt*mstep_get_cell_multiplier(ix,iy,iz));
     } //source terms
 
   //no need of radiative fixup here after source term 
@@ -1109,7 +1154,11 @@ op_explicit(ldouble t, ldouble dt)
    //**********************************************************************
 
 #ifdef MIMICDYNAMO
- 
+  
+  #ifdef MSTEP
+  my_err("Mimic dynamo not yet friends with multipstep.\n");
+  #endif
+
   //correlates ghost cells
   mpi_exchangedata();
   calc_avgs_throughout();
@@ -1156,13 +1205,13 @@ op_implicit(ldouble t, ldouble dt)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      #ifdef SKIP_MSTEP
+      #ifdef MSTEP
       if(mstep_is_cell_active(ix,iy,iz)==0) 
 	continue;
       #endif
 
       //uses values already in *p as the initial guess
-      implicit_lab_rad_source_term(ix,iy,iz,dt*mstep_multiplier[mstep_cell_levels[ix][iy][iz]]);
+      implicit_lab_rad_source_term(ix,iy,iz,dt*mstep_get_cell_multiplier(ix,iy,iz));
     } //source terms
 
   //fixup here after source term 
@@ -1195,107 +1244,114 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //x 'sweep'
  
 #ifdef MPI4CORNERS
-    if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1)
+  if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1)
 #else
     if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
 #endif
       {
-      //characteristic wave speeds for calculating the flux on both sides of a face
-      ap1l[0]=get_u_scalar(ahdxl,ix,iy,iz);
-      ap1r[0]=get_u_scalar(ahdxr,ix,iy,iz);
-      ap1l[1]=get_u_scalar(aradxl,ix,iy,iz);
-      ap1r[1]=get_u_scalar(aradxr,ix,iy,iz);
-      ap1[0]=get_u_scalar(ahdx,ix,iy,iz);
-      ap1[1]=get_u_scalar(aradx,ix,iy,iz);
-      am1l[0]=get_u_scalar(ahdxl,ix-1,iy,iz);
-      am1r[0]=get_u_scalar(ahdxr,ix-1,iy,iz);
-      am1l[1]=get_u_scalar(aradxl,ix-1,iy,iz);
-      am1r[1]=get_u_scalar(aradxr,ix-1,iy,iz);
-      am1[0]=get_u_scalar(ahdx,ix-1,iy,iz);
-      am1[1]=get_u_scalar(aradx,ix-1,iy,iz);
+      
 
-      /*
-	ap2[0]=get_u_scalar(ahdx,ix+1,iy,iz);
-	ap2[1]=get_u_scalar(aradx,ix+1,iy,iz);
-	am2[0]=get_u_scalar(ahdx,ix-2,iy,iz);
-	am2[1]=get_u_scalar(aradx,ix-2,iy,iz);
-      */
+#ifdef MSTEP
+	if(mstep_is_face_active(ix,iy,iz,0))
+#endif
+	  {
+	    //characteristic wave speeds for calculating the flux on both sides of a face
+	    ap1l[0]=get_u_scalar(ahdxl,ix,iy,iz);
+	    ap1r[0]=get_u_scalar(ahdxr,ix,iy,iz);
+	    ap1l[1]=get_u_scalar(aradxl,ix,iy,iz);
+	    ap1r[1]=get_u_scalar(aradxr,ix,iy,iz);
+	    ap1[0]=get_u_scalar(ahdx,ix,iy,iz);
+	    ap1[1]=get_u_scalar(aradx,ix,iy,iz);
+	    am1l[0]=get_u_scalar(ahdxl,ix-1,iy,iz);
+	    am1r[0]=get_u_scalar(ahdxr,ix-1,iy,iz);
+	    am1l[1]=get_u_scalar(aradxl,ix-1,iy,iz);
+	    am1r[1]=get_u_scalar(aradxr,ix-1,iy,iz);
+	    am1[0]=get_u_scalar(ahdx,ix-1,iy,iz);
+	    am1[1]=get_u_scalar(aradx,ix-1,iy,iz);
 
-      //primitives at faces
-      for(i=0;i<NV;i++)
-	{
-	  fd_uLl[i]=get_ub(pbLx,i,ix,iy,iz,0);
-	  fd_uRl[i]=get_ub(pbRx,i,ix,iy,iz,0);
-	}
+	    /*
+	      ap2[0]=get_u_scalar(ahdx,ix+1,iy,iz);
+	      ap2[1]=get_u_scalar(aradx,ix+1,iy,iz);
+	      am2[0]=get_u_scalar(ahdx,ix-2,iy,iz);
+	      am2[1]=get_u_scalar(aradx,ix-2,iy,iz);
+	    */
 
-      //converting interpolated primitives to conserved
-      fill_geometry_face(ix,iy,iz,0,&geom);
+	    //primitives at faces
+	    for(i=0;i<NV;i++)
+	      {
+		fd_uLl[i]=get_ub(pbLx,i,ix,iy,iz,0);
+		fd_uRl[i]=get_ub(pbRx,i,ix,iy,iz,0);
+	      }
+
+	    //converting interpolated primitives to conserved
+	    fill_geometry_face(ix,iy,iz,0,&geom);
 
 #ifdef WAVESPEEDSATFACES
-      ldouble aaa[12];
-      calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
-      am1l[0]=aaa[0];
-      am1r[0]=aaa[1];
-      am1l[1]=aaa[6];
-      am1r[1]=aaa[7];
-      am1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
-      am1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
-      calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
-      ap1l[0]=aaa[0];
-      ap1r[0]=aaa[1];
-      ap1l[1]=aaa[6];
-      ap1r[1]=aaa[7];
-      ap1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
-      ap1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
+	    ldouble aaa[12];
+	    calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
+	    am1l[0]=aaa[0];
+	    am1r[0]=aaa[1];
+	    am1l[1]=aaa[6];
+	    am1r[1]=aaa[7];
+	    am1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
+	    am1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
+	    calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
+	    ap1l[0]=aaa[0];
+	    ap1r[0]=aaa[1];
+	    ap1l[1]=aaa[6];
+	    ap1r[1]=aaa[7];
+	    ap1[0]=my_max(fabs(aaa[0]),fabs(aaa[1]));
+	    ap1[1]=my_max(fabs(aaa[6]),fabs(aaa[7]));
 #endif
    
-      p2u(fd_uLl,fd_uLl,&geom);
-      p2u(fd_uRl,fd_uRl,&geom);
+	    p2u(fd_uLl,fd_uLl,&geom);
+	    p2u(fd_uRl,fd_uRl,&geom);
   
-      //variable loop
-      for(i=0;i<NV;i++)
-	{
-	  //choosing the proper characteristic speed - radiation decoupled from hydro
+	    //variable loop
+	    for(i=0;i<NV;i++)
+	      {
+		//choosing the proper characteristic speed - radiation decoupled from hydro
 #ifdef RADIATION
-	  if(i<NVMHD)      
-	    {
-	      ag=my_max(ap1[0],am1[0]);
-	      al=my_min(ap1l[0],am1l[0]);
-	      ar=my_max(ap1r[0],am1r[0]);
-	    }
-	  else
-	    {
-	      ag=my_max(ap1[1],am1[1]); 
-	      al=my_min(ap1l[1],am1l[1]);
-	      ar=my_max(ap1r[1],am1r[1]);
-	    }
+		if(i<NVMHD)      
+		  {
+		    ag=my_max(ap1[0],am1[0]);
+		    al=my_min(ap1l[0],am1l[0]);
+		    ar=my_max(ap1r[0],am1r[0]);
+		  }
+		else
+		  {
+		    ag=my_max(ap1[1],am1[1]); 
+		    al=my_min(ap1l[1],am1l[1]);
+		    ar=my_max(ap1r[1],am1r[1]);
+		  }
 #else
-	  ag=my_max(ap1[0],am1[0]); 
-	  al=my_min(ap1l[0],am1l[0]);
-	  ar=my_max(ap1r[0],am1r[0]);
+		ag=my_max(ap1[0],am1[0]); 
+		al=my_min(ap1l[0],am1l[0]);
+		ar=my_max(ap1r[0],am1r[0]);
 #endif
 
 #ifdef FULLDISSIPATION
-	  ag=max_ws[0];
+		ag=max_ws[0];
 #endif
 
-	  if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
-	    {
-	      fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
-	    }
-	  if (FLUXMETHOD==HLL_FLUX) //HLL
-	    {
-	      if(al>0.) 
-		fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
-	      else if(ar<0.)
-		fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
-	      else
-		fd_fstarl[i] = (-al*get_ub(flRx,i,ix,iy,iz,0) + ar*get_ub(flLx,i,ix,iy,iz,0) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
-	    }
+		if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
+		  {
+		    fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
+		  }
+		if (FLUXMETHOD==HLL_FLUX) //HLL
+		  {
+		    if(al>0.) 
+		      fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
+		    else if(ar<0.)
+		      fd_fstarl[i] = get_ub(flLx,i,ix,iy,iz,0);
+		    else
+		      fd_fstarl[i] = (-al*get_ub(flRx,i,ix,iy,iz,0) + ar*get_ub(flLx,i,ix,iy,iz,0) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
+		  }
 
-	  set_ubx(flbx,i,ix,iy,iz,fd_fstarl[i]);
-	}
-    }
+		set_ubx(flbx,i,ix,iy,iz,fd_fstarl[i]);
+	      }
+	  }
+      }
 
 
   //**********************************************************************
@@ -1307,92 +1363,97 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
     if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
 #endif
     {
-      ap1l[0]=get_u_scalar(ahdyl,ix,iy,iz);
-      ap1r[0]=get_u_scalar(ahdyr,ix,iy,iz);
-      ap1l[1]=get_u_scalar(aradyl,ix,iy,iz);
-      ap1r[1]=get_u_scalar(aradyr,ix,iy,iz);
-      ap1[0]=get_u_scalar(ahdy,ix,iy,iz);
-      ap1[1]=get_u_scalar(arady,ix,iy,iz);
+#ifdef MSTEP
+      if(mstep_is_face_active(ix,iy,iz,1))
+#endif
+	  {
+	    ap1l[0]=get_u_scalar(ahdyl,ix,iy,iz);
+	    ap1r[0]=get_u_scalar(ahdyr,ix,iy,iz);
+	    ap1l[1]=get_u_scalar(aradyl,ix,iy,iz);
+	    ap1r[1]=get_u_scalar(aradyr,ix,iy,iz);
+	    ap1[0]=get_u_scalar(ahdy,ix,iy,iz);
+	    ap1[1]=get_u_scalar(arady,ix,iy,iz);
 
-      am1l[0]=get_u_scalar(ahdyl,ix,iy-1,iz);
-      am1r[0]=get_u_scalar(ahdyr,ix,iy-1,iz);
-      am1l[1]=get_u_scalar(aradyl,ix,iy-1,iz);
-      am1r[1]=get_u_scalar(aradyr,ix,iy-1,iz);
-      am1[0]=get_u_scalar(ahdy,ix,iy-1,iz);
-      am1[1]=get_u_scalar(arady,ix,iy-1,iz);
+	    am1l[0]=get_u_scalar(ahdyl,ix,iy-1,iz);
+	    am1r[0]=get_u_scalar(ahdyr,ix,iy-1,iz);
+	    am1l[1]=get_u_scalar(aradyl,ix,iy-1,iz);
+	    am1r[1]=get_u_scalar(aradyr,ix,iy-1,iz);
+	    am1[0]=get_u_scalar(ahdy,ix,iy-1,iz);
+	    am1[1]=get_u_scalar(arady,ix,iy-1,iz);
 
-      for(i=0;i<NV;i++)
-	{
-	  fd_uLl[i]=get_ub(pbLy,i,ix,iy,iz,1);
-	  fd_uRl[i]=get_ub(pbRy,i,ix,iy,iz,1);
-	}
+	    for(i=0;i<NV;i++)
+	      {
+		fd_uLl[i]=get_ub(pbLy,i,ix,iy,iz,1);
+		fd_uRl[i]=get_ub(pbRy,i,ix,iy,iz,1);
+	      }
 
-      fill_geometry_face(ix,iy,iz,1,&geom);
+	    fill_geometry_face(ix,iy,iz,1,&geom);
  
 #ifdef WAVESPEEDSATFACES
-      ldouble aaa[12];
-      calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
-      am1l[0]=aaa[2];
-      am1r[0]=aaa[3];
-      am1l[1]=aaa[8];
-      am1r[1]=aaa[9];
-      am1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
-      am1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
-      calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
-      ap1l[0]=aaa[2];
-      ap1r[0]=aaa[3];
-      ap1l[1]=aaa[8];
-      ap1r[1]=aaa[9];
-      ap1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
-      ap1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
+	    ldouble aaa[12];
+	    calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
+	    am1l[0]=aaa[2];
+	    am1r[0]=aaa[3];
+	    am1l[1]=aaa[8];
+	    am1r[1]=aaa[9];
+	    am1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
+	    am1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
+	    calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
+	    ap1l[0]=aaa[2];
+	    ap1r[0]=aaa[3];
+	    ap1l[1]=aaa[8];
+	    ap1r[1]=aaa[9];
+	    ap1[0]=my_max(fabs(aaa[2]),fabs(aaa[3]));
+	    ap1[1]=my_max(fabs(aaa[8]),fabs(aaa[9]));
 #endif
  	    
-      p2u(fd_uLl,fd_uLl,&geom);
-      p2u(fd_uRl,fd_uRl,&geom);
+	    p2u(fd_uLl,fd_uLl,&geom);
+	    p2u(fd_uRl,fd_uRl,&geom);
 
 
-      for(i=0;i<NV;i++)
-	{
+	    for(i=0;i<NV;i++)
+	      {
 #ifdef RADIATION
-	  if(i<NVMHD)      
-	    {
-	      ag=my_max(ap1[0],am1[0]);
-	      al=my_min(ap1l[0],am1l[0]);
-	      ar=my_max(ap1r[0],am1r[0]);
-	    }
-	  else
-	    {
-	      ag=my_max(ap1[1],am1[1]); 
-	      al=my_min(ap1l[1],am1l[1]);
-	      ar=my_max(ap1r[1],am1r[1]);
-	    }
+		if(i<NVMHD)      
+		  {
+		    ag=my_max(ap1[0],am1[0]);
+		    al=my_min(ap1l[0],am1l[0]);
+		    ar=my_max(ap1r[0],am1r[0]);
+		  }
+		else
+		  {
+		    ag=my_max(ap1[1],am1[1]); 
+		    al=my_min(ap1l[1],am1l[1]);
+		    ar=my_max(ap1r[1],am1r[1]);
+		  }
 #else
-	  ag=my_max(ap1[0],am1[0]); 
-	  al=my_min(ap1l[0],am1l[0]);
-	  ar=my_max(ap1r[0],am1r[0]);
+		ag=my_max(ap1[0],am1[0]); 
+		al=my_min(ap1l[0],am1l[0]);
+		ar=my_max(ap1r[0],am1r[0]);
 #endif
 
 
 #ifdef FULLDISSIPATION
-	  ag=max_ws[1];
+		ag=max_ws[1];
 #endif
 	  
-	  if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
-	    fd_fstarl[i] = .5*(get_ub(flRy,i,ix,iy,iz,1) + get_ub(flLy,i,ix,iy,iz,1) - ag * (fd_uRl[i] - fd_uLl[i]));
-	  if (FLUXMETHOD==HLL_FLUX) //HLL
-	    {
-	      if(al>0.) 
-		fd_fstarl[i] = get_ub(flLy,i,ix,iy,iz,1);
-	      else if(ar<0.)
-		fd_fstarl[i] = get_ub(flLy,i,ix,iy,iz,1);
-	      else
-		fd_fstarl[i] = (-al*get_ub(flRy,i,ix,iy,iz,1) + ar*get_ub(flLy,i,ix,iy,iz,1) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
-	    }
+		if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
+		  fd_fstarl[i] = .5*(get_ub(flRy,i,ix,iy,iz,1) + get_ub(flLy,i,ix,iy,iz,1) - ag * (fd_uRl[i] - fd_uLl[i]));
+		if (FLUXMETHOD==HLL_FLUX) //HLL
+		  {
+		    if(al>0.) 
+		      fd_fstarl[i] = get_ub(flLy,i,ix,iy,iz,1);
+		    else if(ar<0.)
+		      fd_fstarl[i] = get_ub(flLy,i,ix,iy,iz,1);
+		    else
+		      fd_fstarl[i] = (-al*get_ub(flRy,i,ix,iy,iz,1) + ar*get_ub(flLy,i,ix,iy,iz,1) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
+		  }
       
-	  set_uby(flby,i,ix,iy,iz,fd_fstarl[i]);
- 	}
-    }
-  else for(i=0;i<NV;i++) set_uby(flby,i,ix,iy,iz,0.);
+		set_uby(flby,i,ix,iy,iz,fd_fstarl[i]);
+	      }
+	  }
+	  }
+	  else for(i=0;i<NV;i++) set_uby(flby,i,ix,iy,iz,0.);
 
   //**********************************************************************
   //**********************************************************************
@@ -1403,89 +1464,93 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
     if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
 #endif
     {
-      ap1l[0]=get_u_scalar(ahdzl,ix,iy,iz);
-      ap1r[0]=get_u_scalar(ahdzr,ix,iy,iz);
-      ap1l[1]=get_u_scalar(aradzl,ix,iy,iz);
-      ap1r[1]=get_u_scalar(aradzr,ix,iy,iz);
-      ap1[0]=get_u_scalar(ahdz,ix,iy,iz);
-      ap1[1]=get_u_scalar(aradz,ix,iy,iz);
+#ifdef MSTEP
+      if(mstep_is_face_active(ix,iy,iz,2))
+#endif
+	  {
+	    ap1l[0]=get_u_scalar(ahdzl,ix,iy,iz);
+	    ap1r[0]=get_u_scalar(ahdzr,ix,iy,iz);
+	    ap1l[1]=get_u_scalar(aradzl,ix,iy,iz);
+	    ap1r[1]=get_u_scalar(aradzr,ix,iy,iz);
+	    ap1[0]=get_u_scalar(ahdz,ix,iy,iz);
+	    ap1[1]=get_u_scalar(aradz,ix,iy,iz);
 
-      am1l[0]=get_u_scalar(ahdzl,ix,iy,iz-1);
-      am1r[0]=get_u_scalar(ahdzr,ix,iy,iz-1);
-      am1l[1]=get_u_scalar(aradzl,ix,iy,iz-1);
-      am1r[1]=get_u_scalar(aradzr,ix,iy,iz-1);
-      am1[0]=get_u_scalar(ahdz,ix,iy,iz-1);
-      am1[1]=get_u_scalar(aradz,ix,iy,iz-1);
+	    am1l[0]=get_u_scalar(ahdzl,ix,iy,iz-1);
+	    am1r[0]=get_u_scalar(ahdzr,ix,iy,iz-1);
+	    am1l[1]=get_u_scalar(aradzl,ix,iy,iz-1);
+	    am1r[1]=get_u_scalar(aradzr,ix,iy,iz-1);
+	    am1[0]=get_u_scalar(ahdz,ix,iy,iz-1);
+	    am1[1]=get_u_scalar(aradz,ix,iy,iz-1);
  
-      for(i=0;i<NV;i++)
-	{
-	  fd_uLl[i]=get_ub(pbLz,i,ix,iy,iz,2);
-	  fd_uRl[i]=get_ub(pbRz,i,ix,iy,iz,2);
-	}
+	    for(i=0;i<NV;i++)
+	      {
+		fd_uLl[i]=get_ub(pbLz,i,ix,iy,iz,2);
+		fd_uRl[i]=get_ub(pbRz,i,ix,iy,iz,2);
+	      }
 
-      fill_geometry_face(ix,iy,iz,2,&geom);
+	    fill_geometry_face(ix,iy,iz,2,&geom);
 
 #ifdef WAVESPEEDSATFACES
-      ldouble aaa[12];
-      calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
-      am1l[0]=aaa[4];
-      am1r[0]=aaa[5];
-      am1l[1]=aaa[10];
-      am1r[1]=aaa[11];
-      am1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
-      am1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
-      calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
-      ap1l[0]=aaa[4];
-      ap1r[0]=aaa[5];
-      ap1l[1]=aaa[10];
-      ap1r[1]=aaa[11];
-      ap1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
-      ap1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
+	    ldouble aaa[12];
+	    calc_wavespeeds_lr_pure(fd_uLl,&geom,aaa);
+	    am1l[0]=aaa[4];
+	    am1r[0]=aaa[5];
+	    am1l[1]=aaa[10];
+	    am1r[1]=aaa[11];
+	    am1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
+	    am1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
+	    calc_wavespeeds_lr_pure(fd_uRl,&geom,aaa);
+	    ap1l[0]=aaa[4];
+	    ap1r[0]=aaa[5];
+	    ap1l[1]=aaa[10];
+	    ap1r[1]=aaa[11];
+	    ap1[0]=my_max(fabs(aaa[4]),fabs(aaa[5]));
+	    ap1[1]=my_max(fabs(aaa[10]),fabs(aaa[11]));
 #endif
 
-      p2u(fd_uLl,fd_uLl,&geom);
-      p2u(fd_uRl,fd_uRl,&geom);
+	    p2u(fd_uLl,fd_uLl,&geom);
+	    p2u(fd_uRl,fd_uRl,&geom);
 
-      for(i=0;i<NV;i++)
-	{
+	    for(i=0;i<NV;i++)
+	      {
 #ifdef RADIATION
-	  if(i<NVMHD)      
-	    {
-	      ag=my_max(ap1[0],am1[0]);
-	      al=my_min(ap1l[0],am1l[0]);
-	      ar=my_max(ap1r[0],am1r[0]);
-	    }
-	  else
-	    {
-	      ag=my_max(ap1[1],am1[1]);
-	      al=my_min(ap1l[1],am1l[1]);
-	      ar=my_max(ap1r[1],am1r[1]);
-	    }
+		if(i<NVMHD)      
+		  {
+		    ag=my_max(ap1[0],am1[0]);
+		    al=my_min(ap1l[0],am1l[0]);
+		    ar=my_max(ap1r[0],am1r[0]);
+		  }
+		else
+		  {
+		    ag=my_max(ap1[1],am1[1]);
+		    al=my_min(ap1l[1],am1l[1]);
+		    ar=my_max(ap1r[1],am1r[1]);
+		  }
 #else
-	  ag=my_max(ap1[0],am1[0]); 
-	  al=my_min(ap1l[0],am1l[0]);
-	  ar=my_max(ap1r[0],am1r[0]);
+		ag=my_max(ap1[0],am1[0]); 
+		al=my_min(ap1l[0],am1l[0]);
+		ar=my_max(ap1r[0],am1r[0]);
 #endif
 
 #ifdef FULLDISSIPATION
-	  ag=max_ws[2];
+		ag=max_ws[2];
 #endif
 
-	  if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
-	    fd_fstarl[i] = .5*(get_ub(flRz,i,ix,iy,iz,2) + get_ub(flLz,i,ix,iy,iz,2) - ag * (fd_uRl[i] - fd_uLl[i]));
-	  if (FLUXMETHOD==HLL_FLUX) //HLL
-	    {
-	      if(al>0.) 
-		fd_fstarl[i] = get_ub(flLz,i,ix,iy,iz,2);
-	      else if(ar<0.)
-		fd_fstarl[i] = get_ub(flLz,i,ix,iy,iz,2);
-	      else
-		fd_fstarl[i] = (-al*get_ub(flRz,i,ix,iy,iz,2) + ar*get_ub(flLz,i,ix,iy,iz,2) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
-	    }
+		if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
+		  fd_fstarl[i] = .5*(get_ub(flRz,i,ix,iy,iz,2) + get_ub(flLz,i,ix,iy,iz,2) - ag * (fd_uRl[i] - fd_uLl[i]));
+		if (FLUXMETHOD==HLL_FLUX) //HLL
+		  {
+		    if(al>0.) 
+		      fd_fstarl[i] = get_ub(flLz,i,ix,iy,iz,2);
+		    else if(ar<0.)
+		      fd_fstarl[i] = get_ub(flLz,i,ix,iy,iz,2);
+		    else
+		      fd_fstarl[i] = (-al*get_ub(flRz,i,ix,iy,iz,2) + ar*get_ub(flLz,i,ix,iy,iz,2) + al*ar* (fd_uRl[i] - fd_uLl[i]))/(ar-al);
+		  }
   	        
-	  set_ubz(flbz,i,ix,iy,iz,fd_fstarl[i]);
- 	}
-
+		set_ubz(flbz,i,ix,iy,iz,fd_fstarl[i]);
+	      }
+	  }
     }
   else for(i=0;i<NV;i++) set_ubz(flbz,i,ix,iy,iz,0.);
 	

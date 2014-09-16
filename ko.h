@@ -803,7 +803,7 @@ MPI_Comm mpi_inttotal_comm[NTX], mpi_intbelow_comm[NTX];
 
 //multisteps
 int mstep_cell_levels[NX][NY][NZ];
-int mstep_multiplier[NUMMSTEPLEVELS+1];
+ldouble mstep_multiplier[NUMMSTEPLEVELS+1];
 int mstep_current_counts[NUMMSTEPLEVELS];
 
 //mstep.c
@@ -816,5 +816,8 @@ int mstep_test();
 int mstep_update_levels();
 int mstep_print_levels();
 int mstep_is_cell_or_neighbour_active(int ix, int iy, int iz,int idim);
+int mstep_is_face_active(int ix, int iy, int iz,int idim);
+ldouble mstep_get_cell_multiplier(int ix,int iy,int iz);
+ldouble mstep_get_face_multiplier(int ix,int iy,int iz,int dim);
 
 
