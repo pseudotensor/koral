@@ -342,7 +342,7 @@ solve_the_problem(ldouble tstart, char* folder)
       if(nstep>1)
 	{
 	  mstep_update_levels();
-	  mstep_print_levels(); getch();
+	  //mstep_print_levels(); getch();
 	}
       #endif
  
@@ -587,13 +587,25 @@ solve_the_problem(ldouble tstart, char* folder)
 #endif
 
 #ifdef RADIATION
-	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f\n",
+	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f ",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],
 		 avimpit[0],avimpit[1],avimpit[2],avimpit[3],avimpit[4]);
-#else
-	  printf("\n");
 #endif
 
+#ifdef MSTEP
+	  int nlev[NUMMSTEPLEVELS];
+	  mstep_count_levels(nlev);
+	  printf("| ");
+	  int ilev,ilevshow=3;
+	  for(ilev=0;ilev<ilevshow;ilev++) 
+	    printf("%d ",nlev[ilev]);
+	  for(ilev=ilevshow+1;ilev<NUMMSTEPLEVELS;ilev++) 
+	    nlev[ilevshow]+=nlev[ilev];
+	  printf(" +%d ",nlev[ilevshow]);
+	  getch();
+#endif
+
+	  printf("\n");
 	  fflush(stdout);
 
 	  fprintf_time=end_time;

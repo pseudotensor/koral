@@ -92,7 +92,7 @@ mstep_update_levels()
 	  levelold=mstep_cell_levels[ix][iy][iz];
 	  levelnew=mstep_calc_level(dt,dtmin);
 
-	  printf("%d %e %e > %d %d\n",ix,dt,dtmin,levelnew,levelold);
+	  //printf("%d %e %e > %d %d\n",ix,dt,dtmin,levelnew,levelold);
 	  
 	  if(levelnew>levelold) //can switch to longer time only when this one active
 	    {
@@ -222,6 +222,23 @@ mstep_is_level_active(int level)
     return 1;
   else
     return 0;
+}
+
+/* gets number of cells at each level */
+int
+mstep_count_levels(int* nlev)
+{
+  int i;
+  for(i=0;i<NUMMSTEPLEVELS;i++)
+    nlev[i]=0;
+
+  int ix,iy,iz;
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	nlev[mstep_cell_levels[ix][iy][iz]]++;
+
+  return 0;
 }
 
 /* gets time step multiplier for a given cell */
