@@ -86,6 +86,15 @@
 #include <gsl/gsl_blas.h>
 //#include <gsl/gsl_odeiv2.h>
 
+/*
+#ifdef _OPENMP
+    #include <omp.h>
+#else
+    #define omp_get_num_threads() 1
+    #define omp_get_thread_num() 0
+#endif
+*/
+
 #ifdef PR_DEFS
 #include PR_DEFS
 #endif

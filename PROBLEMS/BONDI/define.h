@@ -9,14 +9,14 @@
 /************************************/
 //define MSTEPS
 /************************************/
-//#define MSTEP
+#define MSTEP
 #define MSTEP_LIMITBC
 #define NUMMSTEPLEVELS 20
 
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 #define NCOMPTONIZATION 
@@ -99,7 +99,7 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e0
+#define MDOT 1.e2
 #define TAMB (1.e8*(1.e5/RMAXOUT))
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
