@@ -1010,8 +1010,23 @@ op_explicit(ldouble t, ldouble dt)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      ldouble fd_der[NV],t_der[NV],val,ms_der[NV],ss_der[NV],rho,uint,pp[NV],uu[NV],uuold[NV],duu[NV];
-	      
+      //time step multiplier
+      ldouble mcell=mstep_get_cell_multiplier(ix,iy,iz);
+
+      ldouble mxl,mxr,myl,myr,mzl,mzr;
+      mxl=mstep_get_face_multiplier(ix,iy,iz,0);
+      mxr=mstep_get_face_multiplier(ix+1,iy,iz,0);
+      myl=mstep_get_face_multiplier(ix,iy,iz,1);
+      myr=mstep_get_face_multiplier(ix,iy+1,iz,1);
+      mzl=mstep_get_face_multiplier(ix,iy,iz,2);
+      mzr=mstep_get_face_multiplier(ix,iy,iz+1,2);
+
+
+      //source term
+      ldouble ms[NV],val,du;
+      f_metric_source_term(ix,iy,iz,ms);
+
+
       //updating u - fluxes
       for(iv=0;iv<NV;iv++)
 	{
@@ -1038,13 +1053,10 @@ op_explicit(ldouble t, ldouble dt)
 #endif
 		  
 	  //unsplit scheme
-	  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
+	  du=-(flxr*mxr-flxl*mxl)*dt/dx - (flyr*myr-flyl*myl)*dt/dy - (flzr*mzr-flzl*mzl)*dt/dz;
 
-	  val=get_u(u,iv,ix,iy,iz)+t_der[iv]*dt;
-
-	  if(isnan(val) || isinf(val)) {printf("i: %4d %4d %4d %d der: %e %e %e %e %e %e %e %e %e %e %e %e\n",ix,iy,iz,iv,flxr,flxl,flyr,flyl,flzr,flzl,dx,dy,dz,
-					       get_u(u,iv,ix,iy,iz),get_u(p,iv,ix,iy,iz),dt);getchar();}
-	  
+	  //applying advective and source together
+	  val=get_u(u,iv,ix,iy,iz) + du + ms[iv]*dt*mcell;
 
 	  //saving new conserved to memory
 	  #ifdef SKIPHDEVOLUTION
@@ -1061,7 +1073,7 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
 
-
+  /*
   //again over cells - source terms
   #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
    for(ii=0;ii<Nloop_0;ii++) //domain 
@@ -1105,13 +1117,10 @@ op_explicit(ldouble t, ldouble dt)
 	  uu[iv]=val;
 	} 
 
-      /***************************/
-      //testing if entropy increased after advection and calculating post-advection primitives
-      /***************************/
-
+  
       //calc_primitives(ix,iy,iz,VERIFYENTROPYAFTERADVECTION,1);
     }
-
+*/
    //**********************************************************************
    //**********************************************************************
    //**********************************************************************
