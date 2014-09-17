@@ -573,7 +573,7 @@ op_explicit(ldouble t, ldouble dt)
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
       int reconstrpar;
       struct geometry geom;
-      int i;
+      int i,dol,dor;
 
 
       //**********************************************************************
@@ -590,6 +590,15 @@ op_explicit(ldouble t, ldouble dt)
 	    if(mstep_is_cell_or_neighbour_active(ix,iy,iz,0))
 #endif
 	      {
+
+		dol=dor=1;
+#ifdef MSTEP
+		if(ix<0 || (ix==0 && mstep_is_cell_active(ix,iy,iz)==0) || (ix>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix-1,iy,iz)==0))
+		  dol=0;
+		if(ix>=NX || (ix==NX-1 && mstep_is_cell_active(ix,iy,iz)==0) || (ix<NX-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix+1,iy,iz)==0))
+		  dor=0;
+#endif
+		
 
 		x0[0]=get_x(ix,0);
 
@@ -636,14 +645,16 @@ op_explicit(ldouble t, ldouble dt)
 
 		avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 
-		if(ix>=0) //no need to calculate at left face of first GC
+		//if(ix>=0) //no need to calculate at left face of first GC
+		if(dol)
 		  {
 		    fill_geometry_face(ix,iy,iz,0,&geom);
 		    check_floors_mhd(fd_pl,VELPRIM,&geom);
 		    f_flux_prime(fd_pl,0,ix,iy,iz,ffl,1); //right biased
 		  }
 
-		if(ix<NX)
+		//if(ix<NX)
+		if(dor)
 		  {
 		    fill_geometry_face(ix+1,iy,iz,0,&geom);
 		    check_floors_mhd(fd_pr,VELPRIM,&geom);
