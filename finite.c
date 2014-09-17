@@ -524,12 +524,13 @@ op_explicit(ldouble t, ldouble dt)
   ldouble pp[NV];
      
   //calculates and saves wavespeeds
-  #pragma omp parallel for private(ix,iy,iz,iv,max_lws,ii) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,max_lws) schedule (static)
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
       iy=loop_1[ii][1];
-      iz=loop_1[ii][2]; ldouble aaa[12];
+      iz=loop_1[ii][2]; 
+      ldouble aaa[12];
 
       #ifdef MSTEP
       if(mstep_is_cell_active(ix,iy,iz)==0) 
@@ -547,7 +548,7 @@ op_explicit(ldouble t, ldouble dt)
 
 #ifndef SKIPEVOLUTION
   //interpolation and flux-calculation
-  #pragma omp parallel for private(iy,iz,iv,ix,ii)  schedule (static) 
+  #pragma omp parallel for private(iy,iz,iv,ix)  schedule (static) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -835,7 +836,7 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
 
-  #pragma omp parallel for private(iy,iz,ix,ii)  schedule (static) 
+  #pragma omp parallel for private(iy,iz,ix)  schedule (static) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -869,8 +870,11 @@ op_explicit(ldouble t, ldouble dt)
   //sweep over x-faces
   //**********************************************************************
 
+
+  /*
   ldouble flux,dxl,dxr,vall,valr,m;
-#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux,m) schedule (static)
+  
+#pragma omp parallel for private(ix,iy,iz,iv,flux,dxl,dxr,vall,valr,m) schedule (static)
   for(ix=0;ix<NX+1;ix++)
     {
       for(iy=0;iy<NY;iy++)
@@ -898,22 +902,25 @@ op_explicit(ldouble t, ldouble dt)
 		if(iv>=NVMHD)
 #endif
 		  {
+		    #pragma omp critical
+		    {
 		    set_u(u,iv,ix-1,iy,iz,vall);
+
 		    set_u(u,iv,ix,iy,iz,valr);
+		    }
 		  }	 
 	      }
 	    }
 	}
     }
   
-
   //**********************************************************************
   //sweep over y-faces
   //**********************************************************************
 
   
   if(TNY>1)
-#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux,m) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux,m) schedule (dynamic)
   for(iy=0;iy<NY+1;iy++)
     {
       for(ix=0;ix<NX;ix++)
@@ -954,7 +961,7 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   
   if(TNZ>1)
-#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux,m) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,dxl,dxr,vall,valr,flux,m) schedule (dynamic)
   for(iz=0;iz<NZ+1;iz++)
     {
       for(ix=0;ix<NX;ix++)
@@ -989,15 +996,14 @@ op_explicit(ldouble t, ldouble dt)
 	    }
 	}
     }
-  
+  */
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
-
 
   //original:
-  /*
-    #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  
+  #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -1006,14 +1012,6 @@ op_explicit(ldouble t, ldouble dt)
 
       ldouble fd_der[NV],t_der[NV],val,ms_der[NV],ss_der[NV],rho,uint,pp[NV],uu[NV],uuold[NV],duu[NV];
 	      
-      ldouble gg[4][5],GG[4][5];
-      ldouble tup[4][4],tlo[4][4];
-      pick_T(tmuup,ix,iy,iz,tup);
-      pick_T(tmulo,ix,iy,iz,tlo);
-      pick_g(ix,iy,iz,gg);
-      pick_G(ix,iy,iz,GG);
-      ldouble gdet=gg[3][4];
-	      	      
       //updating u - fluxes
       for(iv=0;iv<NV;iv++)
 	{
@@ -1029,6 +1027,15 @@ op_explicit(ldouble t, ldouble dt)
 	  flyr=get_ub(flby,iv,ix,iy+1,iz,1);
 	  flzl=get_ub(flbz,iv,ix,iy,iz,2);
 	  flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
+
+#ifdef MSTEP
+	  if(mstep_is_face_active(ix,iy,iz,0)==0) flxl=0;
+	  if(mstep_is_face_active(ix+1,iy,iz,0)==0) flxr=0;
+	  if(mstep_is_face_active(ix,iy,iz,1)==0) flyl=0;
+	  if(mstep_is_face_active(ix,iy+1,iz,1)==0) flyr=0;
+	  if(mstep_is_face_active(ix,iy,iz,2)==0) flzl=0;
+	  if(mstep_is_face_active(ix,iy,iz+1,2)==0) flzr=0;
+#endif
 		  
 	  //unsplit scheme
 	  t_der[iv]=-(flxr-flxl)/dx - (flyr-flyl)/dy - (flzr-flzl)/dz;
@@ -1048,7 +1055,7 @@ op_explicit(ldouble t, ldouble dt)
 	}
 
     }
-  */ 
+  
 
   //**********************************************************************
   //**********************************************************************
@@ -1056,7 +1063,7 @@ op_explicit(ldouble t, ldouble dt)
 
 
   //again over cells - source terms
-  #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
    for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -1125,7 +1132,7 @@ op_explicit(ldouble t, ldouble dt)
 #ifndef SKIPRADSOURCE
 #ifdef EXPLICIT_LAB_RAD_SOURCE
 
-   #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+   #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -1197,7 +1204,7 @@ op_implicit(ldouble t, ldouble dt)
 #ifdef IMPLICIT_LAB_RAD_SOURCE
   
   //again over cells - source terms
-#pragma omp parallel for schedule (static)
+#pragma omp parallel for schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       int ix,iy,iz;
@@ -2582,7 +2589,7 @@ int set_bc(ldouble t,int ifinit)
 
 
   //first fill the GC with no corners
-  #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (dynamic)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only, no corners
     {
       ix=loop_2[ii][0];
@@ -2932,7 +2939,7 @@ cell_fixup_hd()
   copy_u(1.,p,p_bak_fixup);
 
   //gets the neiboring the primitives
-  #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static)
+  #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -3059,7 +3066,7 @@ cell_fixup_rad()
   copy_u(1.,p,p_bak_fixup);
 
   //gets the neighboring the primitives
-  #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static)
+  #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -3420,7 +3427,7 @@ correct_polaraxis()
   //spherical like coords
   if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
     {
-      #pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static)
+      #pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (dynamic)
       for(ix=0;ix<NX;ix++)
 	{
 	  for(iz=0;iz<NZ;iz++)
@@ -3562,7 +3569,7 @@ correct_polaraxis()
   //cylindrical like coords
   if (MYCOORDS==CYLCOORDS || MYCOORDS==MCYL1COORDS)
     {
-      #pragma omp parallel for private(ic,ix,iy,iz,iv,ixsrc) schedule (static)
+      #pragma omp parallel for private(ic,ix,iy,iz,iv,ixsrc) schedule (dynamic)
       for(iy=0;iy<NY;iy++)
 	{
 	  for(iz=0;iz<NZ;iz++)
