@@ -1,4 +1,4 @@
-
+ 
 //KORAL - finite.c
 //routines related to finite difference and grid
 
@@ -2659,6 +2659,12 @@ int set_bc(ldouble t,int ifinit)
       if(iy>=NY) BCtype=YBCHI;
       if(iz<0) BCtype=ZBCLO;
       if(iz>=NZ) BCtype=ZBCHI;
+
+#if defined(MSTEP) && defined(MSTEP_LIMITBC) //check if near boundary cells have been modified
+      if(BCtype==XBCHI && mstep_is_cell_active(NX-1,iy,iz)==0 && mstep_is_cell_active(NX-2,iy,iz)==0) continue;												  if(BCtype==XBCLO && mstep_is_cell_active(0,iy,iz)==0 && mstep_is_cell_active(1,iy,iz)==0) continue;
+      if(BCtype==YBCHI && mstep_is_cell_active(ix,NY-1,iz)==0 && mstep_is_cell_active(ix,NY-2,iz)==0) continue;											  if(BCtype==YBCLO && mstep_is_cell_active(ix,0,iz)==0 && mstep_is_cell_active(ix,1,iz)==0) continue;
+      if(BCtype==ZBCHI && mstep_is_cell_active(ix,iy,NZ-1)==0 && mstep_is_cell_active(ix,iy,NZ-2)==0) continue;												  if(BCtype==ZBCLO && mstep_is_cell_active(ix,iy,0)==0 && mstep_is_cell_active(ix,iy,1)==0) continue;
+#endif
 
       if(mpi_isitBC(BCtype)==0) //this border exchanged through MPI
 	{
