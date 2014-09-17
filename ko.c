@@ -343,7 +343,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  mstep_iterate();
 	  mstep_update_levels();
-	  //mstep_print_state(); getch();
+	  //mstep_print_state();
 	}
       #endif
  
@@ -597,7 +597,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  int nlev[NUMMSTEPLEVELS];
 	  mstep_count_levels(nlev);
 	  printf("| ");
-	  int ilev,ilevshow=3;
+	  int ilev,ilevshow=NUMMSTEPLEVELS-1;
 	  for(ilev=0;ilev<ilevshow;ilev++) 
 	    printf("%d ",nlev[ilev]);
 	  for(ilev=ilevshow+1;ilev<NUMMSTEPLEVELS;ilev++) 
@@ -607,6 +607,7 @@ solve_the_problem(ldouble tstart, char* folder)
 #endif
 
 	  printf("\n");
+
 	  fflush(stdout);
 
 	  fprintf_time=end_time;

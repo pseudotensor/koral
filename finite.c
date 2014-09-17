@@ -1,5 +1,4 @@
 
-
 //KORAL - finite.c
 //routines related to finite difference and grid
 
@@ -408,7 +407,7 @@ calc_u2p()
   //**********************************************************************
 
   //calculates the primitives
-  #pragma omp parallel for schedule (static)
+#pragma omp parallel for schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       int ix,iy,iz;
@@ -524,7 +523,7 @@ op_explicit(ldouble t, ldouble dt)
   ldouble pp[NV];
      
   //calculates and saves wavespeeds
-#pragma omp parallel for private(ix,iy,iz,max_lws) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,max_lws) schedule (dynamic)
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -548,7 +547,7 @@ op_explicit(ldouble t, ldouble dt)
 
 #ifndef SKIPEVOLUTION
   //interpolation and flux-calculation
-  #pragma omp parallel for private(iy,iz,iv,ix)  schedule (static) 
+  #pragma omp parallel for private(iy,iz,iv,ix)  schedule (dynamic) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -836,7 +835,7 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
 
-  #pragma omp parallel for private(iy,iz,ix)  schedule (static) 
+  #pragma omp parallel for private(iy,iz,ix)  schedule (dynamic) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -874,7 +873,7 @@ op_explicit(ldouble t, ldouble dt)
   /*
   ldouble flux,dxl,dxr,vall,valr,m;
   
-#pragma omp parallel for private(ix,iy,iz,iv,flux,dxl,dxr,vall,valr,m) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,flux,dxl,dxr,vall,valr,m) schedule (dynamic)
   for(ix=0;ix<NX+1;ix++)
     {
       for(iy=0;iy<NY;iy++)
@@ -902,12 +901,9 @@ op_explicit(ldouble t, ldouble dt)
 		if(iv>=NVMHD)
 #endif
 		  {
-		    #pragma omp critical
-		    {
 		    set_u(u,iv,ix-1,iy,iz,vall);
 
 		    set_u(u,iv,ix,iy,iz,valr);
-		    }
 		  }	 
 	      }
 	    }
@@ -1002,6 +998,8 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
 
   //original:
+
+  
   
   #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain 
@@ -1009,6 +1007,7 @@ op_explicit(ldouble t, ldouble dt)
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
+
 
       //time step multiplier
       ldouble mcell=mstep_get_cell_multiplier(ix,iy,iz);
@@ -1025,6 +1024,10 @@ op_explicit(ldouble t, ldouble dt)
       //source term
       ldouble ms[NV],val,du;
       f_metric_source_term(ix,iy,iz,ms);
+#ifdef MSTEP
+      if(mstep_is_cell_active(ix,iy,iz)==0) 
+	PLOOP(iv) ms[iv]=0.; //source terms applied only for active cells
+#endif
 
 
       //updating u - fluxes
@@ -1044,12 +1047,12 @@ op_explicit(ldouble t, ldouble dt)
 	  flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
 
 #ifdef MSTEP
-	  if(mstep_is_face_active(ix,iy,iz,0)==0) flxl=0;
-	  if(mstep_is_face_active(ix+1,iy,iz,0)==0) flxr=0;
-	  if(mstep_is_face_active(ix,iy,iz,1)==0) flyl=0;
-	  if(mstep_is_face_active(ix,iy+1,iz,1)==0) flyr=0;
-	  if(mstep_is_face_active(ix,iy,iz,2)==0) flzl=0;
-	  if(mstep_is_face_active(ix,iy,iz+1,2)==0) flzr=0;
+	  if(mstep_is_face_active(ix,iy,iz,0)==0) flxl=0.;
+	  if(mstep_is_face_active(ix+1,iy,iz,0)==0) flxr=0.;
+	  if(mstep_is_face_active(ix,iy,iz,1)==0) flyl=0.;
+	  if(mstep_is_face_active(ix,iy+1,iz,1)==0) flyr=0.;
+	  if(mstep_is_face_active(ix,iy,iz,2)==0) flzl=0.;
+	  if(mstep_is_face_active(ix,iy,iz+1,2)==0) flzr=0.;
 #endif
 		  
 	  //unsplit scheme
