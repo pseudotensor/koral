@@ -1023,22 +1023,37 @@ op_explicit(ldouble t, ldouble dt)
 
       //source term
       ldouble ms[NV],val,du;
-      f_metric_source_term(ix,iy,iz,ms);
+
 #ifdef MSTEP
-      if(mstep_is_cell_active(ix,iy,iz)==0) 
+      if(mstep_is_cell_active(ix,iy,iz)==0)
+	{ 
 	PLOOP(iv) ms[iv]=0.; //source terms applied only for active cells
+	}
+      else
+#endif
+	f_metric_source_term(ix,iy,iz,ms);
+
+      ldouble dx=get_size_x(ix,0);
+      ldouble dy=get_size_x(iy,1);
+      ldouble dz=get_size_x(iz,2);
+
+      int doxl,doxr,doyl,doyr,dozl,dozr;
+      doxl=doxr=doyl=doyr=dozl=dozr=1;
+#ifdef MSTEP
+      if(mstep_is_face_active(ix,iy,iz,0)==0) doxl=0;
+      if(mstep_is_face_active(ix+1,iy,iz,0)==0) doxr=0;
+      if(mstep_is_face_active(ix,iy,iz,1)==0) doyl=0;
+      if(mstep_is_face_active(ix,iy+1,iz,1)==0) doyr=0;
+      if(mstep_is_face_active(ix,iy,iz,2)==0) dozl=0;
+      if(mstep_is_face_active(ix,iy,iz+1,2)==0) dozr=0;
 #endif
 
 
-      //updating u - fluxes
+      //fluxes at faces
       for(iv=0;iv<NV;iv++)
 	{
 	  ldouble flxr,flyr,flzr,flxl,flyl,flzl;
-
-	  ldouble dx=get_size_x(ix,0);
-	  ldouble dy=get_size_x(iy,1);
-	  ldouble dz=get_size_x(iz,2);
-
+	  
 	  flxl=get_ub(flbx,iv,ix,iy,iz,0);
 	  flxr=get_ub(flbx,iv,ix+1,iy,iz,0);
 	  flyl=get_ub(flby,iv,ix,iy,iz,1);
@@ -1047,12 +1062,12 @@ op_explicit(ldouble t, ldouble dt)
 	  flzr=get_ub(flbz,iv,ix,iy,iz+1,2);
 
 #ifdef MSTEP
-	  if(mstep_is_face_active(ix,iy,iz,0)==0) flxl=0.;
-	  if(mstep_is_face_active(ix+1,iy,iz,0)==0) flxr=0.;
-	  if(mstep_is_face_active(ix,iy,iz,1)==0) flyl=0.;
-	  if(mstep_is_face_active(ix,iy+1,iz,1)==0) flyr=0.;
-	  if(mstep_is_face_active(ix,iy,iz,2)==0) flzl=0.;
-	  if(mstep_is_face_active(ix,iy,iz+1,2)==0) flzr=0.;
+	  if(doxl==0) flxl=0.;
+	  if(doxr==0) flxr=0.;
+	  if(doyl==0) flyl=0.;
+	  if(doyr==0) flyr=0.;
+	  if(dozl==0) flzl=0.;
+	  if(dozr==0) flzr=0.;
 #endif
 		  
 	  //unsplit scheme

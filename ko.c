@@ -507,9 +507,7 @@ solve_the_problem(ldouble tstart, char* folder)
       #endif
       #endif
       
-      //save to avg arrays
-      save_avg(dt);
-
+ 
       //time mark
       my_clock_gettime(&temp_clock);    
 
@@ -520,6 +518,10 @@ solve_the_problem(ldouble tstart, char* folder)
 
       //avg files
 #if(AVGOUTPUT==1) 
+      //save to avg arrays
+      save_avg(dt);
+
+      //dump avg file?
       if(lasttoutavg_floor!=floor(t/dtoutavg))
 	{
 	  if(PROCID==0)
