@@ -688,6 +688,13 @@ op_explicit(ldouble t, ldouble dt)
 	     if(mstep_is_cell_or_neighbour_active(ix,iy,iz,1))
 #endif
 	       {
+		dol=dor=1;
+#ifdef MSTEP
+		if(iy<0 || (iy==0 && mstep_is_cell_active(ix,iy,iz)==0) || (iy>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy-1,iz)==0))
+		  dol=0;
+		if(iy>=NY || (iy==NY-1 && mstep_is_cell_active(ix,iy,iz)==0) || (iy<NY-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy+1,iz)==0))
+		  dor=0;
+#endif
 
 		 x0l[1]=get_xb(iy,1);
 		 xm1[1]=get_x(iy-1,1);
@@ -769,6 +776,13 @@ op_explicit(ldouble t, ldouble dt)
 		   if(mstep_is_cell_or_neighbour_active(ix,iy,iz,2))
 #endif
 		   {
+		     dol=dor=1;
+#ifdef MSTEP
+		if(iz<0 || (iz==0 && mstep_is_cell_active(ix,iy,iz)==0) || (iz>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy,iz-1)==0))
+		  dol=0;
+		if(iz>=NZ || (iz==NZ-1 && mstep_is_cell_active(ix,iy,iz)==0) || (iz<NZ-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy,iz+1)==0))
+		  dor=0;
+#endif
 
 		    x0l[2]=get_xb(iz,2);
 		    xm1[2]=get_x(iz-1,2);
@@ -2986,6 +3000,8 @@ cell_fixup_hd()
 
       if(get_cflag(HDFIXUPFLAG,ix,iy,iz)==1)
 	{
+	  set_cflag(HDFIXUPFLAG,ix,iy,iz,0); //try only once
+
 	  //total fixups  
 	  struct geometry geom;
 	  fill_geometry(ix,iy,iz,&geom);
@@ -3113,6 +3129,9 @@ cell_fixup_rad()
 
       if(get_cflag(RADFIXUPFLAG,ix,iy,iz)<0)
 	{
+
+	  set_cflag(RADFIXUPFLAG,iz,iy,iz,0); //only once
+
 	  ldouble ppn[26][NV],pp[NV],uu[NV];
 
 	  //total fixups  

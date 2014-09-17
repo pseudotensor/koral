@@ -73,7 +73,7 @@
 #define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0      
 
-#define DOFIXUPS 1
+#define DOFIXUPS 0
 #define U2PCONV 1.e-12
 #define RADIMPCONV 1.e-8
 #define RADIMPEPS 1.e-8
@@ -88,7 +88,7 @@
 #define RADOUTPUT 0
 #define SCAOUTPUT 1
 #define ALLSTEPSOUTPUT 0 //whether to output every step
-#define NSTEPSTOP 5e4 //stop after this number of steps
+//#define NSTEPSTOP 5e4 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #define DTOUT1 1.e5 //res
 #define DTOUT2 1.e40 //avg
