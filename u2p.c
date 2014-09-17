@@ -68,11 +68,13 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   //************************************
   //checking on rad floors
     
+  #ifdef RADIATION
   floorret=check_floors_rad(pp,VELPRIMRAD,&geom);
   if(floorret<0.)
     {
       corrected[1]=1;
     }
+  #endif
 
   //************************************
   //************************************

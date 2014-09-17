@@ -226,6 +226,7 @@ solve_the_problem(ldouble tstart, char* folder)
   int nentr[4],nentr2[4];
   
   ldouble fprintf_time = 0.;
+  int fprintf_nstep=0;
   int i1,i2,i3,ix,iy,iz,iv;
   struct timespec temp_clock;
   struct rad_parameters rp;
@@ -518,7 +519,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
       //avg files
 #if(AVGOUTPUT==1) 
-      //save to avg arrays
+     //save to avg arrays
       save_avg(dt);
 
       //dump avg file?
@@ -580,6 +581,8 @@ solve_the_problem(ldouble tstart, char* folder)
       //performance to screen only every second
       if(end_time-fprintf_time>1. && PROCID==0) 
 	{
+	  znps = TNX*TNY*TNZ*(nstep-fprintf_nstep);
+	  
 	  printf("(%d) step #%6d t=%10.3e dt=%.3e (real time: %7.2f | %7.6f) znps: %.0f "
 		 ,PROCID,nstep,t,dt,end_time-start_time,2*maxmp_time,znps);
 
@@ -613,6 +616,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  fflush(stdout);
 
 	  fprintf_time=end_time;
+	  fprintf_nstep = nstep;
 	}
     }
   return 0;
