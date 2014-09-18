@@ -538,6 +538,8 @@ op_explicit(ldouble t, ldouble dt)
 
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
 
+      //printf("%d %d %d\n",ix,iy,iz); print_Nvector(aaa,6); getch();
+
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
 
@@ -909,7 +911,6 @@ op_explicit(ldouble t, ldouble dt)
       mzl=mstep_get_face_multiplier(ix,iy,iz,2);
       mzr=mstep_get_face_multiplier(ix,iy,iz+1,2);
 
-
       //source term
       ldouble ms[NV],val,du;
 
@@ -964,6 +965,8 @@ op_explicit(ldouble t, ldouble dt)
 
 	  //applying advective and source together
 	  val=get_u(u,iv,ix,iy,iz) + du + ms[iv]*dt*mcell;
+
+	  //printf("%d > %d %d %d > %e %e %e %e\n",iv,ix,iy,iz, flzr,mzr,flzl,mzl); getch();
 
 	  //saving new conserved to memory
 	  #ifdef SKIPHDEVOLUTION
@@ -2371,6 +2374,7 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
   calc_bc(ix,iy,iz,t,uval,pval,ifinit,BCtype);
 
 #else  
+
   //standard BC  
   if(BCtype==XBCLO || BCtype==XBCHI)
     {       
@@ -2470,6 +2474,7 @@ int set_bc(ldouble t,int ifinit)
       if(BCtype==ZBCHI && mstep_is_cell_active(ix,iy,NZ-1)==0 && mstep_is_cell_active(ix,iy,NZ-2)==0) continue;												  if(BCtype==ZBCLO && mstep_is_cell_active(ix,iy,0)==0 && mstep_is_cell_active(ix,iy,1)==0) continue;
 #endif
 
+      
       if(mpi_isitBC(BCtype)==0) //this border exchanged through MPI
 	{
 	  struct geometry geom;
@@ -2479,6 +2484,7 @@ int set_bc(ldouble t,int ifinit)
       else //need for real BC
 	{
 	  ldouble uval[NV],pval[NV];
+
 	  set_bc_core(ix,iy,iz,t,uval,pval,ifinit,BCtype);
 
 	  for(iv=0;iv<NV;iv++)

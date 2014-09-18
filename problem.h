@@ -84,7 +84,7 @@
 //81 TWOBEAM - test of VET with two beams
 //82 VETTHIN - thin disk emission for VET tests
 
-#define PROBLEM 7
+#define PROBLEM 58
 
 #if(PROBLEM==82)
 
@@ -1746,34 +1746,47 @@
 #define NZ (TNZ/NTZ)
 #endif 
 
-#ifndef MPIMSGBUFSIZE
-#define MPIMSGBUFSIZE 12
-#endif
-
-#ifndef MPI4CORNERS //required by MAGNFIELD and VETCLOSURE
-//#ifdef MAGNFIELD //always fill corners? 
-#define MPI4CORNERS
-#undef MPIMSGBUFSIZE
-#if (TNX>1 && TNY>1 && TNY>1) //3d
-#define MPIMSGBUFSIZE 52
-#else //2d
-#define MPIMSGBUFSIZE 20
-#endif
-//#endif
-#endif
-
-#ifndef MPI
-#ifndef OUTPUTPERCORE
-#define OUTPUTPERCORE
-#endif
-#endif
-
 #ifndef RADCLOSURE
 #define RADCLOSURE M1CLOSURE
 #endif
 
 #ifndef RADCLOSURECOORDS
 #define RADCLOSURECOORDS MYCOORDS
+#endif
+
+
+#ifndef MPIMSGBUFSIZE
+#define MPIMSGBUFSIZE 12
+#endif
+
+#ifndef MPI4CORNERS //required by MAGNFIELD and VETCLOSURE
+#ifdef MAGNFIELD
+#define MPI4CORNERS
+#endif
+#endif
+
+#ifndef MPI4CORNERS //required by MAGNFIELD and VETCLOSURE
+#ifdef RADIATION //required by MAGNFIELD and VETCLOSURE
+#if (RADCLOSURE==VETCLOSURE)
+#define MPI4CORNERS
+#endif
+#endif
+#endif
+
+#ifdef MPI4CORNERS
+#undef MPIMSGBUFSIZE
+#if (TNX>1 && TNY>1 && TNY>1) //3d
+#define MPIMSGBUFSIZE 52
+#else //2d
+#define MPIMSGBUFSIZE 20
+#endif
+#endif
+
+
+#ifndef MPI
+#ifndef OUTPUTPERCORE
+#define OUTPUTPERCORE
+#endif
 #endif
 
 //ZERO short solver

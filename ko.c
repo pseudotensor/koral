@@ -156,6 +156,7 @@ main(int argc, char **argv)
 
     }
 
+
   //prepares files  
   fprint_openfiles(folder);
   
