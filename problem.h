@@ -84,7 +84,7 @@
 //81 TWOBEAM - test of VET with two beams
 //82 VETTHIN - thin disk emission for VET tests
 
-#define PROBLEM 58
+#define PROBLEM 7
 
 #if(PROBLEM==82)
 
@@ -1490,7 +1490,7 @@
 #ifndef NAVGVARS
 //#ifdef BHDISK_PROBLEMTYPE
 #ifdef RADIATION
-#define NAVGVARS (143+3*NV) //added to existing NV 
+#define NAVGVARS (151+3*NV) //added to existing NV 
 #else
 #define NAVGVARS (110+3*NV)
 #endif

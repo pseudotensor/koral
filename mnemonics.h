@@ -167,6 +167,8 @@
 #define AVGEHATUCOV(i) (4*NV+131+i)
 #define AVGURFCON(i) (4*NV+135+i)
 #define AVGURFCOV(i) (4*NV+139+i)
+#define AVGGHAT(i) (4*NV+143+i)
+#define AVGGHATCOMPT(i) (4*NV+147+i)
 
 
 //MPI mnemonics

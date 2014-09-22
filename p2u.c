@@ -243,6 +243,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   //four-vectors etc
   ldouble rho=pp[0];
   ldouble uint=pp[1];
+  ldouble Tgas=(GAMMA-1.)*uint*MU_GAS*M_PROTON/K_BOLTZ/rho; 
   ldouble vcon[4],vcov[4],ucon[4],ucov[4];
   ldouble bcon[4]={0.,0.,0.,0.},bcov[4]={0.,0.,0.,0.},bsq=0.;
   vcon[1]=pp[2];
@@ -344,6 +345,13 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   vcon[3]=pp[FZ(0)];
   vcon[0]=0.;  
   conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG); 
+  //fluid frame Ghat
+  ldouble Gi[4],Gic[4];
+  calc_Gi(pp,&geomout,Gi,0); 
+  ldouble kappaes=calc_kappaes(pp,&geomout);
+  ldouble uffcon[4]={1.,0.,0.,0.};
+  calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,uffcon);
+  
 
   for(iv=0;iv<4;iv++)
     avg[AVGURFCON(iv)]=ucon[iv];
@@ -359,6 +367,11 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
     avg[AVGEHATUCON(iv)]=Ehat*ucon[iv];
   for(iv=0;iv<4;iv++)
     avg[AVGEHATUCOV(iv)]=Ehat*ucov[iv];
+
+  for(iv=0;iv<4;iv++)
+    avg[AVGGHAT(iv)]=Gi[iv];
+  for(iv=0;iv<4;iv++)
+    avg[AVGGHATCOMPT(iv)]=Gic[iv];
 
 #endif
 
