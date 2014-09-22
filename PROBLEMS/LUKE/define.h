@@ -11,6 +11,10 @@
 #define TNY 32
 #define TNZ 32
 
+#define NTX 4
+#define NTY 1
+#define NTZ 1
+
 #define INT_ORDER 1
 #define TSTEPLIM .5
 
