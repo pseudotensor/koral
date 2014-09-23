@@ -830,13 +830,7 @@ omp_myinit()
 			 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
   }
 
-  #pragma omp parallel
-  {
-    printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
-	   "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
-  }
-
-
+ 
 
 #else
   NPROCS=1;

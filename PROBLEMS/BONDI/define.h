@@ -44,10 +44,10 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 60
 #define TNY 1
 #define TNZ 1
-#define NTX 16 //for MPI
+#define NTX 6 //for MPI
 #define NTY 1
 #define NTZ 1
 

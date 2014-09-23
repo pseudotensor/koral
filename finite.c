@@ -1498,7 +1498,8 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 int
 alloc_loops(int init,ldouble t,ldouble dt)
 {
-  int ix,iy,iz,i,ii,jj,zone=-1;
+  int zone=-1;
+  int ix,iy,iz,i,ii,jj ;
   int ix1,ix2,iy1,iy2,iz1,iz2;
 
   //by default cover the whole domain
@@ -1510,19 +1511,10 @@ alloc_loops(int init,ldouble t,ldouble dt)
   iy2=NY;
   iz2=NZ;  
 
-#ifdef OMP
-  //under openMP - loops reflect the tiles
-  ix1=TOI;
-  ix2=TOI+NX;
-  iy1=TOJ;
-  iy2=TOJ+NY;
-  iz1=TOK;
-  iz2=TOK+NZ;
-#endif
 
   if(!init)
     {
-      #ifdef SUBZONES
+#ifdef SUBZONES
       zone = calc_subzones(t,dt,&ix1,&iy1,&iz1,&ix2,&iy2,&iz2);
       
       if(zone==currentzone) //no need for reallocating arrays
@@ -1616,21 +1608,21 @@ alloc_loops(int init,ldouble t,ldouble dt)
       //restore ghost cells from u_bak_subzone
 
       /*
-      for(ii=0;ii<Nloop_2;ii++) //gc only
+	for(ii=0;ii<Nloop_2;ii++) //gc only
 	{
-	  ix=loop_2[ii][0];
-	  iy=loop_2[ii][1];
-	  iz=loop_2[ii][2]; 
+	ix=loop_2[ii][0];
+	iy=loop_2[ii][1];
+	iz=loop_2[ii][2]; 
 
-	  //but skip restoring global ghost cells
-	  if(ix<0 || ix>=NX)
-	    continue;
+	//but skip restoring global ghost cells
+	if(ix<0 || ix>=NX)
+	continue;
 
-	  PLOOP(jj)
-	  {
-	    set_u(u,jj,ix,iy,iz,get_u(u_bak_subzone,jj,ix,iy,iz));
-	    set_u(p,jj,ix,iy,iz,get_u(p_bak_subzone,jj,ix,iy,iz));
-	  }
+	PLOOP(jj)
+	{
+	set_u(u,jj,ix,iy,iz,get_u(u_bak_subzone,jj,ix,iy,iz));
+	set_u(p,jj,ix,iy,iz,get_u(p_bak_subzone,jj,ix,iy,iz));
+	}
 	 
 	}
       */
@@ -1646,318 +1638,335 @@ alloc_loops(int init,ldouble t,ldouble dt)
       for(i=0;i<Nloop_4;i++) free(loop_4[i]); free(loop_4);
       for(i=0;i<Nloop_5;i++) free(loop_5[i]); free(loop_5);
       for(i=0;i<Nloop_6;i++) free(loop_6[i]); free(loop_6);
-      #endif
+#endif
     }
 
-  global_ix1=ix1;
-  global_iy1=iy1;
-  global_iz1=iz1;
 
-  global_ix2=ix2;
-  global_iy2=iy2;
-  global_iz2=iz2;
 
-  //inside domain only
-  Nloop_0=0;
-  loop_0=(int **)malloc(sizeof(int*));
-  loop_0[0]=(int *)malloc(3*sizeof(int));
+#pragma omp parallel private(ix,iy,iz,i,ii,jj,ix1,ix2,iy1,iy2,iz1,iz2)
+  {
+#ifdef OMP
+    //under openMP - loops reflect the tiles
+    ix1=TOI;
+    ix2=TOI+NX;
+    iy1=TOJ;
+    iy2=TOJ+NY;
+    iz1=TOK;
+    iz2=TOK+NZ;
+#endif
 
-  for(ix=ix1;ix<ix2;ix++)
-    {
-      for(iy=iy1;iy<iy2;iy++)
-	{
-	  for(iz=iz1;iz<iz2;iz++)
-	    {	
-	      loop_0[Nloop_0][0]=ix;
-	      loop_0[Nloop_0][1]=iy;
-	      loop_0[Nloop_0][2]=iz;
+    global_ix1=ix1;
+    global_iy1=iy1;
+    global_iz1=iz1;
 
-	      Nloop_0++;
+    global_ix2=ix2;
+    global_iy2=iy2;
+    global_iz2=iz2;
+
+    //inside domain only
+    Nloop_0=0;
+    loop_0=(int **)malloc(sizeof(int*));
+    loop_0[0]=(int *)malloc(3*sizeof(int));
+
+    
+    for(ix=ix1;ix<ix2;ix++)
+      {
+	for(iy=iy1;iy<iy2;iy++)
+	  {
+	    for(iz=iz1;iz<iz2;iz++)
+	      {	
+		loop_0[Nloop_0][0]=ix;
+		loop_0[Nloop_0][1]=iy;
+		loop_0[Nloop_0][2]=iz;
+
+		Nloop_0++;
 	      
-	      loop_0=(int **)realloc(loop_0,(Nloop_0+1)*sizeof(int*));
-	      loop_0[Nloop_0]=(int *)malloc(3*sizeof(int));	      
-	    }
-	}
-    }
+		loop_0=(int **)realloc(loop_0,(Nloop_0+1)*sizeof(int*));
+		loop_0[Nloop_0]=(int *)malloc(3*sizeof(int));	      
+	      }
+	  }
+      }
  
-  //shuffling:
+    //shuffling:
 #if (SHUFFLELOOPS)
-  shuffle_loop(loop_0,Nloop_0);
+    shuffle_loop(loop_0,Nloop_0);
+#endif 
+ 
+
+    //**********************************************************************
+    //**********************************************************************
+    //inside + ghost cells - number depending on the order of reconstruction
+    //used to indicate where calculate fluxes
+    int xlim,ylim,zlim;
+    int lim;
+
+    if(INT_ORDER==1) lim=1;
+    if(INT_ORDER==2) lim=1;
+    if(INT_ORDER==4) lim=2;
+
+    if(NX>1) xlim=lim; else xlim=0;  
+    if(NY>1) ylim=lim; else ylim=0;
+    if(NZ>1) zlim=lim; else zlim=0;
+
+    Nloop_1=0;
+    loop_1=(int **)malloc(sizeof(int*));
+    loop_1[0]=(int *)malloc(3*sizeof(int));
+
+    for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
+      {
+	for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
+	  {
+	    for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
+	      {	
+		//if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
+
+		loop_1[Nloop_1][0]=ix;
+		loop_1[Nloop_1][1]=iy;
+		loop_1[Nloop_1][2]=iz;
+
+		Nloop_1++;
+	      
+		loop_1=(int **)realloc(loop_1,(Nloop_1+1)*sizeof(int*));
+		loop_1[Nloop_1]=(int *)malloc(3*sizeof(int));	      
+	      }
+	  }
+      }
+
+    //shuffling:
+#if (SHUFFLELOOPS)
+    shuffle_loop(loop_1,Nloop_1);
 #endif
 
-  //**********************************************************************
-  //**********************************************************************
-  //inside + ghost cells - number depending on the order of reconstruction
-  //used to indicate where calculate fluxes
-  int xlim,ylim,zlim;
-  int lim;
 
-  if(INT_ORDER==1) lim=1;
-  if(INT_ORDER==2) lim=1;
-  if(INT_ORDER==4) lim=2;
+    //**********************************************************************
+    //**********************************************************************
+    //only ghost cells (with no corners)
 
-  if(NX>1) xlim=lim; else xlim=0;  
-  if(NY>1) ylim=lim; else ylim=0;
-  if(NZ>1) zlim=lim; else zlim=0;
+    //reduction of size basing on the dimension
+    //for constrained transport fluxes copied onto missing dimensions
 
-  Nloop_1=0;
-  loop_1=(int **)malloc(sizeof(int*));
-  loop_1[0]=(int *)malloc(3*sizeof(int));
+    if(NX>1) xlim=NG; else xlim=0;  
+    if(NY>1) ylim=NG; else ylim=0;
+    if(NZ>1) zlim=NG; else zlim=0;
 
-  for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
-    {
-      for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
-	{
-	  for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
-	    {	
-	      //if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
+    Nloop_2=0;
+    loop_2=(int **)malloc(sizeof(int*));
+    loop_2[0]=(int *)malloc(3*sizeof(int));
 
-	      loop_1[Nloop_1][0]=ix;
-	      loop_1[Nloop_1][1]=iy;
-	      loop_1[Nloop_1][2]=iz;
+    for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
+      {
+	for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
+	  {
+	    for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
+	      {	 
+		//within domain:
+		if(if_indomain(ix,iy,iz)==1) continue;
 
-	      Nloop_1++;
+		//at the corners
+		//I commented it out to precalculate metric in the corners but may affect something, who knows? :)
+		//It makes it calculate boundary conditions at the corners
+		//if(if_outsidegc(ix,iy,iz)==1) continue;
+
+		loop_2[Nloop_2][0]=ix;
+		loop_2[Nloop_2][1]=iy;
+		loop_2[Nloop_2][2]=iz;
+
+		Nloop_2++;
 	      
-	      loop_1=(int **)realloc(loop_1,(Nloop_1+1)*sizeof(int*));
-	      loop_1[Nloop_1]=(int *)malloc(3*sizeof(int));	      
-	    }
-	}
-    }
-
-  //shuffling:
+		loop_2=(int **)realloc(loop_2,(Nloop_2+1)*sizeof(int*));
+		loop_2[Nloop_2]=(int *)malloc(3*sizeof(int));
+	      }
+	  }
+      }	
+ 
+    //shuffling:
 #if (SHUFFLELOOPS)
-  shuffle_loop(loop_1,Nloop_1);
+    shuffle_loop(loop_2,Nloop_2);
 #endif
 
-
-  //**********************************************************************
-  //**********************************************************************
-  //only ghost cells (with no corners)
-
-  //reduction of size basing on the dimension
-  //for constrained transport fluxes copied onto missing dimensions
-
-  if(NX>1) xlim=NG; else xlim=0;  
-  if(NY>1) ylim=NG; else ylim=0;
-  if(NZ>1) zlim=NG; else zlim=0;
-
-  Nloop_2=0;
-  loop_2=(int **)malloc(sizeof(int*));
-  loop_2[0]=(int *)malloc(3*sizeof(int));
-
-  for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
-    {
-      for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
-	{
-	  for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
-	    {	 
-	      //within domain:
-	      if(if_indomain(ix,iy,iz)==1) continue;
-
-	      //at the corners
-	      //I commented it out to precalculate metric in the corners but may affect something, who knows? :)
-	      //It makes it calculate boundary conditions at the corners
-	      //if(if_outsidegc(ix,iy,iz)==1) continue;
-
-	      loop_2[Nloop_2][0]=ix;
-	      loop_2[Nloop_2][1]=iy;
-	      loop_2[Nloop_2][2]=iz;
-
-	      Nloop_2++;
-	      
-	      loop_2=(int **)realloc(loop_2,(Nloop_2+1)*sizeof(int*));
-	      loop_2[Nloop_2]=(int *)malloc(3*sizeof(int));
-	    }
-	}
-    }	
+    //**********************************************************************
+    //**********************************************************************
+    //domain and all ghost cells (no corners)
+    Nloop_02=Nloop_0+Nloop_2;
+    loop_02=(int **)malloc(Nloop_02*sizeof(int*));
+    for(ix=0;ix<Nloop_0;ix++)
+      {
+	loop_02[ix]=(int *)malloc(3*sizeof(int));
+	loop_02[ix][0]=loop_0[ix][0];
+	loop_02[ix][1]=loop_0[ix][1];
+	loop_02[ix][2]=loop_0[ix][2];
+      }
+    for(ix=0;ix<Nloop_2;ix++)
+      {
+	loop_02[ix+Nloop_0]=(int *)malloc(3*sizeof(int));
+	loop_02[ix+Nloop_0][0]=loop_2[ix][0];
+	loop_02[ix+Nloop_0][1]=loop_2[ix][1];
+	loop_02[ix+Nloop_0][2]=loop_2[ix][2];
+      }
   
-  //shuffling:
+    //shuffling:
 #if (SHUFFLELOOPS)
-  shuffle_loop(loop_2,Nloop_2);
+    shuffle_loop(loop_02,Nloop_02);
 #endif
 
-  //**********************************************************************
-  //**********************************************************************
-  //domain and all ghost cells (no corners)
-  Nloop_02=Nloop_0+Nloop_2;
-  loop_02=(int **)malloc(Nloop_02*sizeof(int*));
-  for(ix=0;ix<Nloop_0;ix++)
-    {
-      loop_02[ix]=(int *)malloc(3*sizeof(int));
-      loop_02[ix][0]=loop_0[ix][0];
-      loop_02[ix][1]=loop_0[ix][1];
-      loop_02[ix][2]=loop_0[ix][2];
-    }
-  for(ix=0;ix<Nloop_2;ix++)
-    {
-      loop_02[ix+Nloop_0]=(int *)malloc(3*sizeof(int));
-      loop_02[ix+Nloop_0][0]=loop_2[ix][0];
-      loop_02[ix+Nloop_0][1]=loop_2[ix][1];
-      loop_02[ix+Nloop_0][2]=loop_2[ix][2];
-    }
+    //**********************************************************************
+    //**********************************************************************
+    //1-deep surfaces on corners only
+    if(NX>1) xlim=NG; else xlim=0;  
+    if(NY>1) ylim=NG; else ylim=0;
+    if(NZ>1) zlim=NG; else zlim=0;
 
-  //shuffling:
-#if (SHUFFLELOOPS)
-  shuffle_loop(loop_02,Nloop_02);
-#endif
-
-  //**********************************************************************
-  //**********************************************************************
-  //1-deep surfaces on corners only
-  if(NX>1) xlim=NG; else xlim=0;  
-  if(NY>1) ylim=NG; else ylim=0;
-  if(NZ>1) zlim=NG; else zlim=0;
-
-  Nloop_3=0;
-  loop_3=(int **)malloc(sizeof(int*));
-  loop_3[0]=(int *)malloc(3*sizeof(int));
-  /*
-  for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
-    {
+    Nloop_3=0;
+    loop_3=(int **)malloc(sizeof(int*));
+    loop_3[0]=(int *)malloc(3*sizeof(int));
+    /*
+      for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
+      {
       for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
-	{
-	  for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
-	    {	  
-  */
-  //test
- for(ix=-0;ix<NX+0;ix++)
-    {
-      for(iy=-ylim;iy<NY+ylim;iy++)
-	{
-	  for(iz=-zlim;iz<NZ+zlim;iz++)
-	    {
-	      /*
+      {
+      for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
+      {	  
+    */
+    //test
+    for(ix=-0;ix<NX+0;ix++)
+      {
+	for(iy=-ylim;iy<NY+ylim;iy++)
+	  {
+	    for(iz=-zlim;iz<NZ+zlim;iz++)
+	      {
+		/*
 		//test
-	      //if outside the corners skip
-	      if(if_outsidegc(ix,iy,iz)==0) continue;
+		//if outside the corners skip
+		if(if_outsidegc(ix,iy,iz)==0) continue;
 
-	      //now check if in the surface layer of a corner
-	      int dix,diy,diz;
-	      if(ix<ix1) dix=ix1-ix;
-	      else dix=ix-ix2+1;
-	      if(iy<iy1) diy=iy1-iy;
-	      else diy=iy-iy2+1;
-	      if(iz<iz1) diz=iz1-iz;
-	      else diz=iz-iz2+1;	      
-	      if(dix!=1 && diy!=1 && diz!=1) continue;
+		//now check if in the surface layer of a corner
+		int dix,diy,diz;
+		if(ix<ix1) dix=ix1-ix;
+		else dix=ix-ix2+1;
+		if(iy<iy1) diy=iy1-iy;
+		else diy=iy-iy2+1;
+		if(iz<iz1) diz=iz1-iz;
+		else diz=iz-iz2+1;	      
+		if(dix!=1 && diy!=1 && diz!=1) continue;
 
-	      //printf("%4d %4d %4d %d %d %d\n",ix,iy,iz,dix,diy,diz);
-	      */
-	      loop_3[Nloop_3][0]=ix;
-	      loop_3[Nloop_3][1]=iy;
-	      loop_3[Nloop_3][2]=iz;
+		//printf("%4d %4d %4d %d %d %d\n",ix,iy,iz,dix,diy,diz);
+		*/
+		loop_3[Nloop_3][0]=ix;
+		loop_3[Nloop_3][1]=iy;
+		loop_3[Nloop_3][2]=iz;
 
-	      Nloop_3++;
+		Nloop_3++;
 	      
-	      loop_3=(int **)realloc(loop_3,(Nloop_3+1)*sizeof(int*));
-	      loop_3[Nloop_3]=(int *)malloc(3*sizeof(int));	      
-	    }
-	}
-    }
+		loop_3=(int **)realloc(loop_3,(Nloop_3+1)*sizeof(int*));
+		loop_3[Nloop_3]=(int *)malloc(3*sizeof(int));	      
+	      }
+	  }
+      }
 
-  //shuffling:
+    //shuffling:
 #if (SHUFFLELOOPS)
-  shuffle_loop(loop_3,Nloop_3);
+    shuffle_loop(loop_3,Nloop_3);
 #endif
 
-  //**********************************************************************
-  //**********************************************************************
-  //all corners of the domain - like in staggered grid
+    //**********************************************************************
+    //**********************************************************************
+    //all corners of the domain - like in staggered grid
   
-  Nloop_4=0;
-  loop_4=(int **)malloc(sizeof(int*));
-  loop_4[0]=(int *)malloc(3*sizeof(int));
+    Nloop_4=0;
+    loop_4=(int **)malloc(sizeof(int*));
+    loop_4[0]=(int *)malloc(3*sizeof(int));
 
-  if(NY>1) ylim=iy2; else ylim=iy1;
-  if(NZ>1) zlim=iz2; else zlim=iz1;
-  for(ix=ix1;ix<=ix2;ix++)
-    {
-      for(iy=iy1;iy<=ylim;iy++)
-	{
-	  for(iz=iz1;iz<=zlim;iz++)
-	    {	
-	      loop_4[Nloop_4][0]=ix;
-	      loop_4[Nloop_4][1]=iy;
-	      loop_4[Nloop_4][2]=iz;
+    if(NY>1) ylim=iy2; else ylim=iy1;
+    if(NZ>1) zlim=iz2; else zlim=iz1;
+    for(ix=ix1;ix<=ix2;ix++)
+      {
+	for(iy=iy1;iy<=ylim;iy++)
+	  {
+	    for(iz=iz1;iz<=zlim;iz++)
+	      {	
+		loop_4[Nloop_4][0]=ix;
+		loop_4[Nloop_4][1]=iy;
+		loop_4[Nloop_4][2]=iz;
 
-	      Nloop_4++;
+		Nloop_4++;
 	      
-	      loop_4=(int **)realloc(loop_4,(Nloop_4+1)*sizeof(int*));
-	      loop_4[Nloop_4]=(int *)malloc(3*sizeof(int));	      
-	    }
-	}
-    }
+		loop_4=(int **)realloc(loop_4,(Nloop_4+1)*sizeof(int*));
+		loop_4[Nloop_4]=(int *)malloc(3*sizeof(int));	      
+	      }
+	  }
+      }
 
-  //shuffling:
+    //shuffling:
 #if (SHUFFLELOOPS)
-  shuffle_loop(loop_4,Nloop_4);
+    shuffle_loop(loop_4,Nloop_4);
+#endif
+       
+    //**********************************************************************
+    //**********************************************************************
+    //domain + ghost cells + corners = total
+  
+    Nloop_5=0;
+    loop_5=(int **)malloc(sizeof(int*));
+    loop_5[0]=(int *)malloc(3*sizeof(int));
+
+    for(ix=-NGCX+ix1;ix<ix2+NGCX;ix++)
+      {
+	for(iy=-NGCY+iy1;iy<iy2+NGCY;iy++)
+	  {
+	    for(iz=-NGCZ+iz1;iz<iz2+NGCZ;iz++)
+	      {	
+		loop_5[Nloop_5][0]=ix;
+		loop_5[Nloop_5][1]=iy;
+		loop_5[Nloop_5][2]=iz;
+
+		Nloop_5++;
+	      
+		loop_5=(int **)realloc(loop_5,(Nloop_5+1)*sizeof(int*));
+		loop_5[Nloop_5]=(int *)malloc(3*sizeof(int));	      
+	      }
+	  }
+      }
+
+    //shuffling:
+#if (SHUFFLELOOPS)
+    shuffle_loop(loop_5,Nloop_5);
 #endif
       
-  //**********************************************************************
-  //**********************************************************************
-  //domain + ghost cells + corners = total
+    //**********************************************************************
+    //**********************************************************************
+    //inner domain plus 1-cell layer including corners
   
-  Nloop_5=0;
-  loop_5=(int **)malloc(sizeof(int*));
-  loop_5[0]=(int *)malloc(3*sizeof(int));
+    Nloop_6=0;
+    loop_6=(int **)malloc(sizeof(int*));
+    loop_6[0]=(int *)malloc(3*sizeof(int));
 
-   for(ix=-NGCX+ix1;ix<ix2+NGCX;ix++)
-    {
-      for(iy=-NGCY+iy1;iy<iy2+NGCY;iy++)
-	{
-	  for(iz=-NGCZ+iz1;iz<iz2+NGCZ;iz++)
-	    {	
-	      loop_5[Nloop_5][0]=ix;
-	      loop_5[Nloop_5][1]=iy;
-	      loop_5[Nloop_5][2]=iz;
+    if(NY>1) ylim=1 ; else ylim=0;
+    if(NZ>1) zlim=1 ; else zlim=0;
 
-	      Nloop_5++;
+    for(ix=-1+ix1;ix<ix2+1;ix++)
+      {
+	for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
+	  {
+	    for(iz=-zlim+iz1;iz<=iz2+zlim;iz++)
+	      {
+		loop_6[Nloop_6][0]=ix;
+		loop_6[Nloop_6][1]=iy;
+		loop_6[Nloop_6][2]=iz;
+
+		Nloop_6++;
 	      
-	      loop_5=(int **)realloc(loop_5,(Nloop_5+1)*sizeof(int*));
-	      loop_5[Nloop_5]=(int *)malloc(3*sizeof(int));	      
-	    }
-	}
-    }
+		loop_6=(int **)realloc(loop_6,(Nloop_6+1)*sizeof(int*));
+		loop_6[Nloop_6]=(int *)malloc(3*sizeof(int));	      
+	      }
+	  }
+      }
 
-  //shuffling:
+    //shuffling:
 #if (SHUFFLELOOPS)
-  shuffle_loop(loop_5,Nloop_5);
+    shuffle_loop(loop_6,Nloop_6);
 #endif
-      
-  //**********************************************************************
-  //**********************************************************************
-  //inner domain plus 1-cell layer including corners
-  
-  Nloop_6=0;
-  loop_6=(int **)malloc(sizeof(int*));
-  loop_6[0]=(int *)malloc(3*sizeof(int));
+  }     
 
-  if(NY>1) ylim=1 ; else ylim=0;
-  if(NZ>1) zlim=1 ; else zlim=0;
-
-  for(ix=-1+ix1;ix<ix2+1;ix++)
-    {
-      for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
-	{
-	  for(iz=-zlim+iz1;iz<=iz2+zlim;iz++)
-	    {
-	      loop_6[Nloop_6][0]=ix;
-	      loop_6[Nloop_6][1]=iy;
-	      loop_6[Nloop_6][2]=iz;
-
-	      Nloop_6++;
-	      
-	      loop_6=(int **)realloc(loop_6,(Nloop_6+1)*sizeof(int*));
-	      loop_6[Nloop_6]=(int *)malloc(3*sizeof(int));	      
-	    }
-	}
-    }
-
-  //shuffling:
-#if (SHUFFLELOOPS)
-  shuffle_loop(loop_6,Nloop_6);
-#endif
-      
 
   return zone;
 }
@@ -2268,7 +2277,7 @@ ldouble get_u_scalar(ldouble* uarr,int ix,int iy,int iz)
 //array multiplication
 //uu2=factor*uu1
 int 
-copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N )\
+copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N)	\
 {
   int i;
   //#pragma omp parallel for private (i) 
@@ -2284,10 +2293,27 @@ copy_u(ldouble factor,ldouble *uu1,ldouble* uu2 )
   return 0;
 }
 
+int 
+copyi_u(ldouble factor,ldouble *uu1,ldouble* uu2)	\
+{
+  int ix,iy,iz,ii,iv;
+  for(ii=0;ii<Nloop_0;ii++) //domain only
+    {
+      int ix,iy,iz;
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2];
+      PLOOP(iv)
+	set_u(uu2,iv,ix,iy,iz,factor*get_u(uu1,iv,ix,iy,iz));
+    }
+
+  return 0;
+}
+
 //array multiplication plus addition
 //uu3=f1*uu1+f2*uu2
 int 
-add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3,int N)
+add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3, int N)
 {
   int i;
   //#pragma omp parallel for private (i) 
@@ -2302,6 +2328,24 @@ add_u(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3)
   add_u_core(f1,uu1,f2,uu2,uu3,SX*SY*SZ*NV);
   return 0;
 }
+
+int 
+addi_u(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3)
+{
+  int ix,iy,iz,ii,iv;
+  for(ii=0;ii<Nloop_0;ii++) //domain only
+    {
+      int ix,iy,iz;
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2];
+      PLOOP(iv)
+	set_u(uu3,iv,ix,iy,iz,f1*get_u(uu1,iv,ix,iy,iz)+f2*get_u(uu2,iv,ix,iy,iz));
+    }
+
+  return 0;
+}
+
 
 //array multiplication plus addition on 3 matrices
 //uu3=f1*uu1+f2*uu2
@@ -2321,6 +2365,24 @@ add_u_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble 
   add_u_core_3(f1,uu1,f2,uu2,f3,uu3,uu4,SX*SY*SZ*NV);
   return 0;
 }
+
+int 
+addi_u_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble *uu3, ldouble *uu4)
+{
+  int ix,iy,iz,ii,iv;
+  for(ii=0;ii<Nloop_0;ii++) //domain only
+    {
+      int ix,iy,iz;
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2];
+      PLOOP(iv)
+	set_u(uu4,iv,ix,iy,iz,f1*get_u(uu1,iv,ix,iy,iz)+f2*get_u(uu2,iv,ix,iy,iz)+f3*get_u(uu3,iv,ix,iy,iz));
+    }
+
+  return 0;
+}
+
 
 //**********************************************************************
 //**********************************************************************

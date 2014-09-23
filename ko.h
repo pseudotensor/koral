@@ -155,7 +155,7 @@ int **loop_0,**loop_02,**loop_1,**loop_2,**loop_3,**loop_4,**loop_5,**loop_6;
 int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;
 
 #ifdef OMP
-#pragma omp threadprivate(loop_0,loop_02,loop_1,loop_2,loop_3,loop_4,loop_5,loop_6,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6,TI,TJ,TK,TOI,TOJ,TOK,PROCID)
+#pragma omp threadprivate(loop_0,loop_02,loop_1,loop_2,loop_3,loop_4,loop_5,loop_6,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6,TI,TJ,TK,TOI,TOJ,TOK,PROCID,global_ix1,global_ix2,global_iy1,global_iy2,global_iz1,global_iz2)
 #endif
 
 ldouble sigma_otg[TNX];
@@ -275,11 +275,14 @@ ldouble f_der_kurganovtadmor(int ix,int iy, int yz,ldouble*);
 ldouble f_der_hlle_obsolete(int ix,int iy, int yz,ldouble*);
 ldouble f_der_muscl(int ix,int iy, int yz,ldouble*);
 int copy_u(ldouble,ldouble*,ldouble*);
-int copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N );
+int copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int );
+int copyi_u(ldouble,ldouble*,ldouble*);
 int add_u(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble *u3);
-int add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3,int N);
+int add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3,int);
+int addi_u(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble *u3);
 int add_u_3(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble f3, ldouble *u3, ldouble *u4);
-int add_u_core_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble *uu3, ldouble *uu4,int N);
+int add_u_core_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble *uu3, ldouble *uu4,int);
+int addi_u_3(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble f3, ldouble *u3, ldouble *u4);
 ldouble f_timeder_source_term(ldouble t, const ldouble y[], ldouble f[],  void *params);
 
 int set_bc(ldouble,int);
