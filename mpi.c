@@ -803,3 +803,45 @@ mpi_tile2procid(int tilei, int tilej, int tilek)
 {
   return tilek * NTX * NTY + tilej * NTX + tilei;
 }
+
+//parasitic openMP 
+
+int
+omp_myinit()
+{
+#ifdef OMP
+  omp_set_dynamic(0);
+
+  #pragma omp parallel
+  {
+    NPROCS=omp_get_num_threads();
+    PROCID=omp_get_thread_num();
+    if(NPROCS!=NTX*NTY*NTZ)
+      {
+	if(PROCID==0) 
+	  {
+	    printf("Wrong number of threads. Problem set up for: %d x %d x %d = %d threads (openMP).\n",NTX,NTY,NTZ,NTX*NTY*NTZ);
+	    exit(-1);
+	  }
+      } 
+    mpi_procid2tile(PROCID,&TI,&TJ,&TK);
+    mpi_tileorigin(TI,TJ,TK,&TOI,&TOJ,&TOK);
+    if(PROCID==0) printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
+			 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
+  }
+
+  #pragma omp parallel
+  {
+    printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
+	   "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
+  }
+
+
+
+#else
+  NPROCS=1;
+  TI=TJ=TK=0;
+  TOI=TOJ=TOK=0;
+  PROCID=0;  
+#endif
+}

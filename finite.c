@@ -363,17 +363,17 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
       //TODO: this may not work in general!!!
 
       ws_ph=wsx*sqrt(get_g(g,1,1,ix,iy,iz));
-      //#pragma omp critical
+      ////#pragma omp critical
       if(wsx>max_ws[0]) max_ws[0]=wsx;
       if(ws_ph>max_ws_ph) max_ws_ph=ws_ph;
       
       ws_ph=wsy*sqrt(get_g(g,2,2,ix,iy,iz));
-      //#pragma omp critical
+      ////#pragma omp critical
       if(wsy>max_ws[1]) max_ws[1]=wsy;
       if(ws_ph>max_ws_ph) max_ws_ph=ws_ph;
 
       ws_ph=wsz*sqrt(get_g(g,3,3,ix,iy,iz));
-      //#pragma omp critical
+      ////#pragma omp critical
       if(wsz>max_ws[2]) max_ws[2]=wsz;
       if(ws_ph>max_ws_ph) max_ws_ph=ws_ph;
 
@@ -388,7 +388,7 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 
       set_u_scalar(cell_tsteps,ix,iy,iz,tstepden);
 
-      //#pragma omp critical
+      ////#pragma omp critical
       if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
     }
   
@@ -407,7 +407,7 @@ calc_u2p()
   //**********************************************************************
 
   //calculates the primitives
-#pragma omp parallel for schedule (static,4)
+//#pragma omp parallel for schedule (static,4)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       int ix,iy,iz;
@@ -523,7 +523,7 @@ op_explicit(ldouble t, ldouble dt)
   ldouble pp[NV];
      
   //calculates and saves wavespeeds
-#pragma omp parallel for private(ix,iy,iz,max_lws) schedule (static,4)
+//#pragma omp parallel for private(ix,iy,iz,max_lws) schedule (static,4)
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -549,7 +549,7 @@ op_explicit(ldouble t, ldouble dt)
 
 #ifndef SKIPEVOLUTION
   //interpolation and flux-calculation
-  #pragma omp parallel for private(iy,iz,iv,ix)  schedule (static,4) 
+  //#pragma omp parallel for private(iy,iz,iv,ix)  schedule (static,4) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -862,7 +862,7 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
 
-  #pragma omp parallel for private(iy,iz,ix)  schedule (static,4) 
+  //#pragma omp parallel for private(iy,iz,ix)  schedule (static,4) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -892,7 +892,7 @@ op_explicit(ldouble t, ldouble dt)
 
   //evolving the conserved quantities
   
-  #pragma omp parallel for private(ix,iy,iz,iv) schedule (static,4)
+  //#pragma omp parallel for private(ix,iy,iz,iv) schedule (static,4)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -991,7 +991,7 @@ op_explicit(ldouble t, ldouble dt)
 #ifndef SKIPRADSOURCE
 #ifdef EXPLICIT_LAB_RAD_SOURCE
 
-   #pragma omp parallel for private(ix,iy,iz,iv) schedule (static,4)
+   //#pragma omp parallel for private(ix,iy,iz,iv) schedule (static,4)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -1063,7 +1063,7 @@ op_implicit(ldouble t, ldouble dt)
 #ifdef IMPLICIT_LAB_RAD_SOURCE
   
   //again over cells - source terms
-#pragma omp parallel for schedule (static,4)
+//#pragma omp parallel for schedule (static,4)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       int ix,iy,iz;
@@ -1509,6 +1509,16 @@ alloc_loops(int init,ldouble t,ldouble dt)
   ix2=NX;
   iy2=NY;
   iz2=NZ;  
+
+#ifdef OMP
+  //under openMP - loops reflect the tiles
+  ix1=TOI;
+  ix2=TOI+NX;
+  iy1=TOJ;
+  iy2=TOJ+NY;
+  iz1=TOK;
+  iz2=TOK+NZ;
+#endif
 
   if(!init)
     {
@@ -2261,7 +2271,7 @@ int
 copy_u_core(ldouble factor,ldouble *uu1,ldouble* uu2, int N )\
 {
   int i;
-  #pragma omp parallel for private (i) 
+  //#pragma omp parallel for private (i) 
   for (i=0;i<N;i++)
     uu2[i]=uu1[i]*factor;
   return 0;
@@ -2280,7 +2290,7 @@ int
 add_u_core(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3,int N)
 {
   int i;
-  #pragma omp parallel for private (i) 
+  //#pragma omp parallel for private (i) 
   for (i=0;i<N;i++)
     uu3[i]=uu1[i]*f1+uu2[i]*f2;
   return 0;
@@ -2299,7 +2309,7 @@ int
 add_u_core_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble *uu3, ldouble *uu4,int N)
 {
   int i;
-  #pragma omp parallel for private (i) 
+  //#pragma omp parallel for private (i) 
   for (i=0;i<N;i++)
     uu4[i]=uu1[i]*f1+uu2[i]*f2+uu3[i]*f3;
   return 0;
@@ -2449,7 +2459,7 @@ int set_bc(ldouble t,int ifinit)
 
 
   //first fill the GC with no corners
-  #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static,4)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static,4)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only, no corners
     {
       ix=loop_2[ii][0];
@@ -2807,7 +2817,7 @@ cell_fixup_hd()
   copy_u(1.,p,p_bak_fixup);
 
   //gets the neiboring the primitives
-  #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static,4)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static,4)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -2936,7 +2946,7 @@ cell_fixup_rad()
   copy_u(1.,p,p_bak_fixup);
 
   //gets the neighboring the primitives
-  #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static,4)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static,4)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -3293,6 +3303,10 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
 int
 correct_polaraxis()
 {
+  #ifdef OMP
+  printf("need to redo the loops in correct_polaraxis() or move is somewhere to work with OMP\n");
+  #endif
+
   int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
   int ix,iy,iz,iv,ic,iysrc,ixsrc;
@@ -3300,7 +3314,7 @@ correct_polaraxis()
   //spherical like coords
   if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
     {
-      #pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static,4)
+      //#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static,4)
       for(ix=0;ix<NX;ix++)
 	{
 	  for(iz=0;iz<NZ;iz++)
@@ -3442,7 +3456,7 @@ correct_polaraxis()
   //cylindrical like coords
   if (MYCOORDS==CYLCOORDS || MYCOORDS==MCYL1COORDS)
     {
-#pragma omp parallel for private(ic,ix,iy,iz,iv,ixsrc) schedule (static,4)
+//#pragma omp parallel for private(ic,ix,iy,iz,iv,ixsrc) schedule (static,4)
       for(iy=0;iy<NY;iy++)
 	{
 	  for(iz=0;iz<NZ;iz++)

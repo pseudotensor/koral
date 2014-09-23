@@ -9,14 +9,14 @@
 /************************************/
 //define MSTEPS
 /************************************/
-#define MSTEP
+//#define MSTEP
 #define MSTEP_LIMITBC
 #define NUMMSTEPLEVELS 20
 
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 #define NCOMPTONIZATION 
@@ -47,7 +47,7 @@
 #define TNX 64
 #define TNY 1
 #define TNZ 1
-#define NTX 16
+#define NTX 16 //for MPI
 #define NTY 1
 #define NTZ 1
 
@@ -61,7 +61,7 @@
 //#define FIX_PRESSURERHO
 #define FIX_VELBONDI
 //#define FIX_VELOUTBONDI
-#define INFLOW
+//#define INFLOW
 
 
 /************************************/

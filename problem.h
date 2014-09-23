@@ -1701,7 +1701,7 @@
 /*********************/
 /*********************/
 
-#ifndef MPI
+#if !defined(MPI) && !defined(OMP)
 #undef NTX
 #undef NTY
 #undef NTZ

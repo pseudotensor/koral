@@ -61,6 +61,10 @@
 #include <mpi.h>
 #endif
 
+#ifdef OMP
+#include <omp.h>
+#endif
+
 #ifdef __MACH__
 #include <mach/clock.h>
 #include <mach/mach.h>
@@ -145,8 +149,14 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak_fixup,*p_bak_fixup,
   *emuup2,*emulo2,*emuupbx2,*emulobx2,*emuupby2,*emuloby2,*emuupbz2,*emulobz2,
   *tmuup,*tmulo,*tmuupbx,*tmulobx,*tmuupby,*tmuloby,*tmuupbz,*tmulobz,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
-int *cellflag,**loop_0,**loop_02,**loop_1,**loop_2,**loop_3,**loop_4,**loop_5,**loop_6;
+int *cellflag;
+
+int **loop_0,**loop_02,**loop_1,**loop_2,**loop_3,**loop_4,**loop_5,**loop_6;
 int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;
+
+#ifdef OMP
+#pragma omp threadprivate(loop_0,loop_02,loop_1,loop_2,loop_3,loop_4,loop_5,loop_6,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6,TI,TJ,TK,TOI,TOJ,TOK,PROCID)
+#endif
 
 ldouble sigma_otg[TNX];
 ldouble sigma_otg_temp[TNX];
@@ -695,6 +705,7 @@ ldouble calc_Qtheta(int ix, int iy, int iz);
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
+int omp_myinit(void);
 int
 mpi_isitBC(int BCtype);
 void

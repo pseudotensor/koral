@@ -7,10 +7,18 @@ int
 main(int argc, char **argv)
 {  
   mpi_myinit(argc,argv);
+  omp_myinit();  
   mstep_init();
 
-  //mstep_test();
-  // exit(0);
+  exit(0);
+
+  /*
+    #pragma omp parallel
+    {
+    printf("%d %d\n",omp_get_num_threads(),omp_get_thread_num());
+    }
+    exit(0);
+  */
 
   ldouble tstart;
   int i; char folder[100],bufer[100];
