@@ -134,6 +134,30 @@ int TOI,TOJ,TOK; //indices of the tile origin
 int PROCID;
 int NPROCS;
 
+//size of 3d arrays
+#define SX (NX+2*NG)
+#define NGCX NG
+#define iX(ix) (ix)
+#if(NY>1)
+#define NGCY NG
+#define SY (NY+2*NG)
+#define iY(iy) (iy)
+#else
+#define NGCY 0
+#define SY 1
+#define iY(iy) (0)
+#endif
+#if(NZ>1)
+#define NGCZ NG
+#define SZ (NZ+2*NG)
+#define iZ(iz) (iz)
+#else
+#define NGCZ 0
+#define SZ 1
+#define iZ(iz) (0)
+#endif
+
+
 //arrays and stuff
 ldouble **msgbufs;
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak_fixup,*p_bak_fixup,
@@ -151,7 +175,16 @@ ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak_fixup,*p_bak_fixup,
   *tmuup2,*tmulo2,*tmuupbx2,*tmulobx2,*tmuupby2,*tmuloby2,*tmuupbz2,*tmulobz2;
 int *cellflag;
 
-int **loop_0,**loop_02,**loop_1,**loop_2,**loop_3,**loop_4,**loop_5,**loop_6;
+//int **loop_0,**loop_02,**loop_1,**loop_2,**loop_3,**loop_4,**loop_5,**loop_6;
+
+int loop_0[SX*SY*SZ][3];
+int loop_1[SX*SY*SZ][3];
+int loop_2[SX*SY*SZ][3];
+int loop_02[SX*SY*SZ][3];
+int loop_3[SX*SY*SZ][3];
+int loop_4[SX*SY*SZ][3];
+int loop_5[SX*SY*SZ][3];
+int loop_6[SX*SY*SZ][3];
 int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;
 
 #ifdef OMP
@@ -292,28 +325,6 @@ int if_outsidewave(int ix,int iy,int iz);
 ldouble get_size_x(int ic, int idim);
 
 
-//size of 3d arrays
-#define SX (NX+2*NG)
-#define NGCX NG
-#define iX(ix) (ix)
-#if(NY>1)
-#define NGCY NG
-#define SY (NY+2*NG)
-#define iY(iy) (iy)
-#else
-#define NGCY 0
-#define SY 1
-#define iY(iy) (0)
-#endif
-#if(NZ>1)
-#define NGCZ NG
-#define SZ (NZ+2*NG)
-#define iZ(iz) (iz)
-#else
-#define NGCZ 0
-#define SZ 1
-#define iZ(iz) (0)
-#endif
 
 //ldouble get_x(int,int);
 int get_xx(int ix,int iy,int iz,ldouble *xx);

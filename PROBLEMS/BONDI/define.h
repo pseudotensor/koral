@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
 #define MODYFIKUJKRZYSIE 0

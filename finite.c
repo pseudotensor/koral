@@ -1434,8 +1434,9 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   ldouble mdx,mdy,mdz,dx,dy,dz,gloc[4][5],xx[4];
   mdx=mdy=mdz=-1;
   ldouble maxdt=-1;
-      
 
+  //FIX HERE!
+      
   //x
   for(i1=-NG;i1<=NX+NG;i1++)
     {
@@ -1630,14 +1631,16 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
       //todo: restore ghostcells from ubak
 
+      /*
       for(i=0;i<Nloop_0;i++) free(loop_0[i]); free(loop_0);
       for(i=0;i<Nloop_02;i++) free(loop_02[i]); free(loop_02);
       for(i=0;i<Nloop_1;i++) free(loop_1[i]); free(loop_1);
       for(i=0;i<Nloop_2;i++) free(loop_2[i]); free(loop_2);
-      for(i=0;i<Nloop_3;i++) free(loop_3[i]); free(loop_3);
+      //for(i=0;i<Nloop_3;i++) free(loop_3[i]); free(loop_3);
       for(i=0;i<Nloop_4;i++) free(loop_4[i]); free(loop_4);
       for(i=0;i<Nloop_5;i++) free(loop_5[i]); free(loop_5);
       for(i=0;i<Nloop_6;i++) free(loop_6[i]); free(loop_6);
+      */
 #endif
     }
 
@@ -1665,8 +1668,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
     //inside domain only
     Nloop_0=0;
-    loop_0=(int **)malloc(sizeof(int*));
-    loop_0[0]=(int *)malloc(3*sizeof(int));
+    //loop_0=(int **)malloc(sizeof(int*));
+    //loop_0[0]=(int *)malloc(3*sizeof(int));
 
     
     for(ix=ix1;ix<ix2;ix++)
@@ -1681,8 +1684,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 		Nloop_0++;
 	      
-		loop_0=(int **)realloc(loop_0,(Nloop_0+1)*sizeof(int*));
-		loop_0[Nloop_0]=(int *)malloc(3*sizeof(int));	      
+		//loop_0=(int **)realloc(loop_0,(Nloop_0+1)*sizeof(int*));
+		//loop_0[Nloop_0]=(int *)malloc(3*sizeof(int));	      
 	      }
 	  }
       }
@@ -1709,8 +1712,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(NZ>1) zlim=lim; else zlim=0;
 
     Nloop_1=0;
-    loop_1=(int **)malloc(sizeof(int*));
-    loop_1[0]=(int *)malloc(3*sizeof(int));
+    //loop_1=(int **)malloc(sizeof(int*));
+    //loop_1[0]=(int *)malloc(3*sizeof(int));
 
     for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
       {
@@ -1726,8 +1729,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 		Nloop_1++;
 	      
-		loop_1=(int **)realloc(loop_1,(Nloop_1+1)*sizeof(int*));
-		loop_1[Nloop_1]=(int *)malloc(3*sizeof(int));	      
+		//loop_1=(int **)realloc(loop_1,(Nloop_1+1)*sizeof(int*));
+		//loop_1[Nloop_1]=(int *)malloc(3*sizeof(int));	      
 	      }
 	  }
       }
@@ -1750,8 +1753,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(NZ>1) zlim=NG; else zlim=0;
 
     Nloop_2=0;
-    loop_2=(int **)malloc(sizeof(int*));
-    loop_2[0]=(int *)malloc(3*sizeof(int));
+    //loop_2=(int **)malloc(sizeof(int*));
+    //loop_2[0]=(int *)malloc(3*sizeof(int));
 
     for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
       {
@@ -1773,8 +1776,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 		Nloop_2++;
 	      
-		loop_2=(int **)realloc(loop_2,(Nloop_2+1)*sizeof(int*));
-		loop_2[Nloop_2]=(int *)malloc(3*sizeof(int));
+		//loop_2=(int **)realloc(loop_2,(Nloop_2+1)*sizeof(int*));
+		//loop_2[Nloop_2]=(int *)malloc(3*sizeof(int));
 	      }
 	  }
       }	
@@ -1788,17 +1791,17 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //**********************************************************************
     //domain and all ghost cells (no corners)
     Nloop_02=Nloop_0+Nloop_2;
-    loop_02=(int **)malloc(Nloop_02*sizeof(int*));
+    //loop_02=(int **)malloc(Nloop_02*sizeof(int*));
     for(ix=0;ix<Nloop_0;ix++)
       {
-	loop_02[ix]=(int *)malloc(3*sizeof(int));
+	//loop_02[ix]=(int *)malloc(3*sizeof(int));
 	loop_02[ix][0]=loop_0[ix][0];
 	loop_02[ix][1]=loop_0[ix][1];
 	loop_02[ix][2]=loop_0[ix][2];
       }
     for(ix=0;ix<Nloop_2;ix++)
       {
-	loop_02[ix+Nloop_0]=(int *)malloc(3*sizeof(int));
+	//loop_02[ix+Nloop_0]=(int *)malloc(3*sizeof(int));
 	loop_02[ix+Nloop_0][0]=loop_2[ix][0];
 	loop_02[ix+Nloop_0][1]=loop_2[ix][1];
 	loop_02[ix+Nloop_0][2]=loop_2[ix][2];
@@ -1812,6 +1815,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //**********************************************************************
     //**********************************************************************
     //1-deep surfaces on corners only
+
+    /*
     if(NX>1) xlim=NG; else xlim=0;  
     if(NY>1) ylim=NG; else ylim=0;
     if(NZ>1) zlim=NG; else zlim=0;
@@ -1819,14 +1824,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
     Nloop_3=0;
     loop_3=(int **)malloc(sizeof(int*));
     loop_3[0]=(int *)malloc(3*sizeof(int));
-    /*
-      for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
-      {
-      for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
-      {
-      for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
-      {	  
-    */
+   
     //test
     for(ix=-0;ix<NX+0;ix++)
       {
@@ -1834,23 +1832,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  {
 	    for(iz=-zlim;iz<NZ+zlim;iz++)
 	      {
-		/*
-		//test
-		//if outside the corners skip
-		if(if_outsidegc(ix,iy,iz)==0) continue;
-
-		//now check if in the surface layer of a corner
-		int dix,diy,diz;
-		if(ix<ix1) dix=ix1-ix;
-		else dix=ix-ix2+1;
-		if(iy<iy1) diy=iy1-iy;
-		else diy=iy-iy2+1;
-		if(iz<iz1) diz=iz1-iz;
-		else diz=iz-iz2+1;	      
-		if(dix!=1 && diy!=1 && diz!=1) continue;
-
-		//printf("%4d %4d %4d %d %d %d\n",ix,iy,iz,dix,diy,diz);
-		*/
 		loop_3[Nloop_3][0]=ix;
 		loop_3[Nloop_3][1]=iy;
 		loop_3[Nloop_3][2]=iz;
@@ -1867,14 +1848,14 @@ alloc_loops(int init,ldouble t,ldouble dt)
 #if (SHUFFLELOOPS)
     shuffle_loop(loop_3,Nloop_3);
 #endif
-
+*/
     //**********************************************************************
     //**********************************************************************
     //all corners of the domain - like in staggered grid
   
     Nloop_4=0;
-    loop_4=(int **)malloc(sizeof(int*));
-    loop_4[0]=(int *)malloc(3*sizeof(int));
+    //loop_4=(int **)malloc(sizeof(int*));
+    //loop_4[0]=(int *)malloc(3*sizeof(int));
 
     if(NY>1) ylim=iy2; else ylim=iy1;
     if(NZ>1) zlim=iz2; else zlim=iz1;
@@ -1890,8 +1871,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 		Nloop_4++;
 	      
-		loop_4=(int **)realloc(loop_4,(Nloop_4+1)*sizeof(int*));
-		loop_4[Nloop_4]=(int *)malloc(3*sizeof(int));	      
+		//loop_4=(int **)realloc(loop_4,(Nloop_4+1)*sizeof(int*));
+		//loop_4[Nloop_4]=(int *)malloc(3*sizeof(int));	      
 	      }
 	  }
       }
@@ -1906,8 +1887,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //domain + ghost cells + corners = total
   
     Nloop_5=0;
-    loop_5=(int **)malloc(sizeof(int*));
-    loop_5[0]=(int *)malloc(3*sizeof(int));
+    //loop_5=(int **)malloc(sizeof(int*));
+    //loop_5[0]=(int *)malloc(3*sizeof(int));
 
     for(ix=-NGCX+ix1;ix<ix2+NGCX;ix++)
       {
@@ -1921,8 +1902,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 		Nloop_5++;
 	      
-		loop_5=(int **)realloc(loop_5,(Nloop_5+1)*sizeof(int*));
-		loop_5[Nloop_5]=(int *)malloc(3*sizeof(int));	      
+		//loop_5=(int **)realloc(loop_5,(Nloop_5+1)*sizeof(int*));
+		//loop_5[Nloop_5]=(int *)malloc(3*sizeof(int));	      
 	      }
 	  }
       }
@@ -1937,8 +1918,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //inner domain plus 1-cell layer including corners
   
     Nloop_6=0;
-    loop_6=(int **)malloc(sizeof(int*));
-    loop_6[0]=(int *)malloc(3*sizeof(int));
+    //loop_6=(int **)malloc(sizeof(int*));
+    //loop_6[0]=(int *)malloc(3*sizeof(int));
 
     if(NY>1) ylim=1 ; else ylim=0;
     if(NZ>1) zlim=1 ; else zlim=0;
@@ -1955,8 +1936,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 		Nloop_6++;
 	      
-		loop_6=(int **)realloc(loop_6,(Nloop_6+1)*sizeof(int*));
-		loop_6[Nloop_6]=(int *)malloc(3*sizeof(int));	      
+		//loop_6=(int **)realloc(loop_6,(Nloop_6+1)*sizeof(int*));
+		//loop_6[Nloop_6]=(int *)malloc(3*sizeof(int));	      
 	      }
 	  }
       }
@@ -2303,6 +2284,9 @@ copyi_u(ldouble factor,ldouble *uu1,ldouble* uu2)	\
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2];
+      //printf("%d > %d\n",PROCID,ix); 
+
+
       PLOOP(iv)
 	set_u(uu2,iv,ix,iy,iz,factor*get_u(uu1,iv,ix,iy,iz));
     }

@@ -1804,12 +1804,23 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       #ifdef RADIATION
 	       ldouble Rtt,ehat,Rij[4][4];
 	       ldouble ugas[4],Fx,Fy,Fz;
+	       ldouble Gi[4],Giff[4]={0.,0.,0.,0.};
+	       ldouble Gic[4],Gicff[4]={0.,0.,0.,0.};
 	       if(doingavg==0)
 		{
 		  calc_ff_Rtt(pp,&Rtt,ugas,&geomBL);
 		  ehat=-Rtt;  
 		  calc_Rij(pp,&geomBL,Rij); //calculates R^munu in OUTCOORDS
-		  indices_2221(Rij,Rij,geomBL.gg);	      							  
+		  indices_2221(Rij,Rij,geomBL.gg);
+
+		  //four fource
+		  calc_Gi(pp,&geomBL,Gi,1); 
+		  boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
+                  #ifdef COMPTONIZATION
+		  ldouble kappaes=calc_kappaes(pp,&geomBL);
+		  calc_Compt_Gi(pp,&geomBL,Gic,ehat,temp,kappaes,vel);
+		  boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
+                   #endif 
 		}
 	      else
 		{
@@ -1817,39 +1828,23 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 		  int i,j;
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
-		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz); 
+		  for(j=0;j<4;j++)
+		    Giff[j]=get_uavg(pavg,AVGGHAT(j),ix,iy,iz);
+                  #ifdef COMPTONIZATION
+		  for(j=0;j<4;j++)
+		    Gicff[j]=get_uavg(pavg,AVGGHATCOMPT(j),ix,iy,iz);
+		  #endif		  
 		}
 	       
 	       //flux
 	       Fx=Rij[1][0];
 	       Fy=Rij[2][0];
 	       Fz=Rij[3][0];
-
-	       //four fource
-	       ldouble Gi[4],Giff[4]={0.,0.,0.,0.};
-	       ldouble Gic[4],Gicff[4]={0.,0.,0.,0.};
-	       calc_Gi(pp,&geomBL,Gi,1); 
-	       boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
-	       #ifdef COMPTONIZATION
-	       ldouble kappaes=calc_kappaes(pp,&geomBL);
-	       calc_Compt_Gi(pp,&geomBL,Gic,ehat,temp,kappaes,vel);
-	       boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
-               #endif 
-
-	       /*
-	       if(ix==NX/2 && iy==NY/2)
-		 {
-		   print_4vector(Gi);
-		   print_4vector(Giff);
-		   print_4vector(Gic);
-		   print_4vector(Gicff);
-		   getchar();
-		 }
-	       */
 	       	       
 	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",endenGU2CGS(ehat),fluxGU2CGS(Fx),fluxGU2CGS(Fy),fluxGU2CGS(Fz));
 	       
-	       ldouble conv=kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.);
+	       ldouble conv=kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC; //because (cE-4piB) in non-geom
 	       fprintf(fout1,"%.5e %.5e ",Giff[0]*conv,Gicff[0]*conv);
 #endif
 

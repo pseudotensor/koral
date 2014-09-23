@@ -183,7 +183,7 @@ flux_ct()
   else coefemf[3]=0.5; 
   
   int ix,iy,iz,iv,ii;
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   //calculating EMF at corners
   for(ii=0;ii<Nloop_4;ii++) 
     {
@@ -253,7 +253,7 @@ flux_ct()
   //reset certain emfs at the boundaries to ensure stationarity
   adjust_fluxcttoth_emfs();
 
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_4;ii++) // 0...NX
     {
       ix=loop_4[ii][0];
@@ -325,7 +325,7 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
 
   int ix,iy,iz,iv,ii;
   
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_4;ii++) //all corners of the inner domain
     {      
       ix=loop_4[ii][0];
@@ -367,7 +367,7 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
   //overwriting vector potential with magnetic fields (e.g., at init)  
   if(ifoverwrite)
     {
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+      //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
       for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
 	{
 	  ix=loop_02[ii][0];
@@ -415,7 +415,7 @@ calc_BfromA_core()
 
   int ix,iy,iz,iv,ii;
   
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain
     {
       ix=loop_0[ii][0];
@@ -740,7 +740,7 @@ mimic_dynamo(ldouble dt)
 
   int ix,iy,iz,iv,ii;
 
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_6;ii++) //inner domain plus 1-cell layer including corners
     {      
       ix=loop_6[ii][0];
@@ -924,7 +924,7 @@ mimic_dynamo(ldouble dt)
   calc_BfromA(ptemp1,0);  
    
   //and superimpose it on the original one
-#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only!
     {
       ix=loop_0[ii][0];

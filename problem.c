@@ -59,11 +59,11 @@ set_initial_profile()
 
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
-  for(ix=0;ix<NX;ix++)
+  for(ix=0;ix<TNX;ix++)
     {
-      for(iy=0;iy<NY;iy++)
+      for(iy=0;iy<TNY;iy++)
 	{
-	  for(iz=0;iz<NZ;iz++)
+	  for(iz=0;iz<TNZ;iz++)
 	    {
 
 #include PR_INIT
@@ -75,6 +75,10 @@ set_initial_profile()
   #ifdef MPI
       MPI_Barrier(MPI_COMM_WORLD);
   #endif
+
+  #ifdef OMP
+      #pragma omp barrier
+#endif
 
   if(PROCID==0) printf("done!\n");
 

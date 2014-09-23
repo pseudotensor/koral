@@ -120,6 +120,9 @@ main(int argc, char **argv)
     {
       //or initialize new problem
       set_initial_profile();
+if(PROCID==0) print_conserved(&get_u(u,0,1,0,0));
+if(PROCID==0) print_primitives(&get_u(p,0,1,0,0));
+ getch();
 
       tstart=0.;
       //exchange initial state
@@ -360,7 +363,9 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
-      if(TIMESTEPPING==RK2IMEX)
+     	    
+
+	    if(TIMESTEPPING==RK2IMEX)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
 
@@ -373,8 +378,6 @@ solve_the_problem(ldouble tstart, char* folder)
 		   PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK,global_ix1,global_ix2);
 	    
 	    copyi_u(1.,u,ut0);
-	    getch();
-	    
 	    calc_u2p();
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 
