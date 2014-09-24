@@ -380,11 +380,13 @@ solve_the_problem(ldouble tstart, char* folder)
 
 #pragma omp parallel
 	  {
-
+	    
+	    /*
 	    printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
 		   "tile: %d,%d,%d; tile orig.: %d,%d,%d\n"
 		   "ix12: %d - %d\n",
 		   PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK,global_ix1,global_ix2);
+	    */
 	    
 	    copyi_u(1.,u,ut0);
 	    calc_u2p();

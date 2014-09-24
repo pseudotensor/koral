@@ -1521,6 +1521,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
   iz2=NZ;  
 
 
+  
   if(!init)
     {
 #ifdef SUBZONES
@@ -1653,17 +1654,16 @@ alloc_loops(int init,ldouble t,ldouble dt)
     }
 
 
-
 #pragma omp parallel private(ix,iy,iz,i,ii,jj,ix1,ix2,iy1,iy2,iz1,iz2)
   {
 #ifdef OMP
     //under openMP - loops reflect the tiles
     ix1=TOI;
-    ix2=TOI+NX;
+    ix2=TOI+TNX/NTX;
     iy1=TOJ;
-    iy2=TOJ+NY;
+    iy2=TOJ+TNY/NTY;
     iz1=TOK;
-    iz2=TOK+NZ;
+    iz2=TOK+TNZ/NTZ;
 #endif
 
     global_ix1=ix1;
@@ -1680,7 +1680,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_0[0]=(int *)malloc(3*sizeof(int));
 
 
-        
     for(ix=ix1;ix<ix2;ix++)
       {
 	for(iy=iy1;iy<iy2;iy++)

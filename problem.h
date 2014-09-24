@@ -1231,6 +1231,10 @@
 //including problem specific definitions from PROBLEMS/XXX/define.h
 /*********************/
 
+#ifdef _OPENMP
+#define OMP
+#endif
+
 #include PR_DEFINE
 
 /*********************/

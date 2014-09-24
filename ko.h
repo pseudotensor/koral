@@ -61,7 +61,7 @@
 #include <mpi.h>
 #endif
 
-#ifdef OMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 
