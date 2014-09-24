@@ -4324,7 +4324,7 @@ int
 calc_M1intensities()
 {
   int ix,iy,iz,ii;
-#pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
+  //#pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
   for(ii=0;ii<Nloop_5;ii++) //domain plus layer of one
     {
       ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
@@ -4375,7 +4375,7 @@ update_intensities()
   int ii;
 
   //making backup acting as the previous time step
-#pragma omp parallel for private(ii) schedule (static)
+  //#pragma omp parallel for private(ii) schedule (static)
   for(ii=0;ii<Nloop_5;ii++) //everything
     {
       int i,j,ix,iy,iz;
@@ -4387,7 +4387,7 @@ update_intensities()
     }
      
   //updating using ZERO
-#pragma omp parallel for private(ii) schedule (static)
+  //#pragma omp parallel for private(ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       int ix,ix0,iy,iy0,iz,iz0,i,j,k,l;

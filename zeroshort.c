@@ -2825,7 +2825,7 @@ int zero_readangles()
 
   //making backup acting as the previous time step
   int ii;
-#pragma omp parallel for private(ii) schedule (static)
+  //#pragma omp parallel for private(ii) schedule (static)
   for(ii=0;ii<Nloop_6;ii++) //domain + 1 layer 
     {
       int ix,iy,iz;

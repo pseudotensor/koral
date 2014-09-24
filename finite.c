@@ -1435,22 +1435,30 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   mdx=mdy=mdz=-1;
   ldouble maxdt=-1;
 
-  //FIX HERE!
-      
+  int ix1,ix2,iy1,iy2,iz1,iz2;
+  
+  ix1=-0;
+  ix2=TNX+0;
+  iy1=-0;
+  iy2=TNY+0;
+  iz1=-0;
+  iz2=TNZ+0;
+  
+
   //x
-  for(i1=-NG;i1<=NX+NG;i1++)
+  for(i1=ix1-NG;i1<=ix2+NG;i1++)
     {
       set_xb(i1,0,calc_xb(i1,0));  
       if(i1>-NG) set_x(i1-1,0,.5*(get_xb(i1,0)+get_xb(i1-1,0)));
      }
   //y
-  for(i1=-NG;i1<=NY+NG;i1++)
+  for(i1=iy1-NG;i1<=iy2+NG;i1++)
     {
       set_xb(i1,1,calc_xb(i1,1));  
       if(i1>-NG) set_x(i1-1,1,.5*(get_xb(i1,1)+get_xb(i1-1,1)));
    }
   //z
-  for(i1=-NG;i1<=NZ+NG;i1++)
+  for(i1=iz1-NG;i1<=iz2+NG;i1++)
     {
       set_xb(i1,2,calc_xb(i1,2));  
       if(i1>-NG) set_x(i1-1,2,.5*(get_xb(i1,2)+get_xb(i1-1,2)));
@@ -1466,11 +1474,11 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
 #endif
 
   //minimal cell size
-  for(ix=0;ix<NX;ix++)
+  for(ix=ix1;ix<ix2;ix++)
     {
-      for(iy=0;iy<NY;iy++)
+      for(iy=iy1;iy<iy2;iy++)
 	{
-	  for(iz=0;iz<NZ;iz++)
+	  for(iz=iz1;iz<iz2;iz++)
 	    {
 	      dx=get_size_x(ix,0);
 	      dy=get_size_x(iy,1);
@@ -1503,7 +1511,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
   int ix,iy,iz,i,ii,jj ;
   int ix1,ix2,iy1,iy2,iz1,iz2;
 
-  //by default cover the whole domain
+  //by default cover the whole local tile
   ix1=0;
   iy1=0;
   iz1=0;
@@ -1671,7 +1679,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_0=(int **)malloc(sizeof(int*));
     //loop_0[0]=(int *)malloc(3*sizeof(int));
 
-    
+
+        
     for(ix=ix1;ix<ix2;ix++)
       {
 	for(iy=iy1;iy<iy2;iy++)
@@ -1707,9 +1716,9 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(INT_ORDER==2) lim=1;
     if(INT_ORDER==4) lim=2;
 
-    if(NX>1) xlim=lim; else xlim=0;  
-    if(NY>1) ylim=lim; else ylim=0;
-    if(NZ>1) zlim=lim; else zlim=0;
+    if(TNX>1) xlim=lim; else xlim=0;  
+    if(TNY>1) ylim=lim; else ylim=0;
+    if(TNZ>1) zlim=lim; else zlim=0;
 
     Nloop_1=0;
     //loop_1=(int **)malloc(sizeof(int*));
@@ -1748,9 +1757,9 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //reduction of size basing on the dimension
     //for constrained transport fluxes copied onto missing dimensions
 
-    if(NX>1) xlim=NG; else xlim=0;  
-    if(NY>1) ylim=NG; else ylim=0;
-    if(NZ>1) zlim=NG; else zlim=0;
+    if(TNX>1) xlim=NG; else xlim=0;  
+    if(TNY>1) ylim=NG; else ylim=0;
+    if(TNZ>1) zlim=NG; else zlim=0;
 
     Nloop_2=0;
     //loop_2=(int **)malloc(sizeof(int*));
@@ -1857,8 +1866,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_4=(int **)malloc(sizeof(int*));
     //loop_4[0]=(int *)malloc(3*sizeof(int));
 
-    if(NY>1) ylim=iy2; else ylim=iy1;
-    if(NZ>1) zlim=iz2; else zlim=iz1;
+    if(TNY>1) ylim=iy2; else ylim=iy1;
+    if(TNZ>1) zlim=iz2; else zlim=iz1;
     for(ix=ix1;ix<=ix2;ix++)
       {
 	for(iy=iy1;iy<=ylim;iy++)
@@ -1921,14 +1930,14 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_6=(int **)malloc(sizeof(int*));
     //loop_6[0]=(int *)malloc(3*sizeof(int));
 
-    if(NY>1) ylim=1 ; else ylim=0;
-    if(NZ>1) zlim=1 ; else zlim=0;
+    if(TNY>1) ylim=1 ; else ylim=0;
+    if(TNZ>1) zlim=1 ; else zlim=0;
 
     for(ix=-1+ix1;ix<ix2+1;ix++)
       {
 	for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
 	  {
-	    for(iz=-zlim+iz1;iz<=iz2+zlim;iz++)
+	    for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
 	      {
 		loop_6[Nloop_6][0]=ix;
 		loop_6[Nloop_6][1]=iy;
@@ -2043,14 +2052,14 @@ ldouble get_xb(int ic, int idim)
 //returns size of a cell
 ldouble get_size_x(int ic, int idim)
 {
-  if(ic<-NG || (idim==0 && ic>NX-1+NG) || (idim==1 && ic>NY-1+NG) || (idim==2 && ic>NZ-1+NG)) my_err("blont w get_size_x - index ouf of range");
+  //if(ic<-NG || (idim==0 && ic>NX-1+NG) || (idim==1 && ic>NY-1+NG) || (idim==2 && ic>NZ-1+NG)) my_err("blont w get_size_x - index ouf of range");
   return get_xb(ic+1,idim)-get_xb(ic,idim);
 }
 
 //sets cell boundaries
 int set_xb(int ic, int idim,ldouble val)
 {  
-  if(ic<-NG || (idim==0 && ic>NX+NG) || (idim==1 && ic>NY+NG) || (idim==2 && ic>NZ+NG)) my_err("blont w set_xb - index ouf of range");
+  //  if(ic<-NG || (idim==0 && ic>NX+NG) || (idim==1 && ic>NY+NG) || (idim==2 && ic>NZ+NG)) my_err("blont w set_xb - index ouf of range");
   if(idim==0)
     xb[ic+NG]=val;
   if(idim==1)
@@ -2516,13 +2525,14 @@ int set_bc(ldouble t,int ifinit)
       if(if_outsidegc(ix,iy,iz)==1) continue;
 
       //type of BC
-      int BCtype;
+      int BCtype=-1;
       if(ix<0) BCtype=XBCLO;
       if(ix>=NX) BCtype=XBCHI;
       if(iy<0) BCtype=YBCLO;
       if(iy>=NY) BCtype=YBCHI;
       if(iz<0) BCtype=ZBCLO;
       if(iz>=NZ) BCtype=ZBCHI;
+      if(BCtype==-1) my_err("wrong GC in loop_2\n");
 
 #if defined(MSTEP) && defined(MSTEP_LIMITBC) //check if near boundary cells have been modified
       if(BCtype==XBCHI && mstep_is_cell_active(NX-1,iy,iz)==0 && mstep_is_cell_active(NX-2,iy,iz)==0) continue;												  if(BCtype==XBCLO && mstep_is_cell_active(0,iy,iz)==0 && mstep_is_cell_active(1,iy,iz)==0) continue;

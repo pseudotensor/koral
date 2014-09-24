@@ -748,9 +748,9 @@ mpi_myfinalize()
 void
 mpi_tileorigin(int ti, int tj, int tk, int* toi, int* toj, int* tok)
 {
-  *toi = ti * NX;
-  *toj = tj * NY;
-  *tok = tk * NZ;
+  *toi = ti * (TNX/NTX);
+  *toj = tj * (TNY/NTY);
+  *tok = tk * (TNZ/NTZ);
 }
 
 void
@@ -810,6 +810,13 @@ int
 omp_myinit()
 {
 #ifdef OMP
+  #ifdef SUBZONES
+  printf("SUBZONES do not work with OMP.\n"); exit(-1);
+  #endif
+  #ifdef MPI
+  printf("MPI does not work with OMP.\n"); exit(-1);
+  #endif
+
   omp_set_dynamic(0);
 
   #pragma omp parallel
@@ -829,9 +836,6 @@ omp_myinit()
     if(PROCID==0) printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
 			 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
   }
-
- 
-
 #else
   NPROCS=1;
   TI=TJ=TK=0;
@@ -839,3 +843,4 @@ omp_myinit()
   PROCID=0;  
 #endif
 }
+

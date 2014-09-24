@@ -28,7 +28,7 @@ if(1) //uses MDOT and TGAS at the outer boundary
 		struct geometry geomBL;
 		fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
-		//printf("r: %e %d\n",geomBL.xx,ix);
+		printf("r: %e %d\n",geomBL.xx,ix);
 
 		//at given cell
 		ldouble R=geomBL.xx;

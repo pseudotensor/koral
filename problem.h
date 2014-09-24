@@ -1734,6 +1734,7 @@
 #define TNZ (NZ*NTZ)
 #endif
 
+#ifdef MPI
 #ifndef NX
 #define NX (TNX/NTX)
 #endif 
@@ -1745,6 +1746,22 @@
 #ifndef NZ
 #define NZ (TNZ/NTZ)
 #endif 
+
+#else //OMP or single core
+
+#ifndef NX
+#define NX (TNX)
+#endif 
+
+#ifndef NY
+#define NY (TNY)
+#endif
+ 
+#ifndef NZ
+#define NZ (TNZ)
+#endif 
+#endif
+
 
 #ifndef RADCLOSURE
 #define RADCLOSURE M1CLOSURE

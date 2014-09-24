@@ -11,7 +11,8 @@ save_avg(ldouble dt)
 {
   int ix,iy,iz,iv,ii;
 
-  #pragma omp parallel for private(ix,iy,iz,iv) schedule (static)
+  #pragma omp parallel private(ix,iy,iz,iv) 
+  {
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       ix=loop_0[ii][0];
@@ -26,6 +27,7 @@ save_avg(ldouble dt)
 	  set_uavg(pavg,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz)+avg[iv]*dt);
 	}
     }
+  }
 
   avgtime+=dt;
   

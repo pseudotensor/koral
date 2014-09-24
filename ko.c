@@ -69,6 +69,7 @@ main(int argc, char **argv)
 #ifdef RADIATION
   //prepare angular grid for radiative solver
 #if(RADCLOSURE==VETCLOSURE)
+#pragma omp parallel
   zero_readangles();						
   //ZEROtest_oldmain();
 #endif
@@ -103,6 +104,7 @@ main(int argc, char **argv)
   //todo: read intensities from file!
 #if (RADCLOSURE==VETCLOSURE)
 #ifdef RADSTARTWITHM1INTENSITIES
+#pragma omp parallel  
   calc_M1intensities();
 #endif
 #endif
@@ -111,6 +113,7 @@ main(int argc, char **argv)
       //exchange initial state
       mpi_exchangedata();  
       calc_avgs_throughout();
+      #pragma omp parallel
       set_bc(tstart,1);
     }
 #endif
@@ -129,6 +132,7 @@ if(PROCID==0) print_primitives(&get_u(p,0,1,0,0));
       if(PROCID==0) {printf("Sending initial data... ");fflush(stdout);}
       mpi_exchangedata();
       calc_avgs_throughout();
+#pragma omp parallel
       set_bc(tstart,1);
       #ifdef MPI
       MPI_Barrier(MPI_COMM_WORLD);
@@ -136,8 +140,10 @@ if(PROCID==0) print_primitives(&get_u(p,0,1,0,0));
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
 #ifdef VECPOTGIVEN
       if(PROCID==0) {printf("Calculating magn. field... ");fflush(stdout);}
+#pragma omp parallel
       calc_BfromA(p,1);
       //exchange magn. field calculated in domain
+#pragma omp parallel  
       set_bc(tstart,1);
       mpi_exchangedata();
       calc_avgs_throughout();
@@ -147,6 +153,7 @@ if(PROCID==0) print_primitives(&get_u(p,0,1,0,0));
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
 #endif
 #ifdef RADSTARTWITHM1INTENSITIES
+#pragma omp parallel  
       calc_M1intensities();
 #endif
 
@@ -266,11 +273,12 @@ solve_the_problem(ldouble tstart, char* folder)
   loopsallociter=0;
   currentzonetime=t;
 
-  
-  set_bc(t,0);
-  int ii,jj;
-  for(ii=0;ii<Nloop_02;ii++) //domain + gc
-    {
+  #pragma omp parallel
+  {
+    set_bc(t,0);
+    int ii,jj;
+    for(ii=0;ii<Nloop_02;ii++) //domain + gc
+      {
       ix=loop_02[ii][0];
       iy=loop_02[ii][1];
       iz=loop_02[ii][2]; 
@@ -279,7 +287,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	set_u(u_bak_subzone,jj,ix,iy,iz,get_u(u,jj,ix,iy,iz));
 	set_u(p_bak_subzone,jj,ix,iy,iz,get_u(p,jj,ix,iy,iz));
       }
-    }
+      }
+  }
   
   #endif
  
@@ -470,6 +479,7 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
  
 #ifdef EVOLVEINTENSITIES
+      #pragma omp parallel
       update_intensities();
 #endif
 
@@ -565,6 +575,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    printf("%d > snap file no #%6d dumped\n",PROCID,nfout1);
 	  
 	  //projects primitives onto ghost cells
+	  #pragma omp parallel
 	  set_bc(t,0);
 
 	  //restart files
