@@ -3155,6 +3155,7 @@ calc_metric()
 	iy=loop_02[ii][1];
 	iz=loop_02[ii][2]; 
 
+
 	ldouble gloc[4][5];
 	ldouble Kr[4][4][4];
 	ldouble eup[4][4],elo[4][4];
@@ -3166,6 +3167,9 @@ calc_metric()
 	xx[1]=get_x(ix,0);
 	xx[2]=get_x(iy,1);
 	xx[3]=get_x(iz,2);
+
+	//if(PROCID==0)printf("%d %d %d> %e %e\n",ix,iy,iz,xx[1],calc_gdet(xx));
+
 	calc_g(xx,gloc);
 	for(i=0;i<4;i++)
 	  for(j=0;j<4;j++)
@@ -3173,6 +3177,9 @@ calc_metric()
 	for(j=0;j<3;j++)
 	  set_g(g,j,4,ix,iy,iz,calc_dlgdet(xx,j));
 	set_g(g,3,4,ix,iy,iz,calc_gdet(xx));
+
+
+	
 
 	calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 	calc_tetrades(gloc,tup,tlo,MYCOORDS);

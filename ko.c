@@ -6,8 +6,12 @@
 int 
 main(int argc, char **argv)
 {  
+  #ifdef MPI
   mpi_myinit(argc,argv);
+  #endif
+  #ifdef OMP
   omp_myinit();  
+  #endif
   mstep_init();
 
   ldouble tstart;
@@ -66,6 +70,7 @@ main(int argc, char **argv)
   //precalculates metric etc.
   calc_metric();
 
+
 #ifdef RADIATION
   //prepare angular grid for radiative solver
 #if(RADCLOSURE==VETCLOSURE)
@@ -118,20 +123,21 @@ main(int argc, char **argv)
     }
 #endif
 
+
   //no restart or no restart file
   if(ifinit==1)
     {
       //or initialize new problem
       set_initial_profile();
-if(PROCID==0) print_conserved(&get_u(u,0,1,0,0));
-if(PROCID==0) print_primitives(&get_u(p,0,1,0,0));
- getch();
 
       tstart=0.;
       //exchange initial state
       if(PROCID==0) {printf("Sending initial data... ");fflush(stdout);}
       mpi_exchangedata();
       calc_avgs_throughout();
+      
+
+
 #pragma omp parallel
       set_bc(tstart,1);
       #ifdef MPI
@@ -164,6 +170,11 @@ if(PROCID==0) print_primitives(&get_u(p,0,1,0,0));
 
     }
 
+  /*
+  print_primitives(&get_u(p,0,20,0,0));
+  print_conserved(&get_u(u,0,20,0,0));
+  exit(1);
+  */
 
   //prepares files  
   fprint_openfiles(folder);
@@ -240,6 +251,8 @@ solve_the_problem(ldouble tstart, char* folder)
   struct timespec temp_clock;
   struct rad_parameters rp;
    
+
+ 
   i1=i2=0.;
   global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]=0; //counting number of critical failures
   global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]=0; //and fixups requests
@@ -267,6 +280,9 @@ solve_the_problem(ldouble tstart, char* folder)
 
   //main time loop
   nstep=0;
+
+
+
   #ifdef SUBZONES
   currentzone=-1;
   currentzone=alloc_loops(1,t,dt);
@@ -368,13 +384,12 @@ solve_the_problem(ldouble tstart, char* folder)
       max_ws[2]=-1.;
       max_ws_ph=-1.;
       tstepdenmax=-1.;
-
+   
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
      	    
-
-	    if(TIMESTEPPING==RK2IMEX)
+      if(TIMESTEPPING==RK2IMEX)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
 
@@ -390,6 +405,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    
 	    copyi_u(1.,u,ut0);
 	    calc_u2p();
+
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  

@@ -20,6 +20,7 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
 
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
+
   
   //temporary using local arrays
   gg=geom.gg;
@@ -82,8 +83,15 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   //************************************
   //update conserved to follow corrections on primitives
 
-  p2u(pp,uu,&geom);
   
+  p2u(pp,uu,&geom);
+
+  /*
+  if(ix==5 && PROCID==0) print_primitives(pp);
+  if(ix==5 && PROCID==0) print_conserved(uu);
+  if(ix==5 && PROCID==0) printf("gdet: %e\n",geom.gdet);
+  */
+
   for(iv=0;iv<NV;iv++)
     {
       set_u(u,iv,ix,iy,iz,uu[iv]);

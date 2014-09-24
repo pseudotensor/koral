@@ -1438,11 +1438,11 @@ set_grid(ldouble *mindx,ldouble *mindy, ldouble *mindz, ldouble *maxdtfac)
   int ix1,ix2,iy1,iy2,iz1,iz2;
   
   ix1=-0;
-  ix2=TNX+0;
+  ix2=NX+0;
   iy1=-0;
-  iy2=TNY+0;
+  iy2=NY+0;
   iz1=-0;
-  iz2=TNZ+0;
+  iz2=NZ+0;
   
 
   //x
@@ -1679,7 +1679,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_0=(int **)malloc(sizeof(int*));
     //loop_0[0]=(int *)malloc(3*sizeof(int));
 
-
     for(ix=ix1;ix<ix2;ix++)
       {
 	for(iy=iy1;iy<iy2;iy++)
@@ -1708,6 +1707,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //**********************************************************************
     //inside + ghost cells - number depending on the order of reconstruction
     //used to indicate where calculate fluxes
+    int xlim1,xlim2,ylim1,ylim2,zlim1,zlim2;
     int xlim,ylim,zlim;
     int lim;
 
@@ -1715,19 +1715,28 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(INT_ORDER==2) lim=1;
     if(INT_ORDER==4) lim=2;
 
-    if(TNX>1) xlim=lim; else xlim=0;  
-    if(TNY>1) ylim=lim; else ylim=0;
-    if(TNZ>1) zlim=lim; else zlim=0;
+    if(TNX>1) xlim1=xlim2=lim; else xlim1=xlim2=0;  
+    if(TNY>1) ylim1=ylim2=lim; else ylim1=ylim2=0;
+    if(TNZ>1) zlim1=zlim2=lim; else zlim1=zlim2=0;
+
+    #ifdef OMP
+    if(TI>0) xlim1=0; //not left-most
+    if(TI<NTX-1) xlim2=0; //not right-most
+    if(TJ>0) ylim1=0; 
+    if(TJ<NTY-1) ylim2=0;
+    if(TK>0) zlim1=0; 
+    if(TK<NTZ-1) zlim2=0;
+    #endif
 
     Nloop_1=0;
     //loop_1=(int **)malloc(sizeof(int*));
     //loop_1[0]=(int *)malloc(3*sizeof(int));
 
-    for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
+    for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
       {
-	for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
+	for(iy=-ylim1+iy1;iy<iy2+ylim2;iy++)
 	  {
-	    for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
+	    for(iz=-zlim1+iz1;iz<iz2+zlim2;iz++)
 	      {	
 		//if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
 
@@ -1756,19 +1765,28 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //reduction of size basing on the dimension
     //for constrained transport fluxes copied onto missing dimensions
 
-    if(TNX>1) xlim=NG; else xlim=0;  
-    if(TNY>1) ylim=NG; else ylim=0;
-    if(TNZ>1) zlim=NG; else zlim=0;
+    if(TNX>1) xlim1=xlim2=NG; else xlim1=xlim2=0;  
+    if(TNY>1) ylim1=ylim2=NG; else ylim1=ylim2=0;
+    if(TNZ>1) zlim1=zlim2=NG; else zlim1=zlim2=0;
+
+    #ifdef OMP
+    if(TI>0) xlim1=0; //not left-most
+    if(TI<NTX-1) xlim2=0; //not right-most
+    if(TJ>0) ylim1=0; 
+    if(TJ<NTY-1) ylim2=0;
+    if(TK>0) zlim1=0; 
+    if(TK<NTZ-1) zlim2=0;
+    #endif
 
     Nloop_2=0;
     //loop_2=(int **)malloc(sizeof(int*));
     //loop_2[0]=(int *)malloc(3*sizeof(int));
 
-    for(ix=-xlim+ix1;ix<ix2+xlim;ix++)
+    for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
       {
-	for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
+	for(iy=-ylim1+iy1;iy<iy2+ylim2;iy++)
 	  {
-	    for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
+	    for(iz=-zlim1+iz1;iz<iz2+zlim2;iz++)
 	      {	 
 		//within domain:
 		if(if_indomain(ix,iy,iz)==1) continue;
@@ -1898,11 +1916,24 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_5=(int **)malloc(sizeof(int*));
     //loop_5[0]=(int *)malloc(3*sizeof(int));
 
-    for(ix=-NGCX+ix1;ix<ix2+NGCX;ix++)
+    if(TNX>1) xlim1=xlim2=NGCX; else xlim1=xlim2=0;  
+    if(TNY>1) ylim1=ylim2=NGCY; else ylim1=ylim2=0;
+    if(TNZ>1) zlim1=zlim2=NGCZ; else zlim1=zlim2=0;
+
+    #ifdef OMP
+    if(TI>0) xlim1=0; //not left-most
+    if(TI<NTX-1) xlim2=0; //not right-most
+    if(TJ>0) ylim1=0; 
+    if(TJ<NTY-1) ylim2=0;
+    if(TK>0) zlim1=0; 
+    if(TK<NTZ-1) zlim2=0;
+    #endif
+
+    for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
       {
-	for(iy=-NGCY+iy1;iy<iy2+NGCY;iy++)
+	for(iy=-ylim1+iy1;iy<iy2+ylim2;iy++)
 	  {
-	    for(iz=-NGCZ+iz1;iz<iz2+NGCZ;iz++)
+	    for(iz=-zlim1+iz1;iz<iz2+zlim2;iz++)
 	      {	
 		loop_5[Nloop_5][0]=ix;
 		loop_5[Nloop_5][1]=iy;
@@ -1929,14 +1960,27 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_6=(int **)malloc(sizeof(int*));
     //loop_6[0]=(int *)malloc(3*sizeof(int));
 
+    if(TNX>1) xlim1=xlim2=1; else xlim1=xlim2=0;  
+    if(TNY>1) ylim1=ylim2=1; else ylim1=ylim2=0;
+    if(TNZ>1) zlim1=zlim2=1; else zlim1=zlim2=0;
+
+    #ifdef OMP
+    if(TI>0) xlim1=0; //not left-most
+    if(TI<NTX-1) xlim2=0; //not right-most
+    if(TJ>0) ylim1=0; 
+    if(TJ<NTY-1) ylim2=0;
+    if(TK>0) zlim1=0; 
+    if(TK<NTZ-1) zlim2=0;
+    #endif
+
     if(TNY>1) ylim=1 ; else ylim=0;
     if(TNZ>1) zlim=1 ; else zlim=0;
 
-    for(ix=-1+ix1;ix<ix2+1;ix++)
+    for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
       {
-	for(iy=-ylim+iy1;iy<iy2+ylim;iy++)
+	for(iy=-ylim1+iy1;iy<iy2+ylim2;iy++)
 	  {
-	    for(iz=-zlim+iz1;iz<iz2+zlim;iz++)
+	    for(iz=-zlim1+iz1;iz<iz2+zlim2;iz++)
 	      {
 		loop_6[Nloop_6][0]=ix;
 		loop_6[Nloop_6][1]=iy;
@@ -2288,7 +2332,6 @@ copyi_u(ldouble factor,ldouble *uu1,ldouble* uu2)	\
   int ix,iy,iz,ii,iv;
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
-      int ix,iy,iz;
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2];
@@ -3358,10 +3401,6 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
 int
 correct_polaraxis()
 {
-  #ifdef OMP
-  printf("need to redo the loops in correct_polaraxis() or move is somewhere to work with OMP\n");
-  #endif
-
   int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
   int ix,iy,iz,iv,ic,iysrc,ixsrc;

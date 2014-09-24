@@ -59,11 +59,11 @@ set_initial_profile()
 
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
-  for(ix=0;ix<TNX;ix++)
+  for(ix=0;ix<NX;ix++)
     {
-      for(iy=0;iy<TNY;iy++)
+      for(iy=0;iy<NY;iy++)
 	{
-	  for(iz=0;iz<TNZ;iz++)
+	  for(iz=0;iz<NZ;iz++)
 	    {
 
 #include PR_INIT

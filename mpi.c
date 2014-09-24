@@ -818,6 +818,7 @@ omp_myinit()
   #endif
 
   omp_set_dynamic(0);
+  omp_set_num_threads(NTX*NTY*NTZ);
 
   #pragma omp parallel
   {
@@ -842,5 +843,7 @@ omp_myinit()
   TOI=TOJ=TOK=0;
   PROCID=0;  
 #endif
+
+  return 0;
 }
 

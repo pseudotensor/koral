@@ -16,11 +16,11 @@ if(1) //uses MDOT and TGAS at the outer boundary
 
     int ix,iy,iz;
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
-    for(iz=0;iz<TNZ;iz++)
+    for(iz=0;iz<NZ;iz++)
       {
-	for(iy=0;iy<TNY;iy++)
+	for(iy=0;iy<NY;iy++)
 	  {
-	    for(ix=-NGCX;ix<TNX+NGCX;ix++)
+	    for(ix=-NGCX;ix<NX+NGCX;ix++)
 	      {
 		struct geometry geom;
 		fill_geometry(ix,iy,iz,&geom);
@@ -28,7 +28,7 @@ if(1) //uses MDOT and TGAS at the outer boundary
 		struct geometry geomBL;
 		fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
-		printf("r: %e %d\n",geomBL.xx,ix);
+		//if(PROCID==1)printf("%d> r: %e %d\n",PROCID,geomBL.xx,ix);
 
 		//at given cell
 		ldouble R=geomBL.xx;
