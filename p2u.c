@@ -348,6 +348,21 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   //fluid frame Ghat
   ldouble Gi[4],Gic[4];
   calc_Gi(pp,&geomout,Gi,0); 
+
+
+  //test
+  ldouble Gi2[4];
+  if(ix>60 && iy==TNY/2)
+    {
+      calc_Gi(pp,&geomout,Gi2,1); 
+      boost2_lab2ff(Gi2,Gi2,pp,geomout.gg,geomout.GG);
+      printf("%d %d %d\n",ix,iy,iz);
+      print_4vector(Gi);
+      print_4vector(Gi2);
+      getch();
+    }
+  
+
   ldouble kappaes=calc_kappaes(pp,&geomout);
   ldouble uffcon[4]={1.,0.,0.,0.};
   calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,uffcon);

@@ -1558,21 +1558,11 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
 
   //the four-velocity of fluid in lab frame
   ldouble ucon[4],utcon[4],ucov[4],vpr[3];
-  if(labframe==1) //transform ff definition to lab frame
-    {
-      utcon[1]=pp[2];
-      utcon[2]=pp[3];
-      utcon[3]=pp[4];
-      conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-    }
-  else
-    {
-      ucon[1]=ucon[2]=ucon[3]=ucov[1]=ucov[2]=ucov[3]=0.;
-      ucon[0]=1.;
-      ucov[0]=-1.;
-      //return fluid frame four-force
-    }
 
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
  
   //gas properties
   ldouble rho=pp[RHO];
@@ -1606,8 +1596,26 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       Gi[i]=-chi*Ru - (kappaes*Ruu + kappagasAbs*4.*Pi*B)*ucon[i];
     }
 
+  if(labframe==0)
+    {
+      boost2_lab2ff(Gi,Gi,pp,gg,GG);
+
+      //rewrite the time component directly
+      Gi[0]=-kappagasAbs*4.*Pi*B + kapparadAbs*Ehatrad;
+    }
+      
+      
+  
+
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
   ldouble Gic[4];
+
+if(labframe==0)
+  {
+      ucon[1]=ucon[2]=ucon[3]=ucov[1]=ucov[2]=ucov[3]=0.;
+      ucon[0]=1.;
+      ucov[0]=-1.;
+  }
   calc_Compt_Gi(pp,ggg,Gic,Ehatrad,Tgas,kappaes,ucon);
 
   ldouble fac=1.;
@@ -4132,13 +4140,14 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   ix=geom->ix;
   iy=geom->iy;
   iz=geom->iz;
+  
   if(geom->par==0) //left biased interpolation on face, lets use intensities on the left
     {
       if(geom->ifacedim==0) ix--;
       if(geom->ifacedim==1) iy--;
       if(geom->ifacedim==2) iz--;
     }
-
+  
   //reading from memory
   rho=pp0[RHO];
   uint=pp0[UU];
