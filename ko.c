@@ -183,7 +183,7 @@ main(int argc, char **argv)
   copy_u(1.,p,pinit);
 
   //zeros the avg array
-  copy_u(0.,p,pavg);
+  copy_u_core(0.,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));	  
   avgtime=0.;
 
   //prints initial profiles to out0000.dat
@@ -578,6 +578,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	  //avg goes first so that what is later can use it
 	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
 	  fprint_avgfile(t,folder,"avg");
+	  //zeros avg
+	  copy_u_core(0.,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
 	  avgtime=0.;
   
 	  nfout2++;

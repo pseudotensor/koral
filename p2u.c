@@ -351,6 +351,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 
 
   //test
+  /*
   ldouble Gi2[4];
   if(ix>60 && iy==TNY/2)
     {
@@ -361,7 +362,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
       print_4vector(Gi2);
       getch();
     }
-  
+  */
 
   ldouble kappaes=calc_kappaes(pp,&geomout);
   ldouble uffcon[4]={1.,0.,0.,0.};

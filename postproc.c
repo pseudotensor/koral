@@ -59,27 +59,30 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
   //calculates scale-height etc.
   calc_avgs_throughout();     
-
-  int ix,iy,iz,iv,i,j;
-  ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
-  ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
-  ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,ucon[4],utcon[4],ucon3[4];
-  ldouble rhoucont,enden,rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
-  ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
-  ldouble tautot,tautotloc,tauabs,tauabsloc;
-  ldouble avgsums[NV+NAVGVARS][NX];
-  ldouble Bangle1,Bangle2,brbphi;
-  ldouble Sigmagdet;
-  ldouble diffflux[NV];
-  ldouble fd_u0[NV],fd_up1[NV],fd_up2[NV],fd_um1[NV],fd_um2[NV];
-  ldouble fd_p0[NV],fd_pp1[NV],fd_pp2[NV],fd_pm1[NV],fd_pm2[NV],fd_pm3[NV],fd_pp3[NV];
-  ldouble fd_pl[NV],fd_pr[NV],fd_plm1[NV],fd_prm1[NV],fd_plp1[NV],fd_prp1[NV];
-  ldouble fd_ul[NV],fd_ur[NV],fd_ulm1[NV],fd_urm1[NV],fd_ulp1[NV],fd_urp1[NV];
-  ldouble du[NV],dul[NV],dur[NV],aaa[12],ahd,arad;
+  int ix;
 
   //search for appropriate radial index
+#pragma omp parallel for
   for(ix=0;ix<NX;ix++)
     {
+      int iy,iz,iv,i,j;
+      ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
+      ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
+      ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,ucon[4],utcon[4],ucon3[4];
+      ldouble rhoucont,enden,rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
+      ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
+      ldouble tautot,tautotloc,tauabs,tauabsloc;
+      ldouble avgsums[NV+NAVGVARS][NX];
+      ldouble Bangle1,Bangle2,brbphi;
+      ldouble Sigmagdet;
+      ldouble diffflux[NV];
+      ldouble fd_u0[NV],fd_up1[NV],fd_up2[NV],fd_um1[NV],fd_um2[NV];
+      ldouble fd_p0[NV],fd_pp1[NV],fd_pp2[NV],fd_pm1[NV],fd_pm2[NV],fd_pm3[NV],fd_pp3[NV];
+      ldouble fd_pl[NV],fd_pr[NV],fd_plm1[NV],fd_prm1[NV],fd_plp1[NV],fd_prp1[NV];
+      ldouble fd_ul[NV],fd_ur[NV],fd_ulm1[NV],fd_urm1[NV],fd_ulp1[NV],fd_urp1[NV];
+      ldouble du[NV],dul[NV],dur[NV],aaa[12],ahd,arad;
+      int injet;
+
       //vertically integrated/averaged profiles
 
       for(iv=0;iv<NRADPROFILES;iv++)
@@ -268,7 +271,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		}
 	      else
 		{ 
-			  rho=pp[0];
+		  rho=pp[0];
 		  uint=pp[1];
 		  utcon[1]=pp[2];
 		  utcon[2]=pp[3];
@@ -307,6 +310,16 @@ int calc_radialprofiles(ldouble profiles[][NX])
 #endif
 
 		}
+
+	      ldouble muBe;
+	      muBe=-(Trt+rhouconr)/rhouconr;
+	      #ifdef RADIATION
+	      muBe+=-Rrt/rhouconr;
+	      #endif
+	      
+	      int isjet;
+	      if(muBe>0.05) isjet=1;
+	      else isjet=0;
 
 	      //estimating the diffusive flux
 	      //to conserved
@@ -473,7 +486,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[13][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //jet mhd energy flux (16)
-	      if(utcon[1]>0. &&bsq > rho)
+	      if(isjet==1)
 		profiles[14][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //total rad energy flux (17)
@@ -494,7 +507,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[16][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //jet rad energy flux (19)
-	      if(utcon[1] >0. && bsq>rho)
+	      if(isjet==1)
 		profiles[17][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 	      
 	      //outflowin mass flux (20)
@@ -506,7 +519,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[25][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //jet mass flux (21)
-	      if(utcon[1] >0. && bsq>rho)
+	      if(isjet==1)
 		profiles[19][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //rho-weighted minus radial velocity (4)

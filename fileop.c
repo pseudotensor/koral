@@ -1822,7 +1822,10 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 		  ldouble kappaes=calc_kappaes(pp,&geomBL);
 		  calc_Compt_Gi(pp,&geomBL,Gic,ehat,temp,kappaes,vel);
 		  boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
-                   #endif 
+                  #endif 
+		  
+		  //test
+		  calc_Gi(pp,&geomBL,Gi,0); 
 		}
 	      else
 		{
