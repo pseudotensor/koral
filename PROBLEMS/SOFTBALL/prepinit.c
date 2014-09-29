@@ -1,9 +1,8 @@
-int ix,iy,iz;
 int ii;
-#pragma omp parallel for private(ix,iy,iz) schedule (static)
+#pragma omp parallel for schedule (static)
 for(ii=0;ii<Nloop_0;ii++) //domain only
   {
-
+    int ix,iy,iz;
     int iv;
     ix=loop_0[ii][0];
     iy=loop_0[ii][1];

@@ -9,7 +9,7 @@
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 
 /************************************/
 //magnetic fields
@@ -25,7 +25,7 @@
 
 #define MYCOORDS KERRCOORDS
 #define RMIN 3.5
-#define RMAX 20.
+#define RMAX 17
 #define MINX RMIN
 #define MAXX RMAX 
 #define DTH .6
@@ -33,8 +33,8 @@
 #define MAXY (M_PI/2.+DTH)
 #define MINZ -1.
 #define MAXZ 1. 
-#define TNX 60 // Total number of cells in X 
-#define TNY 40
+#define TNX 80 // Total number of cells in X 
+#define TNY 80
 #define TNZ 1
 #define NTX 1 //number of tiles in X 
 #define NTY 1
@@ -51,7 +51,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 5000 //stop after this number of outputs
-#define DTOUT1 1. //res
+#define DTOUT1 10. //res
 #define DTOUT2 100 //avg
 
 /************************************/

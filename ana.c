@@ -76,7 +76,6 @@ main(int argc, char **argv)
 
   printf("working on files #%04d to #%04d with %d step \n",no1,no2,nostep);
 
-  int ix,iy,iz,iv;
   ldouble pp[NV],uu[NV];
 
   for(ifile=no1;ifile<=no2;ifile+=nostep)

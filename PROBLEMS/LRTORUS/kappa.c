@@ -16,7 +16,7 @@ ldouble mpcgs=1.67262158e-24;
 *kappagasAbs=kappaCGS2GU((6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*log(1.+1.6*zeta))*rho;
 *kapparadAbs=*kappagasAbs/zeta/zeta/zeta;
 	
-//Roseland mean							  
+//Rosseland mean							  
 *kappagasRos=kappaCGS2GU((2.1e-25/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*(1.-exp(-6.94*zeta)))*rho;
 *kapparadRos=*kappagasAbs/zeta/zeta/zeta;
 
