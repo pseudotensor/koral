@@ -9,7 +9,8 @@
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
+#define BALANCEENTROPYWITHRADIATION
 
 /************************************/
 //magnetic fields
@@ -33,10 +34,10 @@
 #define MAXY (M_PI/2.+DTH)
 #define MINZ -1.
 #define MAXZ 1. 
-#define TNX 80 // Total number of cells in X 
-#define TNY 80
+#define TNX 200 // Total number of cells in X 
+#define TNY 200
 #define TNZ 1
-#define NTX 1 //number of tiles in X 
+#define NTX 4 //number of tiles in X 
 #define NTY 1
 #define NTZ 1
 #define SPECIFIC_BC
@@ -51,7 +52,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 5000 //stop after this number of outputs
-#define DTOUT1 10. //res
+#define DTOUT1 1. //res
 #define DTOUT2 100 //avg
 
 /************************************/
@@ -66,7 +67,7 @@
 /************************************/
 //rhd floors
 /************************************/
-#define UURHORATIOMIN 1.e-8
+#define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-15
 #define EERHORATIOMAX 1.e6
@@ -74,7 +75,7 @@
 #define EEUURATIOMAX 1.e6
 #define ERADLIMIT 1.e-50
 #define RHOFLOOR 1.e-50
-#define GAMMAMAXRAD 50.
+#define GAMMAMAXRAD 20.
 
 /************************************/
 //physics
@@ -86,6 +87,6 @@
 /************************************/
 #define MASS 10.
 #define TORUSENTR 5.e2
-#define RHOAMB 1.e-30
+#define RHOAMB 1.e-25
 #define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho
-#define ERADATMMIN 1.e-30
+#define ERADATMMIN 1.e-25

@@ -1,13 +1,13 @@
-int ii;
-#pragma omp parallel for schedule (static)
-for(ii=0;ii<Nloop_0;ii++) //domain only
-  {
-    int ix,iy,iz;
-    int iv;
-    ix=loop_0[ii][0];
-    iy=loop_0[ii][1];
-    iz=loop_0[ii][2];
+int ix,iy,iz;
 
+//for(ii=0;ii<Nloop_0;ii++) //this loop is already divided between cores
+#pragma omp parallel for private (iy,iz) schedule (static)
+for(ix=0;ix<TNX;ix++)
+  for(iy=0;iy<TNY;iy++)
+    for(iz=0;iz<TNZ;iz++)
+  {
+    int iv;
+   
     struct geometry geom;
     fill_geometry(ix,iy,iz,&geom);
     struct geometry geomBL; 
@@ -70,7 +70,7 @@ for(ii=0;ii<Nloop_0;ii++) //domain only
     if (radius < rcri)
       pp[VX] = uxcri + 1.;
     else
-      pp[VX] = powl(10,-5);
+      pp[VX] = 1.e-5;
         
     ldouble hru = kappa*GAMMA/(Gamma_mo)*powl((c1/(pp[VX]*powl(radius,2))),(Gamma_mo));
     ldouble fu  = powl((1+hru),2)*(1.-2.*1./radius+powl(pp[VX],2.)) - c3;
@@ -78,5 +78,6 @@ for(ii=0;ii<Nloop_0;ii++) //domain only
     //vmichel == fmax(powl(10,-5),pp[VX]-fu/dfdu);
     vmichel = fmax(powl(10,-5),pp[VX]-fu/dfdu);
     set_u(pproblem1,0,ix,iy,iz,vmichel);
+    
   }
 

@@ -30,9 +30,27 @@ if(BCtype==XBCHI)
    pp[VX]=0.;
    pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
-   #ifdef MAGNFIELD
-   pp[B1]=pp[B2]=pp[B3]=0.;
-   #endif
+   //#ifdef MAGNFIELD
+   //pp[B1]=pp[B2]=pp[B3]=0.;
+   //#endif
+
+ //check for inflow
+    if(pp[VX]<0.)
+      {
+	pp[RHO]=RHOAMB; 
+	pp[UU]=UUAMB; 
+	pp[VZ]=0.;
+	pp[VY]=0.;
+	pp[VX]=0.;
+	pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+      }
+
+#ifdef RADIATION
+    if(pp[FX0]<0.)
+      {
+	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+#endif
+      }
 
    p2u(pp,uu,&geom);
    return 0;  
@@ -50,7 +68,29 @@ if(BCtype==XBCLO)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
+
+    //check for inflow
+    if(pp[VX]>0.)
+      {
+	/*pp[RHO]=RHOAMB; 
+	pp[UU]=UUAMB; 
+	pp[VZ]=0.;
+	pp[VY]=0.;
+	*/
+	pp[VX]=0.;
+	//pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+      }
+
+#ifdef RADIATION
+    if(pp[FX0]>0.)
+      {
+	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+#endif
+      }
+
     p2u(pp,uu,&geom);
+
+
     return 0;  
   }
 
@@ -66,6 +106,26 @@ if(BCtype==YBCLO)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }    
+
+    //check for inflow
+    if(pp[VY]>0.)
+      {
+	pp[VY]=0.;
+	/*	
+	pp[RHO]=RHOAMB; 
+	pp[UU]=UUAMB; 
+	pp[VZ]=0.;
+	pp[VX]=0.;
+	pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);*/
+      }
+
+#ifdef RADIATION
+    if(pp[FY0]>0.)
+      {
+	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+#endif
+      }
+
     p2u(pp,uu,&geom);
     return 0;
   }
@@ -80,7 +140,27 @@ if(BCtype==YBCHI)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
-       p2u(pp,uu,&geom);
+    
+    //check for inflow
+    if(pp[VY]<0.)
+      {pp[VY]=0.;
+	/*
+	pp[RHO]=RHOAMB; 
+	pp[UU]=UUAMB; 
+	pp[VZ]=0.;
+	pp[VY]=0.;
+	pp[VX]=0.;
+	pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);*/
+      }
+
+#ifdef RADIATION
+    if(pp[FY0]<0.)
+      {
+	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+#endif
+      }
+
+    p2u(pp,uu,&geom);
     return 0;
   }
 
