@@ -5,9 +5,6 @@
 #include "ko.h"
 
 
-int mstep_cell_levels[NX][NY][NZ];
-int mstep_current_counts[NUMMSTEPLEVELS];
-
 /* initiate counters etc. */
 int 
 mstep_init(void)

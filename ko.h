@@ -840,6 +840,7 @@ int mstep_cell_levels[NX][NY][NZ];
 ldouble mstep_multiplier[NUMMSTEPLEVELS+1];
 int mstep_current_counts[NUMMSTEPLEVELS];
 
+
 //mstep.c
 int mstep_calc_level(ldouble,ldouble);
 int mstep_is_cell_active(int,int,int);

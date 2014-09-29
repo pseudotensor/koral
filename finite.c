@@ -430,6 +430,41 @@ calc_u2p()
   //fixup here hd after inversions
   cell_fixup_hd();
 
+//**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+  set_bc(global_time,0);
+
+//**********************************************************************
+  //**********************************************************************
+  //**********************************************************************
+
+//calculates and saves wavespeeds
+
+//local - not used anymore
+  ldouble max_lws[3];
+  max_lws[0]=max_lws[1]=max_lws[2]=-1.;
+
+  int ix,iy,iz;
+  for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
+    {
+      ix=loop_1[ii][0];
+      iy=loop_1[ii][1];
+      iz=loop_1[ii][2]; 
+      ldouble aaa[12];
+
+      #ifdef MSTEP
+      if(mstep_is_cell_active(ix,iy,iz)==0) 
+	continue;
+      #endif
+
+      calc_wavespeeds_lr(ix,iy,iz,aaa);	
+
+      //printf("%d %d %d\n",ix,iy,iz); print_Nvector(aaa,6); getch();
+
+      save_wavespeeds(ix,iy,iz,aaa,max_lws);
+    }
 
   return 0;
 }
@@ -474,10 +509,7 @@ op_explicit(ldouble t, ldouble dt)
   //global wavespeeds
   max_ws[0]=max_ws[1]=max_ws[2]=-1.;
  
-  //local - not used anymore
-  ldouble max_lws[3];
-  max_lws[0]=max_lws[1]=max_lws[2]=-1.;
-
+  
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -503,7 +535,7 @@ op_explicit(ldouble t, ldouble dt)
   
   //projects primitives onto ghost cells at the boundaries of the total domain
   //or calculates conserved from exchanged primitives
-  set_bc(t,0);
+  //set_bc(t,0);
 
   //**********************************************************************
   //**********************************************************************
@@ -521,9 +553,8 @@ op_explicit(ldouble t, ldouble dt)
   int superverbose=0;
 
   ldouble pp[NV];
-     
+  /*
   //calculates and saves wavespeeds
-//#pragma omp parallel for private(ix,iy,iz,max_lws) schedule (static,4)
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -542,6 +573,9 @@ op_explicit(ldouble t, ldouble dt)
 
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
+  */
+
+  //#pragma omp barrier
 
   //**********************************************************************
   //**********************************************************************
@@ -669,7 +703,9 @@ op_explicit(ldouble t, ldouble dt)
 		    set_ubx(pbRx,i,ix,iy,iz,fd_pl[i]);
 		    set_ubx(pbLx,i,ix+1,iy,iz,fd_pr[i]);
 
+		    if(dol)
 		    set_ubx(flRx,i,ix,iy,iz,ffl[i]);
+		    if(dor)
 		    set_ubx(flLx,i,ix+1,iy,iz,ffr[i]);		  
 		  }
 	      }
@@ -757,7 +793,9 @@ op_explicit(ldouble t, ldouble dt)
 		      set_uby(pbRy,i,ix,iy,iz,fd_pl[i]);
 		      set_uby(pbLy,i,ix,iy+1,iz,fd_pr[i]);
 
+		      if(dol)
 		      set_uby(flRy,i,ix,iy,iz,ffl[i]);
+		      if(dor)
 		      set_uby(flLy,i,ix,iy+1,iz,ffr[i]);		  
 		    }
 		}
@@ -847,7 +885,9 @@ op_explicit(ldouble t, ldouble dt)
 			set_ubz(pbRz,i,ix,iy,iz,fd_pl[i]);
 			set_ubz(pbLz,i,ix,iy,iz+1,fd_pr[i]);
 
+			if(dol)
 			set_ubz(flRz,i,ix,iy,iz,ffl[i]);
+			if(dor)
 			set_ubz(flLz,i,ix,iy,iz+1,ffr[i]);		  
 		      }
 	  
@@ -861,6 +901,8 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
+
+  #pragma omp barrier
 
   //#pragma omp parallel for private(iy,iz,ix)  schedule (static,4) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
@@ -1653,6 +1695,25 @@ alloc_loops(int init,ldouble t,ldouble dt)
 #endif
     }
 
+    int toi,tsi,tnx,imaxx=-1;
+#ifdef MSTEP
+    //find active cell at largest x-index, that will limi the range of cells covered by tiles
+    for(ix=0;ix<TNX;ix++)
+      for(iy=0;iy<TNY;iy++)
+	for(iz=0;iz<TNZ;iz++)
+	  if(mstep_is_cell_active(ix,iy,iz)==1)
+	    if(ix>imaxx) imaxx=ix;    
+    //choose total number of cells which multiplies number of tiles in x
+    imaxx+=2; //plus two because we need left biased flux from imax+1 cell
+    if(imaxx>TNX) imaxx=TNX;
+
+    if(imaxx % (NTX) == 0)
+      tnx=imaxx;
+    else
+      tnx = (floor((ldouble) imaxx/(ldouble)(NTX))+1)*NTX;
+
+    tsi=tnx/NTX;
+#endif
 
 #pragma omp parallel private(ix,iy,iz,i,ii,jj,ix1,ix2,iy1,iy2,iz1,iz2)
   {
@@ -1664,7 +1725,18 @@ alloc_loops(int init,ldouble t,ldouble dt)
     iy2=TOJ+TNY/NTY;
     iz1=TOK;
     iz2=TOK+TNZ/NTZ;
+
+    #ifdef MSTEP
+
+    ix1=TI * tsi;
+    ix2=ix1+tsi;
+
+    //printf("pid: %d > %d to %d || %d %d %d %d\n",PROCID,ix1,ix2,mstep_current_counts[0],mstep_current_counts[1],mstep_current_counts[2],mstep_current_counts[3]);             if(PROCID==0) getch();
+
+ #endif
 #endif
+
+
 
     global_ix1=ix1;
     global_iy1=iy1;
@@ -1720,12 +1792,16 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(TNZ>1) zlim1=zlim2=lim; else zlim1=zlim2=0;
 
     #ifdef OMP
+    
     if(TI>0) xlim1=0; //not left-most
     if(TI<NTX-1) xlim2=0; //not right-most
     if(TJ>0) ylim1=0; 
     if(TJ<NTY-1) ylim2=0;
     if(TK>0) zlim1=0; 
     if(TK<NTZ-1) zlim2=0;
+ 
+    
+    
     #endif
 
     Nloop_1=0;
