@@ -20,6 +20,9 @@ fill_geometry(ix,iy,iz,&geom);
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
+ldouble r=geomBL.xx;
+ldouble th=geomBL.yy;
+
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
@@ -37,12 +40,44 @@ calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 /**********************/
 
 //radius
-if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
+if(BCtype==XBCHI&&ifinit==1) //outflow in magn, atm in rad., atm. in HD
   {
     iix=NX-1;
     iiy=iy;
     iiz=iz;
     
+	
+	// compute limo torus
+	ldouble rho,uint,ell;
+	init_dsandvels_limotorus(r,th,BHSPIN,&rho,&uint,&ell);
+	if(rho>0.) 
+	{
+
+
+    ell*=-1.;
+
+    ldouble ult,ulph,ucov[4],ucon[4];
+    ulph = sqrt(-1./(geomBL.GG[0][0]/ell/ell + 2./ell*geomBL.GG[0][3] + geomBL.GG[3][3]));
+    ult = ulph / ell;
+
+    ucov[0]=ult;
+    ucov[1]=0.;
+    ucov[2]=0.;
+    ucov[3]=-ulph;
+    
+    indices_12(ucov,ucon,geomBL.GG);
+
+    conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+   
+    pp[0]=rho;
+    pp[1]=uint;
+    pp[2]=ucon[1]; 
+    pp[3]=ucon[2];
+    pp[4]=ucon[3];
+	pp[5]=calc_Sfromu(pp[0],pp[1]);
+	}
+	else {
+
     //copying everything
     for(iv=0;iv<=NV;iv++)
       {
@@ -86,17 +121,49 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
     pp[FZ0]=pp[VZ];
     #endif
     */
-    
+	}
 
     p2u(pp,uu,&geom);
     return 0;  
   }
- else if(BCtype==XBCLO) //outflow near BH
+ else if(BCtype==XBCLO&&ifinit==1) //outflow near BH
    {
      iix=0;
      iiy=iy;
      iiz=iz;
 
+	// compute limo torus
+	ldouble rho,uint,ell;
+	init_dsandvels_limotorus(r,th,BHSPIN,&rho,&uint,&ell);
+	if(rho>0.) 
+	{
+
+
+    //uint=LT_KAPPA * pow(rho, LT_GAMMA) / (LT_GAMMA - 1.);
+    //pgas = GAMMAM1 * uint;
+    ell*=-1.;
+
+    ldouble ult,ulph,ucov[4],ucon[4];
+    ulph = sqrt(-1./(geomBL.GG[0][0]/ell/ell + 2./ell*geomBL.GG[0][3] + geomBL.GG[3][3]));
+    ult = ulph / ell;
+
+    ucov[0]=ult;
+    ucov[1]=0.;
+    ucov[2]=0.;
+    ucov[3]=-ulph;
+    
+    indices_12(ucov,ucon,geomBL.GG);
+
+    conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+   
+    pp[0]=rho;
+    pp[1]=uint;
+    pp[2]=ucon[1]; 
+    pp[3]=ucon[2];
+    pp[4]=ucon[3];
+	pp[5]=calc_Sfromu(pp[0],pp[1]);
+	}
+	else {
      //gc
      ldouble r=xxvec[1];
 
@@ -112,13 +179,13 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
      //linear extrapolation
       for(iv=0;iv<NV;iv++)
        {
-	 //pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
+	 //pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(/-r0)/(r1-r0);
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
 
       //      pp[0] = get_u(p,0,0,iiy,iiz)*pow(r/r0,-1.5);
       //pp[1] = get_u(p,1,0,iiy,iiz)*pow(r/r0,-1.5);
- 
+	} 
 
      p2u(pp,uu,&geom);
      return 0;

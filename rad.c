@@ -1636,12 +1636,13 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
   ldouble Gic[4];
 
-if(labframe==0)
+  if(labframe==0)
   {
       ucon[1]=ucon[2]=ucon[3]=ucov[1]=ucov[2]=ucov[3]=0.;
       ucon[0]=1.;
       ucov[0]=-1.;
   }
+  
   calc_Compt_Gi(pp,ggg,Gic,Ehatrad,Tgas,kappaes,ucon);
 
   ldouble fac=1.;
