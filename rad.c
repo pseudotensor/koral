@@ -1245,7 +1245,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 0th ****
   //int conserving=1;
-  ldouble enratiotreshold = 1.e-2;
+  ldouble enratiotreshold = 1.e20;
   ret=-1;
 
   //in pp0[] initial guess for solvers
@@ -1254,6 +1254,32 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //***********************************************//
   //***********************************************//
   //***********************************************//
+
+#ifdef RADIMPLICITFIXVEL
+  PLOOP(iv) 
+    { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+    params[1]=RADIMPLICIT_ENERGYEQ;
+    params[2]=RADIMPLICIT_LAB;
+    params[0]=RAD;
+
+    ret=solve_implicit_lab_4dprim_fixvel(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
+    
+    #ifndef BASICRADIMPLICIT
+    if(ret!=0)
+      { 
+	PLOOP(iv) 
+	{ pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+	params[2]=RADIMPLICIT_FF;
+	ret=solve_implicit_lab_4dprim_fixvel(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+      }      
+    #endif
+
+    if(ret<0)
+      printf("fixvel failed at %d\n",ix);
+
+#endif
+
+
 
   int startwith;
   if(Ehat<enratiotreshold*pp0[UU]) startwith=RAD; else startwith=MHD;
@@ -3648,6 +3674,102 @@ calc_ncompt_nphlab(ldouble *pp, void* ggg)
 int
 test_solve_implicit_lab()
 {
+  int i1,i2,iv;
+  ldouble uu0[NV],pp0[NV],pp[NV],uu[NV],dt;
+  struct geometry geom;
+  fill_geometry(0,0,0,&geom);
+
+  pp0[0]=1.;
+  pp0[1]=1.;
+  pp0[2]=0.;
+  pp0[3]=0.;
+  pp0[4]=0.;
+  pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
+  pp0[6]=0.1;
+  pp0[7]=0.1;
+  pp0[8]=0.;
+  pp0[9]=0.;
+
+  p2u(pp0,uu0,&geom);
+
+  dt=1.e0;
+
+  PLOOP(iv) pp[iv]=pp0[iv];
+
+  print_primitives(pp0);
+
+  ldouble del4[NRADVAR];
+  int verbose=0;
+  int params[4];
+
+  int solver=0;
+  
+  //explicit
+  if(1)
+    {
+      solve_explicit_lab_core(uu0,pp,&geom,dt,del4,verbose);
+      ldouble delapl[NV];
+      delapl[RHO]=0.;
+      delapl[UU]=-del4[0];
+      delapl[VX]=-del4[1];
+      delapl[VY]=-del4[2];
+      delapl[VZ]=-del4[3];
+      delapl[ENTR]=-del4[0];
+#ifdef MAGNFIELD
+      delapl[B1]=0.;
+      delapl[B2]=0.;
+      delapl[B3]=0.;
+#endif
+      delapl[EE0]=del4[0];
+      delapl[FX0]=del4[1];
+      delapl[FY0]=del4[2];
+      delapl[FZ0]=del4[3];
+
+      for(iv=0;iv<NV;iv++)
+	uu[iv]=uu0[iv]+delapl[iv];
+
+      int corr[3],fixup[2];
+      u2p(uu,pp,&geom,corr,fixup,0);
+
+      if(corr[0]!=0 || corr[1]!=0) printf("corr: %d %d\n",corr[0],corr[1]);
+    }
+
+  print_primitives(pp);
+
+  //full implicit
+  PLOOP(iv) pp[iv]=pp0[iv];
+  if(1)
+    { 
+    
+      params[0]=RAD;
+      params[1]=RADIMPLICIT_ENERGYEQ;
+      params[2]=RADIMPLICIT_LAB;
+      params[3]=0; 
+      solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,del4,verbose,params,pp);
+    }
+
+  print_primitives(pp);
+
+  //implicit with fixed gas-vel
+  PLOOP(iv) pp[iv]=pp0[iv];
+  if(1)
+    { 
+    
+      params[0]=RAD;
+      params[1]=RADIMPLICIT_ENERGYEQ;
+      params[2]=RADIMPLICIT_LAB;
+      params[3]=0; 
+      solve_implicit_lab_4dprim_fixvel(uu0,pp0,&geom,dt,del4,verbose,params,pp);
+    }
+
+  print_primitives(pp);
+
+  exit(1);  
+}
+
+int
+test_solve_implicit_lab_file()
+{
   FILE *in = fopen("imp.problem.0","r");
 
   int i1,i2,iv;
@@ -4532,3 +4654,876 @@ reset_radviscaccel()
 	}
 }
 
+
+//**********************************************************************
+//******* solves implicitidly four-force source terms *********************
+//******* in the lab frame  working on primitives    ***********************
+//******* rad only, assumes explicit velocity of gas**********************
+//******* only in the end imposes momentum conservation ***********
+//**********************************************************************
+
+int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,void* ggg,ldouble *f,int *params,ldouble *err0)
+{
+  int ret=0,i;
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  int whichprim=params[0];
+
+  whichprim=RAD;
+
+  int whicheq=params[1];
+  int whichframe=params[2];
+
+  ldouble uu[NV],pp[NV],err[5]={0.,0.,0.,0.,0.};
+  int corr[3]={0,0,0},fixup[2]={0,0},u2pret,i1,i2;
+
+  for(i=0;i<NV;i++) pp[i]=ppin[i];
+  
+   //total inversion, but only whichprim part matters
+  p2u(pp,uu,geom);
+
+  //corresponding change in entropy
+  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
+
+  //opposite changes in the other quantities and inversion
+  u2pret=0;
+  if(whichprim==RAD)
+    {
+      uu[RHO]=uu0[RHO];
+      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
+
+      int rettemp=0;
+      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
+      //if(rettemp<0)
+      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+
+      if(rettemp<0) 
+	  u2pret=-2; //to return error
+
+      else u2pret=0;
+
+      //imposes explicit velocity given in ppin!
+      pp[VX]=ppin[VX];
+      pp[VY]=ppin[VY];
+      pp[VZ]=ppin[VZ];      
+    }
+ 
+  if(corr[0]!=0 || corr[1]!=0) 
+    ret=1;
+  
+  if(u2pret<-1) 
+    {
+      return -1; //allows for entropy and radiation ceilings but does not update conserved 
+    }
+
+  //radiative four-force
+  ldouble Gi[4];
+  calc_Gi(pp,ggg,Gi,1); 
+  indices_21(Gi,Gi,gg);
+  
+  //errors in momenta - always in lab frame
+  if(whichprim==RAD) //rad-primitives
+    {
+      f[1] = uu[FX0] - uu0[FX0] + dt * gdetu * Gi[1];
+      f[2] = uu[FY0] - uu0[FY0] + dt * gdetu * Gi[2];
+      f[3] = uu[FZ0] - uu0[FZ0] + dt * gdetu * Gi[3];
+
+      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[FX0])+fabs(uu0[FX0])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[FY0])+fabs(uu0[FY0])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
+      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[FZ0])+fabs(uu0[FZ0])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
+    }
+
+  /***** LAB FRAME ENERGY/ENTROPY EQS *****/
+  if(whichframe==RADIMPLICIT_LAB)
+    {      
+      if(whichprim==RAD) //rad-primitives
+	{
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    {
+	      f[0] = uu[EE0] - uu0[EE0] + dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[EE0]) + fabs(uu0[EE0]) + fabs(dt*gdetu*Gi[0])); else err[0]=0.;
+
+	      ldouble bsq=0.;
+	      ldouble bcon[4],bcov[4];
+	    }
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    {
+	      f[0] = uu[ENTR] - uu0[ENTR] + dt * gdetu * Gi[0];//but this works on hydro entropy and may fail!
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	    }
+	  else
+	    my_err("not implemented 23\n");
+	}
+      else
+	my_err("not implemented 24\n");      
+    }
+
+  /***** FF FRAME ENERGY/ENTROPY EQS *****/
+  if(whichframe==RADIMPLICIT_FF)
+    {
+      //recalculate the ff time component of four-force
+      calc_Gi(pp,ggg,Gi,0);  // Ghat^0 = - kappa 4 Pi B + ...
+
+      ldouble uconf[4],Rtt0,Rtt;
+      //zero - state 
+      calc_ff_Rtt(pp0,&Rtt0,uconf,geom);
+      //new state
+      calc_ff_Rtt(pp,&Rtt,uconf,geom);
+      
+      ldouble T=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+      ldouble B = SIGMA_RAD*pow(T,4.)/Pi;
+      ldouble Ehat = -Rtt;
+      ldouble Ehat0 = -Rtt0;
+      ldouble dtau=dt/uconf[0];
+
+      //fluid frame energy equation:
+      if(whichprim==RAD) //rad-primitives
+	{
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    {
+	      f[0]=Ehat - Ehat0 + dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(Ehat) + fabs(Ehat0) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	    }
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    {
+	      pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
+	      f[0]=pp[ENTR] - pp0[ENTR] - dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+	    }
+	  else
+	    my_err("not implemented 22\n");	 
+	    
+	}      
+    }
+
+  if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]))
+    return -1;
+  *err0=my_max(my_max(err[0],err[1]),my_max(err[2],err[3]));
+ 
+  return ret;
+} 
+
+int
+print_state_implicit_lab_4dprim_fixvel (int iter, ldouble *x, ldouble *f,ldouble err)
+{
+  printf ("iter = %3d x = % .13e % .13e % .13e % .13e "
+	  "e = %.10e f(x) = % .10e % .10e % .10e % .10e\n",
+	  iter,
+	  //	  x[0],x[1]/x[0],x[2]/x[0],x[3]/x[0],f[0],f[1],f[2],f[3]);
+	  x[0],x[1],x[2],x[3],err,f[0],f[1],f[2],f[3]);
+  return 0;
+}
+
+/*****************************************/
+/******* 4D solver working on primitives */
+/*****************************************/
+int
+solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *pp)
+{
+  //  verbose=2;
+  int i1,i2,i3,iv,i,j;
+  int mom_over_flag;
+  ldouble J[NRADVAR][NRADVAR],iJ[NRADVAR][NRADVAR]; 
+  ldouble pp0[NV],ppp[NV],uu[NV],uu0[NV],uup[NV],ppexp[NV],uuexp[NV]; 
+  ldouble f1[NRADVAR],f2[NRADVAR],f3[NRADVAR],xxx[NRADVAR],xxxbest[NRADVAR],err,errbase,errbest;
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uu0[iv]=uu00[iv]; //zero state for substepping
+      pp0[iv]=pp00[iv]; 
+      uu[iv]=uu0[iv]; 
+      pp[iv]=pp0[iv];     
+    }
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  int ix=geom->ix;
+  int iy=geom->iy;
+  int iz=geom->iz;
+
+  //temporary using local arrays
+  gg=geom->gg;
+  GG=geom->GG;
+  gdet=geom->gdet; gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  //prepare the explicit solution - assumes pp <-> uu
+  ldouble Gi[4];
+  calc_Gi(pp,geom,Gi,1);
+  indices_21(Gi,Gi,geom->gg);
+  
+  deltas[0]=-Gi[0]*dt*gdetu;
+  deltas[1]=-Gi[1]*dt*gdetu;
+  deltas[2]=-Gi[2]*dt*gdetu;
+  deltas[3]=-Gi[3]*dt*gdetu;
+
+  ldouble delapl[NV];
+      
+ 
+  for(iv=0;iv<NV;iv++)
+    {
+      delapl[iv]=0.;
+      uuexp[iv]=uu[iv];
+      ppexp[iv]=pp[iv];
+    }
+      
+  delapl[1]=-deltas[0];
+  delapl[ENTR]=-deltas[0];
+  delapl[2]=-deltas[1];
+  delapl[3]=-deltas[2];
+  delapl[4]=-deltas[3];
+  delapl[EE0]=deltas[0];
+  delapl[FX0]=deltas[1];
+  delapl[FY0]=deltas[2];
+  delapl[FZ0]=deltas[3];
+
+  for(iv=0;iv<NV;iv++)
+    {
+      uuexp[iv]+=delapl[iv];
+    }
+
+  int corr[3],fixup[2];
+
+  //only hd-part inverted to get new explicit velocity
+  int rettemp;
+  rettemp=u2p_solver(uuexp,ppexp,geom,U2P_HOT,0); 
+  //from previous timestep:
+  
+  /*
+  if(rettemp<0.)
+    {
+      ppexp[VX]=pp[VX];
+    }
+  */
+
+  //ppexp[VX]=0.;
+  //rettemp=0;
+       
+
+  if(rettemp<0)
+    printf("hd u2p in fix vel failed %d %d\n",corr[0],corr[1]);
+
+  /* end of explicit */
+
+  
+  
+  /******************************************/
+  /******************************************/
+  /******************************************/
+  //choice of primitives to evolve
+  int whichprim=RAD;
+  
+  int whicheq=params[1];
+  int do_mom_over =params[3];
+  
+  if(verbose && whichprim==MHD) printf("Working on MHD\n\n");
+  if(verbose && whichprim==RAD) printf("Working on RAD\n\n");
+
+  /******************************************/
+  /******************************************/
+  /******************************************/
+
+  //check if one can compare gas & rad velocities
+  if(VELPRIM!=VELPRIMRAD) 
+    my_err("implicit solver assumes VELPRIM == VELPRIMRAD\n");
+
+ 
+  //4dprim
+  ldouble EPS = RADIMPEPS;
+  ldouble CONV = RADIMPCONV;  
+  ldouble MAXITER = RADIMPMAXITER;
+
+  int sh;
+
+  if(whichprim==MHD) 
+    sh=UU; //solving in hydro primitives
+  else if(whichprim==RAD) 
+    sh=EE0; //solving in rad primitives
+
+  ldouble frdt = 1.0;
+  ldouble ucon[4];
+	  
+  int iter=0;
+  int failed=0;
+
+  if(verbose) 
+    {
+      printf("=== i: %d %d %d\n\n",ix,iy,iz);
+      print_conserved(uu);
+      print_primitives(pp);
+      print_metric(gg);
+    }
+
+  if(verbose) 
+    {
+      printf("\n===\n Trying imp lab 4d prim with dt : %e \n",dt);
+    }
+
+  failed=0;
+  iter=0;
+  errbest=BIG;
+
+  int np;
+#ifdef NCOMPTONIZATION
+  np=5;
+#else
+  np=4;
+#endif
+
+  //test
+
+  do //main solver loop
+    {	 
+      iter++;
+      
+      for(i=0;i<NV;i++)
+	{
+	  ppp[i]=pp[i];
+	}	
+      
+      for(i=0;i<4;i++)
+	{
+	  xxx[i]=ppp[i+sh];
+	}  
+      #ifdef NCOMPTONIZATION
+      xxx[4]=ppp[NF0];
+      #endif
+      
+      if(verbose>0)
+	{
+	  pp[VX]=ppexp[VX];pp[VY]=ppexp[VY];pp[VZ]=ppexp[VZ];
+	  int ret=f_implicit_lab_4dprim_fixvel(pp,uu0,pp0,dt,geom,f1,params,&err);
+	  print_state_implicit_lab_4dprim_fixvel (iter-1,xxx,f1,err); 
+	  if(ret<0) printf("f_lab_4dprim ret: %d\n",ret);
+	}
+
+
+      //values at base state
+      pp[VX]=ppexp[VX];pp[VY]=ppexp[VY];pp[VZ]=ppexp[VZ];
+      if(f_implicit_lab_4dprim_fixvel(pp,uu0,pp0,dt,geom,f1,params,&err)<0) 
+	{
+	  if(verbose>0) printf("base state\n");
+	  return -1;	  
+	}
+
+      errbase=err;	  
+
+      //criterion of convergence on the error
+      if(err<CONV)
+	{
+	  //if(verbose) print_NVvector(pp0);
+	  if(verbose) printf("\n === success (error) ===\n");
+	  //if(verbose==2) getchar();
+	  break;
+	}
+
+      if(err<errbest)
+	{
+	  errbest=err;
+	  for(j=0;j<np;j++)
+	    xxxbest[j]=xxx[j];          
+	}
+	  
+
+      ldouble del;
+      //calculating approximate Jacobian
+      for(j=0;j<np;j++)
+	{
+	  //one-way derivatives
+	  //try both signs
+	  ldouble sign=-1.;
+	  for(;;)
+	  {
+	    if(j==0)
+	      {
+		//EEE
+		
+		//uses EPS of the dominating quantity
+		/*
+		if(dominates==RAD)
+		  del=sign*EPS*ppp[EE0];
+		else
+		  del=sign*EPS*ppp[UU];	   
+		*/
+		
+		//EPS of the iterated quantity
+		del=sign*EPS*ppp[sh]; //minus avoids u2p_mhd errors when working on radiative
+
+		pp[j+sh]=ppp[j+sh]+del;
+	      }
+	    else if(j==4) //number of photons, only for NCOMPTONIZATION
+	      {
+		del=sign*EPS*ppp[NF0]; 
+		pp[NF0]=ppp[NF0]+del;
+	      }	    
+	    else //decreasing velocity
+	      {
+		ldouble veleps = EPS*my_sign(ppp[j+sh])*my_max(1.e-6/sqrt(geom->gg[j][j]),fabs(ppp[j+sh]));
+		if(ppp[j+sh]>=0.)
+		  del=sign*veleps; 
+		else
+		  del=-sign*veleps; 
+		pp[j+sh]=ppp[j+sh]+del;
+	      }	    
+	   
+	    pp[VX]=ppexp[VX];pp[VY]=ppexp[VY];pp[VZ]=ppexp[VZ]; 
+	    int fret=f_implicit_lab_4dprim_fixvel(pp,uu0,pp0,dt,geom,f2,params,&err);  
+	    
+	    if(fret<0) 
+	      {
+		if(sign>0.) //already switched signs
+		  {	      
+		    if(verbose) printf("Jac mid-state (%d) both signs lead to trouble\n",j);
+		    failed=1;
+		    break;
+		  }
+		else
+		  {
+		    if(verbose) printf("Jac mid-state (%d) trying the other one\n",j);
+		    pp[j+sh]=ppp[j+sh];
+		    sign*=-1.;
+		    continue;
+		  }
+	      }
+  
+	    //Jacobian matrix component
+	    for(i=0;i<np;i++)
+	      {
+		if(j<4)
+		  J[i][j]=(f2[i] - f1[i])/(pp[j+sh]-ppp[j+sh]);
+		else
+		  J[i][j]=(f2[i] - f1[i])/(pp[NF0]-ppp[NF0]);		  
+	      }
+
+	    if(j<4) 
+	      pp[j+sh]=ppp[j+sh];
+	    else
+	      pp[NF0]=ppp[NF0];
+	    break;
+	  }
+
+	  if(failed==1)
+	    break;
+	}
+      
+      if(failed==1)
+	break;
+ 
+      //inversion
+#ifndef NCOMPTONIZATION
+      if(inverse_44matrix(J,iJ)<0)
+	{
+	  failed=1;
+	  if(verbose) 
+	    {
+	      print_tensor(J);
+	      print_tensor(iJ);
+
+	      int k,l;
+	      ldouble JJ[4][4];
+	      for(i=0;i<4;i++)
+		{
+		  for(j=0;j<4;j++)
+		    {
+		      JJ[i][j]=0.;
+
+		      for(k=0;k<4;k++)     
+			JJ[i][j]+=J[i][k]*iJ[k][j];
+		    }
+		}
+
+	      print_tensor(JJ);
+
+	      printf("Jacobian inversion failed\n");getchar();
+	    }
+	  break;
+	}
+#else
+      int ret;
+#pragma omp critical //for some reason gsl-based inverse does not work on my mac with openmp
+      {
+       ret=inverse_matrix(&J[0][0],&iJ[0][0],5);
+      }
+      if(ret<0)
+	{
+	  failed=1;
+	  if(verbose || 1) 
+	    printf("Jacobian 5x5 inversion failed\n");getchar();
+	  break;
+	}
+      
+#endif     
+	 
+      if(verbose) 
+	{
+	  //	  if(verbose!=2) exit(0);
+	  //getchar();
+	}
+
+
+      //applying corrections
+      ldouble xiapp=1.;
+      do //check whether energy density positive and the error function returns 0
+	{	    
+	  //original x
+	  for(i=0;i<np;i++)
+	    {
+	      if(i<4)
+		xxx[i]=ppp[i+sh];
+	      else
+		xxx[i]=ppp[NF0];		
+	    }
+
+	  //updating x
+	  for(i=0;i<np;i++)
+	    {
+	      for(j=0;j<np;j++)
+		{
+		  xxx[i]-=xiapp*iJ[i][j]*f1[j];
+		}
+	    }
+
+	  if(verbose)
+	    {
+	      printf("\nsub> trying with xi=%e\n",xiapp);
+	      print_Nvector(xxx,np);
+	      //print_Nvector(&J[0][0],25);
+	    }
+
+	  /*
+	  mom_over_flag=0;
+	  //check if momenta overshoot
+	  ldouble ALLOWANCE; 
+	  if(params[3]==1) ALLOWANCE=100.;
+	  if(params[3]==2) ALLOWANCE=1.1;	  
+	  if(params[3]==3) ALLOWANCE=1.0001;	  
+	  ldouble mommin,mommax,momsep;
+	  if(do_mom_over)
+	    {
+	      for(i=1;i<4;i++)
+		{
+		  //allowed brackets 
+		  //TODO: precalculate
+		  mommin=my_min(pp0[EE0+i],pp0[UU+i]);
+		  mommax=my_max(pp0[EE0+i],pp0[UU+i]);
+		  momsep=fabs(mommin-mommax);
+
+		  mommin=mommin - ALLOWANCE*momsep;
+		  mommax=mommax + ALLOWANCE*momsep;
+
+		  if(verbose) printf("mom min/max (%d) %e %e\n",i,mommin,mommax);
+
+		  if(xxx[i]<mommin)
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],mommin);
+		      xxx[i]=mommin;
+		      mom_over_flag=1;
+		    }
+		  if(xxx[i]>mommax)
+		    {
+		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],mommax);
+		      xxx[i]=mommax;
+		      mom_over_flag=1;
+		    }
+		}
+	    }
+	  */
+	
+	  //update primitives
+	  for(i=0;i<np;i++)
+	    {
+	      if(i<4)
+		pp[i+sh]=xxx[i];
+	      else
+		pp[NF0]=xxx[i];
+	    }
+
+	 
+
+	  //updating entropy
+	  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+
+	  //updating the other set of quantities
+	  p2u(pp,uu,geom);
+
+	  uu[ENTR] = uu0[ENTR] - (uu[EE0]-uu0[EE0]);
+  
+	  int u2pret;
+	  //opposite changes in the other quantities and inversion
+	  if(whichprim==RAD)
+	    {
+	      uu[RHO]=uu0[RHO];
+	      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+	      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+	      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+	      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+
+	      int rettemp=0;
+	      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0);
+	      //WHY?
+	      //rettemp=0.;
+	      //if(rettemp<0)
+	      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+
+	      if(rettemp<0) u2pret=-2; //to return error if even entropy inversion failed
+	      else u2pret=0;	      
+
+	      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+
+	    }
+	  if(whichprim==MHD)
+	    {
+	      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+	      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+	      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+	      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+	      u2pret=u2p_rad(uu,pp,geom,corr);
+
+#ifdef NCOMPTONIZATION //urf unknown before p2u
+	      pp[NF0]=xxx[4];
+#endif
+
+
+	      //report on ceilings
+	      if(corr[0]>0)
+		{
+		  if(verbose) printf("corr: %d\n",corr[0]);
+#ifdef ALLOWRADCEILINGINIMPLICIT
+		  u2pret=-1;
+#else
+		  u2pret=-2; //not to allow hitting radiation ceiling in rad when doing iterations
+#endif
+		}
+	    }    
+
+	    
+	  
+	  //check if energy density positive and the inversion worked using U2P_HOT
+	  if(xxx[0]>0. && u2pret>=-1) break;
+
+	  
+	  //if not decrease the applied fraction
+	  if(xxx[0]<=0. && 1)
+	    {
+	      xiapp*=ppp[sh]/(ppp[sh]+fabs(xxx[0]));
+	      xiapp*=1.e-1;//sqrt(EPS); //not to land too close to zero, but sometimes prevents from finding proper solution
+	    }
+	  else //u2p error only
+	    {
+	      xiapp/=2.; 
+	    }
+
+	  if(xiapp<1.e-2) 
+	    {
+	      if(verbose) printf("damped unsuccesfully in implicit_4dprim_fixvel\n");
+	      failed=1;
+	      break;
+	    }
+	}
+      while(1); 
+
+
+      //TODO:
+      //this may fail but necessary to start of a.neq.0 runs      
+#ifdef BHDISK_PROBLEMTYPE
+      if(1 && failed==0 && global_time<100.)
+	{
+	  //criterion of convergence on relative change of quantities
+	  f3[0]=fabs((pp[sh]-ppp[sh])/ppp[sh]);
+	  for(i=1;i<np;i++)
+	    {
+	      if(i<4)
+		{
+		  f3[i]=pp[i+sh]-ppp[i+sh];
+		  f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[i+sh])));	
+		}
+	      if(i==5)
+		{
+		  f3[i]=pp[NF0]-ppp[NF0];
+		  f3[i]=fabs(f3[i]/my_max(EPS,fabs(ppp[NF0])));	
+		}
+	    }
+
+	  if(verbose) {
+	    //print_4vector(&ppp[sh]);
+	    //print_4vector(&pp[sh]);
+	    //print_4vector(f3);
+	  }
+	  
+	  ldouble CONVREL=EPS;
+	  ldouble CONVRELERR=1.-EPS;
+
+	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
+	    {
+	      if(verbose) printf("\n === success (rel.change) ===\n");
+	      break;
+	    }     
+	}
+#endif
+      
+      
+     
+
+      if(iter>MAXITER || failed==1)
+	break;
+    }
+  while(1); //main solver loop
+
+  if(iter>MAXITER || failed==1)
+    {
+      getch();
+      if(verbose)
+	{
+	  printf("iter (%d) or failed in solve_implicit_lab_4dprim_fixvel() for frdt=%f (%e)\n",iter,dt,errbest);	  
+	}
+      
+      /*
+      ldouble CONVLOOSE=CONV*1.e0;
+      if(errbest<CONVLOOSE)
+	{
+	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
+	  //update primitives
+	  for(i=0;i<4;i++)
+	    pp[i+sh]=xxxbest[i];
+	}
+      else
+      */
+
+      return -1;       
+    }
+
+  //updating conserved
+  if(whichprim==MHD)
+    {
+      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+      pp[RHO]=(uu0[RHO])/gdetu/ucon[0];
+    }
+  //updating entropy
+  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+
+#ifdef NCOMPTONIZATION //urf unknown before p2u
+  ldouble nf0bak=pp[NF0];
+#endif
+
+  p2u(pp,uu,geom);
+  
+  int u2pret;
+  if(whichprim==RAD)
+    {
+      uu[RHO]=uu0[RHO];
+      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
+      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
+      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
+      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);
+      uu[ENTR] = uu0[ENTR];
+
+      int rettemp=0;
+      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
+      //if(rettemp<0)
+      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+      
+      if(rettemp<0) //to return error if neither entropy or energy inversion succeeded
+	u2pret=-2; 
+      else 
+	u2pret=0;
+	      
+      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
+      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+    }
+  if(whichprim==MHD)
+    {
+      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+      u2pret=u2p_rad(uu,pp,geom,corr);
+
+#ifdef NCOMPTONIZATION //urf unknown before p2u
+      pp[NF0]=nf0bak;
+#endif
+
+
+      if(corr[0]>0) //if final solution hit ceiling, discard 
+	{
+	  if(verbose>1)
+	    printf("final solution corrected in rad\n");
+	  #ifdef ALLOWRADCEILINGINIMPLICIT
+	  u2pret=-1;
+	  #else
+	  u2pret=-2;
+	  #endif
+
+	  //printf("discarding gammamax solution at %d %d\n",geom->ix,geom->iy);
+	}
+    }    
+  if(u2pret<-1) 
+    {
+      if(verbose>1)
+	printf("final solution rejected\n");
+      return -1;
+    }
+  
+  //returns corrections to radiative primitives - not used anymore
+  deltas[0]=uu[EE0]-(uu0[EE0]);
+  deltas[1]=uu[FX0]-(uu0[FX0]);
+  deltas[2]=uu[FY0]-(uu0[FY0]);
+  deltas[3]=uu[FZ0]-(uu0[FZ0]);
+
+#ifdef NCOMPTONIZATION
+  deltas[4]=uu[NF0]-(uu0[NF0]);
+#endif
+  
+  if(verbose) print_4vector(deltas);
+  
+
+  //succeeded
+  //primitives vector returned to pp[]
+
+  //report on average number of iterations
+   if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ)
+    {
+      //#pragma omp critical //to make the counting precise
+      global_int_slot[GLOBALINTSLOT_ITERIMPENERRAD]+=iter;
+    }
+  if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_ITERIMPENERMHD]+=iter;
+    }
+  if(whichprim==RAD && whicheq==RADIMPLICIT_ENTROPYEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_ITERIMPENTRRAD]+=iter;
+    }
+  if(whichprim==MHD && whicheq==RADIMPLICIT_ENTROPYEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_ITERIMPENTRMHD]+=iter;
+    }
+  if(whicheq==RADIMPLICIT_LTEEQ)
+    {
+      //#pragma omp critical
+      global_int_slot[GLOBALINTSLOT_ITERIMPLTE]+=iter;
+    }
+
+ 
+  return 0;
+}

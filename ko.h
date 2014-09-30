@@ -646,6 +646,7 @@ int calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *,ldouble *mfpret,ldouble *
 int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff);
 int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble RijM1[][4], ldouble Rijvisc[][4]);
 int solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *);
+int solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,int *params,ldouble *);
 int solve_implicit_lab_4dcon(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldouble* deltas,int verbose,ldouble *pp);
 int solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* deltas,int verbose);
 int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt);
@@ -654,6 +655,7 @@ int test_if_rad_implicit(int ix,int iy, int iz,ldouble dt, ldouble gg[][5], ldou
 int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt);
 ldouble calc_LTE_temp(ldouble *pp,void *ggg,int);
 int test_solve_implicit_lab();
+int test_solve_implicit_lab_file();
 int test_jon_solve_implicit_lab();
 int calc_LTE_state(ldouble *pp,ldouble *ppLTE,void *ggg);
 int calc_LTE_state_temp(ldouble *pp,void *ggg);

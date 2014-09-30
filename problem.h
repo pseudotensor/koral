@@ -83,8 +83,23 @@
 //80 GENCLOSURE - tests of closures
 //81 TWOBEAM - test of VET with two beams
 //82 VETTHIN - thin disk emission for VET tests
+//83 RADFLATTEST - tests of radiation solvers in flat space
 
-#define PROBLEM 7
+#define PROBLEM 83
+
+#if(PROBLEM==83)
+
+#define PR_DEFINE "PROBLEMS/RADFLATTEST/define.h"
+#define PR_BC "PROBLEMS/RADFLATTEST/bc.c"
+#define PR_INIT "PROBLEMS/RADFLATTEST/init.c"
+#define PR_KAPPA "PROBLEMS/RADFLATTEST/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADFLATTEST/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADFLATTEST/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADFLATTEST/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADFLATTEST/dump.c"
+#define PR_TOOLS "PROBLEMS/RADFLATTEST/tools.c"
+
+#endif
 
 #if(PROBLEM==82)
 
