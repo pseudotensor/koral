@@ -136,15 +136,13 @@ main(int argc, char **argv)
       if(PROCID==0) {printf("Sending initial data... ");fflush(stdout);}
       mpi_exchangedata();
       calc_avgs_throughout();
-      
-
-
 #pragma omp parallel
       set_bc(tstart,1);
       #ifdef MPI
       MPI_Barrier(MPI_COMM_WORLD);
       #endif
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
+#ifdef MAGNFIELD
 #ifdef VECPOTGIVEN
       if(PROCID==0) {printf("Calculating magn. field... ");fflush(stdout);}
 #pragma omp parallel
@@ -158,6 +156,7 @@ main(int argc, char **argv)
       MPI_Barrier(MPI_COMM_WORLD);
       #endif
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
+#endif
 #endif
 #ifdef RADSTARTWITHM1INTENSITIES
 #pragma omp parallel  
