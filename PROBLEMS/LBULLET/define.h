@@ -128,7 +128,7 @@
 /***********************************/
 // Bullet choice
 /**********************************/
-#define PI 3.14159
+//#define PI 3.14159
 #define BULLET_PHI
 //#define BULLET_THETA
 

@@ -185,6 +185,56 @@ fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
   return 0;
 }
  
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints theta profiles to thNNNN.dat */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int
+fprint_thprofiles(ldouble t, int nfile, char* folder, char* prefix)
+{
+  //#ifdef BHDISK_PROBLEMTYPE 
+  char bufor[50],bufor2[50];
+  sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
+
+  FILE *fout_thprofiles=fopen(bufor,"w");
+
+  int ix,iy,iv;
+
+  //search for appropriate radial index
+  ldouble xx[4],xxBL[4];
+  ldouble radius=1.e3;
+  #ifdef THPROFRADIUS
+  radius=THPROFRADIUS;
+  #endif
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
+
+  //calculating theta profiles
+  ldouble profiles[NTHPROFILES][NY];
+  calc_thetaprofiles(profiles);
+  //printing th profiles  
+  for(iy=0;iy<NY;iy++)
+    {
+      get_xx(ix,iy,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS); 
+      
+      fprintf(fout_thprofiles,"%e ",xxBL[2]);
+      for(iv=0;iv<NTHPROFILES;iv++)
+	fprintf(fout_thprofiles,"%e ",profiles[iv][iy]);
+      fprintf(fout_thprofiles,"\n");
+    }
+  fclose(fout_thprofiles);
+  
+  return 0;
+}
+ 
 
 /*********************************************/
 /*********************************************/

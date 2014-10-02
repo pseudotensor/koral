@@ -102,6 +102,11 @@ main(int argc, char **argv)
 #if(RADOUTPUT==1)
       fprint_radprofiles(t,nfout1,"analysis","rad");
 #endif
+
+#if(THOUTPUT==1)
+      fprint_thprofiles(t,nfout1,"analysis","th");
+#endif
+
 #if(OUTOUTPUT==1)
       fprint_outfile(t,nfout1,0,"analysis","out");
 #endif

@@ -606,6 +606,152 @@ int calc_radialprofiles(ldouble profiles[][NX])
 }
 
 /*********************************************/
+/* calculates theta profiles  */
+
+//total energy flux (2) (column)
+
+/*********************************************/
+int calc_thetaprofiles(ldouble profiles[][NY])
+{
+  //adjust NTHPROFILES in problem.h
+  ldouble rho,uint,bsq,bcon[4],bcov[4],utcon[4],ucov[4],rhouconr,rhoucont;
+  ldouble Tij[4][4],Tij22[4][4],Rij[4][4],Trt,Rrt,Ehat,Rviscij[4][4],Rviscrt;
+  ldouble pp[NV];
+
+  //choose radius where to extract from
+  int ix,i,j,iv,iz;
+
+  //search for appropriate radial index
+  ldouble xx[4],xxBL[4];
+  ldouble radius=1.e3;
+  #ifdef THPROFRADIUS
+  radius=THPROFRADIUS;
+  #endif
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
+
+  int iy;
+#pragma omp parallel for
+  for(iy=0;iy<NY;iy++)
+    {
+      for(iv=0;iv<NTHPROFILES;iv++)
+	profiles[iv][iy]=0.;
+
+      if(NZ==1) //phi-symmetry
+	{
+	  iz=0;
+	  struct geometry geomBL;
+	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	  struct geometry geom;
+	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
+	      
+	  //primitives at the cell - either averaged or original, in BL or MYCOORDS
+	  for(iv=0;iv<NV;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  //to BL, res-files and primitives in avg in MYCOORDS
+	  trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+
+	  if(doingavg)
+	    {
+	      rho=get_uavg(pavg,RHO,ix,iy,iz);
+	      uint=get_uavg(pavg,UU,ix,iy,iz);
+	      bsq=get_uavg(pavg,AVGBSQ,ix,iy,iz);
+	      bcon[0]=get_uavg(pavg,AVGBCON(0),ix,iy,iz);
+	      bcon[1]=get_uavg(pavg,AVGBCON(1),ix,iy,iz);
+	      bcon[2]=get_uavg(pavg,AVGBCON(2),ix,iy,iz);
+	      bcon[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
+	      utcon[0]=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      utcon[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      utcon[2]=get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      utcon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+	      rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+	      rhoucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz);
+		  
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+
+		  Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(i,j),ix,iy,iz)
+		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(i,j),ix,iy,iz)
+		    + get_uavg(pavg,AVGBSQUCONUCOV(i,j),ix,iy,iz)
+		    - get_uavg(pavg,AVGBCONBCOV(i,j),ix,iy,iz); 
+
+	      Trt=Tij[1][0];
+
+#ifdef RADIATION  
+	      for(i=0;i<4;i++)
+		for(j=0;j<4;j++)
+		  Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz); 
+
+	      Rrt = Rij[1][0];
+	      Ehat = get_uavg(pavg,AVGEHAT,ix,iy,iz);
+
+	      int derdir[3]={0,0,0};
+	      calc_Rij_visc(pp,&geomBL,Rviscij,derdir);      
+	      Rviscrt = Rviscij[1][0];
+#endif
+		  
+	      //no need of transforming interpolated primitives to BL, already there
+		 
+	    }
+	  else
+	    { 
+	      rho=pp[0];
+	      uint=pp[1];
+	      utcon[1]=pp[2];
+	      utcon[2]=pp[3];
+	      utcon[3]=pp[4];
+		  
+#ifdef MAGNFIELD
+	      calc_bcon_prim(pp,bcon,&geomBL);
+	      indices_21(bcon,bcov,geomBL.gg); 
+	      bsq = dot(bcon,bcov); 
+#endif
+
+	      conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	      rhouconr=rho*utcon[1];
+
+	      calc_Tij(pp,&geomBL,Tij22);
+	      indices_2221(Tij22,Tij,geomBL.gg);
+
+	      Trt = Tij[1][0];
+
+#ifdef RADIATION
+	      calc_Rij(pp,&geomBL,Rij);
+	      indices_2221(Rij,Rij,geomBL.gg);
+
+	      Rrt = Rij[1][0];
+
+	      ldouble Rtt,uconr[4];
+	      calc_ff_Rtt(&get_u(p,0,ix,iy,iz),&Rtt,uconr,&geomBL);
+	      Ehat=-Rtt; 	
+
+	      int derdir[3]={0,0,0}; 
+	      calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
+      
+	      Rviscrt = Rviscij[1][0];
+#endif
+	      
+	    }
+	  
+	  ldouble fluxconv=fluxGU2CGS(1.); 
+	  profiles[0][iy]=-fluxconv*(Rrt+rhouconr+Trt);
+
+	  profiles[1][iy]=-fluxconv*(Rrt);
+
+	}
+
+    }
+
+  return 0;
+}
+
+
+/*********************************************/
 /* calculates scalar s - total mass, accretion rate etc. */
 /*********************************************/
 int calc_scalars(ldouble *scalars,ldouble t)

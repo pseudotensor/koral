@@ -168,6 +168,11 @@ main(int argc, char **argv)
   fprint_radprofiles(t,no2,"analysis",prefix);
 #endif
   
+#if(THOUTPUT==1)
+  sprintf(prefix,"thavg%s%04d-",suffix,no1);
+  fprint_thprofiles(t,no2,"analysis",prefix);
+#endif
+  
 #if(OUTOUTPUT==1)
   sprintf(prefix,"outavg%s%04d-",suffix,no1);
   fprint_outfile(t,no2,0,"analysis",prefix);
