@@ -47,10 +47,9 @@ if(BCtype==XBCHI)
 
 #ifdef RADIATION
     if(pp[FX0]<0.)
-      {
-	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+      pp[FX0]=0.;
 #endif
-      }
+     
 
    p2u(pp,uu,&geom);
    return 0;  
@@ -83,10 +82,10 @@ if(BCtype==XBCLO)
 
 #ifdef RADIATION
     if(pp[FX0]>0.)
-      {
-	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+      pp[FX0]=0.;
+	//set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+	
 #endif
-      }
 
     p2u(pp,uu,&geom);
 
@@ -121,10 +120,8 @@ if(BCtype==YBCLO)
 
 #ifdef RADIATION
     if(pp[FY0]>0.)
-      {
-	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+      pp[FY0]=0.;
 #endif
-      }
 
     p2u(pp,uu,&geom);
     return 0;
@@ -155,10 +152,8 @@ if(BCtype==YBCHI)
 
 #ifdef RADIATION
     if(pp[FY0]<0.)
-      {
-	set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+      pp[FY0]=0.;
 #endif
-      }
 
     p2u(pp,uu,&geom);
     return 0;
