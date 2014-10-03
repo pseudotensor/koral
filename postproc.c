@@ -50,6 +50,7 @@
 //conserved flux rhout+Trt in MYCOORDS (39)
 //conserved flux for Rrt int MYCOORDS(40)
 //surface density of energy = int (Ttt+rhout+Rtt) dz (41)
+//rho-weighted radial velocity in the jet (42)
 
 
 /*********************************************/
@@ -95,6 +96,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
       
       Bangle1=Bangle2=0.;
       Sigmagdet=0.;
+      ldouble jetsigma=0.;
 
       for(iv=0;iv<NAVGVARS;iv++)
 	avgsums[iv][ix]=0.;
@@ -489,6 +491,13 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      if(isjet==1)
 		profiles[14][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
+	      //jet gas velocity (42)
+	      if(isjet==1)
+		{
+		  profiles[40][ix]+=rhouconr*dx[1]*dx[2]*geomBL.gdet;
+		  jetsigma+=rho*dx[1]*dx[2]*geomBL.gdet;
+		}
+
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
 
@@ -559,6 +568,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	  profiles[32][ix]/=profiles[0][ix];
 	  //profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
 	  profiles[29][ix]=scaleth_otg[ix]; //scale height
+	  profiles[40][ix]/=jetsigma;
 	  
 	  Bangle1/=profiles[0][ix];
 	  Bangle2/=profiles[0][ix];

@@ -345,29 +345,26 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   vcon[3]=pp[FZ(0)];
   vcon[0]=0.;  
   conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG); 
+
+  /*
   //fluid frame Ghat
   ldouble Gi[4],Gic[4];
   calc_Gi(pp,&geomout,Gi,0); 
 
-
-  //test
-  /*
-  ldouble Gi2[4];
-  if(ix>60 && iy==TNY/2)
-    {
-      calc_Gi(pp,&geomout,Gi2,1); 
-      boost2_lab2ff(Gi2,Gi2,pp,geomout.gg,geomout.GG);
-      printf("%d %d %d\n",ix,iy,iz);
-      print_4vector(Gi);
-      print_4vector(Gi2);
-      getch();
-    }
-  */
-
   ldouble kappaes=calc_kappaes(pp,&geomout);
   ldouble uffcon[4]={1.,0.,0.,0.};
   calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,uffcon);
-  
+  */
+
+  //four fource
+  ldouble Gi[4],Gic[4];
+  calc_Gi(pp,&geomout,Gi,1); 
+  boost2_lab2ff(Gi,Gi,pp,geomout.gg,geomout.GG);
+#if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
+  ldouble kappaes=calc_kappaes(pp,&geomout);
+  calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,ucon);
+  boost2_lab2ff(Gic,Gic,pp,geomout.gg,geomout.GG);
+#endif 
 
   for(iv=0;iv<4;iv++)
     avg[AVGURFCON(iv)]=ucon[iv];

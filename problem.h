@@ -85,7 +85,7 @@
 //82 VETTHIN - thin disk emission for VET tests
 //83 RADFLATTEST - tests of radiation solvers in flat space
 
-#define PROBLEM 75
+#define PROBLEM 7
 
 #if(PROBLEM==83)
 
@@ -1520,7 +1520,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 40
+#define NRADPROFILES 41
 #endif
 
 #ifndef NTHPROFILES

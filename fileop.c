@@ -1875,7 +1875,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
                   #endif 
 		  
 		  //test
-		  calc_Gi(pp,&geomBL,Gi,0); 
+		  //calc_Gi(pp,&geomBL,Gi,0); 
 		}
 	      else
 		{
