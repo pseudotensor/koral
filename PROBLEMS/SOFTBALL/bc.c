@@ -18,7 +18,7 @@ if(BCtype==XBCHI)
     iiy=iy;
     iiz=iz;
     
-    for(iv=0;iv<=NV;iv++)
+    for(iv=0;iv<NV;iv++)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
@@ -63,7 +63,7 @@ if(BCtype==XBCLO)
     iiy=iy;
     iiz=iz;
     
-    for(iv=0;iv<=NV;iv++)
+    for(iv=0;iv<NV;iv++)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
@@ -101,7 +101,7 @@ if(BCtype==YBCLO)
     iiy=0;
     iiz=iz;
 
-    for(iv=0;iv<=NV;iv++)
+    for(iv=0;iv<NV;iv++)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }    
@@ -133,7 +133,7 @@ if(BCtype==YBCHI)
     iiy=NY-1;
     iiz=iz;
 
-    for(iv=0;iv<=NV;iv++)
+    for(iv=0;iv<NV;iv++)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }

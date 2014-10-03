@@ -3,6 +3,7 @@
 /************************************/
 #define RESTART 
 #define RESTARTNUM -1
+#define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
 //#define UNPERTURBED
 
@@ -10,7 +11,7 @@
 //radiation
 /************************************/
 #define RADIATION
-#define BALANCEENTROPYWITHRADIATION
+//#define BALANCEENTROPYWITHRADIATION
 
 /************************************/
 //magnetic fields
@@ -53,7 +54,7 @@
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 5000 //stop after this number of outputs
 #define DTOUT1 1. //res
-#define DTOUT2 100 //avg
+#define DTOUT2 100. //avg
 
 /************************************/
 //reconstruction / stepping
