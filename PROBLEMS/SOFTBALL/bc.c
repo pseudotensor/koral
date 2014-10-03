@@ -14,6 +14,7 @@ fill_geometry(ix,iy,iz,&geom);
 if(BCtype==XBCHI) 
   {
 
+    //outflow for radiation
     iix=NX-1;
     iiy=iy;
     iiz=iz;
@@ -23,6 +24,13 @@ if(BCtype==XBCHI)
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
 
+
+#ifdef RADIATION
+    if(pp[FX0]<0.)
+      pp[FX0]=0.;
+#endif
+
+    //fixed hydro part
    pp[RHO]=RHOAMB; 
    pp[UU]=UUAMB; 
    pp[VZ]=0.;
@@ -30,25 +38,8 @@ if(BCtype==XBCHI)
    pp[VX]=0.;
    pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
-   //#ifdef MAGNFIELD
-   //pp[B1]=pp[B2]=pp[B3]=0.;
-   //#endif
+  
 
- //check for inflow
-    if(pp[VX]<0.)
-      {
-	pp[RHO]=RHOAMB; 
-	pp[UU]=UUAMB; 
-	pp[VZ]=0.;
-	pp[VY]=0.;
-	pp[VX]=0.;
-	pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
-      }
-
-#ifdef RADIATION
-    if(pp[FX0]<0.)
-      pp[FX0]=0.;
-#endif
      
 
    p2u(pp,uu,&geom);

@@ -125,6 +125,11 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
    }
 
 /***********************************************/
+
+check_floors_mhd(pp,VELPRIM,&geom);
+
+if(pp[RHO]<RHOAMB) pp[RHO]=RHOAMB;
+
 //calculate entropy from rho & uint
 pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 

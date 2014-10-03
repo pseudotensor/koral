@@ -5,6 +5,7 @@
 #define RESTARTNUM -1
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
+#define DOFIXUPS 0
 //#define UNPERTURBED
 
 /************************************/
@@ -66,6 +67,15 @@
 #define MINMOD_THETA 1.5
 
 /************************************/
+//problem params
+/************************************/
+#define MASS 10.
+#define TORUSENTR 5.e2
+#define RHOAMB 1.e-25
+#define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho
+#define ERADATMMIN 1.e-25
+
+/************************************/
 //rhd floors
 /************************************/
 #define UURHORATIOMIN 1.e-10
@@ -75,19 +85,10 @@
 #define EEUURATIOMIN 1.e-15
 #define EEUURATIOMAX 1.e6
 #define ERADLIMIT 1.e-50
-#define RHOFLOOR 1.e-50
+#define RHOFLOOR (RHOAMB/10.)
 #define GAMMAMAXRAD 20.
 
 /************************************/
 //physics
 /************************************/
 #define GAMMA (5./3.)
-
-/************************************/
-//problem params
-/************************************/
-#define MASS 10.
-#define TORUSENTR 5.e2
-#define RHOAMB 1.e-25
-#define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho
-#define ERADATMMIN 1.e-25

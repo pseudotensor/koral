@@ -1245,7 +1245,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //**** 0th ****
   //int conserving=1;
-  ldouble enratiotreshold = 1.e-10;
+  ldouble enratiotreshold = RADIMPLICITTHRESHOLD;
   ret=-1;
 
   //in pp0[] initial guess for solvers
