@@ -89,8 +89,8 @@ main(int argc, char **argv)
   //**************
   //tests
   //**************
-  //test_solve_implicit_lab();
-  //exit(-1);
+  test_solve_implicit_lab();
+  exit(-1);
 
   //print scalings GU->CGS and quit
   //print_scalings(); exit(-1);
@@ -730,7 +730,7 @@ print_scalings()
 	 lenGU2CGS(1.),
 	 timeGU2CGS(1.),
 	 endenGU2CGS(1.),
-	 fluxGU2CGS(1.,)
+	 fluxGU2CGS(1.),
 	 calc_PEQ_Tfromurho(1.,1.),
 	 K_BOLTZ/MU_GAS/M_PROTON,
 	 K_BOLTZ/M_ELECTR,

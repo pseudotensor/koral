@@ -3690,6 +3690,9 @@ test_solve_implicit_lab()
   pp0[7]=0.1;
   pp0[8]=0.;
   pp0[9]=0.;
+  #ifdef NCOMPTONIZATION
+  pp0[NF0]=calc_NFfromE(pp0[EE0]);
+  #endif
 
   p2u(pp0,uu0,&geom);
 
@@ -3706,7 +3709,7 @@ test_solve_implicit_lab()
   int solver=0;
   
   //explicit
-  if(1)
+  if(0)
     {
       solve_explicit_lab_core(uu0,pp,&geom,dt,del4,verbose);
       ldouble delapl[NV];
@@ -3733,9 +3736,9 @@ test_solve_implicit_lab()
       u2p(uu,pp,&geom,corr,fixup,0);
 
       if(corr[0]!=0 || corr[1]!=0) printf("corr: %d %d\n",corr[0],corr[1]);
+      print_primitives(pp);
     }
 
-  print_primitives(pp);
 
   //full implicit
   PLOOP(iv) pp[iv]=pp0[iv];
@@ -3747,13 +3750,13 @@ test_solve_implicit_lab()
       params[2]=RADIMPLICIT_LAB;
       params[3]=0; 
       solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,del4,verbose,params,pp);
+      print_primitives(pp);
     }
 
-  print_primitives(pp);
 
   //implicit with fixed gas-vel
   PLOOP(iv) pp[iv]=pp0[iv];
-  if(1)
+  if(0)
     { 
     
       params[0]=RAD;
@@ -3761,9 +3764,9 @@ test_solve_implicit_lab()
       params[2]=RADIMPLICIT_LAB;
       params[3]=0; 
       solve_implicit_lab_4dprim_fixvel(uu0,pp0,&geom,dt,del4,verbose,params,pp);
+      print_primitives(pp);
     }
 
-  print_primitives(pp);
 
   exit(1);  
 }
