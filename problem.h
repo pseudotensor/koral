@@ -1520,11 +1520,11 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 41
+#define NRADPROFILES 44
 #endif
 
 #ifndef NTHPROFILES
-#define NTHPROFILES 2
+#define NTHPROFILES 4
 #endif
 
 #ifndef NANARELRADPROFILES

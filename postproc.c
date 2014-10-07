@@ -51,6 +51,9 @@
 //conserved flux for Rrt int MYCOORDS(40)
 //surface density of energy = int (Ttt+rhout+Rtt) dz (41)
 //rho-weighted radial velocity in the jet (42)
+//magnetic flux in the jet (43)
+//kinetic flux in the jet (44)
+//radial velocity close to the axis (45)                                                                                                                                                                                                                                    
 
 
 /*********************************************/
@@ -71,6 +74,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
       ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,ucon[4],utcon[4],ucon3[4];
       ldouble rhoucont,enden,rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
+      ldouble Trtmagn,Trtkin;
       ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
       ldouble tautot,tautotloc,tauabs,tauabsloc;
       ldouble avgsums[NV+NAVGVARS][NX];
@@ -253,6 +257,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  Trt=Tij[1][0];
 		  enden = Tij[0][0]+rhoucont;
 
+		  Trtmagn = get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+
+		  Trtkin = get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz);
+
 #ifdef RADIATION  
 		  for(i=0;i<4;i++)
 		    for(j=0;j<4;j++)
@@ -271,7 +280,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  //no need of transforming interpolated primitives to BL, already there
 		 
 		}
-	      else
+	      else //on the go from the primitives
 		{ 
 		  rho=pp[0];
 		  uint=pp[1];
@@ -292,6 +301,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  indices_2221(Tij22,Tij,geomBL.gg);
 
 		  Trt = Tij[1][0];
+
+		  Trtmagn = bsq*utcon[1]*ucov[0] - bcon[1]*bcov[0];
+		  Trtkin =  rho*utcon[1]*ucov[0];
 		  enden = Tij[0][0] + rho*utcon[0];
 
 #ifdef RADIATION
@@ -478,6 +490,16 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //total mhd energy flux (14)
 	      profiles[12][ix]+=(-Trt)*dx[1]*dx[2]*geomBL.gdet;
 
+	      //magnetic mhd energy flux in jet (43) 
+	      if(isjet==1)
+		profiles[41][ix]+=(-Trtmagn)*dx[1]*dx[2]*geomBL.gdet;
+
+	      //kinetic mhd energy flux in jet (43)  
+	      if(isjet==1)
+		profiles[42][ix]+=(-Trtkin)*dx[1]*dx[2]*geomBL.gdet;
+
+
+
 	      
 	      //opt thin mhd energy flux (25)
 	      if(tautot<1.)
@@ -497,6 +519,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  profiles[40][ix]+=rhouconr*dx[1]*dx[2]*geomBL.gdet;
 		  jetsigma+=rho*dx[1]*dx[2]*geomBL.gdet;
 		}
+
+	      //gas velocity near the axis (45)
+	      if(iy==NCCORRECTPOLAR+1 || iy==(NY-NCCORRECTPOLAR-2))
+		profiles[43][ix]+=0.5*utcon[1];
 
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;
@@ -748,10 +774,28 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 	      
 	    }
 	  
-	  ldouble fluxconv=fluxGU2CGS(1.); 
-	  profiles[0][iy]=-fluxconv*(Rrt+rhouconr+Trt);
 
+
+	  int isconverged;
+	  if(fabs(utcon[1])>xxBL[1]/(global_time/2.)) 
+	    isconverged=1;
+	  else
+	    isconverged=0;
+	  
+	  ldouble fluxconv=fluxGU2CGS(1.); 
+
+	  //total energy luminosity in cgs for converged region (2)
+	  profiles[0][iy]=-fluxconv*(Rrt+rhouconr+Trt);
+	      
+	  //radiative luminosity in cgs for converged region (2)
 	  profiles[1][iy]=-fluxconv*(Rrt);
+
+	  //gas velocity (3)
+	  profiles[2][iy]=utcon[1];
+
+	  //converged? (4)
+	  profiles[3][iy]=(ldouble)isconverged;
+
 
 	}
 
@@ -802,8 +846,10 @@ int calc_scalars(ldouble *scalars,ldouble t)
 #endif
   ldouble radlum,totallum;
   calc_lum(rlum,3,&radlum,&totallum);
+
   //radiative luminosity everywhere (4)
   scalars[2]=radlum*mdotscale*CCC0*CCC0/calc_lumEdd();
+
   //total energy at infinity (rho ur + Trt + Rrt) (12)
   calc_lum(rlum,1,&radlum,&totallum);
   scalars[10]=totallum;
