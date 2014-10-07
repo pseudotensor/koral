@@ -2682,6 +2682,11 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       coco_MSPH12SPH(x1,x2);
       coco_SPH2MINK(x2,x2);
     }
+  else if (CO1==MKER1COORDS && CO2==MINKCOORDS)
+    {
+      coco_MKER12KER(x1,x2);
+      coco_SPH2MINK(x2,x2);
+    }
   else if (CO1==MINKCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       coco_MINK2SPH(x1,x2);

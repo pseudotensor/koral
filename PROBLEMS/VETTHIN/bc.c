@@ -18,6 +18,7 @@ fill_geometry(ix,iy,iz,&geom);
 struct geometry geomSPH;
 fill_geometry_arb(ix,iy,iz,&geomSPH,SPHCOORDS);
 
+
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 //gdet_src=get_g(g,3,4,iix,iiy,iiz);
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
@@ -120,6 +121,9 @@ if(ix>=NX) //analytical solution at rout only
 	 pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
 
+     if(pp[VX]>0.) pp[VX]=0.;
+     if(pp[FX0]>0.) pp[FX0]=0.;
+
    
      p2u(pp,uu,&geom); 
 
@@ -151,19 +155,19 @@ if(iy<0.) //spin axis
    
     p2u(pp,uu,&geom);
     
-    //should reflect the intensities!!!!
-
-/*
+    /*
     int il;
     for(il=0;il<NUMANGLES;il++)
       {
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
-	}
-*/
+      }
+    */
+
 #if(RADCLOSURE==VETCLOSURE)
     double reflect_direction[3] = {1.,0.,0.};
     reflectI(reflect_direction, &Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][0], &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 #endif   
+
     return 0;
   }
 
@@ -202,7 +206,8 @@ if(iy>=NY) //equatorial plane
     //hot disk:
     ldouble rSPH=xxvecSPH[1];
     ldouble rin=6.;
-#ifndef HOURGLASS
+
+#ifdef DISK
     if(rSPH>rin) //hot boundary
       {
 
@@ -245,15 +250,11 @@ if(iy>=NY) //equatorial plane
       
 	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 #endif
-	
-
-
-	
-
       }
+#endif
 
-#else
-   if(rSPH>10. && rSPH<15.) //hot boundary
+#ifdef HOURGLASS
+   if(rSPH>6. && rSPH<10.) //hot boundary
       {
 
 	pp[EE0]=calc_LTE_EfromT(1.e11)*(1.-sqrt(rin/rSPH))/pow(rSPH,3.);
@@ -292,14 +293,52 @@ if(iy>=NY) //equatorial plane
       
 	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 #endif
-	
-
-
-	
-
       }
 
 #endif 
+
+#ifdef BEAM1
+   set_hdatmosphere(pp,xxvec,gg,GG,0);
+#ifdef RADIATION
+   set_radatmosphere(pp,xxvec,gg,GG,0);
+
+#endif
+   pp[5]=calc_Sfromu(pp[0],pp[1]);
+
+   if(rSPH>RBEAM1 && rSPH<RBEAM2) //hot boundary
+      {
+
+	pp[EE0]*=1.e3;
+	pp[FZ0]=0.;
+	pp[FY0]=-2./rSPH;
+	pp[FX0]=0.;
+	  
+
+      }
+ 
+
+#if(RADCLOSURE==VETCLOSURE)
+	//calculate the intensities
+	double RijM1[4][4];double M1[5];
+	calc_Rij_M1(pp,&geom,RijM1);
+	//converting to RADCLOSURECOORDS
+	trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+	//to ortonormal
+	trans22_cc2on(RijM1,RijM1,geomSPH.tup);
+	
+
+	//input
+	M1[0]=RijM1[0][0];
+	M1[1]=RijM1[0][1];
+	M1[2]=RijM1[0][2];
+	M1[3]=RijM1[0][3];
+	M1[4]=pp[EE0];
+      
+	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+
+  
+#endif 
+#endif
     p2u(pp,uu,&geom); 
     return 0; 
   }

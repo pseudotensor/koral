@@ -780,6 +780,7 @@ int transformI_Lagrange(int,int,int,double I_return[NUMANGLES], double*);
 void ZERO_decomposeM1(int,int,int,double M1_Data[5], double I_return[NUMANGLES]);
 double
 calc_stretchFactor(void *argsin);
+void linComb(double targetAng[3], double angGridCoords[NUMANGLES][3], int angIndex[3], double interp_coeff[3]);
 
 
 double Ibeam[SX][SY][SZ][NUMANGLES];                //specific intensities at cell centers
@@ -792,6 +793,8 @@ double intersectGridWeights[SX][SY][SZ][NUMANGLES][4];	//weights corresponding t
 double intersectDistances[SX][SY][SZ][NUMANGLES];		//distance to intersection point from center
 double intersectGridPhi[SX][SY][SZ][NUMANGLES];		//phi value of intersection point used in axisymmetryc in spherical-like
 double carttetrad[SX][SY][SZ][3][3]; //cartesian components of the local RADCLOSURECOORDS tetrad
+int intersectAngIndices[SX][SY][SZ][NUMANGLES][4][3];  //3 nearest angle indices for intersection
+double intersectAngWeights[SX][SY][SZ][NUMANGLES][4][3];	//weights corresponding to 3 nearest angles
 
 #ifdef MPI
 MPI_Group mpi_all_group;

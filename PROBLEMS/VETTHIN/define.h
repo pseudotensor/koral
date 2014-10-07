@@ -1,10 +1,10 @@
 #define RESTART
-#define RESTARTNUM -1
+#define RESTARTNUM 5
 
 
 #define RADIATION
 
-#define myVET
+//#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
@@ -12,7 +12,8 @@
 #define RADSTARTWITHM1INTENSITIES
 #endif
 
-
+#define BEAM1
+//#define DISK
 #define DOFIXUPS 1
 #define SKIPRADSOURCE
 
@@ -28,15 +29,28 @@
 #define BHSPIN 0.
 #define GAMMAMAXRAD 20.
 
-//#define myMKS1COORDS
-#define myMSPH1COORDS
+
 #define OMSCALE 1.
 //#define HOURGLASS
 
+//#define myMKS1COORDS
+#define myMKER1COORDS
+//#define myMSPH1COORDS
+
 #ifdef myMSPH1COORDS
 #define MYCOORDS MSPH1COORDS
-#else
+#endif
+
+#ifdef myMKS1COORDS
+#define MYCOORDS MKS1COORDS
+#endif
+
+#ifdef mySPHCOORDS
 #define MYCOORDS SPHCOORDS//KSCOORDS//SPHCOORDS//KERRCOORDS
+#endif
+
+#ifdef myMKER1COORDS
+#define MYCOORDS MKER1COORDS
 #endif
 
 #define RADCLOSURECOORDS SPHCOORDS
@@ -56,12 +70,36 @@
 #define SILO2D_XZPLANE
 #define SIMOUTPUT 0
 
+#define RMIN 2.2
+#define RMAX 5.
+#define RBEAM1 2.8
+#define RBEAM2 3.2
+
+
 #ifdef myMSPH1COORDS
 #define MKS1R0 0.
-#define MINX (log(2.-MKS1R0))
-#define MAXX (log(50.-MKS1R0))
-#define TNX 50
-#else
+#define MINX (log(RMIN-MKS1R0))
+#define MAXX (log(RMAX-MKS1R0))
+#define TNX 60
+#endif
+
+#ifdef myMKS1COORDS
+#define MKS1R0 0.
+#define MINX (log(RMIN-MKS1R0))
+#define MAXX (log(RMAX-MKS1R0))
+#define TNX 60
+#endif
+
+#ifdef myMKER1COORDS
+#define MKS1R0 0.
+#define MINX (log(RMIN-MKS1R0))
+#define MAXX (log(RMAX-MKS1R0))
+#define TNX 60
+#endif
+
+
+
+#ifdef mySPHCOORDS
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
 #define TNX 40
@@ -75,7 +113,7 @@
 #define NTZ 1
 
 
-#define MINY (0.02*Pi/4.)
+#define MINY 0.001
 #define MAXY Pi/2.
 #define HALFTHETA
 #define MINZ -1.
@@ -94,9 +132,9 @@
 #define ERADATMMIN  (calc_LTE_EfromT(1.e9))
 
 #define INT_ORDER 1
-#define TSTEPLIM .6
+#define TSTEPLIM .4
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 
 
 #define NODONUT 0

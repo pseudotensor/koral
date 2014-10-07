@@ -1493,17 +1493,17 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       dxdx_SPH2MSPH1(xx,dxdx);
       multiply2(u1,u2,dxdx);
     }
-  else if(CO1==MKER1COORDS && CO2==KERRCOORDS)
+  else if(CO1==MKER1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       dxdx_MKER12KER(xx,dxdx);
       multiply2(u1,u2,dxdx);
     }
-  else if(CO1==KERRCOORDS && CO2==MKER1COORDS)
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MKER1COORDS)
     {
       dxdx_KER2MKER1(xx,dxdx);
       multiply2(u1,u2,dxdx);
     }
-  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       dxdx_MKS12KS(xx,dxdx);
       multiply2(u1,u2,dxdx);
@@ -1511,7 +1511,7 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       dxdx_KS2BL(xx2,dxdx);
       multiply2(u2,u2,dxdx);
     }
-  else if (CO1==MKS2COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+  else if (CO1==MKS2COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       dxdx_MKS22KS(xx,dxdx);
       multiply2(u1,u2,dxdx);
@@ -1519,7 +1519,7 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       dxdx_KS2BL(xx2,dxdx);
       multiply2(u2,u2,dxdx);
     }
-  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MKS1COORDS)
     {
       dxdx_BL2KS(xx,dxdx);
       multiply2(u1,u2,dxdx);
@@ -1527,7 +1527,7 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
       dxdx_KS2MKS1(xx2,dxdx);
       multiply2(u2,u2,dxdx);  
     }
-  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS2COORDS)
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MKS2COORDS)
     {
       dxdx_BL2KS(xx,dxdx);
       multiply2(u1,u2,dxdx);
@@ -1618,17 +1618,17 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       dxdx_SPH2MSPH1(xx,dxdx);
       multiply22(T1,T2,dxdx);
     }
-  else if(CO1==MKER1COORDS && CO2==KERRCOORDS)
+  else if(CO1==MKER1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       dxdx_MKER12KER(xx,dxdx);
       multiply22(T1,T2,dxdx);
     }
-  else if(CO1==KERRCOORDS && CO2==MKER1COORDS)
+  else if((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MKER1COORDS)
     {
       dxdx_KER2MKER1(xx,dxdx);
       multiply22(T1,T2,dxdx);
     }
-  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+  else if (CO1==MKS1COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       dxdx_MKS12KS(xx,dxdx);
       multiply22(T1,T2,dxdx);
@@ -1636,7 +1636,7 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       dxdx_KS2BL(xx2,dxdx);
       multiply22(T2,T2,dxdx);
     }
-  else if (CO1==MKS2COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS))
+  else if (CO1==MKS2COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       dxdx_MKS22KS(xx,dxdx);
       multiply22(T1,T2,dxdx);
@@ -1644,7 +1644,7 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       dxdx_KS2BL(xx2,dxdx);
       multiply22(T2,T2,dxdx);
     }
-  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MKS1COORDS)
     {
       dxdx_BL2KS(xx,dxdx);
       multiply22(T1,T2,dxdx);
@@ -1652,7 +1652,7 @@ trans22_coco(ldouble *xx,ldouble T1[][4],ldouble T2[][4],int CO1, int CO2)
       dxdx_KS2MKS1(xx2,dxdx);
       multiply22(T2,T2,dxdx);  
     }
-  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS2COORDS)
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MKS2COORDS)
     {
       dxdx_BL2KS(xx,dxdx);
       multiply22(T1,T2,dxdx);
