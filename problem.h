@@ -214,6 +214,7 @@
 #define PR_OUT2GIF_1D "PROBLEMS/LBULLET/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/LBULLET/dump.c"
 #define PR_TOOLS "PROBLEMS/LBULLET/tools.c"
+#define PR_PREPINIT "PROBLEMS/LBULLET/prepinit.c"
 
 #endif
 
@@ -1519,11 +1520,11 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 40
+#define NRADPROFILES 44
 #endif
 
 #ifndef NTHPROFILES
-#define NTHPROFILES 2
+#define NTHPROFILES 4
 #endif
 
 #ifndef NANARELRADPROFILES
@@ -1841,4 +1842,8 @@
 
 #ifndef NUMMSTEPLEVELS
 #define NUMMSTEPLEVELS 1
+#endif
+
+#ifndef RADIMPLICITTHRESHOLD
+#define RADIMPLICITTHRESHOLD 1.e-2
 #endif

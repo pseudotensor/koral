@@ -58,7 +58,7 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   //************************************
   //************************************
   //checking on hd floors  
-  int floorret;
+  int floorret=0;
   floorret=check_floors_mhd(pp,VELPRIM,&geom);
 
   if(floorret<0.)
@@ -215,7 +215,7 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
     ppold[iv]=pp[iv];
 
   //negative uu[0] = rho u^t
-  if(uu[0]/gdetu<GAMMAMAXHD*RHOFLOOR) 
+  if(uu[0]/gdetu<0.)
     {
        int gix,giy,giz;
        mpi_local2globalidx(geom->ix,geom->iy,geom->iz,&gix,&giy,&giz);

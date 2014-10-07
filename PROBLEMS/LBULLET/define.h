@@ -84,13 +84,13 @@
 #define MINX 400.
 #define MAXX 4000.
 //total resolution
-#define TNX 100
-#define TNY 128
-#define TNZ 200
+#define TNX 40
+#define TNY 40
+#define TNZ 40
 //number of tiles
-#define NTX 4
-#define NTY 4
-#define NTZ 4
+#define NTX 2
+#define NTY 2
+#define NTZ 1
 #endif
 
 #define MINY (0.0025*Pi/2.)
@@ -128,7 +128,7 @@
 /***********************************/
 // Bullet choice
 /**********************************/
-//#define PI 3.14159
+#define PI 3.14159
 #define BULLET_PHI
 //#define BULLET_THETA
 

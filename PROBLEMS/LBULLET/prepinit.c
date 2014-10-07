@@ -1,4 +1,8 @@
 
+int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
+int my_init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
+
+
 
 int ix, iy, iz;
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
@@ -9,8 +13,6 @@ for(iz=0;iz<NZ;iz++)
 	    for(ix=0;ix<NX;ix++)
 	    {
 
-int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
-int my_init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
 
 ldouble rho,mx,my,mz,m,E,uint,pgas,Fx,Fy,Fz,pLTE,ell;  
 ldouble uu[NV], pp[NV],ppback[NV],T,uintorg;
@@ -29,6 +31,14 @@ ldouble th=geomBL.yy;
 ldouble ph=geomBL.zz;
 
 init_dsandvels_limotorus(r, th, BHSPIN, &rho, &uint, &ell);
+
+/*
+if(iz==0 && iy==TNY/2)
+  {
+    //printf("%d %d %d %e %e %e %e\n",ix,iy,iz,r,th,rho,uint);
+    getch();
+    }*/
+
 uintorg=uint;
 
 if(rho<0.) //outside donut

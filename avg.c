@@ -106,6 +106,8 @@ main(int argc, char **argv)
 		  set_uavg(pavg,iv,ix,iy,iz,get_u(p,iv,ix,iy,iz));
 	}
 
+      global_time=t;
+
       if(procotg)
 	{
 	  //calculates scaleheight etc.
