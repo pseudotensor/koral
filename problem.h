@@ -1524,7 +1524,7 @@
 #endif
 
 #ifndef NTHPROFILES
-#define NTHPROFILES 4
+#define NTHPROFILES 6
 #endif
 
 #ifndef NANARELRADPROFILES

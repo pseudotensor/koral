@@ -787,14 +787,53 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 	  //total energy luminosity in cgs for converged region (2)
 	  profiles[0][iy]=-fluxconv*(Rrt+rhouconr+Trt);
 	      
-	  //radiative luminosity in cgs for converged region (2)
+	  //radiative luminosity in cgs for converged region (3)
 	  profiles[1][iy]=-fluxconv*(Rrt);
 
-	  //gas velocity (3)
+	  //gas velocity (4)
 	  profiles[2][iy]=utcon[1];
 
-	  //converged? (4)
+	  //converged? (5)
 	  profiles[3][iy]=(ldouble)isconverged;
+
+	  //optical depths
+	  int iix;
+	  ldouble tau1,tau2,Rphot;
+	  ldouble k1,k2,k3,k4;
+	  tau1=tau2=0.;
+	  Rphot=-1.;
+
+
+	  for(iix=NX-1;iix>=0;iix--)
+	    {
+	      struct geometry geomBL2;
+	      fill_geometry_arb(iix,iy,iz,&geomBL2,BLCOORDS);
+	      ldouble grr=geomBL2.gg[1][1];
+	      //coordinates
+	      ldouble dxph[3],dx[0];
+	      ldouble xx1[4],xx2[4];
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[0]=fabs(xx2[1]-xx1[1]);
+	      dxph[0]=dx[0]*sqrt(geomBL2.gg[1][1]);
+	      ldouble rho2=get_u(p,RHO,iix,iy,iz);
+              ldouble uint2=get_u(p,UU,iix,iy,iz);
+              ldouble Tgas2=calc_PEQ_Tfromurho(uint2,rho2);
+	      ldouble kabsloc = calc_kappa(&get_u(p,0,iix,iy,iz),&geomBL2,&k1,&k2,&k3,&k4);
+	      ldouble kscaloc = calc_kappaes(&get_u(p,0,iix,iy,iz),&geomBL2);
+	      tau1+=-(kabsloc+kscaloc)*(ucov[0]+ucov[1])*sqrt(grr)*dxph[0];
+	      tau2=-(kabsloc+kscaloc)*(ucov[0]+ucov[1])*geomBL2.xx*sqrt(grr);
+	      if(Rphot<0. && my_max(tau1,tau2)>2./3.)
+		Rphot=geomBL2.xx;
+	    }
+
+	  //location of photosphere (6)
+	  profiles[4][iy]=Rphot;
+
+	  //optical depth along radius between boundaries (7)
+	  profiles[5][iv]=tau1;
 
 
 	}
