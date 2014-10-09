@@ -515,13 +515,13 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
   ldouble L[4][4];
   calc_Lorentz_lab2ff(pp,gg,GG,L);
 
-  //copying and multiplying by lapse to express T1 in ZAMO
-  ldouble alpha=sqrt(-1./GG[0][0]);  
+
+  //copying 
   for(i=0;i<4;i++)
     {
       for(j=0;j<4;j++)
 	{
-	  Tt[i][j]=T1[i][j]*alpha;
+	  Tt[i][j]=T1[i][j];
 	}
     }
   
@@ -542,6 +542,16 @@ boost22_lab2ff(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
 	    }
 	}
     }
+
+  
+  //correcting for ortonormality
+  ldouble alpha=sqrt(-1./GG[0][0]);  
+  for(i=0;i<4;i++)
+    {
+      T2[i][0]*=alpha;
+      T2[0][i]*=alpha;
+    }
+      
 
   if(verbose>0) print_tensor(T2);
 
@@ -577,6 +587,13 @@ boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
 	}
     }
   
+  //correcting for ortonormality
+  ldouble alpha=sqrt(-1./GG[0][0]);  
+  for(i=0;i<4;i++)
+    {
+      T1[i][0]/=alpha;
+      T1[0][i]/=alpha;
+    }
  
   if(verbose>0) print_tensor(L);
 
@@ -596,6 +613,7 @@ boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
 	}
     } 
 
+  /*
   //dividing by lapse to express T2 in no-frame
   ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
@@ -605,6 +623,7 @@ boost22_ff2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp,ldouble gg[][5],ldoub
 	  T2[i][j]=T2[i][j]/alpha;
 	}
     }
+  */
 
   if(verbose>0) print_tensor(T2);
 
@@ -788,14 +807,12 @@ boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
   ldouble L[4][4];
   calc_Lorentz_lab2ff(pp,gg,GG,L);
 
-  //copying and multiplying by lapse to express A1 in ZAMO
-  ldouble alpha=sqrt(-1./GG[0][0]);  
+  //copying
   for(i=0;i<4;i++)
     {
-      At[i]=A1[i]*alpha;
-      //At[i]=A1[i];
+      At[i]=A1[i];
     }
-  
+
   if(verbose>0) print_tensor(L);
 
   //boosting
@@ -808,8 +825,15 @@ boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
 	}
     }
 
-  if(verbose>0) print_4vector(A2);
+  //laps to make it ortonormal
+  ldouble alpha=sqrt(-1./GG[0][0]);  
+  for(i=0;i<4;i++)
+    {
+      A2[i]*=alpha;
+    }
 
+   if(verbose>0) print_4vector(A2);
+   
   if(verbose>0) getchar();
 
   return 0; 
@@ -890,12 +914,14 @@ boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
   ldouble L[4][4];
   calc_Lorentz_ff2lab(pp,gg,GG,L);
 
-  //copying
+  //copying and ortonormality
+  ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
     {
-      At[i]=A1[i];
+      At[i]=A1[i]/alpha;
     }
   
+
   if(verbose>0) print_tensor(L);
 
   //boosting
@@ -908,12 +934,14 @@ boost2_ff2lab(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
 	}
     }
 
+  /*
   //dividing by lapse to express A2 in no-frame
   ldouble alpha=sqrt(-1./GG[0][0]);  
   for(i=0;i<4;i++)
     {      
       A2[i]=A2[i]/alpha;	
     }
+  */
 
 
   if(verbose>0) print_4vector(A2);
