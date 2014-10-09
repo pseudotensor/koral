@@ -4,7 +4,7 @@
 
 #define RADIATION
 
-//#define myVET
+#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
