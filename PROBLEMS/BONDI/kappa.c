@@ -9,11 +9,11 @@ Trad = calc_ncompt_Thatrad_full(pp,ggg);
 #endif
 
 ldouble zeta = Trad/Tgas;
-
-
-		   
-//absorbtion mean
 ldouble mpcgs=1.67262158e-24;
+
+#ifndef SKIPFANCYOPACITIES		   
+//absorbtion mean
+
 *kappagasAbs=kappaCGS2GU((6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*log(1.+1.6*zeta))*rho*(1.+4.4e-10*Tgas);
 *kapparadAbs=*kappagasAbs/zeta/zeta/zeta;
 	
@@ -23,4 +23,10 @@ ldouble mpcgs=1.67262158e-24;
 
 //default
 kappa=*kappagasRos;
+#else
+
+kappa=kappaCGS2GU((6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*log(1.+1.6*zeta))*rho*(1.+4.4e-10*Tgas);
+#endif
+
+
 

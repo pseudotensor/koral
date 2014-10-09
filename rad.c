@@ -3771,6 +3771,46 @@ test_solve_implicit_lab()
   exit(1);  
 }
 
+
+int
+test_Giff()
+{
+  int i1,i2,iv;
+  ldouble uu0[NV],pp0[NV],pp[NV],uu[NV],dt;
+  struct geometry geom;
+  fill_geometry(0,0,0,&geom);
+
+  pp0[0]=1.;
+  pp0[1]=1.e-1;
+  pp0[2]=0.1;
+  pp0[3]=0.;
+  pp0[4]=0.;
+  pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
+  pp0[6]=0.1;
+  pp0[7]=0.;
+  pp0[8]=0.;
+  pp0[9]=0.;
+  #ifdef NCOMPTONIZATION
+  pp0[NF0]=calc_NFfromE(pp0[EE0]);
+  #endif
+
+  //radiative four-force
+  ldouble Gi[4],Giff[4],Giff2[4];
+  calc_Gi(pp0,&geom,Gi,1); 
+  calc_Gi(pp0,&geom,Giff,0); 
+  boost2_lab2ff(Gi,Giff2,pp0,geom.gg,geom.GG);
+
+  print_4vector(Gi);
+  print_4vector(Giff);
+  print_4vector(Giff2);
+  
+  
+
+  print_primitives(pp0);
+
+  return 0;
+}
+
 int
 test_solve_implicit_lab_file()
 {

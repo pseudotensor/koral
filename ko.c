@@ -89,7 +89,8 @@ main(int argc, char **argv)
   //**************
   //tests
   //**************
-  test_solve_implicit_lab();
+  //test_solve_implicit_lab();
+  test_Giff();
   exit(-1);
 
   //print scalings GU->CGS and quit

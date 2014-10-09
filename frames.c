@@ -793,6 +793,7 @@ boost2_lab2ff(ldouble A1[4],ldouble A2[4],ldouble *pp,ldouble gg[][5],ldouble GG
   for(i=0;i<4;i++)
     {
       At[i]=A1[i]*alpha;
+      //At[i]=A1[i];
     }
   
   if(verbose>0) print_tensor(L);

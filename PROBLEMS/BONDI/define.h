@@ -19,24 +19,29 @@
 #define RADIATION
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
-#define NCOMPTONIZATION 
+//#define NCOMPTONIZATION
+#define SKIPFANCYOPACITIES 
 #define RADOUTPUTVELS
 
 /************************************/
 //coordinates / resolution
 /************************************/
 #define MKS1R0 0.
-#define MYCOORDS MKS1COORDS
+//#define MYCOORDS MKS1COORDS
+#define MYCOORDS KERRCOORDS
 #define OUTCOORDS BLCOORDS
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 10.
-#define RMAX 1.e5
+#define RMIN 1.e1
+#define RMAX 2.e1
 #define RMAXOUT 1.e6
 
-#define MINX (log(RMIN-MKS1R0))
-#define MAXX (log(RMAX-MKS1R0))
+//#define MINX (log(RMIN-MKS1R0))
+//#define MAXX (log(RMAX-MKS1R0))
+
+#define MINX RMIN
+#define MAXX RMAX
 
 
 #define MINY .99*Pi/2.
