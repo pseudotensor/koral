@@ -792,7 +792,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double intersectGridPhi[SX][SY][SZ][NUMANGLES])
 {
   double aspin=0., aspin2=aspin*aspin; // black hole spin
-
+  double mintime = 1.0e99;
 
   int n1_central=1,n2_central=1,n3_central=1; //use as central index, will loop over later
   int delta_n1, delta_n2, delta_n3;
@@ -1187,6 +1187,9 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
 
       intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * (-x_new[0]);
+
+      if (-x_new[0] < mintime)
+	{ mintime = -x_new[0];}
 //      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = 1.0e99;
 
 
@@ -1270,6 +1273,10 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
    exit(-1);
 */
 
+  if (ix == 0)
+    {
+  printf("ZERO Mintime = %e\n", mintime);
+    }
 }
 
 
