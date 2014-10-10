@@ -53,7 +53,7 @@
 //rho-weighted radial velocity in the jet (42)
 //magnetic flux in the jet (43)
 //kinetic flux in the jet (44)
-//radial velocity close to the axis (45)                                                                                                                                                                                                                                    
+//radial velocity close to the axis (45)                                                                                                                                                                                                        //Bernoulli close to the axis (46)                                                                                                                                                                                                                                    
 
 
 /*********************************************/
@@ -523,6 +523,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //gas velocity near the axis (45)
 	      if(iy==NCCORRECTPOLAR+1 || iy==(NY-NCCORRECTPOLAR-2))
 		profiles[43][ix]+=0.5*utcon[1];
+
+	      //Bernoulli near the axis (46)
+	      if(iy==NCCORRECTPOLAR+1 || iy==(NY-NCCORRECTPOLAR-2))
+		profiles[44][ix]+=0.5*muBe;
 
 	      //total rad energy flux (17)
 	      profiles[15][ix]+=(-Rrt)*dx[1]*dx[2]*geomBL.gdet;

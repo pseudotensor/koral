@@ -20,7 +20,7 @@
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 //#define NCOMPTONIZATION
-#define SKIPFANCYOPACITIES 
+//#define SKIPFANCYOPACITIES 
 #define RADOUTPUTVELS
 
 /************************************/

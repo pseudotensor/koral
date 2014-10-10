@@ -3783,13 +3783,13 @@ test_Giff()
   pp0[0]=1.;
   pp0[1]=1.e-1;
   pp0[2]=0.1;
-  pp0[3]=0.;
-  pp0[4]=0.;
+  pp0[3]=0.2;
+  pp0[4]=0.5;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
   pp0[6]=0.1;
-  pp0[7]=0.;
-  pp0[8]=0.;
-  pp0[9]=0.;
+  pp0[7]=0.1;
+  pp0[8]=0.6;
+  pp0[9]=0.1;
   #ifdef NCOMPTONIZATION
   pp0[NF0]=calc_NFfromE(pp0[EE0]);
   #endif
