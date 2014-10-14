@@ -1186,7 +1186,8 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = w0_high*w1_low;
       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
 
-      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * (-x_new[0]);
+            intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * (-x_new[0]);
+      //intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = sqrt((x_new[1]-x_sphere[1])*(x_new[1]-x_sphere[1]) + x_sphere[1]*x_sphere[1]*(x_new[2]-x_sphere[2])*(x_new[2]-x_sphere[2]) + x_sphere[1]*x_sphere[1]*sin(x_sphere[2])*sin(x_sphere[2])*(x_new[3]-x_sphere[3])*(x_new[3]-x_sphere[3]));
 
       if (-x_new[0] < mintime)
 	{ mintime = -x_new[0];}
@@ -3303,12 +3304,18 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 		exit(-1);
 	}
 
+
+      if(LIGHT_C * delta_t > intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng])
+	{
+	//printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
+	  intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * delta_t;
+	}
+
       I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t; //apply time step
       //I_time[probeAng] = I_Data[1][1][1][probeAng];
 
       
-      if(LIGHT_C * delta_t > intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng])
-	printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
+
       
 
       I_return[probeAng] = I_time[probeAng];

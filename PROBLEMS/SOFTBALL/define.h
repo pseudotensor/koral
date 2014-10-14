@@ -8,11 +8,10 @@
 #define DOFIXUPS 0
 //#define UNPERTURBED
 
-
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define BALANCEENTROPYWITHRADIATION
 
 /************************************/
@@ -35,18 +34,18 @@
 #define DTH .6
 #define MINY (M_PI/2.-DTH)
 #define MAXY (M_PI/2.+DTH)
-#define MINZ -1.
-#define MAXZ 1. 
-#define TNX 200 // Total number of cells in X 
-#define TNY 200
-#define TNZ 1
-#define NTX 1 //number of tiles in X 
+#define MINZ -1
+#define MAXZ 1 
+#define TNX 40 // Total number of cells in X 
+#define TNY 40
+#define TNZ 40
+#define NTX 4 //number of tiles in X 
 #define NTY 1
 #define NTZ 1
 #define SPECIFIC_BC
 
 /************************************/
-//output
+//Output
 /************************************/
 #define SILOOUTPUT 1 //to silo file
 #define RADOUTPUT 1
@@ -55,7 +54,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 5000 //stop after this number of outputs
-#define DTOUT1 1. //res
+#define DTOUT1 10. //res
 #define DTOUT2 100. //avg
 
 /************************************/
@@ -72,7 +71,7 @@
 /************************************/
 #define MASS 10.
 #define TORUSENTR 5.e2
-#define RHOAMB 1.e-25
+#define RHOAMB 1.e-30
 #define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho
 #define ERADATMMIN 1.e-25
 
