@@ -25,6 +25,7 @@ ldouble rin=4.57599;
 ldouble Win = -0.0416192; 
 ldouble w=exp(-(W-Win));
 
+
 //OS: I didn't know how to manipulate the size of the torus in your formulae, so I used my old ones:
 //ldouble podpierd=-(geom.GG[0][0]-2.*L*geom.GG[0][3]+L*L*geom.GG[3][3]);
 //ldouble ut=-1./sqrt(podpierd);
@@ -48,7 +49,8 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     //density
     ldouble rho0=powl((effgamma-1)*epsilon/kappa,1/(effgamma-1)); //OS: without the if(w>1.) condition rho0 could be NaN
     pp[RHO]=rho0;
-
+    //if(ix==0) {printf("%d %e %e %e %e\n",ix, pp[RHO],effgamma,GAMMA,epsilon);getch();}
+ 
     //~pressure
     ldouble uu0 = kappa * pow(rho0, effgamma) / (effgamma - 1.); //OS: you forgot to define pressure which must be consistent with the torus model
     pp[UU]=uu0;

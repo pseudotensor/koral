@@ -8,6 +8,7 @@
 #define DOFIXUPS 0
 //#define UNPERTURBED
 
+
 /************************************/
 //radiation
 /************************************/
@@ -39,7 +40,7 @@
 #define TNX 200 // Total number of cells in X 
 #define TNY 200
 #define TNZ 1
-#define NTX 4 //number of tiles in X 
+#define NTX 1 //number of tiles in X 
 #define NTY 1
 #define NTZ 1
 #define SPECIFIC_BC
@@ -91,4 +92,4 @@
 /************************************/
 //physics
 /************************************/
-#define GAMMA (5./3.)
+#define GAMMA (4./3.)
