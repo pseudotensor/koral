@@ -1726,6 +1726,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     iz1=TOK;
     iz2=TOK+TNZ/NTZ;
 
+    //printf("%d %d %d %d %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,iz1,iz2);
+    
     #ifdef MSTEP
 
     ix1=TI * tsi;

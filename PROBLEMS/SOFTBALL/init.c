@@ -65,7 +65,7 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     vmichel=0.;
     #endif
 
-    ldouble vmichel4vel[4]={0.,0.06*vmichel,0.,0.};
+    ldouble vmichel4vel[4]={0.,FRACMICHEL*vmichel,0.,0.};
     trans2_coco(geom.xxvec,vmichel4vel,vmichel4vel,BLCOORDS,MYCOORDS);
     pp[VX]=vmichel4vel[1];
     pp[VY]=vmichel4vel[2];

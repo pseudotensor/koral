@@ -85,7 +85,7 @@
 //82 VETTHIN - thin disk emission for VET tests
 //83 RADFLATTEST - tests of radiation solvers in flat space
 
-#define PROBLEM 82
+#define PROBLEM 79
 
 #if(PROBLEM==83)
 
@@ -1833,7 +1833,11 @@
 //ZERO short solver
 
 #ifndef NUMANGLES
+#ifdef EVOLVEINTENSITIES
 #define NUMANGLES 80 		//Must be equal to number of lines in angle grid file
+#else
+#define NUMANGLES 1
+#endif
 #endif
 
 #ifndef NUMDUALANGLES

@@ -34,15 +34,16 @@
 #define DTH .6
 #define MINY (M_PI/2.-DTH)
 #define MAXY (M_PI/2.+DTH)
-#define MINZ -1
-#define MAXZ 1 
+#define MINZ 0.
+#define MAXZ (2.*M_PI) 
 #define TNX 40 // Total number of cells in X 
 #define TNY 40
 #define TNZ 40
-#define NTX 4 //number of tiles in X 
+#define NTX 1 //number of tiles in X 
 #define NTY 1
-#define NTZ 1
+#define NTZ 4
 #define SPECIFIC_BC
+#define PERIODIC_ZBC
 
 /************************************/
 //Output
@@ -92,3 +93,4 @@
 //physics
 /************************************/
 #define GAMMA (4./3.)
+#define FRACMICHEL 0.06

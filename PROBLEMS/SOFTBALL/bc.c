@@ -149,6 +149,20 @@ if(BCtype==YBCHI)
     p2u(pp,uu,&geom);
     return 0;
   }
+ 
+//periodic in phi, used under OMP
+iiz=iz;
+iiy=iy;
+iix=ix;
+if(BCtype==ZBCLO) iiz=iz+NZ;
+if(BCtype==ZBCHI) iiz=iz-NZ;
+
+for(iv=0;iv<NV;iv++)
+  {
+    uu[iv]=get_u(u,iv,iix,iiy,iiz);
+    pp[iv]=get_u(p,iv,iix,iiy,iiz);      
+  }
+
 
 //and that is all
 

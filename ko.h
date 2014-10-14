@@ -46,8 +46,9 @@
 #define KAPPA_ES_COEFF (kappaCGS2GU(0.4))
 
 //other stuff
-#include "problem.h"
 #include "mnemonics.h"
+#include "problem.h"
+
 
 #include "mdefs.h"
 #include <stdio.h>
@@ -781,7 +782,6 @@ void ZERO_decomposeM1(int,int,int,double M1_Data[5], double I_return[NUMANGLES])
 double
 calc_stretchFactor(void *argsin);
 void linComb(double targetAng[3], double angGridCoords[NUMANGLES][3], int angIndex[3], double interp_coeff[3]);
-
 
 double Ibeam[SX][SY][SZ][NUMANGLES];                //specific intensities at cell centers
 double Ibeam2[SX][SY][SZ][NUMANGLES];                //specific intensities at cell centers _ auxiliary

@@ -40,7 +40,7 @@ calc_wavespeeds_lr_core(ldouble *ucon,ldouble GG[][5],ldouble *aret,ldouble wspe
   A = Bu2 * (1.0 - wspeed2) - Bsq * wspeed2;
   discr = 4.0 * wspeed2 * ((AB * AB - Asq * Bsq) * wspeed2 + (2.0 * AB * Au * Bu - Asq * Bu2 - Bsq * Au2) * (wspeed2 - 1.0));
 
-  if(discr<0.) {printf("discr in wavespeeds lt 0\n"); discr=0.;}
+  if(discr<0.) {printf("discr in wavespeeds lt 0\n"); return -1;}
   discr = sqrt(discr);
   cst1 = -(-B + discr) / (2. * A);
   cst2 = -(-B - discr) / (2. * A);  
@@ -132,15 +132,19 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   //**********************************************************************
 
   ldouble aret[2];
-  calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,0);
+  int ret;
+  ret=calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,0);
+  if(ret<0) {printf("error wsx at %d | %d | %d\n",geom->ix,geom->iy,geom->iz);}
   axhdl=aret[0];
   axhdr=aret[1];
   
-  calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,1);
+  ret=calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,1);
+  if(ret<0) {printf("error wsy at %d | %d | %d\n",geom->ix,geom->iy,geom->iz);}
   ayhdl=aret[0];
   ayhdr=aret[1];
   
-  calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,2);
+  ret=calc_wavespeeds_lr_core(ucon,GG,aret,vtot2,2);
+  if(ret<0) {printf("error wsz at %d | %d | %d\n",geom->ix,geom->iy,geom->iz);}
   azhdl=aret[0];
   azhdr=aret[1];
  
