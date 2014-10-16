@@ -109,6 +109,11 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     prad_ff2lab(pp,pp,&geomBL);
 #endif
 
+#ifdef PERTMAGN //perturb to trigger PapaloizuPringle
+    pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
+//printf("%e %e\n",(double)rand(),((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN); getch();
+#endif
+
   }
  else //OS: atmosphere outside the torus
    {

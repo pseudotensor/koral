@@ -9,14 +9,14 @@
 /************************************/
 //define MSTEPS
 /************************************/
-#define MSTEP
+//#define MSTEP
 #define MSTEP_LIMITBC
 #define NUMMSTEPLEVELS 20
 
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 //#define NCOMPTONIZATION
@@ -34,8 +34,8 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 1.e1
-#define RMAX 2.e1
-#define RMAXOUT 1.e6
+#define RMAX 1.e3
+#define RMAXOUT 1.e3
 
 //#define MINX (log(RMIN-MKS1R0))
 //#define MAXX (log(RMAX-MKS1R0))
@@ -49,10 +49,10 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 256
+#define TNX 128
 #define TNY 1
 #define TNZ 1
-#define NTX 2 //for MPI and OMP
+#define NTX 4 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 

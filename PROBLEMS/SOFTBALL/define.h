@@ -39,9 +39,9 @@
 #define TNX 40 // Total number of cells in X 
 #define TNY 40
 #define TNZ 40
-#define NTX 1 //number of tiles in X 
-#define NTY 1
-#define NTZ 4
+#define NTX 2 //number of tiles in X 
+#define NTY 2
+#define NTZ 1
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
 
@@ -94,3 +94,4 @@
 /************************************/
 #define GAMMA (4./3.)
 #define FRACMICHEL 0.06
+#define PERTMAGN 1.e-1
