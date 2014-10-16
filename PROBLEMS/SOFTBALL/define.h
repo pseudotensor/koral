@@ -36,12 +36,12 @@
 #define MAXY (M_PI/2.+DTH)
 #define MINZ 0.
 #define MAXZ (2.*M_PI) 
-#define TNX 40 // Total number of cells in X 
-#define TNY 40
-#define TNZ 40
+#define TNX 100 // Total number of cells in X 
+#define TNY 100
+#define TNZ 200
 #define NTX 2 //number of tiles in X 
 #define NTY 2
-#define NTZ 2
+#define NTZ 1
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
 
