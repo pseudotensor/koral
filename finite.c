@@ -2505,15 +2505,17 @@ addi_u_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble
 int 
 if_indomain(int ix,int iy,int iz)
 {
+  /*
 #ifdef SUBZONES
   if(ix>=global_ix1 && ix<global_ix2 &&
      iy>=global_iy1 && iy<global_iy2 && 
      iz>=global_iz1 && iz<global_iz2) return 1;
   else return 0;
 #else
+  */
   if(ix>=0 && ix<NX && iy>=0 && iy<NY && iz>=0 && iz<NZ) return 1;
   else return 0;
-#endif
+  //#endif
 }
 
 //checks if cell outside both domain and ghostcells, i.e. if cells in corners
@@ -3710,6 +3712,7 @@ int
 calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2,int* iz2)
 {
   int zone=currentzone;
+  int verbose=0;
 #ifdef SUBZONES
   
   if(PROBLEM==7) //BONDI
@@ -3748,14 +3751,17 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       for(i=0;i<nzones;i++)
 	{
 	  ldouble fac;
-	  //dtzones[i]=10.*(rzones[i+1]-rzones[i])/1.; //timestep limited by speed of light
 	  if(i==nzones-1) //most outern
 	    fac=.1;
 	  else
-	    fac=2.;
+	    fac=.1;
 
-	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
+	  //test: 
+	  fac=0.; //setting zero here makes the subzones switch every SUBZONES_NSTEPSTEP
 
+	  //dtzones[i]=fac*(rzones[i+1]-rzones[i])/sqrt(1./rzones[i+1]); //by roughly free-fall speed = sound speed
+	  dtzones[i]=fac*(rzones[i+1]-rzones[i])/1.; //timestep limited by speed of light
+	 
 	  //dtzones[i]=1.e10; //do not switch;
 	}
 
@@ -3765,10 +3771,13 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       if(currentzone<0) //start from the outermost
 	{	
 	  zone=nzones;
-	  printf("------------- fliping to ZONE %d ------------ \n",zone);
-	  printf("%d %d | %d %d | %e %e %e \n",currentzone,zone,
+	  if(verbose)
+	    {
+	      printf("------------- fliping to ZONE %d ------------ \n",zone);
+	      printf("%d %d | %d %d | %e %e %e \n",currentzone,zone,
 		     izones[zone-1],izones[zone],
 		     currentzonetime,t,dtzones[zone-1]);
+	    }
 	}
       else
 	{
@@ -3777,11 +3786,14 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 	      zone=currentzone-1;
 	      if(zone==0) zone=nzones;
 	      currentzonetime=t;
+	      if(verbose)
+		{
 	      printf("------------- fliping to ZONE %d ------------ \n",zone);
 	      printf("%d %d | %d %d | %e %e %e \n",currentzone,zone,
 		     izones[zone-1],izones[zone],
 		     currentzonetime,t,dtzones[zone-1]);
 	      //getch();
+		}
 	    }
 	  else
 	    zone=currentzone;

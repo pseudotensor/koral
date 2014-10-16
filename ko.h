@@ -291,7 +291,8 @@ int dosthelse(void);
 ldouble opacity_BellLin(ldouble rhoc, ldouble Tc);
 
 //finite.c
-
+int
+calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2,int* iz2);
 int calc_u2p();
 int do_finger();
 int correct_polaraxis();
@@ -441,7 +442,8 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss);
 int calc_hd_shearviscosity(ldouble *pp,void* ggg,ldouble shear[][4],ldouble *nuret,ldouble *vdiff2ret);
 int calc_shear_lab(ldouble *pp,void* ggg,ldouble S[][4],int hdorrad,int *);
 int calc_shear_rad_lab(ldouble *pp,void* ggg,ldouble S[][4],int *);
-
+int
+save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws);
 int calc_wavespeeds_lr_pure(ldouble *pp,void*,ldouble *aaa);
 int calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4]);
 int calc_Tij( ldouble *p, void*, ldouble T[][4]);

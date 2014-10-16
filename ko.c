@@ -241,7 +241,7 @@ solve_the_problem(ldouble tstart, char* folder)
   ldouble dtoutavg = DTOUT2;
   int lasttout_floor;
   int lasttoutavg_floor;
-  int i,j;
+  int i,j,ii;
   int loopsallociter;
   int spitoutput,lastzone;
   int nentr[4],nentr2[4];
@@ -338,7 +338,7 @@ solve_the_problem(ldouble tstart, char* folder)
       //reallocate loops to allow for sub-zones, but don't do it every step
       #ifdef SUBZONES
       loopsallociter++;
-      if(loopsallociter>1000)
+      if(loopsallociter>SUBZONES_NSTEPSTEP)
 	{
 	  lastzone=currentzone;
 	  currentzone=alloc_loops(0,t,dt);
@@ -355,7 +355,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	      if(lastzone!=currentzone) spitoutput=1;
 	      #endif	  
 	    }
-	  if(lastzone==1 && currentzone!=1) spitoutput=1; //finished with the innermost one, output
+	  //if(lastzone==1 && currentzone!=1) spitoutput=1; //finished with the innermost one, output
 	  loopsallociter=0;
 	}
       #endif

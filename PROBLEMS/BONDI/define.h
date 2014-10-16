@@ -27,8 +27,8 @@
 //coordinates / resolution
 /************************************/
 #define MKS1R0 0.
-//#define MYCOORDS MKS1COORDS
-#define MYCOORDS KERRCOORDS
+#define MYCOORDS MKS1COORDS
+//#define MYCOORDS KERRCOORDS
 #define OUTCOORDS BLCOORDS
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
@@ -37,11 +37,11 @@
 #define RMAX 1.e3
 #define RMAXOUT 1.e3
 
-//#define MINX (log(RMIN-MKS1R0))
-//#define MAXX (log(RMAX-MKS1R0))
+#define MINX (log(RMIN-MKS1R0))
+#define MAXX (log(RMAX-MKS1R0))
 
-#define MINX RMIN
-#define MAXX RMAX
+//#define MINX RMIN
+//#define MAXX RMAX
 
 
 #define MINY .99*Pi/2.
@@ -52,12 +52,13 @@
 #define TNX 128
 #define TNY 1
 #define TNZ 1
-#define NTX 4 //for MPI and OMP
+#define NTX 1 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
-//#define SUBZONES
-#define OUTPUTAFTERSUBZONES
+#define SUBZONES
+#define SUBZONES_NSTEPSTEP 1000
+//#define OUTPUTAFTERSUBZONES
 #define NSUBZONES 2
 #define SUBZONESOVERLAP 4
 
@@ -66,7 +67,7 @@
 //#define FIX_PRESSURERHO
 #define FIX_VELBONDI
 //#define FIX_VELOUTBONDI
-#define INFLOW
+//#define INFLOW
 
 
 /************************************/
@@ -96,7 +97,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 //#define NSTEPSTOP 5e4 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e3 //res
+#define DTOUT1 1.e4 //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 
