@@ -25,20 +25,43 @@
 
 
 //multi rad-fluid macros
+/*
 #define EE(nf) (NVMHD+nf*NRADVAR)
 #define FX(nf) (NVMHD+nf*NRADVAR+1)
 #define FY(nf) (NVMHD+nf*NRADVAR+2)
 #define FZ(nf) (NVMHD+nf*NRADVAR+3)
-
 //number of photons
 #define NF(nf) (NVMHD+nf*NRADVAR+4)
+*/
+
+#ifdef RADIATION
+
+#define EE (NVMHD)
+#define FX (NVMHD+1)
+#define FY (NVMHD+2)
+#define FZ (NVMHD+3)
+#else
+
+#define EE 0
+#define FX 0
+#define FY 0
+#define FZ 0
+
+#endif
+
+#if defined(RADIATION) && defined(NCOMPTONIZATION)
+#define NF (NVMHD+4)
+#else
+#define NF 0
+#endif
 
 //single fluid macros
-#define EE0 EE(0)
-#define FX0 FX(0)
-#define FY0 FY(0)
-#define FZ0 FZ(0)
-#define NF0 NF(0)
+#define EE0 EE
+#define FX0 FX
+#define FY0 FY
+#define FZ0 FZ
+#define NF0 NF
+
 
 //radiative closures
 #define M1CLOSURE 0

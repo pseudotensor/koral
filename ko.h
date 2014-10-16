@@ -46,8 +46,9 @@
 #define KAPPA_ES_COEFF (kappaCGS2GU(0.4))
 
 //other stuff
-#include "mnemonics.h"
 #include "problem.h"
+#include "mnemonics.h"
+#include "choices.h"
 
 
 #include "mdefs.h"

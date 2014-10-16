@@ -1907,8 +1907,8 @@ int
 calc_Rij_M1_ff(ldouble *pp, ldouble Rij[][4])
 {
   int irf=0;
-  ldouble E=pp[EE(irf)];
-  ldouble F[3]={pp[FX(irf)],pp[FY(irf)],pp[FZ(irf)]};
+  ldouble E=pp[EE];
+  ldouble F[3]={pp[FX],pp[FY],pp[FZ]};
 
   ldouble nx,ny,nz,nlen,f;
 
@@ -1966,8 +1966,8 @@ int
 calc_Rij_Minerbo_ff(ldouble *pp, ldouble Rij[][4])
 {
   int irf=0;
-  ldouble E=pp[EE(irf)];
-  ldouble F[3]={pp[FX(irf)],pp[FY(irf)],pp[FZ(irf)]};
+  ldouble E=pp[EE];
+  ldouble F[3]={pp[FX],pp[FY],pp[FZ]};
 
   ldouble nx,ny,nz,nlen,f;
 
@@ -3043,7 +3043,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
   else if(hdorrad==RAD)
     {
       whichvel=VELPRIMRAD;
-      istart=FX(0);
+      istart=FX;
     }
 
   //neglecting time derivatives
@@ -3484,7 +3484,7 @@ calc_nsource(ldouble *pp, void* ggg)
     {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
     
   //number of photons in rad rest frame
-  ldouble nphrf = pp[NF(0)];
+  ldouble nphrf = pp[NF];
 
   //relative gamma rad-fluid rest frames
   ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
@@ -3521,7 +3521,8 @@ ldouble
 calc_ncompt_Thatrad_4vel(ldouble *pp, void* ggg, ldouble Ehatrad, ldouble* urfcon, ldouble* uffcov)
 {
   //number of photons in rad rest frame
-  ldouble nphrf = pp[NF(0)];
+  ldouble nphrf = pp[NF];
+
 
   //relative gamma rad-fluid rest frames
   ldouble relgamma = urfcon[0]*uffcov[0] + urfcon[1]*uffcov[1] +urfcon[2]*uffcov[2] +urfcon[3]*uffcov[3]; 
@@ -3646,7 +3647,7 @@ calc_ncompt_nphlab(ldouble *pp, void* ggg)
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
 
   //number of photons in rad rest frame
-  ldouble nphrf = pp[NF(0)];
+  ldouble nphrf = pp[NF];
 
   //relative gamma rad-lab frames
   ldouble relgamma = urfcon[0]*ucov[0] + urfcon[1]*ucov[1] +urfcon[2]*ucov[2] +urfcon[3]*ucov[3]; 
@@ -3686,10 +3687,10 @@ test_solve_implicit_lab()
   pp0[3]=0.;
   pp0[4]=0.;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
-  pp0[6]=0.1;
-  pp0[7]=0.1;
-  pp0[8]=0.;
-  pp0[9]=0.;
+  pp0[EE]=0.1;
+  pp0[FX]=0.1;
+  pp0[FY]=0.;
+  pp0[FZ]=0.;
   #ifdef NCOMPTONIZATION
   pp0[NF0]=calc_NFfromE(pp0[EE0]);
   #endif
@@ -3786,10 +3787,10 @@ test_Giff()
   pp0[3]=0.2;
   pp0[4]=0.5;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
-  pp0[6]=0.1;
-  pp0[7]=0.1;
-  pp0[8]=0.6;
-  pp0[9]=0.1;
+  pp0[EE]=0.1;
+  pp0[FX]=0.1;
+  pp0[FY]=0.6;
+  pp0[FZ]=0.1;
   #ifdef NCOMPTONIZATION
   pp0[NF0]=calc_NFfromE(pp0[EE0]);
   #endif

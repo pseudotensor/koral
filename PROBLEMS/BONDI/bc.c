@@ -167,6 +167,8 @@ if(ix>=NX) //total boundary, properties of the galaxy
     pp[NF0]=Nf*geomBLl.gdet/geomBL.gdet;
     #endif
 
+
+
 #endif	 
     
     p2u(pp,uu,&geom);

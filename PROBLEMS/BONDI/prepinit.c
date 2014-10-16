@@ -36,7 +36,6 @@ if(1) //uses MDOT and TGAS at the outer boundary
 		ldouble ur = urout * sqrt(RMAXout/R);
 		ldouble uint = uintout * pow(R/RMAXout, -3./2.*GAMMA);
 	    
-	    
 		set_u(pproblem1,RHO,ix,iy,iz,rho);
 		set_u(pproblem1,UU,ix,iy,iz,uint);
 		set_u(pproblem1,VX,ix,iy,iz,ur); //overwritten in init.c
@@ -52,7 +51,9 @@ if(1) //uses MDOT and TGAS at the outer boundary
 		E=calc_LTE_Efromurho(uint,rho);
 #endif
 		set_u(pproblem1,EE0,ix,iy,iz,E);
+		#ifdef NCOMPTONIZATION
 		set_u(pproblem1,NF0,ix,iy,iz,calc_NFfromE(E));
+		#endif
 		set_u(pproblem1,FX0,ix,iy,iz,0.); //overwritten in init.c
 		set_u(pproblem1,FY0,ix,iy,iz,0.);
 		set_u(pproblem1,FZ0,ix,iy,iz,0.);

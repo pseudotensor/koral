@@ -338,6 +338,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
       //reallocate loops to allow for sub-zones, but don't do it every step
       #ifdef SUBZONES
+
       loopsallociter++;
       if(loopsallociter>SUBZONES_NSTEPSTEP)
 	{
@@ -435,8 +436,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    addi_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
 	    addi_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
 	    calc_u2p();
-
-
+	
 	    //printf("nstep: %d\n",nstep);
 	  }
 	  t+=dt;	 

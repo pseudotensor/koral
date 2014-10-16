@@ -16,7 +16,7 @@
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 //#define NCOMPTONIZATION
@@ -52,15 +52,15 @@
 #define TNX 128
 #define TNY 1
 #define TNZ 1
-#define NTX 2 //for MPI and OMP
+#define NTX 4 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
 #define SUBZONES
-#define SUBZONES_NSTEPSTEP 100
+#define SUBZONES_NSTEPSTEP 10
 //#define OUTPUTAFTERSUBZONES
-#define NSUBZONES 2
-#define SUBZONESOVERLAP 4
+#define NSUBZONES 3
+#define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
 //#define FIX_TEMPERATURE

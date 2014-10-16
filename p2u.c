@@ -168,16 +168,16 @@ int p2u_rad(ldouble *pp,ldouble *uu,void *ggg)
 #endif
  
   //M1
-  for(irf=0;irf<NRF;irf++)
+  //for(irf=0;irf<NRF;irf++)
     {
-      ldouble Erf=pp[EE(irf)];
+      ldouble Erf=pp[EE];
 
       //relative four-velocity
       ldouble urf[4];
       urf[0]=0.;
-      urf[1]=pp[FX(irf)];
-      urf[2]=pp[FY(irf)];
-      urf[3]=pp[FZ(irf)];
+      urf[1]=pp[FX];
+      urf[2]=pp[FY];
+      urf[3]=pp[FZ];
 
       //converting to lab four-velocity
       conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
@@ -190,13 +190,13 @@ int p2u_rad(ldouble *pp,ldouble *uu,void *ggg)
 
       indices_21(Rtopp,Rtopp,gg); //R^t_mu
 
-      uu[EE(irf)]=gdetu*Rtopp[0]; //R^t_t
-      uu[FX(irf)]=gdetu*Rtopp[1]; //R^t_i
-      uu[FY(irf)]=gdetu*Rtopp[2];
-      uu[FZ(irf)]=gdetu*Rtopp[3];
+      uu[EE]=gdetu*Rtopp[0]; //R^t_t
+      uu[FX]=gdetu*Rtopp[1]; //R^t_i
+      uu[FY]=gdetu*Rtopp[2];
+      uu[FZ]=gdetu*Rtopp[3];
 
       #ifdef NCOMPTONIZATION
-      uu[NF(irf)]=gdetu*pp[NF(irf)]*urf[0];
+      uu[NF]=gdetu*pp[NF]*urf[0];
       #endif
     }
 
@@ -340,9 +340,9 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   ldouble Rij[4][4];
   calc_Rij(pp,&geomout,Rij);
   indices_2221(Rij,Rij,geomout.gg);
-  vcon[1]=pp[FX(0)];
-  vcon[2]=pp[FY(0)];
-  vcon[3]=pp[FZ(0)];
+  vcon[1]=pp[FX];
+  vcon[2]=pp[FY];
+  vcon[3]=pp[FZ];
   vcon[0]=0.;  
   conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG); 
 

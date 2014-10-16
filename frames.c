@@ -655,7 +655,7 @@ boost22_rf2lab(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldou
   if(verbose>0) print_tensor(T1);
 
   //artificial and temporary substitution
-  ldouble urf[4]={0.,pp[FX(0)],pp[FY(0)],pp[FZ(0)]};
+  ldouble urf[4]={0.,pp[FX],pp[FY],pp[FZ]};
   conv_vels(urf,urf,VELPRIMRAD,VELPRIM,gg,GG);
   pp[2]=urf[1];
   pp[3]=urf[2];
@@ -734,7 +734,7 @@ boost22_lab2rf(ldouble T1[][4],ldouble T2[][4],ldouble *pp0,ldouble gg[][5],ldou
   if(verbose>0) print_tensor(T1);
 
   //artificial and temporary substitution
-  ldouble urf[4]={0.,pp[FX(0)],pp[FY(0)],pp[FZ(0)]};
+  ldouble urf[4]={0.,pp[FX],pp[FY],pp[FZ]};
   conv_vels(urf,urf,VELPRIMRAD,VELPRIM,gg,GG);
   pp[2]=urf[1];
   pp[3]=urf[2];
@@ -858,7 +858,7 @@ boost2_lab2rf(ldouble A1[4],ldouble A2[4],ldouble *pp0,ldouble gg[][5],ldouble G
   int verbose=0;
 
   //artificial and temporary substitution
-  ldouble urf[4]={0.,pp[FX(0)],pp[FY(0)],pp[FZ(0)]};
+  ldouble urf[4]={0.,pp[FX],pp[FY],pp[FZ]};
   conv_vels(urf,urf,VELPRIMRAD,VELPRIM,gg,GG);
   pp[2]=urf[1];
   pp[3]=urf[2];

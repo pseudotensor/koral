@@ -537,14 +537,14 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  //summing up multifluids
 									  int irf;
 									  E=Fx=Fy=Fz=0.;
-									  for(irf=0;irf<NRF;irf++)
+									  //for(irf=0;irf<NRF;irf++)
 									    {
 
 									      //						      irf=0;
-									      E+=pp[EE(irf)];
-									      Fx+=pp[FX(irf)];
-									      Fy+=pp[FY(irf)];
-									      Fz+=pp[FZ(irf)];
+									      E+=pp[EE];
+									      Fx+=pp[FX];
+									      Fy+=pp[FY];
+									      Fz+=pp[FZ];
 									      //						      break;
 									    }
 
@@ -576,10 +576,10 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 										  uu[3],  //7
 										  uu[4],  //8
 										  uu[5],  //9
-										  uu[6],  //10
-										  uu[7],  //11
-										  uu[8],  //12
-										  uu[9],  //13
+										  uu[EE],  //10
+										  uu[FX],  //11
+										  uu[FY],  //12
+										  uu[FZ],  //13
 
 										  rho,    //14
 										  uint, 

@@ -76,7 +76,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   
   ldouble utcon[4],ucon[4],ucov[4],cst1,cst2,cst3,cst4;
   ldouble bcon[4],bcov[4],bsq;
-  ldouble cs2,va2,EF,EE; 
+  ldouble cs2,va2,EF,EEloc; 
   ldouble rho,uu,pre;
 
   //**********************************************************************
@@ -109,8 +109,8 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   indices_21(bcon,bcov,gg); 
   bsq = dot(bcon,bcov);
   EF = rho + GAMMA*uu;
-  EE = bsq + EF ;
-  va2 = bsq/EE ;
+  EEloc = bsq + EF ;
+  va2 = bsq/EEloc ;
 
   if(cs2<0.) cs2=0.;
 #endif

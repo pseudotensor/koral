@@ -1582,7 +1582,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
       
       
       //copy what is in current subdomain to u_bak_subzone
-      for(ii=0;ii<Nloop_0;ii++) //domain only
+      for(ii=0;ii<Nloop_0;ii++) //domain only, previous subzone
 	{
 	  ix=loop_0[ii][0];
 	  iy=loop_0[ii][1];
@@ -1596,6 +1596,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
       
       
       //make the transition in the overlapping region smooth
+      //is not working properly
+     
       if(SUBZONESOVERLAP>0)
 	{
 	  for(ii=0;ii<SUBZONESOVERLAP;ii++)
@@ -1607,7 +1609,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  
 	      if(global_szix1>0) //lower boundary connects to another subzone
 		{
-		  index=global_szix1+SUBZONESOVERLAP-ii-1;
+		  //index=global_szix1+SUBZONESOVERLAP-ii-1;
+		  index=global_szix1+ii;
 		  PLOOP(jj)
 		  {
 		    val1=get_u(p,jj,index,iy,iz);
@@ -1635,7 +1638,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	 
 	      if(global_szix2<NX) //upper boundary connects to another subzone
 		{
-		  index=global_szix2-SUBZONESOVERLAP+ii+1;
+		  //index=global_szix2-SUBZONESOVERLAP+ii+1;
+		  index=global_szix2-ii;
 		  PLOOP(jj)
 		  {
 		    val1=get_u(p,jj,index,iy,iz);
@@ -1703,24 +1707,27 @@ alloc_loops(int init,ldouble t,ldouble dt)
 #endif
     }
 
-    int toi,tsi,tnx,imaxx=-1;
+  int toi,tsi,tnx,imaxx=-1;
 #ifdef MSTEP
     //find active cell at largest x-index, that will limi the range of cells covered by tiles
+
+  #ifdef SUBZONES
+  printf("SUBZONES don't like MSTEP\n"); exit(1);
+  #endif
     for(ix=0;ix<TNX;ix++)
       for(iy=0;iy<TNY;iy++)
 	for(iz=0;iz<TNZ;iz++)
 	  if(mstep_is_cell_active(ix,iy,iz)==1)
 	    if(ix>imaxx) imaxx=ix;    
+
+
     //choose total number of cells which multiplies number of tiles in x
     imaxx+=2; //plus two because we need left biased flux from imax+1 cell
     if(imaxx>TNX) imaxx=TNX;
 
-    if(imaxx % (NTX) == 0)
-      tnx=imaxx;
-    else
-      tnx = (floor((ldouble) imaxx/(ldouble)(NTX))+1)*NTX;
+    szix1=0;
+    szix2=imaxx;
 
-    tsi=tnx/NTX;
 #endif
 
 #pragma omp parallel private(ix,iy,iz,i,ii,jj,ix1,ix2,iy1,iy2,iz1,iz2)
@@ -1735,17 +1742,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     iz2=TOK+TNZ/NTZ;
 
     //printf("%d %d %d %d %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,iz1,iz2);
-    
-    #ifdef MSTEP
 
-    ix1=TI * tsi;
-    ix2=ix1+tsi;
-
-    //printf("pid: %d > %d to %d || %d %d %d %d\n",PROCID,ix1,ix2,mstep_current_counts[0],mstep_current_counts[1],mstep_current_counts[2],mstep_current_counts[3]);             if(PROCID==0) getch();
-
-#endif
-
-    #ifdef SUBZONES
+#if defined(SUBZONES) || defined(MSTEP)
     //split the subzone between szix1 and szix2 into tiles - 1d only
     ldouble istart=(ldouble)szix1;
     ldouble iend=(ldouble)szix2;
@@ -1755,27 +1753,10 @@ alloc_loops(int init,ldouble t,ldouble dt)
     ix1 = szix1 + TI*tsi;
     ix2 = ix1 + tsi;
 
-    if(TI==NTX-1) ix2=szix2;    
+    if(TI==NTX-1) ix2=szix2;  
 
-    /*
-    if(!init)
-      {
-	if(TI==0)
-	  {
-	ix1=0;
-	ix2=34;
-	  }
-	else
-	  {
-	    ix1=68;
-	    ix2=100;
-	  }
-      }
-    */
-
-    //    printf("%d %d %d | %d %d\n",PROCID,ix1,ix2,szix1,szix2); getch();
-
-    #endif
+    //printf("%d %d %d | %d %d\n",PROCID,ix1,ix2,szix1,szix2); if(PROCID==0) getch();
+#endif
 #endif
 
     global_ix1=ix1;
