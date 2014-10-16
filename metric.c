@@ -3470,9 +3470,10 @@ calc_metric()
     rphotonBL = r_photon_BL(BHSPIN);
     etaNT = 1.-sqrt(1.-2./3./r_ISCO_BL(BHSPIN));
 
-    if(PROCID==0) printf("done!\n");
+
   }
 
+    if(PROCID==0) printf("done!\n");
   return 0;
 }
 

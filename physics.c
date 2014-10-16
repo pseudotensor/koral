@@ -501,7 +501,7 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
       {
 	if(isnan(T[ii][jj])) 
 	  {
-	    printf("nan tmunu: %d %d %e\n",ii,jj,T[ii][jj]);
+	    printf("nan tmunu: %d %d %e at %d %d %d\n",ii,jj,T[ii][jj],ix,iy,iz);
 	    print_Nvector(pp,NV);
 	    my_err("nan in flux_prime\n");
 	  }

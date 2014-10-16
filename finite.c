@@ -532,6 +532,7 @@ op_explicit(ldouble t, ldouble dt)
   //**********************************************************************
   //**********************************************************************
 
+ 
   
   //projects primitives onto ghost cells at the boundaries of the total domain
   //or calculates conserved from exchanged primitives
@@ -1551,7 +1552,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 {
   int zone=-1;
   int ix,iy,iz,i,ii,jj ;
-  int ix1,ix2,iy1,iy2,iz1,iz2;
+  int ix1,ix2,iy1,iy2,iz1,iz2,szix1,szix2;
 
   //by default cover the whole local tile
   ix1=0;
@@ -1562,13 +1563,18 @@ alloc_loops(int init,ldouble t,ldouble dt)
   iy2=NY;
   iz2=NZ;  
 
-
+  szix1=ix1;
+  szix2=ix2;
   
   if(!init)
     {
 #ifdef SUBZONES
-      zone = calc_subzones(t,dt,&ix1,&iy1,&iz1,&ix2,&iy2,&iz2);
-      
+      zone = calc_subzones(t,dt,&szix1,&iy1,&iz1,&szix2,&iy2,&iz2);
+
+      printf("%d %d\n",szix1,szix2);
+      ix1=szix1;
+      ix2=szix2;
+
       if(zone==currentzone) //no need for reallocating arrays
 	return zone;
       
@@ -1735,10 +1741,15 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
     //printf("pid: %d > %d to %d || %d %d %d %d\n",PROCID,ix1,ix2,mstep_current_counts[0],mstep_current_counts[1],mstep_current_counts[2],mstep_current_counts[3]);             if(PROCID==0) getch();
 
- #endif
 #endif
 
+    #ifdef SUBZONES
+    //split the subzone between ix1 and ix2 into tiles - 1d only
 
+    printf("%d %d %d\n",PROCID,szix1,szix2); getch();
+
+    #endif
+#endif
 
     global_ix1=ix1;
     global_iy1=iy1;

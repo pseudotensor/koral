@@ -1,7 +1,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART 
+//#define RESTART 
 #define RESTARTNUM -1
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
@@ -38,9 +38,9 @@
 #define MAXZ (2.*M_PI) 
 #define TNX 40 // Total number of cells in X 
 #define TNY 40
-#define TNZ 40
-#define NTX 2 //number of tiles in X 
-#define NTY 2
+#define TNZ 1
+#define NTX 1 //number of tiles in X 
+#define NTY 1
 #define NTZ 1
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
@@ -51,7 +51,9 @@
 #define SILOOUTPUT 1 //to silo file
 #define RADOUTPUT 1
 #define SCAOUTPUT 1
+#if (TNZ==1)
 #define SILO2D_XZPLANE
+#endif
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 5000 //stop after this number of outputs
@@ -93,5 +95,5 @@
 //physics
 /************************************/
 #define GAMMA (4./3.)
-#define FRACMICHEL 0.06
-#define PERTMAGN 1.e-1
+#define FRACMICHEL 0.0
+#define PERTMAGN 0.e-1

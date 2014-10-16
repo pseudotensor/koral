@@ -11,7 +11,7 @@
 #define TNY 32
 #define TNZ 32
 
-#define NTX 4
+#define NTX 2
 #define NTY 1
 #define NTZ 1
 

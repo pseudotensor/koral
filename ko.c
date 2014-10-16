@@ -139,6 +139,7 @@ main(int argc, char **argv)
       calc_avgs_throughout();
 #pragma omp parallel
       set_bc(tstart,1);
+
       #ifdef MPI
       MPI_Barrier(MPI_COMM_WORLD);
       #endif
@@ -396,6 +397,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
 
+
+  
 #pragma omp parallel
 	  {
 	    
@@ -410,8 +413,21 @@ solve_the_problem(ldouble tstart, char* folder)
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  
 	    addi_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
-	    copyi_u(1.,u,ut1);	  
+	    copyi_u(1.,u,ut1);
+
+	    /*	     //test
+	      printf("^^\n");
+  print_conserved(&get_u(u,RHO,16,16,16));
+  print_primitives(&get_u(p,RHO,16,16,16));
+  printf("--\n");
+	    */
 	    calc_u2p();
+	    /*
+     //test
+  print_conserved(&get_u(u,RHO,16,16,16));
+  print_primitives(&get_u(p,RHO,16,16,16));
+	    */
+
 	    #pragma omp barrier
 	    count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	    op_explicit (t,dt); //U(1) in *ut1; 
@@ -491,7 +507,7 @@ solve_the_problem(ldouble tstart, char* folder)
       else 
 	my_err("wrong time stepping specified\n");
       
-
+ 
       
       //**********************************************************************
       //************************* updating intensities *************************

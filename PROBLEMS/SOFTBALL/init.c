@@ -59,7 +59,6 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     pp[VY]=0.;
     pp[VX]=0.;
 
-    
     //superimposing vmichel
     #ifdef UNPERTURBED
     vmichel=0.;
@@ -139,6 +138,14 @@ pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 //convert primitives to conserved
 p2u(pp,uu,&geom);
 /***********************************************/
+
+
+/*
+printf("%d %d %d\n",ix+TOI,iy+TOJ,iz+TOK);
+print_primitives(pp); 
+if(ix+TOI==TNX/2 && iy+TOJ==TNY/2) getchar();
+*/
+
 //save to memory
 int iv;
 for(iv=0;iv<NV;iv++)

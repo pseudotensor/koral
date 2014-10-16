@@ -426,6 +426,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		    + cos(th)*sin(ph)*vel[2]
 		    + cos(ph)*vel[3];
 
+		  /*
+		  if(iy==TNY/2 && ix==TNX/2){
+		    printf("%d %d %d > %e %e %e\n",ix,iy,iz,vx[nodalindex],vy[nodalindex],vz[nodalindex]); getch();}
+		  */
+
 		  vz[nodalindex] = cos(th)*vel[1] 
 		    - sin(th)*vel[2];
 

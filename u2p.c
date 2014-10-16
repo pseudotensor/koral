@@ -44,10 +44,25 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
       set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
       set_cflag(ENTROPYFLAG2,ix,iy,iz,0); 
     }
- 
+  //test
+  /*
+  if(ix==16 && iy==16 && iz==16)
+    {
+      print_conserved(uu);
+      print_primitives(pp);
+    }
+  */
   //converting to primitives
   u2p(uu,pp,&geom,corrected,fixups,type);
-
+  
+  //test
+  
+  if(ix==16 && iy==16 && iz==16)
+    {
+      //      print_conserved(uu);
+      print_primitives(pp);
+    }
+  
   if(corrected[0]==1 && setflags) //hd correction - entropy solver
     set_cflag(ENTROPYFLAG,ix,iy,iz,1); 
   if(corrected[2]==1 && setflags) //borrowing energy from radiation didn't work
@@ -1095,7 +1110,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   QdotBsq = QdotB*QdotB;
 #else
   Bsq=QdotB=QdotBsq=0.;
-  Bcon[0]=Bcon[1]=Bcon[2]=0.;
+  Bcon[0]=Bcon[1]=Bcon[2]=Bcon[3]=0.;
 #endif  
 
   //n_mu = (-alpha, 0, 0, 0)
