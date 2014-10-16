@@ -2,9 +2,9 @@ int ix,iy,iz;
 
 //for(ii=0;ii<Nloop_0;ii++) //this loop is already divided between cores
 #pragma omp parallel for private (iy,iz) schedule (static)
-for(ix=0;ix<TNX;ix++)
-  for(iy=0;iy<TNY;iy++)
-    for(iz=0;iz<TNZ;iz++)
+for(ix=0;ix<NX;ix++)
+  for(iy=0;iy<NY;iy++)
+    for(iz=0;iz<NZ;iz++)
   {
     int iv;
    

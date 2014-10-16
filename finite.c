@@ -1571,7 +1571,9 @@ alloc_loops(int init,ldouble t,ldouble dt)
 #ifdef SUBZONES
       zone = calc_subzones(t,dt,&szix1,&iy1,&iz1,&szix2,&iy2,&iz2);
 
-      printf("%d %d\n",szix1,szix2);
+      global_szix1=szix1;
+      global_szix2=szix2;
+ 
       ix1=szix1;
       ix2=szix2;
 
@@ -1603,9 +1605,9 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	      int index;
 
 	  
-	      if(global_ix1>0) //lower boundary connects to another subzone
+	      if(global_szix1>0) //lower boundary connects to another subzone
 		{
-		  index=global_ix1+SUBZONESOVERLAP-jj-1;
+		  index=global_szix1+SUBZONESOVERLAP-ii-1;
 		  PLOOP(jj)
 		  {
 		    val1=get_u(p,jj,index,iy,iz);
@@ -1631,9 +1633,9 @@ alloc_loops(int init,ldouble t,ldouble dt)
 		}
 
 	 
-	      if(global_ix2<NX) //upper boundary connects to another subzone
+	      if(global_szix2<NX) //upper boundary connects to another subzone
 		{
-		  index=global_ix2-SUBZONESOVERLAP+jj+1;
+		  index=global_szix2-SUBZONESOVERLAP+ii+1;
 		  PLOOP(jj)
 		  {
 		    val1=get_u(p,jj,index,iy,iz);
@@ -1744,9 +1746,34 @@ alloc_loops(int init,ldouble t,ldouble dt)
 #endif
 
     #ifdef SUBZONES
-    //split the subzone between ix1 and ix2 into tiles - 1d only
+    //split the subzone between szix1 and szix2 into tiles - 1d only
+    ldouble istart=(ldouble)szix1;
+    ldouble iend=(ldouble)szix2;
+    ldouble ilen=(iend-istart)/(ldouble)NTX;
+    int tsi=floor(ilen);
+    if(tsi<ilen) tsi++;
+    ix1 = szix1 + TI*tsi;
+    ix2 = ix1 + tsi;
 
-    printf("%d %d %d\n",PROCID,szix1,szix2); getch();
+    if(TI==NTX-1) ix2=szix2;    
+
+    /*
+    if(!init)
+      {
+	if(TI==0)
+	  {
+	ix1=0;
+	ix2=34;
+	  }
+	else
+	  {
+	    ix1=68;
+	    ix2=100;
+	  }
+      }
+    */
+
+    //    printf("%d %d %d | %d %d\n",PROCID,ix1,ix2,szix1,szix2); getch();
 
     #endif
 #endif
@@ -1805,15 +1832,13 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(TNZ>1) zlim1=zlim2=lim; else zlim1=zlim2=0;
 
     #ifdef OMP
-    
+        
     if(TI>0) xlim1=0; //not left-most
     if(TI<NTX-1) xlim2=0; //not right-most
     if(TJ>0) ylim1=0; 
     if(TJ<NTY-1) ylim2=0;
     if(TK>0) zlim1=0; 
-    if(TK<NTZ-1) zlim2=0;
- 
-    
+    if(TK<NTZ-1) zlim2=0;   
     
     #endif
 

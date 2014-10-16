@@ -38,10 +38,10 @@
 #define MAXZ (2.*M_PI) 
 #define TNX 40 // Total number of cells in X 
 #define TNY 40
-#define TNZ 1
-#define NTX 1 //number of tiles in X 
-#define NTY 1
-#define NTZ 1
+#define TNZ 40
+#define NTX 2 //number of tiles in X 
+#define NTY 2
+#define NTZ 2
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
 
@@ -95,5 +95,5 @@
 //physics
 /************************************/
 #define GAMMA (4./3.)
-#define FRACMICHEL 0.0
+#define FRACMICHEL 0.06
 #define PERTMAGN 0.e-1

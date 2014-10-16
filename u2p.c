@@ -55,14 +55,6 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   //converting to primitives
   u2p(uu,pp,&geom,corrected,fixups,type);
   
-  //test
-  
-  if(ix==16 && iy==16 && iz==16)
-    {
-      //      print_conserved(uu);
-      print_primitives(pp);
-    }
-  
   if(corrected[0]==1 && setflags) //hd correction - entropy solver
     set_cflag(ENTROPYFLAG,ix,iy,iz,1); 
   if(corrected[2]==1 && setflags) //borrowing energy from radiation didn't work

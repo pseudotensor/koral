@@ -52,12 +52,12 @@
 #define TNX 128
 #define TNY 1
 #define TNZ 1
-#define NTX 4 //for MPI and OMP
+#define NTX 2 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
 #define SUBZONES
-#define SUBZONES_NSTEPSTEP 1000
+#define SUBZONES_NSTEPSTEP 100
 //#define OUTPUTAFTERSUBZONES
 #define NSUBZONES 2
 #define SUBZONESOVERLAP 4
