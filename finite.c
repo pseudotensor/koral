@@ -3738,6 +3738,12 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
       int nzones=NSUBZONES,izones[10+1]; //10 is the maximal number of zones handled
       double rzones[10+1];
       double dtzones[10];
+      if(nzones>4)
+	{
+	  int ii;
+	  for(ii=0;ii<=nzones;ii++)
+	    izones[ii]=ii*NX/nzones;
+	}
       if(nzones==4)
 	{
 	  izones[0]=0;

@@ -22,7 +22,9 @@
 #define RADIMPEPS 1.e-8
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
+#ifdef RADIATION
 #define NCOMPTONIZATION
+#endif
 //#define SKIPFANCYOPACITIES 
 #define RADOUTPUTVELS
 
@@ -36,9 +38,10 @@
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 1.8
-#define RMAX 1.e3
-#define RMAXOUT RMAX
+#define RMIN 1.25
+#define RMAX 1.e6
+#define RMAXOUT (RMAX)
+#define RTEMPOUT (RMAX/10.)
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -62,15 +65,15 @@
 #define SUBZONES
 #define SUBZONES_NSTEPSTEP 3
 //#define OUTPUTAFTERSUBZONES
-#define NSUBZONES 4
+#define NSUBZONES 8
 #define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
-//#define FIX_TEMPERATURE
+#define FIX_TEMPERATURE
 //#define FIX_PRESSURERHO
 #define FIX_VELBONDI
 //#define FIX_VELOUTBONDI
-//#define INFLOW
+#define INFLOW
 
 
 /************************************/
@@ -87,7 +90,7 @@
 #define U2PCONV 1.e-12
 
 #define RADIMPMAXITER 15
-#define GAMMAMAXRAD 10.
+#define GAMMAMAXRAD 3.
 /************************************/
 //output
 /************************************/
@@ -99,7 +102,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 (RMAX*10.) //res
+#define DTOUT1 (RMAX*100.) //res
 #define DTOUT2 (DTOUT1*100.) //avg
 #define TMAX 1.e100 //time to stop
 
@@ -107,8 +110,8 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e0
-#define TAMB (1.e8*(1.e5/RMAXOUT))
+#define MDOT 1.e-4
+#define TAMB (1.e8*(1.e5/RTEMPOUT))
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
 

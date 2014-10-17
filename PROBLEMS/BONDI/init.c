@@ -73,8 +73,8 @@ uint=get_u(pproblem1,UU,ix,iy,iz);
 ur=get_u(pproblem1,VX,ix,iy,iz);
 
 #ifdef INFLOW
-rho*=1.e-5;
-uint*=1.e-5;
+rho*=1.e-10;
+uint*=1.e-10;
 #endif
 
 //four-vel in BL
@@ -97,7 +97,6 @@ pp[6]=E;
 pp[7]=urfcon[1];
 pp[8]=urfcon[2];
 pp[9]=urfcon[3]; 
-#endif	 
 
 //transforming primitives from BL to MYCOORDS
 //trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
@@ -108,6 +107,7 @@ pp[NF0]=calc_NFfromE(pp[EE0]);
 //pp[NF0]=calc_NFfromT(Tgas);
 //printf("%d %e %e\n",ix,pp[NF0],Tgas);
 #endif
+#endif	 
 
 
 p2u(pp,uu,&geom);	 
