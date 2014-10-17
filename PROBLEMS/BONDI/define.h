@@ -33,9 +33,9 @@
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 1.e1
-#define RMAX 1.e3
-#define RMAXOUT 1.e3
+#define RMIN 1.8
+#define RMAX 1.e4
+#define RMAXOUT 1.e4
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -49,7 +49,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 4 //for MPI and OMP
@@ -59,7 +59,7 @@
 #define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
 //#define OUTPUTAFTERSUBZONES
-#define NSUBZONES 3
+#define NSUBZONES 4
 #define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
@@ -97,7 +97,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 //#define NSTEPSTOP 5e4 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 1.e4 //res
+#define DTOUT1 (RMAX*10.) //res
 #define DTOUT2 1.e40 //avg
 #define TMAX 1.e100 //time to stop
 

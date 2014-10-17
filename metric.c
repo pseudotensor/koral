@@ -3160,6 +3160,10 @@ calc_metric()
 	iy=loop_02[ii][1];
 	iz=loop_02[ii][2]; 
 
+	#ifdef METRICAXISYMMETRIC
+	if(iz>0) continue;
+	#endif
+
 
 	ldouble gloc[4][5];
 	ldouble Kr[4][4][4];

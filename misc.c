@@ -138,21 +138,35 @@ initialize_arrays()
   cellflag=(int*)malloc((SX)*(SY)*(SZ)*NFLAGS*sizeof(int));
  
   //metric at cell centers
-  g=(ldouble*)malloc((SX)*(SY)*(SZ)*gSIZE*sizeof(ldouble));
+  g=(ldouble*)malloc((SX)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
   //metric at cell centers
-  G=(ldouble*)malloc((SX)*(SY)*(SZ)*gSIZE*sizeof(ldouble));
+  G=(ldouble*)malloc((SX)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
   //Kristofels at cell centers
-  gKr=(ldouble*)malloc((SX)*(SY)*(SZ)*64*sizeof(ldouble));
+  gKr=(ldouble*)malloc((SX)*(SY)*(SZMET)*64*sizeof(ldouble));
+
+
+  //metric at cell x-faces
+  gbx=(ldouble*)malloc((SX+1)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
+  //metric at cell y-faces
+  gby=(ldouble*)malloc((SX)*(SY+1)*(SZMET)*gSIZE*sizeof(ldouble));
+  //metric at cell z-faces
+  gbz=(ldouble*)malloc((SX)*(SY)*(SZMET+1)*gSIZE*sizeof(ldouble));
+  //metric at cell x-faces
+  Gbx=(ldouble*)malloc((SX+1)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
+  //metric at cell y-faces
+  Gby=(ldouble*)malloc((SX)*(SY+1)*(SZMET)*gSIZE*sizeof(ldouble));
+  //metric at cell z-faces
+  Gbz=(ldouble*)malloc((SX)*(SY)*(SZMET+1)*gSIZE*sizeof(ldouble));
 
   //LNRF basis one-forms
-  emuup=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
+  emuup=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
   //LNRF basis vectors
-  emulo=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
+  emulo=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
 
   //ortonormal tetrad one-forms
-  tmuup=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
+  tmuup=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
   //ortonormal tetrad vectors
-  tmulo=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
+  tmulo=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
 
   //left-interpolated primitives at cell x-faces
   pbLx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble));
@@ -189,18 +203,6 @@ initialize_arrays()
   flRz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
 
 
-  //metric at cell x-faces
-  gbx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*gSIZE*sizeof(ldouble));
-  //metric at cell y-faces
-  gby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*gSIZE*sizeof(ldouble));
-  //metric at cell z-faces
-  gbz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*gSIZE*sizeof(ldouble));
-  //metric at cell x-faces
-  Gbx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*gSIZE*sizeof(ldouble));
-  //metric at cell y-faces
-  Gby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*gSIZE*sizeof(ldouble));
-  //metric at cell z-faces
-  Gbz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*gSIZE*sizeof(ldouble));
 
 
   //auxiliary primitive arrays
