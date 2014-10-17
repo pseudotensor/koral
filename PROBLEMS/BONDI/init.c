@@ -104,6 +104,9 @@ pp[9]=urfcon[3];
 
 #ifdef NCOMPTONIZATION
 pp[NF0]=calc_NFfromE(pp[EE0]);
+//ldouble Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+//pp[NF0]=calc_NFfromT(Tgas);
+//printf("%d %e %e\n",ix,pp[NF0],Tgas);
 #endif
 
 

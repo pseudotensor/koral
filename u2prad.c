@@ -509,11 +509,11 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   #endif
   ldouble urfcon[4];
   urfcon[0]=0.;
-  urfcon[1]=pp[FX0];
-  urfcon[2]=pp[FY0];
-  urfcon[3]=pp[FZ0];
+  urfcon[1]=pp[FX];
+  urfcon[2]=pp[FY];
+  urfcon[3]=pp[FZ];
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
-  pp[NF(0)]=uu[NF(0)]/urfcon[0]/gdetu;
+  pp[NF]=uu[NF]/urfcon[0]/gdetu;
   #endif
 
   //M1

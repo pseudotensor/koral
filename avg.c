@@ -7,8 +7,12 @@ int
 main(int argc, char **argv)
 {  
   #ifdef MPI
-  printf("avg works on one core only, do not use MPI, please\n");
+  printf("avg works on shared memory only, do not use MPI, please\n");
   exit(-1);
+  #endif
+
+  #ifdef OMP
+  omp_myinit();  
   #endif
 
   //which files to read
@@ -114,6 +118,7 @@ main(int argc, char **argv)
 	  calc_avgs_throughout();
 	  
 	  //sets bc
+	  #pragma omp parallel
 	  set_bc(t,0);
 	  
 	  //calculate scalars
@@ -154,6 +159,7 @@ main(int argc, char **argv)
   calc_avgs_throughout();
 
   //projects on ghost cells
+  #pragma omp parallel
   set_bc(t,0);
 
   char prefix[40];
@@ -163,6 +169,7 @@ main(int argc, char **argv)
   else
     sprintf(suffix,"res");
  
+
   
   //dumps dumps to analysis analysis
 #if(RADOUTPUT==1)

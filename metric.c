@@ -3164,6 +3164,8 @@ calc_metric()
 	if(iz>0) continue;
 	#endif
 
+	
+
 
 	ldouble gloc[4][5];
 	ldouble Kr[4][4][4];

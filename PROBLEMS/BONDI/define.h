@@ -17,9 +17,12 @@
 //radiation
 /************************************/
 #define RADIATION
+#define RADIMPLICITTHRESHOLD 1.e5
+#define RADIMPCONV 1.e-8
+#define RADIMPEPS 1.e-8
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
-//#define NCOMPTONIZATION
+#define NCOMPTONIZATION
 //#define SKIPFANCYOPACITIES 
 #define RADOUTPUTVELS
 
@@ -34,8 +37,8 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 1.8
-#define RMAX 1.e4
-#define RMAXOUT 1.e4
+#define RMAX 1.e3
+#define RMAXOUT RMAX
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -49,7 +52,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 128
 #define TNY 1
 #define TNZ 1
 #define NTX 4 //for MPI and OMP
@@ -57,7 +60,7 @@
 #define NTZ 1
 
 #define SUBZONES
-#define SUBZONES_NSTEPSTEP 10
+#define SUBZONES_NSTEPSTEP 3
 //#define OUTPUTAFTERSUBZONES
 #define NSUBZONES 4
 #define SUBZONESOVERLAP 0
@@ -82,23 +85,22 @@
 
 #define DOFIXUPS 0
 #define U2PCONV 1.e-12
-#define RADIMPCONV 1.e-8
-#define RADIMPEPS 1.e-8
+
 #define RADIMPMAXITER 15
-#define GAMMAMAXRAD 50.
+#define GAMMAMAXRAD 10.
 /************************************/
 //output
 /************************************/
 #define SILOOUTPUT 0 //to silo file
 #define OUTOUTPUT 1 //to out file
 #define AVGOUTPUT 0
-#define RADOUTPUT 0
+#define RADOUTPUT 1
 #define SCAOUTPUT 1
 #define ALLSTEPSOUTPUT 0 //whether to output every step
-//#define NSTEPSTOP 5e4 //stop after this number of steps
+#define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #define DTOUT1 (RMAX*10.) //res
-#define DTOUT2 1.e40 //avg
+#define DTOUT2 (DTOUT1*100.) //avg
 #define TMAX 1.e100 //time to stop
 
 /************************************/
@@ -110,7 +112,7 @@
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
 
-#define PRADGASINIT 1.e-10
+#define PRADGASINIT 1.e-5
 #define MASS 10.
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s

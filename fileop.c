@@ -11,23 +11,31 @@ save_avg(ldouble dt)
 {
   int ix,iy,iz,iv,ii;
 
-  #pragma omp parallel private(ix,iy,iz,iv) 
-  {
-  for(ii=0;ii<Nloop_0;ii++) //domain 
-    {
-      ix=loop_0[ii][0];
-      iy=loop_0[ii][1];
-      iz=loop_0[ii][2]; 
-      
-      ldouble avg[NV+NAVGVARS];
-      p2avg(ix,iy,iz,avg);
+  //commented out to work with SUBZONES too
+  //  for(ii=0;ii<Nloop_0;ii++) //domain 
+  //ix=loop_0[ii][0];
+  //iy=loop_0[ii][1];
+  //iz=loop_0[ii][2]; 
 
-      for(iv=0;iv<NV+NAVGVARS;iv++)
+#pragma omp parallel private(ix,iy,iz,iv) 
+  for(iz=0;iz<NZ;iz++)
+    {
+      for(iy=0;iy<NY;iy++)
 	{
-	  set_uavg(pavg,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz)+avg[iv]*dt);
+	  for(ix=0;ix<NX;ix++) 
+	    {
+     
+      
+	      ldouble avg[NV+NAVGVARS];
+	      p2avg(ix,iy,iz,avg);
+
+	      for(iv=0;iv<NV+NAVGVARS;iv++)
+		{
+		  set_uavg(pavg,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz)+avg[iv]*dt);
+		}
+	    }
 	}
     }
-  }
 
   avgtime+=dt;
   
@@ -288,6 +296,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
   sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
   fout1=fopen(bufor,"w");
   
+ 
   //header
   //## nout time problem NX NY NZ
   fprintf(fout1,"## %d %e %d %d %d %d\n",nfout1,t,PROBLEM,NX,NY,NZ);
@@ -386,6 +395,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 						  
 
+									  
+
 
 									  struct geometry geom;
 									  fill_geometry(ix,iy,iz,&geom);
@@ -440,6 +451,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									      pporg[iv]=get_u(p,iv,ix,iy,iz);
 									    }	 
 
+
+
 						  
 									  ldouble tup[4][4],tlo[4][4];
 									  pick_T(tmuup,ix,iy,iz,tup);
@@ -454,15 +467,16 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  calc_G_arb(xxvecout,GGout,OUTCOORDS);
 									  fill_geometry_arb(ix,iy,iz,&geomout,OUTCOORDS);
 
-						  
+
 
 									  if(MYCOORDS!=OUTCOORDS && codeprim==0)
 									    {
+
 #ifdef RADIATION
 									      trans_prad_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
 #endif
 									      trans_pmhd_coco(pp, pp, MYCOORDS,OUTCOORDS, xxvec,&geom,&geomout);
-									      
+
 									      //from now on geom,gg, GG, tup, etc. defined in OUTCOORDS!
 									      fill_geometry_arb(ix,iy,iz,&geom,OUTCOORDS);
 									      for(i=0;i<4;i++)
@@ -472,6 +486,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									      calc_tetrades(gg,tup,tlo,OUTCOORDS);
 									      calc_ZAMOes(gg,eup,elo,OUTCOORDS);
 									    }
+
+
 
 									  ldouble rho=pp[0];
 									  ldouble uint=pp[1];
@@ -505,6 +521,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 						  
 						  
 
+
 #ifdef RADIATION
 
 									  if(codeprim==0)
@@ -530,6 +547,8 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									    }
 #endif
 						  
+
+
 									  //**********************************************************************
 									  //**********************************************************************
 									  //**********************************************************************

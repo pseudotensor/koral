@@ -7,8 +7,12 @@ int
 main(int argc, char **argv)
 {  
   #ifdef MPI
-  printf("ana works on one core only, do not use MPI, please\n");
+  printf("ana works on shared memory only, do not use MPI, please\n");
   exit(-1);
+  #endif
+
+  #ifdef OMP
+  omp_myinit();  
   #endif
 
   //which files to read
@@ -90,6 +94,7 @@ main(int argc, char **argv)
       calc_avgs_throughout();
       
       //sets bc
+      #pragma omp parallel
       set_bc(t,0);
      
       //calculate scalars
