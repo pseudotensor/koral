@@ -144,7 +144,6 @@ initialize_arrays()
   //Kristofels at cell centers
   gKr=(ldouble*)malloc((SX)*(SY)*(SZMET)*64*sizeof(ldouble));
 
-
   //metric at cell x-faces
   gbx=(ldouble*)malloc((SX+1)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
   //metric at cell y-faces

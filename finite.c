@@ -2241,7 +2241,7 @@ int set_g(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value)
 {
   if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_g - index ouf of range");
   
-  uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX)*gSIZE] = value;
+  uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX)*gSIZE] = value;
   return 0;
 }
 
@@ -2250,7 +2250,7 @@ int set_T(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value)
 {
   if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_T - index ouf of range");
   
-  uarr[i*4+j + (ix+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16] = value;
+  uarr[i*4+j + (ix+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16] = value;
   return 0;
 }
 
@@ -2301,15 +2301,15 @@ int set_gKrb(int i,int j,int k,int ix,int iy,int iz,ldouble val,int idim)
 {
   if(idim==0)
     {
-      gKrbx[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX+1)*64 + (iZ(iz)+NGCZ)*(SY)*(SX+1)*64]=val;
+      gKrbx[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX+1)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*64]=val;
     }
   if(idim==1)
     {
-      gKrby[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZ(iz)+NGCZ)*(SY+1)*(SX)*64]=val;
+      gKrby[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*64]=val;
     }
   if(idim==2)
     {
-      gKrbz[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZ(iz)+NGCZ)*(SY)*(SX)*64]=val;
+      gKrbz[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*64]=val;
     }
   return 0;
 }
@@ -2320,15 +2320,15 @@ int set_gb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim
 {
   if(idim==0)
     {
-      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX+1)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX+1)*gSIZE] = value;
+      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX+1)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*gSIZE] = value;
     }
   if(idim==1)
     {
-      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY+1)*(SX)*gSIZE] = value;
+      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*gSIZE] = value;
     }
   if(idim==2)
     {
-      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX)*gSIZE] = value;
+      uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX)*gSIZE] = value;
     }
   return 0;
 }
@@ -2338,15 +2338,15 @@ int set_Tb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim
 {
   if(idim==0)
     {
-      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX+1)*16 + (iZ(iz)+NGCZ)*(SY)*(SX+1)*16] = value;
+      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX+1)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*16] = value;
     }
   if(idim==1)
     {
-      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY+1)*(SX)*16] = value;
+      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*16] = value;
     }
   if(idim==2)
     {
-      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16] = value;
+      uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16] = value;
     }
   return 0;
 }

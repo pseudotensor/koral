@@ -27,6 +27,7 @@
 /************************************/
 
 #define MYCOORDS KERRCOORDS
+#define METRICAXISYMMETRIC
 #define RMIN 3.5
 #define RMAX 17
 #define MINX RMIN
@@ -96,4 +97,4 @@
 /************************************/
 #define GAMMA (4./3.)
 #define FRACMICHEL 0.06
-#define PERTMAGN 0.e-1
+#define PERTMAGN 1.e-2

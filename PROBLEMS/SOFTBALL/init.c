@@ -110,7 +110,7 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
 
 #ifdef PERTMAGN //perturb to trigger PapaloizuPringle
     pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
-//printf("%e %e\n",(double)rand(),((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN); getch();
+    if(ix==NX/2 && iy==NY/2) {printf("%e %e\n",1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN,((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN); }
 #endif
 
   }

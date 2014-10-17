@@ -160,6 +160,19 @@ int NPROCS;
 #define iZ(iz) (0)
 #endif
 
+#define SZMET SZ
+#define NGCZMET NGCZ
+#define iZMET(iz) iZ(iz)
+
+#ifdef METRICAXISYMMETRIC
+#undef SZMET
+#undef NGCZMET
+#undef iZMET
+#define SZMET 1
+#define NGCZMET 0
+#define iZMET(iz) (0)
+#endif
+
 
 //arrays and stuff
 ldouble **msgbufs;
@@ -364,21 +377,21 @@ int set_ub(ldouble* uarr,int iv,int ix,int iy,int iz,ldouble value,int idim);
 #define set_ubz(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV]=val
 //ldouble get_ub(ldouble* uarr,int iv,int ix,int iy,int iz,int idim);
 #define get_ub(uarr,iv,ix,iy,iz,idim) (idim==0 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX+1)*NV + (iZ(iz)+NGCZ)*(SY)*(SX+1)*NV] : (idim==1 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY+1)*(SX)*NV] : (idim==2 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV] : 0.)))
-//ldouble get_g(ldouble* uarr, int i,int j, int iX(ix), int iy, int iz);
-#define get_g(uarr,i,j,ix,iy,iz) uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX)*gSIZE]
+
+
+//metric specific
 int set_g(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value);
 int set_T(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value);
-
-#define get_T(uarr,i,j,ix,iy,iz) uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16]
-#define get_Tb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX+1)*16 + (iZ(iz)+NGCZ)*(SY)*(SX+1)*16] : (idim==1 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY+1)*(SX)*16] : (idim==2 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16] : 0.)))
 int set_Tb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim);
 int set_gb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim);
-//ldouble get_gb(ldouble* uarr,int i,int j,int ix,int iy,int iz,int idim);
-#define get_gb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX+1)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX+1)*gSIZE] : (idim==1 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY+1)*(SX)*gSIZE] : (idim==2 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZ(iz)+NGCZ)*(SY)*(SX)*gSIZE] : 0.)))
-#define get_gKr(i,j,k,ix,iy,iz) gKr[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZ(iz)+NGCZ)*(SY)*(SX)*64]
-#define get_gKrb(i,j,k,ix,iy,iz,idim) (idim==0 ? gKrbx[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX+1)*64 + (iZ(iz)+NGCZ)*(SY)*(SX+1)*64] : (idim==1 ? gKrby[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZ(iz)+NGCZ)*(SY+1)*(SX+1)*64] : (idim==2 ? gKrbz[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZ(iz)+NGCZ)*(SY)*(SX+1)*64] : 0.)))
-#define set_gKr(i,j,k,ix,iy,iz,val) gKr[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZ(iz)+NGCZ)*(SY)*(SX)*64]=val
 int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
+#define get_g(uarr,i,j,ix,iy,iz) uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX)*gSIZE]
+#define get_T(uarr,i,j,ix,iy,iz) uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16]
+#define get_Tb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX+1)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*16] : (idim==1 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*16] : (idim==2 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16] : 0.)))
+#define get_gb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX+1)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*gSIZE] : (idim==1 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*gSIZE] : (idim==2 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX)*gSIZE] : 0.)))
+#define get_gKr(i,j,k,ix,iy,iz) gKr[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*64]
+#define get_gKrb(i,j,k,ix,iy,iz,idim) (idim==0 ? gKrbx[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX+1)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*64] : (idim==1 ? gKrby[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY+1)*(SX+1)*64] : (idim==2 ? gKrbz[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*64] : 0.)))
+#define set_gKr(i,j,k,ix,iy,iz,val) gKr[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*64]=val
 
 //other wrappers
 #define delta(i,j) (i==j ? 1 : 0)
