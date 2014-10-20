@@ -126,9 +126,34 @@ if(ix>=NX) //total boundary, properties of the galaxy
     #ifdef NCOMPTONIZATION
     Nf=get_u(p,NF0,NX-1,iy,iz);
     #endif
+
+    
     uconl[0]=uconl[2]=uconl[3]=0.;
     uconl[1]=url;
-    conv_vels(uconl,uconl,VELPRIM,VEL4,geoml.gg,geoml.GG);
+    conv_vels(uconl,uconl,VELPRIMRAD,VEL4,geoml.gg,geoml.GG);
+    trans2_coco(geoml.xxvec,uconl,uconl,MYCOORDS,BLCOORDS);
+
+    ucon[0]=ucon[2]=ucon[3]=0.;
+    ucon[1]=uconl[1];
+
+    //    ucon[1]=GAMMAMAXRAD;
+  
+    //velocity back to MYCOORDS
+    trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+    
+    
+    conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
+
+    //    printf("%e %e %e\n",url,uconl[1],ucon[1]);
+
+    pp[EE0]=El;
+    pp[FX0]=ucon[1];
+    pp[FY0]=0.;
+    pp[FZ0]=0.;
+    #ifdef NCOMPTONIZATION
+    pp[NF0]=Nf;
+    #endif
+    /*
 
     //flat luminosity
     ldouble Rijl[4][4];
@@ -166,6 +191,7 @@ if(ix>=NX) //total boundary, properties of the galaxy
     #ifdef NCOMPTONIZATION
     pp[NF0]=Nf*geomBLl.gdet/geomBL.gdet;
     #endif
+    */
 
 
 

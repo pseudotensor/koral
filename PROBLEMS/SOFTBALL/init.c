@@ -23,6 +23,8 @@ ldouble L=3.8;
 ldouble W = (1./2.)*log(-(geom.gg[0][0]*geom.gg[3][3])/(geom.gg[3][3]+L*L*geom.gg[0][0]));
 ldouble rin=4.57599;
 ldouble Win = -0.0416192; 
+
+Win = -0.049;
 ldouble w=exp(-(W-Win));
 
 //OS: I didn't know how to manipulate the size of the torus in your formulae, so I used my old ones:
@@ -109,8 +111,9 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
 #endif
 
 #ifdef PERTMAGN //perturb to trigger PapaloizuPringle
-    pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
-    if(ix==NX/2 && iy==NY/2) {printf("%e %e\n",1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN,((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN); }
+    //pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
+    pp[VZ]*=1.+PERTMAGN*sin(2.*geomBL.zz);
+    //if(ix==NX/2 && iy==NY/2) {printf("%e %e\n",1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN,((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN); }
 #endif
 
   }

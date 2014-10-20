@@ -28,18 +28,18 @@
 
 #define MYCOORDS KERRCOORDS
 #define METRICAXISYMMETRIC
-#define RMIN 3.5
-#define RMAX 17
+#define RMIN 5.
+#define RMAX 12
 #define MINX RMIN
 #define MAXX RMAX 
-#define DTH .6
+#define DTH .3
 #define MINY (M_PI/2.-DTH)
 #define MAXY (M_PI/2.+DTH)
 #define MINZ 0.
 #define MAXZ (2.*M_PI) 
 #define TNX 100 // Total number of cells in X 
 #define TNY 100
-#define TNZ 200
+#define TNZ 50
 #define NTX 2 //number of tiles in X 
 #define NTY 2
 #define NTZ 1

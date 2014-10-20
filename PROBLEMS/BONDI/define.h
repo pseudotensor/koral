@@ -40,8 +40,8 @@
 #define PRINTINSIDEBH
 #define RMIN 1.25
 #define RMAX 1.e6
-#define RMAXOUT (RMAX)
-#define RTEMPOUT (RMAX/10.)
+#define RMAXOUT (1.e6)
+#define RTEMPOUT (1.e6/10.)
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))

@@ -1780,7 +1780,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 #endif
 #endif
 
-    printf("%d %d %d | %d %d\n",PROCID,ix1,ix2,TOI,TOI+TNX/NTX); if(PROCID==0) getch();
+    //printf("%d %d %d | %d %d\n",PROCID,ix1,ix2,TOI,TOI+TNX/NTX); if(PROCID==0) getch();
 
     global_ix1=ix1;
     global_iy1=iy1;
