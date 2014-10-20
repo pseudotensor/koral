@@ -386,10 +386,13 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
       else
 	tstepden=wsx/dx;   
 
-      set_u_scalar(cell_tsteps,ix,iy,iz,tstepden);
+      tstepden/=TSTEPLIM;
+
+      set_u_scalar(cell_tstepstemp,ix,iy,iz,tstepden);
 
       ////#pragma omp critical
       if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
+      if(tstepden<tstepdenmin) tstepdenmin=tstepden;  
     }
   
   return 0;
@@ -501,10 +504,10 @@ do_finger()
 /* starts from *u, copies to *ubase, updates *u, ***/
 /***************************************************/
 int
-op_explicit(ldouble t, ldouble dt) 
+op_explicit(ldouble t, ldouble dtin) 
 {
   int ix,iy,iz,iv,ii;
-
+  ldouble dt;
   
   //global wavespeeds
   max_ws[0]=max_ws[1]=max_ws[2]=-1.;
@@ -981,8 +984,13 @@ op_explicit(ldouble t, ldouble dt)
       if(mstep_is_face_active(ix,iy,iz+1,2)==0) dozr=0;
 #endif
 
+      //timestep
+      dt=dtin;
+      #ifdef SELFTIMESTEP
+      dt=1./get_u_scalar(cell_tsteps,ix,iy,iz); //individual time step
+      #endif
 
-      //fluxes at faces
+      //updating conserved
       for(iv=0;iv<NV;iv++)
 	{
 	  ldouble flxr,flyr,flzr,flxl,flyl,flzl;
@@ -1046,6 +1054,12 @@ op_explicit(ldouble t, ldouble dt)
 	continue;
       #endif
 
+      //timestep
+      dt=dtin;
+      #ifdef SELFTIMESTEP
+      dt=1./get_u_scalar(cell_tsteps,ix,iy,iz); //individual time step
+      #endif
+
       //using primitives from *p, i.e., from the beginning of this timestep
       explicit_rad_source_term(ix,iy,iz,dt*mstep_get_cell_multiplier(ix,iy,iz));
     } //source terms
@@ -1089,9 +1103,10 @@ op_explicit(ldouble t, ldouble dt)
 /* starts from *u, copies to *ubase, updates *u, ***/
 /***************************************************/
 int
-op_implicit(ldouble t, ldouble dt) 
+op_implicit(ldouble t, ldouble dtin) 
 {
   int ii;
+  ldouble dt;
 
   //to count the average number of iteration in the implicit solver
   for(ii=0;ii<NGLOBALINTSLOT;ii++)
@@ -1117,6 +1132,12 @@ op_implicit(ldouble t, ldouble dt)
       #ifdef MSTEP
       if(mstep_is_cell_active(ix,iy,iz)==0) 
 	continue;
+      #endif
+
+      //timestep
+      dt=dtin;
+      #ifdef SELFTIMESTEP
+      dt=1./get_u_scalar(cell_tsteps,ix,iy,iz); //individual time step
       #endif
 
       //uses values already in *p as the initial guess
@@ -1755,9 +1776,11 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
     if(TI==NTX-1) ix2=szix2;  
 
-    //printf("%d %d %d | %d %d\n",PROCID,ix1,ix2,szix1,szix2); if(PROCID==0) getch();
+
 #endif
 #endif
+
+    printf("%d %d %d | %d %d\n",PROCID,ix1,ix2,TOI,TOI+TNX/NTX); if(PROCID==0) getch();
 
     global_ix1=ix1;
     global_iy1=iy1;
@@ -3735,9 +3758,9 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
   if(PROBLEM==7) //BONDI
     {      
       double startzoningtime=0.e2;
-      int nzones=NSUBZONES,izones[10+1]; //10 is the maximal number of zones handled
-      double rzones[10+1];
-      double dtzones[10];
+      int nzones=NSUBZONES,izones[TNX+1]; //10 is the maximal number of zones handled
+      double rzones[TNX+1];
+      double dtzones[TNX];
       if(nzones>4)
 	{
 	  int ii;

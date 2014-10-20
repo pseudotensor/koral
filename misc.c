@@ -249,6 +249,7 @@ initialize_arrays()
 
   //timesteps required by each cell
   cell_tsteps=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+  cell_tstepstemp=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
   
   return 0;
 }
@@ -373,6 +374,7 @@ free_arrays()
   free(ahdyr);
   free(ahdzr);
   free(cell_tsteps);
+  free(cell_tstepstemp);
 
   return 0;
 }

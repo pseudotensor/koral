@@ -273,6 +273,23 @@ solve_the_problem(ldouble tstart, char* folder)
   else
     tstepdenmax=max_ws[0]/min_dx;
 
+  tstepdenmax/=TSTEPLIM;
+  tstepdenmin=tstepdenmax;
+
+#pragma omp parallel private(ii)
+  {
+    for(ii=0;ii<Nloop_0;ii++) //domain 
+      {
+	int ix,iy,iz;
+	ix=loop_0[ii][0];
+	iy=loop_0[ii][1];
+	iz=loop_0[ii][2]; 
+
+	set_u_scalar(cell_tsteps,ix,iy,iz,tstepdenmax);
+	set_u_scalar(cell_tstepstemp,ix,iy,iz,tstepdenmax);
+      }
+  }
+
   //chooses the smalles timestep etc.
   mpi_synchtiming(&t);
 
@@ -365,7 +382,10 @@ solve_the_problem(ldouble tstart, char* folder)
 
 
       //dt based on the estimate from the last midpoint
-      dt=TSTEPLIM*1./tstepdenmax;
+      dt=1./tstepdenmax;
+      #ifdef SELFTIMESTEP
+      dt=1./tstepdenmin;
+      #endif
       global_dt=dt;
 
       #ifdef MSTEP
@@ -389,6 +409,7 @@ solve_the_problem(ldouble tstart, char* folder)
       max_ws[2]=-1.;
       max_ws_ph=-1.;
       tstepdenmax=-1.;
+      tstepdenmin=BIG;
    
       //**********************************************************************
       //**********************************************************************
@@ -400,51 +421,127 @@ solve_the_problem(ldouble tstart, char* folder)
 
 
   
-#pragma omp parallel
+#pragma omp parallel private(ii,iv,ix,iy,iz)
 	  {
+
+
+	    for(ii=0;ii<Nloop_0;ii++) //domain 
+	      {
+		int ix,iy,iz;
+		ix=loop_0[ii][0];
+		iy=loop_0[ii][1];
+		iz=loop_0[ii][2]; 
+		set_u_scalar(cell_tsteps,ix,iy,iz,get_u_scalar(cell_tstepstemp,ix,iy,iz));
+		//if(ix==20)	{printf("%d %e %e\n",ix,1./get_u_scalar(cell_tsteps,ix,iy,iz),1./get_u_scalar(cell_tsteps,0,iy,iz));}
+	      }
+
+	    //#pragma omp barrier
+	    //getch();
+
 	    
 	    /*
-	    printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
-		   "tile: %d,%d,%d; tile orig.: %d,%d,%d\n"
-		   "ix12: %d - %d\n",
-		   PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK,global_ix1,global_ix2);
+	      printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
+	      "tile: %d,%d,%d; tile orig.: %d,%d,%d\n"
+	      "ix12: %d - %d\n",
+	      PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK,global_ix1,global_ix2);
 	    */
 	    
 	    copyi_u(1.,u,ut0);
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  
-	    addi_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
+	    for(ii=0;ii<Nloop_0;ii++) { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+#ifdef SELFTIMESTEP
+	      PLOOP(iv) set_u(drt1,iv,ix,iy,iz,(1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)*gamma))*get_u(ut0,iv,ix,iy,iz)); 
+#else
+	      PLOOP(iv) set_u(drt1,iv,ix,iy,iz,(1./(dt*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(dt*gamma))*get_u(ut0,iv,ix,iy,iz)); 
+#endif	   
+	    } 
+	    //addi_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
+
 	    copyi_u(1.,u,ut1);	    
 	    calc_u2p();
-	    #pragma omp barrier
+#pragma omp barrier
 	    count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	    op_explicit (t,dt); //U(1) in *ut1; 
-	    addi_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
-	    addi_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
+	    
+	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+#ifdef SELFTIMESTEP
+	      PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)))*get_u(u,iv,ix,iy,iz)+(-1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)))*get_u(ut1,iv,ix,iy,iz)); 
+#else
+	      PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(dt))*get_u(u,iv,ix,iy,iz)+(-1./(dt))*get_u(ut1,iv,ix,iy,iz)); 
+#endif
+	    }
+	    //addi_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
+
+
+	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+#ifdef SELFTIMESTEP
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz))*get_u(dut1,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
+#else
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dt)*get_u(dut1,iv,ix,iy,iz)+(dt*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
+#endif
+	    }
+	    //addi_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
+
 	    copyi_u(1.,u,uforget);
 	    calc_u2p();
-	    #pragma omp barrier
+#pragma omp barrier
 	    count_entropy(&nentr[2],&nentr2[2]); do_finger();
 	    op_implicit (t,gamma*dt); //U(2) in *u
-	    addi_u(1./(dt*gamma),u,-1./(dt*gamma),uforget,drt2); //R(U(2)) in *drt2;
+
+	    for(ii=0;ii<Nloop_0;ii++) { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+#ifdef SELFTIMESTEP
+	      PLOOP(iv) set_u(drt2,iv,ix,iy,iz,(1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)*gamma))*get_u(uforget,iv,ix,iy,iz)); 
+#else
+	      PLOOP(iv) set_u(drt2,iv,ix,iy,iz,(1./(dt*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(dt*gamma))*get_u(uforget,iv,ix,iy,iz)); 
+#endif
+	    }
+	    //addi_u(1./(dt*gamma),u,-1./(dt*gamma),uforget,drt2); //R(U(2)) in *drt2;
+
 	    copyi_u(1.,u,ut2);
 	    calc_u2p();
-	    #pragma omp barrier
+#pragma omp barrier
 	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
 	    op_explicit (t,dt); //U(2) in *ut2; 
-	    addi_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
-	    addi_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
-	    addi_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
+
+	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+#ifdef SELFTIMESTEP
+	      PLOOP(iv) set_u(dut2,iv,ix,iy,iz,(1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)))*get_u(u,iv,ix,iy,iz)+(-1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)))*get_u(ut2,iv,ix,iy,iz)); 	   
+#else
+	      PLOOP(iv) set_u(dut2,iv,ix,iy,iz,(1./(dt))*get_u(u,iv,ix,iy,iz)+(-1./(dt))*get_u(ut2,iv,ix,iy,iz)); 
+#endif
+	    }
+	    //addi_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
+	    
+
+	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+#ifdef SELFTIMESTEP
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)/2.)*get_u(dut1,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)/2.)*get_u(dut2,iv,ix,iy,iz)); 
+#else
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dt/2.)*get_u(dut1,iv,ix,iy,iz)+(dt/2.)*get_u(dut2,iv,ix,iy,iz)); 
+#endif
+	    }
+	    //addi_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
+	    
+
+	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+#ifdef SELFTIMESTEP
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(u,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)/2.)*get_u(drt1,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)/2.)*get_u(drt2,iv,ix,iy,iz));
+#else
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(u,iv,ix,iy,iz)+(dt/2.)*get_u(drt1,iv,ix,iy,iz)+(dt/2.)*get_u(drt2,iv,ix,iy,iz));
+#endif
+	    }
+	    //addi_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
 	    calc_u2p();
 	
-	    //printf("nstep: %d\n",nstep);
+	  //printf("nstep: %d\n",nstep);
 	  }
 	  t+=dt;	 
 	}
       else if(TIMESTEPPING==RK2)
 	{ 
-	  //******************************* RK2 **********************************
-	  //1st
+	  /******************************* RK2 **********************************
+	   //1st
 	  copy_u(1.,u,ut0);
 	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	  op_explicit (t,.5*dt); 
@@ -465,11 +562,11 @@ solve_the_problem(ldouble tstart, char* folder)
 	  //together     
 	  t+=dt;    
 	  add_u(1.,ut0,1.,ut2,u);
-	  //************************** end of RK2 **********************************
+	  ************************** end of RK2 **********************************/
 	}
       else if(TIMESTEPPING==RK2HEUN)
 	{ 
-	  //******************************* RK2 **********************************
+	  /******************************* RK2 **********************************
 	  //1st	 
 	  copy_u(1.,u,ut0);
 	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
@@ -489,7 +586,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  //together     
 	  t+=dt;    
 	  add_u_3(1.,u,1./2.,ut2,1./2.,ut3,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
-	  //************************** end of RK2 **********************************
+	  ************************** end of RK2 **********************************/
 	}
       else 
 	my_err("wrong time stepping specified\n");

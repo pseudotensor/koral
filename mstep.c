@@ -9,6 +9,10 @@
 int 
 mstep_init(void)
 {
+#if defined(SELFTIMESTEP) && defined(MSTEP)
+  printf("mstep not friends with selftimestep\n");exit(-1);
+#endif
+
   int i;
   int ix;int iy;int iz;
   for(ix=0;ix<NX;ix++)
@@ -85,7 +89,7 @@ mstep_update_levels()
 	    continue;
 
 	  update=0;
-	  dt=1./get_u_scalar(cell_tsteps,ix,iy,iz); //new time step
+	  dt=1./get_u_scalar(cell_tstepstemp,ix,iy,iz); //new time step
 	  levelold=mstep_cell_levels[ix][iy][iz];
 	  levelnew=mstep_calc_level(dt,dtmin);
 

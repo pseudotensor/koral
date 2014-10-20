@@ -675,6 +675,11 @@ mpi_synchtiming(ldouble *time)
   MPI_Allreduce(&tstepdenmax, &global_tstepdenmax, 1, MPI_DOUBLE, MPI_MAX,
                 MPI_COMM_WORLD);
 
+  #ifdef SELFTIMESTEP
+  MPI_Allreduce(&tstepdenmin, &global_tstepdenmin, 1, MPI_DOUBLE, MPI_MIN,
+                MPI_COMM_WORLD);
+  #endif
+
   //maximal time taken by information exchange
   ldouble localmp_time=mid2_time-mid1_time;
   MPI_Allreduce(&localmp_time, &maxmp_time, 1, MPI_DOUBLE, MPI_MAX,
@@ -686,6 +691,7 @@ mpi_synchtiming(ldouble *time)
 
   *time=global_time;
   tstepdenmax=global_tstepdenmax;
+  tstepdenmin=global_tstepdenmin;
  #endif
 }
 

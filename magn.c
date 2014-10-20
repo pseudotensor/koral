@@ -732,13 +732,14 @@ calc_curl(ldouble *ptu, ldouble idx, int ix, int iy, int iz, void* ggg, ldouble 
 /************************* mimics alpha-dynamo in axisymmetric sims involvin MRI ***************/
 /***********************************************************************************************/
 int
-mimic_dynamo(ldouble dt)
+mimic_dynamo(ldouble dtin)
 {
 #ifdef MAGNFIELD
 #ifdef MIMICDYNAMO
 #ifdef BHDISK_PROBLEMTYPE
 
   int ix,iy,iz,iv,ii;
+  ldouble dt;
 
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_6;ii++) //inner domain plus 1-cell layer including corners
@@ -838,6 +839,12 @@ mimic_dynamo(ldouble dt)
       //dynamo proportional to vertical gravity ~ z
       #ifdef ALPHAFLIPSSIGN
       effalpha = - (M_PI/2. - xxBL[2])/(HRDTHETA/2.) * ALPHADYNAMO;  //2 to get average alpha = alphadynamo
+      #endif
+
+      //timestep
+      dt=dtin;
+      #ifdef SELFTIMESTEP
+      dt=1./get_u_scalar(cell_tsteps,ix,iy,iz); //individual time step
       #endif
 
       ldouble Bphi=get_u(p,B3,ix,iy,iz);

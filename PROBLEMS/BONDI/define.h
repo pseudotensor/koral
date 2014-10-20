@@ -62,10 +62,12 @@
 #define NTY 1
 #define NTZ 1
 
-#define SUBZONES
+
+//#define SUBZONES
+#define SELFTIMESTEP
 #define SUBZONES_NSTEPSTEP 3
 //#define OUTPUTAFTERSUBZONES
-#define NSUBZONES 8
+#define NSUBZONES (8)
 #define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
