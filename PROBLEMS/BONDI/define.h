@@ -39,7 +39,7 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 1.25
-#define RMAX 1.e6
+#define RMAX 1.e7
 #define RMAXOUT (1.e6)
 #define RTEMPOUT (1.e6/10.)
 
