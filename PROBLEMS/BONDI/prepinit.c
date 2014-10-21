@@ -1,4 +1,4 @@
-ldouble  RMAXout=5.e4;
+ldouble  RMAXout=RBONDI;
 //precalculates hydro Bondi solution, saves it to pproblem1
 
 if(1) //uses MDOT and TGAS at the outer boundary

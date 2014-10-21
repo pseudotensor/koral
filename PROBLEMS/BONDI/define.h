@@ -40,8 +40,9 @@
 #define PRINTINSIDEBH
 #define RMIN 1.25
 #define RMAX 1.e6
-#define RMAXOUT (1.e6)
-#define RTEMPOUT (1.e6/10.)
+#define RBONDI 1.e5
+#define RMAXOUT RBONDI
+//#define RTEMPOUT (1.e6/10.)
 
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
@@ -55,10 +56,10 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 64
 #define TNY 1
 #define TNZ 1
-#define NTX 4 //for MPI and OMP
+#define NTX 8 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -113,7 +114,8 @@
 /***********************************/
 #define GAMMA (5./3.)
 #define MDOT 1.e-4
-#define TAMB (1.e8*(1.e5/RTEMPOUT))
+//#define TAMB (1.e8*(1.e5/RTEMPOUT))
+#define (3.267e12/RBONDI)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
 

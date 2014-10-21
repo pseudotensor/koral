@@ -97,7 +97,7 @@ if(ix>=NX) //total boundary, properties of the galaxy
     #endif
 
     #ifdef FIX_VELOUTBONDI //estimating the velocity outside the Bondi radius
-    ldouble Rbondi = 3.267e12 / TAMB;
+    ldouble Rbondi = RBONDI;
     ldouble vbondi = -sqrt(1./2./Rbondi);
     ldouble vout = vbondi * (Rbondi/geomBL.xx) * (Rbondi/geomBL.xx);
 
