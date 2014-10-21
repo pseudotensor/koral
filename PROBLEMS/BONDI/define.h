@@ -39,9 +39,9 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 1.25
-#define RMAX 1.e6
-#define RBONDI 1.e5
-#define RMAXOUT RBONDI
+#define RMAX 3.267e8
+#define RBONDI 3.267e6 //(3.267e12/TAMB)
+#define RMAXOUT RBONDI 
 //#define RTEMPOUT (1.e6/10.)
 
 #define MINX (log(RMIN-MKS1R0))
@@ -56,10 +56,10 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 128
 #define TNY 1
 #define TNZ 1
-#define NTX 8 //for MPI and OMP
+#define NTX 32 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -74,8 +74,8 @@
 #define SPECIFIC_BC
 #define FIX_TEMPERATURE
 //#define FIX_PRESSURERHO
-#define FIX_VELBONDI
-//#define FIX_VELOUTBONDI
+//#define FIX_VELBONDI
+#define FIX_VELOUTBONDI
 #define INFLOW
 
 
@@ -105,8 +105,8 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 (RMAX*100.) //res
-#define DTOUT2 (DTOUT1*100.) //avg
+#define DTOUT1 (RMAX*1000.) //res
+#define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 
 /************************************/
@@ -115,7 +115,7 @@
 #define GAMMA (5./3.)
 #define MDOT 1.e-4
 //#define TAMB (1.e8*(1.e5/RTEMPOUT))
-#define (3.267e12/RBONDI)
+#define TAMB (3.267e12/RBONDI)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
 
