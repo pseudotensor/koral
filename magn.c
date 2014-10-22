@@ -740,6 +740,10 @@ mimic_dynamo(ldouble dtin)
 
   int ix,iy,iz,iv,ii;
   ldouble dt;
+  int verbose=0,stop=0;
+  int verix=75;
+  int veriy=100;
+  ldouble bcon[4],bcov[4],bsqin,bsqout,ugasin,ugasout;
 
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_6;ii++) //inner domain plus 1-cell layer including corners
@@ -752,6 +756,25 @@ mimic_dynamo(ldouble dtin)
 
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
+
+
+      if(verbose && ix+TOI==verix && iy+TOJ==veriy)
+	{
+	  printf("before dynamo: \n");
+
+	  print_primitives(&get_u(p,0,ix,iy,iz));
+	  print_conserved(&get_u(u,0,ix,iy,iz));
+
+
+	  calc_bcon_prim(&get_u(p,0,ix,iy,iz), bcon, &geom);
+	  indices_21(bcon,bcov,geom.gg); 
+	  bsqin = dot(bcon,bcov);
+
+	  ugasin=get_u(p,UU,ix,iy,iz);
+
+	  printf("bsqin: %e\n",bsqin);
+	}
+
 
       //let's use ptemp1 to hold the extra vector potential
       set_u(ptemp1,B1,ix,iy,iz,0.);
@@ -917,8 +940,18 @@ mimic_dynamo(ldouble dtin)
 	* my_max(0.,beta - BETASATURATED) / BETASATURATED 
 	* Bphi;
 
+
+
+      
       if((dBphi+Bphi)*Bphi<0.) dBphi=-Bphi; //not to overshoot zero 
-                                                              
+
+
+      if(verbose && ix+TOI==verix && iy+TOJ==veriy)
+	{
+	  printf("dBphi: %e \n",dBphi);
+	  if( dBphi!=0.) stop=1;
+	}
+                                                   
       set_u(p,B3,ix,iy,iz,Bphi+dBphi);    
       
 #endif    
@@ -957,11 +990,56 @@ mimic_dynamo(ldouble dtin)
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
       set_u(p,B3,ix,iy,iz,get_u(p,B3,ix,iy,iz)+B[3]);
 
+      
+      if(verbose && ix+TOI==verix && iy+TOJ==veriy)
+	{
+	  printf("dBvec = %e %e %e\n",B[1],B[2],B[3]);
+	
+	  ldouble pptemp[NV];
+	  PLOOP(iv) pptemp[iv]=get_u(p,iv,ix,iy,iz);
+	  pptemp[B1]+=B[1];
+	  pptemp[B2]+=B[2];
+	  pptemp[B3]+=B[3];
+	  
+
+	  calc_bcon_prim(&get_u(p,0,ix,iy,iz), bcon, &geom);
+	  indices_21(bcon,bcov,geom.gg); 
+	  bsqout = dot(bcon,bcov);
+
+	  printf("bsqout: %e\n",bsqout);
+
+	  
+	}
+
       ldouble uutemp[NV];
       p2u(&get_u(p,0,ix,iy,iz),uutemp,&geom);
       set_u(u,B1,ix,iy,iz,uutemp[B1]);
       set_u(u,B2,ix,iy,iz,uutemp[B2]);
       set_u(u,B3,ix,iy,iz,uutemp[B3]);
+
+     
+      if(verbose && ix+TOI==verix && iy+TOJ==veriy)
+	{
+	  printf("after dynamo: \n");
+	  print_primitives(&get_u(p,0,ix,iy,iz));
+	  print_conserved(&get_u(u,0,ix,iy,iz));
+
+	  ldouble pptemp[NV];
+	  PLOOP(iv) pptemp[iv]=get_u(p,0,ix,iy,iz);
+	  int corr[3],fixup[3];
+	  u2p(&get_u(u,0,ix,iy,iz),pptemp,&geom,corr,fixup,0);
+	  printf("after inversion: \n");
+	  print_primitives(pptemp);	
+
+	  ugasout=pptemp[UU];
+	  
+	  printf("dbsq/2 = %e\n",(bsqout - bsqin)/2.);
+	  printf("dugas = %e\n",ugasout - ugasin);
+
+
+	  if(stop) getch();
+
+	}
 
     }
 
