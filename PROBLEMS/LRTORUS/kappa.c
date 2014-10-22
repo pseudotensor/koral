@@ -1,36 +1,11 @@
-//absorption opacities
+//absorption
 
 ldouble rhocgs=rhoGU2CGS(rho);
-ldouble Tgas=T;
-ldouble Trad=Tgas;
+ldouble Tcgs=tempGU2CGS(T);
+ldouble kappaffcgs=6.4e22*rhocgs/Tcgs/Tcgs/Tcgs/sqrt(Tcgs);
 
-#ifdef NCOMPTONIZATION //adjust the Rosseland mean for the color temperature of radiation
-Trad = calc_ncompt_Thatrad_full(pp,ggg);
-#endif
+return kappaCGS2GU(kappaffcgs)*rho;
 
-ldouble zeta = Trad/Tgas;
+//ldouble kappabfcgs=4.8e-24/1.67262158e-24/1.67262158e-24*rhocgs/Tcgs/Tcgs/Tcgs/sqrt(Tcgs)*ZZsun;
+//return (kappaCGS2GU(kappaffcgs)*rho+kappaCGS2GU(kappabfcgs)*rho);
 
-			   
-//absorbtion mean
-ldouble mpcgs=1.67262158e-24;
-*kappagasAbs=kappaCGS2GU((6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*log(1.+1.6*zeta))*rho;
-*kapparadAbs=*kappagasAbs/zeta/zeta/zeta;
-	
-//Rosseland mean							  
-*kappagasRos=kappaCGS2GU((2.1e-25/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*(1.-exp(-6.94*zeta)))*rho;
-*kapparadRos=*kappagasAbs/zeta/zeta/zeta;
-
-//default
-kappa=*kappagasRos;
-
-
-/*
-#ifdef OPACBELLLIN
-ldouble X=0.75;
-ldouble opaces=0.2*(1.0+X);
-ldouble opactot=opacity_BellLin(rhocgs,Tgas);
-ldouble opacabs=opactot-opaces;
-kappa= kappaCGS2GU(opacabs)*rho;
-#else
-*/
-//ldouble kappaffcgs=6.4e22*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas);

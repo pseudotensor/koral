@@ -17,7 +17,7 @@
 //radiation
 /************************************/
 #define RADIATION
-#define RADIMPLICITTHRESHOLD 1.e5
+#define RADIMPLICITTHRESHOLD 1.e-2
 #define RADIMPCONV 1.e-8
 #define RADIMPEPS 1.e-8
 #define ALLOWRADCEILINGINIMPLICIT
@@ -25,7 +25,8 @@
 #ifdef RADIATION
 #define NCOMPTONIZATION
 #endif
-//#define SKIPFANCYOPACITIES 
+#define SKIPFANCYOPACITIES 
+#define OPACBELLLIN
 #define RADOUTPUTVELS
 
 /************************************/
@@ -59,7 +60,7 @@
 #define TNX 128
 #define TNY 1
 #define TNZ 1
-#define NTX 32 //for MPI and OMP
+#define NTX 4 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -105,7 +106,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 (RMAX*1000.) //res
+#define DTOUT1 (RMAX*100.) //res
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 

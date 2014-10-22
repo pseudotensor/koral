@@ -26,6 +26,18 @@ kappa=*kappagasRos;
 #else
 
 kappa=kappaCGS2GU((6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*log(1.+1.6*zeta))*rho*(1.+4.4e-10*Tgas);
+
+
+
+#ifdef OPACBELLLIN
+ldouble X=0.75;
+ldouble opaces=0.2*(1.0+X);
+ldouble opactot=opacity_BellLin(rhocgs,Tgas);
+ldouble opacabs=opactot-opaces;
+kappa= kappaCGS2GU(opacabs)*rho;
+#endif
+
+
 #endif
 
 

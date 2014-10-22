@@ -3,6 +3,11 @@
 int
 calc_avgs_throughout()
 {
+#ifdef OMP //for openMP only one thread is supposed to do that, the routine may be called from outside parallel region
+  if(PROCID==0)
+    {
+#endif
+
   /***************************/
   //scale height at each radius
 #ifdef CALCHRONTHEGO
@@ -52,6 +57,9 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 #endif
   /***************************/
 
+#ifdef OMP
+    }
+#endif
 return 0;
 }
 

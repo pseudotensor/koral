@@ -1,5 +1,4 @@
 //scattering
-ldouble X=0.75;
-ldouble opaces=0.2*(1.0+X);
-return  kappaCGS2GU(opaces)*rho;
+
+return  kappaCGS2GU(0.34)*rho;
 

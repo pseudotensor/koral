@@ -632,10 +632,12 @@ op_explicit(ldouble t, ldouble dtin)
 	      {
 
 		dol=dor=1;
+		if(ix<0) dol=0;
+		if(ix>=NX) dor=0;
 #ifdef MSTEP
-		if(ix<0 || (ix==0 && mstep_is_cell_active(ix,iy,iz)==0) || (ix>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix-1,iy,iz)==0))
+		if((ix==0 && mstep_is_cell_active(ix,iy,iz)==0) || (ix>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix-1,iy,iz)==0))
 		  dol=0;
-		if(ix>=NX || (ix==NX-1 && mstep_is_cell_active(ix,iy,iz)==0) || (ix<NX-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix+1,iy,iz)==0))
+		if((ix==NX-1 && mstep_is_cell_active(ix,iy,iz)==0) || (ix<NX-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix+1,iy,iz)==0))
 		  dor=0;
 #endif
 		
@@ -731,10 +733,13 @@ op_explicit(ldouble t, ldouble dtin)
 #endif
 	       {
 		dol=dor=1;
+		if(iy<0) dol=0;
+		if(iy>=NY) dor=0;
+
 #ifdef MSTEP
-		if(iy<0 || (iy==0 && mstep_is_cell_active(ix,iy,iz)==0) || (iy>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy-1,iz)==0))
+		if((iy==0 && mstep_is_cell_active(ix,iy,iz)==0) || (iy>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy-1,iz)==0))
 		  dol=0;
-		if(iy>=NY || (iy==NY-1 && mstep_is_cell_active(ix,iy,iz)==0) || (iy<NY-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy+1,iz)==0))
+		if((iy==NY-1 && mstep_is_cell_active(ix,iy,iz)==0) || (iy<NY-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy+1,iz)==0))
 		  dor=0;
 #endif
 
@@ -821,10 +826,13 @@ op_explicit(ldouble t, ldouble dtin)
 #endif
 		   {
 		     dol=dor=1;
+		     if(iz<0) dol=0;
+		     if(iz>=NZ) dor=0;
+
 #ifdef MSTEP
-		if(iz<0 || (iz==0 && mstep_is_cell_active(ix,iy,iz)==0) || (iz>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy,iz-1)==0))
+		if((iz==0 && mstep_is_cell_active(ix,iy,iz)==0) || (iz>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy,iz-1)==0))
 		  dol=0;
-		if(iz>=NZ || (iz==NZ-1 && mstep_is_cell_active(ix,iy,iz)==0) || (iz<NZ-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy,iz+1)==0))
+		if((iz==NZ-1 && mstep_is_cell_active(ix,iy,iz)==0) || (iz<NZ-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy,iz+1)==0))
 		  dor=0;
 #endif
 
@@ -1780,7 +1788,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 #endif
 #endif
 
-    //printf("%d %d %d | %d %d\n",PROCID,ix1,ix2,TOI,TOI+TNX/NTX); if(PROCID==0) getch();
+    //printf("%d %d %d | %d %d | %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,SX,SY,SZMET); if(PROCID==0) getch();
 
     global_ix1=ix1;
     global_iy1=iy1;
