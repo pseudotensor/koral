@@ -179,6 +179,15 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 
 #endif
 
+#ifdef OVERWRITERADWAVESPEEDSWITHHD
+  axl=axhdl;
+  axr=axhdr;
+  ayl=ayhdl;
+  ayr=ayhdr;
+  azl=azhdl;
+  azr=azhdr;
+#endif
+
   //zeroing 'co-going' velocities
   if(axhdl>0.) axhdl=0.;
   if(axhdr<0.) axhdr=0.;
@@ -398,6 +407,8 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
       ss[NF0]+=-dlgdet[l-1]*pp[NF0]*urfcon[l];
       #endif
     }
+
+
 #endif //GDETIN
 
   /***************************************************/

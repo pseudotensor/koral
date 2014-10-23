@@ -2994,6 +2994,8 @@ int f_flux_prime_rad( ldouble *pp, int idim, void *ggg,ldouble *ff)
   ff[NF0]= gdetu*nphrad*urfcon[idim+1];
 #endif
 
+
+
 #endif
   return 0;
 }

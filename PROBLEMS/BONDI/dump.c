@@ -38,4 +38,4 @@ v4=tau[0];
 
 
 
-v9=calc_ncompt_nphlab(pp,&geomout);
+v9=pp[NF];//calc_ncompt_nphlab(pp,&geomout);

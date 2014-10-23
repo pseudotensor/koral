@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 165
 #define MODYFIKUJKRZYSIE 0
 
 /************************************/
@@ -17,16 +17,24 @@
 //radiation
 /************************************/
 #define RADIATION
+//#define OVERWRITERADWAVESPEEDSWITHHD
+//#define RESETNPH
+#define SKIPRADSOURCE
+
+#define PUTNFFLOOR
+
 #define RADIMPLICITTHRESHOLD 1.e-2
 #define RADIMPCONV 1.e-8
 #define RADIMPEPS 1.e-8
+#define U2PCONV 1.e-12
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 #ifdef RADIATION
 #define NCOMPTONIZATION
 #endif
-#define SKIPFANCYOPACITIES 
-#define OPACBELLLIN
+
+#define SKIPFANCYOPACITIES
+//#define OPACBELLLIN
 #define RADOUTPUTVELS
 
 /************************************/
@@ -40,8 +48,9 @@
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 1.25
-#define RMAX 3.267e8
 #define RBONDI 3.267e6 //(3.267e12/TAMB)
+#define RMAX (RBONDI*100.)
+
 #define RMAXOUT RBONDI 
 //#define RTEMPOUT (1.e6/10.)
 
@@ -64,12 +73,12 @@
 #define NTY 1
 #define NTZ 1
 
+#define SELFTIMESTEP
 
 //#define SUBZONES
-#define SELFTIMESTEP
-#define SUBZONES_NSTEPSTEP 3
+#define SUBZONES_NSTEPSTEP 10
 //#define OUTPUTAFTERSUBZONES
-#define NSUBZONES (8)
+#define NSUBZONES (4.)
 #define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
@@ -91,7 +100,7 @@
 #define SHUFFLELOOPS 0      
 
 #define DOFIXUPS 0
-#define U2PCONV 1.e-12
+
 
 #define RADIMPMAXITER 15
 #define GAMMAMAXRAD 3.
@@ -106,7 +115,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 (RMAX*100.) //res
+#define DTOUT1 (RMAX*1000.) //res
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 

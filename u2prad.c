@@ -760,15 +760,6 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
       ret=-1;
     }
 
-#ifdef SKIP_NCOMPTONIZATION
-  //floor on number of photons
-  if(pp[NF]<0.)
-    {
-
-      //printf("NF floor imposed at  (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[NF],SMALL);
-    pp[NF]=SMALL;
-    }
-#endif
 
 #ifdef SKIP_MAGNFIELD
 
@@ -800,6 +791,15 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
 
 #endif
 
+#endif
+
+#ifdef PUTNFFLOOR
+  //floor on number of photons - does not work in general
+  if(pp[NF]<SMALL)
+    {
+      //printf("NF floor imposed at  (%d,%d,%d): %e %e\n",geom->ix,geom->iy,geom->iz,pp[NF],SMALL);
+      pp[NF]=SMALL;
+    }
 #endif
 #endif
  
