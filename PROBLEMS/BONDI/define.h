@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 165
+#define RESTARTNUM -1
 #define MODYFIKUJKRZYSIE 0
 
 /************************************/
@@ -47,7 +47,7 @@
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 1.25
+#define RMIN 1000.25
 #define RBONDI 3.267e6 //(3.267e12/TAMB)
 #define RMAX (RBONDI*100.)
 
