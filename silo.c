@@ -88,8 +88,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   #ifdef MIMICDYNAMO  
   if(doingpostproc) 
     {
-      set_bc(time,0);
-      mimic_dynamo(1.); 
+      #pragma omp parallel
+      {
+	set_bc(time,0);
+	mimic_dynamo(1.); 
+      }
     }
   ldouble *Bxdyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Bydyn = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -203,6 +206,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 #ifdef PRINTYGC_RIGHT
 	      imy=iy-NG;
 #endif
+	      
 	      int nodalindex=imz*(ny*nx) + imy*nx + imx;
 	      for(iv=0;iv<NV;iv++)
 		{
@@ -620,7 +624,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      urady[nodalindex]=urad[2];
 	      uradz[nodalindex]=urad[3];
 
-	      forcebal3[nodalindex]=gdet*Gi[1];
+	      //forcebal3[nodalindex]=gdet*Gi[1];
+	      //test
+	      forcebal3[nodalindex]=Gi[0]*global_dt;
+	      forcebal2[nodalindex]=get_u(p_bak_subzone,UU,ix,iy,iz);
+
 	      	
 	      if(iy==0)
 		{
