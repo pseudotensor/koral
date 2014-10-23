@@ -12,7 +12,7 @@
 #define TNZ 32
 
 #define NTX 2
-#define NTY 1
+#define NTY 2
 #define NTZ 1
 
 #define INT_ORDER 1
