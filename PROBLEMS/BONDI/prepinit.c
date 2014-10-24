@@ -7,7 +7,7 @@ if(1) //uses MDOT and TGAS at the outer boundary
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
 
-    ldouble urout = -sqrt(2./1./RMAXout);
+    ldouble urout = -sqrt(2/RMAXout);
     ldouble rhoout = -mdotout / (4.*M_PI *urout* RMAXout * RMAXout);
     //as Jerry suggested
     //cs2 = GM/2R for gamma=5/3

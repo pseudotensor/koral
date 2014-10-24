@@ -388,6 +388,15 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 
       tstepden/=TSTEPLIM;
 
+      //test 124
+      #ifdef TEST124
+      struct geometry geom;
+      fill_geometry_arb(ix,iy,iz,&geom,BLCOORDS);
+      ldouble fac=100./sqrt(geom.xx);
+      if(fac>1.) fac=1.;
+      tstepden/=fac;
+      #endif
+
       set_u_scalar(cell_tstepstemp,ix,iy,iz,tstepden);
 
       ////#pragma omp critical
@@ -1018,11 +1027,13 @@ op_explicit(ldouble t, ldouble dtin)
 	  if(dozl==0) flzl=0.;
 	  if(dozr==0) flzr=0.;
 #endif
+
+	 
 		  
 	  //unsplit scheme
 	  du=-(flxr*mxr-flxl*mxl)*dt/dx - (flyr*myr-flyl*myl)*dt/dy - (flzr*mzr-flzl*mzl)*dt/dz;
 
-	  //applying advective and source together
+	  //applying advective and explicit source together
 	  val=get_u(u,iv,ix,iy,iz) + du + ms[iv]*dt*mcell;
 
 	  //printf("%d > %d %d %d > %e %e %e %e\n",iv,ix,iy,iz, flzr,mzr,flzl,mzl); getch();
@@ -1271,6 +1282,17 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 #ifdef FULLDISSIPATION
 		ag=max_ws[0];
 #endif
+
+		
+		//test 124
+		#ifdef TEST124
+		struct geometry geomBL;
+		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+		ldouble fac=sqrt(geomBL.xx);
+		if(fac<1.) fac=1.;
+		//ag*=fac;
+		if(ix>125) printf("%d %e %e\n",ix,geomBL.xx,ag);
+		#endif
 
 		if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
 		  {

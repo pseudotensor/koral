@@ -4,7 +4,11 @@
 #define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
-#define MODYFIKUJKRZYSIE 0
+//#define MODYFIKUJKRZYSIE 1
+//#define FLUXMETHOD HLL_FLUX
+//#define TEST124
+//#define GDETIN 1
+//#define WAVESPEEDSATFACES
 
 /************************************/
 //define MSTEPS
@@ -19,9 +23,8 @@
 #define RADIATION
 //#define OVERWRITERADWAVESPEEDSWITHHD
 //#define RESETNPH
-#define SKIPRADSOURCE
-
-#define PUTNFFLOOR
+//#define SKIPRADSOURCE
+//#define PUTNFFLOOR
 
 #define RADIMPLICITTHRESHOLD 1.e-2
 #define RADIMPCONV 1.e-8
@@ -45,10 +48,10 @@
 //#define MYCOORDS KERRCOORDS
 #define OUTCOORDS BLCOORDS
 #define PRINTXGC_LEFT
-#define PRINTXGC_RIGHT
+#define PRINTGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 1000.25
-#define RBONDI 3.267e6 //(3.267e12/TAMB)
+#define RMIN 1.25
+#define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*100.)
 
 #define RMAXOUT RBONDI 
@@ -96,7 +99,7 @@
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
 
 #define DOFIXUPS 0
@@ -123,7 +126,7 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e-6
+#define MDOT 1.e-4
 //#define TAMB (1.e8*(1.e5/RTEMPOUT))
 #define TAMB (3.267e12/RBONDI)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))

@@ -211,66 +211,24 @@ if(ix>=NX) //total boundary, properties of the galaxy
 */
 else if(ix<0) //outflow near BH
    {
-     ldouble r1,r2,r,v1,v2,v;
-     r1=log10(geomBLr.xx);
-     r2=log10(geomBLrr.xx);
-     r=log10(geomBL.xx);
-   
-     //copying primitives with gdet taken into account
-     for(iv=0;iv<NV;iv++)
-       { 
-	 /*
-	 if(0 && iv==VX) // to have flat mdot
-	   {
-	     //first cell
-	     ldouble urr=get_u(p,VX,global_ix1,iy,iz);
-	     ldouble rhor=get_u(p,RHO,global_ix1,iy,iz);
-	     ldouble rho=get_u(p,RHO,ix,iy,iz);
-	     ldouble uconr[4]={0.,urr,0.,0.};
-	     conv_vels(uconr,uconr,VELPRIM,VEL4,geomr.gg,geomr.GG);
-	     ldouble mdot=rhor*uconr[1]*geomr.gdet;
-	     uconr[1]=mdot/rho/geom.gdet;
-	     conv_vels(uconr,uconr,VEL4,VELPRIM,geom.gg,geom.GG);
-	     pp[VX]=uconr[1];
-	   }
-	 else
-	   {
-	     pp[iv]=get_u(p,iv,iix,iiy,iiz);
-	   }
-	 */
-	 
-	 
-	 //logarithmic extrapolation
-	 /*
-	 v1=get_u(p,iv,global_ix1,iiy,iiz); 
-	 v2=get_u(p,iv,global_ix1+1,iiy,iiz);
-
-	 if(v1>0. && v2>0.)
-	   {
-	     v1=log10(v1);
-	     v2=log10(v2);
-	     v=v1 + (r-r1)/(r2-r1)*(v2-v1);
-	     pp[iv]=pow(10.,v);
-	   }
-	 else if (v1<0. && v2<0.)
-	   {
-	     v1=log10(-v1);
-	     v2=log10(-v2);
-	     v=v1 + (r-r1)/(r2-r1)*(v2-v1);
-	     pp[iv]=-pow(10.,v);
-	   }
-	 else
-	   pp[iv]=v1;
-	 
-	 */
-	 //override
+     PLOOP(iv)
+     {
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
 
-     //printf("%d %d %d > %e %e %e\n",ix,iy,iz,pp[NF0],get_u(p,NF0,0,0,0),get_u(p,NF0,1,0,0)); //getch();
-     //#ifdef NCOMPTONIZATION
-     //pp[NF0]=get_u(p,NF0,0,iiy,iiz)*geomBLr.gdet/geomBL.gdet;
-     //#endif
+     //no outflow
+     if(RMIN>2.)
+       {
+	 ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
+	 conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+	 trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
+	 if(ucon[1]>0.) ucon[1]=0.;
+	 trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+	 conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+     
+	 pp[VX]=ucon[1];
+       }
+     
      
      p2u(pp,uu,&geom);
      return 0;
