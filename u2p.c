@@ -504,6 +504,27 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       ret=-1; 
     }
 
+#ifdef VXFLOOR
+  if(fabs(pp[VX])<1.e-10) 
+    { 
+      struct geometry geomBL;
+      fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geomBL,BLCOORDS);
+      ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+      trans2_coco(geom->xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
+      if(fabs(ucon[1])<VXFLOOR)
+	{
+	  ucon[1]=my_sign(ucon[1])*VXFLOOR;
+	}
+      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+      conv_vels(ucon,ucon,VEL4,VELPRIM,geom->gg,geom->GG);
+     
+      pp[VX]=ucon[1];
+       
+      ret=-1;
+    }
+#endif
+
   //**********************************************************************
   //rho too small, BH-disk like
 #ifdef RHOFLOOR_BH

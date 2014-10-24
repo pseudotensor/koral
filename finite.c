@@ -389,7 +389,7 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
       tstepden/=TSTEPLIM;
 
       //test 124
-      #ifdef TEST124
+      #ifdef SKIP_TEST124
       struct geometry geom;
       fill_geometry_arb(ix,iy,iz,&geom,BLCOORDS);
       ldouble fac=100./sqrt(geom.xx);
@@ -1288,10 +1288,10 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 		#ifdef TEST124
 		struct geometry geomBL;
 		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-		ldouble fac=sqrt(geomBL.xx);
+		ldouble fac=0.01*sqrt(geomBL.xx);
 		if(fac<1.) fac=1.;
-		//ag*=fac;
-		if(ix>125) printf("%d %e %e\n",ix,geomBL.xx,ag);
+		if(i<NVMHD) ag*=fac;
+		//if(ix>125) printf("%d %e %e\n",ix,geomBL.xx,ag);
 		#endif
 
 		if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr

@@ -1475,6 +1475,11 @@ solve_explicit_lab_core(ldouble *uu,ldouble *pp,void* ggg,ldouble dt,ldouble* de
   deltas[2]=-Gi[2]*dt*gdetu;
   deltas[3]=-Gi[3]*dt*gdetu;
 
+  #ifdef NCOMPTONIZATION
+  ldouble nsource=calc_nsource(pp,geom);
+  deltas[5]=dt*gdetu*nsource;
+  #endif
+
   if(verbose)
     {
       ldouble delapl[NV];
@@ -2408,6 +2413,10 @@ apply_rad_source_del4(int ix,int iy,int iz,ldouble *del4)
   delapl[FY0]=del4[2];
   delapl[FZ0]=del4[3];
 
+#ifdef NCOMPTONIZATION
+  delapl[NF]=del4[5];
+#endif
+
   for(iv=0;iv<NV;iv++)
     {
       set_u(u,iv,ix,iy,iz, get_u(u,iv,ix,iy,iz)+delapl[iv] );
@@ -2426,7 +2435,7 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt)
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
 
-  ldouble del4[4],delapl[NV];
+  ldouble del4[NRADVAR],delapl[NV];
   int iv;
 
   //applied explicitly directly in lab frame

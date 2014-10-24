@@ -3,12 +3,14 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 40
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
 //#define GDETIN 1
 //#define WAVESPEEDSATFACES
+#define VXFLOOR 1.e-6
+
 
 /************************************/
 //define MSTEPS
@@ -21,6 +23,8 @@
 //radiation
 /************************************/
 #define RADIATION
+#define EXPLICIT_LAB_RAD_SOURCE
+
 //#define OVERWRITERADWAVESPEEDSWITHHD
 //#define RESETNPH
 //#define SKIPRADSOURCE
@@ -50,8 +54,8 @@
 #define PRINTXGC_LEFT
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 1.25
-#define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
+#define RMIN 100.
+#define RBONDI 1.e5 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*100.)
 
 #define RMAXOUT RBONDI 
@@ -69,7 +73,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 4 //for MPI and OMP
@@ -118,7 +122,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 (RMAX*1000.) //res
+#define DTOUT1 (RMAX*10000.) //res
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 
