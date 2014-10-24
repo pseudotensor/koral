@@ -34,20 +34,12 @@
 #define NF(nf) (NVMHD+nf*NRADVAR+4)
 */
 
-#ifdef RADIATION
 
 #define EE (NVMHD)
 #define FX (NVMHD+1)
 #define FY (NVMHD+2)
 #define FZ (NVMHD+3)
-#else
 
-#define EE 0
-#define FX 0
-#define FY 0
-#define FZ 0
-
-#endif
 
 #if defined(RADIATION) && defined(NCOMPTONIZATION)
 #define NF (NVMHD+4)

@@ -49,22 +49,22 @@
 
 //min Erad over rho
 #ifndef EERHORATIOMIN
-#define EERHORATIOMIN 1.e-20
+#define EERHORATIOMIN 1.e-30
 #endif
 
 //max Erad over rho
 #ifndef EERHORATIOMAX 
-#define EERHORATIOMAX 1.e20
+#define EERHORATIOMAX 1.e30
 #endif
 
 //min Erad over uint
 #ifndef EEUURATIOMIN
-#define EEUURATIOMIN 1.e-20
+#define EEUURATIOMIN 1.e-30
 #endif
 
 //max Erad over uint
 #ifndef EEUURATIOMAX 
-#define EEUURATIOMAX 1.e20
+#define EEUURATIOMAX 1.e30
 #endif
 
 //min absolute Erad

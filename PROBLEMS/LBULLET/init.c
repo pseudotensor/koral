@@ -12,8 +12,14 @@ for(iv=0; iv<NV; iv++)
     pp[iv]=get_u(pproblem1,iv,ix,iy,iz);
   }
 
+/*
+if(ix+TOI==0)
 
-
+  {
+printf("%d %d %d\n",ix,iy,iz);
+print_primitives(pp);getch();
+  }
+*/
 //to conserved
 p2u(pp,uu,&geom);
 

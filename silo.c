@@ -216,6 +216,8 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		    pp[iv]=get_u(p,iv,iix,iiy,iiz);
 		}
 	     
+	   
+	    
 
 	      //coordinates
 	      nodex[nodalindex]=xxveccar[1];

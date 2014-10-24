@@ -78,6 +78,7 @@
 #define MKS1R0 0.
 
 #define FULLPHI
+#define METRICAXISYMMETRIC
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS KERRCOORDS
@@ -86,7 +87,7 @@
 //total resolution
 #define TNX 40
 #define TNY 40
-#define TNZ 40
+#define TNZ 4
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -99,6 +100,7 @@
 #define MINZ 0.
 #define MAXZ 2.*Pi
 #define SPECIFIC_BC
+#define PERIODIC_ZBC
 
 /************************************/
 //output

@@ -8,7 +8,6 @@
 #define GRID_SPACING get_size_x(0,0)      //distance between adjacent grid cells (grid is assumed cubic with equal spacing in all directions)
 #define LIGHT_C 1.		//Speed of light in code units
 #define STEFAN_BOLTZMANN SIGMA_RAD //stefan boltzmann constant in code units
-#define PI 3.14159265358979
 
 #define BINAVERAGE 0
 
@@ -3215,7 +3214,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 		  eps = 1.0;
 		}
 
-	      S[i][j][k]=eps*pow(source_Data[i][j][k][0],4)*STEFAN_BOLTZMANN/PI + (1.0-eps)*source_Data[i][j][k][1]*LIGHT_C/4.0/PI;
+	      S[i][j][k]=eps*pow(source_Data[i][j][k][0],4)*STEFAN_BOLTZMANN/M_PI + (1.0-eps)*source_Data[i][j][k][1]*LIGHT_C/4.0/M_PI;
 	    }
 	}
     }
@@ -3332,7 +3331,7 @@ ZERO_calcVET(int ix, int iy, int iz,double I_time[NUMANGLES], double eddingtonFa
 
   //Calculate radiative moments using our RT solution to intensity field
 
-  double dOmega = 4.0*PI/NUMANGLES;
+  double dOmega = 4.0*M_PI/NUMANGLES;
   double targetDirection1[3], targetDirection2[3];
   double cos1, cos2;
   double P[3][3], E = 0;
