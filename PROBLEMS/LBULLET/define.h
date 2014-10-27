@@ -78,20 +78,19 @@
 #define MKS1R0 0.
 
 #define FULLPHI
-#define METRICAXISYMMETRIC
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MYCOORDS KERRCOORDS
-#define MINX 400.
+#define MINX 200.
 #define MAXX 4000.
 //total resolution
-#define TNX 40
-#define TNY 40
-#define TNZ 4
+#define TNX (24*1)
+#define TNY (32*1)
+#define TNZ (1*6)
 //number of tiles
 #define NTX 2
 #define NTY 2
-#define NTZ 1
+#define NTZ 2
 #endif
 
 #define MINY (0.0025*Pi/2.)
@@ -101,6 +100,8 @@
 #define MAXZ 2.*Pi
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
+
+#define METRICAXISYMMETRIC
 
 /************************************/
 //output
@@ -138,7 +139,7 @@
 #define BULLETPOS 2500.
 #define BULLETRAD 200.
 #define BULLETTH PI/5.
-#define BULLETRHO 1.e0
+#define BULLETRHO 1.e1
 
 
 

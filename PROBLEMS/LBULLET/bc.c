@@ -1,5 +1,3 @@
-int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
-
 //returns problem specific BC
 //int calc_bc(int ix,int iy,int iz,ldouble t,
 //	ldouble *uu,ldouble *pp,int ifinit,int BCtype)
@@ -133,10 +131,11 @@ if(BCtype==XBCHI&&ifinit==1) //outflow in magn, atm in rad., atm. in HD
      iix=0;
      iiy=iy;
      iiz=iz;
-
+	
 	// compute limo torus
 	ldouble rho,uint,ell;
 	init_dsandvels_limotorus(r,th,BHSPIN,&rho,&uint,&ell);
+	//printf("%d %d %d %f\n",iix, iiy, iiz,rho );
 	if(rho>0.) 
 	{
 
@@ -189,10 +188,6 @@ if(BCtype==XBCHI&&ifinit==1) //outflow in magn, atm in rad., atm. in HD
       //pp[1] = get_u(p,1,0,iiy,iiz)*pow(r/r0,-1.5);
 	} 
 
-
-	/* printf("xlo: %d %d %d \n",ix,iy,iz);
-    print_primitives(pp);
-	*/
      p2u(pp,uu,&geom);
      return 0;
    }
@@ -217,9 +212,6 @@ if(BCtype==YBCLO) //spin axis
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
      
-    
-    //printf("ylo: %d %d %d | %d\n",ix,iy,iz,iiy);
-    //print_primitives(pp);getch();
 
     p2u(pp,uu,&geom);
     return 0;
@@ -240,10 +232,6 @@ if(BCtype==YBCHI) //equatorial plane
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	
       }
-
-
-    //    printf("yhi: %d %d %d | %d | %e | %d %d %d\n",ix,iy,iz,iiy,get_u(p,RHO,iix,iiy,iiz),VY,B2,FY0);
-    //print_primitives(pp);getch();
  
     p2u(pp,uu,&geom); 
     return 0; 

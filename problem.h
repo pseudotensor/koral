@@ -85,7 +85,7 @@
 //82 VETTHIN - thin disk emission for VET tests
 //83 RADFLATTEST - tests of radiation solvers in flat space
 
-#define PROBLEM 7
+#define PROBLEM 75
 
 #if(PROBLEM==83)
 
@@ -208,6 +208,7 @@
 #define PR_DEFINE "PROBLEMS/LBULLET/define.h"
 #define PR_BC "PROBLEMS/LBULLET/bc.c"
 #define PR_INIT "PROBLEMS/LBULLET/init.c"
+#define PR_FINGER "PROBLEMS/LBULLET/finger.c"
 #define PR_KAPPA "PROBLEMS/LBULLET/kappa.c"
 #define PR_KAPPAES "PROBLEMS/LBULLET/kappaes.c"
 #define PR_OUT2GIF_2D "PROBLEMS/LBULLET/out2gif_2d.c"

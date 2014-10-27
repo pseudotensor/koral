@@ -5,13 +5,13 @@
 
 #define FTYPE double
 
-#define LT_BHSPIN 0.9
-#define LT_KAPPA 2.e3
-#define LT_XI 0.975
-#define LT_R1 30.
+#define LT_BHSPIN 0.
+#define LT_KAPPA 1.e-3
+#define LT_XI 0.7
+#define LT_R1 35.
 #define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 22.
+#define LT_GAMMA 5./3.
+#define LT_RIN 7.5
 
 void compute_gd( FTYPE r, FTYPE th, FTYPE a, FTYPE *gdtt, FTYPE *gdtp, FTYPE *gdpp ) {
    FTYPE Sigma, tmp;

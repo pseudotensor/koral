@@ -1,8 +1,4 @@
 
-int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
-int my_init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
-
-
 
 int ix, iy, iz;
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
@@ -13,6 +9,8 @@ for(iz=0;iz<NZ;iz++)
 	    for(ix=0;ix<NX;ix++)
 	    {
 
+int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
+int my_init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
 
 ldouble rho,mx,my,mz,m,E,uint,pgas,Fx,Fy,Fz,pLTE,ell;  
 ldouble uu[NV], pp[NV],ppback[NV],T,uintorg;
@@ -27,18 +25,11 @@ struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
 ldouble r=geomBL.xx;
+//printf("%d %d %d %f\n", ix, iy, iz,r);
 ldouble th=geomBL.yy;
 ldouble ph=geomBL.zz;
 
 init_dsandvels_limotorus(r, th, BHSPIN, &rho, &uint, &ell);
-
-/*
-if(iz==0 && iy==TNY/2)
-  {
-    //printf("%d %d %d %e %e %e %e\n",ix,iy,iz,r,th,rho,uint);
-    getch();
-    }*/
-
 uintorg=uint;
 
 if(rho<0.) //outside donut
@@ -345,6 +336,7 @@ if(rho<0.) //outside donut
 
 // ADD BULLET
 #ifdef BULLET_PHI
+    
 
     //xyz
     ldouble x = r*sin(th)*cos(ph);
@@ -375,17 +367,20 @@ if(rho<0.) //outside donut
     ldouble d2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0); 
 
 
-	ldouble flat = 1. - step_function((d2-BULLETRAD*BULLETRAD)/BULLETRAD/BULLETRAD,.02);
+	ldouble flat = 1. - step_function((d2-BULLETRAD*BULLETRAD)/BULLETRAD/BULLETRAD,.5); // was 0.02
 
 	ldouble gaussian = exp(- d2/BULLETRAD/BULLETRAD/2.);
 	ldouble bullet_type = flat;
+
+    ldouble bullet_range = 4.; 
     // do nothign if outside bullet
-    if(d2 <= BULLETRAD*BULLETRAD*2.*2.)
+    if(d2 <= BULLETRAD*BULLETRAD*bullet_range*bullet_range)
     {
 
-	    pp[RHO] = rho_background + (BULLETRHO - rho_background)*bullet_type;
+        pp[RHO] = rho_background + (BULLETRHO - rho_background)*bullet_type;
 	
 
+    printf("putting bullet...%f, %f, %f\n", flat,0.,0.);
 	    //Give Bullet Velocity
 
 	    ldouble vel_bullet = sqrt(2.)/pow(ri,1./2.);
