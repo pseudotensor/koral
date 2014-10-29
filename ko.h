@@ -759,6 +759,7 @@ mpi_synchtiming(ldouble *time);
 
 
 //zeroshort.c
+
 //Define what is contained in each node
 struct bsptree
 {
@@ -776,10 +777,10 @@ int ZEROtest_oldmain();
 int zero_readangles();
 struct bsptree *angGridRoot;
 struct bsptree *angDualGridRoot;
-void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
-void setupInterpWeights_cart3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
-void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES]);
-void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double intersectGridPhi[SX][SY][SZ][NUMANGLES]);
+void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES]);
+void setupInterpWeights_cart3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES]);
+void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES]);
+void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES], double intersectGridPhi[SXVET][SYVET][SZVET][NUMANGLES]);
 
 
 void ZERO_shortCharI(int,int,int,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4],
@@ -800,18 +801,20 @@ double
 calc_stretchFactor(void *argsin);
 void linComb(double targetAng[3], double angGridCoords[NUMANGLES][3], int angIndex[3], double interp_coeff[3]);
 
-double Ibeam[SX][SY][SZ][NUMANGLES];                //specific intensities at cell centers
-double Ibeam2[SX][SY][SZ][NUMANGLES];                //specific intensities at cell centers _ auxiliary
+
+
+double Ibeam[SXVET][SYVET][SZVET][NUMANGLES];                //specific intensities at cell centers
+double Ibeam2[SXVET][SYVET][SZVET][NUMANGLES];                //specific intensities at cell centers _ auxiliary
 double angGridCoords[NUMANGLES][3];  		//Store xyz locations of angle grid
 double angDualGridCoords[NUMDUALANGLES][3]; 	//Store xyz locations of dual angle grid
 int dualAdjacency[NUMDUALANGLES][3]; 		//Store index information for adjacent angles
-int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4];	//indices for gridLoc of 4 points bounding intersection
-double intersectGridWeights[SX][SY][SZ][NUMANGLES][4];	//weights corresponding to 4 points bounding intersection
-double intersectDistances[SX][SY][SZ][NUMANGLES];		//distance to intersection point from center
-double intersectGridPhi[SX][SY][SZ][NUMANGLES];		//phi value of intersection point used in axisymmetryc in spherical-like
-double carttetrad[SX][SY][SZ][3][3]; //cartesian components of the local RADCLOSURECOORDS tetrad
-int intersectAngIndices[SX][SY][SZ][NUMANGLES][4][3];  //3 nearest angle indices for intersection
-double intersectAngWeights[SX][SY][SZ][NUMANGLES][4][3];	//weights corresponding to 3 nearest angles
+int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4];	//indices for gridLoc of 4 points bounding intersection
+double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4];	//weights corresponding to 4 points bounding intersection
+double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES];		//distance to intersection point from center
+double intersectGridPhi[SXVET][SYVET][SZVET][NUMANGLES];		//phi value of intersection point used in axisymmetryc in spherical-like
+double carttetrad[SXVET][SYVET][SZVET][3][3]; //cartesian components of the local RADCLOSURECOORDS tetrad
+int intersectAngIndices[SXVET][SYVET][SZVET][NUMANGLES][4][3];  //3 nearest angle indices for intersection
+double intersectAngWeights[SXVET][SYVET][SZVET][NUMANGLES][4][3];	//weights corresponding to 3 nearest angles
 
 #ifdef MPI
 MPI_Group mpi_all_group;

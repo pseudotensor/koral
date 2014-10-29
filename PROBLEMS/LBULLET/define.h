@@ -84,9 +84,9 @@
 #define MINX 200.
 #define MAXX 4000.
 //total resolution
-#define TNX (24*1)
-#define TNY (32*1)
-#define TNZ (1*6)
+#define TNX (64*1)
+#define TNY (64*1)
+#define TNZ (64*1)
 //number of tiles
 #define NTX 2
 #define NTY 2

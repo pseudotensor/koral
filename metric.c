@@ -1700,10 +1700,12 @@ fill_geometry(int ix,int iy,int iz,void *geom)
   ggg->ifacedim = -1;
   pick_g(ix,iy,iz,ggg->gg);
   pick_G(ix,iy,iz,ggg->GG);
+  /*
   pick_T(tmuup,ix,iy,iz,ggg->tup);
   pick_T(tmulo,ix,iy,iz,ggg->tlo);
   pick_T(emuup,ix,iy,iz,ggg->eup);
   pick_T(emulo,ix,iy,iz,ggg->elo);
+  */
   ggg->alpha=sqrt(-1./ggg->GG[0][0]);
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz;
   ggg->xxvec[0]=0.;
@@ -3152,7 +3154,7 @@ calc_metric()
 
   if(PROCID==0) {printf("Precalculating metrics... "); fflush(stdout);}
   
-  #pragma omp parallel private(ix,iy,iz,ii) 
+#pragma omp parallel private(ix,iy,iz,ii) 
   {
     for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
       {
@@ -3160,9 +3162,9 @@ calc_metric()
 	iy=loop_02[ii][1];
 	iz=loop_02[ii][2]; 
 
-	#ifdef METRICAXISYMMETRIC
+#ifdef METRICAXISYMMETRIC
 	if(iz>0) continue;
-	#endif
+#endif
 
 	
 
@@ -3179,8 +3181,6 @@ calc_metric()
 	xx[2]=get_x(iy,1);
 	xx[3]=get_x(iz,2);
 
-	//if(PROCID==0)printf("%d %d %d> %e %e\n",ix,iy,iz,xx[1],calc_gdet(xx));
-
 	calc_g(xx,gloc);
 	for(i=0;i<4;i++)
 	  for(j=0;j<4;j++)
@@ -3189,20 +3189,20 @@ calc_metric()
 	  set_g(g,j,4,ix,iy,iz,calc_dlgdet(xx,j));
 	set_g(g,3,4,ix,iy,iz,calc_gdet(xx));
 
-
 	
-
-	calc_ZAMOes(gloc,eup,elo,MYCOORDS);
-	calc_tetrades(gloc,tup,tlo,MYCOORDS);
+	/*
+	  calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+	  calc_tetrades(gloc,tup,tlo,MYCOORDS);
 	      
-	for(i=0;i<4;i++)
+	  for(i=0;i<4;i++)
 	  for(j=0;j<4;j++)
-	    {
-	      set_T(emuup,i,j,ix,iy,iz,eup[i][j]);
-	      set_T(emulo,i,j,ix,iy,iz,elo[i][j]);
-	      set_T(tmuup,i,j,ix,iy,iz,tup[i][j]);
-	      set_T(tmulo,i,j,ix,iy,iz,tlo[i][j]);
-	    }	      
+	  {
+	  set_T(emuup,i,j,ix,iy,iz,eup[i][j]);
+	  set_T(emulo,i,j,ix,iy,iz,elo[i][j]);
+	  set_T(tmuup,i,j,ix,iy,iz,tup[i][j]);
+	  set_T(tmulo,i,j,ix,iy,iz,tlo[i][j]);
+	  }	      
+	*/
 
 	calc_G(xx,gloc);
 	for(i=0;i<4;i++)
@@ -3215,17 +3215,62 @@ calc_metric()
 	    for(k=0;k<4;k++)
 	      set_gKr(i,j,k,ix,iy,iz,Kr[i][j][k]);
 	      	      
-	//x-faces
-	if(ix==-NG)
+	if(doingpostproc==0) //metric at faces needed only for time evolution
 	  {
+	
+	    //x-faces
+	    if(ix==-NG)
+	      {
+		xx[0]=0.;
+		xx[1]=get_xb(ix,0);
+		xx[2]=get_x(iy,1);
+		xx[3]=get_x(iz,2);
+		calc_g(xx,gloc);
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    set_gb(gbx,i,j,ix,iy,iz,gloc[i][j],0);
+
+		calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+		calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    {
+		      /*
+			set_Tb(emuupbx,i,j,ix,iy,iz,eup[i][j],0);
+			set_Tb(emulobx,i,j,ix,iy,iz,elo[i][j],0);
+			set_Tb(tmuupbx,i,j,ix,iy,iz,tup[i][j],0);
+			set_Tb(tmulobx,i,j,ix,iy,iz,tlo[i][j],0);
+		      */
+		    }	      
+
+
+		calc_G(xx,gloc);
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    set_gb(Gbx,i,j,ix,iy,iz,gloc[i][j],0);
+		for(j=0;j<3;j++)
+		  set_gb(gbx,j,4,ix,iy,iz,calc_dlgdet(xx,j),0);
+		set_gb(gbx,3,4,ix,iy,iz,calc_gdet(xx),0);
+
+		/* Christoffels used only at centers
+		   calc_Krzysie(xx,Kr);
+		   for(i=0;i<4;i++)
+		   for(j=0;j<4;j++)
+		   for(k=0;k<4;k++)
+		   set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],0);
+		*/
+
+
+	      }
 	    xx[0]=0.;
-	    xx[1]=get_xb(ix,0);
+	    xx[1]=get_xb(ix+1,0);
 	    xx[2]=get_x(iy,1);
 	    xx[3]=get_x(iz,2);
 	    calc_g(xx,gloc);
 	    for(i=0;i<4;i++)
 	      for(j=0;j<4;j++)
-		set_gb(gbx,i,j,ix,iy,iz,gloc[i][j],0);
+		set_gb(gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
 
 	    calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 	    calc_tetrades(gloc,tup,tlo,MYCOORDS);
@@ -3234,167 +3279,83 @@ calc_metric()
 	      for(j=0;j<4;j++)
 		{
 		  /*
-		    set_Tb(emuupbx,i,j,ix,iy,iz,eup[i][j],0);
-		    set_Tb(emulobx,i,j,ix,iy,iz,elo[i][j],0);
-		    set_Tb(tmuupbx,i,j,ix,iy,iz,tup[i][j],0);
-		    set_Tb(tmulobx,i,j,ix,iy,iz,tlo[i][j],0);
-		  */
-		}	      
-
-
-	    calc_G(xx,gloc);
-	    for(i=0;i<4;i++)
-	      for(j=0;j<4;j++)
-		set_gb(Gbx,i,j,ix,iy,iz,gloc[i][j],0);
-	    for(j=0;j<3;j++)
-	      set_gb(gbx,j,4,ix,iy,iz,calc_dlgdet(xx,j),0);
-	    set_gb(gbx,3,4,ix,iy,iz,calc_gdet(xx),0);
-
-	    /* Christoffels used only at centers
-	       calc_Krzysie(xx,Kr);
-	       for(i=0;i<4;i++)
-	       for(j=0;j<4;j++)
-	       for(k=0;k<4;k++)
-	       set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],0);
-	    */
-
-
-	  }
-	xx[0]=0.;
-	xx[1]=get_xb(ix+1,0);
-	xx[2]=get_x(iy,1);
-	xx[3]=get_x(iz,2);
-	calc_g(xx,gloc);
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    set_gb(gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
-
-	calc_ZAMOes(gloc,eup,elo,MYCOORDS);
-	calc_tetrades(gloc,tup,tlo,MYCOORDS);
-
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    {
-	      /*
-		set_Tb(emuupbx,i,j,ix+1,iy,iz,eup[i][j],0);
-		set_Tb(emulobx,i,j,ix+1,iy,iz,elo[i][j],0);
-		set_Tb(tmuupbx,i,j,ix+1,iy,iz,tup[i][j],0);
-		set_Tb(tmulobx,i,j,ix+1,iy,iz,tlo[i][j],0);
-	      */
-	    }	      
-
-	calc_G(xx,gloc);
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    set_gb(Gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
-	for(j=0;j<3;j++)
-	  set_gb(gbx,j,4,ix+1,iy,iz,calc_dlgdet(xx,j),0);
-	set_gb(gbx,3,4,ix+1,iy,iz,calc_gdet(xx),0);
-
-	/*
-	  calc_Krzysie(xx,Kr);
-	  for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	  for(k=0;k<4;k++)
-	  set_gKrb(i,j,k,ix+1,iy,iz,Kr[i][j][k],0);
-	*/
-
-		  
-	//y-faces
-	if(iy==-NG)
-	  {
-	    xx[0]=0.;
-	    xx[1]=get_x(ix,0);
-	    xx[2]=get_xb(iy,1);
-	    xx[3]=get_x(iz,2);
-	    calc_g(xx,gloc);
-	    for(i=0;i<4;i++)
-	      for(j=0;j<4;j++)
-		set_gb(gby,i,j,ix,iy,iz,gloc[i][j],1);
-
-	    calc_ZAMOes(gloc,eup,elo,MYCOORDS);
-	    calc_tetrades(gloc,tup,tlo,MYCOORDS);
-
-	    for(i=0;i<4;i++)
-	      for(j=0;j<4;j++)
-		{
-		  /*
-		    set_Tb(emuupby,i,j,ix,iy,iz,eup[i][j],1);
-		    set_Tb(emuloby,i,j,ix,iy,iz,elo[i][j],1);
-		    set_Tb(tmuupby,i,j,ix,iy,iz,tup[i][j],1);
-		    set_Tb(tmuloby,i,j,ix,iy,iz,tlo[i][j],1);
+		    set_Tb(emuupbx,i,j,ix+1,iy,iz,eup[i][j],0);
+		    set_Tb(emulobx,i,j,ix+1,iy,iz,elo[i][j],0);
+		    set_Tb(tmuupbx,i,j,ix+1,iy,iz,tup[i][j],0);
+		    set_Tb(tmulobx,i,j,ix+1,iy,iz,tlo[i][j],0);
 		  */
 		}	      
 
 	    calc_G(xx,gloc);
 	    for(i=0;i<4;i++)
 	      for(j=0;j<4;j++)
-		set_gb(Gby,i,j,ix,iy,iz,gloc[i][j],1);
+		set_gb(Gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
 	    for(j=0;j<3;j++)
-	      set_gb(gby,j,4,ix,iy,iz,calc_dlgdet(xx,j),1);
-	    set_gb(gby,3,4,ix,iy,iz,calc_gdet(xx),1);
+	      set_gb(gbx,j,4,ix+1,iy,iz,calc_dlgdet(xx,j),0);
+	    set_gb(gbx,3,4,ix+1,iy,iz,calc_gdet(xx),0);
 
 	    /*
 	      calc_Krzysie(xx,Kr);
 	      for(i=0;i<4;i++)
 	      for(j=0;j<4;j++)
 	      for(k=0;k<4;k++)
-	      set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],1);
+	      set_gKrb(i,j,k,ix+1,iy,iz,Kr[i][j][k],0);
 	    */
 
-	  }
-
-
-	xx[0]=0.;
-	xx[1]=get_x(ix,0);
-	xx[2]=get_xb(iy+1,1);
-	xx[3]=get_x(iz,2);
-	calc_g(xx,gloc);
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    set_gb(gby,i,j,ix,iy+1,iz,gloc[i][j],1);
-
-	calc_ZAMOes(gloc,eup,elo,MYCOORDS);
-	calc_tetrades(gloc,tup,tlo,MYCOORDS);
-
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    {
-	      /*
-		set_Tb(emuupby,i,j,ix,iy+1,iz,eup[i][j],1);
-		set_Tb(emuloby,i,j,ix,iy+1,iz,elo[i][j],1);
-		set_Tb(tmuupby,i,j,ix,iy+1,iz,tup[i][j],1);
-		set_Tb(tmuloby,i,j,ix,iy+1,iz,tlo[i][j],1);
-	      */
-	    }	      
-
-	calc_G(xx,gloc);
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    set_gb(Gby,i,j,ix,iy+1,iz,gloc[i][j],1);
-	for(j=0;j<3;j++)
-	  set_gb(gby,j,4,ix,iy+1,iz,calc_dlgdet(xx,j),1);
-	set_gb(gby,3,4,ix,iy+1,iz,calc_gdet(xx),1);
 		  
-	/*
-	  calc_Krzysie(xx,Kr);
-	  for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	  for(k=0;k<4;k++)
-	  set_gKrb(i,j,k,ix,iy+1,iz,Kr[i][j][k],1);
-	*/
+	    //y-faces
+	    if(iy==-NG)
+	      {
+		xx[0]=0.;
+		xx[1]=get_x(ix,0);
+		xx[2]=get_xb(iy,1);
+		xx[3]=get_x(iz,2);
+		calc_g(xx,gloc);
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    set_gb(gby,i,j,ix,iy,iz,gloc[i][j],1);
 
-	//z-faces
-	if(iz==-NG)
-	  {
+		calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+		calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    {
+		      /*
+			set_Tb(emuupby,i,j,ix,iy,iz,eup[i][j],1);
+			set_Tb(emuloby,i,j,ix,iy,iz,elo[i][j],1);
+			set_Tb(tmuupby,i,j,ix,iy,iz,tup[i][j],1);
+			set_Tb(tmuloby,i,j,ix,iy,iz,tlo[i][j],1);
+		      */
+		    }	      
+
+		calc_G(xx,gloc);
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    set_gb(Gby,i,j,ix,iy,iz,gloc[i][j],1);
+		for(j=0;j<3;j++)
+		  set_gb(gby,j,4,ix,iy,iz,calc_dlgdet(xx,j),1);
+		set_gb(gby,3,4,ix,iy,iz,calc_gdet(xx),1);
+
+		/*
+		  calc_Krzysie(xx,Kr);
+		  for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		  for(k=0;k<4;k++)
+		  set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],1);
+		*/
+
+	      }
+
+
 	    xx[0]=0.;
 	    xx[1]=get_x(ix,0);
-	    xx[2]=get_x(iy,1);
-	    xx[3]=get_xb(iz,2);
+	    xx[2]=get_xb(iy+1,1);
+	    xx[3]=get_x(iz,2);
 	    calc_g(xx,gloc);
 	    for(i=0;i<4;i++)
 	      for(j=0;j<4;j++)
-		set_gb(gbz,i,j,ix,iy,iz,gloc[i][j],2);
+		set_gb(gby,i,j,ix,iy+1,iz,gloc[i][j],1);
 
 	    calc_ZAMOes(gloc,eup,elo,MYCOORDS);
 	    calc_tetrades(gloc,tup,tlo,MYCOORDS);
@@ -3403,69 +3364,112 @@ calc_metric()
 	      for(j=0;j<4;j++)
 		{
 		  /*
-		    set_Tb(emuupbz,i,j,ix,iy,iz,eup[i][j],2);
-		    set_Tb(emulobz,i,j,ix,iy,iz,elo[i][j],2);
-		    set_Tb(tmuupbz,i,j,ix,iy,iz,tup[i][j],2);
-		    set_Tb(tmulobz,i,j,ix,iy,iz,tlo[i][j],2);
+		    set_Tb(emuupby,i,j,ix,iy+1,iz,eup[i][j],1);
+		    set_Tb(emuloby,i,j,ix,iy+1,iz,elo[i][j],1);
+		    set_Tb(tmuupby,i,j,ix,iy+1,iz,tup[i][j],1);
+		    set_Tb(tmuloby,i,j,ix,iy+1,iz,tlo[i][j],1);
 		  */
 		}	      
 
 	    calc_G(xx,gloc);
 	    for(i=0;i<4;i++)
 	      for(j=0;j<4;j++)
-		set_gb(Gbz,i,j,ix,iy,iz,gloc[i][j],2);
+		set_gb(Gby,i,j,ix,iy+1,iz,gloc[i][j],1);
 	    for(j=0;j<3;j++)
-	      set_gb(gbz,j,4,ix,iy,iz,calc_dlgdet(xx,j),2);
-	    set_gb(gbz,3,4,ix,iy,iz,calc_gdet(xx),2);
+	      set_gb(gby,j,4,ix,iy+1,iz,calc_dlgdet(xx,j),1);
+	    set_gb(gby,3,4,ix,iy+1,iz,calc_gdet(xx),1);
+		  
+	    /*
+	      calc_Krzysie(xx,Kr);
+	      for(i=0;i<4;i++)
+	      for(j=0;j<4;j++)
+	      for(k=0;k<4;k++)
+	      set_gKrb(i,j,k,ix,iy+1,iz,Kr[i][j][k],1);
+	    */
+
+	    //z-faces
+	    if(iz==-NG)
+	      {
+		xx[0]=0.;
+		xx[1]=get_x(ix,0);
+		xx[2]=get_x(iy,1);
+		xx[3]=get_xb(iz,2);
+		calc_g(xx,gloc);
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    set_gb(gbz,i,j,ix,iy,iz,gloc[i][j],2);
+
+		calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+		calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    {
+		      /*
+			set_Tb(emuupbz,i,j,ix,iy,iz,eup[i][j],2);
+			set_Tb(emulobz,i,j,ix,iy,iz,elo[i][j],2);
+			set_Tb(tmuupbz,i,j,ix,iy,iz,tup[i][j],2);
+			set_Tb(tmulobz,i,j,ix,iy,iz,tlo[i][j],2);
+		      */
+		    }	      
+
+		calc_G(xx,gloc);
+		for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		    set_gb(Gbz,i,j,ix,iy,iz,gloc[i][j],2);
+		for(j=0;j<3;j++)
+		  set_gb(gbz,j,4,ix,iy,iz,calc_dlgdet(xx,j),2);
+		set_gb(gbz,3,4,ix,iy,iz,calc_gdet(xx),2);
+
+		/*
+		  calc_Krzysie(xx,Kr);
+		  for(i=0;i<4;i++)
+		  for(j=0;j<4;j++)
+		  for(k=0;k<4;k++)
+		  set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],2);
+		*/
+
+	      }
+	    xx[0]=0.;
+	    xx[1]=get_x(ix,0);
+	    xx[2]=get_x(iy,1);
+	    xx[3]=get_xb(iz+1,2);
+	    calc_g(xx,gloc);
+	    for(i=0;i<4;i++)
+	      for(j=0;j<4;j++)
+		set_gb(gbz,i,j,ix,iy,iz+1,gloc[i][j],2);	  
+
+	    calc_ZAMOes(gloc,eup,elo,MYCOORDS);
+	    calc_tetrades(gloc,tup,tlo,MYCOORDS);
+
+	    for(i=0;i<4;i++)
+	      for(j=0;j<4;j++)
+		{
+		  /*
+		    set_Tb(emuupbz,i,j,ix,iy,iz+1,eup[i][j],2);
+		    set_Tb(emulobz,i,j,ix,iy,iz+1,elo[i][j],2);
+		    set_Tb(tmuupbz,i,j,ix,iy,iz+1,tup[i][j],2);
+		    set_Tb(tmulobz,i,j,ix,iy,iz+1,tlo[i][j],2);
+		  */
+		}	      
+
+	    calc_G(xx,gloc);
+	    for(i=0;i<4;i++)
+	      for(j=0;j<4;j++)
+		set_gb(Gbz,i,j,ix,iy,iz+1,gloc[i][j],2);	  
+	    for(j=0;j<3;j++)
+	      set_gb(gbz,j,4,ix,iy,iz+1,calc_dlgdet(xx,j),2);
+	    set_gb(gbz,3,4,ix,iy,iz+1,calc_gdet(xx),2);
 
 	    /*
 	      calc_Krzysie(xx,Kr);
 	      for(i=0;i<4;i++)
 	      for(j=0;j<4;j++)
 	      for(k=0;k<4;k++)
-	      set_gKrb(i,j,k,ix,iy,iz,Kr[i][j][k],2);
+	      set_gKrb(i,j,k,ix,iy,iz+1,Kr[i][j][k],2);
 	    */
 
 	  }
-	xx[0]=0.;
-	xx[1]=get_x(ix,0);
-	xx[2]=get_x(iy,1);
-	xx[3]=get_xb(iz+1,2);
-	calc_g(xx,gloc);
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    set_gb(gbz,i,j,ix,iy,iz+1,gloc[i][j],2);	  
-
-	calc_ZAMOes(gloc,eup,elo,MYCOORDS);
-	calc_tetrades(gloc,tup,tlo,MYCOORDS);
-
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    {
-	      /*
-		set_Tb(emuupbz,i,j,ix,iy,iz+1,eup[i][j],2);
-		set_Tb(emulobz,i,j,ix,iy,iz+1,elo[i][j],2);
-		set_Tb(tmuupbz,i,j,ix,iy,iz+1,tup[i][j],2);
-		set_Tb(tmulobz,i,j,ix,iy,iz+1,tlo[i][j],2);
-	      */
-	    }	      
-
-	calc_G(xx,gloc);
-	for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	    set_gb(Gbz,i,j,ix,iy,iz+1,gloc[i][j],2);	  
-	for(j=0;j<3;j++)
-	  set_gb(gbz,j,4,ix,iy,iz+1,calc_dlgdet(xx,j),2);
-	set_gb(gbz,3,4,ix,iy,iz+1,calc_gdet(xx),2);
-
-	/*
-	  calc_Krzysie(xx,Kr);
-	  for(i=0;i<4;i++)
-	  for(j=0;j<4;j++)
-	  for(k=0;k<4;k++)
-	  set_gKrb(i,j,k,ix,iy,iz+1,Kr[i][j][k],2);
-	*/
-
       }
 
     //precalculating characteristic radii and parameters

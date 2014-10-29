@@ -367,12 +367,12 @@ if(rho<0.) //outside donut
     ldouble d2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0); 
 
 
-	ldouble flat = 1. - step_function((d2-BULLETRAD*BULLETRAD)/BULLETRAD/BULLETRAD,.5); // was 0.02
+	ldouble flat = 1. - step_function((d2-BULLETRAD*BULLETRAD)/BULLETRAD/BULLETRAD,.02); // was 0.02
 
 	ldouble gaussian = exp(- d2/BULLETRAD/BULLETRAD/2.);
 	ldouble bullet_type = flat;
 
-    ldouble bullet_range = 4.; 
+    ldouble bullet_range = 2.; 
     // do nothign if outside bullet
     if(d2 <= BULLETRAD*BULLETRAD*bullet_range*bullet_range)
     {
@@ -380,7 +380,7 @@ if(rho<0.) //outside donut
         pp[RHO] = rho_background + (BULLETRHO - rho_background)*bullet_type;
 	
 
-    printf("putting bullet...%f, %f, %f\n", flat,0.,0.);
+    //printf("putting bullet...%f, %f, %f\n", flat,0.,0.);
 	    //Give Bullet Velocity
 
 	    ldouble vel_bullet = sqrt(2.)/pow(ri,1./2.);

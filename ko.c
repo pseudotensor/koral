@@ -93,7 +93,7 @@ main(int argc, char **argv)
   //test_Giff();  exit(-1);
 
   //print scalings GU->CGS and quit
-  //print_scalings(); exit(-1);
+  //print_scalings(); getch(); exit(-1);
 
   //**************
   //end of tests

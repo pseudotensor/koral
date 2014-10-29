@@ -58,21 +58,17 @@ main(int argc, char **argv)
 
 
   //precalculating problem related numbers
-#ifdef PR_PREPINIT
-#include PR_PREPINIT
-#endif
+  /*
+    #ifdef PR_PREPINIT
+    #include PR_PREPINIT
+    #endif
+  */
+
+  //getch();
 
   //opens the scalar file
   sprintf(bufer,"analysis/scalars.dat");
   fout_scalars=fopen(bufer,"w");
-
-  //arrays for averaging of primitives
-
-  //ldouble *pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
-  ldouble *pavgtot=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
-
-  for(i=0;i<(SX)*(SY)*(SZ)*(NV+NAVGVARS);i++)
-    pavg[i]=pavgtot[i]=0.;
 
   int ifile,itot=0,readret;
   ldouble t,ttot; ldouble scalars[NSCALARS];

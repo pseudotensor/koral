@@ -7,9 +7,9 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 32
-#define TNY 32
-#define TNZ 32
+#define TNX 132
+#define TNY 132
+#define TNZ 132
 
 #define NTX 2
 #define NTY 2

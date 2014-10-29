@@ -415,7 +415,7 @@ int readAngleFiles(double angGridCoords[NUMANGLES][3], double angDualGridCoords[
 
 
 
-void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
+void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES])
 {
   int n1_central=1,n2_central=1,n3_central=1; //use as central index, will loop over later
   int delta_n1, delta_n2, delta_n3;
@@ -788,7 +788,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 
 
 
-void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double intersectGridPhi[SX][SY][SZ][NUMANGLES])
+void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES], double intersectGridPhi[SXVET][SYVET][SZVET][NUMANGLES])
 {
   double aspin=0., aspin2=aspin*aspin; // black hole spin
   double mintime = 1.0e99;
@@ -1287,7 +1287,7 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 
 
 
-void setupInterpWeights_sph2D_flat(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES], double intersectGridPhi[SX][SY][SZ][NUMANGLES])
+void setupInterpWeights_sph2D_flat(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES], double intersectGridPhi[SXVET][SYVET][SZVET][NUMANGLES])
 {
   int n1_central=1,n2_central=1,n3_central=1; //use as central index, will loop over later
   int delta_n1, delta_n2, delta_n3;
@@ -1615,7 +1615,7 @@ void setupInterpWeights_sph2D_flat(int ix, int iy, int iz, double angGridCoords[
 
 // We find the 2 bounding edges for each ray hitting the boundary, and their appropriate weights to use in interpolation later on
 
-void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
+void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES])
 {
   int probeAng;
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
@@ -1808,7 +1808,7 @@ void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMA
 
 
 
-void setupInterpWeights_cart3D(int ix,int iy,int iz,double angGridCoords[NUMANGLES][3], int intersectGridIndices[SX][SY][SZ][NUMANGLES][3][4], double intersectGridWeights[SX][SY][SZ][NUMANGLES][4], double intersectDistances[SX][SY][SZ][NUMANGLES])
+void setupInterpWeights_cart3D(int ix,int iy,int iz,double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES])
 {
   int probeAng;
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)

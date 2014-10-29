@@ -586,6 +586,18 @@
 #endif
 #endif
 
+//to limit memory footprint
+
+#if (RADCLOSURE==VETCLOSURE)
+#define SXVET SX
+#define SYVET SY
+#define SZVET SZ
+#else
+#define SXVET 1
+#define SYVET 1
+#define SZVET 1
+#endif
+
 #ifndef NUMDUALANGLES
 #define NUMDUALANGLES 156 	//Must be equal to number of lines in dual angle grid file
 #endif
