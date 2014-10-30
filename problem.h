@@ -84,8 +84,24 @@
 //81 TWOBEAM - test of VET with two beams
 //82 VETTHIN - thin disk emission for VET tests
 //83 RADFLATTEST - tests of radiation solvers in flat space
+//84 AXISBLOB - blob near 3d polar axis
 
-#define PROBLEM 58
+#define PROBLEM 84
+
+#if(PROBLEM==84)
+
+#define PR_DEFINE "PROBLEMS/AXISBLOB/define.h"
+#define PR_BC "PROBLEMS/AXISBLOB/bc.c"
+#define PR_INIT "PROBLEMS/AXISBLOB/init.c"
+#define PR_KAPPA "PROBLEMS/AXISBLOB/kappa.c"
+#define PR_KAPPAES "PROBLEMS/AXISBLOB/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/AXISBLOB/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/AXISBLOB/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/AXISBLOB/dump.c"
+#define PR_TOOLS "PROBLEMS/AXISBLOB/tools.c"
+
+#endif
+
 
 #if(PROBLEM==83)
 

@@ -220,9 +220,17 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	    
 
 	      //coordinates
+
+#if(SILOCOORDS==SPHCOORDS)
+	      nodex[nodalindex]=xxvecsph[1];
+	      nodey[nodalindex]=xxvecsph[2];
+	      nodez[nodalindex]=xxvecsph[3];
+#else
 	      nodex[nodalindex]=xxveccar[1];
 	      nodey[nodalindex]=xxveccar[2];
 	      nodez[nodalindex]=xxveccar[3];
+#endif
+
 
 	      //primitives to OUTCOORDS
               #ifdef RADIATION

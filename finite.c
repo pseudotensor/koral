@@ -496,6 +496,9 @@ do_finger()
 #ifdef CORRECT_POLARAXIS
   correct_polaraxis();
 #endif
+#ifdef CORRECT_POLARAXIS_3D
+  correct_polaraxis_3d();
+#endif
 
   //**********************************************************************
   //**********************************************************************
@@ -3780,6 +3783,231 @@ correct_polaraxis()
 
   return 0; 
 }
+
+
+//treats the most polar cells is a special way, correcting them, not evolving them
+int
+correct_polaraxis_3d()
+{
+  int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
+
+  int ix,iy,iz,iv,ic,iysrc,ixsrc;
+
+  //spherical like coords
+  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
+    {
+      //#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static,4)
+      ldouble ppavg[NV];
+      for(ix=0;ix<NX;ix++)
+	{
+	  //TODO
+	  //temporary calculating averages here - should be moved to calc_avgs!!!
+
+	  //TODO
+	  //averaging Omega as well!!!
+	  ldouble v[4],Omega,pp[NV];
+	  PLOOP(iv) ppavg[iv]=0.;
+	  struct geometry geomBL,geom;
+
+	  //upper
+	  if(TJ==0) //tile number
+	    {
+	      for(iz=0;iz<NZ;iz++)
+		{
+		  fill_geometry_arb(ix,NCCORRECTPOLAR,iz,&geomBL,BLCOORDS);
+		  fill_geometry(ix,NCCORRECTPOLAR,iz,&geom);
+
+		  PLOOP(iv)
+		    pp[iv]=get_u(p,iv,ix,NCCORRECTPOLAR,iz); 
+
+		  ppavg[RHO]+=pp[RHO];
+		  ppavg[UU]+=pp[UU];
+		
+
+		  //cartesian velocities in VX..VZ slots
+		  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
+		  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+ 		  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
+		  ldouble r=geomBL.xx;
+		  ldouble th=geomBL.yy;
+		  ldouble ph=geomBL.zz;
+
+		  //to cartesian
+		  ucon[2]*=r;
+		  ucon[3]*=r*sin(th);
+		  
+		  v[1] = sin(th)*cos(ph)*ucon[1] 
+		    + cos(th)*cos(ph)*ucon[2]
+		    - sin(ph)*ucon[3];
+
+		  v[2] = sin(th)*sin(ph)*ucon[1] 
+		    + cos(th)*sin(ph)*ucon[2]
+		    + cos(ph)*ucon[3];
+		  
+		  v[3] = cos(th)*ucon[1] 
+		    - sin(th)*ucon[2];
+
+		  ppavg[VX]+=v[1];
+		  ppavg[VY]+=v[2];
+		  ppavg[VZ]+=v[3];
+
+#ifdef RADIATION
+
+		  ppavg[EE]+=pp[EE];
+		  //cartesian velocities in VX..VZ slots
+		  ucon[1]=pp[FX];
+		  ucon[2]=pp[FY];
+		  ucon[3]=pp[FZ];
+		  conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+ 		  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
+
+		  //to cartesian
+		  ucon[2]*=r;
+		  ucon[3]*=r*sin(th);
+		  
+		  v[1] = sin(th)*cos(ph)*ucon[1] 
+		    + cos(th)*cos(ph)*ucon[2]
+		    - sin(ph)*ucon[3];
+
+		  v[2] = sin(th)*sin(ph)*ucon[1] 
+		    + cos(th)*sin(ph)*ucon[2]
+		    + cos(ph)*ucon[3];
+		  
+		  v[3] = cos(th)*ucon[1] 
+		    - sin(th)*ucon[2];
+
+		  ppavg[FX]+=v[1];
+		  ppavg[FY]+=v[2];
+		  ppavg[FZ]+=v[3];
+
+		  #ifdef NCOMPTONIZATION
+		  ppavg[NF]+=pp[NF];
+#endif
+#endif
+		}
+
+	      PLOOP(iv)
+		ppavg[iv]/=NZ;
+
+	      //overwriting
+	      for(iz=0;iz<NZ;iz++)
+		{
+		  ldouble r,th;
+		  ldouble pp[NV],uu[NV];
+		  struct geometry geom,geomBL;
+
+		  for(ic=0;ic<nc;ic++)
+		    {
+		      iy=ic;
+	      	 
+ 		      fill_geometry(ix,iy,iz,&geom);
+		      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+		      ldouble r=geomBL.xx;
+		      ldouble th=geomBL.yy;
+		      ldouble ph=geomBL.zz;
+		      ldouble vr,vth,vph;
+		      ldouble cosph,sinth,costh,sinph;
+		      sinth=sin(th);
+		      costh=cos(th);
+		      sinph=sin(ph);
+		      cosph=cos(ph);
+	  
+		      PLOOP(iv)
+			pp[iv]=get_u(p,iv,ix,iy,iz);
+		  
+		      //gas
+		      pp[RHO]=ppavg[RHO];
+		      pp[UU]=ppavg[UU];
+		      pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+		  		  		  
+		      //gas velocities
+		      ldouble vx=ppavg[VX];
+		      ldouble vy=ppavg[VY];
+		      ldouble vz=ppavg[VZ];
+		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+			     costh*Power(sinph,2)*vz)/
+			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+		      vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+			       Power(sinph,2)*sinth*vz)/
+			      ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+		      vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+
+		      vth /= r;
+		      vph /= r*sinth;
+
+		      ldouble ucon[4]={0.,vr,vth,vph};
+		      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+		      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+
+		      pp[VX]=ucon[1];
+		      pp[VY]=ucon[2];
+		      pp[VZ]=ucon[3];
+
+
+
+		      
+		     
+#ifdef MAGNFIELD
+		      //do not overwrite magnetic field, not to break div B=0 there
+#endif
+
+#ifdef RADIATION
+		      //rad density
+		      pp[EE]=ppavg[EE];
+
+#ifdef NCOMPTONIZATION
+		      //no. of photons
+		      pp[NF]=ppavg[NF];
+#endif
+
+		      //rad velocities
+		      ldouble vx=ppavg[FX];
+		      ldouble vy=ppavg[FY];
+		      ldouble vz=ppavg[FZ];
+		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+			     costh*Power(sinph,2)*vz)/
+			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+		      vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+			       Power(sinph,2)*sinth*vz)/
+			      ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+		      vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+
+		      vth /= r;
+		      vph /= r*sinth;
+
+		      ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+		      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+		      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+
+		      pp[FX]=ucon[1];
+		      pp[FY]=ucon[2];
+		      pp[FZ]=ucon[3];
+
+       
+#ifdef EVOLVEINTENSITIES
+		      for(iv=0;iv<NUMANGLES;iv++)
+			Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
+#endif
+#endif
+
+		      p2u(pp,uu,&geom);
+
+		      PLOOP(iv)
+		      {
+			set_u(p,iv,ix,iy,iz,pp[iv]);  
+			set_u(u,iv,ix,iy,iz,uu[iv]);
+		      }
+		    }
+		}
+	    }
+	}
+    }
+
+
+  return 0; 
+}
+
 
 /*****************************************************************/
 /* determines the extent of the domain currently solved **********/

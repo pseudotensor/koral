@@ -311,6 +311,7 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
 int calc_u2p();
 int do_finger();
 int correct_polaraxis();
+int correct_polaraxis_3d();
 int solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase);
 int cell_fixup_rad();
 int cell_fixup_hd();
