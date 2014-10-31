@@ -75,18 +75,44 @@ if(BCtype==XBCHI)
      ldouble rfac=pow(r/RMIN,-6.);
      rfac=1.;
 
-     pp[RHO]=RHO_AMB*rfac;
-     pp[UU]=U_AMB*rfac;
-     pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+   
 
     //velocities zero - not rotating, settling down
      pp[VX]=pp[VY]=pp[VZ]=0.;
 
      //pure rotation
-     pp[VZ]=OMEGA;
+     //pp[VZ]=OMEGA;
      
     
+     ldouble Bcon0[4]={0.,get_u(p,B1,0,iy,iz),get_u(p,B2,0,iy,iz),get_u(p,B3,0,iy,iz)},Bcov0[4];
+     indices_21(Bcon0,Bcov0,geom0.gg);
+     ldouble vcon0[4]={0.,get_u(p,VX,0,iy,iz),get_u(p,VY,0,iy,iz),get_u(p,VZ,0,iy,iz)};
+     ldouble vpar0 = dot(vcon0,Bcov0) / sqrt(dot(Bcon0,Bcov0)) * my_sign(Bcon0[1]);
 
+     ldouble vpar;
+     if(vpar0>0.) vpar=0.5;
+     else vpar=vpar0;
+
+     ldouble Bcon[4]={0.,pp[B1],pp[B2],pp[B3]},Bcov[4];
+     indices_21(Bcon,Bcov,geom.gg);
+    
+     pp[VX]=pp[B1]*vpar/sqrt(dot(Bcon,Bcov))* my_sign(Bcon0[1]);;
+     pp[VY]=pp[B2]*vpar/sqrt(dot(Bcon,Bcov))* my_sign(Bcon0[1]);;
+     pp[VZ]=OMEGA+pp[B3]*vpar/sqrt(dot(Bcon,Bcov))* my_sign(Bcon0[1]);;
+     
+     if(vpar0>0.)
+       {
+	 pp[RHO]=RHO_AMB*rfac;
+	 pp[UU]=U_AMB*rfac;
+       }
+     else
+       {
+	 pp[RHO]=get_u(p,RHO,0,iy,iz);
+	 pp[UU]=get_u(p,UU,0,iy,iz);
+       }
+
+
+     pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
 
     p2u(pp,uu,&geom);

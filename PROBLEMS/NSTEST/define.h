@@ -1,12 +1,12 @@
-#define MYCOORDS SPHCOORDS
+#define MYCOORDS MSPH1COORDS
 
 #define MKS1R0 0.
 #define RMIN 5.
 #define RMAX 30.
-//#define MINX (log(RMIN-MKS1R0))
-//#define MAXX (log(30.-MKS1R0))
-#define MINX RMIN
-#define MAXX RMAX
+#define MINX (log(RMIN-MKS1R0))
+#define MAXX (log(RMAX-MKS1R0))
+//#define MINX RMIN
+//#define MAXX RMAX
 #define MINY 1.e-6
 #define MAXY (M_PI-1.e-6)
 #define MINZ -M_PI
@@ -33,10 +33,10 @@
 #define DIPOLE
 #define GDETIN 1
 //#define VECPOTGIVEN
-#define BETANORMFACTOR 1.
+#define BETANORMFACTOR 10.
 #define B2RHORATIOMAX 50.
 
-#define OMEGA 0.0;
+#define OMEGA 0.1
 
 
 #define CORRECT_POLARAXIS
