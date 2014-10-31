@@ -85,8 +85,31 @@
 //82 VETTHIN - thin disk emission for VET tests
 //83 RADFLATTEST - tests of radiation solvers in flat space
 //84 AXISBLOB - blob near 3d polar axis
+//85 NSTEST - tests of axisymmetric NS
 
-#define PROBLEM 84
+#define PROBLEM 85
+
+
+
+#if(PROBLEM==85)
+
+
+#define PR_DEFINE "PROBLEMS/NSTEST/define.h"
+//#define PR_POSTINIT "PROBLEMS/NSTEST/postinit.c"
+#define PR_PREPINIT "PROBLEMS/NSTEST/prepinit.c"
+#define PR_BC "PROBLEMS/NSTEST/bc.c"
+#define PR_INIT "PROBLEMS/NSTEST/init.c"
+#define PR_KAPPA "PROBLEMS/NSTEST/kappa.c"
+#define PR_KAPPAES "PROBLEMS/NSTEST/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/NSTEST/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/NSTEST/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/NSTEST/dump.c"
+#define PR_TOOLS "PROBLEMS/NSTEST/tools.c"
+
+#endif
+
+
+
 
 #if(PROBLEM==84)
 

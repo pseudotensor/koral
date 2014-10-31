@@ -414,6 +414,21 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
       //**********************************************************************
      	    
+      //test
+      /*
+      printf("%e %e %e %e %e\n",get_u(p,B1,-2,NY/4,0)
+	     ,get_u(p,B1,-1,NY/4,0),
+	     get_u(p,B1,0,NY/4,0),
+	     get_u(p,B1,1,NY/4,0),
+	     get_u(p,B1,2,NY/4,0)); getch();
+      */
+
+      /*
+      print_primitives(&get_u(p,0,-2,NY/4,0));
+      print_primitives(&get_u(p,0,-1,NY/4,0));
+      print_primitives(&get_u(p,0,0,NY/4,0));getch();
+      */
+
       if(TIMESTEPPING==RK2IMEX)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);

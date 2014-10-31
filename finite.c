@@ -422,10 +422,17 @@ calc_u2p()
 //#pragma omp parallel for schedule (static,4)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
+    
+      
       int ix,iy,iz;
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
+
+#ifdef CORRECT_POLARAXIS
+      if(TJ==0 && iy<NCCORRECTPOLAR-1) continue;
+      if(TJ==NTY-1 && iy>(NY-NCCORRECTPOLAR)) continue;
+#endif
 
       #ifdef MSTEP
       if(mstep_is_cell_active(ix,iy,iz)==0) 
@@ -949,6 +956,7 @@ op_explicit(ldouble t, ldouble dtin)
   my_err("Magnetic fields do not work with multistep yet. On todo list\n");
 #endif
 
+  //TODO: barrier here!!!!
   flux_ct(); //constrained transport to preserve div.B=0
 #endif
 

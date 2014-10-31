@@ -416,7 +416,7 @@ calc_BfromA_core()
   int ix,iy,iz,iv,ii;
   
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-  for(ii=0;ii<Nloop_0;ii++) //domain
+  for(ii=0;ii<Nloop_0;ii++) //domain + one layer
     {
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
