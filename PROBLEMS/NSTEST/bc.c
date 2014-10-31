@@ -43,10 +43,17 @@ if(BCtype==XBCHI)
 	pp[iv]=get_u(p,iv,ix,iy,iz);
       }
 
-    struct geometry geomBL0;
+    struct geometry geomBL0,geom0;
     fill_geometry_arb(0,iy,iz,&geomBL0,BLCOORDS);
+    fill_geometry(0,iy,iz,&geom0);
     ldouble r0=geomBL0.xx;
-    ldouble scfac = r0*r0*r0/(r*r*r);
+    ldouble scfac = 1.;
+    #ifdef MONOPOLE
+    scfac=r0*r0/r/r;
+    #endif
+    #ifdef DIPOLE
+    scfac=r0*r0*r0/r/r/r;
+    #endif
 
      if(ifinit) //magnetic field fixed
        {
@@ -56,23 +63,28 @@ if(BCtype==XBCHI)
 	 pp[B2]=get_u(pproblem1,B2,0,iy,iz)*scfac;
 	 pp[B3]=get_u(pproblem1,B3,0,iy,iz)*scfac;
 	 */
-	 pp[B1]=get_u(p,B1,0,iy,iz)*scfac;
-	 pp[B2]=get_u(p,B2,0,iy,iz)*scfac;
-	 pp[B3]=get_u(p,B3,0,iy,iz)*scfac;
+	 pp[B1]=get_u(p,B1,0,iy,iz)*sqrt(geom0.gg[1][1])*scfac/sqrt(geom.gg[1][1]);
+	 pp[B2]=get_u(p,B2,0,iy,iz)*sqrt(geom0.gg[2][2])*scfac/sqrt(geom.gg[2][2]);
+	 pp[B3]=get_u(p,B3,0,iy,iz)*sqrt(geom0.gg[3][3])*scfac/sqrt(geom.gg[3][3]);
        }
 
-     //pp[B2]=get_u(p,B2,0,iy,iz)*scfac;
-     //pp[B3]=get_u(p,B3,0,iy,iz)*scfac;
+     pp[B2]=get_u(p,B2,0,iy,iz)*sqrt(geom0.gg[2][2])*scfac/sqrt(geom.gg[2][2]);
+     pp[B3]=get_u(p,B3,0,iy,iz)*sqrt(geom0.gg[3][3])*scfac/sqrt(geom.gg[3][3]);
 
     //density fixed, temparture too
      ldouble rfac=pow(r/RMIN,-6.);
+     rfac=1.;
 
      pp[RHO]=RHO_AMB*rfac;
-     pp[UU]=U_AMB;//*rfac;
-    pp[5]=calc_Sfromu(pp[0],pp[1]);
+     pp[UU]=U_AMB*rfac;
+     pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
     //velocities zero - not rotating, settling down
-    pp[VX]=pp[VY]=pp[VZ]=0.;
+     pp[VX]=pp[VY]=pp[VZ]=0.;
+
+     //pure rotation
+     pp[VZ]=OMEGA;
+     
     
 
 

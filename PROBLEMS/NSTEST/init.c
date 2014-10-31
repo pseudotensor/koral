@@ -16,9 +16,9 @@ ldouble ph=geomBL.zz;
 
 ldouble rfac=pow(r/RMIN,-6.);
 
-
+rfac=1.;
 pp[RHO]=RHO_AMB*rfac;// + RHO_BLOB*exp(-((y-5.)*(y-5.) + (z-20.)*(z-20.) + (x*x))/10.);
-pp[UU]=U_AMB;//*rfac;
+pp[UU]=U_AMB*rfac;//*rfac;
 
 pp[VX]=0.;
 pp[VY]=0.;
@@ -31,9 +31,13 @@ pp[B2]=get_u(pproblem1,B2,ix,iy,iz);
 pp[B3]=get_u(pproblem1,B3,ix,iy,iz);
 
 //test
+/*
 pp[B1]=2.*cos(th)/r/r/r/sqrt(geom.gg[1][1])*BETANORMFACTOR;
 pp[B2]=sin(th)/r/r/r/sqrt(geom.gg[2][2])*BETANORMFACTOR;
 pp[B3]=0.;
+*/
+//test
+//pp[B3]=pp[B1]=pp[B2]=0.;
 #endif
 
 /*

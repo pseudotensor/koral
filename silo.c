@@ -427,7 +427,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      Edotz[nodalindex]=Tit[3];
 
 	      //transform to cartesian
-	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
+	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS || MYCOORDS==MKER1COORDS)
 		{
 		  vel[2]*=r;
 		  vel[3]*=r*sin(th);
@@ -440,13 +440,15 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		    + cos(th)*sin(ph)*vel[2]
 		    + cos(ph)*vel[3];
 
-		  /*
-		  if(iy==TNY/2 && ix==TNX/2){
-		    printf("%d %d %d > %e %e %e\n",ix,iy,iz,vx[nodalindex],vy[nodalindex],vz[nodalindex]); getch();}
-		  */
+		  
+			  
 
 		  vz[nodalindex] = cos(th)*vel[1] 
 		    - sin(th)*vel[2];
+
+		  /*
+		  if(iy==TNY/2){
+		  printf("%d %d %d > %e %e %e\n",ix,iy,iz,vx[nodalindex],vy[nodalindex],vz[nodalindex]); getch();}*/
 
 		  Tit[2]*=r;
 		  Tit[3]*=r*sin(th);
@@ -520,7 +522,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 
 	      //transform to cartesian
-	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS)
+	      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS || MYCOORDS==MKER1COORDS)
 		{
 		  bcon[2]*=r;
 		  bcon[3]*=r*sin(th);

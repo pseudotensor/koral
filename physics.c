@@ -542,6 +542,9 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
   ff[B1]=gdetu*(bcon[1]*ucon[idim+1] - bcon[idim+1]*ucon[1]);
   ff[B2]=gdetu*(bcon[2]*ucon[idim+1] - bcon[idim+1]*ucon[2]);
   ff[B3]=gdetu*(bcon[3]*ucon[idim+1] - bcon[idim+1]*ucon[3]);
+
+  //test
+  //ff[B1]=ff[B2]=ff[B3]=0.;
 #endif
 
   //radiation

@@ -429,6 +429,18 @@ solve_the_problem(ldouble tstart, char* folder)
       print_primitives(&get_u(p,0,0,NY/4,0));getch();
       */
 
+      /*
+      int iix=0;
+      
+      for(iix=-2;iix<TNX;iix++)
+	{
+	  printf("%d %e %e %e %e %e\n",iix,get_x(iix,0),get_x(iix,0)*get_x(iix,0)*get_u(p,B1,iix,NY/2,0)*sqrt(get_g(g,1,1,iix,NY/2,0)),
+		 get_u(p,RHO,iix,NY/2,0),get_u(p,UU,iix,NY/2,0),get_u(p,VX,iix,NY/2,0));
+
+	}
+      getch();
+      */
+
       if(TIMESTEPPING==RK2IMEX)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);

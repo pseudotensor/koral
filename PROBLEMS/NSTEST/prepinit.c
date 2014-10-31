@@ -23,7 +23,12 @@
 
 	    set_u(pproblem1,B1,ix,iy,iz,0.);
 	    set_u(pproblem1,B2,ix,iy,iz,0.);
-	    set_u(pproblem1,B3,ix,iy,iz,sin(th)/r/r);
+#ifdef DIPOLE
+	    set_u(pproblem1,B3,ix,iy,iz,sin(th)*sin(th)/r);
+#endif
+#ifdef MONOPOLE
+	    set_u(pproblem1,B3,ix,iy,iz,1.-cos(th)); 
+#endif
 	  }
 }
 
