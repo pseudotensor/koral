@@ -34,6 +34,6 @@
 
 #define RHO_AMB 1.e-3
 #define U_AMB 1.e-7
-#define VELWIND 0.
+#define VELWIND 0.1
 
 #define SILOOUTPUT 1
