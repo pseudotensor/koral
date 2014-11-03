@@ -58,7 +58,7 @@
 //55 G2STATIC - cloud through static atmosphere
 //56 EDDSPH - 1d Edd Sphere
 //57 LIMOTORUS - torus from Bob's/Akshay's paper
-//58 LUKE - beam hitting a net gas flow
+//58 LUKE - beam hitting a net gas flow / the simplest 3d
 //59 BBBLOB - rad blobs
 //60 JONTESTS - testing jon's fails.dat
 //61 MAGTESTS - simple mag tests
@@ -87,7 +87,7 @@
 //84 AXISBLOB - blob near 3d polar axis
 //85 NSTEST - tests of axisymmetric NS
 
-#define PROBLEM 85
+#define PROBLEM 58
 
 
 

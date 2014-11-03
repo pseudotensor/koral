@@ -7,13 +7,15 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 132
-#define TNY 132
-#define TNZ 132
+#define TNX 32
+#define TNY 32
+#define TNZ 32
 
 #define NTX 2
 #define NTY 2
-#define NTZ 1
+#define NTZ 2
+
+#define MPI4CORNERS
 
 #define INT_ORDER 1
 #define TSTEPLIM .5

@@ -2766,186 +2766,765 @@ int set_bc(ldouble t,int ifinit)
 
 
 #ifdef MPI4CORNERS
-  //now calculate conserved in corners - 
+  /*****************************************************************/
+  /* now calculate conserved in corners from exchanged primitives */
+  /*****************************************************************/  
   struct geometry geom;
-  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0) 
+
+  if(TNY==1 && TNZ>1) //2D
     {
-      for(ix=-NG;ix<0;ix++)
-	for(iy=-NG;iy<0;iy++)
-	  for(iz=0;iz<NZ;iz++)
-	    {	    
-	      fill_geometry(ix,iy,iz,&geom);
-	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
-	    }
+      my_err("MPI4corners does not work yet with TNY==1 && TNZ>1\n");
     }
-  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0) 
+  
+  if(TNZ==1 && TNY>1) //2D
     {
-      for(ix=NX;ix<NX+NG;ix++)
-	for(iy=-NG;iy<0;iy++)
-	  for(iz=0;iz<NZ;iz++)
-	    {	    
-	      fill_geometry(ix,iy,iz,&geom);
-	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
-	    }
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iy=-NG;iy<0;iy++)
+	      for(iz=0;iz<NZ;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iy=-NG;iy<0;iy++)
+	      for(iz=0;iz<NZ;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iy=NY;iy<NY+NG;iy++)
+	      for(iz=0;iz<NZ;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iy=NY;iy<NY+NG;iy++)
+	      for(iz=0;iz<NZ;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
     }
-  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0) 
+  
+  if(TNZ>1 && TNY>1) //full 3d
     {
-      for(ix=-NG;ix<0;ix++)
-	for(iy=NY;iy<NY+NG;iy++)
-	  for(iz=0;iz<NZ;iz++)
-	    {	    
-	      fill_geometry(ix,iy,iz,&geom);
-	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
-	    }
-    }
-  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0) 
-    {
-      for(ix=NX;ix<NX+NG;ix++)
-	for(iy=NY;iy<NY+NG;iy++)
-	  for(iz=0;iz<NZ;iz++)
-	    {	    
-	      fill_geometry(ix,iy,iz,&geom);
-	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
-	    }
+      //elongated blocks first
+      //along z
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iy=-NG;iy<0;iy++)
+	      for(iz=0;iz<NZ;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iy=-NG;iy<0;iy++)
+	      for(iz=0;iz<NZ;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iy=NY;iy<NY+NG;iy++)
+	      for(iz=0;iz<NZ;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iy=NY;iy<NY+NG;iy++)
+	      for(iz=0;iz<NZ;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      //along y
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(ZBCLO)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iz=-NG;iz<0;iz++)
+	      for(iy=0;iy<NY;iy++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(ZBCLO)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iz=-NG;iz<0;iz++)
+	      for(iy=0;iy<NY;iy++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(ZBCHI)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iz=NZ;iz<NZ+NG;iz++)
+	      for(iy=0;iy<NY;iy++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(ZBCHI)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iz=NZ;iz<NZ+NG;iz++)
+	      for(iy=0;iy<NY;iy++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      //along x
+      if(mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0) 
+	{
+	  for(iy=-NG;iy<0;iy++)
+	    for(iz=-NG;iz<0;iz++)
+	      for(ix=0;ix<NX;ix++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0) 
+	{
+	  for(iy=NY;iy<NY+NG;iy++)
+	    for(iz=-NG;iz<0;iz++)
+	      for(ix=0;ix<NX;ix++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0) 
+	{
+	  for(iy=-NG;iy<0;iy++)
+	    for(iz=NZ;iz<NZ+NG;iz++)
+	      for(ix=0;ix<NX;ix++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0) 
+	{
+	  for(iy=NY;iy<NY+NG;iy++)
+	    for(iz=NZ;iz<NZ+NG;iz++)
+	      for(ix=0;ix<NX;ix++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom);
+		  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      //now cubic corners corners
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iy=-NG;iy<0;iy++)
+	      for(iz=-NG;iz<0;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom); p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iy=-NG;iy<0;iy++)
+	      for(iz=-NG;iz<0;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom); p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iy=NY;iy<NY+NG;iy++)
+	      for(iz=-NG;iz<0;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom); p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iy=NY;iy<NY+NG;iy++)
+	      for(iz=-NG;iz<0;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom); p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iy=-NG;iy<0;iy++)
+	      for(iz=NZ;iz<NZ+NG;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom); p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iy=-NG;iy<0;iy++)
+	      for(iz=NZ;iz<NZ+NG;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom); p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0) 
+	{
+	  for(ix=-NG;ix<0;ix++)
+	    for(iy=NY;iy<NY+NG;iy++)
+	      for(iz=NZ;iz<NZ+NG;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom); p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0) 
+	{
+	  for(ix=NX;ix<NX+NG;ix++)
+	    for(iy=NY;iy<NY+NG;iy++)
+	      for(iz=NZ;iz<NZ+NG;iz++)
+		{	    
+		  fill_geometry(ix,iy,iz,&geom); p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+ 
+
+
     }
 
+  /*****************************************************************/
   //corners of the whole domain are never real BC so need to fill them with something
+  /*****************************************************************/  
+
+
+  
   int xlim,ylim,zlim;
   int lim,i,j;
 
-  if(NZ>1)
+  if(TNZ==1 && TNY>1)
     {
-      printf("filling corners not implemented for NZ>1\n");exit(-1);
-    }
+      iz=0;
 
-  iz=0;
-
-  //total corners, filling one cell deep surfaces
-  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1 && NY>1)
-    {
-
-      for(i=0;i<NG-1;i++)
+      //total corners, filling one cell deep surfaces
+      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1 && NY>1)
 	{
+
+	  for(i=0;i<NG-1;i++)
+	    {
+	      PLOOP(iv)
+	      {
+		set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+1,0,iz));
+		set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+1,iz));
+	      }
+	      fill_geometry(-NG+i,-1,iz,&geom);
+	      p2u(&get_u(p,0,-NG+i,-1,iz),&get_u(u,0,-NG+i,-1,iz),&geom);
+	      fill_geometry(-1,-NG+i,iz,&geom);
+	      p2u(&get_u(p,0,-1,-NG+i,iz),&get_u(u,0,-1,-NG+i,iz),&geom);
+	    }
+      
+	  //averaging <(-1,0),(0,-1)> -> (-1,-1)
 	  PLOOP(iv)
-	  {
-	    set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+1,0,iz));
-	    set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+1,iz));
-	  }
-	  fill_geometry(-NG+i,-1,iz,&geom);
-	  p2u(&get_u(p,0,-NG+i,-1,iz),&get_u(u,0,-NG+i,-1,iz),&geom);
-	  fill_geometry(-1,-NG+i,iz,&geom);
-	  p2u(&get_u(p,0,-1,-NG+i,iz),&get_u(u,0,-1,-NG+i,iz),&geom);
+	    set_u(p,iv,-1,-1,iz,.5*(get_u(p,iv,-1,0,iz)+get_u(p,iv,0,-1,iz)));
+	  fill_geometry(-1,-1,iz,&geom);
+	  p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
+
+	  //averaging <(-2,-1),(-1,-2)> -> (-2,-2)
+      
+	  PLOOP(iv)
+	    set_u(p,iv,-2,-2,iz,.5*(get_u(p,iv,-2,-1,iz)+get_u(p,iv,-1,-2,iz)));
+	  fill_geometry(-2,-2,iz,&geom);
+	  p2u(&get_u(p,0,-2,-2,iz),&get_u(u,0,-2,-2,iz),&geom);
+      
+
 	}
-      
-      //copying (0,0) -> (-1,-1) 
-      /*
-      PLOOP(iv)
-	set_u(p,iv,-1,-1,iz,get_u(p,iv,0,0,iz));
-      fill_geometry(-1,-1,iz,&geom);
-      p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
-      */
-
-      //averaging <(-1,0),(0,-1)> -> (-1,-1)
-      PLOOP(iv)
-	set_u(p,iv,-1,-1,iz,.5*(get_u(p,iv,-1,0,iz)+get_u(p,iv,0,-1,iz)));
-      fill_geometry(-1,-1,iz,&geom);
-      p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
-
-      //averaging <(-2,-1),(-1,-2)> -> (-2,-2)
-      
-	PLOOP(iv)
-	set_u(p,iv,-2,-2,iz,.5*(get_u(p,iv,-2,-1,iz)+get_u(p,iv,-1,-2,iz)));
-      fill_geometry(-2,-2,iz,&geom);
-      p2u(&get_u(p,0,-2,-2,iz),&get_u(u,0,-2,-2,iz),&geom);
-      
-
-    }
   
 
-  if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1 && NY>1)
-    {
+      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1 && NY>1)
+	{
  
-      for(i=0;i<NG-1;i++)
-	{
+	  for(i=0;i<NG-1;i++)
+	    {
+	      PLOOP(iv)
+	      {
+		set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+1,NY-1,iz));
+		set_u(p,iv,-1,NY+i+1,iz,get_u(p,iv,0,NY+i+1,iz));
+	      }
+	      fill_geometry(-NG+i,NY,iz,&geom);
+	      p2u(&get_u(p,0,-NG+i,NY,iz),&get_u(u,0,-NG+i,NY,iz),&geom);
+	      fill_geometry(-1,NY+i+1,iz,&geom);
+	      p2u(&get_u(p,0,-1,NY+i+1,iz),&get_u(u,0,-1,NY+i+1,iz),&geom);
+	    }
+
 	  PLOOP(iv)
-	  {
-	    set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+1,NY-1,iz));
-	    set_u(p,iv,-1,NY+i+1,iz,get_u(p,iv,0,NY+i+1,iz));
-	  }
-	  fill_geometry(-NG+i,NY,iz,&geom);
-	  p2u(&get_u(p,0,-NG+i,NY,iz),&get_u(u,0,-NG+i,NY,iz),&geom);
-	  fill_geometry(-1,NY+i+1,iz,&geom);
-	  p2u(&get_u(p,0,-1,NY+i+1,iz),&get_u(u,0,-1,NY+i+1,iz),&geom);
+	    set_u(p,iv,-1,NY,iz,.5*(get_u(p,iv,-1,NY-1,iz)+get_u(p,iv,0,NY,iz)));
+	  fill_geometry(-1,NY,iz,&geom);
+	  p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
+
+	  PLOOP(iv)
+	    set_u(p,iv,-2,NY+1,iz,.5*(get_u(p,iv,-2,NY,iz)+get_u(p,iv,-1,NY+1,iz)));
+	  fill_geometry(-2,NY+1,iz,&geom);
+	  p2u(&get_u(p,0,-2,NY+1,iz),&get_u(u,0,-2,NY+1,iz),&geom);
+      
 	}
 
-      PLOOP(iv)
-	set_u(p,iv,-1,NY,iz,.5*(get_u(p,iv,-1,NY-1,iz)+get_u(p,iv,0,NY,iz)));
-      fill_geometry(-1,NY,iz,&geom);
-      p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
+      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1 && NY>1)
+	{
+	  for(i=0;i<NG-1;i++)
+	    {
+	      PLOOP(iv)
+	      {
+		set_u(p,iv,NX+i+1,-1,iz,get_u(p,iv,NX+i+1,0,iz));
+		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+1,iz));
+	      }
+	      fill_geometry(NX+i+1,-1,iz,&geom);
+	      p2u(&get_u(p,0,NX+i+1,-1,iz),&get_u(u,0,NX+i+1,-1,iz),&geom);
+	      fill_geometry(NX,-NG+i,iz,&geom);
+	      p2u(&get_u(p,0,NX,-NG+i,iz),&get_u(u,0,NX,-NG+i,iz),&geom);
+	    }
 
-      PLOOP(iv)
-	set_u(p,iv,-2,NY+1,iz,.5*(get_u(p,iv,-2,NY,iz)+get_u(p,iv,-1,NY+1,iz)));
-      fill_geometry(-2,NY+1,iz,&geom);
-      p2u(&get_u(p,0,-2,NY+1,iz),&get_u(u,0,-2,NY+1,iz),&geom);
+	  PLOOP(iv)
+	    set_u(p,iv,NX,-1,iz,.5*(get_u(p,iv,NX-1,-1,iz)+get_u(p,iv,NX,0,iz)));
+	  fill_geometry(NX,-1,iz,&geom);
+	  p2u(&get_u(p,0,NX,-1,iz),&get_u(u,0,NX,-1,iz),&geom);
+
+	  PLOOP(iv)
+	    set_u(p,iv,NX+1,-2,iz,.5*(get_u(p,iv,NX,-2,iz)+get_u(p,iv,NX+1,-1,iz)));
+	  fill_geometry(NX+1,-2,iz,&geom);
+	  p2u(&get_u(p,0,NX+1,-2,iz),&get_u(u,0,NX+1,-2,iz),&geom);
       
-   }
 
-  if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1 && NY>1)
+	}
+
+      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1 && NY>1)
+	{
+	  for(i=0;i<NG-1;i++)
+	    {
+	      PLOOP(iv)
+	      {
+		set_u(p,iv,NX+i+1,NY,iz,get_u(p,iv,NX+i+1,NY-1,iz));
+		set_u(p,iv,NX,NY+i+1,iz,get_u(p,iv,NX-1,NY+i+1,iz));
+	      }
+	      fill_geometry(NX+i+1,NY,iz,&geom);
+	      p2u(&get_u(p,0,NX+i+1,NY,iz),&get_u(u,0,NX+i+1,NY,iz),&geom);
+	      fill_geometry(NX,NY+i+1,iz,&geom);
+	      p2u(&get_u(p,0,NX,NY+i+1,iz),&get_u(u,0,NX,NY+i+1,iz),&geom);
+	    }
+
+	  PLOOP(iv)
+	    set_u(p,iv,NX,NY,iz,.5*(get_u(p,iv,NX-1,NY,iz)+get_u(p,iv,NX,NY-1,iz)));
+	  fill_geometry(NX,NY,iz,&geom);
+	  p2u(&get_u(p,0,NX,NY,iz),&get_u(u,0,NX,NY,iz),&geom);
+
+	  PLOOP(iv)
+	    set_u(p,iv,NX+1,NY+1,iz,.5*(get_u(p,iv,NX,NY+1,iz)+get_u(p,iv,NX+1,NY,iz)));
+	  fill_geometry(NX+1,NY+1,iz,&geom);
+	  p2u(&get_u(p,0,NX+1,NY+1,iz),&get_u(u,0,NX+1,NY+1,iz),&geom);
+      
+	}
+    }
+
+  /**************************************/
+  if(TNZ>1 && TNY>1) //full 3d
     {
-     for(i=0;i<NG-1;i++)
+      //elongated corners along z, filling one cell deep surfaces, and averaging diagonally
+      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
 	{
-	  PLOOP(iv)
-	  {
-	    set_u(p,iv,NX+i+1,-1,iz,get_u(p,iv,NX+i+1,0,iz));
-	    set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+1,iz));
+	  for(iz=0;iz<NZ;iz++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+1,0,iz));
+		set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+1,iz)); }
+	      fill_geometry(-NG+i,-1,iz,&geom);  p2u(&get_u(p,0,-NG+i,-1,iz),&get_u(u,0,-NG+i,-1,iz),&geom);
+	      fill_geometry(-1,-NG+i,iz,&geom);  p2u(&get_u(p,0,-1,-NG+i,iz),&get_u(u,0,-1,-NG+i,iz),&geom);
+	    }
+      
+	    //averaging <(-1,0),(0,-1)> -> (-1,-1)
+	    PLOOP(iv)
+	      set_u(p,iv,-1,-1,iz,.5*(get_u(p,iv,-1,0,iz)+get_u(p,iv,0,-1,iz)));
+	    fill_geometry(-1,-1,iz,&geom);  p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
+
+	    //averaging <(-2,-1),(-1,-2)> -> (-2,-2)
+	    PLOOP(iv)
+	      set_u(p,iv,-2,-2,iz,.5*(get_u(p,iv,-2,-1,iz)+get_u(p,iv,-1,-2,iz)));
+	    fill_geometry(-2,-2,iz,&geom);   p2u(&get_u(p,0,-2,-2,iz),&get_u(u,0,-2,-2,iz),&geom);
 	  }
-	  fill_geometry(NX+i+1,-1,iz,&geom);
-	  p2u(&get_u(p,0,NX+i+1,-1,iz),&get_u(u,0,NX+i+1,-1,iz),&geom);
-	  fill_geometry(NX,-NG+i,iz,&geom);
-	  p2u(&get_u(p,0,NX,-NG+i,iz),&get_u(u,0,NX,-NG+i,iz),&geom);
 	}
 
-      PLOOP(iv)
-	set_u(p,iv,NX,-1,iz,.5*(get_u(p,iv,NX-1,-1,iz)+get_u(p,iv,NX,0,iz)));
-      fill_geometry(NX,-1,iz,&geom);
-      p2u(&get_u(p,0,NX,-1,iz),&get_u(u,0,NX,-1,iz),&geom);
-
-      PLOOP(iv)
-	set_u(p,iv,NX+1,-2,iz,.5*(get_u(p,iv,NX,-2,iz)+get_u(p,iv,NX+1,-1,iz)));
-      fill_geometry(NX+1,-2,iz,&geom);
-      p2u(&get_u(p,0,NX+1,-2,iz),&get_u(u,0,NX+1,-2,iz),&geom);
+      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
+	{
+	  for(iz=0;iz<NZ;iz++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+1,NY-1,iz));
+		set_u(p,iv,-1,NY+i+1,iz,get_u(p,iv,0,NY+i+1,iz)); }
+	      fill_geometry(-NG+i,NY,iz,&geom);  p2u(&get_u(p,0,-NG+i,NY,iz),&get_u(u,0,-NG+i,NY,iz),&geom);
+	      fill_geometry(-1,NY+i+1,iz,&geom);  p2u(&get_u(p,0,-1,NY+i+1,iz),&get_u(u,0,-1,NY+i+1,iz),&geom);
+	    }
       
+	    PLOOP(iv)
+	      set_u(p,iv,-1,NY,iz,.5*(get_u(p,iv,-1,NY-1,iz)+get_u(p,iv,0,NY,iz)));
+	    fill_geometry(-1,NY,iz,&geom);  p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,-2,NY+1,iz,.5*(get_u(p,iv,-2,NY,iz)+get_u(p,iv,-1,NY+1,iz)));
+	    fill_geometry(-2,NY+1,iz,&geom);   p2u(&get_u(p,0,-2,NY+1,iz),&get_u(u,0,-2,NY+1,iz),&geom);
+	  }
+	}
+
+      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1)
+	{
+	  for(iz=0;iz<NZ;iz++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+1,iz));
+		set_u(p,iv,NX+i+1,-1,iz,get_u(p,iv,NX+i+1,0,iz)); }
+
+	      fill_geometry(NX+i+1,-1,iz,&geom);    p2u(&get_u(p,0,NX+i+1,-1,iz),&get_u(u,0,NX+i+1,-1,iz),&geom);
+	      fill_geometry(NX,-NG+i,iz,&geom);    p2u(&get_u(p,0,NX,-NG+i,iz),&get_u(u,0,NX,-NG+i,iz),&geom);
+	    }
+
+	    PLOOP(iv)
+	      set_u(p,iv,NX,-1,iz,.5*(get_u(p,iv,NX-1,-1,iz)+get_u(p,iv,NX,0,iz)));
+	    fill_geometry(NX,-1,iz,&geom); p2u(&get_u(p,0,NX,-1,iz),&get_u(u,0,NX,-1,iz),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,NX+1,-2,iz,.5*(get_u(p,iv,NX,-2,iz)+get_u(p,iv,NX+1,-1,iz)));
+	    fill_geometry(NX+1,-2,iz,&geom);  p2u(&get_u(p,0,NX+1,-2,iz),&get_u(u,0,NX+1,-2,iz),&geom);
+	  }
+	}
+
+       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1)
+	{
+	  for(iz=0;iz<NZ;iz++) {
+	    for(i=0;i<NG-1;i++)
+	      {
+		PLOOP(iv) {
+		  set_u(p,iv,NX+i+1,NY,iz,get_u(p,iv,NX+i+1,NY-1,iz));
+		  set_u(p,iv,NX,NY+i+1,iz,get_u(p,iv,NX-1,NY+i+1,iz));
+		}
+		fill_geometry(NX+i+1,NY,iz,&geom);		p2u(&get_u(p,0,NX+i+1,NY,iz),&get_u(u,0,NX+i+1,NY,iz),&geom);
+		fill_geometry(NX,NY+i+1,iz,&geom);		p2u(&get_u(p,0,NX,NY+i+1,iz),&get_u(u,0,NX,NY+i+1,iz),&geom);
+	      }
+
+	    PLOOP(iv)
+	      set_u(p,iv,NX,NY,iz,.5*(get_u(p,iv,NX-1,NY,iz)+get_u(p,iv,NX,NY-1,iz)));
+	    fill_geometry(NX,NY,iz,&geom);	    p2u(&get_u(p,0,NX,NY,iz),&get_u(u,0,NX,NY,iz),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,NX+1,NY+1,iz,.5*(get_u(p,iv,NX,NY+1,iz)+get_u(p,iv,NX+1,NY,iz)));
+	    fill_geometry(NX+1,NY+1,iz,&geom);	    p2u(&get_u(p,0,NX+1,NY+1,iz),&get_u(u,0,NX+1,NY+1,iz),&geom);
+	  }
+	}
+
+       //elongated corners along y, filling one cell deep surfaces, and averaging diagonally
+      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(ZBCLO)==1)
+	{
+	  for(iy=0;iy<NY;iy++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,-NG+i,iy,iz,get_u(p,iv,-NG+1,iy,0));
+		set_u(p,iv,-1,iy,-NG+i,get_u(p,iv,0,iy,-NG+1)); }
+	      fill_geometry(-NG+i,iy,-1,&geom);  p2u(&get_u(p,0,-NG+i,iy,-1),&get_u(u,0,-NG+i,iy,-1),&geom);
+	      fill_geometry(-1,iy,-NG+i,&geom);  p2u(&get_u(p,0,-1,iy,-NG+i),&get_u(u,0,-1,iy,-NG+i),&geom);
+	    }
+      
+	    PLOOP(iv)
+	      set_u(p,iv,-1,iy,-1,.5*(get_u(p,iv,-1,iy,0)+get_u(p,iv,0,iy,-1)));
+	    fill_geometry(-1,iy,-1,&geom);  p2u(&get_u(p,0,-1,iy,-1),&get_u(u,0,-1,iy,-1),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,-2,iy,-2,.5*(get_u(p,iv,-2,iy,-1)+get_u(p,iv,-1,iy,-2)));
+	    fill_geometry(-2,iy,-2,&geom);   p2u(&get_u(p,0,-2,iy,-2),&get_u(u,0,-2,iy,-2),&geom);
+	  }
+	}
+
+      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(ZBCHI)==1)
+	{
+	  for(iy=0;iy<NY;iy++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,-NG+i,iy,NZ,get_u(p,iv,-NG+1,iy,NZ-1));
+		set_u(p,iv,-1,iy,NZ+i+1,get_u(p,iv,0,iy,NZ+i+1)); }
+	      fill_geometry(-NG+i,iy,NZ,&geom);  p2u(&get_u(p,0,-NG+i,iy,NZ),&get_u(u,0,-NG+i,iy,NZ),&geom);
+	      fill_geometry(-1,iy,NZ+i+1,&geom);  p2u(&get_u(p,0,-1,iy,NZ+i+1),&get_u(u,0,-1,iy,NZ+i+1),&geom);
+	    }
+      
+	    PLOOP(iv)
+	      set_u(p,iv,-1,iy,NZ,.5*(get_u(p,iv,-1,iy,NZ-1)+get_u(p,iv,0,iy,NZ)));
+	    fill_geometry(-1,iy,NZ,&geom);  p2u(&get_u(p,0,-1,iy,NZ),&get_u(u,0,-1,iy,NZ),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,-2,iy,NZ+1,.5*(get_u(p,iv,-2,iy,NZ)+get_u(p,iv,-1,iy,NZ+1)));
+	    fill_geometry(-2,iy,NZ+1,&geom);   p2u(&get_u(p,0,-2,iy,NZ+1),&get_u(u,0,-2,iy,NZ+1),&geom);
+	  }
+	}
+
+      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(ZBCLO)==1)
+	{
+	  for(iy=0;iy<NY;iy++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,NX,iy,-NG+i,get_u(p,iv,NX-1,iy,-NG+1));
+		set_u(p,iv,NX+i+1,iy,-1,get_u(p,iv,NX+i+1,iy,0)); }
+
+	      fill_geometry(NX+i+1,iy,-1,&geom);    p2u(&get_u(p,0,NX+i+1,iy,-1),&get_u(u,0,NX+i+1,iy,-1),&geom);
+	      fill_geometry(NX,iy,-NG+i,&geom);    p2u(&get_u(p,0,NX,iy,-NG+i),&get_u(u,0,NX,iy,-NG+i),&geom);
+	    }
+
+	    PLOOP(iv)
+	      set_u(p,iv,NX,iy,-1,.5*(get_u(p,iv,NX-1,iy,-1)+get_u(p,iv,NX,iy,0)));
+	    fill_geometry(NX,iy,-1,&geom); p2u(&get_u(p,0,NX,iy,-1),&get_u(u,0,NX,iy,-1),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,NX+1,iy,-2,.5*(get_u(p,iv,NX,iy,-2)+get_u(p,iv,NX+1,iy,-1)));
+	    fill_geometry(NX+1,iy,-2,&geom);  p2u(&get_u(p,0,NX+1,iy,-2),&get_u(u,0,NX+1,iy,-2),&geom);
+	  }
+	}
+
+       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(ZBCHI)==1)
+	{
+	  for(iy=0;iy<NY;iy++) {
+	    for(i=0;i<NG-1;i++)
+	      {
+		PLOOP(iv) {
+		  set_u(p,iv,NX+i+1,iy,NZ,get_u(p,iv,NX+i+1,iy,NZ-1));
+		  set_u(p,iv,NX,iy,NZ+i+1,get_u(p,iv,NX-1,iy,NZ+i+1));
+		}
+		fill_geometry(NX+i+1,iy,NZ,&geom);		p2u(&get_u(p,0,NX+i+1,iy,NZ),&get_u(u,0,NX+i+1,iy,NZ),&geom);
+		fill_geometry(NX,iy,NZ+i+1,&geom);		p2u(&get_u(p,0,NX,iy,NZ+i+1),&get_u(u,0,NX,iy,NZ+i+1),&geom);
+	      }
+
+	    PLOOP(iv)
+	      set_u(p,iv,NX,iy,NZ,.5*(get_u(p,iv,NX-1,iy,NZ)+get_u(p,iv,NX,iy,NZ-1)));
+	    fill_geometry(NX,iy,NZ,&geom);	    p2u(&get_u(p,0,NX,iy,NZ),&get_u(u,0,NX,iy,NZ),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,NX+1,iy,NZ+1,.5*(get_u(p,iv,NX,iy,NZ+1)+get_u(p,iv,NX+1,iy,NZ)));
+	    fill_geometry(NX+1,iy,NZ+1,&geom);	    p2u(&get_u(p,0,NX+1,iy,NZ+1),&get_u(u,0,NX+1,iy,NZ+1),&geom);
+	  }
+	}
+
+       //elongated corners along x, filling one cell deep surfaces, and averaging diagonally
+      if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCLO)==1)
+	{
+	  for(ix=0;ix<NX;ix++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,ix,-NG+i,iz,get_u(p,iv,ix,-NG+1,0));
+		set_u(p,iv,ix,-1,-NG+i,get_u(p,iv,ix,0,-NG+1)); }
+	      fill_geometry(ix,-NG+i,-1,&geom);  p2u(&get_u(p,0,ix,-NG+i,-1),&get_u(u,0,ix,-NG+i,-1),&geom);
+	      fill_geometry(ix,-1,-NG+i,&geom);  p2u(&get_u(p,0,ix,-1,-NG+i),&get_u(u,0,ix,-1,-NG+i),&geom);
+	    }
+      
+	    PLOOP(iv)
+	      set_u(p,iv,ix,-1,-1,.5*(get_u(p,iv,ix,-1,0)+get_u(p,iv,ix,0,-1)));
+	    fill_geometry(ix,-1,-1,&geom);  p2u(&get_u(p,0,ix,-1,-1),&get_u(u,0,ix,-1,-1),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,ix,-2,-2,.5*(get_u(p,iv,ix,-2,-1)+get_u(p,iv,ix,-1,-2)));
+	    fill_geometry(ix,-2,-2,&geom);   p2u(&get_u(p,0,ix,-2,-2),&get_u(u,0,ix,-2,-2),&geom);
+	  }
+	}
+
+      if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCHI)==1)
+	{
+	  for(ix=0;ix<NX;ix++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,ix,-NG+i,NZ,get_u(p,iv,ix,-NG+1,NZ-1));
+		set_u(p,iv,ix,-1,NZ+i+1,get_u(p,iv,ix,0,NZ+i+1)); }
+	      fill_geometry(ix,-NG+i,NZ,&geom);  p2u(&get_u(p,0,ix,-NG+i,NZ),&get_u(u,0,ix,-NG+i,NZ),&geom);
+	      fill_geometry(ix,-1,NZ+i+1,&geom);  p2u(&get_u(p,0,ix,-1,NZ+i+1),&get_u(u,0,ix,-1,NZ+i+1),&geom);
+	    }
+      
+	    PLOOP(iv)
+	      set_u(p,iv,ix,-1,NZ,.5*(get_u(p,iv,ix,-1,NZ-1)+get_u(p,iv,ix,0,NZ)));
+	    fill_geometry(ix,-1,NZ,&geom);  p2u(&get_u(p,0,ix,-1,NZ),&get_u(u,0,ix,-1,NZ),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,ix,-2,NZ+1,.5*(get_u(p,iv,ix,-2,NZ)+get_u(p,iv,ix,-1,NZ+1)));
+	    fill_geometry(ix,-2,NZ+1,&geom);   p2u(&get_u(p,0,ix,-2,NZ+1),&get_u(u,0,ix,-2,NZ+1),&geom);
+	  }
+	}
+
+      if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCLO)==1)
+	{
+	  for(ix=0;ix<NX;ix++) {
+	    for(i=0;i<NG-1;i++) {
+	      PLOOP(iv) {
+		set_u(p,iv,ix,NY,-NG+i,get_u(p,iv,ix,NY-1,-NG+1));
+		set_u(p,iv,ix,NY+i+1,-1,get_u(p,iv,ix,NY+i+1,0)); }
+
+	      fill_geometry(ix,NY+i+1,-1,&geom);    p2u(&get_u(p,0,ix,NY+i+1,-1),&get_u(u,0,ix,NY+i+1,-1),&geom);
+	      fill_geometry(ix,NY,-NG+i,&geom);    p2u(&get_u(p,0,ix,NY,-NG+i),&get_u(u,0,ix,NY,-NG+i),&geom);
+	    }
+
+	    PLOOP(iv)
+	      set_u(p,iv,ix,NY,-1,.5*(get_u(p,iv,ix,NY-1,-1)+get_u(p,iv,ix,NY,0)));
+	    fill_geometry(ix,NY,-1,&geom); p2u(&get_u(p,0,ix,NY,-1),&get_u(u,0,ix,NY,-1),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,ix,NY+1,-2,.5*(get_u(p,iv,ix,NY,-2)+get_u(p,iv,ix,NY+1,-1)));
+	    fill_geometry(ix,NY+1,-2,&geom);  p2u(&get_u(p,0,ix,NY+1,-2),&get_u(u,0,ix,NY+1,-2),&geom);
+	  }
+	}
+
+       if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCHI)==1)
+	{
+	  for(ix=0;ix<NX;ix++) {
+	    for(i=0;i<NG-1;i++)
+	      {
+		PLOOP(iv) {
+		  set_u(p,iv,ix,NY+i+1,NZ,get_u(p,iv,ix,NY+i+1,NZ-1));
+		  set_u(p,iv,ix,NY,NZ+i+1,get_u(p,iv,ix,NY-1,NZ+i+1));
+		}
+		fill_geometry(ix,NY+i+1,NZ,&geom);		p2u(&get_u(p,0,ix,NY+i+1,NZ),&get_u(u,0,ix,NY+i+1,NZ),&geom);
+		fill_geometry(ix,NY,NZ+i+1,&geom);		p2u(&get_u(p,0,ix,NY,NZ+i+1),&get_u(u,0,ix,NY,NZ+i+1),&geom);
+	      }
+
+	    PLOOP(iv)
+	      set_u(p,iv,ix,NY,NZ,.5*(get_u(p,iv,ix,NY-1,NZ)+get_u(p,iv,ix,NY,NZ-1)));
+	    fill_geometry(ix,NY,NZ,&geom);	    p2u(&get_u(p,0,ix,NY,NZ),&get_u(u,0,ix,NY,NZ),&geom);
+
+	    PLOOP(iv)
+	      set_u(p,iv,ix,NY+1,NZ+1,.5*(get_u(p,iv,ix,NY,NZ+1)+get_u(p,iv,ix,NY+1,NY)));
+	    fill_geometry(ix,NY+1,NZ+1,&geom);	    p2u(&get_u(p,0,ix,NY+1,NZ+1),&get_u(u,0,ix,NY+1,NZ+1),&geom);
+	  }
+	}
+
+       //total corners
+       //TODO - so far very simplified!!!
+       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCLO)==1)
+	{
+	  for(ix=-NG;ix<0;ix++) 
+	    for(iy=-NG;iy<0;iy++) 
+	      for(iz=-NG;iz<0;iz++) 
+		{
+		  PLOOP(iv) 
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,0,0,0));
+		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+
+       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCLO)==1)
+	{
+	  for(ix=NX;ix<NX+NG;ix++) 
+	    for(iy=-NG;iy<0;iy++) 
+	      for(iz=-NG;iz<0;iz++) 
+		{
+		  PLOOP(iv) 
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,NX-1,0,0));
+		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+       
+       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCLO)==1)
+	{
+	  for(ix=-NG;ix<0;ix++) 
+	    for(iy=NY;iy<NY+NG;iy++) 
+	      for(iz=-NG;iz<0;iz++) 
+		{
+		  PLOOP(iv) 
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,0,NY-1,0));
+		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+
+       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCLO)==1)
+	{
+	  for(ix=NX;ix<NX+NG;ix++) 
+	    for(iy=NY;iy<NY+NG;iy++) 
+	      for(iz=-NG;iz<0;iz++) 
+		{
+		  PLOOP(iv) 
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,NX-1,NY-1,0));
+		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+
+       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCHI)==1)
+	{
+	  for(ix=-NG;ix<0;ix++) 
+	    for(iy=-NG;iy<0;iy++) 
+	      for(iz=NZ;iz<NZ+NG;iz++) 
+		{
+		  PLOOP(iv) 
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,0,0,0));
+		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+
+       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCHI)==1)
+	{
+	  for(ix=NX;ix<NX+NG;ix++) 
+	    for(iy=-NG;iy<0;iy++) 
+	      for(iz=NZ;iz<NZ+NG;iz++) 
+		{
+		  PLOOP(iv) 
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,NX-1,0,0));
+		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+       
+       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCHI)==1)
+	{
+	  for(ix=-NG;ix<0;ix++) 
+	    for(iy=NY;iy<NY+NG;iy++) 
+	      for(iz=NZ;iz<NZ+NG;iz++) 
+		{
+		  PLOOP(iv) 
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,0,NY-1,0));
+		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
+
+       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCHI)==1)
+	{
+	  for(ix=NX;ix<NX+NG;ix++) 
+	    for(iy=NY;iy<NY+NG;iy++) 
+	      for(iz=NZ;iz<NZ+NG;iz++) 
+		{
+		  PLOOP(iv) 
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,NX-1,NY-1,0));
+		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+		}
+	}
 
     }
 
- if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1 && NY>1)
-    {
-      for(i=0;i<NG-1;i++)
-	{
-	  PLOOP(iv)
-	  {
-	    set_u(p,iv,NX+i+1,NY,iz,get_u(p,iv,NX+i+1,NY-1,iz));
-	    set_u(p,iv,NX,NY+i+1,iz,get_u(p,iv,NX-1,NY+i+1,iz));
-	  }
-	  fill_geometry(NX+i+1,NY,iz,&geom);
-	  p2u(&get_u(p,0,NX+i+1,NY,iz),&get_u(u,0,NX+i+1,NY,iz),&geom);
-	  fill_geometry(NX,NY+i+1,iz,&geom);
-	  p2u(&get_u(p,0,NX,NY+i+1,iz),&get_u(u,0,NX,NY+i+1,iz),&geom);
-	}
 
-      PLOOP(iv)
-	set_u(p,iv,NX,NY,iz,.5*(get_u(p,iv,NX-1,NY,iz)+get_u(p,iv,NX,NY-1,iz)));
-      fill_geometry(NX,NY,iz,&geom);
-      p2u(&get_u(p,0,NX,NY,iz),&get_u(u,0,NX,NY,iz),&geom);
-
-      PLOOP(iv)
-	set_u(p,iv,NX+1,NY+1,iz,.5*(get_u(p,iv,NX,NY+1,iz)+get_u(p,iv,NX+1,NY,iz)));
-      fill_geometry(NX+1,NY+1,iz,&geom);
-      p2u(&get_u(p,0,NX+1,NY+1,iz),&get_u(u,0,NX+1,NY+1,iz),&geom);
-      
-    }
-
- //third dimension!!!
 
  ldouble uval[NV],pval[NV];
  iz=0;
