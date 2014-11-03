@@ -3031,14 +3031,14 @@ int set_bc(ldouble t,int ifinit)
 
   
   int xlim,ylim,zlim;
-  int lim,i,j;
+  int lim,i,j,k;
 
   if(TNZ==1 && TNY>1)
     {
       iz=0;
 
       //total corners, filling one cell deep surfaces
-      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1 && NY>1)
+      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
 	{
 
 	  for(i=0;i<NG-1;i++)
@@ -3071,7 +3071,7 @@ int set_bc(ldouble t,int ifinit)
 	}
   
 
-      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1 && NY>1)
+      if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
 	{
  
 	  for(i=0;i<NG-1;i++)
@@ -3099,7 +3099,7 @@ int set_bc(ldouble t,int ifinit)
       
 	}
 
-      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1 && NY>1)
+      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1)
 	{
 	  for(i=0;i<NG-1;i++)
 	    {
@@ -3127,7 +3127,7 @@ int set_bc(ldouble t,int ifinit)
 
 	}
 
-      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1 && NY>1)
+      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1)
 	{
 	  for(i=0;i<NG-1;i++)
 	    {
@@ -3958,6 +3958,324 @@ int set_bc(ldouble t,int ifinit)
 		 PLOOP(iv)	       {
 		   set_u(u,iv,ix,i,j,uval[iv]);
 		   set_u(p,iv,ix,i,j,pval[iv]);	      
+		 }
+	       }
+       }
+
+     //corners corners but withing the domain
+     //protruding only in x
+     if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+      if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     //protruding only in y
+     if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCLO)==0)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCHI)==0)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCLO)==0)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCHI)==0)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCLO)==0)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCHI)==0)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCLO)==0)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCHI)==0)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+
+     //protruding only in z
+     if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==1)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==1)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==1)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==1)
+       {
+	 for(i=-NG;i<0;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+      if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==1)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==1)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=-NG;j<0;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==1)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=-NG;k<0;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCLO);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		 }
+	       }
+       }
+     if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==1)
+       {
+	 for(i=NX;i<NX+NG;i++)
+	   for(j=NY;j<NY+NG;j++)
+	     for(k=NZ;k<NZ+NG;k++)
+	       {
+		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCHI);
+		 PLOOP(iv)     	 {
+		   set_u(u,iv,i,j,iz,uval[iv]);
+		   set_u(p,iv,i,j,iz,pval[iv]);	      
 		 }
 	       }
        }
