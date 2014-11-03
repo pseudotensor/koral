@@ -13,16 +13,17 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
+//#define MIMICDYNAMO
+//#define CALCHRONTHEGO
 #define THETAANGLE 0.25
 #define ALPHAFLIPSSIGN                                                        
-#define CALCHRONTHEGO
+
 #define ALPHADYNAMO 0.314
 #define DAMPBETA
 #define BETASATURATED 0.1
@@ -82,16 +83,18 @@
 /************************************/
 #define myMKS2COORDS
 #define MKS2R0 0.
-#define MKS2H0 0.45
+#define MKS2H0 0.8
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.65-MKS2R0))
-#define MAXX (log(1000.-MKS2R0))
+//#define MINX (log(1.65-MKS2R0))
+//#define MAXX (log(1000.-MKS2R0))
+#define MINX (log(4.-MKS2R0))
+#define MAXX (log(100.-MKS2R0))
 //total resolution
-#define TNX 264 //22*12
-#define TNY 240 //24*10
-#define TNZ 1
+#define TNX 128 
+#define TNY 128
+#define TNZ 16
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -103,9 +106,10 @@
 #define MINY (0.001)
 #define MAXY (1.-0.001)
 //#define MAXY (Pi/2.) //change in postinit.c
-#define MINZ -1.
-#define MAXZ 1.
+#define MINZ (-M_PI/4.)
+#define MAXZ (M_PI/4.)
 #define SPECIFIC_BC
+#define PERIODIC_ZBC
 
 /************************************/
 //output
@@ -124,7 +128,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e-1
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/

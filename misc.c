@@ -105,6 +105,9 @@ initialize_arrays()
   //primitives at cell centers
   p=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
+ //quantities to average in time
+  pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
+
   
   //conserved averages
   u=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
@@ -124,9 +127,7 @@ initialize_arrays()
 
   if(doingpostproc==0)
     {
-      //quantities to average in time
-      pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
-
+     
       //primitives at cell centers at initial state - used for fixed boundary conditions
       pinit=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
  

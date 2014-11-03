@@ -23,8 +23,6 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
-pick_T(emuup,ix,iy,iz,eup);
-pick_T(emulo,ix,iy,iz,elo);
 
 //working in BL
 ldouble ggBL[4][5],GGBL[4][5];

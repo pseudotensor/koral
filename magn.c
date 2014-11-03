@@ -250,6 +250,8 @@ flux_ct()
 #endif
     }
   
+  #pragma omp barrier
+
   //reset certain emfs at the boundaries to ensure stationarity
   adjust_fluxcttoth_emfs();
 
@@ -264,12 +266,13 @@ flux_ct()
       // F1
       ////////////////////////////////////
 #if(NX>1)
-      if(iy<NY && iz<NZ) //no need to fill x-face fluxes for iy=NY etc.
-	{
-	  set_ubx(flbx,B1,ix,iy,iz,0.);
-	  set_ubx(flbx,B2,ix,iy,iz,0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix,iy+1,iz)));
-	  set_ubx(flbx,B3,ix,iy,iz,-0.5 * (get_emf(2,ix,iy,iz) + get_emf(2,ix,iy,iz+1)));
-	}
+	if(iy<NY && iz<NZ) //no need to fill x-face fluxes for iy=NY etc., 
+	  {
+	    //	    if(iy==0 && iz==0) printf("%d > %d\n",PROCID,ix);
+	    set_ubx(flbx,B1,ix,iy,iz,0.);
+	    set_ubx(flbx,B2,ix,iy,iz,0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix,iy+1,iz)));
+	    set_ubx(flbx,B3,ix,iy,iz,-0.5 * (get_emf(2,ix,iy,iz) + get_emf(2,ix,iy,iz+1)));
+	  }
 #endif
 
       /////////////////////////////////////
@@ -278,16 +281,9 @@ flux_ct()
 #if(NY>1)
       if(ix<NX && iz<NZ)	
 	{
-
 	  set_uby(flby,B1,ix,iy,iz,-0.5 * (get_emf(3,ix,iy,iz) + get_emf(3,ix+1,iy,iz)));
 	  set_uby(flby,B2,ix,iy,iz,0.);
 	  set_uby(flby,B3,ix,iy,iz,0.5 * (get_emf(1,ix,iy,iz) + get_emf(1,ix,iy,iz+1)));
-
-	  /*
-	  if(ix>=NX && PROCID==7) printf("%d %d %d %e %e %e\n",ix,iy,iz,
-			    get_ub(flby,B1,ix,iy,iz,1),
-			    get_ub(flby,B2,ix,iy,iz,1),get_ub(flby,B3,ix,iy,iz,1));
-	  */
 	}
 #endif
       
@@ -415,6 +411,15 @@ calc_BfromA_core()
 
   int ix,iy,iz,iv,ii;
   
+  if(NY==1 && NZ==1)
+    {
+      my_err("1D calc_BfromA_core() not implemented.\n"); exit(-1);
+    }
+
+  if(NY>1 && NZ>1)
+    if(PROCID==0) printf("calc_BfromA_core(): warning: assumes d/dz A_i = 0. \n");
+
+
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain + one layer
     {
@@ -429,44 +434,27 @@ calc_BfromA_core()
       ldouble dA[4][4];
       dA[1][1]=dA[2][2]=dA[3][3]=0.;
 
-      if(NY==1 && NZ==1)
-	{
-	  my_err("1D calc_BfromA_core() not implemented.\n"); exit(-1);
-	}
+     
+      /* flux-ct-compatible, axisymmetric! */
 
-      if(NY>1 && NZ==1)
-	{
-	  /* flux-ct-compatible */
-
-	  dA[1][2] = -(get_u(pvecpot,B1,ix,iy,iz) - get_u(pvecpot,B1,ix,iy+1,iz)
+      dA[1][2] = -(get_u(pvecpot,B1,ix,iy,iz) - get_u(pvecpot,B1,ix,iy+1,iz)
 		   + get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
-          dA[1][1] = -(get_u(pvecpot,B1,ix,iy,iz) + get_u(pvecpot,B1,ix,iy+1,iz)
-		  - get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
-	  dA[1][3] = 0.;
+      dA[1][1] = -(get_u(pvecpot,B1,ix,iy,iz) + get_u(pvecpot,B1,ix,iy+1,iz)
+		   - get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+      dA[1][3] = 0.;
 
-	  dA[2][2] = -(get_u(pvecpot,B2,ix,iy,iz) - get_u(pvecpot,B2,ix,iy+1,iz)
+      dA[2][2] = -(get_u(pvecpot,B2,ix,iy,iz) - get_u(pvecpot,B2,ix,iy+1,iz)
 		   + get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
-          dA[2][1] = -(get_u(pvecpot,B2,ix,iy,iz) + get_u(pvecpot,B2,ix,iy+1,iz)
-		  - get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
-	  dA[2][3] = 0.;
+      dA[2][1] = -(get_u(pvecpot,B2,ix,iy,iz) + get_u(pvecpot,B2,ix,iy+1,iz)
+		   - get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+      dA[2][3] = 0.;
 
-	  dA[3][2] = -(get_u(pvecpot,B3,ix,iy,iz) - get_u(pvecpot,B3,ix,iy+1,iz)
+      dA[3][2] = -(get_u(pvecpot,B3,ix,iy,iz) - get_u(pvecpot,B3,ix,iy+1,iz)
 		   + get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
-          dA[3][1] = -(get_u(pvecpot,B3,ix,iy,iz) + get_u(pvecpot,B3,ix,iy+1,iz)
-		  - get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
-	  dA[3][3] = 0.;
+      dA[3][1] = -(get_u(pvecpot,B3,ix,iy,iz) + get_u(pvecpot,B3,ix,iy+1,iz)
+		   - get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+      dA[3][3] = 0.;
 
-	}
-
-      if(NZ>1 && NY==1)
-	{
-	  my_err("2D in (xz) calc_BfromA_core() not implemented.\n"); exit(-1);
-	}
-
-      if(NZ>1 && NY>1)
-	{
-	  my_err("3D in calc_BfromA_core() not implemented.\n"); exit(-1);
-	}
 
       B[1]=(dA[2][3] - dA[3][2])/geom.gdet;
       B[2]=(dA[3][1] - dA[1][3])/geom.gdet;

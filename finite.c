@@ -956,10 +956,15 @@ op_explicit(ldouble t, ldouble dtin)
   my_err("Magnetic fields do not work with multistep yet. On todo list\n");
 #endif
 
-  //TODO: barrier here!!!!
+  #pragma omp barrier
+  //TODO: flux_ct still screws up the boundaries under OMP
   flux_ct(); //constrained transport to preserve div.B=0
-#endif
 
+#endif
+  
+  
+#pragma omp barrier
+  
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -2042,13 +2047,24 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_4=(int **)malloc(sizeof(int*));
     //loop_4[0]=(int *)malloc(3*sizeof(int));
 
-    if(TNY>1) ylim=iy2; else ylim=iy1;
-    if(TNZ>1) zlim=iz2; else zlim=iz1;
-    for(ix=ix1;ix<=ix2;ix++)
+    xlim2=ix2;
+    if(TNY>1) ylim2=iy2; else ylim2=iy1;
+    if(TNZ>1) zlim2=iz2; else zlim2=iz1;
+
+
+    #ifdef OMP
+        
+    if(TI<NTX-1) xlim2=ix2-1; //not right-most
+    if(TJ<NTY-1) ylim2=iy2-1;
+    if(TK<NTZ-1) zlim2=iz2-1;   
+    
+    #endif
+
+    for(ix=ix1;ix<=xlim2;ix++)
       {
-	for(iy=iy1;iy<=ylim;iy++)
+	for(iy=iy1;iy<=ylim2;iy++)
 	  {
-	    for(iz=iz1;iz<=zlim;iz++)
+	    for(iz=iz1;iz<=zlim2;iz++)
 	      {	
 		loop_4[Nloop_4][0]=ix;
 		loop_4[Nloop_4][1]=iy;

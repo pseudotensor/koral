@@ -76,6 +76,49 @@ mpi_exchangedata()
   int nreqs=0;
   mpi_senddata(reqs,&nreqs);
   mpi_recvdata(reqs,&nreqs);
+
+  /****************************/
+  /*
+  // testing which messages are lost
+  int count,out1[MPIMSGBUFSIZE],out2[MPIMSGBUFSIZE],tags[MPIMSGBUFSIZE];
+  MPI_Status statuses[MPIMSGBUFSIZE];
+  for(int i=0;i<MPIMSGBUFSIZE;i++)
+    {
+      out1[i]=out2[i]=0;
+      tags[i]=-1;
+    }
+  for(;;)
+    { 
+      MPI_Barrier(MPI_COMM_WORLD);
+      getch();
+      MPI_Testsome(nreqs,reqs,&count,out1,statuses);
+      if(PROCID==7) 
+	{
+	  printf("\n");
+	  for(int i=0;i<count;i++)
+	    {
+	      out2[out1[i]]=1;
+	      tags[out1[i]]=statuses[i].MPI_TAG;
+	    }
+	  printf("%2d > %3d (%3d) > ",PROCID,count ,nreqs);
+	  for(int i=0;i<MPIMSGBUFSIZE;i++)
+	      printf("%d ",out2[i]);
+	  printf("\n");
+	  printf("tags of completed msgs: \n");
+	  for(int i=0;i<MPIMSGBUFSIZE;i++)
+	    {	    
+	      if(out2[i]==0 || 1) 
+		{
+		  printf("%d ",tags[i]);
+		}
+	    }
+	  fflush(stdout);
+	}     
+    }
+  // end of testing
+  */
+  /*****************************/
+
   MPI_Waitall(nreqs, reqs, MPI_STATUSES_IGNORE);
   mpi_savedata();  
 #endif
@@ -1135,7 +1178,7 @@ mpi_senddata(MPI_Request *reqs, int *nreqs)
       if(tx>=NTX) tx-=NTX;
       #endif
       #ifdef PERIODIC_ZBC
-      if(tz<0) ty+=NTZ;
+      if(tz<0) tz+=NTZ;
       #endif
 
       for(i=NX-NG;i<NX;i++)
@@ -1237,7 +1280,7 @@ mpi_senddata(MPI_Request *reqs, int *nreqs)
       if(ty>=NTY) ty-=NTY;
       #endif
       #ifdef PERIODIC_ZBC
-      if(tz<0) ty+=NTZ;
+      if(tz<0) tz+=NTZ;
       #endif
 
       for(i=0;i<NX;i++)
@@ -1488,6 +1531,7 @@ mpi_senddata(MPI_Request *reqs, int *nreqs)
       *nreqs=*nreqs+1;
     }  
 #endif
+
 
 
   return 0;

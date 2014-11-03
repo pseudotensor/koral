@@ -1728,6 +1728,13 @@ fill_geometry(int ix,int iy,int iz,void *geom)
 int 
 fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
 {
+  if(doingpostproc) //not precalculated
+    {
+      fill_geometry_face_arb(ix,iy,iz,idim,geom,MYCOORDS);
+      return 0;
+    }
+    
+
   struct geometry *ggg 
     = (struct geometry *) geom;
 

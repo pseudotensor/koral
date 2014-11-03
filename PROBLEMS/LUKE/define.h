@@ -7,15 +7,17 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 32
-#define TNY 32
-#define TNZ 32
+#define TNX 33
+#define TNY 33
+#define TNZ 33
 
-#define NTX 2
-#define NTY 2
-#define NTZ 2
+#define NTX 3
+#define NTY 3
+#define NTZ 3
 
 #define MPI4CORNERS
+#define MAGNFIELD
+#define VECPOTGIVEN
 
 #define INT_ORDER 1
 #define TSTEPLIM .5
@@ -28,9 +30,10 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 
-#define DTOUT1 1.
+#define DTOUT1 1.e-10
 
 #define RHO_AMB 1.e-3
 #define U_AMB 1.e-7
+#define VELWIND 0.
 
 #define SILOOUTPUT 1

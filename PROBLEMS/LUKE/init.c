@@ -7,13 +7,21 @@ fill_geometry(ix,iy,iz,&geom);
 
 /***********************************************/
 //background
-pp[RHO]=RHO_AMB + 100.*RHO_AMB*exp(-(geom.xx*geom.xx+geom.yy*geom.yy+geom.zz*geom.zz)/0.02);
+//pp[RHO]=RHO_AMB + 100.*RHO_AMB*exp(-(geom.xx*geom.xx+geom.yy*geom.yy+geom.zz*geom.zz)/0.02);
+pp[RHO]=RHO_AMB + 100.*RHO_AMB*exp(-(geom.xx*geom.xx+geom.yy*geom.yy)/0.02);
 pp[UU]=U_AMB*RHO_AMB/pp[RHO];
 pp[VX]=0.;
 pp[VY]=0.;
 pp[VZ]=0.;
 
-if(pp[RHO]>1.1*RHO_AMB) pp[VZ]=0.1;
+if(pp[RHO]>1.1*RHO_AMB) pp[VZ]=VELWIND;
+//if(pp[RHO]>1.1*RHO_AMB) pp[VX]=VELWIND;
+
+#ifdef MAGNFIELD
+pp[B1]=pp[B2]=pp[B3]=0.;
+
+pp[B3]=0.1*sin(geom.xx*M_PI)*pp[RHO];
+#endif
 
 
 /***********************************************/
