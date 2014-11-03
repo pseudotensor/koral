@@ -185,6 +185,7 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
 
   //corners
 #ifdef MPI4CORNERS
+  //elongated along z
   //upper x upper y
   if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0)
     {
@@ -197,7 +198,7 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
       #ifdef PERIODIC_YBC
       if(ty>=NTY) ty-=NTY;
       #endif
-      MPI_Irecv(msgbufs[16], NG*NG*NZ*NV, MPI_DOUBLE,
+      MPI_Irecv(msgbufs[32], NG*NG*NZ*NV, MPI_DOUBLE,
 		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
    }
@@ -213,7 +214,7 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
       #ifdef PERIODIC_YBC
       if(ty<0) ty+=NTY;
       #endif
-      MPI_Irecv(msgbufs[17], NG*NG*NZ*NV, MPI_DOUBLE,
+      MPI_Irecv(msgbufs[33], NG*NG*NZ*NV, MPI_DOUBLE,
 		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
    }
@@ -229,7 +230,7 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
       #ifdef PERIODIC_YBC
       if(ty>=NTY) ty-=NTY;
       #endif
-      MPI_Irecv(msgbufs[18], NG*NG*NZ*NV, MPI_DOUBLE,
+      MPI_Irecv(msgbufs[34], NG*NG*NZ*NV, MPI_DOUBLE,
 		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
    }
@@ -245,10 +246,294 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
       #ifdef PERIODIC_YBC
       if(ty<0) ty+=NTY;
       #endif
-      MPI_Irecv(msgbufs[19], NG*NG*NZ*NV, MPI_DOUBLE,
+      MPI_Irecv(msgbufs[35], NG*NG*NZ*NV, MPI_DOUBLE,
 		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
    }
+   //elongated along y
+  //upper x upper z
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI+1;
+      ty=TJ;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[36], NG*NY*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOZLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+  //upper x lower z
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI+1;
+      ty=TJ;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[37], NG*NY*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+  //lower x upper z
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI-1;
+      ty=TJ;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[38], NG*NY*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIZLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+  //lower x lower z
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI-1;
+      ty=TJ;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[39], NG*NY*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+   //elongated along x
+  //upper y upper z
+  if(mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI;
+      ty=TJ+1;
+      tz=TK+1;
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[40], NX*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_YLOZLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+  //upper y lower z
+  if(mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI;
+      ty=TJ+1;
+      tz=TK-1;
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[41], NX*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_YLOZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+  //lower y upper z
+  if(mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI;
+      ty=TJ-1;
+      tz=TK+1;
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[42], NX*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_YHIZLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+  //lower x lower z
+  if(mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI;
+      ty=TJ-1;
+      tz=TK-1;
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[43], NX*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_YHIZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
+  /********** corners corners ************/
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI+1;
+      ty=TJ+1;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[44], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYLOZLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI+1;
+      ty=TJ+1;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[45], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYLOZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
+ if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI+1;
+      ty=TJ-1;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[46], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYHIZLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
+ if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI+1;
+      ty=TJ-1;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[47], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYHIZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI-1;
+      ty=TJ+1;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[48], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYLOZLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI-1;
+      ty=TJ+1;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[49], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIOYLOZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
+ if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI-1;
+      ty=TJ-1;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[50], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYHIZLO, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
+ if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI-1;
+      ty=TJ-1;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+      MPI_Irecv(msgbufs[51], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYHIZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+   }
+
 #endif  
 
   return 0;
@@ -502,19 +787,9 @@ mpi_senddata(MPI_Request *reqs, int *nreqs)
     }
 
 #ifdef MPI4CORNERS
-  if(TNX>1 && TNY>1 && TNZ>1)
-    {
-      printf("message passing of corners for flux_ct not implemented for 3D yet. sorry.\n");
-      exit(-1);
-    }
 
-  if(TNZ>1)
-    {
-      printf("message passing of corners for flux_ct not implemented for TNZ>1 yet. sorry.\n");
-      exit(-1);
-    }
-
-  //corners
+  /***************************/
+  //elongated corners - along z
   //lower x lower y
   if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0)
     {
@@ -611,7 +886,422 @@ mpi_senddata(MPI_Request *reqs, int *nreqs)
 		msgbufs[15][(i-NX+NG)*NG*NZ*NV + (j-NY+NG)*NZ*NV + k*NV + iv]=get_u(p,iv,i,j,k);
 	    }
       MPI_Isend(msgbufs[15], NG*NG*NZ*NV, MPI_DOUBLE,
-		mpi_tile2procid(TI+1,TJ+1,TK), MPI_MSG_XHIYHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+
+  /***************************/
+  //elongated corners - along y
+  //lower x lower z
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI-1;
+      ty=TJ;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+
+      for(i=0;i<NG;i++)
+	for(j=0;j<NY;j++)
+	  for(k=0;k<NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[16][i*NY*NG*NV + j*NG*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[16], NG*NY*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+
+  //lower x higher z
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI-1;
+      ty=TJ;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+
+      for(i=0;i<NG;i++)
+	for(j=0;j<NY;j++)
+	  for(k=NZ-NG;k<NZ;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[17][i*NY*NG*NV + j*NG*NV + (k-NZ+NG)*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[17], NG*NY*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }
+  
+  //higher x lower z
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI+1;
+      ty=TJ;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) ty+=NTZ;
+      #endif
+
+      for(i=NX-NG;i<NX;i++)
+	for(j=0;j<NY;j++)
+	  for(k=0;k<NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[18][(i-NX+NG)*NY*NG*NV + j*NG*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[18], NG*NY*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+
+  //higher x higher z
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI+1;
+      ty=TJ;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+
+      for(i=NX-NG;i<NX;i++)
+	for(j=0;j<NY;j++)
+	  for(k=NZ-NG;k<NZ;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[19][(i-NX+NG)*NY*NG*NV + j*NG*NV + (k-NZ+NG)*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[19], NG*NY*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+
+   /***************************/
+  //elongated corners - along x
+  //lower y lower z
+  if(mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI;
+      ty=TJ-1;
+      tz=TK-1;
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+
+      for(i=0;i<NX;i++)
+	for(j=0;j<NG;j++)
+	  for(k=0;k<NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[20][i*NG*NG*NV + j*NG*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[20], NX*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_YLOZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+
+  //lower y higher z
+  if(mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI;
+      ty=TJ-1;
+      tz=TK+1;
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+
+      for(i=0;i<NX;i++)
+	for(j=0;j<NG;j++)
+	  for(k=NZ-NG;k<NZ;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[21][i*NG*NG*NV + j*NG*NV + (k-NZ+NG)*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[21], NX*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_YLOZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }
+  
+  //higher y lower z
+  if(mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI;
+      ty=TJ+1;
+      tz=TK-1;
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) ty+=NTZ;
+      #endif
+
+      for(i=0;i<NX;i++)
+	for(j=NY-NG;j<NY;j++)
+	  for(k=0;k<NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[22][i*NG*NG*NV + (j-NY+NG)*NG*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[22], NX*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_YHIZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+
+  //higher y higher z
+  if(mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI;
+      ty=TJ+1;
+      tz=TK+1;
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+
+      for(i=0;i<NX;i++)
+	for(j=NY-NG;j<NY;j++)
+	  for(k=NZ-NG;k<NZ;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[23][i*NG*NG*NV + (j-NY+NG)*NG*NV + (k-NZ+NG)*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[23], NX*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_YHIZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+
+  /***************************/
+  //corners corners 
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI-1;
+      ty=TJ-1;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+
+      for(i=0;i<NG;i++)
+	for(j=0;j<NG;j++)
+	  for(k=0;k<NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[24][i*NG*NG*NV + j*NG*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[24], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYLOZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI-1;
+      ty=TJ-1;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+
+      for(i=0;i<NG;i++)
+	for(j=0;j<NG;j++)
+	  for(k=NZ-NG;k<NZ;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[25][i*NG*NG*NV + j*NG*NV + (k-NZ+NG)*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[25], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYLOZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+ if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI-1;
+      ty=TJ+1;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+
+      for(i=0;i<NG;i++)
+	for(j=NY-NG;j<NY;j++)
+	  for(k=0;k<NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[26][i*NG*NG*NV + (j-NY+NG)*NG*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[26], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYHIZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+ if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI-1;
+      ty=TJ+1;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx<0) tx+=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+
+      for(i=0;i<NG;i++)
+	for(j=NY-NG;j<NY;j++)
+	  for(k=NZ-NG;k<NZ;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[27][i*NG*NG*NV + (j-NY+NG)*NG*NV + (k-NZ+NG)*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[27], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XLOYHIZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI+1;
+      ty=TJ-1;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+
+      for(i=NX-NG;i<NX;i++)
+	for(j=0;j<NG;j++)
+	  for(k=0;k<NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[28][(i-NX+NG)*NG*NG*NV + j*NG*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[28], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYLOZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI+1;
+      ty=TJ-1;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty<0) ty+=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+
+      for(i=NX-NG;i<NX;i++)
+	for(j=0;j<NG;j++)
+	  for(k=NZ-NG;k<NZ;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[29][(i-NX+NG)*NG*NG*NV + j*NG*NV + (k-NZ+NG)*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[29], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYLOZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+ if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      tx=TI+1;
+      ty=TJ+1;
+      tz=TK-1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz<0) tz+=NTZ;
+      #endif
+
+      for(i=NX-NG;i<NX;i++)
+	for(j=NY-NG;j<NY;j++)
+	  for(k=0;k<NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[30][(i-NX+NG)*NG*NG*NV + (j-NY+NG)*NG*NV + k*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[30], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYHIZLO, MPI_COMM_WORLD,&reqs[*nreqs]);
+      *nreqs=*nreqs+1;
+    }  
+ if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      tx=TI+1;
+      ty=TJ+1;
+      tz=TK+1;
+      #ifdef PERIODIC_XBC
+      if(tx>=NTX) tx-=NTX;
+      #endif
+      #ifdef PERIODIC_YBC
+      if(ty>=NTY) ty-=NTY;
+      #endif
+      #ifdef PERIODIC_ZBC
+      if(tz>=NTZ) tz-=NTZ;
+      #endif
+
+      for(i=NX-NG;i<NX;i++)
+	for(j=NY-NG;j<NY;j++)
+	  for(k=NZ-NG;k<NZ;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		msgbufs[31][(i-NX+NG)*NG*NG*NV + (j-NY+NG)*NG*NV + (k-NZ+NG)*NV + iv]=get_u(p,iv,i,j,k);
+	    }
+      MPI_Isend(msgbufs[31], NG*NG*NG*NV, MPI_DOUBLE,
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYHIZHI, MPI_COMM_WORLD,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
     }  
 #endif
