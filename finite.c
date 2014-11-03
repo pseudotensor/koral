@@ -3161,7 +3161,7 @@ int set_bc(ldouble t,int ifinit)
       //elongated corners along z, filling one cell deep surfaces, and averaging diagonally
       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
 	{
-	  for(iz=0;iz<NZ;iz++) {
+	  for(iz=-NG;iz<NZ+NG;iz++) { //in the total total corners it fills crap but overwritten below!
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+1,0,iz));
@@ -3184,7 +3184,7 @@ int set_bc(ldouble t,int ifinit)
 
       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
 	{
-	  for(iz=0;iz<NZ;iz++) {
+	  for(iz=-NG;iz<NZ+NG;iz++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+1,NY-1,iz));
@@ -3205,7 +3205,7 @@ int set_bc(ldouble t,int ifinit)
 
       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1)
 	{
-	  for(iz=0;iz<NZ;iz++) {
+	  for(iz=-NG;iz<NZ+NG;iz++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+1,iz));
@@ -3227,7 +3227,7 @@ int set_bc(ldouble t,int ifinit)
 
        if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1)
 	{
-	  for(iz=0;iz<NZ;iz++) {
+	  for(iz=-NG;iz<NZ+NG;iz++) {
 	    for(i=0;i<NG-1;i++)
 	      {
 		PLOOP(iv) {
@@ -3251,7 +3251,7 @@ int set_bc(ldouble t,int ifinit)
        //elongated corners along y, filling one cell deep surfaces, and averaging diagonally
       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(ZBCLO)==1)
 	{
-	  for(iy=0;iy<NY;iy++) {
+	  for(iy=-NG;iy<NY+NG;iy++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,-NG+i,iy,iz,get_u(p,iv,-NG+1,iy,0));
@@ -3272,7 +3272,7 @@ int set_bc(ldouble t,int ifinit)
 
       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(ZBCHI)==1)
 	{
-	  for(iy=0;iy<NY;iy++) {
+	  for(iy=-NG;iy<NY+NG;iy++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,-NG+i,iy,NZ,get_u(p,iv,-NG+1,iy,NZ-1));
@@ -3293,7 +3293,7 @@ int set_bc(ldouble t,int ifinit)
 
       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(ZBCLO)==1)
 	{
-	  for(iy=0;iy<NY;iy++) {
+	  for(iy=-NG;iy<NY+NG;iy++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,NX,iy,-NG+i,get_u(p,iv,NX-1,iy,-NG+1));
@@ -3315,7 +3315,7 @@ int set_bc(ldouble t,int ifinit)
 
        if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(ZBCHI)==1)
 	{
-	  for(iy=0;iy<NY;iy++) {
+	  for(iy=-NG;iy<NY+NG;iy++) {
 	    for(i=0;i<NG-1;i++)
 	      {
 		PLOOP(iv) {
@@ -3339,7 +3339,7 @@ int set_bc(ldouble t,int ifinit)
        //elongated corners along x, filling one cell deep surfaces, and averaging diagonally
       if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCLO)==1)
 	{
-	  for(ix=0;ix<NX;ix++) {
+	  for(ix=-NG;ix<NX+NG;ix++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,ix,-NG+i,iz,get_u(p,iv,ix,-NG+1,0));
@@ -3360,7 +3360,7 @@ int set_bc(ldouble t,int ifinit)
 
       if(mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCHI)==1)
 	{
-	  for(ix=0;ix<NX;ix++) {
+	  for(ix=-NG;ix<NX+NG;ix++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,ix,-NG+i,NZ,get_u(p,iv,ix,-NG+1,NZ-1));
@@ -3381,7 +3381,7 @@ int set_bc(ldouble t,int ifinit)
 
       if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCLO)==1)
 	{
-	  for(ix=0;ix<NX;ix++) {
+	  for(ix=-NG;ix<NX+NG;ix++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
 		set_u(p,iv,ix,NY,-NG+i,get_u(p,iv,ix,NY-1,-NG+1));
@@ -3403,7 +3403,7 @@ int set_bc(ldouble t,int ifinit)
 
        if(mpi_isitBC(YBCHI)==1 && mpi_isitBC(ZBCHI)==1)
 	{
-	  for(ix=0;ix<NX;ix++) {
+	  for(ix=-NG;ix<NX+NG;ix++) {
 	    for(i=0;i<NG-1;i++)
 	      {
 		PLOOP(iv) {
@@ -3424,7 +3424,7 @@ int set_bc(ldouble t,int ifinit)
 	  }
 	}
 
-       //total corners
+       //total total corners
        //TODO - so far very simplified!!!
        if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1 && mpi_isitBC(ZBCLO)==1)
 	{
