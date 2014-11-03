@@ -492,7 +492,7 @@ mpi_recvdata(MPI_Request *reqs, int *nreqs)
       if(tz<0) tz+=NTZ;
       #endif
       MPI_Irecv(msgbufs[49], NG*NG*NG*NV, MPI_DOUBLE,
-		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIOYLOZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
+		mpi_tile2procid(tx,ty,tz), MPI_MSG_XHIYLOZHI, MPI_COMM_WORLD ,&reqs[*nreqs]);
       *nreqs=*nreqs+1;
    }
 
@@ -609,6 +609,7 @@ mpi_savedata()
 
   //corners
 #ifdef MPI4CORNERS
+  //elongated along z
   //upper x upper y
   if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0)
     {
@@ -617,7 +618,7 @@ mpi_savedata()
 	  for(k=0;k<NZ;k++)
 	    {
 	      for(iv=0;iv<NV;iv++)
-		set_u(p,iv,i,j,k,msgbufs[16][(i-NX)*NG*NZ*NV + (j-NY)*NZ*NV + k*NV + iv]);
+		set_u(p,iv,i,j,k,msgbufs[32][(i-NX)*NG*NZ*NV + (j-NY)*NZ*NV + k*NV + iv]);
 	    }
     }
   //upper x lower y
@@ -628,7 +629,7 @@ mpi_savedata()
 	  for(k=0;k<NZ;k++)
 	    {
 	      for(iv=0;iv<NV;iv++)
-		set_u(p,iv,i,j,k,msgbufs[17][(i-NX)*NG*NZ*NV + (j+NG)*NZ*NV + k*NV + iv]);
+		set_u(p,iv,i,j,k,msgbufs[33][(i-NX)*NG*NZ*NV + (j+NG)*NZ*NV + k*NV + iv]);
 	    }
     }
   //lower x upper y
@@ -639,7 +640,7 @@ mpi_savedata()
 	  for(k=0;k<NZ;k++)
 	    {
 	      for(iv=0;iv<NV;iv++)
-		set_u(p,iv,i,j,k,msgbufs[18][(i+NG)*NG*NZ*NV + (j-NY)*NZ*NV + k*NV + iv]);
+		set_u(p,iv,i,j,k,msgbufs[34][(i+NG)*NG*NZ*NV + (j-NY)*NZ*NV + k*NV + iv]);
 	    }
     }
   //lower x lower y
@@ -650,9 +651,191 @@ mpi_savedata()
 	  for(k=0;k<NZ;k++)
 	    {
 	      for(iv=0;iv<NV;iv++)
-		set_u(p,iv,i,j,k,msgbufs[19][(i+NG)*NG*NZ*NV + (j+NG)*NZ*NV + k*NV + iv]);
+		set_u(p,iv,i,j,k,msgbufs[35][(i+NG)*NG*NZ*NV + (j+NG)*NZ*NV + k*NV + iv]);
 	    }
     }
+  //elongated along y
+  //upper x upper z
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=0;j<NY;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[36][(i-NX)*NY*NG*NV + j*NG*NV + (k-NZ)*NV + iv]);
+	    }
+    }
+  //upper x lower z
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=0;j<NY;j++)
+	  for(k=-NG;k<0;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[37][(i-NX)*NY*NG*NV + j*NG*NV + (k+NG)*NV + iv]);
+	    }
+    }
+  //lower x upper z
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=0;j<NY;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[38][(i+NG)*NY*NG*NV + j*NG*NV + (k-NZ)*NV + iv]);
+	    }
+    }
+  //lower x lower z
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=0;j<NY;j++)
+	  for(k=-NG;k<0;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[39][(i+NG)*NY*NG*NV + j*NG*NV + (k+NG)*NV + iv]);
+	    }
+    }
+  //elongated along x
+  //upper y upper z
+  if(mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      for(i=0;i<NX;i++)
+	for(j=NY;j<NY+NG;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[40][i*NG*NG*NV + (j-NY)*NG*NV + (k-NZ)*NV + iv]);
+	    }
+    }
+  //upper y lower z
+  if(mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      for(i=0;i<NX;i++)
+	for(j=NY;j<NY+NG;j++)
+	  for(k=-NG;k<0;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[41][i*NG*NG*NV + (j-NY)*NG*NV + (k+NG)*NV + iv]);
+	    }
+    }
+  //lower y upper z
+  if(mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      for(i=0;i<NX;i++)
+	for(j=-NG;j<0;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[42][i*NG*NG*NV + (j+NG)*NG*NV + (k-NZ)*NV + iv]);
+	    }
+    }
+  //lower y lower z
+  if(mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      for(i=0;i<NX;i++)
+	for(j=-NG;j<0;j++)
+	  for(k=-NG;k<0;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[43][i*NG*NG*NV + (j+NG)*NG*NV + (k+NG)*NV + iv]);
+	    }
+    }
+  //corners corners
+
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=NY;j<NY+NG;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[44][(i-NX)*NG*NG*NV + (j-NY)*NG*NV + (k-NZ)*NV + iv]);
+	    }
+    }
+
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=NY;j<NY+NG;j++)
+	  for(k=-NG;k<0;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[45][(i-NX)*NG*NG*NV + (j-NY)*NG*NV + (k+NG)*NV + iv]);
+	    }
+    }
+
+
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=-NG;j<0;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[46][(i-NX)*NG*NG*NV + (j+NG)*NG*NV + (k-NZ)*NV + iv]);
+	    }
+    }
+
+  if(mpi_isitBC(XBCHI)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      for(i=NX;i<NX+NG;i++)
+	for(j=-NG;j<0;j++)
+	  for(k=-NG;k<0;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[47][(i-NX)*NG*NG*NV + (j+NG)*NG*NV + (k+NG)*NV + iv]);
+	    }
+    }
+
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=NY;j<NY+NG;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[48][(i+NG)*NG*NG*NV + (j-NY)*NG*NV + (k-NZ)*NV + iv]);
+	    }
+    }
+
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCHI)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=NY;j<NY+NG;j++)
+	  for(k=-NG;k<0;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[49][(i+NG)*NG*NG*NV + (j-NY)*NG*NV + (k+NG)*NV + iv]);
+	    }
+    }
+
+
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCHI)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=-NG;j<0;j++)
+	  for(k=NZ;k<NZ+NG;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[50][(i+NG)*NG*NG*NV + (j+NG)*NG*NV + (k-NZ)*NV + iv]);
+	    }
+    }
+
+  if(mpi_isitBC(XBCLO)==0 && mpi_isitBC(YBCLO)==0 && mpi_isitBC(ZBCLO)==0)
+    {
+      for(i=-NG;i<0;i++)
+	for(j=-NG;j<0;j++)
+	  for(k=-NG;k<0;k++)
+	    {
+	      for(iv=0;iv<NV;iv++)
+		set_u(p,iv,i,j,k,msgbufs[51][(i+NG)*NG*NG*NV + (j+NG)*NG*NV + (k+NG)*NV + iv]);
+	    }
+    }
+
 
 #endif
 
