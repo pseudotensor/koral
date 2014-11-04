@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 1000
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -84,7 +84,7 @@
 #define myMKS2COORDS
 #define MKS2R0 0.
 #define MKS2H0 0.8
-
+#define METRICAXISYMMETRIC
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
 //#define MINX (log(1.65-MKS2R0))
@@ -92,9 +92,9 @@
 #define MINX (log(4.-MKS2R0))
 #define MAXX (log(100.-MKS2R0))
 //total resolution
-#define TNX 128 
-#define TNY 128
-#define TNZ 16
+#define TNX 32
+#define TNY 32
+#define TNZ 1
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -108,8 +108,10 @@
 //#define MAXY (Pi/2.) //change in postinit.c
 #define MINZ (-M_PI/4.)
 #define MAXZ (M_PI/4.)
-#define SPECIFIC_BC
+//#define SPECIFIC_BC
 #define PERIODIC_ZBC
+#define PERIODIC_XBC
+#define PERIODIC_YBC
 
 /************************************/
 //output
@@ -128,7 +130,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 .1
 #define DTOUT2 1000.
 
 /************************************/

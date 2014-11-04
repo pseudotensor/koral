@@ -1742,9 +1742,6 @@ omp_myinit()
 {
 #ifdef OMP
 
-#ifdef MAGNFIELD
-  printf("MAGNFIELD do not work with OMP temporarily due to divB at borders issues. Try MPI.\n"); exit(-1);
-#endif
   #ifdef MPI
   printf("MPI does not work with OMP.\n"); exit(-1);
   #endif

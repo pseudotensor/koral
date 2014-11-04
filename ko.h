@@ -518,6 +518,7 @@ int fill_geometry_face(int ix,int iy,int iz,int,void *geom);
 int fill_geometry_face_arb(int ix,int iy,int iz,int,void *geom,int);
 int fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS);
 int calc_metric();
+int test_metric();
 int calc_tetrades(ldouble g[][5], ldouble tmuup[][4], ldouble tmulo[][4],int);
 int calc_ZAMOes(ldouble g[][5], ldouble emuup[][4], ldouble emulo[][4],int);
 int dxdx_KS2BL(ldouble *xx, ldouble dxdx[][4]);

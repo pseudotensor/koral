@@ -6,6 +6,9 @@
 int 
 main(int argc, char **argv)
 {  
+  doingavg=0;
+  doingpostproc=1;
+
   #ifdef MPI
   printf("ana works on shared memory only, do not use MPI, please\n");
   exit(-1);
@@ -33,10 +36,8 @@ main(int argc, char **argv)
   sprintf(folder,"%s","dumps");
 
   int i;
-  doingavg=0;
-  doingpostproc=1;
-
-  //currently gsl is not used
+  
+  //no gsl error messages
   gsl_set_error_handler_off();
   
   //random number gen. initialization

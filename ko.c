@@ -70,6 +70,9 @@ main(int argc, char **argv)
 
   //precalculates metric etc.
   calc_metric();
+  
+  //tests
+  test_metric();
 
 
 #ifdef RADIATION

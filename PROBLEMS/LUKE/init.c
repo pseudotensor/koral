@@ -15,8 +15,7 @@ pp[VY]=0.;
 pp[VZ]=0.;
 
 if(pp[RHO]>1.1*RHO_AMB) pp[VZ]=VELWIND;
-if(pp[RHO]>1.1*RHO_AMB) pp[VY]=0.2213*VELWIND;
-if(pp[RHO]>1.1*RHO_AMB) pp[VX]=0.5*VELWIND;
+if(pp[RHO]>1.1*RHO_AMB) pp[VX]=VELWIND;
 
 #ifdef MAGNFIELD
 pp[B1]=pp[B2]=pp[B3]=0.;
