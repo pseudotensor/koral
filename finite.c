@@ -459,13 +459,25 @@ calc_u2p()
   //**********************************************************************
   //**********************************************************************
 
+
+
+  return 0;
+}
+
+/***************************************************/
+/* calcultes wavespeeds on domain plus ghost cells */
+/***************************************************/
+
+int 
+calc_wavespeeds()
+{
 //calculates and saves wavespeeds
 
 //local - not used anymore
   ldouble max_lws[3];
   max_lws[0]=max_lws[1]=max_lws[2]=-1.;
 
-  int ix,iy,iz;
+  int ix,iy,iz,ii;
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -480,11 +492,8 @@ calc_u2p()
 
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
 
-      //printf("%d %d %d\n",ix,iy,iz); print_Nvector(aaa,6); getch();
-
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
-
   return 0;
 }
 
@@ -558,47 +567,19 @@ op_explicit(ldouble t, ldouble dtin)
   
   //projects primitives onto ghost cells at the boundaries of the total domain
   //or calculates conserved from exchanged primitives
-  //set_bc(t,0);
+  set_bc(t,0);
 
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
 
-#if(RADCLOSURE==VETCLOSURE)
-  //update_intensities();
-#endif
-
+  //calculates wavespeeds
+  calc_wavespeeds();
 
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
-	
-  int superverbose=0;
 
-  ldouble pp[NV];
-  /*
-  //calculates and saves wavespeeds
-  for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
-    {
-      ix=loop_1[ii][0];
-      iy=loop_1[ii][1];
-      iz=loop_1[ii][2]; 
-      ldouble aaa[12];
-
-      #ifdef MSTEP
-      if(mstep_is_cell_active(ix,iy,iz)==0) 
-	continue;
-      #endif
-
-      calc_wavespeeds_lr(ix,iy,iz,aaa);	
-
-      //printf("%d %d %d\n",ix,iy,iz); print_Nvector(aaa,6); getch();
-
-      save_wavespeeds(ix,iy,iz,aaa,max_lws);
-    }
-  */
-
-  //#pragma omp barrier
 
   //**********************************************************************
   //**********************************************************************
@@ -946,6 +927,29 @@ op_explicit(ldouble t, ldouble dtin)
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
 
+  //test 889
+  /*
+  if(PROCID==3) printf("%d > %d %d %d\n",PROCID,TOI,TOJ,TOK);
+  if(PROCID==4) printf("%d > %d %d %d\n",PROCID,TOI,TOJ,TOK);
+
+  if(PROCID==4)
+    {
+      printf("%d 1> %e %e %e\n",PROCID,get_u(p,B1,-1,0,0),get_u(p,B1,0,0,0),get_u(p,B1,1,0,0));
+      printf("%d 3> %e %e %e\n",PROCID,get_u(u,B1,-1,0,0),get_u(u,B1,0,0,0),get_u(u,B1,1,0,0));
+      printf("%d 2> %e %e %e\n",PROCID,get_ub(flbx,B1,-1,0,0,0),get_ub(flbx,B1,0,0,0,0),get_ub(flbx,B1,1,0,0,0));
+    }
+
+  if(PROCID==3)
+    {
+      printf("%d 1> %e %e %e\n",PROCID,get_u(p,B1,NX-1,0,0),get_u(p,B1,NX,0,0),get_u(p,B1,NX+1,0,0));
+      printf("%d 3> %e %e %e\n",PROCID,get_u(u,B1,NX-1,0,0),get_u(u,B1,NX,0,0),get_u(u,B1,NX+1,0,0));
+      printf("%d 2> %e %e %e\n",PROCID,get_ub(flbx,B1,NX-1,0,0,0),get_ub(flbx,B1,NX,0,0,0),get_ub(flbx,B1,NX+1,0,0,0));
+    }
+
+
+
+  if(PROCID==0) getch();
+  */
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -1313,6 +1317,15 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 		if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
 		  {
 		    fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
+
+		    //test 889
+		    /*
+		    if(PROCID==3 && ix==NX && iy==0 && i==B1)
+		      printf("%d >>> %e %e %e %e %e\n",PROCID,get_ub(flRx,i,ix,iy,iz,0) ,get_ub(flLx,i,ix,iy,iz,0), ag , fd_uRl[i] , fd_uLl[i]);
+		    //test
+		    if(PROCID==4 && ix==0 && iy==0 && i==B1)
+		      printf("%d >>> %e %e %e %e %e\n",PROCID,get_ub(flRx,i,ix,iy,iz,0) ,get_ub(flLx,i,ix,iy,iz,0), ag , fd_uRl[i] , fd_uLl[i]);
+		    */
 		  }
 		if (FLUXMETHOD==HLL_FLUX) //HLL
 		  {
