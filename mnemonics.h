@@ -79,6 +79,7 @@
 #define SPHCOORDS 6
 #define MKS1COORDS 7
 #define MKS2COORDS 10
+#define MKS3COORDS 12
 #define MCYL1COORDS 8
 #define MSPH1COORDS 11
 #define MKER1COORDS 9
