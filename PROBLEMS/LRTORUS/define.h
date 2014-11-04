@@ -92,9 +92,9 @@
 #define MINX (log(4.-MKS2R0))
 #define MAXX (log(100.-MKS2R0))
 //total resolution
-#define TNX 128
-#define TNY 128
-#define TNZ 16
+#define TNX 32
+#define TNY 32
+#define TNZ 1
 //number of tiles
 #define NTX 2
 #define NTY 2
