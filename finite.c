@@ -3453,7 +3453,7 @@ int set_bc(ldouble t,int ifinit)
 	    fill_geometry(ix,NY,NZ,&geom);	    p2u(&get_u(p,0,ix,NY,NZ),&get_u(u,0,ix,NY,NZ),&geom);
 
 	    PLOOP(iv)
-	      set_u(p,iv,ix,NY+1,NZ+1,.5*(get_u(p,iv,ix,NY,NZ+1)+get_u(p,iv,ix,NY+1,NY)));
+	      set_u(p,iv,ix,NY+1,NZ+1,.5*(get_u(p,iv,ix,NY,NZ+1)+get_u(p,iv,ix,NY+1,NZ)));
 	    fill_geometry(ix,NY+1,NZ+1,&geom);	    p2u(&get_u(p,0,ix,NY+1,NZ+1),&get_u(u,0,ix,NY+1,NZ+1),&geom);
 	  }
 	}
