@@ -2669,7 +2669,6 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
           
 #ifdef SPECIFIC_BC  //BC specific for given problem
   calc_bc(ix,iy,iz,t,uval,pval,ifinit,BCtype);
-
 #else  
 
   //standard BC  
@@ -2795,6 +2794,12 @@ int set_bc(ldouble t,int ifinit)
 
 
 #ifdef MPI4CORNERS
+
+#ifdef OMP
+  if(PROCID==0) //what is below should be serial
+#endif
+    {
+
   /*****************************************************************/
   /* now calculate conserved in corners from exchanged primitives */
   /*****************************************************************/  
@@ -3062,7 +3067,7 @@ int set_bc(ldouble t,int ifinit)
   int xlim,ylim,zlim;
   int lim,i,j,k;
 
-  if(TNZ==1 && TNY>1)
+  if(TNZ==1 && TNY>1) //2d
     {
       iz=0;
 
@@ -3074,8 +3079,8 @@ int set_bc(ldouble t,int ifinit)
 	    {
 	      PLOOP(iv)
 	      {
-		set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+1,0,iz));
-		set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+1,iz));
+		set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+i,0,iz));
+		set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+i,iz));
 	      }
 	      fill_geometry(-NG+i,-1,iz,&geom);
 	      p2u(&get_u(p,0,-NG+i,-1,iz),&get_u(u,0,-NG+i,-1,iz),&geom);
@@ -3107,7 +3112,7 @@ int set_bc(ldouble t,int ifinit)
 	    {
 	      PLOOP(iv)
 	      {
-		set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+1,NY-1,iz));
+		set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+i,NY-1,iz));
 		set_u(p,iv,-1,NY+i+1,iz,get_u(p,iv,0,NY+i+1,iz));
 	      }
 	      fill_geometry(-NG+i,NY,iz,&geom);
@@ -3135,7 +3140,7 @@ int set_bc(ldouble t,int ifinit)
 	      PLOOP(iv)
 	      {
 		set_u(p,iv,NX+i+1,-1,iz,get_u(p,iv,NX+i+1,0,iz));
-		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+1,iz));
+		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+i,iz));
 	      }
 	      fill_geometry(NX+i+1,-1,iz,&geom);
 	      p2u(&get_u(p,0,NX+i+1,-1,iz),&get_u(u,0,NX+i+1,-1,iz),&geom);
@@ -3193,8 +3198,8 @@ int set_bc(ldouble t,int ifinit)
 	  for(iz=-NG;iz<NZ+NG;iz++) { //in the total total corners it fills crap but overwritten below!
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+1,0,iz));
-		set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+1,iz)); }
+		set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+i,0,iz));
+		set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+i,iz)); }
 	      fill_geometry(-NG+i,-1,iz,&geom);  p2u(&get_u(p,0,-NG+i,-1,iz),&get_u(u,0,-NG+i,-1,iz),&geom);
 	      fill_geometry(-1,-NG+i,iz,&geom);  p2u(&get_u(p,0,-1,-NG+i,iz),&get_u(u,0,-1,-NG+i,iz),&geom);
 	    }
@@ -3216,7 +3221,7 @@ int set_bc(ldouble t,int ifinit)
 	  for(iz=-NG;iz<NZ+NG;iz++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+1,NY-1,iz));
+		set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+i,NY-1,iz));
 		set_u(p,iv,-1,NY+i+1,iz,get_u(p,iv,0,NY+i+1,iz)); }
 	      fill_geometry(-NG+i,NY,iz,&geom);  p2u(&get_u(p,0,-NG+i,NY,iz),&get_u(u,0,-NG+i,NY,iz),&geom);
 	      fill_geometry(-1,NY+i+1,iz,&geom);  p2u(&get_u(p,0,-1,NY+i+1,iz),&get_u(u,0,-1,NY+i+1,iz),&geom);
@@ -3237,7 +3242,7 @@ int set_bc(ldouble t,int ifinit)
 	  for(iz=-NG;iz<NZ+NG;iz++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+1,iz));
+		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+i,iz));
 		set_u(p,iv,NX+i+1,-1,iz,get_u(p,iv,NX+i+1,0,iz)); }
 
 	      fill_geometry(NX+i+1,-1,iz,&geom);    p2u(&get_u(p,0,NX+i+1,-1,iz),&get_u(u,0,NX+i+1,-1,iz),&geom);
@@ -3283,8 +3288,8 @@ int set_bc(ldouble t,int ifinit)
 	  for(iy=-NG;iy<NY+NG;iy++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,-NG+i,iy,iz,get_u(p,iv,-NG+1,iy,0));
-		set_u(p,iv,-1,iy,-NG+i,get_u(p,iv,0,iy,-NG+1)); }
+		set_u(p,iv,-NG+i,iy,-1,get_u(p,iv,-NG+i,iy,0));
+		set_u(p,iv,-1,iy,-NG+i,get_u(p,iv,0,iy,-NG+i)); }
 	      fill_geometry(-NG+i,iy,-1,&geom);  p2u(&get_u(p,0,-NG+i,iy,-1),&get_u(u,0,-NG+i,iy,-1),&geom);
 	      fill_geometry(-1,iy,-NG+i,&geom);  p2u(&get_u(p,0,-1,iy,-NG+i),&get_u(u,0,-1,iy,-NG+i),&geom);
 	    }
@@ -3304,7 +3309,7 @@ int set_bc(ldouble t,int ifinit)
 	  for(iy=-NG;iy<NY+NG;iy++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,-NG+i,iy,NZ,get_u(p,iv,-NG+1,iy,NZ-1));
+		set_u(p,iv,-NG+i,iy,NZ,get_u(p,iv,-NG+i,iy,NZ-1));
 		set_u(p,iv,-1,iy,NZ+i+1,get_u(p,iv,0,iy,NZ+i+1)); }
 	      fill_geometry(-NG+i,iy,NZ,&geom);  p2u(&get_u(p,0,-NG+i,iy,NZ),&get_u(u,0,-NG+i,iy,NZ),&geom);
 	      fill_geometry(-1,iy,NZ+i+1,&geom);  p2u(&get_u(p,0,-1,iy,NZ+i+1),&get_u(u,0,-1,iy,NZ+i+1),&geom);
@@ -3325,7 +3330,7 @@ int set_bc(ldouble t,int ifinit)
 	  for(iy=-NG;iy<NY+NG;iy++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,NX,iy,-NG+i,get_u(p,iv,NX-1,iy,-NG+1));
+		set_u(p,iv,NX,iy,-NG+i,get_u(p,iv,NX-1,iy,-NG+i));
 		set_u(p,iv,NX+i+1,iy,-1,get_u(p,iv,NX+i+1,iy,0)); }
 
 	      fill_geometry(NX+i+1,iy,-1,&geom);    p2u(&get_u(p,0,NX+i+1,iy,-1),&get_u(u,0,NX+i+1,iy,-1),&geom);
@@ -3371,8 +3376,8 @@ int set_bc(ldouble t,int ifinit)
 	  for(ix=-NG;ix<NX+NG;ix++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,ix,-NG+i,iz,get_u(p,iv,ix,-NG+1,0));
-		set_u(p,iv,ix,-1,-NG+i,get_u(p,iv,ix,0,-NG+1)); }
+		set_u(p,iv,ix,-NG+i,-1,get_u(p,iv,ix,-NG+i,0));
+		set_u(p,iv,ix,-1,-NG+i,get_u(p,iv,ix,0,-NG+i)); }
 	      fill_geometry(ix,-NG+i,-1,&geom);  p2u(&get_u(p,0,ix,-NG+i,-1),&get_u(u,0,ix,-NG+i,-1),&geom);
 	      fill_geometry(ix,-1,-NG+i,&geom);  p2u(&get_u(p,0,ix,-1,-NG+i),&get_u(u,0,ix,-1,-NG+i),&geom);
 	    }
@@ -3392,7 +3397,7 @@ int set_bc(ldouble t,int ifinit)
 	  for(ix=-NG;ix<NX+NG;ix++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,ix,-NG+i,NZ,get_u(p,iv,ix,-NG+1,NZ-1));
+		set_u(p,iv,ix,-NG+i,NZ,get_u(p,iv,ix,-NG+i,NZ-1));
 		set_u(p,iv,ix,-1,NZ+i+1,get_u(p,iv,ix,0,NZ+i+1)); }
 	      fill_geometry(ix,-NG+i,NZ,&geom);  p2u(&get_u(p,0,ix,-NG+i,NZ),&get_u(u,0,ix,-NG+i,NZ),&geom);
 	      fill_geometry(ix,-1,NZ+i+1,&geom);  p2u(&get_u(p,0,ix,-1,NZ+i+1),&get_u(u,0,ix,-1,NZ+i+1),&geom);
@@ -3413,7 +3418,7 @@ int set_bc(ldouble t,int ifinit)
 	  for(ix=-NG;ix<NX+NG;ix++) {
 	    for(i=0;i<NG-1;i++) {
 	      PLOOP(iv) {
-		set_u(p,iv,ix,NY,-NG+i,get_u(p,iv,ix,NY-1,-NG+1));
+		set_u(p,iv,ix,NY,-NG+i,get_u(p,iv,ix,NY-1,-NG+i));
 		set_u(p,iv,ix,NY+i+1,-1,get_u(p,iv,ix,NY+i+1,0)); }
 
 	      fill_geometry(ix,NY+i+1,-1,&geom);    p2u(&get_u(p,0,ix,NY+i+1,-1),&get_u(u,0,ix,NY+i+1,-1),&geom);
@@ -4310,6 +4315,8 @@ int set_bc(ldouble t,int ifinit)
        }
 
    }
+}
+
   
 #endif
 

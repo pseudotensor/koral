@@ -3161,13 +3161,14 @@ calc_metric()
 
   if(PROCID==0) {printf("Precalculating metrics... "); fflush(stdout);}
   
-#pragma omp parallel private(ix,iy,iz,ii) 
+  #pragma omp parallel private(ix,iy,iz,ii) 
   {
     for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
       {
 	ix=loop_02[ii][0];
 	iy=loop_02[ii][1];
 	iz=loop_02[ii][2]; 
+
 
 #ifdef METRICAXISYMMETRIC
 	if(iz>0) continue;
