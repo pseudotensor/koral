@@ -5069,6 +5069,8 @@ correct_polaraxis_3d()
     {
       int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
+      
+
       int ix,iy,iz,iv,ic,iysrc,ixsrc,gix;
 
       //spherical like coords
@@ -5086,208 +5088,224 @@ correct_polaraxis_3d()
 		  struct geometry geom,geomBL;
 
 		  //upper axis
-		  iysrc=nc;
-		  for(ic=0;ic<nc;ic++)
+		  //bottom axis
+#ifdef MPI
+		  if(TJ==0)
+#endif
 		    {
-		      iy=ic;
+
+		      iysrc=nc;
+		      for(ic=0;ic<nc;ic++)
+			{
+			  iy=ic;
 	      	 
-		      fill_geometry(ix,iy,iz,&geom);
-		      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+			  fill_geometry(ix,iy,iz,&geom);
+			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
-		      ldouble r=geomBL.xx;
-		      ldouble th=geomBL.yy;
-		      ldouble ph=geomBL.zz;
-		      ldouble vr,vth,vph;
-		      ldouble cosph,sinth,costh,sinph;
-		      sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
+			  ldouble r=geomBL.xx;
+			  ldouble th=geomBL.yy;
+			  ldouble ph=geomBL.zz;
+			  ldouble vr,vth,vph;
+			  ldouble cosph,sinth,costh,sinph;
+			  sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
 	  
-		      //gas
-		      pp[RHO]=axis1_primplus[RHO][gix];
-		      pp[UU]=axis1_primplus[UU][gix];
-		      pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
-		  		  		  
-		      //gas velocities
-		      ldouble vx=axis1_primplus[VX][gix];
-		      ldouble vy=axis1_primplus[VY][gix];
-		      ldouble vz=axis1_primplus[VZ][gix];
-		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
-			     costh*Power(sinph,2)*vz)/
-			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-		      vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
-			       Power(sinph,2)*sinth*vz)/
-			      ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-		      vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+			  //gas
+			  pp[RHO]=axis1_primplus[RHO][gix];
+			  pp[UU]=axis1_primplus[UU][gix];
+			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
-		      vth /= r;
-		      vph /= r*sinth;
+			  //gas velocities
+			  ldouble vx=axis1_primplus[VX][gix];
+			  ldouble vy=axis1_primplus[VY][gix];
+			  ldouble vz=axis1_primplus[VZ][gix];
+			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+				 costh*Power(sinph,2)*vz)/
+				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			  vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+				   Power(sinph,2)*sinth*vz)/
+				  ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			  vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
 
-		      ldouble ucon[4]={0.,vr,vth,vph};
-		      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-		      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			  vth /= r;
+			  vph /= r*sinth;
 
-		      pp[VX]=ucon[1];
-		      pp[VY]=ucon[2];
-		      pp[VZ]=ucon[3];
-		      //add average rotation
-		      pp[VZ]+=axis1_primplus[NV][gix];
+			  ldouble ucon[4]={0.,vr,vth,vph};
+			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+
+			  pp[VX]=ucon[1];
+			  pp[VY]=ucon[2];
+			  pp[VZ]=ucon[3];
+			  //add average rotation
+			  pp[VZ]+=axis1_primplus[NV][gix];
+
+			  //print_primitives(pp);getch();
 		     
 #ifdef MAGNFIELD
-		      //do not overwrite magnetic field, not to break div B=0 there
+			  //do not overwrite magnetic field, not to break div B=0 there
 #endif
 
 #ifdef RADIATION
-		      //rad density
-		      pp[EE]=axis1_primplus[EE][gix];
+			  //rad density
+			  pp[EE]=axis1_primplus[EE][gix];
 
 #ifdef NCOMPTONIZATION
-		      //no. of photons
-		      pp[NF]=ppaaxis1_primplusvg[NF][gix];
+			  //no. of photons
+			  pp[NF]=ppaaxis1_primplusvg[NF][gix];
 #endif
 
-		      //rad velocities
-		      ldouble vx=axis1_primplus[FX][gix];
-		      ldouble vy=axis1_primplus[FY][gix];
-		      ldouble vz=axis1_primplus[FZ][gix];
-		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
-			     costh*Power(sinph,2)*vz)/
-			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-		      vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
-			       Power(sinph,2)*sinth*vz)/
-			      ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-		      vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+			  //rad velocities
+			  ldouble vx=axis1_primplus[FX][gix];
+			  ldouble vy=axis1_primplus[FY][gix];
+			  ldouble vz=axis1_primplus[FZ][gix];
+			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+				 costh*Power(sinph,2)*vz)/
+				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			  vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+				   Power(sinph,2)*sinth*vz)/
+				  ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			  vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
 
-		      vth /= r;
-		      vph /= r*sinth;
+			  vth /= r;
+			  vph /= r*sinth;
 
-		      ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-		      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-		      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
-		      pp[FX]=ucon[1];
-		      pp[FY]=ucon[2];
-		      pp[FZ]=ucon[3];
-		      //add average rotation
-		      pp[VZ]+=axis1_primplus[NV+1][gix];
+			  pp[FX]=ucon[1];
+			  pp[FY]=ucon[2];
+			  pp[FZ]=ucon[3];
+			  //add average rotation
+			  pp[VZ]+=axis1_primplus[NV+1][gix];
        
 #ifdef EVOLVEINTENSITIES
-		      for(iv=0;iv<NUMANGLES;iv++)
-			Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
+			  for(iv=0;iv<NUMANGLES;iv++)
+			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
 #endif
 #endif
 
-		      p2u(pp,uu,&geom);
+			  p2u(pp,uu,&geom);
 
-		      PLOOP(iv)
-		      {
-			set_u(p,iv,ix,iy,iz,pp[iv]);  
-			set_u(u,iv,ix,iy,iz,uu[iv]);
-		      }
+		     
+			  PLOOP(iv)
+			  {
+			    set_u(p,iv,ix,iy,iz,pp[iv]);  
+			    set_u(u,iv,ix,iy,iz,uu[iv]);
+			  }
+			}
 		    }
 
 		  //bottom axis
-		  iysrc=NY-1-nc; 
-		  for(ic=0;ic<nc;ic++)
+#ifdef MPI
+		  if(TJ==NTY-1)
+#endif
 		    {
-		      iy=NY-1-ic;
+		      iysrc=NY-1-nc; 
+		      for(ic=0;ic<nc;ic++)
+			{
+			  iy=NY-1-ic;
 	      	 
-		      fill_geometry(ix,iy,iz,&geom);
-		      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+			  fill_geometry(ix,iy,iz,&geom);
+			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
-		      ldouble r=geomBL.xx;
-		      ldouble th=geomBL.yy;
-		      ldouble ph=geomBL.zz;
-		      ldouble vr,vth,vph;
-		      ldouble cosph,sinth,costh,sinph;
-		      sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
+			  ldouble r=geomBL.xx;
+			  ldouble th=geomBL.yy;
+			  ldouble ph=geomBL.zz;
+			  ldouble vr,vth,vph;
+			  ldouble cosph,sinth,costh,sinph;
+			  sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
 	  
-		      //gas
-		      pp[RHO]=axis2_primplus[RHO][gix];
-		      pp[UU]=axis2_primplus[UU][gix];
-		      pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+			  //gas
+			  pp[RHO]=axis2_primplus[RHO][gix];
+			  pp[UU]=axis2_primplus[UU][gix];
+			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 		  		  		  
-		      //gas velocities
-		      ldouble vx=axis2_primplus[VX][gix];
-		      ldouble vy=axis2_primplus[VY][gix];
-		      ldouble vz=axis2_primplus[VZ][gix];
-		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
-			     costh*Power(sinph,2)*vz)/
-			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-		      vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
-			       Power(sinph,2)*sinth*vz)/
-			      ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-		      vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+			  //gas velocities
+			  ldouble vx=axis2_primplus[VX][gix];
+			  ldouble vy=axis2_primplus[VY][gix];
+			  ldouble vz=axis2_primplus[VZ][gix];
+			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+				 costh*Power(sinph,2)*vz)/
+				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			  vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+				   Power(sinph,2)*sinth*vz)/
+				  ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			  vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
 
-		      vth /= r;
-		      vph /= r*sinth;
+			  vth /= r;
+			  vph /= r*sinth;
 
-		      ldouble ucon[4]={0.,vr,vth,vph};
-		      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-		      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			  ldouble ucon[4]={0.,vr,vth,vph};
+			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
-		      pp[VX]=ucon[1];
-		      pp[VY]=ucon[2];
-		      pp[VZ]=ucon[3];
-		     //add average rotation
-		      pp[VZ]+=axis2_primplus[NV][gix];
+			  pp[VX]=ucon[1];
+			  pp[VY]=ucon[2];
+			  pp[VZ]=ucon[3];
+			  //add average rotation
+			  pp[VZ]+=axis2_primplus[NV][gix];
 		      
 #ifdef MAGNFIELD
-		      //do not overwrite magnetic field, not to break div B=0 there
+			  //do not overwrite magnetic field, not to break div B=0 there
 #endif
 
 #ifdef RADIATION
-		      //rad density
-		      pp[EE]=axis2_primplus[EE][gix];
+			  //rad density
+			  pp[EE]=axis2_primplus[EE][gix];
 
 #ifdef NCOMPTONIZATION
-		      //no. of photons
-		      pp[NF]=ppaaxis2_primplusvg[NF][gix];
+			  //no. of photons
+			  pp[NF]=ppaaxis2_primplusvg[NF][gix];
 #endif
 
-		      //rad velocities
-		      ldouble vx=axis2_primplus[FX][gix];
-		      ldouble vy=axis2_primplus[FY][gix];
-		      ldouble vz=axis2_primplus[FZ][gix];
-		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
-			     costh*Power(sinph,2)*vz)/
-			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-		      vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
-			       Power(sinph,2)*sinth*vz)/
-			      ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-		      vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+			  //rad velocities
+			  ldouble vx=axis2_primplus[FX][gix];
+			  ldouble vy=axis2_primplus[FY][gix];
+			  ldouble vz=axis2_primplus[FZ][gix];
+			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+				 costh*Power(sinph,2)*vz)/
+				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			  vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+				   Power(sinph,2)*sinth*vz)/
+				  ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			  vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
 
-		      vth /= r;
-		      vph /= r*sinth;
+			  vth /= r;
+			  vph /= r*sinth;
 
-		      ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-		      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-		      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
-		      pp[FX]=ucon[1];
-		      pp[FY]=ucon[2];
-		      pp[FZ]=ucon[3];
-		      //add average rotation
-		      pp[VZ]+=axis2_primplus[NV+1][gix];
+			  pp[FX]=ucon[1];
+			  pp[FY]=ucon[2];
+			  pp[FZ]=ucon[3];
+			  //add average rotation
+			  pp[VZ]+=axis2_primplus[NV+1][gix];
        
 #ifdef EVOLVEINTENSITIES
-		      for(iv=0;iv<NUMANGLES;iv++)
-			Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
+			  for(iv=0;iv<NUMANGLES;iv++)
+			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
 #endif
 #endif
+			  //printf("> %d > %d %d %d > %e %e %e\n",PROCID,ix,iy,iz,pp[RHO],pp[VX],pp[VZ]);
+      
 
-		      p2u(pp,uu,&geom);
+			  p2u(pp,uu,&geom);
 
-		      PLOOP(iv)
-		      {
-			set_u(p,iv,ix,iy,iz,pp[iv]);  
-			set_u(u,iv,ix,iy,iz,uu[iv]);
-		      }
+			  PLOOP(iv)
+			  {
+			    set_u(p,iv,ix,iy,iz,pp[iv]);  
+			    set_u(u,iv,ix,iy,iz,uu[iv]);
+			  }
+			}
 		    }
 
 		}
 	    }
 	}
     }
-
 
   return 0; 
 }

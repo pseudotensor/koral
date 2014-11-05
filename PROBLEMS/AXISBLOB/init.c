@@ -78,7 +78,7 @@ usph[1]=vr;
 usph[2]=vth;
 usph[3]=vph;
 
-if (pp[RHO]/RHO_AMB > 2.)
+if (pp[RHO]/RHO_AMB > 1.e1)
   {   
     pp[VX]=vr;
     pp[VY]=vth;

@@ -60,14 +60,14 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 
   /***************************/
   //averaging velocities 
-#ifdef CORRECT_AXIS_3D
+#ifdef CORRECT_POLARAXIS_3D
  int ix,iy,iz,gix,giy,giz,iv; 
  struct geometry geom, geomBL;
  ldouble v[4],ucon[4],r,th,ph;
 
  for(gix=0;gix<TNX;gix++)
-   PLOOP(iv)
-     axis1_primplus[iv][gix]= axis1_primplus_otg[iv][gix]=axis2_primplus[iv][gix]= axis2_primplus_otg[iv][gix]=0.;
+   for(iv=0;iv<NV+2;iv++)
+     axis1_primplus[iv][gix]= axis1_primplus[iv][gix]=axis2_primplus[iv][gix]= axis2_primplus[iv][gix]=0.;
 
  for(ix=0;ix<NX;ix++)
    {
@@ -75,89 +75,117 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
      for(iz=0;iz<NZ;iz++)
        {
 #ifdef MPI
-	 if(TOJ==0) //topmost tile
+	 if(TJ==0) //topmost tile
 #endif
 	   {
-	     fill_geometry(ix,iy,iz,&geom);
-	     fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	     fill_geometry(ix,NCCORRECTPOLAR,iz,&geom);
+	     fill_geometry_arb(ix,NCCORRECTPOLAR,iz,&geomBL,BLCOORDS);
 
-	     axis1_primplus_temp[RHO][gix]+=get_u(p,RHO,ix,NCORRECTPOLAR,iz);
-	     axis1_primplus_temp[UU][gix]+=get_u(p,UU,ix,NCORRECTPOLAR,iz);
+	     axis1_primplus_temp[RHO][gix]+=get_u(p,RHO,ix,NCCORRECTPOLAR,iz);
+	     axis1_primplus_temp[UU][gix]+=get_u(p,UU,ix,NCCORRECTPOLAR,iz);
 	     //cartesian velocities in VX..VZ slots
-	     decompose_vels(&get_u(p,0,ix,NCORRECTPOLAR,iz),VX,v,&geom,&geomBL);
+	     decompose_vels(&get_u(p,0,ix,NCCORRECTPOLAR,iz),VX,v,&geom,&geomBL);
 	     axis1_primplus_temp[VX][gix]+=v[1];
 	     axis1_primplus_temp[VY][gix]+=v[2];
 	     axis1_primplus_temp[VZ][gix]+=v[3];
 	     //angular velocity in NV+1 slot!!!
-	     axis1_primplus_temp[NV+1][gix]+=get_u(p,VZ,ix,NCORRECTPOLAR,iz);
+	     axis1_primplus_temp[NV+1][gix]+=get_u(p,VZ,ix,NCCORRECTPOLAR,iz);
 
 #ifdef RADIATION
-	     axis1_primplus_temp[EE][gix]+=get_u(p,EE,ix,NCORRECTPOLAR,iz);
+	     axis1_primplus_temp[EE][gix]+=get_u(p,EE,ix,NCCORRECTPOLAR,iz);
 	     #ifdef NCOMPTONIZATION
-	     axis1_primplus_temp[NF][gix]+=get_u(p,NF,ix,NCORRECTPOLAR,iz);
+	     axis1_primplus_temp[NF][gix]+=get_u(p,NF,ix,NCCORRECTPOLAR,iz);
 	     #endif
 	     //cartesian velocities in FX..FZ slots
-	     decompose_vels(&get_u(p,0,ix,NCORRECTPOLAR,iz),FX,v,&geom,&geomBL);
+	     decompose_vels(&get_u(p,0,ix,NCCORRECTPOLAR,iz),FX,v,&geom,&geomBL);
 	     axis1_primplus_temp[FX][gix]+=v[1];
 	     axis1_primplus_temp[FY][gix]+=v[2];
 	     axis1_primplus_temp[FZ][gix]+=v[3];
 	     //angular velocity in NV+2 slot!!!
-	     axis1_primplus_temp[NV+2][gix]+=get_u(p,FZ,ix,NCORRECTPOLAR,iz);
+	     axis1_primplus_temp[NV+2][gix]+=get_u(p,FZ,ix,NCCORRECTPOLAR,iz);
 #endif
 	   }
 
 #ifdef MPI
-	 if(TOJ==NTY-1) //bottommost tile
+	 if(TJ==NTY-1) //bottommost tile
 #endif
 	   {
-	     fill_geometry(ix,iy,iz,&geom);
-	     fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	     fill_geometry(ix,NY-NCCORRECTPOLAR-1,iz,&geom);
+	     fill_geometry_arb(ix,NY-NCCORRECTPOLAR-1,iz,&geomBL,BLCOORDS);
 
-	     axis2_primplus_temp[RHO][gix]+=get_u(p,RHO,ix,NY-NCORRECTPOLAR-1,iz);
-	     axis2_primplus_temp[UU][gix]+=get_u(p,UU,ix,NY-NCORRECTPOLAR-1,iz);
+	     axis2_primplus_temp[RHO][gix]+=get_u(p,RHO,ix,NY-NCCORRECTPOLAR-1,iz);
+
+	     axis2_primplus_temp[UU][gix]+=get_u(p,UU,ix,NY-NCCORRECTPOLAR-1,iz);
 	     //cartesian velocities in VX..VZ slots
-	     decompose_vels(&get_u(p,0,ix,NY-NCORRECTPOLAR-1,iz),VX,v,&geom,&geomBL);
+	     decompose_vels(&get_u(p,0,ix,NY-NCCORRECTPOLAR-1,iz),VX,v,&geom,&geomBL);
 	     axis2_primplus_temp[VX][gix]+=v[1];
 	     axis2_primplus_temp[VY][gix]+=v[2];
 	     axis2_primplus_temp[VZ][gix]+=v[3];
 	     //angular velocity in NV slot!!!
-	     axis2_primplus_temp[NV][gix]+=get_u(p,VZ,ix,NY-NCORRECTPOLAR-1,iz);
+	     axis2_primplus_temp[NV][gix]+=get_u(p,VZ,ix,NY-NCCORRECTPOLAR-1,iz);
 
 #ifdef RADIATION
-	     axis2_primplus_temp[EE][gix]+=get_u(p,EE,ix,NY-NCORRECTPOLAR-1,iz);
+	     axis2_primplus_temp[EE][gix]+=get_u(p,EE,ix,NY-NCCORRECTPOLAR-1,iz);
 	     #ifdef NCOMPTONIZATION
-	     axis2_primplus_temp[NF][gix]+=get_u(p,NF,ix,NY-NCORRECTPOLAR-1,iz);
+	     axis2_primplus_temp[NF][gix]+=get_u(p,NF,ix,NY-NCCORRECTPOLAR-1,iz);
 	     #endif
 	     //cartesian velocities in FX..FZ slots
-	     decompose_vels(&get_u(p,0,ix,NY-NCORRECTPOLAR-1,iz),FX,v,&geom,&geomBL);
+	     decompose_vels(&get_u(p,0,ix,NY-NCCORRECTPOLAR-1,iz),FX,v,&geom,&geomBL);
 	     axis2_primplus_temp[FX][gix]+=v[1];
 	     axis2_primplus_temp[FY][gix]+=v[2];
 	     axis2_primplus_temp[FZ][gix]+=v[3];
 	     //angular velocity in NV+1 slot!!!
-	     axis2_primplus_temp[NV+1][gix]+=get_u(p,FZ,ix,NY-NCORRECTPOLAR-1,iz);
+	     axis2_primplus_temp[NV+1][gix]+=get_u(p,FZ,ix,NY-NCCORRECTPOLAR-1,iz);
 #endif
 	   }
        }
      for(iv=0;iv<NV+2;iv++)
        {
-	 axis1_primplus_temp[iv]/=NZ;
-	 axis2_primplus_temp[iv]/=NZ;
+	 axis1_primplus_temp[iv][gix]/=NZ;
+	 axis2_primplus_temp[iv][gix]/=NZ;
        }
    }
 
 #ifdef MPI
- MPI_Allreduce(axis1_primplus_temp, axis1_primplus, TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,
+ /*
+ ldouble temp1[TNX*(NV+2)],temp2[TNX*(NV+2)];
+ for(ix=0;ix<TNX;ix++)
+   for(iv=0;iv<NV+2;iv++)
+       temp1[ix*(NV+2)+iv]=axis1_primplus_temp[iv][ix];
+ MPI_Allreduce(temp1, temp2, TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,MPI_COMM_WORLD);
+ for(ix=0;ix<TNX;ix++)
+   for(iv=0;iv<NV+2;iv++)
+     axis1_primplus[iv][ix]=temp2[ix*(NV+2)+iv];
+
+ for(ix=0;ix<TNX;ix++)
+   for(iv=0;iv<NV+2;iv++)
+       temp1[ix*(NV+2)+iv]=axis2_primplus_temp[iv][ix];
+ MPI_Allreduce(temp1, temp2, TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,MPI_COMM_WORLD);
+ for(ix=0;ix<TNX;ix++)
+   for(iv=0;iv<NV+2;iv++)
+     axis1_primplus[iv][ix]=temp2[ix*(NV+2)+iv];
+ */
+
+
+ // printf("%d %e %e %e\n",PROCID,axis1_primplus_temp[VY][10],axis1_primplus_temp[VY][20],axis1_primplus_temp[VY][30]);
+
+     
+ MPI_Allreduce(&axis1_primplus_temp[0][0], &axis1_primplus[0][0], TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,
 		MPI_COMM_WORLD);
- MPI_Allreduce(axis2_primplus_temp, axis2_primplus, TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,
+ MPI_Allreduce(&axis2_primplus_temp[0][0], &axis2_primplus[0][0], TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,
 		MPI_COMM_WORLD);
+
+ //printf("> %d %e %e %e\n",PROCID,axis2_primplus[VY][10],axis2_primplus[VY][20],axis2_primplus[VY][30]);
+ //if(PROCID==0){     exit(-1);   }
+
 #else 
   for(ix=0;ix<NX;ix++)
     {
       gix=ix+TOI;
-      PLOOP(iv)
+      for(iv=0;iv<NV+2;iv++)
       {
-	axis1_primplus[gix]=axis1_primplus_temp[gix];
-	axis2_primplus[gix]=axis2_primplus_temp[gix];
+	axis1_primplus[iv][gix]=axis1_primplus_temp[iv][gix];
+	axis2_primplus[iv][gix]=axis2_primplus_temp[iv][gix];
       }
     }
 #endif
