@@ -85,7 +85,7 @@
 #define MKSR0 0.
 #define MKSH0 0.6
 #define MKSMY1 0.001
-#define MKSMY2 0.1
+#define MKSMY2 0.2
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
@@ -100,20 +100,20 @@
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
-#define MINX (log(2.5-MKSR0))
+#define MINX (log(4.-MKSR0))
 #define MAXX (log(100.-MKSR0))
 #define MINY 0.
 #define MAXY 1.
 #endif
 
-
-#define MINZ (-M_PI/4.)
-#define MAXZ (M_PI/4.)
+#define PHIWEDGE (M_PI/4.)
+#define MINZ (-PHIWEDGE/2.)
+#define MAXZ (PHIWEDGE/2.)
 
 //total resolution
 #define TNX 64
 #define TNY 64
-#define TNZ 1
+#define TNZ 8
 //number of tiles
 #define NTX 2
 #define NTY 2

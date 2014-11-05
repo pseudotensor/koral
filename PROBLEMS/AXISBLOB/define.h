@@ -25,7 +25,7 @@
 #define MINMOD_THETA 1.5
 
 #define CORRECT_POLARAXIS_3D
-#define NCCORRECTPOLAR 3
+#define NCCORRECTPOLAR 2
 
 #define DTOUT1 1.
 

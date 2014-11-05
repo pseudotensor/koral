@@ -6,32 +6,17 @@
 //geometries
 ldouble gdet_src,gdet_bc,Fx,Fy,Fz,ppback[NV];
 int iix,iiy,iiz,iv;  	  
-ldouble xxvec[4],xxvecBL[4],xx,yy,zz;
-
-get_xx(ix,iy,iz,xxvec);
-coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
-xx=xxvec[1];
-yy=xxvec[2];
-zz=xxvec[3];
 
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
 struct geometry geomBL;
-fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
 ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
 
-//working in BL
-ldouble ggBL[4][5],GGBL[4][5];
-calc_g_arb(xxvecBL,ggBL,KERRCOORDS);
-calc_G_arb(xxvecBL,GGBL,KERRCOORDS);
-ldouble eupBL[4][4],eloBL[4][4];
-ldouble tupBL[4][4],tloBL[4][4];
-calc_tetrades(ggBL,tupBL,tloBL,KERRCOORDS);
-calc_ZAMOes(ggBL,eupBL,eloBL,KERRCOORDS);
 /**********************/
 
 //radius
@@ -46,8 +31,6 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
-
-    /*
 
     //checking for the gas inflow
     ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
@@ -64,16 +47,17 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
 	pp[VY]=ucon[2];
 	pp[VZ]=ucon[3];//atmosphere in rho,uint and velocities and zero magn. field
       }
-    */
 
 #ifdef RADIATION
     ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};    
     conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+    trans2_coco(geom.xxvec,urfcon,urfcon,MYCOORDS,BLCOORDS);
     if(urfcon[1]<0.) //inflow, resseting to atmosphere
       {
 	//atmosphere in radiation
 	//set_radatmosphere(pp,xxvec,gg,GG,0);
 	urfcon[1]=0.;
+	trans2_coco(geomBL.xxvec,urfcon,urfcon,BLCOORDS,MYCOORDS);
 	conv_vels(urfcon,urfcon,VEL4,VELPRIM,geom.gg,geom.GG);
 	pp[FX0]=urfcon[1];
 	pp[FY0]=urfcon[2];
@@ -81,14 +65,7 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
       }
 #endif
 
-    /*
-    #ifdef RADIATION
-    pp[EE0]=pp[UU]/1.e6;
-    pp[FX0]=pp[VX];
-    pp[FY0]=pp[VY];
-    pp[FZ0]=pp[VZ];
-    #endif
-    */
+   
     
 
     p2u(pp,uu,&geom);
@@ -100,35 +77,17 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
      iiy=iy;
      iiz=iz;
 
-     //gc
-     ldouble r=xxvec[1];
-
-     //iix=0
-     ldouble xxout[4]={0.,get_x(0,0),get_x(iiy,1),get_x(iiz,2)};
-     ldouble r0=xxout[1];   
-     
-     //iix=1
-     xxout[1]=get_x(1,0);
-     ldouble r1=xxout[1];   
-     
-
-     //linear extrapolation
       for(iv=0;iv<NV;iv++)
        {
-	 //pp[iv]=get_u(p,iv,0,iiy,iiz)+(get_u(p,iv,1,iiy,iiz)-get_u(p,iv,0,iiy,iiz))*(r-r0)/(r1-r0);
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
-
-      //      pp[0] = get_u(p,0,0,iiy,iiz)*pow(r/r0,-1.5);
-      //pp[1] = get_u(p,1,0,iiy,iiz)*pow(r/r0,-1.5);
- 
 
      p2u(pp,uu,&geom);
      return 0;
    }
 
 //reflections/outflow in theta 
-if(BCtype==YBCLO) //spin axis 
+if(BCtype==YBCLO) //upper spin axis 
   {      
     
     iiy=-iy-1;
@@ -139,11 +98,9 @@ if(BCtype==YBCLO) //spin axis
     for(iv=0;iv<NV;iv++)
       {
 	//v_theta
-#ifndef PUREAXISOUTFLOW
 	if(iv==VY || iv==B2 || iv==FY0)
 	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
 	else
-#endif
 	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
        }
      
@@ -151,7 +108,8 @@ if(BCtype==YBCLO) //spin axis
     p2u(pp,uu,&geom);
     return 0;
   }
-if(BCtype==YBCHI) //equatorial plane
+
+if(BCtype==YBCHI) //lower spin axis
   {
     iiy=NY-(iy-NY)-1;
     iiz=iz;

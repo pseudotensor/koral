@@ -207,10 +207,15 @@ int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;
 #pragma omp threadprivate(loop_0,loop_02,loop_1,loop_2,loop_3,loop_4,loop_5,loop_6,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6,TI,TJ,TK,TOI,TOJ,TOK,PROCID,global_ix1,global_ix2,global_iy1,global_iy2,global_iz1,global_iz2)
 #endif
 
+//arrays for on the go averaging throughout the domain
 ldouble sigma_otg[TNX];
 ldouble sigma_otg_temp[TNX];
 ldouble scaleth_otg[TNX];
 ldouble scaleth_otg_temp[TNX];
+ldouble axis1_primplus[NV+2][TNX];
+ldouble axis2_primplus[NV+2][TNX];
+ldouble axis1_primplus_temp[NV+2][TNX];
+ldouble axis2_primplus_temp[NV+2][TNX];
 
 
 ldouble scalars[NSCALARS];
@@ -756,21 +761,15 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix);
 
 //mpi.c
 int omp_myinit(void);
-int
-mpi_isitBC(int BCtype);
-void
-mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz);
-void
-mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz);
+int mpi_isitBC(int BCtype);
+void mpi_global2localidx(int gix,int giy, int giz, int *lix, int *liy, int *liz);
+void mpi_local2globalidx(int lix,int liy, int liz, int *gix, int *giy, int *giz);
 int calc_avgs_throughout();
+int decompose_vels(ldouble *pp,int velidx, ldouble v[4],void *ggg,  void *gggBL);
 int mpi_exchangedata();
-void
-mpi_myinit(int argc, char *argv[]);
-void
-mpi_myfinalize();
-void
-mpi_synchtiming(ldouble *time);
-
+void mpi_myinit(int argc, char *argv[]);
+void mpi_myfinalize();
+void mpi_synchtiming(ldouble *time);
 
 //zeroshort.c
 
