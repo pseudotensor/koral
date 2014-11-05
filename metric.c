@@ -334,7 +334,6 @@ if(coords==MKS1COORDS) {
 #endif
 }
 
- }
 
 if(coords==MKS2COORDS) {
   ldouble a=BHSPIN;
@@ -593,12 +592,8 @@ calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
 ;G[3][3]= Power(Csc(x2),2)/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2))
 ;
 #endif
-
-
   }
 
-
-  }
   if(coords==MKS2COORDS) {
   ldouble a=BHSPIN;
   ldouble R0=0.;
