@@ -63,7 +63,7 @@ if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
   return Sqrt(Power(exp(1.0),2*x1)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2))/2.;
 #endif
  } 
@@ -73,8 +73,8 @@ if(coords==MKS2COORDS) {
   ldouble R0=0.;
   ldouble H0=0.;
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
   return (Power(Pi,2)*Sqrt((Power(exp(1.0),2*x1)*Power(H0,2)*Power(Cot(1.5707963267948966*H0),2)*Power(Csc(1.5707963267948966 - 1.*ArcTan(0. + 1.*Tan(H0*Pi*(-0.5 + x2)))),4)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2),4))/((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)))))/2.;
 #endif
  } 
@@ -83,7 +83,7 @@ if(coords==MKS2COORDS) {
 if(coords==MCYL1COORDS) {
   ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
   return Sqrt(Power(exp(1.0),2*x1)*Power(Power(exp(1.0),x1) + R0,2));
  } 
@@ -91,7 +91,7 @@ if(coords==MCYL1COORDS) {
 if(coords==MSPH1COORDS) {
   ldouble R0=0.;
 #if(MYCOORDS==MSPH1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
   return Sqrt(Power(exp(1.0),2*x1)*Power(Power(exp(1.0),x1) + R0,4)*Power(Sin(x2),2));
  } 
@@ -100,7 +100,7 @@ if(coords==MKER1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0=0.;
 #if(MYCOORDS==MKER1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
   return Sqrt(Power(exp(1.0),2*x1)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)*Power(Sin(x2),2))/2.;
  } 
@@ -163,7 +163,7 @@ if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 ;if(idim==0) return  (Power(a,2) + 6*Power(exp(1.0),2*x1) + 8*Power(exp(1.0),x1)*R0 + 2*Power(R0,2) + Power(a,2)*Cos(2*x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
 ;if(idim==1) return  ((-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + 3*Power(a,2)*Cos(2*x2))*Cot(x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
 ;if(idim==2) return  0
@@ -176,8 +176,8 @@ if(coords==MKS2COORDS) {
   ldouble R0=0.;
   ldouble H0=0.;
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
 ;if(idim==0) return  (-(Power(exp(1.0),x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(a,2) + 3*Power(Power(exp(1.0),x1) + R0,2))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) + (Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - 2*Power(a,2)*(1 + Power(exp(1.0),x1) + R0 - (-1 + Power(exp(1.0),x1) + R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)))) + 8*Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0)*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))) + 2*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))))/(2.*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))))
 ;if(idim==1) return  (H0*Power(Sec(H0*Pi*(-0.5 + x2)),2)*(-(Power(Pi,2)*Cot(1.5707963267948966*H0)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.) - Power(a,2)*((Power(a,2)*Sin(Pi*Power(Csc(1.5707963267948966*H0),2)*Csc(6.283185307179586*H0*(-0.5 + x2))*Sin(3.141592653589793*H0)*Power(Sin(H0*Pi*(-0.5 + x2)),2)))/2. - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)))) + 4*Power(a,2)*Power(Pi,2)*Cos((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)*Cot(1.5707963267948966*H0)*Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))) + (12.566370614359172*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*Tan(0. + 1.*ArcTan(0. + 1.*Tan(H0*Pi*(-0.5 + x2))))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))))/(1. + 1.*Power(Tan(H0*Pi*(-0.5 + x2)),2))))/(2.*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))))
 ;if(idim==2) return  0
@@ -190,7 +190,7 @@ if(coords==MKS2COORDS) {
 if(coords==MCYL1COORDS) {
   ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 ;if(idim==0) return  (2*Power(exp(1.0),x1) + R0)/(Power(exp(1.0),x1) + R0)
 ;if(idim==1) return  0
@@ -201,7 +201,7 @@ if(coords==MCYL1COORDS) {
 if(coords==MSPH1COORDS) {
   ldouble R0=0.;
 #if(MYCOORDS==MSPH1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 ;if(idim==0) return  (3*Power(exp(1.0),x1) + R0)/(Power(exp(1.0),x1) + R0)
 ;if(idim==1) return  Cot(x2)
@@ -214,7 +214,7 @@ if(coords==MKER1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0=0.;
 #if(MYCOORDS==MKER1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 ;if(idim==0) return  (Power(a,2) + 6*Power(exp(1.0),2*x1) + 8*Power(exp(1.0),x1)*R0 + 2*Power(R0,2) + Power(a,2)*Cos(2*x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
 ;if(idim==1) return  ((-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + 3*Power(a,2)*Cos(2*x2))*Cot(x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
@@ -269,7 +269,7 @@ if(coords==MKER1COORDS) {
 #if(MYCOORDS==MKER1COORDS)
   ldouble a=BHSPIN;
   ldouble R0;
-  R0=MKS1R0;
+  R0=MKSR0;
 
 ;g[0][0]= -((Power(a,2) + 2*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0) + Power(a,2)*Cos(2*x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2)))
 ;g[0][1]= 0
@@ -294,7 +294,7 @@ if(coords==MKER1COORDS) {
 if(coords==MCYL1COORDS) {
 #if(MYCOORDS==MCYL1COORDS)
   ldouble R0;
-  R0=MKS1R0;
+  R0=MKSR0;
 
 ;g[0][0]= -1
 ;g[0][1]= 0
@@ -319,7 +319,7 @@ if(coords==MCYL1COORDS) {
 if(coords==MSPH1COORDS) {
 #if(MYCOORDS==MSPH1COORDS)
   ldouble R0;
-  R0=MKS1R0;
+  R0=MKSR0;
 ;g[0][0]= -1
 ;g[0][1]= 0
 ;g[0][2]= 0
@@ -344,7 +344,7 @@ if(coords==MKS1COORDS) {
   ldouble a=BHSPIN;
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 ;g[0][0]= -((Power(a,2) + 2*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0) + Power(a,2)*Cos(2*x2))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2)))
 ;g[0][1]= (4*Power(exp(1.0),x1)*(Power(exp(1.0),x1) + R0))/(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))
 ;g[0][2]= 0
@@ -371,8 +371,8 @@ if(coords==MKS2COORDS) {
   ldouble R0,H0;
   R0=H0=0.;
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
 ;g[0][0]= (-(Power(a,2)/(Power(exp(1.0),2*x1)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),2))) + ((Power(a,2) + (-2 + Power(exp(1.0),x1) + R0)*(Power(exp(1.0),x1) + R0))*Power(Csc((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2))/(Power(exp(1.0),2*x1)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),2)))/((Power(a,2)*((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)))/(Power(exp(1.0),2*x1)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),3)) + (((-4*Power(Power(exp(1.0),x1) + R0,2))/(Power(exp(1.0),2*x1)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),2)) - ((Power(a,2) + (-2 + Power(exp(1.0),x1) + R0)*(Power(exp(1.0),x1) + R0))*((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)))/(Power(exp(1.0),2*x1)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),2)))*Power(Csc((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)))
 ;g[0][1]= (Power(H0,2)*Power(Pi,4)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2))*Power(Cot(1.5707963267948966*H0),2)*Power(Csc(1.5707963267948966 - 1.*ArcTan(0.6366197723675814*Tan(1.5707963267948966*H0)*(-1.5707963267948966 + 1.5707963267948966*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))))),4)*((-8*Power(Csc((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)*Power(Sin(1.5707963267948966 - 1.*ArcTan(0.6366197723675814*Tan(1.5707963267948966*H0)*(-1.5707963267948966 + 1.5707963267948966*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))))),4)*Power(Tan(1.5707963267948966*H0),2))/(Power(H0,2)*Power(Pi,4)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),3)) - (8*R0*Power(Csc((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)*Power(Sin(1.5707963267948966 - 1.*ArcTan(0.6366197723675814*Tan(1.5707963267948966*H0)*(-1.5707963267948966 + 1.5707963267948966*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))))),4)*Power(Tan(1.5707963267948966*H0),2))/(Power(exp(1.0),x1)*Power(H0,2)*Power(Pi,4)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),3))))/(4.*((Power(a,2)*((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)))/(Power(exp(1.0),2*x1)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),3)) + (((-4*Power(Power(exp(1.0),x1) + R0,2))/(Power(exp(1.0),2*x1)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),2)) - ((Power(a,2) + (-2 + Power(exp(1.0),x1) + R0)*(Power(exp(1.0),x1) + R0))*((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)))/(Power(exp(1.0),2*x1)*Power(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2),2)))*Power(Csc((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2))))
 ;g[0][2]= 0
@@ -541,7 +541,7 @@ calc_G_arb_ana(ldouble *xx, ldouble G[][5],int coords)
   if(coords==MCYL1COORDS) {
   ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 ;G[0][0]= -1
 ;G[0][1]= 0
@@ -566,7 +566,7 @@ calc_G_arb_ana(ldouble *xx, ldouble G[][5],int coords)
   if(coords==MSPH1COORDS) {
   ldouble R0=0.;
 #if(MYCOORDS==MSPH1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 ;G[0][0]= -1
 ;G[0][1]= 0
@@ -594,7 +594,7 @@ calc_G_arb_ana(ldouble *xx, ldouble G[][5],int coords)
     ldouble a=BHSPIN;
   ldouble R0=0.;
 #if(MYCOORDS==MKER1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 ;G[0][0]= -((Power(a,4) + 2*Power(Power(exp(1.0),x1) + R0,4) + Power(a,2)*(Power(exp(1.0),x1) + R0)*(2 + 3*(Power(exp(1.0),x1) + R0)) + Power(a,2)*(Power(a,2) + (-2 + Power(exp(1.0),x1) + R0)*(Power(exp(1.0),x1) + R0))*Cos(2*x2))/((Power(a,2) + (-2 + Power(exp(1.0),x1) + R0)*(Power(exp(1.0),x1) + R0))*(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2))))
 ;G[0][1]= 0
 ;G[0][2]= 0
@@ -619,7 +619,7 @@ calc_G_arb_ana(ldouble *xx, ldouble G[][5],int coords)
   ldouble a=BHSPIN;
   ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 ;G[0][0]= -(((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Cos(x2),2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
 ;G[0][1]= (2*(Power(exp(1.0),x1) + R0))/(Power(exp(1.0),x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos(x2),2)))
 ;G[0][2]= 0
@@ -645,8 +645,8 @@ calc_G_arb_ana(ldouble *xx, ldouble G[][5],int coords)
   ldouble R0=0.;
   ldouble H0=0.;
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
 ;G[0][0]= -(((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2))/(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)))
 ;G[0][1]= (2*(Power(exp(1.0),x1) + R0))/(Power(exp(1.0),x1)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Cos((Pi*(1 + Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2))))/2.),2)))
 ;G[0][2]= 0
@@ -926,7 +926,7 @@ calc_Krzysie_arb_ana(ldouble *xx, ldouble Krzys[][4][4],int coords)
   if(coords==MCYL1COORDS) {
   ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= 0
@@ -999,7 +999,7 @@ calc_Krzysie_arb_ana(ldouble *xx, ldouble Krzys[][4][4],int coords)
   if(coords==MSPH1COORDS) {
   ldouble R0=0.;
 #if(MYCOORDS==MSPH1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= 0
@@ -1074,7 +1074,7 @@ calc_Krzysie_arb_ana(ldouble *xx, ldouble Krzys[][4][4],int coords)
 ldouble a=BHSPIN;
   ldouble R0=0.;
 #if(MYCOORDS==MKER1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 ;Krzys[0][0][0]= 0
 ;Krzys[0][0][1]= (2*Power(exp(1.0),x1)*(Power(a,2) + Power(Power(exp(1.0),x1) + R0,2))*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/((Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2))
 ;Krzys[0][0][2]= (-4*Power(a,2)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
@@ -1148,7 +1148,7 @@ ldouble a=BHSPIN;
   ldouble a=BHSPIN;
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 ;Krzys[0][0][0]= (8*(Power(exp(1.0),x1) + R0)*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
 ;Krzys[0][0][1]= (4*Power(exp(1.0),x1)*(Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(1 + R0) + R0*(2 + R0) + Power(a,2)*Power(Cos(x2),2))*(-Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) - Power(a,2)*Cos(2*x2)))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),3)
 ;Krzys[0][0][2]= (-4*Power(a,2)*(Power(exp(1.0),x1) + R0)*Sin(2*x2))/Power(Power(a,2) + 2*Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Cos(2*x2),2)
@@ -1223,8 +1223,8 @@ ldouble a=BHSPIN;
   ldouble a=BHSPIN;
   ldouble R0,H0;
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
 ;Krzys[0][0][0]= ((Power(exp(1.0),x1) + R0)*(-((-Power(a,2) + (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(a,2) + 3*Power(Power(exp(1.0),x1) + R0,2))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) + (Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - 2*Power(a,2)*(1 + Power(exp(1.0),x1) + R0 - (-1 + Power(exp(1.0),x1) + R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)))) + 2*(Power(exp(1.0),x1) + R0)*(-Power(a,2) + (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))) + 2*(-1 + Power(exp(1.0),x1) + R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)))))/((Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*Power((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)),2))
 ;Krzys[0][0][1]= -(Power(exp(1.0),x1)*((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((-Power(a,2) + (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(a,2) + 3*Power(Power(exp(1.0),x1) + R0,2))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) + (Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - 2*Power(a,2)*(1 + Power(exp(1.0),x1) + R0 - (-1 + Power(exp(1.0),x1) + R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))) - 2*(Power(exp(1.0),x1) + R0)*(-Power(a,2) + (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))) - 2*(-1 + Power(exp(1.0),x1) + R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)))))/(2.*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*Power((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)),2))
 ;Krzys[0][0][2]= (H0*Power(Pi,2)*Cot(1.5707963267948966*H0)*Power(Sec(H0*Pi*(-0.5 + x2)),2)*(4*Power(Power(exp(1.0),x1) + R0,2)*(-(Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.) - Power(a,2)*((Power(a,2)*Sin(Pi*Power(Csc(1.5707963267948966*H0),2)*Csc(6.283185307179586*H0*(-0.5 + x2))*Sin(3.141592653589793*H0)*Power(Sin(H0*Pi*(-0.5 + x2)),2)))/2. - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)))) + Power(a,2)*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))) + Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)))) - ((Power(exp(1.0),x1) + R0)*(2 + Power(exp(1.0),x1) + R0) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((-Power(a,2) + (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.) - Power(a,2)*((Power(a,2)*Sin(Pi*Power(Csc(1.5707963267948966*H0),2)*Csc(6.283185307179586*H0*(-0.5 + x2))*Sin(3.141592653589793*H0)*Power(Sin(H0*Pi*(-0.5 + x2)),2)))/2. - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.))) - Power(a,2)*Cos((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)*(-Power(a,2) + (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.)*((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))))))/(2.*(Power(Power(exp(1.0),x1) + R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2))*Power((Power(exp(1.0),x1) + R0)*(Power(Power(exp(1.0),x1) + R0,3) + Power(a,2)*(2 + Power(exp(1.0),x1) + R0))*Power(Sec((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - Power(a,2)*(2*Power(exp(1.0),x1) + Power(exp(1.0),2*x1) + 2*R0 + 2*Power(exp(1.0),x1)*R0 + Power(R0,2) + Power(a,2)*Power(Sin((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2) - (Power(a,2) + Power(exp(1.0),2*x1) + 2*Power(exp(1.0),x1)*(-1 + R0) + (-2 + R0)*R0)*Power(Tan((Pi*Cot(1.5707963267948966*H0)*Tan(H0*Pi*(-0.5 + x2)))/2.),2)),2))
@@ -2141,7 +2141,7 @@ coco_KS2MKS1(ldouble *xKS, ldouble *xMKS1)
   ldouble R0;
 
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   xMKS1[0]
@@ -2176,11 +2176,11 @@ coco_KS2MKS2(ldouble *xKS, ldouble *xMKS1)
   R0=H0=0.;
 
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
 #endif
 
   xMKS1[0]
@@ -2213,28 +2213,35 @@ coco_KS2MKS3(ldouble *xKS, ldouble *xMKS)
   ldouble KSx1=xKS[1];
   ldouble KSx2=xKS[2];
   ldouble KSx3=xKS[3];
+  ldouble x0,x1,x2,x3;
   ldouble R0,H0,MY1,MY2;
   R0=H0=MY1=MY2=0.;
 
-  //TODO: update!
-
+  
 #if(MYCOORDS==MKS3COORDS)
-  MY1=MKS3MY1;
-  MY2=MKS3MY2;
+  R0=MKSR0;
+  H0=MKSH0;
+  MY1=MKSMY1;
+  MY2=MKSMY2;
 #endif
 
-  xMKS[0]
+  x0
     = KSx0
     ;
-  xMKS[1]
-    = Log(KSx1)
+  x1
+    = Log(KSx1 - R0)
     ;
-  xMKS[2]
-    = (-(KSx1*KSx2) - 2*MY1*Pi + KSx1*MY1*Pi + 2*MY2*Pi)/((-KSx1 - 4*MY1 + 2*KSx1*MY1 + 4*MY2)*Pi)
+  x2
+    = (-(H0*KSx1*Pi) - 4*H0*MY1*Pi + 2*H0*KSx1*MY1*Pi + 4*H0*MY2*Pi + 2*KSx1*ArcTan(((-2*KSx2 + Pi)*Tan((H0*Pi)/2.))/Pi))/(2.*H0*(-KSx1 - 4*MY1 + 2*KSx1*MY1 + 4*MY2)*Pi)
     ;
-  xMKS[3]
+  x3
     = KSx3
     ;
+
+  xMKS[0]=x0;
+  xMKS[1]=x1;
+  xMKS[2]=x2;
+  xMKS[3]=x3;
 
   return 0;
 }
@@ -2253,7 +2260,7 @@ coco_MKS12KS(ldouble *xMKS1, ldouble *xKS)
   ldouble x3=xMKS1[3];
   ldouble R0;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   xKS[0]
@@ -2287,11 +2294,11 @@ coco_MKS22KS(ldouble *xMKS1, ldouble *xKS)
   ldouble R0,H0;
   R0=H0=0.;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
 #endif
 
   xKS[0]
@@ -2316,34 +2323,40 @@ coco_MKS22KS(ldouble *xMKS1, ldouble *xKS)
 //converts coordinates
 //for MKS3 -> KS
 int
-coco_MKS32KS(ldouble *xMKS1, ldouble *xKS)
+coco_MKS32KS(ldouble *xMKS, ldouble *xKS)
 {
-  ldouble x0=xMKS1[0];
-  ldouble x1=xMKS1[1];
-  ldouble x2=xMKS1[2];
-  ldouble x3=xMKS1[3];
+  ldouble x0=xMKS[0];
+  ldouble x1=xMKS[1];
+  ldouble x2=xMKS[2];
+  ldouble x3=xMKS[3];
   ldouble R0,H0,MY1,MY2;
+  ldouble KSx0,KSx1,KSx2,KSx3;
   R0=H0=MY1=MY2=0.;
 
-  //TODO: update!
-
 #if(MYCOORDS==MKS3COORDS)
-  MY1=MKS3MY1;
-  MY2=MKS3MY2;
+  R0=MKSR0;
+  H0=MKSH0;
+  MY1=MKSMY1;
+  MY2=MKSMY2;
 #endif
 
-  xKS[0]
-= x0
-;
-  xKS[1]
-    = exp(x1)
-;
-  xKS[2]
-= Pi*((MY1 + (2*(-MY1 + MY2))/Power(exp(1.0),x1))*(1 - 2*x2) + x2)
-;
-  xKS[3]
-= x3
-;
+  KSx0
+    = x0
+    ;
+  KSx1
+    = Power(exp(1.0),x1) + R0
+    ;
+  KSx2
+    = (Pi*(1 + Cot((H0*Pi)/2.)*Tan(H0*Pi*(-0.5 + (MY1 + (2*(-MY1 + MY2))/(Power(exp(1.0),x1) + R0))*(1 - 2*x2) + x2))))/2.
+    ;
+  KSx3
+    = x3
+    ;
+
+  xKS[0]=KSx0;
+  xKS[1]=KSx1;
+  xKS[2]=KSx2;
+  xKS[3]=KSx3;
 
   return 0;
 }
@@ -2362,7 +2375,7 @@ coco_MCYL12CYL(ldouble *xMCYL1, ldouble *xCYL)
   ldouble x3=xMCYL1[3];
   ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   xCYL[0]
@@ -2396,7 +2409,7 @@ coco_CYL2MCYL1(ldouble *xCYL, ldouble *xMCYL1)
   ldouble R0=0.;
 
 #if(MYCOORDS==MCYL1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   xMCYL1[0]
@@ -2429,7 +2442,7 @@ coco_MSPH12SPH(ldouble *xMSPH1, ldouble *xSPH)
   ldouble x3=xMSPH1[3];
   ldouble R0=0.;
 #if(MYCOORDS==MSPH1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
   xSPH[0]
     = x0
@@ -2462,7 +2475,7 @@ coco_SPH2MSPH1(ldouble *xSPH, ldouble *xMSPH1)
   ldouble R0=0.;
 
 #if(MYCOORDS==MSPH1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   xMSPH1[0]
@@ -2495,7 +2508,7 @@ coco_MKER12KER(ldouble *xMKER1, ldouble *xKER)
   ldouble x3=xMKER1[3];
   ldouble R0=0.;
 #if(MYCOORDS==MKER1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   xKER[0]
@@ -2529,7 +2542,7 @@ coco_KER2MKER1(ldouble *xKER, ldouble *xMKER1)
   ldouble R0=0.;
 
 #if(MYCOORDS==MKER1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   xMKER1[0]
@@ -2837,7 +2850,7 @@ dxdx_KS2MKS1(ldouble *xx, ldouble dxdx[][4])
   ldouble KSx3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   int i,j;
@@ -2846,6 +2859,55 @@ dxdx_KS2MKS1(ldouble *xx, ldouble dxdx[][4])
       dxdx[i][j]=delta(i,j);
   
   dxdx[1][1]=1./(KSx1-R0);
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for KS -> MKS3
+int
+dxdx_KS2MKS3(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble KSx0=xx[0];
+  ldouble KSx1=xx[1];
+  ldouble KSx2=xx[2];
+  ldouble KSx3=xx[3];
+
+  ldouble R0,H0,MY1,MY2;
+  R0=H0=MY1=MY2=0.;
+
+#if(MYCOORDS==MKS3COORDS)
+  R0=MKSR0;
+  H0=MKSH0;
+  MY1=MKSMY1;
+  MY2=MKSMY2;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+;dxdx[0][0]= 1.
+;dxdx[0][1]= 0
+;dxdx[0][2]= 0
+;dxdx[0][3]= 0
+;dxdx[1][0]= 0
+;dxdx[1][1]= 1./(KSx1 - R0)
+;dxdx[1][2]= 0
+;dxdx[1][3]= 0
+;dxdx[2][0]= 0
+;dxdx[2][1]= (-4*(MY1 - MY2)*ArcTan(((-2*KSx2 + Pi)*Tan((H0*Pi)/2.))/Pi))/(H0*Power(-4*MY1 + KSx1*(-1 + 2*MY1) + 4*MY2,2)*Pi)
+;dxdx[2][2]= (-2*KSx1*Tan((H0*Pi)/2.))/(H0*(-4*MY1 + KSx1*(-1 + 2*MY1) + 4*MY2)*Power(Pi,2)*(1 + (Power(-2*KSx2 + Pi,2)*Power(Tan((H0*Pi)/2.),2))/Power(Pi,2)))
+;dxdx[2][3]= 0
+;dxdx[3][0]= 0
+;dxdx[3][1]= 0
+;dxdx[3][2]= 0
+;dxdx[3][3]= 1.
+;
 
   return 0;
 }
@@ -2865,8 +2927,8 @@ dxdx_KS2MKS2(ldouble *xx, ldouble dxdx[][4])
   ldouble R0=0.;
   ldouble H0=0.;
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
 #endif
 
   int i,j;
@@ -2895,7 +2957,7 @@ dxdx_MKS12KS(ldouble *xx, ldouble dxdx[][4])
   ldouble x3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   int i,j;
@@ -2923,8 +2985,8 @@ dxdx_MKS22KS(ldouble *xx, ldouble dxdx[][4])
   ldouble R0=0.;
   ldouble H0=0.;
 #if(MYCOORDS==MKS2COORDS)
-  R0=MKS2R0;
-  H0=MKS2H0;
+  R0=MKSR0;
+  H0=MKSH0;
 #endif
 
   int i,j;
@@ -2943,6 +3005,55 @@ dxdx_MKS22KS(ldouble *xx, ldouble dxdx[][4])
 //**********************************************************************
 //**********************************************************************
 //calculates transformation matrices dxmu/dxnu
+//for MKS3 -> KS
+int
+dxdx_MKS32KS(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble x0=xx[0];
+  ldouble x1=xx[1];
+  ldouble x2=xx[2];
+  ldouble x3=xx[3];
+
+  ldouble R0,H0,MY1,MY2;
+  R0=H0=MY1=MY2=0.;
+
+#if(MYCOORDS==MKS3COORDS)
+  R0=MKSR0;
+  H0=MKSH0;
+  MY1=MKSMY1;
+  MY2=MKSMY2;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+;dxdx[0][0]= 1.
+;dxdx[0][1]= 0
+;dxdx[0][2]= 0
+;dxdx[0][3]= 0
+;dxdx[1][0]= 0
+;dxdx[1][1]= Power(exp(1.0),x1)
+;dxdx[1][2]= 0
+;dxdx[1][3]= 0
+;dxdx[2][0]= 0
+;dxdx[2][1]= -((Power(exp(1.0),x1)*H0*(MY1 - MY2)*Power(Pi,2)*(-1 + 2*x2)*Cot((H0*Pi)/2.)*Power(Sec(H0*Pi*(-0.5 + (MY1 + (2*(-MY1 + MY2))/(Power(exp(1.0),x1) + R0))*(1 - 2*x2) + x2)),2))/Power(Power(exp(1.0),x1) + R0,2))
+;dxdx[2][2]= (H0*Power(Pi,2)*(1 - 2*(MY1 + (2*(-MY1 + MY2))/(Power(exp(1.0),x1) + R0)))*Cot((H0*Pi)/2.)*Power(Sec(H0*Pi*(-0.5 + (MY1 + (2*(-MY1 + MY2))/(Power(exp(1.0),x1) + R0))*(1 - 2*x2) + x2)),2))/2.
+;dxdx[2][3]= 0
+;dxdx[3][0]= 0
+;dxdx[3][1]= 0
+;dxdx[3][2]= 0
+;dxdx[3][3]= 1.
+;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
 //for CYL -> MCYL1
 int
 dxdx_CYL2MCYL1(ldouble *xx, ldouble dxdx[][4])
@@ -2953,7 +3064,7 @@ dxdx_CYL2MCYL1(ldouble *xx, ldouble dxdx[][4])
   ldouble CYLx3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   int i,j;
@@ -2980,7 +3091,7 @@ dxdx_MCYL12CYL(ldouble *xx, ldouble dxdx[][4])
   ldouble x3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MCYL1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   int i,j;
@@ -3007,7 +3118,7 @@ dxdx_SPH2MSPH1(ldouble *xx, ldouble dxdx[][4])
   ldouble SPHx3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MSPH1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   int i,j;
@@ -3034,7 +3145,7 @@ dxdx_MSPH12SPH(ldouble *xx, ldouble dxdx[][4])
   ldouble x3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MSPH1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   int i,j;
@@ -3061,7 +3172,7 @@ dxdx_KER2MKER1(ldouble *xx, ldouble dxdx[][4])
   ldouble KERx3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MKER1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   int i,j;
@@ -3088,7 +3199,7 @@ dxdx_MKER12KER(ldouble *xx, ldouble dxdx[][4])
   ldouble x3=xx[3];
   ldouble R0=0.;
 #if(MYCOORDS==MKER1COORDS)
-  R0=MKS1R0;
+  R0=MKSR0;
 #endif
 
   int i,j;

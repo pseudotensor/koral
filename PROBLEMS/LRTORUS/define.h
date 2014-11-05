@@ -82,8 +82,8 @@
 //coordinates / resolution
 /************************************/
 #define myMKS2COORDS
-#define MKS2R0 0.
-#define MKS2H0 0.8
+#define MKSR0 0.
+#define MKSH0 0.8
 #define METRICAXISYMMETRIC
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
