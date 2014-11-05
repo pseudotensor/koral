@@ -74,7 +74,6 @@ main(int argc, char **argv)
   //tests
   //test_metric();
 
-
 #ifdef RADIATION
   //prepare angular grid for radiative solver
 #if(RADCLOSURE==VETCLOSURE)
@@ -173,12 +172,7 @@ main(int argc, char **argv)
 #ifdef PR_POSTINIT
 #include PR_POSTINIT
 #endif
-
-  /*
-  print_primitives(&get_u(p,0,20,0,0));
-  print_conserved(&get_u(u,0,20,0,0));
-  exit(1);
-  */
+  
 
   //prepares files  
   fprint_openfiles(folder);
@@ -198,13 +192,13 @@ main(int argc, char **argv)
       //dumps dumps only for shared memory
       #ifndef MPI
 #if(SCAOUTPUT==1)
-      fprint_scalars(tstart,scalars,NSCALARS);
+            fprint_scalars(tstart,scalars,NSCALARS);
 #endif
 #if(RADOUTPUT==1)
-      fprint_radprofiles(tstart,nfout1,folder,"rad");
+            fprint_radprofiles(tstart,nfout1,folder,"rad");
 #endif
 #if(OUTOUTPUT==1)
-      fprint_outfile(tstart,nfout1,0,folder,"out");
+            fprint_outfile(tstart,nfout1,0,folder,"out");
 #endif
 #if(SILOOUTPUT==1)
 #ifndef NOSILO
@@ -212,7 +206,7 @@ main(int argc, char **argv)
 #endif
 #endif
 #if(SIMOUTPUT!=0)
-      fprint_simplefile(tstart,nfout1,folder,"sim");
+            fprint_simplefile(tstart,nfout1,folder,"sim");
 
 #endif
       #endif
@@ -255,7 +249,6 @@ solve_the_problem(ldouble tstart, char* folder)
   struct timespec temp_clock;
   struct rad_parameters rp;
    
-
  
   i1=i2=0.;
   global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]=0; //counting number of critical failures

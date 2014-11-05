@@ -168,6 +168,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      get_xx(iix,iiy,iiz,xxvec);
 	      coco_N(xxvec,xxvecsph,MYCOORDS,SPHCOORDS);
+	      //if(PROCID==0) {if(iy==0) printf("%d %f\n",ix,xxvecsph[2]);getch();}
 	      coco_N(xxvec,xxveccar,MYCOORDS,MINKCOORDS);
 	      ldouble r=xxvecsph[1];
 	      ldouble th=xxvecsph[2];

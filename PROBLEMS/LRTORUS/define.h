@@ -81,18 +81,35 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS2COORDS
+#define myMKS3COORDS
 #define MKSR0 0.
-#define MKSH0 0.8
+#define MKSH0 0.6
+#define MKSMY1 0.001
+#define MKSMY2 0.1
+#define MKSMP0 1.5
 #define METRICAXISYMMETRIC
+
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define METRICNUMERIC
-
-//#define MINX (log(1.65-MKSR0))
-//#define MAXX (log(1000.-MKSR0))
 #define MINX (log(4.-MKSR0))
 #define MAXX (log(100.-MKSR0))
+#define MINY (0.001)
+#define MAXY (1.-0.001)
+#endif
+
+#ifdef myMKS3COORDS //modified Kerr-Shild further from axis
+#define METRICNUMERIC
+#define MYCOORDS MKS3COORDS
+#define MINX (log(2.5-MKSR0))
+#define MAXX (log(100.-MKSR0))
+#define MINY 0.
+#define MAXY 1.
+#endif
+
+
+#define MINZ (-M_PI/4.)
+#define MAXZ (M_PI/4.)
+
 //total resolution
 #define TNX 64
 #define TNY 64
@@ -101,15 +118,7 @@
 #define NTX 2
 #define NTY 2
 #define NTZ 1
-#endif
 
-//#define MINY (0.0025*Pi/2.)
-//#define MAXY (Pi-0.0025*Pi/2.)
-#define MINY (0.001)
-#define MAXY (1.-0.001)
-//#define MAXY (Pi/2.) //change in postinit.c
-#define MINZ (-M_PI/4.)
-#define MAXZ (M_PI/4.)
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
 //#define PERIODIC_XBC

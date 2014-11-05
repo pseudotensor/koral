@@ -2214,7 +2214,7 @@ coco_KS2MKS3(ldouble *xKS, ldouble *xMKS)
   ldouble KSx2=xKS[2];
   ldouble KSx3=xKS[3];
   ldouble x0,x1,x2,x3;
-  ldouble R0,H0,MY1,MY2;
+  ldouble R0,H0,MY1,MY2,MP0;
   R0=H0=MY1=MY2=0.;
 
   
@@ -2223,20 +2223,21 @@ coco_KS2MKS3(ldouble *xKS, ldouble *xMKS)
   H0=MKSH0;
   MY1=MKSMY1;
   MY2=MKSMY2;
+  MP0=MKSMP0;
 #endif
 
   x0
-    = KSx0
-    ;
-  x1
-    = Log(KSx1 - R0)
-    ;
-  x2
-    = (-(H0*KSx1*Pi) - 4*H0*MY1*Pi + 2*H0*KSx1*MY1*Pi + 4*H0*MY2*Pi + 2*KSx1*ArcTan(((-2*KSx2 + Pi)*Tan((H0*Pi)/2.))/Pi))/(2.*H0*(-KSx1 - 4*MY1 + 2*KSx1*MY1 + 4*MY2)*Pi)
-    ;
-  x3
-    = KSx3
-    ;
+= KSx0
+;
+x1
+= Log(KSx1 - R0)
+;
+x2
+= (-(H0*Power(KSx1,MP0)*Pi) - Power(2,1 + MP0)*H0*MY1*Pi + 2*H0*Power(KSx1,MP0)*MY1*Pi + Power(2,1 + MP0)*H0*MY2*Pi + 2*Power(KSx1,MP0)*ArcTan(((-2*KSx2 + Pi)*Tan((H0*Pi)/2.))/Pi))/(2.*H0*(-Power(KSx1,MP0) - Power(2,1 + MP0)*MY1 + 2*Power(KSx1,MP0)*MY1 + Power(2,1 + MP0)*MY2)*Pi)
+;
+x3
+= KSx3
+;
 
   xMKS[0]=x0;
   xMKS[1]=x1;
@@ -2329,7 +2330,7 @@ coco_MKS32KS(ldouble *xMKS, ldouble *xKS)
   ldouble x1=xMKS[1];
   ldouble x2=xMKS[2];
   ldouble x3=xMKS[3];
-  ldouble R0,H0,MY1,MY2;
+  ldouble R0,H0,MY1,MY2,MP0;
   ldouble KSx0,KSx1,KSx2,KSx3;
   R0=H0=MY1=MY2=0.;
 
@@ -2338,20 +2339,21 @@ coco_MKS32KS(ldouble *xMKS, ldouble *xKS)
   H0=MKSH0;
   MY1=MKSMY1;
   MY2=MKSMY2;
+  MP0=MKSMP0;
 #endif
 
   KSx0
-    = x0
-    ;
-  KSx1
-    = exp(x1) + R0
-    ;
-  KSx2
-    = (Pi*(1 + Cot((H0*Pi)/2.)*Tan(H0*Pi*(-0.5 + (MY1 + (2*(-MY1 + MY2))/(exp(x1) + R0))*(1 - 2*x2) + x2))))/2.
-    ;
-  KSx3
-    = x3
-    ;
+= x0
+;
+KSx1
+= exp(x1) + R0
+;
+KSx2
+= (Pi*(1 + Cot((H0*Pi)/2.)*Tan(H0*Pi*(-0.5 + (MY1 + (Power(2,MP0)*(-MY1 + MY2))/Power(exp(x1) + R0,MP0))*(1 - 2*x2) + x2))))/2.
+;
+KSx3
+= x3
+;
 
   xKS[0]=KSx0;
   xKS[1]=KSx1;
@@ -2690,10 +2692,14 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     coco_KS2MKS1(x1,x2);
   else if (CO1==KSCOORDS && CO2==MKS2COORDS)
     coco_KS2MKS2(x1,x2);
+  else if (CO1==KSCOORDS && CO2==MKS3COORDS)
+    coco_KS2MKS3(x1,x2);
   else if (CO1==MKS1COORDS && CO2==KSCOORDS)
     coco_MKS12KS(x1,x2);
   else if (CO1==MKS2COORDS && CO2==KSCOORDS)
     coco_MKS22KS(x1,x2);
+  else if (CO1==MKS3COORDS && CO2==KSCOORDS)
+    coco_MKS32KS(x1,x2);
   else if (CO1==MCYL1COORDS && CO2==CYLCOORDS)
     coco_MCYL12CYL(x1,x2);
   else if (CO1==CYLCOORDS && CO2==MCYL1COORDS)
@@ -2716,6 +2722,11 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       coco_MKS22KS(x1,x2);
       coco_KS2BL(x2,x2);
     }
+ else if (CO1==MKS3COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
+    {
+      coco_MKS32KS(x1,x2);
+      coco_KS2BL(x2,x2);
+    }
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
     {
       coco_BL2KS(x1,x2);
@@ -2725,6 +2736,11 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     {
       coco_BL2KS(x1,x2);
       coco_KS2MKS2(x2,x2);
+    }
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS3COORDS)
+    {
+      coco_BL2KS(x1,x2);
+      coco_KS2MKS3(x2,x2);
     }
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MINKCOORDS)
     {
@@ -2756,6 +2772,12 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       coco_BL2KS(x2,x2);
       coco_KS2MKS2(x2,x2);
     }
+ else if (CO1==MINKCOORDS && CO2==MKS3COORDS)
+    {
+      coco_MINK2SPH(x1,x2);
+      coco_BL2KS(x2,x2);
+      coco_KS2MKS3(x2,x2);
+    }
  else if (CO1==KSCOORDS && CO2==MINKCOORDS)
     {      
       coco_KS2BL(x1,x2);
@@ -2770,6 +2792,12 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
   else if (CO1==MKS2COORDS && CO2==MINKCOORDS)
     {
       coco_MKS22KS(x1,x2);
+      coco_KS2BL(x2,x2);
+      coco_SPH2MINK(x2,x2);
+    }
+  else if (CO1==MKS3COORDS && CO2==MINKCOORDS)
+    {
+      coco_MKS32KS(x1,x2);
       coco_KS2BL(x2,x2);
       coco_SPH2MINK(x2,x2);
     }
@@ -2876,7 +2904,7 @@ dxdx_KS2MKS3(ldouble *xx, ldouble dxdx[][4])
   ldouble KSx2=xx[2];
   ldouble KSx3=xx[3];
 
-  ldouble R0,H0,MY1,MY2;
+  ldouble R0,H0,MY1,MY2,MP0;
   R0=H0=MY1=MY2=0.;
 
 #if(MYCOORDS==MKS3COORDS)
@@ -2884,6 +2912,7 @@ dxdx_KS2MKS3(ldouble *xx, ldouble dxdx[][4])
   H0=MKSH0;
   MY1=MKSMY1;
   MY2=MKSMY2;
+  MP0=MKSMP0;
 #endif
 
   int i,j;
@@ -2891,23 +2920,25 @@ dxdx_KS2MKS3(ldouble *xx, ldouble dxdx[][4])
     for(j=0;j<4;j++)
       dxdx[i][j]=delta(i,j);
   
-;dxdx[0][0]= 1.
+;dxdx[0][0]= 1
 ;dxdx[0][1]= 0
 ;dxdx[0][2]= 0
 ;dxdx[0][3]= 0
 ;dxdx[1][0]= 0
-;dxdx[1][1]= 1./(KSx1 - R0)
+;dxdx[1][1]= 1/(KSx1 - R0)
 ;dxdx[1][2]= 0
 ;dxdx[1][3]= 0
 ;dxdx[2][0]= 0
-;dxdx[2][1]= (-4*(MY1 - MY2)*ArcTan(((-2*KSx2 + Pi)*Tan((H0*Pi)/2.))/Pi))/(H0*Power(-4*MY1 + KSx1*(-1 + 2*MY1) + 4*MY2,2)*Pi)
-;dxdx[2][2]= (-2*KSx1*Tan((H0*Pi)/2.))/(H0*(-4*MY1 + KSx1*(-1 + 2*MY1) + 4*MY2)*Power(Pi,2)*(1 + (Power(-2*KSx2 + Pi,2)*Power(Tan((H0*Pi)/2.),2))/Power(Pi,2)))
+;dxdx[2][1]= -((Power(2,1 + MP0)*Power(KSx1,-1 + MP0)*MP0*(MY1 - MY2)*ArcTan(((-2*KSx2 + Pi)*Tan((H0*Pi)/2.))/Pi))/(H0*Power(Power(KSx1,MP0)*(1 - 2*MY1) + Power(2,1 + MP0)*(MY1 - MY2),2)*Pi))
+;dxdx[2][2]= (-2*Power(KSx1,MP0)*Tan((H0*Pi)/2.))/(H0*(Power(KSx1,MP0)*(-1 + 2*MY1) + Power(2,1 + MP0)*(-MY1 + MY2))*Power(Pi,2)*(1 + (Power(-2*KSx2 + Pi,2)*Power(Tan((H0*Pi)/2.),2))/Power(Pi,2)))
 ;dxdx[2][3]= 0
 ;dxdx[3][0]= 0
 ;dxdx[3][1]= 0
 ;dxdx[3][2]= 0
-;dxdx[3][3]= 1.
+;dxdx[3][3]= 1
 ;
+
+
 
   return 0;
 }
@@ -3014,7 +3045,7 @@ dxdx_MKS32KS(ldouble *xx, ldouble dxdx[][4])
   ldouble x2=xx[2];
   ldouble x3=xx[3];
 
-  ldouble R0,H0,MY1,MY2;
+  ldouble R0,H0,MY1,MY2,MP0;
   R0=H0=MY1=MY2=0.;
 
 #if(MYCOORDS==MKS3COORDS)
@@ -3022,6 +3053,7 @@ dxdx_MKS32KS(ldouble *xx, ldouble dxdx[][4])
   H0=MKSH0;
   MY1=MKSMY1;
   MY2=MKSMY2;
+  MP0=MKSMP0;
 #endif
 
   int i,j;
@@ -3029,7 +3061,7 @@ dxdx_MKS32KS(ldouble *xx, ldouble dxdx[][4])
     for(j=0;j<4;j++)
       dxdx[i][j]=delta(i,j);
   
-;dxdx[0][0]= 1.
+;dxdx[0][0]= 1
 ;dxdx[0][1]= 0
 ;dxdx[0][2]= 0
 ;dxdx[0][3]= 0
@@ -3038,14 +3070,16 @@ dxdx_MKS32KS(ldouble *xx, ldouble dxdx[][4])
 ;dxdx[1][2]= 0
 ;dxdx[1][3]= 0
 ;dxdx[2][0]= 0
-;dxdx[2][1]= -((exp(x1)*H0*(MY1 - MY2)*Power(Pi,2)*(-1 + 2*x2)*Cot((H0*Pi)/2.)*Power(Sec(H0*Pi*(-0.5 + (MY1 + (2*(-MY1 + MY2))/(exp(x1) + R0))*(1 - 2*x2) + x2)),2))/Power(exp(x1) + R0,2))
-;dxdx[2][2]= (H0*Power(Pi,2)*(1 - 2*(MY1 + (2*(-MY1 + MY2))/(exp(x1) + R0)))*Cot((H0*Pi)/2.)*Power(Sec(H0*Pi*(-0.5 + (MY1 + (2*(-MY1 + MY2))/(exp(x1) + R0))*(1 - 2*x2) + x2)),2))/2.
+;dxdx[2][1]= -(Power(2,-1 + MP0)*exp(x1)*H0*MP0*(MY1 - MY2)*Power(Pi,2)*Power(exp(x1) + R0,-1 - MP0)*(-1 + 2*x2)*Cot((H0*Pi)/2.)*Power(Sec(H0*Pi*(-0.5 + (MY1 + (Power(2,MP0)*(-MY1 + MY2))/Power(exp(x1) + R0,MP0))*(1 - 2*x2) + x2)),2))
+;dxdx[2][2]= (H0*Power(Pi,2)*(1 - 2*(MY1 + (Power(2,MP0)*(-MY1 + MY2))/Power(exp(x1) + R0,MP0)))*Cot((H0*Pi)/2.)*Power(Sec(H0*Pi*(-0.5 + (MY1 + (Power(2,MP0)*(-MY1 + MY2))/Power(exp(x1) + R0,MP0))*(1 - 2*x2) + x2)),2))/2.
 ;dxdx[2][3]= 0
 ;dxdx[3][0]= 0
 ;dxdx[3][1]= 0
 ;dxdx[3][2]= 0
-;dxdx[3][3]= 1.
+;dxdx[3][3]= 1
 ;
+
+
 
   return 0;
 }
@@ -3518,7 +3552,7 @@ calc_g_arb_num(ldouble *xx, ldouble gout[][5],int COORDS)
   //transformation matrix
   if(COORDS==MKS1COORDS) dxdx_KS2MKS1(xxb,dxdx);
   if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
-  //if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
+  if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
   if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
 
   //G = dxdx dxdx Gb
@@ -3561,7 +3595,7 @@ calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
   //transformation matrix
   if(COORDS==MKS1COORDS) dxdx_KS2MKS1(xxb,dxdx);
   if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
-  //if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
+  if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
   if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
 
   //G = dxdx dxdx Gb
@@ -3667,6 +3701,10 @@ test_metric()
 
   struct geometry geom;
   fill_geometry(NX/2,NY/2,0,&geom);
+  ldouble xxBL[4];
+  coco_N(geom.xxvec,xxBL,MYCOORDS,BLCOORDS);
+  print_4vector(geom.xxvec);
+  print_4vector(xxBL);
   ldouble gnum[4][5],gana[4][5];
   calc_g_arb_num(geom.xxvec,gnum,MYCOORDS);
   calc_g_arb_ana(geom.xxvec,gana,MYCOORDS);

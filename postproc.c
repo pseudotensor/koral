@@ -149,6 +149,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      ldouble gdetuBL=geomBL.gdet;
 
+	      //	      if(PROCID==0) {printf("%d %d %d > %e %e %e\n",ix,iy,iz,geom.gg[1][1],geom.gdet,geomBL.gdet);getch();}
+	      //exit(1);
+
 #if (GDETIN==0) //gdet out of derivatives
 	      gdetuBL=1.;
 #endif
@@ -463,6 +466,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
     
 	      //rest mass flux (3)
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
+
 
 	      //conserved flux (rhour) transformed to BLCOORDS (may be imprecise) (37)
 	      //profiles[35][ix]+=-rhouconrcons*dx[1]*dx[2];
