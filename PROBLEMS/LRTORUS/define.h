@@ -89,10 +89,10 @@
 #define MYCOORDS MKS2COORDS
 #define METRICNUMERIC
 
-//#define MINX (log(1.65-MKS2R0))
-//#define MAXX (log(1000.-MKS2R0))
-#define MINX (log(4.-MKS2R0))
-#define MAXX (log(100.-MKS2R0))
+//#define MINX (log(1.65-MKSR0))
+//#define MAXX (log(1000.-MKSR0))
+#define MINX (log(4.-MKSR0))
+#define MAXX (log(100.-MKSR0))
 //total resolution
 #define TNX 64
 #define TNY 64
