@@ -223,9 +223,24 @@ calc_g(ldouble *xx, ldouble g[][5])
   calc_g_arb(xx,g,MYCOORDS);
   return 0;
 }
+  
+//g_ij
+int
+calc_g_arb(ldouble *xx, ldouble g[][5],int COORDS)
+{
+  #ifdef METRICNUMERIC
+  calc_g_arb_num(xx,g,COORDS); 
+  #else
+  calc_g_arb_ana(xx,g,COORDS);
+  #endif
+
+  return 0;
+}
+
+
 
 int
-calc_g_arb(ldouble *xx, ldouble g[][5],int coords)
+calc_g_arb_ana(ldouble *xx, ldouble g[][5],int coords)
 {
   ldouble x0=xx[0];
   ldouble x1=xx[1];
@@ -483,9 +498,21 @@ calc_G(ldouble *xx, ldouble G[][5])
   calc_G_arb(xx,G,MYCOORDS);
   return 0;
 }
+  
+int
+calc_G_arb(ldouble *xx, ldouble G[][5],int COORDS)
+{
+  #ifdef METRICNUMERIC
+  calc_G_arb_num(xx,G,COORDS); 
+  #else
+  calc_G_arb_ana(xx,G,COORDS);
+#endif
+
+  return 0;
+}
 
 int
-calc_G_arb(ldouble *xx, ldouble G[][5],int coords)
+calc_G_arb_ana(ldouble *xx, ldouble G[][5],int coords)
 {
   ldouble x0=xx[0];
   ldouble x1=xx[1];
@@ -765,6 +792,17 @@ calc_Krzysie(ldouble *xx, ldouble Krzys[][4][4])
 }
 
 int
+calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int COORDS)
+{
+  #ifdef METRICNUMERIC
+  calc_Krzysie_arb_num(xx,Krzys,COORDS);
+  #else
+  calc_Krzysie_arb_ana(xx,Krzys,COORDS);
+  #endif
+  return 0;
+}
+
+int
 calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
 {
 #if(MODYFIKUJKRZYSIE==0)
@@ -775,11 +813,10 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
   xx[2]=get_x(iy,1);
   xx[3]=get_x(iz,2);
 
-  calc_Krzysie_arb(xx,Krzys,MYCOORDS);
+  calc_Krzysie(xx,Krzys);
 #else
   ldouble xx[4];
   ldouble Krzys_org[4][4][4];
-
   //analytical at center
 
   xx[0]=0.;
@@ -787,8 +824,8 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
   xx[2]=get_x(iy,1);
   xx[3]=get_x(iz,2);
 
-  calc_Krzysie_arb(xx,Krzys_org,MYCOORDS);
-  calc_Krzysie_arb(xx,Krzys,MYCOORDS);
+  calc_Krzysie(xx,Krzys_org);
+  calc_Krzysie(xx,Krzys);
 
   //modifying \Gamma ^mu_mu_k
 
@@ -856,7 +893,7 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
 }
 
 int
-calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int coords)
+calc_Krzysie_arb_ana(ldouble *xx, ldouble Krzys[][4][4],int coords)
 {
   ldouble x0=xx[0];
   ldouble x1=xx[1];
@@ -3312,6 +3349,99 @@ calc_metric()
   return 0;
 }
 
+/******************************************************/
+//calculates metric in COORDS using other coordinates
+//and appropriate dxdx as base
+/******************************************************/
+int
+calc_g_arb_num(ldouble *xx, ldouble gout[][5],int COORDS)
+{
+  //base system of coordinates
+  ldouble xxb[4],Gb[4][4],dxdx[4][4],G[4][4],g[4][4],gtemp[4][5];
+  int BASECOORDS,i,j;
+
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS)
+    BASECOORDS=KSCOORDS;
+  else if(COORDS==MSPH1COORDS)
+    BASECOORDS=SPHCOORDS;
+  else
+    my_err("calc_g_arb_num() called with unsupported COORDS\n");
+
+  //let's transform coordinates first
+  coco_N(xx,xxb,COORDS,BASECOORDS);
+
+  //analytical metric in BASECOORDS
+  calc_G_arb_ana(xxb,gtemp,BASECOORDS);
+  DLOOP(i,j) Gb[i][j]=gtemp[i][j];
+
+  //transformation matrix
+  if(COORDS==MKS1COORDS) dxdx_KS2MKS1(xxb,dxdx);
+  if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
+  //if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
+  if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
+
+  //G = dxdx dxdx Gb
+  multiply22(Gb,G,dxdx);
+
+  //g = G^-1
+  inverse_44matrix(G,g);
+  DLOOP(i,j) gout[i][j]=g[i][j];
+
+  //voila!
+
+  return 0;
+}
+   
+/******************************************************/
+//calculates metric in COORDS using other coordinates
+//and appropriate dxdx as base
+/******************************************************/
+int
+calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
+{
+  //base system of coordinates
+  ldouble xxb[4],Gb[4][4],dxdx[4][4],G[4][4],g[4][4],gtemp[4][5];
+  int BASECOORDS,i,j;
+
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS)
+    BASECOORDS=KSCOORDS;
+  else if(COORDS==MSPH1COORDS)
+    BASECOORDS=SPHCOORDS;
+  else
+    my_err("calc_G_arb_num() called with unsupported COORDS\n");
+
+  //let's transform coordinates first
+  coco_N(xx,xxb,COORDS,BASECOORDS);
+
+  //analytical metric in BASECOORDS
+  calc_G_arb_ana(xxb,gtemp,BASECOORDS);
+  DLOOP(i,j) Gb[i][j]=gtemp[i][j];
+
+  //transformation matrix
+  if(COORDS==MKS1COORDS) dxdx_KS2MKS1(xxb,dxdx);
+  if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
+  //if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
+  if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
+
+  //G = dxdx dxdx Gb
+  multiply22(Gb,G,dxdx);
+  DLOOP(i,j) Gout[i][j]=G[i][j];
+
+  //voila!
+
+  return 0;
+}
+   
+/******************************************************/
+//calculates Kristoffels in COORDS by numerical
+//differentiation of metric calculated through calc_G_arb()
+/******************************************************/    
+int
+calc_Krzysie_arb_num(ldouble *xx, ldouble Krzys[][4][4],int COORDS)
+{
+  return 0;
+}
+
 /**********************/
 //tests numerical calculation of metric
 /**********************/
@@ -3319,5 +3449,12 @@ int
 test_metric()
 {
   //test numerical metric computation
+
+  struct geometry geom;
+  fill_geometry(NX/2,NY/2,0,&geom);
+  print_metric(geom.gg);
+  print_metric(geom.GG);
+  exit(-1);
+
   return 0;
 }

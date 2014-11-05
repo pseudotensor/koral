@@ -84,9 +84,11 @@
 #define myMKS2COORDS
 #define MKS2R0 0.
 #define MKS2H0 0.8
-#define METRICAXISYMMETRIC
+//#define METRICAXISYMMETRIC
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
+#define METRICNUMERIC
+
 //#define MINX (log(1.65-MKS2R0))
 //#define MAXX (log(1000.-MKS2R0))
 #define MINX (log(4.-MKS2R0))
