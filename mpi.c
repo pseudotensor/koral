@@ -93,6 +93,9 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 
 #ifdef RADIATION
 	     axis1_primplus_temp[EE][gix]+=get_u(p,EE,ix,NCORRECTPOLAR,iz);
+	     #ifdef NCOMPTONIZATION
+	     axis1_primplus_temp[NF][gix]+=get_u(p,NF,ix,NCORRECTPOLAR,iz);
+	     #endif
 	     //cartesian velocities in FX..FZ slots
 	     decompose_vels(&get_u(p,0,ix,NCORRECTPOLAR,iz),FX,v,&geom,&geomBL);
 	     axis1_primplus_temp[FX][gix]+=v[1];
@@ -122,6 +125,9 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 
 #ifdef RADIATION
 	     axis2_primplus_temp[EE][gix]+=get_u(p,EE,ix,NY-NCORRECTPOLAR-1,iz);
+	     #ifdef NCOMPTONIZATION
+	     axis2_primplus_temp[NF][gix]+=get_u(p,NF,ix,NY-NCORRECTPOLAR-1,iz);
+	     #endif
 	     //cartesian velocities in FX..FZ slots
 	     decompose_vels(&get_u(p,0,ix,NY-NCORRECTPOLAR-1,iz),FX,v,&geom,&geomBL);
 	     axis2_primplus_temp[FX][gix]+=v[1];

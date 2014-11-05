@@ -4824,142 +4824,224 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
 int
 correct_polaraxis()
 {
-  int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
-
-  int ix,iy,iz,iv,ic,iysrc,ixsrc;
-
-  //spherical like coords
-  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
+ #ifdef OMP
+  if(PROCID==0)
+#endif
     {
-      //#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static,4)
-      for(ix=0;ix<NX;ix++)
-	{
-	  for(iz=0;iz<NZ;iz++)
-	    {
-	      ldouble th,thsrc,thaxis;
-	      ldouble pp[NV],uu[NV];
-	      struct geometry geom;
+      int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
-	      //upper
-	      if(TJ==0) //tile number
+      int ix,iy,iz,iv,ic,iysrc,ixsrc;
+
+      //spherical like coords
+      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
+	{
+	  //#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static,4)
+	  for(ix=0;ix<NX;ix++)
+	    {
+	      for(iz=0;iz<NZ;iz++)
 		{
-		  thaxis=get_xb(0,1);
-		  for(ic=0;ic<nc;ic++)
+		  ldouble th,thsrc,thaxis;
+		  ldouble pp[NV],uu[NV];
+		  struct geometry geom;
+
+		  //upper
+		  if(TJ==0) //tile number
 		    {
-		      iy=ic;iysrc=nc;
-		      th=get_x(iy,1);
-		      thsrc=get_x(iysrc,1);	      
+		      thaxis=get_xb(0,1);
+		      for(ic=0;ic<nc;ic++)
+			{
+			  iy=ic;iysrc=nc;
+			  th=get_x(iy,1);
+			  thsrc=get_x(iysrc,1);	      
 	      	  
-		      fill_geometry(ix,iy,iz,&geom);
+			  fill_geometry(ix,iy,iz,&geom);
 	  
-		      PLOOP(iv)
-			pp[iv]=get_u(p,iv,ix,iy,iz);
+			  PLOOP(iv)
+			    pp[iv]=get_u(p,iv,ix,iy,iz);
 		  
-		      //gas densities
-		      pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
-		      pp[UU]=get_u(p,UU,ix,iysrc,iz);
-		      pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
+			  //gas densities
+			  pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
+			  pp[UU]=get_u(p,UU,ix,iysrc,iz);
+			  pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
 		  		  		  
-		      //gas velocities
-		      pp[VX]=get_u(p,VX,ix,iysrc,iz);
-		      pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
-		      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
+			  //gas velocities
+			  pp[VX]=get_u(p,VX,ix,iysrc,iz);
+			  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
+			  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
 #ifdef MAGNFIELD
-		      //do not overwrite magnetic field, not to break div B=0 there
-		      /*
-			pp[B1]=get_u(p,B1,ix,iysrc,iz);
-		      pp[B3]=get_u(p,B3,ix,iysrc,iz);
-		      pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
-		      */
+			  //do not overwrite magnetic field, not to break div B=0 there
+			  /*
+			    pp[B1]=get_u(p,B1,ix,iysrc,iz);
+			    pp[B3]=get_u(p,B3,ix,iysrc,iz);
+			    pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
+			  */
 #endif
 
 #ifdef RADIATION
-		      //rad density
-		      pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
+			  //rad density
+			  pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
 
-		      #ifdef NCOMPTONIZATION
-		      //no. of photons
-		      pp[NF0]=get_u(p,NF0,ix,iysrc,iz);
-		      #endif
+#ifdef NCOMPTONIZATION
+			  //no. of photons
+			  pp[NF0]=get_u(p,NF0,ix,iysrc,iz);
+#endif
 
-		      //rad velocities
-		      pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
-		      pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
-		      pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
+			  //rad velocities
+			  pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
+			  pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
+			  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
        
 #ifdef EVOLVEINTENSITIES
-		      for(iv=0;iv<NUMANGLES;iv++)
-			Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
+			  for(iv=0;iv<NUMANGLES;iv++)
+			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
 #endif
 
 #endif 
 
-		      p2u(pp,uu,&geom);
+			  p2u(pp,uu,&geom);
 
-		      PLOOP(iv)
-		      {
-			set_u(p,iv,ix,iy,iz,pp[iv]);  
-			set_u(u,iv,ix,iy,iz,uu[iv]);
-		      }
+			  PLOOP(iv)
+			  {
+			    set_u(p,iv,ix,iy,iz,pp[iv]);  
+			    set_u(u,iv,ix,iy,iz,uu[iv]);
+			  }
+			}
 		    }
-		}
   
-	      //lower
+		  //lower
 #ifndef HALFTHETA
-	      if(TJ==NTY-1)
+		  if(TJ==NTY-1)
+		    {
+		      thaxis=get_xb(NY,1);
+		      for(ic=0;ic<nc;ic++)
+			{
+			  iy=NY-1-ic;iysrc=NY-1-nc;
+			  th=get_x(iy,1);
+			  thsrc=get_x(iysrc,1);	      
+	      	  
+			  fill_geometry(ix,iy,iz,&geom);
+	  
+			  PLOOP(iv)
+			    pp[iv]=get_u(p,iv,ix,iy,iz);
+  
+			  //gas densities
+			  pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
+			  pp[UU]=get_u(p,UU,ix,iysrc,iz);
+			  pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
+
+			  //gas velocities
+			  pp[VX]=get_u(p,VX,ix,iysrc,iz);
+			  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
+			  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
+
+#ifdef MAGNFIELD
+			  /*
+			    pp[B1]=get_u(p,B1,ix,iysrc,iz);
+			    pp[B3]=get_u(p,B3,ix,iysrc,iz);
+			    pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
+			  */
+#endif
+
+#ifdef RADIATION
+			  //rad density
+			  pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
+
+#ifdef NCOMPTONIZATION
+			  //no. of photons
+			  pp[NF0]=get_u(p,NF0,ix,iysrc,iz);
+#endif
+
+			  //rad velocities
+			  pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
+			  pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
+			  pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
+
+#ifdef EVOLVEINTENSITIES
+			  for(iv=0;iv<NUMANGLES;iv++)
+			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
+#endif
+
+#endif 
+		  
+			  p2u(pp,uu,&geom);
+
+			  PLOOP(iv)
+			  {
+			    set_u(p,iv,ix,iy,iz,pp[iv]);  
+			    set_u(u,iv,ix,iy,iz,uu[iv]);
+			  }
+			}
+		    }
+#endif
+		}
+	    }
+	}
+
+      //cylindrical like coords
+      if (MYCOORDS==CYLCOORDS || MYCOORDS==MCYL1COORDS)
+	{
+	  //#pragma omp parallel for private(ic,ix,iy,iz,iv,ixsrc) schedule (static,4)
+	  for(iy=0;iy<NY;iy++)
+	    {
+	      for(iz=0;iz<NZ;iz++)
 		{
-		  thaxis=get_xb(NY,1);
+		  ldouble R,Rsrc,Raxis;
+		  ldouble pp[NV],uu[NV];
+		  struct geometry geom;
+
+		  //upper
+		  Raxis=get_xb(0,0);
 		  for(ic=0;ic<nc;ic++)
 		    {
-		      iy=NY-1-ic;iysrc=NY-1-nc;
-		      th=get_x(iy,1);
-		      thsrc=get_x(iysrc,1);	      
+		      ix=ic;ixsrc=nc;
+		      R=get_x(ix,0);
+		      Rsrc=get_x(ixsrc,0);	      
 	      	  
 		      fill_geometry(ix,iy,iz,&geom);
 	  
 		      PLOOP(iv)
 			pp[iv]=get_u(p,iv,ix,iy,iz);
-  
+
 		      //gas densities
-		      pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
-		      pp[UU]=get_u(p,UU,ix,iysrc,iz);
-		      pp[ENTR]=get_u(p,ENTR,ix,iysrc,iz);		  
+		      pp[RHO]=get_u(p,RHO,ixsrc,iy,iz);
+		      pp[UU]=get_u(p,UU,ixsrc,iy,iz);
+		      pp[ENTR]=get_u(p,ENTR,ixsrc,iy,iz);		  
 
 		      //gas velocities
-		      pp[VX]=get_u(p,VX,ix,iysrc,iz);
-		      pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
-		      pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
+		      pp[VY]=get_u(p,VY,ixsrc,iy,iz);
+		      pp[VZ]=get_u(p,VZ,ixsrc,iy,iz);
+		      pp[VX]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,VX,ixsrc,iy,iz);
 
 #ifdef MAGNFIELD
 		      /*
-		      pp[B1]=get_u(p,B1,ix,iysrc,iz);
-		      pp[B3]=get_u(p,B3,ix,iysrc,iz);
-		      pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
+			pp[B2]=get_u(p,B2,ixsrc,iy,iz);
+			pp[B3]=get_u(p,B3,ixsrc,iy,iz);
+			pp[B1]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,B1,ixsrc,iy,iz);
 		      */
 #endif
 
 #ifdef RADIATION
 		      //rad density
-		      pp[EE0]=get_u(p,EE0,ix,iysrc,iz);
+		      pp[EE0]=get_u(p,EE0,ixsrc,iy,iz);
 
-                      #ifdef NCOMPTONIZATION
+#ifdef NCOMPTONIZATION
 		      //no. of photons
-		      pp[NF0]=get_u(p,NF0,ix,iysrc,iz);
-		      #endif
+		      pp[NF0]=get_u(p,NF0,ixsrc,iy,iz);
+#endif
 
 		      //rad velocities
-		      pp[FX0]=get_u(p,FX0,ix,iysrc,iz);
-		      pp[FZ0]=get_u(p,FZ0,ix,iysrc,iz);
-		      pp[FY0]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,FY0,ix,iysrc,iz);
+		      pp[FY0]=get_u(p,FY0,ixsrc,iy,iz);
+		      pp[FZ0]=get_u(p,FZ0,ixsrc,iy,iz);
+		      pp[FX0]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,FX0,ixsrc,iy,iz);
 
 #ifdef EVOLVEINTENSITIES
 		      for(iv=0;iv<NUMANGLES;iv++)
-			Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
+			Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ixsrc+NGCX][iy+NGCY][iz+NGCZ][iv];
 #endif
 
 #endif 
-		  
+
 		      p2u(pp,uu,&geom);
 
 		      PLOOP(iv)
@@ -4969,88 +5051,10 @@ correct_polaraxis()
 		      }
 		    }
 		}
-#endif
 	    }
 	}
+
     }
-
-  //cylindrical like coords
-  if (MYCOORDS==CYLCOORDS || MYCOORDS==MCYL1COORDS)
-    {
-//#pragma omp parallel for private(ic,ix,iy,iz,iv,ixsrc) schedule (static,4)
-      for(iy=0;iy<NY;iy++)
-	{
-	  for(iz=0;iz<NZ;iz++)
-	    {
-	      ldouble R,Rsrc,Raxis;
-	      ldouble pp[NV],uu[NV];
-	      struct geometry geom;
-
-	      //upper
-	      Raxis=get_xb(0,0);
-	      for(ic=0;ic<nc;ic++)
-		{
-		  ix=ic;ixsrc=nc;
-		  R=get_x(ix,0);
-		  Rsrc=get_x(ixsrc,0);	      
-	      	  
-		  fill_geometry(ix,iy,iz,&geom);
-	  
-		  PLOOP(iv)
-		    pp[iv]=get_u(p,iv,ix,iy,iz);
-
-		  //gas densities
-		  pp[RHO]=get_u(p,RHO,ixsrc,iy,iz);
-		  pp[UU]=get_u(p,UU,ixsrc,iy,iz);
-		  pp[ENTR]=get_u(p,ENTR,ixsrc,iy,iz);		  
-
-		  //gas velocities
-		  pp[VY]=get_u(p,VY,ixsrc,iy,iz);
-		  pp[VZ]=get_u(p,VZ,ixsrc,iy,iz);
-		  pp[VX]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,VX,ixsrc,iy,iz);
-
-		  #ifdef MAGNFIELD
-		  /*
-		  pp[B2]=get_u(p,B2,ixsrc,iy,iz);
-		  pp[B3]=get_u(p,B3,ixsrc,iy,iz);
-		  pp[B1]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,B1,ixsrc,iy,iz);
-		  */
-		  #endif
-
-		  #ifdef RADIATION
-		  //rad density
-		  pp[EE0]=get_u(p,EE0,ixsrc,iy,iz);
-
-                  #ifdef NCOMPTONIZATION
-		  //no. of photons
-		  pp[NF0]=get_u(p,NF0,ixsrc,iy,iz);
-		  #endif
-
-		  //rad velocities
-		  pp[FY0]=get_u(p,FY0,ixsrc,iy,iz);
-		  pp[FZ0]=get_u(p,FZ0,ixsrc,iy,iz);
-		  pp[FX0]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,FX0,ixsrc,iy,iz);
-
-#ifdef EVOLVEINTENSITIES
-		  for(iv=0;iv<NUMANGLES;iv++)
-		    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ixsrc+NGCX][iy+NGCY][iz+NGCZ][iv];
-#endif
-
-		  #endif 
-
-		  p2u(pp,uu,&geom);
-
-		  PLOOP(iv)
-		  {
-		    set_u(p,iv,ix,iy,iz,pp[iv]);  
-		    set_u(u,iv,ix,iy,iz,uu[iv]);
-		  }
-		}
-	    }
-	}
-    }
-
-
   return 0; 
 }
 
@@ -5059,106 +5063,21 @@ correct_polaraxis()
 int
 correct_polaraxis_3d()
 {
-  int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
-
-  int ix,iy,iz,iv,ic,iysrc,ixsrc;
-
-  //spherical like coords
-  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
+#ifdef OMP
+  if(PROCID==0)
+#endif
     {
-      //#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static,4)
-      ldouble ppavg[NV];
-      for(ix=0;ix<NX;ix++)
+      int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
+
+      int ix,iy,iz,iv,ic,iysrc,ixsrc,gix;
+
+      //spherical like coords
+      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
 	{
-	  //TODO
-	  //temporary calculating averages here - should be moved to calc_avgs!!!
-
-	  //TODO
-	  //averaging Omega as well!!!
-	  ldouble v[4],Omega,pp[NV];
-	  PLOOP(iv) ppavg[iv]=0.;
-	  struct geometry geomBL,geom;
-
-	  //upper
-	  if(TJ==0) //tile number
+	  ldouble ppavg[NV];
+	  for(ix=0;ix<NX;ix++)
 	    {
-	      for(iz=0;iz<NZ;iz++)
-		{
-		  fill_geometry_arb(ix,NCCORRECTPOLAR,iz,&geomBL,BLCOORDS);
-		  fill_geometry(ix,NCCORRECTPOLAR,iz,&geom);
-
-		  PLOOP(iv)
-		    pp[iv]=get_u(p,iv,ix,NCCORRECTPOLAR,iz); 
-
-		  ppavg[RHO]+=pp[RHO];
-		  ppavg[UU]+=pp[UU];
-		
-
-		  //cartesian velocities in VX..VZ slots
-		  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};
-		  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
- 		  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
-		  ldouble r=geomBL.xx;
-		  ldouble th=geomBL.yy;
-		  ldouble ph=geomBL.zz;
-
-		  //to cartesian
-		  ucon[2]*=r;
-		  ucon[3]*=r*sin(th);
-		  
-		  v[1] = sin(th)*cos(ph)*ucon[1] 
-		    + cos(th)*cos(ph)*ucon[2]
-		    - sin(ph)*ucon[3];
-
-		  v[2] = sin(th)*sin(ph)*ucon[1] 
-		    + cos(th)*sin(ph)*ucon[2]
-		    + cos(ph)*ucon[3];
-		  
-		  v[3] = cos(th)*ucon[1] 
-		    - sin(th)*ucon[2];
-
-		  ppavg[VX]+=v[1];
-		  ppavg[VY]+=v[2];
-		  ppavg[VZ]+=v[3];
-
-#ifdef RADIATION
-
-		  ppavg[EE]+=pp[EE];
-		  //cartesian velocities in VX..VZ slots
-		  ucon[1]=pp[FX];
-		  ucon[2]=pp[FY];
-		  ucon[3]=pp[FZ];
-		  conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
- 		  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
-
-		  //to cartesian
-		  ucon[2]*=r;
-		  ucon[3]*=r*sin(th);
-		  
-		  v[1] = sin(th)*cos(ph)*ucon[1] 
-		    + cos(th)*cos(ph)*ucon[2]
-		    - sin(ph)*ucon[3];
-
-		  v[2] = sin(th)*sin(ph)*ucon[1] 
-		    + cos(th)*sin(ph)*ucon[2]
-		    + cos(ph)*ucon[3];
-		  
-		  v[3] = cos(th)*ucon[1] 
-		    - sin(th)*ucon[2];
-
-		  ppavg[FX]+=v[1];
-		  ppavg[FY]+=v[2];
-		  ppavg[FZ]+=v[3];
-
-		  #ifdef NCOMPTONIZATION
-		  ppavg[NF]+=pp[NF];
-#endif
-#endif
-		}
-
-	      PLOOP(iv)
-		ppavg[iv]/=NZ;
-
+	      gix=ix+TOI;
 	      //overwriting
 	      for(iz=0;iz<NZ;iz++)
 		{
@@ -5166,11 +5085,13 @@ correct_polaraxis_3d()
 		  ldouble pp[NV],uu[NV];
 		  struct geometry geom,geomBL;
 
+		  //upper axis
+		  iysrc=nc;
 		  for(ic=0;ic<nc;ic++)
 		    {
 		      iy=ic;
 	      	 
- 		      fill_geometry(ix,iy,iz,&geom);
+		      fill_geometry(ix,iy,iz,&geom);
 		      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
 		      ldouble r=geomBL.xx;
@@ -5178,23 +5099,17 @@ correct_polaraxis_3d()
 		      ldouble ph=geomBL.zz;
 		      ldouble vr,vth,vph;
 		      ldouble cosph,sinth,costh,sinph;
-		      sinth=sin(th);
-		      costh=cos(th);
-		      sinph=sin(ph);
-		      cosph=cos(ph);
+		      sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
 	  
-		      PLOOP(iv)
-			pp[iv]=get_u(p,iv,ix,iy,iz);
-		  
 		      //gas
-		      pp[RHO]=ppavg[RHO];
-		      pp[UU]=ppavg[UU];
+		      pp[RHO]=axis1_primplus[RHO][gix];
+		      pp[UU]=axis1_primplus[UU][gix];
 		      pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 		  		  		  
 		      //gas velocities
-		      ldouble vx=ppavg[VX];
-		      ldouble vy=ppavg[VY];
-		      ldouble vz=ppavg[VZ];
+		      ldouble vx=axis1_primplus[VX][gix];
+		      ldouble vy=axis1_primplus[VY][gix];
+		      ldouble vz=axis1_primplus[VZ][gix];
 		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
 			     costh*Power(sinph,2)*vz)/
 			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
@@ -5213,10 +5128,8 @@ correct_polaraxis_3d()
 		      pp[VX]=ucon[1];
 		      pp[VY]=ucon[2];
 		      pp[VZ]=ucon[3];
-
-
-
-		      
+		      //add average rotation
+		      pp[VZ]+=axis1_primplus[NV][gix];
 		     
 #ifdef MAGNFIELD
 		      //do not overwrite magnetic field, not to break div B=0 there
@@ -5224,17 +5137,17 @@ correct_polaraxis_3d()
 
 #ifdef RADIATION
 		      //rad density
-		      pp[EE]=ppavg[EE];
+		      pp[EE]=axis1_primplus[EE][gix];
 
 #ifdef NCOMPTONIZATION
 		      //no. of photons
-		      pp[NF]=ppavg[NF];
+		      pp[NF]=ppaaxis1_primplusvg[NF][gix];
 #endif
 
 		      //rad velocities
-		      ldouble vx=ppavg[FX];
-		      ldouble vy=ppavg[FY];
-		      ldouble vz=ppavg[FZ];
+		      ldouble vx=axis1_primplus[FX][gix];
+		      ldouble vy=axis1_primplus[FY][gix];
+		      ldouble vz=axis1_primplus[FZ][gix];
 		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
 			     costh*Power(sinph,2)*vz)/
 			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
@@ -5253,7 +5166,8 @@ correct_polaraxis_3d()
 		      pp[FX]=ucon[1];
 		      pp[FY]=ucon[2];
 		      pp[FZ]=ucon[3];
-
+		      //add average rotation
+		      pp[VZ]+=axis1_primplus[NV+1][gix];
        
 #ifdef EVOLVEINTENSITIES
 		      for(iv=0;iv<NUMANGLES;iv++)
@@ -5269,6 +5183,106 @@ correct_polaraxis_3d()
 			set_u(u,iv,ix,iy,iz,uu[iv]);
 		      }
 		    }
+
+		  //bottom axis
+		  iysrc=NY-1-nc; 
+		  for(ic=0;ic<nc;ic++)
+		    {
+		      iy=NY-1-ic;
+	      	 
+		      fill_geometry(ix,iy,iz,&geom);
+		      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+		      ldouble r=geomBL.xx;
+		      ldouble th=geomBL.yy;
+		      ldouble ph=geomBL.zz;
+		      ldouble vr,vth,vph;
+		      ldouble cosph,sinth,costh,sinph;
+		      sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
+	  
+		      //gas
+		      pp[RHO]=axis2_primplus[RHO][gix];
+		      pp[UU]=axis2_primplus[UU][gix];
+		      pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+		  		  		  
+		      //gas velocities
+		      ldouble vx=axis2_primplus[VX][gix];
+		      ldouble vy=axis2_primplus[VY][gix];
+		      ldouble vz=axis2_primplus[VZ][gix];
+		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+			     costh*Power(sinph,2)*vz)/
+			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+		      vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+			       Power(sinph,2)*sinth*vz)/
+			      ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+		      vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+
+		      vth /= r;
+		      vph /= r*sinth;
+
+		      ldouble ucon[4]={0.,vr,vth,vph};
+		      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+		      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+
+		      pp[VX]=ucon[1];
+		      pp[VY]=ucon[2];
+		      pp[VZ]=ucon[3];
+		     //add average rotation
+		      pp[VZ]+=axis2_primplus[NV][gix];
+		      
+#ifdef MAGNFIELD
+		      //do not overwrite magnetic field, not to break div B=0 there
+#endif
+
+#ifdef RADIATION
+		      //rad density
+		      pp[EE]=axis2_primplus[EE][gix];
+
+#ifdef NCOMPTONIZATION
+		      //no. of photons
+		      pp[NF]=ppaaxis2_primplusvg[NF][gix];
+#endif
+
+		      //rad velocities
+		      ldouble vx=axis2_primplus[FX][gix];
+		      ldouble vy=axis2_primplus[FY][gix];
+		      ldouble vz=axis2_primplus[FZ][gix];
+		      vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+			     costh*Power(sinph,2)*vz)/
+			    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+		      vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+			       Power(sinph,2)*sinth*vz)/
+			      ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+		      vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+
+		      vth /= r;
+		      vph /= r*sinth;
+
+		      ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+		      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+		      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+
+		      pp[FX]=ucon[1];
+		      pp[FY]=ucon[2];
+		      pp[FZ]=ucon[3];
+		      //add average rotation
+		      pp[VZ]+=axis2_primplus[NV+1][gix];
+       
+#ifdef EVOLVEINTENSITIES
+		      for(iv=0;iv<NUMANGLES;iv++)
+			Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
+#endif
+#endif
+
+		      p2u(pp,uu,&geom);
+
+		      PLOOP(iv)
+		      {
+			set_u(p,iv,ix,iy,iz,pp[iv]);  
+			set_u(u,iv,ix,iy,iz,uu[iv]);
+		      }
+		    }
+
 		}
 	    }
 	}
