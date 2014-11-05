@@ -298,6 +298,7 @@ ldouble find_max_eigenvalue(ldouble *data,int N);
 int find_max_eigenvalue_lr(ldouble *data,int N,ldouble*,ldouble*);
 int my_err(char *);
 int inverse_44matrix(ldouble a[][4], ldouble ia[][4]);
+ldouble determinant_44matrix(ldouble a[][4]);
 int inverse_matrix(ldouble *a, ldouble *ia, int N);
 int convert_out2gif_1d(char *fname,char*,int niter,ldouble t);
 int convert_out2gif_2d(char *fname,char*,int niter,ldouble t);
@@ -553,6 +554,8 @@ int print_g(ldouble [][5]);
 ldouble calc_gdet(ldouble *xx);
 ldouble calc_dlgdet(ldouble *xx, int idim);
 ldouble calc_gdet_arb(ldouble *xx,int);
+ldouble calc_gdet_arb_ana(ldouble *xx,int);
+ldouble calc_gdet_arb_num(ldouble *xx,int);
 ldouble calc_dlgdet_arb(ldouble *xx, int idim,int);
 int coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2);
 int coco_BL2KS(ldouble *xBL, ldouble *xKS);
@@ -864,6 +867,8 @@ MPI_Comm mpi_inttotal_comm[NTX], mpi_intbelow_comm[NTX];
 #define PLOOP(j) for(j=0;j<NV;j++)
 /* loop over all Dimensions; second rank loop */
 #define DLOOP(j,k) for(j=0;j<NDIM;j++)for(k=0;k<NDIM;k++)
+/* loop over all Dimensions; second rank loop */
+#define DLOOPB(i,j,k) for(i=0;i<NDIM;i++)for(j=0;j<NDIM;j++)for(k=0;k<NDIM;k++)
 /* loop over all Dimensions; first rank loop */
 #define DLOOPA(j) for(j=0;j<NDIM;j++)
 /* loop over all Space dimensions; second rank loop */

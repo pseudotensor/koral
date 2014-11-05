@@ -13,7 +13,20 @@ calc_gdet(ldouble *xx)
 }
  
 ldouble
-calc_gdet_arb(ldouble *xx,int coords)
+calc_gdet_arb(ldouble *xx,int COORDS)
+{
+#ifdef METRICNUMERIC
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==MSPH1COORDS)
+    return calc_gdet_arb_num(xx,COORDS);
+  else
+    return calc_gdet_arb_ana(xx,COORDS);
+#else
+  return calc_gdet_arb_ana(xx,COORDS);
+#endif
+}
+
+ldouble
+calc_gdet_arb_ana(ldouble *xx,int coords)
 {
   ldouble x0=xx[0];
   ldouble x1=xx[1];
@@ -229,7 +242,10 @@ int
 calc_g_arb(ldouble *xx, ldouble g[][5],int COORDS)
 {
   #ifdef METRICNUMERIC
-  calc_g_arb_num(xx,g,COORDS); 
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==MSPH1COORDS)
+    calc_g_arb_num(xx,g,COORDS); 
+  else
+    calc_g_arb_ana(xx,g,COORDS);
   #else
   calc_g_arb_ana(xx,g,COORDS);
   #endif
@@ -247,7 +263,7 @@ calc_g_arb_ana(ldouble *xx, ldouble g[][5],int coords)
   ldouble x2=xx[2];
   ldouble x3=xx[3];
 
-  g[3][4]=calc_gdet_arb(xx,coords);
+  //g[3][4]=calc_gdet_arb(xx,coords);
 
 if(coords==MKER1COORDS) {
 #if(MYCOORDS==MKER1COORDS)
@@ -503,10 +519,13 @@ int
 calc_G_arb(ldouble *xx, ldouble G[][5],int COORDS)
 {
   #ifdef METRICNUMERIC
-  calc_G_arb_num(xx,G,COORDS); 
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==MSPH1COORDS)
+    calc_G_arb_num(xx,G,COORDS); 
+  else
+    calc_G_arb_ana(xx,G,COORDS); 
   #else
-  calc_G_arb_ana(xx,G,COORDS);
-#endif
+  calc_G_arb_ana(xx,G,COORDS); 
+  #endif
 
   return 0;
 }
@@ -795,7 +814,10 @@ int
 calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int COORDS)
 {
   #ifdef METRICNUMERIC
-  calc_Krzysie_arb_num(xx,Krzys,COORDS);
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==MSPH1COORDS)
+    calc_Krzysie_arb_num(xx,Krzys,COORDS);
+  else
+    calc_Krzysie_arb_ana(xx,Krzys,COORDS);
   #else
   calc_Krzysie_arb_ana(xx,Krzys,COORDS);
   #endif
@@ -3168,6 +3190,14 @@ calc_metric()
 {
   int ix,iy,iz,ii;
 
+  #ifdef METRICNUMERIC
+  if(GDETIN==0)
+    {
+      my_err("METRICNUMERIC requires GDETIN==1!\n");
+      exit(-1);
+    }
+  #endif
+
   if(PROCID==0) {printf("Precalculating metrics... "); fflush(stdout);}
   
   #pragma omp parallel private(ix,iy,iz,ii) 
@@ -3434,13 +3464,87 @@ calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
    
 /******************************************************/
 //calculates Kristoffels in COORDS by numerical
-//differentiation of metric calculated through calc_G_arb()
+//differentiation of metric calculated through calc_g_arb()
 /******************************************************/    
+
+struct fg_params
+{
+  int i,j,k,COORDS;
+  ldouble xx[4];
+};
+
+ldouble fg (double x, void * params)
+{
+  struct fg_params *par
+    = (struct fg_params *) params;
+  ldouble xx[4]={par->xx[0],par->xx[1],par->xx[2],par->xx[3]};
+  xx[par->k]=x;
+  ldouble g[4][5];
+  calc_g_arb(xx,g,par->COORDS);
+
+  return g[par->i][par->j];
+}
+
 int
 calc_Krzysie_arb_num(ldouble *xx, ldouble Krzys[][4][4],int COORDS)
 {
+  //derivative of metric against coordinates
+  ldouble dgdx[4][4][4];
+  gsl_function F;
+  double result, abserr;
+  int i,j,k,l;
+  struct fg_params par;
+  F.function = &fg;
+  F.params = &par;
+  par.COORDS=COORDS;
+  DLOOPA(i)
+    par.xx[i]=xx[i];
+  DLOOPB(i,j,k)
+    {
+      //dg_ij , k
+      par.i=i; par.j=j; par.k=k;    
+      gsl_deriv_central (&F, xx[k], 1e-6, &result, &abserr);
+      dgdx[i][j][k]=result;
+    }
+
+  //Kristoffels with all lower indices
+  ldouble gamma[4][4][4];
+  DLOOPB(i,j,k)
+    {
+      gamma[i][j][k]=0.5*(dgdx[i][j][k]+dgdx[i][k][j]-dgdx[j][k][i]);
+    }
+
+  //\Gamma^i_jk
+  ldouble G[4][5];
+  calc_G_arb(xx,G,COORDS);
+  DLOOPB(i,j,k)
+    {
+      Krzys[i][j][k]=0.;
+      DLOOPA(l)
+	Krzys[i][j][k]+=G[i][l]*gamma[l][j][k];
+    }
+
   return 0;
 }
+
+
+/******************************************************/
+//calculates gdet by numerical determinant of calc_g_arb()
+/******************************************************/    
+
+ldouble
+calc_gdet_arb_num(ldouble *xx,int COORDS)
+{
+  int i,j;
+  ldouble g[4][5],a[4][4];
+  calc_g_arb(xx,g,COORDS);
+  DLOOP(i,j)
+    a[i][j]=g[i][j];
+  
+  return sqrt(-determinant_44matrix(a));
+
+}
+
 
 /**********************/
 //tests numerical calculation of metric
@@ -3452,9 +3556,26 @@ test_metric()
 
   struct geometry geom;
   fill_geometry(NX/2,NY/2,0,&geom);
-  print_metric(geom.gg);
-  print_metric(geom.GG);
+  ldouble gnum[4][5],gana[4][5];
+  calc_g_arb_num(geom.xxvec,gnum,MYCOORDS);
+  calc_g_arb_ana(geom.xxvec,gana,MYCOORDS);
+  print_metric(gnum);
+  print_metric(gana);
+  ldouble Knum[4][4][4];
+  ldouble Kana[4][4][4];
+  calc_Krzysie_arb_num(geom.xxvec, Knum, MYCOORDS);
+  calc_Krzysie_arb_ana(geom.xxvec, Kana, MYCOORDS);
+
+  int i,j,k;
+  printf("gdets: %e vs %e\n",calc_gdet_arb_num(geom.xxvec,MYCOORDS),calc_gdet_arb_ana(geom.xxvec,MYCOORDS));
+  DLOOPB(i,j,k)
+    {
+      //printf("%d %d %d > %e vs %e\n",i,j,k,Knum[i][j][k],Kana[i][j][k]);
+    }
+
+  fflush(stdout);
   exit(-1);
 
   return 0;
 }
+

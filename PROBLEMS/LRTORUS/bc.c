@@ -47,19 +47,24 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
 
+    /*
+
     //checking for the gas inflow
     ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
     conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+    trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
     if(ucon[1]<0.) //inflow, resseting to atmosphere
       {
 	//atmosphere in rho,uint and velocities and zero magn. field
 	//set_hdatmosphere(pp,xxvec,gg,GG,4);
 	ucon[1]=0.;
+	trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
 	conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 	pp[VX]=ucon[1];
 	pp[VY]=ucon[2];
 	pp[VZ]=ucon[3];//atmosphere in rho,uint and velocities and zero magn. field
       }
+    */
 
 #ifdef RADIATION
     ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};    
