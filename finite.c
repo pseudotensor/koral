@@ -5108,7 +5108,7 @@ correct_polaraxis_3d()
 			  fill_geometry(ix,iy,iz,&geom);
 			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
-			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,iy,iz);
+			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NCCORRECTPOLAR,iz);
 
 			  ldouble r=geomBL.xx;
 			  ldouble th=geomBL.yy;
@@ -5237,7 +5237,7 @@ correct_polaraxis_3d()
 			{
 			  iy=NY-1-ic;
 
-			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,iy,iz);
+			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NY-NCCORRECTPOLAR-1,iz);
 	      	 
 			  fill_geometry(ix,iy,iz,&geom);
 			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
