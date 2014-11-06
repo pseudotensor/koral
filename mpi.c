@@ -61,6 +61,7 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
   /***************************/
   //averaging velocities 
 #ifdef CORRECT_POLARAXIS_3D
+#ifdef POLARAXISAVGIN3D
  int ix,iy,iz,gix,giy,giz,iv; 
  struct geometry geom, geomBL;
  ldouble v[4],ucon[4],r,th,ph;
@@ -163,6 +164,7 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 	axis2_primplus[iv][gix]=axis2_primplus_temp[iv][gix];
       }
     }
+#endif
 #endif
 #endif
 

@@ -5109,6 +5109,8 @@ correct_polaraxis_3d()
 
 			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NCCORRECTPOLAR,iz);
 
+			  #ifdef POLARAXISAVGIN3D
+
 			  ldouble r=geomBL.xx;
 			  ldouble th=geomBL.yy;
 			  ldouble ph=geomBL.zz;
@@ -5216,6 +5218,8 @@ correct_polaraxis_3d()
 			  //add average rotation
 			  pp[VZ]+=axis1_primplus[NV+1][gix];
 			  }
+
+			  #endif
 #ifdef EVOLVEINTENSITIES
 			  for(iv=0;iv<NUMANGLES;iv++)
 			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
@@ -5245,6 +5249,9 @@ correct_polaraxis_3d()
 
 			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NY-NCCORRECTPOLAR-1,iz);
 	      	 
+
+			  #ifdef POLARAXISAVGIN3D
+
 			  fill_geometry(ix,iy,iz,&geom);
 			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
@@ -5335,6 +5342,7 @@ correct_polaraxis_3d()
 			  //add average rotation
 			  pp[FZ]+=axis2_primplus[NV+1][gix];
 			  }
+ #endif
 
 #ifdef EVOLVEINTENSITIES
 			  for(iv=0;iv<NUMANGLES;iv++)
