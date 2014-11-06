@@ -81,7 +81,7 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS2COORDS
+#define myMKS3COORDS
 #define MKSR0 0.
 #define MKSH0 0.6
 #define MKSMY1 0.001
@@ -91,8 +91,8 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(4.-MKSR0))
-#define MAXX (log(100.-MKSR0))
+#define MINX (log(1.85-MKSR0))
+#define MAXX (log(1000.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
 #endif
@@ -141,7 +141,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 2.
 #define DTOUT2 1000.
 
 /************************************/

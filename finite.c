@@ -5079,9 +5079,10 @@ correct_polaraxis_3d()
 	  for(ix=0;ix<NX;ix++)
 	    {
 	      fill_geometry_arb(ix,0,0,&geomBL,BLCOORDS);
-	      //printf("%d %e %e\n",ix,geomBL.xx,rhorizonBL);getch();
-	      //if(geomBL.xx < 1.*rhorizonBL ) 
-	      //continue;
+
+	      //to avoid amibous VEL4 after 
+	      if(geomBL.xx < 1.*rhorizonBL ) 
+		continue;
 
 	      gix=ix+TOI;
 	      //overwriting
