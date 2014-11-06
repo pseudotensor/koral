@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 11
 
 /************************************/
 //radiation choices

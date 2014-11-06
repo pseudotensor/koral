@@ -637,10 +637,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      urady[nodalindex]=urad[2];
 	      uradz[nodalindex]=urad[3];
 
-	      //forcebal3[nodalindex]=gdet*Gi[1];
-	      //test
-	      forcebal3[nodalindex]=Gi[0]*global_dt;
-	      forcebal2[nodalindex]=get_u(p_bak_subzone,UU,ix,iy,iz);
+	      forcebal3[nodalindex]=gdet*Gi[1];
 
 	      	
 	      if(iy==0)

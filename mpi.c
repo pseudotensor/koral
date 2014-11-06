@@ -98,6 +98,7 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 	     #endif
 	     //cartesian velocities in FX..FZ slots
 	     decompose_vels(&get_u(p,0,ix,NCCORRECTPOLAR,iz),FX,v,&geom,&geomBL);
+	     //if(ix==10) printf("1 %d > %e | %e %e %e\n",ix,get_u(p,EE,ix,NCCORRECTPOLAR,iz),v[1],v[2],v[3]);
 	     axis1_primplus_temp[FX][gix]+=v[1];
 	     axis1_primplus_temp[FY][gix]+=v[2];
 	     axis1_primplus_temp[FZ][gix]+=v[3];
@@ -131,6 +132,7 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 	     #endif
 	     //cartesian velocities in FX..FZ slots
 	     decompose_vels(&get_u(p,0,ix,NY-NCCORRECTPOLAR-1,iz),FX,v,&geom,&geomBL);
+	     //if(ix==10) printf("2 %d > %e | %e %e %e\n",ix,get_u(p,EE,ix,NY-NCCORRECTPOLAR-1,iz),v[1],v[2],v[3]);
 	     axis2_primplus_temp[FX][gix]+=v[1];
 	     axis2_primplus_temp[FY][gix]+=v[2];
 	     axis2_primplus_temp[FZ][gix]+=v[3];
