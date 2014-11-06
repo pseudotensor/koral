@@ -5075,14 +5075,15 @@ correct_polaraxis_3d()
       if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS|| MYCOORDS==MKS3COORDS || MYCOORDS==MSPH1COORDS)
 	{
 	  ldouble ppavg[NV];
+	  ldouble ucon[4];
 	  struct geometry geom,geomBL;
 	  for(ix=0;ix<NX;ix++)
 	    {
 	      fill_geometry_arb(ix,0,0,&geomBL,BLCOORDS);
 
 	      //to avoid amibous VEL4 after 
-	      if(geomBL.xx < 1.*rhorizonBL ) 
-		continue;
+	      //if(geomBL.xx < 1.*rhorizonBL ) 
+	      //continue;
 
 	      gix=ix+TOI;
 	      //overwriting
@@ -5114,7 +5115,7 @@ correct_polaraxis_3d()
 			  ldouble ph=geomBL.zz;
 
 			  
-		
+
 			  			  
 			  ldouble vr,vth,vph,vx,vy,vz;
 			  ldouble cosph,sinth,costh,sinph;
@@ -5125,6 +5126,8 @@ correct_polaraxis_3d()
 			  pp[UU]=axis1_primplus[UU][gix];
 			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
+			  if(geomBL.xx > 1.*rhorizonBL ) 
+			    {
 			  //gas velocities
 			  vx=axis1_primplus[VX][gix];
 			  vy=axis1_primplus[VY][gix];
@@ -5140,8 +5143,7 @@ correct_polaraxis_3d()
 			  vth /= r;
 			  vph /= r*sinth;
 
-			  ldouble ucon[4]={0.,vr,vth,vph};
-
+			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
 			  /*
 			  ldouble xxvec[4],xxvecBL[4];
 			  get_xx(ix,iy,iz,xxvec);
@@ -5165,7 +5167,7 @@ correct_polaraxis_3d()
 			  pp[VZ]=ucon[3];
 			  //add average rotation
 			  pp[VZ]+=axis1_primplus[NV][gix];
-
+			    }
 			  //print_primitives(pp);getch();
 		     
 #ifdef MAGNFIELD
@@ -5181,7 +5183,7 @@ correct_polaraxis_3d()
 			  //no. of photons
 			  pp[NF]=axis1_primplus[NF][gix];
 #endif
-
+			  if(geomBL.xx > 1.*rhorizonBL ) {
 			  //rad velocities
 			  vx=axis1_primplus[FX][gix];
 			  vy=axis1_primplus[FY][gix];
@@ -5207,7 +5209,7 @@ correct_polaraxis_3d()
 			  pp[FZ]=ucon[3];
 			  //add average rotation
 			  pp[VZ]+=axis1_primplus[NV+1][gix];
-       
+			  }
 #ifdef EVOLVEINTENSITIES
 			  for(iv=0;iv<NUMANGLES;iv++)
 			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
@@ -5251,7 +5253,8 @@ correct_polaraxis_3d()
 			  pp[RHO]=axis2_primplus[RHO][gix];
 			  pp[UU]=axis2_primplus[UU][gix];
 			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
-		  		  		  
+
+			  if(geomBL.xx > 1.*rhorizonBL ) 	{  
 			  //gas velocities
 			  vx=axis2_primplus[VX][gix];
 			  vy=axis2_primplus[VY][gix];
@@ -5267,7 +5270,7 @@ correct_polaraxis_3d()
 			  vth /= r;
 			  vph /= r*sinth;
 
-			  ldouble ucon[4]={0.,vr,vth,vph};
+			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
 			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
 			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
 			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
@@ -5277,7 +5280,7 @@ correct_polaraxis_3d()
 			  pp[VZ]=ucon[3];
 			  //add average rotation
 			  pp[VZ]+=axis2_primplus[NV][gix];
-		      
+			  }
 #ifdef MAGNFIELD
 			  //do not overwrite magnetic field, not to break div B=0 there
 #endif
@@ -5290,7 +5293,7 @@ correct_polaraxis_3d()
 			  //no. of photons
 			  pp[NF]=axis2_primplus[NF][gix];
 #endif
-
+			  if(geomBL.xx > 1.*rhorizonBL ) 	{  
 			  //rad velocities
 			  vx=axis2_primplus[FX][gix];
 			  vy=axis2_primplus[FY][gix];
@@ -5316,7 +5319,8 @@ correct_polaraxis_3d()
 			  pp[FZ]=ucon[3];
 			  //add average rotation
 			  pp[FZ]+=axis2_primplus[NV+1][gix];
-       
+			  }
+
 #ifdef EVOLVEINTENSITIES
 			  for(iv=0;iv<NUMANGLES;iv++)
 			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
