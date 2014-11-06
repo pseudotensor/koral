@@ -1150,20 +1150,21 @@ opacity_BellLin(ldouble rhoc, ldouble Tc)
 
 //decomposes velocities into cartesian
 int
-decompose_vels(ldouble *pp,int velidx, ldouble v[4],void *ggg,  void *gggBL)
+decompose_vels(ldouble *pp,int velidx, ldouble v[4],void *ggg,  void *gggKS)
 {
   struct geometry *geom
     = (struct geometry *) ggg;
-  struct geometry *geomBL
-    = (struct geometry *) gggBL;
+  struct geometry *geomKS
+    = (struct geometry *) gggKS;
   int iv;
   int velprim=VELPRIM; if(velidx==FX) velprim=VELPRIMRAD;
   ldouble r,th,ph,ucon[4];
   DLOOPA(iv) ucon[iv]=pp[velidx-1+iv];
   ucon[0]=0.;
   conv_vels(ucon,ucon,velprim,VEL4,geom->gg,geom->GG);
-  trans2_coco(geom->xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
-  r=geomBL->xx;	     th=geomBL->yy;	     ph=geomBL->zz;
+  trans2_coco(geom->xxvec,ucon,ucon,MYCOORDS,KSCOORDS);
+  conv_vels(ucon,ucon,VEL4,velprim,geomKS->gg,geomKS->GG);
+  r=geomKS->xx;	     th=geomKS->yy;	     ph=geomKS->zz;
   //to ortonormal cartesian
   ucon[2]*=r;
   ucon[3]*=r*sin(th);

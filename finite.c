@@ -5076,13 +5076,13 @@ correct_polaraxis_3d()
 	{
 	  ldouble ppavg[NV];
 	  ldouble ucon[4];
-	  struct geometry geom,geomBL;
+	  struct geometry geom,geomKS;
 	  for(ix=0;ix<NX;ix++)
 	    {
-	      fill_geometry_arb(ix,0,0,&geomBL,BLCOORDS);
+	      fill_geometry_arb(ix,0,0,&geomKS,KSCOORDS);
 
 	      //to avoid amibous VEL4 after 
-	      //if(geomBL.xx < 1.*rhorizonBL ) 
+	      //if(geomKS.xx < 1.*rhorizonBL ) 
 	      //continue;
 
 	      gix=ix+TOI;
@@ -5106,13 +5106,13 @@ correct_polaraxis_3d()
 			  iy=ic;
 	      	 
 			  fill_geometry(ix,iy,iz,&geom);
-			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+			  fill_geometry_arb(ix,iy,iz,&geomKS,KSCOORDS);
 
 			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NCCORRECTPOLAR,iz);
 
-			  ldouble r=geomBL.xx;
-			  ldouble th=geomBL.yy;
-			  ldouble ph=geomBL.zz;
+			  ldouble r=geomKS.xx;
+			  ldouble th=geomKS.yy;
+			  ldouble ph=geomKS.zz;
 
 			  
 
@@ -5126,7 +5126,7 @@ correct_polaraxis_3d()
 			  pp[UU]=axis1_primplus[UU][gix];
 			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
-			  if(geomBL.xx > 1.*rhorizonBL ) 
+			  //if(geomKS.xx > 1.*rhorizonBL ) 
 			    {
 			  //gas velocities
 			  vx=axis1_primplus[VX][gix];
@@ -5145,19 +5145,19 @@ correct_polaraxis_3d()
 
 			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
 			  /*
-			  ldouble xxvec[4],xxvecBL[4];
+			  ldouble xxvec[4],xxvecKS[4];
 			  get_xx(ix,iy,iz,xxvec);
-			  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+			  coco_N(xxvec,xxvecKS,MYCOORDS,KSCOORDS);
 			  printf("%d > %e %e %e\n",ix,r,th,ph);
 			  print_4vector(xxvec);
-			  print_4vector(xxvecBL);
-			  print_metric(geomBL.gg);
+			  print_4vector(xxvecKS);
+			  print_metric(geomKS.gg);
 			  print_metric(geom.gg);
 			  print_4vector(ucon);
 			  */
 
-			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
-			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			  conv_vels(ucon,ucon,VELPRIM,VEL4,geomKS.gg,geomKS.GG);
+			  trans2_coco(geomKS.xxvec,ucon,ucon,KSCOORDS,MYCOORDS);
 			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 			  //			  print_4vector(ucon);
 			  //getch();
@@ -5183,7 +5183,8 @@ correct_polaraxis_3d()
 			  //no. of photons
 			  pp[NF]=axis1_primplus[NF][gix];
 #endif
-			  if(geomBL.xx > 1.*rhorizonBL ) {
+			  //if(geomKS.xx > 1.*rhorizonBL )
+			  {
 			  //rad velocities
 			  vx=axis1_primplus[FX][gix];
 			  vy=axis1_primplus[FY][gix];
@@ -5200,8 +5201,8 @@ correct_polaraxis_3d()
 			  vph /= r*sinth;
 
 			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
-			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			  conv_vels(ucon,ucon,VELPRIM,VEL4,geomKS.gg,geomKS.GG);
+			  trans2_coco(geomKS.xxvec,ucon,ucon,KSCOORDS,MYCOORDS);
 			  conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
 			  pp[FX]=ucon[1];
@@ -5240,11 +5241,11 @@ correct_polaraxis_3d()
 			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NY-NCCORRECTPOLAR-1,iz);
 	      	 
 			  fill_geometry(ix,iy,iz,&geom);
-			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+			  fill_geometry_arb(ix,iy,iz,&geomKS,KSCOORDS);
 
-			  ldouble r=geomBL.xx;
-			  ldouble th=geomBL.yy;
-			  ldouble ph=geomBL.zz;
+			  ldouble r=geomKS.xx;
+			  ldouble th=geomKS.yy;
+			  ldouble ph=geomKS.zz;
 			  ldouble vr,vth,vph,vx,vy,vz;
 			  ldouble cosph,sinth,costh,sinph;
 			  sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
@@ -5254,7 +5255,8 @@ correct_polaraxis_3d()
 			  pp[UU]=axis2_primplus[UU][gix];
 			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
-			  if(geomBL.xx > 1.*rhorizonBL ) 	{  
+			  //if(geomKS.xx > 1.*rhorizonBL ) 	
+			  {  
 			  //gas velocities
 			  vx=axis2_primplus[VX][gix];
 			  vy=axis2_primplus[VY][gix];
@@ -5271,8 +5273,8 @@ correct_polaraxis_3d()
 			  vph /= r*sinth;
 
 			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
-			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			  conv_vels(ucon,ucon,VELPRIM,VEL4,geomKS.gg,geomKS.GG);
+			  trans2_coco(geomKS.xxvec,ucon,ucon,KSCOORDS,MYCOORDS);
 			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
 			  pp[VX]=ucon[1];
@@ -5293,7 +5295,8 @@ correct_polaraxis_3d()
 			  //no. of photons
 			  pp[NF]=axis2_primplus[NF][gix];
 #endif
-			  if(geomBL.xx > 1.*rhorizonBL ) 	{  
+			  //if(geomKS.xx > 1.*rhorizonBL ) 	
+{  
 			  //rad velocities
 			  vx=axis2_primplus[FX][gix];
 			  vy=axis2_primplus[FY][gix];
@@ -5310,8 +5313,8 @@ correct_polaraxis_3d()
 			  vph /= r*sinth;
 
 			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
-			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			  conv_vels(ucon,ucon,VELPRIM,VEL4,geomKS.gg,geomKS.GG);
+			  trans2_coco(geomKS.xxvec,ucon,ucon,KSCOORDS,MYCOORDS);
 			  conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
 			  pp[FX]=ucon[1];
