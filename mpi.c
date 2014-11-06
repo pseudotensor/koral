@@ -67,7 +67,7 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 
  for(gix=0;gix<TNX;gix++)
    for(iv=0;iv<NV+2;iv++)
-     axis1_primplus[iv][gix]= axis1_primplus[iv][gix]=axis2_primplus[iv][gix]= axis2_primplus[iv][gix]=0.;
+     axis1_primplus_temp[iv][gix]= axis1_primplus[iv][gix]=axis2_primplus_temp[iv][gix]= axis2_primplus[iv][gix]=0.;
 
  for(ix=0;ix<NX;ix++)
    {
@@ -147,37 +147,10 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
    }
 
 #ifdef MPI
- /*
- ldouble temp1[TNX*(NV+2)],temp2[TNX*(NV+2)];
- for(ix=0;ix<TNX;ix++)
-   for(iv=0;iv<NV+2;iv++)
-       temp1[ix*(NV+2)+iv]=axis1_primplus_temp[iv][ix];
- MPI_Allreduce(temp1, temp2, TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,MPI_COMM_WORLD);
- for(ix=0;ix<TNX;ix++)
-   for(iv=0;iv<NV+2;iv++)
-     axis1_primplus[iv][ix]=temp2[ix*(NV+2)+iv];
-
- for(ix=0;ix<TNX;ix++)
-   for(iv=0;iv<NV+2;iv++)
-       temp1[ix*(NV+2)+iv]=axis2_primplus_temp[iv][ix];
- MPI_Allreduce(temp1, temp2, TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,MPI_COMM_WORLD);
- for(ix=0;ix<TNX;ix++)
-   for(iv=0;iv<NV+2;iv++)
-     axis1_primplus[iv][ix]=temp2[ix*(NV+2)+iv];
- */
-
-
- // printf("%d %e %e %e\n",PROCID,axis1_primplus_temp[VY][10],axis1_primplus_temp[VY][20],axis1_primplus_temp[VY][30]);
-
-     
  MPI_Allreduce(&axis1_primplus_temp[0][0], &axis1_primplus[0][0], TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,
 		MPI_COMM_WORLD);
  MPI_Allreduce(&axis2_primplus_temp[0][0], &axis2_primplus[0][0], TNX*(NV+2), MPI_LDOUBLE, MPI_SUM,
 		MPI_COMM_WORLD);
-
- //printf("> %d %e %e %e\n",PROCID,axis2_primplus[VY][10],axis2_primplus[VY][20],axis2_primplus[VY][30]);
- //if(PROCID==0){     exit(-1);   }
-
 #else 
   for(ix=0;ix<NX;ix++)
     {
@@ -190,6 +163,7 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
     }
 #endif
 #endif
+
   
   /***************************/
 

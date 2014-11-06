@@ -6,14 +6,14 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define COMPTONIZATION
 
 /************************************/
@@ -47,7 +47,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
@@ -57,7 +57,7 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define CORRECT_POLARAXIS
+#define CORRECT_POLARAXIS_3D
 #define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
@@ -81,7 +81,7 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS3COORDS
+#define myMKS2COORDS
 #define MKSR0 0.
 #define MKSH0 0.6
 #define MKSMY1 0.001
@@ -100,20 +100,20 @@
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
-#define MINX (log(4.-MKSR0))
+#define MINX (log(1.85-MKSR0))
 #define MAXX (log(100.-MKSR0))
 #define MINY 0.
 #define MAXY 1.
 #endif
 
-#define PHIWEDGE (M_PI/4.)
+#define PHIWEDGE (M_PI/2.)
 #define MINZ (-PHIWEDGE/2.)
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
 #define TNX 64
 #define TNY 64
-#define TNZ 8
+#define TNZ 4
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -141,7 +141,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 50.
 #define DTOUT2 1000.
 
 /************************************/

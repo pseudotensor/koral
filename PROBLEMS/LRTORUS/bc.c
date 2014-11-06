@@ -58,7 +58,7 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
 	//set_radatmosphere(pp,xxvec,gg,GG,0);
 	urfcon[1]=0.;
 	trans2_coco(geomBL.xxvec,urfcon,urfcon,BLCOORDS,MYCOORDS);
-	conv_vels(urfcon,urfcon,VEL4,VELPRIM,geom.gg,geom.GG);
+	conv_vels(urfcon,urfcon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 	pp[FX0]=urfcon[1];
 	pp[FY0]=urfcon[2];
 	pp[FZ0]=urfcon[3];//atmosphere in rho,uint and velocities and zero magn. field
@@ -87,6 +87,7 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
    }
 
 //reflections/outflow in theta 
+//in 3D polar cells overwritten with #define CORRECT_POLARAXIS_3D
 if(BCtype==YBCLO) //upper spin axis 
   {      
     

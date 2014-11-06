@@ -454,7 +454,6 @@ solve_the_problem(ldouble tstart, char* folder)
 		iy=loop_0[ii][1];
 		iz=loop_0[ii][2]; 
 		set_u_scalar(cell_tsteps,ix,iy,iz,get_u_scalar(cell_tstepstemp,ix,iy,iz));
-		//if(ix==20)	{printf("%d %e %e\n",ix,1./get_u_scalar(cell_tsteps,ix,iy,iz),1./get_u_scalar(cell_tsteps,0,iy,iz));}
 	      }
 
 	    //#pragma omp barrier

@@ -61,6 +61,7 @@ if(rho<0.) //outside donut
     pp[B1]=pp[B2]=pp[B3]=0.; 
 #endif
 
+
 #ifdef RADIATION
     //distributing pressure
     ldouble P,aaa,bbb;
@@ -78,12 +79,15 @@ if(rho<0.) //outside donut
     pp[UU]=my_max(uint,ppback[1]);
     pp[EE0]=my_max(E,ppback[EE0]);
 
+
+
     pp[FX0]=Fx;
     pp[FY0]=Fy;
     pp[FZ0]=Fz;
 
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
     prad_ff2lab(pp,pp,&geomBL);
+
 #endif
 
     //transforming primitives from BL to MYCOORDS

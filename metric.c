@@ -1785,7 +1785,7 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
   ggg->yy=xxvecBL[2];
   ggg->zz=xxvecBL[3];
   
-  ggg->gdet=ggg->gg[3][4];
+  ggg->gdet=calc_gdet_arb(xxvecBL,COORDS);
   ggg->coords=COORDS;
 
 
@@ -1835,7 +1835,7 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   ggg->yy=xxvecBL[2];
   ggg->zz=xxvecBL[3];
   
-  ggg->gdet=ggg->gg[3][4];
+  ggg->gdet=calc_gdet_arb(xxvecBL,COORDS);
   ggg->coords=COORDS;
 
   return 0;
@@ -2079,15 +2079,9 @@ coco_BL2KS(ldouble *xBL, ldouble *xKS)
   //theta
   xKS[2]=xBL[2];
   //phi
-  if(NZ==1)
-    {
-      //phi - let's assume phi constant no to break 2d cartesian output
-      xKS[3]=xBL[3];
-    }
-  else
-    {
-      xKS[3]=xBL[3]+a/sqrta*atanh(sqrta/(1.-r));
-    }
+  xKS[3]=xBL[3];
+  //?
+  //xKS[3]=xBL[3]+a/sqrta*atanh(sqrta/(1.-r));
 
   return 0;
 }
@@ -2112,15 +2106,9 @@ coco_KS2BL(ldouble *xKS, ldouble *xBL)
   //theta
   xBL[2]=xKS[2];
   //phi  
-  if(NZ==1)
-    {
-      //phi - let's assume phi constant no to break 2d cartesian output
-      xBL[3]=xKS[3];
-    }
-  else
-    {      
-      xBL[3]=xKS[3]-a/sqrta*atanh(sqrta/(1.-r));
-    }
+  xBL[3]=xKS[3];
+  //?
+  //xBL[3]=xKS[3]-a/sqrta*atanh(sqrta/(1.-r));
 
   return 0;
 }

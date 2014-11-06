@@ -1161,7 +1161,7 @@ decompose_vels(ldouble *pp,int velidx, ldouble v[4],void *ggg,  void *gggBL)
   ldouble r,th,ph,ucon[4];
   DLOOPA(iv) ucon[iv]=pp[velidx-1+iv];
   ucon[0]=0.;
-  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+  conv_vels(ucon,ucon,velprim,VEL4,geom->gg,geom->GG);
   trans2_coco(geom->xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
   r=geomBL->xx;	     th=geomBL->yy;	     ph=geomBL->zz;
   //to ortonormal cartesian

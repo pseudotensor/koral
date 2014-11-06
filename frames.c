@@ -158,23 +158,25 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
+  int i,j;
 
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4],gdetu;
+  ldouble (*gg)[5],(*GG)[5],gdetu;
   gg=geom->gg;
   GG=geom->GG;
-  tlo=geom->tlo;
-  tup=geom->tup;
+  ldouble tlo[4][4];
+  //tlo=geom->tlo;
+  //approximate?
+  DLOOP(i,j) tlo[i][j]=0.;
+  DLOOPA(i) tlo[i][i]=1./sqrt((gg[i][i]));
+  tlo[0][0]=1.;
   gdetu=geom->gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
 #endif
 
   ldouble Rij[4][4];
-  int i,j;
 
   int verbose=0;
- 
-
   calc_Rij_M1_ff(pp1,Rij);  
   trans22_on2cc(Rij,Rij,tlo);  
   boost22_ff2lab(Rij,Rij,pp1,gg,GG); 
@@ -222,15 +224,17 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
 {
   struct geometry *geom
    = (struct geometry *) ggg;
-
-  ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  int i,j;  
+  ldouble (*gg)[5],(*GG)[5];
   gg=geom->gg;
   GG=geom->GG;
-  tlo=geom->tlo;
-  tup=geom->tup;
-
+  ldouble tup[4][4];
+  //tlo=geom->tlo;
+  DLOOP(i,j) tup[i][j]=0.;
+  DLOOPA(i) tup[i][i]=sqrt(gg[i][i]);
+  
   ldouble Rij[4][4];
-  int i,j;  
+
 
   calc_Rij_M1(pp1,ggg,Rij);
 

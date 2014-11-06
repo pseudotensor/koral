@@ -4833,7 +4833,7 @@ correct_polaraxis()
       int ix,iy,iz,iv,ic,iysrc,ixsrc;
 
       //spherical like coords
-      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
+      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS|| MYCOORDS==MKS3COORDS || MYCOORDS==MSPH1COORDS)
 	{
 	  //#pragma omp parallel for private(ic,ix,iy,iz,iv,iysrc) schedule (static,4)
 	  for(ix=0;ix<NX;ix++)
@@ -5069,30 +5069,34 @@ correct_polaraxis_3d()
     {
       int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
-      
-
       int ix,iy,iz,iv,ic,iysrc,ixsrc,gix;
 
       //spherical like coords
-      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MSPH1COORDS)
+      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS|| MYCOORDS==MKS3COORDS || MYCOORDS==MSPH1COORDS)
 	{
 	  ldouble ppavg[NV];
+	  struct geometry geom,geomBL;
 	  for(ix=0;ix<NX;ix++)
 	    {
+	      fill_geometry_arb(ix,0,0,&geomBL,BLCOORDS);
+	      //printf("%d %e %e\n",ix,geomBL.xx,rhorizonBL);getch();
+	      //if(geomBL.xx < 1.*rhorizonBL ) 
+	      //continue;
+
 	      gix=ix+TOI;
 	      //overwriting
 	      for(iz=0;iz<NZ;iz++)
 		{
 		  ldouble r,th;
 		  ldouble pp[NV],uu[NV];
-		  struct geometry geom,geomBL;
+
 
 		  //upper axis
-		  //bottom axis
 #ifdef MPI
 		  if(TJ==0)
 #endif
 		    {
+
 
 		      iysrc=nc;
 		      for(ic=0;ic<nc;ic++)
@@ -5102,10 +5106,16 @@ correct_polaraxis_3d()
 			  fill_geometry(ix,iy,iz,&geom);
 			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
+			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,iy,iz);
+
 			  ldouble r=geomBL.xx;
 			  ldouble th=geomBL.yy;
 			  ldouble ph=geomBL.zz;
-			  ldouble vr,vth,vph;
+
+			  
+		
+			  			  
+			  ldouble vr,vth,vph,vx,vy,vz;
 			  ldouble cosph,sinth,costh,sinph;
 			  sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
 	  
@@ -5115,9 +5125,9 @@ correct_polaraxis_3d()
 			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
 			  //gas velocities
-			  ldouble vx=axis1_primplus[VX][gix];
-			  ldouble vy=axis1_primplus[VY][gix];
-			  ldouble vz=axis1_primplus[VZ][gix];
+			  vx=axis1_primplus[VX][gix];
+			  vy=axis1_primplus[VY][gix];
+			  vz=axis1_primplus[VZ][gix];
 			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
 				 costh*Power(sinph,2)*vz)/
 				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
@@ -5130,8 +5140,24 @@ correct_polaraxis_3d()
 			  vph /= r*sinth;
 
 			  ldouble ucon[4]={0.,vr,vth,vph};
+
+			  /*
+			  ldouble xxvec[4],xxvecBL[4];
+			  get_xx(ix,iy,iz,xxvec);
+			  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+			  printf("%d > %e %e %e\n",ix,r,th,ph);
+			  print_4vector(xxvec);
+			  print_4vector(xxvecBL);
+			  print_metric(geomBL.gg);
+			  print_metric(geom.gg);
+			  print_4vector(ucon);
+			  */
+
+			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
 			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
 			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			  //			  print_4vector(ucon);
+			  //getch();
 
 			  pp[VX]=ucon[1];
 			  pp[VY]=ucon[2];
@@ -5149,15 +5175,16 @@ correct_polaraxis_3d()
 			  //rad density
 			  pp[EE]=axis1_primplus[EE][gix];
 
+
 #ifdef NCOMPTONIZATION
 			  //no. of photons
-			  pp[NF]=ppaaxis1_primplusvg[NF][gix];
+			  pp[NF]=axis1_primplus[NF][gix];
 #endif
 
 			  //rad velocities
-			  ldouble vx=axis1_primplus[FX][gix];
-			  ldouble vy=axis1_primplus[FY][gix];
-			  ldouble vz=axis1_primplus[FZ][gix];
+			  vx=axis1_primplus[FX][gix];
+			  vy=axis1_primplus[FY][gix];
+			  vz=axis1_primplus[FZ][gix];
 			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
 				 costh*Power(sinph,2)*vz)/
 				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
@@ -5170,8 +5197,9 @@ correct_polaraxis_3d()
 			  vph /= r*sinth;
 
 			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
 			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			  conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
 			  pp[FX]=ucon[1];
 			  pp[FY]=ucon[2];
@@ -5190,8 +5218,8 @@ correct_polaraxis_3d()
 		     
 			  PLOOP(iv)
 			  {
-			    set_u(p,iv,ix,iy,iz,pp[iv]);  
-			    set_u(u,iv,ix,iy,iz,uu[iv]);
+				set_u(p,iv,ix,iy,iz,pp[iv]);  
+				set_u(u,iv,ix,iy,iz,uu[iv]);
 			  }
 			}
 		    }
@@ -5205,6 +5233,8 @@ correct_polaraxis_3d()
 		      for(ic=0;ic<nc;ic++)
 			{
 			  iy=NY-1-ic;
+
+			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,iy,iz);
 	      	 
 			  fill_geometry(ix,iy,iz,&geom);
 			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
@@ -5212,7 +5242,7 @@ correct_polaraxis_3d()
 			  ldouble r=geomBL.xx;
 			  ldouble th=geomBL.yy;
 			  ldouble ph=geomBL.zz;
-			  ldouble vr,vth,vph;
+			  ldouble vr,vth,vph,vx,vy,vz;
 			  ldouble cosph,sinth,costh,sinph;
 			  sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
 	  
@@ -5222,9 +5252,9 @@ correct_polaraxis_3d()
 			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 		  		  		  
 			  //gas velocities
-			  ldouble vx=axis2_primplus[VX][gix];
-			  ldouble vy=axis2_primplus[VY][gix];
-			  ldouble vz=axis2_primplus[VZ][gix];
+			  vx=axis2_primplus[VX][gix];
+			  vy=axis2_primplus[VY][gix];
+			  vz=axis2_primplus[VZ][gix];
 			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
 				 costh*Power(sinph,2)*vz)/
 				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
@@ -5237,6 +5267,7 @@ correct_polaraxis_3d()
 			  vph /= r*sinth;
 
 			  ldouble ucon[4]={0.,vr,vth,vph};
+			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
 			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
 			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
@@ -5256,13 +5287,13 @@ correct_polaraxis_3d()
 
 #ifdef NCOMPTONIZATION
 			  //no. of photons
-			  pp[NF]=ppaaxis2_primplusvg[NF][gix];
+			  pp[NF]=axis2_primplus[NF][gix];
 #endif
 
 			  //rad velocities
-			  ldouble vx=axis2_primplus[FX][gix];
-			  ldouble vy=axis2_primplus[FY][gix];
-			  ldouble vz=axis2_primplus[FZ][gix];
+			  vx=axis2_primplus[FX][gix];
+			  vy=axis2_primplus[FY][gix];
+			  vz=axis2_primplus[FZ][gix];
 			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
 				 costh*Power(sinph,2)*vz)/
 				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
@@ -5275,22 +5306,21 @@ correct_polaraxis_3d()
 			  vph /= r*sinth;
 
 			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+			  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
 			  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-			  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			  conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
 			  pp[FX]=ucon[1];
 			  pp[FY]=ucon[2];
 			  pp[FZ]=ucon[3];
 			  //add average rotation
-			  pp[VZ]+=axis2_primplus[NV+1][gix];
+			  pp[FZ]+=axis2_primplus[NV+1][gix];
        
 #ifdef EVOLVEINTENSITIES
 			  for(iv=0;iv<NUMANGLES;iv++)
 			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
 #endif
 #endif
-			  //printf("> %d > %d %d %d > %e %e %e\n",PROCID,ix,iy,iz,pp[RHO],pp[VX],pp[VZ]);
-      
 
 			  p2u(pp,uu,&geom);
 
@@ -5303,9 +5333,15 @@ correct_polaraxis_3d()
 		    }
 
 		}
+	      //	      printf("%d > %e %e %e %e\n",gix,get_u(p,EE,ix,0,0),get_u(p,EE,ix,1,0),get_u(p,EE,ix,2,0),get_u(p,EE,ix,3,0));
+	      //	      printf("%d > %e %e %e %e\n",gix,get_u(p,EE,ix,0,1),get_u(p,EE,ix,1,1),get_u(p,EE,ix,2,1),get_u(p,EE,ix,3,1));
 	    }
 	}
-    }
+
+      //      getch();
+
+	     }
+
 
   return 0; 
 }
