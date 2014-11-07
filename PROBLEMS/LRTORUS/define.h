@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 11
+#define RESTARTNUM 185
 
 /************************************/
 //radiation choices
@@ -38,7 +38,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
-#define TSTEPLIM .6
+#define TSTEPLIM .4
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
