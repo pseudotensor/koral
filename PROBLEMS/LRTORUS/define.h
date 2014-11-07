@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 185
+#define RESTARTNUM 10
 
 /************************************/
 //radiation choices
@@ -58,6 +58,7 @@
 //rmhd floors
 /************************************/
 #define CORRECT_POLARAXIS_3D
+#define POLARAXISAVGIN3D
 #define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2

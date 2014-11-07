@@ -5170,7 +5170,7 @@ correct_polaraxis_3d()
 			  pp[VY]=ucon[2];
 			  pp[VZ]=ucon[3];
 			  //add average rotation
-			  pp[VZ]+=axis1_primplus[NV][gix];
+			  //pp[VZ]=axis1_primplus[NV][gix];
 			    }
 			  //print_primitives(pp);getch();
 		     
@@ -5213,10 +5213,10 @@ correct_polaraxis_3d()
 			  //conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 			  
 			    pp[FX]=ucon[1];
-			    //  pp[FY]=ucon[2];
-			  pp[FZ]=ucon[3];
+			    pp[FY]=ucon[2];
+			    pp[FZ]=ucon[3];
 			  //add average rotation
-			  pp[VZ]+=axis1_primplus[NV+1][gix];
+			    //pp[FZ]=axis1_primplus[NV+1][gix];
 			  }
 
 			  #endif
@@ -5297,7 +5297,7 @@ correct_polaraxis_3d()
 			  pp[VY]=ucon[2];
 			  pp[VZ]=ucon[3];
 			  //add average rotation
-			  pp[VZ]+=axis2_primplus[NV][gix];
+			  //pp[VZ]=axis2_primplus[NV][gix];
 			  }
 #ifdef MAGNFIELD
 			  //do not overwrite magnetic field, not to break div B=0 there
@@ -5337,10 +5337,10 @@ correct_polaraxis_3d()
 			  //conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
 			    pp[FX]=ucon[1];
-			    //pp[FY]=ucon[2];
-			  pp[FZ]=ucon[3];
+			    pp[FY]=ucon[2];
+			    pp[FZ]=ucon[3];
 			  //add average rotation
-			  pp[FZ]+=axis2_primplus[NV+1][gix];
+			  //pp[FZ]=axis2_primplus[NV+1][gix];
 			  }
  #endif
 
