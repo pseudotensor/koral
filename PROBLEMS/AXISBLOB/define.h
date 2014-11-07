@@ -7,9 +7,9 @@
 #define MINZ 0
 #define MAXZ (2.*M_PI)
 
-#define TNX 40
-#define TNY 40
-#define TNZ 40
+#define TNX 30
+#define TNY 30
+#define TNZ 30
 
 #define NTX 2
 #define NTY 2
@@ -25,6 +25,7 @@
 #define MINMOD_THETA 1.5
 
 #define CORRECT_POLARAXIS_3D
+//#define POLARAXISAVGIN3D
 #define NCCORRECTPOLAR 2
 
 #define DTOUT1 1.

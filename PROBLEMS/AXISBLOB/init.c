@@ -54,6 +54,7 @@ ldouble usph[4];
 ldouble vx,vy,vz;
 vx=vz=0.;
 vy=-.1;
+vx=-.05;
 
 ldouble vr,vth,vph;
 ldouble cosph,sinth,costh,sinph;
