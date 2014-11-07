@@ -3034,11 +3034,9 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
 
- ldouble (*gg)[5],(*GG)[5],(*tlo)[4],(*tup)[4];
+  ldouble (*gg)[5],(*GG)[5];
   gg=geom.gg;
   GG=geom.GG;
-  tlo=geom.tlo;
-  tup=geom.tup;
 
   //let's start with derivatives
   ldouble du[4][4]; //du_i,j

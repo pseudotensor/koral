@@ -280,7 +280,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      
 	      entropyinv[nodalindex]=get_cflag(ENTROPYFLAG3,ix,iy,iz);
 
-	      if(doingavg==0) //using snapshot date
+	      if(doingavg==0) //using snapshot data
 		{
 		  rho[nodalindex]=pp[RHO];
 		  uint[nodalindex]=pp[UU];

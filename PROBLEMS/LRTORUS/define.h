@@ -8,12 +8,12 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 10
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define COMPTONIZATION
 
 /************************************/
@@ -47,12 +47,13 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
+#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
 #define ALPHARADVISC 0.1
-#define MAXRADVISCVEL 1.
+#define MAXRADVISCVEL .1
 
 /************************************/
 //rmhd floors
@@ -101,7 +102,7 @@
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
-#define MINX (log(1.85-MKSR0))
+#define MINX (log(1.6-MKSR0))
 #define MAXX (log(100.-MKSR0))
 #define MINY 0.
 #define MAXY 1.
@@ -112,13 +113,13 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 64
+#define TNX 128
 #define TNY 64
-#define TNZ 4
+#define TNZ 8
 //number of tiles
 #define NTX 2
 #define NTY 2
-#define NTZ 1
+#define NTZ 2
 
 #define SPECIFIC_BC
 #define PERIODIC_ZBC

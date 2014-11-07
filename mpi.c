@@ -89,8 +89,8 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 	     axis1_primplus_temp[VX][gix]+=v[1];
 	     axis1_primplus_temp[VY][gix]+=v[2];
 	     axis1_primplus_temp[VZ][gix]+=v[3];
-	     //angular velocity in NV+1 slot!!!
-	     axis1_primplus_temp[NV+1][gix]+=get_u(p,VZ,ix,NCCORRECTPOLAR,iz);
+	     //angular velocity in NV slot!!!
+	     axis1_primplus_temp[NV][gix]+=get_u(p,VZ,ix,NCCORRECTPOLAR,iz);
 
 #ifdef RADIATION
 	     axis1_primplus_temp[EE][gix]+=get_u(p,EE,ix,NCCORRECTPOLAR,iz);
@@ -103,8 +103,8 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
 	     axis1_primplus_temp[FX][gix]+=v[1];
 	     axis1_primplus_temp[FY][gix]+=v[2];
 	     axis1_primplus_temp[FZ][gix]+=v[3];
-	     //angular velocity in NV+2 slot!!!
-	     axis1_primplus_temp[NV+2][gix]+=get_u(p,FZ,ix,NCCORRECTPOLAR,iz);
+	     //rad angular velocity in NV+1 slot!!!
+	     axis1_primplus_temp[NV+1][gix]+=get_u(p,FZ,ix,NCCORRECTPOLAR,iz);
 #endif
 	   }
 
