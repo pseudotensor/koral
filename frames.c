@@ -160,15 +160,18 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
    = (struct geometry *) ggg;
   int i,j;
 
+  //print_primitives(pp1);
+
   ldouble (*gg)[5],(*GG)[5],gdetu;
   gg=geom->gg;
   GG=geom->GG;
   ldouble tlo[4][4];
-  //tlo=geom->tlo;
-  //approximate?
+  //calc_tetrades(geom->gg,tup,tlo,MYCOORDS);
+  //approximate:
   DLOOP(i,j) tlo[i][j]=0.;
   DLOOPA(i) tlo[i][i]=1./sqrt((gg[i][i]));
   tlo[0][0]=1.;
+
   gdetu=geom->gdet;
 #if (GDETIN==0) //gdet out of derivatives
   gdetu=1.;
@@ -214,6 +217,8 @@ int prad_ff2lab(ldouble *pp1, ldouble *pp2, void* ggg)
   pp2[NF0]=nphrf;
   #endif
 
+  //print_primitives(pp2);getch();
+
   return 0;
 } 
 
@@ -232,6 +237,7 @@ int prad_lab2ff(ldouble *pp1, ldouble *pp2, void *ggg)
   //tlo=geom->tlo;
   DLOOP(i,j) tup[i][j]=0.;
   DLOOPA(i) tup[i][i]=sqrt(gg[i][i]);
+  tup[0][0]=1.;
   
   ldouble Rij[4][4];
 

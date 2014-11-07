@@ -1,10 +1,10 @@
 #define RESTART
-#define RESTARTNUM 5
+#define RESTARTNUM 40
 
 
 #define RADIATION
 
-#define myVET
+//#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
@@ -12,17 +12,17 @@
 #define RADSTARTWITHM1INTENSITIES
 #endif
 
-#define BEAM1
-//#define DISK
-#define DOFIXUPS 1
+//#define BEAM1
+#define DISK
+#define DOFIXUPS 0
 #define SKIPRADSOURCE
 
-//#define RADVISCOSITY SHEARVISCOSITY
-#define ACCELRADVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
+//#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define ALPHARADVISC 0.1
-#define MAXRADVISCVEL .5
+#define MAXRADVISCVEL 1.
 
 
 #define MASS 10.
@@ -34,8 +34,8 @@
 //#define HOURGLASS
 
 //#define myMKS1COORDS
-#define myMKER1COORDS
-//#define myMSPH1COORDS
+//#define myMKER1COORDS
+#define myMSPH1COORDS
 
 #ifdef myMSPH1COORDS
 #define MYCOORDS MSPH1COORDS
@@ -70,11 +70,24 @@
 #define SILO2D_XZPLANE
 #define SIMOUTPUT 0
 
+#ifdef DISK
+#define RMIN 4.
+#define RMAX 15.
+#endif
+
+#ifdef HOURGLASS
 #define RMIN 2.2
 #define RMAX 5.
 #define RBEAM1 2.8
 #define RBEAM2 3.2
+#endif
 
+#ifdef BEAM1
+#define RMIN 2.2
+#define RMAX 5.
+#define RBEAM1 2.8
+#define RBEAM2 3.2
+#endif
 
 #ifdef myMSPH1COORDS
 #define MKS1R0 0.
@@ -108,7 +121,7 @@
 #define TNY 40
 #define TNZ 1
 
-#define NTX 4
+#define NTX 2
 #define NTY 2
 #define NTZ 1
 

@@ -45,16 +45,19 @@
 #define MKS1R0 0.
 #define MINX (log(2.-MKS1R0))
 #define MAXX (log(50.-MKS1R0))
-#define NX 50
+#define TNX 50
 #else
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
-#define NX 40
+#define TNX 40
 #endif
 
-#define NY 30
-#define NZ 1
+#define TNY 30
+#define TNZ 1
 
+#define NTX 2
+#define NTY 2
+#define NTZ 1
 
 #define MINY (0.02*Pi/4.)
 #define MAXY Pi/2.

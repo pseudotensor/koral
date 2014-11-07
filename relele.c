@@ -532,7 +532,7 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       #ifdef MAGNFIELD
       pp[B1]=pp[B2]=pp[B3]=0.;
       #endif
-  
+
       return 0;
     }
   else if(atmtype==1) //normal observer plur rho \propto r^-2.0

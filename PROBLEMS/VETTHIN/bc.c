@@ -21,11 +21,9 @@ fill_geometry_arb(ix,iy,iz,&geomSPH,SPHCOORDS);
 
 gdet_bc=get_g(g,3,4,ix,iy,iz);  
 //gdet_src=get_g(g,3,4,iix,iiy,iiz);
-ldouble gg[4][5],GG[4][5],ggsrc[4][5],eup[4][4],elo[4][4];
+ldouble gg[4][5],GG[4][5],ggsrc[4][5];
 pick_g(ix,iy,iz,gg);
 pick_G(ix,iy,iz,GG);
-pick_T(emuup,ix,iy,iz,eup);
-pick_T(emulo,ix,iy,iz,elo);
 //working in SPH
 ldouble ggSPH[4][5],GGSPH[4][5];
 calc_g_arb(xxvecSPH,ggSPH,SPHCOORDS);
@@ -95,11 +93,14 @@ if(ix>=NX) //analytical solution at rout only
       
     ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
     */
+
+    #ifdef myVET
     int il;
      for(il=0;il<NUMANGLES;il++)
       {
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
       }
+     #endif
     return 0.;
   }
  else if(ix<0) //outflow near BH
@@ -127,11 +128,13 @@ if(ix>=NX) //analytical solution at rout only
    
      p2u(pp,uu,&geom); 
 
+     #ifdef myVET
      int il;
      for(il=0;il<NUMANGLES;il++)
       {
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
       }
+     #endif
      return 0;
    }
 
@@ -163,7 +166,7 @@ if(iy<0.) //spin axis
       }
     */
 
-#if(RADCLOSURE==VETCLOSURE)
+#ifdef myVET
     double reflect_direction[3] = {1.,0.,0.};
     reflectI(reflect_direction, &Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][0], &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 #endif   
@@ -173,20 +176,16 @@ if(iy<0.) //spin axis
 
 if(iy>=NY) //equatorial plane
   {
-    
-    iiy=NY-(iy-NY)-1;
-    iiz=iz;
-    iix=ix;
-    gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-    gdet_bc=get_g(g,3,4,ix,iy,iz);  
 
-    for(iv=0;iv<NV;iv++)
-      {
-	if(iv==3 || iv==8)
-	  pp[iv]=-get_u(p,iv,iix,iiy,iiz);
-	else
-	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
-      }
+if(1)
+  {
+    //ambient
+    set_hdatmosphere(pp,xxvec,geom.gg,geom.GG,0);
+#ifdef RADIATION
+    set_radatmosphere(pp,xxvec,geom.gg,geom.GG,0);
+
+#endif
+  }
 
     /*
     int il;
@@ -196,7 +195,7 @@ if(iy>=NY) //equatorial plane
       }
     */
 
-#if(RADCLOSURE==VETCLOSURE)
+#ifdef myVET
     double reflect_direction[3] = {0.,0.,1.};
 
     reflectI(reflect_direction, &Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][0], &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
@@ -250,6 +249,9 @@ if(iy>=NY) //equatorial plane
       
 	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 #endif
+
+
+
       }
 #endif
 
@@ -339,7 +341,11 @@ if(iy>=NY) //equatorial plane
   
 #endif 
 #endif
+	/*
     p2u(pp,uu,&geom); 
+    printf("%d > \n",ix);
+    print_primitives(pp);getch();
+	*/
     return 0; 
   }
    

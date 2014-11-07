@@ -3363,6 +3363,9 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
 
   ldouble chi=calc_chi(pp,geom);
   ldouble mfp = 1./chi; // dr / dtau
+  #ifdef SKIPRADSOURCE
+  mfp=1.e50;
+  #endif
   ldouble mindx,nu;
 
   //limiting in opt.thin region

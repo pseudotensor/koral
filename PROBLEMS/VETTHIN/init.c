@@ -23,18 +23,13 @@ yy=xxvecSPH[2];
 zz=xxvecSPH[3];
 
 
-ldouble gg[4][5],GG[4][5],eup[4][4],elo[4][4],tlo[4][4];
-pick_g(ix,iy,iz,gg);
-pick_G(ix,iy,iz,GG);
+ldouble gg[4][5],GG[4][5];
 
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
 struct geometry geomSPH;
 fill_geometry_arb(ix,iy,iz,&geomSPH,SPHCOORDS);
-
-pick_T(tmulo,ix,iy,iz,tlo);
-calc_ZAMOes(gg,eup,elo,MYCOORDS);
 
 ldouble pp[NV],ppback[NV],T;
 
@@ -57,9 +52,9 @@ ldouble D,W,eps,uT,uphi,uPhi;
 if(1)
   {
     //ambient
-    set_hdatmosphere(pp,xxvec,gg,GG,0);
+    set_hdatmosphere(pp,xxvec,geom.gg,geom.GG,0);
 #ifdef RADIATION
-    set_radatmosphere(pp,xxvec,gg,GG,0);
+    set_radatmosphere(pp,xxvec,geom.gg,geom.GG,0);
 
 #endif
   }
@@ -76,7 +71,7 @@ calc_Rij_M1(pp,&geom,RijM1);
 //converting to RADCLOSURECOORDS
 trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
 //to ortonormal
-trans22_cc2on(RijM1,RijM1,geomSPH.tup);
+trans22_cc2on(RijM1,RijM1,tupSPH);
 //input
 M1[0]=RijM1[0][0];
 M1[1]=RijM1[0][1];
@@ -84,7 +79,9 @@ M1[2]=RijM1[0][2];
 M1[3]=RijM1[0][3];
 M1[4]=pp[EE0];
       
+#ifdef myVET
 ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+#endif
 /***********************************************/
 
 int iv;
@@ -102,3 +99,6 @@ update_entropy(ix,iy,iz,0);
 
 //mark initialy succesfull u2p_hot step
 set_cflag(0,ix,iy,iz,0);
+
+
+//print_primitives(pp);

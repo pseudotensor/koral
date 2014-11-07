@@ -431,7 +431,9 @@ calc_u2p()
 
 #if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
       if(TJ==0 && iy<NCCORRECTPOLAR-1) continue;
+#ifndef HALFTHETA
       if(TJ==NTY-1 && iy>(NY-NCCORRECTPOLAR)) continue;
+#endif
 #endif
 
       #ifdef MSTEP

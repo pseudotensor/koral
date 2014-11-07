@@ -365,8 +365,8 @@
 #define SHUFFLELOOPS 0
 #endif
 
-#ifndef MKS1R0
-#define MKS1R0 0.
+#ifndef MKSR0
+#define MKSR0 0.
 #endif
 
 //whether to check if the advection operator keeps entropy increasing,
@@ -492,17 +492,7 @@
 #define NTZ 1
 #endif
 
-#ifndef TNX
-#define TNX (NX*NTX)
-#endif
 
-#ifndef TNY
-#define TNY (NY*NTY)
-#endif
-
-#ifndef TNZ
-#define TNZ (NZ*NTZ)
-#endif
 
 #ifdef MPI
 #ifndef NX
