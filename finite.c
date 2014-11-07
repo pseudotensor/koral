@@ -429,7 +429,7 @@ calc_u2p()
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-#ifdef CORRECT_POLARAXIS
+#if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
       if(TJ==0 && iy<NCCORRECTPOLAR-1) continue;
       if(TJ==NTY-1 && iy>(NY-NCCORRECTPOLAR)) continue;
 #endif
@@ -5247,14 +5247,14 @@ correct_polaraxis_3d()
 			{
 			  iy=NY-1-ic;
 
+			  fill_geometry(ix,iy,iz,&geom);
+			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+			  
 			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NY-NCCORRECTPOLAR-1,iz);
 	      	 
 
 			  #ifdef POLARAXISAVGIN3D
-
-			  fill_geometry(ix,iy,iz,&geom);
-			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-
 			  ldouble r=geomBL.xx;
 			  ldouble th=geomBL.yy;
 			  ldouble ph=geomBL.zz;
