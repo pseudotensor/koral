@@ -2879,13 +2879,13 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[
 
       //left
       fill_geometry(iix,iiy,iiz,&geomcent);
-      derdir[geom->ifacedim]=0; //right derivative
+      derdir[geom->ifacedim]=2; //right derivative
       calc_Rij_visc(&get_u(p,0,iix,iiy,iiz),&geomcent,Rvisc1,derdir);
       indices_2221(Rvisc1,Rvisc1,geomcent.gg); //R^i_j
 
       //right
       fill_geometry(ix,iy,iz,&geomcent);      
-      derdir[geom->ifacedim]=0; //left derivative
+      derdir[geom->ifacedim]=1; //left derivative
       calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc2,derdir);
       indices_2221(Rvisc2,Rvisc2,geomcent.gg); //R^i_j
       
@@ -3417,7 +3417,7 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   /**********************************/
 
 #ifdef RADVISCNUDAMP
-  ldouble nulimit = mindx*mindx / 2. / dt;
+  ldouble nulimit = mindx*mindx / 2. / global_dt / 2.;
   ldouble fac=nu/nulimit;
   if(nu>nulimit)
     {

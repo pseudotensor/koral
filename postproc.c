@@ -53,7 +53,7 @@
 //rho-weighted radial velocity in the jet (42)
 //magnetic flux in the jet (43)
 //kinetic flux in the jet (44)
-//radial velocity close to the axis (45)                                                                                                                                                                                                        //Bernoulli close to the axis (46)                                                                                                                                                                                                                                    
+//radial velocity close to the axis (45)                                                                                                                                                                              //Bernoulli close to the axis (46)                                                                                                                                                                                                                                    
 
 
 /*********************************************/

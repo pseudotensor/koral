@@ -1,5 +1,5 @@
-#define RESTART
-#define RESTARTNUM 40
+//#define RESTART
+#define RESTARTNUM 0
 
 
 #define RADIATION
@@ -22,7 +22,8 @@
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define ALPHARADVISC 0.1
-#define MAXRADVISCVEL 1.
+#define RADVISCMAXVELDAMP
+#define MAXRADVISCVEL 0.1
 
 
 #define MASS 10.
@@ -36,6 +37,7 @@
 //#define myMKS1COORDS
 //#define myMKER1COORDS
 #define myMSPH1COORDS
+//#define mySPHCOORDS
 
 #ifdef myMSPH1COORDS
 #define MYCOORDS MSPH1COORDS
@@ -72,7 +74,7 @@
 
 #ifdef DISK
 #define RMIN 4.
-#define RMAX 15.
+#define RMAX 30.
 #endif
 
 #ifdef HOURGLASS
@@ -100,17 +102,15 @@
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
-#define TNX 60
+#define TNX 40
 #endif
 
 #ifdef myMKER1COORDS
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
-#define TNX 60
+#define TNX 40
 #endif
-
-
 
 #ifdef mySPHCOORDS
 #define MINX (1.5*r_horizon_BL(BHSPIN))
