@@ -831,6 +831,20 @@ int calc_thetaprofiles(ldouble profiles[][NY])
               ldouble Tgas2=calc_PEQ_Tfromurho(uint2,rho2);
 	      ldouble kabsloc = calc_kappa(&get_u(p,0,iix,iy,iz),&geomBL2,&k1,&k2,&k3,&k4);
 	      ldouble kscaloc = calc_kappaes(&get_u(p,0,iix,iy,iz),&geomBL2);
+	      if(doingavg)
+                {
+                  utcon[0]=get_uavg(pavg,AVGRHOUCON(0),iix,iy,iz)/get_uavg(pavg,RHO,iix,iy,iz);
+                  utcon[1]=get_uavg(pavg,AVGRHOUCON(1),iix,iy,iz)/get_uavg(pavg,RHO,iix,iy,iz);
+                  utcon[2]=get_uavg(pavg,AVGRHOUCON(2),iix,iy,iz)/get_uavg(pavg,RHO,iix,iy,iz);
+                  utcon[3]=get_uavg(pavg,AVGRHOUCON(3),iix,iy,iz)/get_uavg(pavg,RHO,iix,iy,iz);
+		  conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL2.gg,geomBL2.GG);
+		}
+	      else
+		{
+		  //temporary
+		  ucov[0]=-1.; ucov[1]=0.;
+		}
+
 	      tau1+=-(kabsloc+kscaloc)*(ucov[0]+ucov[1])*sqrt(grr)*dxph[0];
 	      tau2=-(kabsloc+kscaloc)*(ucov[0]+ucov[1])*geomBL2.xx*sqrt(grr);
 	      if(Rphot<0. && my_max(tau1,tau2)>2./3.)
