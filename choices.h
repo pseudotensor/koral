@@ -17,6 +17,10 @@
 #define VELPRIMRAD VELR
 #endif
 
+#ifndef DORADFIXUPS
+#define DORADFIXUPS 1
+#endif
+
 #ifndef DOFIXUPS
 #define DOFIXUPS 1
 #endif

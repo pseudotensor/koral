@@ -451,12 +451,12 @@ corrected[2]=0;
   //************************************
 
   //commented out - rad fixups only for critical failure in implicit
-  /*
+#if (DORADFIXUPS==1)
   if(radcor>0)     
     fixups[1]=1;
   else
     fixups[1]=0;
-  */
+#endif
 
   //************************************
   //************************************

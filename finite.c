@@ -4458,7 +4458,7 @@ cell_fixup_hd()
 int
 cell_fixup_rad()
 {
-  if(DOFIXUPS==0)
+  if(DORADFIXUPS==0)
     return 0;
 
   int ix,iy,iz,iv;
