@@ -113,13 +113,13 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 128
-#define TNY 64
-#define TNZ 8
+#define TNX 304
+#define TNY 192
+#define TNZ 1
 //number of tiles
 #define NTX 2
 #define NTY 2
-#define NTZ 2
+#define NTZ 1
 
 #define SPECIFIC_BC
 #define PERIODIC_ZBC

@@ -167,11 +167,13 @@ main(int argc, char **argv)
       calc_M1intensities();
 #endif
 
-    }
-
+      
 #ifdef PR_POSTINIT
 #include PR_POSTINIT
 #endif
+
+    }
+
   
 
   //prepares files  
