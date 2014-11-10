@@ -601,6 +601,7 @@ int conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],l
 int conv_vels_core(ldouble *u1,ldouble *u2,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5],ldouble,int);
 
 //u2p.c
+int test_inversion();
 int count_entropy(int *,int*);
 int copy_entropycount();
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
@@ -610,6 +611,7 @@ int u2p(ldouble *uu, ldouble *pp, void*,int*,int*,int);
 int u2p_hot(ldouble*,ldouble*,void*);
 int u2p_entropy(ldouble*,ldouble*,void*);
 int u2p_cold(ldouble*,ldouble*,void*);
+int u2p_slow(ldouble*,ldouble*,void*);
 int u2p_hotmax(ldouble*,ldouble*,void*);
 int u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
 

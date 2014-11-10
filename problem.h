@@ -87,7 +87,7 @@
 //84 AXISBLOB - blob near 3d polar axis
 //85 NSTEST - tests of axisymmetric NS
 
-#define PROBLEM 67
+#define PROBLEM 7
 
 
 

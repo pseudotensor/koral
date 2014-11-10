@@ -233,10 +233,19 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
     }
   else
     {
+      int method=U2P_HOT;
+#ifdef REVERTTOSLOW
+      ldouble xxBL[4];
+      coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>1.e6 && fabs(pp[VX])<1.e-4)
+	method=U2P_SLOW;
+#endif
+
+
 #ifdef ENFORCEENTROPY
       u2pret=-1; //skip hot
 #else
-      u2pret=u2p_solver(uu,pp,ggg,U2P_HOT,0); 
+      u2pret=u2p_solver(uu,pp,ggg,method,0); 
   
       //check if u2p_hot went mad by making entropy decrease
       //this check performed only when type==1
@@ -768,6 +777,68 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   return 0;  
 }
 
+
+//assumes u^t=1
+int
+f_u2p_slow(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
+{
+
+  ldouble Qn=cons[0];
+  ldouble Qt2=cons[1];
+  ldouble D=cons[2];
+  ldouble QdotBsq=cons[3];
+  ldouble Bsq=cons[4];
+  
+  ldouble W=Wp+D;
+
+  FTYPE W3,X3,Ssq,Wsq,X,X2,Xsq; 
+  FTYPE Qtsq = Qt2;
+  X = Bsq + W;
+  Wsq = W*W;
+  W3 = Wsq*W ;
+  X2 = X*X;
+  Xsq = X2;
+  X3 = X2*X;
+  //  return -(Qn+W)*(GAMMA/GAMMAM1)+W*(1.-Qt2/W/W)-D*sqrt(1.-Qt2/W/W);   
+
+  //a bit more clear
+
+  ldouble v2=0.;//( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
+  ldouble gamma2 = 1./(1.-v2);
+  ldouble gamma = sqrt(gamma2);
+  ldouble w = W/gamma2;
+  ldouble rho0 = D/gamma;
+  ldouble wmrho0 = w - rho0;
+  ldouble u = (w - rho0) / GAMMA;
+  ldouble p = (GAMMA-1)*u;
+
+  //*f= Qn + W - p;
+
+  *f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
+
+  *err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
+
+  // dp/dW = dp/dW + dP/dv^2 dv^2/dW
+    
+  ldouble dvsq=(-2.0/X3 * ( Qtsq  +  QdotBsq * (3.0*W*X + Bsq*Bsq)/W3));
+  ldouble dp1 = dpdWp_calc_vsq(Wp, D, v2 ); // vsq can be unphysical
+
+  ldouble idwmrho0dp=compute_idwmrho0dp(wmrho0);
+  ldouble dwmrho0dvsq = (D*(gamma*0.5-1.0) - Wp);
+
+  ldouble drho0dvsq = -D*gamma*0.5; // because \rho=D/\gamma
+  ldouble idrho0dp = compute_idrho0dp(wmrho0);
+
+  ldouble dp2 =   drho0dvsq *idrho0dp  +   dwmrho0dvsq *idwmrho0dp;
+
+  ldouble dpdW = dp1  + dp2*dvsq; // dp/dW = dp/dWp
+
+  *df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
+
+  return 0;  
+}
+
+
 /********************************************
 Harm u2p_entropy
 ********************************************/
@@ -1080,6 +1151,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
    f_u2p=&f_u2p_hotmax;
  if(Etype==U2P_COLD) 
    f_u2p=&f_u2p_cold;
+ if(Etype==U2P_SLOW) 
+   f_u2p=&f_u2p_slow;
   /****************************/
  
   
@@ -1459,4 +1532,41 @@ int copy_entropycount()
     }
 
   return 0;
+}
+
+//tests
+int
+test_inversion()
+{
+  ldouble pp[NV],pp2[NV],uu[NV],ucon[4]={0.,0.,0.,0.};
+  struct geometry geom,geomBL;
+  int iv;
+
+  fill_geometry(NX/2,0,0,&geom);
+  fill_geometry_arb(NX/2,0,0,&geomBL,BLCOORDS);
+  ucon[1]=1.e-9;
+  conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
+  trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+  pp[RHO]=1.;
+  pp[UU]=1.;
+  pp[VX]=ucon[1];
+  pp[VY]=pp[VZ]=0.;
+  PLOOP(iv) pp2[iv]=pp[iv];
+  
+  p2u(pp,uu,&geom);
+
+  print_primitives(pp);
+  print_conserved(uu);
+  printf("gdet = %e\n",geom.gdet);
+  u2p_solver(uu,pp,&geom,U2P_HOT,0); 
+  print_primitives(pp);
+ 
+  PLOOP(iv) pp[iv]=pp2[iv];
+  u2p_solver(uu,pp,&geom,U2P_SLOW,0); 
+  
+  print_primitives(pp);
+
+  return 0;
+
 }

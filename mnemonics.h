@@ -67,6 +67,8 @@
 #define U2P_ENTROPY 1
 #define U2P_HOTMAX 2
 #define U2P_COLD 3
+#define U2P_SLOW 4
+
 
 //coordinates/metric
 #define BLCOORDS 1

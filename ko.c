@@ -91,6 +91,9 @@ main(int argc, char **argv)
   //**************
   //tests
   //**************
+  //test_inversion();
+  //exit(1);
+
   //test_solve_implicit_lab();
   //test_Giff();  exit(-1);
 

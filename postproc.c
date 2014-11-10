@@ -335,7 +335,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      #endif
 	      
 	      int isjet;
-	      if(muBe>0.05) isjet=1;
+	      if(muBe>0.05 && (xxBL[2]<M_PI/4. || xxBL[2]>3.*M_PI/4.))
+		isjet=1;
 	      else isjet=0;
 
 	      //estimating the diffusive flux

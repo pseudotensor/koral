@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 40
+#define RESTARTNUM -1
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -22,7 +22,7 @@
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define EXPLICIT_LAB_RAD_SOURCE
 
 //#define OVERWRITERADWAVESPEEDSWITHHD
@@ -48,24 +48,33 @@
 //coordinates / resolution
 /************************************/
 #define MKS1R0 0.
-#define MYCOORDS MKS1COORDS
-//#define MYCOORDS KERRCOORDS
+
+#define myMKSCOORDS
 #define OUTCOORDS BLCOORDS
 #define PRINTXGC_LEFT
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
 #define RMIN 100.
-#define RBONDI 1.e5 //(TAMB=3.267e12/RBONDI)
-#define RMAX (RBONDI*100.)
+#define RBONDI 1.e3 //(TAMB=3.267e12/RBONDI)
+
+
+#define RMAX (RBONDI*1000.)
+//#define REVERTTOSLOW
 
 #define RMAXOUT RBONDI 
 //#define RTEMPOUT (1.e6/10.)
 
+#ifdef myMKSCOORDS
+#define MYCOORDS MKS1COORDS
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
+#endif
 
-//#define MINX RMIN
-//#define MAXX RMAX
+#ifdef myMKER1COORDS
+#define MYCOORDS MKER1COORDS
+#define MINX (log(RMIN-MKS1R0))
+#define MAXX (log(RMAX-MKS1R0))
+#endif
 
 
 #define MINY .99*Pi/2.
@@ -80,7 +89,7 @@
 #define NTY 1
 #define NTZ 1
 
-#define SELFTIMESTEP
+//#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -101,7 +110,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .6
+#define TSTEPLIM .1
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
