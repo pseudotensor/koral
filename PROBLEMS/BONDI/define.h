@@ -22,7 +22,7 @@
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define EXPLICIT_LAB_RAD_SOURCE
 
 //#define OVERWRITERADWAVESPEEDSWITHHD
@@ -54,11 +54,11 @@
 #define PRINTXGC_LEFT
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 1000.
-#define RBONDI 1.e3 //(TAMB=3.267e12/RBONDI)
+#define RMIN 1.5
+#define RBONDI 1.e4 //(TAMB=3.267e12/RBONDI)
 
 
-#define RMAX (RBONDI*2000.)
+#define RMAX (RBONDI*100.)
 //#define REVERTTOSLOW
 
 #define RMAXOUT RBONDI 
