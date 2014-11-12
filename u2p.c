@@ -234,12 +234,6 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
   else
     {
       int method=U2P_HOT;
-#ifdef REVERTTOSLOW
-      ldouble xxBL[4];
-      coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-      if(xxBL[1]>1.e6 && fabs(pp[VX])<1.e-4)
-	method=U2P_SLOW;
-#endif
 
 
 #ifdef ENFORCEENTROPY
@@ -262,10 +256,30 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
 	  if(s2/s1 < 0.1)
 	    {  
 	      //go to entropy
-	      if(verbose) printf("enforcing entr at %4d %4d %4d\n",geom->ix,geom->iy,geom->iz);
+	      if(verbose || 1) printf("enforcing entr at %4d %4d %4d\n",geom->ix,geom->iy,geom->iz);
 	      u2pret=-1;
 	    }
 	}
+
+
+#ifdef REVERTTOSLOW
+      ldouble xxBL[4],ucon[4]={0.,0.,0.,0.};
+      if(u2pret==0)
+	{
+	  coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
+	  ucon[1]=pp[VX];
+	  conv_vels(ucon,ucon,VEL4,VEL4,geom->gg,geom->GG);
+	  trans2_coco(geom->xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
+	  
+	  if(xxBL[1]>1.e5)//za && fabs(ucon[1])<1.e-6)
+	    {
+	      method=U2P_SLOW;
+	      u2pret=u2p_solver(uu,pp,ggg,method,0); 
+	      //	      printf("used SLOW at %d\n",geom->ix);
+	    }
+	}
+#endif
+
 #endif
     }
  
@@ -1542,9 +1556,9 @@ test_inversion()
   struct geometry geom,geomBL;
   int iv;
 
-  fill_geometry(NX/2,0,0,&geom);
-  fill_geometry_arb(NX/2,0,0,&geomBL,BLCOORDS);
-  ucon[1]=1.e-9;
+  fill_geometry(NX-2,0,0,&geom);
+  fill_geometry_arb(NX-2,0,0,&geomBL,BLCOORDS);
+  ucon[1]=1.e-12;
   conv_vels(ucon,ucon,VEL4,VEL4,geomBL.gg,geomBL.GG);
   trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
   conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
@@ -1552,11 +1566,18 @@ test_inversion()
   pp[UU]=1.;
   pp[VX]=ucon[1];
   pp[VY]=pp[VZ]=0.;
-  PLOOP(iv) pp2[iv]=pp[iv];
-  
-  p2u(pp,uu,&geom);
 
   print_primitives(pp);
+  p2u(pp,uu,&geom);
+
+  pp[VX]*=100000.*M_PI;
+  pp[RHO]*=0.001245325124;
+  pp[UU]*=23.124124214421124;
+  
+  PLOOP(iv) pp2[iv]=pp[iv];
+  
+
+  
   print_conserved(uu);
   printf("gdet = %e\n",geom.gdet);
   u2p_solver(uu,pp,&geom,U2P_HOT,0); 

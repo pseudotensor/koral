@@ -9,7 +9,7 @@
 //#define TEST124
 //#define GDETIN 1
 //#define WAVESPEEDSATFACES
-#define VXFLOOR 1.e-6
+//#define VXFLOOR 1.e-6
 
 
 /************************************/
@@ -31,7 +31,7 @@
 //#define PUTNFFLOOR
 
 #define RADIMPLICITTHRESHOLD 1.e-2
-#define RADIMPCONV 1.e-8
+#define RADIMPCONV 1.e-14
 #define RADIMPEPS 1.e-8
 #define U2PCONV 1.e-12
 #define ALLOWRADCEILINGINIMPLICIT
@@ -54,7 +54,7 @@
 #define PRINTXGC_LEFT
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
-#define RMIN 100.
+#define RMIN 1000.
 #define RBONDI 1.e3 //(TAMB=3.267e12/RBONDI)
 
 
@@ -89,7 +89,7 @@
 #define NTY 1
 #define NTZ 1
 
-//#define SELFTIMESTEP
+#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
