@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 36
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -88,7 +88,8 @@
 #define NTX 4 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
-#define SELFTIMESTEP
+
+//#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -109,9 +110,9 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .1
+#define TSTEPLIM .4
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0      
 
 #define DOFIXUPS 0
@@ -130,7 +131,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 (RMAX*10000.) //res
+#define DTOUT1 10.//(RMAX*1000.) //res
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 
@@ -138,7 +139,7 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e-4
+#define MDOT 1.e-2
 //#define TAMB (1.e8*(1.e5/RTEMPOUT))
 #define TAMB (3.267e12/RBONDI)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
