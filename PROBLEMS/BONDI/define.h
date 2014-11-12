@@ -58,7 +58,7 @@
 #define RBONDI 1.e3 //(TAMB=3.267e12/RBONDI)
 
 
-#define RMAX (RBONDI*1000.)
+#define RMAX (RBONDI*2000.)
 //#define REVERTTOSLOW
 
 #define RMAXOUT RBONDI 
@@ -88,7 +88,6 @@
 #define NTX 4 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
-
 #define SELFTIMESTEP
 
 //#define SUBZONES
