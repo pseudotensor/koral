@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 36
+#define RESTARTNUM -1
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -23,14 +23,14 @@
 //radiation
 /************************************/
 #define RADIATION
-#define EXPLICIT_LAB_RAD_SOURCE
+//#define EXPLICIT_LAB_RAD_SOURCE
 
 //#define OVERWRITERADWAVESPEEDSWITHHD
 //#define RESETNPH
 //#define SKIPRADSOURCE
 //#define PUTNFFLOOR
 
-#define RADIMPLICITTHRESHOLD 1.e-2
+#define RADIMPLICITTHRESHOLD 1.e20
 #define RADIMPCONV 1.e-14
 #define RADIMPEPS 1.e-8
 #define U2PCONV 1.e-12
@@ -82,14 +82,14 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 128
 #define TNY 1
 #define TNZ 1
-#define NTX 4 //for MPI and OMP
+#define NTX 4//for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
-//#define SELFTIMESTEP
+#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -110,9 +110,9 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .4
+#define TSTEPLIM .3
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
 
 #define DOFIXUPS 0
@@ -131,7 +131,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 10.//(RMAX*1000.) //res
+#define DTOUT1 (RMAX*1000.) //res
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 

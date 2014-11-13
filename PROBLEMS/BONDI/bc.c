@@ -211,6 +211,8 @@ if(ix>=NX) //total boundary, properties of the galaxy
 */
 else if(ix<0) //outflow near BH
    {
+     iiy=iy;
+     iiz=iz;
      PLOOP(iv)
      {
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
