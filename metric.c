@@ -16,7 +16,7 @@ ldouble
 calc_gdet_arb(ldouble *xx,int COORDS)
 {
 #ifdef METRICNUMERIC
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==MSPH1COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS)
     return calc_gdet_arb_num(xx,COORDS);
   else
     return calc_gdet_arb_ana(xx,COORDS);
@@ -242,7 +242,7 @@ int
 calc_g_arb(ldouble *xx, ldouble g[][5],int COORDS)
 {
   #ifdef METRICNUMERIC
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==MSPH1COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS)
     calc_g_arb_num(xx,g,COORDS); 
   else
     calc_g_arb_ana(xx,g,COORDS);
@@ -519,7 +519,7 @@ int
 calc_G_arb(ldouble *xx, ldouble G[][5],int COORDS)
 {
   #ifdef METRICNUMERIC
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==MSPH1COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS)
     calc_G_arb_num(xx,G,COORDS); 
   else
     calc_G_arb_ana(xx,G,COORDS); 
@@ -814,7 +814,7 @@ int
 calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int COORDS)
 {
   #ifdef METRICNUMERIC
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==MSPH1COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS)
     calc_Krzysie_arb_num(xx,Krzys,COORDS);
   else
     calc_Krzysie_arb_ana(xx,Krzys,COORDS);
@@ -2239,6 +2239,53 @@ x3
 //**********************************************************************
 //**********************************************************************
 //converts coordinates
+//for KS -> TKS3
+int
+coco_KS2TKS3(ldouble *xKS, ldouble *xMKS)
+{
+  ldouble KSx0=xKS[0];
+  ldouble KSx1=xKS[1];
+  ldouble KSx2=xKS[2];
+  ldouble KSx3=xKS[3];
+  ldouble x0,x1,x2,x3;
+  ldouble R0,H0,MY1,MY2,MP0,T0;
+  R0=H0=MY1=MY2=T0=0.;
+
+  
+#if(MYCOORDS==TKS3COORDS)
+  T0=TKST0;
+  R0=MKSR0;
+  H0=MKSH0;
+  MY1=MKSMY1;
+  MY2=MKSMY2;
+  MP0=MKSMP0;
+#endif
+
+  x1
+= Log(KSx1 - R0)
+;
+x0
+= (Power(2,T0)*KSx0)/Power(KSx1,T0)
+;
+x2
+= (-(H0*Power(KSx1,MP0)*Pi) - Power(2,1 + MP0)*H0*MY1*Pi + 2*H0*Power(KSx1,MP0)*MY1*Pi + Power(2,1 + MP0)*H0*MY2*Pi + 2*Power(KSx1,MP0)*ArcTan(((-2*KSx2 + Pi)*Tan((H0*Pi)/2.))/Pi))/(2.*H0*(-Power(KSx1,MP0) - Power(2,1 + MP0)*MY1 + 2*Power(KSx1,MP0)*MY1 + Power(2,1 + MP0)*MY2)*Pi)
+;
+x3
+= KSx3
+;
+
+  xMKS[0]=x0;
+  xMKS[1]=x1;
+  xMKS[2]=x2;
+  xMKS[3]=x3;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
 //for MKS1 -> KS
 int
 coco_MKS12KS(ldouble *xMKS1, ldouble *xKS)
@@ -2332,6 +2379,52 @@ coco_MKS32KS(ldouble *xMKS, ldouble *xKS)
 
   KSx0
 = x0
+;
+KSx1
+= exp(x1) + R0
+;
+KSx2
+= (Pi*(1 + Cot((H0*Pi)/2.)*Tan(H0*Pi*(-0.5 + (MY1 + (Power(2,MP0)*(-MY1 + MY2))/Power(exp(x1) + R0,MP0))*(1 - 2*x2) + x2))))/2.
+;
+KSx3
+= x3
+;
+
+  xKS[0]=KSx0;
+  xKS[1]=KSx1;
+  xKS[2]=KSx2;
+  xKS[3]=KSx3;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for TKS3 -> KS
+int
+coco_TKS32KS(ldouble *xMKS, ldouble *xKS)
+{
+  ldouble x0=xMKS[0];
+  ldouble x1=xMKS[1];
+  ldouble x2=xMKS[2];
+  ldouble x3=xMKS[3];
+  ldouble R0,H0,MY1,MY2,MP0,T0;
+  ldouble KSx0,KSx1,KSx2,KSx3;
+  R0=H0=MY1=MY2=T0=0.;
+
+#if(MYCOORDS==TKS3COORDS)
+  T0=TKST0;
+  R0=MKSR0;
+  H0=MKSH0;
+  MY1=MKSMY1;
+  MY2=MKSMY2;
+  MP0=MKSMP0;
+#endif
+
+  KSx0
+= (Power(exp(x1) + R0,T0)*x0)/Power(2,T0)
 ;
 KSx1
 = exp(x1) + R0
@@ -2682,12 +2775,16 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     coco_KS2MKS2(x1,x2);
   else if (CO1==KSCOORDS && CO2==MKS3COORDS)
     coco_KS2MKS3(x1,x2);
+  else if (CO1==KSCOORDS && CO2==TKS3COORDS)
+    coco_KS2TKS3(x1,x2);
   else if (CO1==MKS1COORDS && CO2==KSCOORDS)
     coco_MKS12KS(x1,x2);
   else if (CO1==MKS2COORDS && CO2==KSCOORDS)
     coco_MKS22KS(x1,x2);
   else if (CO1==MKS3COORDS && CO2==KSCOORDS)
     coco_MKS32KS(x1,x2);
+  else if (CO1==TKS3COORDS && CO2==KSCOORDS)
+    coco_TKS32KS(x1,x2);
   else if (CO1==MCYL1COORDS && CO2==CYLCOORDS)
     coco_MCYL12CYL(x1,x2);
   else if (CO1==CYLCOORDS && CO2==MCYL1COORDS)
@@ -2715,6 +2812,11 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       coco_MKS32KS(x1,x2);
       coco_KS2BL(x2,x2);
     }
+ else if (CO1==TKS3COORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
+    {
+      coco_TKS32KS(x1,x2);
+      coco_KS2BL(x2,x2);
+    }
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==MKS1COORDS)
     {
       coco_BL2KS(x1,x2);
@@ -2729,6 +2831,11 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     {
       coco_BL2KS(x1,x2);
       coco_KS2MKS3(x2,x2);
+    }
+  else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==TKS3COORDS)
+    {
+      coco_BL2KS(x1,x2);
+      coco_KS2TKS3(x2,x2);
     }
   else if ((CO1==SCHWCOORDS || CO1==KERRCOORDS || CO1==SPHCOORDS) && CO2==MINKCOORDS)
     {
@@ -2766,6 +2873,12 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       coco_BL2KS(x2,x2);
       coco_KS2MKS3(x2,x2);
     }
+else if (CO1==MINKCOORDS && CO2==TKS3COORDS)
+    {
+      coco_MINK2SPH(x1,x2);
+      coco_BL2KS(x2,x2);
+      coco_KS2TKS3(x2,x2);
+    }
  else if (CO1==KSCOORDS && CO2==MINKCOORDS)
     {      
       coco_KS2BL(x1,x2);
@@ -2786,6 +2899,12 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
   else if (CO1==MKS3COORDS && CO2==MINKCOORDS)
     {
       coco_MKS32KS(x1,x2);
+      coco_KS2BL(x2,x2);
+      coco_SPH2MINK(x2,x2);
+    }
+   else if (CO1==TKS3COORDS && CO2==MINKCOORDS)
+    {
+      coco_TKS32KS(x1,x2);
       coco_KS2BL(x2,x2);
       coco_SPH2MINK(x2,x2);
     }
@@ -2935,6 +3054,57 @@ dxdx_KS2MKS3(ldouble *xx, ldouble dxdx[][4])
 //**********************************************************************
 //**********************************************************************
 //calculates transformation matrices dxmu/dxnu
+//for KS -> TKS3
+int
+dxdx_KS2TKS3(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble KSx0=xx[0];
+  ldouble KSx1=xx[1];
+  ldouble KSx2=xx[2];
+  ldouble KSx3=xx[3];
+
+  ldouble R0,H0,MY1,MY2,MP0,T0;
+  R0=H0=MY1=MY2=T0=0.;
+
+#if(MYCOORDS==TKS3COORDS)			
+  T0=TKST0;
+  R0=MKSR0;
+  H0=MKSH0;
+  MY1=MKSMY1;
+  MY2=MKSMY2;
+  MP0=MKSMP0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+;dxdx[0][0]= Power(2,T0)/Power(KSx1,T0)
+;dxdx[0][1]= -(Power(2,T0)*KSx0*Power(KSx1,-1 - T0)*T0)
+;dxdx[0][2]= 0
+;dxdx[0][3]= 0
+;dxdx[1][0]= 0
+;dxdx[1][1]= 1/(KSx1 - R0)
+;dxdx[1][2]= 0
+;dxdx[1][3]= 0
+;dxdx[2][0]= 0
+;dxdx[2][1]= -((Power(2,1 + MP0)*Power(KSx1,-1 + MP0)*MP0*(MY1 - MY2)*ArcTan(((-2*KSx2 + Pi)*Tan((H0*Pi)/2.))/Pi))/(H0*Power(Power(KSx1,MP0)*(1 - 2*MY1) + Power(2,1 + MP0)*(MY1 - MY2),2)*Pi))
+;dxdx[2][2]= (-2*Power(KSx1,MP0)*Tan((H0*Pi)/2.))/(H0*(Power(KSx1,MP0)*(-1 + 2*MY1) + Power(2,1 + MP0)*(-MY1 + MY2))*Power(Pi,2)*(1 + (Power(-2*KSx2 + Pi,2)*Power(Tan((H0*Pi)/2.),2))/Power(Pi,2)))
+;dxdx[2][3]= 0
+;dxdx[3][0]= 0
+;dxdx[3][1]= 0
+;dxdx[3][2]= 0
+;dxdx[3][3]= 1
+;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
 //for KS -> MKS1
 int
 dxdx_KS2MKS2(ldouble *xx, ldouble dxdx[][4])
@@ -3068,6 +3238,58 @@ dxdx_MKS32KS(ldouble *xx, ldouble dxdx[][4])
 ;
 
 
+
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for TKS3 -> KS
+int
+dxdx_TKS32KS(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble x0=xx[0];
+  ldouble x1=xx[1];
+  ldouble x2=xx[2];
+  ldouble x3=xx[3];
+
+  ldouble R0,H0,MY1,MY2,MP0,T0;
+  R0=H0=MY1=MY2=T0=0.;
+
+#if(MYCOORDS==MKS3COORDS)
+  T0=TKST0;
+  R0=MKSR0;
+  H0=MKSH0;
+  MY1=MKSMY1;
+  MY2=MKSMY2;
+  MP0=MKSMP0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+;dxdx[0][0]= Power(exp(x1) + R0,T0)/Power(2,T0)
+;dxdx[0][1]= (exp(x1)*Power(exp(x1) + R0,-1 + T0)*T0*x0)/Power(2,T0)
+;dxdx[0][2]= 0
+;dxdx[0][3]= 0
+;dxdx[1][0]= 0
+;dxdx[1][1]= exp(x1)
+;dxdx[1][2]= 0
+;dxdx[1][3]= 0
+;dxdx[2][0]= 0
+;dxdx[2][1]= -(Power(2,-1 + MP0)*exp(x1)*H0*MP0*(MY1 - MY2)*Power(Pi,2)*Power(exp(x1) + R0,-1 - MP0)*(-1 + 2*x2)*Cot((H0*Pi)/2.)*Power(Sec(H0*Pi*(-0.5 + (MY1 + (Power(2,MP0)*(-MY1 + MY2))/Power(exp(x1) + R0,MP0))*(1 - 2*x2) + x2)),2))
+;dxdx[2][2]= (H0*Power(Pi,2)*(1 - 2*(MY1 + (Power(2,MP0)*(-MY1 + MY2))/Power(exp(x1) + R0,MP0)))*Cot((H0*Pi)/2.)*Power(Sec(H0*Pi*(-0.5 + (MY1 + (Power(2,MP0)*(-MY1 + MY2))/Power(exp(x1) + R0,MP0))*(1 - 2*x2) + x2)),2))/2.
+;dxdx[2][3]= 0
+;dxdx[3][0]= 0
+;dxdx[3][1]= 0
+;dxdx[3][2]= 0
+;dxdx[3][3]= 1
+;
 
   return 0;
 }
