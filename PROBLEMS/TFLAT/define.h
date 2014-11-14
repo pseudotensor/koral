@@ -20,8 +20,8 @@
 
 #define MYCOORDS TFLATCOORDS
 #define METRICNUMERIC
-//#define METRICTIMEDEPENDENT
-#define TFLATT0 0.
+#define METRICTIMEDEPENDENT
+#define TFLATT0 0.5
 #define MINX 1.
 #define MAXX 2. 
 #define MINY 0.
@@ -46,7 +46,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 5000 //stop after this number of outputs
-#define DTOUT1 1.e0 //res
+#define DTOUT1 1.e-1 //res
 #define DTOUT2 1.e50 //avg
 
 /************************************/
@@ -54,7 +54,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .6
+#define TSTEPLIM .06
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 
