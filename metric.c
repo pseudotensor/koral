@@ -16,7 +16,7 @@ ldouble
 calc_gdet_arb(ldouble *xx,int COORDS)
 {
 #ifdef METRICNUMERIC
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS || COORDS==TFLATCOORDS)
     return calc_gdet_arb_num(xx,COORDS);
   else
     return calc_gdet_arb_ana(xx,COORDS);
@@ -242,7 +242,7 @@ int
 calc_g_arb(ldouble *xx, ldouble g[][5],int COORDS)
 {
   #ifdef METRICNUMERIC
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS || COORDS==TFLATCOORDS)
     calc_g_arb_num(xx,g,COORDS); 
   else
     calc_g_arb_ana(xx,g,COORDS);
@@ -519,7 +519,7 @@ int
 calc_G_arb(ldouble *xx, ldouble G[][5],int COORDS)
 {
   #ifdef METRICNUMERIC
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS || COORDS==TFLATCOORDS)
     calc_G_arb_num(xx,G,COORDS); 
   else
     calc_G_arb_ana(xx,G,COORDS); 
@@ -814,7 +814,7 @@ int
 calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int COORDS)
 {
   #ifdef METRICNUMERIC
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==MSPH1COORDS || COORDS==TFLATCOORDS)
     calc_Krzysie_arb_num(xx,Krzys,COORDS);
   else
     calc_Krzysie_arb_ana(xx,Krzys,COORDS);
@@ -2280,6 +2280,46 @@ x3
 //**********************************************************************
 //**********************************************************************
 //converts coordinates
+//for MINK -> TFLAT
+int
+coco_MINK2TFLAT(ldouble *xKS, ldouble *xMKS)
+{
+  ldouble KSx0=xKS[0];
+  ldouble KSx1=xKS[1];
+  ldouble KSx2=xKS[2];
+  ldouble KSx3=xKS[3];
+
+
+  ldouble T0,x0,x1,x2,x3;
+#if(MYCOORDS==TFLATCOORDS)
+  T0=TFLATT0;
+#endif
+
+x1
+= KSx1
+;
+x0
+= KSx0/Power(KSx1,T0)
+;
+x2
+= KSx2
+;
+x3
+= KSx3
+;
+
+  xMKS[0]=x0;
+  xMKS[1]=x1;
+  xMKS[2]=x2;
+  xMKS[3]=x3;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
 //for MKS1 -> KS
 int
 coco_MKS12KS(ldouble *xMKS1, ldouble *xKS)
@@ -2429,6 +2469,48 @@ KSx2
 KSx3
 = x3
 ;
+
+  xKS[0]=KSx0;
+  xKS[1]=KSx1;
+  xKS[2]=KSx2;
+  xKS[3]=KSx3;
+
+  return 0;
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for TFLAT -> MINK
+int
+coco_TFLAT2MINK(ldouble *xMKS, ldouble *xKS)
+{
+  ldouble x0=xMKS[0];
+  ldouble x1=xMKS[1];
+  ldouble x2=xMKS[2];
+  ldouble x3=xMKS[3];
+
+
+  ldouble T0,KSx0,KSx1,KSx2,KSx3;
+#if(MYCOORDS==TFLATCOORDS)
+  T0=TFLATT0;
+#endif
+
+KSx0
+= x0*Power(x1,T0)
+;
+KSx1
+= x1
+;
+KSx2
+= x2
+;
+KSx3
+= x3
+;
+
 
   xKS[0]=KSx0;
   xKS[1]=KSx1;
@@ -2835,6 +2917,10 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
     {
       coco_SPH2MINK(x1,x2);
     }
+   else if ((CO1==TFLATCOORDS) && CO2==MINKCOORDS)
+    {
+      coco_TFLAT2MINK(x1,x2);
+    }
   else if (CO1==MSPH1COORDS && CO2==MINKCOORDS)
     {
       coco_MSPH12SPH(x1,x2);
@@ -2848,6 +2934,10 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
   else if (CO1==MINKCOORDS && (CO2==SCHWCOORDS || CO2==KERRCOORDS || CO2==SPHCOORDS))
     {
       coco_MINK2SPH(x1,x2);
+    }
+  else if (CO1==MINKCOORDS && (CO2==TFLATCOORDS))
+    {
+      coco_MINK2TFLAT(x1,x2);
     }
   else if (CO1==MINKCOORDS && CO2==MKS1COORDS)
     {
@@ -3095,6 +3185,51 @@ dxdx_KS2TKS3(ldouble *xx, ldouble dxdx[][4])
   return 0;
 }
 
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for MINK -> TFLAT
+int
+dxdx_MINK2TFLAT(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble KSx0=xx[0];
+  ldouble KSx1=xx[1];
+  ldouble KSx2=xx[2];
+  ldouble KSx3=xx[3];
+
+  ldouble T0;
+#if(MYCOORDS==TFLATCOORDS)
+  T0=TFLATT0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+;dxdx[0][0]= Power(KSx1,-T0)
+;dxdx[0][1]= -(KSx0*Power(KSx1,-1 - T0)*T0)
+;dxdx[0][2]= 0
+;dxdx[0][3]= 0
+;dxdx[1][0]= 0
+;dxdx[1][1]= 1
+;dxdx[1][2]= 0
+;dxdx[1][3]= 0
+;dxdx[2][0]= 0
+;dxdx[2][1]= 0
+;dxdx[2][2]= 1
+;dxdx[2][3]= 0
+;dxdx[3][0]= 0
+;dxdx[3][1]= 0
+;dxdx[3][2]= 0
+;dxdx[3][3]= 1
+;
+
+  return 0;
+}
+
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
@@ -3287,6 +3422,53 @@ dxdx_TKS32KS(ldouble *xx, ldouble dxdx[][4])
 
   return 0;
 }
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for TFLAT -> MINK
+int
+dxdx_TFLAT2MINK(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble x0=xx[0];
+  ldouble x1=xx[1];
+  ldouble x2=xx[2];
+  ldouble x3=xx[3];
+  
+  ldouble T0;
+#if(MYCOORDS==TFLATCOORDS)
+  T0=TFLATT0;
+#endif
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+
+;dxdx[0][0]= Power(x1,T0)
+;dxdx[0][1]= T0*x0*Power(x1,-1 + T0)
+;dxdx[0][2]= 0
+;dxdx[0][3]= 0
+;dxdx[1][0]= 0
+;dxdx[1][1]= 1
+;dxdx[1][2]= 0
+;dxdx[1][3]= 0
+;dxdx[2][0]= 0
+;dxdx[2][1]= 0
+;dxdx[2][2]= 1
+;dxdx[2][3]= 0
+;dxdx[3][0]= 0
+;dxdx[3][1]= 0
+;dxdx[3][2]= 0
+;dxdx[3][3]= 1
+;
+
+
+  return 0;
+}
+
 
 //**********************************************************************
 //**********************************************************************
@@ -3747,6 +3929,8 @@ calc_g_arb_num(ldouble *xx, ldouble gout[][5],int COORDS)
     BASECOORDS=KSCOORDS;
   else if(COORDS==MSPH1COORDS)
     BASECOORDS=SPHCOORDS;
+   else if(COORDS==TFLATCOORDS)
+    BASECOORDS=MINKCOORDS;
   else
     my_err("calc_g_arb_num() called with unsupported COORDS\n");
 
@@ -3762,6 +3946,7 @@ calc_g_arb_num(ldouble *xx, ldouble gout[][5],int COORDS)
   if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
   if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
   if(COORDS==TKS3COORDS) dxdx_KS2TKS3(xxb,dxdx);
+  if(COORDS==TFLATCOORDS) dxdx_MINK2TFLAT(xxb,dxdx);
   if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
 
   //G = dxdx dxdx Gb
@@ -3791,6 +3976,8 @@ calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
     BASECOORDS=KSCOORDS;
   else if(COORDS==MSPH1COORDS)
     BASECOORDS=SPHCOORDS;
+  else if(COORDS==TFLATCOORDS)
+    BASECOORDS=MINKCOORDS;
   else
     my_err("calc_G_arb_num() called with unsupported COORDS\n");
 
@@ -3806,6 +3993,7 @@ calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
   if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
   if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
   if(COORDS==TKS3COORDS) dxdx_KS2TKS3(xxb,dxdx);
+  if(COORDS==TFLATCOORDS) dxdx_MINK2TFLAT(xxb,dxdx);
   if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
 
   //G = dxdx dxdx Gb
@@ -3913,18 +4101,21 @@ test_metric()
     {
       calc_metric();
       fill_geometry(NX/4,NY/2,0,&geom);
-      fill_geometry_arb(NX/4,NY/2,0,&geomBL,BLCOORDS);
+      fill_geometry_arb(NX/4,NY/2,0,&geomBL,MINKCOORDS);
       printf("%f %f %e %e %e\n",global_time,geomBL.xx,geom.gdet,geom.gg[0][1],geom.gg[1][1]);
-      int i,j;
+      int i,j,k;
       ldouble g[4][5],a[4][4],xx[4];
       get_xx(NX/4,NY/2,0,xx);
       calc_g(xx,g);
       DLOOP(i,j)
 	a[i][j]=g[i][j];
       ldouble gdet=sqrt(-determinant_44matrix(a));
-      //print_metric(g);
-      //printf("gdet=%e\n",gdet);
-      //getch();
+      print_metric(g);
+      print_metric(geom.GG);
+      printf("gdet=%e\n",gdet);
+      DLOOPB(i,j,k)
+	printf("%d %d %d > %e\n",i,j,k,get_gKr(i,j,k,NX/4,NY/2,0));
+      getch();
     }
   exit(1);
 

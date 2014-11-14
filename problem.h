@@ -86,9 +86,26 @@
 //83 RADFLATTEST - tests of radiation solvers in flat space
 //84 AXISBLOB - blob near 3d polar axis
 //85 NSTEST - tests of axisymmetric NS
+//86 TFLAT - tests of TFLATCOORDS
 
-#define PROBLEM 7
+#define PROBLEM 86
 
+
+
+#if(PROBLEM==86)
+
+
+#define PR_DEFINE "PROBLEMS/TFLAT/define.h"
+#define PR_BC "PROBLEMS/TFLAT/bc.c"
+#define PR_INIT "PROBLEMS/TFLAT/init.c"
+#define PR_KAPPA "PROBLEMS/TFLAT/kappa.c"
+#define PR_KAPPAES "PROBLEMS/TFLAT/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/TFLAT/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/TFLAT/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/TFLAT/dump.c"
+#define PR_TOOLS "PROBLEMS/TFLAT/tools.c"
+
+#endif
 
 
 #if(PROBLEM==85)
