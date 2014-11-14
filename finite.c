@@ -2235,7 +2235,7 @@ print_grid(ldouble min_dx, ldouble min_dy, ldouble min_dz)
 int 
 get_xx(int ix,int iy,int iz,ldouble *xx)
 {
-  xx[0]=0.;
+  xx[0]=global_time;
   xx[1]=get_x(ix,0);
   xx[2]=get_x(iy,1);
   xx[3]=get_x(iz,2);

@@ -110,6 +110,22 @@ pp[NF0]=calc_NFfromE(pp[EE0]);
 #endif	 
 
 
+#ifdef FLAT
+pp[0]=1.;
+pp[1]=1.;
+pp[2]=0.;
+pp[3]=0.;
+pp[4]=0.;
+pp[5]=calc_Sfromu(rho,uint);
+#ifdef RADIATION
+pp[6]=1.;
+pp[7]=0.;
+pp[8]=0.;
+  pp[9]=0.;
+#endif
+#endif
+
+
 p2u(pp,uu,&geom);	 
 
 //print_primitives(pp);getch();

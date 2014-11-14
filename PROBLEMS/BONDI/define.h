@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 200
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -48,8 +48,9 @@
 //coordinates / resolution
 /************************************/
 #define myTKSCOORDS
+//#define FLAT
 
-#define TKST0 0.
+#define TKST0 0.1
 #define MKSR0 0.
 #define MKSH0 0.1
 #define MKSMY1 0.001
@@ -81,8 +82,8 @@
 #define MAXY 1.01*Pi/2.
 #endif
 
-#ifdef myMKER1COORDS
-#define MYCOORDS MKER1COORDS
+#ifdef myMSPHCOORDS
+#define MYCOORDS MSPH1COORDS
 #define MINX (log(RMIN-MKSR0))
 #define MAXX (log(RMAX-MKSR0))
 
@@ -105,7 +106,7 @@
 #define PRINTXGC_LEFT
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
-//#define SELFTIMESTEP
+#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -147,7 +148,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 RMAX//(RMAX*100.) //res
+#define DTOUT1 (RMAX*100.)//(RMAX*100.) //res
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 

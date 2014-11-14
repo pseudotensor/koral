@@ -827,25 +827,19 @@ calc_Krzysie_arb(ldouble *xx, ldouble Krzys[][4][4],int COORDS)
 int
 calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
 {
-#if(MODYFIKUJKRZYSIE==0)
   ldouble xx[4];
 
-  xx[0]=0.;
+  xx[0]=global_time;
   xx[1]=get_x(ix,0);
   xx[2]=get_x(iy,1);
   xx[3]=get_x(iz,2);
 
+#if(MODYFIKUJKRZYSIE==0)
   calc_Krzysie(xx,Krzys);
 #else
-  ldouble xx[4];
+
   ldouble Krzys_org[4][4][4];
   //analytical at center
-
-  xx[0]=0.;
-  xx[1]=get_x(ix,0);
-  xx[2]=get_x(iy,1);
-  xx[3]=get_x(iz,2);
-
   calc_Krzysie(xx,Krzys_org);
   calc_Krzysie(xx,Krzys);
 
@@ -870,14 +864,14 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
 
      
       //center
-      xx[0]=0.;
+      xx[0]=global_time;
       xx[1]=get_x(ix,0);
       xx[2]=get_x(iy,1);
       xx[3]=get_x(iz,2);
       gdet[0]=calc_gdet_arb(xx,MYCOORDS);
 
       //upper face
-      xx[0]=0.;
+      xx[0]=global_time;
       xx[1]=get_x(ix,0);
       xx[2]=get_x(iy,1);
       xx[3]=get_x(iz,2);
@@ -887,7 +881,7 @@ calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4])
       gdet[1]=calc_gdet_arb(xx,MYCOORDS);
 
       //lower face
-      xx[0]=0.;
+      xx[0]=global_time;
       xx[1]=get_x(ix,0);
       xx[2]=get_x(iy,1);
       xx[3]=get_x(iz,2);
@@ -3607,7 +3601,7 @@ calc_metric()
 	    //x-faces
 	    if(ix==-NG)
 	      {
-		xx[0]=0.;
+		xx[0]=global_time;
 		xx[1]=get_xb(ix,0);
 		xx[2]=get_x(iy,1);
 		xx[3]=get_x(iz,2);
@@ -3624,7 +3618,7 @@ calc_metric()
 		  set_gb(gbx,j,4,ix,iy,iz,calc_dlgdet(xx,j),0);
 		set_gb(gbx,3,4,ix,iy,iz,calc_gdet(xx),0);
 	      }
-	    xx[0]=0.;
+	    xx[0]=global_time;
 	    xx[1]=get_xb(ix+1,0);
 	    xx[2]=get_x(iy,1);
 	    xx[3]=get_x(iz,2);
@@ -3644,7 +3638,7 @@ calc_metric()
 	    //y-faces
 	    if(iy==-NG)
 	      {
-		xx[0]=0.;
+		xx[0]=global_time;
 		xx[1]=get_x(ix,0);
 		xx[2]=get_xb(iy,1);
 		xx[3]=get_x(iz,2);
@@ -3663,7 +3657,7 @@ calc_metric()
 	      }
 
 
-	    xx[0]=0.;
+	    xx[0]=global_time;
 	    xx[1]=get_x(ix,0);
 	    xx[2]=get_xb(iy+1,1);
 	    xx[3]=get_x(iz,2);
@@ -3683,7 +3677,7 @@ calc_metric()
 	    //z-faces
 	    if(iz==-NG)
 	      {
-		xx[0]=0.;
+		xx[0]=global_time;
 		xx[1]=get_x(ix,0);
 		xx[2]=get_x(iy,1);
 		xx[3]=get_xb(iz,2);
@@ -3701,7 +3695,7 @@ calc_metric()
 		set_gb(gbz,3,4,ix,iy,iz,calc_gdet(xx),2);
 
 	      }
-	    xx[0]=0.;
+	    xx[0]=global_time;
 	    xx[1]=get_x(ix,0);
 	    xx[2]=get_x(iy,1);
 	    xx[3]=get_xb(iz+1,2);
@@ -3864,7 +3858,7 @@ calc_Krzysie_arb_num(ldouble *xx, ldouble Krzys[][4][4],int COORDS)
     {
       //dg_ij , k
       par.i=i; par.j=j; par.k=k;    
-      gsl_deriv_central (&F, xx[k], 1e-6, &result, &abserr);
+      gsl_deriv_central (&F, xx[k], 1.e-6, &result, &abserr);
       dgdx[i][j][k]=result;
     }
 
@@ -3913,8 +3907,29 @@ calc_gdet_arb_num(ldouble *xx,int COORDS)
 int
 test_metric()
 {
-  //test numerical metric computation
+  //test time evolution of a TKS1 metric
+  struct geometry geom,geomBL;
+  for(global_time=0.;global_time<100.;global_time+=1.)
+    {
+      calc_metric();
+      fill_geometry(NX/4,NY/2,0,&geom);
+      fill_geometry_arb(NX/4,NY/2,0,&geomBL,BLCOORDS);
+      printf("%f %f %e %e %e\n",global_time,geomBL.xx,geom.gdet,geom.gg[0][1],geom.gg[1][1]);
+      int i,j;
+      ldouble g[4][5],a[4][4],xx[4];
+      get_xx(NX/4,NY/2,0,xx);
+      calc_g(xx,g);
+      DLOOP(i,j)
+	a[i][j]=g[i][j];
+      ldouble gdet=sqrt(-determinant_44matrix(a));
+      //print_metric(g);
+      //printf("gdet=%e\n",gdet);
+      //getch();
+    }
+  exit(1);
 
+  //test numerical metric computation
+  /*
   struct geometry geom;
   fill_geometry(NX/2,NY/2,0,&geom);
   ldouble xxBL[4];
@@ -3940,7 +3955,7 @@ test_metric()
 
   fflush(stdout);
   exit(-1);
-
+  */
   return 0;
 }
 
