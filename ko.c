@@ -327,7 +327,11 @@ solve_the_problem(ldouble tstart, char* folder)
   #endif
  
   while (t < t1 && nfout1<=NOUTSTOP && nstep<NSTEPSTOP)
-    {    
+    {   
+      #ifdef METRICTIMEDEPENDENT
+      calc_metric();
+#endif
+ 
       spitoutput=0;
       global_time=t;
       nstep++;

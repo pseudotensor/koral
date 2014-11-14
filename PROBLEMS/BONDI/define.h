@@ -22,7 +22,7 @@
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define EXPLICIT_LAB_RAD_SOURCE
 
 //#define OVERWRITERADWAVESPEEDSWITHHD
@@ -47,38 +47,50 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define MKS1R0 0.
+#define myTKSCOORDS
 
-#define myMKSCOORDS
-#define OUTCOORDS BLCOORDS
-#define PRINTXGC_LEFT
-#define PRINTGC_RIGHT
-#define PRINTINSIDEBH
-#define RMIN 1.5
-#define RBONDI 1.e4 //(TAMB=3.267e12/RBONDI)
+#define TKST0 0.
+#define MKSR0 0.
+#define MKSH0 0.1
+#define MKSMY1 0.001
+#define MKSMY2 0.2
+#define MKSMP0 1.5
+#define METRICAXISYMMETRIC
 
-
+#define RMIN 10.
+#define RBONDI 1.e2 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*100.)
-//#define REVERTTOSLOW
-
 #define RMAXOUT RBONDI 
-//#define RTEMPOUT (1.e6/10.)
+
+#ifdef myTKSCOORDS //modified Kerr-Shild further from axis
+#define MYCOORDS TKS3COORDS
+#define METRICNUMERIC
+#define METRICTIMEDEPENDENT
+#define MINX (log(RMIN-MKSR0))
+#define MAXX (log(RMAX-MKSR0))
+#define MINY 0.
+#define MAXY 1.
+#endif
 
 #ifdef myMKSCOORDS
 #define MYCOORDS MKS1COORDS
-#define MINX (log(RMIN-MKS1R0))
-#define MAXX (log(RMAX-MKS1R0))
+//#define METRICNUMERIC
+#define MINX (log(RMIN-MKSR0))
+#define MAXX (log(RMAX-MKSR0))
+#define MINY .99*Pi/2.
+#define MAXY 1.01*Pi/2.
 #endif
 
 #ifdef myMKER1COORDS
 #define MYCOORDS MKER1COORDS
-#define MINX (log(RMIN-MKS1R0))
-#define MAXX (log(RMAX-MKS1R0))
-#endif
-
+#define MINX (log(RMIN-MKSR0))
+#define MAXX (log(RMAX-MKSR0))
 
 #define MINY .99*Pi/2.
 #define MAXY 1.01*Pi/2.
+#endif
+
+
 #define MINZ -1.
 #define MAXZ 1.
 
@@ -89,7 +101,11 @@
 #define NTY 1
 #define NTZ 1
 
-#define SELFTIMESTEP
+#define OUTCOORDS BLCOORDS
+#define PRINTXGC_LEFT
+#define PRINTGC_RIGHT
+#define PRINTINSIDEBH
+//#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -131,7 +147,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 (RMAX*100.) //res
+#define DTOUT1 RMAX//(RMAX*100.) //res
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 

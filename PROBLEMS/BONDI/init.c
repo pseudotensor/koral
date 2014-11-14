@@ -112,6 +112,7 @@ pp[NF0]=calc_NFfromE(pp[EE0]);
 
 p2u(pp,uu,&geom);	 
 
+//print_primitives(pp);getch();
 
 /***********************************************/
 

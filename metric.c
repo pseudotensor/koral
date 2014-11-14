@@ -3259,7 +3259,7 @@ dxdx_TKS32KS(ldouble *xx, ldouble dxdx[][4])
   ldouble R0,H0,MY1,MY2,MP0,T0;
   R0=H0=MY1=MY2=T0=0.;
 
-#if(MYCOORDS==MKS3COORDS)
+#if(MYCOORDS==TKS3COORDS)
   T0=TKST0;
   R0=MKSR0;
   H0=MKSH0;
@@ -3553,7 +3553,9 @@ calc_metric()
     }
   #endif
 
+#ifndef METRICTIMEDEPENDENT
   if(PROCID==0) {printf("Precalculating metrics... "); fflush(stdout);}
+#endif
   
   #pragma omp parallel private(ix,iy,iz,ii) 
   {
@@ -3575,7 +3577,7 @@ calc_metric()
 	ldouble xx[4];
 	int i,j,k;
 	//cell centers
-	xx[0]=0.;
+	xx[0]=global_time;
 	xx[1]=get_x(ix,0);
 	xx[2]=get_x(iy,1);
 	xx[3]=get_x(iz,2);
@@ -3730,7 +3732,9 @@ calc_metric()
 
   }
 
+#ifndef METRICTIMEDEPENDENT
     if(PROCID==0) printf("done!\n");
+#endif
   return 0;
 }
 
@@ -3745,7 +3749,7 @@ calc_g_arb_num(ldouble *xx, ldouble gout[][5],int COORDS)
   ldouble xxb[4],Gb[4][4],dxdx[4][4],G[4][4],g[4][4],gtemp[4][5];
   int BASECOORDS,i,j;
 
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS)
     BASECOORDS=KSCOORDS;
   else if(COORDS==MSPH1COORDS)
     BASECOORDS=SPHCOORDS;
@@ -3763,6 +3767,7 @@ calc_g_arb_num(ldouble *xx, ldouble gout[][5],int COORDS)
   if(COORDS==MKS1COORDS) dxdx_KS2MKS1(xxb,dxdx);
   if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
   if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
+  if(COORDS==TKS3COORDS) dxdx_KS2TKS3(xxb,dxdx);
   if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
 
   //G = dxdx dxdx Gb
@@ -3788,7 +3793,7 @@ calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
   ldouble xxb[4],Gb[4][4],dxdx[4][4],G[4][4],g[4][4],gtemp[4][5];
   int BASECOORDS,i,j;
 
-  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS)
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS)
     BASECOORDS=KSCOORDS;
   else if(COORDS==MSPH1COORDS)
     BASECOORDS=SPHCOORDS;
@@ -3806,6 +3811,7 @@ calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
   if(COORDS==MKS1COORDS) dxdx_KS2MKS1(xxb,dxdx);
   if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
   if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
+  if(COORDS==TKS3COORDS) dxdx_KS2TKS3(xxb,dxdx);
   if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
 
   //G = dxdx dxdx Gb
