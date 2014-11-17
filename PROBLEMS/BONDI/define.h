@@ -162,7 +162,7 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e2
+#define MDOT 1.e3
 //#define TAMB (1.e8*(1.e5/RTEMPOUT))
 #define TAMB (3.267e12/RBONDI)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
