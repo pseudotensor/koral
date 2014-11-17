@@ -37,6 +37,12 @@ if(ix>=NX) //total boundary, properties of the galaxy
     //ldouble RMAXout=geomBL.xx;
     ldouble RMAXout=RMAXOUT;
 
+    #ifdef FULLBONDI
+    RMAXout=RBONDI;
+#endif
+    
+    
+
     ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
     ldouble mdotout = MDOT * calc_mdotEdd() / mdotscale;
     ldouble urout = -sqrt(2./1./RMAXout);

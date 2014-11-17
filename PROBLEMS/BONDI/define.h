@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 200
+#define RESTARTNUM -1
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -22,7 +22,7 @@
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define EXPLICIT_LAB_RAD_SOURCE
 
 //#define OVERWRITERADWAVESPEEDSWITHHD
@@ -30,9 +30,9 @@
 //#define SKIPRADSOURCE
 //#define PUTNFFLOOR
 
-#define RADIMPLICITTHRESHOLD 1.e20
-#define RADIMPCONV 1.e-14
-#define RADIMPEPS 1.e-8
+#define RADIMPLICITTHRESHOLD 1.e-2
+#define RADIMPCONV 1.e-12
+#define RADIMPEPS 1.e-6
 #define U2PCONV 1.e-12
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
@@ -47,7 +47,7 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myTKSCOORDS
+#define myMKSCOORDS
 //#define FLAT
 
 #define TKST0 0.1
@@ -59,7 +59,7 @@
 #define METRICAXISYMMETRIC
 
 #define RMIN 10.
-#define RBONDI 1.e2 //(TAMB=3.267e12/RBONDI)
+#define RBONDI 1.e4 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*100.)
 #define RMAXOUT RBONDI 
 
@@ -95,7 +95,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -106,6 +106,7 @@
 #define PRINTXGC_LEFT
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
+
 #define SELFTIMESTEP
 
 //#define SUBZONES
@@ -127,7 +128,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .3
+#define TSTEPLIM .1
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
@@ -148,7 +149,11 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
-#define DTOUT1 (RMAX*100.)//(RMAX*100.) //res
+#ifdef SELFTIMESTEP
+#define DTOUT1 (RMAX*100.) //res
+#else
+#define DTOUT1 (RMAX*.1)//(RMAX*100.) //res
+#endif
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 
@@ -156,7 +161,7 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e1
+#define MDOT 1.e5
 //#define TAMB (1.e8*(1.e5/RTEMPOUT))
 #define TAMB (3.267e12/RBONDI)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
