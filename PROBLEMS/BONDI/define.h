@@ -58,7 +58,7 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 10.
+#define RMIN 1.5
 #define RBONDI 1.e4 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*100.)
 #define RMAXOUT RBONDI 
@@ -95,7 +95,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 128
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -120,6 +120,7 @@
 //#define FIX_PRESSURERHO
 //#define FIX_VELBONDI
 #define FIX_VELOUTBONDI
+#define FULLBONDI
 //#define INFLOW
 
 
@@ -150,7 +151,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*100.) //res
+#define DTOUT1 (RMAX*1000.) //res
 #else
 #define DTOUT1 (RMAX*.1)//(RMAX*100.) //res
 #endif
@@ -161,7 +162,7 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e5
+#define MDOT 1.e2
 //#define TAMB (1.e8*(1.e5/RTEMPOUT))
 #define TAMB (3.267e12/RBONDI)
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))

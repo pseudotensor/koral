@@ -35,10 +35,10 @@ if(ix>=NX) //total boundary, properties of the galaxy
 
     //calculating Bondi-related values at the boundary
     //ldouble RMAXout=geomBL.xx;
-    ldouble RMAXout=RMAXOUT;
+    ldouble RMAXout=RBONDI;
 
     #ifdef FULLBONDI
-    RMAXout=RBONDI;
+    RMAXout=RMAX;
 #endif
     
     
