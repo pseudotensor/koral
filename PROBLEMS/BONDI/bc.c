@@ -117,7 +117,12 @@ if(ix>=NX) //total boundary, properties of the galaxy
     pp[2]=ucon[1];
     pp[3]=ucon[2];
     pp[4]=ucon[3];
+    #endif
 
+    #ifdef FULLBONDI
+    pp[2]=get_u(pproblem1,VX,ix,iy,iz);
+    pp[3]=get_u(pproblem1,VY,ix,iy,iz);
+    pp[4]=get_u(pproblem1,VZ,ix,iy,iz);
     #endif
 
     pp[5]=calc_Sfromu(rho,uint);

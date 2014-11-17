@@ -58,9 +58,9 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 1.5
-#define RBONDI 1.e4 //(TAMB=3.267e12/RBONDI)
-#define RMAX (RBONDI*100.)
+#define RMIN 1.
+#define RBONDI 3.e6 //(TAMB=3.267e12/RBONDI)
+#define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
 
 #ifdef myTKSCOORDS //modified Kerr-Shild further from axis
@@ -95,7 +95,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -107,7 +107,7 @@
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
 
-#define SELFTIMESTEP
+//#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -129,7 +129,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .1
+#define TSTEPLIM .16
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
@@ -151,9 +151,9 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*1000.) //res
+#define DTOUT1 (RMAX*1000.*TSTEPLIM) //res
 #else
-#define DTOUT1 (RMAX*.1)//(RMAX*100.) //res
+#define DTOUT1 (RMAX*.0001*TSTEPLIM)//(RMAX*100.) //res
 #endif
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
@@ -164,7 +164,14 @@
 #define GAMMA (5./3.)
 #define MDOT 1.e3
 //#define TAMB (1.e8*(1.e5/RTEMPOUT))
+
+#ifndef FULLBONDI
 #define TAMB (3.267e12/RBONDI)
+#else
+#define TAMB 1.e4
+#endif
+
+
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 
 
