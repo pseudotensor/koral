@@ -288,7 +288,7 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
       {
 	ret=-1;
 	
-	if(verbose>2)
+	if(verbose>2 )
 	  {
 	    printf("u2p_entr     >>> %d %d <<< %d >>> %e > %e\n",geom->ix + TOI, geom->iy + TOJ,u2pret,u0,pp[1]);
 	  }
@@ -758,6 +758,17 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
 
   ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
   ldouble gamma2 = 1./(1.-v2);
+
+  //test
+  /*
+  ldouble S = sqrt(QdotBsq);
+  ldouble SoW = S/W;
+  ldouble utsqtop = Qtsq + (Bsq+2.0*W)*SoW*SoW;
+  ldouble utsqbottom = (Bsq*Bsq-Qtsq) + 2.0*Bsq*W + W*W - SoW*SoW*(Bsq+2.0*W);
+  ldouble utsq = utsqtop/utsqbottom;
+  gamma2=1.0+utsq;
+  */
+
   ldouble gamma = sqrt(gamma2);
   ldouble w = W/gamma2;
   ldouble rho0 = D/gamma;

@@ -22,7 +22,7 @@
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define EXPLICIT_LAB_RAD_SOURCE
 
 //#define OVERWRITERADWAVESPEEDSWITHHD
@@ -58,9 +58,9 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 1.
-#define RBONDI 3.e6 //(TAMB=3.267e12/RBONDI)
-#define RMAX (RBONDI*10.)
+#define RMIN 10.
+#define RBONDI 1.e4 //(TAMB=3.267e12/RBONDI)
+#define RMAX (RBONDI*100.)
 #define RMAXOUT RBONDI 
 
 #ifdef myTKSCOORDS //modified Kerr-Shild further from axis
@@ -107,7 +107,7 @@
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
 
-//#define SELFTIMESTEP
+#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -120,7 +120,7 @@
 //#define FIX_PRESSURERHO
 //#define FIX_VELBONDI
 #define FIX_VELOUTBONDI
-#define FULLBONDI
+//#define FULLBONDI
 //#define INFLOW
 
 
@@ -129,7 +129,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .16
+#define TSTEPLIM .3
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
@@ -151,7 +151,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*1000.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*100000.*TSTEPLIM) //res
 #else
 #define DTOUT1 (RMAX*.0001*TSTEPLIM)//(RMAX*100.) //res
 #endif
@@ -168,7 +168,7 @@
 #ifndef FULLBONDI
 #define TAMB (3.267e12/RBONDI)
 #else
-#define TAMB 1.e4
+#define TAMB 1.e6
 #endif
 
 

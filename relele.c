@@ -256,9 +256,8 @@ conv_vels_core(ldouble *u1,ldouble *u2conout,ldouble *u2covout,int which1,int wh
   /*************** VELR -> VEL4 ***************/
   else if (which1==VELR && which2==VEL4)
     {
-      ldouble u1cov[4];
-      /*
-      
+
+      //test
       ldouble qsq=0.;
       for(i=1;i<4;i++)
 	for(j=1;j<4;j++)
@@ -266,11 +265,17 @@ conv_vels_core(ldouble *u1,ldouble *u2conout,ldouble *u2covout,int which1,int wh
 
       ldouble gamma2=(1.+qsq);
       ldouble alpha2=(-1./GG[0][0]);
-      */
+      
+      u2con[0]=sqrt(gamma2/alpha2);
+      u2con[1]=u1[1]-alpgam*GG[0][1];
+      u2con[2]=u1[2]-alpgam*GG[0][2];
+      u2con[3]=u1[3]-alpgam*GG[0][3];
+      
+      indices_21(u2con,u2cov,gg);
 
+      /*
+      ldouble u1cov[4];
       u1[0]=0.;
-      //indices_21(u1,u1cov,gg); //lowering indices in utilda
-
       int i,k;
       for(i=0;i<4;i++)
 	{
@@ -293,7 +298,7 @@ conv_vels_core(ldouble *u1,ldouble *u2conout,ldouble *u2covout,int which1,int wh
 	      u2con[i]+=u2cov[k]*GG[i][k];
 	    }	  
 	}
-
+      */
 
     }
   /*************** VELR -> VEL3 ***************/
