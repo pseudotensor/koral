@@ -843,6 +843,12 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  coord_values[0]=xxvec[1];
 	  coord_values[1]=xxvec[2];
 	  coord_values[2]=xxvec[3];
+	  
+
+	  //TODO:
+	  //temporary, to prevent negative thetas
+	  //if( coord_values[1]<1.e-6)  coord_values[1]=1.e-6;
+	  //if( coord_values[1]>(M_PI-1.e-6))  coord_values[1]=(M_PI-1.e-6);
 
 	  coord_limits[l][m+1]=coord_values[l];
 	}
@@ -1013,8 +1019,8 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	    }
 
 
-	  // printf("%e %e (%e %e %e) (%e %e %e)\n", minL, maxL, posR0, posTh0, posPh0, posR, posTh, posPh);
-	  // printf("%e %e (%e %e %e) (%e %e %e)\n", minL, maxL, x_sphere[1], x_sphere[2], x_sphere[3], x_new[1], x_new[2], x_new[3]);
+	  //printf("%e %e (%e %e %e) (%e %e %e)\n", minL, maxL, posR0, posTh0, posPh0, posR, posTh, posPh);
+	  //printf("%e %e (%e < %e < %e) (%e < %e < %e)\n", minL, maxL, coord_limits[0][0], x_new[1], coord_limits[0][2], coord_limits[1][0], x_new[2], coord_limits[1][2]);
 
 
 	}
@@ -1031,7 +1037,7 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 
       double upperR, upperTh, upperPh;
       double upperRIndex, upperThIndex, upperPhIndex;
-
+      
 
       //R Indices
       if ((posR < coord_limits[0][0]) || (posR > coord_limits[0][2]))
@@ -1103,20 +1109,19 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
       double w0_low, w0_high;
       double w1_low, w1_high;
 
-
+      ldouble EPS=1.e-10;
 
       //Get interpolation weights for 4 bounding corners of cube intersection
-      if ((posR > coord_limits[0][2]) || (posR < coord_limits[0][0]))
+      if ((posR > (1.-EPS)*coord_limits[0][2]) || (posR < (1.+EPS)* coord_limits[0][0]))
 	{
-
 	  int realRIndex;
 
 
-	  if (posR > coord_limits[0][2])
+	  if (posR >(1.-EPS)* coord_limits[0][2])
 	    {
 	      realRIndex = n1_central+1;
 	    }
-	  if (posR < coord_limits[0][0])
+	  if (posR <(1.+EPS)* coord_limits[0][0])
 	    {
 	      realRIndex = n1_central-1;
 	    }
@@ -1144,15 +1149,15 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	}
 
 
-      if ((posTh > coord_limits[1][2]) || (posTh < coord_limits[1][0]))
+      if ((posTh >(1.-EPS)* coord_limits[1][2]) || (posTh < (1.+EPS)*coord_limits[1][0]))
 	{
 	  int realThIndex;
-
-	  if (posTh > coord_limits[1][2])
+  
+	  if (posTh >(1.-EPS)* coord_limits[1][2])
 	    {
 	      realThIndex = n2_central+1;
 	    }
-	  if (posTh < coord_limits[1][0])
+	  if (posTh <(1.+EPS)* coord_limits[1][0])
 	    {
 	      realThIndex = n2_central-1;
 	    }
@@ -1162,6 +1167,7 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	    {
 	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p] = realThIndex;
 	    }
+
 	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerRIndex;
 	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerRIndex;
 	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperRIndex;
@@ -1185,7 +1191,13 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = w0_high*w1_low;
       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
 
-            intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * (-x_new[0]);
+      if(ix==0 && iy==17 &&  iz==0)
+	printf("%d > %e %e %e %e > %e %e %e %e\n", probeAng,intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] ,
+	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] ,
+	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] ,
+	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3], w0_low,w1_low,w0_high,w1_high);
+
+      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * (-x_new[0]);
       //intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = sqrt((x_new[1]-x_sphere[1])*(x_new[1]-x_sphere[1]) + x_sphere[1]*x_sphere[1]*(x_new[2]-x_sphere[2])*(x_new[2]-x_sphere[2]) + x_sphere[1]*x_sphere[1]*sin(x_sphere[2])*sin(x_sphere[2])*(x_new[3]-x_sphere[3])*(x_new[3]-x_sphere[3]));
 
       if (-x_new[0] < mintime)
@@ -1258,13 +1270,18 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
       // printf("!! %e %e %e %e !!\n", w0_low, w0_high, w1_low, w1_high);
       // printf("-- %e %e %e --\n", posX, posY, posZ);
 
+	/*
+	printf("%e %e %e %e\n", x_new[0], x_new[1], x_new[2], x_new[3]);
 
-//    printf("%e %e %e %e\n", x_new[0], x_new[1], x_new[2], x_new[3]);
 
 
-
+	printf("%d > %d %d %d > %d %d %d %d \n",probeAng,ix,iy,iz, intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0],
+	       intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1],
+	       intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2],
+	       intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3]); */
+	
     } //end loop over angles
-
+  //    getch();
 /*
 	printf("R-limits: %e %e %e\n", coord_limits[0][0], coord_limits[0][1], coord_limits[0][2]);
 	printf("Th-limits: %e %e %e\n", coord_limits[1][0], coord_limits[1][1], coord_limits[1][2]);
@@ -1273,10 +1290,12 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
    exit(-1);
 */
 
+  /*
   if (ix == 0)
     {
   printf("ZERO Mintime = %e\n", mintime);
     }
+  */
 }
 
 
@@ -1592,7 +1611,6 @@ void setupInterpWeights_sph2D_flat(int ix, int iy, int iz, double angGridCoords[
 
       // printf("!! %e %e %e %e !!\n", w0_low, w0_high, w1_low, w1_high);
       // printf("-- %e %e %e --\n", posX, posY, posZ);
-
 
 
     } //end loop over angles
@@ -3252,7 +3270,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
 		if (isnan(intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p]))
 		{
-			//printf("ERROR: weight NAN -- %d %d %d -- %d -- %d!\n", ix, iy, iz, probeAng, p);
+			printf("ERROR: weight NAN -- %d %d %d -- %d -- %d!\n", ix, iy, iz, probeAng, p);
 			exit(-1);
 		}
 
@@ -3284,9 +3302,9 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
       if(interp_I[probeAng]<0.) 
 	{
-	  printf("neg interp_I %e %e\n",
+	  printf("neg interp_I %e %e > %d %d %d > %d %d %d > %d\n",
 		 I_Data[intersect_i][intersect_j][intersect_k][probeAng],
-		 intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p]);
+		 intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p],intersect_i,intersect_j,intersect_k,ix,iy,iz,p);
 	}
 
 	interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
@@ -3310,7 +3328,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	  intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * delta_t;
 	}
 
-      I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t; //apply time step
+      I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t ; //apply time step
       //I_time[probeAng] = I_Data[1][1][1][probeAng];
 
       
@@ -3319,7 +3337,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
       I_return[probeAng] = I_time[probeAng];
       
-      //		printf("%d - %e\n", probeAng, I_time[probeAng]);
+      //      printf("%d - %e\n", probeAng, I_time[probeAng]);
 
 
     }
@@ -3402,7 +3420,7 @@ ZERO_calcVET(int ix, int iy, int iz,double I_time[NUMANGLES], double eddingtonFa
 return;
 }
 
-int zero_readangles()
+int zero_init()
 {
   int angGridIndexSort[NUMANGLES][3];
   int angDualGridIndexSort[NUMDUALANGLES][3];

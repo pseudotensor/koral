@@ -4671,7 +4671,7 @@ update_intensities()
 
        
       ZERO_shortCharI(ix0,iy0,iz0,dt, intensities, source, 
-		      &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
+      &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
 
       //diffuse
 

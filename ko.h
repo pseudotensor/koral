@@ -791,7 +791,7 @@ void reflectI(double reflect_direction[3], double I_start[NUMANGLES], double I_r
 int get_angDualIndex(double targetAng[3], double angGridCoords[NUMDUALANGLES][3]);
 void bspGetNearestDualNeighbor(double targetAng[3], double angGridCoords[NUMDUALANGLES][3], struct bsptree *bspCurrentLoc, double *bestDistance, int *bestIndex);
 int ZEROtest_oldmain();
-int zero_readangles();
+int zero_init();
 struct bsptree *angGridRoot;
 struct bsptree *angDualGridRoot;
 void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES]);

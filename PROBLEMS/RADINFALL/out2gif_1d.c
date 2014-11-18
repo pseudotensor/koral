@@ -23,7 +23,7 @@
 	  "set origin 0,0\n"
 	  "set multiplot\n"
 	  "set autoscale\n" 
-	   //	   "set log \n"
+	   "set log y\n"
 	  "set label \"t=%.2e (%.2e s)\" at screen .48, .98\n"
 
 	  "set lmargin at screen 0.07\n"
@@ -94,7 +94,9 @@
 	  "set xlabel \"\"\n"
 	  "set ylabel \"\"\n"
 	  "plot \"%s\" u 1:(-$16) w lp ls 4 pt 7 ti \"vx\""
-	  ,fname2,t,t/CCC,get_xb(-NG,0),get_xb(NX+NG,0),fname,fname,fname,fname,fname,fname,fname);
+#ifdef myMKS
+	   ,fname2,t,t/CCC,exp(get_xb(-NG,0)),exp(get_xb(NX+NG,0)),fname,fname,fname,fname,fname,fname,fname);
+#endif
 
 
 

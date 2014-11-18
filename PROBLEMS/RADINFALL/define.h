@@ -1,13 +1,42 @@
 #define BHSPIN 0.
-#define MYCOORDS SCHWCOORDS
+
+#define myMKS
+
+#ifdef myKERR
+#define MYCOORDS BLCOORDS
+#define RMIN 5.
+#define RMAX 40.
+#define MINX RMIN
+#define MAXX RMAX
+#endif
+
+#ifdef myMKS
+#define MYCOORDS MKER1COORDS
+//#define METRICNUMERIC
+#define MKSR0 0
+#define RMIN 2.01
+#define RMAX 30.
+#define MINX (log(RMIN-MKSR0))
+#define MAXX (log(RMAX-MKSR0))
+#endif
+
+#define OUTCOORDS BLCOORDS 
+
+#define MINY .99*Pi/2.
+#define MAXY 1.01*Pi/2.
+
 #define ANAL_PROFILE
 #define INT_ORDER 1
-#define NX 100
-#define NY 1
-#define NZ 1
+#define TNX 512
+#define TNY 1
+#define TNZ 1
+#define NTX 4
+#define NTY 1
+#define NTZ 1
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define NOUTSTOP 30
+#define OUTOUTPUT 1 //to out file
 //#define U2P_TEMP
 
 #define SPECIFIC_BC
@@ -16,13 +45,9 @@
 #define DTOUT1 5.e0
 #define ALLSTEPSOUTPUT 0
 #define GAMMA (ldouble)(5./3.)
-#define COPY_XBC
+//#define COPY_XBC
 #define COPY_YBC
 #define COPY_ZBC
-#define MINX 6.
-#define MAXX 40.
-#define MINY 0*Pi/2.
-#define MAXY 1.*Pi/2.
 #define MINZ 0.
 #define MAXZ 1.
 #define RHOFLOOR 1.e-20
@@ -39,6 +64,6 @@
 //#define PRINTGC_LEFT
 
 #define BLOB
-#define BLOBX 30.
-#define BLOBMAG 1.
-#define BLOBSIG 1.
+#define BLOBX 20.
+#define BLOBMAG 10.
+#define BLOBSIG .1

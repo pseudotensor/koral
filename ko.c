@@ -78,7 +78,7 @@ main(int argc, char **argv)
   //prepare angular grid for radiative solver
 #if(RADCLOSURE==VETCLOSURE)
 #pragma omp parallel
-  zero_readangles();						
+  zero_init();						
   //ZEROtest_oldmain();
 #endif
 

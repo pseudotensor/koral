@@ -4,7 +4,7 @@
 
 #define RADIATION
 
-//#define myVET
+#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
@@ -12,8 +12,11 @@
 #define RADSTARTWITHM1INTENSITIES
 #endif
 
-//#define BEAM1
-#define DISK
+#define BEAM1
+//#define DISK
+//#define HOURGLASS
+
+
 #define DOFIXUPS 0
 #define SKIPRADSOURCE
 
@@ -32,11 +35,10 @@
 
 
 #define OMSCALE 1.
-//#define HOURGLASS
 
 //#define myMKS1COORDS
-//#define myMKER1COORDS
-#define myMSPH1COORDS
+#define myMKER1COORDS
+//#define myMSPH1COORDS
 //#define mySPHCOORDS
 
 #ifdef myMSPH1COORDS
@@ -126,13 +128,13 @@
 #define NTZ 1
 
 
-#define MINY 0.001
-#define MAXY Pi/2.
+#define MINY 0.1
+#define MAXY Pi/2
 #define HALFTHETA
 #define MINZ -1.
 #define MAXZ 1.
 #define SPECIFIC_BC
-#define CORRECT_POLARAXIS
+//#define CORRECT_POLARAXIS
 #define NCCORRECTPOLAR 2
 
 #define GAMMA (4./3.)

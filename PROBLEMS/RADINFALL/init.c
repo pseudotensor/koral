@@ -12,18 +12,18 @@
   {
 */
 struct geometry geom;
-fill_geometry(ix,iy,iz,&geom);
+fill_geometry_arb(ix,iy,iz,&geom,BLCOORDS);
+struct geometry geomint;
+fill_geometry(ix,iy,iz,&geomint);
 
 ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
 ldouble uu[NV];
 
-xx=get_x(ix,0);
-yy=get_x(iy,1);
-zz=get_x(iz,2);
+xx=geom.xx;
+yy=0.;
+zz=0.;
 ldouble gg[4][5],eup[4][4],elo[4][4],GG[4][5];
-pick_g(ix,iy,iz,gg);
-pick_G(ix,iy,iz,GG);
 
 ldouble pp[NV],T;
 
@@ -36,15 +36,15 @@ pp[1]=U_AMB;
 pp[2]=mx;
 pp[3]=my;
 pp[4]=mz;
-ldouble x[4]={0,xx,yy,zz};
+ldouble x[4]={0,geom.xx,geom.yy,geom.zz};
 	   
 #ifdef ANAL_PROFILE	      
 //zaczynam jednak od profilu analitycznego:   
-ldouble r=xx;
+ldouble r=geom.xx;
 ldouble mD=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
 ldouble mE=PAR_E/(powl(r*r*sqrtl(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
 ldouble V=sqrtl(2./r)*(1.-2./r)           ;
-ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
+ldouble W=1./sqrtl(1.-V*V*geom.gg[1][1]);
 ldouble mrho=mD/W;
 ldouble muint=mE/W;
 	      
@@ -66,10 +66,12 @@ pp[0]*=1.+BLOBMAG*exp(-(xx-BLOBX)*(xx-BLOBX)/BLOBSIG/BLOBSIG);
 pp[5]=calc_Sfromu(pp[0],pp[1]);	      
 
 //converting from 3vel to VELPRIM
-conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
+conv_velsinprims(pp,VEL3,VELPRIM,geom.gg,geom.GG);
+trans_pall_coco(pp,pp, BLCOORDS, MYCOORDS, geom.xxvec,&geom,&geomint);
+
 	      
 if(ix>=-1) //conserved required for ix=-1 only
-  p2u(pp,uu,&geom);	 
+  p2u(pp,uu,&geomint);	 
 
 
 /***********************************************/

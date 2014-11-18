@@ -5,15 +5,12 @@ ldouble gdet_src,gdet_bc;
 int iix,iiy,iiz,iv;  	  
 
 struct geometry geom;
-fill_geometry(ix,iy,iz,&geom);
+fill_geometry_arb(ix,iy,iz,&geom,BLCOORDS);
 
-gdet_bc=get_g(g,3,4,ix,iy,iz);  
-gdet_src=get_g(g,3,4,iix,iiy,iiz);
+struct geometry geomint;
+fill_geometry(ix,iy,iz,&geomint);
+
 ldouble gg[4][5],ggsrc[4][5],eup[4][4],elo[4][4],GG[4][5];
-pick_g(ix,iy,iz,gg);
-pick_G(ix,iy,iz,GG);
-pick_T(emuup,ix,iy,iz,eup);
-pick_T(emulo,ix,iy,iz,elo);
 ldouble xx=get_x(ix,0);
 
 /**********************/
@@ -22,19 +19,12 @@ ldouble xx=get_x(ix,0);
   //  if(ix>=NX || ix<0) //analytical solution on both sides
   if(ix>=NX) //analytical solution at rout only
     {
-      //TODO: to lepiej prekalkulowac
-      ldouble gdet=get_g(g,3,4,ix,iy,iz);  
- 
-      ldouble gg[4][5],eup[4][4],elo[4][4];
-      pick_g(ix,iy,iz,gg);
-      pick_T(emuup,ix,iy,iz,eup);
-      pick_T(emulo,ix,iy,iz,elo);
 
-      ldouble r=get_x(ix,0);
+      ldouble r=	geom.xx;
       ldouble D=PAR_D/(r*r*sqrtl(2./r*(1.-2./r)));
       ldouble E=PAR_E/(powl(r*r*sqrt(2./r),GAMMA)*powl(1.-2./r,(GAMMA+1.)/4.));
       ldouble V=sqrtl(2./r)*(1.-2./r);
-      ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
+      ldouble W=1./sqrtl(1.-V*V*geom.gg[1][1]);
       ldouble rho=D/W;
       ldouble uint=E;//W;
 
@@ -49,9 +39,11 @@ ldouble xx=get_x(ix,0);
       pp[5]=calc_Sfromu(rho,uint);
 
       //converting from 3vel to VELPRIM
-      conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
 
-      p2u(pp,uu,&geom);
+      
+      conv_velsinprims(pp,VEL3,VELPRIM,geom.gg,geom.GG);
+      trans_pall_coco(pp,pp, BLCOORDS, MYCOORDS, geom.xxvec,&geom,&geomint);
+      p2u(pp,uu,&geomint);
 
       return 0.;
     }
@@ -63,6 +55,8 @@ ldouble xx=get_x(ix,0);
       iix=0;
       iiy=iy;
       iiz=iz;
+
+      /*
       pick_g(ix,iy,iz,gg);
       pick_T(emuup,ix,iy,iz,eup);
       pick_T(emulo,ix,iy,iz,elo);
@@ -80,6 +74,7 @@ ldouble xx=get_x(ix,0);
       ldouble W=1./sqrtl(1.-V*V*gg[1][1]);
       ldouble rho=D/W;
       ldouble uint=E/W;
+      
 	
       //corrected rho:
       rho=PAR_D/(r*r*sqrtl(2./r));    
@@ -88,7 +83,7 @@ ldouble xx=get_x(ix,0);
       pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.; 
       pp[5]=calc_Sfromu(rho,uint);
       
-      
+      */
       //copying primitives with gdet taken into account
       for(iv=0;iv<NV;iv++)
 	{ 
@@ -99,7 +94,7 @@ ldouble xx=get_x(ix,0);
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*(1.-(rsrc-rbc)/(.5*(rsrc+rbc)));
 	  if(iv==3 || iv==4)
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*(1.+(rsrc-rbc)/(.5*(rsrc+rbc)));
-	  */
+	  
 	  //following ~r**-1.5 scaling
 	  if(iv==0)
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*powl(rsrc/rbc,1.5);
@@ -107,14 +102,14 @@ ldouble xx=get_x(ix,0);
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz)*powl(rsrc/rbc,1.5*GAMMA);
 	  if(iv==2)
 	    pp[iv]=-sqrtl(2./r)*(1.-2./r) ;
-
+	  */
 	  
 	  //unchanged primitives
-	  //pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	  pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
 
       //converting from 3vel to VELPRIM
-      conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
+      //conv_velsinprims(pp,VEL3,VELPRIM,gg,GG);
 
       
       
@@ -152,7 +147,7 @@ ldouble xx=get_x(ix,0);
       pp[0]=rho; pp[1]=uint; pp[2]=-V; pp[3]=pp[4]=0.;
       */
       
-	p2u(pp,uu,&geom);
+	p2u(pp,uu,&geomint);
       return 0;
     }
 
@@ -162,12 +157,6 @@ ldouble xx=get_x(ix,0);
       iiy=-iy-1;
       iiz=iz;
       iix=ix;
-      gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-      gdet_bc=get_g(g,3,4,ix,iy,iz);  
-      ldouble gg[4][5],eup[4][4],elo[4][4];
-      pick_g(ix,iy,iz,gg);	  
-      pick_T(emuup,ix,iy,iz,eup);
-      pick_T(emulo,ix,iy,iz,elo);
       for(iv=0;iv<NV;iv++)
 	{
 	  if(iv==3)
@@ -175,7 +164,7 @@ ldouble xx=get_x(ix,0);
 	  else
 	    pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	}
-      p2u(pp,uu,&geom);
+      p2u(pp,uu,&geomint);
       return 0;
      }
   if(iy>=NY) //equatorial plane
@@ -183,13 +172,6 @@ ldouble xx=get_x(ix,0);
       iiy=NY-(iy-NY)-1;
       iiz=iz;
       iix=ix;
-      gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-      gdet_bc=get_g(g,3,4,ix,iy,iz);  
-      ldouble gg[4][5],eup[4][4],elo[4][4];
-      pick_g(ix,iy,iz,gg);
-      pick_T(emuup,ix,iy,iz,eup);
-      pick_T(emulo,ix,iy,iz,elo);
-    	  
       for(iv=0;iv<NV;iv++)
 	  {
 	    if(iv==3)
@@ -197,7 +179,7 @@ ldouble xx=get_x(ix,0);
 	    else
 	      pp[iv]=get_u(p,iv,iix,iiy,iiz);
 	  }
-      p2u(pp,uu,&geom); 
+      p2u(pp,uu,&geomint); 
       return 0; 
     }
    
