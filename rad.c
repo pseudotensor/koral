@@ -4290,10 +4290,12 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
     = (struct geometry *) ggg;
   struct geometry geom2;
 
+  int RADCLOSURECOORDShere=BLCOORDS; //TEMP!!!
+
   if(geom->ifacedim==-1) //cell center
-    fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDS);
+    fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDShere);
   else
-    fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
+    fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDShere);
 
   //array holding radiative properties for ZERO
   ldouble rad[5];
@@ -4334,13 +4336,13 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   Erad=pp0[EE0];
   //stress energy tensor
   calc_Rij_M1(pp0,geom,RijM1);		  
-  //converting to RADCLOSURECOORDS
-  trans22_coco(geom->xxvec, RijM1, RijM1, geom->coords, RADCLOSURECOORDS);
+  //converting to RADCLOSURECOORDShere
+  trans22_coco(geom->xxvec, RijM1, RijM1, geom->coords, RADCLOSURECOORDShere);
   //to ortonormal
   trans22_cc2on(RijM1,RijM1,geom2.tup);
 
   //coordinates
-  coco_N(geom->xxvec,&coords[0],geom->coords,RADCLOSURECOORDS);
+  coco_N(geom->xxvec,&coords[0],geom->coords,RADCLOSURECOORDShere);
 	      
   //intensities	      
   for(l=0;l<NUMANGLES;l++)
@@ -4364,14 +4366,14 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  
   //converting velocity
   conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom->gg,geom->GG);	   
-  trans2_coco(geom->xxvec,ucon,ucon,geom->coords,RADCLOSURECOORDS);
+  trans2_coco(geom->xxvec,ucon,ucon,geom->coords,RADCLOSURECOORDShere);
 	  
   //used to cap velocities not too abuse ZERO solver
   beta0=sqrt(1.-1./(ucon[0]*ucon[0]));
   
   //saving rad. field to memory
   rad[0]=Elab; //energy density in lab frame
-  rad[1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDS, ortonormal
+  rad[1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDShere, ortonormal
   rad[2]=RijM1[0][2]; 
   rad[3]=RijM1[0][3]; 
   rad[4]=Erad; //energy density in radiation rest frame
@@ -4400,7 +4402,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //fzero=step_function(.925-ff,.015);
   
   fzero=1.;
-  if(ff>0.99)
+  if(ff>0.95)
     fzero=0.;
 
   //test
@@ -4414,7 +4416,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   trans22_on2cc(Rij,Rij,geom2.tlo);
 
   //converting back to MYCOORDS
-  trans22_coco(&coords[0], Rij, Rij, RADCLOSURECOORDS, geom->coords);
+  trans22_coco(&coords[0], Rij, Rij, RADCLOSURECOORDShere, geom->coords);
 
   //zeroing the trace of R^mu_nu
   indices_2221(Rij,Rij,geom->gg);
@@ -4522,13 +4524,15 @@ calc_M1intensities()
       iy=loop_5[ii][1];
       iz=loop_5[ii][2]; 
 
+      int RADCLOSURECOORDShere=BLCOORDS; //TEMP!!!
+
       fill_geometry(ix,iy,iz,&geom); 
-      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDS);
+      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDShere);
       //stress energy tensor
       calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
 
       //here convert to RADCLOSURECOORDS
-      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDShere);
       //to ortonormal
       trans22_cc2on(RijM1,RijM1,geom2.tup);
 
@@ -4611,8 +4615,10 @@ update_intensities()
 	      iy=iy0+j;
 	      iz=iz0+k;
 	   
+	      int RADCLOSURECOORDShere=BLCOORDS; //TEMP!!!
+
 	      fill_geometry(ix,iy,iz,&geom); //equals geom0
-	      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDS);
+	      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDShere);
 
 	      rho=get_u(p,RHO,ix,iy,iz);
 	      uint=get_u(p,UU,ix,iy,iz);
@@ -4620,12 +4626,12 @@ update_intensities()
 	      Erad=get_u(p,EE0,ix,iy,iz);
 
 	      //coordinates
-	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
+	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDShere);
 
 	      //stress energy tensor
 	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
-	      //converting to RADCLOSURECOORDS
-	      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+	      //converting to RADCLOSURECOORDShere
+	      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDShere);
 	      //to ortonormal
 	      trans22_cc2on(RijM1,RijM1,geom2.tup);
 
@@ -4661,7 +4667,7 @@ update_intensities()
 	  
 	      //saving rad. field to memory
 	      rad[i+1][j+1][k+1][0]=Elab; //energy density in lab frame
-	      rad[i+1][j+1][k+1][1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDS, ortonormal
+	      rad[i+1][j+1][k+1][1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDShere, ortonormal
 	      rad[i+1][j+1][k+1][2]=RijM1[0][2]; 
 	      rad[i+1][j+1][k+1][3]=RijM1[0][3]; 	      
 	      rad[i+1][j+1][k+1][4]=Erad; //
@@ -4670,8 +4676,7 @@ update_intensities()
       //running ZERO
 
        
-      ZERO_shortCharI(ix0,iy0,iz0,dt, intensities, source, 
-      &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
+      ZERO_shortCharI(ix0,iy0,iz0,dt, intensities, source, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
 
       //diffuse
 

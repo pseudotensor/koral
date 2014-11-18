@@ -1191,13 +1191,34 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = w0_high*w1_low;
       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
 
+      /*
       if(ix==0 && iy==17 &&  iz==0)
 	printf("%d > %e %e %e %e > %e %e %e %e\n", probeAng,intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] ,
 	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] ,
 	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] ,
 	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3], w0_low,w1_low,w0_high,w1_high);
+      */
 
-      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * (-x_new[0]);
+      ldouble ncov[4],ncon[4];
+      struct geometry geomBL,geom;
+      fill_geometry(ix,iy,iz,&geom);
+      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+      calc_normalobs_4vel(geom.GG,ncon);
+      trans2_coco(geom.xxvec,ncon,ncon,MYCOORDS,BLCOORDS);
+      indices_21(ncon,ncov,geomBL.gg);
+      double pdotu = dot(p_new,ncov);
+      double dist1 = -pdotu*(minL + maxL)/2.;
+
+      /*
+      print_4vector(ncov);      
+      double dist2 = sqrt(1./(1.-2./x_sphere[1])*(x_new[1]-x_sphere[1])*(x_new[1]-x_sphere[1]) + x_sphere[1]*x_sphere[1]*(x_new[2]-x_sphere[2])*(x_new[2]-x_sphere[2]) + x_sphere[1]*x_sphere[1]*sin(x_sphere[2])*sin(x_sphere[2])*(x_new[3]-x_sphere[3])*(x_new[3]-x_sphere[3]));
+      */
+
+      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] =  dist1;
+      
+      //intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * (-x_new[0]);
+
+      //      printf("%d > %d %d > %f > %e %e %e\n",probeAng, ix,iy,x_sphere[1], dist1, dist2, -x_new[0]);getch();
       //intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = sqrt((x_new[1]-x_sphere[1])*(x_new[1]-x_sphere[1]) + x_sphere[1]*x_sphere[1]*(x_new[2]-x_sphere[2])*(x_new[2]-x_sphere[2]) + x_sphere[1]*x_sphere[1]*sin(x_sphere[2])*sin(x_sphere[2])*(x_new[3]-x_sphere[3])*(x_new[3]-x_sphere[3]));
 
       if (-x_new[0] < mintime)
@@ -3324,7 +3345,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
       if(LIGHT_C * delta_t > intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng])
 	{
-	//printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
+	  //printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
 	  intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * delta_t;
 	}
 
@@ -4083,6 +4104,7 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
+  //return;
   transformI_stretch(ix,iy,iz,I0,M1_input);
   return;
 

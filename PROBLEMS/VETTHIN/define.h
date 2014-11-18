@@ -63,7 +63,7 @@
 #define IMAGETYPE "gif"
 
 #define OUTVEL VEL4
-#define DTOUT1 1.
+#define DTOUT1 .5
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
 #define NOUTSTOP 2250.
@@ -87,17 +87,17 @@
 #endif
 
 #ifdef BEAM1
-#define RMIN 2.2
-#define RMAX 5.
-#define RBEAM1 2.8
-#define RBEAM2 3.2
+#define RMIN 2.2//4.//2.2
+#define RMAX 4.//7.//5.
+#define RBEAM1 2.8//4.8//2.8
+#define RBEAM2 3.2//5.2//3.2
 #endif
 
 #ifdef myMSPH1COORDS
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
-#define TNX 60
+#define TNX 40
 #endif
 
 #ifdef myMKS1COORDS
