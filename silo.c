@@ -13,6 +13,7 @@
 /*********************************************/
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 {
+
   char bufor[50];
   sprintf(bufor,"%s/%s%04d.silo",folder,prefix,num);
 

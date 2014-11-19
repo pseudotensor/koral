@@ -417,44 +417,13 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
-     	    
-      //test
-      /*
-      printf("%e %e %e %e %e\n",get_u(p,B1,-2,NY/4,0)
-	     ,get_u(p,B1,-1,NY/4,0),
-	     get_u(p,B1,0,NY/4,0),
-	     get_u(p,B1,1,NY/4,0),
-	     get_u(p,B1,2,NY/4,0)); getch();
-      */
-
-      /*
-      print_primitives(&get_u(p,0,-2,NY/4,0));
-      print_primitives(&get_u(p,0,-1,NY/4,0));
-      print_primitives(&get_u(p,0,0,NY/4,0));getch();
-      */
-
-      /*
-      int iix=0;
-      
-      for(iix=-2;iix<TNX;iix++)
-	{
-	  printf("%d %e %e %e %e %e\n",iix,get_x(iix,0),get_x(iix,0)*get_x(iix,0)*get_u(p,B1,iix,NY/2,0)*sqrt(get_g(g,1,1,iix,NY/2,0)),
-		 get_u(p,RHO,iix,NY/2,0),get_u(p,UU,iix,NY/2,0),get_u(p,VX,iix,NY/2,0));
-
-	}
-      getch();
-      */
 
       if(TIMESTEPPING==RK2IMEX)
 	{
 	  ldouble gamma=1.-1./sqrt(2.);
 
-
-  
 #pragma omp parallel private(ii,iv,ix,iy,iz)
 	  {
-
-
 	    for(ii=0;ii<Nloop_0;ii++) //domain 
 	      {
 		int ix,iy,iz;
@@ -464,17 +433,6 @@ solve_the_problem(ldouble tstart, char* folder)
 		set_u_scalar(cell_tsteps,ix,iy,iz,get_u_scalar(cell_tstepstemp,ix,iy,iz));
 	      }
 
-	    //#pragma omp barrier
-	    //getch();
-
-	    
-	    /*
-	      printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
-	      "tile: %d,%d,%d; tile orig.: %d,%d,%d\n"
-	      "ix12: %d - %d\n",
-	      PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK,global_ix1,global_ix2);
-	    */
-	    
 	    copyi_u(1.,u,ut0);
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  
@@ -569,29 +527,49 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
       else if(TIMESTEPPING==RK2)
 	{ 
-	  /******************************* RK2 **********************************
-	   //1st
-	  copy_u(1.,u,ut0);
-	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
-	  op_explicit (t,.5*dt); 
-	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
-	  op_implicit (t,.5*dt); 
-	 
-	  //2nd
-	  nentr[2]=nentr2[2]=0;
-	  copy_u(1.,u,ut1);
-	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
-	  op_explicit (t,dt); 
-	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
-	  op_implicit (t,dt); 
-	 
-	 
-	  add_u(1.,u,-1.,ut1,ut2); //k2 in ut2
+	  /******************************* RK2 **********************************/
 
-	  //together     
-	  t+=dt;    
-	  add_u(1.,ut0,1.,ut2,u);
-	  ************************** end of RK2 **********************************/
+#pragma omp parallel private(ii,iv,ix,iy,iz)
+	  {
+	    for(ii=0;ii<Nloop_0;ii++) //domain 
+	      {
+		int ix,iy,iz;
+		ix=loop_0[ii][0];
+		iy=loop_0[ii][1];
+		iz=loop_0[ii][2]; 
+		set_u_scalar(cell_tsteps,ix,iy,iz,get_u_scalar(cell_tstepstemp,ix,iy,iz));
+	      }
+
+	    //1st
+	    copyi_u(1.,u,ut0);
+	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
+	    op_explicit (t,0.5*dt); 
+
+	    calc_u2p();
+            #pragma omp barrier
+	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	    op_implicit (t,0.5*dt); 
+
+	    copyi_u(1.,u,ut1);
+
+	    //2nd
+	    //calc_u2p();
+            #pragma omp barrier
+	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	    op_explicit (t,dt); 
+
+	    calc_u2p();
+            #pragma omp barrier
+	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	    op_implicit (t,dt); 
+
+	    //together
+	    addi_u(1.,u,-1.,ut1,ut2); //k2 in ut2
+	    addi_u(1.,ut0,1.,ut2,u);
+	  }
+	  t+=dt;
+	  
+	  /************************** end of RK2 **********************************/
 	}
       else if(TIMESTEPPING==RK2HEUN)
 	{ 

@@ -984,18 +984,6 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim() for frdt=%f (%e)\n",iter,dt,errbest);	  
 	}
       
-      /*
-      ldouble CONVLOOSE=CONV*1.e0;
-      if(errbest<CONVLOOSE)
-	{
-	  if(verbose) printf("\n === success (looser error) ===\n === coming back to errbest (%e): %e %e %e %e === \n",errbest,xxxbest[0],xxxbest[1],xxxbest[2],xxxbest[3]);
-	  //update primitives
-	  for(i=0;i<4;i++)
-	    pp[i+sh]=xxxbest[i];
-	}
-      else
-      */
-
       return -1;       
     }
 
@@ -1585,7 +1573,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
 
   //radiative stress tensor in the lab frame
   ldouble Rij[4][4];
-  calc_Rij(pp,ggg,Rij);
+  calc_Rij_M1(pp,ggg,Rij);
 
   //the four-velocity of fluid in lab frame
   ldouble ucon[4],utcon[4],ucov[4],vpr[3];
@@ -2541,7 +2529,7 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   //conv_velscov(utcon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
   //indices_21(ucon,ucov,geom->gg);
   ldouble Rij[4][4],Rtt;
-  calc_Rij(pp,ggg,Rij);
+  calc_Rij_M1(pp,ggg,Rij);
  
   indices_2221(Rij,Rij,geom->gg);
   Rtt=0.;
@@ -4290,12 +4278,10 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
     = (struct geometry *) ggg;
   struct geometry geom2;
 
-  int RADCLOSURECOORDShere=BLCOORDS; //TEMP!!!
-
   if(geom->ifacedim==-1) //cell center
-    fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDShere);
+    fill_geometry_arb(geom->ix,geom->iy,geom->iz,&geom2,RADCLOSURECOORDS);
   else
-    fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDShere);
+    fill_geometry_face_arb(geom->ix,geom->iy,geom->iz,geom->ifacedim,&geom2,RADCLOSURECOORDS);
 
   //array holding radiative properties for ZERO
   ldouble rad[5];
@@ -4336,13 +4322,13 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   Erad=pp0[EE0];
   //stress energy tensor
   calc_Rij_M1(pp0,geom,RijM1);		  
-  //converting to RADCLOSURECOORDShere
-  trans22_coco(geom->xxvec, RijM1, RijM1, geom->coords, RADCLOSURECOORDShere);
+  //converting to RADCLOSURECOORDS
+  trans22_coco(geom->xxvec, RijM1, RijM1, geom->coords, RADCLOSURECOORDS);
   //to ortonormal
   trans22_cc2on(RijM1,RijM1,geom2.tup);
 
   //coordinates
-  coco_N(geom->xxvec,&coords[0],geom->coords,RADCLOSURECOORDShere);
+  coco_N(geom->xxvec,&coords[0],geom->coords,RADCLOSURECOORDS);
 	      
   //intensities	      
   for(l=0;l<NUMANGLES;l++)
@@ -4366,14 +4352,14 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	  
   //converting velocity
   conv_vels(ucon,ucon,VELPRIMRAD,VEL4,geom->gg,geom->GG);	   
-  trans2_coco(geom->xxvec,ucon,ucon,geom->coords,RADCLOSURECOORDShere);
+  trans2_coco(geom->xxvec,ucon,ucon,geom->coords,RADCLOSURECOORDS);
 	  
   //used to cap velocities not too abuse ZERO solver
   beta0=sqrt(1.-1./(ucon[0]*ucon[0]));
   
   //saving rad. field to memory
   rad[0]=Elab; //energy density in lab frame
-  rad[1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDShere, ortonormal
+  rad[1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDS, ortonormal
   rad[2]=RijM1[0][2]; 
   rad[3]=RijM1[0][3]; 
   rad[4]=Erad; //energy density in radiation rest frame
@@ -4402,11 +4388,11 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   //fzero=step_function(.925-ff,.015);
   
   fzero=1.;
-  if(ff>0.95)
+  if(ff>0.99)
     fzero=0.;
 
   //test
-  //fzero=1.;
+  fzero=1.;
   
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
@@ -4416,7 +4402,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   trans22_on2cc(Rij,Rij,geom2.tlo);
 
   //converting back to MYCOORDS
-  trans22_coco(&coords[0], Rij, Rij, RADCLOSURECOORDShere, geom->coords);
+  trans22_coco(&coords[0], Rij, Rij, RADCLOSURECOORDS, geom->coords);
 
   //zeroing the trace of R^mu_nu
   indices_2221(Rij,Rij,geom->gg);
@@ -4454,8 +4440,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	printf("%e ",Ibeam[geom->ix+i-1+NGCX][geom->iy+j-1+NGCY][geom->iz+k-1+NGCZ][l]);
       printf("\n");
 	      
-	   
-   
+	  
       printf(">>>>>>> VET \n");
       for (i = 0; i < 3; i++)
 	{
@@ -4465,32 +4450,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	    }
 	  printf("\n");
 	}
-      
-      /*
-      printf(">>>>>>> f vector\n");
-      for (j = 0; j < 3; j++)
-	{
-	  printf("%e ", fvec[j]);
-	}
-      printf("\n");
-      printf(">>>>>>> T-ff eigenvalues\n");
-      for (j = 0; j < 3; j++)
-	{
-	  printf("%e ", Tffev[j]);
-	}
-      printf("\n");
-   
-      printf(">>>>>>> T-ff\n");
-      for (i = 0; i < 3; i++)
-	{
-	  for (j = 0; j < 3; j++)
-	    {
-	      printf("%e ", Tff[i][j]);
-	    }
-	  printf("\n");
-	}
-      */
-   
+    
       printf(">>>>>>> Rij\n");
       for (i = 0; i < 4; i++)
 	{
@@ -4524,15 +4484,13 @@ calc_M1intensities()
       iy=loop_5[ii][1];
       iz=loop_5[ii][2]; 
 
-      int RADCLOSURECOORDShere=BLCOORDS; //TEMP!!!
-
       fill_geometry(ix,iy,iz,&geom); 
-      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDShere);
+      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDS);
       //stress energy tensor
       calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
 
       //here convert to RADCLOSURECOORDS
-      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDShere);
+      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
       //to ortonormal
       trans22_cc2on(RijM1,RijM1,geom2.tup);
 
@@ -4549,12 +4507,6 @@ calc_M1intensities()
       //intensities
       ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 
-      /*
-      int i;      printf("%d %d\n",ix,iy);
-      for(i=0;i<NUMANGLES;i++)
-	printf("%d %e \n",i,Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][i]);
-      getch();
-      */
     }
 
   return 0;
@@ -4567,7 +4519,6 @@ update_intensities()
   int ii;
 
   //making backup acting as the previous time step
-  //#pragma omp parallel for private(ii) schedule (static)
   for(ii=0;ii<Nloop_5;ii++) //everything
     {
       int i,j,ix,iy,iz;
@@ -4579,7 +4530,6 @@ update_intensities()
     }
      
   //updating using ZERO
-  //#pragma omp parallel for private(ii) schedule (static)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       int ix,ix0,iy,iy0,iz,iz0,i,j,k,l;
@@ -4615,10 +4565,8 @@ update_intensities()
 	      iy=iy0+j;
 	      iz=iz0+k;
 	   
-	      int RADCLOSURECOORDShere=BLCOORDS; //TEMP!!!
-
 	      fill_geometry(ix,iy,iz,&geom); //equals geom0
-	      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDShere);
+	      fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDS);
 
 	      rho=get_u(p,RHO,ix,iy,iz);
 	      uint=get_u(p,UU,ix,iy,iz);
@@ -4626,12 +4574,12 @@ update_intensities()
 	      Erad=get_u(p,EE0,ix,iy,iz);
 
 	      //coordinates
-	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDShere);
+	      coco_N(geom.xxvec,&coords[i+1][j+1][k+1][0],MYCOORDS,RADCLOSURECOORDS);
 
 	      //stress energy tensor
 	      calc_Rij_M1(&get_u(p,0,ix,iy,iz),&geom,RijM1);
-	      //converting to RADCLOSURECOORDShere
-	      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDShere);
+	      //converting to RADCLOSURECOORDS
+	      trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
 	      //to ortonormal
 	      trans22_cc2on(RijM1,RijM1,geom2.tup);
 
@@ -4639,14 +4587,6 @@ update_intensities()
 	      for(l=0;l<NUMANGLES;l++)
 		{
 		  intensities[i+1][j+1][k+1][l]=Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][l];
-
-		  /*
-		  if(intensities[i+1][j+1][k+1][l]<0.)
-		    {
-		      printf("before zero neg\n");
-		      exit(1);
-		    }
-		  */
 		}
 
 	      //postprocessing, passing by
@@ -4667,35 +4607,22 @@ update_intensities()
 	  
 	      //saving rad. field to memory
 	      rad[i+1][j+1][k+1][0]=Elab; //energy density in lab frame
-	      rad[i+1][j+1][k+1][1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDShere, ortonormal
+	      rad[i+1][j+1][k+1][1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDS, ortonormal
 	      rad[i+1][j+1][k+1][2]=RijM1[0][2]; 
 	      rad[i+1][j+1][k+1][3]=RijM1[0][3]; 	      
 	      rad[i+1][j+1][k+1][4]=Erad; //
 	    }
 
-      //running ZERO
-
-       
+      //running ZERO rad transfer solver
       ZERO_shortCharI(ix0,iy0,iz0,dt, intensities, source, &Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], 0);
 
-      //diffuse
-
-      /*
-      int p;
-      for(p=0;p<NUMANGLES;p++)
-	if(Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][p]<0.)
-	  {
-	    printf("negative after shortchari\n");
-	    exit(1);
-	  }
-      */
-      
       //rotating, adjusting fluxes
       double fmag = sqrt(rad[1][1][1][1]*rad[1][1][1][1] + 
 				 rad[1][1][1][2]*rad[1][1][1][2] + 
 				 rad[1][1][1][3]*rad[1][1][1][3]);
       double ff = fmag / rad[1][1][1][0];
 
+      //adjusting intensiites to fit fluxes
       transformI(ix,iy,iz,&Ibeam[ix0+NGCX][iy0+NGCY][iz0+NGCZ][0], &rad[1][1][1][0]);
 
     }
@@ -4965,18 +4892,6 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
   //only hd-part inverted to get new explicit velocity
   int rettemp;
   rettemp=u2p_solver(uuexp,ppexp,geom,U2P_HOT,0); 
-  //from previous timestep:
-  
-  /*
-  if(rettemp<0.)
-    {
-      ppexp[VX]=pp[VX];
-    }
-  */
-
-  //ppexp[VX]=0.;
-  //rettemp=0;
-       
 
   if(rettemp<0)
     printf("hd u2p in fix vel failed %d %d\n",corr[0],corr[1]);
@@ -5268,44 +5183,7 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 	      //print_Nvector(&J[0][0],25);
 	    }
 
-	  /*
-	  mom_over_flag=0;
-	  //check if momenta overshoot
-	  ldouble ALLOWANCE; 
-	  if(params[3]==1) ALLOWANCE=100.;
-	  if(params[3]==2) ALLOWANCE=1.1;	  
-	  if(params[3]==3) ALLOWANCE=1.0001;	  
-	  ldouble mommin,mommax,momsep;
-	  if(do_mom_over)
-	    {
-	      for(i=1;i<4;i++)
-		{
-		  //allowed brackets 
-		  //TODO: precalculate
-		  mommin=my_min(pp0[EE0+i],pp0[UU+i]);
-		  mommax=my_max(pp0[EE0+i],pp0[UU+i]);
-		  momsep=fabs(mommin-mommax);
 
-		  mommin=mommin - ALLOWANCE*momsep;
-		  mommax=mommax + ALLOWANCE*momsep;
-
-		  if(verbose) printf("mom min/max (%d) %e %e\n",i,mommin,mommax);
-
-		  if(xxx[i]<mommin)
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 1 (%e). resetting to %e\n",i,xxx[i],mommin);
-		      xxx[i]=mommin;
-		      mom_over_flag=1;
-		    }
-		  if(xxx[i]>mommax)
-		    {
-		      if(verbose) printf("overshoot %d-momentum type 2 (%e). resetting to %e\n",i,xxx[i],mommax);
-		      xxx[i]=mommax;
-		      mom_over_flag=1;
-		    }
-		}
-	    }
-	  */
 	
 	  //update primitives
 	  for(i=0;i<np;i++)

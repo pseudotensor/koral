@@ -12,8 +12,8 @@
 #define RADSTARTWITHM1INTENSITIES
 #endif
 
-#define BEAM1
-//#define DISK
+//#define BEAM1
+#define DISK
 //#define HOURGLASS
 
 
@@ -43,30 +43,34 @@
 
 #ifdef myMSPH1COORDS
 #define MYCOORDS MSPH1COORDS
+#define RADCLOSURECOORDS SPHCOORDS
 #endif
 
 #ifdef myMKS1COORDS
 #define MYCOORDS MKS1COORDS
+#define RADCLOSURECOORDS BLCOORDS
 #endif
 
 #ifdef mySPHCOORDS
 #define MYCOORDS SPHCOORDS//KSCOORDS//SPHCOORDS//KERRCOORDS
+#define RADCLOSURECOORDS SPHCOORDS
 #endif
 
 #ifdef myMKER1COORDS
 #define MYCOORDS MKER1COORDS
+#define RADCLOSURECOORDS BLCOORDS
 #endif
 
-#define RADCLOSURECOORDS SPHCOORDS
+
 #define OUTCOORDS SPHCOORDS
 
 #define IMAGETYPE "gif"
 
 #define OUTVEL VEL4
-#define DTOUT1 .5
+
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
-#define NOUTSTOP 2250.
+#define NOUTSTOP 80
 #define RADOUTPUTINZAMO
 #define PRINTGC_RIGHT
 #define OUTOUTPUT 0
@@ -75,11 +79,13 @@
 #define SIMOUTPUT 0
 
 #ifdef DISK
+#define DTOUT1 1.
 #define RMIN 4.
 #define RMAX 30.
 #endif
 
 #ifdef HOURGLASS
+#define DTOUT1 1.
 #define RMIN 2.2
 #define RMAX 5.
 #define RBEAM1 2.8
@@ -87,6 +93,7 @@
 #endif
 
 #ifdef BEAM1
+#define DTOUT1 .1
 #define RMIN 2.2//4.//2.2
 #define RMAX 4.//7.//5.
 #define RBEAM1 2.8//4.8//2.8
@@ -97,30 +104,30 @@
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
-#define TNX 40
+#define TNX 60
 #endif
 
 #ifdef myMKS1COORDS
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
-#define TNX 40
+#define TNX 60
 #endif
 
 #ifdef myMKER1COORDS
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
-#define TNX 40
+#define TNX 60
 #endif
 
 #ifdef mySPHCOORDS
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
-#define TNX 40
+#define TNX 60
 #endif
 
-#define TNY 40
+#define TNY 60
 #define TNZ 1
 
 #define NTX 2
@@ -128,7 +135,7 @@
 #define NTZ 1
 
 
-#define MINY 0.1
+#define MINY 0.02
 #define MAXY Pi/2
 #define HALFTHETA
 #define MINZ -1.

@@ -7,16 +7,18 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 30
-#define TNY 30
-#define TNZ 30
+#define TNX 60
+#define TNY 60
+#define TNZ 1
 
-#define NTX 3
-#define NTY 3
-#define NTZ 3
+#define NTX 2
+#define NTY 2
+#define NTZ 1
 
-#define MPI4CORNERS
-#define MAGNFIELD
+#define TIMESTEPPING RK2
+
+//#define MPI4CORNERS
+//#define MAGNFIELD
 #define VECPOTGIVEN
 
 #define INT_ORDER 1

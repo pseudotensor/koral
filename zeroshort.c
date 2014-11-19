@@ -3488,7 +3488,7 @@ int zero_init()
 	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2]=1.;
 	}
 
-      if(RADCLOSURECOORDS==SPHCOORDS)
+      if(RADCLOSURECOORDS==SPHCOORDS || RADCLOSURECOORDS==BLCOORDS)
 	{
 	  double xxsph[4],th,ph;
 	  get_xx_arb(ix,iy,iz,xxsph,SPHCOORDS);
@@ -3518,7 +3518,7 @@ int zero_init()
 
 	 
 	}
-      else if(RADCLOSURECOORDS==SPHCOORDS)
+      else if(RADCLOSURECOORDS==SPHCOORDS || RADCLOSURECOORDS==BLCOORDS)
 	{
 	   if(TNZ==1) 
 	     setupInterpWeights_sph2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, intersectGridPhi);
