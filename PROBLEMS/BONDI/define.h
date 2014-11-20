@@ -59,7 +59,7 @@
 #define METRICAXISYMMETRIC
 
 #define RMIN 100.
-#define RBONDI 1.e4 //(TAMB=3.267e12/RBONDI)
+#define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
 
