@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 38
+#define RESTARTNUM -1
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -58,9 +58,9 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 10.
+#define RMIN 100.
 #define RBONDI 1.e4 //(TAMB=3.267e12/RBONDI)
-#define RMAX (RBONDI*100.)
+#define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
 
 #ifdef myTKSCOORDS //modified Kerr-Shild further from axis
@@ -129,7 +129,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .3
+#define TSTEPLIM .05
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
@@ -151,7 +151,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*100000.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*10000.)//*TSTEPLIM) //res
 #else
 #define DTOUT1 (RMAX*.0001*TSTEPLIM)//(RMAX*100.) //res
 #endif

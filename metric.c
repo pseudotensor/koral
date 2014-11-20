@@ -4113,9 +4113,9 @@ test_metric()
   fill_geometry_arb(NX-4,NY/2,0,&geomBL,BLCOORDS);
   fill_geometry(NX-4,NY/2,0,&geom);
   print_metric(geomBL.gg);
-  printf("g_tt+1 = %f\n",geomBL.gttpert);
+  printf("g_tt+1 = %.16e vs %.16e\n",geomBL.gttpert,geomBL.gg[0][0]+1.);
   print_metric(geom.gg);
-  printf("g_tt+1 = %f\n",geom.gttpert);
+  printf("g_tt+1 = %.16e vs %.16e\n",geom.gttpert,geomBL.gg[0][0]+1.);
   exit(1);
 
   //test time evolution of a TKS1 metric

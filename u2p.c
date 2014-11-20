@@ -1075,7 +1075,7 @@ int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
   int i,j,k;
-  ldouble rho,uint,w,W,alpha,D,Sc,alphasq,betasqoalphasq;
+  ldouble rho,uint,w,W,Wp,Wpprev,alpha,D,Sc,alphasq,betasqoalphasq;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
   ldouble Qcon[4],Qcov[4],Qconp[4],Qcovp[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn,Qdotnp;
   ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
@@ -1201,7 +1201,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   /****************************/
   
-  //initial guess for W = w gamma**2 based on primitives
+  //initial guess for Wp = w gamma**2 based on primitives
   rho=pp[0];
   uint=pp[1];
   utcon[0]=0.;
@@ -1220,9 +1220,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble gamma=sqrt(gamma2);
 
   //W
-  W=(rho+GAMMA*uint)*gamma2;
+  Wp=(GAMMA*uint)*gamma2;
 
-  if(verbose>1) printf("initial W:%e\n",W);
+  if(verbose>1) printf("initial Wp:%e\n",Wp);
 
   /****************************/
   
@@ -1231,26 +1231,26 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   int i_increase = 0;
   ldouble f0,f1,dfdW,err;
   ldouble CONV=U2PCONV; 
-  ldouble EPS=1.e-4;
-  ldouble Wprev=W;
   ldouble cons[7]={Qn,Qt2,D,QdotBsq,Bsq,Sc,Qdotnp};
- 
+  int iter=0,fu2pret;
+  
+  W=Wp+D;
+
   do
     {
       f0=dfdW=0.;
 
-      //now invoked for all solvers:
-      //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
-      (*f_u2p)(W-D,cons,&f0,&dfdW,&err);
+      (*f_u2p)(Wp,cons,&f0,&dfdW,&err);
 
-      if( ((( W*W*W * ( W + 2.*Bsq ) 
-	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
-	  || !isfinite(f0) || !isfinite(f0)
-	  || !isfinite(dfdW) || !isfinite(dfdW))	  
-	  && (i_increase < 50)) 
+      //if( ((( W*W*W * ( W + 2.*Bsq ) 
+      //- QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
+      //|| 
+      if((!isfinite(f0) || !isfinite(f0)
+	 || !isfinite(dfdW) || !isfinite(dfdW))	  
+	 && (i_increase < 50))
 	{
-	  if(verbose>0) printf("init W : %e -> %e (%e %e)\n",W,100.*W,f0,dfdW);
-	  W *= 10.;
+	  if(verbose>0) printf("init Wp : %e -> %e (%e %e)\n",Wp,100.*Wp,f0,dfdW);
+	  Wp *= 10.;
 	  i_increase++;
 	  continue;
 	}
@@ -1270,28 +1270,28 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     }
 
   //1d Newton solver
-  int iter=0,fu2pret;
-  ldouble Wp=W+D;
+ 
   do
     {
-      Wprev=W;
+      Wpprev=Wp;
       iter++;
      
-      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW,&err);
+      fu2pret=(*f_u2p)(Wp,cons,&f0,&dfdW,&err);
 
       //numerical derivative
       //fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW,&err);
       //dfdW=(f1-f0)/(EPS*W);
 
-      if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,dfdW,err);
+      if(verbose>1) printf("%d %e %e %e %e\n",iter,Wp,f0,dfdW,err);
  
       //convergence test
       if(err<CONV)
 	break;
       
-      if(dfdW==0.) {W*=1.1; continue;}
+      if(dfdW==0.) {Wp*=1.1; continue;}
 
-      ldouble Wnew=W-f0/dfdW;
+      ldouble Wpnew=Wp-f0/dfdW;
+      ldouble Wnew=Wpnew+D;
       int idump=0;
       ldouble dumpfac=1.;
 
@@ -1302,17 +1302,18 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  f0tmp=dfdWtmp=0.;
 	  //now for all solvers
 	  //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
-	  (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp,&errtmp);
-	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e\n",idump,iter,Wnew,f0tmp,dfdWtmp,errtmp);
-	  if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
-		  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))
-	       || !isfinite(f0tmp) || !isfinite(f0tmp)
+	  (*f_u2p)(Wpnew,cons,&f0tmp,&dfdWtmp,&errtmp);
+	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e\n",idump,iter,Wpnew,f0tmp,dfdWtmp,errtmp);
+	  //if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
+	  //	  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))
+	  //    ||
+	  if((!isfinite(f0tmp) || !isfinite(f0tmp)
 	       || !isfinite(dfdWtmp) || !isfinite(dfdWtmp))
 	      && (idump<100))
 	    {
 	      idump++;
 	      dumpfac/=2.;
-	      Wnew=W-dumpfac*f0/dfdW;
+	      Wpnew=Wp-dumpfac*f0/dfdW;
 	      continue;
 	    }
 	  else
@@ -1326,7 +1327,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  return -101;
 	}
 	
-      W=Wnew; 
+      Wp=Wpnew; 
 
       if(fabs(W)>BIG) 
 	{
@@ -1335,7 +1336,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	}
 
 
-      if(fabs((W-Wprev)/Wprev)<CONV && err<1.e-1) break;
+      if(fabs((Wp-Wpprev)/Wpprev)<CONV && err<1.e-1) break;
     }
   while(iter<50);
 
@@ -1347,18 +1348,19 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     }
 
 
-  if(!isfinite(W) || !isfinite(W)) {if(verbose) printf("nan/inf W in u2p_solver with Etype: %d\n",Etype); return -103;}
+  if(!isfinite(Wp) || !isfinite(Wp)) {if(verbose) printf("nan/inf W in u2p_solver with Etype: %d\n",Etype); return -103;}
  
   if(verbose>1) 
     {
-      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW,&err);
-      printf("end: %d %e %e %e %e\n",iter,W,f0,dfdW,err);
+      fu2pret=(*f_u2p)(Wp,cons,&f0,&dfdW,&err);
+      printf("end: %d %e %e %e %e\n",iter,Wp,f0,dfdW,err);
     }
 
   //W found, let's calculate v2 and the rest
   //ldouble v2=Qt2/W/W;
 
-  ldouble Wsq,Xsq,v2;
+  W=Wp+D;
+  ldouble Wsq,Xsq,v2,wmrho0;
 	
   Wsq = W*W ;
   Xsq = (Bsq + W) * (Bsq + W);  
@@ -1367,7 +1369,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   gamma2=1./(1.-v2);
   gamma=sqrt(gamma2);
   rho=D/gamma;
-  uint=1./GAMMA*(W/gamma2-rho);
+  // w-\rho_0 = (u+p) = W'/\gamma^2 - D v^2/(1+\gamma)
+  wmrho0 = Wp/gamma2 - D*v2/(1.+gamma);
+  uint=1./GAMMA*wmrho0;
   utcon[0]=0.;
   utcon[1]=gamma/(W+Bsq)*(Qtcon[1]+QdotB*Bcon[1]/W);
   utcon[2]=gamma/(W+Bsq)*(Qtcon[2]+QdotB*Bcon[2]/W);
@@ -1380,7 +1384,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     }
 
 
-  if(uint<0. || gamma2<0. ||isnan(W) || !isfinite(W)) 
+  if(uint<0. || gamma2<0. ||isnan(Wp) || !isfinite(Wp)) 
     {
       if(verbose>0) printf("neg u in u2p_solver %e %e %e %e\n",rho,uint,gamma2,W);//getchar();
       return -104;
@@ -1419,43 +1423,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   pp[TRA]=Dtr/gamma;
 #endif
 
-
   if(verbose) print_primitives(pp);
-
-  // test the inversion
-  /*
-  ldouble uu2[NV];
-  int iv;
-  int lostprecision=0;
-  p2u(pp,uu2,ggg);
-
-  //if(verbose) print_NVvector(uu2);
-  //if(verbose) print_NVvector(uu);
-  
- 
-  for(iv=0;iv<NVMHD;iv++)
-    {
-      if(Etype==U2P_HOT) if(iv==5) continue;
-      if(Etype==U2P_ENTROPY) if(iv==1) continue;
-      if(Etype==U2P_COLD || Etype==U2P_HOTMAX) if(iv==1 || iv==5) continue;
-      if(((iv==0 || iv==1 || iv==5) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-1))
-	lostprecision=1;
-    }     
-  
-  if(lostprecision)
-    {
-      if(verbose>0 || 1)
-	{
-	  print_Nvector(uu,NV);
-	  print_Nvector(uu2,NV);  
-	  printf("u2p_solver lost precision:\n");      
-	  //getchar();
-	}
-      
-      //test
-      return -106;
-    }
-  */
 
   if(verbose>0) printf("u2p_solver returns 0\n");
   return 0; //ok

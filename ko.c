@@ -70,9 +70,6 @@ main(int argc, char **argv)
 
   //precalculates metric etc.
   calc_metric();
-  
-  //tests
-  //test_metric();
 
 #ifdef RADIATION
   //prepare angular grid for radiative solver
@@ -91,6 +88,8 @@ main(int argc, char **argv)
   //**************
   //tests
   //**************
+  //test_metric(); exit(1);
+
   //test_inversion(); exit(1);
 
   //test_solve_implicit_lab();
