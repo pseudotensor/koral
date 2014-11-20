@@ -1665,6 +1665,7 @@ fill_geometry(int ix,int iy,int iz,void *geom)
   ggg->yy=ggg->xxvec[2];
   ggg->zz=ggg->xxvec[3];
   ggg->gdet=ggg->gg[3][4];
+  ggg->gttpert=ggg->GG[3][4];
   ggg->coords=MYCOORDS;
 
   return 0;
@@ -1741,6 +1742,7 @@ fill_geometry_face(int ix,int iy,int iz,int idim, void *geom)
   ggg->zz=ggg->xxvec[3];
 
   ggg->gdet=ggg->gg[3][4];
+  ggg->gttpert=ggg->GG[3][4];
 
   return 0;
 }
@@ -1755,13 +1757,13 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
   struct geometry *ggg 
     = (struct geometry *) geom;
 
-  ldouble xxvec[4],xxvecBL[4];
+  ldouble xxvec[4],xxvecC[4];
 
   get_xx(ix,iy,iz,xxvec);
-  coco_N(xxvec,xxvecBL,MYCOORDS,COORDS);
+  coco_N(xxvec,xxvecC,MYCOORDS,COORDS);
 
-  calc_g_arb(xxvecBL,ggg->gg,COORDS);
-  calc_G_arb(xxvecBL,ggg->GG,COORDS);
+  calc_g_arb(xxvecC,ggg->gg,COORDS);
+  calc_G_arb(xxvecC,ggg->GG,COORDS);
 
   calc_tetrades(ggg->gg,ggg->tup,ggg->tlo,COORDS);
   calc_ZAMOes(ggg->gg,ggg->eup,ggg->elo,COORDS);
@@ -1771,15 +1773,17 @@ fill_geometry_arb(int ix,int iy,int iz,void *geom,int COORDS)
   ggg->ifacedim=-1;
 
   ggg->xxvec[0]=0.;
-  ggg->xxvec[1]=xxvecBL[1];
-  ggg->xxvec[2]=xxvecBL[2];
-  ggg->xxvec[3]=xxvecBL[3];  
+  ggg->xxvec[1]=xxvecC[1];
+  ggg->xxvec[2]=xxvecC[2];
+  ggg->xxvec[3]=xxvecC[3];  
 
-  ggg->xx=xxvecBL[1];
-  ggg->yy=xxvecBL[2];
-  ggg->zz=xxvecBL[3];
+  ggg->xx=xxvecC[1];
+  ggg->yy=xxvecC[2];
+  ggg->zz=xxvecC[3];
   
-  ggg->gdet=calc_gdet_arb(xxvecBL,COORDS);
+  ggg->gdet=calc_gdet_arb(xxvecC,COORDS);
+  ggg->gttpert=calc_gttpert_arb(xxvecC,COORDS);
+  
   ggg->coords=COORDS;
 
 
@@ -1797,7 +1801,7 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   struct geometry *ggg 
     = (struct geometry *) geom;
 
-  ldouble xxvec[4],xxvecBL[4];
+  ldouble xxvec[4],xxvecC[4];
 
   get_xx(ix,iy,iz,xxvec);
   
@@ -1808,10 +1812,10 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   if(idim==2) //z-face
     xxvec[3]=get_xb(iz,2);
 
-  coco_N(xxvec,xxvecBL,MYCOORDS,COORDS);
+  coco_N(xxvec,xxvecC,MYCOORDS,COORDS);
 
-  calc_g_arb(xxvecBL,ggg->gg,COORDS);
-  calc_G_arb(xxvecBL,ggg->GG,COORDS);
+  calc_g_arb(xxvecC,ggg->gg,COORDS);
+  calc_G_arb(xxvecC,ggg->GG,COORDS);
 
   calc_tetrades(ggg->gg,ggg->tup,ggg->tlo,COORDS);
   calc_ZAMOes(ggg->gg,ggg->eup,ggg->elo,COORDS);
@@ -1821,15 +1825,16 @@ fill_geometry_face_arb(int ix,int iy,int iz,int idim, void *geom,int COORDS)
   ggg->ix=ix;  ggg->iy=iy;  ggg->iz=iz; ggg->ifacedim=idim;
 
   ggg->xxvec[0]=0.;
-  ggg->xxvec[1]=xxvecBL[1];
-  ggg->xxvec[2]=xxvecBL[2];
-  ggg->xxvec[3]=xxvecBL[3];  
+  ggg->xxvec[1]=xxvecC[1];
+  ggg->xxvec[2]=xxvecC[2];
+  ggg->xxvec[3]=xxvecC[3];  
 
-  ggg->xx=xxvecBL[1];
-  ggg->yy=xxvecBL[2];
-  ggg->zz=xxvecBL[3];
-  
-  ggg->gdet=calc_gdet_arb(xxvecBL,COORDS);
+  ggg->xx=xxvecC[1];
+  ggg->yy=xxvecC[2];
+  ggg->zz=xxvecC[3];
+ 
+  ggg->gdet=calc_gdet_arb(xxvecC,COORDS);
+  ggg->gttpert=calc_gttpert_arb(xxvecC,COORDS);
   ggg->coords=COORDS;
 
   return 0;
@@ -4104,7 +4109,14 @@ int
 test_metric()
 {
   //test perturbation to g_tt
-  
+  struct geometry geom,geomBL;
+  fill_geometry_arb(NX-4,NY/2,0,&geomBL,BLCOORDS);
+  fill_geometry(NX-4,NY/2,0,&geom);
+  print_metric(geomBL.gg);
+  printf("g_tt+1 = %f\n",geomBL.gttpert);
+  print_metric(geom.gg);
+  printf("g_tt+1 = %f\n",geom.gttpert);
+  exit(1);
 
   //test time evolution of a TKS1 metric
   /*

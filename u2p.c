@@ -1075,9 +1075,9 @@ int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
   int i,j,k;
-  ldouble rho,uint,w,W,alpha,D,Sc;
+  ldouble rho,uint,w,W,alpha,D,Sc,alphasq,betasqoalphasq;
   ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
-  ldouble Qcon[4],Qcov[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn,Qdotnp;
+  ldouble Qcon[4],Qcov[4],Qconp[4],Qcovp[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn,Qdotnp;
   ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
 
   /****************************/
@@ -1113,7 +1113,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   //conserved quantities etc
   
   //alpha
-  alpha=sqrt(-1./GG[0][0]);
+  alpha=geom->alpha;
+  alphasq=alpha*alpha;
 
   //D
   D=uu[0]/gdetu*alpha; //uu[0]=gdetu rho ut
@@ -1121,7 +1122,16 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   //conserved entropy "S u^t"
   Sc=uu[5]/gdetu*alpha; 
 
-  //Q_mu=alpha T^t_mu
+  //Qp_mu=alpha T^t_mu 
+  Qcovp[0]=uu[1]/gdetu*alpha;
+  Qcovp[1]=uu[2]/gdetu*alpha;
+  Qcovp[2]=uu[3]/gdetu*alpha;
+  Qcovp[3]=uu[4]/gdetu*alpha;
+
+  //Qp^mu
+  indices_12(Qcovp,Qconp,GG);
+
+  //Q_mu=alpha (T^t_mu - rho u^t delta(t,mu)) - avoid this one
   Qcov[0]=(uu[1]/gdetu-uu[0]/gdetu)*alpha;
   Qcov[1]=uu[2]/gdetu*alpha;
   Qcov[2]=uu[3]/gdetu*alpha;
@@ -1160,8 +1170,14 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   //Q_mu n^mu = Q^mu n_mu = -alpha*Q^t
   Qn=Qcon[0] * ncov[0];
 
-  //TODO!!!!
-  Qdotnp=0.0;
+  //\beta^i \beta_i / \alpha^2 = g^{ti} g_{ti}
+  betasqoalphasq=gg[0][1]*GG[0][1] + gg[0][2]*GG[0][2] + gg[0][3]*GG[0][3]; 
+  
+  //Qdotnp=-E'=-E+D
+  ldouble Dfactor = (-geom->gttpert + alphasq*betasqoalphasq)/(alphasq+alpha);
+  Qdotnp = Qconp[0]*ncov[0] + D*(Dfactor) ; // -Qdotn-W = -Qdotnp-Wp
+
+ 
 
   //j^mu_nu=delta^mu_nu +n^mu n_nu
   for(i=0;i<4;i++)
@@ -1255,6 +1271,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   //1d Newton solver
   int iter=0,fu2pret;
+  ldouble Wp=W+D;
   do
     {
       Wprev=W;
@@ -1521,11 +1538,6 @@ test_inversion()
   print_conserved(uu);
   printf("gdet = %e\n",geom.gdet);
   u2p_solver(uu,pp,&geom,U2P_HOT,0); 
-  print_primitives(pp);
- 
-  PLOOP(iv) pp[iv]=pp2[iv];
-  u2p_solver(uu,pp,&geom,U2P_ENTROPY,0); 
-  
   print_primitives(pp);
 
   return 0;
