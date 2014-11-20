@@ -3806,6 +3806,8 @@ calc_metric()
 		for(j=0;j<3;j++)
 		  set_gb(gbx,j,4,ix,iy,iz,calc_dlgdet(xx,j),0);
 		set_gb(gbx,3,4,ix,iy,iz,calc_gdet(xx),0);
+
+		set_gb(Gbx,3,4,ix,iy,iz,calc_gttpert(xx),0);
 	      }
 	    xx[0]=global_time;
 	    xx[1]=get_xb(ix+1,0);
@@ -3820,9 +3822,12 @@ calc_metric()
 	    for(i=0;i<4;i++)
 	      for(j=0;j<4;j++)
 		set_gb(Gbx,i,j,ix+1,iy,iz,gloc[i][j],0);
+
 	    for(j=0;j<3;j++)
 	      set_gb(gbx,j,4,ix+1,iy,iz,calc_dlgdet(xx,j),0);
 	    set_gb(gbx,3,4,ix+1,iy,iz,calc_gdet(xx),0);
+
+	    set_gb(Gbx,3,4,ix+1,iy,iz,calc_gttpert(xx),0);
 
 	    //y-faces
 	    if(iy==-NG)
@@ -3843,6 +3848,8 @@ calc_metric()
 		for(j=0;j<3;j++)
 		  set_gb(gby,j,4,ix,iy,iz,calc_dlgdet(xx,j),1);
 		set_gb(gby,3,4,ix,iy,iz,calc_gdet(xx),1);
+
+		set_gb(Gby,3,4,ix,iy,iz,calc_gttpert(xx),1);
 	      }
 
 
@@ -3862,6 +3869,9 @@ calc_metric()
 	    for(j=0;j<3;j++)
 	      set_gb(gby,j,4,ix,iy+1,iz,calc_dlgdet(xx,j),1);
 	    set_gb(gby,3,4,ix,iy+1,iz,calc_gdet(xx),1);
+
+	    set_gb(Gby,3,4,ix,iy+1,iz,calc_gttpert(xx),1);
+		
 		  
 	    //z-faces
 	    if(iz==-NG)
@@ -3883,6 +3893,9 @@ calc_metric()
 		  set_gb(gbz,j,4,ix,iy,iz,calc_dlgdet(xx,j),2);
 		set_gb(gbz,3,4,ix,iy,iz,calc_gdet(xx),2);
 
+		set_gb(Gbz,3,4,ix,iy,iz,calc_gttpert(xx),2);
+
+
 	      }
 	    xx[0]=global_time;
 	    xx[1]=get_x(ix,0);
@@ -3900,6 +3913,8 @@ calc_metric()
 	    for(j=0;j<3;j++)
 	      set_gb(gbz,j,4,ix,iy,iz+1,calc_dlgdet(xx,j),2);
 	    set_gb(gbz,3,4,ix,iy,iz+1,calc_gdet(xx),2);
+	    
+	    set_gb(Gbz,3,4,ix,iy,iz+1,calc_gttpert(xx),2);
 
 	  }
       }

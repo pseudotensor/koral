@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 30
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -58,9 +58,9 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN (RBONDI/10.)//100.
-#define RBONDI 1.e9 //(TAMB=3.267e12/RBONDI)
-#define RMAX (RBONDI*10.)
+#define RMIN 100.
+#define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
+#define RMAX (RBONDI*100.)
 #define RMAXOUT RBONDI 
 
 #ifdef myTKSCOORDS //modified Kerr-Shild further from axis
@@ -98,7 +98,7 @@
 #define TNX 64
 #define TNY 1
 #define TNZ 1
-#define NTX 2//for MPI and OMP
+#define NTX 4//for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -107,7 +107,7 @@
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
 
-//#define SELFTIMESTEP
+#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -129,7 +129,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .5
+#define TSTEPLIM .05
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
@@ -151,9 +151,9 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*10000.)//*TSTEPLIM) //res
+#define DTOUT1 (RMAX*1000000.)//*TSTEPLIM) //res
 #else
-#define DTOUT1 (RMAX*10000.*TSTEPLIM)//(RMAX*100.) //res
+#define DTOUT1 (RMAX*1000.*TSTEPLIM)//(RMAX*100.) //res
 #endif
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop

@@ -928,7 +928,7 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df, ldouble *err)
   dSsdrho=compute_dspecificSdrho_wmrho0_idealgas(rho0,wmrho0);
   dSsdchi=compute_dspecificSdwmrho0_wmrho0_idealgas(rho0,wmrho0);
 
-  dwmrho0dW = 1.0/gamma2; // holding utsq fixed
+  dwmrho0dW = 1.0/gamma; // holding utsq fixed
   drho0dW = 0.0; // because \rho=D/\gamma and holding utsq fixed
   dwmrho0dvsq = (D*(gamma*0.5-1.0) - Wp); // holding Wp fixed
   drho0dvsq = -D*gamma*0.5; // because \rho=D/\gamma and holding Wp fixed
@@ -1227,23 +1227,30 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble cons[7]={Qn,Qt2,D,QdotBsq,Bsq,Sc,Qdotnp};
   int iter=0,fu2pret;
   
-  W=Wp+D;
+  
 
   do
     {
+      W=Wp+D;
       f0=dfdW=0.;
 
-      (*f_u2p)(Wp,cons,&f0,&dfdW,&err);
+      FTYPE Wsq,Xsq,X; 
+      X = Bsq + W;
+      Wsq = W*W;
 
-      //if( ((( W*W*W * ( W + 2.*Bsq ) 
-      //- QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
-      //|| 
-      if((!isfinite(f0) || !isfinite(f0)
-	 || !isfinite(dfdW) || !isfinite(dfdW))	  
-	 && (i_increase < 50))
+      ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
+      ldouble gamma2 = 1./(1.-v2);
+      ldouble gamma = sqrt(gamma2);
+      ldouble rho0 = D/gamma;
+      ldouble wmrho0 = Wp/gamma2 - D*v2/(1.+gamma);
+      
+      //if(Etype!=U2P_HOT) 
+      (*f_u2p)(Wp,cons,&f0,&dfdW,&err);
+      
+      if((v2>(1.-SMALL) || v2<0. || Wp<0. || wmrho0<0.|| !isfinite(f0) || !isfinite(dfdW)) && (i_increase < 50))
 	{
 	  if(verbose>0) printf("init Wp : %e -> %e (%e %e)\n",Wp,100.*Wp,f0,dfdW);
-	  Wp *= 10.;
+	  Wp *= 2.;
 	  i_increase++;
 	  continue;
 	}
@@ -1254,7 +1261,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   if(i_increase>=50)
     {
-      return -150;
+      //return -150;
       printf("failed to find initial W for Etype: %d\n",Etype);
       printf("at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
       print_NVvector(uu);
@@ -1278,8 +1285,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       if(verbose>1) printf("%d %e %e %e %e\n",iter,Wp,f0,dfdW,err);
  
       //convergence test
-      if(err<CONV)
-	break;
+      //if(err<CONV)
+      //break;
       
       if(dfdW==0.) {Wp*=1.1; continue;}
 
@@ -1292,17 +1299,25 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       do
 	{
 	  ldouble f0tmp,dfdWtmp,errtmp;
+	  Wnew=Wpnew+D;
 	  f0tmp=dfdWtmp=0.;
-	  //now for all solvers
-	  //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
-	  (*f_u2p)(Wpnew,cons,&f0tmp,&dfdWtmp,&errtmp);
+
+	  FTYPE Wsq,Xsq,X; 
+	  X = Bsq + Wnew;
+	  Wsq = Wnew*Wnew;
+
+	  ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*Wnew)) / (Wsq*Xsq);
+	  ldouble gamma2 = 1./(1.-v2);
+	  ldouble gamma = sqrt(gamma2);
+	  ldouble rho0 = D/gamma;
+	  ldouble wmrho0 = Wpnew/gamma2 - D*v2/(1.+gamma);
+
+	  //if(Etype!=U2P_HOT) 
+	      (*f_u2p)(Wpnew,cons,&f0tmp,&dfdWtmp,&errtmp);
+
 	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e\n",idump,iter,Wpnew,f0tmp,dfdWtmp,errtmp);
-	  //if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
-	  //	  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))
-	  //    ||
-	  if((!isfinite(f0tmp) || !isfinite(f0tmp)
-	       || !isfinite(dfdWtmp) || !isfinite(dfdWtmp))
-	      && (idump<100))
+
+	  if((v2>(1.-SMALL) || v2<0. || Wpnew<0. || wmrho0<0. || !isfinite(f0tmp) || !isfinite(dfdWtmp)) && (idump<100))
 	    {
 	      idump++;
 	      dumpfac/=2.;
@@ -1329,7 +1344,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	}
 
 
-      if(fabs((Wp-Wpprev)/Wpprev)<CONV && err<1.e-1) break;
+      //convergence test:
+      if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<CONV*100.)) break;
     }
   while(iter<50);
 
