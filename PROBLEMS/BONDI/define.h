@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 38
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124

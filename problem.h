@@ -88,7 +88,7 @@
 //85 NSTEST - tests of axisymmetric NS
 //86 TFLAT - tests of TFLATCOORDS
 
-#define PROBLEM 58
+#define PROBLEM 7
 
 
 

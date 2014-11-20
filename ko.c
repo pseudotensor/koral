@@ -72,7 +72,7 @@ main(int argc, char **argv)
   calc_metric();
   
   //tests
-  //test_metric();
+  test_metric();
 
 #ifdef RADIATION
   //prepare angular grid for radiative solver

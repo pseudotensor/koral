@@ -551,6 +551,8 @@ int calc_Krzysie_arb_ana(ldouble*,ldouble[][4][4],int);
 int calc_Krzysie_arb_num(ldouble*,ldouble[][4][4],int);
 int calc_Krzysie_arb(ldouble*,ldouble[][4][4],int);
 int calc_Krzysie_at_center(int ix,int iy,int iz, ldouble Krzys[][4][4]);
+ldouble calc_gttpert(ldouble *xx);
+ldouble calc_gttpert_arb(double *xx, int COORDS);
 int calc_g_arb(ldouble*,ldouble[][5],int);
 int calc_g_arb_ana(ldouble*,ldouble[][5],int);
 int calc_g_arb_num(ldouble*,ldouble[][5],int);

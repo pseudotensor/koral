@@ -3770,6 +3770,8 @@ calc_metric()
 	for(i=0;i<4;i++)
 	  for(j=0;j<4;j++)
 	    set_g(G,i,j,ix,iy,iz,gloc[i][j]);
+
+	set_g(G,3,4,ix,iy,iz,calc_gttpert(xx));
 	      
 	calc_Krzysie_at_center(ix,iy,iz,Kr);
 	for(i=0;i<4;i++)
@@ -3928,8 +3930,10 @@ calc_g_arb_num(ldouble *xx, ldouble gout[][5],int COORDS)
   if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS)
     BASECOORDS=KSCOORDS;
   else if(COORDS==MSPH1COORDS)
-    BASECOORDS=SPHCOORDS;
-   else if(COORDS==TFLATCOORDS)
+    BASECOORDS=SPHCOORDS;   
+  else if(COORDS==MKER1COORDS)
+    BASECOORDS=BLCOORDS;
+  else if(COORDS==TFLATCOORDS)
     BASECOORDS=MINKCOORDS;
   else
     my_err("calc_g_arb_num() called with unsupported COORDS\n");
@@ -3945,6 +3949,7 @@ calc_g_arb_num(ldouble *xx, ldouble gout[][5],int COORDS)
   if(COORDS==MKS1COORDS) dxdx_KS2MKS1(xxb,dxdx);
   if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
   if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
+  if(COORDS==MKER1COORDS) dxdx_KER2MKER1(xxb,dxdx);
   if(COORDS==TKS3COORDS) dxdx_KS2TKS3(xxb,dxdx);
   if(COORDS==TFLATCOORDS) dxdx_MINK2TFLAT(xxb,dxdx);
   if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
@@ -3976,6 +3981,8 @@ calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
     BASECOORDS=KSCOORDS;
   else if(COORDS==MSPH1COORDS)
     BASECOORDS=SPHCOORDS;
+  else if(COORDS==MKER1COORDS)
+    BASECOORDS=BLCOORDS;
   else if(COORDS==TFLATCOORDS)
     BASECOORDS=MINKCOORDS;
   else
@@ -3992,6 +3999,7 @@ calc_G_arb_num(ldouble *xx, ldouble Gout[][5],int COORDS)
   if(COORDS==MKS1COORDS) dxdx_KS2MKS1(xxb,dxdx);
   if(COORDS==MKS2COORDS) dxdx_KS2MKS2(xxb,dxdx);
   if(COORDS==MKS3COORDS) dxdx_KS2MKS3(xxb,dxdx);
+  if(COORDS==MKER1COORDS) dxdx_KER2MKER1(xxb,dxdx);
   if(COORDS==TKS3COORDS) dxdx_KS2TKS3(xxb,dxdx);
   if(COORDS==TFLATCOORDS) dxdx_MINK2TFLAT(xxb,dxdx);
   if(COORDS==MSPH1COORDS) dxdx_SPH2MSPH1(xxb,dxdx);
@@ -4095,7 +4103,11 @@ calc_gdet_arb_num(ldouble *xx,int COORDS)
 int
 test_metric()
 {
+  //test perturbation to g_tt
+  
+
   //test time evolution of a TKS1 metric
+  /*
   struct geometry geom,geomBL;
   for(global_time=0.;global_time<100.;global_time+=1.)
     {
@@ -4118,6 +4130,7 @@ test_metric()
       getch();
     }
   exit(1);
+  */
 
   //test numerical metric computation
   /*
@@ -4150,3 +4163,92 @@ test_metric()
   return 0;
 }
 
+//calculates the perturbed part of g_tt
+ldouble
+calc_gttpert(ldouble *xx)
+{
+  return calc_gttpert_arb(xx,MYCOORDS);
+}
+
+//assumes input (xx,g,G) in COORDS!
+ldouble
+calc_gttpert_arb(double *xx, int COORDS)
+{
+  int BASECOORDS,i,j;
+  
+  if(COORDS==MKS1COORDS  || COORDS==MKS2COORDS || COORDS==MKS3COORDS || COORDS==TKS3COORDS || COORDS==KSCOORDS)
+    BASECOORDS=KSCOORDS;
+  else if(COORDS==BLCOORDS || COORDS==MKER1COORDS)
+    BASECOORDS=BLCOORDS;
+  else
+    BASECOORDS=-1;
+
+  if(BASECOORDS==-1) //by default - flat spacetime
+    return 0.;
+
+  ldouble xxb[4],gttpert;
+  //let's transform coordinates first
+  coco_N(xx,xxb,COORDS,BASECOORDS);
+
+
+  ldouble gpert[4][5],Gpert[4][5];
+  ldouble gbase[4][5],Gbase[4][5];
+  ldouble dxdxp[4][4];
+
+  //analytical metric in BASECOORDS
+  calc_g_arb_ana(xxb,gbase,BASECOORDS);
+      
+  DLOOP(i,j) gpert[i][j]=Gpert[i][j]=0.;
+
+  if(BASECOORDS==KSCOORDS)
+    {
+      ldouble r,Sigma,costh;
+      r=xxb[1];
+      costh=cos(xxb[2]);
+      Sigma=r*r + BHSPIN*BHSPIN*costh*costh;
+      gpert[0][0]=gpert[1][1]=2.*r/Sigma;
+      gpert[2][2]=gbase[2][2]-1.0;
+      gpert[3][3]=gbase[3][3]-1.0;
+     
+      //transformation matrix
+      if(COORDS==MKS1COORDS) dxdx_MKS12KS(xx,dxdxp);
+      if(COORDS==MKS2COORDS) dxdx_MKS22KS(xx,dxdxp);
+      if(COORDS==MKS3COORDS) dxdx_MKS32KS(xx,dxdxp);
+      if(COORDS==TKS3COORDS) dxdx_TKS32KS(xx,dxdxp);
+      if(COORDS==KSCOORDS) {DLOOP(i,j) if(i==j) dxdxp[i][i]=1.0; else dxdxp[i][j]=0.;}
+    }
+
+
+  if(BASECOORDS==BLCOORDS)
+    {
+      ldouble r,Sigma,costh,mup,DDp;
+      r=xxb[1];
+      costh=cos(xxb[2]);
+      Sigma=r*r + BHSPIN*BHSPIN*costh*costh;
+      mup=1.+BHSPIN*BHSPIN*costh*costh;
+      DDp=1.-2./r+BHSPIN*BHSPIN/r/r;
+      gpert[0][0]=2.*r/Sigma;
+      gpert[1][1]=(mup-DDp)/(1.+DDp); //sign different than in HARM but this not used at all
+      gpert[2][2]=gbase[2][2]-1.0;
+      gpert[3][3]=gbase[3][3]-1.0;
+     
+      //transformation matrix
+      if(COORDS==BLCOORDS) {DLOOP(i,j) if(i==j) dxdxp[i][i]=1.0; else dxdxp[i][j]=0.;}
+      if(COORDS==MKER1COORDS) dxdx_MKER12KER(xx,dxdxp);
+    }
+      
+  //from HARM, only _tt component
+  int q=0,m,l;
+  ldouble ftemp1=(-1.0 + dxdxp[q][q] * dxdxp[q][q]);
+  ftemp1 *=-1.0;
+  gttpert = (gpert[q][q] * dxdxp[q][q] * dxdxp[q][q]) + ftemp1;
+  // now add 15 other terms
+  ldouble ftemp2 = 0.;
+  for(l=0;l<NDIM;l++) for(m=0;m<NDIM;m++){
+      if((l!=q)&&(m!=q)) ftemp2+= gbase[l][m] * dxdxp[l][q] * dxdxp[m][q];
+    }
+  // add other 15 terms to answer for total of 16 terms
+  gttpert+=ftemp2;
+
+  return gttpert;
+}
