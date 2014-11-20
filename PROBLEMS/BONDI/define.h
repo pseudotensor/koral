@@ -58,8 +58,8 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 100.
-#define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
+#define RMIN (RBONDI/10.)//100.
+#define RBONDI 1.e9 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
 
@@ -98,7 +98,7 @@
 #define TNX 64
 #define TNY 1
 #define TNZ 1
-#define NTX 4//for MPI and OMP
+#define NTX 2//for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -107,7 +107,7 @@
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
 
-#define SELFTIMESTEP
+//#define SELFTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -129,7 +129,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .05
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
@@ -153,7 +153,7 @@
 #ifdef SELFTIMESTEP
 #define DTOUT1 (RMAX*10000.)//*TSTEPLIM) //res
 #else
-#define DTOUT1 (RMAX*.0001*TSTEPLIM)//(RMAX*100.) //res
+#define DTOUT1 (RMAX*10000.*TSTEPLIM)//(RMAX*100.) //res
 #endif
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop

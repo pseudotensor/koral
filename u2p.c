@@ -752,22 +752,20 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   */
 
   ldouble gamma = sqrt(gamma2);
-  ldouble w = W/gamma2;
   ldouble rho0 = D/gamma;
-  ldouble wmrho0 = w - rho0;
-  ldouble u = (w - rho0) / GAMMA;
+  ldouble wmrho0 = Wp/gamma2 - D*v2/(1.+gamma);
+  ldouble u = wmrho0 / GAMMA;
   ldouble p = (GAMMA-1)*u;
 
   //original:
-  *f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
-  *err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
+  //*f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
+  //*err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
 
   //JONS:
   *f = Qdotnp + Wp - p + 0.5*Bsq + (Bsq*Qtsq - QdotBsq)/X2;
   *err = fabs(*f) / (fabs(Qdotnp) + fabs(Wp) + fabs(p) + fabs(0.5*Bsq) + fabs((Bsq*Qtsq - QdotBsq)/X2));
 
-
-  // dp/dW = dp/dW + dP/dv^2 dv^2/dW
+  // dp/dWp = dp/dW + dP/dv^2 dv^2/dW
     
   ldouble dvsq=(-2.0/X3 * ( Qtsq  +  QdotBsq * (3.0*W*X + Bsq*Bsq)/W3));
   ldouble dp1 = dpdWp_calc_vsq(Wp, D, v2 ); // vsq can be unphysical
@@ -783,7 +781,7 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   ldouble dpdW = dp1  + dp2*dvsq; // dp/dW = dp/dWp
 
   //original:
-  *df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
+  //*df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
 
   //JONs:
   *df=1. -dpdW + (Bsq*Qtsq - QdotBsq)/X3*(-2.0);
@@ -908,19 +906,14 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df, ldouble *err)
   X2 = X*X;
   Xsq = X2;
   X3 = X2*X;
- 
+
   ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
   ldouble gamma2 = 1./(1.-v2);
-  ldouble gammasq = gamma2;
   ldouble gamma = sqrt(gamma2);
-  ldouble w = W/gamma2;
   ldouble rho0 = D/gamma;
-  ldouble wmrho0 = w - rho0;
+  ldouble wmrho0 = Wp/gamma2 - D*v2/(1.+gamma);
   ldouble u = wmrho0 / GAMMA;
   ldouble p = (GAMMA-1)*u;
-
-  //test
-  //printf("%e %e %e\n",w,wmrho0,v2);
 
   ldouble Ssofchi=compute_specificentropy_wmrho0_idealgas(rho0,wmrho0);
 
@@ -935,7 +928,7 @@ f_u2p_entropy(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df, ldouble *err)
   dSsdrho=compute_dspecificSdrho_wmrho0_idealgas(rho0,wmrho0);
   dSsdchi=compute_dspecificSdwmrho0_wmrho0_idealgas(rho0,wmrho0);
 
-  dwmrho0dW = 1.0/gammasq; // holding utsq fixed
+  dwmrho0dW = 1.0/gamma2; // holding utsq fixed
   drho0dW = 0.0; // because \rho=D/\gamma and holding utsq fixed
   dwmrho0dvsq = (D*(gamma*0.5-1.0) - Wp); // holding Wp fixed
   drho0dvsq = -D*gamma*0.5; // because \rho=D/\gamma and holding Wp fixed
