@@ -110,51 +110,9 @@ p2u_mhd(ldouble *p, ldouble *u, void *ggg)
   ldouble etap = uu+pre+bsq; //eta-rho
   ldouble ptot=pre+0.5*bsq;
   
-  //this computes utp1=1+u_t , which for nonrelativistic cases is ~0 .  If computed as 1+u_t, then residual will be large error if small residual.
+  //this computes utp1=1+u_t
   ldouble utp1;
-
-  if(VELPRIM==VELR) //based on vELR
-    {
-      int i,j;
-      ldouble qsq=0.;
-      for(i=1;i<4;i++)
-	for(j=1;j<4;j++)
-	  qsq+=vcon[i]*vcon[j]*gg[i][j];
-      ldouble gamma2=(1.+qsq);
-      ldouble alphasq=(-1./GG[0][0]);
-      ldouble alpgam=sqrt(alphasq*gamma2);
-      //\beta^i \beta_i / \alpha^2 = g^{ti} g_{ti}
-      ldouble betasqoalphasq=gg[0][1]*GG[0][1] + gg[0][2]*GG[0][2] + gg[0][3]*GG[0][3]; 
-
-      ldouble ud0tilde = 0.0;
-      SLOOPA(j) ud0tilde += vcon[j]*gg[0][j]; // \tilde{u}_t = \tilde{u}^i g_{ti} since \tilde{u}^t=0
-      utp1= ud0tilde + (geom->gttpert - alphasq*(betasqoalphasq + qsq))/(1.0+alpgam);
-    }
-  else //based on ucon[]
-    {
-      int i,j,k;
-      // 3-velocity in coordinate basis
-      ldouble vconp[4];
-      SLOOPA(j) vconp[j]=ucon[j]/ucon[0];
-
-      ldouble plus1gv00=geom->gttpert;
-      ldouble vsq=geom->gttpert;
-      SLOOPA(j) vsq+=2.0*geom->gg[0][j]*vconp[j];
-      SLOOP(j,k) vsq+=geom->gg[j][k]*vconp[j]*vconp[k];
-
-      ldouble gvtt=geom->gg[0][0];
-      
-      ldouble alpha=0.0;
-      SLOOPA(j) alpha+=geom->gg[j][0]*ucon[j];
-
-      ldouble uu0 = ucon[0];
-
-      utp1 = alpha + ((1.0-gvtt)*plus1gv00 - uu0*uu0*vsq*gvtt*gvtt)/(1.0-gvtt*uu0);
-    }
-
-
-  //overwrite:
-  //utp1=1.+ucov[0];
+  utp1=calc_utp1(vcon,ucon,geom);
 
   ldouble Tttt=etap*ucon[0]*ucov[0] + rho*ucon[0]*utp1 + ptot - bcon[0]*bcov[0];
   ldouble Ttr =eta*ucon[0]*ucov[1] - bcon[0]*bcov[1];
@@ -437,4 +395,59 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   //#endif
 
   return 0.;
+}
+
+//this computes utp1=1+u_t , which for nonrelativistic cases is ~0 .  If computed as 1+u_t, then residual will be large error if small residual.
+ldouble
+calc_utp1(ldouble *vcon, ldouble *ucon, void *ggg)
+{
+   struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  gdet=geom->gdet;
+  GG=geom->GG;
+  gdetu=gdet;
+
+  ldouble utp1;
+  if(VELPRIM==VELR) //based on vELR
+    {
+      int i,j;
+      ldouble qsq=0.;
+      for(i=1;i<4;i++)
+	for(j=1;j<4;j++)
+	  qsq+=vcon[i]*vcon[j]*gg[i][j];
+      ldouble gamma2=(1.+qsq);
+      ldouble alphasq=(-1./GG[0][0]);
+      ldouble alpgam=sqrt(alphasq*gamma2);
+      //\beta^i \beta_i / \alpha^2 = g^{ti} g_{ti}
+      ldouble betasqoalphasq=gg[0][1]*GG[0][1] + gg[0][2]*GG[0][2] + gg[0][3]*GG[0][3]; 
+
+      ldouble ud0tilde = 0.0;
+      SLOOPA(j) ud0tilde += vcon[j]*gg[0][j]; // \tilde{u}_t = \tilde{u}^i g_{ti} since \tilde{u}^t=0
+      utp1= ud0tilde + (geom->gttpert - alphasq*(betasqoalphasq + qsq))/(1.0+alpgam);
+    }
+  else //based on ucon[]
+    {
+      int i,j,k;
+      // 3-velocity in coordinate basis
+      ldouble vconp[4];
+      SLOOPA(j) vconp[j]=ucon[j]/ucon[0];
+
+      ldouble plus1gv00=geom->gttpert;
+      ldouble vsq=geom->gttpert;
+      SLOOPA(j) vsq+=2.0*geom->gg[0][j]*vconp[j];
+      SLOOP(j,k) vsq+=geom->gg[j][k]*vconp[j]*vconp[k];
+
+      ldouble gvtt=geom->gg[0][0];
+      
+      ldouble alpha=0.0;
+      SLOOPA(j) alpha+=geom->gg[j][0]*ucon[j];
+
+      ldouble uu0 = ucon[0];
+
+      utp1 = alpha + ((1.0-gvtt)*plus1gv00 - uu0*uu0*vsq*gvtt*gvtt)/(1.0-gvtt*uu0);
+    }
+  return utp1;
 }

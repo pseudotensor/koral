@@ -59,7 +59,7 @@
 #define METRICAXISYMMETRIC
 
 #define RMIN 100.
-#define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
+#define RBONDI 1.e7 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*100.)
 #define RMAXOUT RBONDI 
 
@@ -151,7 +151,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*1000000.)//*TSTEPLIM) //res
+#define DTOUT1 (RMAX*100000.)//*TSTEPLIM) //res
 #else
 #define DTOUT1 (RMAX*1000.*TSTEPLIM)//(RMAX*100.) //res
 #endif

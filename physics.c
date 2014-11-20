@@ -497,7 +497,10 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
 #endif
   ldouble rho=pp[RHO];
   ldouble u=pp[UU];
-  ldouble vcon[4],ucon[4],ucov[4];
+
+  ldouble vcon[4],ucon[4],ucov[4],bcon[4],bcov[4],bsq=0.;
+
+
   vcon[1]=pp[2];
   vcon[2]=pp[3];
   vcon[3]=pp[4];
@@ -505,6 +508,19 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
 
   //converting to 4-velocity
   conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+
+#ifdef MAGNFIELD
+  calc_bcon_4vel(pp,ucon,ucov,bcon);
+  indices_21(bcon,bcov,gg); 
+  bsq = dot(bcon,bcov);
+#endif
+
+
+  ldouble pre=(GAMMA-1.)*u; 
+  ldouble w=rho+u+pre;
+  ldouble eta=w+bsq;
+  ldouble etap = u+pre+bsq; //eta-rho
+
 
   int ii, jj, irf;
   for(ii=0;ii<4;ii++)
@@ -518,16 +534,20 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
 	  }
       }
 
-#ifdef MAGNFIELD
-  ldouble bcon[4];
-  calc_bcon_4vel(pp,ucon,ucov,bcon);
-#endif
- 
+
+  ldouble utp1=calc_utp1(vcon,ucon,&geom);
+
   //fluxes
 
   //hydro
   ff[0]= gdetu*rho*ucon[idim+1];
-  ff[1]= gdetu*(T[idim+1][0]+rho*ucon[idim+1]);
+  //ff[1]= gdetu*(T[idim+1][0]+rho*ucon[idim+1]);
+  //to avoid slow cancellation:
+  ff[1]= gdetu*(etap*ucon[idim+1]*ucov[0] + rho*ucon[idim+1]*utp1);
+#ifdef MAGNFIELD
+  ff[1]+= - gdetu*bcon[idim+1]*bcov[0];
+#endif
+
   ff[2]= gdetu*(T[idim+1][1]);
   ff[3]= gdetu*(T[idim+1][2]); 
   ff[4]= gdetu*(T[idim+1][3]);

@@ -627,6 +627,7 @@ int u2p_rad_onff(ldouble *uu, ldouble *pp, void*,int*);
 int u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected);
 
 //p2u.c
+ldouble calc_utp1(ldouble *vcon, ldouble *ucon, void *ggg);
 int p2avg(int,int,int,ldouble*);
 int calc_conserved(int ix,int iy,int iz);
 int p2u(ldouble *p, ldouble *u,void*);
