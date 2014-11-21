@@ -7,13 +7,16 @@ int iix,iiy,iiz,iv;
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
-
+iix=ix;
+    iiy=iy;
+    iiz=iz;
 
 /**********************/
 
 //radius
-if(ix>=NX) //outflow
+if(ix>=NX) //outflow or 2nd beam
   {    
+    #ifndef TWOBEAMS
     iix=NX-1;
     iiy=iy;
     iiz=iz;
@@ -32,6 +35,44 @@ if(ix>=NX) //outflow
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
       }
 #endif
+#else //beam from the right as well
+    iix=NX-1;
+ iiy=iy;
+    iiz=iz;
+     for(iv=0;iv<NVMHD;iv++)
+       { 
+	 pp[iv]=get_u(p,iv,0,iiy,iiz);
+       } 
+
+     pp[0]=.001;
+     pp[1]=.1;
+     pp[2]=0.;
+     pp[3]=0.;
+     pp[4]=0.;
+     pp[5]=calc_Sfromu(pp[0],pp[1]);
+
+#ifdef RADIATION
+     pp[6]=.1;
+     pp[7]=-.9;
+     pp[8]=0.;
+     pp[9]=0.;
+
+     #if(RADCLOSURE==VETCLOSURE)
+	//calculate the intensities
+	double RijM1[4][4];double M1[5];
+	calc_Rij_M1(pp,&geom,RijM1);
+	
+	//input
+	M1[0]=RijM1[0][0];
+	M1[1]=RijM1[0][1];
+	M1[2]=RijM1[0][2];
+	M1[3]=RijM1[0][3];
+	M1[4]=pp[EE0];
+      
+	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+#endif
+#endif	 
+    #endif
 
     p2u(pp,uu,&geom);
  
@@ -57,7 +98,7 @@ if(ix>=NX) //outflow
 
 #ifdef RADIATION
      pp[6]=.1;
-     pp[7]=0.9;
+     pp[7]=.9;
      pp[8]=0.;
      pp[9]=0.;
 
@@ -95,6 +136,9 @@ for(iv=0;iv<NV;iv++)
     uu[iv]=get_u(u,iv,iix,iiy,iiz);
     pp[iv]=get_u(p,iv,iix,iiy,iiz);      
   }
+for(iv=0;iv<NUMANGLES;iv++)
+    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][iv];
+
   
 return 0;
   

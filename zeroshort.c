@@ -2937,7 +2937,6 @@ void initAngIndex(double angGridCoords[NUMANGLES][3], double angDualGridCoords[N
 	}	
 
 
-
 	//Same exercise for Dual Angle Grid
 
 	//initialize
@@ -2987,6 +2986,15 @@ double FE_to_Gamma(double FE)
 
 void getNearest3Ang(double target[3], int nearestAngleIndices[3])
 {
+
+  if(!isfinite(target[0]) || !isfinite(target[1]) || !isfinite(target[2]))
+    {
+      printf("nans in getneareast3ang\n");
+      target[0]=0.;
+      target[1]=1.;
+      target[2]=2.;
+    }
+
   int probeAng, startShift, i;
   double dotprod;
   double bestDots[3] = {-BIG,-BIG,-BIG};   //best angles found so far, sorted by dot product
@@ -3029,8 +3037,7 @@ void getNearest3Ang(double target[3], int nearestAngleIndices[3])
 	}
     }
 
-  //printf("best Angs = %d %d %d\n",nearestAngleIndices[0], nearestAngleIndices[1], nearestAngleIndices[2]);
-  //getch();
+  
 
 }
 
@@ -3692,6 +3699,8 @@ int zero_init()
       my_err("zero_readangles() failed. missing files best-xyz.dat, best-dualtri-xyz.dat, or best-dualtri-adjIndex.dat.\n");
       exit(-1);
     }
+
+
 
   #ifdef USEDUALNEIGHBOR
   initAngIndex(angGridCoords, angDualGridCoords, angGridIndexSort, angDualGridIndexSort);

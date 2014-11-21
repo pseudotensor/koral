@@ -4385,14 +4385,16 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   
   //rewriting the pressure part with VET and mixing with M1
   ldouble fzero;
-  //fzero=step_function(.925-ff,.015);
+  
   
   fzero=1.;
-  if(ff>0.95)
+  if(ff>0.99)
     fzero=0.;
 
   //test
   fzero=1.;
+
+  //fzero=step_function(.925-ff,.015);
   
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
@@ -4600,6 +4602,15 @@ update_intensities()
 		{
 		  intensities[i+1][j+1][k+1][l]=Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][l];
 		}
+
+	      /*
+	      if(ix==-1 && iy==-1)
+		printf("%d %d > %e %e %e\n",ix,iy,intensities[i+1][j+1][k+1][0],intensities[i+1][j+1][k+1][20],intensities[i+1][j+1][k+1][40]);
+	      if(ix==0 && iy==0)
+		printf("%d %d > %e %e %e\n",ix,iy,intensities[i+1][j+1][k+1][0],intensities[i+1][j+1][k+1][20],intensities[i+1][j+1][k+1][40]);
+	      if(ix==-1 && iy==0)
+		printf("%d %d > %e %e %e\n",ix,iy,intensities[i+1][j+1][k+1][0],intensities[i+1][j+1][k+1][20],intensities[i+1][j+1][k+1][40]);
+	      */
 
 	      //postprocessing, passing by
 	      pre=(GAMMA-1.)*(uint);

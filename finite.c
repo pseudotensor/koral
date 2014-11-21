@@ -3093,11 +3093,22 @@ int set_bc(ldouble t,int ifinit)
 	  //averaging <(-1,0),(0,-1)> -> (-1,-1)
 	  PLOOP(iv)
 	    set_u(p,iv,-1,-1,iz,.5*(get_u(p,iv,-1,0,iz)+get_u(p,iv,0,-1,iz)));
+
+	  //TODO!!! - only handles two left corners! and no intensities copied!!!
+	  #ifdef PERIODIC_YBC
+	  PLOOP(iv)
+	    set_u(p,iv,-1,-1,iz,get_u(p,iv,-1,NY-1,iz));
+          #endif
+	  #ifdef PERIODIC_XBC
+	  PLOOP(iv)
+	    set_u(p,iv,-1,-1,iz,get_u(p,iv,NX-1,-1,iz)));
+          #endif
+
+	  
 	  fill_geometry(-1,-1,iz,&geom);
 	  p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
 
 	  //averaging <(-2,-1),(-1,-2)> -> (-2,-2)
-      
 	  PLOOP(iv)
 	    set_u(p,iv,-2,-2,iz,.5*(get_u(p,iv,-2,-1,iz)+get_u(p,iv,-1,-2,iz)));
 	  fill_geometry(-2,-2,iz,&geom);
@@ -3125,6 +3136,16 @@ int set_bc(ldouble t,int ifinit)
 
 	  PLOOP(iv)
 	    set_u(p,iv,-1,NY,iz,.5*(get_u(p,iv,-1,NY-1,iz)+get_u(p,iv,0,NY,iz)));
+
+          #ifdef PERIODIC_YBC
+	  PLOOP(iv)
+	    set_u(p,iv,-1,NY,iz,get_u(p,iv,-1,0,iz));
+          #endif
+	  #ifdef PERIODIC_XBC
+	  PLOOP(iv)
+	    set_u(p,iv,-1,NY,iz,get_u(p,iv,NX-1,NY,iz)));
+          #endif
+
 	  fill_geometry(-1,NY,iz,&geom);
 	  p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
 

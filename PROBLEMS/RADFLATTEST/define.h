@@ -10,11 +10,13 @@
 //radiation
 /************************************/
 #define RADIATION
-
+#define SKIPRADSOURCE
+#define TWOBEAMS
 
 #define myVET
 
 #ifdef myVET
+
 #define RADCLOSURE VETCLOSURE
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
@@ -58,14 +60,17 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 128
 #define TNY 1
 #define TNZ 1
-#define NTX 1 //for MPI and OMP
+#define NTX 4 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
 #define SPECIFIC_BC
+#define PERIODIC_YBC
+#define PERIODIC_ZBC
+
 
 /************************************/
 //reconstruction / Courant
@@ -82,7 +87,7 @@
 #define RADIMPCONV 1.e-10
 #define RADIMPEPS 1.e-8
 #define RADIMPMAXITER 15
-#define GAMMAMAXRAD 5.
+#define GAMMAMAXRAD 50.
 
 /************************************/
 //output
