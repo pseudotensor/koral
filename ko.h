@@ -803,7 +803,7 @@ void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMA
 void setupInterpWeights_cart3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES]);
 void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES]);
 void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES], double intersectGridPhi[SXVET][SYVET][SZVET][NUMANGLES]);
-
+void getNearest3Ang(double target[3], int nearestAngleIndices[3]);
 
 void ZERO_shortCharI(int,int,int,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4],
 		     double I_return[NUMANGLES],int verbose);
