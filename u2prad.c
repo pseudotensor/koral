@@ -455,7 +455,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       // get \gamma^2 for relative 4-velocity
       if(get_m1closure_gammarel2(verbose,ggg,Avcon,Avcov,&gammarel2,&delta,&numerator,&divisor)<0)
 	{
-	  printf("get_m1closure_gammarel2 failed at %d %d %d\n",geom->ix+TOI,geom->ix+TOJ,geom->iz+TOK);
+	  printf("get_m1closure_gammarel2 failed at %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK);
 	 
 	  return -1;
 	}
@@ -466,7 +466,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
       // get relative 4-velocity
       if(get_m1closure_urfconrel(verbose,ggg,pp,Avcon,Avcov,gammarel2,delta,numerator,divisor,&Erf,urfcon,corrected)<0)
 	{
-	  printf("get_m1closure_urfconrel failed at %d %d %d\n",geom->ix+TOI,geom->ix+TOJ,geom->iz+TOK);
+	  printf("get_m1closure_urfconrel failed at %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK);
 	  return -1;
 	}
 

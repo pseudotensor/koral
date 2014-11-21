@@ -12,12 +12,19 @@
 #define VETFEACCEPT 0.0
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
-#define SOCCERBALL 2
-#if ((SOCCERBALL==0) || (SOCCERBALL==1))
+#define SOCCERBALL 0
+#if (SOCCERBALL==0) 
+#define USEDUALNEIGHBOR
+#define NUMANGLES 80
+#endif
+#if(SOCCERBALL==1)
 #define NUMANGLES 80
 #endif
 #if(SOCCERBALL==2)
 #define NUMANGLES 160
+#endif
+#if(SOCCERBALL==3)
+#define NUMANGLES 48
 #endif
 #endif
 

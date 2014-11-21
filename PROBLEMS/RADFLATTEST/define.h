@@ -19,6 +19,20 @@
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
 #define RADCLOSURECOORDS MINKCOORDS
+#define SOCCERBALL 0
+#if (SOCCERBALL==0) 
+#define USEDUALNEIGHBOR
+#define NUMANGLES 80
+#endif
+#if(SOCCERBALL==1)
+#define NUMANGLES 80
+#endif
+#if(SOCCERBALL==2)
+#define NUMANGLES 160
+#endif
+#if(SOCCERBALL==3)
+#define NUMANGLES 48
+#endif
 #endif
 
 #define ALLOWRADCEILINGINIMPLICIT
@@ -58,7 +72,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .6
+#define TSTEPLIM .3
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0      

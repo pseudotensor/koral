@@ -282,6 +282,9 @@ int readAngleFiles(double angGridCoords[NUMANGLES][3], double angDualGridCoords[
 #if(SOCCERBALL==2)
   angFile = fopen("octant-160.dat", "r");
 #endif
+#if(SOCCERBALL==3)
+  angFile = fopen("octant-48.dat", "r");
+#endif
 
 if (!angFile)
     {
@@ -2986,34 +2989,48 @@ void getNearest3Ang(double target[3], int nearestAngleIndices[3])
 {
   int probeAng, startShift, i;
   double dotprod;
-  double bestDots[3] = {-1.,-1.,-1.};   //best angles found so far, sorted by dot product
+  double bestDots[3] = {-BIG,-BIG,-BIG};   //best angles found so far, sorted by dot product
 
   for (probeAng=0; probeAng < NUMANGLES; probeAng++)
     {
       dotprod = target[0]*angGridCoords[probeAng][0] + target[1]*angGridCoords[probeAng][1] + target[2]*angGridCoords[probeAng][2];
 
+      //printf("dots = %e %e %e\n", bestDots[0],bestDots[1],bestDots[2]);
+      //printf("indices = %e %e %e\n", );
+      //printf("p=%d - dot=%e\n", probeAng, dotprod);
+
       //locate where to insert new angle
-      for ( startShift = 2; startShift >= 0; startShift--)
+      for ( startShift = 0; startShift < 3; startShift++)
 	{
-	  if (bestDots[startShift] > dotprod) {break;}
+	  if (bestDots[startShift] < dotprod) 
+	  {
+	    //printf("found better - %d, insert at %d | %e < %e\n", probeAng, startShift, bestDots[startShift], dotprod);
+	    break;
+	  }
 	}  
 
+
+
       //insert new angle and shift elements
-      for (i=2; i > startShift; i--)
+      for (i=2; i >= startShift; i--)
 	{
 	  //add new element
-	  if (i==startShift+1) 
+	  if (i==startShift) 
 	    {
 	      bestDots[i] = dotprod;
 	      nearestAngleIndices[i] = probeAng;
 	    }
 	  else //otherwise shift from the end
 	    {
+	      
 	      bestDots[i] = bestDots[i-1];
 	      nearestAngleIndices[i] = nearestAngleIndices[i-1];
 	    }
 	}
     }
+
+  //printf("best Angs = %d %d %d\n",nearestAngleIndices[0], nearestAngleIndices[1], nearestAngleIndices[2]);
+  //getch();
 
 }
 
