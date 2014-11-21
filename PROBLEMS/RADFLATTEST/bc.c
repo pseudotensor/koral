@@ -12,15 +12,26 @@ fill_geometry(ix,iy,iz,&geom);
 /**********************/
 
 //radius
-if(ix>=NX) //total boundary, properties of the galaxy
+if(ix>=NX) //outflow
   {    
+    iix=NX-1;
+    iiy=iy;
+    iiz=iz;
     for(iv=0;iv<NV;iv++)
       { 
-	pp[iv]=get_u(p,iv,NX-1,iiy,iiz);
+	pp[iv]=get_u(p,iv,iix,iiy,iiz);
       } 
 
     if(pp[VX]<0.) pp[VX]=0.;
     if(pp[FX0]<0.) pp[FX0]=0.;
+    
+#ifdef myVET
+    int il;
+    for(il=0;il<NUMANGLES;il++)
+      {
+	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
+      }
+#endif
 
     p2u(pp,uu,&geom);
  
@@ -29,17 +40,14 @@ if(ix>=NX) //total boundary, properties of the galaxy
 
  else if(ix<0) //outflow near BH
    {
+     iix=0;
+    iiy=iy;
+    iiz=iz;
      for(iv=0;iv<NVMHD;iv++)
        { 
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        } 
 
-     /*
-     if(geom.xx<0.3)
-       pp[0]=1000.;
-     else
-       pp[0]=.001;
-     */
      pp[0]=.001;
      pp[1]=.1;
      pp[2]=0.;
@@ -52,6 +60,21 @@ if(ix>=NX) //total boundary, properties of the galaxy
      pp[7]=0.9;
      pp[8]=0.;
      pp[9]=0.;
+
+     #if(RADCLOSURE==VETCLOSURE)
+	//calculate the intensities
+	double RijM1[4][4];double M1[5];
+	calc_Rij_M1(pp,&geom,RijM1);
+	
+	//input
+	M1[0]=RijM1[0][0];
+	M1[1]=RijM1[0][1];
+	M1[2]=RijM1[0][2];
+	M1[3]=RijM1[0][3];
+	M1[4]=pp[EE0];
+      
+	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+#endif
 #endif	 
     
      p2u(pp,uu,&geom);

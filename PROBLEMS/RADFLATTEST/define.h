@@ -7,21 +7,19 @@
 #define MODYFIKUJKRZYSIE 0
 
 /************************************/
-//define MSTEPS
-/************************************/
-//#define MSTEP
-#define MSTEP_LIMITBC
-#define NUMMSTEPLEVELS 20
-
-/************************************/
 //radiation
 /************************************/
 #define RADIATION
 
+
+#define myVET
+
+#ifdef myVET
 #define RADCLOSURE VETCLOSURE
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
-
+#define RADCLOSURECOORDS MINKCOORDS
+#endif
 
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
@@ -36,7 +34,6 @@
 #define MKS1R0 0.
 #define MYCOORDS MINKCOORDS
 #define OUTCOORDS MINKCOORDS
-#define RADCLOSURECOORDS MYCOORDS
 
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
@@ -47,17 +44,12 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define TNX 256
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 1 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
-
-//#define SUBZONES
-#define OUTPUTAFTERSUBZONES
-#define NSUBZONES 2
-#define SUBZONESOVERLAP 4
 
 #define SPECIFIC_BC
 
@@ -73,10 +65,10 @@
 
 #define DOFIXUPS 0
 #define U2PCONV 1.e-12
-#define RADIMPCONV 1.e-8
+#define RADIMPCONV 1.e-10
 #define RADIMPEPS 1.e-8
 #define RADIMPMAXITER 15
-#define GAMMAMAXRAD 50.
+#define GAMMAMAXRAD 5.
 
 /************************************/
 //output

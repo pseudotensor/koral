@@ -1656,6 +1656,7 @@ void setupInterpWeights_sph2D_flat(int ix, int iy, int iz, double angGridCoords[
 
 void setupInterpWeights_cart1D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES])
 {
+
   int probeAng;
   for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
     {
@@ -1734,7 +1735,7 @@ void setupInterpWeights_cart1D(int ix, int iy, int iz, double angGridCoords[NUMA
 	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p] = 1;  //Z index is always 1 (since we assume symmetry in Z)
 	    }
 
-
+	  
 
 	  //only use 1 of 4 neighbors, since in 1D all neighbors are the same point
       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] = 1.0;
@@ -1759,7 +1760,19 @@ void setupInterpWeights_cart1D(int ix, int iy, int iz, double angGridCoords[NUMA
       // printf("!! %e %e %e %e !!\n", w0_low, w0_high, w1_low, w1_high);
       // printf("-- %e %e %e --\n", posX, posY, posZ);
 
+	/*
+	printf("%d %d > xcoord: %e %e %e\n",ix,probeAng,angGridCoords[probeAng][0],angGridCoords[probeAng][1],angGridCoords[probeAng][2]);
 
+	for (p=0; p < 4; p++)
+	  {
+	    printf("p:=%d indices : %d %d %d weights: %f\n",p,
+		   intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p],
+		   intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p],
+		   intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p],
+		   intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p]);
+	  }
+	getch();
+	*/   
 
     } //end loop over angles
 
@@ -3467,6 +3480,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	  printf("neg interp_I %e %e > %d %d %d > %d %d %d > %d\n",
 		 I_Data[intersect_i][intersect_j][intersect_k][probeAng],
 		 intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p],intersect_i,intersect_j,intersect_k,ix,iy,iz,p);
+	  getch();
 	}
 
 	interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
@@ -3486,7 +3500,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
       if(LIGHT_C * delta_t > intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng])
 	{
-	  //printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
+	  printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
 	  intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * delta_t;
 	}
 
@@ -3654,7 +3668,7 @@ int zero_init()
 	{
 	  if(TNZ==1 && TNY==1)
 	    setupInterpWeights_cart1D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
-	  if(TNZ==1)
+	  else if(TNZ==1)
 	    setupInterpWeights_cart2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
 	  else
 	    setupInterpWeights_cart3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
