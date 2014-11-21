@@ -611,3 +611,11 @@
 #ifndef SILOCOORDS
 #define SILOCOORDS MINKCOORDS
 #endif
+
+#ifndef VETFLUXCOSACCEPT
+#define VETFLUXCOSACCEPT 1.
+#endif
+
+#ifndef VETFEACCEPT
+#define VETFEACCEPT 0.
+#endif

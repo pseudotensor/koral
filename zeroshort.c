@@ -1650,6 +1650,129 @@ void setupInterpWeights_sph2D_flat(int ix, int iy, int iz, double angGridCoords[
 
 
 // Subroutine to calculate the interpolation weights for a square 3x3x1 cubic grid
+// (Assuming symmetry in y,z)
+
+// We find the 2 bounding edges for each ray hitting the boundary, and their appropriate weights to use in interpolation later on
+
+void setupInterpWeights_cart1D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES])
+{
+  int probeAng;
+  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
+    {
+
+      double posX, posY, posZ;
+      double minL = 0., maxL = 100.0;
+
+
+      //Bisect on ray to numerically find intersection location
+      int iter;
+      for (iter=0; iter < 50; iter++)
+	{
+
+
+	  posX = 1.0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][0]);
+	  posY = 1.0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][1]);
+	  posZ = 1.0 + (minL+maxL)/2.0 * (-angGridCoords[probeAng][2]);
+
+
+
+	  //bisect on path length to find nearest boundary intersection
+	  if ((posX > 2.0) || (posX < 0.0))
+	    {
+	      maxL = (minL+maxL)/2.0;
+	    }
+	  else
+	    {
+	      minL = (minL+maxL)/2.0;
+	    }
+
+
+	  // printf("%e %e (%e %e %e) (%e %e %e)\n", minL, maxL, posR0, posTh0, posPh0, posR, posTh, posPh);
+	  // printf("%e %e (%e %e %e)\n", minL, maxL, posX, posY, posZ);
+
+
+	}
+
+
+      posX = 1.0 + maxL * (-angGridCoords[probeAng][0]);
+      posY = 1.0 + maxL * (-angGridCoords[probeAng][1]);
+      posZ = 1.0 + maxL * (-angGridCoords[probeAng][2]);
+
+      int lowerXIndex = floor(posX), upperXIndex = lowerXIndex + 1;
+      int lowerYIndex = floor(posY), upperYIndex = lowerYIndex + 1;
+      int lowerZIndex = floor(posZ), upperZIndex = lowerZIndex + 1;
+
+      //Interpolation weight components
+      double w0_low, w0_high;
+      double w1_low, w1_high;
+
+
+
+      //Get interpolation weights for 4 bounding corners of cube intersection
+
+	  int realXIndex;
+
+
+	  if (posX > 2.0)
+	    {
+	      realXIndex = lowerXIndex;
+	    }
+	  else if (posX < 0.0)
+	    {
+	      realXIndex = upperXIndex;
+	    }
+	  else // for a ray that fails to hit any X boundary
+	    {
+	      realXIndex = 1;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p] = realXIndex;
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p] = 1;  //Y index is always 1 (since we assume symmetry in Y)
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][p] = 1;  //Z index is always 1 (since we assume symmetry in Z)
+	    }
+
+
+
+	  //only use 1 of 4 neighbors, since in 1D all neighbors are the same point
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] = 1.0;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] = 0.;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = 0.;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = 0.;
+
+      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = maxL*GRID_SPACING;
+
+	for (p=0; p < 4; p++)
+	{
+	      intersectAngWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][0] = 1.0;
+	      intersectAngWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][1] = 0.;
+	      intersectAngWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][2] = 0.;
+
+	      intersectAngIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][0] = probeAng;
+	      intersectAngIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][1] = probeAng;
+	      intersectAngIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][2] = probeAng;
+      	}
+
+
+      // printf("!! %e %e %e %e !!\n", w0_low, w0_high, w1_low, w1_high);
+      // printf("-- %e %e %e --\n", posX, posY, posZ);
+
+
+
+    } //end loop over angles
+
+
+}
+
+
+
+
+
+
+
+// Subroutine to calculate the interpolation weights for a square 3x3x1 cubic grid
 // (Assuming symmetry in z)
 
 // We find the 2 bounding edges for each ray hitting the boundary, and their appropriate weights to use in interpolation later on
@@ -1825,24 +1948,6 @@ void setupInterpWeights_cart2D(int ix, int iy, int iz, double angGridCoords[NUMA
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2829,6 +2934,19 @@ void initAngIndex(double angGridCoords[NUMANGLES][3], double angDualGridCoords[N
 
 }
 
+double FE_to_Gamma(double FE)
+{
+  double beta;
+
+  if(FE<1.e-2) 
+    beta=3.*FE/4.;
+  else
+    beta=(4.-sqrt(16.-12.*FE*FE))/2./FE;
+	    
+  return 1./(1.-beta*beta);
+
+}
+
 
 void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
 {
@@ -2865,7 +2983,6 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
     {
       I_start[i] = I_return[i];
       //printf("%e\n", I_start[i]);
-      I_return[i] = 0.;
     }
 
   //printf("%e %e %e\n", F_final[0], F_final[1], F_final[2]);
@@ -2896,6 +3013,7 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
   Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
   Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
 
+  //if isotropic, dont use transformI
   if (Fmag_final/Efinal < 1.0e-10)
     {
       for (p=0; p<NUMANGLES; p++)
@@ -2905,6 +3023,25 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
       //	    printf("%e %e\n",I_start[0],I_return[0]);
       return;
     }
+
+  //if start FE == final FE, don't use transformI
+  //double FE_Ratio = (Fmag_start/Estart)/(Fmag_final/Efinal); 
+  double gamma_start = FE_to_Gamma(Fmag_start/Estart);
+  double gamma_final = FE_to_Gamma(Fmag_final/Efinal);
+  double gamma_ratio = gamma_start/gamma_final;
+
+
+
+  //if start direction and final direction within 10deg, don't use tranformI 
+  double F_dotprod = F_start[0]*F_final[0] + F_start[1]*F_final[1] + F_start[2]*F_final[2];
+
+ 
+  if (( gamma_ratio > (1.-VETFEACCEPT)) && (gamma_ratio < (1.+VETFEACCEPT)) && (F_dotprod/Fmag_final/Fmag_start > VETFLUXCOSACCEPT))
+    {
+      return;
+    } 
+
+
 
   for (l=0; l < 3; l++)
     {
@@ -3012,13 +3149,7 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
   //printf("SF = %e | Estart = %e, Fstart = %e, Ffinal = %e | F/E = %e\n", stretchFactor,Estart,  Fmag_start, Fmag_final, Fmag_start/Estart);
 
   if(!isfinite(stretchFactor) || stretchFactor<1.e-15) 
-    {
-	    
-      for (i=0; i < NUMANGLES; i++)
-
-	I_return[i] = I_start[i];
-	
-
+    {	   	
       return;
 	   
     }
@@ -3028,10 +3159,14 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
 
   //	printf("start: %e %e %e\nfinish: %e %e %e\n", F_norm[0], F_norm[1], F_norm[2], F_final[0], F_final[1], F_final[2]);
 
-
-
-
   int probeAng;
+  for (probeAng=0; probeAng<NUMANGLES; probeAng++)
+    {
+      I_return[i] = 0.;
+    }
+
+
+
   for (probeAng=0; probeAng < NUMANGLES; probeAng++)
     {
 
@@ -3130,6 +3265,9 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
 
       linComb(n_final, angGridCoords, angNeighborIndex, interpCoeffs);
 
+      
+
+
       for (p=0; p < 3; p++)
 	{
 	  //			printf("%d %d | %e %e %e \n", bestIndex, angNeighborIndex[p], n_norm, I_start[probeAng], interpCoeffs[p]);
@@ -3183,7 +3321,7 @@ void ZERO_decomposeM1(int ix, int iy, int iz,double M1_Data[5], double I_return[
 		     F_final[2]*F_final[2]);
 
   double ff = fmag / M1_Data[0]; //F/Elab using input argument
-
+  
   //printf("ff: %f\n",ff);
   double beta;
 
@@ -3193,6 +3331,9 @@ void ZERO_decomposeM1(int ix, int iy, int iz,double M1_Data[5], double I_return[
     beta=(4.-sqrt(16.-12.*ff*ff))/2./ff;
 	    
   double gamma2=1./(1.-beta*beta);
+  
+
+    //double gamma2 = FE_to_Gamma(ff);
 
   double Erad=M1_Data[0]/(4./3.*gamma2-1./3.);
 
@@ -3511,6 +3652,8 @@ int zero_init()
       //interpolation weights
       if(RADCLOSURECOORDS==MINKCOORDS)
 	{
+	  if(TNZ==1 && TNY==1)
+	    setupInterpWeights_cart1D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
 	  if(TNZ==1)
 	    setupInterpWeights_cart2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
 	  else

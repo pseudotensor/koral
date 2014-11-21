@@ -1,5 +1,5 @@
-//#define RESTART
-#define RESTARTNUM 0
+#define RESTART
+#define RESTARTNUM -1
 
 
 #define RADIATION
@@ -8,12 +8,14 @@
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
+#define VETFLUXCOSACCEPT 1.0
+#define VETFEACCEPT 0.0
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
 #endif
 
-//#define BEAM1
-#define DISK
+#define BEAM1
+//#define DISK
 //#define HOURGLASS
 
 
@@ -21,12 +23,12 @@
 #define SKIPRADSOURCE
 
 #define RADVISCOSITY SHEARVISCOSITY
-//#define ACCELRADVISCOSITY
+#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define ALPHARADVISC 0.1
 #define RADVISCMAXVELDAMP
-#define MAXRADVISCVEL 0.1
+#define MAXRADVISCVEL 0.5
 
 
 #define MASS 10.

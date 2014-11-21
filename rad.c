@@ -4549,15 +4549,27 @@ update_intensities()
       iy0=loop_0[ii][1];
       iz0=loop_0[ii][2]; 
 
+      int jlo,jhi;
       int klo,khi;
       
-      if(TNZ==1) 
-	klo=khi=0;
-      else
-	{klo=-1;khi=1;}
+      if(TNZ==1 && TNY==1) //1d
+	{
+	  jlo=jhi=0;
+	  klo=khi=0;
+	}
+      else if(TNZ==1) //2d
+	{
+	  klo=khi=0;
+	  jlo=-1;jhi=1;
+	}
+      else //3d
+	{
+	  jlo=-1;jhi=1;
+	  klo=-1;khi=1;
+	}
 
       for(i=-1;i<=1;i++) //loop over cell centers
-	for(j=-1;j<=1;j++)
+	for(j=jlo;j<=jhi;j++)
 	  for(k=klo;k<=khi;k++)
 	    {
 	      ucon[0]=0.;
