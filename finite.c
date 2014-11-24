@@ -486,7 +486,12 @@ calc_wavespeeds()
     {
       ix=loop_1[ii][0];
       iy=loop_1[ii][1];
-      iz=loop_1[ii][2]; 
+      iz=loop_1[ii][2];
+
+      #ifndef MPI4CORNERS
+      if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
+      #endif
+ 
       ldouble aaa[12];
 
       #ifdef MSTEP
@@ -600,6 +605,10 @@ op_explicit(ldouble t, ldouble dtin)
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
+      #ifndef MPI4CORNERS
+      if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
+      #endif
+
      
       //interpolating conserved quantities
       ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
@@ -647,7 +656,6 @@ op_explicit(ldouble t, ldouble dtin)
 		  dor=0;
 #endif
 		
-
 		x0[0]=get_x(ix,0);
 
 		x0l[0]=get_xb(ix,0);
@@ -723,6 +731,7 @@ op_explicit(ldouble t, ldouble dtin)
 	      }
 	}
 
+      
 	    //**********************************************************************
 	    //**********************************************************************
 	    //y 'sweep'
@@ -788,14 +797,14 @@ op_explicit(ldouble t, ldouble dtin)
 
 		  avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 	  
-		  if(iy>=0)
+		  if(dol)
 		    {
 		      fill_geometry_face(ix,iy,iz,1,&geom);
 		      check_floors_mhd(fd_pl,VELPRIM,&geom);
 		      f_flux_prime(fd_pl,1,ix,iy,iz,ffl,1);
 		    }
 
-		  if(iy<NY)
+		  if(dor)
 		    {
 		      fill_geometry_face(ix,iy+1,iz,1,&geom);
 		      check_floors_mhd(fd_pr,VELPRIM,&geom);
@@ -882,14 +891,14 @@ op_explicit(ldouble t, ldouble dtin)
 
 		    avg2point(fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_pp2,fd_pl,fd_pr,dxm2,dxm1,dx0,dxp1,dxp2,reconstrpar);   
 
-		    if(iz>=0)
+		    if(dol)
 		      {
 			fill_geometry_face(ix,iy,iz,2,&geom);
 			check_floors_mhd(fd_pl,VELPRIM,&geom);
 			f_flux_prime(fd_pl,2,ix,iy,iz,ffl,0);
 		      }
 
-		    if(iz<NZ)
+		    if(dor)
 		      {
 			fill_geometry_face(ix,iy,iz+1,2,&geom);
 			check_floors_mhd(fd_pr,VELPRIM,&geom);
@@ -929,9 +938,6 @@ op_explicit(ldouble t, ldouble dtin)
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
-      if(ix<0 || ix>NX || iy<0 || iy>NY || iz<0 || iz>NZ)
-	continue;
-      
       //combines right - left fluxes
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
@@ -1199,12 +1205,13 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //x 'sweep'
  
 #ifdef MPI4CORNERS
-  if(NX>1 && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1)
+  if(NX>1 && ix>=0 && ix<=NX && iy>=-1 && iy<NY+1 && iz>=-1 && iz<NZ+1)
 #else
-    if(NX>1 && iy>=0 && iy<NY && iz>=0 && iz<NZ)
+    if(NX>1 && ix>=0 && ix<=NX && iy>=0 && iy<NY && iz>=0 && iz<NZ)
 #endif
       {
       
+	printf("x %d %d\n",ix,iy);
 
 #ifdef MSTEP
 	if(mstep_is_face_active(ix,iy,iz,0))
@@ -1313,11 +1320,13 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //**********************************************************************
   //y 'sweep'
 #ifdef MPI4CORNERS
-    if(NY>1 && ix>=-1 && ix<NX+1 && iz>=-1 && iz<NZ+1)
+    if(NY>1 && iy>=0 && iy<=NY && ix>=-1 && ix<NX+1 && iz>=-1 && iz<NZ+1)
 #else
-    if(NY>1 && ix>=0 && ix<NX && iz>=0 && iz<NZ)
+    if(NY>1 && iy>=0 && iy<=NY  && ix>=0 && ix<NX && iz>=0 && iz<NZ)
 #endif
     {
+      printf("y %d %d\n",ix,iy);
+
 #ifdef MSTEP
       if(mstep_is_face_active(ix,iy,iz,1))
 #endif
@@ -1414,9 +1423,9 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
   //**********************************************************************
   //z 'sweep'
 #ifdef MPI4CORNERS
-    if(NZ>1 && ix>=-1 && ix<NX+1 && iy>=-1 && iy<NY+1)
+    if(NZ>1 && iz>=0 && iz<=NZ && ix>=-1 && ix<NX+1 && iy>=-1 && iy<NY+1)
 #else
-    if(NZ>1 && ix>=0 && ix<NX && iy>=0 && iy<NY)
+    if(NZ>1 && iz>=0 && iz<=NZ && ix>=0 && ix<NX && iy>=0 && iy<NY)
 #endif
     {
 #ifdef MSTEP
@@ -1844,8 +1853,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  {
 	    for(iz=-zlim1+iz1;iz<iz2+zlim2;iz++)
 	      {	
-		if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
-
 		loop_1[Nloop_1][0]=ix;
 		loop_1[Nloop_1][1]=iy;
 		loop_1[Nloop_1][2]=iz;

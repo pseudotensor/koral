@@ -549,7 +549,7 @@
 #ifndef MPI4CORNERS //required by MAGNFIELD and VETCLOSURE
 #ifdef RADIATION //required by MAGNFIELD and VETCLOSURE
 #if (RADCLOSURE==VETCLOSURE)
-//#define MPI4CORNERS
+#define MPI4CORNERS
 #endif
 #endif
 #endif
