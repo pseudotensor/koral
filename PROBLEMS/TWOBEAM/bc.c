@@ -31,15 +31,15 @@ if(ix>=NX) //outflow
  
 if(ix<0) //bulk inflow
   {
-    ldouble EE,Fx;
+    ldouble E,Fx;
     if ((geom.yy < 0.25) || (geom.yy > 0.35))
       {
-	EE=1.e-5;
+	E=1.e-5;
 	Fx=0.;
       }
     else
       {
-	EE=1000.;
+	E=1000.;
 	Fx=5.;
       }
 
@@ -48,7 +48,7 @@ if(ix<0) //bulk inflow
       {
 	pp[iv]=get_u(p,iv,0,iy,iz);
       }
-    pp[EE0]=EE;
+    pp[EE0]=E;
     pp[FX0]=Fx;
     pp[FY0]=pp[FZ0]=0.;
     //stress energy tensor
@@ -109,15 +109,15 @@ if(ix<0) //bulk inflow
  
 if(iy<0) //beam
   {
-    ldouble EE,Fy;
+    ldouble E,Fy;
     if ((geom.xx < 0.25) || (geom.xx > 0.35))
       {
-	EE=1.e-5;
+	E=1.e-5;
 	Fy=0.;
       }
     else
       {
-	EE=1000.;
+	E=1000.;
 	Fy=5.;
       }
 
@@ -126,7 +126,7 @@ if(iy<0) //beam
       {
 	pp[iv]=get_u(p,iv,ix,0,iz);
       }
-    pp[EE0]=EE;
+    pp[EE0]=E;
     pp[FY0]=Fy;
     pp[FX0]=pp[FZ0]=0.;
 	

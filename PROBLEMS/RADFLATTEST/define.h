@@ -64,7 +64,7 @@
 #define MAXZ 1.
 
 #define TNX 128
-#define TNY 8
+#define TNY 1
 #define TNZ 1
 #define NTX 4 //for MPI and OMP
 #define NTY 1
