@@ -14,7 +14,6 @@
 //#define TWOBEAMS
 
 #define myVET
-//#define MPI4CORNERS
 
 #ifdef myVET
 

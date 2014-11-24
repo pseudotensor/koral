@@ -388,15 +388,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 
       tstepden/=TSTEPLIM;
 
-      //test 124
-      #ifdef SKIP_TEST124
-      struct geometry geom;
-      fill_geometry_arb(ix,iy,iz,&geom,BLCOORDS);
-      ldouble fac=100./sqrt(geom.xx);
-      if(fac>1.) fac=1.;
-      tstepden/=fac;
-      #endif
-
       set_u_scalar(cell_tstepstemp,ix,iy,iz,tstepden);
 
       ////#pragma omp critical
@@ -428,8 +419,6 @@ calc_u2p()
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
-
-      //printf("%d %d %d\n",ix,iy,iz);
 
 #if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
       if(TJ==0 && iy<NCCORRECTPOLAR-1) continue;
@@ -1210,9 +1199,6 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
     if(NX>1 && ix>=0 && ix<=NX && iy>=0 && iy<NY && iz>=0 && iz<NZ)
 #endif
       {
-      
-	printf("x %d %d\n",ix,iy);
-
 #ifdef MSTEP
 	if(mstep_is_face_active(ix,iy,iz,0))
 #endif
@@ -1325,8 +1311,6 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
     if(NY>1 && iy>=0 && iy<=NY  && ix>=0 && ix<NX && iz>=0 && iz<NZ)
 #endif
     {
-      printf("y %d %d\n",ix,iy);
-
 #ifdef MSTEP
       if(mstep_is_face_active(ix,iy,iz,1))
 #endif
@@ -3021,9 +3005,9 @@ int set_bc(ldouble t,int ifinit)
 		set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+i,iz));
 	      }
               #ifdef EVOLVEINTENSITIES
-	      for(i=0;i<NUMANGLES;i++) {
-		Ibeam[-NG+i+NGCX][-1+NGCY][iz+NGCZ][i]=Ibeam[-NG+i+NGCX][0+NGCY][iz+NGCZ][i];
-		Ibeam[-1+NGCX][-NG+i+NGCY][iz+NGCZ][i]=Ibeam[0+NGCX][-NG+i+NGCY][iz+NGCZ][i]; }
+	      for(j=0;j<NUMANGLES;j++) {
+		Ibeam[-NG+i+NGCX][-1+NGCY][iz+NGCZ][i]=Ibeam[-NG+i+NGCX][0+NGCY][iz+NGCZ][j];
+		Ibeam[-1+NGCX][-NG+i+NGCY][iz+NGCZ][i]=Ibeam[0+NGCX][-NG+i+NGCY][iz+NGCZ][j]; }
 	      #endif
 	      fill_geometry(-NG+i,-1,iz,&geom);
 	      p2u(&get_u(p,0,-NG+i,-1,iz),&get_u(u,0,-NG+i,-1,iz),&geom);
@@ -3084,9 +3068,9 @@ int set_bc(ldouble t,int ifinit)
 		set_u(p,iv,-1,NY+i+1,iz,get_u(p,iv,0,NY+i+1,iz));
 	      }
 	      #ifdef EVOLVEINTENSITIES
-	      for(i=0;i<NUMANGLES;i++) {
-		Ibeam[-NG+i+NGCX][NY+NGCY][iz+NGCZ][i]=Ibeam[-NG+i+NGCX][NY-1+NGCY][iz+NGCZ][i];
-		Ibeam[-1+NGCX][NY+i+NGCY][iz+NGCZ][i]=Ibeam[0+NGCX][NY+i+1+NGCY][iz+NGCZ][i]; }
+	      for(j=0;j<NUMANGLES;j++) {
+		Ibeam[-NG+i+NGCX][NY+NGCY][iz+NGCZ][i]=Ibeam[-NG+i+NGCX][NY-1+NGCY][iz+NGCZ][j];
+		Ibeam[-1+NGCX][NY+i+NGCY][iz+NGCZ][i]=Ibeam[0+NGCX][NY+i+1+NGCY][iz+NGCZ][j]; }
 	      #endif
 	      fill_geometry(-NG+i,NY,iz,&geom);
 	      p2u(&get_u(p,0,-NG+i,NY,iz),&get_u(u,0,-NG+i,NY,iz),&geom);
@@ -3145,9 +3129,9 @@ int set_bc(ldouble t,int ifinit)
 		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+i,iz));
 	      }
 	      #ifdef EVOLVEINTENSITIES
-	      for(i=0;i<NUMANGLES;i++) {
-		Ibeam[NX+i+1+NGCX][-1+NGCY][iz+NGCZ][i]=Ibeam[NX+i+1+NGCX][0+NGCY][iz+NGCZ][i];
-		Ibeam[NX+NGCX][-NG+i+NGCY][iz+NGCZ][i]=Ibeam[NX-1+NGCX][-NG+i+NGCY][iz+NGCZ][i]; }
+	      for(j=0;j<NUMANGLES;j++) {
+		Ibeam[NX+i+1+NGCX][-1+NGCY][iz+NGCZ][i]=Ibeam[NX+i+1+NGCX][0+NGCY][iz+NGCZ][j];
+		Ibeam[NX+NGCX][-NG+i+NGCY][iz+NGCZ][i]=Ibeam[NX-1+NGCX][-NG+i+NGCY][iz+NGCZ][j]; }
 	      #endif
 	      fill_geometry(NX+i+1,-1,iz,&geom);
 	      p2u(&get_u(p,0,NX+i+1,-1,iz),&get_u(u,0,NX+i+1,-1,iz),&geom);
@@ -3205,9 +3189,10 @@ int set_bc(ldouble t,int ifinit)
 		set_u(p,iv,NX,NY+i+1,iz,get_u(p,iv,NX-1,NY+i+1,iz));
 	      }
 	      #ifdef EVOLVEINTENSITIES
-	      for(i=0;i<NUMANGLES;i++) {
-		Ibeam[NX+i+1+NGCX][NY+NGCY][iz+NGCZ][i]=Ibeam[NX+i+1+NGCX][NY-1+NGCY][iz+NGCZ][i];
-		Ibeam[NX+NGCX][NY+i+1+NGCY][iz+NGCZ][i]=Ibeam[NX-1+NGCX][NY+i+1+NGCY][iz+NGCZ][i]; }
+	      for(j=0;j<NUMANGLES;j++) {
+		Ibeam[NX+i+1+NGCX][NY+NGCY][iz+NGCZ][i]=Ibeam[NX+i+1+NGCX][NY-1+NGCY][iz+NGCZ][j];
+		Ibeam[NX+NGCX][NY+i+1+NGCY][iz+NGCZ][i]=Ibeam[NX-1+NGCX][NY+i+1+NGCY][iz+NGCZ][j]; 
+	      }
 	      #endif
 	      fill_geometry(NX+i+1,NY,iz,&geom);
 	      p2u(&get_u(p,0,NX+i+1,NY,iz),&get_u(u,0,NX+i+1,NY,iz),&geom);
@@ -4490,11 +4475,7 @@ cell_fixup_hd()
 
 	      if(verbose>1) 
 		{
-		  //for(iii=0;iii<in;iii++)
-		  //print_primitives(ppn[iii]);
-		  //print_primitives(pp);
 		  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
-		  //getch();
 		}
 	      
 	      //save to updated arrays memory
