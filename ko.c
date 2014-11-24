@@ -610,7 +610,7 @@ solve_the_problem(ldouble tstart, char* folder)
  
 #ifdef EVOLVEINTENSITIES
       #pragma omp parallel
-      //update_intensities();
+      update_intensities();
 #endif
 
 
@@ -756,9 +756,11 @@ solve_the_problem(ldouble tstart, char* folder)
 #endif
 
 #ifdef RADIATION
+#ifndef SKIPRADSOURCE
 	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f ",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],
 		 avimpit[0],avimpit[1],avimpit[2],avimpit[3],avimpit[4]);
+#endif
 #endif
 
 #ifdef MSTEP

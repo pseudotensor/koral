@@ -1777,8 +1777,7 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 
 #elif (RADCLOSURE==VETCLOSURE) //Yucong's ZERO solver
 
-   calc_Rij_M1(pp,ggg,Rij);
-   //radclosure_VET(pp,geom,Rij);
+  radclosure_VET(pp,geom,Rij);
 
 #endif
 
@@ -4393,7 +4392,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
     fzero=0.;
 
   //test
-  fzero=0.;
+  fzero=1.;
 
   //fzero=step_function(.925-ff,.015);
   
