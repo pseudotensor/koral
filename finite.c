@@ -1897,10 +1897,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 		//within domain:
 		if(if_indomain(ix,iy,iz)==1) continue;
 
-		//at the corners
-		//I commented it out to precalculate metric in the corners but may affect something, who knows? :)
-		//It makes it calculate boundary conditions at the corners
-		//if(if_outsidegc(ix,iy,iz)==1) continue;
+		//but not at the corners
+		if(if_outsidegc(ix,iy,iz)==1) continue;
 
 		loop_2[Nloop_2][0]=ix;
 		loop_2[Nloop_2][1]=iy;
