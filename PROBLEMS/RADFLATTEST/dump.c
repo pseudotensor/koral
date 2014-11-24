@@ -11,8 +11,8 @@ ldouble cs  = sqrt(GAMMA*pp[UU]*GAMMAM1/pp[RHO]);
 
 v5 = cs;
 ldouble radlum,totlum;
-calc_lum(xxvecout[1],3,&radlum,&totlum);
-v6 = 1.e-40+radlum/calc_lumEdd()*(rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*velGU2CGS(1.)*velGU2CGS(1.));
+//calc_lum(xxvecout[1],3,&radlum,&totlum);
+//v6 = 1.e-40+radlum/calc_lumEdd()*(rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*velGU2CGS(1.)*velGU2CGS(1.));
 
 //ldouble Rij[4][4];
 //calc_Rij(pp,&geom,Rij);   
@@ -36,6 +36,8 @@ v3=tau[0];
 calc_tauabs(pp,&geomout,dxx,tau);
 v4=tau[0];
 
-
-
 v9=calc_ncompt_nphlab(pp,&geomout);
+
+#ifdef EVOLVEINTENSITIES
+v8=Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][40];
+#endif

@@ -1116,13 +1116,20 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 
  
   //search for appropriate radial index
-  for(ix=0;ix<NX;ix++)
+  for(ix=0;ix<NX-1;ix++)
     {
       get_xx(ix,0,0,xx);
       coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
       if(xxBL[1]>radius) break;
     }
-  if(ix==NX) ix=NX-1;
+  if(ix==NX) 
+    {
+      ix=NX-2;
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+    }
+      
+  
 
   ldouble lum=0.,jet=0.;
 

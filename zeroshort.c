@@ -3476,14 +3476,31 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
   double I_ray[NUMANGLES];  //intensity field evaluated at the center, for time independent problem
   double I_time[NUMANGLES];  //"" "", for time-dependent problem
 
+  int jlo,jhi;
+  int klo,khi;
+  if(TNZ==1 && TNY==1) //1d
+    {
+      jlo=jhi=1;
+      klo=khi=1;
+    }
+  else if(TNZ==1) //2d
+    {
+      klo=khi=1;
+      jlo=0;jhi=3;
+    }
+  else //3d
+    {
+      jlo=0;jhi=3;
+      klo=0;khi=3;
+    }
 
   //Fill out source function for cube
   int i,j,k;
   for (i=0; i<3; i++)
     {
-      for (j=0; j<3; j++)
+      for (j=jlo; j<jhi; j++)
 	{
-	  for (k=0; k<3; k++)
+	  for (k=klo; k<khi; k++)
 	    {
 	      double alpha=source_Data[i][j][k][2], sigma=source_Data[i][j][k][3];
 	      double eps;
@@ -4355,7 +4372,7 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-  //return;
+  return;
   transformI_stretch(ix,iy,iz,I0,M1_input);
   return;
 

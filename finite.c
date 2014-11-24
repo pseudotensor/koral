@@ -429,6 +429,8 @@ calc_u2p()
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
+      //printf("%d %d %d\n",ix,iy,iz);
+
 #if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
       if(TJ==0 && iy<NCCORRECTPOLAR-1) continue;
 #ifndef HALFTHETA
@@ -443,7 +445,7 @@ calc_u2p()
 
       calc_primitives(ix,iy,iz,0,1);
     }  
-
+  
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -496,6 +498,8 @@ calc_wavespeeds()
 
       save_wavespeeds(ix,iy,iz,aaa,max_lws);
     }
+
+  //  getch();
   return 0;
 }
 
@@ -925,33 +929,13 @@ op_explicit(ldouble t, ldouble dtin)
       iy=loop_1[ii][1];
       iz=loop_1[ii][2]; ldouble aaa[12];
 
+      if(ix<0 || ix>NX || iy<0 || iy>NY || iz<0 || iz>NZ)
+	continue;
+      
       //combines right - left fluxes
       f_calc_fluxes_at_faces(ix,iy,iz);
     }
 
-  //test 889
-  /*
-  if(PROCID==3) printf("%d > %d %d %d\n",PROCID,TOI,TOJ,TOK);
-  if(PROCID==4) printf("%d > %d %d %d\n",PROCID,TOI,TOJ,TOK);
-
-  if(PROCID==4)
-    {
-      printf("%d 1> %e %e %e\n",PROCID,get_u(p,B1,-1,0,0),get_u(p,B1,0,0,0),get_u(p,B1,1,0,0));
-      printf("%d 3> %e %e %e\n",PROCID,get_u(u,B1,-1,0,0),get_u(u,B1,0,0,0),get_u(u,B1,1,0,0));
-      printf("%d 2> %e %e %e\n",PROCID,get_ub(flbx,B1,-1,0,0,0),get_ub(flbx,B1,0,0,0,0),get_ub(flbx,B1,1,0,0,0));
-    }
-
-  if(PROCID==3)
-    {
-      printf("%d 1> %e %e %e\n",PROCID,get_u(p,B1,NX-1,0,0),get_u(p,B1,NX,0,0),get_u(p,B1,NX+1,0,0));
-      printf("%d 3> %e %e %e\n",PROCID,get_u(u,B1,NX-1,0,0),get_u(u,B1,NX,0,0),get_u(u,B1,NX+1,0,0));
-      printf("%d 2> %e %e %e\n",PROCID,get_ub(flbx,B1,NX-1,0,0,0),get_ub(flbx,B1,NX,0,0,0),get_ub(flbx,B1,NX+1,0,0,0));
-    }
-
-
-
-  if(PROCID==0) getch();
-  */
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -1305,29 +1289,9 @@ ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz)
 		ag=max_ws[0];
 #endif
 
-		
-		//test 124
-		#ifdef TEST124
-		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-		ldouble fac=0.01*sqrt(geomBL.xx);
-		if(fac<1.) fac=1.;
-		if(i<NVMHD) ag*=fac;
-		//if(ix>125) printf("%d %e %e\n",ix,geomBL.xx,ag);
-		#endif
-
 		if (FLUXMETHOD==LAXF_FLUX) //Lax-Fr
 		  {
 		    fd_fstarl[i] = .5*(get_ub(flRx,i,ix,iy,iz,0) + get_ub(flLx,i,ix,iy,iz,0) - ag * (fd_uRl[i] - fd_uLl[i]));
-
-		    //test 889
-		    /*
-		    if(PROCID==3 && ix==NX && iy==0 && i==B1)
-		      printf("%d >>> %e %e %e %e %e\n",PROCID,get_ub(flRx,i,ix,iy,iz,0) ,get_ub(flLx,i,ix,iy,iz,0), ag , fd_uRl[i] , fd_uLl[i]);
-		    //test
-		    if(PROCID==4 && ix==0 && iy==0 && i==B1)
-		      printf("%d >>> %e %e %e %e %e\n",PROCID,get_ub(flRx,i,ix,iy,iz,0) ,get_ub(flLx,i,ix,iy,iz,0), ag , fd_uRl[i] , fd_uLl[i]);
-		    */
 		  }
 		if (FLUXMETHOD==HLL_FLUX) //HLL
 		  {
@@ -1749,43 +1713,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	    }
 	}
       
-
-      
-      //restore ghost cells from u_bak_subzone
-
-      /*
-	for(ii=0;ii<Nloop_2;ii++) //gc only
-	{
-	ix=loop_2[ii][0];
-	iy=loop_2[ii][1];
-	iz=loop_2[ii][2]; 
-
-	//but skip restoring global ghost cells
-	if(ix<0 || ix>=NX)
-	continue;
-
-	PLOOP(jj)
-	{
-	set_u(u,jj,ix,iy,iz,get_u(u_bak_subzone,jj,ix,iy,iz));
-	set_u(p,jj,ix,iy,iz,get_u(p_bak_subzone,jj,ix,iy,iz));
-	}
-	 
-	}
-      */
-      
-
-      //todo: restore ghostcells from ubak
-
-      /*
-      for(i=0;i<Nloop_0;i++) free(loop_0[i]); free(loop_0);
-      for(i=0;i<Nloop_02;i++) free(loop_02[i]); free(loop_02);
-      for(i=0;i<Nloop_1;i++) free(loop_1[i]); free(loop_1);
-      for(i=0;i<Nloop_2;i++) free(loop_2[i]); free(loop_2);
-      //for(i=0;i<Nloop_3;i++) free(loop_3[i]); free(loop_3);
-      for(i=0;i<Nloop_4;i++) free(loop_4[i]); free(loop_4);
-      for(i=0;i<Nloop_5;i++) free(loop_5[i]); free(loop_5);
-      for(i=0;i<Nloop_6;i++) free(loop_6[i]); free(loop_6);
-      */
 #endif
     }
 
@@ -1917,7 +1844,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 	  {
 	    for(iz=-zlim1+iz1;iz<iz2+zlim2;iz++)
 	      {	
-		//if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
+		if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
 
 		loop_1[Nloop_1][0]=ix;
 		loop_1[Nloop_1][1]=iy;
@@ -3068,12 +2995,16 @@ int set_bc(ldouble t,int ifinit)
   
   int xlim,ylim,zlim;
   int lim,i,j,k;
+  int ix1,iy1,iz1;
+  int ix2,iy2,iz2;
 
   if(TNZ==1 && TNY>1) //2d
     {
       iz=0;
 
       //total corners, filling one cell deep surfaces
+
+      //bottom-left corner
       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
 	{
 
@@ -3084,6 +3015,11 @@ int set_bc(ldouble t,int ifinit)
 		set_u(p,iv,-NG+i,-1,iz,get_u(p,iv,-NG+i,0,iz));
 		set_u(p,iv,-1,-NG+i,iz,get_u(p,iv,0,-NG+i,iz));
 	      }
+              #ifdef EVOLVEINTENSITIES
+	      for(i=0;i<NUMANGLES;i++) {
+		Ibeam[-NG+i+NGCX][-1+NGCY][iz+NGCZ][i]=Ibeam[-NG+i+NGCX][0+NGCY][iz+NGCZ][i];
+		Ibeam[-1+NGCX][-NG+i+NGCY][iz+NGCZ][i]=Ibeam[0+NGCX][-NG+i+NGCY][iz+NGCZ][i]; }
+	      #endif
 	      fill_geometry(-NG+i,-1,iz,&geom);
 	      p2u(&get_u(p,0,-NG+i,-1,iz),&get_u(u,0,-NG+i,-1,iz),&geom);
 	      fill_geometry(-1,-NG+i,iz,&geom);
@@ -3091,33 +3027,47 @@ int set_bc(ldouble t,int ifinit)
 	    }
       
 	  //averaging <(-1,0),(0,-1)> -> (-1,-1)
-	  PLOOP(iv)
-	    set_u(p,iv,-1,-1,iz,.5*(get_u(p,iv,-1,0,iz)+get_u(p,iv,0,-1,iz)));
-
-	  //TODO!!! - only handles two left corners! and no intensities copied!!!
-	  #ifdef PERIODIC_YBC
-	  PLOOP(iv)
-	    set_u(p,iv,-1,-1,iz,get_u(p,iv,-1,NY-1,iz));
+	  ix1=-1;iy1=0;ix2=0;iy2=-1;
+          #if defined(PERIODIC_YBC) && !defined(MPI) //periodic boundary conditions more tricky in MPI, in this case use simpler total corners
+	  ix1=ix2=-1;iy1=iy2=NY-1;
           #endif
-	  #ifdef PERIODIC_XBC
-	  PLOOP(iv)
-	    set_u(p,iv,-1,-1,iz,get_u(p,iv,NX-1,-1,iz)));
+	  #if defined(PERIODIC_XBC) && !defined(MPI)
+	  ix1=ix2=NX-1;iy1=iy2=-1;
           #endif
 
-	  
+	  PLOOP(iv)
+	    set_u(p,iv,-1,-1,iz,.5*(get_u(p,iv,ix1,iy1,iz)+get_u(p,iv,ix2,iy2,iz)));
+	  #ifdef EVOLVEINTENSITIES
+	  for(i=0;i<NUMANGLES;i++)
+	    Ibeam[-1+NGCX][-1+NGCY][iz+NGCZ][i]=0.5*(Ibeam[ix1+NGCX][iy1+NGCY][iz+NGCZ][i]+Ibeam[ix2+NGCX][iy2+NGCY][iz+NGCZ][i]);
+	  #endif
+
 	  fill_geometry(-1,-1,iz,&geom);
 	  p2u(&get_u(p,0,-1,-1,iz),&get_u(u,0,-1,-1,iz),&geom);
 
 	  //averaging <(-2,-1),(-1,-2)> -> (-2,-2)
+	  ix1=-2;iy1=-1;ix2=-1;iy2=-2;
+          #if defined(PERIODIC_YBC) && !defined(MPI)
+	  ix1=ix2=-2;iy1=iy2=NY-2;
+          #endif
+	  #if defined(PERIODIC_XBC) && !defined(MPI)
+	  ix1=ix2=NX-2;iy1=iy2=-2;
+          #endif
+
 	  PLOOP(iv)
-	    set_u(p,iv,-2,-2,iz,.5*(get_u(p,iv,-2,-1,iz)+get_u(p,iv,-1,-2,iz)));
+	    set_u(p,iv,-2,-2,iz,.5*(get_u(p,iv,ix1,iy1,iz)+get_u(p,iv,ix2,iy2,iz)));
+	  #ifdef EVOLVEINTENSITIES
+	  for(i=0;i<NUMANGLES;i++)
+	    Ibeam[-2+NGCX][-2+NGCY][iz+NGCZ][i]=0.5*(Ibeam[ix1+NGCX][iy1+NGCY][iz+NGCZ][i]+Ibeam[ix2+NGCX][iy2+NGCY][iz+NGCZ][i]);
+	  #endif
+
 	  fill_geometry(-2,-2,iz,&geom);
 	  p2u(&get_u(p,0,-2,-2,iz),&get_u(u,0,-2,-2,iz),&geom);
       
 
 	}
   
-
+      //top-left corner
       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCHI)==1)
 	{
  
@@ -3128,34 +3078,58 @@ int set_bc(ldouble t,int ifinit)
 		set_u(p,iv,-NG+i,NY,iz,get_u(p,iv,-NG+i,NY-1,iz));
 		set_u(p,iv,-1,NY+i+1,iz,get_u(p,iv,0,NY+i+1,iz));
 	      }
+	      #ifdef EVOLVEINTENSITIES
+	      for(i=0;i<NUMANGLES;i++) {
+		Ibeam[-NG+i+NGCX][NY+NGCY][iz+NGCZ][i]=Ibeam[-NG+i+NGCX][NY-1+NGCY][iz+NGCZ][i];
+		Ibeam[-1+NGCX][NY+i+NGCY][iz+NGCZ][i]=Ibeam[0+NGCX][NY+i+1+NGCY][iz+NGCZ][i]; }
+	      #endif
 	      fill_geometry(-NG+i,NY,iz,&geom);
 	      p2u(&get_u(p,0,-NG+i,NY,iz),&get_u(u,0,-NG+i,NY,iz),&geom);
 	      fill_geometry(-1,NY+i+1,iz,&geom);
 	      p2u(&get_u(p,0,-1,NY+i+1,iz),&get_u(u,0,-1,NY+i+1,iz),&geom);
 	    }
 
-	  PLOOP(iv)
-	    set_u(p,iv,-1,NY,iz,.5*(get_u(p,iv,-1,NY-1,iz)+get_u(p,iv,0,NY,iz)));
+	  //averaging <(-1,NY-1),(0,NY)> -> (-1,NY)
+	  ix1=-1;iy1=NY-1;iy1=0;iy2=NY;
+	  #if defined(PERIODIC_YBC) && !defined(MPI)
+	  ix1=ix2=-1;iy1=iy2=0;
+          #endif
+	  #if defined(PERIODIC_XBC) && !defined(MPI)
+	  ix1=ix2=NX-1;iy1=iy2=NY;
+          #endif
 
-          #ifdef PERIODIC_YBC
 	  PLOOP(iv)
-	    set_u(p,iv,-1,NY,iz,get_u(p,iv,-1,0,iz));
-          #endif
-	  #ifdef PERIODIC_XBC
-	  PLOOP(iv)
-	    set_u(p,iv,-1,NY,iz,get_u(p,iv,NX-1,NY,iz)));
-          #endif
+	    set_u(p,iv,-1,NY,iz,.5*(get_u(p,iv,ix1,iy1,iz)+get_u(p,iv,ix2,iy2,iz)));
+	  #ifdef EVOLVEINTENSITIES
+	  for(i=0;i<NUMANGLES;i++)
+	    Ibeam[-1+NGCX][NY+NGCY][iz+NGCZ][i]=0.5*(Ibeam[ix1+NGCX][iy1+NGCY][iz+NGCZ][i]+Ibeam[ix2+NGCX][iy2+NGCY][iz+NGCZ][i]);
+	  #endif
+
 
 	  fill_geometry(-1,NY,iz,&geom);
 	  p2u(&get_u(p,0,-1,NY,iz),&get_u(u,0,-1,NY,iz),&geom);
 
+	  //averaging <(-2,NY),(-1,NY+1)> -> (-2,NY+1)
+	  ix1=-2;iy1=NY;ix2=-1;iy2=NY+1;
+          #if defined(PERIODIC_YBC) && !defined(MPI)
+	  ix1=ix2=-2;iy1=iy2=1;
+          #endif
+	  #if defined(PERIODIC_XBC) && !defined(MPI)
+	  ix1=ix2=NX-2;iy1=iy2=NY+1;
+          #endif
+
 	  PLOOP(iv)
-	    set_u(p,iv,-2,NY+1,iz,.5*(get_u(p,iv,-2,NY,iz)+get_u(p,iv,-1,NY+1,iz)));
+	    set_u(p,iv,-2,NY+1,iz,.5*(get_u(p,iv,ix1,iy1,iz)+get_u(p,iv,ix2,iy2,iz)));
+	  #ifdef EVOLVEINTENSITIES
+	  for(i=0;i<NUMANGLES;i++)
+	    Ibeam[-2+NGCX][NY+1+NGCY][iz+NGCZ][i]=0.5*(Ibeam[ix1+NGCX][iy1+NGCY][iz+NGCZ][i]+Ibeam[ix2+NGCX][iy2+NGCY][iz+NGCZ][i]);
+	  #endif
+
 	  fill_geometry(-2,NY+1,iz,&geom);
 	  p2u(&get_u(p,0,-2,NY+1,iz),&get_u(u,0,-2,NY+1,iz),&geom);
-      
 	}
 
+  //bottom-right corner
       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCLO)==1)
 	{
 	  for(i=0;i<NG-1;i++)
@@ -3165,25 +3139,57 @@ int set_bc(ldouble t,int ifinit)
 		set_u(p,iv,NX+i+1,-1,iz,get_u(p,iv,NX+i+1,0,iz));
 		set_u(p,iv,NX,-NG+i,iz,get_u(p,iv,NX-1,-NG+i,iz));
 	      }
+	      #ifdef EVOLVEINTENSITIES
+	      for(i=0;i<NUMANGLES;i++) {
+		Ibeam[NX+i+1+NGCX][-1+NGCY][iz+NGCZ][i]=Ibeam[NX+i+1+NGCX][0+NGCY][iz+NGCZ][i];
+		Ibeam[NX+NGCX][-NG+i+NGCY][iz+NGCZ][i]=Ibeam[NX-1+NGCX][-NG+i+NGCY][iz+NGCZ][i]; }
+	      #endif
 	      fill_geometry(NX+i+1,-1,iz,&geom);
 	      p2u(&get_u(p,0,NX+i+1,-1,iz),&get_u(u,0,NX+i+1,-1,iz),&geom);
 	      fill_geometry(NX,-NG+i,iz,&geom);
 	      p2u(&get_u(p,0,NX,-NG+i,iz),&get_u(u,0,NX,-NG+i,iz),&geom);
 	    }
 
+	  //averaging <(NX-1,-1),(NX,0)> -> (NX,-1)
+	  ix1=NX-1;iy1=-1;ix2=NX;iy2=0;
+          #if defined(PERIODIC_YBC) && !defined(MPI)
+	  ix1=ix2=NX;iy1=iy2=NY-1;
+          #endif
+	  #if defined(PERIODIC_XBC) && !defined(MPI)
+	  ix1=ix2=0;iy1=iy2=-1;
+          #endif
+
 	  PLOOP(iv)
-	    set_u(p,iv,NX,-1,iz,.5*(get_u(p,iv,NX-1,-1,iz)+get_u(p,iv,NX,0,iz)));
+	    set_u(p,iv,NX,-1,iz,.5*(get_u(p,iv,ix1,iy1,iz)+get_u(p,iv,ix2,iy2,iz)));
+	  #ifdef EVOLVEINTENSITIES
+	  for(i=0;i<NUMANGLES;i++)
+	    Ibeam[NX+NGCX][-1+NGCY][iz+NGCZ][i]=0.5*(Ibeam[ix1+NGCX][iy1+NGCY][iz+NGCZ][i]+Ibeam[ix2+NGCX][iy2+NGCY][iz+NGCZ][i]);
+	  #endif
+	 
 	  fill_geometry(NX,-1,iz,&geom);
 	  p2u(&get_u(p,0,NX,-1,iz),&get_u(u,0,NX,-1,iz),&geom);
 
-	  PLOOP(iv)
-	    set_u(p,iv,NX+1,-2,iz,.5*(get_u(p,iv,NX,-2,iz)+get_u(p,iv,NX+1,-1,iz)));
+	  //averaging <(NX,-2),(NX+1,-1)> -> (NX+1,-2)
+	  ix1=NX;iy1=-2;ix2=NX+1;iy2=-1;
+	  #if defined(PERIODIC_YBC) && !defined(MPI)
+	  ix1=ix2=NX+1;iy1=iy2=NY-2;
+          #endif
+	  #if defined(PERIODIC_XBC) && !defined(MPI)
+	  ix1=ix2=1;iy1=iy2=-2;
+          #endif
+
+	   PLOOP(iv)
+	    set_u(p,iv,NX+1,-2,iz,.5*(get_u(p,iv,ix1,iy1,iz)+get_u(p,iv,ix2,iy2,iz)));
+	  #ifdef EVOLVEINTENSITIES
+	  for(i=0;i<NUMANGLES;i++)
+	    Ibeam[NX+1+NGCX][-2+NGCY][iz+NGCZ][i]=0.5*(Ibeam[ix1+NGCX][iy1+NGCY][iz+NGCZ][i]+Ibeam[ix2+NGCX][iy2+NGCY][iz+NGCZ][i]);
+	  #endif
+
 	  fill_geometry(NX+1,-2,iz,&geom);
 	  p2u(&get_u(p,0,NX+1,-2,iz),&get_u(u,0,NX+1,-2,iz),&geom);
-      
-
 	}
 
+      //top-right corner
       if(mpi_isitBC(XBCHI)==1 && mpi_isitBC(YBCHI)==1)
 	{
 	  for(i=0;i<NG-1;i++)
@@ -3193,28 +3199,64 @@ int set_bc(ldouble t,int ifinit)
 		set_u(p,iv,NX+i+1,NY,iz,get_u(p,iv,NX+i+1,NY-1,iz));
 		set_u(p,iv,NX,NY+i+1,iz,get_u(p,iv,NX-1,NY+i+1,iz));
 	      }
+	      #ifdef EVOLVEINTENSITIES
+	      for(i=0;i<NUMANGLES;i++) {
+		Ibeam[NX+i+1+NGCX][NY+NGCY][iz+NGCZ][i]=Ibeam[NX+i+1+NGCX][NY-1+NGCY][iz+NGCZ][i];
+		Ibeam[NX+NGCX][NY+i+1+NGCY][iz+NGCZ][i]=Ibeam[NX-1+NGCX][NY+i+1+NGCY][iz+NGCZ][i]; }
+	      #endif
 	      fill_geometry(NX+i+1,NY,iz,&geom);
 	      p2u(&get_u(p,0,NX+i+1,NY,iz),&get_u(u,0,NX+i+1,NY,iz),&geom);
 	      fill_geometry(NX,NY+i+1,iz,&geom);
 	      p2u(&get_u(p,0,NX,NY+i+1,iz),&get_u(u,0,NX,NY+i+1,iz),&geom);
 	    }
 
+	  //averaging <(NX-1,NY),(NX,NY-1)> -> (NX,NY)
+	  ix1=NX-1;iy1=NY;ix2=NX;iy2=NY-1;
+          #if defined(PERIODIC_YBC) && !defined(MPI)
+	  ix1=ix2=NX;iy1=iy2=0;
+          #endif
+	  #if defined(PERIODIC_XBC) && !defined(MPI)
+	  ix1=ix2=0;iy1=iy2=NY;
+          #endif
+	  
 	  PLOOP(iv)
-	    set_u(p,iv,NX,NY,iz,.5*(get_u(p,iv,NX-1,NY,iz)+get_u(p,iv,NX,NY-1,iz)));
+	    set_u(p,iv,NX,NY,iz,.5*(get_u(p,iv,ix1,iy1,iz)+get_u(p,iv,ix2,iy2,iz)));
+	  #ifdef EVOLVEINTENSITIES
+	  for(i=0;i<NUMANGLES;i++)
+	    Ibeam[NX+NGCX][NY+NGCY][iz+NGCZ][i]=0.5*(Ibeam[ix1+NGCX][iy1+NGCY][iz+NGCZ][i]+Ibeam[ix2+NGCX][iy2+NGCY][iz+NGCZ][i]);
+	  #endif
+
 	  fill_geometry(NX,NY,iz,&geom);
 	  p2u(&get_u(p,0,NX,NY,iz),&get_u(u,0,NX,NY,iz),&geom);
+	  
+	  //averaging <(NX,NY+1),(NX+1,NY)> -> (NX+1,NY+1)
+	  ix1=NX;iy1=NY+1;ix2=NX+1;iy2=NY;
+          #if defined(PERIODIC_YBC) && !defined(MPI)
+	  ix1=ix2=NX+1;iy1=iy2=1;
+          #endif
+	  #if defined(PERIODIC_XBC) && !defined(MPI)
+	  ix1=ix2=1;iy1=iy2=NY+1;
+          #endif
 
 	  PLOOP(iv)
-	    set_u(p,iv,NX+1,NY+1,iz,.5*(get_u(p,iv,NX,NY+1,iz)+get_u(p,iv,NX+1,NY,iz)));
+	    set_u(p,iv,NX+1,NY+1,iz,.5*(get_u(p,iv,ix1,iy1,iz)+get_u(p,iv,ix2,iy2,iz)));
+	  #ifdef EVOLVEINTENSITIES
+	  for(i=0;i<NUMANGLES;i++)
+	    Ibeam[NX+1+NGCX][NY+1+NGCY][iz+NGCZ][i]=0.5*(Ibeam[ix1+NGCX][iy1+NGCY][iz+NGCZ][i]+Ibeam[ix2+NGCX][iy2+NGCY][iz+NGCZ][i]);
+	  #endif
+
 	  fill_geometry(NX+1,NY+1,iz,&geom);
 	  p2u(&get_u(p,0,NX+1,NY+1,iz),&get_u(u,0,NX+1,NY+1,iz),&geom);
-      
 	}
     }
 
   /**************************************/
   if(TNZ>1 && TNY>1) //full 3d
     {
+      #ifdef EVOLVEINTENSITIES
+      my_warning("corners are not filled properly with intensities in 3d yet!\n");
+      #endif
+
       //elongated corners along z, filling one cell deep surfaces, and averaging diagonally
       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
 	{

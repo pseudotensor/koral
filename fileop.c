@@ -310,7 +310,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
   gclx=gcly=gclz=0;
   gcrx=gcry=gcrz=0;
 #ifdef PRINTGC_LEFT
-  gclx=1;//gcly=1;
+  gclx=1;
 #endif
 #ifdef PRINTGC_RIGHT
   gcrx=1;
@@ -392,7 +392,7 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 
 
 									  //within domain:
-									  if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
+									  //if(if_indomain(ix,iy,iz)==0 && if_outsidegc(ix,iy,iz)==1) continue;
 						  
 
 									  

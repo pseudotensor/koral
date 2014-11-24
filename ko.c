@@ -118,6 +118,7 @@ main(int argc, char **argv)
   calc_M1intensities();
 #endif
 #endif
+
   if(!ifinit)
     {
       //exchange initial state
@@ -153,11 +154,11 @@ main(int argc, char **argv)
 #pragma omp parallel
       calc_BfromA(p,1);
       //exchange magn. field calculated in domain
-#pragma omp parallel  
-      set_bc(tstart,1);
       mpi_exchangedata();
       calc_avgs_throughout();
-      #ifdef MPI
+#pragma omp parallel  
+      set_bc(tstart,1);
+       #ifdef MPI
       MPI_Barrier(MPI_COMM_WORLD);
       #endif
       if(PROCID==0) {printf("done!\n");fflush(stdout);}
@@ -166,6 +167,10 @@ main(int argc, char **argv)
 #ifdef RADSTARTWITHM1INTENSITIES
 #pragma omp parallel  
       calc_M1intensities();
+      mpi_exchangedata();
+      calc_avgs_throughout();
+#pragma omp parallel  
+      set_bc(tstart,1);
 #endif
 
       
@@ -605,7 +610,7 @@ solve_the_problem(ldouble tstart, char* folder)
  
 #ifdef EVOLVEINTENSITIES
       #pragma omp parallel
-      update_intensities();
+      //update_intensities();
 #endif
 
 

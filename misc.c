@@ -139,13 +139,15 @@ initialize_arrays()
       pvecpot=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
       //primitives at cell centers in previous time steps
-      ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      ptm2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+      //ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+      //ptm2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
       //buffer for sending/receiving messages
+#ifdef MPI
       msgbufs=(ldouble**)malloc(MPIMSGBUFSIZE*sizeof(ldouble*));
       for(i=0;i<MPIMSGBUFSIZE;i++)
 	msgbufs[i]=(ldouble*)malloc(my_max3(NX*NY*NV*NG,NY*NZ*NV*NG,NZ*NX*NV*NG)*sizeof(ldouble));
+#endif
 
 #ifdef MAGNFIELD
       //electromotive force at corners
@@ -165,6 +167,7 @@ initialize_arrays()
       //metric at cell z-faces
       Gbz=(ldouble*)malloc((SX)*(SY)*(SZMET+1)*gSIZE*sizeof(ldouble));
 
+      
       //LNRF basis one-forms
       emuup=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
       //LNRF basis vectors
@@ -693,6 +696,22 @@ my_err(char *message)
       sprintf(bufor,"|err| : %s\n",message);
       printf("%s",bufor);
       getchar();
+    }
+  return 0;  
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//prints warning message and returns
+int
+my_warning(char *message)
+{
+  if(PROCID==0)
+    {
+      char bufor[200];
+      sprintf(bufor,"|warning| : %s\n",message);
+      printf("%s",bufor);
     }
   return 0;  
 }

@@ -303,6 +303,7 @@ int find_eigenvalues(ldouble*,int);
 ldouble find_max_eigenvalue(ldouble *data,int N);
 int find_max_eigenvalue_lr(ldouble *data,int N,ldouble*,ldouble*);
 int my_err(char *);
+int my_warning(char *);
 int inverse_44matrix(ldouble a[][4], ldouble ia[][4]);
 ldouble determinant_44matrix(ldouble a[][4]);
 int inverse_matrix(ldouble *a, ldouble *ia, int N);

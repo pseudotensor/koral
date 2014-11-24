@@ -1777,7 +1777,8 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 
 #elif (RADCLOSURE==VETCLOSURE) //Yucong's ZERO solver
 
-  radclosure_VET(pp,geom,Rij);
+   calc_Rij_M1(pp,ggg,Rij);
+   //radclosure_VET(pp,geom,Rij);
 
 #endif
 
@@ -4392,7 +4393,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
     fzero=0.;
 
   //test
-  fzero=1.;
+  fzero=0.;
 
   //fzero=step_function(.925-ff,.015);
   
@@ -4476,15 +4477,15 @@ int
 calc_M1intensities()
 {
   int ix,iy,iz,ii;
-  //#pragma omp parallel for private(ix,iy,iz,ii) schedule (static)
-  for(ii=0;ii<Nloop_5;ii++) //domain plus layer of one
+  double rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
+  struct geometry geom,geom2;
+  ldouble ucon[4], M1[5];
+
+  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells 
     {
-      ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
-      struct geometry geom,geom2;
-      ldouble ucon[4], M1[5];
-      ix=loop_5[ii][0];
-      iy=loop_5[ii][1];
-      iz=loop_5[ii][2]; 
+      ix=loop_02[ii][0];
+      iy=loop_02[ii][1];
+      iz=loop_02[ii][2]; 
 
       fill_geometry(ix,iy,iz,&geom); 
       fill_geometry_arb(ix,iy,iz,&geom2,RADCLOSURECOORDS);
@@ -4519,6 +4520,7 @@ int
 update_intensities()
 {
   int ii;
+  //return 0;
 
   //making backup acting as the previous time step
   for(ii=0;ii<Nloop_5;ii++) //everything

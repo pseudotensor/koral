@@ -11,9 +11,10 @@
 /************************************/
 #define RADIATION
 #define SKIPRADSOURCE
-#define TWOBEAMS
+//#define TWOBEAMS
 
 #define myVET
+//#define MPI4CORNERS
 
 #ifdef myVET
 
@@ -53,6 +54,8 @@
 
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
+#define PRINTYGC_LEFT
+#define PRINTYGC_RIGHT
 #define MINX 0.
 #define MAXX 1.
 #define MINY 0.
@@ -60,8 +63,8 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define TNX 128
-#define TNY 1
+#define TNX 64
+#define TNY 8
 #define TNZ 1
 #define NTX 4 //for MPI and OMP
 #define NTY 1
@@ -98,7 +101,7 @@
 #define RADOUTPUT 0
 #define SCAOUTPUT 0
 #define ALLSTEPSOUTPUT 0 //whether to output every step
-//#define NSTEPSTOP 5e4 //stop after this number of steps
+//#define NSTEPSTOP 5 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #define DTOUT1 .1 //res
 #define DTOUT2 1.e40 //avg

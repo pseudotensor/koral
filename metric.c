@@ -3740,11 +3740,11 @@ calc_metric()
   
   #pragma omp parallel private(ix,iy,iz,ii) 
   {
-    for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
+    for(ii=0;ii<Nloop_5;ii++) //domain and ghost cells
       {
-	ix=loop_02[ii][0];
-	iy=loop_02[ii][1];
-	iz=loop_02[ii][2]; 
+	ix=loop_5[ii][0];
+	iy=loop_5[ii][1];
+	iz=loop_5[ii][2]; 
 
 
 #ifdef METRICAXISYMMETRIC

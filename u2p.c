@@ -15,12 +15,10 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   int verbose=0;
   int iv,u2pret,u2pretav;
   ldouble uu[NV],uuav[NV],pp[NV],ppav[NV];
-  ldouble tlo[4][4],tup[4][4];
   ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
 
   struct geometry geom;
   fill_geometry(ix,iy,iz,&geom);
-
   
   //temporary using local arrays
   gg=geom.gg;
@@ -44,14 +42,7 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
       set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
       set_cflag(ENTROPYFLAG2,ix,iy,iz,0); 
     }
-  //test
-  /*
-  if(ix==16 && iy==16 && iz==16)
-    {
-      print_conserved(uu);
-      print_primitives(pp);
-    }
-  */
+ 
   //converting to primitives
   u2p(uu,pp,&geom,corrected,fixups,type);
   
@@ -1236,6 +1227,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
       FTYPE Wsq,Xsq,X; 
       X = Bsq + W;
+      Xsq = X*X;
       Wsq = W*W;
 
       ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
@@ -1243,7 +1235,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       ldouble gamma = sqrt(gamma2);
       ldouble rho0 = D/gamma;
       ldouble wmrho0 = Wp/gamma2 - D*v2/(1.+gamma);
-      
+
+
       //if(Etype!=U2P_HOT) 
       (*f_u2p)(Wp,cons,&f0,&dfdW,&err);
       
@@ -1304,6 +1297,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 	  FTYPE Wsq,Xsq,X; 
 	  X = Bsq + Wnew;
+	  Xsq = X*X;
 	  Wsq = Wnew*Wnew;
 
 	  ldouble v2=( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*Wnew)) / (Wsq*Xsq);

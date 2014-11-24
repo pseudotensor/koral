@@ -364,11 +364,11 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
   if(ifoverwrite)
     {
       //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-      for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
+      for(ii=0;ii<Nloop_5;ii++) //domain and ghost cells
 	{
-	  ix=loop_02[ii][0];
-	  iy=loop_02[ii][1];
-	  iz=loop_02[ii][2]; 
+	  ix=loop_5[ii][0];
+	  iy=loop_5[ii][1];
+	  iz=loop_5[ii][2]; 
 
 	  struct geometry geom;
 	  fill_geometry(ix,iy,iz,&geom);

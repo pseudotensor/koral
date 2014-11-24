@@ -97,6 +97,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
  
   pre=(GAMMA-1.)*uu;
   cs2=GAMMA*pre/(rho+uu+pre);
+  if(cs2<0.) cs2=0.;
 
   //**********************************************************************
   //***** magn: alvenic speed ****** *************************************
@@ -111,8 +112,7 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   EF = rho + GAMMA*uu;
   EEloc = bsq + EF ;
   va2 = bsq/EEloc ;
-
-  if(cs2<0.) cs2=0.;
+  if(va2<0.) va2=0.;
 #endif
 
   //**********************************************************************
@@ -121,11 +121,6 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
 
   ldouble vtot2; //total characteristic velocity
   vtot2=cs2 + va2 - cs2*va2;
-
-  /*
-  if(vtot2<0.) vtot2=0.;
-  if(vtot2>1.) vtot2=1.;
-  */
 
   //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
