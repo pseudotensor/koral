@@ -11,7 +11,7 @@
 /************************************/
 #define RADIATION
 #define SKIPRADSOURCE
-//#define TWOBEAMS
+#define TWOBEAMS
 
 #define myVET
 
@@ -41,6 +41,7 @@
 #define BASICRADIMPLICIT
 //#define NCOMPTONIZATION 
 #define RADOUTPUTVELS
+//#define RADOUTPUTINFF
 
 //#define RADIMPLICITFIXVEL
 
@@ -53,8 +54,8 @@
 
 #define PRINTXGC_LEFT
 #define PRINTXGC_RIGHT
-#define PRINTYGC_LEFT
-#define PRINTYGC_RIGHT
+//#define PRINTYGC_LEFT
+//#define PRINTYGC_RIGHT
 #define MINX 0.
 #define MAXX 1.
 #define MINY 0.
@@ -62,7 +63,7 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 128
 #define TNY 8
 #define TNZ 1
 #define NTX 4 //for MPI and OMP
@@ -81,7 +82,7 @@
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .3
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
 
 #define DOFIXUPS 0

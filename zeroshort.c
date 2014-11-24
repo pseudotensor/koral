@@ -3731,12 +3731,12 @@ int zero_init()
   //making backup acting as the previous time step
   int ii;
 #pragma omp parallel for private(ii) schedule (static)
-  for(ii=0;ii<Nloop_6;ii++) //domain + 1 layer 
+  for(ii=0;ii<Nloop_5;ii++) //everywhere
     {
       int ix,iy,iz;
-      ix=loop_6[ii][0];
-      iy=loop_6[ii][1];
-      iz=loop_6[ii][2];
+      ix=loop_5[ii][0];
+      iy=loop_5[ii][1];
+      iz=loop_5[ii][2];
 
       //tetrad
       if(RADCLOSURECOORDS==MINKCOORDS)
@@ -3773,6 +3773,15 @@ int zero_init()
 	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1]=cos(ph);
 	  carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2]=0.;
 	}
+    }
+
+#pragma omp parallel for private(ii) schedule (static)
+  for(ii=0;ii<Nloop_6;ii++) //domain + 1 layer 
+    {
+      int ix,iy,iz;
+      ix=loop_6[ii][0];
+      iy=loop_6[ii][1];
+      iz=loop_6[ii][2];
 
       //interpolation weights
       if(RADCLOSURECOORDS==MINKCOORDS)
@@ -4372,7 +4381,7 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-  return;
+  //  return;
   transformI_stretch(ix,iy,iz,I0,M1_input);
   return;
 
