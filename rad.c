@@ -1643,7 +1643,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   #ifdef DAMPCOMPTONIZATIONATBH
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
-  fac=step_function(xxBL[1]-1.2*rhorizonBL,0.1*rhorizonBL);
+  fac=step_function(xxBL[1]-1.2*rhorizonBL,.1*rhorizonBL);
   if(xxBL[1]<rhorizonBL) fac=0.;
   #endif
 
@@ -4308,7 +4308,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   iy=geom->iy;
   iz=geom->iz;
   
-  if(geom->par==0) //left biased interpolation on face, lets use intensities on the left
+  if(geom->par==0) //interpolation on face, lets use intensities on the left
     {
       if(geom->ifacedim==0) ix--;
       if(geom->ifacedim==1) iy--;

@@ -3110,18 +3110,18 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
   Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
   Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
 
-  //if isotropic, dont use transformI
+  //if perfectly isotropic, dont use transformI
   if (Fmag_final/Efinal < 1.0e-10)
     {
       for (p=0; p<NUMANGLES; p++)
 	{
 	  I_return[p] = Efinal/NUMANGLES;
 	}
-      //	    printf("%e %e\n",I_start[0],I_return[0]);
       return;
     }
+    
 
-  //if start FE == final FE, don't use transformI
+    //if start FE == final FE, don't use transformI
   //double FE_Ratio = (Fmag_start/Estart)/(Fmag_final/Efinal); 
   double gamma_start = FE_to_Gamma(Fmag_start/Estart);
   double gamma_final = FE_to_Gamma(Fmag_final/Efinal);
@@ -3135,6 +3135,7 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
  
   if (( gamma_ratio > (1.-VETFEACCEPT)) && (gamma_ratio < (1.+VETFEACCEPT)) && (F_dotprod/Fmag_final/Fmag_start > VETFLUXCOSACCEPT))
     {
+      my_warning("VET accepted\n");
       return;
     } 
 
@@ -3247,6 +3248,7 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
 
   if(!isfinite(stretchFactor) || stretchFactor<1.e-15) 
     {	   	
+      my_warning("problems with strechFactor\n");
       return;
 	   
     }
@@ -3277,6 +3279,352 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
 	      transformAng[probeAng][i] += rotM[i][j]*angGridCoords[probeAng][j];
 	    }
 	}
+
+
+
+
+      //		printf("%e %e %e\n", angGridCoords[probeAng][0], angGridCoords[probeAng][1], angGridCoords[probeAng][2]);
+      //		printf("%e %e %e\n", transformAng[probeAng][0], transformAng[probeAng][1], transformAng[probeAng][2]);
+
+
+      //Keep track of component of E^2 that remains unchanged
+
+
+      //Stretch initial intensity distrubution parallel to Ffinal
+
+      //First, calculate parallel component of I
+      double n_parallel[3], n_perp[3], n_final[3];
+      double dotprod = 0., n_norm = 0.;
+
+
+      for (l=0; l < 3; l++)
+	{
+	  dotprod += transformAng[probeAng][l]*F_final_norm[l];
+	}
+
+
+      for (l=0; l < 3; l++)
+	{
+	  n_parallel[l] = dotprod*F_final_norm[l];
+	  n_perp[l] = transformAng[probeAng][l] - n_parallel[l];
+
+	  if (dotprod > 0)
+	    {
+	      n_parallel[l] = n_parallel[l]*stretchFactor;
+	    }
+	  else
+	    {
+	      n_parallel[l] = n_parallel[l]/stretchFactor;
+	    }
+	  n_final[l] = n_perp[l] + n_parallel[l];
+
+	}
+
+
+
+      n_norm = sqrt(n_final[0]*n_final[0] + n_final[1]*n_final[1] + n_final[2]*n_final[2]);
+
+
+      //		printf("%e\n", n_norm);
+
+      for (l=0; l < 3; l++)
+	{
+	  n_final[l] = n_final[l]/n_norm;
+	}
+
+
+      //		printf("%e %e %e\n", n_final[0], n_final[1], n_final[2]);
+
+
+      //		printf("n final = %e %e %e | %e\n", n_final[0], n_final[1], n_final[2], sqrt(n_final[0]*n_final[0] + n_final[1]*n_final[1] + n_final[2]*n_final[2]));
+
+
+
+
+
+      //		struct bsptree *bspCurrentLoc = angDualGridRoot;
+      double bestDistance = 1.0e10;
+      int bestIndex = 0;
+
+
+ 
+      int angNeighborIndex[3];
+      double interpCoeffs[3];
+
+
+      #ifdef USEDUALNEIGHBOR
+     bspGetNearestDualNeighbor(n_final, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
+      //bestIndex = get_angDualIndex(n_final, angDualGridCoords);
+
+      for (l=0; l < 3; l++)
+	{
+	  angNeighborIndex[l] = dualAdjacency[bestIndex][l];
+	}
+      #else
+      getNearest3Ang(n_final, angNeighborIndex);
+      #endif
+
+
+      //		printf("Best Angle: %d, %e %e %e\n", bestIndex, angDualGridCoords[bestIndex][0], angDualGridCoords[bestIndex][1], angDualGridCoords[bestIndex][2]);
+
+
+      linComb(n_final, angGridCoords, angNeighborIndex, interpCoeffs);
+
+      
+
+
+      for (p=0; p < 3; p++)
+	{
+	  //			printf("%d %d | %e %e %e \n", bestIndex, angNeighborIndex[p], n_norm, I_start[probeAng], interpCoeffs[p]);
+
+	  I_return[angNeighborIndex[p]] += n_norm*I_start[probeAng]*interpCoeffs[p];
+	}
+
+      //		printf("\n");
+
+    }
+
+
+
+  double rescaleFactor = Fmag_final/F_stretch;
+  //Renormalize to get correct fluxes
+  for (p=0; p < NUMANGLES; p++)
+    {
+      I_return[p] = I_return[p]*rescaleFactor;
+    }
+}
+
+
+void transformI_stretch1d(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
+{
+  double F_final[3],Efinal,Efinalrad;
+
+  F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
+
+  F_final[1]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1];
+
+  F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+
+  Efinal=M1_input[0];
+  Efinalrad=M1_input[4];
+
+  int i,j,p,l;
+  double I_start[NUMANGLES];
+  double res[3];
+
+  double F_start[3], F_start_norm[3], F_final_norm[3], Fmag_start, Fmag_final, F_stretch;
+  double fStart, F_Start_forward, F_Start_backward, fFinal, Estart;
+  double stretchFactor;
+
+  double rotM[3][3];
+  double transformAng[NUMANGLES][3];
+
+
+  for (i=0; i < NUMANGLES; i++)
+    {
+      I_start[i] = I_return[i];
+      //printf("%e\n", I_start[i]);
+    }
+
+  //printf("%e %e %e\n", F_final[0], F_final[1], F_final[2]);
+
+  Estart=0.;
+  //Calculate net flux direction
+  for (l=0; l < 3; l++)
+    {
+      F_start[l] = 0.;
+    }
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+      //if(p<10) printf("%e\n", I_start[p]);
+      for (l=0; l < 3; l++)
+	{
+	  F_start[l] += I_start[p]*angGridCoords[p][l];
+	}
+      Estart += I_start[p];
+    }
+
+  //	printf("start: %e %e %e || %e\n", F_start[0], F_start[1], F_start[2], Estat);
+  //	printf("F start: %e %e %e || %e\n", F_start[0], F_start[1], F_start[2], sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]));
+
+
+
+
+  Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
+  Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
+
+  //if perfectly isotropic, dont use transformI
+  if (Fmag_final/Efinal < 1.0e-10)
+    {
+      for (p=0; p<NUMANGLES; p++)
+	{
+	  I_return[p] = Efinal/NUMANGLES;
+	}
+      return;
+    }
+    
+
+    //if start FE == final FE, don't use transformI
+  //double FE_Ratio = (Fmag_start/Estart)/(Fmag_final/Efinal); 
+  double gamma_start = FE_to_Gamma(Fmag_start/Estart);
+  double gamma_final = FE_to_Gamma(Fmag_final/Efinal);
+  double gamma_ratio = gamma_start/gamma_final;
+
+
+
+  //if start direction and final direction within 10deg, don't use tranformI 
+  double F_dotprod = F_start[0]*F_final[0] + F_start[1]*F_final[1] + F_start[2]*F_final[2];
+
+ 
+  if (( gamma_ratio > (1.-VETFEACCEPT)) && (gamma_ratio < (1.+VETFEACCEPT)) && (F_dotprod/Fmag_final/Fmag_start > VETFLUXCOSACCEPT))
+    {
+      my_warning("VET accepted\n");
+      return;
+    } 
+
+
+
+  for (l=0; l < 3; l++)
+    {
+      F_start_norm[l] = F_start[l]/Fmag_start;
+      F_final_norm[l] = F_final[l]/Fmag_final;
+    }
+
+  /*
+  if (Fmag_start/Estart < 1.0e-2)
+    {
+      Fmag_start = 1.0;   //Careful about renormalizing data when Fmag_start = 0
+
+      F_start_norm[0]=1.0;
+      F_start_norm[1]=0.0;
+      F_start_norm[2]=0.0;
+    }
+  */
+
+  if (Fmag_start/Estart < 1.0e-2)
+    {
+      //Calculate starting flux after reflecting half the rays about origin
+
+      F_start_norm[0]=0.0;
+      F_start_norm[1]=0.0;
+      F_start_norm[2]=0.0;
+
+      for (l=0; l < NUMANGLES; l++)
+	{
+	  if (angGridCoords[l][0] < 0) //reflect half the rays about origin
+	    {
+	      for (p=0; p < 3; p++)
+		{
+		  F_start_norm[p] += I_start[l]*(-angGridCoords[l][p]);
+		}
+	    }
+	  else
+	    {
+	      for (p=0; p < 3; p++)
+		{
+		  F_start_norm[p] += I_start[l]*angGridCoords[l][p];
+		}
+	    }
+	}
+
+      double tempMag = sqrt(F_start_norm[0]*F_start_norm[0] +
+			    F_start_norm[1]*F_start_norm[1] + F_start_norm[2]*F_start_norm[2]);
+
+      for (p=0; p < 3; p++)
+	{
+	  F_start_norm[p] = F_start_norm[p]/tempMag;
+
+	}
+
+    }
+
+  
+  F_Start_forward = 0.;
+  F_Start_backward = 0.;
+  double cosang[NUMANGLES];
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+
+
+      cosang[p] = angGridCoords[p][0]*F_start_norm[0] + angGridCoords[p][1]*F_start_norm[1] + angGridCoords[p][2]*F_start_norm[2];
+
+      if (cosang[p] > 0.)
+	{
+	  F_Start_forward += I_start[p]*cosang[p]; //positive fluxes in direction of net flux
+	}
+      else
+	{
+	 
+	  F_Start_backward += I_start[p]*cosang[p]; //negative fluxes "" ""
+	}
+    }
+
+
+
+  fStart = Fmag_start/Estart;
+  fFinal = Fmag_final/Efinal;
+
+  struct solverarg args;
+
+  args.F_Start_forward=F_Start_forward;
+  args.F_Start_backward=F_Start_backward;
+  args.Intensities = &I_start[0];
+  args.F_final_norm = &F_final_norm[0];
+  args.fFinal = fFinal;
+  args.cosang = &cosang[0];
+  
+  stretchFactor = calc_stretchFactor(&args);
+  //exit(1);
+
+  F_stretch = fabs(stretchFactor*F_Start_forward + F_Start_backward/stretchFactor);
+
+  //printf("%e %e %e\n", stretchFactor, F_Start_forward, F_Start_backward);
+
+
+  //stretchFactor = sqrt(fabs((fFinal*fFinal - fFinal*fFinal*fStart*fStart)/(fStart*fStart - fFinal*fFinal*fStart*fStart)));
+
+
+  //printf("Fstart = %e %e %e\n", F_start[0], F_start[1], F_start[2]);
+
+  //printf("SF = %e | Estart = %e, Fstart = %e, Ffinal = %e | F/E = %e\n", stretchFactor,Estart,  Fmag_start, Fmag_final, Fmag_start/Estart);
+
+  if(!isfinite(stretchFactor) || stretchFactor<1.e-15) 
+    {	   	
+      my_warning("problems with strechFactor\n");
+      return;
+	   
+    }
+
+  //Calculate rotation matrix
+  calc_rot_M(F_start_norm, F_final_norm, rotM);
+
+  //	printf("start: %e %e %e\nfinish: %e %e %e\n", F_norm[0], F_norm[1], F_norm[2], F_final[0], F_final[1], F_final[2]);
+
+  int probeAng;
+  for (probeAng=0; probeAng<NUMANGLES; probeAng++)
+    {
+      I_return[i] = 0.;
+    }
+
+
+
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+
+     
+	  for (j=0; j < 3; j++)
+	    {
+	      transformAng[probeAng][j] = angGridCoords[probeAng][j];
+	    }
+	
 
 
 
@@ -4381,8 +4729,12 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-  //  return;
-  transformI_stretch(ix,iy,iz,I0,M1_input);
+  //return;
+
+  if(TNY==1 && TNZ==1)
+    transformI_stretch1d(ix,iy,iz,I0,M1_input);
+  else
+    transformI_stretch(ix,iy,iz,I0,M1_input);
   return;
 
   /*  

@@ -21,7 +21,7 @@
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
 #define RADCLOSURECOORDS MINKCOORDS
-#define SOCCERBALL 0
+#define SOCCERBALL 1
 #if (SOCCERBALL==0) 
 #define USEDUALNEIGHBOR
 #define NUMANGLES 80
@@ -40,8 +40,8 @@
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 //#define NCOMPTONIZATION 
-#define RADOUTPUTVELS
-//#define RADOUTPUTINFF
+//#define RADOUTPUTVELS
+#define RADOUTPUTINFF
 
 //#define RADIMPLICITFIXVEL
 
@@ -73,6 +73,7 @@
 #define SPECIFIC_BC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC
+#define VELRAD 2.
 
 
 /************************************/
@@ -90,7 +91,7 @@
 #define RADIMPCONV 1.e-10
 #define RADIMPEPS 1.e-8
 #define RADIMPMAXITER 15
-#define GAMMAMAXRAD 50.
+#define GAMMAMAXRAD 5.
 
 /************************************/
 //output

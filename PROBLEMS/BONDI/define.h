@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 5
+#define RESTARTNUM 21
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -32,12 +32,13 @@
 
 #define RADIMPLICITTHRESHOLD 1.e-2
 #define RADIMPCONV 1.e-12
-#define RADIMPEPS 1.e-6
+#define RADIMPEPS 1.e-8
 #define U2PCONV 1.e-12
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 #ifdef RADIATION
 #define NCOMPTONIZATION
+//#define DAMPCOMPTONIZATIONATBH
 #endif
 
 #define SKIPFANCYOPACITIES
@@ -58,7 +59,7 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 1.5
+#define RMIN 1.75
 #define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
@@ -95,10 +96,10 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 512
 #define TNY 1
 #define TNZ 1
-#define NTX 32//for MPI and OMP
+#define NTX 4//for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -129,12 +130,12 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .001
+#define TSTEPLIM .01
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
 
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 
 
 #define RADIMPMAXITER 15
@@ -153,7 +154,7 @@
 #ifdef SELFTIMESTEP
 #define DTOUT1 (RMAX*10.*TSTEPLIM) //res
 #else
-#define DTOUT1 (RMAX*1000.*TSTEPLIM)//(RMAX*100.) //res
+#define DTOUT1 (RMAX*1.*TSTEPLIM)//(RMAX*100.) //res
 #endif
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop

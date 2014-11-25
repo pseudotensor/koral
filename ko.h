@@ -817,6 +817,7 @@ ZERO_calcVET(int,int,int,double I_time[NUMANGLES], double eddingtonFactor[3][3],
 
 void transformI(int,int,int,double I_return[NUMANGLES], double*);
 void transformI_stretch(int,int,int,double I_return[NUMANGLES], double*);
+void transformI_stretch1d(int,int,int,double I_return[NUMANGLES], double*);
 void transformI_quad(int,int,int,double I_return[NUMANGLES], double*);
 int transformI_Lagrange(int,int,int,double I_return[NUMANGLES], double*);
 void ZERO_decomposeM1(int,int,int,double M1_Data[5], double I_return[NUMANGLES]);

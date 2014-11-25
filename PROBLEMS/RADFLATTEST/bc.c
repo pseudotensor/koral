@@ -53,7 +53,7 @@ if(ix>=NX) //outflow or 2nd beam
 
 #ifdef RADIATION
      pp[6]=.1;
-     pp[7]=-1.;
+     pp[7]=-VELRAD;
      pp[8]=0.;
      pp[9]=0.;
 
@@ -97,8 +97,8 @@ if(ix>=NX) //outflow or 2nd beam
      pp[5]=calc_Sfromu(pp[0],pp[1]);
 
 #ifdef RADIATION
-     pp[6]=.05;
-     pp[7]=1.;
+     pp[6]=.1;
+     pp[7]=VELRAD;
      pp[8]=0.;
      pp[9]=0.;
 
