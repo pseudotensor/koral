@@ -3,13 +3,12 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 21
+#define RESTARTNUM 10
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
 //#define GDETIN 1
 //#define WAVESPEEDSATFACES
-//#define VXFLOOR 1.e-6
 
 
 /************************************/
@@ -59,7 +58,7 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 1.75
+#define RMIN 1.5
 #define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
@@ -96,7 +95,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 512
+#define TNX 256
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -130,9 +129,9 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .01
+#define TSTEPLIM .05
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0      
 
 #define DOFIXUPS 1
@@ -154,7 +153,7 @@
 #ifdef SELFTIMESTEP
 #define DTOUT1 (RMAX*10.*TSTEPLIM) //res
 #else
-#define DTOUT1 (RMAX*1.*TSTEPLIM)//(RMAX*100.) //res
+#define DTOUT1 (100.)//(RMAX*100.) //res
 #endif
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
