@@ -246,7 +246,33 @@ else if(ix<0) //outflow near BH
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        }
 
-     //no outflow
+     //logarithmic extrapololation
+     /*
+     struct geometry geomBL0,geomBL1;
+     fill_geometry_arb(0,iy,iz,&geomBL0,KERRCOORDS);
+     fill_geometry_arb(1,iy,iz,&geomBL1,KERRCOORDS);
+     ldouble r0=geomBL0.xx;
+     ldouble r1=geomBL1.xx;
+     ldouble r=geomBL.xx;
+
+     PLOOP(iv)
+     {
+       ldouble v0=(get_u(p,iv,0,iiy,iiz));
+       ldouble v1=(get_u(p,iv,1,iiy,iiz));
+
+       if((iv==RHO || iv==UU || iv==EE || iv==NF) && (v0>0. && v1>0.))
+	 {
+	   v0=log10(v0);
+	   v1=log10(v1);
+	   pp[iv]=pow(10.,v0 + ((r-r0)/(r1-r0)*(v1-v0)));
+
+	 }
+       else //linear
+	 pp[iv]=v0 + ((r-r0)/(r1-r0)*(v1-v0));
+     }
+     */
+
+     //no outflow if inner boundary outside BH
      if(RMIN>2.)
        {
 	 ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};

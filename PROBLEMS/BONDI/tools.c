@@ -1,3 +1,5 @@
+
+
 /*
 //precalculates hydro Bondi solution, saves it to 
 int ix,iy,iz;

@@ -763,7 +763,7 @@ void calc_bcon_prim(double *pp, double *bcon, void* ggg);
 void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg);
 int flux_ct();
 ldouble calc_Qtheta(int ix, int iy, int iz);
-
+ldouble get_tsteplimiter();
 
 //silo.c
 int fprint_silofile(ldouble time, int num, char* folder, char* prefix);

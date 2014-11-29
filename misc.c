@@ -1159,9 +1159,13 @@ opacity_BellLin(ldouble rhoc, ldouble Tc)
   //ice grains
   ldouble opacice=2.e-4*Tc*Tc;
 
+  #ifdef SIMPLEBELLLIN
+  ldouble opacity=1.e0/((1.e0/(opacHm+opacmol))+(1.e0/(opaces+opacKr)));    
+  #else
   ldouble opacity=1.e0/((1.e0/(opacHm+opacmol))+(1.e0/(opaces+opacKr)))
     +1.e0/(1.e0/opacice+1.e0/opaciceevap)
     +1.e0/(1.e0/opacmet+1.e0/opacmetevap);
+  #endif
   
   return opacity;
 }
@@ -1195,4 +1199,18 @@ decompose_vels(ldouble *pp,int velidx, ldouble v[4],void *ggg,  void *gggBL)
   v[2] = sin(th)*sin(ph)*ucon[1] + cos(th)*sin(ph)*ucon[2] + cos(ph)*ucon[3];
   v[3] = cos(th)*ucon[1] - sin(th)*ucon[2];
   return 0;
+}
+
+//returns problem specific time limiter
+ldouble
+get_tsteplimiter()
+{
+  if(PROBLEM==7) //BONDI
+    {
+      if(global_time<1.e8)  return 0.001;
+      else if(global_time<1.e9)  return 0.01;
+      else return 0.05;
+    }
+
+    return 0.5;
 }

@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 10
+#define RESTARTNUM -1
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -31,7 +31,7 @@
 
 #define RADIMPLICITTHRESHOLD 1.e-2
 #define RADIMPCONV 1.e-12
-#define RADIMPEPS 1.e-8
+#define RADIMPEPS 1.e-7
 #define U2PCONV 1.e-12
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
@@ -41,7 +41,7 @@
 #endif
 
 #define SKIPFANCYOPACITIES
-//#define OPACBELLLIN
+#define OPACBELLLIN
 #define RADOUTPUTVELS
 
 /************************************/
@@ -58,7 +58,7 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 1.5
+#define RMIN 1.75
 #define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
@@ -98,7 +98,7 @@
 #define TNX 256
 #define TNY 1
 #define TNZ 1
-#define NTX 4//for MPI and OMP
+#define NTX 32//for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -128,8 +128,8 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .05
+#define TIMESTEPPING RK2
+#define TSTEPLIM (get_tsteplimiter())
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0      
@@ -151,7 +151,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*10.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*100.*TSTEPLIM) //res
 #else
 #define DTOUT1 (100.)//(RMAX*100.) //res
 #endif
@@ -168,7 +168,7 @@
 #ifndef FULLBONDI
 #define TAMB (3.267e12/RBONDI)
 #else
-#define TAMB 1.e6
+#define TAMB (3.267e12/RBONDI)
 #endif
 
 
