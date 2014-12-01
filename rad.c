@@ -4516,12 +4516,12 @@ calc_M1intensities()
 
 //evolves intensities using ZERO and makes them consistent with M1 fluxes
 int
-update_intensities()
+update_intensities(ldouble t,ldouble dt)
 {
   int ii;
   //return 0;
 
-  //making backup acting as the previous time step
+  //making backup
   for(ii=0;ii<Nloop_5;ii++) //everything
     {
       int i,j,ix,iy,iz;
@@ -4529,7 +4529,7 @@ update_intensities()
       iy=loop_5[ii][1];
       iz=loop_5[ii][2];
       for(i=0;i<NUMANGLES;i++)
-	Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][i]=Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][i];
+	Ibeambak[ix+NGCX][iy+NGCY][iz+NGCZ][i]=Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][i];
     }
      
   //updating using ZERO
@@ -4601,7 +4601,7 @@ update_intensities()
 	      //intensities	      
 	      for(l=0;l<NUMANGLES;l++)
 		{
-		  intensities[i+1][j+1][k+1][l]=Ibeam2[ix+NGCX][iy+NGCY][iz+NGCZ][l];
+		  intensities[i+1][j+1][k+1][l]=Ibeambak[ix+NGCX][iy+NGCY][iz+NGCZ][l];
 		}
 
 	      /*

@@ -182,8 +182,6 @@ main(int argc, char **argv)
 
     }
 
-  
-
   //prepares files  
   fprint_openfiles(folder);
   
@@ -419,7 +417,7 @@ solve_the_problem(ldouble tstart, char* folder)
       max_ws_ph=-1.;
       tstepdenmax=-1.;
       tstepdenmin=BIG;
-   
+
       //**********************************************************************
       //**********************************************************************
       //**********************************************************************
@@ -432,6 +430,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
 #pragma omp parallel private(ii,iv,ix,iy,iz,dtcell)
 	  {
+	    
 	    copyi_u(1.,u,ut0);
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  
@@ -445,6 +444,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    copyi_u(1.,u,ut1);	    
 	    calc_u2p();
+
 #pragma omp barrier
 	    count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	    op_explicit (t,dt); //U(1) in *ut1; 
@@ -513,9 +513,14 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //addi_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
 	    calc_u2p();
 	
-	  //printf("nstep: %d\n",nstep);
+
+	    
+#ifdef EVOLVEINTENSITIES //only 1st order!
+	  update_intensities(t, dt);
+#endif
 	  }
-	  t+=dt;	 
+
+
 	}
       else if(TIMESTEPPING==RK2)
 	{ 
@@ -537,6 +542,12 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    copyi_u(1.,u,ut1);
 
+#ifdef EVOLVEINTENSITIES
+	    copyi_intensities(1.,Ibeam,Ibeam0);
+	    update_intensities(t, 0.5*dt);
+	    copyi_intensities(1.,Ibeam,Ibeam1);
+#endif
+
 	    //2nd
 	    //calc_u2p();
             #pragma omp barrier
@@ -551,6 +562,12 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //together
 	    addi_u(1.,u,-1.,ut1,ut2); //k2 in ut2
 	    addi_u(1.,ut0,1.,ut2,u);
+
+	    #ifdef EVOLVEINTENSITIES
+	    update_intensities(t, dt);
+	    addi_intensities(1.,Ibeam,-1.,Ibeam1,Ibeambak);
+	    addi_intensities(1.,Ibeam0,1.,Ibeambak,Ibeam);
+            #endif
 	  }
 	  t+=dt;
 	  
@@ -589,11 +606,9 @@ solve_the_problem(ldouble tstart, char* folder)
       //************************* updating intensities *************************
       //**********************************************************************
  
-#ifdef EVOLVEINTENSITIES
-      #pragma omp parallel
-      update_intensities();
+      #ifdef EVOLVEINTENSITIES1STORDER
+      update_intensities(t, dt);
 #endif
-
 
       //**********************************************************************
       //************************* finger  ************************************

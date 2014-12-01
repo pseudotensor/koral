@@ -343,6 +343,9 @@ int addi_u(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble *u3);
 int add_u_3(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble f3, ldouble *u3, ldouble *u4);
 int add_u_core_3(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble f3, ldouble *uu3, ldouble *uu4,int);
 int addi_u_3(ldouble f1, ldouble* u1, ldouble f2, ldouble *u2, ldouble f3, ldouble *u3, ldouble *u4);
+int addi_intensities(ldouble f1, ldouble uu1[SXVET][SYVET][SZVET][NUMANGLES], ldouble f2, ldouble uu2[SXVET][SYVET][SZVET][NUMANGLES], ldouble uu3[SXVET][SYVET][SZVET][NUMANGLES]);
+int copyi_intensities(ldouble factor,ldouble uu1[SXVET][SYVET][SZVET][NUMANGLES], ldouble uu2[SXVET][SYVET][SZVET][NUMANGLES]);
+
 ldouble f_timeder_source_term(ldouble t, const ldouble y[], ldouble f[],  void *params);
 
 int set_bc(ldouble,int);
@@ -686,7 +689,7 @@ ldouble Rijviscprev[SX][SY][SZ][4][4],radvisclasttime[SX][SY][SZ];
 
 int test_opacities();
 void reset_radviscaccel();
-int update_intensities();
+int update_intensities(ldouble,ldouble);
 int calc_M1intensities(void);
 ldouble calc_ncompt_nphlab(ldouble *pp, void* ggg);
 ldouble calc_ncompt_Thatrad(ldouble *pp, void* ggg,ldouble);
@@ -829,8 +832,10 @@ void linComb(double targetAng[3], double angGridCoords[NUMANGLES][3], int angInd
 
 
 
-double Ibeam[SXVET][SYVET][SZVET][NUMANGLES];                //specific intensities at cell centers
-double Ibeam2[SXVET][SYVET][SZVET][NUMANGLES];                //specific intensities at cell centers _ auxiliary
+double Ibeam[SXVET][SYVET][SZVET][NUMANGLES];                 //specific intensities at cell centers
+double Ibeambak[SXVET][SYVET][SZVET][NUMANGLES];                //specific intensities at cell centers _ auxiliary
+double Ibeam0[SXVET][SYVET][SZVET][NUMANGLES];                //specific intensities at cell centers _ auxiliary
+double Ibeam1[SXVET][SYVET][SZVET][NUMANGLES];                //specific intensities at cell centers _ auxiliary
 double angGridCoords[NUMANGLES][3];  		//Store xyz locations of angle grid
 double angDualGridCoords[NUMDUALANGLES][3]; 	//Store xyz locations of dual angle grid
 int dualAdjacency[NUMDUALANGLES][3]; 		//Store index information for adjacent angles

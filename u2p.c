@@ -1240,9 +1240,9 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       //if(Etype!=U2P_HOT) 
       (*f_u2p)(Wp,cons,&f0,&dfdW,&err);
       
-      if((v2>(1.-SMALL) || v2<0. || Wp<0. || wmrho0<0.|| !isfinite(f0) || !isfinite(dfdW)) && (i_increase < 50))
+      if((gamma2<0. || Wp<0. || wmrho0<0.|| !isfinite(f0) || !isfinite(dfdW)) && (i_increase < 50))
 	{
-	  if(verbose>0) printf("init Wp : %e -> %e (%e %e)\n",Wp,100.*Wp,f0,dfdW);
+	  if(verbose>0) printf("init Wp : %e - %e %e %e %e\n",Wp,v2,wmrho0,f0,dfdW);
 	  Wp *= 2.;
 	  i_increase++;
 	  continue;
@@ -1254,9 +1254,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   if(i_increase>=50)
     {
+      if(verbose>0) 
+	{printf("failed to find initial W for Etype: %d\n",Etype);
+	  printf("at %d %d\n",geom->ix+TOI,geom->iy+TOJ);}
       return -150;
-      printf("failed to find initial W for Etype: %d\n",Etype);
-      printf("at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+
       print_NVvector(uu);
       print_NVvector(pp);
       getchar();
@@ -1307,11 +1309,11 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  ldouble wmrho0 = Wpnew/gamma2 - D*v2/(1.+gamma);
 
 	  //if(Etype!=U2P_HOT) 
-	      (*f_u2p)(Wpnew,cons,&f0tmp,&dfdWtmp,&errtmp);
+	  (*f_u2p)(Wpnew,cons,&f0tmp,&dfdWtmp,&errtmp);
 
-	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e\n",idump,iter,Wpnew,f0tmp,dfdWtmp,errtmp);
+	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e %e\n",idump,iter,Wpnew,f0tmp,dfdWtmp,errtmp,v2);
 
-	  if((v2>(1.-SMALL) || v2<0. || Wpnew<0. || wmrho0<0. || !isfinite(f0tmp) || !isfinite(dfdWtmp)) && (idump<100))
+	  if((gamma2<0. || Wpnew<0. || wmrho0<0. || !isfinite(f0tmp) || !isfinite(dfdWtmp)) && (idump<100))
 	    {
 	      idump++;
 	      dumpfac/=2.;

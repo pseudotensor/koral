@@ -2463,11 +2463,26 @@ copyi_u(ldouble factor,ldouble *uu1,ldouble* uu2)	\
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2];
-      //printf("%d > %d\n",PROCID,ix); 
-
 
       PLOOP(iv)
 	set_u(uu2,iv,ix,iy,iz,factor*get_u(uu1,iv,ix,iy,iz));
+    }
+
+  return 0;
+}
+
+int 
+copyi_intensities(ldouble factor,ldouble uu1[SXVET][SYVET][SZVET][NUMANGLES], ldouble uu2[SXVET][SYVET][SZVET][NUMANGLES])
+{
+  int ix,iy,iz,ii,iv;
+  for(ii=0;ii<Nloop_0;ii++) //domain only
+    {
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2];
+      
+      for(iv=0;iv<NUMANGLES;iv++)
+	uu2[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=factor*uu1[ix+NGCX][iy+NGCY][iz+NGCZ][iv];
     }
 
   return 0;
@@ -2504,6 +2519,27 @@ addi_u(ldouble f1, ldouble* uu1, ldouble f2, ldouble *uu2, ldouble *uu3)
       iz=loop_0[ii][2];
       PLOOP(iv)
 	set_u(uu3,iv,ix,iy,iz,f1*get_u(uu1,iv,ix,iy,iz)+f2*get_u(uu2,iv,ix,iy,iz));
+    }
+
+  return 0;
+}
+
+
+int 
+addi_intensities(ldouble f1, ldouble uu1[SXVET][SYVET][SZVET][NUMANGLES], ldouble f2, ldouble uu2[SXVET][SYVET][SZVET][NUMANGLES], ldouble uu3[SXVET][SYVET][SZVET][NUMANGLES])
+{
+  int ix,iy,iz,ii,iv;
+  for(ii=0;ii<Nloop_0;ii++) //domain only
+    {
+      int ix,iy,iz;
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2];
+      for(iv=0;iv<NUMANGLES;iv++)
+	{
+	uu3[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=f1*uu1[ix+NGCX][iy+NGCY][iz+NGCZ][iv]+f2*uu2[ix+NGCX][iy+NGCY][iz+NGCZ][iv];
+	if(uu3[ix+NGCX][iy+NGCY][iz+NGCZ][iv]<0.) uu3[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=0.;
+	}
     }
 
   return 0;
