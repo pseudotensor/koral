@@ -390,12 +390,12 @@ solve_the_problem(ldouble tstart, char* folder)
 
       //dt based on the estimate from the last midpoint
       dt=1./tstepdenmax;
-      #ifdef SELFTIMESTEP
+#ifdef SELFTIMESTEP
       dt=1./tstepdenmin;
-      #endif
+#endif
       global_dt=dt;
 
-      #ifdef MSTEP
+#ifdef MSTEP
       //adjusts the time levels if possible
       if(nstep>1)
 	{
@@ -405,7 +405,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	  alloc_loops(0,t,dt);
  	  //mstep_print_state();
 	}
-      #endif
+#endif
 
       if(t+dt>t1) {dt=t1-t;}
 
@@ -426,11 +426,12 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  ldouble gamma=1.-1./sqrt(2.),dtcell;
 	  save_timesteps(); 
-	  dtcell=dt;
 
 #pragma omp parallel private(ii,iv,ix,iy,iz,dtcell)
 	  {
-	    
+	    dtcell=dt;
+
+	    /******* 1st implicit **********/
 	    copyi_u(1.,u,ut0);
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  
@@ -442,6 +443,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    } 
 	    //addi_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
 
+	    /******* 1st explicit **********/
 	    copyi_u(1.,u,ut1);	    
 	    calc_u2p();
 
@@ -451,23 +453,26 @@ solve_the_problem(ldouble tstart, char* folder)
 	    
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
+	    dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
-	      PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(dtcell))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell))*get_u(ut1,iv,ix,iy,iz)); 
-	    }
+	    PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(dtcell))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell))*get_u(ut1,iv,ix,iy,iz)); 
+	  }
 	    //addi_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
 
 
+	    /******* 1st together **********/
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
+	    dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
-	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dtcell)*get_u(dut1,iv,ix,iy,iz)+(dtcell*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
-	    }
+	    PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dtcell)*get_u(dut1,iv,ix,iy,iz)+(dtcell*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
+	  }
 	    //addi_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
-
+	    
+	    /******* 2nd implicit **********/
 	    copyi_u(1.,u,uforget);
 	    calc_u2p();
+
 #pragma omp barrier
 	    count_entropy(&nentr[2],&nentr2[2]); do_finger();
 	    op_implicit (t,gamma*dt); //U(2) in *u
@@ -479,9 +484,11 @@ solve_the_problem(ldouble tstart, char* folder)
 	      PLOOP(iv) set_u(drt2,iv,ix,iy,iz,(1./(dtcell*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell*gamma))*get_u(uforget,iv,ix,iy,iz)); 
 	    }
 	    //addi_u(1./(dt*gamma),u,-1./(dt*gamma),uforget,drt2); //R(U(2)) in *drt2;
-
+	    
+	    /******* 2nd explicit **********/
 	    copyi_u(1.,u,ut2);
 	    calc_u2p();
+
 #pragma omp barrier
 	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
 	    op_explicit (t,dt); //U(2) in *ut2; 
@@ -494,7 +501,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    }
 	    //addi_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
 	    
-
+            /******* explicit together **********/
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
 	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
@@ -504,6 +511,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //addi_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
 	    
 
+	    /******* implicit together ***********/
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
 	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
@@ -514,12 +522,13 @@ solve_the_problem(ldouble tstart, char* folder)
 	    calc_u2p();
 	
 
-	    
-#ifdef EVOLVEINTENSITIES //only 1st order!
-	  update_intensities(t, dt);
-#endif
-	  }
 
+#ifdef EVOLVEINTENSITIES //only 1st order!
+	    update_intensities(t, dt);
+#endif
+	    //printf("nstep: %d\n",nstep);
+	  }
+	  t+=dt;	 
 
 	}
       else if(TIMESTEPPING==RK2)

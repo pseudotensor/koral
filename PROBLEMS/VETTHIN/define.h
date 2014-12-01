@@ -1,10 +1,10 @@
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 
 #define RADIATION
 
-//#define myVET
+#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
@@ -149,8 +149,8 @@
 #define TNY 60
 #define TNZ 1
 
-#define NTX 1
-#define NTY 1
+#define NTX 2
+#define NTY 2
 #define NTZ 1
 
 
@@ -174,7 +174,7 @@
 
 #define INT_ORDER 1
 #define TSTEPLIM .4
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2IMEX
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 
