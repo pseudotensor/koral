@@ -98,6 +98,8 @@ main(int argc, char **argv)
   //print scalings GU->CGS and quit
   //print_scalings(); getch(); exit(-1);
 
+  //test_opacities(); exit(1);
+
   //**************
   //end of tests
   //**************

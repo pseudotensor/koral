@@ -1160,9 +1160,9 @@ opacity_BellLin(ldouble rhoc, ldouble Tc)
   ldouble opacice=2.e-4*Tc*Tc;
 
   #ifdef SIMPLEBELLLIN
-  ldouble opacity=1.e0/((1.e0/(opacHm+opacmol))+(1.e0/(opaces+opacKr)));    
+  ldouble opacity=1.e0/((1.e0/(opacHm+opacmol))+(1.e0/(0.*opaces+opacKr)));    
   #else
-  ldouble opacity=1.e0/((1.e0/(opacHm+opacmol))+(1.e0/(opaces+opacKr)))
+  ldouble opacity=1.e0/((1.e0/(opacHm+opacmol))+(1.e0/(0.*opaces+opacKr)))
     +1.e0/(1.e0/opacice+1.e0/opaciceevap)
     +1.e0/(1.e0/opacmet+1.e0/opacmetevap);
   #endif

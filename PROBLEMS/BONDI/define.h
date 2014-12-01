@@ -41,7 +41,7 @@
 #endif
 
 #define SKIPFANCYOPACITIES
-#define OPACBELLLIN
+#define OPACSIMPLE
 #define RADOUTPUTVELS
 
 /************************************/

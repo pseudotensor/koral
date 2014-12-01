@@ -5491,3 +5491,25 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
  
   return 0;
 }
+
+//prints opacities
+int
+test_opacities()
+{
+  ldouble temp,rho,rhocgs,pp[NV],k1,k2,k3,k4;
+  struct geometry geom;
+  fill_geometry(NX/2,0,0,&geom);
+
+  rhocgs=1.e-5;
+  rho=rhoCGS2GU(rhocgs);
+  
+  pp[RHO]=rho;
+
+  for(temp=10.;temp<1.e10;temp*=1.5)
+    {
+      pp[UU]= calc_PEQ_ufromTrho(temp,rho);
+      printf("%e %e %e\n",temp,calc_kappa(pp,&geom,&k1,&k2,&k3,&k4),opacity_BellLin(rhocgs,temp));
+    }
+  
+  return 0;
+}

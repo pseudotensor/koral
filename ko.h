@@ -683,6 +683,7 @@ int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 //rad-viscosity specific
 ldouble Rijviscprev[SX][SY][SZ][4][4],radvisclasttime[SX][SY][SZ];
 
+int test_opacities();
 void reset_radviscaccel();
 int update_intensities();
 int calc_M1intensities(void);
