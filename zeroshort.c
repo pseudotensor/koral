@@ -74,7 +74,8 @@ calc_stretchFactor(void *argsin)
 	  struct solverarg *args
 	    = (struct solverarg *) argsin;
 	  printf("calc_stretchFactor() failed to find solution with F/E=%f\n",args->fFinal);
-	  
+	  return 1.;
+
 	  /*
 	  int p;
 	  for(p=0;p<NUMANGLES;p++)
@@ -4731,7 +4732,7 @@ void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
   //return;
 
-  if(TNY==1 && TNZ==1)
+  if(TNY==1 && TNZ==1 && 1)
     transformI_stretch1d(ix,iy,iz,I0,M1_input);
   else
     transformI_stretch(ix,iy,iz,I0,M1_input);
