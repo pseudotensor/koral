@@ -290,8 +290,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	iy=loop_0[ii][1];
 	iz=loop_0[ii][2]; 
 
-	set_u_scalar(cell_tsteps,ix,iy,iz,tstepdenmax);
-	set_u_scalar(cell_tstepstemp,ix,iy,iz,tstepdenmax);
+	set_u_scalar(cell_tstepden,ix,iy,iz,tstepdenmax);
+	set_u_scalar(cell_dt,ix,iy,iz,1./tstepdenmax);
       }
   }
 
@@ -426,28 +426,20 @@ solve_the_problem(ldouble tstart, char* folder)
 
       if(TIMESTEPPING==RK2IMEX)
 	{
-	  ldouble gamma=1.-1./sqrt(2.);
+	  ldouble gamma=1.-1./sqrt(2.),dtcell;
+	  save_timesteps(); 
+	  dtcell=dt;
 
-#pragma omp parallel private(ii,iv,ix,iy,iz)
+#pragma omp parallel private(ii,iv,ix,iy,iz,dtcell)
 	  {
-	    for(ii=0;ii<Nloop_0;ii++) //domain 
-	      {
-		int ix,iy,iz;
-		ix=loop_0[ii][0];
-		iy=loop_0[ii][1];
-		iz=loop_0[ii][2]; 
-		set_u_scalar(cell_tsteps,ix,iy,iz,get_u_scalar(cell_tstepstemp,ix,iy,iz));
-	      }
-
 	    copyi_u(1.,u,ut0);
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  
 	    for(ii=0;ii<Nloop_0;ii++) { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      PLOOP(iv) set_u(drt1,iv,ix,iy,iz,(1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)*gamma))*get_u(ut0,iv,ix,iy,iz)); 
-#else
-	      PLOOP(iv) set_u(drt1,iv,ix,iy,iz,(1./(dt*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(dt*gamma))*get_u(ut0,iv,ix,iy,iz)); 
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif	   
+	      PLOOP(iv) set_u(drt1,iv,ix,iy,iz,(1./(dtcell*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell*gamma))*get_u(ut0,iv,ix,iy,iz)); 
 	    } 
 	    //addi_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
 
@@ -459,20 +451,18 @@ solve_the_problem(ldouble tstart, char* folder)
 	    
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)))*get_u(u,iv,ix,iy,iz)+(-1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)))*get_u(ut1,iv,ix,iy,iz)); 
-#else
-	      PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(dt))*get_u(u,iv,ix,iy,iz)+(-1./(dt))*get_u(ut1,iv,ix,iy,iz)); 
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
+	      PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(dtcell))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell))*get_u(ut1,iv,ix,iy,iz)); 
 	    }
 	    //addi_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
 
 
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz))*get_u(dut1,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
-#else
-	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dt)*get_u(dut1,iv,ix,iy,iz)+(dt*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dtcell)*get_u(dut1,iv,ix,iy,iz)+(dtcell*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
 	    }
 	    //addi_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
 
@@ -484,10 +474,9 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    for(ii=0;ii<Nloop_0;ii++) { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      PLOOP(iv) set_u(drt2,iv,ix,iy,iz,(1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)*gamma))*get_u(uforget,iv,ix,iy,iz)); 
-#else
-	      PLOOP(iv) set_u(drt2,iv,ix,iy,iz,(1./(dt*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(dt*gamma))*get_u(uforget,iv,ix,iy,iz)); 
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
+	      PLOOP(iv) set_u(drt2,iv,ix,iy,iz,(1./(dtcell*gamma))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell*gamma))*get_u(uforget,iv,ix,iy,iz)); 
 	    }
 	    //addi_u(1./(dt*gamma),u,-1./(dt*gamma),uforget,drt2); //R(U(2)) in *drt2;
 
@@ -499,30 +488,27 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      PLOOP(iv) set_u(dut2,iv,ix,iy,iz,(1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)))*get_u(u,iv,ix,iy,iz)+(-1./(1./get_u_scalar(cell_tsteps,ix,iy,iz)))*get_u(ut2,iv,ix,iy,iz)); 	   
-#else
-	      PLOOP(iv) set_u(dut2,iv,ix,iy,iz,(1./(dt))*get_u(u,iv,ix,iy,iz)+(-1./(dt))*get_u(ut2,iv,ix,iy,iz)); 
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
+	      PLOOP(iv) set_u(dut2,iv,ix,iy,iz,(1./(dtcell))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell))*get_u(ut2,iv,ix,iy,iz)); 
 	    }
 	    //addi_u(1./dt,u,-1./dt,ut2,dut2); //F(U(2)) in *dut2;
 	    
 
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)/2.)*get_u(dut1,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)/2.)*get_u(dut2,iv,ix,iy,iz)); 
-#else
-	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dt/2.)*get_u(dut1,iv,ix,iy,iz)+(dt/2.)*get_u(dut2,iv,ix,iy,iz)); 
-#endif
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
+#endif	      
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dtcell/2.)*get_u(dut1,iv,ix,iy,iz)+(dtcell/2.)*get_u(dut2,iv,ix,iy,iz)); 
 	    }
 	    //addi_u_3(1.,ut0,dt/2.,dut1,dt/2.,dut2,u); //U(n) + dt/2 (F(U(1)) + F(U(2))) in *u
 	    
 
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(u,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)/2.)*get_u(drt1,iv,ix,iy,iz)+(1./get_u_scalar(cell_tsteps,ix,iy,iz)/2.)*get_u(drt2,iv,ix,iy,iz));
-#else
-	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(u,iv,ix,iy,iz)+(dt/2.)*get_u(drt1,iv,ix,iy,iz)+(dt/2.)*get_u(drt2,iv,ix,iy,iz));
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(u,iv,ix,iy,iz)+(dtcell/2.)*get_u(drt1,iv,ix,iy,iz)+(dtcell/2.)*get_u(drt2,iv,ix,iy,iz));
 	    }
 	    //addi_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
 	    calc_u2p();
@@ -537,14 +523,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
 #pragma omp parallel private(ii,iv,ix,iy,iz)
 	  {
-	    for(ii=0;ii<Nloop_0;ii++) //domain 
-	      {
-		int ix,iy,iz;
-		ix=loop_0[ii][0];
-		iy=loop_0[ii][1];
-		iz=loop_0[ii][2]; 
-		set_u_scalar(cell_tsteps,ix,iy,iz,get_u_scalar(cell_tstepstemp,ix,iy,iz));
-	      }
+	    save_timesteps();
 
 	    //1st
 	    copyi_u(1.,u,ut0);

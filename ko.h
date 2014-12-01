@@ -178,7 +178,7 @@ int NPROCS;
 ldouble **msgbufs;
 ldouble *u,*x,*xb,*du,*ut1,*ut2,*ut3,*ut4,*ut0,*u_bak_fixup,*p_bak_fixup,
   *u_step1,*u_step2,*u_bak_subzone,*p_bak_subzone,
-  *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,*cell_tstepstemp,*cell_tsteps,
+  *u_step3,*u_step4,*ahdx,*ahdy,*ahdz,*aradx,*arady,*aradz,*cell_tstepden,*cell_dt,
   *dut0,*dut1,*dut2,*dut3,*uforget,*drt0,*drt1,*drt2,*drt3,
   *ahdxl,*ahdyl,*ahdzl,*aradxl,*aradyl,*aradzl,  *ahdxr,*ahdyr,*ahdzr,*aradxr,
   *aradyr,*aradzr,*p,*pinit,*pproblem1,*pproblem2,*emf,*ptemp1,*pvecpot,
@@ -468,6 +468,7 @@ int calc_shear_lab(ldouble *pp,void* ggg,ldouble S[][4],int hdorrad,int *);
 int calc_shear_rad_lab(ldouble *pp,void* ggg,ldouble S[][4],int *);
 int
 save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws);
+int save_timesteps();
 int calc_wavespeeds_lr_pure(ldouble *pp,void*,ldouble *aaa);
 int calc_visc_Tij(ldouble *pp, void* ggg, ldouble T[][4]);
 int calc_Tij( ldouble *p, void*, ldouble T[][4]);

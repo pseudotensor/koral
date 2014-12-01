@@ -388,12 +388,34 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 
       tstepden/=TSTEPLIM;
 
-      set_u_scalar(cell_tstepstemp,ix,iy,iz,tstepden);
+      set_u_scalar(cell_tstepden,ix,iy,iz,tstepden);
 
       ////#pragma omp critical
       if(tstepden>tstepdenmax) tstepdenmax=tstepden;  
       if(tstepden<tstepdenmin) tstepdenmin=tstepden;  
     }
+  
+  return 0;
+}
+
+/***************************************************/
+/* saves individual timesteps to be ******************/
+/* used inside the time stepping *******************/
+/***************************************************/
+int
+save_timesteps()
+{
+#pragma omp parallel
+  {
+    int ii;
+    for(ii=0;ii<Nloop_0;ii++) 
+      { 
+	int ix,iy,iz;
+	ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+
+	set_u_scalar(cell_dt,ix,iy,iz,1./get_u_scalar(cell_tstepden,ix,iy,iz));
+      }
+  }
   
   return 0;
 }
@@ -1005,7 +1027,7 @@ op_explicit(ldouble t, ldouble dtin)
       //timestep
       dt=dtin;
       #ifdef SELFTIMESTEP
-      dt=1./get_u_scalar(cell_tsteps,ix,iy,iz); //individual time step
+      dt=get_u_scalar(cell_dt,ix,iy,iz); //individual time step
       #endif
 
       //updating conserved
@@ -1077,7 +1099,7 @@ op_explicit(ldouble t, ldouble dtin)
       //timestep
       dt=dtin;
       #ifdef SELFTIMESTEP
-      dt=1./get_u_scalar(cell_tsteps,ix,iy,iz); //individual time step
+      dt=get_u_scalar(cell_dt,ix,iy,iz); //individual time step
       #endif
 
       //using primitives from *p, i.e., from the beginning of this timestep
@@ -1157,7 +1179,7 @@ op_implicit(ldouble t, ldouble dtin)
       //timestep
       dt=dtin;
       #ifdef SELFTIMESTEP
-      dt=1./get_u_scalar(cell_tsteps,ix,iy,iz); //individual time step
+      dt=get_u_scalar(cell_dt,ix,iy,iz); //individual time step
       #endif
 
       //uses values already in *p as the initial guess

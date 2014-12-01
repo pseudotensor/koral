@@ -89,7 +89,7 @@ mstep_update_levels()
 	    continue;
 
 	  update=0;
-	  dt=1./get_u_scalar(cell_tstepstemp,ix,iy,iz); //new time step
+	  dt=get_u_scalar(cell_dt,ix,iy,iz); //new time step
 	  levelold=mstep_cell_levels[ix][iy][iz];
 	  levelnew=mstep_calc_level(dt,dtmin);
 

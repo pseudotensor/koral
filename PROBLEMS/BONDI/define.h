@@ -21,7 +21,7 @@
 /************************************/
 //radiation
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define EXPLICIT_LAB_RAD_SOURCE
 
 //#define OVERWRITERADWAVESPEEDSWITHHD
@@ -98,7 +98,7 @@
 #define TNX 256
 #define TNY 1
 #define TNZ 1
-#define NTX 32//for MPI and OMP
+#define NTX 4//for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -120,7 +120,7 @@
 //#define FIX_PRESSURERHO
 //#define FIX_VELBONDI
 #define FIX_VELOUTBONDI
-#define FULLBONDI
+//#define FULLBONDI
 //#define INFLOW
 
 
@@ -151,7 +151,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*100.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*10000000.*TSTEPLIM) //res
 #else
 #define DTOUT1 (100.)//(RMAX*100.) //res
 #endif
