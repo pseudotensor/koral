@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 1
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -58,7 +58,7 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 5.
+#define RMIN 10.
 #define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
@@ -108,7 +108,7 @@
 #define PRINTINSIDEBH
 
 #define SELFTIMESTEP
-#define SELFTIMESTEP_POWRADIUS 1.
+#define SELFTIMESTEP_POWRADIUS 1.25
 //#define SHORTERTIMESTEP
 
 //#define SUBZONES
@@ -118,7 +118,7 @@
 #define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
-#define FIX_TEMPERATURE
+//#define FIX_TEMPERATURE
 //#define FIX_PRESSURERHO
 //#define FIX_VELBONDI
 #define FIX_VELOUTBONDI
@@ -153,7 +153,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*100.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*1000.*TSTEPLIM) //res
 #else
 #define DTOUT1 (10000000.)//(RMAX*100.) //res
 #endif
