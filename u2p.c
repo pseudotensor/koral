@@ -260,7 +260,7 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
       {
 	ret=-1;
 	
-	if(verbose>2 )
+	if(verbose>2)
 	  {
 	    printf("u2p_entr     >>> %d %d <<< %d >>> %e > %e\n",geom->ix + TOI, geom->iy + TOJ,u2pret,u0,pp[1]);
 	  }

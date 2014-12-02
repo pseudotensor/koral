@@ -1207,8 +1207,8 @@ get_tsteplimiter()
 {
   if(PROBLEM==7) //BONDI
     {
-      if(global_time<1.e8)  return 0.001;
-      else if(global_time<1.e9)  return 0.01;
+      if(global_time<1.e8)  return 0.01;
+      else if(global_time<1.e9)  return 0.03;
       else return 0.05;
     }
 

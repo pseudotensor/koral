@@ -1594,7 +1594,6 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   if(kappagasRos==-1) //no distincion
     {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
   ldouble kappaes=calc_kappaes(pp,geom);
-  ldouble chi=kapparadAbs+kappaes;
 
   //contravariant four-force in the lab frame
 
@@ -1611,8 +1610,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       Ru=0.;
       for(j=0;j<4;j++)
 	Ru+=Rij[i][j]*ucov[j];
-      //test
-      Gi[i]=-chi*Ru - (kappaes*Ruu + kappagasAbs*4.*Pi*B)*ucon[i];
+      
+      Gi[i]=-(kapparadAbs+kappaes)*Ru - (kappaes*Ruu + kappagasAbs*4.*Pi*B)*ucon[i];
     }
 
   if(labframe==0)

@@ -32,7 +32,7 @@ ldouble rhoc=rhocgs;
 ldouble Tc=Tgas;
 ldouble opacKr=(6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas);
 ldouble opacHm=1.e-36*cbrt(rhoc)*Tc*Tc*Tc*Tc*Tc*Tc*Tc*Tc*Tc*Tc;
-				ldouble opacmol=1.e-8*cbrt(rhoc*rhoc)*Tc*Tc*Tc;
+ldouble opacmol=1.e-8*cbrt(rhoc*rhoc)*Tc*Tc*Tc;
 ldouble opacity=1.e0/((1.e0/(opacHm+opacmol))+(1.e0/(opacKr))); 
 kappa=kappaCGS2GU(opacity)*rho;
 #endif

@@ -5,13 +5,13 @@
 #define RESTARTNUM -1
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
-#define DOFIXUPS 0
-//#define UNPERTURBED
+#define DOFIXUPS 1
+#define UNPERTURBED
 
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define BALANCEENTROPYWITHRADIATION
 
 /************************************/
@@ -29,7 +29,7 @@
 #define MYCOORDS KERRCOORDS
 #define METRICAXISYMMETRIC
 #define RMIN 5.
-#define RMAX 12
+#define RMAX 12.
 #define MINX RMIN
 #define MAXX RMAX 
 #define DTH .3
@@ -39,7 +39,7 @@
 #define MAXZ (2.*M_PI) 
 #define TNX 100 // Total number of cells in X 
 #define TNY 100
-#define TNZ 50
+#define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2
 #define NTZ 1
@@ -58,24 +58,32 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 5000 //stop after this number of outputs
-#define DTOUT1 10. //res
+#define DTOUT1 1. //res
 #define DTOUT2 100. //avg
 
 /************************************/
 //reconstruction / stepping
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .6
+#define TIMESTEPPING RK2
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
+
+#ifndef U2PCONV
+#define U2PCONV 1.e-8
+#endif
+
+#ifndef RADIMPCONV
+#define RADIMPCONV 1.e-12
+#endif
 
 /************************************/
 //problem params
 /************************************/
 #define MASS 10.
 #define TORUSENTR 5.e2
-#define RHOAMB 1.e-30
+#define RHOAMB 1.e-25
 #define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho
 #define ERADATMMIN 1.e-25
 
@@ -96,5 +104,5 @@
 //physics
 /************************************/
 #define GAMMA (4./3.)
-#define FRACMICHEL 0.06
+#define FRACMICHEL 0.0//0.06
 #define PERTMAGN 1.e-2

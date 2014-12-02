@@ -414,6 +414,23 @@ save_timesteps()
 	ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 
 	set_u_scalar(cell_dt,ix,iy,iz,1./get_u_scalar(cell_tstepden,ix,iy,iz));
+
+	#ifdef SHORTERTIMESTEP
+	ldouble dtm1,dtp1,dt;
+	if(ix>0)
+	  dtm1=1./get_u_scalar(cell_tstepden,ix-1,iy,iz);
+	else
+	  dtm1=BIG;
+
+	if(ix<NX)
+	  dtp1=1./get_u_scalar(cell_tstepden,ix+1,iy,iz);
+	else
+	  dtp1=BIG;
+
+	dt=1./get_u_scalar(cell_tstepden,ix,iy,iz);
+
+	set_u_scalar(cell_dt,ix,iy,iz,my_min(my_min(dtm1,dtp1),dt));
+#endif
       }
   }
   

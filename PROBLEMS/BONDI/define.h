@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 10
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -21,7 +21,7 @@
 /************************************/
 //radiation
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define EXPLICIT_LAB_RAD_SOURCE
 
 //#define OVERWRITERADWAVESPEEDSWITHHD
@@ -31,7 +31,7 @@
 
 #define RADIMPLICITTHRESHOLD 1.e-2
 #define RADIMPCONV 1.e-12
-#define RADIMPEPS 1.e-7
+#define RADIMPEPS 1.e-8
 #define U2PCONV 1.e-12
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
@@ -40,8 +40,8 @@
 //#define DAMPCOMPTONIZATIONATBH
 #endif
 
-#define SKIPFANCYOPACITIES
-#define OPACSIMPLE
+//#define SKIPFANCYOPACITIES
+//#define OPACSIMPLE
 #define RADOUTPUTVELS
 
 /************************************/
@@ -58,7 +58,7 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 1.75
+#define RMIN 10.
 #define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
@@ -95,7 +95,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 256
+#define TNX 32
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -108,6 +108,7 @@
 #define PRINTINSIDEBH
 
 #define SELFTIMESTEP
+//#define SHORTERTIMESTEP
 
 //#define SUBZONES
 #define SUBZONES_NSTEPSTEP 10
@@ -120,7 +121,7 @@
 //#define FIX_PRESSURERHO
 //#define FIX_VELBONDI
 #define FIX_VELOUTBONDI
-//#define FULLBONDI
+#define FULLBONDI
 //#define INFLOW
 
 
@@ -129,7 +130,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
-#define TSTEPLIM (get_tsteplimiter())
+#define TSTEPLIM 0.3//(get_tsteplimiter())
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0      
@@ -151,9 +152,9 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*10000000.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*1000.*TSTEPLIM) //res
 #else
-#define DTOUT1 (100.)//(RMAX*100.) //res
+#define DTOUT1 (10000000.)//(RMAX*100.) //res
 #endif
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop

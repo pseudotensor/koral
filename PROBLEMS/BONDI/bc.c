@@ -38,7 +38,7 @@ if(ix>=NX) //total boundary, properties of the galaxy
     ldouble RMAXout=RBONDI;
 
     #ifdef FULLBONDI
-    RMAXout=RMAX;
+    RMAXout=geomBL.xx;
 #endif
     
     
@@ -60,6 +60,7 @@ if(ix>=NX) //total boundary, properties of the galaxy
     url=get_u(p,VX,NX-1,iy,iz);
     rhol=get_u(p,RHO,NX-1,iy,iz);
     uintl=get_u(p,UU,NX-1,iy,iz);
+    uint=uintl;
     
     #ifdef FIX_PRESSURE
     //to keep pressure fixed to initial hydro Bondi value
