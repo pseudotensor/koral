@@ -388,7 +388,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
 
 
-      //dt based on the estimate from the last midpoint
+      //dt based on the estimate from the last timestep
       dt=1./tstepdenmax;
 #ifdef SELFTIMESTEP
       dt=1./tstepdenmin;
@@ -535,9 +535,10 @@ solve_the_problem(ldouble tstart, char* folder)
 	{ 
 	  /******************************* RK2 **********************************/
 
+	    save_timesteps();
 #pragma omp parallel private(ii,iv,ix,iy,iz)
 	  {
-	    save_timesteps();
+
 
 	    //1st
 	    copyi_u(1.,u,ut0);

@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 10
+#define RESTARTNUM -1
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -58,7 +58,7 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 10.
+#define RMIN 5.
 #define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
@@ -95,7 +95,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 32
+#define TNX 128
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -108,6 +108,7 @@
 #define PRINTINSIDEBH
 
 #define SELFTIMESTEP
+#define SELFTIMESTEP_POWRADIUS 1.
 //#define SHORTERTIMESTEP
 
 //#define SUBZONES
@@ -130,7 +131,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
-#define TSTEPLIM 0.3//(get_tsteplimiter())
+#define TSTEPLIM (get_tsteplimiter())
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0      
@@ -152,7 +153,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*1000.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*100.*TSTEPLIM) //res
 #else
 #define DTOUT1 (10000000.)//(RMAX*100.) //res
 #endif

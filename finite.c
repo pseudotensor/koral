@@ -405,16 +405,22 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 int
 save_timesteps()
 {
-#pragma omp parallel
+#if defined(MPI) && defined(SELFTIMESTEP)
+  my_err("SELFTIMESTEP does not work with MPI becaues of save_timesteps - lacking reduction\n");
+#endif
+
+
+#pragma omp parallel 
   {
     int ii;
+    ldouble dtminloc=BIG;
     for(ii=0;ii<Nloop_0;ii++) 
       { 
 	int ix,iy,iz;
 	ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 
 	set_u_scalar(cell_dt,ix,iy,iz,1./get_u_scalar(cell_tstepden,ix,iy,iz));
-
+	
 	#ifdef SHORTERTIMESTEP
 	ldouble dtm1,dtp1,dt;
 	if(ix>0)
@@ -430,9 +436,71 @@ save_timesteps()
 	dt=1./get_u_scalar(cell_tstepden,ix,iy,iz);
 
 	set_u_scalar(cell_dt,ix,iy,iz,my_min(my_min(dtm1,dtp1),dt));
-#endif
+        #endif
+
+	//find the shortest
+	
+	if(get_u_scalar(cell_dt,ix,iy,iz)<dtminloc)
+	  dtminloc=get_u_scalar(cell_dt,ix,iy,iz);
+
       }
   }
+  
+
+#ifdef SELFTIMESTEP_POWRADIUS
+  //find the smallest (dt / RMIN**pow)
+  ldouble dtormin=BIG,dtminrad,dtmin,dtorloc;
+  int ix,iy,iz;
+  struct geometry geomBL;
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	{
+	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	  dtorloc=get_u_scalar(cell_dt,ix,iy,iz)/pow(geomBL.xx,SELFTIMESTEP_POWRADIUS);
+	  if(dtorloc<dtormin)
+	    {
+	      dtormin=dtorloc;
+	      dtminrad=geomBL.xx;
+	      dtmin=get_u_scalar(cell_dt,ix,iy,iz);
+	    }
+	}
+
+#pragma omp parallel shared(dtmin)
+  {
+    int ii;
+    struct geometry geomBL;
+    for(ii=0;ii<Nloop_0;ii++) 
+      { 
+	int ix,iy,iz;
+	ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+	
+	//reset to dtmin * (R/RMIN)^pow
+	
+	fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	ldouble rBL = geomBL.xx;
+	ldouble frad = pow(rBL / dtminrad, SELFTIMESTEP_POWRADIUS);
+
+	set_u_scalar(cell_dt,ix,iy,iz,dtmin*frad);
+
+	//printf("%d %d>%e %e %e\n",PROCID,ix,get_u_scalar(cell_dt,ix,iy,iz),dtmin,frad);
+      }
+    
+  }
+
+
+  //find the longest
+  ldouble dtmax=-1.;
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	if(get_u_scalar(cell_dt,ix,iy,iz)>dtmax)
+	  dtmax=get_u_scalar(cell_dt,ix,iy,iz);
+
+  //pass up to determine the total timestep
+  tstepdenmin = 1./dtmax;
+
+#endif
   
   return 0;
 }
