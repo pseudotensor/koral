@@ -36,19 +36,20 @@
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 #ifdef RADIATION
-#define NCOMPTONIZATION
+//#define NCOMPTONIZATION
 //#define DAMPCOMPTONIZATIONATBH
 #endif
 
 //#define SKIPFANCYOPACITIES
 //#define OPACSIMPLE
+//#define EXTRAHEATINGCOOLING
 #define RADOUTPUTVELS
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKSCOORDS
-//#define FLAT
+#define myMSPHCOORDS
+#define FLAT
 
 #define TKST0 0.1
 #define MKSR0 0.
@@ -107,7 +108,7 @@
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
 
-#define SELFTIMESTEP
+//#define SELFTIMESTEP
 #define SELFTIMESTEP_POWRADIUS 1.25
 //#define SHORTERTIMESTEP
 
@@ -118,7 +119,7 @@
 #define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
-//#define FIX_TEMPERATURE
+#define FIX_TEMPERATURE
 //#define FIX_PRESSURERHO
 //#define FIX_VELBONDI
 #define FIX_VELOUTBONDI
@@ -157,6 +158,12 @@
 #else
 #define DTOUT1 (10000000.)//(RMAX*100.) //res
 #endif
+
+#ifdef FLAT
+#undef DTOUT1
+#define DTOUT1 1.e2
+#endif
+
 #define DTOUT2 (DTOUT1*100000.) //avg
 #define TMAX 1.e100 //time to stop
 
@@ -178,6 +185,11 @@
 
 
 #define PRADGASINIT 1.e-5
+#ifdef FLAT
+#undef PRADGASINIT
+#define PRADGASINIT 1.e-20
+#endif
+
 #define MASS 10.
 #define BHSPIN 0.
 #define MDOTEDD 2.23/16.*1.e18*MASS //cm/s

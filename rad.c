@@ -1591,7 +1591,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
   ldouble kappagasRos,kappagasAbs,kapparadRos,kapparadAbs;
   ldouble kappa=calc_kappa(pp,geom,&kappagasRos,&kappagasAbs,&kapparadRos,&kapparadAbs);
-  if(kappagasRos==-1) //no distincion
+  if(kappagasAbs==-1) //no distincion
     {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
   ldouble kappaes=calc_kappaes(pp,geom);
 
@@ -1622,7 +1622,15 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       Gi[0]=-kappagasAbs*4.*Pi*B + kapparadAbs*Ehatrad;
     }
       
-      
+  ldouble fac;
+
+#ifdef EXTRAHEATINGCOOLING
+  ldouble Gihc[4];
+  calc_heatcool(pp,geom,labframe,Gihc);
+  fac=1;
+  for(i=0;i<4;i++)
+    Gi[i]+=fac*Gihc[i];
+#endif
   
 
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
@@ -1636,9 +1644,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   }
   
   calc_Compt_Gi(pp,ggg,Gic,Ehatrad,Tgas,kappaes,ucon);
-
-  ldouble fac=1.;
-
+  fac=1.;
   #ifdef DAMPCOMPTONIZATIONATBH
   ldouble xxBL[4];
   coco_N(geom->xxvec,xxBL,MYCOORDS,BLCOORDS);
@@ -3479,7 +3485,7 @@ calc_nsource(ldouble *pp, void* ggg)
   ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
   ldouble kappagasRos,kappagasAbs,kapparadRos,kapparadAbs;
   ldouble kappa=calc_kappa(pp,geom,&kappagasRos,&kappagasAbs,&kapparadRos,&kapparadAbs);
-  if(kappagasRos==-1) //no distincion
+  if(kappagasAbs==-1) //no distincion
     {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
     
   //number of photons in rad rest frame
@@ -3656,6 +3662,55 @@ calc_ncompt_nphlab(ldouble *pp, void* ggg)
 
   return nphlab;
 
+}
+
+
+//**********************************************************************
+//* calculates the extra heating / cooling term
+//**********************************************************************
+int
+calc_heatcool(ldouble *pp, void* ggg,int labframe,ldouble Gihc[4])
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+  
+#if(PROBLEM==7) //Bondi
+  //extra heating which balances internal cooling at the outern boundary, 
+  //i.e., provides constant temperature there, applied throughout the domain
+  struct geometry geomNX;
+  fill_geometry(NX,geom->iy,geom->iz,&geomNX);
+
+  //gas properties
+  ldouble rho=get_u(pproblem1,RHO,NX,iy,iz);
+  ldouble u=get_u(pproblem1,UU,NX,iy,iz);
+  ldouble p= (GAMMA-1.)*(ldouble)u;
+  ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
+  ldouble kappagasRos,kappagasAbs,kapparadRos,kapparadAbs;
+  ldouble kappa=calc_kappa(&get_u(pproblem1,RHO,NX,iy,iz),&geomNX,&kappagasRos,&kappagasAbs,&kapparadRos,&kapparadAbs);
+  if(kappagasAbs==-1) //no distincion
+    {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
+  ldouble kappaes=calc_kappaes(&get_u(pproblem1,RHO,NX,iy,iz),geom);
+  
+  //fluid frame:
+  Gihc[0]=+kappagasAbs*4.*Pi*B; //to balance internal cooling
+  Gihc[1]=Gihc[2]=Gihc[3];
+
+  //to lab frame
+  boost2_ff2lab(Gihc,Gihc,&get_u(pproblem1,RHO,NX,iy,iz),geomNX.gg,geomNX.GG);
+
+  //the same lab-frame Gihc throughout the domain
+  
+  //but if requested in fluid frame, has to be transfomed back locally
+  if(labframe==0)
+    boost2_lab2ff(Gihc,Gihc,pp,geom->gg,geom->GG);
+#endif
+
+  return 0;
 }
 
 //**********************************************************************

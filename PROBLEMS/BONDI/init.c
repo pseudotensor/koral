@@ -22,55 +22,18 @@ ldouble pp[NV],T;
 
 /************************/
 
-/*
- ldouble rhos,Tgass,ur,Tgas,Trad,r,prad,pgas,ut,vx,Be,Kappa,urs;
+int iix=ix;
+#ifdef FLAT
+iix=NX;
+#endif
 
- //at RBONDI
- r=RMAX;
- Be=(5.-3.*GAMMA)/(4.*(GAMMA-1.))/RBONDI;
- urs=-sqrt(Be/(5.-3.*GAMMA)*2.*GAMMAM1);
- rhos=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(RBONDI)*lenGU2CGS(RBONDI)*velGU2CGS(urs)));
- Kappa=GAMMAM1/pow(rhos,GAMMAM1)*(Be+1./RBONDI-0.5*urs*urs);
- pgas=Kappa*pow(rhos,GAMMA);
- Tgass=pgas/K_BOLTZ/rhos*MU_GAS*M_PROTON;
+rho=get_u(pproblem1,RHO,iix,iy,iz);
+uint=get_u(pproblem1,UU,iix,iy,iz);
+ur=get_u(pproblem1,VX,iix,iy,iz);
 
-
- //at given cell
- r=geomBL.xx;
-
- ur=urs*pow(RBONDI/r,1.5);
- rho=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
- Tgas=Tgass*pow(rho/rhos,GAMMA-1.);      
- uint=calc_PEQ_ufromTrho(Tgas,rho);
- pgas=K_BOLTZ*rho*Tgas/MU_GAS/M_PROTON;
- prad=PRADGAS*pgas;
- E=prad*3.;
-*/
-
-/* old
-//at outern boundary
-r=RMAX;
-ur=-sqrt(2./r);
-rho0=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
-Tgas0=TGAS0;
-            
-//at given cell
-r=geomBL.xx;
-ur=-sqrt(2./r);    
-
-rho=rhoCGS2GU(-MDOT*MDOTEDD/(4.*Pi*lenGU2CGS(r)*lenGU2CGS(r)*velGU2CGS(ur)));
-Tgas=Tgas0*pow(rho/rho0,GAMMA-1.);      
-
-uint=calc_PEQ_ufromTrho(Tgas,rho);
-
-pgas=K_BOLTZ*rho*Tgas/MU_GAS/M_PROTON;
-prad=PRADGAS*pgas;
-E=prad*3.;
-*/
-
-rho=get_u(pproblem1,RHO,ix,iy,iz);
-uint=get_u(pproblem1,UU,ix,iy,iz);
-ur=get_u(pproblem1,VX,ix,iy,iz);
+#ifdef FLAT
+ur=0.;
+#endif
 
 #ifdef INFLOW
 rho*=1.e-10;
@@ -79,11 +42,8 @@ uint*=1.e-10;
 
 //four-vel in BL
 ldouble ucon[4]={0.,ur,0.,0.};
-//conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
-
 //rad. four-vel in BL
-ldouble urfcon[4]={0.,ur,0.,0.}; //initialy radiative field is residual so this is not important, ur because zero would not be allowed under the horizon
-//conv_vels(urfcon,urfcon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
+ldouble urfcon[4]={0.,ur,0.,0.}; 
 
 pp[0]=rho;
 pp[1]=uint;
@@ -92,43 +52,18 @@ pp[3]=ucon[2];
 pp[4]=ucon[3];
 pp[5]=calc_Sfromu(rho,uint);
 #ifdef RADIATION
-E=get_u(pproblem1,EE0,ix,iy,iz); //Erad already residual
+E=get_u(pproblem1,EE0,iix,iy,iz); 
 pp[6]=E;
 pp[7]=urfcon[1];
 pp[8]=urfcon[2];
 pp[9]=urfcon[3]; 
 
-//transforming primitives from BL to MYCOORDS
-//trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-
 #ifdef NCOMPTONIZATION
 pp[NF0]=calc_NFfromE(pp[EE0]);
-//ldouble Tgas=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
-//pp[NF0]=calc_NFfromT(Tgas);
-//printf("%d %e %e\n",ix,pp[NF0],Tgas);
 #endif
 #endif	 
 
-
-#ifdef FLAT
-pp[0]=1.;
-pp[1]=1.;
-pp[2]=0.;
-pp[3]=0.;
-pp[4]=0.;
-pp[5]=calc_Sfromu(rho,uint);
-#ifdef RADIATION
-pp[6]=1.;
-pp[7]=0.;
-pp[8]=0.;
-  pp[9]=0.;
-#endif
-#endif
-
-
 p2u(pp,uu,&geom);	 
-
-//print_primitives(pp);getch();
 
 /***********************************************/
 
