@@ -42,5 +42,5 @@ v9=pp[NF];//calc_ncompt_nphlab(pp,&geomout);
 
 
 //temp
-v8=get_u_scalar(cell_dt,ix,iy,iz);
-v9=1./get_u_scalar(cell_tstepden,ix,iy,iz);
+//v8=get_u_scalar(cell_dt,ix,iy,iz);
+//v9=1./get_u_scalar(cell_tstepden,ix,iy,iz);

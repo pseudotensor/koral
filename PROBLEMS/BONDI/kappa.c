@@ -10,7 +10,7 @@ Trad = calc_ncompt_Thatrad_full(pp,ggg);
 
 ldouble zeta = Trad/Tgas;
 //test
-zeta=1.;
+//zeta=1.;
 
 ldouble mpcgs=1.67262158e-24;
 
@@ -19,7 +19,7 @@ ldouble mpcgs=1.67262158e-24;
 //absorbtion mean
 ldouble kappaff,kappabe;
 kappaff=kappaCGS2GU((6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*log(1.+1.6*zeta))*rho*(1.+4.4e-10*Tgas);
-kappabe=kappaCGS2GU((8.3e-15/mpcgs/mpcgs)*rhocgs*pow(Tgas,-1.7)/Tgas/Tgas/Tgas*log(1.+1.6*zeta))*rho*(1.+4.4e-10*Tgas);
+kappabe=kappaCGS2GU((5.0e-15/mpcgs/mpcgs)*rhocgs*pow(Tgas,-1.7)/Tgas/Tgas/Tgas*log(1.+1.6*zeta))*rho*(1.+4.4e-10*Tgas);
 
 *kappagasAbs=kappaff+kappabe;
 *kapparadAbs=*kappagasAbs/zeta/zeta/zeta;
@@ -32,8 +32,8 @@ kappabe=kappaCGS2GU((8.3e-15/mpcgs/mpcgs)*rhocgs*pow(Tgas,-1.7)/Tgas/Tgas/Tgas*l
 kappa=*kappagasAbs;
 
 //test
-*kappagasAbs=kappaff;
-*kapparadAbs=kappabe;
+//*kappagasAbs=kappaff;
+//*kapparadAbs=kappabe;
 
 #else
 //the simplest

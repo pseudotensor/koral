@@ -3,7 +3,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 1
+#define RESTARTNUM -1
 //#define MODYFIKUJKRZYSIE 1
 //#define FLUXMETHOD HLL_FLUX
 //#define TEST124
@@ -36,20 +36,20 @@
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 #ifdef RADIATION
-//#define NCOMPTONIZATION
+#define NCOMPTONIZATION
 //#define DAMPCOMPTONIZATIONATBH
 #endif
 
 //#define SKIPFANCYOPACITIES
 //#define OPACSIMPLE
-//#define EXTRAHEATINGCOOLING
+#define EXTRAHEATINGCOOLING
 #define RADOUTPUTVELS
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMSPHCOORDS
-#define FLAT
+#define myMKSCOORDS
+//#define FLAT
 
 #define TKST0 0.1
 #define MKSR0 0.
@@ -59,7 +59,7 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
-#define RMIN 10.
+#define RMIN 1.5
 #define RBONDI 1.e6 //(TAMB=3.267e12/RBONDI)
 #define RMAX (RBONDI*10.)
 #define RMAXOUT RBONDI 
@@ -108,7 +108,7 @@
 #define PRINTGC_RIGHT
 #define PRINTINSIDEBH
 
-//#define SELFTIMESTEP
+#define SELFTIMESTEP
 #define SELFTIMESTEP_POWRADIUS 1.25
 //#define SHORTERTIMESTEP
 
@@ -154,7 +154,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*1000.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*10000.*TSTEPLIM) //res
 #else
 #define DTOUT1 (10000000.)//(RMAX*100.) //res
 #endif

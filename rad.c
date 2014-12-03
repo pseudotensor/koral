@@ -1627,7 +1627,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
 #ifdef EXTRAHEATINGCOOLING
   ldouble Gihc[4];
   calc_heatcool(pp,geom,labframe,Gihc);
-  fac=1;
+  fac=1.;
   for(i=0;i<4;i++)
     Gi[i]+=fac*Gihc[i];
 #endif
@@ -3683,6 +3683,8 @@ calc_heatcool(ldouble *pp, void* ggg,int labframe,ldouble Gihc[4])
   //i.e., provides constant temperature there, applied throughout the domain
   struct geometry geomNX;
   fill_geometry(NX,geom->iy,geom->iz,&geomNX);
+  int iy,iz;
+  iy=geom->iy;iz=geom->iz;
 
   //gas properties
   ldouble rho=get_u(pproblem1,RHO,NX,iy,iz);
@@ -3698,7 +3700,7 @@ calc_heatcool(ldouble *pp, void* ggg,int labframe,ldouble Gihc[4])
   
   //fluid frame:
   Gihc[0]=+kappagasAbs*4.*Pi*B; //to balance internal cooling
-  Gihc[1]=Gihc[2]=Gihc[3];
+  Gihc[1]=Gihc[2]=Gihc[3]=0.;
 
   //to lab frame
   boost2_ff2lab(Gihc,Gihc,&get_u(pproblem1,RHO,NX,iy,iz),geomNX.gg,geomNX.GG);
