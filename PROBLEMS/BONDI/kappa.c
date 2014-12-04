@@ -19,9 +19,25 @@ ldouble mpcgs=1.67262158e-24;
 //absorbtion mean
 ldouble kappaff,kappabe;
 kappaff=kappaCGS2GU((6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas/Tgas/Tgas/sqrt(Tgas)*log(1.+1.6*zeta))*rho*(1.+4.4e-10*Tgas);
-kappabe=kappaCGS2GU((5.0e-15/mpcgs/mpcgs)*rhocgs*pow(Tgas,-1.7)/Tgas/Tgas/Tgas*log(1.+1.6*zeta))*rho*(1.+4.4e-10*Tgas);
+kappabe=kappaCGS2GU((5.0e-15/mpcgs/mpcgs)*rhocgs*pow(Tgas,-1.7)/Tgas/Tgas/Tgas*log(1.+1.6*zeta))*rho;
 
 *kappagasAbs=kappaff+kappabe;
+
+#ifdef OPACSKIPBE
+*kappagasAbs=kappaff;
+#endif
+
+#ifdef OPACSMOOTH
+ldouble Tgas0=3.e7;
+ldouble zeta0=Trad/Tgas0;
+//test
+//zeta0=1.;
+ldouble kappaff0=kappaCGS2GU((6.6e-24/mpcgs/mpcgs)*rhocgs/Tgas0/Tgas0/Tgas0/sqrt(Tgas0)*log(1.+1.6*zeta0))*rho*(1.+4.4e-10*Tgas0);
+ldouble kappabe0=kappaCGS2GU((5.0e-15/mpcgs/mpcgs)*rhocgs*pow(Tgas0,-1.7)/Tgas0/Tgas0/Tgas0*log(1.+1.6*zeta0))*rho;
+
+*kappagasAbs=kappaff+kappabe+10.*(kappaff0+kappabe0)*Tgas0*Tgas0*Tgas0*Tgas0/Tgas/Tgas/Tgas/Tgas;
+#endif
+
 *kapparadAbs=*kappagasAbs/zeta/zeta/zeta;
 	
 //Roseland mean - not used at all							  

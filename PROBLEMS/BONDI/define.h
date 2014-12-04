@@ -42,6 +42,9 @@
 
 //#define SKIPFANCYOPACITIES
 //#define OPACSIMPLE
+//#define OPACSKIPBE
+//#define OPACSMOOTH
+//#define RADIMPSTARTLOWTEMP
 #define EXTRAHEATINGCOOLING
 #define RADOUTPUTVELS
 
@@ -96,7 +99,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 128
+#define TNX 512
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -109,7 +112,7 @@
 #define PRINTINSIDEBH
 
 #define SELFTIMESTEP
-#define SELFTIMESTEP_POWRADIUS 1.25
+#define SELFTIMESTEP_POWRADIUS 1.2
 //#define SHORTERTIMESTEP
 
 //#define SUBZONES
@@ -132,7 +135,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2
-#define TSTEPLIM (get_tsteplimiter())
+#define TSTEPLIM 0.3//(get_tsteplimiter())
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define SHUFFLELOOPS 0      
@@ -154,9 +157,9 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*10000.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*10.*TSTEPLIM) //res
 #else
-#define DTOUT1 (10000000.)//(RMAX*100.) //res
+#define DTOUT1 (1000.)//(RMAX*100.) //res
 #endif
 
 #ifdef FLAT

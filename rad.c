@@ -361,6 +361,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       pp[iv]=pp0[iv];     
     }
 
+  #ifdef RADIMPSTARTLOWTEMP
+  pp[UU]=calc_PEQ_ufromTrho(1.e4,pp[RHO]);
+  pp0[UU]=pp[UU];
+  #endif
+
   struct geometry *geom
     = (struct geometry *) ggg;
 
@@ -929,11 +934,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }
 	}
       while(1); 
-
-
+      
       //TODO:
       //this may fail but necessary to start of a.neq.0 runs      
-#ifdef BHDISK_PROBLEMTYPE
+      #ifdef BHDISK_PROBLEMTYPE
       if(1 && failed==0 && global_time<100.)
 	{
 	  //criterion of convergence on relative change of quantities
@@ -961,13 +965,14 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  ldouble CONVREL=EPS;
 	  ldouble CONVRELERR=1.-EPS;
 
+
 	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
 	    {
 	      if(verbose) printf("\n === success (rel.change) ===\n");
 	      break;
 	    }     
 	}
-#endif
+      #endif
       
       
      

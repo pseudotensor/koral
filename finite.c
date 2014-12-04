@@ -4545,7 +4545,7 @@ cell_fixup_hd()
 
       if(get_cflag(HDFIXUPFLAG,ix,iy,iz)==1)
 	{
-	  set_cflag(HDFIXUPFLAG,ix,iy,iz,0); //try only once
+	  //set_cflag(HDFIXUPFLAG,ix,iy,iz,0); //try only once
 
 	  //total fixups  
 	  struct geometry geom;
