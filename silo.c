@@ -193,8 +193,6 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      gdet2=calc_gdet_arb(xx2,BLCOORDS);
 
-	      if(OUTCOORDS==BLCOORDS && geomout.xx<rhorizonBL)
-	      continue;
 
 	      imz=iz;
 	      imy=iy;
