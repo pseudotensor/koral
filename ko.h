@@ -272,6 +272,9 @@ int calc_anarelradialprofiles(ldouble profiles[][NX]);
 ldouble calc_totalmass();
 ldouble calc_mdot(ldouble radius,int);
 int calc_lum(ldouble radius,int,ldouble*,ldouble*);
+int
+calc_local_lum(int ix,int iy,int iz,ldouble *radlum, ldouble *totallum);
+
 ldouble calc_photloc(int ix);
 
 //misc§<.c

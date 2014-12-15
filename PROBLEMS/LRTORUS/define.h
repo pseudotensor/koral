@@ -14,20 +14,20 @@
 //radiation choices
 /************************************/
 //#define RADIATION
-#define COMPTONIZATION
+//#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
 //#define MIMICDYNAMO
 //#define CALCHRONTHEGO
-#define THETAANGLE 0.25
-#define ALPHAFLIPSSIGN                                                        
+//#define THETAANGLE 0.25
+//#define ALPHAFLIPSSIGN                                                        
+//#define ALPHADYNAMO 0.314
+//#define DAMPBETA
+//#define BETASATURATED 0.1
+//#define ALPHABETA 6.28
 
-#define ALPHADYNAMO 0.314
-#define DAMPBETA
-#define BETASATURATED 0.1
-#define ALPHABETA 6.28
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
@@ -37,8 +37,8 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
-#define TSTEPLIM .4
+#define TIMESTEPPING RK2
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
@@ -47,13 +47,13 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
-#define ACCELRADVISCOSITY
-#define RADVISCMFPSPH
-#define RADVISCNUDAMP
-#define RADVISCMAXVELDAMP
-#define ALPHARADVISC 0.1
-#define MAXRADVISCVEL .1
+//#define RADVISCOSITY SHEARVISCOSITY
+//#define ACCELRADVISCOSITY
+//#define RADVISCMFPSPH
+//#define RADVISCNUDAMP
+//#define RADVISCMAXVELDAMP
+//#define ALPHARADVISC 0.1
+//#define MAXRADVISCVEL .1
 
 /************************************/
 //rmhd floors
@@ -78,22 +78,22 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
+#define BHSPIN 0.7
 
 /************************************/
 //coordinates / resolution
 /************************************/
 #define myMKS3COORDS
 #define MKSR0 0.
-#define MKSH0 0.6
+#define MKSH0 0.4
 #define MKSMY1 0.001
-#define MKSMY2 0.2
-#define MKSMP0 1.5
+#define MKSMY2 0.025
+#define MKSMP0 1.2
 #define METRICAXISYMMETRIC
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.85-MKSR0))
+#define MINX (log(1.65-MKSR0))
 #define MAXX (log(1000.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
@@ -102,8 +102,8 @@
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
-#define MINX (log(1.6-MKSR0))
-#define MAXX (log(100.-MKSR0))
+#define MINX (log(1.55-MKSR0))
+#define MAXX (log(1000.-MKSR0))
 #define MINY 0.
 #define MAXY 1.
 #endif
@@ -113,9 +113,9 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 304
-#define TNY 192
-#define TNZ 1
+#define TNX 160//264
+#define TNY 80//192
+#define TNZ 1//32
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -151,7 +151,23 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 7
+#define NTORUS 77
+
+#if(NTORUS==77) //flat sigma, single poloidal loop
+#define LT_KAPPA 5.e2
+#define LT_XI 0.975
+#define LT_R1 30.
+#define LT_R2 200.
+#ifdef RADIATION
+#define LT_GAMMA 4./3.
+#else
+#define LT_GAMMA 5./3.
+#endif
+#define LT_RIN 22.
+#define BETANORMFULL
+#undef MAXBETA
+#define MAXBETA (.5) 
+#endif
 
 #if(NTORUS==7) //flat sigma
 #define LT_KAPPA 5.e2
@@ -159,11 +175,15 @@
 #define LT_XI 0.975
 #define LT_R1 30.
 #define LT_R2 200.
+#ifdef RADIATION
 #define LT_GAMMA 4./3.
+#else
+#define LT_GAMMA 5./3.
+#endif
 #define LT_RIN 22.
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (1./10.) //eq.plane
+#define MAXBETA (1./10.)
 #endif
 
 #if(NTORUS==6) //for not-so-hyper
@@ -238,6 +258,6 @@
 #define LT_RIN 10.
 #endif
 
-#define RHOATMMIN  1.e-24
+#define RHOATMMIN  1.e-10
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

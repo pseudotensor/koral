@@ -949,7 +949,27 @@ int calc_scalars(ldouble *scalars,ldouble t)
   //scaleheight at rtemp (10)
   ldouble rscale=15.;
   scalars[8]=calc_scaleheight(rscale);
- 
+
+  //brightness at R=THPROFRADIUS (11)
+  //, fixed polar index - for power spectrum calculation                                                                                        
+  //search for appropriate radial index                                                                                                                       
+  ldouble radius=5.e3;
+  #ifdef THPROFRADIUS
+  radius=THPROFRADIUS;
+  #endif
+  int ix;
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
+
+  double totlum;
+  calc_local_lum(ix,NCCORRECTPOLAR+1,0,&radlum,&totlum);
+  scalars[11]=totlum;
+
+   
 
   /*********************************************/
   //Tgas Trad Egas Erad for testing Comptonization
@@ -1100,6 +1120,93 @@ calc_lumEdd()
 
 //**********************************************************************
 //**********************************************************************
+//**********************************************************************
+//calculates local radial fluxes of energy
+//normalized to total sphere, taken at radius radius
+int
+calc_local_lum(int ix,int iy,int iz,ldouble *radlum, ldouble *totallum)
+{
+  int iv,i,j;
+  ldouble xx[4],xxBL[4],dx[3],pp[NV],Rrt,rhour,Tij[4][4],Trt;
+  ldouble Rij[4][4],Rtt,ehat,ucongas[4];
+  ldouble tautot[3],tau=0.;
+  ldouble gdet;
+  double lum,jet;
+
+  for(iv=0;iv<NV;iv++)
+    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+  struct geometry geomBL;
+  fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+  
+  if(doingavg)
+    {
+      PLOOP(iv)
+	pp[iv]=get_uavg(pavg,iv,ix,iy,iz);
+
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+
+      ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
+      ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
+      rhour=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+      Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+	+ GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
+	+ get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+	- get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+
+#ifdef RADIATION
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
+      Rrt=Rij[1][0];// + ehat*uconr);
+      //	  if(Rrt<0.) Rrt=0.;
+#else
+      Rrt=0.;
+#endif
+
+      lum=-geomBL.gdet*Rrt*4.*M_PI;
+      jet=geomBL.gdet*(Trt+rhour+Rrt)*4.*M_PI;
+    }
+  else
+    {
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  
+      ucongas[1]=pp[2];
+      ucongas[2]=pp[3];
+      ucongas[3]=pp[4];	      
+      conv_vels(ucongas,ucongas,VELPRIM,VEL4,geom.gg,geom.GG);
+
+      rhour = pp[RHO]*ucongas[1];
+	  
+      calc_Tij(pp,&geom,Tij);
+      indices_2221(Tij,Tij,geom.gg);
+      Trt=Tij[1][0];
+
+
+#ifdef RADIATION	      
+      calc_Rij(pp,&geom,Rij); 
+      indices_2221(Rij,Rij,geom.gg);
+      Rrt=Rij[1][0];// + ehat*ucongas[1];
+      //if(Rrt<0.)	  	    Rrt=0.;
+#endif
+     
+
+      lum=-geom.gdet*Rrt*4.*M_PI;
+      jet=geom.gdet*(rhour+Trt+Rrt)*4.*M_PI;
+
+      //printf("%e %e %e %e\n",xxBL[1],Rrt,geom.gdet,lum);
+    }
+
+  *radlum=lum;
+  *totallum=jet;
+
+  return 0;
+}
+
+
+
 //**********************************************************************
 //calculates luminosity by integrating positive flux from the axis up to tau=1 surface
 //normalized to total sphere, taken at radius radius
