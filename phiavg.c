@@ -86,9 +86,9 @@ main
 	{
 	  sprintf(bufor,"cp %s %s\n",fnamehead,fnameheadout);
 	  system(bufor);
-	  nx=NX;
-	  ny=NY;
-	  nz=NZ;
+	  nx=TNX;
+	  ny=TNY;
+	  nz=TNZ;
 	  problem=PROBLEM;
 	}
       else
@@ -113,7 +113,7 @@ main
 
      
       
-      if(nx!=TNX || ny!=TNY || nz!=TNZ || problem!=PROBLEM)
+      if(nx!=TNX || ny!=TNY || problem!=PROBLEM)
 	{
 	  printf("PROBLEM files inconsistent with the dump file\n");
 	  exit (-1);
@@ -129,40 +129,51 @@ main
       //body file
       fdump=fopen(fname,"rb");
  
-      for(i=0;i<nx;i++)
+      for(j=0;j<ny;j++)
+	for(i=0;i<nx;i++)
+	  for(iv=0;iv<nv;iv++)
+	    prims[i][j][iv]=0.;
+
+      for(k=0;k<nz;k++)
 	{
 	  for(j=0;j<ny;j++)
 	    {
-	      
-	      for(iv=0;iv<nv;iv++)
-		prims[i][j][iv]=0.;
-
-	      for(k=0;k<nz;k++)
+	      for(i=0;i<nx;i++)
 		{
-		  int gix,giy,giz;
+	    	  int gix,giy,giz;
 		  
 		  ret=fread(&gix,sizeof(int),1,fdump);
 		  ret=fread(&giy,sizeof(int),1,fdump);
 		  ret=fread(&giz,sizeof(int),1,fdump);
 		  ret=fread(pp,sizeof(double),nv,fdump);
 
-		  for(iv=0;iv<nv;iv++)
-		    prims[i][j][iv]+=pp[iv];
+
+		  if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
+		    printf("blont: %d %d %d vs %d %d %d | %d %d %d\n",i,j,k,gix,giy,giz,nx,ny,nz);
+		  else
+		    for(iv=0;iv<nv;iv++)
+		      prims[gix][giy][iv]+=pp[iv];
 		}
-
-	      for(iv=0;iv<nv;iv++)
-		prims[i][j][iv]/=(double)nz;
-
-	      //print to a file
-	      
-	      k=0;
-	      fwrite(&i,sizeof(int),1,fout);
-	      fwrite(&j,sizeof(int),1,fout);
-	      fwrite(&k,sizeof(int),1,fout);
-	      fwrite(&prims[i][j][0],sizeof(ldouble),nv,fout);	    
-
 	    }
 	}
+
+      for(j=0;j<ny;j++)
+	for(i=0;i<nx;i++)
+	  for(iv=0;iv<nv;iv++)
+	    prims[i][j][iv]/=(double)nz;
+
+      //print to a file
+      k=0;
+      for(j=0;j<ny;j++)
+	for(i=0;i<nx;i++)
+	  {
+	    fwrite(&i,sizeof(int),1,fout);
+	    fwrite(&j,sizeof(int),1,fout);
+	    fwrite(&k,sizeof(int),1,fout);
+	    fwrite(&prims[i][j][0],sizeof(ldouble),nv,fout);	    
+	  }
+
+	
       fclose(fdump);
       fclose(fout);
     }
