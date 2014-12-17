@@ -113,9 +113,9 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 160//264
-#define TNY 80//192
-#define TNZ 1//32
+#define TNX 80//264
+#define TNY 60//192
+#define TNZ 4//32
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -143,8 +143,8 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 2.
-#define DTOUT2 1000.
+#define DTOUT1 1.
+#define DTOUT2 1.
 
 /************************************/
 //common physics / torus / atmosphere

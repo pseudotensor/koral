@@ -16,10 +16,10 @@ main(int argc, char **argv)
   #endif
 
   //which files to read
-  int no1,no2,nostep,procotg;
-  if(argc!=6)
+  int no1,no2,nostep,procotg,ifphiavg;
+  if(argc!=4 && argc!=7)
     {
-      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep doingavg procotg\n");
+      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep [doingavg procotg ifphiavg]\n");
       return -1;
     }
   else
@@ -27,8 +27,18 @@ main(int argc, char **argv)
       no1=atof(argv[1]);
       no2=atof(argv[2]);
       nostep=atof(argv[3]);
-      doingavg=atoi(argv[4]);
-      procotg=atoi(argv[5]);      
+      if(argc==7)
+	{
+	  doingavg=atoi(argv[4]);
+	  procotg=atoi(argv[5]);      
+	  ifphiavg=atoi(argv[6]);      
+	}
+      else
+	{
+	  doingavg=1;
+	  procotg=0;
+	  ifphiavg=0;
+	}
     }
 
   doingpostproc=1;
@@ -55,9 +65,16 @@ main(int argc, char **argv)
   fprint_coordfile("analysis","coord");
   #endif
 
-  //folder to write in
-  char folder[100],bufor[100];
+  //folder to write to
+  char folder[100];
+    //folder to write from
+  char folderin[100],bufor[100];
   sprintf(folder,"analysis");
+
+  if(!ifphiavg)
+    sprintf(folderin,"%s","dumps");
+  else
+    sprintf(folderin,"%s","dumps_phiavg");
 
   if(procotg)
     {
@@ -95,12 +112,12 @@ main(int argc, char **argv)
       if(doingavg)
 	{
 	  //reading avg file
-	  readret=fread_avgfile(ifile,"dumps",pavg,&dt,&t);
+	  readret=fread_avgfile(ifile,folderin,pavg,&dt,&t);
 	}
       else
 	{
 	  //reading res file
-	  readret=fread_restartfile(ifile,"dumps",&t);
+	  readret=fread_restartfile(ifile,folderin,&t);
 	  dt=1.;
 	  //rewrite primitives to pavg
 	  for(iz=0;iz<NZ;iz++)
@@ -168,6 +185,9 @@ main(int argc, char **argv)
     sprintf(suffix,"");
   else
     sprintf(suffix,"res");
+
+  if(ifphiavg)
+    sprintf(suffix,"%sphiavg",suffix);
  
 
   

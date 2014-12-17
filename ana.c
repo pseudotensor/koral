@@ -19,10 +19,10 @@ main(int argc, char **argv)
   #endif
 
   //which files to read
-  int no1,no2,nostep;
-  if(argc!=4)
+  int no1,no2,nostep,ifphiavg;
+  if(argc<4 || argc>5)
     {
-      printf("Not enough input arguments. Asks for ./ana no1 no2 nostep\n");
+      printf("Not enough input arguments. Asks for ./ana no1 no2 nostep [ifphiavg]\n");
       return -1;
     }
   else
@@ -30,10 +30,18 @@ main(int argc, char **argv)
       no1=atof(argv[1]);
       no2=atof(argv[2]);
       nostep=atof(argv[3]);
+
+      if(argc==5)
+	ifphiavg=atof(argv[4]);
+      else
+	ifphiavg=0;
     }
 
   char folder[100],bufer[100];
-  sprintf(folder,"%s","dumps");
+  if(!ifphiavg)
+    sprintf(folder,"%s","dumps");
+  else
+    sprintf(folder,"%s","dumps_phiavg");
 
   int i;
   
@@ -98,27 +106,42 @@ main(int argc, char **argv)
       calc_scalars(scalars,t);
 
       //dumps dumps to analysis analysis
+      
+      char prefix[40];
+      char suffix[10];
+      sprintf(suffix,"");
+
+      if(ifphiavg)
+	sprintf(suffix,"%sphiavg",suffix);
+ 
+
+
 #if(SCAOUTPUT==1)
       fprint_scalars(t,scalars,NSCALARS);
 #endif
 #if(RADOUTPUT==1)
-      fprint_radprofiles(t,nfout1,"analysis","rad");
+      sprintf(prefix,"rad%s",suffix);  
+      fprint_radprofiles(t,nfout1,"analysis",prefix);
 #endif
 
 #if(THOUTPUT==1)
-      fprint_thprofiles(t,nfout1,"analysis","th");
+      sprintf(prefix,"th%s",suffix);  
+      fprint_thprofiles(t,nfout1,"analysis",prefix);
 #endif
 
 #if(OUTOUTPUT==1)
-      fprint_outfile(t,nfout1,0,"analysis","out");
+      sprintf(prefix,"out%s",suffix);  
+      fprint_outfile(t,nfout1,0,"analysis",prefix);
 #endif
 #if(SILOOUTPUT==1)
 #ifndef NOSILO
-      fprint_silofile(t,nfout1,"analysis","sil");
+      sprintf(prefix,"sil%s",suffix);  
+      fprint_silofile(t,nfout1,"analysis",prefix);
 #endif
 #endif
 #if(SIMOUTPUT!=0)	  
-      fprint_simplefile(t,nfout1,"analysis","sim");
+      sprintf(prefix,"sim%s",suffix);  
+      fprint_simplefile(t,nfout1,"analysis",prefix);
 #endif
   
 
