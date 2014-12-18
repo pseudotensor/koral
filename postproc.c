@@ -952,8 +952,8 @@ int calc_scalars(ldouble *scalars,ldouble t)
   ldouble rscale=15.;
   scalars[8]=calc_scaleheight(rscale);
 
-  //brightness at R=THPROFRADIUS (11)
-  //, fixed polar index - for power spectrum calculation                                                                                        
+  //brightness at R=THPROFRADIUS (13)
+  //fixed polar index - for power spectrum calculation                                                                                        
   //search for appropriate radial index                                                                                                                       
   ldouble radius=5.e3;
   #ifdef THPROFRADIUS
@@ -1004,15 +1004,38 @@ int calc_scalars(ldouble *scalars,ldouble t)
 #endif
 
   /*********************************************/
+  //L2 measure
+  /*********************************************/
+
+#if(PROBLEM==79) //SOFTBALL
+  ldouble L2=0;
+  int i,j;
+  for(i=0;i<NX;i++)
+    { 
+      for(j=0;j<NY;j++)
+	{
+	  struct geometry geomBL;
+	  fill_geometry_arb(i,j,0,&geomBL,BLCOORDS);
+	  ldouble dV=get_size_x(i,0)*get_size_x(j,1)*2.*M_PI*geomBL.gdet;
+	  L2+=get_u(p,RHO,i,j,0)*get_u(p,RHO,i,j,0)*dV;
+	}
+    }
+  scalars[9]=L2;///(ldouble)NX;
+#endif
+
+  /*********************************************/
   //L1 ERRRORS for some problems
   /*********************************************/
 
 #ifdef CALCL1_RMHDWAVE
   //temporarily here: L1 error for RMHDWAVE
   ldouble L1=0;
-  int i;
+  int i,j;
   for(i=0;i<NX;i++)
     {
+     
+	  
+
       calc_primitives(i,0,0,0,0);
       ldouble xx=get_x(i,0);
       ldouble dx=get_size_x(i,0);
