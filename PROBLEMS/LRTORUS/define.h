@@ -114,8 +114,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 272 //8*34
-#define TNY 192 //8*24
+#define TNX 160//272 //8*34
+#define TNY 120//192 //8*24
 #define TNZ 1 //16*2
 //number of tiles
 #define NTX 2//34//16
@@ -156,19 +156,20 @@
 
 #if(NTORUS==78) //
 #define LT_KAPPA 5.e2
-#define LT_XI 0.975
-#define LT_R1 25.
+#define LT_XI 0.96
+#define LT_R1 14.
+
 #define LT_R2 400.
 #ifdef RADIATION
 #define LT_GAMMA 4./3.
 #else
 #define LT_GAMMA 5./3.
 #endif
-#define LT_RIN 19.
+#define LT_RIN 10.
 //#define BETANORMFULL
 #define BETANORMEQPLANE
 #undef MAXBETA
-#define MAXBETA (.025) 
+#define MAXBETA (.1) 
 #endif
 
 #if(NTORUS==77) //flat sigma, single poloidal loop

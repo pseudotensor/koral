@@ -4,7 +4,7 @@ int ix,iy,iz;
 #ifdef MAGNFIELD
 if(PROCID==0) {printf("Renormalizing magnetic field... ");fflush(stdout);}
 ldouble maxbeta=0.;
-#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
+//#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
 for(iz=0;iz<NZ;iz++)
   {
     for(iy=0;iy<NY;iy++)
