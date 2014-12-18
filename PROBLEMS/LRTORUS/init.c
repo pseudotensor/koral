@@ -266,8 +266,12 @@ if(rho<0.) //outside donut
 #else //standard single poloidal loop
 
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/1.e-5,2.)-0.03,0.)*
-      pow(sin(fabs(geomBL.yy)),4.)*
-      step_function(-(geomBL.xx-350.),10.);
+      pow(sin(fabs(geomBL.yy)),4.);
+				     //*step_function(-(geomBL.xx-350.),10.);
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.0001,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
+				     //*step_function(-(geomBL.xx-350.),10.);
 #endif
 
     pp[B1]=Acov[1];

@@ -42,23 +42,23 @@ for(iz=0;iz<NZ;iz++)
 		
 #endif
 
-#ifdef BETANORMFULL
-		//normalizing wrt everywhere
+#ifdef BETANORMEQPLANE //normalizing wrt to near the equatorial plane
+		if(fabs(geomBL.yy-M_PI/2.)<M_PI/10.)
+		  {
+#pragma omp critical
+		    if(pmag/ptot>maxbeta) 
+		      maxbeta=pmag/ptot;
+		  }
+#else		//normalizing wrt everywhere by default
 #pragma omp critical
 		if(pmag/ptot>maxbeta) 
 		  {
 		    maxbeta=pmag/ptot;
 		    //printf("%d %d > %e %e %e\n",ix,iy,pmag,ptot,maxbeta);
 		  }
-		    
-#else //normalizing wrt to the equatorial plane
-		if(geom.iy==NY/2)
-		  {
-#pragma omp critical
-		    if(pmag/ptot>maxbeta) 
-		      maxbeta=pmag/ptot;
-		  }
 #endif
+		    
+
 	  }
       }
   }

@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 0
 
 /************************************/
 //radiation choices
@@ -37,8 +37,8 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
-#define TSTEPLIM .5
+#define TIMESTEPPING RK2IMEX
+#define TSTEPLIM .4
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
@@ -93,7 +93,7 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.65-MKSR0))
+#define MINX (log(1.85-MKSR0))
 #define MAXX (log(1000.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
@@ -113,13 +113,13 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 80//264
-#define TNY 60//192
-#define TNZ 4//32
+#define TNX 140//272 //8*34
+#define TNY 80//192 //8*24
+#define TNZ 1 //16*2
 //number of tiles
-#define NTX 2
-#define NTY 2
-#define NTZ 1
+#define NTX 2//34//16
+#define NTY 2//24//16
+#define NTZ 1//1
 
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
@@ -144,14 +144,31 @@
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 1.
-#define DTOUT2 1.
+#define DTOUT2 1000.
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 77
+#define NTORUS 78
+
+#if(NTORUS==78) //
+#define LT_KAPPA 5.e2
+#define LT_XI 0.975
+#define LT_R1 25.
+#define LT_R2 400.
+#ifdef RADIATION
+#define LT_GAMMA 4./3.
+#else
+#define LT_GAMMA 5./3.
+#endif
+#define LT_RIN 19.
+//#define BETANORMFULL
+#define BETANORMEQPLANE
+#undef MAXBETA
+#define MAXBETA (.025) 
+#endif
 
 #if(NTORUS==77) //flat sigma, single poloidal loop
 #define LT_KAPPA 5.e2
@@ -166,7 +183,7 @@
 #define LT_RIN 22.
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (.5) 
+#define MAXBETA (.05) 
 #endif
 
 #if(NTORUS==7) //flat sigma
@@ -258,6 +275,6 @@
 #define LT_RIN 10.
 #endif
 
-#define RHOATMMIN  1.e-10
+#define RHOATMMIN  1.e-15
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

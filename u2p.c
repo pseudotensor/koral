@@ -283,8 +283,8 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
 	      }
 
 	    //test, to print it out 
-	    //u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
-	    //getchar();
+	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
+	    getchar();
 
 	    /*
 	    if(u2pret==-103 && 0)  //TODO: work out hotmax
@@ -1243,14 +1243,16 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       if((gamma2<0. || Wp<0. || wmrho0<0.|| !isfinite(f0) || !isfinite(dfdW)) && (i_increase < 50))
 	{
 	  if(verbose>0) printf("init Wp : %e - %e %e %e %e\n",Wp,v2,wmrho0,f0,dfdW);
-	  Wp *= 2.;
+	  Wp *= 10.;
 	  i_increase++;
 	  continue;
 	}
+
       else
 	break;    
     }
   while(1);
+
 
   if(i_increase>=50)
     {
@@ -1341,7 +1343,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 
       //convergence test:
-      if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<CONV*100.)) break;
+      if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<sqrt(sqrt(CONV)))) break;
     }
   while(iter<50);
 
