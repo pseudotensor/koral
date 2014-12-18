@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 0
+#define RESTARTNUM 28
 
 /************************************/
 //radiation choices
@@ -58,8 +58,9 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define CORRECT_POLARAXIS_3D
-#define POLARAXISAVGIN3D
+//#define CORRECT_POLARAXIS_3D
+#define CORRECT_POLARAXIS
+//#define POLARAXISAVGIN3D
 #define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
@@ -113,8 +114,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 140//272 //8*34
-#define TNY 80//192 //8*24
+#define TNX 272 //8*34
+#define TNY 192 //8*24
 #define TNZ 1 //16*2
 //number of tiles
 #define NTX 2//34//16
@@ -143,7 +144,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 100.
 #define DTOUT2 1000.
 
 /************************************/

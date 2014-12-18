@@ -5208,11 +5208,11 @@ correct_polaraxis()
 		      pp[VX]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,VX,ixsrc,iy,iz);
 
 #ifdef MAGNFIELD
-		      /*
+		      
 			pp[B2]=get_u(p,B2,ixsrc,iy,iz);
 			pp[B3]=get_u(p,B3,ixsrc,iy,iz);
 			pp[B1]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,B1,ixsrc,iy,iz);
-		      */
+		      
 #endif
 
 #ifdef RADIATION

@@ -23,8 +23,7 @@ ldouble L=3.8;
 ldouble W = (1./2.)*log(-(geom.gg[0][0]*geom.gg[3][3])/(geom.gg[3][3]+L*L*geom.gg[0][0]));
 ldouble rin=4.57599;
 ldouble Win = -0.0416192; 
-
-Win = -0.049;
+Win=-0.049;
 ldouble w=exp(-(W-Win));
 
 //OS: I didn't know how to manipulate the size of the torus in your formulae, so I used my old ones:
@@ -36,10 +35,7 @@ ldouble epsilon = (w-1.)/GAMMA;  //OS: dot after 1.
 ldouble vmichel = get_u(pproblem1,0,ix,iy,iz);
 
 //when constructing rad-pressure supported torus we want to have pressure like for a gamma=4/3 gas, because radiation pressure has effective gamma = 4/3 
-ldouble effgamma=GAMMA;
-#ifdef RADIATION
-effgamma=4./3.;
-#endif
+ldouble effgamma=EFFGAMMA;
 
 if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
   {
@@ -111,9 +107,10 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
 #endif
 
 #ifdef PERTMAGN //perturb to trigger PapaloizuPringle
-    //pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
-    pp[VZ]*=1.+PERTMAGN*sin(2.*geomBL.zz);
-    //if(ix==NX/2 && iy==NY/2) {printf("%e %e\n",1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN,((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN); }
+    pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
+    pp[VZ]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
+    //pp[VZ]*=1.+PERTMAGN*sin(2.*geomBL.zz);
+    if(iz==100) printf("%e %e\n",(double)rand(),((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN); 
 #endif
 
   }

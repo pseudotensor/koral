@@ -59,20 +59,25 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   int floorret=0;
   floorret=check_floors_mhd(pp,VELPRIM,&geom);
 
-  if(floorret<0.)
-    {
+  if(floorret<0)
       corrected[0]=1;
-    }
+
+  if(floorret<-1)
+    fixups[0]=1;
+
+
   //************************************
   //************************************
   //checking on rad floors
     
   #ifdef RADIATION
   floorret=check_floors_rad(pp,VELPRIMRAD,&geom);
-  if(floorret<0.)
-    {
+  
+  if(floorret<0)
       corrected[1]=1;
-    }
+
+  if(floorret<-1)
+    fixups[1]=1;
   #endif
 
   //************************************
@@ -80,15 +85,7 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   
   //************************************
   //update conserved to follow corrections on primitives
-
-  
   p2u(pp,uu,&geom);
-
-  /*
-  if(ix==5 && PROCID==0) print_primitives(pp);
-  if(ix==5 && PROCID==0) print_conserved(uu);
-  if(ix==5 && PROCID==0) printf("gdet: %e\n",geom.gdet);
-  */
 
   for(iv=0;iv<NV;iv++)
     {
@@ -283,8 +280,8 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
 	      }
 
 	    //test, to print it out 
-	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
-	    getchar();
+	    //    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
+	    //getchar();
 
 	    /*
 	    if(u2pret==-103 && 0)  //TODO: work out hotmax
@@ -496,7 +493,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
     {
       if(verbose) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix+TOI,geom->iy+TOJ,pp[0]);
       pp[0]=RHOFLOOR; 
-      ret=-1; 
+        if(ret==0) ret=-1; 
     }
 
 #ifdef VXFLOOR
@@ -516,7 +513,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
      
       pp[VX]=ucon[1];
        
-      ret=-1;
+        if(ret==0) ret=-1;
     }
 #endif
 
@@ -531,7 +528,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
     {
       if(verbose) printf("hd_floors BH CASE 1 at %d %d (%e)\n",geom->ix+TOI,geom->iy+TOJ,pp[0]);
       pp[0]=rhofloor;
-      ret=-1; 
+      if(ret==0) ret=-1; 
     }
 #endif
 
@@ -573,6 +570,8 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 
   if(magpre>B2RHORATIOMAX*pp[RHO]) 
     {
+      if(ret==0) ret=-1;
+
       if(verbose) printf("mag_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix+TOI,geom->iy+TOJ,geom->iz,pp[RHO],magpre);
       ldouble f=magpre/(B2RHORATIOMAX*pp[RHO]);
 
@@ -589,13 +588,16 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       dpp[VX] = etarel[1];
       dpp[VY] = etarel[2];
       dpp[VZ] = etarel[3];
-      dpp[ENTR] = 0.;
+      dpp[ENTR] = calc_Sfromu(dpp[RHO],dpp[UU]);
       dpp[B1] = dpp[B2] = dpp[B3] = 0.;
 
       p2u_mhd(dpp,duu,geom);
  
       for(iv=0;iv<NVMHD;iv++)
-	uu[iv]+=duu[iv];
+	{
+	  uu[iv]+=duu[iv];
+	  pp[iv]+=dpp[iv];
+	}
 
       int rettemp=0;
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
@@ -604,7 +606,8 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       
       if(rettemp<0) 
 	{
-	  printf("u2p failed after imposing bsq over rho floors\n");
+	  printf("u2p failed after imposing bsq over rho floors at %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK);
+	  ret=-2; //hard error - requests fixup
 	}
     
 #elif(B2RHOFLOORFRAME==FFFRAME) //new mass in fluid frame
@@ -614,7 +617,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 
 #endif
       
-      ret=-1;      
+       
     }
   
   /*
@@ -646,7 +649,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 	  ldouble A=sqrt(qsqmax/qsq);
 	  for(j=1;j<4;j++)
 	    pp[UU+j]*=A;
-	  ret=-1;
+	  if(ret==0) ret=-1;
 	  if(verbose)
 	    {
 	      printf("hd_floors CASE 4 at (%d,%d,%d): %e",geom->ix+TOI,geom->iy+TOJ,geom->iz,sqrt(gamma2));
@@ -1344,6 +1347,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
       //convergence test:
       if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<sqrt(sqrt(CONV)))) break;
+      //if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV)) break;
     }
   while(iter<50);
 
@@ -1390,8 +1394,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       return -120;
     }
 
-
-  if(uint<0. || gamma2<0. ||isnan(Wp) || !isfinite(Wp)) 
+  if(uint<SMALL || gamma2<SMALL ||isnan(Wp) || !isfinite(Wp)) 
     {
       if(verbose>0) printf("neg u in u2p_solver %e %e %e %e\n",rho,uint,gamma2,W);//getchar();
       return -104;

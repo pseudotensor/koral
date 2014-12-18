@@ -5,8 +5,8 @@
 #define RESTARTNUM -1
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
-#define DOFIXUPS 1
-#define UNPERTURBED
+#define DOFIXUPS 0
+//#define UNPERTURBED
 
 /************************************/
 //radiation
@@ -27,9 +27,8 @@
 /************************************/
 
 #define MYCOORDS KERRCOORDS
-#define METRICAXISYMMETRIC
 #define RMIN 5.
-#define RMAX 12.
+#define RMAX 14.
 #define MINX RMIN
 #define MAXX RMAX 
 #define DTH .3
@@ -57,35 +56,27 @@
 #endif
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
-#define NOUTSTOP 5000 //stop after this number of outputs
-#define DTOUT1 1. //res
-#define DTOUT2 100. //avg
+#define NOUTSTOP 9000 //stop after this number of outputs
+#define DTOUT1 2. //res
+#define DTOUT2 1.e20 //avg
 
 /************************************/
 //reconstruction / stepping
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
-#define TSTEPLIM .5
+#define TIMESTEPPING RK2IMEX
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
-
-#ifndef U2PCONV
-#define U2PCONV 1.e-8
-#endif
-
-#ifndef RADIMPCONV
-#define RADIMPCONV 1.e-12
-#endif
 
 /************************************/
 //problem params
 /************************************/
 #define MASS 10.
 #define TORUSENTR 5.e2
-#define RHOAMB 1.e-25
+#define RHOAMB 1.e-30
 #define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho
-#define ERADATMMIN 1.e-25
+#define ERADATMMIN 1.e-40
 
 /************************************/
 //rhd floors
@@ -103,6 +94,8 @@
 /************************************/
 //physics
 /************************************/
-#define GAMMA (4./3.)
-#define FRACMICHEL 0.0//0.06
-#define PERTMAGN 1.e-2
+#define GAMMA (5./3.)
+//when constructing rad-pressure supported torus we want to have pressure like for a gamma=4/3 gas, because radiation pressure has effective gamma = 4/3 
+#define EFFGAMMA (4./3.) //opt.thick
+#define FRACMICHEL 0.06
+#define PERTMAGN 0.
