@@ -1050,9 +1050,12 @@ f_u2p_hotmax(ldouble Wp, ldouble* cons, ldouble *f, ldouble *df, ldouble *err)
  
 }
 
-int
-find_wmrho0(ldouble Wp,ldouble *cons,ldouble *wmrho0)
+double
+fWplim (double Wp, void *params)
 {
+  ldouble *cons
+    = (double *) params;
+  
   ldouble Qn=cons[0];
   ldouble Qtsq=cons[1];
   ldouble D=cons[2];
@@ -1060,512 +1063,110 @@ find_wmrho0(ldouble Wp,ldouble *cons,ldouble *wmrho0)
   ldouble Bsq=cons[4];
   ldouble Qdotnp=cons[6];
   
-  wmrho0[0]=(-Bsq - 2*D)/2. - Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Power(Bsq + 2*D,2) + 
-      (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)/3. + Qtsq + 
-				   (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-       (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-           36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-           108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-             2) + 108*Power(Bsq + 2*D,2)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-           72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-           Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-             Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-               36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-               108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                  D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-               72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333))
-        + Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-         36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-         108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-           2) + 108*Power(Bsq + 2*D,2)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-         72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-         Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-              2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-             36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-             108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-               2) + 108*Power(Bsq + 2*D,2)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-             72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333)/
-       (3.*Power(2,0.3333333333333333)))/2. - 
-   Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + 2*Power(Bsq + 2*D,2) + Qtsq + 
-      (-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Qtsq)/3. - 
-      (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-       (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-           36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-           108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-             2) + 108*Power(Bsq + 2*D,2)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-           72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-           Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-             Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-               36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-               108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                  D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-               72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333))
-        - Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-         36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-         108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-           2) + 108*Power(Bsq + 2*D,2)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-         72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-         Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-              2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-             36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-             108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-               2) + 108*Power(Bsq + 2*D,2)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-             72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333)/
-       (3.*Power(2,0.3333333333333333)) - 
-      (-8*Power(Bsq + 2*D,3) + 8*(Bsq + 2*D)*
-          (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq) - 
-         16*(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq))/
-       (4.*Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Power(Bsq + 2*D,2) + 
-           (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)/3. + Qtsq + 
-           (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-            (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                 (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-                108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                   D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                 (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                 (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-                Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                     2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-                  Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                    36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                     (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq)\
-                     + 108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - 
-                       QdotBsq - D*Qtsq,2) + 
-                    108*Power(Bsq + 2*D,2)*
-                     (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                    72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                     (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),
-               0.3333333333333333)) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-              36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-               (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-              108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                 D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-               (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-              72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-               (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-              Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                   2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-                Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                  36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                   (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-                  108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                     D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                   (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                  72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                   (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),
-		 0.3333333333333333)/(3.*Power(2,0.3333333333333333)))))/2.;
+  return Wp*(1 - (Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))/
+       (Power(D + Wp,2)*Power(Bsq + D + Wp,2))) - 
+   (D*(Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp))))/
+    (Power(D + Wp,2)*Power(Bsq + D + Wp,2)*
+      (1 + Sqrt(1/
+          (1 - (Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))/
+	   (Power(D + Wp,2)*Power(Bsq + D + Wp,2))))));
+}
 
-   wmrho0[1]=(-Bsq - 2*D)/2. - Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Power(Bsq + 2*D,2) + 
-      (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)/3. + Qtsq + 
-      (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-       (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-           36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-           108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-             2) + 108*Power(Bsq + 2*D,2)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-           72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-           Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-             Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-               36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-               108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                  D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-               72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333))
-        + Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-         36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-         108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-           2) + 108*Power(Bsq + 2*D,2)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-         72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-         Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-              2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-             36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-             108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-               2) + 108*Power(Bsq + 2*D,2)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-             72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333)/
-       (3.*Power(2,0.3333333333333333)))/2. + 
-   Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + 2*Power(Bsq + 2*D,2) + Qtsq + 
-      (-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Qtsq)/3. - 
-      (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-       (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-           36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-           108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-             2) + 108*Power(Bsq + 2*D,2)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-           72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-           Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-             Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-               36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-               108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                  D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-               72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333))
-        - Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-         36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-         108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-           2) + 108*Power(Bsq + 2*D,2)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-         72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-         Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-              2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-             36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-             108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-               2) + 108*Power(Bsq + 2*D,2)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-             72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333)/
-       (3.*Power(2,0.3333333333333333)) - 
-      (-8*Power(Bsq + 2*D,3) + 8*(Bsq + 2*D)*
-          (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq) - 
-         16*(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq))/
-       (4.*Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Power(Bsq + 2*D,2) + 
-           (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)/3. + Qtsq + 
-           (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-            (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                 (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-                108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                   D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                 (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                 (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-                Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                     2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-                  Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                    36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                     (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq)\
-                     + 108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - 
-                       QdotBsq - D*Qtsq,2) + 
-                    108*Power(Bsq + 2*D,2)*
-                     (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                    72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                     (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),
-               0.3333333333333333)) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-              36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-               (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-              108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                 D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-               (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-              72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-               (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-              Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                   2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-                Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                  36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                   (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-                  108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                     D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                   (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                  72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                   (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),
-		 0.3333333333333333)/(3.*Power(2,0.3333333333333333)))))/2.;
+double
+fWplim_deriv (double Wp, void *params)
+{
+  ldouble *cons
+    = (double *) params;
+  
+  ldouble Qn=cons[0];
+  ldouble Qtsq=cons[1];
+  ldouble D=cons[2];
+  ldouble QdotBsq=cons[3];
+  ldouble Bsq=cons[4];
+  ldouble Qdotnp=cons[6];
 
-   wmrho0[2]=(-Bsq - 2*D)/2. + Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Power(Bsq + 2*D,2) + 
-      (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)/3. + Qtsq + 
-      (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-       (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-           36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-           108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-             2) + 108*Power(Bsq + 2*D,2)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-           72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-           Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-             Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-               36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-               108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                  D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-               72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333))
-        + Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-         36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-         108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-           2) + 108*Power(Bsq + 2*D,2)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-         72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-         Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-              2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-             36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-             108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-               2) + 108*Power(Bsq + 2*D,2)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-             72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333)/
-       (3.*Power(2,0.3333333333333333)))/2. - 
-   Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + 2*Power(Bsq + 2*D,2) + Qtsq + 
-      (-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Qtsq)/3. - 
-      (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-       (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-           36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-           108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-             2) + 108*Power(Bsq + 2*D,2)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-           72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-           Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-             Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-               36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-               108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                  D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-               72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333))
-        - Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-         36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-         108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-           2) + 108*Power(Bsq + 2*D,2)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-         72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-         Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-              2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-             36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-             108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-               2) + 108*Power(Bsq + 2*D,2)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-             72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333)/
-       (3.*Power(2,0.3333333333333333)) + 
-      (-8*Power(Bsq + 2*D,3) + 8*(Bsq + 2*D)*
-          (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq) - 
-         16*(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq))/
-       (4.*Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Power(Bsq + 2*D,2) + 
-           (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)/3. + Qtsq + 
-           (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-            (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                 (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-                108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                   D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                 (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                 (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-                Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                     2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-                  Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                    36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                     (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq)\
-                     + 108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - 
-                       QdotBsq - D*Qtsq,2) + 
-                    108*Power(Bsq + 2*D,2)*
-                     (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                    72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                     (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),
-               0.3333333333333333)) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-              36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-               (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-              108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                 D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-               (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-              72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-               (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-              Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                   2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-                Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                  36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                   (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-                  108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                     D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                   (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                  72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                   (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),
-		 0.3333333333333333)/(3.*Power(2,0.3333333333333333)))))/2.;
+  return 1 - (Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))/
+    (Power(D + Wp,2)*Power(Bsq + D + Wp,2)) + 
+   (2*Wp*(Power(Bsq,2)*QdotBsq + 3*Bsq*QdotBsq*(D + Wp) + 
+        Power(D + Wp,2)*(3*QdotBsq + Qtsq*(D + Wp))))/
+    (Power(D + Wp,3)*Power(Bsq + D + Wp,3)) - 
+   (D*(Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))*
+      (Power(Bsq,2)*QdotBsq + 3*Bsq*QdotBsq*(D + Wp) + 
+        Power(D + Wp,2)*(3*QdotBsq + Qtsq*(D + Wp)))*
+      Power(1/(1 - (Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))/
+           (Power(D + Wp,2)*Power(Bsq + D + Wp,2))),1.5))/
+    (Power(D + Wp,5)*Power(Bsq + D + Wp,5)*
+      Power(1 + Sqrt(1/
+          (1 - (Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))/
+             (Power(D + Wp,2)*Power(Bsq + D + Wp,2)))),2)) - 
+   (2*D*(QdotBsq + Qtsq*(D + Wp)))/
+    (Power(D + Wp,2)*Power(Bsq + D + Wp,2)*
+      (1 + Sqrt(1/
+          (1 - (Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))/
+             (Power(D + Wp,2)*Power(Bsq + D + Wp,2)))))) + 
+   (2*D*(Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp))))/
+    (Power(D + Wp,2)*Power(Bsq + D + Wp,3)*
+      (1 + Sqrt(1/
+          (1 - (Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))/
+             (Power(D + Wp,2)*Power(Bsq + D + Wp,2)))))) + 
+   (2*D*(Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp))))/
+    (Power(D + Wp,3)*Power(Bsq + D + Wp,2)*
+      (1 + Sqrt(1/
+          (1 - (Bsq*QdotBsq + (D + Wp)*(2*QdotBsq + Qtsq*(D + Wp)))/
+	   (Power(D + Wp,2)*Power(Bsq + D + Wp,2))))));
+}
 
-   wmrho0[3]=(-Bsq - 2*D)/2. + Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Power(Bsq + 2*D,2) + 
-      (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)/3. + Qtsq + 
-      (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-       (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-           36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-           108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-             2) + 108*Power(Bsq + 2*D,2)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-           72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-           Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-             Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-               36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-               108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                  D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-               72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333))
-        + Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-         36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-         108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-           2) + 108*Power(Bsq + 2*D,2)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-         72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-         Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-              2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-             36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-             108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-               2) + 108*Power(Bsq + 2*D,2)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-             72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333)/
-       (3.*Power(2,0.3333333333333333)))/2. + 
-   Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + 2*Power(Bsq + 2*D,2) + Qtsq + 
-      (-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Qtsq)/3. - 
-      (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-       (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-           36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-           108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-             2) + 108*Power(Bsq + 2*D,2)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-           72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-            (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-           Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-             Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-               36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-               108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                  D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-               72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333))
-        - Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-         36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-         108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-           2) + 108*Power(Bsq + 2*D,2)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-         72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-          (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-         Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-              2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-             36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-             108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq,
-               2) + 108*Power(Bsq + 2*D,2)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-             72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-              (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),0.3333333333333333)/
-       (3.*Power(2,0.3333333333333333)) + 
-      (-8*Power(Bsq + 2*D,3) + 8*(Bsq + 2*D)*
-          (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq) - 
-         16*(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq))/
-       (4.*Sqrt(-Power(Bsq,2) - 6*Bsq*D - 5*Power(D,2) + Power(Bsq + 2*D,2) + 
-           (Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)/3. + Qtsq + 
-           (Power(2,0.3333333333333333)*Power(Power(Bsq,2) - Power(D,2) - Qtsq,2))/
-            (3.*Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                 (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-                108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                   D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                 (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                 (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-                Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                     2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-                  Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                    36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                     (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq)\
-                     + 108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - 
-                       QdotBsq - D*Qtsq,2) + 
-                    108*Power(Bsq + 2*D,2)*
-                     (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                    72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                     (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),
-               0.3333333333333333)) + 
-           Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-              36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-               (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-              108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                 D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-               (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-              72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-               (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) + 
-              Sqrt(-4*Power(Power(Bsq,4) - 2*Power(Bsq,2)*Power(D,2) + Power(D,4) - 
-                   2*Power(Bsq,2)*Qtsq + 2*Power(D,2)*Qtsq + Power(Qtsq,2),3) + 
-                Power(2*Power(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq,3) - 
-                  36*(Bsq + 2*D)*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                   (Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - D*Qtsq) + 
-                  108*Power(Power(Bsq,2)*D + 2*Bsq*Power(D,2) + Power(D,3) - QdotBsq - 
-                     D*Qtsq,2) + 108*Power(Bsq + 2*D,2)*
-                   (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq) - 
-                  72*(Power(Bsq,2) + 6*Bsq*D + 5*Power(D,2) - Qtsq)*
-                   (-(Bsq*QdotBsq) - 2*D*QdotBsq - Power(D,2)*Qtsq),2)),
-		 0.3333333333333333)/(3.*Power(2,0.3333333333333333)))))/2.;
+void
+fWplim_fdf (double Wp, void *params, 
+               double *y, double *dy)
+{
+  *y = fWplim (Wp,params);
+  *dy =  fWplim_deriv (Wp,params);
+}
 
-   return 0;
 
+int
+find_Wplim(ldouble Wp,ldouble *cons)
+{
+  int status;
+  int iter = 0, max_iter = 100;
+  const gsl_root_fdfsolver_type *T;
+  gsl_root_fdfsolver *s;
+  double x = Wp, x0;
+  gsl_function_fdf FDF;
+
+  FDF.f = &fWplim;
+  FDF.df = &fWplim_deriv;
+  FDF.fdf = &fWplim_fdf;
+  FDF.params = cons;
+
+  T = gsl_root_fdfsolver_newton;
+  s = gsl_root_fdfsolver_alloc (T);
+  gsl_root_fdfsolver_set (s, &FDF, x);
+
+  printf ("using %s method\n", 
+          gsl_root_fdfsolver_name (s));
+
+  printf ("%-5s %10s %10s %10s\n",
+          "iter", "root", "err", "err(est)");
+  do
+    {
+      iter++;
+      status = gsl_root_fdfsolver_iterate (s);
+      x0 = x;
+      x = gsl_root_fdfsolver_root (s);
+      status = gsl_root_test_delta (x, x0, 0, 1e-3);
+
+      if (status == GSL_SUCCESS)
+        printf ("Converged:\n");
+
+      printf ("%5d %10.7f %10.7f\n",
+              iter, x, x - x0);
+    }
+  while (status == GSL_CONTINUE && iter < max_iter);
+
+  gsl_root_fdfsolver_free (s);
+  return status;
 }
 
 //**********************************************************************
@@ -1740,8 +1341,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble cons[7]={Qn,Qt2,D,QdotBsq,Bsq,Sc,Qdotnp};
   int iter=0,fu2pret;
   
-  double wmrho00[4];
-  find_wmrho0(Wp,cons,wmrho00);
+  find_Wplim(Wp,cons);
 
   do
     {
@@ -1778,7 +1378,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   if(i_increase>5)
     {
-      printf(">@#$ %e %e %e %e\n",wmrho00[0],wmrho00[1],wmrho00[2],wmrho00[3]);
+      //printf(">@#$ %e %e %e %e\n",wmrho00[0],wmrho00[1],wmrho00[2],wmrho00[3]);
       getch();
     }
 
