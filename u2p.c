@@ -282,9 +282,9 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
 		printf("u2p_entr err No. %4d > %e %e %e > %e %e > %4d %4d %4d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 	      }
 
-	    //test, to print it out 
-	    u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
-	    getchar();
+	    //test, to print it if error and stop
+	    //u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
+	    //getchar();
 
 	    /*
 	    if(u2pret==-103 && 0)  //TODO: work out hotmax
@@ -1125,14 +1125,15 @@ fWplim_fdf (double Wp, void *params,
 }
 
 
-ldouble
-find_Wplim(ldouble Wp,ldouble *cons)
+int
+find_Wplim(ldouble *Wp,ldouble *cons)
 {
+  int verbose=0;
   int status;
   int iter = 0, max_iter = 100;
   const gsl_root_fdfsolver_type *T;
   gsl_root_fdfsolver *s;
-  double x = Wp, x0;
+  double x = *Wp, x0;
   gsl_function_fdf FDF;
 
   FDF.f = &fWplim;
@@ -1144,11 +1145,14 @@ find_Wplim(ldouble Wp,ldouble *cons)
   s = gsl_root_fdfsolver_alloc (T);
   gsl_root_fdfsolver_set (s, &FDF, x);
 
-  printf ("using %s method\n", 
+  if(verbose) printf ("using %s method\n", 
           gsl_root_fdfsolver_name (s));
 
-  printf ("%-5s %10s %10s\n",
+  if(verbose) printf ("%-5s %10s %10s\n",
           "iter", "root", "err(est)");
+
+   if(verbose) printf ("%5d %10.7e %10.7e\n",
+              iter, x, x - x0);
   do
     {
       iter++;
@@ -1157,29 +1161,55 @@ find_Wplim(ldouble Wp,ldouble *cons)
       x = gsl_root_fdfsolver_root (s);
       status = gsl_root_test_delta (x, x0, 0, 1e-3);
 
-      if (status == GSL_SUCCESS)
+      if(isnan(x))
+	return -1;
+
+      //forbid  Wp<0
+      while(x<=0)
+	{
+	  x=0.5*(x0+x);
+	}
+	
+
+      if (verbose && status == GSL_SUCCESS)
         printf ("Converged:\n");
 
-      printf ("%5d %10.7e %10.7e\n",
+      if(verbose) printf ("%5d %10.7e %10.7e\n",
               iter, x, x - x0);
     }
   while (status == GSL_CONTINUE && iter < max_iter);
 
   gsl_root_fdfsolver_free (s);
-  return x;
+  *Wp = x;
+
+  return 0;
 }
 
+//*** wrapper ***/
+int
+u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
+{
+  if(Etype==U2P_HOT) 
+    u2p_solver_W(uu,pp,ggg,Etype,verbose);
+  else if(Etype==U2P_ENTROPY) 
+    u2p_solver_W(uu,pp,ggg,Etype,verbose); //this one is more failsafe
+  else
+    u2p_solver_W(uu,pp,ggg,Etype,verbose);
+  return 0;
+}
+ 
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
 //Newton-Rapshon solver 
+//upgraded - uses Wp
 //Etype == 0 -> hot inversion (uses D,Ttt,Tti)
 //Etype == 1 -> entropy inversion (uses D,S,Tti)
 //Etype == 2 -> hotmax inversion (uses D,Tti,u over rho max ratio)
 //Etype == 3 -> cold inversion (uses D,Tti,u over rho min ratio)
 
 int
-u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
+u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
   int i,j,k;
   ldouble rho,uint,w,W,Wp,Wpprev,alpha,D,Sc,alphasq,betasqoalphasq;
@@ -1329,7 +1359,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   //W
   Wp=(GAMMA*uint)*gamma2;
 
-  if(verbose>1 || 1) printf("initial Wp:%e\n",Wp);
+  if(verbose>1) printf("initial Wp:%e\n",Wp);
 
   /****************************/
   
@@ -1341,8 +1371,12 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble cons[7]={Qn,Qt2,D,QdotBsq,Bsq,Sc,Qdotnp};
   int iter=0,fu2pret;
   
-  Wp=1.0001*find_Wplim(Wp,cons);
-
+  /*
+  if(find_Wplim(&Wp,cons)!=0) //does not modify if error
+    {
+      if(verbose) printf("err in find_Wplim\n");
+    }
+  */
 
   do
     {
@@ -1362,12 +1396,12 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 
       //if(Etype!=U2P_HOT) 
-      //(*f_u2p)(Wp,cons,&f0,&dfdW,&err);
+      (*f_u2p)(Wp,cons,&f0,&dfdW,&err);
       
-      //if((gamma2<0. || Wp<0. || wmrho0<0.|| !isfinite(f0) || !isfinite(dfdW)) && (i_increase < 50))
-      if((gamma2<0. || Wp<0. || wmrho0<0.) && (i_increase < 50))
+      if((gamma2<0. || Wp<0. || wmrho0<0.|| !isfinite(f0) || !isfinite(dfdW)) && (i_increase < 50))
+	//if((gamma2<0. || Wp<0. || wmrho0<0.) && (i_increase < 50))
 	{
-	  if(verbose>0 || 1) printf("init Wp : %e - %e %e %e %e\n",Wp,v2,wmrho0,f0,dfdW);
+	  if(verbose>0) printf("init Wp : %e - %e %e %e %e\n",Wp,v2,wmrho0,f0,dfdW);
 	  Wp *= 2.;
 	  i_increase++;
 	  continue;
@@ -1377,8 +1411,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     }
   while(1);
 
-    getch();
-
+  
 
   if(i_increase>=50)
     {
@@ -1476,7 +1509,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 
       //convergence test:
-      if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<1.e-1)) break;
+      if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<sqrt(sqrt(CONV)))) break;
     }
   while(iter<50);
    
@@ -1571,26 +1604,31 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 int count_entropy(int *n, int *n2)
 {
-
-  //counting the number of entropy inversions
-  int nentr,nentrloc=0,ii,ix,iy,iz;
-  int nentr2,nentrloc2=0;
-  for(ii=0;ii<Nloop_0;ii++) //domain 
-    {
-      ix=loop_0[ii][0];
-      iy=loop_0[ii][1];
-      iz=loop_0[ii][2]; 
-      nentrloc+=get_cflag(ENTROPYFLAG,ix,iy,iz); 
-      nentrloc2+=get_cflag(ENTROPYFLAG2,ix,iy,iz); 
-    }
-#ifdef MPI
-  MPI_Allreduce(&nentrloc, &nentr, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
-  MPI_Allreduce(&nentrloc2, &nentr2, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
-#else
-  nentr=nentrloc;
-  nentr2=nentrloc2;
+  int nentr=0,nentrloc=0,ii,ix,iy,iz;
+  int nentr2=0,nentrloc2=0;
+#ifdef OMP //for openMP only one thread is supposed to do that, the routine may be called from outside parallel region
+  if(PROCID==0)
 #endif
 
+    {
+      //counting the number of entropy inversions
+
+      for(ix=0;ix<NX;ix++)
+	for(iy=0;iy<NY;iy++)
+	  for(iz=0;iz<NZ;iz++)
+	    {
+	      nentrloc+=get_cflag(ENTROPYFLAG,ix,iy,iz); 
+	      nentrloc2+=get_cflag(ENTROPYFLAG2,ix,iy,iz); 
+	    }
+#ifdef MPI
+      MPI_Allreduce(&nentrloc, &nentr, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
+      MPI_Allreduce(&nentrloc2, &nentr2, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
+#else
+      nentr=nentrloc;
+      nentr2=nentrloc2;
+#endif
+
+    }
   *n = nentr;
   *n2 = nentr2;
   return 0;
@@ -1648,5 +1686,405 @@ test_inversion()
   print_primitives(pp);
 
   return 0;
+
+}
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//old Newton-Rapshon solver 
+//iterates W, not Wp
+//Etype == 0 -> hot inversion (uses D,Ttt,Tti)
+//Etype == 1 -> entropy inversion (uses D,S,Tti)
+//Etype == 2 -> hotmax inversion (uses D,Tti,u over rho max ratio)
+//Etype == 3 -> cold inversion (uses D,Tti,u over rho min ratio)
+
+int
+u2p_solver_W(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
+{
+  int i,j,k;
+  ldouble rho,uint,w,W,alpha,D,Sc;
+  ldouble ucon[4],ucov[4],utcon[4],utcov[4],ncov[4],ncon[4];
+  ldouble Qcon[4],Qcov[4],Qconp[4],Qcovp[4],jmunu[4][4],Qtcon[4],Qtcov[4],Qt2,Qn;
+  ldouble QdotB,QdotBsq,Bcon[4],Bcov[4],Bsq;
+
+  /****************************/
+  //prepare geometry
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;  GG=geom->GG;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+  /****************************/
+
+  /****************************/
+  //equations choice
+  int (*f_u2p)(ldouble,ldouble*,ldouble*,ldouble*,ldouble*);
+ if(Etype==U2P_HOT) 
+   f_u2p=&f_u2p_hot;
+ if(Etype==U2P_ENTROPY) 
+   f_u2p=&f_u2p_entropy;
+ if(Etype==U2P_HOTMAX) 
+   f_u2p=&f_u2p_hotmax;
+ if(Etype==U2P_COLD) 
+   f_u2p=&f_u2p_cold;
+  /****************************/
+ 
+  
+  if(verbose>1) {printf("********************\n");print_conserved(uu);print_primitives(pp);}
+
+  /****************************/
+  //conserved quantities etc
+  
+  //alpha
+  alpha=sqrt(-1./GG[0][0]);
+
+  //D
+  D=uu[0]/gdetu*alpha; //uu[0]=gdetu rho ut
+
+  //conserved entropy "S u^t"
+  Sc=uu[5]/gdetu*alpha; 
+
+  //Q_mu=alpha T^t_mu
+  Qcov[0]=(uu[1]/gdetu-uu[0]/gdetu)*alpha;
+  Qcov[1]=uu[2]/gdetu*alpha;
+  Qcov[2]=uu[3]/gdetu*alpha;
+  Qcov[3]=uu[4]/gdetu*alpha;
+
+  //Qp_mu=alpha T^t_mu 
+  Qcovp[0]=uu[1]/gdetu*alpha;
+  Qcovp[1]=uu[2]/gdetu*alpha;
+  Qcovp[2]=uu[3]/gdetu*alpha;
+  Qcovp[3]=uu[4]/gdetu*alpha;
+
+
+  //Qp^mu
+  indices_12(Qcovp,Qconp,GG);
+
+  //Q^mu
+  indices_12(Qcov,Qcon,GG);
+
+#ifdef MAGNFIELD
+  //curly B^mu
+  Bcon[0]=0.;
+  Bcon[1]=uu[B1]/gdetu*alpha;
+  Bcon[2]=uu[B2]/gdetu*alpha;
+  Bcon[3]=uu[B3]/gdetu*alpha;
+
+  //B_mu
+  indices_21(Bcon,Bcov,gg);
+
+  Bsq = dot(Bcon,Bcov);
+
+  QdotB = dot(Qcov,Bcon);
+
+  QdotBsq = QdotB*QdotB;
+#else
+  Bsq=QdotB=QdotBsq=0.;
+  Bcon[0]=Bcon[1]=Bcon[2]=Bcon[3]=0.;
+#endif  
+
+  //n_mu = (-alpha, 0, 0, 0)
+  ncov[0]=-alpha;
+  ncov[1]=ncov[2]=ncov[3]=0.;
+  
+  //n^mu
+  indices_12(ncov,ncon,GG);
+
+  //Q_mu n^mu = Q^mu n_mu = -alpha*Q^t
+  Qn=Qcon[0] * ncov[0];
+
+  //j^mu_nu=delta^mu_nu +n^mu n_nu
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      jmunu[i][j] = delta(i,j) + ncon[i]*ncov[j];
+
+  //Qtilda^nu = j^nu_mu Q^mu
+  for(i=0;i<4;i++)
+    {
+      Qtcon[i]=0.;
+      for(j=0;j<4;j++)
+	Qtcon[i]+=jmunu[i][j]*Qcon[j];
+    }
+
+  //Qtilda_nu
+  indices_21(Qtcon,Qtcov,gg);
+
+  //Qt2=Qtilda^mu Qtilda_mu
+  Qt2=dot(Qtcon,Qtcov);
+  FTYPE Qtsq = Qt2;
+
+  //\beta^i \beta_i / \alpha^2 = g^{ti} g_{ti}
+  ldouble betasqoalphasq=gg[0][1]*GG[0][1] + gg[0][2]*GG[0][2] + gg[0][3]*GG[0][3]; 
+  ldouble alphasq=alpha*alpha;
+  //Qdotnp=-E'=-E+D
+  ldouble Dfactor = (-geom->gttpert + alphasq*betasqoalphasq)/(alphasq+alpha);
+  ldouble Qdotnp = Qconp[0]*ncov[0] + D*(Dfactor) ; // -Qdotn-W = -Qdotnp-Wp
+
+
+  /****************************/
+  
+  //initial guess for W = w gamma**2 based on primitives
+  rho=pp[0];
+  uint=pp[1];
+  utcon[0]=0.;
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  //conv_vels(utcon,ucon,VELPRIM,VEL4,gg,GG);
+  //indices_21(ucon,ucov,gg);
+  conv_vels(utcon,utcon,VELPRIM,VELR,gg,GG);
+
+  ldouble qsq=0.;
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      qsq+=utcon[i]*utcon[j]*gg[i][j];
+  ldouble gamma2=1.+qsq;
+  ldouble gamma=sqrt(gamma2);
+
+  //W
+  W=(rho+GAMMA*uint)*gamma2;
+
+  if(verbose>1) printf("initial W:%e\n",W);
+
+  /****************************/
+  
+  //test if does not provide reasonable gamma2
+  // Make sure that W is large enough so that v^2 < 1 : 
+  int i_increase = 0;
+  ldouble f0,f1,dfdW,err;
+  ldouble CONV=U2PCONV; 
+  ldouble EPS=1.e-4;
+  ldouble Wprev=W;
+  ldouble cons[7]={Qn,Qt2,D,QdotBsq,Bsq,Sc,Qdotnp};
+  
+  do
+    {
+      f0=dfdW=0.;
+
+      //now invoked for all solvers:
+      //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
+      (*f_u2p)(W-D,cons,&f0,&dfdW,&err);
+
+      if( ((( W*W*W * ( W + 2.*Bsq ) 
+	    - QdotBsq*(2.*W + Bsq) ) <= W*W*(Qtsq-Bsq*Bsq))
+	  || !isfinite(f0) || !isfinite(f0)
+	  || !isfinite(dfdW) || !isfinite(dfdW))	  
+	  && (i_increase < 50)) 
+	{
+	  if(verbose>0) printf("init W : %e -> %e (%e %e)\n",W,100.*W,f0,dfdW);
+	  W *= 10.;
+	  i_increase++;
+	  continue;
+	}
+      else
+	break;    
+    }
+  while(1);
+
+  if(i_increase>=50)
+    {
+      return -150;
+      printf("failed to find initial W for Etype: %d\n",Etype);
+      printf("at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+      print_NVvector(uu);
+      print_NVvector(pp);
+      getchar();
+    }
+
+  //1d Newton solver
+  int iter=0,fu2pret;
+  do
+    {
+      Wprev=W;
+      iter++;
+     
+      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW,&err);
+
+      //numerical derivative
+      //fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW,&err);
+      //dfdW=(f1-f0)/(EPS*W);
+
+      if(verbose>1) printf("%d %e %e %e %e\n",iter,W,f0,dfdW,err);
+ 
+      //convergence test
+      if(err<CONV)
+	break;
+      
+      if(dfdW==0.) {W*=1.1; continue;}
+
+      ldouble Wnew=W-f0/dfdW;
+      int idump=0;
+      ldouble dumpfac=1.;
+
+      //test if goes out of bounds and damp solution if so
+      do
+	{
+	  ldouble f0tmp,dfdWtmp,errtmp;
+	  f0tmp=dfdWtmp=0.;
+	  //now for all solvers
+	  //if(Etype!=U2P_HOT) //entropy-like solvers require this additional check
+	  (*f_u2p)(Wnew-D,cons,&f0tmp,&dfdWtmp,&errtmp);
+	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e\n",idump,iter,Wnew,f0tmp,dfdWtmp,errtmp);
+	  if( ((( Wnew*Wnew*Wnew * ( Wnew + 2.*Bsq ) 
+		  - QdotBsq*(2.*Wnew + Bsq) ) <= Wnew*Wnew*(Qtsq-Bsq*Bsq))
+	       || !isfinite(f0tmp) || !isfinite(f0tmp)
+	       || !isfinite(dfdWtmp) || !isfinite(dfdWtmp))
+	      && (idump<100))
+	    {
+	      idump++;
+	      dumpfac/=2.;
+	      Wnew=W-dumpfac*f0/dfdW;
+	      continue;
+	    }
+	  else
+	    break;
+	}
+      while(1);
+	  
+      if(idump>=100) 
+	{
+	  if(verbose>0) printf("damped unsuccessfuly\n");
+	  return -101;
+	}
+	
+      W=Wnew; 
+
+      if(fabs(W)>BIG) 
+	{
+	  if(verbose>1) printf("W has gone out of bounds at %d,%d,%d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz); 
+	  return -103;
+	}
+
+
+      if(fabs((W-Wprev)/Wprev)<CONV && err<1.e-1) break;
+    }
+  while(iter<50);
+
+ 
+  if(iter>=50)
+    {
+      if(verbose>0) printf("iter exceeded in u2p_solver with Etype: %d\n",Etype); //getchar();
+      return -102;
+    }
+
+
+  if(!isfinite(W) || !isfinite(W)) {if(verbose) printf("nan/inf W in u2p_solver with Etype: %d\n",Etype); return -103;}
+ 
+  if(verbose>1) 
+    {
+      fu2pret=(*f_u2p)(W-D,cons,&f0,&dfdW,&err);
+      printf("end: %d %e %e %e %e\n",iter,W,f0,dfdW,err);
+    }
+
+  //W found, let's calculate v2 and the rest
+  //ldouble v2=Qt2/W/W;
+
+  ldouble Wsq,Xsq,v2;
+	
+  Wsq = W*W ;
+  Xsq = (Bsq + W) * (Bsq + W);  
+  v2 = ( Wsq * Qtsq  + QdotBsq * (Bsq + 2.*W)) / (Wsq*Xsq);
+
+  gamma2=1./(1.-v2);
+  gamma=sqrt(gamma2);
+  rho=D/gamma;
+  uint=1./GAMMA*(W/gamma2-rho);
+  utcon[0]=0.;
+  utcon[1]=gamma/(W+Bsq)*(Qtcon[1]+QdotB*Bcon[1]/W);
+  utcon[2]=gamma/(W+Bsq)*(Qtcon[2]+QdotB*Bcon[2]/W);
+  utcon[3]=gamma/(W+Bsq)*(Qtcon[3]+QdotB*Bcon[3]/W);
+
+  if(!isfinite(utcon[1]))
+    {
+      //print_4vector(utcon);
+      return -120;
+    }
+
+
+  if(uint<0. || gamma2<0. ||isnan(W) || !isfinite(W)) 
+    {
+      if(verbose>0) printf("neg u in u2p_solver %e %e %e %e\n",rho,uint,gamma2,W);//getchar();
+      return -104;
+    }
+
+  //converting to VELPRIM
+  conv_vels(utcon,utcon,VELR,VELPRIM,gg,GG);
+  
+  //returning new primitives
+  pp[RHO]=rho;
+  pp[UU]=uint;
+  pp[VX]=utcon[1];
+  pp[VY]=utcon[2];
+  pp[VZ]=utcon[3];
+
+
+  if(rho<0.) 
+    {
+      if(verbose>0) printf("neg rho in u2p_solver %e %e %e %e\n",rho,uint,gamma2,W);//getchar();
+      return -105;
+    }
+
+
+  //entropy based on Etype
+  pp[ENTR]=calc_Sfromu(rho,uint);
+
+#ifdef MAGNFIELD
+  //magnetic conserved=primitives
+  pp[B1]=uu[B1]/gdetu;
+  pp[B2]=uu[B2]/gdetu;
+  pp[B3]=uu[B3]/gdetu;
+#endif
+
+#ifdef TRACER
+  ldouble Dtr=uu[TRA]/gdetu*alpha; //uu[0]=gdetu rho ut
+  pp[TRA]=Dtr/gamma;
+#endif
+
+
+  if(verbose) print_primitives(pp);
+
+  // test the inversion
+  /*
+  ldouble uu2[NV];
+  int iv;
+  int lostprecision=0;
+  p2u(pp,uu2,ggg);
+
+  //if(verbose) print_NVvector(uu2);
+  //if(verbose) print_NVvector(uu);
+  
+ 
+  for(iv=0;iv<NVMHD;iv++)
+    {
+      if(Etype==U2P_HOT) if(iv==5) continue;
+      if(Etype==U2P_ENTROPY) if(iv==1) continue;
+      if(Etype==U2P_COLD || Etype==U2P_HOTMAX) if(iv==1 || iv==5) continue;
+      if(((iv==0 || iv==1 || iv==5) && fabs(uu2[iv]-uu[iv])/fabs(uu[iv]+uu2[iv])>1.e-1))
+	lostprecision=1;
+    }     
+  
+  if(lostprecision)
+    {
+      if(verbose>0 || 1)
+	{
+	  print_Nvector(uu,NV);
+	  print_Nvector(uu2,NV);  
+	  printf("u2p_solver lost precision:\n");      
+	  //getchar();
+	}
+      
+      //test
+      return -106;
+    }
+  */
+
+  if(verbose>0) printf("u2p_solver returns 0\n");
+  return 0; //ok
 
 }

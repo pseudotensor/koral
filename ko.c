@@ -547,7 +547,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    calc_u2p();
             #pragma omp barrier
-	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	    count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	    op_implicit (t,0.5*dt); 
 
 	    copyi_u(1.,u,ut1);
@@ -561,7 +561,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //2nd
 	    //calc_u2p();
             #pragma omp barrier
-	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	    count_entropy(&nentr[2],&nentr2[2]); do_finger();
 	    op_explicit (t,dt); 
 
 	    calc_u2p();

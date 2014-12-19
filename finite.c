@@ -527,6 +527,9 @@ calc_u2p()
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
+      set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
+      set_cflag(ENTROPYFLAG2,ix,iy,iz,0); 
+
 #if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
       if(TJ==0 && iy<NCCORRECTPOLAR-1) continue;
 #ifndef HALFTHETA
