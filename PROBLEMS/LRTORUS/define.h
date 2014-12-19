@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 28
+#define RESTARTNUM 0
 
 /************************************/
 //radiation choices
@@ -144,7 +144,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 100.
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/
@@ -277,6 +277,6 @@
 #define LT_RIN 10.
 #endif
 
-#define RHOATMMIN  1.e-15
+#define RHOATMMIN  1.e-20
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
