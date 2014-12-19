@@ -1125,7 +1125,7 @@ fWplim_fdf (double Wp, void *params,
 }
 
 
-int
+ldouble
 find_Wplim(ldouble Wp,ldouble *cons)
 {
   int status;
@@ -1147,8 +1147,8 @@ find_Wplim(ldouble Wp,ldouble *cons)
   printf ("using %s method\n", 
           gsl_root_fdfsolver_name (s));
 
-  printf ("%-5s %10s %10s %10s\n",
-          "iter", "root", "err", "err(est)");
+  printf ("%-5s %10s %10s\n",
+          "iter", "root", "err(est)");
   do
     {
       iter++;
@@ -1160,13 +1160,13 @@ find_Wplim(ldouble Wp,ldouble *cons)
       if (status == GSL_SUCCESS)
         printf ("Converged:\n");
 
-      printf ("%5d %10.7f %10.7f\n",
+      printf ("%5d %10.7e %10.7e\n",
               iter, x, x - x0);
     }
   while (status == GSL_CONTINUE && iter < max_iter);
 
   gsl_root_fdfsolver_free (s);
-  return status;
+  return x;
 }
 
 //**********************************************************************
@@ -1329,7 +1329,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   //W
   Wp=(GAMMA*uint)*gamma2;
 
-  if(verbose>1) printf("initial Wp:%e\n",Wp);
+  if(verbose>1 || 1) printf("initial Wp:%e\n",Wp);
 
   /****************************/
   
@@ -1341,7 +1341,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble cons[7]={Qn,Qt2,D,QdotBsq,Bsq,Sc,Qdotnp};
   int iter=0,fu2pret;
   
-  find_Wplim(Wp,cons);
+  Wp=1.0001*find_Wplim(Wp,cons);
+
 
   do
     {
@@ -1376,11 +1377,8 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     }
   while(1);
 
-  if(i_increase>5)
-    {
-      //printf(">@#$ %e %e %e %e\n",wmrho00[0],wmrho00[1],wmrho00[2],wmrho00[3]);
-      getch();
-    }
+    getch();
+
 
   if(i_increase>=50)
     {
