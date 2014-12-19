@@ -1141,6 +1141,7 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 
   //set the initial location
   MPI_Offset pos;
+  int idx[3];
 
 #ifndef RESTARTGENERALINDICES
   if(PROCID==0) pos=0;
@@ -1159,9 +1160,15 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
       for(tix=0;tix<TNX;tix++)
 #endif
 	{
+	  MPI_File_read( cFile, idx, 3, MPI_INT, &status );
+
+	  /*
 	  MPI_File_read( cFile, &gix, 1, MPI_INT, &status );
 	  MPI_File_read( cFile, &giy, 1, MPI_INT, &status );
 	  MPI_File_read( cFile, &giz, 1, MPI_INT, &status );
+	  */
+	  
+	  gix=idx[0];giy=idx[1];giz=idx[2];
 
 	  mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
 
@@ -1257,7 +1264,7 @@ fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
     pos=PROCID*NX*NY*NZ*(3*sizeof(int)+(NV+NAVGVARS)*sizeof(ldouble));
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
-  int ix,iy,iz,iv;
+  int ix,iy,iz,iv,idx[3];
   int gix,giy,giz;
   ldouble pp[NV];
   for(iz=0;iz<NZ;iz++)
@@ -1266,10 +1273,9 @@ fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
 	{
 	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
 	  
-	    MPI_File_write( cFile, &gix, 1, MPI_INT, &status );
-	    MPI_File_write( cFile, &giy, 1, MPI_INT, &status );
-	    MPI_File_write( cFile, &giz, 1, MPI_INT, &status );
-	    MPI_File_write( cFile, &get_uavg(pavg,0,ix,iy,iz), NV+NAVGVARS, MPI_LDOUBLE, &status );
+	  idx[0]=gix;idx[1]=giy;idx[2]=giz;
+	  MPI_File_write( cFile, idx, 3, MPI_INT, &status );
+	  MPI_File_write( cFile, &get_uavg(pavg,0,ix,iy,iz), NV+NAVGVARS, MPI_LDOUBLE, &status );
 	}
 
   MPI_File_close( &cFile );
