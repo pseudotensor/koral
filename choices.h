@@ -428,7 +428,7 @@
 #endif
 
 #ifndef U2PCONV
-#define U2PCONV 1.e-12
+#define U2PCONV 1.e-8
 #endif
 
 #ifndef RADIMPCONV

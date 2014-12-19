@@ -604,7 +604,11 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
       
       if(rettemp<0) 
 	{
-	  printf("u2p failed after imposing bsq over rho floors\n");
+#ifdef BHDISK_PROBLEMTYPE
+	  if(geom->ix+TOI>5) //report only outside horizon
+#endif
+	    printf("u2p failed after imposing bsq over rho floors at %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK);
+	  
 	}
     
 #elif(B2RHOFLOORFRAME==FFFRAME) //new mass in fluid frame
@@ -1238,9 +1242,10 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 
       //if(Etype!=U2P_HOT) 
-      (*f_u2p)(Wp,cons,&f0,&dfdW,&err);
+      //(*f_u2p)(Wp,cons,&f0,&dfdW,&err);
       
-      if((gamma2<0. || Wp<0. || wmrho0<0.|| !isfinite(f0) || !isfinite(dfdW)) && (i_increase < 50))
+      //if((gamma2<0. || Wp<0. || wmrho0<0.|| !isfinite(f0) || !isfinite(dfdW)) && (i_increase < 50))
+      if((gamma2<0. || Wp<0. || wmrho0<0.) && (i_increase < 50))
 	{
 	  if(verbose>0) printf("init Wp : %e - %e %e %e %e\n",Wp,v2,wmrho0,f0,dfdW);
 	  Wp *= 2.;
@@ -1274,14 +1279,15 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       fu2pret=(*f_u2p)(Wp,cons,&f0,&dfdW,&err);
 
       //numerical derivative
+      //      double EPS=1.e-8;
       //fu2pret=(*f_u2p)((1.+EPS)*W-D,cons,&f1,&dfdW,&err);
       //dfdW=(f1-f0)/(EPS*W);
 
       if(verbose>1) printf("%d %e %e %e %e\n",iter,Wp,f0,dfdW,err);
  
       //convergence test
-      if(err<CONV)
-	break;
+      //if(err<CONV)
+      //break;
       
       if(dfdW==0.) {Wp*=1.1; continue;}
 
@@ -1291,6 +1297,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       ldouble dumpfac=1.;
 
       //test if goes out of bounds and damp solution if so
+      int itmaxdamp=50;
       do
 	{
 	  ldouble f0tmp,dfdWtmp,errtmp;
@@ -1309,11 +1316,12 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  ldouble wmrho0 = Wpnew/gamma2 - D*v2/(1.+gamma);
 
 	  //if(Etype!=U2P_HOT) 
-	  (*f_u2p)(Wpnew,cons,&f0tmp,&dfdWtmp,&errtmp);
+	  //(*f_u2p)(Wpnew,cons,&f0tmp,&dfdWtmp,&errtmp);
 
 	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e %e\n",idump,iter,Wpnew,f0tmp,dfdWtmp,errtmp,v2);
 
-	  if((gamma2<0. || Wpnew<0. || wmrho0<0. || !isfinite(f0tmp) || !isfinite(dfdWtmp)) && (idump<100))
+	  //if((gamma2<0. || Wpnew<0. || wmrho0<0. || !isfinite(f0tmp) || !isfinite(dfdWtmp)) && (idump<itmaxdamp))
+	  if((gamma2<0. || Wpnew<0. || wmrho0<0.) && (idump<itmaxdamp))
 	    {
 	      idump++;
 	      dumpfac/=2.;
@@ -1324,8 +1332,10 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	    break;
 	}
       while(1);
-	  
-      if(idump>=100) 
+
+
+
+      if(idump>=itmaxdamp) 
 	{
 	  if(verbose>0) printf("damped unsuccessfuly\n");
 	  return -101;
@@ -1341,11 +1351,10 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 
       //convergence test:
-      if((fabs((Wp-Wpprev)/Wpprev)<CONV && err<1.e-1)) break;
+      if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<1.e-1)) break;
     }
   while(iter<50);
-
- 
+   
   if(iter>=50)
     {
       if(verbose>0) printf("iter exceeded in u2p_solver with Etype: %d\n",Etype); //getchar();

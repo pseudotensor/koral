@@ -8,7 +8,8 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 0
+#define RESTARTNUM -1
+//#define ENFORCEENTROPY
 
 /************************************/
 //radiation choices
@@ -37,7 +38,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX
+#define TIMESTEPPING RK2
 #define TSTEPLIM .4
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
