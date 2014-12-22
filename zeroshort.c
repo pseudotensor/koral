@@ -2859,18 +2859,20 @@ void linComb(double targetAng[3], double angGridCoords[NUMANGLES][3], int angInd
 
 	
 	// Conserve Intensity
+	/*
 	interp_coeff[0]=lc1/(lc1+lc2+lc3);
 	interp_coeff[1]=lc2/(lc1+lc2+lc3);
 	interp_coeff[2]=lc3/(lc1+lc2+lc3);
+	*/
 	
 
 
-	/*
+	
 	// Conserve Flux
 	interp_coeff[0]=lc1;
 	interp_coeff[1]=lc2;
 	interp_coeff[2]=lc3;
-	*/
+	
 
 
 	/*
@@ -3112,11 +3114,11 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
   Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
 
   //if perfectly isotropic, dont use transformI
-  if (Fmag_final/Efinal < 1.0e-10)
+  if (Fmag_final/Efinal < .1)
     {
       for (p=0; p<NUMANGLES; p++)
 	{
-	  I_return[p] = Efinal/NUMANGLES;
+	  //I_return[p] = Efinal/NUMANGLES;
 	}
       return;
     }
@@ -4730,7 +4732,9 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-  return;
+  //return;
+  //transformI_stretch(ix,iy,iz,I0,M1_input);
+
 
   if(TNY==1 && TNZ==1 && 1)
     transformI_stretch1d(ix,iy,iz,I0,M1_input);
