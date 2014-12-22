@@ -531,9 +531,13 @@ calc_u2p()
       set_cflag(ENTROPYFLAG2,ix,iy,iz,0); 
 
 #if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
-      if(TJ==0 && iy<NCCORRECTPOLAR-1) continue;
+      if(TJ==0 && iy<NCCORRECTPOLAR) 
+	{
+	  //printf("skipping: %d %d %d\n",PROCID,ix,iy);
+	  continue;
+	}
 #ifndef HALFTHETA
-      if(TJ==NTY-1 && iy>(NY-NCCORRECTPOLAR)) continue;
+      if(TJ==NTY-1 && iy>(NY-NCCORRECTPOLAR-1)) continue;
 #endif
 #endif
 

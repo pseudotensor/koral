@@ -70,9 +70,9 @@
 #define EEUURATIOMIN 1.e-20
 #define EEUURATIOMAX 1.e20
 #define B2UURATIOMIN 0.
-#define B2UURATIOMAX 100000.
+#define B2UURATIOMAX 10000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 50.
+#define B2RHORATIOMAX 10.
 #define GAMMAMAXRAD 50.
 #define GAMMAMAXHD 50.
 
@@ -119,8 +119,8 @@
 #define TNY 120//192 //8*24
 #define TNZ 1 //16*2
 //number of tiles
-#define NTX 1//34//16
-#define NTY 1//24//16
+#define NTX 2//34//16
+#define NTY 4//24//16
 #define NTZ 1//1
 
 #define SPECIFIC_BC

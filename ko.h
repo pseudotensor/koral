@@ -376,6 +376,7 @@ int set_xb(int,int,ldouble);
 //ldouble get_u(ldouble*,int,int,int,int);
 #define get_cflag(iflag,ix,iy,iz) (cellflag[iflag + (iX(ix)+NGCX)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS])
 #define set_cflag(iflag,ix,iy,iz,val) cellflag[iflag + (iX(ix)+NGCX)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS]=val
+//what is below works like u[SZ][SY][SX][NV] but NGCX accounts for negative indices
 #define get_u(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV])
 #define get_uavg(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+NGCX)*(NV+NAVGVARS) + (iY(iy)+NGCY)*(SX)*(NV+NAVGVARS) + (iZ(iz)+NGCZ)*(SY)*(SX)*(NV+NAVGVARS)])
 //int set_u(ldouble*,int,int,int,int,ldouble);

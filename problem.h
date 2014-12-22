@@ -90,8 +90,6 @@
 
 #define PROBLEM 67 
 
-
-
 #if(PROBLEM==86)
 
 

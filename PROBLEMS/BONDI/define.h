@@ -42,7 +42,7 @@
 
 //#define SKIPFANCYOPACITIES
 //#define OPACSIMPLE
-//#define OPACSKIPBE
+#define OPACSKIPBE
 //#define OPACSMOOTH
 //#define RADIMPSTARTLOWTEMP
 #define EXTRAHEATINGCOOLING
@@ -99,7 +99,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 512
+#define TNX 64
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -157,7 +157,7 @@
 #define NSTEPSTOP 1e40 //stop after this number of steps
 #define NOUTSTOP 10000 //stop after this number of outputs
 #ifdef SELFTIMESTEP
-#define DTOUT1 (RMAX*10.*TSTEPLIM) //res
+#define DTOUT1 (RMAX*1000.*TSTEPLIM) //res
 #else
 #define DTOUT1 (1000.)//(RMAX*100.) //res
 #endif

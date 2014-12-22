@@ -40,6 +40,34 @@ v4=tau[0];
 
 v9=pp[NF];//calc_ncompt_nphlab(pp,&geomout);
 
+//radiative stress tensor in the lab frame
+ldouble Rij[4][4];
+calc_Rij_M1(pp,&geom,Rij);
+//four fource
+ldouble Gi[4],Gic[4];
+calc_Gi(pp,&geom,Gi,1); 
+indices_21(Gi,Gi,geom.gg);
+//the four-velocity of fluid in lab frame
+ldouble ucon[4],utcon[4],ucov[4],vpr[3];
+utcon[1]=pp[2];
+utcon[2]=pp[3];
+utcon[3]=pp[4];
+conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
+//gas properties
+ldouble kappaes=calc_kappaes(pp,&geom);
+
+//contravariant four-force in the lab frame
+
+//R^ab u_a u_b = Erad in fluid frame
+ldouble Ruu=0.;
+for(i=0;i<4;i++)
+  for(j=0;j<4;j++)
+      Ruu+=Rij[i][j]*ucov[i]*ucov[j];
+  ldouble Ehatrad = Ruu;
+calc_Compt_Gi(pp,&geom,Gic,Ehatrad,Tgas,kappaes,ucon);
+
+v10=Gi[0];
+v11=Gic[0];
 
 //temp
 //v8=get_u_scalar(cell_dt,ix,iy,iz);
