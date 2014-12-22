@@ -554,6 +554,8 @@ calc_u2p()
   //**********************************************************************
 
   //fixup here hd after inversions
+  //cell_fixup_hd();
+  //test
   cell_fixup_hd();
 
 //**********************************************************************
@@ -4648,6 +4650,58 @@ cell_fixup_hd()
   //restoring to memory
   copy_u(1.,u_bak_fixup,u);
   copy_u(1.,p_bak_fixup,p);
+
+  return 0;
+}
+
+
+//fixing after failed MHD main inversion
+int
+cell_fixup_hd_ptm1()
+{
+  if(DOFIXUPS==0)
+    return 0;
+
+  int ix,iy,iz,iv;
+  int in,ii,iii;
+  int verbose=2;
+
+  copy_u(1.,u,u_bak_fixup);
+  copy_u(1.,p,p_bak_fixup);
+
+  //gets the neiboring the primitives
+  //#pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (static,4)
+  for(ii=0;ii<Nloop_0;ii++) //domain only
+    {
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
+
+      if(get_cflag(HDFIXUPFLAG,ix,iy,iz)==1)
+	{
+	  //set_cflag(HDFIXUPFLAG,ix,iy,iz,0); //try only once
+
+	  //total fixups  
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+
+	  ldouble ppn[6][NV],pp[NV],uu[NV];
+	  
+	  for(iv=0;iv<NV;iv++)
+	    {
+	      pp[iv]=get_u(ptm1,iv,ix,iy,iz);
+	    }
+	     
+	  p2u(pp,uu,&geom);
+
+	  //save to updated arrays memory
+	  for(iv=0;iv<NVMHD;iv++)
+	    {
+	      set_u(u,iv,ix,iy,iz,uu[iv]);
+	      set_u(p,iv,ix,iy,iz,pp[iv]);
+	    }
+	}
+    }
 
   return 0;
 }

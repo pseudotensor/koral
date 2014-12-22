@@ -139,7 +139,7 @@ initialize_arrays()
       pvecpot=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
       //primitives at cell centers in previous time steps
-      //ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+      ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
       //ptm2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
       //buffer for sending/receiving messages
@@ -288,7 +288,7 @@ free_arrays()
 #endif
 
   free(ptm1);
-  free(ptm2);
+  //free(ptm2);
   for(i=0;i<12;i++)
   free(msgbufs[i]);
   free(msgbufs);

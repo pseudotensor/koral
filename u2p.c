@@ -104,8 +104,8 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
 	  set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
 	  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
 	}
-      else
-	set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
+      //else
+      //set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
 
   
       if(fixups[1]>0)
@@ -113,8 +113,8 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
 	  set_cflag(RADFIXUPFLAG,ix,iy,iz,-1); 
 	  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
 	}
-      else
-	set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
+      //else
+      //set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
     }
   
 
@@ -1192,7 +1192,7 @@ int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
   if(Etype==U2P_HOT) 
-    return u2p_solver_W(uu,pp,ggg,Etype,verbose);
+    return u2p_solver_Wp(uu,pp,ggg,Etype,verbose);
   else if(Etype==U2P_ENTROPY) 
     return u2p_solver_W(uu,pp,ggg,Etype,verbose); //this one is more failsafe
   else
@@ -1963,8 +1963,8 @@ u2p_solver_W(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	}
 
 
-      if(fabs((W-Wprev)/Wprev)<CONV && err<1.e-1) break;
-      //if(fabs((W-Wprev)/Wprev)<CONV && err<sqrt(CONV)) break;
+      //if(fabs((W-Wprev)/Wprev)<CONV && err<1.e-1) break;
+      if(fabs((W-Wprev)/Wprev)<CONV && err<sqrt(CONV)) break;
     }
   while(iter<50);
 

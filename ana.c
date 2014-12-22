@@ -22,7 +22,7 @@ main(int argc, char **argv)
   int no1,no2,nostep,ifphiavg;
   if(argc<4 || argc>5)
     {
-      printf("Not enough input arguments. Asks for ./ana no1 no2 nostep [ifphiavg]\n");
+      printf("Not enough input arguments. Asks for ./ana no1 no2 nostep [ifphiavg=0]\n");
       return -1;
     }
   else

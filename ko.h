@@ -326,6 +326,7 @@ int correct_polaraxis_3d();
 int solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase);
 int cell_fixup_rad();
 int cell_fixup_hd();
+int cell_fixup_hd_ptm1();
 ldouble f_calc_fluxes_at_faces(int ix,int iy,int iz);
 int op_explicit(ldouble t, ldouble dt);
 int op_implicit(ldouble t, ldouble dt);

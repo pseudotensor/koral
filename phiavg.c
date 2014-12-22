@@ -15,17 +15,24 @@ main
   int nx,ny,nz,nv,ret,problem;
   double time;
 
-  if(argc!=5)
+  if(argc!=5 || argc!=4)
     {
-      printf("Not enough input arguments. Asks for ./phiavg no1 no2 nostep ifavg\n");
+      printf("Not enough input arguments. Asks for ./phiavg no1 no2 nostep [ifavg=0]\n");
       return -1;
     }
-  else
+  if(argc==5)
     {      
       no1=atof(argv[1]);
       no2=atof(argv[2]);
       nostep=atof(argv[3]);
       ifavg=atof(argv[4]);
+    }
+  if(argc==4)
+    {      
+      no1=atof(argv[1]);
+      no2=atof(argv[2]);
+      nostep=atof(argv[3]);
+      ifavg=0;
     }
 
   char folder[100],folderout[100],bufer[100],base[10],fname[100],fnamehead[100],fnameout[100],fnameheadout[100],bufor[500];

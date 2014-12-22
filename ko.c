@@ -537,8 +537,17 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    save_timesteps();
 #pragma omp parallel private(ii,iv,ix,iy,iz)
-	  {
+	    {
+	      for(ii=0;ii<Nloop_0;ii++) //domain 
+		{
+		  ix=loop_0[ii][0];
+		  iy=loop_0[ii][1];
+		  iz=loop_0[ii][2];
+		  set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
+		}
 
+	    //backup of the initial state
+	    copyi_u(1.,p,ptm1);
 
 	    //1st
 	    copyi_u(1.,u,ut0);
