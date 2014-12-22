@@ -1,9 +1,9 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 6
 #define MODYFIKUJKRZYSIE 0
 
 /************************************/
@@ -21,7 +21,7 @@
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
 #define RADCLOSURECOORDS MINKCOORDS
-#define SOCCERBALL 1
+#define SOCCERBALL 0
 #if (SOCCERBALL==0) 
 #define USEDUALNEIGHBOR
 #define NUMANGLES 80
@@ -63,8 +63,8 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define TNX 128
-#define TNY 1
+#define TNX 40
+#define TNY 40
 #define TNZ 1
 #define NTX 4 //for MPI and OMP
 #define NTY 1
@@ -73,7 +73,7 @@
 #define SPECIFIC_BC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC
-#define VELRAD 2.
+#define VELRAD 1.
 
 
 /************************************/

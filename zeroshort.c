@@ -4730,7 +4730,7 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-  //return;
+  return;
 
   if(TNY==1 && TNZ==1 && 1)
     transformI_stretch1d(ix,iy,iz,I0,M1_input);

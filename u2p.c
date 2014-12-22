@@ -104,8 +104,8 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
 	  set_cflag(HDFIXUPFLAG,ix,iy,iz,1); 
 	  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
 	}
-      //else
-      //set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
+      else
+	set_cflag(HDFIXUPFLAG,ix,iy,iz,0); 
 
   
       if(fixups[1]>0)
@@ -113,8 +113,8 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
 	  set_cflag(RADFIXUPFLAG,ix,iy,iz,-1); 
 	  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
 	}
-      //else
-      //set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
+      else
+	set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
     }
   
 
@@ -282,7 +282,10 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
 		printf("u2p_entr err No. %4d > %e %e %e > %e %e > %4d %4d %4d\n",u2pret,uu[0],uu[1],uu[5],pp[0],pp[1],geom->ix,geom->iy,geom->iz);
 	      }
 
+	    //mark: u2perror
 	    //test, to print it if error and stop
+	    //u2pret=u2p_solver(uu,pp,ggg,U2P_HOT,2);  
+	    //getch();
 	    //u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
 	    //getchar();
 
@@ -753,12 +756,12 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   ldouble p = (GAMMA-1)*u;
 
   //original:
-  *f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
-  *err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
+  //*f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
+  //*err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
 
   //JONS:
-  //*f = Qdotnp + Wp - p + 0.5*Bsq + (Bsq*Qtsq - QdotBsq)/X2;
-  //*err = fabs(*f) / (fabs(Qdotnp) + fabs(Wp) + fabs(p) + fabs(0.5*Bsq) + fabs((Bsq*Qtsq - QdotBsq)/X2));
+  *f = Qdotnp + Wp - p + 0.5*Bsq + (Bsq*Qtsq - QdotBsq)/X2;
+  *err = fabs(*f) / (fabs(Qdotnp) + fabs(Wp) + fabs(p) + fabs(0.5*Bsq) + fabs((Bsq*Qtsq - QdotBsq)/X2));
 
   // dp/dWp = dp/dW + dP/dv^2 dv^2/dW
     
@@ -776,10 +779,10 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   ldouble dpdW = dp1  + dp2*dvsq; // dp/dW = dp/dWp
 
   //original:
-  *df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
+  //*df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
 
   //JONs:
-  //*df=1. -dpdW + (Bsq*Qtsq - QdotBsq)/X3*(-2.0);
+  *df=1. -dpdW + (Bsq*Qtsq - QdotBsq)/X3*(-2.0);
 
   return 0;  
 }
@@ -1357,10 +1360,13 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble gamma2=1.+qsq;
   ldouble gamma=sqrt(gamma2);
 
-  //W
+  //Wp
   Wp=(GAMMA*uint)*gamma2;
 
+  ldouble Wpinit, Winit;
   if(verbose>1) printf("initial Wp:%e\n",Wp);
+  Wpinit=Wp;
+  Winit=Wpinit+D;
 
   /****************************/
   
@@ -1451,11 +1457,16 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       if(dfdW==0.) {Wp*=1.1; continue;}
 
       ldouble Wpnew=Wp-f0/dfdW;
+      
+      //not to jump zero over
+      //test
+      Wpnew = my_max(Wpnew, Wp/100.);
+
       ldouble Wnew=Wpnew+D;
       int idump=0;
       ldouble dumpfac=1.;
 
-      //test if goes out of bounds and damp solution if so
+      //test if goes out of bounds and damp step if so
       int itmaxdamp=50;
       do
 	{
@@ -1510,7 +1521,8 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 
       //convergence test:
-      if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<(sqrt(CONV)))) break;
+      //if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<(sqrt(CONV)))) break;
+      if(err<CONV || fabs((Wp-Wpprev)/Winit)<CONV) break;
     }
   while(iter<50);
    
@@ -1597,6 +1609,26 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 #endif
 
   if(verbose) print_primitives(pp);
+
+  //verify uunew agains uu
+  ldouble uunew[NV];
+  p2u(pp,uunew,geom);
+  
+  ldouble errinv,maxerrinv=-1.;
+  int iv;
+  for(iv=0;iv<NV;iv++)
+    {
+      if(Etype==U2P_HOT && iv == ENTR)  continue;
+      if(Etype==U2P_ENTROPY && iv == UU)  continue;
+      errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
+      if(errinv > maxerrinv) maxerrinv=errinv;
+    }
+
+  if(maxerrinv>1.e-1 && verbose>0) 
+    {
+      printf("verify u2p failed: %e\n",maxerrinv);
+      return -200;
+    }
 
   if(verbose>0) printf("u2p_solver returns 0\n");
   return 0; //ok
@@ -1963,8 +1995,8 @@ u2p_solver_W(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	}
 
 
-      //if(fabs((W-Wprev)/Wprev)<CONV && err<1.e-1) break;
-      if(fabs((W-Wprev)/Wprev)<CONV && err<sqrt(CONV)) break;
+      if(fabs((W-Wprev)/Wprev)<CONV && err<1.e-1) break;
+      //if(fabs((W-Wprev)/Wprev)<CONV && err<sqrt(CONV)) break;
     }
   while(iter<50);
 

@@ -38,8 +38,8 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
-#define TSTEPLIM .4
+#define TIMESTEPPING RK2HEUN
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0

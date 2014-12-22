@@ -594,27 +594,35 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
       else if(TIMESTEPPING==RK2HEUN)
 	{ 
-	  /******************************* RK2 **********************************
+	  /******************************* RK2 **********************************/
 	  //1st	 
 	  copy_u(1.,u,ut0);
-	  calc_u2p();count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
+	  calc_u2p();
+	  count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
 	  op_explicit (t,1.*dt); 
-	  calc_u2p();count_entropy(&nentr[1],&nentr2[1]); do_finger();
+	  #ifdef RADIATION
+	  calc_u2p();
+	  #endif
+	  count_entropy(&nentr[1],&nentr2[1]); do_finger();
 	  op_implicit (t,1.*dt); 
 	  add_u(1.,u,-1.,ut0,ut2); 
 
 	  //2nd
 	  copy_u(1.,u,ut1);
-	  calc_u2p();count_entropy(&nentr[2],&nentr2[2]); do_finger();
+	  calc_u2p();
+	  count_entropy(&nentr[2],&nentr2[2]); do_finger();
 	  op_explicit (t,dt); 
-	  calc_u2p();count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	  #ifdef RADIATION
+	  calc_u2p();
+	  #endif
+	  count_entropy(&nentr[3],&nentr2[3]); do_finger();
 	  op_implicit (t,dt); 
 	  add_u(1.,u,-1.,ut1,ut3); 
 
 	  //together     
 	  t+=dt;    
 	  add_u_3(1.,u,1./2.,ut2,1./2.,ut3,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
-	  ************************** end of RK2 **********************************/
+	  /************************** end of RK2 **********************************/
 	}
       else 
 	my_err("wrong time stepping specified\n");

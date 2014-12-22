@@ -65,7 +65,7 @@ for(i=0;i<4;i++)
       Ruu+=Rij[i][j]*ucov[i]*ucov[j];
   ldouble Ehatrad = Ruu;
 calc_Compt_Gi(pp,&geom,Gic,Ehatrad,Tgas,kappaes,ucon);
-
+indices_21(Gic,Gic,geom.gg);
 v10=Gi[0];
 v11=Gic[0];
 
