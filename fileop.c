@@ -719,35 +719,43 @@ fprint_restartfile_mpi(ldouble t, char* folder)
     printf( "Unable to open/create file %s\n", bufor );fflush(stdout); exit(-1);
     }
 
-  //set the initial location
-  MPI_Offset pos;
-  if(PROCID==0) pos=0;
-  else
-    pos=PROCID*NX*NY*NZ*(3*sizeof(int)+NV*sizeof(ldouble));
-  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
-  
-  //what is below should be combined into less MPI_File_writes
+  /***** first write all the indices ******/
+
+  int indices[NX*NY*NZ*3];
 
   int ix,iy,iz,iv;
   int gix,giy,giz;
-  ldouble pp[NV];
-  for(iz=0;iz<NZ;iz++)
+
+  for(ix=0;ix<NX;ix++)
     for(iy=0;iy<NY;iy++)
-      for(ix=0;ix<NX;ix++)
+      for(iz=0;iz<NZ;iz++)
 	{
 	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
-	  
-	  MPI_File_write( cFile, &gix, 1, MPI_INT, &status );
-	  MPI_File_write( cFile, &giy, 1, MPI_INT, &status );
-	  MPI_File_write( cFile, &giz, 1, MPI_INT, &status );
+	  indices[ix*NY*NZ*3+iy*NZ*3+iz*3+0]=gix;
+	  indices[ix*NY*NZ*3+iy*NZ*3+iz*3+1]=giy;
+	  indices[ix*NY*NZ*3+iy*NZ*3+iz*3+2]=giz;
+	}
+
+  //set the initial location at each process for indices
+  MPI_Offset pos;
+  pos=PROCID*NX*NY*NZ*(3*sizeof(int));  
+  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
+
+  //write all indices
+  MPI_File_write( cFile, indices, NX*NY*NZ*3, MPI_INT, &status );
+  
+  /***** then primitives in the same order ******/
+						
+  //new location in the second block
+  pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
+  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
+
+  //so far manually
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	{
 	  MPI_File_write( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
-	  /*
-	  //somehow hangs up
-	  MPI_File_iwrite( cFile, &gix, 1, MPI_INT, &req );
-	  MPI_File_iwrite( cFile, &giy, 1, MPI_INT, &req );
-	  MPI_File_iwrite( cFile, &giz, 1, MPI_INT, &req );
-	  MPI_File_iwrite( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &req );
-	  */
 	}
 
   MPI_File_close( &cFile );
@@ -998,9 +1006,7 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   /***********/
   //body file
   struct geometry geom;
-  ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;
-  char c;
 
   MPI_File cFile;
   MPI_Status status;
@@ -1011,35 +1017,60 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
     printf( "Unable to open/create file %s\n", fname );fflush(stdout); exit(-1);
     }
 
+  /***** first read all the indices ******/
+
+  //first read the indices
+  int indices[NX*NY*NZ*3];
+
   //set the initial location
   MPI_Offset pos;
-  int idx[3];
-
-#ifndef RESTARTGENERALINDICES
-  if(PROCID==0) pos=0;
-  else
-    pos=PROCID*NX*NY*NZ*(3*sizeof(int)+NV*sizeof(ldouble));
+  pos=PROCID*NX*NY*NZ*(3*sizeof(int));  
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
-  for(tiz=0;tiz<NZ;tiz++)
-    for(tiy=0;tiy<NY;tiy++)
-      for(tix=0;tix<NX;tix++)
-#else //going through the whole file, useful when changing number of cores
+  //read them
+  MPI_File_read( cFile, indices, NX*NY*NZ*3, MPI_INT, &status );
+
+  //convert to local
+  for(ic=0;ic<NX*NY*NZ;ic++)
+    {
+      gix=indices[ic*3+0];
+      giy=indices[ic*3+1];
+      giz=indices[ic*3+2];
+      mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+      indices[ic*3+0]=ix;
+      indices[ic*3+1]=iy;
+      indices[ic*3+2]=iz;
+    }
+
+  /***** then primitives in the same order ******/
+
+  //new location in the second block
+  pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
+  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
+
+  //so far manually
+  for(ic=0;ic<NX*NY*NZ;ic++)
+    {
+      ix=indices[ic*3+0];
+      iy=indices[ic*3+1];
+      iz=indices[ic*3+2];
+      MPI_File_read( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
+
+      fill_geometry(ix,iy,iz,&geom);
+      PLOOP(iv)
+	set_u(p,iv,ix,iy,iz,pp[iv]);
+      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+    }
+
+  /*
   pos=0;
   MPI_File_seek( cFile, pos, MPI_SEEK_SET );
   for(tiz=0;tiz<TNZ;tiz++)
     for(tiy=0;tiy<TNY;tiy++)
       for(tix=0;tix<TNX;tix++)
-#endif
 	{
 	  MPI_File_read( cFile, idx, 3, MPI_INT, &status );
 
-	  /*
-	  MPI_File_read( cFile, &gix, 1, MPI_INT, &status );
-	  MPI_File_read( cFile, &giy, 1, MPI_INT, &status );
-	  MPI_File_read( cFile, &giz, 1, MPI_INT, &status );
-	  */
-	  
 	  gix=idx[0];giy=idx[1];giz=idx[2];
 
 	  mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
@@ -1053,7 +1084,8 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 		set_u(p,iv,ix,iy,iz,pp[iv]);
 	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 	    }
-	}
+*/
+
 
   MPI_File_close( &cFile );
 #endif
