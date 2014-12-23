@@ -5098,7 +5098,9 @@ correct_polaraxis()
 		  struct geometry geom;
 
 		  //upper
+		  #ifdef MPI
 		  if(TJ==0) //tile number
+		  #endif
 		    {
 		      thaxis=get_xb(0,1);
 		      for(ic=0;ic<nc;ic++)
@@ -5123,12 +5125,10 @@ correct_polaraxis()
 			  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
 #ifdef MAGNFIELD
-			  //do not overwrite magnetic field, not to break div B=0 there
-			  /*
-			    pp[B1]=get_u(p,B1,ix,iysrc,iz);
-			    pp[B3]=get_u(p,B3,ix,iysrc,iz);
-			    pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
-			  */
+			  //do overwrite magnetic field, div B!=0 does not propagate in
+			  pp[B1]=get_u(p,B1,ix,iysrc,iz);
+			  pp[B3]=get_u(p,B3,ix,iysrc,iz);
+			  pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
 #endif
 
 #ifdef RADIATION
@@ -5161,10 +5161,12 @@ correct_polaraxis()
 			  }
 			}
 		    }
-  
+
 		  //lower
 #ifndef HALFTHETA
+		  #ifdef MPI
 		  if(TJ==NTY-1)
+		    #endif
 		    {
 		      thaxis=get_xb(NY,1);
 		      for(ic=0;ic<nc;ic++)
@@ -5189,11 +5191,9 @@ correct_polaraxis()
 			  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
 #ifdef MAGNFIELD
-			  /*
-			    pp[B1]=get_u(p,B1,ix,iysrc,iz);
-			    pp[B3]=get_u(p,B3,ix,iysrc,iz);
-			    pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
-			  */
+			  pp[B1]=get_u(p,B1,ix,iysrc,iz);
+			  pp[B3]=get_u(p,B3,ix,iysrc,iz);
+			  pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
 #endif
 
 #ifdef RADIATION
@@ -5216,7 +5216,7 @@ correct_polaraxis()
 #endif
 
 #endif 
-		  
+
 			  p2u(pp,uu,&geom);
 
 			  PLOOP(iv)

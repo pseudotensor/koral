@@ -756,12 +756,12 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   ldouble p = (GAMMA-1)*u;
 
   //original:
-  //*f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
-  //*err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
+  *f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
+ *err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
 
   //JONS:
-  *f = Qdotnp + Wp - p + 0.5*Bsq + (Bsq*Qtsq - QdotBsq)/X2;
-  *err = fabs(*f) / (fabs(Qdotnp) + fabs(Wp) + fabs(p) + fabs(0.5*Bsq) + fabs((Bsq*Qtsq - QdotBsq)/X2));
+ //*f = Qdotnp + Wp - p + 0.5*Bsq + (Bsq*Qtsq - QdotBsq)/X2;
+ //  *err = fabs(*f) / (fabs(Qdotnp) + fabs(Wp) + fabs(p) + fabs(0.5*Bsq) + fabs((Bsq*Qtsq - QdotBsq)/X2));
 
   // dp/dWp = dp/dW + dP/dv^2 dv^2/dW
     
@@ -779,10 +779,10 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   ldouble dpdW = dp1  + dp2*dvsq; // dp/dW = dp/dWp
 
   //original:
-  //*df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
+  *df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
 
   //JONs:
-  *df=1. -dpdW + (Bsq*Qtsq - QdotBsq)/X3*(-2.0);
+  //*df=1. -dpdW + (Bsq*Qtsq - QdotBsq)/X3*(-2.0);
 
   return 0;  
 }
@@ -1195,9 +1195,9 @@ int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
   if(Etype==U2P_HOT) 
-    return u2p_solver_Wp(uu,pp,ggg,Etype,verbose);
+    return u2p_solver_W(uu,pp,ggg,Etype,verbose);
   else if(Etype==U2P_ENTROPY) 
-    return u2p_solver_Wp(uu,pp,ggg,Etype,verbose); //this one is more failsafe
+    return u2p_solver_W(uu,pp,ggg,Etype,verbose); //this one is more failsafe
   else
     return u2p_solver_W(uu,pp,ggg,Etype,verbose);
 }
