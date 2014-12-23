@@ -477,12 +477,16 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      Bzdyn[nodalindex]=bcondyn[3];
 	      #endif
 	      
-
-	      if(iy==0)
+	      int iphimin,iphimax;
+	      iphimin=0;
+              #if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
+	      iphimin=NCCORRECTPOLAR; iphimax=ny-NCCORRECTPOLAR-1;
+	      #endif
+		if(iy==iphimin)
 		{
 		  phi[nodalindex]=geom.gdet*get_u(p,B1,ix,iy,iz)*get_size_x(iy,1)*2.*M_PI;
 		}
-	      else
+		else if(iy>iphimin && iy<=iphimax)
 		{
 		  imz=iz;imy=iy;imx=ix;
 #ifdef PRINTXGC_RIGHT

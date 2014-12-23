@@ -812,14 +812,22 @@ fprint_restartfile_bin(ldouble t, char* folder)
   int ix,iy,iz,iv;
   int gix,giy,giz;
   ldouble pp[NV];
-  for(iz=0;iz<NZ;iz++)
+  //indices first
+  for(ix=0;ix<NX;ix++)
     for(iy=0;iy<NY;iy++)
-      for(ix=0;ix<NX;ix++)
+      for(iz=0;iz<NZ;iz++)
 	{
 	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
 	  fwrite(&gix,sizeof(int),1,fout1);
 	  fwrite(&giy,sizeof(int),1,fout1);
 	  fwrite(&giz,sizeof(int),1,fout1);
+	}
+
+  //then, in the same order, primitives
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	{
 	  fwrite(&get_u(p,0,ix,iy,iz),sizeof(ldouble),NV,fout1);
 	}
 
@@ -1066,14 +1074,30 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;
   char c;
+  int indices[NX*NY*NZ][3];
+
+  //first indices
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
       ret=fread(&gix,sizeof(int),1,fdump);
       ret=fread(&giy,sizeof(int),1,fdump);
       ret=fread(&giz,sizeof(int),1,fdump);
-      ret=fread(pp,sizeof(ldouble),NV,fdump);
 
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+
+      indices[ic][0]=ix;
+      indices[ic][1]=iy;
+      indices[ic][2]=iz;
+    }
+
+  //then primitives
+   for(ic=0;ic<NX*NY*NZ;ic++)
+    {
+      ret=fread(pp,sizeof(ldouble),NV,fdump);
+
+      ix=indices[ic][0];
+      iy=indices[ic][1];
+      iz=indices[ic][2];
 
       fill_geometry(ix,iy,iz,&geom);
       p2u(pp,uu,&geom);
