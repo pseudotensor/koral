@@ -322,11 +322,17 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
   int ix,iy,iz,iv,ii;
   
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-  for(ii=0;ii<Nloop_4;ii++) //all corners of the inner domain
+  
+  /*for(ii=0;ii<Nloop_4;ii++) //all corners of the inner domain
     {      
       ix=loop_4[ii][0];
       iy=loop_4[ii][1];
-      iz=loop_4[ii][2]; 
+      iz=loop_4[ii][2];*/
+  for(ix=0;ix<=NX;ix++)
+    for(iy=0;iy<=NY;iy++)
+      for(iz=0;iz<=NZ;iz++)
+	{
+    
 
       //calculating A_i on corners by averaging neighbouring cell centers
       ldouble A[3];
@@ -364,31 +370,38 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
   if(ifoverwrite)
     {
       //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+      /*
       for(ii=0;ii<Nloop_5;ii++) //domain and ghost cells
 	{
 	  ix=loop_5[ii][0];
 	  iy=loop_5[ii][1];
 	  iz=loop_5[ii][2]; 
+      */
+	  
+      for(ix=0-NG;ix<NX+NG;ix++)
+	for(iy=0-NG;iy<NY+NG;iy++)
+	  for(iz=0-NG;iz<NZ+NG;iz++)
+	    {
 
-	  struct geometry geom;
-	  fill_geometry(ix,iy,iz,&geom);
+	      struct geometry geom;
+	      fill_geometry(ix,iy,iz,&geom);
       
-	  ldouble pp[NV],uu[NV];
-	  PLOOP(iv)
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
+	      ldouble pp[NV],uu[NV];
+	      PLOOP(iv)
+		pp[iv]=get_u(p,iv,ix,iy,iz);
 
-	  pp[B1]=get_u(pvecpot,1,ix,iy,iz);
-	  pp[B2]=get_u(pvecpot,2,ix,iy,iz);
-	  pp[B3]=get_u(pvecpot,3,ix,iy,iz);
+	      pp[B1]=get_u(pvecpot,1,ix,iy,iz);
+	      pp[B2]=get_u(pvecpot,2,ix,iy,iz);
+	      pp[B3]=get_u(pvecpot,3,ix,iy,iz);
 
-	  p2u(pp,uu,&geom);
+	      p2u(pp,uu,&geom);
 
-	  set_u(p,B1,ix,iy,iz,pp[B1]);
-	  set_u(p,B2,ix,iy,iz,pp[B2]);
-	  set_u(p,B3,ix,iy,iz,pp[B3]);
-	  set_u(u,B1,ix,iy,iz,uu[B1]);
-	  set_u(u,B2,ix,iy,iz,uu[B2]);
-	  set_u(u,B3,ix,iy,iz,uu[B3]);     
+	      set_u(p,B1,ix,iy,iz,pp[B1]);
+	      set_u(p,B2,ix,iy,iz,pp[B2]);
+	      set_u(p,B3,ix,iy,iz,pp[B3]);
+	      set_u(u,B1,ix,iy,iz,uu[B1]);
+	      set_u(u,B2,ix,iy,iz,uu[B2]);
+	      set_u(u,B3,ix,iy,iz,uu[B3]);     
 
 
 	}
@@ -421,11 +434,18 @@ calc_BfromA_core()
 
 
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  /*
   for(ii=0;ii<Nloop_0;ii++) //domain + one layer
     {
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
+  */
+
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	{
 
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);

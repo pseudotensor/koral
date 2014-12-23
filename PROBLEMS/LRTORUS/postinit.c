@@ -1,6 +1,5 @@
 //scales magnetic pressure so MAXBETA = pmag/(pgas+prad)
 int ix,iy,iz;
-
 #ifdef MAGNFIELD
 if(PROCID==0) {printf("Renormalizing magnetic field... ");fflush(stdout);}
 ldouble maxbeta=0.;

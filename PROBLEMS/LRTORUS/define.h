@@ -158,17 +158,17 @@
 
 #if(NTORUS==79) //
 #define LT_KAPPA 5.e2
-#define LT_XI 0.96
-#define LT_R1 14.
-
-#define LT_R2 400.
+#define LT_XI 0.705
+#define LT_R1 40.
+#define LT_R2 1000.
 #ifdef RADIATION
 #define LT_GAMMA 4./3.
 #else
 #define LT_GAMMA 5./3.
 #endif
 #define LT_RIN 10.
-#define BETANORMEQPLANE
+//#define BETANORMEQPLANE
+#define BETANORMFACTOR 3.e-3
 #undef MAXBETA
 #define MAXBETA (.1) 
 #endif

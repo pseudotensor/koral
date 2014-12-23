@@ -269,11 +269,22 @@ if(rho<0.) //outside donut
     //    if(iy==NY/2) printf("%d %f %f > %e %e %e %e\n",iy,r,th,uchop,u_av_mid,u_av, u_av_chop);
     Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
 
+#elif (NTORUS==77 || NTORUS==78)
+
+
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.0001,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
+
+#elif (NTORUS==79) //a'la adaf paper
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.01,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
+
+
 #else //standard single poloidal loop
 
-    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/1.e-5,2.)-0.03,0.)*
-      pow(sin(fabs(geomBL.yy)),4.);
-				     //*step_function(-(geomBL.xx-350.),10.);
+    
   
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.0001,0.)*
       pow(sin(fabs(geomBL.yy)),4.);
