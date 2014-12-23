@@ -39,7 +39,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2//HEUN
+#define TIMESTEPPING RK2IMEX//HEUN
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -169,7 +169,8 @@
 #endif
 #define LT_RIN 10.
 //#define BETANORMFULL
-#define BETANORMEQPLANE
+//#define BETANORMEQPLANE
+#define BETANORMFACTOR 1.
 #undef MAXBETA
 #define MAXBETA (.1) 
 #endif
