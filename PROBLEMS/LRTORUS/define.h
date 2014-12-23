@@ -39,7 +39,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX//HEUN
+#define TIMESTEPPING RK2HEUN
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -63,6 +63,7 @@
 //#define CORRECT_POLARAXIS_3D
 #define CORRECT_POLARAXIS
 //#define POLARAXISAVGIN3D
+#define U2P_EQS U2P_EQS_NOBLE
 #define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2

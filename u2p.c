@@ -756,12 +756,16 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   ldouble p = (GAMMA-1)*u;
 
   //original:
+#if (U2P_EQS==U2P_EQS_NOBLE)
   *f = Qn + W - p + 0.5*Bsq*(1.+v2) - QdotBsq/2./Wsq;
  *err = fabs(*f) / (fabs(Qn) + fabs(W) + fabs(p) + fabs(0.5*Bsq*(1.+v2)) + fabs(QdotBsq/2./Wsq));
+#endif
 
   //JONS:
- //*f = Qdotnp + Wp - p + 0.5*Bsq + (Bsq*Qtsq - QdotBsq)/X2;
- //  *err = fabs(*f) / (fabs(Qdotnp) + fabs(Wp) + fabs(p) + fabs(0.5*Bsq) + fabs((Bsq*Qtsq - QdotBsq)/X2));
+#if (U2P_EQS==U2P_EQS_JON)
+ *f = Qdotnp + Wp - p + 0.5*Bsq + (Bsq*Qtsq - QdotBsq)/X2;
+ *err = fabs(*f) / (fabs(Qdotnp) + fabs(Wp) + fabs(p) + fabs(0.5*Bsq) + fabs((Bsq*Qtsq - QdotBsq)/X2));
+#endif
 
   // dp/dWp = dp/dW + dP/dv^2 dv^2/dW
     
@@ -779,10 +783,14 @@ f_u2p_hot(ldouble Wp, ldouble* cons,ldouble *f,ldouble *df,ldouble *err)
   ldouble dpdW = dp1  + dp2*dvsq; // dp/dW = dp/dWp
 
   //original:
+  #if (U2P_EQS==U2P_EQS_NOBLE)
   *df=1.-dpdW + QdotBsq/(Wsq*W) + 0.5*Bsq*dvsq;
+  #endif
 
   //JONs:
-  //*df=1. -dpdW + (Bsq*Qtsq - QdotBsq)/X3*(-2.0);
+  #if (U2P_EQS==U2P_EQS_JON)
+  *df=1. -dpdW + (Bsq*Qtsq - QdotBsq)/X3*(-2.0);
+  #endif
 
   return 0;  
 }
@@ -1194,12 +1202,15 @@ find_Wplim(ldouble *Wp,ldouble *cons)
 int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
-  if(Etype==U2P_HOT) 
-    return u2p_solver_W(uu,pp,ggg,Etype,verbose);
-  else if(Etype==U2P_ENTROPY) 
-    return u2p_solver_W(uu,pp,ggg,Etype,verbose); //this one is more failsafe
-  else
-    return u2p_solver_W(uu,pp,ggg,Etype,verbose);
+  int (*solver)(ldouble*,ldouble*,void*,int,int);
+#if (U2P_SOLVER==U2P_SOLVER_WP)
+  solver = & u2p_solver_Wp;
+#endif
+#if (U2P_SOLVER==U2P_SOLVER_W)
+  solver = & u2p_solver_W;
+#endif
+
+  return (*solver)(uu,pp,ggg,Etype,verbose);
 }
  
 //**********************************************************************

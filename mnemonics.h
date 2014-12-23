@@ -69,6 +69,11 @@
 #define U2P_COLD 3
 #define U2P_SLOW 4
 
+#define U2P_EQS_NOBLE 0
+#define U2P_EQS_JON 1
+
+#define U2P_SOLVER_WP 0
+#define U2P_SOLVER_W 1
 
 //coordinates/metric
 #define BLCOORDS 1

@@ -619,3 +619,13 @@
 #ifndef VETFEACCEPT
 #define VETFEACCEPT 0.
 #endif
+
+#ifndef U2P_EQS
+#define U2P_EQS U2P_EQS_NOBLE
+#endif
+
+
+#ifndef U2P_SOLVER
+#define U2P_SOLVER U2P_SOLVER_WP
+#endif
+
