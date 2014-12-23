@@ -33,7 +33,6 @@
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
-#define MAXBETA .01 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
@@ -155,9 +154,9 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 78
+#define NTORUS 79
 
-#if(NTORUS==78) //
+#if(NTORUS==79) //
 #define LT_KAPPA 5.e2
 #define LT_XI 0.96
 #define LT_R1 14.
@@ -169,9 +168,23 @@
 #define LT_GAMMA 5./3.
 #endif
 #define LT_RIN 10.
-//#define BETANORMFULL
 #define BETANORMEQPLANE
-//#define BETANORMFACTOR 1.
+#undef MAXBETA
+#define MAXBETA (.1) 
+#endif
+
+#if(NTORUS==78) //
+#define LT_KAPPA 5.e2
+#define LT_XI 0.96
+#define LT_R1 14.
+#define LT_R2 400.
+#ifdef RADIATION
+#define LT_GAMMA 4./3.
+#else
+#define LT_GAMMA 5./3.
+#endif
+#define LT_RIN 10.
+#define BETANORMEQPLANE
 #undef MAXBETA
 #define MAXBETA (.1) 
 #endif
