@@ -745,21 +745,6 @@ fprint_restartfile_mpi(ldouble t, char* folder)
   MPI_File_write( cFile, indices, NX*NY*NZ*3, MPI_INT, &status );
   
   /***** then primitives in the same order ******/
-			
-  /*
-  //new location in the second block
-  pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
-  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
-
-  //so far manually
-  
-  for(ix=0;ix<NX;ix++)
-    for(iy=0;iy<NY;iy++)
-      for(iz=0;iz<NZ;iz++)
-	{
-	  MPI_File_write( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
-	}
-  */
 
   //now let's try manually
   pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
@@ -774,33 +759,7 @@ fprint_restartfile_mpi(ldouble t, char* folder)
 	  pout[ix*NY*NZ*NV+iy*NZ*NV+iz*NV+iv]=get_u(p,iv,ix,iy,iz);
 
   MPI_File_write( cFile, pout, NX*NY*NZ*NV, MPI_LDOUBLE, &status );
-  if(PROCID==7) {print_conserved(&get_u(u,0,NX-1,NY-1,NZ-1));}
-  //now let's try subarray
-  /*
-
-  pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
-  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
-
-  MPI_Datatype mysubarray;
- 
-  int bigsizes[4]  = {SX,SY,SZ,NV};
-  int subsizes[4]  = {NX,NY,NZ,NV};
-  int starts[4] = {NGCX,NGCY,NGCZ,0};
-  int ic;
-
-
-  MPI_Type_create_subarray(4, bigsizes, subsizes, starts,
-			   MPI_ORDER_C, MPI_DOUBLE, &mysubarray);
-  MPI_Type_commit(&mysubarray);
-
-  MPI_Offset fileoff = pos;
-  char name[] = "native";
-
-  //MPI_File_set_view(cFile, fileoff, MPI_DOUBLE, mysubarray, "native", MPI_INFO_NULL);
   
- 
-  MPI_File_write(cFile,p,1,mysubarray, MPI_STATUS_IGNORE);
-  */
   MPI_File_close( &cFile );
 
   if(PROCID==0)
@@ -1109,70 +1068,6 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
       p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
     }
 
-  /*
-  for(ic=0;ic<NX*NY*NZ;ic++)
-    {
-      ix=indices[ic*3+0];
-      iy=indices[ic*3+1];
-      iz=indices[ic*3+2];
-      MPI_File_read( cFile, &get_u(p,0,ix,iy,iz), NV, MPI_LDOUBLE, &status );
-
-      fill_geometry(ix,iy,iz,&geom);
-      PLOOP(iv)
-	set_u(p,iv,ix,iy,iz,pp[iv]);
-      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
-    }
-  */
-
-  /*
-  MPI_Datatype mysubarray;
- 
-  int bigsizes[4]  = {SX,SY,SZ,NV};
-  int subsizes[4]  = {NX,NY,NZ,NV};
-  int starts[4] = {NGCX,NGCY,NGCZ,0};
-
-  MPI_Type_create_subarray(4, bigsizes, subsizes, starts,
-			   MPI_ORDER_C, MPI_DOUBLE, &mysubarray);
-  MPI_Type_commit(&mysubarray);
-
-  MPI_Offset fileoff = pos;
-  char name[] = "native";
-
-  MPI_File_read(cFile,p,1,mysubarray, MPI_STATUS_IGNORE);
-  */
-  //if(PROCID==7) {print_conserved(&get_u(u,0,NX-1,NY-1,NZ-1));exit(1);}
-
-  /*
-  pos=0;
-  MPI_File_seek( cFile, pos, MPI_SEEK_SET );
-  for(tiz=0;tiz<TNZ;tiz++)
-    for(tiy=0;tiy<TNY;tiy++)
-      for(tix=0;tix<TNX;tix++)
-	{
-	  MPI_File_read( cFile, idx, 3, MPI_INT, &status );
-
-	  gix=idx[0];giy=idx[1];giz=idx[2];
-
-	  mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
-
-	  MPI_File_read( cFile, pp, NV, MPI_LDOUBLE, &status );
-
-	  if(if_indomain(ix,iy,iz))
-	    {
-	      fill_geometry(ix,iy,iz,&geom);
-	      PLOOP(iv)
-		set_u(p,iv,ix,iy,iz,pp[iv]);
-	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
-	    }
-  */
-  /*
-  for(ix=0;ix<NX;ix++)
-    for(iy=0;iy<NY;iy++)
-      for(iz=0;iz<NZ;iz++)
-	{
-	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
-	}
-  */
   MPI_File_close( &cFile );
 #endif
   return 0;
