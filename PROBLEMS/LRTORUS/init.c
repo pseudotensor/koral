@@ -49,8 +49,14 @@ if(rho<0.) //outside donut
     
     indices_12(ucov,ucon,geomBL.GG);
 
+#ifdef PERTURBVEL
+    ucon[1]=PERTURBVEL;
+    #endif
+
     conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
    
+   
+
     pp[0]=my_max(rho,ppback[0]); 
     pp[1]=my_max(uint,ppback[1]);
     pp[2]=ucon[1]; 

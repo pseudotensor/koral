@@ -1197,7 +1197,7 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   if(Etype==U2P_HOT) 
     return u2p_solver_Wp(uu,pp,ggg,Etype,verbose);
   else if(Etype==U2P_ENTROPY) 
-    return u2p_solver_W(uu,pp,ggg,Etype,verbose); //this one is more failsafe
+    return u2p_solver_Wp(uu,pp,ggg,Etype,verbose); //this one is more failsafe
   else
     return u2p_solver_W(uu,pp,ggg,Etype,verbose);
 }
@@ -1610,25 +1610,62 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   if(verbose) print_primitives(pp);
 
-  //verify uunew agains uu
+  //verify uunew agains uuoriginal
+  //seems unnecessary - if this point reached, it already did its best and its best to stay like that
+  /*
   ldouble uunew[NV];
   p2u(pp,uunew,geom);
   
   ldouble errinv,maxerrinv=-1.;
   int iv;
-  for(iv=0;iv<NV;iv++)
+
+  //do we recover rho properly
+  iv=RHO;
+  errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
+  if(errinv > maxerrinv) maxerrinv=errinv;
+  //internal energy
+  if(Etype==U2P_HOT)
     {
-      if(Etype==U2P_HOT && iv == ENTR)  continue;
-      if(Etype==U2P_ENTROPY && iv == UU)  continue;
+      iv=UU;
+      errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
+      if(errinv > maxerrinv) maxerrinv=errinv;
+    }
+   if(Etype==U2P_ENTROPY)
+    {
+      iv=ENTR;
       errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
       if(errinv > maxerrinv) maxerrinv=errinv;
     }
 
-  if(maxerrinv>1.e-1 && verbose>0) 
+   double inverr=1.e-2;
+
+   if(Etype==U2P_ENTROPY) inverr=0.999;
+
+   if(Etype==U2P_HOT) inverr=0.01;
+
+
+   if(maxerrinv>inverr)// && verbose>0) 
     {
-      printf("verify u2p failed: %e\n",maxerrinv);
+     
+      if(Etype==U2P_ENTROPY) { 
+	printf("verify u2p (%d) failed: %e || ",Etype,maxerrinv);
+	printf("%e %e | %e %e | %e %e\n",uunew[RHO],uu[RHO],uunew[ENTR],uu[ENTR],uunew[VX],uu[VX]);
+	print_conserved(uu);
+	print_conserved(uunew);
+	print_primitives(pp);
+	getch();
+      }
+      if(Etype==U2P_HOT && 0) { 
+	printf("verify u2p (%d) failed: %e || ",Etype,maxerrinv);
+	printf("%e %e | %e %e | %e %e\n",uunew[RHO],uu[RHO],uunew[UU],uu[UU],uunew[VX],uu[VX]);
+	print_conserved(uu);
+	print_conserved(uunew);
+	print_primitives(pp);
+	getch();
+      }
       return -200;
     }
+  */
 
   if(verbose>0) printf("u2p_solver returns 0\n");
   return 0; //ok

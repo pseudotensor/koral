@@ -2,6 +2,7 @@
 //general
 /************************************/
 #define BHDISK_PROBLEMTYPE
+#define PERTURBVEL (-.5)
 
 /************************************/
 //restart
@@ -38,7 +39,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2HEUN
+#define TIMESTEPPING RK2//HEUN
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
