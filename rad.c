@@ -3511,6 +3511,7 @@ calc_nsource(ldouble *pp, void* ggg)
   //C=8pi/c**3/h**3
   ldouble C=60.*SIGMA_RAD/M_PI/M_PI/M_PI/M_PI/K_BOLTZ/K_BOLTZ/K_BOLTZ/K_BOLTZ;
 
+  //should be rewritted to avoid using (3.-2.3397 ... ) twice in Thatrad and here!
   ldouble ndotff=-(kapparadAbs*Ehatrad/K_BOLTZ/Thatrad/(3.-2.449724*nphhat*nphhat*nphhat*nphhat/C/Ehatrad/Ehatrad/Ehatrad) - (4.*M_PI*kappagasAbs*B/K_BOLTZ/Tgas/2.701178));
 
   //the rate of change of number of photons invariant

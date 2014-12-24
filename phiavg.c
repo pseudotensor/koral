@@ -11,11 +11,11 @@ main
   int no1,no2,nostep,ifavg;
   
   int ifile,itot=0;
-  int i,j,k,iv;
+  int i,j,k,iv,ix,iy,iz,ic,gix,giy,giz;
   int nx,ny,nz,nv,ret,problem;
   double time;
 
-  if(argc!=5 || argc!=4)
+  if(argc!=5 && argc!=4)
     {
       printf("Not enough input arguments. Asks for ./phiavg no1 no2 nostep [ifavg=0]\n");
       return -1;
@@ -141,27 +141,37 @@ main
 	  for(iv=0;iv<nv;iv++)
 	    prims[i][j][iv]=0.;
 
-      for(k=0;k<nz;k++)
+      int indices[NX*NY*NZ][3];
+
+      //first indices
+      for(ic=0;ic<NX*NY*NZ;ic++)
 	{
-	  for(j=0;j<ny;j++)
-	    {
-	      for(i=0;i<nx;i++)
-		{
-	    	  int gix,giy,giz;
-		  
-		  ret=fread(&gix,sizeof(int),1,fdump);
-		  ret=fread(&giy,sizeof(int),1,fdump);
-		  ret=fread(&giz,sizeof(int),1,fdump);
-		  ret=fread(pp,sizeof(double),nv,fdump);
+	  ret=fread(&ix,sizeof(int),1,fdump);
+	  ret=fread(&iy,sizeof(int),1,fdump);
+	  ret=fread(&iz,sizeof(int),1,fdump);
 
+	  //phiavg only serial
+	  //mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
 
-		  if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
-		    printf("blont: %d %d %d vs %d %d %d | %d %d %d\n",i,j,k,gix,giy,giz,nx,ny,nz);
-		  else
-		    for(iv=0;iv<nv;iv++)
-		      prims[gix][giy][iv]+=pp[iv];
-		}
-	    }
+	  indices[ic][0]=ix;
+	  indices[ic][1]=iy;
+	  indices[ic][2]=iz;
+	}
+
+      //then primitives
+      for(ic=0;ic<NX*NY*NZ;ic++)
+	{
+	  ret=fread(pp,sizeof(ldouble),NV,fdump);
+
+	  gix=indices[ic][0];
+	  giy=indices[ic][1];
+	  giz=indices[ic][2];
+	  
+	  if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
+	    printf("blont: %d %d %d vs %d %d %d | %d %d %d\n",i,j,k,gix,giy,giz,nx,ny,nz);
+	  else
+	    for(iv=0;iv<nv;iv++)
+	      prims[gix][giy][iv]+=pp[iv];
 	}
 
       for(j=0;j<ny;j++)
@@ -170,17 +180,25 @@ main
 	    prims[i][j][iv]/=(double)nz;
 
       //print to a file
-      k=0;
-      for(j=0;j<ny;j++)
-	for(i=0;i<nx;i++)
-	  {
-	    fwrite(&i,sizeof(int),1,fout);
-	    fwrite(&j,sizeof(int),1,fout);
-	    fwrite(&k,sizeof(int),1,fout);
-	    fwrite(&prims[i][j][0],sizeof(ldouble),nv,fout);	    
-	  }
+      
+      //indices first
+      iz=0;
+      for(ix=0;ix<NX;ix++)
+	for(iy=0;iy<NY;iy++)
+	    {
+	      fwrite(&ix,sizeof(int),1,fout);
+	      fwrite(&iy,sizeof(int),1,fout);
+	      fwrite(&iz,sizeof(int),1,fout);
+	    }
 
-	
+      //then, in the same order, primitives
+      for(ix=0;ix<NX;ix++)
+	for(iy=0;iy<NY;iy++)
+	    {
+	      fwrite(&prims[ix][iy][0],sizeof(ldouble),nv,fout);
+	    }
+
+
       fclose(fdump);
       fclose(fout);
     }
