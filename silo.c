@@ -153,18 +153,18 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      fill_geometry_arb(iix,iiy,iiz,&geomout,OUTCOORDS);
 	      
 	      ldouble dxph[3],dx[3];
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz+1,2);
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[2]=fabs(xx2[3]-xx1[3]);

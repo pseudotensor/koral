@@ -276,11 +276,15 @@ if(rho<0.) //outside donut
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.0001,0.)*
       pow(sin(fabs(geomBL.yy)),4.);
 
-#elif (NTORUS==79) //a'la adaf paper
+#elif (NTORUS==79) //a'la adaf paper - center too close
   
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.01,0.)*
       pow(sin(fabs(geomBL.yy)),4.);
 
+#elif (NTORUS==80) //a'la adaf paper
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/1.e-5,2.)-0.1,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
 
 #else //standard single poloidal loop
 

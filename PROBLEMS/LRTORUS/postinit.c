@@ -80,7 +80,7 @@ ldouble fac=sqrt(MAXBETA/maxbeta);
 fac=BETANORMFACTOR;
 #endif
 
-printf("rescaling magn.fields by %e (%e)\n",fac,maxbeta);
+if(PROCID==0) printf("rescaling magn.fields by %e (%e)\n",fac,maxbeta);
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
 for(iz=0;iz<NZ;iz++)

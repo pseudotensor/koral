@@ -155,9 +155,9 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 79
+#define NTORUS 80
 
-#if(NTORUS==79) //
+#if(NTORUS==79 || NTORUS==80) //
 #define LT_KAPPA 5.e2
 #define LT_XI 0.705
 #define LT_R1 40.
@@ -169,7 +169,7 @@
 #endif
 #define LT_RIN 10.
 //#define BETANORMEQPLANE
-#define BETANORMFACTOR 3.e-3
+#define BETANORMFACTOR 1.e-04
 #undef MAXBETA
 #define MAXBETA (.1) 
 #endif
