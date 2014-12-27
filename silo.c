@@ -61,6 +61,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *Omega = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *muBe = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Qtheta = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Qphi = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *divB = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   int *entropyinv = (int*)malloc(nx*ny*nz*sizeof(int));
  
@@ -153,16 +154,21 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      
 	      ldouble dxph[3],dx[3];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
-	      dx[2]=2.*M_PI;
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz+1,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[2]=fabs(xx2[3]-xx1[3]);
+
 	      dxph[0]=dx[0]*sqrt(geomout.gg[1][1]);
 	      dxph[1]=dx[1]*sqrt(geomout.gg[2][2]);
 	      dxph[2]=dx[2]*sqrt(geomout.gg[3][3]);
@@ -244,6 +250,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      if(doingavg==0)
 		{
 		  calc_bcon_prim(pp,bcon,&geomout);
+		  /*
+		  printf("%d %d > ix,iy\n");
+		  print_4vector(bcon);
+		  getch();
+		  */
 		  indices_21(bcon,bcov,geomout.gg); 
 		  bsq[nodalindex] = dot(bcon,bcov);
 		}
@@ -312,6 +323,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  //muBe[nodalindex]+=-bsq[nodalindex]/rho[nodalindex]*vcov[0];
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
+		  Qphi[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[2]*fabs(bcon[3])/sqrt(rho[nodalindex]);
+		  //if(iy==NY/2+10 || iy==NY/2-10)printf("%d %d > %e %e %e %e > %e\n",ix,iy,Omega[nodalindex],dx[1],bcon[2],rho[nodalindex],Qtheta[nodalindex]);
+
 
 		  //to calculate magn. field angle
 		  ldouble brbphi,bsq,bfake[4];
@@ -379,6 +393,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  //muBe[nodalindex]+=-bsq[nodalindex]/rho[nodalindex]*vcov[0];
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
+		  Qphi[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[2]*fabs(bcon[3])/sqrt(rho[nodalindex]);
 		  //to calculate magn. field angle
 		  ldouble brbphi,bsq,bfake[4];
 		  #ifdef BHDISK_PROBLEMTYPE
@@ -871,6 +886,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
   DBPutQuadvar1(file, "Qtheta","mesh1", Qtheta,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+  DBPutQuadvar1(file, "Qphi","mesh1", Qphi,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 

@@ -66,8 +66,6 @@ main
 	prims[i][j]=(double*)malloc(nv*sizeof(double));
     }
 
-  prims[0][0][0]=0.;
-
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
       itot++;
@@ -141,10 +139,10 @@ main
 	  for(iv=0;iv<nv;iv++)
 	    prims[i][j][iv]=0.;
 
-      int indices[NX*NY*NZ][3];
+      int indices[nx*ny*nz][3];
 
       //first indices
-      for(ic=0;ic<NX*NY*NZ;ic++)
+      for(ic=0;ic<nx*ny*nz;ic++)
 	{
 	  ret=fread(&ix,sizeof(int),1,fdump);
 	  ret=fread(&iy,sizeof(int),1,fdump);
@@ -159,9 +157,9 @@ main
 	}
 
       //then primitives
-      for(ic=0;ic<NX*NY*NZ;ic++)
+      for(ic=0;ic<nx*ny*nz;ic++)
 	{
-	  ret=fread(pp,sizeof(ldouble),NV,fdump);
+	  ret=fread(pp,sizeof(double),nv,fdump);
 
 	  gix=indices[ic][0];
 	  giy=indices[ic][1];
@@ -172,6 +170,7 @@ main
 	  else
 	    for(iv=0;iv<nv;iv++)
 	      prims[gix][giy][iv]+=pp[iv];
+
 	}
 
       for(j=0;j<ny;j++)
@@ -183,8 +182,8 @@ main
       
       //indices first
       iz=0;
-      for(ix=0;ix<NX;ix++)
-	for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<nx;ix++)
+	for(iy=0;iy<ny;iy++)
 	    {
 	      fwrite(&ix,sizeof(int),1,fout);
 	      fwrite(&iy,sizeof(int),1,fout);
@@ -192,8 +191,8 @@ main
 	    }
 
       //then, in the same order, primitives
-      for(ix=0;ix<NX;ix++)
-	for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<nx;ix++)
+	for(iy=0;iy<ny;iy++)
 	    {
 	      fwrite(&prims[ix][iy][0],sizeof(ldouble),nv,fout);
 	    }

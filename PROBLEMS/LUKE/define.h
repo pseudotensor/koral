@@ -7,13 +7,13 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 60
-#define TNY 60
-#define TNZ 1
+#define TNX 100
+#define TNY 100
+#define TNZ 100
 
 #define NTX 2
 #define NTY 2
-#define NTZ 1
+#define NTZ 2
 
 #define TIMESTEPPING RK2
 

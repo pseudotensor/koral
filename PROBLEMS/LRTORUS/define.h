@@ -81,7 +81,7 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 10.
+#define MASS 1.e6
 #define BHSPIN 0.7
 
 /************************************/
@@ -121,7 +121,7 @@
 #define TNY 120//192 //8*24
 #define TNZ 1 //16*2
 //number of tiles
-#define NTX 2//34//16
+#define NTX 4//34//16
 #define NTY 4//24//16
 #define NTZ 1//1
 

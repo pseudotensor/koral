@@ -6,7 +6,7 @@
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
 #define DOFIXUPS 0
-//#define UNPERTURBED
+#define UNPERTURBED
 
 /************************************/
 //radiation
@@ -38,7 +38,7 @@
 #define MAXZ (2.*M_PI) 
 #define TNX 100 // Total number of cells in X 
 #define TNY 100
-#define TNZ 1
+#define TNZ 100
 #define NTX 2 //number of tiles in X 
 #define NTY 2
 #define NTZ 1
@@ -57,7 +57,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 9000 //stop after this number of outputs
-#define DTOUT1 2. //res
+#define DTOUT1 1. //res
 #define DTOUT2 1.e20 //avg
 
 /************************************/
@@ -98,4 +98,4 @@
 //when constructing rad-pressure supported torus we want to have pressure like for a gamma=4/3 gas, because radiation pressure has effective gamma = 4/3 
 #define EFFGAMMA (4./3.) //opt.thick
 #define FRACMICHEL 0.06
-#define PERTMAGN 0.
+#define PERTMAGN 0.01
