@@ -1532,8 +1532,9 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
 
       //convergence test:
-      //if(err<CONV || (fabs((Wp-Wpprev)/Wpprev)<CONV && err<(sqrt(CONV)))) break;
-      if(err<CONV || fabs((Wp-Wpprev)/Winit)<CONV) break;
+      if(err<CONV || (Etype==U2P_HOT && fabs((Wp-Wpprev)/Wpprev)<CONV && err<(sqrt(CONV)))
+	 || (Etype==U2P_ENTROPY && fabs((Wp-Wpprev)/Wpprev)<CONV && err<0.9)) break;
+      //if(err<CONV || fabs((Wp-Wpprev)/Winit)<CONV) break;
     }
   while(iter<50);
    
@@ -1623,42 +1624,43 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   //verify uunew agains uuoriginal
   //seems unnecessary - if this point reached, it already did its best and its best to stay like that
-  /*
-  ldouble uunew[NV];
-  p2u(pp,uunew,geom);
-  
-  ldouble errinv,maxerrinv=-1.;
-  int iv;
-
-  //do we recover rho properly
-  iv=RHO;
-  errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
-  if(errinv > maxerrinv) maxerrinv=errinv;
-  //internal energy
   if(Etype==U2P_HOT)
     {
-      iv=UU;
+      ldouble uunew[NV];
+      p2u(pp,uunew,geom);
+      
+      ldouble errinv,maxerrinv=-1.;
+      int iv;
+      
+      //do we recover rho properly
+      iv=RHO;
       errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
       if(errinv > maxerrinv) maxerrinv=errinv;
-    }
-   if(Etype==U2P_ENTROPY)
+      //internal energy
+      if(Etype==U2P_HOT)
+	{
+	  iv=UU;
+	  errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
+	  if(errinv > maxerrinv) maxerrinv=errinv;
+	}
+      if(Etype==U2P_ENTROPY)
+	{
+	  iv=ENTR;
+	  errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
+	  if(errinv > maxerrinv) maxerrinv=errinv;
+	}
+      
+      double inverr=1.e-2;
+      
+      if(Etype==U2P_ENTROPY) inverr=0.999;
+      
+      if(Etype==U2P_HOT) inverr=0.1;
+      
+      
+      if(maxerrinv>inverr)// && verbose>0) 
     {
-      iv=ENTR;
-      errinv = fabs((uunew[iv]-uu[iv])/uu[iv]);
-      if(errinv > maxerrinv) maxerrinv=errinv;
-    }
-
-   double inverr=1.e-2;
-
-   if(Etype==U2P_ENTROPY) inverr=0.999;
-
-   if(Etype==U2P_HOT) inverr=0.01;
-
-
-   if(maxerrinv>inverr)// && verbose>0) 
-    {
-     
-      if(Etype==U2P_ENTROPY) { 
+      
+      if(Etype==U2P_ENTROPY && 0) { 
 	printf("verify u2p (%d) failed: %e || ",Etype,maxerrinv);
 	printf("%e %e | %e %e | %e %e\n",uunew[RHO],uu[RHO],uunew[ENTR],uu[ENTR],uunew[VX],uu[VX]);
 	print_conserved(uu);
@@ -1676,7 +1678,7 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
       }
       return -200;
     }
-  */
+    }
 
   if(verbose>0) printf("u2p_solver returns 0\n");
   return 0; //ok

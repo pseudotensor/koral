@@ -351,15 +351,15 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
 
       
+      //chooses the smalles timestep etc.
+      mpi_synchtiming(&t);
+
       //initial time mark
       my_clock_gettime(&temp_clock);
 
       start_time=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
       ldouble tstepden;
       
-      //chooses the smalles timestep etc.
-      mpi_synchtiming(&t);
-
       //reallocate loops to allow for sub-zones, but don't do it every step
       #ifdef SUBZONES
 
@@ -444,7 +444,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //addi_u(1./(dt*gamma),u,-1./(dt*gamma),ut0,drt1); //R(U(1)) in *drt1;
 
 	    /******* 1st explicit **********/
-	    copyi_u(1.,u,ut1);	    
+	    copyi_u(1.,u,ut1);
+      
 	    calc_u2p();
 
 #pragma omp barrier
@@ -768,8 +769,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  znps = TNX*TNY*TNZ*(nstep-fprintf_nstep);
 	  
-	  printf("(%d) step #%6d t=%10.3e dt=%.3e (real time: %7.2f | %7.6f) znps: %.0f "
-		 ,PROCID,nstep,t,dt,end_time-start_time,2*maxmp_time,znps);
+	  printf("(%d) step #%6d t=%10.3e dt=%.3e (tot.time: %7.2f (%.2f|%3d > %.2f|%3d) mp: %7.6f) znps: %.0f "
+		 ,PROCID,nstep,t,dt,end_time-start_time,2.*max_u2ptime,max_u2ptime_loc,2.*min_u2ptime,min_u2ptime_loc,2*maxmp_time,znps);
 
 #ifdef BALANCEENTROPYWITHRADIATION
 	  printf("#: %d|%d %d|%d %d|%d %d|%d ",nentr[0],nentr2[0],nentr[1],nentr2[1],nentr[2],nentr2[2],nentr[3],nentr2[3]);

@@ -302,8 +302,15 @@ if(rho<0.) //outside donut
 
    }
 
+#ifdef PERTMAGN //perturb to break axisymmetry
+//pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
+pp[UU]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL.zz)/(MAXZ-MINZ));
+#endif
+
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
+
+
 //to conserved
 p2u(pp,uu,&geom);
 

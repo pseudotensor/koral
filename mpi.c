@@ -1722,8 +1722,28 @@ mpi_synchtiming(ldouble *time)
 
   //maximal time taken by information exchange
   ldouble localmp_time=mid2_time-mid1_time;
-  MPI_Allreduce(&localmp_time, &maxmp_time, 1, MPI_DOUBLE, MPI_MAX,
-                MPI_COMM_WORLD);   
+  //MPI_Allreduce(&localmp_time, &maxmp_time, 1, MPI_DOUBLE, MPI_MAX,        MPI_COMM_WORLD);   
+  //only PROCID==0 writes to stdout
+  MPI_Reduce(&localmp_time, &maxmp_time, 1, MPI_DOUBLE, MPI_MAX,     0,   MPI_COMM_WORLD);   
+
+  //total operation time
+  ldouble local_u2ptime=end_u2ptime-start_u2ptime;
+  struct {
+    double time;
+    int ti;
+  } in,outmin,outmax;
+  in.time=local_u2ptime;
+  in.ti=TI;
+
+  MPI_Reduce(&in, &outmax, 1, MPI_DOUBLE_INT, MPI_MAXLOC,0,
+		 MPI_COMM_WORLD);  
+  MPI_Reduce(&in, &outmin, 1, MPI_DOUBLE_INT, MPI_MINLOC,0,
+		 MPI_COMM_WORLD);  
+
+  max_u2ptime=outmax.time;
+  max_u2ptime_loc=outmax.ti;
+  min_u2ptime=outmin.time;
+  min_u2ptime_loc=outmin.ti;  
 
   MPI_Bcast(&global_time, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   

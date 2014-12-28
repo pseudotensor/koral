@@ -114,7 +114,8 @@
 ldouble global_time;
 ldouble global_dt;
 ldouble global_tstepdenmax,global_tstepdenmin;
-ldouble start_time, end_time, mid1_time, mid2_time, maxmp_time;
+ldouble start_time, end_time, mid1_time, mid2_time, maxmp_time, max_u2ptime,  min_u2ptime, start_u2ptime, end_u2ptime;
+int max_u2ptime_loc,min_u2ptime_loc;
 
 ldouble avgtime,dt;
 int nstep;

@@ -516,6 +516,11 @@ calc_u2p()
   //**********************************************************************
   //**********************************************************************
 
+  struct timespec temp_clock;
+  my_clock_gettime(&temp_clock);    
+  start_u2ptime=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
+  
+
   //calculates the primitives
 //#pragma omp parallel for schedule (static,4)
   for(ii=0;ii<Nloop_0;ii++) //domain only
@@ -565,8 +570,10 @@ calc_u2p()
 //**********************************************************************
   //**********************************************************************
   //**********************************************************************
-
-
+  
+  my_clock_gettime(&temp_clock);    
+  end_u2ptime=(ldouble)temp_clock.tv_sec+(ldouble)temp_clock.tv_nsec/1.e9;
+  
 
   return 0;
 }
