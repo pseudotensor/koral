@@ -769,7 +769,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  znps = TNX*TNY*TNZ*(nstep-fprintf_nstep);
 	  
-	  printf("(%d) step #%6d t=%10.3e dt=%.3e (tot.time: %7.2f (%.2f|%3d > %.2f|%3d) mp: %7.6f) znps: %.0f "
+	  printf("(%d) step #%6d t=%10.3e dt=%.3e (tot.time: %7.2f (%.2e|%3d > %.2e|%3d) mp: %7.6f) znps: %.0f "
 		 ,PROCID,nstep,t,dt,end_time-start_time,2.*max_u2ptime,max_u2ptime_loc,2.*min_u2ptime,min_u2ptime_loc,2*maxmp_time,znps);
 
 #ifdef BALANCEENTROPYWITHRADIATION

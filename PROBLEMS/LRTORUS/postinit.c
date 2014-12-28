@@ -42,7 +42,7 @@ for(iz=0;iz<NZ;iz++)
 #endif
 
 #ifdef BETANORMEQPLANE //normalizing wrt to near the equatorial plane
-		if(fabs(geomBL.yy-M_PI/2.)<M_PI/10.)
+		if(fabs(geomBL.yy-M_PI/2.)<M_PI/10. && geomBL.xx<300.)
 		  {
 #pragma omp critical
 		    if(pmag/ptot>maxbeta) 

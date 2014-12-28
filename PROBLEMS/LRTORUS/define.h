@@ -10,7 +10,7 @@
 #define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
-#define PERTMAGN 1.e-1
+#define PERTMAGN 1.e-2
 //#define ENFORCEENTROPY
 
 /************************************/
@@ -120,7 +120,7 @@
 //total resolution
 #define TNX 160//272 //8*34
 #define TNY 120//192 //8*24
-#define TNZ 16 //16*2
+#define TNZ 1 //16*2
 //number of tiles
 #define NTX 4//34//16
 #define NTY 4//24//16
@@ -156,7 +156,25 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 80
+#define NTORUS 81
+
+#if(NTORUS==81) //
+#define LT_KAPPA 5.e2
+#define LT_XI 0.705
+#define LT_R1 40.
+#define LT_R2 1000.
+#ifdef RADIATION
+#define LT_GAMMA 4./3.
+#else
+#define LT_GAMMA 5./3.
+#endif
+#define LT_RIN 10.
+#define BETANORMEQPLANE
+//#define BETANORMFACTOR 1.e-04
+#undef MAXBETA
+#define MAXBETA (.03) 
+#endif
+
 
 #if(NTORUS==79 || NTORUS==80) //
 #define LT_KAPPA 5.e2

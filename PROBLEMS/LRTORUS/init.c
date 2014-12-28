@@ -281,10 +281,53 @@ if(rho<0.) //outside donut
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.01,0.)*
       pow(sin(fabs(geomBL.yy)),4.);
 
-#elif (NTORUS==80) //a'la adaf paper
+#elif (NTORUS==80) //a'la adaf paper but ~ RHO
   
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/1.e-5,2.)-0.1,0.)*
       pow(sin(fabs(geomBL.yy)),4.);
+
+
+#elif (NTORUS==81) //a'la adaf paper but ~ UU
+    /*
+    Acov[3]=my_max((pp[UU]*geomBL.xx*geomBL.xx-1.e-10*10.*10.)/7e-10-0.1,0.)*
+      pow(sin(fabs(geomBL.yy)),3.);
+
+    ldouble STARTFIELD=LT_RIN*1.2;
+    ldouble lambda = 750.;
+    ldouble fr = (pow(geomBL.xx,0.6)/0.6  + 0.5/0.4*pow(geomBL.xx,-0.4)) / lambda;
+    ldouble fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
+    Acov[3] *= sin(fr - fr_start) ;
+    */
+
+  //LIMOFIELD from a=0 MAD harm init.c
+    ldouble lambda = 25.;
+    ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
+    ldouble rchop = 800.; //outer boundary of field loops
+    ldouble u_av = pp[UU];
+    ldouble u_av_chop, u_av_mid;
+    //midplane at r
+    init_dsandvels_limotorus(r, M_PI/2., BHSPIN, &rho, &u_av_mid, &ell);
+    //midplane at rchop
+    init_dsandvels_limotorus(rchop, M_PI/2., BHSPIN, &rho, &u_av_chop, &ell);
+    
+    //vetor potential follows contours of UU
+    ldouble uchop = u_av - u_av_chop; //vpot->zero on contour of radius r=rchop
+    ldouble uchopmid = u_av_mid - u_av_chop; //vpot->zero away from midplane
+
+    ldouble rin=LT_RIN;
+    ldouble STARTFIELD = 2.5*rin;
+    ldouble q, fr, fr_start, vpot=0.;
+    if (r > STARTFIELD && r < rchop) {
+      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 3); // * pow(tanh(r/rsmooth),2);
+    } else q = 0;
+
+    if(q > 0.) {
+      fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
+      fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
+      vpot += q * sin(fr - fr_start) ;
+    }
+
+    Acov[3]=vpot;
 
 #else //standard single poloidal loop
 
