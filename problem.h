@@ -87,11 +87,25 @@
 //84 AXISBLOB - blob near 3d polar axis
 //85 NSTEST - tests of axisymmetric NS
 //86 TFLAT - tests of TFLATCOORDS
+//87 INFDISK - gas dumped to circularize
 
 #define PROBLEM 67
 
-#if(PROBLEM==86)
+#if(PROBLEM==87)
 
+#define PR_DEFINE "PROBLEMS/INFDISK/define.h"
+#define PR_BC "PROBLEMS/INFDISK/bc.c"
+#define PR_INIT "PROBLEMS/INFDISK/init.c"
+#define PR_KAPPA "PROBLEMS/INFDISK/kappa.c"
+#define PR_KAPPAES "PROBLEMS/INFDISK/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/INFDISK/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/INFDISK/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/INFDISK/dump.c"
+#define PR_TOOLS "PROBLEMS/INFDISK/tools.c"
+
+#endif
+
+#if(PROBLEM==86)
 
 #define PR_DEFINE "PROBLEMS/TFLAT/define.h"
 #define PR_BC "PROBLEMS/TFLAT/bc.c"

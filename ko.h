@@ -319,6 +319,8 @@ ldouble opacity_BellLin(ldouble rhoc, ldouble Tc);
 
 //finite.c
 int
+is_cell_active(int ix, int iy, int iz);
+int
 calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2,int* iz2);
 int calc_u2p();
 int do_finger();

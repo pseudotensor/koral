@@ -535,21 +535,9 @@ calc_u2p()
       set_cflag(ENTROPYFLAG,ix,iy,iz,0); 
       set_cflag(ENTROPYFLAG2,ix,iy,iz,0); 
 
-#if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
-      if(TJ==0 && iy<NCCORRECTPOLAR) 
-	{
-	  //printf("skipping: %d %d %d\n",PROCID,ix,iy);
-	  continue;
-	}
-#ifndef HALFTHETA
-      if(TJ==NTY-1 && iy>(NY-NCCORRECTPOLAR-1)) continue;
-#endif
-#endif
-
-      #ifdef MSTEP
-      if(mstep_is_cell_active(ix,iy,iz)==0) 
+      //skip if cell is passive
+      if(!is_cell_active(ix,iy,iz))
 	continue;
-      #endif
 
       calc_primitives(ix,iy,iz,0,1);
     }  
@@ -604,10 +592,8 @@ calc_wavespeeds()
  
       ldouble aaa[12];
 
-      #ifdef MSTEP
-      if(mstep_is_cell_active(ix,iy,iz)==0) 
+      if(!is_cell_active(ix,iy,iz))
 	continue;
-      #endif
 
       calc_wavespeeds_lr(ix,iy,iz,aaa);	
 
@@ -759,12 +745,12 @@ op_explicit(ldouble t, ldouble dtin)
 		dol=dor=1;
 		if(ix<0) dol=0;
 		if(ix>=NX) dor=0;
-#ifdef MSTEP
-		if((ix==0 && mstep_is_cell_active(ix,iy,iz)==0) || (ix>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix-1,iy,iz)==0))
+
+		//skip flux calculation if not needed
+		if((ix==0 && is_cell_active(ix,iy,iz)==0) || (ix>0 && is_cell_active(ix,iy,iz)==0 && is_cell_active(ix-1,iy,iz)==0))
 		  dol=0;
-		if((ix==NX-1 && mstep_is_cell_active(ix,iy,iz)==0) || (ix<NX-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix+1,iy,iz)==0))
+		if((ix==NX-1 && is_cell_active(ix,iy,iz)==0) || (ix<NX-1 && is_cell_active(ix,iy,iz)==0 && is_cell_active(ix+1,iy,iz)==0))
 		  dor=0;
-#endif
 		
 		x0[0]=get_x(ix,0);
 
@@ -861,12 +847,10 @@ op_explicit(ldouble t, ldouble dtin)
 		if(iy<0) dol=0;
 		if(iy>=NY) dor=0;
 
-#ifdef MSTEP
-		if((iy==0 && mstep_is_cell_active(ix,iy,iz)==0) || (iy>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy-1,iz)==0))
+		if((iy==0 && is_cell_active(ix,iy,iz)==0) || (iy>0 && is_cell_active(ix,iy,iz)==0 && is_cell_active(ix,iy-1,iz)==0))
 		  dol=0;
-		if((iy==NY-1 && mstep_is_cell_active(ix,iy,iz)==0) || (iy<NY-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy+1,iz)==0))
+		if((iy==NY-1 && is_cell_active(ix,iy,iz)==0) || (iy<NY-1 && is_cell_active(ix,iy,iz)==0 && is_cell_active(ix,iy+1,iz)==0))
 		  dor=0;
-#endif
 
 		 x0l[1]=get_xb(iy,1);
 		 xm1[1]=get_x(iy-1,1);
@@ -954,16 +938,14 @@ op_explicit(ldouble t, ldouble dtin)
 		     if(iz<0) dol=0;
 		     if(iz>=NZ) dor=0;
 
-#ifdef MSTEP
-		if((iz==0 && mstep_is_cell_active(ix,iy,iz)==0) || (iz>0 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy,iz-1)==0))
-		  dol=0;
-		if((iz==NZ-1 && mstep_is_cell_active(ix,iy,iz)==0) || (iz<NZ-1 && mstep_is_cell_active(ix,iy,iz)==0 && mstep_is_cell_active(ix,iy,iz+1)==0))
-		  dor=0;
-#endif
+		     if((iz==0 && is_cell_active(ix,iy,iz)==0) || (iz>0 && is_cell_active(ix,iy,iz)==0 && is_cell_active(ix,iy,iz-1)==0))
+		       dol=0;
+		     if((iz==NZ-1 && is_cell_active(ix,iy,iz)==0) || (iz<NZ-1 && is_cell_active(ix,iy,iz)==0 && is_cell_active(ix,iy,iz+1)==0))
+		       dor=0;
 
-		    x0l[2]=get_xb(iz,2);
-		    xm1[2]=get_x(iz-1,2);
-		    x0l[0]=xm1[0]=get_x(ix,0); 
+		     x0l[2]=get_xb(iz,2);
+		     xm1[2]=get_x(iz-1,2);
+		     x0l[0]=xm1[0]=get_x(ix,0); 
 		    x0l[1]=xm1[1]=get_x(iy,1);
   
 		    x0r[2]=get_xb(iz+1,2);
@@ -1099,13 +1081,11 @@ op_explicit(ldouble t, ldouble dtin)
       //source term
       ldouble ms[NV],val,du;
 
-#ifdef MSTEP
-      if(mstep_is_cell_active(ix,iy,iz)==0)
+      if(is_cell_active(ix,iy,iz)==0)
 	{ 
 	PLOOP(iv) ms[iv]=0.; //source terms applied only for active cells
 	}
       else
-#endif
 	f_metric_source_term(ix,iy,iz,ms);
 
       ldouble dx=get_size_x(ix,0);
@@ -1190,10 +1170,8 @@ op_explicit(ldouble t, ldouble dtin)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      #ifdef MSTEP
-      if(mstep_is_cell_active(ix,iy,iz)==0) 
+      if(is_cell_active(ix,iy,iz)==0) 
 	continue;
-      #endif
 
       //timestep
       dt=dtin;
@@ -1270,10 +1248,8 @@ op_implicit(ldouble t, ldouble dtin)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      #ifdef MSTEP
-      if(mstep_is_cell_active(ix,iy,iz)==0) 
+      if(is_cell_active(ix,iy,iz)==0) 
 	continue;
-      #endif
 
       //timestep
       dt=dtin;
@@ -5758,3 +5734,31 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
   return zone;
 }
 
+
+/* say if given cell is evolved or rather corrected */
+int
+is_cell_active(int ix, int iy, int iz)
+{
+#if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
+#ifdef MPI
+  if(TJ==0) //tile
+#endif
+    if(iy<NCCORRECTPOLAR) 
+      return 0;
+#ifndef HALFTHETA
+#ifdef MPI
+  if(TJ==NTY-1) //tile
+#endif   
+    if(iy>(NY-NCCORRECTPOLAR-1))
+      return 0;
+#endif
+#endif
+
+#ifdef MSTEP
+  if(mstep_is_cell_active(ix,iy,iz)==0) 
+    return 0;
+#endif
+      
+      //by default active
+  return 1;
+}

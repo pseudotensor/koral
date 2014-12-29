@@ -1533,7 +1533,7 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
       //convergence test:
       if(err<CONV || (Etype==U2P_HOT && fabs((Wp-Wpprev)/Wpprev)<CONV && err<(sqrt(CONV)))
-	 || (Etype==U2P_ENTROPY && fabs((Wp-Wpprev)/Wpprev)<CONV && err<0.9)) break;
+	 || (Etype==U2P_ENTROPY && fabs((Wp-Wpprev)/Wpprev)<CONV && err<0.99)) break;
       //if(err<CONV || fabs((Wp-Wpprev)/Winit)<CONV) break;
     }
   while(iter<50);
