@@ -494,8 +494,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      
 	      int iphimin,iphimax;
 	      iphimin=0;
+	      iphimax=ny-1;
               #if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
-	      iphimin=NCCORRECTPOLAR; iphimax=ny-NCCORRECTPOLAR-1;
+	      iphimin=NCCORRECTPOLAR; 
+	      #ifndef HALFTHETA
+	      iphimax=ny-NCCORRECTPOLAR-1;
+	      #endif
 	      #endif
 		if(iy==iphimin)
 		{

@@ -57,7 +57,9 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   //************************************
   //checking on hd floors  
   int floorret=0;
-  floorret=check_floors_mhd(pp,VELPRIM,&geom);
+
+  if(is_cell_active(ix,iy,iz))
+    floorret=check_floors_mhd(pp,VELPRIM,&geom);
 
   if(floorret<0.)
     {
@@ -68,7 +70,9 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   //checking on rad floors
     
   #ifdef RADIATION
-  floorret=check_floors_rad(pp,VELPRIMRAD,&geom);
+  floorret=0;
+  if(is_cell_active(ix,iy,iz))
+    floorret=check_floors_rad(pp,VELPRIMRAD,&geom);
   if(floorret<0.)
     {
       corrected[1]=1;
