@@ -52,7 +52,7 @@ main
 
 
   printf("phiavg: %d %d %d %d\n",no1,no2,nostep,ifavg);
-
+  if(ifavg) printf("for avg set the proper TNZ!\n");
 
   //allocate memory
   nx=NX;ny=NY;
@@ -87,7 +87,7 @@ main
       //reading damp file parameters
       int intpar[6];
 
-      if(ifavg)
+      if(ifavg) //avg follows old writing sequence
 	{
 	  sprintf(bufor,"cp %s %s\n",fnamehead,fnameheadout);
 	  system(bufor);
@@ -95,6 +95,63 @@ main
 	  ny=TNY;
 	  nz=TNZ;
 	  problem=PROBLEM;
+
+	  /***********/
+	  fout=fopen(fnameout,"w");
+	  //body file
+	  fdump=fopen(fname,"rb");
+ 
+	  printf("avg file (%s) read no. %d\n",
+		 fname,itot);
+
+	  
+	  for(j=0;j<ny;j++)
+	    for(i=0;i<nx;i++)
+	      for(iv=0;iv<nv;iv++)
+		prims[i][j][iv]=0.;
+
+	  for(k=0;k<nz;k++)
+	    {
+	      for(j=0;j<ny;j++)
+		{
+		  for(i=0;i<nx;i++)
+		    {
+		      int gix,giy,giz;
+		  
+		      ret=fread(&gix,sizeof(int),1,fdump);
+		      ret=fread(&giy,sizeof(int),1,fdump);
+		      ret=fread(&giz,sizeof(int),1,fdump);
+		      ret=fread(pp,sizeof(double),nv,fdump);
+
+
+		      if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
+			printf("blont: %d %d %d vs %d %d %d | %d %d %d\n",i,j,k,gix,giy,giz,nx,ny,nz);
+		      else
+			for(iv=0;iv<nv;iv++)
+			  prims[gix][giy][iv]+=pp[iv];
+		    }
+		}
+	    }
+
+	  for(j=0;j<ny;j++)
+	    for(i=0;i<nx;i++)
+	      for(iv=0;iv<nv;iv++)
+		prims[i][j][iv]/=(double)nz;
+
+	  //print to a file
+	  k=0;
+	  for(j=0;j<ny;j++)
+	    for(i=0;i<nx;i++)
+	      {
+		fwrite(&i,sizeof(int),1,fout);
+		fwrite(&j,sizeof(int),1,fout);
+		fwrite(&k,sizeof(int),1,fout);
+		fwrite(&prims[i][j][0],sizeof(ldouble),nv,fout);	    
+	      }
+
+	
+	  fclose(fdump);
+	  fclose(fout);
 	}
       else
 	{
@@ -110,96 +167,95 @@ main
 	  fprintf(fout,"%s",bufor);
 	  fprintf(fout,"phi-averaged to NZ=1\n");
 	  fclose(fout);
-	}
-      
-
-      /***********/
-      fout=fopen(fnameout,"w");
+       
+	  /***********/
+	  fout=fopen(fnameout,"w");
 
      
       
-      if(nx!=TNX || ny!=TNY || problem!=PROBLEM)
-	{
-	  printf("PROBLEM files inconsistent with the dump file\n");
-	  exit (-1);
-	}
+	  if(nx!=TNX || ny!=TNY || problem!=PROBLEM)
+	    {
+	      printf("PROBLEM files inconsistent with the dump file\n");
+	      exit (-1);
+	    }
 
-      printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
-	     fname,intpar[0],time,intpar[2],intpar[3],intpar[4],intpar[5]); 
-
-
-      printf("time: %e resolution: %d x %d x %d NV: %d\n",time,nx,ny,nz,nv);
+	  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
+		 fname,intpar[0],time,intpar[2],intpar[3],intpar[4],intpar[5]); 
 
 
-      //body file
-      fdump=fopen(fname,"rb");
+	  printf("time: %e resolution: %d x %d x %d NV: %d\n",time,nx,ny,nz,nv);
+
+
+	  //body file
+	  fdump=fopen(fname,"rb");
  
-      for(j=0;j<ny;j++)
-	for(i=0;i<nx;i++)
-	  for(iv=0;iv<nv;iv++)
-	    prims[i][j][iv]=0.;
+	  for(j=0;j<ny;j++)
+	    for(i=0;i<nx;i++)
+	      for(iv=0;iv<nv;iv++)
+		prims[i][j][iv]=0.;
 
-      int indices[nx*ny*nz][3];
+	  int indices[nx*ny*nz][3];
 
-      //first indices
-      for(ic=0;ic<nx*ny*nz;ic++)
-	{
-	  ret=fread(&ix,sizeof(int),1,fdump);
-	  ret=fread(&iy,sizeof(int),1,fdump);
-	  ret=fread(&iz,sizeof(int),1,fdump);
+	  //first indices
+	  for(ic=0;ic<nx*ny*nz;ic++)
+	    {
+	      ret=fread(&ix,sizeof(int),1,fdump);
+	      ret=fread(&iy,sizeof(int),1,fdump);
+	      ret=fread(&iz,sizeof(int),1,fdump);
 
-	  //phiavg only serial
-	  //mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+	      //phiavg only serial
+	      //mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
 
-	  indices[ic][0]=ix;
-	  indices[ic][1]=iy;
-	  indices[ic][2]=iz;
-	}
+	      indices[ic][0]=ix;
+	      indices[ic][1]=iy;
+	      indices[ic][2]=iz;
+	    }
 
-      //then primitives
-      for(ic=0;ic<nx*ny*nz;ic++)
-	{
-	  ret=fread(pp,sizeof(double),nv,fdump);
+	  //then primitives
+	  for(ic=0;ic<nx*ny*nz;ic++)
+	    {
+	      ret=fread(pp,sizeof(double),nv,fdump);
 
-	  gix=indices[ic][0];
-	  giy=indices[ic][1];
-	  giz=indices[ic][2];
+	      gix=indices[ic][0];
+	      giy=indices[ic][1];
+	      giz=indices[ic][2];
 	  
-	  if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
-	    printf("blont: %d %d %d vs %d %d %d | %d %d %d\n",i,j,k,gix,giy,giz,nx,ny,nz);
-	  else
-	    for(iv=0;iv<nv;iv++)
-	      prims[gix][giy][iv]+=pp[iv];
+	      if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
+		printf("blont: %d %d %d vs %d %d %d | %d %d %d\n",i,j,k,gix,giy,giz,nx,ny,nz);
+	      else
+		for(iv=0;iv<nv;iv++)
+		  prims[gix][giy][iv]+=pp[iv];
 
-	}
+	    }
 
-      for(j=0;j<ny;j++)
-	for(i=0;i<nx;i++)
-	  for(iv=0;iv<nv;iv++)
-	    prims[i][j][iv]/=(double)nz;
+	  for(j=0;j<ny;j++)
+	    for(i=0;i<nx;i++)
+	      for(iv=0;iv<nv;iv++)
+		prims[i][j][iv]/=(double)nz;
 
-      //print to a file
+	  //print to a file
       
-      //indices first
-      iz=0;
-      for(ix=0;ix<nx;ix++)
-	for(iy=0;iy<ny;iy++)
-	    {
-	      fwrite(&ix,sizeof(int),1,fout);
-	      fwrite(&iy,sizeof(int),1,fout);
-	      fwrite(&iz,sizeof(int),1,fout);
-	    }
+	  //indices first
+	  iz=0;
+	  for(ix=0;ix<nx;ix++)
+	    for(iy=0;iy<ny;iy++)
+	      {
+		fwrite(&ix,sizeof(int),1,fout);
+		fwrite(&iy,sizeof(int),1,fout);
+		fwrite(&iz,sizeof(int),1,fout);
+	      }
 
-      //then, in the same order, primitives
-      for(ix=0;ix<nx;ix++)
-	for(iy=0;iy<ny;iy++)
-	    {
-	      fwrite(&prims[ix][iy][0],sizeof(ldouble),nv,fout);
-	    }
+	  //then, in the same order, primitives
+	  for(ix=0;ix<nx;ix++)
+	    for(iy=0;iy<ny;iy++)
+	      {
+		fwrite(&prims[ix][iy][0],sizeof(ldouble),nv,fout);
+	      }
 
 
-      fclose(fdump);
-      fclose(fout);
+	  fclose(fdump);
+	  fclose(fout);
+	}
     }
   return 0;
 }
