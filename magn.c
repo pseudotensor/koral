@@ -782,6 +782,8 @@ mimic_dynamo(ldouble dtin)
       iy=loop_6[ii][1];
       iz=loop_6[ii][2]; 
 
+      if(!is_cell_active(ix,iy,iz)) continue;
+
       calc_primitives(ix,iy,iz,0,0);
 
       struct geometry geom;
@@ -848,6 +850,11 @@ mimic_dynamo(ldouble dtin)
 
       //radius
       ldouble facradius = step_function(xxBL[1]-1.*rISCOBL,.1*rISCOBL);
+
+      #ifdef MAXRADIUS4DYNAMO
+      if(xxBL[1]>2.*MAXRADIUSDYNAMO) continue;
+      facradius *= step_function(MAXRADIUS4DYNAMO-xxBL[1],.1*MAXRADIUS4DYNAMO);
+      #endif
 
       //pre(gas+rad)
       ldouble prermhd = GAMMAM1*get_u(p,UU,ix,iy,iz);

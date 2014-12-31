@@ -108,8 +108,13 @@ int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
   pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[2][2])*cos(MAGNOMEGA*global_time);
   */
   
-  pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[2][2])*sin(theq2/thmax*M_PI)*cos(MAGNOMEGA*global_time);
+  //pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[2][2])*sin(theq2/thmax*M_PI)*cos(MAGNOMEGA*global_time);
 
+  //radial
+  pp[B1]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[1][1])*sin(theq2/thmax*M_PI*2.)*cos(MAGNOMEGA*global_time);
+  if(global_time < VERTBTIME)
+    pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA/2.)/sqrt(geom->gg[2][2])*sin(theq2/thmax*M_PI)*cos(MAGNOMEGA*global_time);
+ 
   /*
   //MYCOORDS vector potential to calculate B's
   ldouble Acov[4];

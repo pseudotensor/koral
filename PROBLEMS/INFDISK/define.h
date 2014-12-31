@@ -12,7 +12,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define COMPTONIZATION
 
 /************************************/
@@ -21,6 +21,15 @@
 //if we want a magnetic field, uncomment MAGNFIELD
 #define MAGNFIELD
 #define GDETIN 1
+
+#define MIMICDYNAMO
+#define CALCHRONTHEGO
+#define THETAANGLE 0.25
+#define ALPHAFLIPSSIGN                                                        
+#define ALPHADYNAMO 0.314
+#define DAMPBETA
+#define BETASATURATED 0.1
+#define ALPHABETA 6.28
 
 /************************************/
 //reconstruction / Courant
@@ -97,8 +106,8 @@
 #endif
 
 //total resolution
-#define TNX 240
-#define TNY 160
+#define TNX 160//240
+#define TNY 100//160
 #define TNZ 1
 //number of tiles
 #define NTX 2
@@ -157,13 +166,16 @@
 #define DISKSIGMA surfdensCGS2GU(MDOT/((-3.e10)*DISKVR*2.*DISKHCGS))
 #define DISKRCIR 25.
 #define DISKTEMP 1.e8
+#define VERTBTIME 10.
+
+#define MAXRADIUS4DYNAMO DISKRCIR
 
 #define DISKH (DISKHR*ROUT)
 #define DISKRHO (DISKSIGMA/2./DISKH)
 
-#define MAGNOMEGA (2.*M_PI/1000.)//0.
+#define MAGNOMEGA 0.//(2.*M_PI/1000.)//0.
 //#define MAGNOMEGA 0.*(1.5e-2*pow(200./50.,-1.5)) //omega should follow the free fall time?
-#define MAGBETA 0.02
+#define MAGBETA 0.1
 
 //atmosphere
 #define RHOATMMIN  1.e-20
