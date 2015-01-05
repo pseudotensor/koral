@@ -19,7 +19,7 @@ main(int argc, char **argv)
   int no1,no2,nostep,procotg,ifphiavg;
   if(argc!=4 && argc!=7)
     {
-      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep [doingavg procotg ifphiavg]\n");
+      printf("Not enough input arguments. Asks for ./avg no1 no2 nostep [doingavg=1 procotg=0 ifphiavg=0]\n");
       return -1;
     }
   else
