@@ -126,6 +126,11 @@ int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
   pp[B3]=Acov[3];
   */
 #endif
+
+
+#ifdef PERTMAGN //perturb to break axisymmetry
+pp[UU]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL->zz)/(MAXZ-MINZ));
+#endif
   
   return 0;
 }

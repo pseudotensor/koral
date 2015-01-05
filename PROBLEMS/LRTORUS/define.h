@@ -2,7 +2,7 @@
 //general
 /************************************/
 #define BHDISK_PROBLEMTYPE
-#define PERTURBVEL (-.5)
+//#define PERTURBVEL (-.5)
 
 /************************************/
 //restart
@@ -172,7 +172,7 @@
 #define BETANORMEQPLANE
 //#define BETANORMFACTOR 1.e-04
 #undef MAXBETA
-#define MAXBETA (.03) 
+#define MAXBETA (.1) 
 #endif
 
 

@@ -318,7 +318,7 @@ if(rho<0.) //outside donut
     ldouble STARTFIELD = 2.5*rin;
     ldouble q, fr, fr_start, vpot=0.;
     if (r > STARTFIELD && r < rchop) {
-      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 3); // * pow(tanh(r/rsmooth),2);
+      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 8); // * pow(tanh(r/rsmooth),2);
     } else q = 0;
 
     if(q > 0.) {

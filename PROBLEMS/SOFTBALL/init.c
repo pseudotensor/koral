@@ -63,6 +63,8 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     #endif
 
     ldouble vmichel4vel[4]={0.,FRACMICHEL*vmichel,0.,0.};
+    conv_vels(vmichel4vel,vmichel4vel,VEL4,VEL4,geomBL.gg,geomBL.GG);
+
     trans2_coco(geom.xxvec,vmichel4vel,vmichel4vel,BLCOORDS,MYCOORDS);
     pp[VX]=vmichel4vel[1];
     pp[VY]=vmichel4vel[2];
@@ -103,7 +105,7 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     pp[FY0]=Fy;
     pp[FZ0]=Fz;
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
-    prad_ff2lab(pp,pp,&geomBL);
+    prad_ff2lab(pp,pp,&geom);
 #endif
 
 #ifdef PERTMAGN //perturb to trigger PapaloizuPringle

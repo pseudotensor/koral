@@ -38,7 +38,7 @@
 #define MAXZ (2.*M_PI) 
 #define TNX 100 // Total number of cells in X 
 #define TNY 100
-#define TNZ 100
+#define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2
 #define NTZ 1

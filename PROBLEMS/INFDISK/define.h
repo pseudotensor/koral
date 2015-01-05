@@ -127,9 +127,15 @@
 #endif
 #endif
 
-#define MINZ -1.
-#define MAXZ 1.
+
+
+#define PHIWEDGE (M_PI)
+#define MINZ (-PHIWEDGE/2.)
+#define MAXZ (PHIWEDGE/2.)
+
+#define PERTMAGN 1.e-2
 #define SPECIFIC_BC
+#define PERIODIC_ZBC
 
 /************************************/
 //output
@@ -163,6 +169,7 @@
 #define DISKHCGS (DISKHR*ROUT*MASS*1477.) 
 #define MDOTEDD 10.
 #define MDOT (MDOTEDD*2.23e18)
+//TODO:correct!!!
 #define DISKSIGMA surfdensCGS2GU(MDOT/((-3.e10)*DISKVR*2.*DISKHCGS))
 #define DISKRCIR 25.
 #define DISKTEMP 1.e8
