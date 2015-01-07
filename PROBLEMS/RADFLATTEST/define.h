@@ -66,7 +66,7 @@
 #define TNX 40
 #define TNY 5
 #define TNZ 1
-#define NTX 4 //for MPI and OMP
+#define NTX 1 //for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
