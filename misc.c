@@ -1214,3 +1214,104 @@ get_tsteplimiter()
 
     return 0.5;
 }
+
+//calculates the state, mostly for postprocessing
+int
+get_state(ldouble *pp,void* ggg,void* sss)
+{
+  struct geometry *geom
+    = (struct geometry *) ggg;
+  struct struct_of_state *state
+    = (struct struct_of_state *) sss;
+
+
+  int i,j;
+  //the four-velocity of fluid in lab frame
+  ldouble ucon[4],utcon[4],ucov[4];
+
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
+ 
+  //gas properties
+  ldouble rho=pp[RHO];
+  ldouble uint=pp[1];
+  ldouble pgas= (GAMMA-1.)*uint;
+  ldouble Tgas=pgas*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  
+  rho=pp[RHO];
+  uint=pp[UU];
+  pgas=GAMMAM1*pp[UU];
+  ldouble dV=get_size_x(geom->ix,0)*get_size_x(geom->iy,1)*get_size_x(geom->ix,2)*geom->gdet;
+
+  state->rho=rho;
+  state->uint=uint;
+  state->pgas=pgas;
+  state->dV=dV;
+  state->Tgas=Tgas;
+  
+  DLOOPA(i)
+  {
+    state->ucon[i]=ucon[i];
+    state->ucov[i]=ucov[i];
+  }
+
+#ifdef MAGN_FIELD
+  //...
+#endif
+  
+#ifdef RADIATION
+  //the four-velocity of radiation frame in lab frame
+  ldouble urfcon[4],urfcov[4];
+
+  utcon[1]=pp[FX];
+  utcon[2]=pp[FY];
+  utcon[3]=pp[FZ];
+  conv_vels_both(utcon,urfcon,urfcov,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+
+  //radiative stress tensor in the lab frame
+  ldouble Rij[4][4];
+  calc_Rij_M1(pp,ggg,Rij);
+
+  ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
+  ldouble kappagasRos,kappagasAbs,kapparadRos,kapparadAbs;
+  ldouble kappa=calc_kappa(pp,geom,&kappagasRos,&kappagasAbs,&kapparadRos,&kapparadAbs);
+  if(kappagasAbs==-1) //no distincion
+    {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
+  ldouble kappaes=calc_kappaes(pp,geom);
+  //R^ab u_a u_b = Erad in fluid frame
+  ldouble Ruu=0.;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      Ruu+=Rij[i][j]*ucov[i]*ucov[j];
+  ldouble Ehat = Ruu;
+
+  ldouble prad=1./3.*Ehat;
+  ldouble betarad=prad/pgas;
+
+  ldouble Gi[4],Gic[4];
+  calc_Gi(pp,ggg,Gi,1);
+  calc_Compt_Gi(pp,ggg,Gic,Ehat,Tgas,kappaes,ucon);
+
+  state->Ehat=Ehat;
+  state->betarad=betarad;
+  state->prad=prad;
+  state->kappa=kappa;
+  state->kappagasRos=kappagasRos;
+  state->kappagasAbs=kappagasAbs;
+  state->kapparadRos=kapparadRos;
+  state->kapparadAbs=kapparadAbs;
+  state->kappaes=kappaes;
+ 
+  DLOOPA(i)
+  {
+    state->Gi[i]=Gi[i];
+    state->Gic[i]=Gic[i];
+    state->urfcon[i]=urfcon[i];
+    state->urfcov[i]=urfcov[i];
+  }
+#endif
+  
+  return 0;
+}

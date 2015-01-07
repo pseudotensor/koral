@@ -1008,6 +1008,8 @@ int calc_scalars(ldouble *scalars,ldouble t)
   /*********************************************/
 
 #if(PROBLEM==79) //SOFTBALL
+
+  //L2 norm of density
   ldouble L2=0;
   int i,j;
   for(i=0;i<NX;i++)
@@ -1021,6 +1023,34 @@ int calc_scalars(ldouble *scalars,ldouble t)
 	}
     }
   scalars[9]=L2;///(ldouble)NX;
+
+  //average beta = p_rad / p_gas
+  ldouble beta=0;
+  ldouble rho=0;
+  ldouble pp[NV];
+  int iv;
+  struct geometry geom,geomBL;
+  ldouble dV,Ehat,Rtt,prad,ugas[4],pgas,betaloc,rho2;
+
+   for(i=0;i<NX;i++)
+    { 
+      for(j=0;j<NY;j++)
+	{
+	  PLOOP(iv) pp[iv]=get_u(p,iv,i,j,0);
+	  fill_geometry(i,j,0,&geom);
+	  calc_ff_Rtt(pp,&Rtt,ugas,&geom);
+	  Ehat=-Rtt;
+	  prad=1./3.*Ehat;
+	  pgas=GAMMAM1*pp[UU];
+	  dV=get_size_x(i,0)*get_size_x(j,1)*2.*M_PI*geom.gdet;
+	  betaloc=prad/pgas;
+	  rho=pp[RHO];
+	  beta+=rho*rho*dV*betaloc;
+	  rho2+=rho*rho*dV;
+	}
+    }
+   scalars[3]=beta/rho2;
+
 #endif
 
   /*********************************************/

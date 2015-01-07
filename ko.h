@@ -255,6 +255,22 @@ struct geometry
   ldouble gttpert; //perturbed part of g_tt
 };
 
+
+//structure of state
+struct struct_of_state
+{
+  ldouble rho,uint,pgas,dV,Tgas,ucon[4],ucov[4];
+  #ifdef MAGN_FIELD
+  ldouble bcon[4],bcov[4],Bcon[4],bsq,pmag,betamag;
+  #endif
+  #ifdef RADIATION
+  ldouble urfcon[4],urfcov[4],Ehat,betarad,prad;
+  ldouble kappa,kappagasRos,kapparadRos,kappagasAbs,kapparadAbs,kappaes;
+  ldouble Gi[4],Gic[4];
+  #endif
+
+};
+
 //main.c
 int solve_the_problem(ldouble,char*);
 int print_scalings(void);
