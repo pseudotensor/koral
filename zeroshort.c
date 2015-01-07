@@ -110,7 +110,7 @@ calc_stretchFactor(void *argsin)
 	}
 
       f=f_stretchFactor(k, argsin);
-      df=(f_stretchFactor(k+1.e-6*k, argsin) - f)/(1.e-6*k);
+      df=(f_stretchFactor(k+1.e-3*k, argsin) - f)/(1.e-3*k);
 
       kprev=k;
 
@@ -129,9 +129,9 @@ calc_stretchFactor(void *argsin)
       //printf ("%5d %.7f %.7f\n", iter, k, k-kprev);
       
     }
-  while (fabs((k-kprev)/k)>1.e-3);
+  while (fabs((k-kprev)/k)>1.e-8);
   //while(iter<10);
-  
+  //  printf ("%5d %.7f %.7f\n", iter, k, k-kprev);
   return k;
 }
 
@@ -182,7 +182,7 @@ calc_stretchFactor_gsl(void *argsin)
       status = gsl_root_test_interval (s_lo, s_hi,
                                        0, 0.0001);
       
-      
+      /*
       if (status == GSL_SUCCESS)
         printf ("Converged:\n");
 
@@ -190,9 +190,11 @@ calc_stretchFactor_gsl(void *argsin)
               iter, s_lo, s_hi,
               s,   
               s_hi - s_lo);
-      
+      */
     }
   while (status == GSL_CONTINUE && iter < max_iter);
+
+  if(iter==max_iter) printf("_gsl strech solver failed\n");
 
   gsl_root_fsolver_free (solv);
 
@@ -2204,6 +2206,15 @@ double I_Solve(double S0, double S1, double I1, double dtau)
 }
 
 
+void calc_Identity_M( double rotM[3][3])
+{
+  int i,j;
+  for(i=0;i<3;i++)
+    for(j=0;j<3;j++)
+      if(i==j) rotM[i][j]=1.;
+      else rotM[i][j]=0.;
+}
+
 //Subroutine for angle rotation, making use of quaternion rotation matrix
 
 // CAVEAT for case of 180 degrees rotation: there are multiple allowed rotation planes, so we just pick an arbitrary allowed one
@@ -3114,14 +3125,14 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
   Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
 
   //if perfectly isotropic, dont use transformI
-  if (Fmag_final/Efinal < .1)
-    {
-      for (p=0; p<NUMANGLES; p++)
-	{
-	  //I_return[p] = Efinal/NUMANGLES;
-	}
-      return;
-    }
+  if (Fmag_final/Efinal < .01 || Fmag_start/Estart < .01)
+      {
+	for (p=0; p<NUMANGLES; p++)
+	  {
+	    //I_return[p] = Efinal/NUMANGLES;
+	  }
+	return;
+      }
     
 
     //if start FE == final FE, don't use transformI
@@ -3161,7 +3172,8 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
     }
   */
 
-  if (Fmag_start/Estart < 1.0e-2)
+  /*
+  if (Fmag_start/Estart < 0.01)
     {
       //Calculate starting flux after reflecting half the rays about origin
 
@@ -3196,8 +3208,9 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
 
 	}
 
+    
     }
-
+*/
   
   F_Start_forward = 0.;
   F_Start_backward = 0.;
@@ -3252,11 +3265,18 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
   if(!isfinite(stretchFactor) || stretchFactor<1.e-15) 
     {	   	
       my_warning("problems with strechFactor\n");
+      printf("SF = %e | Estart = %e, Fstart = %e, Ffinal = %e | F/E = %e\n", stretchFactor,Estart,  Fmag_start, Fmag_final, Fmag_start/Estart);
+
       return;
 	   
     }
 
   //Calculate rotation matrix
+
+
+if (Fmag_start/Estart < 0.01)
+  calc_Identity_M(rotM);
+else
   calc_rot_M(F_start_norm, F_final_norm, rotM);
 
   //	printf("start: %e %e %e\nfinish: %e %e %e\n", F_norm[0], F_norm[1], F_norm[2], F_final[0], F_final[1], F_final[2]);
@@ -3397,6 +3417,140 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
     }
 }
 
+
+
+void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
+{
+  double F_final[3],Efinal,Efinalrad;
+
+  F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
+
+  F_final[1]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1];
+
+  F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
+    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
+    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+
+  Efinal=M1_input[0];
+  Efinalrad=M1_input[4];
+
+  int i,j,p,l;
+  double I_start[NUMANGLES];
+  double res[3];
+
+  double F_start[3], F_start_norm[3], F_final_norm[3], Fmag_start, Fmag_final, F_stretch;
+  double fStart, F_Start_forward, F_Start_backward, fFinal, Estart;
+  double F_delta[3];
+
+
+  double rotM[3][3];
+  double transformAng[NUMANGLES][3];
+
+
+  for (i=0; i < NUMANGLES; i++)
+    {
+      I_start[i] = I_return[i];
+      //printf("%e\n", I_start[i]);
+    }
+
+  //printf("%e %e %e\n", F_final[0], F_final[1], F_final[2]);
+
+  Estart=0.;
+  //Calculate net flux direction
+  for (l=0; l < 3; l++)
+    {
+      F_start[l] = 0.;
+    }
+
+  for (p=0; p < NUMANGLES; p++)
+    {
+      //if(p<10) printf("%e\n", I_start[p]);
+      for (l=0; l < 3; l++)
+	{
+	  F_start[l] += I_start[p]*angGridCoords[p][l];
+	}
+      Estart += I_start[p];
+    }
+
+  printf("start: %e %e %e || %e\n", F_start[0], F_start[1], F_start[2], Estart);
+ printf("F start: %e %e %e || %e\n", F_start[0], F_start[1], F_start[2], sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]));
+
+
+
+
+  Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
+  Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
+ 
+
+
+  for (l=0; l < 3; l++)
+    {
+      F_start_norm[l] = F_start[l]/Fmag_start;
+      F_final_norm[l] = F_final[l]/Fmag_final;
+
+      F_delta[l] = (F_final[l]-F_start[l]);
+    }
+  printf("delta: %e %e %e \n", F_delta[0], F_delta[1], F_delta[2]);
+
+
+  fStart = Fmag_start/Estart;
+  fFinal = Fmag_final/Efinal;
+
+
+
+  int probeAng;
+  double n_final[3],n_final_norm[3], interpCoeffs[3];
+  double nmag;
+  int angNeighborIndex[3];
+
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+      I_return[probeAng]=0.;
+    }
+
+
+  for (probeAng=0; probeAng<NUMANGLES; probeAng++)
+    {
+      for (l=0; l < 3; l++)
+	{
+	  n_final[l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l]/NUMANGLES;
+	}
+      nmag=sqrt(n_final[0]*n_final[0] + n_final[1]*n_final[1] + n_final[2]*n_final[2]);
+
+      for (l=0; l < 3; l++)
+	{
+	  n_final_norm[l]= n_final[l]/nmag;
+	}
+
+      printf("nfilnal [%d] : %e %e %e\n",probeAng,n_final[0],n_final[1],n_final[2]);
+
+      getNearest3Ang(n_final_norm, angNeighborIndex);
+      linComb(n_final_norm, angGridCoords, angNeighborIndex, interpCoeffs);
+
+      printf("%d %d %d || %e %e %e\n",angNeighborIndex[0],angNeighborIndex[1],angNeighborIndex[2],interpCoeffs[0],interpCoeffs[1],interpCoeffs[2]);
+
+      for (p=0; p < 3; p++)
+	{
+	  I_return[angNeighborIndex[p]] += nmag*interpCoeffs[p];
+	}
+
+    }
+
+
+
+
+      
+
+
+
+
+
+
+}
 
 void transformI_stretch1d(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
 {
@@ -3602,6 +3756,8 @@ void transformI_stretch1d(int ix, int iy,int iz,double I_return[NUMANGLES], doub
   if(!isfinite(stretchFactor) || stretchFactor<1.e-15) 
     {	   	
       my_warning("problems with strechFactor\n");
+      printf("SF = %e | Estart = %e, Fstart = %e, Ffinal = %e | F/E = %e\n", stretchFactor,Estart,  Fmag_start, Fmag_final, Fmag_start/Estart);
+      getch();
       return;
 	   
     }
@@ -3971,7 +4127,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
       I_return[probeAng] = I_time[probeAng];
       
-      //      printf("%d - %e\n", probeAng, I_time[probeAng]);
+      if(isnan( I_return[probeAng]))      printf("%d - %e\n", probeAng, I_time[probeAng]);
 
 
     }
@@ -4732,9 +4888,8 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-  //return;
-  //transformI_stretch(ix,iy,iz,I0,M1_input);
-
+   transformI_basic(ix,iy,iz,I0,M1_input);
+   return;
 
   if(TNY==1 && TNZ==1 && 1)
     transformI_stretch1d(ix,iy,iz,I0,M1_input);
@@ -4826,7 +4981,7 @@ int ZEROtest_oldmain()
 
 	for (p=0; p < NUMANGLES; p++)
 	{
-	  if (1 || p<25)
+	  if (p<25 && 1)
 		{
 			I_start[p]=1.;
 		}

@@ -813,6 +813,8 @@ void mpi_myfinalize();
 void mpi_synchtiming(ldouble *time);
 
 //zeroshort.c
+void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5]);
+void calc_Identity_M( double rotM[3][3]);
 
 //Define what is contained in each node
 struct bsptree

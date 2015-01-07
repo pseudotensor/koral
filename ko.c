@@ -76,7 +76,7 @@ main(int argc, char **argv)
 #if(RADCLOSURE==VETCLOSURE)
 #pragma omp parallel
   zero_init();						
-  //ZEROtest_oldmain();
+  ZEROtest_oldmain();
 #endif
 
   //prepare arrays for accelerating radiative viscosity

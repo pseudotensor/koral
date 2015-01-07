@@ -44,7 +44,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .6
+#define TSTEPLIM .3
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define GDETIN 0
