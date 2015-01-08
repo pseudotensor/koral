@@ -86,7 +86,7 @@
 #define TNZ 1
 
 //# of tiles
-#define NTX 1
+#define NTX 4
 #define NTY 1
 #define NTZ 1
 

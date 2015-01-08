@@ -89,7 +89,7 @@
 //86 TFLAT - tests of TFLATCOORDS
 //87 INFDISK - gas dumped to circularize
 
-#define PROBLEM 7
+#define PROBLEM 81
 
 #if(PROBLEM==87)
 

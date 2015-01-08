@@ -3422,7 +3422,7 @@ else
 void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
 {
   double F_final[3],Efinal,Efinalrad;
-  int verbose=0;
+  int verbose=1;
   //if(ix==3 && iy==0 && iz==0) verbose=1;
 
   F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
@@ -3517,8 +3517,8 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
 
 
   int probeAng;
-  double n_final[3],n_final_norm[3], interpCoeffs[3];
-  double nmag;
+  double n_final[NUMANGLES][3],n_final_norm[NUMANGLES][3], interpCoeffs[3];
+  double nmag[NUMANGLES];
   int angNeighborIndex[3];
 
   for (probeAng=0; probeAng < NUMANGLES; probeAng++)
@@ -3527,72 +3527,137 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
     }
 
 
+  //Calculate all shifted angles
   for (probeAng=0; probeAng<NUMANGLES; probeAng++)
     {
       for (l=0; l < 3; l++)
 	{
-	  n_final[l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l]/NUMANGLES;
-
+	  n_final[probeAng][l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l]/NUMANGLES;
 	}
-      nmag=sqrt(n_final[0]*n_final[0] + n_final[1]*n_final[1] + n_final[2]*n_final[2]);
-      if(!isfinite(nmag)) {printf("nan nmag: %e %e %e | %e %e %e | %e %e %e\n",n_final[0],n_final[1],n_final[2],F_start[0],F_start[1],F_start[2],F_final[0],F_final[1],F_final[2]);getch();}
+      nmag[probeAng]=sqrt(n_final[probeAng][0]*n_final[probeAng][0] + n_final[probeAng][1]*n_final[probeAng][1] + n_final[probeAng][2]*n_final[probeAng][2]);
+      //if(!isfinite(nmag)) {printf("nan nmag: %e %e %e | %e %e %e | %e %e %e\n",n_final[0],n_final[1],n_final[2],F_start[0],F_start[1],F_start[2],F_final[0],F_final[1],F_final[2]);getch();}
 
       //if(nmag<1.e-3*Efinal) continue;
 
       for (l=0; l < 3; l++)
 	{
-	  n_final_norm[l]= n_final[l]/nmag;
+	  n_final_norm[probeAng][l]= n_final[probeAng][l]/nmag[probeAng];
 	}
 
       //printf("nfilnal [%d] : %e %e %e\n",probeAng,n_final[0],n_final[1],n_final[2]);
 
-         #ifdef USEDUALNEIGHBOR
+    }
+
+  
+  double cosang[NUMANGLES];
+  double I_intermed[NUMANGLES];
+  double n_parallel[NUMANGLES][3], n_perp[NUMANGLES][3];
+  F_Start_forward =F_Start_backward=0.;
+  //calculate quantities to determine stretch factor
+  for (probeAng=0; probeAng<NUMANGLES; probeAng++)
+    {
+      double dotprod = F_final_norm[0]*n_final[probeAng][0] +F_final_norm[1]*n_final[probeAng][1] + F_final_norm[2]*n_final[probeAng][2] ;
+
+      cosang[probeAng] = F_final_norm[0]*n_final_norm[probeAng][0] +F_final_norm[1]*n_final_norm[probeAng][1] + F_final_norm[2]*n_final_norm[probeAng][2] ;
+
+      I_intermed[probeAng] = sqrt(n_final[probeAng][0]*n_final[probeAng][0] + n_final[probeAng][1]*n_final[probeAng][1] + n_final[probeAng][2]*n_final[probeAng][2]);
+
+	  if (dotprod > 0)
+	    {
+	      F_Start_forward +=  dotprod;
+	    }
+	  else
+	    {
+	      F_Start_backward += dotprod;
+	    }
+      
+
+      for (l=0; l < 3; l++)
+	{
+	  n_parallel[probeAng][l] = dotprod * F_final_norm[l];
+          n_perp[probeAng][l] = n_final[probeAng][l] - n_parallel[probeAng][l];
+
+	  // F_post[l] += I_return[probeAng]*angGridCoords[probeAng][l];
+
+	}
+    }
+ struct solverarg args;
+
+  args.F_Start_forward=F_Start_forward;
+  args.F_Start_backward=F_Start_backward;
+  args.Intensities = &I_intermed[0];
+  args.F_final_norm = &F_final_norm[0];
+  args.fFinal = fFinal;
+  args.cosang = &cosang[0];
+  
+  if(verbose) 
+    {
+      printf("%e %e %e \n",F_Start_forward, F_Start_backward,fFinal);
+    }
+
+  double stretchFactor = calc_stretchFactor(&args);
+  //stretchFactor =1.;
+  if(verbose) 
+    {
+      printf("strech: %f \n",stretchFactor);
+    }
+
+  //apply stretch factor
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+          double dotprod = F_final_norm[0]*n_final[probeAng][0] +F_final_norm[1]*n_final[probeAng][1] + F_final_norm[2]*n_final[probeAng][2] ;
+	  double n_interp[3], n_interp_norm[3], n_interp_mag;
+
+	  for (l=0; l < 3; l++)
+	    {
+	  if (dotprod > 0)
+	    {
+	      n_parallel[probeAng][l] = n_parallel[probeAng][l]*stretchFactor;
+	    }
+	  else
+	    {
+	      n_parallel[probeAng][l] = n_parallel[probeAng][l]/stretchFactor;
+	    }
+
+	  n_interp[l] = n_perp[probeAng][l] + n_parallel[probeAng][l];
+	    }
+
+	  n_interp_mag = sqrt(n_interp[0]*n_interp[0] + n_interp[1]*n_interp[1] + n_interp[2]*n_interp[2]);
+
+	  for (l=0; l < 3; l++)
+	    {
+	      n_interp_norm[l] = n_interp[l]/n_interp_mag;
+	    }
+
+
+      //This interpolation calculation should happen as the very last step
+#ifdef USEDUALNEIGHBOR
       ldouble bestDistance;
       int bestIndex;
-     bspGetNearestDualNeighbor(n_final, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
+      bspGetNearestDualNeighbor(n_interp_norm, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
       //bestIndex = get_angDualIndex(n_final, angDualGridCoords);
 
       for (l=0; l < 3; l++)
 	{
 	  angNeighborIndex[l] = dualAdjacency[bestIndex][l];
 	}
-      #else
+#else
       //bug near angle 32
-      getNearest3Ang(n_final, angNeighborIndex);
-      #endif
-linComb(n_final_norm, angGridCoords, angNeighborIndex, interpCoeffs);
+      getNearest3Ang(n_interp_norm, angNeighborIndex);
+#endif
+      linComb(n_interp_norm, angGridCoords, angNeighborIndex, interpCoeffs);
 
-//printf("%d %d %d || %e %e %e\n",angNeighborIndex[0],angNeighborIndex[1],angNeighborIndex[2],interpCoeffs[0],interpCoeffs[1],interpCoeffs[2]);
+      //printf("%d %d %d || %e %e %e\n",angNeighborIndex[0],angNeighborIndex[1],angNeighborIndex[2],interpCoeffs[0],interpCoeffs[1],interpCoeffs[2]);
 
       for (p=0; p < 3; p++)
 	{
-	  I_return[angNeighborIndex[p]] += nmag*interpCoeffs[p];
+	  I_return[angNeighborIndex[p]] += n_interp_mag*interpCoeffs[p];
 	}
-    }
-
-for (probeAng=0; probeAng<NUMANGLES; probeAng++)
-    {
-    
-      for (l=0; l < 3; l++)
-	{
-	  F_post[l] += I_return[probeAng]*angGridCoords[probeAng][l];
-
-	}
-    }
-      
-      if(verbose)  printf("Fpost : %e %e %e\n",F_post[0], F_post[1], F_post[2]);
-if(verbose) getch();
  
-
-
-
+    }
+  
       
-
-
-
-
-
-
+  if(verbose) getch();
 }
 
 void transformI_stretch1d(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
@@ -4931,8 +4996,8 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
-   transformI_basic(ix,iy,iz,I0,M1_input);
-   return;
+  transformI_basic(ix,iy,iz,I0,M1_input);
+  return;
 
   if(TNY==1 && TNZ==1 && 1)
     transformI_stretch1d(ix,iy,iz,I0,M1_input);
@@ -5040,7 +5105,7 @@ int ZEROtest_oldmain()
 	M1data[0]=80.;
 	M1data[1]=0.;
 	M1data[2]=0.;
-	M1data[3]=0.;
+	M1data[3]=1.;
 
 	//rotating, adjusting fluxes
 	double fmag = sqrt(M1data[1]*M1data[1] + 
