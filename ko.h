@@ -259,16 +259,11 @@ struct geometry
 //structure of state
 struct struct_of_state
 {
-  ldouble rho,uint,pgas,dV,Tgas,ucon[4],ucov[4];
-  #ifdef MAGN_FIELD
-  ldouble bcon[4],bcov[4],Bcon[4],bsq,pmag,betamag;
-  #endif
-  #ifdef RADIATION
-  ldouble urfcon[4],urfcov[4],Ehat,betarad,prad;
+  ldouble rho,uint,pgas,dV,Tgas,ucon[4],ucov[4],entr,betamag,betarad,cs;
+  ldouble bcon[4],bcov[4],Bcon[4],bsq,pmag;
+  ldouble urfcon[4],urfcov[4],Ehat,prad,Nph;
   ldouble kappa,kappagasRos,kapparadRos,kappagasAbs,kapparadAbs,kappaes;
-  ldouble Gi[4],Gic[4];
-  #endif
-
+  ldouble Rij[4][4],Gi[4],Gic[4],Giff[4],Gicff[4],radentr,Trad;
 };
 
 //main.c
@@ -295,6 +290,8 @@ calc_local_lum(int ix,int iy,int iz,ldouble *radlum, ldouble *totallum);
 ldouble calc_photloc(int ix);
 
 //misc§<.c
+int
+get_state(ldouble *pp,void* ggg,void* sss);
 int print_primitives(ldouble *u);
 int print_conserved(ldouble *u);
 int my_clock_gettime(void* tsptr);
@@ -457,6 +454,7 @@ int fread_avgfile_mpi(int,char *,ldouble*,ldouble *,ldouble *);
 
 int fprint_simplefile(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_simplecart(ldouble t, int nfile, char* folder, char* prefix);
+int fprint_simplebondi(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_simplesph(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_scalars(ldouble t, ldouble *scalars, int nscalars);
 int fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix);

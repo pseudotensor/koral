@@ -45,7 +45,7 @@
 #define OPACSKIPBE
 //#define OPACSMOOTH
 //#define RADIMPSTARTLOWTEMP
-#define EXTRAHEATINGCOOLING
+//#define EXTRAHEATINGCOOLING
 #define RADOUTPUTVELS
 
 /************************************/
@@ -99,7 +99,7 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 64
+#define TNX 512
 #define TNY 1
 #define TNZ 1
 #define NTX 4//for MPI and OMP
@@ -134,7 +134,9 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2HEUN
+#define U2P_SOLVER U2P_SOLVER_W
+#define U2P_EQS U2P_EQS_NOBLE
 #define TSTEPLIM 0.3//(get_tsteplimiter())
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
@@ -151,6 +153,7 @@
 #define SILOOUTPUT 0 //to silo file
 #define OUTOUTPUT 1 //to out file
 #define AVGOUTPUT 0
+#define SIMOUTPUT 3
 #define RADOUTPUT 1
 #define SCAOUTPUT 1
 #define ALLSTEPSOUTPUT 0 //whether to output every step
@@ -174,15 +177,16 @@
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e3
-//#define TAMB (1.e8*(1.e5/RTEMPOUT))
+#define MDOT 1.e4
+#define TAMB 3.e3
 
+/*
 #ifndef FULLBONDI
 #define TAMB (3.267e12/RBONDI)
 #else
 #define TAMB (3.267e12/RBONDI)
 #endif
-
+*/
 
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 

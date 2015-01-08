@@ -1024,7 +1024,9 @@ int calc_scalars(ldouble *scalars,ldouble t)
     }
   scalars[9]=L2;///(ldouble)NX;
 
-  //average beta = p_rad / p_gas
+  //average quantities
+  //beta = p_rad / p_gas
+  //temp, angular momentum
   ldouble beta=0;
   ldouble rho=0;
   ldouble pp[NV];

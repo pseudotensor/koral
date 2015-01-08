@@ -454,12 +454,9 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 
 
 						  
-									  ldouble tup[4][4],tlo[4][4];
-									  pick_T(tmuup,ix,iy,iz,tup);
-									  pick_T(tmulo,ix,iy,iz,tlo);	    
+									  ldouble tup[4][4],tlo[4][4];    
 									  ldouble eup[4][4],elo[4][4];
-									  pick_T(emuup,ix,iy,iz,eup);
-									  pick_T(emulo,ix,iy,iz,elo);
+
 									  //to transform primitives between coordinates if necessary
 									  ldouble ggout[4][5],GGout[4][5];
 									  struct geometry geomout;
@@ -706,6 +703,9 @@ fprint_restartfile_mpi(ldouble t, char* folder)
        fprintf(fout1,"%s",bufor);
        fclose(fout1);
     }
+  
+  //maybe not needed
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //body
   sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
@@ -1004,6 +1004,10 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   nfout1=intpar[0]+1; //global file no.
   nfout2=intpar[1]; //global file no. for avg
   fclose(fdump);
+
+
+  //maybe not needed
+  MPI_Barrier(MPI_COMM_WORLD);
 
   /***********/
   //body file
@@ -1435,6 +1439,10 @@ int fprint_simplefile(ldouble t, int nfile, char* folder,char* prefix)
   fprint_simplesph(t,nfile,folder,prefix);
 #endif
 
+#if (SIMOUTPUT==3)
+  fprint_simplebondi(t,nfile,folder,prefix);
+#endif
+
   return 0;
 }
 
@@ -1687,6 +1695,102 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 #endif
 
 	      fprintf(fout1,"\n");
+
+
+	     }
+	 }
+     }
+
+   fflush(fout1);
+   fclose(fout1);
+
+   return 0;
+ }
+
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints in ASCII & BL coordinates,  */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int fprint_simplebondi(ldouble t, int nfile, char* folder,char* prefix)
+ {
+   char bufor[50];
+   sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfile);
+
+   fout1=fopen(bufor,"w");
+  
+   /***********************************/  
+   /** writing order is fixed  ********/  
+   /***********************************/  
+ 
+   int ix,iy,iz,iv;
+   ldouble pp[NV];
+   struct struct_of_state state;
+   for(iz=0;iz<NZ;iz++)
+     {
+       for(iy=0;iy<NY;iy++)
+	 {
+	   for(ix=0;ix<NX;ix++)
+	     {
+	       for(iv=0;iv<NV;iv++)
+		 pp[iv]=get_u(p,iv,ix,iy,iz);
+	       struct geometry geom,geomBL;
+	       fill_geometry(ix,iy,iz,&geom);
+	       fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	       trans_pall_coco(pp, pp, MYCOORDS,BLCOORDS, geom.xxvec,&geom,&geomBL);
+
+	       get_state(pp,&geomBL,&state);
+
+	       ldouble r=geomBL.xx;
+	       ldouble th=geomBL.yy;
+	       ldouble ph=geomBL.zz;
+	       ldouble radlum,totlum;
+	       calc_lum(r,3,&radlum,&totlum);
+	       ldouble luminosity = 1.e-40+radlum/calc_lumEdd()*(rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*velGU2CGS(1.)*velGU2CGS(1.));
+	       ldouble mdotscale = rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.);
+	       ldouble mdot = calc_mdot(r,0) * mdotscale / calc_mdotEdd();
+	       ldouble Fr=state.Rij[1][0];
+	       ldouble convGt=kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC; //because (cE-4piB) in non-geom
+	       ldouble tausca = kappaGU2CGS(state.kappaes/state.rho) *rhoGU2CGS(state.rho) * lenGU2CGS(r);
+	       ldouble tauabs = kappaGU2CGS(state.kappa/state.rho) * rhoGU2CGS(state.rho) *lenGU2CGS(r);
+	       //ldouble tausca = (state.kappaes) * (r);
+	       //ldouble tauabs = (state.kappa) * (r);
+
+
+	       fprintf(fout1,"%.5e ",r);
+
+	       fprintf(fout1,"%.5e ",rhoGU2CGS(state.rho));
+
+	       fprintf(fout1,"%.5e ",endenGU2CGS(state.uint));
+
+	       fprintf(fout1,"%.5e ",tempGU2CGS(state.Tgas)); //4
+
+	       fprintf(fout1,"%.5e ",(state.entr));
+
+	       fprintf(fout1,"%.5e ",state.ucon[1]);
+
+	       fprintf(fout1,"%.5e ",mdot); //7
+	       	       
+	       fprintf(fout1,"%.5e ",endenGU2CGS(state.Ehat)); //8
+
+	       fprintf(fout1,"%.5e ",tempGU2CGS(state.Trad)); //9
+
+	       fprintf(fout1,"%.5e ",(state.radentr)); //10
+	       	       
+	       fprintf(fout1,"%.5e ",luminosity); //11
+
+	       fprintf(fout1,"%.5e ",state.Giff[0]*convGt); //12
+
+	       fprintf(fout1,"%.5e ",state.Gicff[0]*convGt); //13
+
+	       fprintf(fout1,"%.5e ",tausca); //14
+
+	       fprintf(fout1,"%.5e ",tauabs); //15
+
+	       fprintf(fout1,"\n");
 
 
 	     }

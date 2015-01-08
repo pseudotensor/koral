@@ -122,16 +122,18 @@ initialize_arrays()
   //Kristofels at cell centers
   gKr=(ldouble*)malloc((SX)*(SY)*(SZMET)*64*sizeof(ldouble));
 
+  //primitives at cell centers at initial state - used for fixed boundary conditions
+  pinit=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+ 
+  //primitives at cell centers for other uses 
+  pproblem1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+     
+
   /********* extra arrays, used only for time evolution ***********/
 
   if(doingpostproc==0)
     {
-     
-      //primitives at cell centers at initial state - used for fixed boundary conditions
-      pinit=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
- 
       //primitives at cell centers for other uses 
-      pproblem1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
       pproblem2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
       //arrays for temporary use (e.g., vector potential, mimic_dynamo)
@@ -1228,6 +1230,8 @@ get_state(ldouble *pp,void* ggg,void* sss)
   int i,j;
   //the four-velocity of fluid in lab frame
   ldouble ucon[4],utcon[4],ucov[4];
+  ldouble pgas,pmag,prad;
+  pgas=pmag=prad=0.;
 
   utcon[1]=pp[2];
   utcon[2]=pp[3];
@@ -1236,18 +1240,19 @@ get_state(ldouble *pp,void* ggg,void* sss)
  
   //gas properties
   ldouble rho=pp[RHO];
-  ldouble uint=pp[1];
-  ldouble pgas= (GAMMA-1.)*uint;
+  ldouble uint=pp[UU];
+  pgas= (GAMMA-1.)*uint;
   ldouble Tgas=pgas*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble cs=sqrt(GAMMA*pp[UU]*GAMMAM1/pp[RHO]);
   
   rho=pp[RHO];
   uint=pp[UU];
-  pgas=GAMMAM1*pp[UU];
   ldouble dV=get_size_x(geom->ix,0)*get_size_x(geom->iy,1)*get_size_x(geom->ix,2)*geom->gdet;
 
   state->rho=rho;
   state->uint=uint;
   state->pgas=pgas;
+  state->entr=calc_Sfromu(rho,uint);
   state->dV=dV;
   state->Tgas=Tgas;
   
@@ -1257,8 +1262,25 @@ get_state(ldouble *pp,void* ggg,void* sss)
     state->ucov[i]=ucov[i];
   }
 
+
 #ifdef MAGN_FIELD
-  //...
+  ldouble bcon[4],bcov[4],Bcon[4],bsq;
+  calc_bcon_prim(pp,bcon,geom);
+  indices_21(bcon,bcov,geom->gg); 
+  bsq = dot(bcon,bcov); 
+  calc_Bcon_prim(pp,bcon,Bcon,geom);
+  pmag=bsq/2.;
+  
+  state->bsq=bsq;
+  state->pmag=pmag;
+    
+  DLOOPA(i)
+  {
+    state->Bcon[i]=Bcon[i];
+    state->bcov[i]=bcov[i];
+    state->Bcov[i]=Bcov[i];
+  }
+
 #endif
   
 #ifdef RADIATION
@@ -1287,15 +1309,29 @@ get_state(ldouble *pp,void* ggg,void* sss)
       Ruu+=Rij[i][j]*ucov[i]*ucov[j];
   ldouble Ehat = Ruu;
 
-  ldouble prad=1./3.*Ehat;
-  ldouble betarad=prad/pgas;
+  prad=1./3.*Ehat;
 
-  ldouble Gi[4],Gic[4];
+  //radiation temperature
+  ldouble Trad,Nph;
+  #ifdef NCOMPTONIZATION //number of photons conserved
+  Trad = calc_ncompt_Thatrad(pp,ggg,Ehat);
+  Nph = pp[NF];
+  #else //thermal comptonization
+  Trad = calc_LTE_TfromE(Ehat);
+  Nph = 0.;
+  #endif
+
+  ldouble radentr=(4./3.) * A_RAD * Trad*Trad*Trad / rho;
+
+  ldouble Gi[4],Gic[4],Giff[4],Gicff[4];
   calc_Gi(pp,ggg,Gi,1);
   calc_Compt_Gi(pp,ggg,Gic,Ehat,Tgas,kappaes,ucon);
 
+  boost2_lab2ff(Gi,Giff,pp,geom->gg,geom->GG);
+  boost2_lab2ff(Gic,Gicff,pp,geom->gg,geom->GG);
+ 
+
   state->Ehat=Ehat;
-  state->betarad=betarad;
   state->prad=prad;
   state->kappa=kappa;
   state->kappagasRos=kappagasRos;
@@ -1303,15 +1339,30 @@ get_state(ldouble *pp,void* ggg,void* sss)
   state->kapparadRos=kapparadRos;
   state->kapparadAbs=kapparadAbs;
   state->kappaes=kappaes;
+  state->radentr=radentr;
+  state->Trad=Trad;
+  state->Nph=Nph;
  
   DLOOPA(i)
   {
+    DLOOPA(j)
+    {
+      state->Rij[i][j]=Rij[i][j];
+    }
     state->Gi[i]=Gi[i];
     state->Gic[i]=Gic[i];
+    state->Giff[i]=Giff[i];
+    state->Gicff[i]=Gicff[i];
     state->urfcon[i]=urfcon[i];
     state->urfcov[i]=urfcov[i];
   }
 #endif
-  
+
+  ldouble betamag=pmag/(pgas+prad);
+  ldouble betarad=prad/(pgas+pmag);
+
+  state->betamag=betamag;
+  state->betarad=betarad;
+
   return 0;
 }
