@@ -88,9 +88,23 @@
 //85 NSTEST - tests of axisymmetric NS
 //86 TFLAT - tests of TFLATCOORDS
 //87 INFDISK - gas dumped to circularize
+//88 VETPHIBEAMS - beams in phi
 
-#define PROBLEM 83
+#define PROBLEM 88
 
+#if(PROBLEM==88)
+
+#define PR_DEFINE "PROBLEMS/VETPHIBEAMS/define.h"
+#define PR_BC "PROBLEMS/VETPHIBEAMS/bc.c"
+#define PR_INIT "PROBLEMS/VETPHIBEAMS/init.c"
+#define PR_KAPPA "PROBLEMS/VETPHIBEAMS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/VETPHIBEAMS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/VETPHIBEAMS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/VETPHIBEAMS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/VETPHIBEAMS/dump.c"
+#define PR_TOOLS "PROBLEMS/VETPHIBEAMS/tools.c"
+
+#endif
 #if(PROBLEM==87)
 
 #define PR_DEFINE "PROBLEMS/INFDISK/define.h"

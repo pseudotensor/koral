@@ -23,16 +23,18 @@
 #define RADCLOSURECOORDS MINKCOORDS
 #define SOCCERBALL 0
 #if (SOCCERBALL==0) 
-#define USEDUALNEIGHBOR
 #define NUMANGLES 80
 #endif
 #if(SOCCERBALL==1)
+#define USE3ANGLELOOKUP
 #define NUMANGLES 80
 #endif
 #if(SOCCERBALL==2)
+#define USE3ANGLELOOKUP
 #define NUMANGLES 160
 #endif
 #if(SOCCERBALL==3)
+#define USE3ANGLELOOKUP
 #define NUMANGLES 48
 #endif
 #endif

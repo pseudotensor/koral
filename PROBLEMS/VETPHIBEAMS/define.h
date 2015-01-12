@@ -1,7 +1,6 @@
 #define RESTART
 #define RESTARTNUM -1
 
-
 #define RADIATION
 
 //#define myVET
@@ -14,32 +13,12 @@
 #define RADSTARTWITHM1INTENSITIES
 #endif
 
-//#define BEAM1
-#define DISK
-//#define HOURGLASS
-
-
 #define DOFIXUPS 0
 #define SKIPRADSOURCE
-
-#ifndef myVET
-//#define RADVISCOSITY SHEARVISCOSITY
-#endif
-
-#define ACCELRADVISCOSITY
-#define RADVISCMFPSPH
-#define RADVISCNUDAMP
-#define ALPHARADVISC 0.1
-#define RADVISCMAXVELDAMP
-#define MAXRADVISCVEL 0.5
-
 
 #define MASS 10.
 #define BHSPIN 0.
 #define GAMMAMAXRAD 20.
-
-
-#define OMSCALE 1.
 
 //#define myMKS1COORDS
 #define myMKER1COORDS
@@ -80,30 +59,14 @@
 #define PRINTGC_RIGHT
 #define OUTOUTPUT 0
 #define SILOOUTPUT 1
-#define SILO2D_XZPLANE
+//#define SILO2D_XZPLANE
 #define SIMOUTPUT 0
 
-#ifdef DISK
-#define DTOUT1 1.
-#define RMIN 4.
-#define RMAX 30.
-#endif
-
-#ifdef HOURGLASS
-#define DTOUT1 1.
+#define DTOUT1 .1
 #define RMIN 2.2
-#define RMAX 5.
+#define RMAX 4.
 #define RBEAM1 2.8
 #define RBEAM2 3.2
-#endif
-
-#ifdef BEAM1
-#define DTOUT1 .1
-#define RMIN 2.2//4.//2.2
-#define RMAX 4.//7.//5.
-#define RBEAM1 2.8//4.8//2.8
-#define RBEAM2 3.2//5.2//3.2
-#endif
 
 #ifdef myMSPH1COORDS
 #define MKS1R0 0.
@@ -123,31 +86,30 @@
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
-#define TNX 60
+#define TNX 40
 #endif
 
 #ifdef mySPHCOORDS
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
-#define TNX 60
+#define TNX 40
 #endif
 
-#define TNY 60
-#define TNZ 1
+#define TNY 1
+#define TNZ 80
 
 #define NTX 2
-#define NTY 2
-#define NTZ 1
+#define NTY 1
+#define NTZ 2
 
 
-#define MINY 0.02
-#define MAXY Pi/2
-#define HALFTHETA
-#define MINZ -1.
-#define MAXZ 1.
+#define MINY (M_PI/2.-0.01)
+#define MAXY (M_PI/2.+0.01)
+
+#define MINZ 0.
+#define MAXZ (M_PI*2.)
+
 #define SPECIFIC_BC
-//#define CORRECT_POLARAXIS
-#define NCCORRECTPOLAR 2
 
 #define GAMMA (4./3.)
 #define KKK 1.e-4

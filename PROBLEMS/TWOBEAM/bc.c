@@ -21,10 +21,12 @@ if(ix>=NX) //outflow
      
     p2u(pp,uu,&geom);
  
+    #ifdef EVOLVEINTENSITIES
     for(il=0;il<NUMANGLES;il++)
       {
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[NX-1+NGCX][iy+NGCY][iz+NGCZ][il];
       }
+    #endif
 
     return 0;
   }
@@ -61,8 +63,10 @@ if(ix<0) //bulk inflow
     M1[3]=RijM1[0][3];
     M1[4]=pp[EE0];
       
+      #ifdef EVOLVEINTENSITIES
+  
     ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
-      
+  #endif    
       /*
     if ((geom.yy < 0.25) || (geom.yy > 0.35))
       {
@@ -140,8 +144,10 @@ if(iy<0) //beam
     M1[3]=RijM1[0][3];
     M1[4]=pp[EE0];
       
+      #ifdef EVOLVEINTENSITIES
+  
     ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
-	
+#endif	
 
     p2u(pp,uu,&geom);
     return 0;
@@ -157,10 +163,13 @@ if(iy>=NY)
      
      p2u(pp,uu,&geom);
 
+       #ifdef EVOLVEINTENSITIES
+  
      for(il=0;il<NUMANGLES;il++)
        {
 	 Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[ix+NGCX][NY-1+NGCY][iz+NGCZ][il];
        }
+#endif
 
     return 0;
   }

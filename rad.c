@@ -4450,7 +4450,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
   
   
   fzero=1.;
-  if(ff>0.99) fzero=0.;
+  //if(ff>0.99) fzero=0.;
 
   //test
   //fzero=1.;

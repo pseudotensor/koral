@@ -131,7 +131,7 @@ calc_stretchFactor(void *argsin)
     }
   while (fabs((k-kprev)/k)>1.e-8);
 
-  if(k<0.01 || k>100.) printf("k=%f\n",k);
+  //if(k<0.01 || k>100.) printf("k=%f\n",k);
 
   //while(iter<10);
   //  printf ("%5d %.7f %.7f\n", iter, k, k-kprev);
@@ -297,7 +297,7 @@ if (!angFile)
       fprintf(stderr, "ERROR:  Unable to open Angle Grid File!\n");
       return -1;
     }
-     #ifdef USEDUALNEIGHBOR
+     #ifndef USE3ANGLELOOKUP
   angDualFile = fopen("best-dualtri-xyz.dat", "r");
   angDualAdjFile = fopen("best-dualtri-adjIndex.dat", "r");
 
@@ -355,7 +355,7 @@ if (!angFile)
 
 
 
-   #ifdef USEDUALNEIGHBOR
+   #ifndef USE3ANGLELOOKUP
   //read in angle dual grid from file
 
   count = 0;
@@ -1289,7 +1289,7 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	int angNeighborIndex[3];
 	double interpCoeffs[3];
 
-#ifdef USEDUALNEIGHBOR
+#ifndef USE3ANGLELOOKUP
 	bspGetNearestDualNeighbor(rotAng, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
 
 	for (l=0; l < 3; l++)
@@ -3378,7 +3378,7 @@ else
       double interpCoeffs[3];
 
 
-      #ifdef USEDUALNEIGHBOR
+      #ifndef USE3ANGLELOOKUP
      bspGetNearestDualNeighbor(n_final, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
       //bestIndex = get_angDualIndex(n_final, angDualGridCoords);
 
@@ -3682,7 +3682,7 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
 
 
       //This interpolation calculation should happen as the very last step
-#ifdef USEDUALNEIGHBOR
+#ifndef USE3ANGLELOOKUP
       ldouble bestDistance;
       int bestIndex;
       bspGetNearestDualNeighbor(n_interp_norm, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
@@ -4040,7 +4040,7 @@ void transformI_stretch1d(int ix, int iy,int iz,double I_return[NUMANGLES], doub
       double interpCoeffs[3];
 
 
-      #ifdef USEDUALNEIGHBOR
+      #ifndef USE3ANGLELOOKUP
      bspGetNearestDualNeighbor(n_final, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
       //bestIndex = get_angDualIndex(n_final, angDualGridCoords);
 
@@ -4409,7 +4409,7 @@ int zero_init()
 
 
 
-  #ifdef USEDUALNEIGHBOR
+  #ifndef USE3ANGLELOOKUP
   initAngIndex(angGridCoords, angDualGridCoords, angGridIndexSort, angDualGridIndexSort);
   //Calculate decision trees for BSP angle lookup
   splitAngGrid(NUMANGLES, angGridIndexSort, 0, angGridCoords, &angGridRoot);
@@ -5342,7 +5342,7 @@ void reflectI(double reflect_direction[3], double I_start[NUMANGLES], double I_r
 	      int angNeighborIndex[3];
 	      double interpCoeffs[3];
 
-   #ifdef USEDUALNEIGHBOR
+   #ifndef USE3ANGLELOOKUP
 	      
 	      bspGetNearestDualNeighbor(finalDirection, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
 
