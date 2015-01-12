@@ -76,6 +76,49 @@ if(ix>=NX) //analytical solution at rout only
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
       }
      #endif
+
+
+     #ifdef PHIBEAM
+
+   set_hdatmosphere(pp,xxvec,gg,GG,0);
+#ifdef RADIATION
+   set_radatmosphere(pp,xxvec,gg,GG,0);
+#endif
+   pp[5]=calc_Sfromu(pp[0],pp[1]);
+
+
+   if(geomSPH.zz>PHBEAM1 && geomSPH.zz<PHBEAM2) //hot boundary
+      {
+	pp[EE0]*=1.e3;
+	pp[FX0]=-1.4*2./sqrt(geom.gg[1][1]);
+	pp[FZ0]=0.;
+	pp[FY0]=0.;
+      }
+   p2u(pp,uu,&geom); 
+
+#ifdef myVET
+	//calculate the intensities
+	double RijM1[4][4];double M1[5];
+	calc_Rij_M1(pp,&geom,RijM1);
+	//converting to RADCLOSURECOORDS
+	trans22_coco(geom.xxvec, RijM1, RijM1, MYCOORDS, RADCLOSURECOORDS);
+	//to ortonormal
+	trans22_cc2on(RijM1,RijM1,geomSPH.tup);
+	
+
+	//input
+	M1[0]=RijM1[0][0];
+	M1[1]=RijM1[0][1];
+	M1[2]=RijM1[0][2];
+	M1[3]=RijM1[0][3];
+	M1[4]=pp[EE0];
+      
+	ZERO_decomposeM1(ix,iy,iz,M1, &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
+#endif 
+
+	#endif
+
+
     return 0.;
   }
  else if(ix<0) //outflow near BH
@@ -153,10 +196,10 @@ if(iz<0.) //inflow
       {
 	pp[EE0]*=1.e3;
 	pp[FX0]=0.;
-	pp[FZ0]=2./rSPH;
+	pp[FZ0]=2./sqrt(geom.gg[3][3]);
 	pp[FY0]=0.;
       }
- 
+ p2u(pp,uu,&geom); 
 
 #ifdef myVET
 	//calculate the intensities

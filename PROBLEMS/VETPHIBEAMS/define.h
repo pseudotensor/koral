@@ -3,7 +3,7 @@
 
 #define RADIATION
 
-//#define myVET
+#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
@@ -54,7 +54,7 @@
 
 #define ALLSTEPSOUTPUT 0
 #define NSTEPSTOP 100e10
-#define NOUTSTOP 80
+#define NOUTSTOP 1.e100
 #define RADOUTPUTINZAMO
 #define PRINTGC_RIGHT
 #define OUTOUTPUT 0
@@ -63,10 +63,14 @@
 #define SIMOUTPUT 0
 
 #define DTOUT1 .1
-#define RMIN 2.2
+#define RMIN 2.1
 #define RMAX 4.
-#define RBEAM1 2.8
-#define RBEAM2 3.2
+#define RBEAM1 2.85
+#define RBEAM2 3.15
+
+//#define PHIBEAM
+#define PHBEAM1 (-0.1*M_PI/8.)
+#define PHBEAM2 (0.1*M_PI/8.)
 
 #ifdef myMSPH1COORDS
 #define MKS1R0 0.
@@ -86,17 +90,17 @@
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
-#define TNX 40
+#define TNX 60
 #endif
 
 #ifdef mySPHCOORDS
 #define MINX (1.5*r_horizon_BL(BHSPIN))
 #define MAXX 40.//27.8
-#define TNX 40
+#define TNX 60
 #endif
 
 #define TNY 1
-#define TNZ 80
+#define TNZ 100
 
 #define NTX 2
 #define NTY 1
@@ -106,8 +110,8 @@
 #define MINY (M_PI/2.-0.01)
 #define MAXY (M_PI/2.+0.01)
 
-#define MINZ 0.
-#define MAXZ (M_PI*2.)
+#define MINZ (3./8.*M_PI/2.)
+#define MAXZ ((1.+3./8.)*M_PI/2.)
 
 #define SPECIFIC_BC
 

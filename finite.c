@@ -2858,7 +2858,7 @@ int set_bc(ldouble t,int ifinit)
 
   if(TNY==1 && TNZ>1) //2D
     {
-      my_err("MPI4corners does not work yet with TNY==1 && TNZ>1\n");
+      //my_err("MPI4corners does not work yet with TNY==1 && TNZ>1\n");
     }
   
   if(TNZ==1 && TNY>1) //2D
