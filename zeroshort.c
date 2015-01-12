@@ -130,6 +130,9 @@ calc_stretchFactor(void *argsin)
       
     }
   while (fabs((k-kprev)/k)>1.e-8);
+
+  if(k<0.01 || k>100.) printf("k=%f\n",k);
+
   //while(iter<10);
   //  printf ("%5d %.7f %.7f\n", iter, k, k-kprev);
   return k;
@@ -3542,8 +3545,8 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
     {
       for (l=0; l < 3; l++)
 	{
-	  n_final[probeAng][l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l]/NUMANGLES;
-	  //n_final[probeAng][l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l] * I_start[probeAng]/Estart;
+	  //n_final[probeAng][l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l]/NUMANGLES;
+	  n_final[probeAng][l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l] * I_start[probeAng]/Estart;
 	}
       nmag[probeAng]=sqrt(n_final[probeAng][0]*n_final[probeAng][0] + n_final[probeAng][1]*n_final[probeAng][1] + n_final[probeAng][2]*n_final[probeAng][2]);
       //if(!isfinite(nmag)) {printf("nan nmag: %e %e %e | %e %e %e | %e %e %e\n",n_final[0],n_final[1],n_final[2],F_start[0],F_start[1],F_start[2],F_final[0],F_final[1],F_final[2]);getch();}
@@ -3623,7 +3626,7 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
     }
 
   double stretchFactor;
-  stretchFactor=calc_stretchFactor_gsl(&args);
+  stretchFactor=calc_stretchFactor(&args);
   //stretchFactor =1.;
   if(verbose) 
     {
