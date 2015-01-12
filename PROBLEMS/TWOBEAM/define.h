@@ -12,6 +12,7 @@
 /************************************/
 #define RADIATION
 #define RADCLOSURE VETCLOSURE
+#define USEDUALNEIGHBOR
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
 //#define NUMRADWAVESPEEDS

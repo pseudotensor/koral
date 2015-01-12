@@ -3422,7 +3422,7 @@ else
 void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
 {
   double F_final[3],Efinal,Efinalrad;
-  int verbose=1;
+  int verbose=0;
   //if(ix==3 && iy==0 && iz==0) verbose=1;
 
   F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
@@ -3500,14 +3500,24 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
   //printf("F start: %e %e %e || %e\n", F_start[0], F_start[1], F_start[2], sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]));
 
 
+ for (l=0; l < 3; l++)
+   F_delta[l] = (F_final[l]-F_start[l]);
 
-  for (l=0; l < 3; l++)
-    {
-      F_start_norm[l] = F_start[l]/Fmag_start;
-      F_final_norm[l] = F_final[l]/Fmag_final;
+ if(Fmag_final>SMALL)
+   {
+     for (l=0; l < 3; l++)
+       {
+	 F_final_norm[l] = F_final[l]/Fmag_final;
+       }
+   }
+ else
+   {
+     F_final_norm[0]=1.;
+     F_final_norm[1]=F_final_norm[2]=0.;
+   }
 
-      F_delta[l] = (F_final[l]-F_start[l]);
-    }
+    
+
   //printf("delta: %e %e %e \n", F_delta[0], F_delta[1], F_delta[2]);
 
 
@@ -3533,18 +3543,30 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
       for (l=0; l < 3; l++)
 	{
 	  n_final[probeAng][l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l]/NUMANGLES;
+	  //n_final[probeAng][l] = I_start[probeAng]*angGridCoords[probeAng][l] + F_delta[l] * I_start[probeAng]/Estart;
 	}
       nmag[probeAng]=sqrt(n_final[probeAng][0]*n_final[probeAng][0] + n_final[probeAng][1]*n_final[probeAng][1] + n_final[probeAng][2]*n_final[probeAng][2]);
       //if(!isfinite(nmag)) {printf("nan nmag: %e %e %e | %e %e %e | %e %e %e\n",n_final[0],n_final[1],n_final[2],F_start[0],F_start[1],F_start[2],F_final[0],F_final[1],F_final[2]);getch();}
 
       //if(nmag<1.e-3*Efinal) continue;
 
-      for (l=0; l < 3; l++)
-	{
-	  n_final_norm[probeAng][l]= n_final[probeAng][l]/nmag[probeAng];
-	}
+      	for (l=0; l < 3; l++)
+	  {
+	    if(nmag[probeAng]>SMALL)
 
-      //printf("nfilnal [%d] : %e %e %e\n",probeAng,n_final[0],n_final[1],n_final[2]);
+	      n_final_norm[probeAng][l]= n_final[probeAng][l]/nmag[probeAng];
+	    else
+	      n_final_norm[probeAng][l]=0.;
+	  }
+     
+
+      
+
+	if(verbose)
+	  {
+	    printf("nfilnal [%d] : %e %e %e\n",probeAng,n_final[probeAng][0],n_final[probeAng][1],n_final[probeAng][2]);
+	    printf("nfilnalnorm [%d] : %e %e %e\n",probeAng,n_final_norm[probeAng][0],n_final_norm[probeAng][1],n_final_norm[probeAng][2]);
+	  }
 
     }
 
@@ -3580,6 +3602,11 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
 	  // F_post[l] += I_return[probeAng]*angGridCoords[probeAng][l];
 
 	}
+
+      if(verbose){
+      printf("par  : %e %e %e \n",n_parallel[probeAng][0],n_parallel[probeAng][1],n_parallel[probeAng][2]);
+      printf("perp  : %e %e %e\n",n_perp[probeAng][0],n_perp[probeAng][1],n_perp[probeAng][2]);}
+      
     }
  struct solverarg args;
 
@@ -3595,12 +3622,16 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
       printf("%e %e %e \n",F_Start_forward, F_Start_backward,fFinal);
     }
 
-  double stretchFactor = calc_stretchFactor(&args);
+  double stretchFactor;
+  stretchFactor=calc_stretchFactor_gsl(&args);
   //stretchFactor =1.;
   if(verbose) 
     {
       printf("strech: %f \n",stretchFactor);
     }
+
+  double Fcheck[3]={0.,0.,0.};
+  double Echeck=0.;
 
   //apply stretch factor
   for (probeAng=0; probeAng < NUMANGLES; probeAng++)
@@ -3624,10 +3655,27 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
 
 	  n_interp_mag = sqrt(n_interp[0]*n_interp[0] + n_interp[1]*n_interp[1] + n_interp[2]*n_interp[2]);
 
+	  if(n_interp_mag>SMALL)
+	    {
+	      for (l=0; l < 3; l++)
+		{
+		  n_interp_norm[l] = n_interp[l]/n_interp_mag;
+		}
+
+	    }
+	  else
+	    {
+	      n_interp_norm[0]=1.;
+	      n_interp_norm[1]=0.;
+	      n_interp_norm[2]=0.;
+	    }
+
 	  for (l=0; l < 3; l++)
 	    {
-	      n_interp_norm[l] = n_interp[l]/n_interp_mag;
+	      Fcheck[l] += n_interp[l];
 	    }
+
+	  Echeck += n_interp_mag;
 
 
       //This interpolation calculation should happen as the very last step
@@ -3636,7 +3684,7 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
       int bestIndex;
       bspGetNearestDualNeighbor(n_interp_norm, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
       //bestIndex = get_angDualIndex(n_final, angDualGridCoords);
-
+      if(verbose)printf("n_interp = %e %e %e\n", n_interp_norm[0],n_interp_norm[1],n_interp_norm[2]);
       for (l=0; l < 3; l++)
 	{
 	  angNeighborIndex[l] = dualAdjacency[bestIndex][l];
@@ -3647,7 +3695,7 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
 #endif
       linComb(n_interp_norm, angGridCoords, angNeighborIndex, interpCoeffs);
 
-      //printf("%d %d %d || %e %e %e\n",angNeighborIndex[0],angNeighborIndex[1],angNeighborIndex[2],interpCoeffs[0],interpCoeffs[1],interpCoeffs[2]);
+      //      printf("%d %d %d || %e %e %e\n",angNeighborIndex[0],angNeighborIndex[1],angNeighborIndex[2],interpCoeffs[0],interpCoeffs[1],interpCoeffs[2]);
 
       for (p=0; p < 3; p++)
 	{
@@ -3655,10 +3703,34 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
 	}
  
     }
-  
+
+  //  printf("Fcheck = %e %e %e | Echeck = %e | FE = %e\n", Fcheck[0],Fcheck[1],Fcheck[2], Echeck, sqrt(Fcheck[0]*Fcheck[0]+Fcheck[1]*Fcheck[1]+Fcheck[2]*Fcheck[2])/Echeck);
+
+
+  double E_renorm = 0.;
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+      E_renorm += I_return[probeAng];
+    }
+
+  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
+    {
+      I_return[probeAng] = I_return[probeAng]*Efinal/E_renorm;
+    }
+
       
   if(verbose) getch();
 }
+
+
+
+
+
+
+
+
+
+
 
 void transformI_stretch1d(int ix, int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
 {
@@ -4997,6 +5069,7 @@ void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
 {
   transformI_basic(ix,iy,iz,I0,M1_input);
+  //  transformI_stretch(ix,iy,iz,I0,M1_input);
   return;
 
   if(TNY==1 && TNZ==1 && 1)
@@ -5089,9 +5162,9 @@ int ZEROtest_oldmain()
 
 	for (p=0; p < NUMANGLES; p++)
 	{
-	  if (p==40)
+	  if (p==40 || 1)
 		{
-			I_start[p]=1.;
+			I_start[p]=1.0;
 		}
 		else
 		{
@@ -5105,7 +5178,7 @@ int ZEROtest_oldmain()
 	M1data[0]=80.;
 	M1data[1]=0.;
 	M1data[2]=0.;
-	M1data[3]=1.;
+	M1data[3]=0.;
 
 	//rotating, adjusting fluxes
 	double fmag = sqrt(M1data[1]*M1data[1] + 
