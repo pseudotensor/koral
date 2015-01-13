@@ -4277,7 +4277,8 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	  printf("neg interp_I %e %e > %d %d %d > %d %d %d > %d\n",
 		 I_Data[intersect_i][intersect_j][intersect_k][probeAng],
 		 intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p],intersect_i,intersect_j,intersect_k,ix,iy,iz,p);
-	  getch();
+	  interp_I[probeAng]=0.;
+	  //getch();
 	}
 
 	interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];

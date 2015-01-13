@@ -89,8 +89,24 @@
 //86 TFLAT - tests of TFLATCOORDS
 //87 INFDISK - gas dumped to circularize
 //88 VETPHIBEAMS - beams in phi
+//89 RADTORUS - radiating fixed torus
 
-#define PROBLEM 88
+#define PROBLEM 89
+
+#if(PROBLEM==89)
+
+#define PR_DEFINE "PROBLEMS/RADTORUS/define.h"
+#define PR_BC "PROBLEMS/RADTORUS/bc.c"
+#define PR_INIT "PROBLEMS/RADTORUS/init.c"
+#define PR_KAPPA "PROBLEMS/RADTORUS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/RADTORUS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/RADTORUS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/RADTORUS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/RADTORUS/dump.c"
+#define PR_TOOLS "PROBLEMS/RADTORUS/tools.c"
+
+#endif
+
 
 #if(PROBLEM==88)
 
@@ -105,6 +121,7 @@
 #define PR_TOOLS "PROBLEMS/VETPHIBEAMS/tools.c"
 
 #endif
+
 #if(PROBLEM==87)
 
 #define PR_DEFINE "PROBLEMS/INFDISK/define.h"

@@ -1398,8 +1398,13 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   //save to memory consistent pp & uu
   PLOOP(iv)
   {
-    set_u(p,iv,ix,iy,iz,pp[iv]);
-    set_u(u,iv,ix,iy,iz,uu[iv]);
+#ifdef SKIPHDEVOLUTION
+    if(iv>=NVMHD)
+#endif
+      {
+	set_u(p,iv,ix,iy,iz,pp[iv]);
+	set_u(u,iv,ix,iy,iz,uu[iv]);
+      }
   }
 
  //to calculate average number of succesful iterations

@@ -345,9 +345,10 @@ solve_the_problem(ldouble tstart, char* folder)
 	 global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]>1.e3 ||
 	 global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]>1.e3)
 	{
+	  /*
 	  printf("exceeded # of failures (%d %d %d) - exiting.\n",
 		 global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES],global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS],global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]);
-	  exit(-1);
+		 exit(-1);*/
 	}
 
       
