@@ -762,6 +762,10 @@ fprint_restartfile_mpi(ldouble t, char* folder)
   
   MPI_File_close( &cFile );
 
+
+  //maybe not needed
+  MPI_Barrier(MPI_COMM_WORLD);
+
   if(PROCID==0)
     {
       //sprintf(bufor,"cp %s/res%04d.dat %s/reslast.dat",folder,nfout1,folder);
@@ -1073,6 +1077,7 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
     }
 
   MPI_File_close( &cFile );
+  MPI_Barrier(MPI_COMM_WORLD);
 #endif
   return 0;
 }

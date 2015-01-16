@@ -13,6 +13,23 @@
 //radiation
 /************************************/
 #define RADIATION
+
+
+
+/************************************/
+//viscosity choices
+/************************************/
+//#define RADVISCOSITY SHEARVISCOSITY
+#define ACCELRADVISCOSITY
+#define RADVISCMFPSPH
+#define RADVISCNUDAMP
+#define RADVISCMAXVELDAMP
+#define ALPHARADVISC 1.
+#define MAXRADVISCVEL 1.
+
+#define ALLOWRADCEILINGINIMPLICIT
+#define BASICRADIMPLICIT
+
 #define U2PCONV 1.e-8
 #define RADIMPCONV 1.e-8
 #define RADIMPEPS 1.e-6
@@ -70,7 +87,7 @@
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
 
-#define CORRECT_POLARAXIS
+//#define CORRECT_POLARAXIS
 #define U2P_EQS U2P_EQS_NOBLE
 #define U2P_SOLVER U2P_SOLVER_W
 #define NCCORRECTPOLAR 2
@@ -81,6 +98,7 @@
 /************************************/
 #define SILOOUTPUT 1 //to silo file
 #define RADOUTPUT 1
+#define SIMOUTPUT 2
 #define SCAOUTPUT 1
 #if (TNZ==1)
 #define SILO2D_XZPLANE
@@ -106,7 +124,7 @@
 #define MASS 10.
 #define TORUSENTR 5.e2
 #define RHOAMB 1.e-30
-#define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho
+#define UUAMB 1.e-7*RHOAMB //temp ~ uu/rho
 #define ERADATMMIN 1.e-30
 #define RADIMPLICITTHRESHOLD 1.e10
 

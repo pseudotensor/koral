@@ -2076,8 +2076,10 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //loop_4[0]=(int *)malloc(3*sizeof(int));
 
     xlim2=ix2;
-    if(TNY>1) ylim2=iy2; else ylim2=iy1;
-    if(TNZ>1) zlim2=iz2; else zlim2=iz1;
+    ylim2=iy2;
+    zlim2=iz2;
+    //if(TNY>1) ylim2=iy2; else ylim2=iy1;
+    //if(TNZ>1) zlim2=iz2; else zlim2=iz1;
 
 
     #ifdef OMP
@@ -2113,7 +2115,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
        
     //**********************************************************************
     //**********************************************************************
-    //domain + ghost cells + corners = total
+    //domain + ghost cells, no corners  = total
   
     Nloop_5=0;
     //loop_5=(int **)malloc(sizeof(int*));
@@ -3212,7 +3214,7 @@ int set_bc(ldouble t,int ifinit)
 	    }
 
 	  //averaging <(-1,NY-1),(0,NY)> -> (-1,NY)
-	  ix1=-1;iy1=NY-1;iy1=0;iy2=NY;
+	  ix1=-1;iy1=NY-1;ix2=0;iy2=NY;
 	  #if defined(PERIODIC_YBC) && !defined(MPI)
 	  ix1=ix2=-1;iy1=iy2=0;
           #endif
@@ -3703,7 +3705,7 @@ int set_bc(ldouble t,int ifinit)
 	      for(iz=NZ;iz<NZ+NG;iz++) 
 		{
 		  PLOOP(iv) 
-		    set_u(p,iv,ix,iy,iz,get_u(p,iv,0,0,0));
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,0,0,NZ-1));
 		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 		}
 	}
@@ -3715,7 +3717,7 @@ int set_bc(ldouble t,int ifinit)
 	      for(iz=NZ;iz<NZ+NG;iz++) 
 		{
 		  PLOOP(iv) 
-		    set_u(p,iv,ix,iy,iz,get_u(p,iv,NX-1,0,0));
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,NX-1,0,NZ-1));
 		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 		}
 	}
@@ -3727,7 +3729,7 @@ int set_bc(ldouble t,int ifinit)
 	      for(iz=NZ;iz<NZ+NG;iz++) 
 		{
 		  PLOOP(iv) 
-		    set_u(p,iv,ix,iy,iz,get_u(p,iv,0,NY-1,0));
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,0,NY-1,NZ-1));
 		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 		}
 	}
@@ -3739,7 +3741,7 @@ int set_bc(ldouble t,int ifinit)
 	      for(iz=NZ;iz<NZ+NG;iz++) 
 		{
 		  PLOOP(iv) 
-		    set_u(p,iv,ix,iy,iz,get_u(p,iv,NX-1,NY-1,0));
+		    set_u(p,iv,ix,iy,iz,get_u(p,iv,NX-1,NY-1,NZ-1));
 		  fill_geometry(ix,iy,iz,&geom);  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 		}
 	}

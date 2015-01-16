@@ -199,7 +199,7 @@ int loop_1[SX*SY*SZ][3];
 int loop_2[SX*SY*SZ][3];
 int loop_02[SX*SY*SZ][3];
 int loop_3[SX*SY*SZ][3];
-int loop_4[SX*SY*SZ][3];
+int loop_4[(SX+1)*(SY+1)*(SZ+1)][3];
 int loop_5[SX*SY*SZ][3];
 int loop_6[SX*SY*SZ][3];
 int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;

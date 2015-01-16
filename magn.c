@@ -369,18 +369,9 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
   //overwriting vector potential with magnetic fields (e.g., at init)  
   if(ifoverwrite)
     {
-      //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-      /*
-      for(ii=0;ii<Nloop_5;ii++) //domain and ghost cells
-	{
-	  ix=loop_5[ii][0];
-	  iy=loop_5[ii][1];
-	  iz=loop_5[ii][2]; 
-      */
-	  
-      for(ix=0-NG;ix<NX+NG;ix++)
-	for(iy=0-NG;iy<NY+NG;iy++)
-	  for(iz=0-NG;iz<NZ+NG;iz++)
+      for(ix=0-NGCX;ix<NX+NGCX;ix++)
+	for(iy=0-NGCY;iy<NY+NGCY;iy++)
+	  for(iz=0-NGCZ;iz<NZ+NGCZ;iz++)
 	    {
 
 	      struct geometry geom;
@@ -768,7 +759,7 @@ mimic_dynamo(ldouble dtin)
 
   int ix,iy,iz,iv,ii;
   ldouble dt;
-  int verbose=1,stop=0;
+  int verbose=0,stop=0;
   int verix=75;
   int veriy=100;
   ldouble bcon[4],bcov[4],bsqin,bsqout,ugasin,ugasout;
