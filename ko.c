@@ -860,7 +860,8 @@ print_scalings()
 {
   
   printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.16e\nmdot: %.16e\nsigma: %.16e\nlen: %.16e\ntime: %.16e\nenden:"
-	 "%.16e\nflux: %.16e\nT(1,1): %.16e\nkbt: %.16e\nkb/me: %.16e\nkappa: %.16e\n\nrhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\nmdotEdd: %.16e\n",
+	 "%.16e\nflux: %.16e\nT(1,1): %.16e\nkbt: %.16e\nkb/me: %.16e\nkappa: %.16e\n\n"
+	 "rhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\nmdotEdd: %.16e\n\nlumEdd: %.16e\n",
 	 MASS,BHSPIN,
 	 rhoGU2CGS(1.),
 	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.),
@@ -876,7 +877,8 @@ print_scalings()
 	 rhorizonBL,
 	 rISCOBL,
 	 etaNT,
-	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)/calc_mdotEdd()
+	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)/calc_mdotEdd(),
+	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*CCC0*CCC0/calc_lumEdd()
 	 );
   
   return 0;

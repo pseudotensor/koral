@@ -914,6 +914,12 @@ int calc_scalars(ldouble *scalars,ldouble t)
   //radiative luminosity everywhere (4)
   scalars[2]=radlum*mdotscale*CCC0*CCC0/calc_lumEdd();
 
+  if(PROBLEM==89 || PROBLEM==79) //RADTORUS or SOFTBALL
+    {
+      //luminosity exiting through radial and theta boundaries (4)
+      scalars[2]=calc_exitlum();
+    }
+
   //total energy at infinity (rho ur + Trt + Rrt) (12)
   calc_lum(rlum,1,&radlum,&totallum);
   scalars[10]=totallum;
@@ -971,7 +977,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   calc_local_lum(ix,NCCORRECTPOLAR+1,0,&radlum,&totlum);
   scalars[11]=totlum;
 
-   
+ 
 
   /*********************************************/
   //Tgas Trad Egas Erad for testing Comptonization
@@ -1272,11 +1278,11 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 {
 
 
-    int ix,iy,iz,iv,i,j;
-    ldouble xx[4],xxBL[4],dx[3],pp[NV],Rrt,rhour,Tij[4][4],Trt;
-    ldouble Rij[4][4],Rtt,ehat,ucongas[4];
-    ldouble tautot[3],tau=0.;
-    ldouble gdet;
+  int ix,iy,iz,iv,i,j;
+  ldouble xx[4],xxBL[4],dx[3],pp[NV],Rrt,rhour,Tij[4][4],Trt;
+  ldouble Rij[4][4],Rtt,ehat,ucongas[4];
+  ldouble tautot[3],tau=0.;
+  ldouble gdet;
 
  
   //search for appropriate radial index
@@ -1321,9 +1327,9 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	  ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
 	  rhour=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
 	  Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
-		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
-		    + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
-		    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+	    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
+	    + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+	    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
 
 #ifdef RADIATION
 
@@ -1387,7 +1393,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      indices_2221(Rij,Rij,geom.gg);
 	      Rrt=Rij[1][0];// + ehat*ucongas[1];
 	      if(Rrt<0.)
-	      Rrt=0.;
+		Rrt=0.;
 	    }
 	  else if(type==2) //R^r_t in the outflow region
 	    {
@@ -1467,14 +1473,14 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
 	      rhour=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
 	      
-		  Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
-		    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
-		    + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
-		    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+	      Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+		+ GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
+		+ get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		- get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
 
 	      tau+=ucont*tautot[1];
 
-	      #ifdef RADIATION
+#ifdef RADIATION
 	      if(type==0) //R^r_t outside photosphere
 		{
 		  if(tau>1.) break;
@@ -1515,9 +1521,9 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		}
 	      else
 		Rrt=0.;
-	      #else
+#else
 	      Rrt=0.;
-	      #endif
+#endif
 
 	      lum+=-geomBL.gdet*Rrt*dxBL[1]*dxBL[2];
 	      jet+=geomBL.gdet*(rhour+Rrt+Rrt)*dxBL[1]*dxBL[2];
@@ -1574,9 +1580,9 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		}
 	      else
 		Rrt=0.;
-	      #else
+#else
 	      Rrt=0.;
-	      #endif
+#endif
 
 	      lum+=-gdet*Rrt*dx[1]*dx[2];
 	      jet+=gdet*(rhour+Trt+Rrt)*dx[1]*dx[2];
@@ -1602,6 +1608,120 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 
     return -1;
 }
+
+
+
+//**********************************************************************
+//calculates luminosity escaping through radial and polar boundaries
+ldouble
+calc_exitlum()
+{
+#ifdef RADIATION
+
+  int ix,iy,iz,iv,i,j;
+  ldouble xx[4],xxBL[4],dx[3],pp[NV],Rrt;
+  ldouble Rij[4][4],Rtt,Rtht;
+  ldouble tautot[3],tau=0.;
+  ldouble gdet;
+
+  ldouble lum=0.,jet=0.;
+
+  if(NZ==1) //phi-symmetry only
+    {
+      //inner radial
+      iz=0; ix=0;
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iv=0;iv<NV;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=2.*M_PI;
+	  if(!doingavg)
+	    {
+	      calc_Rij(pp,&geom,Rij); 
+	      indices_2221(Rij,Rij,geom.gg);
+	      Rrt=-Rij[1][0];
+	      if(Rrt>0.) Rrt=0.; //neglect inflowin luminosity
+	      lum+=geom.gdet*fabs(Rrt)*dx[1]*dx[2];
+	    }
+	}
+      //outer radial
+      iz=0; ix=NX-1;
+      for(iy=0;iy<NY;iy++)
+	{
+	  for(iv=0;iv<NV;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=2.*M_PI;
+	  if(!doingavg)
+	    {
+	      calc_Rij(pp,&geom,Rij); 
+	      indices_2221(Rij,Rij,geom.gg);
+	      Rrt=-Rij[1][0];
+	      if(Rrt<0.) Rrt=0.; //neglect inflowin luminosity
+	      lum+=geom.gdet*fabs(Rrt)*dx[1]*dx[2];
+	    }
+	}
+
+      //upper theta 
+      iz=0; iy=0;
+      for(ix=0;ix<NX;ix++)
+	{
+	  for(iv=0;iv<NV;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=2.*M_PI;
+	  if(!doingavg)
+	    {
+	      calc_Rij(pp,&geom,Rij); 
+	      indices_2221(Rij,Rij,geom.gg);
+	      Rtht=-Rij[2][0];
+	      if(Rtht>0.) Rtht=0.; //neglect inflowin luminosity
+	      lum+=geom.gdet*fabs(Rtht)*dx[0]*dx[2];
+	    }
+	}
+
+      //lower theta 
+      iz=0; iy=NY-1;
+      for(ix=0;ix<NX;ix++)
+	{
+	  for(iv=0;iv<NV;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
+	  dx[0]=get_size_x(ix,0);
+	  dx[1]=get_size_x(iy,1);
+	  dx[2]=2.*M_PI;
+	  if(!doingavg)
+	    {
+	      calc_Rij(pp,&geom,Rij); 
+	      indices_2221(Rij,Rij,geom.gg);
+	      Rtht=-Rij[2][0];
+	      if(Rtht<0.) Rtht=0.; //neglect inflowin luminosity
+	      lum+=geom.gdet*fabs(Rtht)*dx[0]*dx[2];
+	    }
+	}
+    }
+      
+  return lum;
+#else
+  return -1.;
+#endif
+}
+
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************

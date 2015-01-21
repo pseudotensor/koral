@@ -278,6 +278,8 @@ int calc_scalars(ldouble*,ldouble);
 int calc_Bflux(ldouble radius,int type,ldouble*,ldouble*);
 ldouble calc_mdotEdd();
 ldouble calc_lumEdd();
+ldouble
+calc_exitlum();
 int calc_radialprofiles(ldouble profiles[][NX]);
 int calc_thetaprofiles(ldouble profiles[][NY]);
 int calc_anarelradialprofiles(ldouble profiles[][NX]);

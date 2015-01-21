@@ -1634,7 +1634,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       
   ldouble fac;
 
-#ifdef EXTRAHEATINGCOOLING
+#ifdef EXTRAHEATINGCOOLINGINIMPLICIT
   ldouble Gihc[4];
   calc_heatcool(pp,geom,labframe,Gihc);
   fac=1.;

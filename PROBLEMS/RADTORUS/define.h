@@ -5,7 +5,7 @@
 #define RESTARTNUM -1
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 #define UNPERTURBED
 #define SKIPHDEVOLUTION
 
@@ -30,12 +30,12 @@
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
 
-#define U2PCONV 1.e-8
-#define RADIMPCONV 1.e-8
+#define U2PCONV 1.e-10
+#define RADIMPCONV 1.e-10
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 15
 
-#define myVET
+//#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
@@ -87,7 +87,7 @@
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
 
-//#define CORRECT_POLARAXIS
+#define CORRECT_POLARAXIS
 #define U2P_EQS U2P_EQS_NOBLE
 #define U2P_SOLVER U2P_SOLVER_W
 #define NCCORRECTPOLAR 2
@@ -116,7 +116,7 @@
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.5
+#define MINMOD_THETA 1.
 
 /************************************/
 //problem params
@@ -139,7 +139,7 @@
 #define EEUURATIOMAX 1.e60
 #define ERADLIMIT 1.e-50
 #define RHOFLOOR (RHOAMB/10.)
-#define GAMMAMAXRAD 20.
+#define GAMMAMAXRAD 5.
 
 /************************************/
 //physics
