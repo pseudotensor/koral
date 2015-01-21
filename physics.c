@@ -440,6 +440,30 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   return 0;
 }
 
+
+//***************************************
+//returns geometrical source terms for all conserved quantities
+//***************************************
+int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
+{
+  int i;
+
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  int ix,iy,iz,iv;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+ 
+  PLOOP(iv) ss[iv]=0.;
+
+  /***************************************************/
+
+  return 0;
+}
+
+
 //***************************************
 //returns geometrical source terms for all conserved quantities
 //***************************************
@@ -455,6 +479,21 @@ int f_metric_source_term(int ix, int iy, int iz,ldouble *ss)
   fill_geometry(ix,iy,iz,&geom);
 
   f_metric_source_term_arb(&get_u(p,0,ix,iy,iz),&geom,ss);
+
+  return 0;
+}
+
+//***************************************
+//returns general source terms for all conserved quantities
+//***************************************
+int f_general_source_term(int ix, int iy, int iz,ldouble *ss)
+{
+  int i;
+
+  struct geometry geom;
+  fill_geometry(ix,iy,iz,&geom);
+
+  f_general_source_term_arb(&get_u(p,0,ix,iy,iz),&geom,ss);
 
   return 0;
 }

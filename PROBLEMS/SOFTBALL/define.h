@@ -7,11 +7,16 @@
 #define BHDISK_PROBLEMTYPE
 #define DOFIXUPS 0
 #define UNPERTURBED
+//#define SKIPHDEVOLUTION
+
 
 /************************************/
 //radiation
 /************************************/
 #define RADIATION
+#define ALLOWRADCEILINGINIMPLICIT
+#define BASICRADIMPLICIT
+
 //#define BALANCEENTROPYWITHRADIATION
 
 /************************************/
