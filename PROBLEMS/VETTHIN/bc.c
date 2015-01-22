@@ -207,6 +207,9 @@ if(1)
 
 #ifdef DISK
     if(rSPH>rin) //hot boundary
+
+    //test top reproduce RADTORUS
+    //if(rSPH>6.5 && rSPH<11.)
       {
 
 	pp[EE0]=calc_LTE_EfromT(1.e11)*(1.-sqrt(rin/rSPH))/pow(rSPH,3.);

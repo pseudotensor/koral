@@ -13,7 +13,7 @@
 //radiation
 /************************************/
 #define RADIATION
-
+#define OMSCALE 0.
 
 
 /************************************/
@@ -57,7 +57,7 @@
 //coordinates / resolution
 /************************************/
 
-#define RMIN 2.5
+#define RMIN 3.5
 #define RMAX 14.
 
 #define myMKER1COORDS
@@ -78,8 +78,8 @@
 #define MAXY (M_PI-DTH)
 #define MINZ -1.
 #define MAXZ 1.
-#define TNX 50 // Total number of cells in X 
-#define TNY 100
+#define TNX 40 // Total number of cells in X 
+#define TNY 80
 #define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2

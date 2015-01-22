@@ -143,7 +143,7 @@
 
 
 #define MINY 0.02
-#define MAXY Pi/2
+#define MAXY (Pi/2.)
 #define HALFTHETA
 #define MINZ -1.
 #define MAXZ 1.

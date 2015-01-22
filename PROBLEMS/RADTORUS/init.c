@@ -53,7 +53,8 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     ldouble omega = -L*(geom.gg[0][0]/geom.gg[3][3]);
     ldouble OMEGA1=sqrt(-omega*omega/(geom.gg[0][0]+omega*omega*geom.gg[3][3]));
 
-    pp[VZ]=OMEGA1;
+    pp[VZ]=OMSCALE*OMEGA1;
+    
     pp[VY]=0.;
     pp[VX]=0.;
 

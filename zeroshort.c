@@ -3677,11 +3677,11 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
     +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
     +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
 #else
-  F_final[0]=M1_input[1];
+  F_final[2]=M1_input[1];
 
-  F_final[1]=M1_input[2];
+  F_final[0]=M1_input[2];
 
-  F_final[2]=M1_input[3];
+  F_final[1]=M1_input[3];
 #endif
 
   Efinal=M1_input[0];
