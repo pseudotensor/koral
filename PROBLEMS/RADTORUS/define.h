@@ -35,7 +35,7 @@
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 15
 
-//#define myVET
+#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
@@ -73,7 +73,7 @@
 #define MAXX (log(RMAX-MKS1R0))
 #endif
 
-#define DTH (0.01)
+#define DTH (0.04)
 #define MINY (DTH)
 #define MAXY (M_PI-DTH)
 #define MINZ -1.
@@ -87,7 +87,7 @@
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
 
-#define CORRECT_POLARAXIS
+//#define CORRECT_POLARAXIS
 #define U2P_EQS U2P_EQS_NOBLE
 #define U2P_SOLVER U2P_SOLVER_W
 #define NCCORRECTPOLAR 2

@@ -1079,14 +1079,19 @@ op_explicit(ldouble t, ldouble dtin)
       mzr=mstep_get_face_multiplier(ix,iy,iz+1,2);
 
       //source term
-      ldouble ms[NV],val,du;
+      ldouble ms[NV],gs[NV],val,du;
 
       if(is_cell_active(ix,iy,iz)==0)
 	{ 
-	PLOOP(iv) ms[iv]=0.; //source terms applied only for active cells
+	  PLOOP(iv) ms[iv]=0.; //source terms applied only for active cells
 	}
       else
-	f_metric_source_term(ix,iy,iz,ms);
+	{
+	  f_metric_source_term(ix,iy,iz,ms);
+	  f_general_source_term(ix,iy,iz,gs);
+	  PLOOP(iv)
+	    ms[iv]+=gs[iv];
+	}
 
       ldouble dx=get_size_x(ix,0);
       ldouble dy=get_size_x(iy,1);

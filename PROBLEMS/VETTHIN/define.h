@@ -4,10 +4,12 @@
 
 #define RADIATION
 
-//#define myVET
+#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE
+//#define CARTANGLES
+//#define USE3ANGLELOOKUP
 #define VETFLUXCOSACCEPT 1.0
 #define VETFEACCEPT 0.0
 #define EVOLVEINTENSITIES

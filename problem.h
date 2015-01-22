@@ -91,7 +91,7 @@
 //88 VETPHIBEAMS - beams in phi
 //89 RADTORUS - radiating fixed torus
 
-#define PROBLEM 79
+#define PROBLEM 82
 
 #if(PROBLEM==89)
 

@@ -487,6 +487,13 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	  coord_values[1]=xxvec[2];
 	  coord_values[2]=xxvec[3];
 
+	  if(xxvec[2]<0.)
+	    {
+	      printf("negative theta detected @: %d %d %d, likely in ghost cell, don't like it, change it. \n",ix,iy,iz);
+	      exit(-1);
+	    }
+
+
 	  coord_limits[l][m+1]=coord_values[l];
 	}
     }
@@ -866,6 +873,13 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	    }
 	  //getCoord(n1_central+delta_n1, n2_central+delta_n2, n3_central+delta_n3, coord_values);
 	  get_xx_arb(ix+delta_n1, iy+delta_n2, iz+delta_n3, xxvec, SPHCOORDS);
+
+	  if(xxvec[2]<0.)
+	    {
+	      printf("negative theta detected @: %d %d %d, likely in ghost cell, don't like it, change it. \n",ix,iy,iz);
+	      exit(-1);
+	    }
+
 	  coord_values[0]=xxvec[1];
 	  coord_values[1]=xxvec[2];
 	  coord_values[2]=xxvec[3];
@@ -1325,6 +1339,582 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
 	printf("%e %e %e %e\n", x_new[0], x_new[1], x_new[2], x_new[3]);
 
 
+	*/
+	/*
+	if(ix==0 && iy==0 && iz==0)
+	printf("%d > %d %d %d > %d %d %d %d \n",probeAng,ix,iy,iz, intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0],
+	       intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1],
+	       intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2],
+	       intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3]); 
+	*/
+    } //end loop over angles
+  //    getch();
+/*
+	printf("R-limits: %e %e %e\n", coord_limits[0][0], coord_limits[0][1], coord_limits[0][2]);
+	printf("Th-limits: %e %e %e\n", coord_limits[1][0], coord_limits[1][1], coord_limits[1][2]);
+	printf("Ph-limits: %e %e %e\n", coord_limits[2][0], coord_limits[2][1], coord_limits[2][2]);
+
+   exit(-1);
+*/
+
+  /*
+  if (ix == 0)
+    {
+  printf("ZERO Mintime = %e\n", mintime);
+    }
+  */
+}
+
+
+
+
+
+
+
+
+
+
+//Same as above spherical grid, but now using locally defined angles
+
+
+void setupInterpWeights_sph2D_local(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES], double intersectGridPhi[SXVET][SYVET][SZVET][NUMANGLES])
+{
+  double aspin=0., aspin2=aspin*aspin; // black hole spin
+  double mintime = 1.0e99;
+
+  int n1_central=1,n2_central=1,n3_central=1; //use as central index, will loop over later
+  int delta_n1, delta_n2, delta_n3;
+
+  double coord_values[3];
+  double xxvec[4];
+  double coord_limits[3][3]; //store the coordinate boundaries in r,theta,phi
+  //indices are [coordinate r,th,phi][min,mid,max]
+
+
+  double x_sphere[4], p_sphere[4], p_dir[3]; //upper indices quantities, for central cell
+
+  double Christoffel[4][4][4];
+  double g_lower[4][4];
+
+
+
+  double posX0, posY0, posZ0; //Coordinates of central cell
+  double posR0, posTh0, posPh0;
+
+  int l,m;
+
+
+  //Read in coordinates
+  for (l=0; l < 3; l++)
+    {
+      for (m=-1; m <= 1; m++)
+	{
+	  if (l==0)
+	    {
+	      delta_n1=m;
+	      delta_n2=0;
+	      delta_n3=0;
+	    }
+	  if (l==1)
+	    {
+	      delta_n1=0;
+	      delta_n2=m;
+	      delta_n3=0;
+	    }
+	  if (l==2)
+	    {
+	      delta_n1=0;
+	      delta_n2=0;
+	      delta_n3=m;
+	    }
+	  //getCoord(n1_central+delta_n1, n2_central+delta_n2, n3_central+delta_n3, coord_values);
+	  get_xx_arb(ix+delta_n1, iy+delta_n2, iz+delta_n3, xxvec, SPHCOORDS);
+	  coord_values[0]=xxvec[1];
+	  coord_values[1]=xxvec[2];
+	  coord_values[2]=xxvec[3];
+	  
+
+	  //TODO:
+	  //temporary, to prevent negative thetas
+	  //if( coord_values[1]<1.e-6)  coord_values[1]=1.e-6;
+	  //if( coord_values[1]>(M_PI-1.e-6))  coord_values[1]=(M_PI-1.e-6);
+
+	  coord_limits[l][m+1]=coord_values[l];
+	}
+    }
+
+  posR0 = coord_limits[0][1];
+  posTh0 = coord_limits[1][1];
+  posPh0 = coord_limits[2][1];
+
+
+  //set BL coordinates
+  x_sphere[0] = 0.; //t;
+  x_sphere[1] = posR0; //r
+  x_sphere[2] = posTh0; //theta
+  x_sphere[3] = posPh0; //phi
+
+
+  coord_limits[2][0]=-1.0e10;
+  coord_limits[2][2]=1.0e10;
+
+
+
+  /*
+  if(ix==NX/2 && iy==NY/2 && iz==0)
+    { 
+      for (l=0; l < 3; l++)
+	{
+	  for (m=0; m <3; m++)
+	    printf("%d %d %e\n", l,m,coord_limits[l][m]);
+	}
+      exit(1);
+
+    }
+  */
+
+
+	double sinph, cosph;
+	double costh = cos(x_sphere[2]), sinth=sin(x_sphere[2]); 
+	double cos2th = costh*costh, sin2th = 1 - cos2th;
+	double mu = costh;
+	double r = x_sphere[1], r2 = r*r, rho2 = r2 + aspin2*cos2th, Delta = (r-2.)*r + aspin2;
+        int a,b,c;
+
+
+	double  //Covariant Metric components
+	g_tt = 2./r - 1.,
+	g_tp = 0.,
+	g_pp = r2 * sin2th,
+	g_rr = 1./(1. - 2./r),
+	g_qq = r2;
+
+
+
+	//zero all components of Christoffel
+	for (a=0; a < 4; a++)
+	{
+	for (b=0; b < 4; b++)
+	{
+	for (c=0; c < 4; c++)
+	{
+		Christoffel[a][b][c]=0.;
+	}
+	}
+	}
+
+
+
+	//Nonzero components
+	Christoffel[1][1][1] = -1./r/r/(1.-2./r);
+	Christoffel[1][2][2] = -(r-2.);
+	Christoffel[1][3][3] = -(r-2.)*sin2th;
+	Christoffel[1][0][0] = 1./r/r*(1.-2./r);
+
+
+	Christoffel[2][1][2] = 1./r;
+	Christoffel[2][2][1] = 1./r;
+	Christoffel[2][3][3] = -costh*sinth;
+
+	Christoffel[3][1][3] = 1./r;
+	Christoffel[3][3][1] = 1./r;
+	Christoffel[3][2][3] = costh/sinth;
+	Christoffel[3][3][2] = costh/sinth;
+
+	Christoffel[0][1][0] = 1./r/r/(1.-2./r);
+	Christoffel[0][0][1] = 1./r/r/(1.-2./r);
+
+
+
+
+
+
+  int probeAng;
+  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
+    {
+
+
+	//starting ray direction (using Cartesian coordinate ordering)
+	p_dir[0] = angGridCoords[probeAng][0]; //x = theta 
+	p_dir[1] = angGridCoords[probeAng][1]; //y = phi
+	p_dir[2] = angGridCoords[probeAng][2]; //z = radial
+
+
+	//coordinate transform the differentials from cartesian to spherical
+	p_sphere[1] = angGridCoords[probeAng][2]/sqrt(g_rr),
+	p_sphere[2] = angGridCoords[probeAng][0]/x_sphere[1],
+	p_sphere[3] = angGridCoords[probeAng][1]/x_sphere[1]/sin(x_sphere[2]);
+
+
+	//solve for pt using u*u = 0;	
+	double quadA = g_tt, quadB = g_tp*p_sphere[3], quadC = g_pp*pow(p_sphere[3],2.) + g_rr*pow(p_sphere[1],2.) + g_qq*pow(p_sphere[2],2.);
+	p_sphere[0] = (-quadB - sqrt(pow(quadB,2.)-quadA*quadC)) / quadA;
+
+
+
+
+
+
+      double minL = 0., maxL = 10.0*sqrt(coord_limits[0][2]*coord_limits[0][2] - coord_limits[0][0]*coord_limits[0][0]);
+
+      double x_new[4], p_new[4], curv_coeff[4];	
+
+
+	//Calculate curvature terms
+	for (a=0; a < 4; a++)
+	{
+		curv_coeff[a]=0.;
+
+		for (b=0; b < 4; b++)
+		{
+		for (c=0; c < 4; c++)
+		{
+			curv_coeff[a] -= Christoffel[a][b][c] * p_sphere[b] * p_sphere[c];
+		}
+		}
+	}
+
+
+
+      //Bisect on ray to numerically find intersection location
+      int iter;
+      for (iter=0; iter < 50; iter++)
+	{
+
+		double dlambda = -(minL+maxL)/2.0;
+
+
+
+		if (iter == 50-1)
+		{
+			dlambda = -maxL; //make sure we are outside grid at final iteration
+		}
+
+
+	  	for (a=0; a < 4; a++)
+		{
+			x_new[a]=x_sphere[a];
+			p_new[a]=p_sphere[a];
+
+			x_new[a] += p_sphere[a]*dlambda + curv_coeff[a]/2.0*dlambda*dlambda;
+			p_new[a] += curv_coeff[a]*dlambda;
+		}
+
+	
+
+
+
+	  //bisect on path length to find nearest boundary intersection
+	  //only bisect on r and theta
+	  if ((x_new[1] > coord_limits[0][2]) || (x_new[1] < coord_limits[0][0]) || (x_new[2] > coord_limits[1][2]) || (x_new[2] < coord_limits[1][0]) )
+	    {
+	      maxL = (minL+maxL)/2.0;
+	    }
+	  else
+	    {
+	      minL = (minL+maxL)/2.0;
+	    }
+
+
+	  //printf("%e %e (%e %e %e) (%e %e %e)\n", minL, maxL, posR0, posTh0, posPh0, posR, posTh, posPh);
+	  //printf("%e %e (%e < %e < %e) (%e < %e < %e)\n", minL, maxL, coord_limits[0][0], x_new[1], coord_limits[0][2], coord_limits[1][0], x_new[2], coord_limits[1][2]);
+
+
+	}
+
+
+
+        intersectGridPhi[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = x_new[3] - x_sphere[3];
+
+
+	double posR = x_new[1], posTh = x_new[2], posPh = x_new[3];
+
+      double lowerR, lowerTh, lowerPh;
+      double lowerRIndex, lowerThIndex, lowerPhIndex;
+
+      double upperR, upperTh, upperPh;
+      double upperRIndex, upperThIndex, upperPhIndex;
+      
+
+
+
+
+      //R Indices
+      if ((posR < coord_limits[0][0]) || (posR > coord_limits[0][2]))
+	{
+	  lowerRIndex = n1_central;
+	  upperRIndex = n1_central;
+
+	  lowerR=coord_limits[0][1];
+	  upperR=coord_limits[0][1];
+	}
+      else if ((posR <= coord_limits[0][1]) && (posR >= coord_limits[0][0]))
+	{
+	  lowerRIndex = n1_central-1;
+	  upperRIndex = n1_central;
+
+	  lowerR=coord_limits[0][0];
+	  upperR=coord_limits[0][1];
+	}
+      else 
+	{
+	  lowerRIndex = n1_central;
+	  upperRIndex = n1_central+1;
+
+	  lowerR=coord_limits[0][1];
+	  upperR=coord_limits[0][2];
+	}
+
+
+
+
+
+
+      //Theta Indices
+      if ((posTh < coord_limits[1][0]) || (posTh > coord_limits[1][2]))
+	{
+	  lowerThIndex = n2_central;
+	  upperThIndex = n2_central;
+
+	  lowerTh=coord_limits[1][1];
+	  upperTh=coord_limits[1][1];
+	}
+      else if ((posTh <= coord_limits[1][1]) && (posTh >= coord_limits[1][0]))
+	{
+	  lowerThIndex = n2_central-1;
+	  upperThIndex = n2_central;
+
+	  lowerTh=coord_limits[1][0];
+	  upperTh=coord_limits[1][1];
+	}
+      else
+	{
+	  lowerThIndex = n2_central;
+	  upperThIndex = n2_central+1;
+
+	  lowerTh=coord_limits[1][1];
+	  upperTh=coord_limits[1][2];
+	}
+
+
+      //Phi Indices
+
+	lowerPhIndex = n3_central;
+	upperPhIndex = n3_central;
+
+
+
+
+
+
+
+
+      //Interpolation weight components
+      double w0_low, w0_high;
+      double w1_low, w1_high;
+
+      ldouble EPS=1.e-10;
+
+      //Get interpolation weights for 4 bounding corners of cube intersection
+      if ((posR > (1.-EPS)*coord_limits[0][2]) || (posR < (1.+EPS)* coord_limits[0][0]))
+	{
+	  int realRIndex;
+
+
+	  if (posR >(1.-EPS)* coord_limits[0][2])
+	    {
+	      realRIndex = n1_central+1;
+	    }
+	  if (posR <(1.+EPS)* coord_limits[0][0])
+	    {
+	      realRIndex = n1_central-1;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][p] = realRIndex;
+	    }
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][0] = lowerThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][1] = lowerThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][2] = upperThIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][3] = upperThIndex;
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1] = upperPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3] = upperPhIndex;
+
+	  w0_high = (posTh - lowerTh)/(upperTh - lowerTh);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = 1.0;
+	  w1_low = 0.0;
+
+	}
+
+
+      if ((posTh >(1.-EPS)* coord_limits[1][2]) || (posTh < (1.+EPS)*coord_limits[1][0]))
+	{
+	  int realThIndex;
+  
+	  if (posTh >(1.-EPS)* coord_limits[1][2])
+	    {
+	      realThIndex = n2_central+1;
+	    }
+	  if (posTh <(1.+EPS)* coord_limits[1][0])
+	    {
+	      realThIndex = n2_central-1;
+	    }
+
+	  int p;
+	  for (p=0; p < 4; p++)
+	    {
+	      intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1][p] = realThIndex;
+	    }
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][0] = lowerRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][1] = lowerRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][2] = upperRIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0][3] = upperRIndex;
+
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1] = upperPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][2] = lowerPhIndex;
+	  intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][3] = upperPhIndex;
+
+	  w0_high = (posR - lowerR)/(upperR - lowerR);
+	  w0_low = 1.0 - w0_high;
+	  w1_high = 1.0;
+	  w1_low = 0.0;
+
+	}
+
+
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] = w0_low*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] = w0_low*w1_high;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] = w0_high*w1_low;
+      intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3] = w0_high*w1_high;
+
+      /*
+      if(ix==0 && iy==17 &&  iz==0)
+	printf("%d > %e %e %e %e > %e %e %e %e\n", probeAng,intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][0] ,
+	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][1] ,
+	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2] ,
+	       intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][3], w0_low,w1_low,w0_high,w1_high);
+      */
+
+      ldouble ncov[4],ncon[4];
+      struct geometry geomBL,geom;
+      fill_geometry(ix,iy,iz,&geom);
+      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+      calc_normalobs_4vel(geom.GG,ncon);
+      trans2_coco(geom.xxvec,ncon,ncon,MYCOORDS,BLCOORDS);
+      indices_21(ncon,ncov,geomBL.gg);
+      double pdotu = dot(p_new,ncov);
+      double dist1 = -pdotu*(minL + maxL)/2.;
+
+      /*
+      print_4vector(ncov);      
+      double dist2 = sqrt(1./(1.-2./x_sphere[1])*(x_new[1]-x_sphere[1])*(x_new[1]-x_sphere[1]) + x_sphere[1]*x_sphere[1]*(x_new[2]-x_sphere[2])*(x_new[2]-x_sphere[2]) + x_sphere[1]*x_sphere[1]*sin(x_sphere[2])*sin(x_sphere[2])*(x_new[3]-x_sphere[3])*(x_new[3]-x_sphere[3]));
+      */
+
+      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] =  dist1;
+      
+      //intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * (-x_new[0]);
+
+      //      printf("%d > %d %d > %f > %e %e %e\n",probeAng, ix,iy,x_sphere[1], dist1, dist2, -x_new[0]);getch();
+      //intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = sqrt((x_new[1]-x_sphere[1])*(x_new[1]-x_sphere[1]) + x_sphere[1]*x_sphere[1]*(x_new[2]-x_sphere[2])*(x_new[2]-x_sphere[2]) + x_sphere[1]*x_sphere[1]*sin(x_sphere[2])*sin(x_sphere[2])*(x_new[3]-x_sphere[3])*(x_new[3]-x_sphere[3]));
+
+      if (-x_new[0] < mintime)
+	{ mintime = -x_new[0];}
+//      intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = 1.0e99;
+
+
+
+
+	//convert momentum back to local Cartesian directions
+	r = x_new[1];
+	r2 = r*r;
+	costh = cos(x_new[2]);
+	sinth = sin(x_new[2]); 
+	cosph = cos(x_new[3]);
+	sinph = sin(x_new[3]);
+
+	double grr = 1./sqrt(1.-2./x_new[1]);
+
+
+	//x-component
+	p_dir[0] = grr*p_new[1]; 
+	//y-component
+	p_dir[1] = x_new[1]*p_new[2]; 
+	//z-component
+	p_dir[2] = x_new[1]*sin(x_new[2])*p_new[3]; 
+
+
+	double pdirnorm = sqrt(p_dir[0]*p_dir[0] + p_dir[1]*p_dir[1] + p_dir[2]*p_dir[2]);
+
+	p_dir[0] = p_dir[0]/pdirnorm;
+	p_dir[1] = p_dir[1]/pdirnorm;
+	p_dir[2] = p_dir[2]/pdirnorm;
+
+
+
+	double rotAng[3];
+	double rotPhi = -x_new[3];
+	//printf("rotPhi %d : %f\n",probeAng,rotPhi);
+
+
+	rotAng[0] = p_dir[1];  //theta = x direction
+	rotAng[1] = p_dir[2]; //phi = y direction
+	rotAng[2] = p_dir[0]; //radial = z direction
+
+
+//	int bestAngIndex = get_angIndex(rotAng, angGridCoords);
+
+
+
+	double bestDistance = 1.0e10;
+	int bestIndex = 0;
+
+	int angNeighborIndex[3];
+	double interpCoeffs[3];
+
+#ifndef USE3ANGLELOOKUP
+	bspGetNearestDualNeighbor(rotAng, angDualGridCoords, angDualGridRoot, &bestDistance, &bestIndex);
+
+	for (l=0; l < 3; l++)
+	{
+		  angNeighborIndex[l] = dualAdjacency[bestIndex][l];
+	}
+	#else
+	getNearest3Ang(rotAng,angNeighborIndex);
+	#endif
+
+	linComb(rotAng, angGridCoords, angNeighborIndex, interpCoeffs);
+
+
+
+
+	  int p;
+	for (p=0; p < 4; p++)
+	{
+	      intersectAngWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][0] = interpCoeffs[0];
+	      intersectAngWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][1] = interpCoeffs[1];
+	      intersectAngWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][2] = interpCoeffs[2];
+
+	      intersectAngIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][0] = angNeighborIndex[0];
+	      intersectAngIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][1] = angNeighborIndex[1];
+	      intersectAngIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p][2] = angNeighborIndex[2];
+      	}
+
+
+      // printf("!! %e %e %e %e !!\n", w0_low, w0_high, w1_low, w1_high);
+      // printf("-- %e %e %e --\n", posX, posY, posZ);
+
+	/*
+	printf("%e %e %e %e\n", x_new[0], x_new[1], x_new[2], x_new[3]);
+
+
 
 	printf("%d > %d %d %d > %d %d %d %d \n",probeAng,ix,iy,iz, intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][0],
 	       intersectGridIndices[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][2][1],
@@ -1348,6 +1938,12 @@ void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMAN
     }
   */
 }
+
+
+
+
+
+
 
 
 
@@ -3012,7 +3608,7 @@ void getNearest3Ang(double target[3], int nearestAngleIndices[3])
       target[2]=2.;
     }
 
-  int probeAng, startShift, i;
+  int probeAng, i;
   double dotprod;
   double bestDots[3] = {-BIG,-BIG,-BIG};   //best angles found so far, sorted by dot product
 
@@ -3023,6 +3619,8 @@ void getNearest3Ang(double target[3], int nearestAngleIndices[3])
       //printf("dots = %e %e %e\n", bestDots[0],bestDots[1],bestDots[2]);
       //printf("indices = %e %e %e\n", );
       //printf("p=%d - dot=%e\n", probeAng, dotprod);
+
+      int startShift=0;
 
       //locate where to insert new angle
       for ( startShift = 0; startShift < 3; startShift++)
@@ -3066,6 +3664,7 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
 {
   double F_final[3],Efinal,Efinalrad;
 
+    #ifdef CARTANGLES
   F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
     +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
     +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
@@ -3077,6 +3676,13 @@ void transformI_stretch(int ix, int iy,int iz,double I_return[NUMANGLES], double
   F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
     +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
     +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+#else
+  F_final[0]=M1_input[1];
+
+  F_final[1]=M1_input[2];
+
+  F_final[2]=M1_input[3];
+#endif
 
   Efinal=M1_input[0];
   Efinalrad=M1_input[4];
@@ -3428,6 +4034,7 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
   int verbose=0;
   //if(ix==3 && iy==0 && iz==0) verbose=1;
 
+  #ifdef CARTANGLES
   F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
     +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
     +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
@@ -3439,6 +4046,13 @@ void transformI_basic(int ix, int iy,int iz,double I_return[NUMANGLES], double M
   F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
     +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
     +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+#else
+  F_final[2]=M1_input[1];
+
+  F_final[0]=M1_input[2];
+
+  F_final[1]=M1_input[3];
+#endif
 
   Efinal=M1_input[0];
   Efinalrad=M1_input[4];
@@ -3739,6 +4353,7 @@ void transformI_stretch1d(int ix, int iy,int iz,double I_return[NUMANGLES], doub
 {
   double F_final[3],Efinal,Efinalrad;
 
+  #ifdef CARTANGLES
   F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
     +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
     +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
@@ -3750,6 +4365,14 @@ void transformI_stretch1d(int ix, int iy,int iz,double I_return[NUMANGLES], doub
   F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
     +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
     +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+#else
+  F_final[2]=M1_input[1];
+
+  F_final[0]=M1_input[2];
+
+  F_final[1]=M1_input[3];
+#endif
+
 
   Efinal=M1_input[0];
   Efinalrad=M1_input[4];
@@ -4096,6 +4719,7 @@ void ZERO_decomposeM1(int ix, int iy, int iz,double M1_Data[5], double I_return[
 
   double F_final[3];
 
+  #ifdef CARTANGLES
   F_final[0]=M1_Data[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
     +M1_Data[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
     +M1_Data[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
@@ -4107,6 +4731,15 @@ void ZERO_decomposeM1(int ix, int iy, int iz,double M1_Data[5], double I_return[
   F_final[2]=M1_Data[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
     +M1_Data[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
     +M1_Data[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
+#else
+ F_final[2]=M1_Data[1];
+
+  F_final[0]=M1_Data[2];
+
+  F_final[1]=M1_Data[3];
+#endif
+
+
 
 
   double fmag = sqrt(F_final[0]*F_final[0] + 
@@ -4277,8 +4910,7 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	  printf("neg interp_I %e %e > %d %d %d > %d %d %d > %d\n",
 		 I_Data[intersect_i][intersect_j][intersect_k][probeAng],
 		 intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p],intersect_i,intersect_j,intersect_k,ix,iy,iz,p);
-	  interp_I[probeAng]=0.;
-	  //getch();
+	  getch();
 	}
 
 	interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
@@ -4296,25 +4928,39 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	}
 
 
+
       if(LIGHT_C * delta_t > intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng])
 	{
 	  printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
 	  intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * delta_t;
 	}
 
-      I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t ; //apply time step
-      //I_time[probeAng] = I_Data[1][1][1][probeAng];
-
-      
-
-      
-
+      double expfactor = exp(-LIGHT_C * delta_t/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng]);  
+      I_time[probeAng] = I_Data[1][1][1][probeAng]*expfactor + I_ray[probeAng]*(1.-expfactor) ; //apply time step
+     
+      /*
+      printf("%d %d %d | %d | %e %e\n",ix,iy,iz,probeAng,
+	     I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t ,
+	     I_time[probeAng]);
+      */
+    //I_time[probeAng] = I_Data[1][1][1][probeAng] + (I_ray[probeAng] - I_Data[1][1][1][probeAng])/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] * LIGHT_C * delta_t ; //apply time step
+   
       I_return[probeAng] = I_time[probeAng];
       
       if(isnan( I_return[probeAng]))      printf("%d - %e\n", probeAng, I_time[probeAng]);
 
 
     }
+  //  getch();
+}
+
+int
+localgridremap(int in)
+{
+  if(in==0) return 2;
+  if(in==1) return 0;
+  if(in==2) return 1;
+  return -1;
 }
 
 void
@@ -4342,16 +4988,27 @@ ZERO_calcVET(int ix, int iy, int iz,double I_time[NUMANGLES], double eddingtonFa
   //Calculate P_ij by summing up contributions over all angles
   for (q=0; q < 3; q++)
     {
+      #ifdef CARTANGLES
       targetDirection1[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][0];
       targetDirection1[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][1];
       targetDirection1[2] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][q][2];
+      #else
+      targetDirection1[0] =targetDirection1[1] =targetDirection1[2]=0;
+      targetDirection1[localgridremap(q)]=1; 
+      #endif
 
       for (r=0; r < 3; r++)
-	{
-	  targetDirection2[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][0];
-	  targetDirection2[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][1];
+	{ 
+#ifdef CARTANGLES
+          targetDirection2[0] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][0];
+          targetDirection2[1] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][1];
 	  targetDirection2[2] = carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][r][2];
- 
+#else
+	  targetDirection2[0] =targetDirection2[1] =targetDirection2[2]=0;
+	  targetDirection2[localgridremap(r)]=1; 
+#endif
+
+
 	  int probeAng;
 	  for (probeAng = 0; probeAng < NUMANGLES; probeAng++)
 	    {
@@ -4467,14 +5124,15 @@ int zero_init()
     }
 
 #pragma omp parallel for private(ii) schedule (static)
-  for(ii=0;ii<Nloop_6;ii++) //domain + 1 layer 
+  for(ii=0;ii<Nloop_0;ii++) //domain + 1 layer 
     {
       int ix,iy,iz;
-      ix=loop_6[ii][0];
-      iy=loop_6[ii][1];
-      iz=loop_6[ii][2];
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2];
 
       //interpolation weights
+      
       if(RADCLOSURECOORDS==MINKCOORDS)
 	{
 	  if(TNZ==1 && TNY==1)
@@ -4483,16 +5141,25 @@ int zero_init()
 	    setupInterpWeights_cart2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
 	  else
 	    setupInterpWeights_cart3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
-
-	 
 	}
+
       else if(RADCLOSURECOORDS==SPHCOORDS || RADCLOSURECOORDS==BLCOORDS)
 	{
+	  #ifdef CARTANGLES
 	   if(TNZ==1) 
 	     setupInterpWeights_sph2D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, intersectGridPhi);
 	   else
 	     setupInterpWeights_sph3D(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
-	
+	#else
+	   if(TNZ==1) 
+	     setupInterpWeights_sph2D_local(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances, intersectGridPhi);
+	   else
+	     {
+	       my_err("setupInterpWeights_sph3D_local is not there yet.\n");
+	       //setupInterpWeights_sph3D_local(ix,iy,iz,angGridCoords, intersectGridIndices, intersectGridWeights, intersectDistances);
+	     }
+	   #endif
+
 	  
 	}
       else
@@ -4507,196 +5174,6 @@ int zero_init()
 
 
 
-
-
-
-// Use method of lagrange multipliers to determine correct tranformation
-
-int transformI_Lagrange(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
-{
-  double F_final[3],Efinal,Efinalrad;
- 
-  F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
-    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
-    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
-
-  F_final[1]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1] 
-    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]
-    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1];
-
-  F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
-    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
-    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
- 
-  Efinal=M1_input[0];
-  Efinalrad=M1_input[4];
-
-  int i,j,p,l;
-  double I_start[NUMANGLES];
-
-  double F_start[3], Fmag_start, Fmag_final;
-  double Estart;
-
-  double target_vec[4], Lagrange_Multiplier[4];
-  double Lagrange_Matrix[4][4], inv_Lagrange_Matrix[4][4];
-
-
-
-  for (i=0; i < NUMANGLES; i++)
-    {
-      I_start[i] = I_return[i];
-      I_return[i] = 0.;
-    }
-
-
-  Estart=0.;
-  //Calculate net flux direction
-  for (l=0; l < 3; l++)
-    {
-      F_start[l] = 0.;
-    }
-
-  for (p=0; p < NUMANGLES; p++)
-    {
-      //if(p<10) printf("%e\n", I_start[p]);
-      for (l=0; l < 3; l++)
-	{
-	  F_start[l] += I_start[p]*angGridCoords[p][l];
-	}
-      Estart += I_start[p];
-    }
-
-
-
-
-  Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
-  Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
-
-
-  target_vec[0]=Efinal-Estart;
-  target_vec[1]=F_final[0]-F_start[0];
-  target_vec[2]=F_final[1]-F_start[1];
-  target_vec[3]=F_final[2]-F_start[2];
-
-
-  //initialize various quantities to zero
-  for (i=0; i < 4; i++)
-    {
-      Lagrange_Multiplier[i]=0.;
-      for (j=0; j < 4; j++)
-	{
-	  Lagrange_Matrix[i][j]=0.;
-	  inv_Lagrange_Matrix[i][j]=0.;
-	}
-    }
-
-  //Calculate 4x4 matrix for Lagrange multiplier solution
-  for (l=0; l<NUMANGLES; l++)
-    {
-      Lagrange_Matrix[0][0] += 1.0;
-      Lagrange_Matrix[0][1] += angGridCoords[l][0];
-      Lagrange_Matrix[0][2] += angGridCoords[l][1];
-      Lagrange_Matrix[0][3] += angGridCoords[l][2];
-
-      Lagrange_Matrix[1][0] += angGridCoords[l][0];
-      Lagrange_Matrix[1][1] += angGridCoords[l][0]*angGridCoords[l][0];
-      Lagrange_Matrix[1][2] += angGridCoords[l][0]*angGridCoords[l][1];
-      Lagrange_Matrix[1][3] += angGridCoords[l][0]*angGridCoords[l][2];
-
-      Lagrange_Matrix[2][0] += angGridCoords[l][1];
-      Lagrange_Matrix[2][1] += angGridCoords[l][1]*angGridCoords[l][0];
-      Lagrange_Matrix[2][2] += angGridCoords[l][1]*angGridCoords[l][1];
-      Lagrange_Matrix[2][3] += angGridCoords[l][1]*angGridCoords[l][2];
-
-      Lagrange_Matrix[3][0] += angGridCoords[l][2];
-      Lagrange_Matrix[3][1] += angGridCoords[l][2]*angGridCoords[l][0];
-      Lagrange_Matrix[3][2] += angGridCoords[l][2]*angGridCoords[l][1];
-      Lagrange_Matrix[3][3] += angGridCoords[l][2]*angGridCoords[l][2];
-    }
-
-
-  //matrixInverse(Lagrange_Matrix, inv_Lagrange_Matrix);
-  inverse_44matrix(Lagrange_Matrix, inv_Lagrange_Matrix);
-
-
-  //Apply inverse matrix to get multipliers
-  for (i=0; i < 4; i++)
-    {
-      for (j=0; j < 4; j++)
-	{
-	  Lagrange_Multiplier[i] += inv_Lagrange_Matrix[i][j]*target_vec[j];
-	}
-    }
-
-  int isnegative=0;
-  for(l=0; l < NUMANGLES; l++)
-    {
-      I_return[l] = I_start[l] + Lagrange_Multiplier[0] + angGridCoords[l][0]*Lagrange_Multiplier[1] + angGridCoords[l][1]*Lagrange_Multiplier[2] + angGridCoords[l][2]*Lagrange_Multiplier[3];
-
-      if(I_return[l]<0.) 
-	isnegative=1;	
-    }
-
-  return isnegative;
-}
-
-
-
-//Do a linear search to find 4 nearest angles
-void get_4angIndex(double targetAng[3], double angGridCoords[NUMANGLES][3], int returnIndex[4])
-{
-  double dx, dy, dz, dtot2;
-  //double dmin = 1.0e10;
-  double dmax[4]={-1.0e10,-1.0e10,-1.0e10,-1.0e10};
-  int ibest[4] = {0,0,0,0};
-
-  int i_insert=0, i_shift=3;
-  int i;
-
-
-  for (i = 0; i < NUMANGLES; i++)
-    {
-
-
-
-      dtot2=targetAng[0]*angGridCoords[i][0] + targetAng[1]*angGridCoords[i][1] + targetAng[2]*angGridCoords[i][2];
-
-
-      i_insert=0;
-
-      while ((dmax[i_insert] > dtot2) && (i_insert < 4))
-	{
-	  i_insert++;
-	}
-
-
-      if (dtot2 > 0.9)
-	// printf("%d -- dp %15.13e\n",i, dtot2);
-
-	//shift old best values down by 1 index
-	for (i_shift = 3; i_shift > i_insert; i_shift--)
-	  {
-	    dmax[i_shift] = dmax[i_shift-1];
-	    ibest[i_shift] = ibest[i_shift-1];
-	  }
-
-
-      //commit the new best values
-      if (i_insert < 4)
-	{
-	  dmax[i_insert] = dtot2;
-	  ibest[i_insert] = i;
-	}
-
-    }
-
-
-  for (i=0; i<4; i++)
-    {
-      returnIndex[i]=ibest[i];
-    }
-  return;
-}
 
 
 
@@ -4769,305 +5246,6 @@ void quadComb(double startI[3], int basisIndex[4], double angGridCoords[NUMANGLE
 
 
 
-
-
-void transformI_quad(int ix,int iy,int iz,double I_return[NUMANGLES], double M1_input[5])
-{
-  double F_final[3],Efinal,Efinalrad;
-  
-  F_final[0]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][0] 
-    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][0]
-    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][0];
-
-  F_final[1]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][1] 
-    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][1]
-    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][1];
-
-  F_final[2]=M1_input[1]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][0][2] 
-    +M1_input[2]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][1][2]
-    +M1_input[3]*carttetrad[ix+NGCX][iy+NGCY][iz+NGCZ][2][2];
-  Efinal=M1_input[0];
-  Efinalrad=M1_input[4];
-
-  int i,j,p,l;
-  double I_start[NUMANGLES];
-  double res[3];
-
-  double F_start[3], F_start_norm[3], F_final_norm[3], Fmag_start, Fmag_final, F_stretch;
-  double fStart, F_Start_forward, F_Start_backward, fFinal, Estart;
-  double stretchFactor;
-
-  double rotM[3][3];
-  double transformAng[NUMANGLES][3];
-
-
-  for (i=0; i < NUMANGLES; i++)
-    {
-      I_start[i] = I_return[i];
-      I_return[i] = 0.;
-    }
-
-
-  Estart=0.;
-  //Calculate net flux direction
-  for (l=0; l < 3; l++)
-    {
-      F_start[l] = 0.;
-    }
-
-  for (p=0; p < NUMANGLES; p++)
-    {
-      for (l=0; l < 3; l++)
-	{
-	  F_start[l] += I_start[p]*angGridCoords[p][l];
-	}
-      Estart += I_start[p];
-    }
-
-
-
-
-
-  Fmag_start = sqrt(F_start[0]*F_start[0] + F_start[1]*F_start[1] + F_start[2]*F_start[2]);
-  Fmag_final = sqrt(F_final[0]*F_final[0] + F_final[1]*F_final[1] + F_final[2]*F_final[2]);
-
-  if (Fmag_final/Efinal < 1.0e-10)
-    {
-      for (p=0; p<NUMANGLES; p++)
-	{
-	  I_return[p] = Efinal/NUMANGLES;
-	}
-      //    printf("%e %e\n",I_start[0],I_return[0]);
-      return;
-    }
-
-  for (l=0; l < 3; l++)
-    {
-      F_start_norm[l] = F_start[l]/Fmag_start;
-      F_final_norm[l] = F_final[l]/Fmag_final;
-    }
-
-
-
-  if (Fmag_start/Estart < 1.0e-2)
-    {
-
-      //Calculate starting flux after reflecting half the rays about origin
-
-      F_start_norm[0]=0.0;
-      F_start_norm[1]=0.0;
-      F_start_norm[2]=0.0;
-
-      for (l=0; l < NUMANGLES; l++)
-	{
-	  if (angGridCoords[l][0] < 0) //reflect half the rays about origin
-	    {
-	      for (p=0; p < 3; p++)
-		{
-		  F_start_norm[p] += I_start[l]*(-angGridCoords[l][p]);
-		}
-	    }
-	  else
-	    {
-	      for (p=0; p < 3; p++)
-		{
-		  F_start_norm[p] += I_start[l]*angGridCoords[l][p];
-		}
-	    }
-	}
-
-      double tempMag = sqrt(F_start_norm[0]*F_start_norm[0] +
-			    F_start_norm[1]*F_start_norm[1] + F_start_norm[2]*F_start_norm[2]);
-
-      for (p=0; p < 3; p++)
-	{
-	  F_start_norm[p] = F_start_norm[p]/tempMag;
-	}
-    }
-
-
-  F_Start_forward = 0.;
-  F_Start_backward = 0.;
-  double cosang[NUMANGLES];
-
-  for (p=0; p < NUMANGLES; p++)
-    {
-
-
-      cosang[p] = angGridCoords[p][0]*F_start_norm[0] + angGridCoords[p][1]*F_start_norm[1] + angGridCoords[p][2]*F_start_norm[2];
-
-      if (cosang[p] > 0.)
-	{
-	  F_Start_forward += I_start[p]*cosang[p]; //positive fluxes in direction of net flux
-	}
-      else
-	{
-
-	  F_Start_backward += I_start[p]*cosang[p]; //negative fluxes "" ""
-	}
-    }
-
-
-
-  fStart = Fmag_start/Estart;
-  fFinal = Fmag_final/Efinal;
-
-  struct solverarg args;
-
-  args.F_Start_forward=F_Start_forward;
-  args.F_Start_backward=F_Start_backward;
-  args.Intensities = &I_start[0];
-  args.F_final_norm = &F_final_norm[0];
-  args.fFinal = fFinal;
-  args.cosang = &cosang[0];
-
-
-
-  int iter;
-  double testVal, sval=1.0;
-  double fval, dfds;
-  double deltas;
-
-  for (iter=0; iter < 10; iter++)
-    {
-      fval = f_stretchFactor(sval, &args);
-
-      dfds = (f_stretchFactor(sval+1.e-3, &args) - fval)/(1.e-3);
-
-      deltas = -fval/dfds;
-
-      if (fabs(deltas) > 0.5*sval)
-	{
-	  if (deltas < 0)
-	    {
-	      deltas = -0.5*sval;
-	    }
-	  else
-	    {
-	      deltas = 0.5*sval;
-	    }
-	}
-
-      sval = sval + deltas;
-
-    }
-
-  stretchFactor = sval;
-
-
-  F_stretch = fabs(stretchFactor*F_Start_forward + F_Start_backward/stretchFactor);
-
-
-  if(stretchFactor<1.e-15)
-    {
- 
-      for (i=0; i < NUMANGLES; i++)
-	I_return[i] = I_start[i];
-      return;
-    }
-
-  //Calculate rotation matrix
-  calc_rot_M(F_start_norm, F_final_norm, rotM);
-
-  // printf("start: %e %e %e\nfinish: %e %e %e\n", F_norm[0], F_norm[1], F_norm[2], F_final[0], F_final[1], F_final[2]);
-
-
-
-
-  int probeAng;
-  for (probeAng=0; probeAng < NUMANGLES; probeAng++)
-    {
-
-      //Apply Rotation Matrix to some initial intesity distribution
-
-      for (i=0; i < 3; i++)
-	{
-	  transformAng[probeAng][i]=0;
-	  for (j=0; j < 3; j++)
-	    {
-	      transformAng[probeAng][i] += rotM[i][j]*angGridCoords[probeAng][j];
-	    }
-	}
-
-
-
-      //Stretch initial intensity distrubution parallel to Ffinal
-
-      //First, calculate parallel component of I
-      double n_parallel[3], n_perp[3], n_final[3];
-      double dotprod = 0., n_norm = 0.;
-
-
-      for (l=0; l < 3; l++)
-	{
-	  dotprod += transformAng[probeAng][l]*F_final_norm[l];
-	}
-
-
-      for (l=0; l < 3; l++)
-	{
-	  n_parallel[l] = dotprod*F_final_norm[l];
-	  n_perp[l] = transformAng[probeAng][l] - n_parallel[l];
-
-	  if (dotprod > 0)
-	    {
-	      n_parallel[l] = n_parallel[l]*stretchFactor;
-	    }
-	  else
-	    {
-	      n_parallel[l] = n_parallel[l]/stretchFactor;
-	    }
-	  n_final[l] = n_perp[l] + n_parallel[l];
-
-	}
-
-
-      int angNeighborIndex[4];
-      double interpCoeffs[4], finalAng[4]={0.,0.,0.,0.};
-
-      get_4angIndex(n_final,angGridCoords,angNeighborIndex);
-      quadComb(n_final,angNeighborIndex,angGridCoords,interpCoeffs);
-
-      for (p=0; p < 4; p++)
-	{
-	  I_return[angNeighborIndex[p]] += I_start[probeAng]*interpCoeffs[p];
-	}
-
-
-    }
-
-
-
-
-
-  double rescaleFactor;// = Fmag_final/F_stretch;
- 
-  double E_intermediate=0.;
-
-  
-  //Zero all beams with negative intensities
-  //Figure out new rescale factor
-
-  for (p=0; p < NUMANGLES; p++)
-    {
-      if (I_return[p] < 0)
-	{
-	  I_return[p]=0.;
-	}
-      E_intermediate += I_return[p];
-    }
-  
-
-  rescaleFactor = Efinal/E_intermediate;
-
-
-
-  //Renormalize to get correct energy density
-  for (p=0; p < NUMANGLES; p++)
-    {
-      I_return[p] = I_return[p]*rescaleFactor;
-    }
-}
 
 
 void transformI(int ix, int iy, int iz,double I0[NUMANGLES], double M1_input[5])
@@ -5161,6 +5339,19 @@ int ZEROtest_oldmain()
 
 
 
+
+	double testAng[3] = {-1.,0.,0.};
+	int angList[3];
+
+
+	getNearest3Ang(testAng,angList);	
+
+	printf("Nearest Angle Indices: %d %d %d\n", angList[0],angList[1],angList[2]);
+	printf("Vec 1: %e %e %e\n", angGridCoords[angList[0]][0],angGridCoords[angList[0]][1], angGridCoords[angList[0]][2]);
+	printf("Vec 2: %e %e %e\n", angGridCoords[angList[1]][0],angGridCoords[angList[1]][1], angGridCoords[angList[1]][2]);
+	printf("Vec 3: %e %e %e\n", angGridCoords[angList[2]][0],angGridCoords[angList[2]][1], angGridCoords[angList[2]][2]);
+
+	exit(-1);
 
 //------------------------------------------------------------------------------------------------
 
@@ -5291,7 +5482,26 @@ void reflectI(double reflect_direction[3], double I_start[NUMANGLES], double I_r
 
 
 	double reflect_normal[3];
-	int probeAng, l;
+	int probeAng, l,i;
+
+
+	//Local coordinates use a new definition for indices
+	// 0 = r, 1 = theta, 2 =phi
+	// And the local grid uses x,y,z coordinates mapped according to
+	// x --> theta
+	// y --> phi
+	// z --> r
+
+	#ifndef CARTANGLES
+	double temprdir[3];
+	for(i=0;i<3;i++)
+	  temprdir[i]=reflect_direction[i];
+
+	reflect_direction[0]=temprdir[2];
+	reflect_direction[1]=temprdir[0];
+	reflect_direction[2]=temprdir[1];
+
+	#endif
 
 
 	for (probeAng=0; probeAng < NUMANGLES; probeAng++)

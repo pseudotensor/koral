@@ -127,7 +127,7 @@ if(BCtype==YBCLO)
       {
 	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][il];
       }
- */
+ */   //in cart coords
        double reflect_direction[3] = {1.,0.,0.};
        reflectI(reflect_direction, &Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][0], &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 #endif   
@@ -163,7 +163,10 @@ if(BCtype==YBCHI)
     */
 
 #ifdef myVET
-    double reflect_direction[3] = {1.,0.,0.};
+    
+    //in cart coords
+       double reflect_direction[3] = {1.,0.,0.};
+
     reflectI(reflect_direction, &Ibeam[iix+NGCX][iiy+NGCY][iiz+NGCZ][0], &Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][0]);
 #endif   
 
