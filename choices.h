@@ -626,6 +626,6 @@
 
 
 #ifndef U2P_SOLVER
-#define U2P_SOLVER U2P_SOLVER_WP
+#define U2P_SOLVER U2P_SOLVER_W
 #endif
 

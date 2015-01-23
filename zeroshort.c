@@ -4851,6 +4851,9 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 
 	      S[i][j][k]=eps*pow(source_Data[i][j][k][0],4)*STEFAN_BOLTZMANN/M_PI*NUMANGLES + 
 		(1.0-eps)*source_Data[i][j][k][1]*LIGHT_C*NUMANGLES/4.0/M_PI;
+
+	      //test
+	      //S[i][j][k]=0.;
 	    }
 	}
     }

@@ -90,8 +90,24 @@
 //87 INFDISK - gas dumped to circularize
 //88 VETPHIBEAMS - beams in phi
 //89 RADTORUS - radiating fixed torus
+//90 VETSHADOW - vet shadow test
 
-#define PROBLEM 89
+#define PROBLEM 90
+
+#if(PROBLEM==90)
+
+#define PR_DEFINE "PROBLEMS/VETSHADOW/define.h"
+#define PR_BC "PROBLEMS/VETSHADOW/bc.c"
+#define PR_INIT "PROBLEMS/VETSHADOW/init.c"
+#define PR_KAPPA "PROBLEMS/VETSHADOW/kappa.c"
+#define PR_KAPPAES "PROBLEMS/VETSHADOW/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/VETSHADOW/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/VETSHADOW/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/VETSHADOW/dump.c"
+#define PR_TOOLS "PROBLEMS/VETSHADOW/tools.c"
+
+#endif
+
 
 #if(PROBLEM==89)
 

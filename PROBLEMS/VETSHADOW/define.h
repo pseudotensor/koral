@@ -4,7 +4,9 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
+#define SKIPHDEVOLUTION
+//#define SKIPRADSOURCE
 #define RESTARTNUM -1
 
 /************************************/
@@ -15,17 +17,13 @@
 #define myVET
 
 #ifdef myVET
+
 #define CARTANGLES
 #define RADCLOSURE VETCLOSURE
 #define EVOLVEINTENSITIES
 #define RADSTARTWITHM1INTENSITIES
 #endif
 
-//#define NUMRADWAVESPEEDS
-#define SKIPRADWAVESPEEDLIMITER
-#define SKIPRADSOURCE
-//#define NCOMPTONIZATION
-//#define COMPTONIZATION
 
 /************************************/
 //rhd floors
@@ -51,7 +49,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .3
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define GDETIN 0
@@ -72,7 +70,7 @@
 //blackhole
 /************************************/
 #define BHSPIN 0.0
-#define MASS 1.e10
+#define MASS 1.e0
 
 /************************************/
 //coordinates / resolution
@@ -93,7 +91,7 @@
 #define TNZ 1
 
 //# of tiles
-#define NTX 4
+#define NTX 1
 #define NTY 1
 #define NTZ 1
 
@@ -121,6 +119,14 @@
 /************************************/
 //problem params
 /************************************/
+#define GAMMA (5./3.)
+#define RHOZERO 1.0e-2
+#define TEMPZERO 1.0e11
+#define BLOBMAG1 1.0e4
+#define XBLOB1 0.5
+#define YBLOB1 0.5
+#define SIZEBLOB1 0.1
+//#define TEMPBLOB1 1.0e6
 
 
 
