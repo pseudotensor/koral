@@ -7,13 +7,14 @@
 #define BHDISK_PROBLEMTYPE
 #define DOFIXUPS 1
 #define UNPERTURBED
+//#define SKIPRADSOURCE
 #define SKIPHDEVOLUTION
 
 /************************************/
 //radiation
 /************************************/
 #define RADIATION
-#define OMSCALE 0.
+#define OMSCALE 1.
 
 
 /************************************/
@@ -78,8 +79,8 @@
 #define MAXY (M_PI-DTH)
 #define MINZ -1.
 #define MAXZ 1.
-#define TNX 40 // Total number of cells in X 
-#define TNY 80
+#define TNX 50 // Total number of cells in X 
+#define TNY 100
 #define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2

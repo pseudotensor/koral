@@ -4609,8 +4609,8 @@ update_intensities(ldouble t,ldouble dt)
       //array holding coordinates for ZERO
       ldouble coords[3][3][3][4];
       //array holding coordinates for ZERO
-      ldouble source[3][3][3][4];
-      ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4];
+      ldouble source[3][3][3][8];
+      ldouble rho,uint,pre,Tgas,Elab,Erad,alpha,sigma,RijM1[4][4],betagas;
       struct geometry geom;
       struct geometry geom2;
       ldouble ucon[4], M1[5];
@@ -4651,7 +4651,18 @@ update_intensities(ldouble t,ldouble dt)
 
 	      rho=get_u(p,RHO,ix,iy,iz);
 	      uint=get_u(p,UU,ix,iy,iz);
-	      for(l=1;l<4;l++) ucon[l]=get_u(p,EE0+l,ix,iy,iz);
+	      for(l=1;l<4;l++) ucon[l]=get_u(p,VX+l,ix,iy,iz);
+
+	      //converting velocity
+	      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);	  
+	      
+	      trans2_coco(geom.xxvec,ucon,ucon,geom.coords,RADCLOSURECOORDS);
+	      betagas=sqrt(1.-1./(ucon[0]*ucon[0]));
+	      //to ortonormal
+	      trans2_cc2on(ucon,ucon,geom2.tup);
+
+
+
 	      Erad=get_u(p,EE0,ix,iy,iz);
 
 	      //coordinates
@@ -4694,7 +4705,12 @@ update_intensities(ldouble t,ldouble dt)
 	      source[i+1][j+1][k+1][1]=Elab;
 	      source[i+1][j+1][k+1][2]=alpha;
 	      source[i+1][j+1][k+1][3]=sigma;
-	  
+	      source[i+1][j+1][k+1][4]=betagas;
+	      source[i+1][j+1][k+1][5]=ucon[1];
+	      source[i+1][j+1][k+1][6]=ucon[2];
+	      source[i+1][j+1][k+1][7]=ucon[3];
+
+
 	      //saving rad. field to memory
 	      rad[i+1][j+1][k+1][0]=Elab; //energy density in lab frame
 	      rad[i+1][j+1][k+1][1]=RijM1[0][1]; //R^ti in RADCLOSURECOORDS, ortonormal

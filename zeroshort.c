@@ -4791,7 +4791,7 @@ void ZERO_decomposeM1(int ix, int iy, int iz,double M1_Data[5], double I_return[
 
 
 
-void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4],
+void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][8],
 		     double I_return[NUMANGLES],int verbose)
 {
   double S[3][3][3];  //radiative source function
@@ -4809,21 +4809,33 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
   else if(TNZ==1) //2d
     {
       klo=khi=1;
-      jlo=0;jhi=3;
+      jlo=0;jhi=2;
     }
   else //3d
     {
-      jlo=0;jhi=3;
-      klo=0;khi=3;
+      jlo=0;jhi=2;
+      klo=0;khi=2;
     }
+
+  double beta_gas=source_Data[1][1][1][4];
+  double gamma_gas2=1./(1.-beta_gas*beta_gas);
+  double vel_norm[3]={source_Data[1][1][1][5],source_Data[1][1][1][6],source_Data[1][1][1][7]};
+  double vel_mag = sqrt(vel_norm[0]*vel_norm[0] + 
+		     vel_norm[1]*vel_norm[1] + 
+		     vel_norm[2]*vel_norm[2]);
+
+  vel_norm[0]/=vel_mag;
+  vel_norm[1]/=vel_mag;
+  vel_norm[2]/=vel_mag;
+
 
   //Fill out source function for cube
   int i,j,k;
   for (i=0; i<3; i++)
     {
-      for (j=jlo; j<jhi; j++)
+      for (j=jlo; j<=jhi; j++)
 	{
-	  for (k=klo; k<khi; k++)
+	  for (k=klo; k<=khi; k++)
 	    {
 	      double alpha=source_Data[i][j][k][2], sigma=source_Data[i][j][k][3];
 	      double eps;
@@ -4837,7 +4849,8 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 		  eps = 1.0;
 		}
 
-	      S[i][j][k]=eps*pow(source_Data[i][j][k][0],4)*STEFAN_BOLTZMANN/M_PI + (1.0-eps)*source_Data[i][j][k][1]*LIGHT_C/4.0/M_PI;
+	      S[i][j][k]=eps*pow(source_Data[i][j][k][0],4)*STEFAN_BOLTZMANN/M_PI*NUMANGLES + 
+		(1.0-eps)*source_Data[i][j][k][1]*LIGHT_C*NUMANGLES/4.0/M_PI;
 	    }
 	}
     }
@@ -4913,9 +4926,24 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	  getch();
 	}
 
-	interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
+      	interp_S += S[intersect_i][intersect_j][intersect_k]*intersectGridWeights[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng][p];
+      
 	}
 
+
+      //Boost source function by fluid velocity
+ 
+ 
+      double mu= vel_norm[0]*angGridCoords[probeAng][0] + vel_norm[1]*angGridCoords[probeAng][1] + vel_norm[2]*angGridCoords[probeAng][2];
+      if(beta_gas<1.e-5)	mu=1.;
+      double bm=1.-beta_gas*mu;
+      interp_S = interp_S/bm/bm/bm/bm/gamma_gas2/gamma_gas2;
+
+      if(LIGHT_C * delta_t > intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng])
+	{
+	  printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
+	  intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * delta_t;
+	}
 
       double dtau = (source_Data[1][1][1][2]+source_Data[1][1][1][3]) * intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng];
 
@@ -4928,12 +4956,6 @@ void ZERO_shortCharI(int ix, int iy, int iz,double delta_t, double I_Data[3][3][
 	}
 
 
-
-      if(LIGHT_C * delta_t > intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng])
-	{
-	  printf("dt larger than intersectDistances: %e %e %d %d. increase phi range?\n",intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng],delta_t,ix,iy);
-	  intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng] = LIGHT_C * delta_t;
-	}
 
       double expfactor = exp(-LIGHT_C * delta_t/intersectDistances[ix+NGCX][iy+NGCY][iz+NGCZ][probeAng]);  
       I_time[probeAng] = I_Data[1][1][1][probeAng]*expfactor + I_ray[probeAng]*(1.-expfactor) ; //apply time step

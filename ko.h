@@ -842,7 +842,7 @@ void setupInterpWeights_sph3D(int ix, int iy, int iz, double angGridCoords[NUMAN
 void setupInterpWeights_sph2D(int ix, int iy, int iz, double angGridCoords[NUMANGLES][3], int intersectGridIndices[SXVET][SYVET][SZVET][NUMANGLES][3][4], double intersectGridWeights[SXVET][SYVET][SZVET][NUMANGLES][4], double intersectDistances[SXVET][SYVET][SZVET][NUMANGLES], double intersectGridPhi[SXVET][SYVET][SZVET][NUMANGLES]);
 void getNearest3Ang(double target[3], int nearestAngleIndices[3]);
 
-void ZERO_shortCharI(int,int,int,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][4],
+void ZERO_shortCharI(int,int,int,double delta_t, double I_Data[3][3][3][NUMANGLES], double source_Data[3][3][3][8],
 		     double I_return[NUMANGLES],int verbose);
 
 void initAngIndex(double angGridCoords[NUMANGLES][3], double angDualGridCoords[NUMDUALANGLES][3], int angGridIndexSort[NUMANGLES][3], int angDualGridIndexSort[NUMANGLES][3]);
