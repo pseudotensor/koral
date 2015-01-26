@@ -1629,7 +1629,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       dx[2]=get_size_x(iz,2);
 	       ldouble gdet=geom.gdet;
 	       ldouble volume=dx[0]*dx[1]*dx[2]*gdet;
-	       trans_pmhd_coco(pp, pp, MYCOORDS,BLCOORDS, geom.xxvec,&geom,&geomBL);
+	       trans_pall_coco(pp, pp, MYCOORDS,BLCOORDS, geom.xxvec,&geom,&geomBL);
 
 	       ldouble rho=rhoGU2CGS(pp[RHO]);
 	       ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
@@ -1647,7 +1647,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 
 	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",vel[0],vel[1],vel[2],vel[3]);
 
-	       fprintf(fout1,"%.5e ",volume);
+	       fprintf(fout1,"%.5e ",volume);// (13)
 
 	       #ifdef RADIATION
 	       ldouble Rtt,ehat,Rij[4][4];
@@ -1693,7 +1693,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       Fy=Rij[2][0];
 	       Fz=Rij[3][0];
 	       	       
-	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",endenGU2CGS(ehat),fluxGU2CGS(Fx),fluxGU2CGS(Fy),fluxGU2CGS(Fz));
+	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",endenGU2CGS(ehat),fluxGU2CGS(Fx),fluxGU2CGS(Fy),fluxGU2CGS(Fz)); //(14) - (17)
 	       
 	       ldouble conv=kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC; //because (cE-4piB) in non-geom
 	       fprintf(fout1,"%.5e %.5e ",Giff[0]*conv,Gicff[0]*conv);

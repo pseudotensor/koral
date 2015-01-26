@@ -15,9 +15,15 @@ pp[VX]=0.;
 pp[VY]=0.;
 pp[VZ]=0.;
 
+#ifdef SPHERE
 ldouble w1=exp(-((geom.xx-XBLOB1)*(geom.xx-XBLOB1) + (geom.yy-YBLOB1)*(geom.yy-YBLOB1) )/SIZEBLOB1/SIZEBLOB1);
-
 pp[RHO]*=(1. + BLOBMAG1*w1);
+#endif
+
+#ifdef SQUARE
+if(geom.xx>0.2*(MAXX-MINX) && geom.xx<0.5*(MAXX-MINX) && geom.yy>0.2*(MAXY-MINY) && geom.yy<0.5*(MAXY-MINY))
+  pp[RHO]*=BLOBMAG1;
+#endif
 
 
 

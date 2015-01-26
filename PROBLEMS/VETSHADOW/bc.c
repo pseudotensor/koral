@@ -21,10 +21,11 @@ if(ix>=NX) //outflow
      
     p2u(pp,uu,&geom);
  
-	#ifdef myVET
+    #ifdef myVET
     for(il=0;il<NUMANGLES;il++)
       {
-	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[NX-1+NGCX][iy+NGCY][iz+NGCZ][il];
+	//Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[NX-1+NGCX][iy+NGCY][iz+NGCZ][il];
+	Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=0.;
       }
 #endif
 
@@ -176,7 +177,8 @@ if(iy>=NY) //bulk motion
 	#ifdef myVET
      for(il=0;il<NUMANGLES;il++)
        {
-	 Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[ix+NGCX][NY-1+NGCY][iz+NGCZ][il];
+	 //Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=Ibeam[ix+NGCX][NY-1+NGCY][iz+NGCZ][il];
+	 Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][il]=0.;
        }
 #endif
     return 0;

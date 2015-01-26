@@ -21,12 +21,12 @@
 //viscosity choices
 /************************************/
 //#define RADVISCOSITY SHEARVISCOSITY
-#define ACCELRADVISCOSITY
+//#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
 #define ALPHARADVISC 1.
-#define MAXRADVISCVEL 1.
+#define MAXRADVISCVEL .5
 
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
@@ -36,7 +36,7 @@
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 15
 
-#define myVET
+//#define myVET
 
 #ifdef myVET
 #define RADCLOSURE VETCLOSURE

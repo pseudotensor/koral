@@ -691,7 +691,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		    }
 		  else
 		    {
-		      idx=imz*(ny*nx) + (NY-imy-1)*nx + imx-NG;
+		      idx=imz*(ny*nx) + (NY/2-1)*nx + imx;
 		      tausca[nodalindex]=tausca[idx];
 		      tauabs[nodalindex]=tauabs[idx];
 		      taueff[nodalindex]=taueff[idx];

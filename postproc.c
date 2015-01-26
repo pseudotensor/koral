@@ -908,16 +908,19 @@ int calc_scalars(ldouble *scalars,ldouble t)
 #if(PROBLEM==7) //BONDI
   rlum=RMAX;
 #endif
+#if(PROBLEM==7) //RADTORUS
+  rlum=13.;
+#endif
   ldouble radlum,totallum;
-  calc_lum(rlum,3,&radlum,&totallum);
+  calc_lum(rlum,1,&radlum,&totallum);
 
   //radiative luminosity everywhere (4)
   scalars[2]=radlum*mdotscale*CCC0*CCC0/calc_lumEdd();
 
   if(PROBLEM==89 || PROBLEM==79) //RADTORUS or SOFTBALL
     {
-      //luminosity exiting through radial and theta boundaries (4)
-      scalars[2]=calc_exitlum();
+      //luminosity exiting through radial and theta boundaries (3)
+      scalars[1]=calc_exitlum();
     }
 
   //total energy at infinity (rho ur + Trt + Rrt) (12)
@@ -1390,7 +1393,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
 	      //ehat=-Rtt;
 	      calc_Rij(pp,&geom,Rij); 
-	      indices_2221(Rij,Rij,geom.gg);
+	      //indices_2221(Rij,Rij,geom.gg);
 	      Rrt=Rij[1][0];// + ehat*ucongas[1];
 	      if(Rrt<0.)
 		Rrt=0.;
@@ -1400,7 +1403,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
 	      //ehat=-Rtt;
 	      calc_Rij(pp,&geom,Rij); 
-	      indices_2221(Rij,Rij,geom.gg);
+	      //	      indices_2221(Rij,Rij,geom.gg);
 	      Rrt=Rij[1][0];// + ehat*ucongas[1];
 	      if(Rrt<0. || ucongas[1]<0.)
 		Rrt=0.;
@@ -1408,7 +1411,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	  else if(type==3) //sum of R^r_t everywhere
 	    {
 	      calc_Rij(pp,&geom,Rij); 
-	      indices_2221(Rij,Rij,geom.gg);
+	      //indices_2221(Rij,Rij,geom.gg);
 	      Rrt=Rij[1][0];// + ehat*ucongas[1];	      
 	    }
 	  else
@@ -1446,13 +1449,13 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	  gdet=geom.gdet;
 	  ldouble dxph[3],dxBL[3];
 	  ldouble xx1[4],xx2[4];
-	  xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	  xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	  xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
+	  xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
 	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	  dxBL[0]=fabs(xx2[1]-xx1[1]);
-	  xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	  xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	  xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
+	  xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
 	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	  dxBL[1]=fabs(xx2[2]-xx1[2]);
@@ -1496,7 +1499,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
 		  
-		  Rrt=Rij[1][0];// + ehat*uconr);
+		  Rrt=-Rij[1][0];// + ehat*uconr);
 		  if(Rrt<0.) Rrt=0.;
 
 		  
@@ -1507,7 +1510,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
 		  
-		  Rrt=Rij[1][0];// + ehat*uconr);
+		  Rrt=-Rij[1][0];// + ehat*uconr);
 		  if(uconr<0. || Rrt<0.) Rrt=0.;
 		}
 	      else if(type==3) //any R^r_t everywhere
@@ -1516,7 +1519,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		    for(j=0;j<4;j++)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz);
 		  
-		  Rrt=Rij[1][0];// + ehat*uconr);
+		  Rrt=-Rij[1][0];// + ehat*uconr);
 		  
 		}
 	      else
@@ -1531,6 +1534,9 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	  else
 	    {
 	      
+	      //to BL
+	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+	      //hydro part may be insonsistent
 
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 	      calc_tautot(pp,&geomBL,dxph,tautot);
@@ -1538,12 +1544,12 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      ucongas[1]=pp[2];
 	      ucongas[2]=pp[3];
 	      ucongas[3]=pp[4];	      
-	      conv_vels(ucongas,ucongas,VELPRIM,VEL4,geom.gg,geom.GG);
+	      conv_vels(ucongas,ucongas,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 
 	      rhour = pp[RHO]*ucongas[1];
 	  
-	      calc_Tij(pp,&geom,Tij);
-	      indices_2221(Tij,Tij,geom.gg);
+	      calc_Tij(pp,&geomBL,Tij);
+	      indices_2221(Tij,Tij,geomBL.gg);
 	      Trt=Tij[1][0];
 
 	      tau+=ucongas[0]*tautot[1];
@@ -1554,27 +1560,27 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 		  if(tau>1.) break;	  
 		  //trans_prad_coco(pp,pp,MYCOORDS,KERRCOORDS,xx,&geom,&geomBL);
 		  //prad_lab2on(pp,pp,&geomBL);
-		  calc_Rij(pp,&geom,Rij); 
-		  indices_2221(Rij,Rij,geom.gg);
-		  Rrt=Rij[1][0];
+		  calc_Rij(pp,&geomBL,Rij); 
+		  indices_2221(Rij,Rij,geomBL.gg);
+		  Rrt=-Rij[1][0];
 		  if(Rrt<0.) Rrt=0.;
 		}
 	      else if(type==1) //R^r_t everywhere
 		{
-		  //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
+		  //calc_ff_Rtt(pp,&Rtt,ucongas,&geomBL);
 		  //ehat=-Rtt;
-		  calc_Rij(pp,&geom,Rij); 
-		  indices_2221(Rij,Rij,geom.gg);
-		  Rrt=Rij[1][0];// + ehat*ucongas[1];
+		  calc_Rij(pp,&geomBL,Rij); 
+		  indices_2221(Rij,Rij,geomBL.gg);
+		  Rrt=-Rij[1][0];// + ehat*ucongas[1];
 		  if(Rrt<0.) Rrt=0.;
 		}
 	      else if(type==2) //R^r_t in the outflow region
 		{
-		  //calc_ff_Rtt(pp,&Rtt,ucongas,&geom);
+		  //calc_ff_Rtt(pp,&Rtt,ucongas,&geomBL);
 		  //ehat=-Rtt;
-		  calc_Rij(pp,&geom,Rij); 
-		  indices_2221(Rij,Rij,geom.gg);
-		  Rrt=Rij[1][0];// + ehat*ucongas[1];
+		  calc_Rij(pp,&geomBL,Rij); 
+		  indices_2221(Rij,Rij,geomBL.gg);
+		  Rrt=-Rij[1][0];// + ehat*ucongas[1];
 		  if(Rrt<0. || ucongas[1]<0.)
 		    Rrt=0.;
 		}
@@ -1584,8 +1590,8 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      Rrt=0.;
 #endif
 
-	      lum+=-gdet*Rrt*dx[1]*dx[2];
-	      jet+=gdet*(rhour+Trt+Rrt)*dx[1]*dx[2];
+	      lum+=-geomBL.gdet*Rrt*dxBL[1]*dxBL[2];
+	      jet+=geomBL.gdet*(rhour+Trt+Rrt)*dxBL[1]*dxBL[2];
 	    }
 
 	  //#ifdef CGSOUTPUT

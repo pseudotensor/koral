@@ -4,7 +4,7 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define SKIPHDEVOLUTION
 //#define SKIPRADSOURCE
 #define RESTARTNUM -1
@@ -13,6 +13,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
+#define SQUARE
 
 #define myVET
 
@@ -86,8 +87,8 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define TNX 50
-#define TNY 50
+#define TNX 100
+#define TNY 100
 #define TNZ 1
 
 //# of tiles
