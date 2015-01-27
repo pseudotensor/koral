@@ -1833,7 +1833,8 @@ int
 calc_Rij_visc_total()
 {
 #if (RADVISCOSITY==SHEARVISCOSITY)
-
+#pragma omp parallel
+  {
   int ii,ix,iy,iz,i,j;
   struct geometry geomcent;
   int derdir[3]={0,0,0};
@@ -1855,7 +1856,7 @@ calc_Rij_visc_total()
 	    Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]=Rvisc[i][j];	      
 	  }
     }
-
+  }
    #endif
    return 0;
 }
@@ -2943,21 +2944,23 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[
       //using the face interpolated primitives
       //calc_Rij_visc(pp,&geomcent,Rvisc1);
 
-      //int derdir[3]={0,0,0}; //by default centered derivatives in calc_shear
+      int derdir[3]={0,0,0}; //by default centered derivatives in calc_shear
       //using primitives from the cell centers of neighbours
-      /*
+      
       //left
+      /*
       fill_geometry(iix,iiy,iiz,&geomcent);
-      // derdir[geom->ifacedim]=2; //right derivative
+      //derdir[geom->ifacedim]=2; //right derivative
       calc_Rij_visc(&get_u(p,0,iix,iiy,iiz),&geomcent,Rvisc1,derdir);
       indices_2221(Rvisc1,Rvisc1,geomcent.gg); //R^i_j
 
       //right
       fill_geometry(ix,iy,iz,&geomcent);      
-      // derdir[geom->ifacedim]=1; //left derivative
+      //derdir[geom->ifacedim]=1; //left derivative
       calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc2,derdir);
       indices_2221(Rvisc2,Rvisc2,geomcent.gg); //R^i_j
       */
+      
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
 	  {
@@ -3494,7 +3497,7 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   /**********************************/
 
 #ifdef RADVISCNUDAMP
-  ldouble nulimit = mindx*mindx / 2. / global_dt;
+  ldouble nulimit = mindx*mindx / 2. / global_dt / 2.;
   ldouble fac=nu/nulimit;
   if(nu>nulimit)
     {
