@@ -16,8 +16,8 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
-//#define COMPTONIZATION
+#define RADIATION
+#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
@@ -49,22 +49,22 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 //#define ACCELRADVISCOSITY
-//#define RADVISCMFPSPH
-//#define RADVISCNUDAMP
-//#define RADVISCMAXVELDAMP
-//#define ALPHARADVISC 0.1
-//#define MAXRADVISCVEL .1
+#define RADVISCMFPSPH
+#define RADVISCNUDAMP
+#define RADVISCMAXVELDAMP
+#define ALPHARADVISC 1.0
+#define MAXRADVISCVEL 0.5
 
 /************************************/
 //rmhd floors
 /************************************/
-//#define CORRECT_POLARAXIS_3D
-#define CORRECT_POLARAXIS
-//#define POLARAXISAVGIN3D
+#define CORRECT_POLARAXIS_3D
+//#define CORRECT_POLARAXIS
+#define POLARAXISAVGIN3D
 #define U2P_EQS U2P_EQS_NOBLE
-#define U2P_SOLVER U2P_SOLVER_WP
+#define U2P_SOLVER U2P_SOLVER_W
 #define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
@@ -82,15 +82,15 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 1.e6
-#define BHSPIN 0.7
+#define MASS 10.
+#define BHSPIN 0.
 
 /************************************/
 //coordinates / resolution
 /************************************/
 #define myMKS3COORDS
 #define MKSR0 0.
-#define MKSH0 0.4
+#define MKSH0 0.6
 #define MKSMY1 0.001
 #define MKSMY2 0.025
 #define MKSMP0 1.2
@@ -107,24 +107,24 @@
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
-#define MINX (log(1.55-MKSR0))
+#define MINX (log(1.85-MKSR0))
 #define MAXX (log(1000.-MKSR0))
 #define MINY 0.
 #define MAXY 1.
 #endif
 
-#define PHIWEDGE (M_PI/2.)
+#define PHIWEDGE (2.*M_PI)
 #define MINZ (-PHIWEDGE/2.)
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 160//272 //8*34
-#define TNY 120//192 //8*24
-#define TNZ 1 //16*2
+#define TNX 272 //8*34
+#define TNY 192 //8*24
+#define TNZ 128 //8*16
 //number of tiles
-#define NTX 2//34//16
-#define NTY 2//24//16
-#define NTZ 1//1
+#define NTX 2
+#define NTY 2
+#define NTZ 1
 
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
@@ -156,7 +156,7 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 81
+#define NTORUS 7
 
 #if(NTORUS==81) //
 #define LT_KAPPA 5.e2

@@ -1856,16 +1856,40 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
     {
       ldouble dtlast = global_time - radvisclasttime[ix+NGCX][iy+NGCY][iz+NGCZ];
       ldouble dtmin = global_dt;
-      ldouble radsizefrac = get_size_x(ix,0)*sqrt(get_g(g,1,1,ix,iy,iz)) 
-	/ (min_dx*sqrt(get_g(g,1,1,0,iy,iz)));
-      if(dtlast/dtmin < radsizefrac)
+      ldouble sizevec[3] = {get_size_x(ix,0)*sqrt(get_g(g,1,1,ix,iy,iz)),
+			    get_size_x(iy,1)*sqrt(get_g(g,2,2,ix,iy,iz)),
+			    get_size_x(iz,2)*sqrt(get_g(g,3,3,ix,iy,iz))};
+      ldouble minsize;
+      if(TNZ==1 && TNY==1)
+	minsize=sizevec[0];
+      else if(TNZ==1)
+	minsize=my_min(sizevec[0],sizevec[1]);
+      else
+	minsize=my_min_N(sizevec,3);
+      
+
+      /*
+      ldouble radsizefracvec[3] = {get_size_x(ix,0)*sqrt(get_g(g,1,1,ix,iy,iz)) / (min_dx*sqrt(get_g(g,1,1,0,iy,iz))),
+				   get_size_x(iy,1)*sqrt(get_g(g,2,2,ix,iy,iz)) / (min_dy*sqrt(get_g(g,2,2,0,iy,iz))),
+				   get_size_x(iz,2)*sqrt(get_g(g,3,3,ix,iy,iz)) / (min_dz*sqrt(get_g(g,3,3,0,iy,iz)))};
+      ldouble radsizefrac;
+      if(TNZ==1 && TNY==1)
+	radsizefrac=radsizefracvec[0];
+      else if(TNZ==1)
+	radsizefrac=my_min(radsizefracvec[0],radsizefracvec[1]);
+      else
+	radsizefrac=my_min_N(radsizefracvec,3);
+      */
+      
+      //      if(dtlast/dtmin < radsizefrac)
+      if(dtlast < 0.5*minsize)
 	{
 	  recalcvisc=0.;
 	  /*
-	  if(iy==0)
+	  if(iy==0 || 1)
 	    {
 	      printf("skipping recalculating Rijvisc at %d %d with radsizefrac = %e | %e %e %e %e\n",
-		     ix,iy,radsizefrac,global_time,radvisclasttime[ix+NGCX][iy+NGCY][iz+NGCZ],dtmin,dtlast/dtmin );
+		     ix,iy,minsize,global_time,radvisclasttime[ix+NGCX][iy+NGCY][iz+NGCZ],dtmin,minsize);
 	    }
 	  */
 	}

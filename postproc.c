@@ -47,7 +47,7 @@
 //rho-weighted minus radial velocity in the outflow (36)
 //conserved flux rho ur transformed to BLCOORDS (37)
 //conserved flux rho ur in MYCOORDS (38)
-//conserved flux rhout+Trt in MYCOORDS (39)
+//conserved flux rho ur+Trt in MYCOORDS (39)
 //conserved flux for Rrt int MYCOORDS(40)
 //surface density of energy = int (Ttt+rhout+Rtt) dz (41)
 //rho-weighted radial velocity in the jet (42)
@@ -326,6 +326,70 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  Rviscrt = Rviscij[1][0];
 #endif
 
+
+		  //estimating the diffusive flux
+		  //to conserved
+		  p2u(fd_pl,fd_ul,&geomBLl);
+		  p2u(fd_pr,fd_ur,&geomBLr);
+		  p2u(fd_plp1,fd_ulp1,&geomBLr);
+		  p2u(fd_prm1,fd_urm1,&geomBLl);
+
+		  //gradient of conserved
+		  PLOOP(iv)
+		  {
+		    //getting rid of gdetu in conserved - integrated with gdet lateron
+		    dul[iv]=fd_ul[iv]-fd_urm1[iv];
+		    dur[iv]=fd_ulp1[iv]-fd_ur[iv];
+		    du[iv]=.5*(dul[iv]+dur[iv]);
+		    du[iv]/=gdetuBL;
+
+		    //test - right face only
+		    /*
+		      du[iv]=dur[iv];
+		      du[iv]/=gdetuBL; //de facto substracting ahd (getd_r (rho ut_rR - rho ut_rL))
+		    */
+		  }
+	      
+		  //test - right face only
+		  /*
+		    double ff1[NV],ff2[NV];
+		    f_flux_prime(fd_pr,0,ix+1,iy,iz,ff1,0); 
+		    f_flux_prime(fd_plp1,0,ix+1,iy,iz,ff2,0); 
+		    rhouconr=.5*(ff1[0]+ff2[0])/gdetuBL; //de facto plotting gdet_r * rhour_r
+		    Trt=.5*(ff1[1]-ff1[0]+ff2[1]-ff2[0])/gdetuBL; 
+		    //Trt=.5*(ff1[1]+ff2[1])/gdetuBL; 
+		    */
+
+		  //wavespeeds
+		  calc_wavespeeds_lr_pure(pp,&geomBL,aaa);
+		  ahd=my_max(fabs(aaa[0]),fabs(aaa[1]));
+		  arad=my_max(fabs(aaa[6]),fabs(aaa[7]));
+
+		  //test
+		  /*
+		  calc_wavespeeds_lr_pure(fd_pm1,&geomBLm1,aaa);
+		  ahd=my_max(ahd,my_max(fabs(aaa[0]),fabs(aaa[1])));
+		  arad=my_max(arad,my_max(fabs(aaa[6]),fabs(aaa[7])));
+
+		  calc_wavespeeds_lr_pure(fd_pp1,&geomBLp1,aaa);
+		  ahd=my_max(ahd,my_max(fabs(aaa[0]),fabs(aaa[1])));
+		  arad=my_max(arad,my_max(fabs(aaa[6]),fabs(aaa[7])));
+		  */
+
+		  //diffusive flux
+		  PLOOP(iv)
+		  {
+		    if(iv<NVMHD) diffflux[iv]=-0.5*ahd*du[iv];
+		    else diffflux[iv]=-0.5*arad*du[iv];
+		  }
+
+		  //adding up to the conserved fluxes
+		  Fluxx[RHO]=geomBL.gdet*(rhouconr+diffflux[RHO]);
+		  Fluxx[UU]=geomBL.gdet*(rhouconr+Trt+diffflux[UU]);
+
+		  #ifdef RADIATION
+		  Fluxx[EE0]=geomBL.gdet*(Rrt+diffflux[EE0]);
+                  #endif
 		}
 
 	      ldouble muBe;
@@ -339,60 +403,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		isjet=1;
 	      else isjet=0;
 
-	      //estimating the diffusive flux
-	      //to conserved
-	      p2u(fd_pl,fd_ul,&geomBLl);
-	      p2u(fd_pr,fd_ur,&geomBLr);
-	      p2u(fd_plp1,fd_ulp1,&geomBLr);
-	      p2u(fd_prm1,fd_urm1,&geomBLl);
-
-	      //gradient of conserved
-	      PLOOP(iv)
-	      {
-		//getting rid of gdetu in conserved - integrated with gdet lateron
-		dul[iv]=fd_ul[iv]-fd_urm1[iv];
-		dur[iv]=fd_ulp1[iv]-fd_ur[iv];
-		du[iv]=.5*(dul[iv]+dur[iv]);
-		du[iv]/=gdetuBL;
-
-		//test - right face only
-		/*
-		du[iv]=dur[iv];
-		du[iv]/=gdetuBL; //de facto substracting ahd (getd_r (rho ut_rR - rho ut_rL))
-		*/
-	      }
-	      
-	      //test - right face only
-	      /*
-	      double ff1[NV],ff2[NV];
-	      f_flux_prime(fd_pr,0,ix+1,iy,iz,ff1,0); 
-	      f_flux_prime(fd_plp1,0,ix+1,iy,iz,ff2,0); 
-	      rhouconr=.5*(ff1[0]+ff2[0])/gdetuBL; //de facto plotting gdet_r * rhour_r
-	      Trt=.5*(ff1[1]-ff1[0]+ff2[1]-ff2[0])/gdetuBL; 
-	      //Trt=.5*(ff1[1]+ff2[1])/gdetuBL; 
-	      */
-
-	      //wavespeeds
-	      calc_wavespeeds_lr_pure(pp,&geomBL,aaa);
-	      ahd=my_max(fabs(aaa[0]),fabs(aaa[1]));
-	      arad=my_max(fabs(aaa[6]),fabs(aaa[7]));
-
-	      //test
-	      calc_wavespeeds_lr_pure(fd_pm1,&geomBLm1,aaa);
-	      ahd=my_max(ahd,my_max(fabs(aaa[0]),fabs(aaa[1])));
-	      arad=my_max(arad,my_max(fabs(aaa[6]),fabs(aaa[7])));
-
-	      calc_wavespeeds_lr_pure(fd_pp1,&geomBLp1,aaa);
-	      ahd=my_max(ahd,my_max(fabs(aaa[0]),fabs(aaa[1])));
-	      arad=my_max(arad,my_max(fabs(aaa[6]),fabs(aaa[7])));
-
-	      //diffusive flux
-	      PLOOP(iv)
-	      {
-		if(iv<NVMHD) diffflux[iv]=-0.5*ahd*du[iv];
-		else diffflux[iv]=-0.5*arad*du[iv];
-	      }
-
+	 
 	      ldouble pregas = GAMMAM1*uint;
 	      ldouble ptot = pregas;
 	      #ifdef RADIATION
@@ -470,18 +481,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 
 	      //conserved flux (rhour) transformed to BLCOORDS (may be imprecise) (37)
-	      //profiles[35][ix]+=-rhouconrcons*dx[1]*dx[2];
-
-	      
-	      //test
-	      profiles[35][ix]+=get_uavg(pavg,AVGFLUXYL(EE0),ix,iy,iz)*get_size_x(ix,0)*dx[2]+
-		get_uavg(pavg,AVGFLUXYL(UU),ix,iy,iz)*get_size_x(ix,0)*dx[2];
-	      
-	      /*
-	      if(iy==0) {printf("%d %d > %e %e\n", ix,iy,
-			       get_uavg(pavg,AVGFLUXYL(EE0),ix,iy,iz),
-				get_uavg(pavg,AVGFLUXYL(UU),ix,iy,iz));getchar();}
-	      */
+	      profiles[35][ix]+=-rhouconrcons*dx[1]*dx[2];
 
 	      //conserved flux (gdet rhour) in MYCOORDS (38)
 	      profiles[36][ix]+=-Fluxx[RHO]*get_size_x(iy,1)*dx[2];

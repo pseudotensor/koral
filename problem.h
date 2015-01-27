@@ -92,7 +92,7 @@
 //89 RADTORUS - radiating fixed torus
 //90 VETSHADOW - vet shadow test
 
-#define PROBLEM 90
+#define PROBLEM 89
 
 #if(PROBLEM==90)
 

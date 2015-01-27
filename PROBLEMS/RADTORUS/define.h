@@ -20,8 +20,8 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
-//#define ACCELRADVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
+#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP

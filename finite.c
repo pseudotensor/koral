@@ -620,7 +620,8 @@ do_finger()
   correct_polaraxis();
 #endif
 #ifdef CORRECT_POLARAXIS_3D
-  correct_polaraxis_3d();
+  correct_polaraxis(); //first fill at fixed phi including magnetic field
+  correct_polaraxis_3d(); //then overwrite velocities with phi averages
 #endif
 
   //**********************************************************************
