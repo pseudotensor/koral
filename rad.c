@@ -1924,6 +1924,14 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
 	    Rvisc[i][j]=Rijviscprev[ix+NGCX][iy+NGCY][iz+NGCZ][i][j];	      
 	  }
     }
+  /*
+  if(ix==TNX/2 && iy==TNY/2)
+    {
+      printf(">>> %d > %d %d\n",recalcvisc,ix,iy);
+      print_tensor(Rvisc);
+      if(recalcvisc) getch();
+    }
+  */
 #endif //SHEARVISCOSITY
 
   return 0;
@@ -2906,13 +2914,13 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[
 
       //left
       fill_geometry(iix,iiy,iiz,&geomcent);
-      derdir[geom->ifacedim]=2; //right derivative
+      //derdir[geom->ifacedim]=2; //right derivative
       calc_Rij_visc(&get_u(p,0,iix,iiy,iiz),&geomcent,Rvisc1,derdir);
       indices_2221(Rvisc1,Rvisc1,geomcent.gg); //R^i_j
 
       //right
       fill_geometry(ix,iy,iz,&geomcent);      
-      derdir[geom->ifacedim]=1; //left derivative
+      //derdir[geom->ifacedim]=1; //left derivative
       calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc2,derdir);
       indices_2221(Rvisc2,Rvisc2,geomcent.gg); //R^i_j
       
