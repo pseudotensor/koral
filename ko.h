@@ -713,8 +713,12 @@ int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 
 //rad.c
 //rad-viscosity specific
+#if (RADVISCOSITY==SHEARVISCOSITY)
 ldouble Rijviscprev[SX][SY][SZ][4][4],radvisclasttime[SX][SY][SZ];
-
+ldouble Rijviscglobal[SX][SY][SZ][4][4];
+#endif
+int
+calc_Rij_visc_total();
 int test_opacities();
 void reset_radviscaccel();
 int update_intensities(ldouble,ldouble);

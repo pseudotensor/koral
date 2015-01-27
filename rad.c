@@ -1826,7 +1826,41 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
   return 0;
 }
 
+//**********************************************************************
+//*** calculates Rij visc for all cells **************************************
+//**********************************************************************
+int
+calc_Rij_visc_total()
+{
+#if (RADVISCOSITY==SHEARVISCOSITY)
 
+  int ii,ix,iy,iz,i,j;
+  struct geometry geomcent;
+  int derdir[3]={0,0,0};
+  ldouble Rvisc[4][4];
+   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
+    {
+      ix=loop_1[ii][0];
+      iy=loop_1[ii][1];
+      iz=loop_1[ii][2];
+
+      fill_geometry(ix,iy,iz,&geomcent);
+      calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc,derdir);
+      indices_2221(Rvisc,Rvisc,geomcent.gg); //R^i_j
+
+      //save to memory
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  {
+	    Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]=Rvisc[i][j];	      
+	  }
+    }
+
+   #endif
+   return 0;
+}
+
+ 
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
@@ -2909,34 +2943,42 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[
       //using the face interpolated primitives
       //calc_Rij_visc(pp,&geomcent,Rvisc1);
 
-      int derdir[3]={0,0,0}; //by default centered derivatives in calc_shear
+      //int derdir[3]={0,0,0}; //by default centered derivatives in calc_shear
       //using primitives from the cell centers of neighbours
-
+      /*
       //left
       fill_geometry(iix,iiy,iiz,&geomcent);
-      //derdir[geom->ifacedim]=2; //right derivative
+      // derdir[geom->ifacedim]=2; //right derivative
       calc_Rij_visc(&get_u(p,0,iix,iiy,iiz),&geomcent,Rvisc1,derdir);
       indices_2221(Rvisc1,Rvisc1,geomcent.gg); //R^i_j
 
       //right
       fill_geometry(ix,iy,iz,&geomcent);      
-      //derdir[geom->ifacedim]=1; //left derivative
+      // derdir[geom->ifacedim]=1; //left derivative
       calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc2,derdir);
       indices_2221(Rvisc2,Rvisc2,geomcent.gg); //R^i_j
-      
+      */
       for(i=0;i<4;i++)
 	for(j=0;j<4;j++)
 	  {
-	    Rijvisc[i][j]=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
+	    //Rijvisc[i][j]=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
+	    Rijvisc[i][j]=.5*(Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]+Rijviscglobal[iix+NGCX][iiy+NGCY][iiz+NGCZ][i][j]);
 	  }      
 
     }
   else
     //cell centered fluxes for char. wavespeed evaluation
     {
+      /*
       int derdir[3]={0,0,0};
       calc_Rij_visc(pp,ggg,Rijvisc,derdir);
       indices_2221(Rijvisc,Rijvisc,gg); //R^i_j
+      */
+      for(i=0;i<4;i++)
+	for(j=0;j<4;j++)
+	  {
+	    Rijvisc[i][j]=Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j];
+	  }     
     }  
 
   /**********************************/
@@ -3452,7 +3494,7 @@ calc_rad_visccoeff(ldouble *pp,void *ggg,ldouble *nuret,ldouble *mfpret,ldouble 
   /**********************************/
 
 #ifdef RADVISCNUDAMP
-  ldouble nulimit = mindx*mindx / 2. / global_dt / 2.;
+  ldouble nulimit = mindx*mindx / 2. / global_dt;
   ldouble fac=nu/nulimit;
   if(nu>nulimit)
     {
@@ -4772,6 +4814,8 @@ update_intensities(ldouble t,ldouble dt)
 void
 reset_radviscaccel()
 {
+#if (RADVISCOSITY==SHEARVISCOSITY)
+
   int ix,iy,iz;
   for(ix=0;ix<SX;ix++)
     for(iy=0;iy<SY;iy++)
@@ -4779,6 +4823,8 @@ reset_radviscaccel()
 	{
 	  radvisclasttime[ix][iy][iz]=-1.;
 	}
+
+  #endif
 }
 
 
