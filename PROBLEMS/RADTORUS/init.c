@@ -100,6 +100,10 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     //corrected gas pressure / internal energy density
     pp[UU]=calc_PEQ_ufromTrho(T4,rho);
 
+    #ifdef TEMPTORUS
+    pp[UU]=calc_PEQ_ufromTrho(TEMPTORUS,rho);
+    #endif
+
     //writing to primitives
     pp[EE0]=E;
     pp[FX0]=Fx;
@@ -120,7 +124,7 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
  else //OS: atmosphere outside the torus
    {
      pp[RHO]=RHOAMB;
-     pp[UU]=UUAMB;
+     pp[UU]=calc_PEQ_ufromTrho(TEMPAMB,RHOAMB);
      pp[VY]=pp[VX]=pp[VZ]=0.;
 
 #ifdef RADIATION

@@ -25,7 +25,7 @@
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
-#define ALPHARADVISC .1
+#define ALPHARADVISC .5
 #define MAXRADVISCVEL .5
 
 #define ALLOWRADCEILINGINIMPLICIT
@@ -123,9 +123,11 @@
 //problem params
 /************************************/
 #define MASS 10.
-#define TORUSENTR 5.e2
+#define TORUSENTR 1.2e3//5.e2
+//#define TEMPTORUS 5.e6 //overwrites the temperature
 #define RHOAMB 1.e-30
 #define UUAMB 1.e-7*RHOAMB //temp ~ uu/rho
+#define TEMPAMB 5.e6 //overwrites the temperature
 #define ERADATMMIN 1.e-30
 #define RADIMPLICITTHRESHOLD 1.e10
 

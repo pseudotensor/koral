@@ -17,7 +17,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-#define COMPTONIZATION
+#define NCOMPTONIZATION
 
 /************************************/
 //magnetic choices
@@ -39,7 +39,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2HEUN
+#define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -54,8 +54,8 @@
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
-#define ALPHARADVISC 1.0
-#define MAXRADVISCVEL 0.5
+#define ALPHARADVISC 0.1
+#define MAXRADVISCVEL 0.3
 
 /************************************/
 //rmhd floors
@@ -118,9 +118,9 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 272 //8*34
-#define TNY 192 //8*24
-#define TNZ 128 //8*16
+#define TNX 160//272 //8*34
+#define TNY 120//192 //8*24
+#define TNZ 1//128 //8*16
 //number of tiles
 #define NTX 2
 #define NTY 2

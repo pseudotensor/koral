@@ -5318,11 +5318,14 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 	    }
 	  break;
 	}
+
 #else
       int ret;
+      
+      
 #pragma omp critical //for some reason gsl-based inverse does not work on my mac with openmp
       {
-       ret=inverse_matrix(&J[0][0],&iJ[0][0],5);
+	 ret=inverse_matrix(&J[0][0],&iJ[0][0],5);
       }
       if(ret<0)
 	{
