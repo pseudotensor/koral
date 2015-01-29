@@ -436,6 +436,7 @@ int save_avg(ldouble dt);
 
 int fprint_coordfile(char* folder,char* prefix);
 int fprint_coordBL(char* folder,char* prefix);
+int fprint_coordBL_shell(char* folder,char* prefix);
 int fprint_restartfile(ldouble t, char* folder);
 int fprint_restartfile_ascii(ldouble t, char* folder);
 int fprint_restartfile_bin(ldouble t, char* folder);

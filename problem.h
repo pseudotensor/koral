@@ -91,8 +91,25 @@
 //88 VETPHIBEAMS - beams in phi
 //89 RADTORUS - radiating fixed torus
 //90 VETSHADOW - vet shadow test
+//91 TDENRICO - tidal disruption with Enrico's input
 
-#define PROBLEM 67
+#define PROBLEM 91
+
+
+#if(PROBLEM==91)
+
+#define PR_DEFINE "PROBLEMS/TDENRICO/define.h"
+#define PR_BC "PROBLEMS/TDENRICO/bc.c"
+#define PR_INIT "PROBLEMS/TDENRICO/init.c"
+#define PR_KAPPA "PROBLEMS/TDENRICO/kappa.c"
+#define PR_KAPPAES "PROBLEMS/TDENRICO/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/TDENRICO/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/TDENRICO/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/TDENRICO/dump.c"
+#define PR_TOOLS "PROBLEMS/TDENRICO/tools.c"
+
+#endif
+
 
 #if(PROBLEM==90)
 

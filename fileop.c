@@ -1381,6 +1381,10 @@ int fprint_coordfile(char* folder,char* prefix)
 #if (COORDOUTPUT==1)
   fprint_coordBL(folder,prefix);
 #endif
+#if (COORDOUTPUT==2)
+  fprint_coordBL_shell(folder,prefix);
+#endif
+
   return 0;
 }
 
@@ -1429,6 +1433,49 @@ int fprint_coordBL(char* folder,char* prefix)
    return 0;
  }
 
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints BL polar/azimuthal coordinates on a shell  */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int fprint_coordBL_shell(char* folder,char* prefix)
+ {
+   char bufor[50];
+   sprintf(bufor,"%s/%sBL.dat",folder,prefix);
+   FILE* fout1=fopen(bufor,"w");
+
+   int ix,iy,iz,iv;
+   ldouble pp[NV];
+
+   ix=NX-1;
+
+   for(iz=0;iz<NZ;iz++)
+     {
+       for(iy=0;iy<NY;iy++)
+	 {
+	   struct geometry geom,geomBL;
+	   fill_geometry(ix,iy,iz,&geom);
+	   fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+
+	   ldouble r=geomBL.xx;
+	   ldouble th=geomBL.yy;
+	   ldouble ph=geomBL.zz;
+	     
+	   fprintf(fout1,"%d %d %d ",ix,iy,iz);
+
+	   fprintf(fout1,"%.5e %.5e %.5e ",r,th,ph);
+
+	   fprintf(fout1,"\n");
+	 }
+     }
+
+   fflush(fout1);
+   fclose(fout1);
+
+   return 0;
+ }
 
 /*********************************************/
 /*********************************************/
