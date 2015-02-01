@@ -79,8 +79,8 @@
 #define MAXY (M_PI-DTH)
 #define MINZ -1.
 #define MAXZ 1.
-#define TNX 50 // Total number of cells in X 
-#define TNY 100
+#define TNX 50//150 // Total number of cells in X 
+#define TNY 100//300
 #define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2
@@ -113,7 +113,7 @@
 /************************************/
 //reconstruction / stepping
 /************************************/
-#define INT_ORDER 1
+#define INT_ORDER 2
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
@@ -123,9 +123,9 @@
 //problem params
 /************************************/
 #define MASS 10.
-#define TORUSENTR 1.2e3//5.e2
+#define TORUSENTR 1.2e3//5.e2 - higher density, 1.2e3 - order lower density 
 //#define TEMPTORUS 5.e6 //overwrites the temperature
-#define RHOAMB 1.e-30
+#define RHOAMB 1.e-26
 #define UUAMB 1.e-7*RHOAMB //temp ~ uu/rho
 #define TEMPAMB 5.e6 //overwrites the temperature
 #define ERADATMMIN 1.e-30

@@ -96,7 +96,7 @@ main(int argc, char **argv)
   //test_Giff();  exit(-1);
 
   //print scalings GU->CGS and quit
-  //print_scalings(); getch(); exit(-1);
+  print_scalings();
 
   //test_opacities(); exit(1);
 
@@ -864,7 +864,7 @@ test_maginv()
 int
 print_scalings()
 {
-  
+  printf("\n ***************************************\n\n");
   printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.16e\nmdot: %.16e\nsigma: %.16e\nlen: %.16e\ntime: %.16e\nenden:"
 	 "%.16e\nflux: %.16e\nT(1,1): %.16e\nkbt: %.16e\nkb/me: %.16e\nkappa: %.16e\n\n"
 	 "rhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\nmdotEdd: %.16e\n\nlumEdd: %.16e\n",
@@ -886,6 +886,6 @@ print_scalings()
 	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)/calc_mdotEdd(),
 	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*CCC0*CCC0/calc_lumEdd()
 	 );
-  
+    printf("\n ***************************************\n\n");
   return 0;
 }

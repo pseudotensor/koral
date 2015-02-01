@@ -1,3 +1,7 @@
+#define RESTART
+#define RESTARTNUM -1
+#define RESTARTGENERALINDICES
+
 #define MYCOORDS MINKCOORDS
 
 #define MINX -1.
@@ -7,15 +11,15 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 100
-#define TNY 100
-#define TNZ 100
+#define TNX 50
+#define TNY 50
+#define TNZ 50
 
-#define NTX 2
-#define NTY 2
-#define NTZ 2
+#define NTX 10
+#define NTY 1
+#define NTZ 1
 
-#define TIMESTEPPING RK2
+#define TIMESTEPPING RK2HEUN
 
 //#define MPI4CORNERS
 //#define MAGNFIELD

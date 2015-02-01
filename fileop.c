@@ -1029,19 +1029,30 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 
   /***** first read all the indices ******/
 
+  
   //first read the indices
+  #ifdef RESTARTGENERALINDICES
+  int indices[TNX*TNY*TNZ*3];
+  int len=TNX*TNY*TNZ;
+  #else
   int indices[NX*NY*NZ*3];
+  int len=NX*NY*NZ;
+  #endif
 
   //set the initial location
   MPI_Offset pos;
+  #ifdef RESTARTGENERALINDICES
+  pos=0;
+  #else
   pos=PROCID*NX*NY*NZ*(3*sizeof(int));  
+  #endif
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
   //read them
-  MPI_File_read( cFile, indices, NX*NY*NZ*3, MPI_INT, &status );
+  MPI_File_read( cFile, indices, 3*len, MPI_INT, &status );
 
   //convert to local
-  for(ic=0;ic<NX*NY*NZ;ic++)
+  for(ic=0;ic<len;ic++)
     {
       gix=indices[ic*3+0];
       giy=indices[ic*3+1];
@@ -1055,25 +1066,38 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   /***** then primitives in the same order ******/
 
   //new location in the second block
+  #ifdef RESTARTGENERALINDICES
+  pos=TNX*TNY*TNZ*(3*sizeof(int));
+  ldouble pout[TNX*TNY*TNZ*NV];
+  #else
   pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
+  ldouble pout[NX*NY*NZ*NV];
+  #endif
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
   //so far manually
-  ldouble pout[NX*NY*NZ*NV];
-  MPI_File_read( cFile, pout, NX*NY*NZ*NV, MPI_LDOUBLE, &status );
+
+  MPI_File_read( cFile, pout, len*NV, MPI_LDOUBLE, &status );
  
   //rewriting to p
-  for(ic=0;ic<NX*NY*NZ;ic++)
+  int ppos;
+  for(ic=0;ic<len;ic++)
     {
       ix=indices[ic*3+0];
       iy=indices[ic*3+1];
       iz=indices[ic*3+2];
-      
-      fill_geometry(ix,iy,iz,&geom);
-      PLOOP(iv)
-	set_u(p,iv,ix,iy,iz,pout[ix*NY*NZ*NV+iy*NZ*NV+iz*NV+iv]);
 
-      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+      ppos=ic*NV;
+
+      if(if_indomain(ix,iy,iz))
+	{
+	  fill_geometry(ix,iy,iz,&geom);
+
+	  PLOOP(iv)
+	    set_u(p,iv,ix,iy,iz,pout[ppos+iv]);
+
+	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	}
     }
 
   MPI_File_close( &cFile );
