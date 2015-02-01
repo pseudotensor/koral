@@ -1907,6 +1907,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //**********************************************************************
     //inside + ghost cells - number depending on the order of reconstruction
     //used to indicate where calculate fluxes
+    //excluding corners
     int xlim1,xlim2,ylim1,ylim2,zlim1,zlim2;
     int xlim,ylim,zlim;
     int lim;

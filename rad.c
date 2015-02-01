@@ -1845,6 +1845,9 @@ calc_Rij_visc_total()
       iy=loop_1[ii][1];
       iz=loop_1[ii][2];
 
+      if(if_outsidegc(ix,iy,iz)==1) continue; //avoid corners
+     
+
       fill_geometry(ix,iy,iz,&geomcent);
       calc_Rij_visc(&get_u(p,0,ix,iy,iz),&geomcent,Rvisc,derdir);
       indices_2221(Rvisc,Rvisc,geomcent.gg); //R^i_j

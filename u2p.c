@@ -501,7 +501,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
   //rho too small
   if(pp[0]<RHOFLOOR) 
     {
-      if(verbose) printf("hd_floors CASE 1 at %d %d (%e)\n",geom->ix+TOI,geom->iy+TOJ,pp[0]);
+      if(verbose) printf("hd_floors CASE 1 at %d %d %d | %d %d %d (%e) | tijk: %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK,geom->ix,geom->iy,geom->iz,pp[0],TI,TJ,TK);
       pp[0]=RHOFLOOR; 
       ret=-1; 
     }
@@ -546,7 +546,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
   //too cold
   if(pp[1]<UURHORATIOMIN*pp[0]) 
     {
-      if(verbose) {printf("hd_floors CASE 2 at (%d,%d,%d): %e %e\n",geom->ix+TOI,geom->iy+TOJ,geom->iz,pp[0],pp[1]);}//getchar();}
+      if(verbose) {printf("hd_floors CASE 2 at (%d,%d,%d | %d,%d,%d): %e %e | tijk: %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK,geom->ix,geom->iy,geom->iz,pp[0],pp[1],TI,TJ,TK);}//getchar();}
       pp[1]=UURHORATIOMIN*pp[0]; //increasing uint
       ret=-1;
     }
