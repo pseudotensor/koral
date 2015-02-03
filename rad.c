@@ -1832,6 +1832,7 @@ calc_Rij(ldouble *pp, void* ggg, ldouble Rij[][4])
 int
 calc_Rij_visc_total()
 {
+#ifdef RADIATION
 #if (RADVISCOSITY==SHEARVISCOSITY)
 #pragma omp parallel
   {
@@ -1861,6 +1862,7 @@ calc_Rij_visc_total()
     }
   }
    #endif
+#endif
    return 0;
 }
 

@@ -890,7 +890,7 @@ mimic_dynamo(ldouble dtin)
       ldouble effalpha=ALPHADYNAMO;
 
       //dynamo proportional to vertical gravity ~ z
-      #ifdef ALPHAFLIPSSIGN
+      #ifdef ALPHAFLPSSIGN
       effalpha = - (M_PI/2. - xxBL[2])/(HRDTHETA/2.) * ALPHADYNAMO;  //2 to get average alpha = alphadynamo
       #endif
 

@@ -44,7 +44,13 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
     }
  
   //converting to primitives
-  u2p(uu,pp,&geom,corrected,fixups,type);
+
+  if(is_cell_corrected_polaraxis(ix,iy,iz))
+    {
+      u2p_solver_Bonly(uu,pp,&geom); //invert only the magnetic field, the rest will be overwritten
+    }
+  else
+    u2p(uu,pp,&geom,corrected,fixups,type); //regular inversion
   
   if(corrected[0]==1 && setflags) //hd correction - entropy solver
     set_cflag(ENTROPYFLAG,ix,iy,iz,1); 
@@ -2175,4 +2181,29 @@ u2p_solver_W(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   if(verbose>0) printf("u2p_solver returns 0\n");
   return 0; //ok
 
+}
+
+//recovers only magnetic field primitives - used when correcting polar axis
+int
+u2p_solver_Bonly(ldouble *uu, ldouble *pp, void *ggg)
+{
+  //prepare geometry
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+ ldouble gdet,gdetu;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  
+#ifdef MAGNFIELD
+  //magnetic conserved=primitives
+  pp[B1]=uu[B1]/gdetu;
+  pp[B2]=uu[B2]/gdetu;
+  pp[B3]=uu[B3]/gdetu;
+#endif
+
+  return 0; //always succeeds
 }

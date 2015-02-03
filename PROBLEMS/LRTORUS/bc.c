@@ -94,8 +94,6 @@ if(BCtype==YBCLO) //upper spin axis
     iiy=-iy-1;
     iiz=iz;
     iix=ix;
-    gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-    gdet_bc=get_g(g,3,4,ix,iy,iz);  
     for(iv=0;iv<NV;iv++)
       {
 	//v_theta
@@ -115,9 +113,7 @@ if(BCtype==YBCHI) //lower spin axis
     iiy=NY-(iy-NY)-1;
     iiz=iz;
     iix=ix;
-    gdet_src=get_g(g,3,4,iix,iiy,iiz);  
-    gdet_bc=get_g(g,3,4,ix,iy,iz);  
-  	  
+    	  
     for(iv=0;iv<NV;iv++)
       {
 	if(iv==VY || iv==B2 || iv==FY0)

@@ -17,7 +17,7 @@
 //radiation choices
 /************************************/
 #define RADIATION
-#define NCOMPTONIZATION
+//#define NCOMPTONIZATION
 
 /************************************/
 //magnetic choices
@@ -39,7 +39,11 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
+#ifdef RADIATION
 #define TIMESTEPPING RK2IMEX
+#else
+#define TIMESTEPPING RK2HEUN
+#endif
 #define TSTEPLIM .6
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -49,23 +53,25 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+#ifdef RADIATION
+//#define RADVISCOSITY SHEARVISCOSITY
 //#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define RADVISCMAXVELDAMP
 #define ALPHARADVISC 0.1
 #define MAXRADVISCVEL 0.3
+#endif
 
 /************************************/
 //rmhd floors
 /************************************/
-#define CORRECT_POLARAXIS_3D
-//#define CORRECT_POLARAXIS
-#define POLARAXISAVGIN3D
+//#define CORRECT_POLARAXIS_3D
+#define CORRECT_POLARAXIS
+#define NCCORRECTPOLAR 3
+//#define POLARAXISAVGIN3D
 #define U2P_EQS U2P_EQS_NOBLE
 #define U2P_SOLVER U2P_SOLVER_W
-#define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
@@ -107,7 +113,7 @@
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
-#define MINX (log(1.85-MKSR0))
+#define MINX (log(4.85-MKSR0))
 #define MAXX (log(1000.-MKSR0))
 #define MINY 0.
 #define MAXY 1.

@@ -437,10 +437,14 @@ solve_the_problem(ldouble tstart, char* folder)
 #pragma omp parallel private(ii,iv,ix,iy,iz,dtcell)
 	  {
 	    dtcell=dt;
+	    calc_u2p();
+	    #pragma omp barrier
+	    do_finger();
+	    #pragma omp barrier
 
 	    /******* 1st implicit **********/
 	    copyi_u(1.,u,ut0);
-	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
+	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); 
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  
 	    for(ii=0;ii<Nloop_0;ii++) { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
@@ -454,9 +458,12 @@ solve_the_problem(ldouble tstart, char* folder)
 	    copyi_u(1.,u,ut1);
       
 	    calc_u2p();
-
 #pragma omp barrier
-	    count_entropy(&nentr[1],&nentr2[1]); do_finger();
+	    do_finger();
+#pragma omp barrier
+
+	    count_entropy(&nentr[1],&nentr2[1]); 
+
 	    op_explicit (t,dt); //U(1) in *ut1; 
 	    
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
@@ -480,9 +487,11 @@ solve_the_problem(ldouble tstart, char* folder)
 	    /******* 2nd implicit **********/
 	    copyi_u(1.,u,uforget);
 	    calc_u2p();
+	    #pragma omp barrier
+	    do_finger();
+	    #pragma omp barrier
 
-#pragma omp barrier
-	    count_entropy(&nentr[2],&nentr2[2]); do_finger();
+	    count_entropy(&nentr[2],&nentr2[2]); 
 	    op_implicit (t,gamma*dt); //U(2) in *u
 
 	    for(ii=0;ii<Nloop_0;ii++) { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
@@ -496,9 +505,11 @@ solve_the_problem(ldouble tstart, char* folder)
 	    /******* 2nd explicit **********/
 	    copyi_u(1.,u,ut2);
 	    calc_u2p();
+            #pragma omp barrier
+	    do_finger();
+	    #pragma omp barrier
 
-#pragma omp barrier
-	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	    count_entropy(&nentr[3],&nentr2[3]);
 	    op_explicit (t,dt); //U(2) in *ut2; 
 
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
@@ -527,7 +538,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(u,iv,ix,iy,iz)+(dtcell/2.)*get_u(drt1,iv,ix,iy,iz)+(dtcell/2.)*get_u(drt2,iv,ix,iy,iz));
 	    }
 	    //addi_u_3(1.,u,dt/2.,drt1,dt/2.,drt2,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
-	    calc_u2p();
+	    //	    calc_u2p();
 	
 
 
@@ -553,7 +564,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    calc_u2p();
             #pragma omp barrier
-	    count_entropy(&nentr[1],&nentr2[1]); do_finger();
+	    count_entropy(&nentr[1],&nentr2[1]);
 	    op_implicit (t,0.5*dt); 
 
 	    copyi_u(1.,u,ut1);
@@ -567,12 +578,12 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //2nd
 	    //calc_u2p();
             #pragma omp barrier
-	    count_entropy(&nentr[2],&nentr2[2]); do_finger();
+	    count_entropy(&nentr[2],&nentr2[2]); 
 	    op_explicit (t,dt); 
 
 	    calc_u2p();
             #pragma omp barrier
-	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
+	    count_entropy(&nentr[3],&nentr2[3]); 
 	    op_implicit (t,dt); 
 
 	    //together
@@ -600,13 +611,17 @@ solve_the_problem(ldouble tstart, char* folder)
 	    copyi_u(1.,u,ut0);
 	    calc_u2p();
 #pragma omp barrier
-	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
+	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); 
+	    do_finger();
+#pragma omp barrier
 	    op_explicit (t,1.*dt); 
 #ifdef RADIATION
 	    calc_u2p();
 #pragma omp barrier
+	    do_finger();
 #endif
-	    count_entropy(&nentr[1],&nentr2[1]); do_finger();
+#pragma omp barrier
+	    count_entropy(&nentr[1],&nentr2[1]); 
 	    op_implicit (t,1.*dt); 
 	    addi_u(1.,u,-1.,ut0,ut2); 
 
@@ -614,13 +629,18 @@ solve_the_problem(ldouble tstart, char* folder)
 	    copyi_u(1.,u,ut1);
 	    calc_u2p();
 #pragma omp barrier
-	    count_entropy(&nentr[2],&nentr2[2]); do_finger();
+	    do_finger();
+#pragma omp barrier
+	    count_entropy(&nentr[2],&nentr2[2]); 
+	    //#pragma omp barrier
 	    op_explicit (t,dt); 
 #ifdef RADIATION
 	    calc_u2p();
 #pragma omp barrier
+	    do_finger();
 #endif
-	    count_entropy(&nentr[3],&nentr2[3]); do_finger();
+#pragma omp barrier
+	    count_entropy(&nentr[3],&nentr2[3]); 
 	    op_implicit (t,dt); 
 	    addi_u(1.,u,-1.,ut1,ut3); 
 

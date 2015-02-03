@@ -2852,7 +2852,7 @@ int set_bc(ldouble t,int ifinit)
 	}
     }
 
-
+  //treating the corners of tiles
 #ifdef MPI4CORNERS
 
 #ifdef OMP
@@ -3121,8 +3121,6 @@ int set_bc(ldouble t,int ifinit)
   /*****************************************************************/
   //corners of the whole domain are never real BC so need to fill them with something
   /*****************************************************************/  
-
-
   
   int xlim,ylim,zlim;
   int lim,i,j,k;
@@ -3389,7 +3387,8 @@ int set_bc(ldouble t,int ifinit)
       my_warning("corners are not filled properly with intensities in 3d yet!\n");
       #endif
 
-      //elongated corners along z, filling one cell deep surfaces, and averaging diagonally
+      //elongated corners along z
+      //filling one cell deep surfaces, and averaging diagonally
       if(mpi_isitBC(XBCLO)==1 && mpi_isitBC(YBCLO)==1)
 	{
 	  for(iz=-NG;iz<NZ+NG;iz++) { //in the total total corners it fills crap but overwritten below!
@@ -5069,14 +5068,83 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
 int
 correct_polaraxis()
 {
- #ifdef OMP
+#ifdef OMP
   if(PROCID==0)
 #endif
     {
       int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
       int ix,iy,iz,iv,ic,iysrc,ixsrc;
+      
+      /*
+      for(ix=0;ix<NX;ix++)
+	{
+	  for(iz=0;iz<NZ;iz++)
+	    {
+	      ldouble th,thsrc,thaxis;
+	      ldouble pp[NV],uu[NV];
+	      struct geometry geom;
+	      for(ic=0;ic<nc;ic++)
+		{
+		  iy=ic;iysrc=nc;
+		  th=get_x(iy,1);
+		  thsrc=get_x(iysrc,1);	      
+	      	  
+		  fill_geometry(ix,iy,iz,&geom);
 
+		  //test
+		  //calc_primitives(ix,iy,iz,0,1);
+
+		  PLOOP(iv)
+		  {
+		    pp[iv]=get_u(p,iv,ix,iy,iz);
+		    uu[iv]=get_u(u,iv,ix,iy,iz);
+		  }
+
+		  ldouble Bb1[3]={uu[B1],uu[B2],uu[B3]};
+		  ldouble lB1=sqrt(Bb1[0]*Bb1[0]+Bb1[1]*Bb1[1]+Bb1[2]*Bb1[2]);
+		  
+		  if(ix==43 && ic==1 && PROCID==0)
+		    {
+		      printf("gdet: %e\n",geom.gdet);
+		      print_primitives(pp);
+		      print_conserved(uu);
+
+		    }
+		  
+		  p2u(pp,uu,&geom);
+		  ldouble Bb2[3]={uu[B1],uu[B2],uu[B3]};
+		 ldouble lB2=sqrt(Bb2[0]*Bb2[0]+Bb2[1]*Bb2[1]+Bb2[2]*Bb2[2]);
+		   
+		 ldouble B1B2=lB2-lB1;
+		 
+		  if(ix==43 && ic==1 && PROCID==0)
+		    {
+		      //print_primitives(pp);
+		      //print_conserved(uu);
+		      //getch();
+		      printf("%d %e\n", ic,B1B2);
+		    
+
+		  if(fabs(B1B2)>SMALL)
+		    {
+		      print_primitives(pp);
+		      print_conserved(uu);
+		      getch();
+		    }
+		    }
+
+		  PLOOP(iv)
+		  {
+		    set_u(p,iv,ix,iy,iz,pp[iv]);  
+		    set_u(u,iv,ix,iy,iz,uu[iv]);
+
+		  }
+		}
+	    }
+	}
+			  
+      */
       //spherical like coords
       if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MKS3COORDS || MYCOORDS==TKS3COORDS || MYCOORDS==MSPH1COORDS)
 	{
@@ -5090,9 +5158,9 @@ correct_polaraxis()
 		  struct geometry geom;
 
 		  //upper
-		  #ifdef MPI
+#ifdef MPI
 		  if(TJ==0) //tile number
-		  #endif
+#endif
 		    {
 		      thaxis=get_xb(0,1);
 		      for(ic=0;ic<nc;ic++)
@@ -5105,7 +5173,7 @@ correct_polaraxis()
 	  
 			  PLOOP(iv)
 			    pp[iv]=get_u(p,iv,ix,iy,iz);
-		  
+			  
 			  //gas densities
 			  pp[RHO]=get_u(p,RHO,ix,iysrc,iz);
 			  pp[UU]=get_u(p,UU,ix,iysrc,iz);
@@ -5116,12 +5184,14 @@ correct_polaraxis()
 			  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
 			  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
-#ifdef MAGNFIELD
+			  /*
+#ifdef SKIP_MAGNFIELD
 			  //do overwrite magnetic field, div B!=0 does not propagate in
 			  pp[B1]=get_u(p,B1,ix,iysrc,iz);
 			  pp[B3]=get_u(p,B3,ix,iysrc,iz);
 			  pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
 #endif
+			  */
 
 #ifdef RADIATION
 			  //rad density
@@ -5143,22 +5213,23 @@ correct_polaraxis()
 #endif
 
 #endif 
-
+			  
 			  p2u(pp,uu,&geom);
 
 			  PLOOP(iv)
 			  {
+			    if(iv<B1 || iv>B3) { //skip magnetic field
 			    set_u(p,iv,ix,iy,iz,pp[iv]);  
-			    set_u(u,iv,ix,iy,iz,uu[iv]);
+			    set_u(u,iv,ix,iy,iz,uu[iv]); }
 			  }
 			}
 		    }
 
 		  //lower
 #ifndef HALFTHETA
-		  #ifdef MPI
+#ifdef MPI
 		  if(TJ==NTY-1)
-		    #endif
+#endif
 		    {
 		      thaxis=get_xb(NY,1);
 		      for(ic=0;ic<nc;ic++)
@@ -5182,11 +5253,13 @@ correct_polaraxis()
 			  pp[VZ]=get_u(p,VZ,ix,iysrc,iz);
 			  pp[VY]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,VY,ix,iysrc,iz);
 
-#ifdef MAGNFIELD
+			  /*
+#ifdef SKIP_MAGNFIELD
 			  pp[B1]=get_u(p,B1,ix,iysrc,iz);
 			  pp[B3]=get_u(p,B3,ix,iysrc,iz);
 			  pp[B2]=fabs((th-thaxis)/(thsrc-thaxis))*get_u(p,B2,ix,iysrc,iz);
 #endif
+			  */
 
 #ifdef RADIATION
 			  //rad density
@@ -5213,8 +5286,10 @@ correct_polaraxis()
 
 			  PLOOP(iv)
 			  {
+			    if(iv<B1 || iv>B3) { //skip magnetic field
+			    
 			    set_u(p,iv,ix,iy,iz,pp[iv]);  
-			    set_u(u,iv,ix,iy,iz,uu[iv]);
+			    set_u(u,iv,ix,iy,iz,uu[iv]); }
 			  }
 			}
 		    }
@@ -5258,13 +5333,15 @@ correct_polaraxis()
 		      pp[VZ]=get_u(p,VZ,ixsrc,iy,iz);
 		      pp[VX]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,VX,ixsrc,iy,iz);
 
+		      /*
 #ifdef MAGNFIELD
 		      
-			pp[B2]=get_u(p,B2,ixsrc,iy,iz);
-			pp[B3]=get_u(p,B3,ixsrc,iy,iz);
-			pp[B1]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,B1,ixsrc,iy,iz);
+		      pp[B2]=get_u(p,B2,ixsrc,iy,iz);
+		      pp[B3]=get_u(p,B3,ixsrc,iy,iz);
+		      pp[B1]=fabs((R-Raxis)/(Rsrc-Raxis))*get_u(p,B1,ixsrc,iy,iz);
 		      
 #endif
+		      */
 
 #ifdef RADIATION
 		      //rad density
@@ -5291,13 +5368,16 @@ correct_polaraxis()
 
 		      PLOOP(iv)
 		      {
+			if(iv<B1 || iv>B3) { //skip magnetic field
+			    
 			set_u(p,iv,ix,iy,iz,pp[iv]);  
-			set_u(u,iv,ix,iy,iz,uu[iv]);
+			set_u(u,iv,ix,iy,iz,uu[iv]); }
 		      }
 		    }
 		}
 	    }
 	}
+      
 
     }
   return 0; 
@@ -5743,30 +5823,39 @@ calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2
   return zone;
 }
 
-
-/* say if given cell is evolved or rather corrected */
+/* say if given cell is within NCCORRECTPOLAR from axis */
 int
-is_cell_active(int ix, int iy, int iz)
+is_cell_corrected_polaraxis(int ix, int iy, int iz)
 {
+
 #if defined(CORRECT_POLARAXIS) || defined(CORRECT_POLARAXIS_3D)
 #ifdef MPI
   if(TJ==0) //tile
 #endif
     if(iy<NCCORRECTPOLAR) 
-      return 0;
+      return 1;
 #ifndef HALFTHETA
 #ifdef MPI
   if(TJ==NTY-1) //tile
 #endif   
     if(iy>(NY-NCCORRECTPOLAR-1))
-      return 0;
+      return 1;
 #endif
 #endif
+  
+  return 0;
+}
 
+/* say if given cell is evolved or rather corrected */
+int
+is_cell_active(int ix, int iy, int iz)
+{
+  
 #ifdef MSTEP
   if(mstep_is_cell_active(ix,iy,iz)==0) 
     return 0;
 #endif
+ 
       
       //by default active
   return 1;

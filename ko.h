@@ -336,6 +336,8 @@ ldouble opacity_BellLin(ldouble rhoc, ldouble Tc);
 int
 is_cell_active(int ix, int iy, int iz);
 int
+is_cell_corrected_polaraxis(int ix, int iy, int iz);
+int
 calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2,int* iz2);
 int calc_u2p();
 int do_finger();
@@ -653,6 +655,7 @@ int u2p_hotmax(ldouble*,ldouble*,void*);
 int u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
 int u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
 int u2p_solver_W(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
+int u2p_solver_Bonly(ldouble *uu, ldouble *pp, void *ggg);
 
 //u2prad.c
 int check_floors_rad(ldouble *uu, int,void*);
