@@ -98,10 +98,6 @@ if(rho<0.) //outside donut
 
     //transforming primitives from BL to MYCOORDS
     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-
-#ifdef NCOMPTONIZATION
-    pp[NF0]=calc_NFfromE(pp[EE0]);
-#endif
     
 #ifdef MAGNFIELD 
     //MYCOORDS vector potential to calculate B's
@@ -280,15 +276,17 @@ if(rho<0.) //outside donut
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.0001,0.)*
       pow(sin(fabs(geomBL.yy)),4.);
 
-#elif (NTORUS==79) //a'la adaf paper - center too close
+#elif (NTORUS==79) //a'la adaf paper
   
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.01,0.)*
       pow(sin(fabs(geomBL.yy)),4.);
 
-#elif (NTORUS==80) //a'la adaf paper but ~ RHO
+
+#elif (NTORUS==80) //a'la adaf paper
   
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/1.e-5,2.)-0.1,0.)*
       pow(sin(fabs(geomBL.yy)),4.);
+
 
 
 #elif (NTORUS==81) //a'la adaf paper but ~ UU
@@ -303,7 +301,7 @@ if(rho<0.) //outside donut
     Acov[3] *= sin(fr - fr_start) ;
     */
 
-  //LIMOFIELD from a=0 MAD harm init.c
+    //LIMOFIELD from a=0 MAD harm init.c
     ldouble lambda = 25.;
     ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
     ldouble rchop = 800.; //outer boundary of field loops
@@ -349,15 +347,16 @@ if(rho<0.) //outside donut
 
    }
 
+
 #ifdef PERTMAGN //perturb to break axisymmetry
 //pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
 pp[UU]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL.zz)/(MAXZ-MINZ));
+pp[VZ]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL.zz)/(MAXZ-MINZ));
 #endif
+
 
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
-
-
 //to conserved
 p2u(pp,uu,&geom);
 

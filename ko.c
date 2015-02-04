@@ -617,7 +617,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    op_explicit (t,1.*dt); 
 #ifdef RADIATION
 	    calc_u2p();
-#pragma omp barrier
+	    #pragma omp barrier
 	    do_finger();
 #endif
 #pragma omp barrier
@@ -628,7 +628,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //2nd
 	    copyi_u(1.,u,ut1);
 	    calc_u2p();
-#pragma omp barrier
+	    #pragma omp barrier
 	    do_finger();
 #pragma omp barrier
 	    count_entropy(&nentr[2],&nentr2[2]); 
@@ -636,7 +636,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    op_explicit (t,dt); 
 #ifdef RADIATION
 	    calc_u2p();
-#pragma omp barrier
+	    #pragma omp barrier
 	    do_finger();
 #endif
 #pragma omp barrier

@@ -350,13 +350,6 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
       if(verbose>1 || 1)
 	{
 	  printf("%4d > %4d %4d %4d > MHDU2PFAIL > u2p prim. unchanged > %d \n",PROCID,geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK,u2pret);
-	  /*
-	  if(u2pret!=-103)
-	    {
-	      u2pret=u2p_solver(uu,pp,ggg,U2P_ENTROPY,2);  
-	      getchar();
-	    }
-	  */
 	}
       ret=-3;
       for(u2pret=0;u2pret<NV;u2pret++)

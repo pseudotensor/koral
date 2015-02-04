@@ -62,6 +62,12 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
   //averaging velocities 
 #ifdef CORRECT_POLARAXIS_3D
 #ifdef POLARAXISAVGIN3D
+
+ #ifdef PHIWEDGE
+ if(PHIWEDGE<0.999*2.*M_PI)
+   my_warning("POLARAXISAVGIN3D requires full 2 pi in azimuth!\n");
+#endif
+ 
  int ix,iy,iz,gix,giy,giz,iv; 
  struct geometry geom, geomBL;
  ldouble v[4],ucon[4],r,th,ph;

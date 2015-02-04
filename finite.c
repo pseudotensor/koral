@@ -620,8 +620,11 @@ do_finger()
   correct_polaraxis();
 #endif
 #ifdef CORRECT_POLARAXIS_3D
-  correct_polaraxis(); //first fill at fixed phi including magnetic field
+  ///correct_polaraxis(); //first fill at fixed phi including magnetic field
   correct_polaraxis_3d(); //then overwrite velocities with phi averages
+#endif
+#ifdef SMOOTH_POLARAXIS
+  smooth_polaraxis();
 #endif
 
   //**********************************************************************
@@ -5064,6 +5067,103 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
 
 }
 
+
+//averages the corrected cells over azimuth not touching magn. field
+int
+smooth_polaraxis()
+{
+#ifdef OMP
+  if(PROCID==0)
+#endif
+    {
+      int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
+
+      int ix,iy,iz,iv,ic,iysrc,ixsrc;
+      ldouble pp[NV],uu[NV];
+      struct geometry geom;
+
+      //spherical like coords
+      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MKS3COORDS || MYCOORDS==TKS3COORDS || MYCOORDS==MSPH1COORDS)
+	{
+	  for(ix=0;ix<NX;ix++)
+	    {
+	      //upper axis
+#ifdef MPI
+	      if(TJ==0)
+#endif
+		{
+		  for(ic=0;ic<nc;ic++)
+		    {
+		      iy=ic;
+		      PLOOP(iv)
+			pp[iv]=0.;
+		      for(iz=0;iz<NZ;iz++)
+			{
+			  PLOOP(iv)
+			    pp[iv]+=get_u(p,iv,ix,iy,iz);
+			}
+		      PLOOP(iv)
+			pp[iv]/=NZ;
+		      for(iz=0;iz<NZ;iz++)
+			{
+			  fill_geometry(ix,iy,iz,&geom);
+			  //recover magnetic field from this cell
+			  pp[B1]=get_u(p,B1,ix,iy,iz);
+			  pp[B2]=get_u(p,B2,ix,iy,iz);
+			  pp[B3]=get_u(p,B3,ix,iy,iz);
+			  p2u(pp,uu,&geom);
+			  PLOOP(iv)
+			  {
+			    if(iv<B1 || iv>B3) { //skip magnetic field
+			      set_u(p,iv,ix,iy,iz,pp[iv]);  
+			      set_u(u,iv,ix,iy,iz,uu[iv]); }
+			  }
+			}
+		    }
+		}
+	      //lower axis
+#ifndef HALFTHETA
+#ifdef MPI
+	      if(TJ==NTY-1)
+#endif
+		{
+		  for(ic=0;ic<nc;ic++)
+		    {
+		      iy=NY-1-ic;
+		      PLOOP(iv)
+			pp[iv]=0.;
+		      for(iz=0;iz<NZ;iz++)
+			{
+			  PLOOP(iv)
+			    pp[iv]+=get_u(p,iv,ix,iy,iz);
+			}
+		      PLOOP(iv)
+			pp[iv]/=NZ;
+		      for(iz=0;iz<NZ;iz++)
+			{
+			  fill_geometry(ix,iy,iz,&geom);
+			  //recover magnetic field from this cell
+			  pp[B1]=get_u(p,B1,ix,iy,iz);
+			  pp[B2]=get_u(p,B2,ix,iy,iz);
+			  pp[B3]=get_u(p,B3,ix,iy,iz);
+			  p2u(pp,uu,&geom);
+			  PLOOP(iv)
+			  {
+			    if(iv<B1 || iv>B3) { //skip magnetic field
+			      set_u(p,iv,ix,iy,iz,pp[iv]);  
+			      set_u(u,iv,ix,iy,iz,uu[iv]); }
+			  }
+			}
+		    }
+		}
+#endif
+	    }
+	}
+    }
+
+  return 0;
+}
+
 //treats the most polar cells is a special way, correcting them, not evolving them
 int
 correct_polaraxis()
@@ -5076,75 +5176,6 @@ correct_polaraxis()
 
       int ix,iy,iz,iv,ic,iysrc,ixsrc;
       
-      /*
-      for(ix=0;ix<NX;ix++)
-	{
-	  for(iz=0;iz<NZ;iz++)
-	    {
-	      ldouble th,thsrc,thaxis;
-	      ldouble pp[NV],uu[NV];
-	      struct geometry geom;
-	      for(ic=0;ic<nc;ic++)
-		{
-		  iy=ic;iysrc=nc;
-		  th=get_x(iy,1);
-		  thsrc=get_x(iysrc,1);	      
-	      	  
-		  fill_geometry(ix,iy,iz,&geom);
-
-		  //test
-		  //calc_primitives(ix,iy,iz,0,1);
-
-		  PLOOP(iv)
-		  {
-		    pp[iv]=get_u(p,iv,ix,iy,iz);
-		    uu[iv]=get_u(u,iv,ix,iy,iz);
-		  }
-
-		  ldouble Bb1[3]={uu[B1],uu[B2],uu[B3]};
-		  ldouble lB1=sqrt(Bb1[0]*Bb1[0]+Bb1[1]*Bb1[1]+Bb1[2]*Bb1[2]);
-		  
-		  if(ix==43 && ic==1 && PROCID==0)
-		    {
-		      printf("gdet: %e\n",geom.gdet);
-		      print_primitives(pp);
-		      print_conserved(uu);
-
-		    }
-		  
-		  p2u(pp,uu,&geom);
-		  ldouble Bb2[3]={uu[B1],uu[B2],uu[B3]};
-		 ldouble lB2=sqrt(Bb2[0]*Bb2[0]+Bb2[1]*Bb2[1]+Bb2[2]*Bb2[2]);
-		   
-		 ldouble B1B2=lB2-lB1;
-		 
-		  if(ix==43 && ic==1 && PROCID==0)
-		    {
-		      //print_primitives(pp);
-		      //print_conserved(uu);
-		      //getch();
-		      printf("%d %e\n", ic,B1B2);
-		    
-
-		  if(fabs(B1B2)>SMALL)
-		    {
-		      print_primitives(pp);
-		      print_conserved(uu);
-		      getch();
-		    }
-		    }
-
-		  PLOOP(iv)
-		  {
-		    set_u(p,iv,ix,iy,iz,pp[iv]);  
-		    set_u(u,iv,ix,iy,iz,uu[iv]);
-
-		  }
-		}
-	    }
-	}
-			  
-      */
       //spherical like coords
       if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MKS3COORDS || MYCOORDS==TKS3COORDS || MYCOORDS==MSPH1COORDS)
 	{
@@ -5432,17 +5463,15 @@ correct_polaraxis_3d()
 			  fill_geometry(ix,iy,iz,&geom);
 			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
-			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NCCORRECTPOLAR,iz);
+			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,iysrc,iz);
 
-			  #ifdef POLARAXISAVGIN3D
+#ifdef POLARAXISAVGIN3D
 
 			  ldouble r=geomBL.xx;
 			  ldouble th=geomBL.yy;
 			  ldouble ph=geomBL.zz;
 
-			  
 
-			  			  
 			  ldouble vr,vth,vph,vx,vy,vz;
 			  ldouble cosph,sinth,costh,sinph;
 			  sinth=sin(th);		  costh=cos(th);		  sinph=sin(ph);		  cosph=cos(ph);
@@ -5453,50 +5482,50 @@ correct_polaraxis_3d()
 			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
 			  //if(geomBL.xx > 1.*rhorizonBL ) 
-			    {
-			  //gas velocities
-			  vx=axis1_primplus[VX][gix];
-			  vy=axis1_primplus[VY][gix];
-			  vz=axis1_primplus[VZ][gix];
-			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
-				 costh*Power(sinph,2)*vz)/
-				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-			  vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
-				   Power(sinph,2)*sinth*vz)/
+			  {
+			    //gas velocities
+			    vx=axis1_primplus[VX][gix];
+			    vy=axis1_primplus[VY][gix];
+			    vz=axis1_primplus[VZ][gix];
+			    vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+				   costh*Power(sinph,2)*vz)/
 				  ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-			  vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+			    vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+				     Power(sinph,2)*sinth*vz)/
+				    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			    vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
 
-			  //vth /= r;
-			  //vph /= r*sinth;
-			  vr/=sqrt(geom.gg[1][1]);
-			  vth/=sqrt(geom.gg[2][2]);
-			  vph/=sqrt(geom.gg[3][3]);
+			    //vth /= r;
+			    //vph /= r*sinth;
+			    vr/=sqrt(geom.gg[1][1]);
+			    vth/=sqrt(geom.gg[2][2]);
+			    vph/=sqrt(geom.gg[3][3]);
 
-			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-			  /*
-			  ldouble xxvec[4],xxvecBL[4];
-			  get_xx(ix,iy,iz,xxvec);
-			  coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
-			  printf("%d > %e %e %e\n",ix,r,th,ph);
-			  print_4vector(xxvec);
-			  print_4vector(xxvecBL);
-			  print_metric(geomBL.gg);
-			  print_metric(geom.gg);
-			  print_4vector(ucon);
-			  */
+			    ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+			    /*
+			      ldouble xxvec[4],xxvecBL[4];
+			      get_xx(ix,iy,iz,xxvec);
+			      coco_N(xxvec,xxvecBL,MYCOORDS,BLCOORDS);
+			      printf("%d > %e %e %e\n",ix,r,th,ph);
+			      print_4vector(xxvec);
+			      print_4vector(xxvecBL);
+			      print_metric(geomBL.gg);
+			      print_metric(geom.gg);
+			      print_4vector(ucon);
+			    */
 
-			  //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-			  //trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-			  //conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
-			  //			  print_4vector(ucon);
-			  //getch();
+			    //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+			    //trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			    //conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			    //			  print_4vector(ucon);
+			    //getch();
 
-			  pp[VX]=ucon[1];
-			  pp[VY]=ucon[2];
-			  pp[VZ]=ucon[3];
-			  //add average rotation
-			  pp[VZ]+=axis1_primplus[NV][gix];
-			    }
+			    pp[VX]=ucon[1];
+			    pp[VY]=ucon[2];
+			    pp[VZ]=ucon[3];
+			    //add average rotation
+			    pp[VZ]+=axis1_primplus[NV][gix];
+			  }
 			  //print_primitives(pp);getch();
 		     
 #ifdef MAGNFIELD
@@ -5505,7 +5534,7 @@ correct_polaraxis_3d()
 
 #ifdef RADIATION
 			  //rad density
-			    pp[EE]=axis1_primplus[EE][gix];
+			  pp[EE]=axis1_primplus[EE][gix];
 
 
 #ifdef NCOMPTONIZATION
@@ -5514,37 +5543,37 @@ correct_polaraxis_3d()
 #endif
 			  //if(geomBL.xx > 1.*rhorizonBL )
 			  {
-			  //rad velocities
-			  vx=axis1_primplus[FX][gix];
-			  vy=axis1_primplus[FY][gix];
-			  vz=axis1_primplus[FZ][gix];
-			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
-				 costh*Power(sinph,2)*vz)/
-				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-			  vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
-				   Power(sinph,2)*sinth*vz)/
+			    //rad velocities
+			    vx=axis1_primplus[FX][gix];
+			    vy=axis1_primplus[FY][gix];
+			    vz=axis1_primplus[FZ][gix];
+			    vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+				   costh*Power(sinph,2)*vz)/
 				  ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-			  vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+			    vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+				     Power(sinph,2)*sinth*vz)/
+				    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			    vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
 
-			  //vth /= r;
-			  //vph /= r*sinth;
-			  vr/=sqrt(geom.gg[1][1]);
-			  vth/=sqrt(geom.gg[2][2]);
-			  vph/=sqrt(geom.gg[3][3]);
-			  //if(ic==0 && ix==10) printf("1 %d > %e %e | %e %e %e\n",iy,vth,sqrt(geom.gg[2][2]),vx,vy,vz);
-			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-			  //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-			  //trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-			  //conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
+			    //vth /= r;
+			    //vph /= r*sinth;
+			    vr/=sqrt(geom.gg[1][1]);
+			    vth/=sqrt(geom.gg[2][2]);
+			    vph/=sqrt(geom.gg[3][3]);
+			    //if(ic==0 && ix==10) printf("1 %d > %e %e | %e %e %e\n",iy,vth,sqrt(geom.gg[2][2]),vx,vy,vz);
+			    ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+			    //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+			    //trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			    //conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 			  
 			    pp[FX]=ucon[1];
 			    pp[FY]=ucon[2];
 			    pp[FZ]=ucon[3];
-			  //add average rotation
+			    //add average rotation
 			    pp[FZ]+=axis1_primplus[NV+1][gix];
 			  }
 
-			  #endif
+#endif
 #ifdef EVOLVEINTENSITIES
 			  for(iv=0;iv<NUMANGLES;iv++)
 			    Ibeam[ix+NGCX][iy+NGCY][iz+NGCZ][iv]=Ibeam[ix+NGCX][iysrc+NGCY][iz+NGCZ][iv];
@@ -5556,8 +5585,11 @@ correct_polaraxis_3d()
 		     
 			  PLOOP(iv)
 			  {
+			    if(iv<B1 || iv>B3)
+			      {
 				set_u(p,iv,ix,iy,iz,pp[iv]);  
 				set_u(u,iv,ix,iy,iz,uu[iv]);
+			      }
 			  }
 			}
 		    }
@@ -5576,10 +5608,10 @@ correct_polaraxis_3d()
 			  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
 			  
-			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,NY-NCCORRECTPOLAR-1,iz);
+			  PLOOP(iv) pp[iv]=get_u(p,iv,ix,iysrc,iz);
 	      	 
 
-			  #ifdef POLARAXISAVGIN3D
+#ifdef POLARAXISAVGIN3D
 			  ldouble r=geomBL.xx;
 			  ldouble th=geomBL.yy;
 			  ldouble ph=geomBL.zz;
@@ -5594,35 +5626,35 @@ correct_polaraxis_3d()
 
 			  //if(geomBL.xx > 1.*rhorizonBL ) 	
 			  {  
-			  //gas velocities
-			  vx=axis2_primplus[VX][gix];
-			  vy=axis2_primplus[VY][gix];
-			  vz=axis2_primplus[VZ][gix];
-			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
-				 costh*Power(sinph,2)*vz)/
-				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-			  vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
-				   Power(sinph,2)*sinth*vz)/
+			    //gas velocities
+			    vx=axis2_primplus[VX][gix];
+			    vy=axis2_primplus[VY][gix];
+			    vz=axis2_primplus[VZ][gix];
+			    vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+				   costh*Power(sinph,2)*vz)/
 				  ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-			  vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+			    vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+				     Power(sinph,2)*sinth*vz)/
+				    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			    vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
 
-			  //vth /= r;
-			  //vph /= r*sinth;
-			  vr/=sqrt(geom.gg[1][1]);
-			  vth/=sqrt(geom.gg[2][2]);
-			  //if(ic==0 && ix==10) printf("2 %d > %e %e | %e %e %e\n",iy,vth,sqrt(geom.gg[2][2]),vx,vy,vz);
-			  vph/=sqrt(geom.gg[3][3]);
+			    //vth /= r;
+			    //vph /= r*sinth;
+			    vr/=sqrt(geom.gg[1][1]);
+			    vth/=sqrt(geom.gg[2][2]);
+			    //if(ic==0 && ix==10) printf("2 %d > %e %e | %e %e %e\n",iy,vth,sqrt(geom.gg[2][2]),vx,vy,vz);
+			    vph/=sqrt(geom.gg[3][3]);
 
-			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-			  //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-			  //trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-			  //conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+			    ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+			    //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+			    //trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			    //conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
-			  pp[VX]=ucon[1];
-			  pp[VY]=ucon[2];
-			  pp[VZ]=ucon[3];
-			  //add average rotation
-			  pp[VZ]+=axis2_primplus[NV][gix];
+			    pp[VX]=ucon[1];
+			    pp[VY]=ucon[2];
+			    pp[VZ]=ucon[3];
+			    //add average rotation
+			    pp[VZ]+=axis2_primplus[NV][gix];
 			  }
 #ifdef MAGNFIELD
 			  //do not overwrite magnetic field, not to break div B=0 there
@@ -5637,37 +5669,37 @@ correct_polaraxis_3d()
 			  pp[NF]=axis2_primplus[NF][gix];
 #endif
 			  //if(geomBL.xx > 1.*rhorizonBL ) 	
-{  
-			  //rad velocities
-			  vx=axis2_primplus[FX][gix];
-			  vy=axis2_primplus[FY][gix];
-			  vz=axis2_primplus[FZ][gix];
-			  vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
-				 costh*Power(sinph,2)*vz)/
-				((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-			  vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
-				   Power(sinph,2)*sinth*vz)/
+			  {  
+			    //rad velocities
+			    vx=axis2_primplus[FX][gix];
+			    vy=axis2_primplus[FY][gix];
+			    vz=axis2_primplus[FZ][gix];
+			    vr =-((-(cosph*sinth*vx) - sinph*sinth*vy - Power(cosph,2)*costh*vz - 
+				   costh*Power(sinph,2)*vz)/
 				  ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
-			  vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
+			    vth = -((-(cosph*costh*vx) - costh*sinph*vy + Power(cosph,2)*sinth*vz + 
+				     Power(sinph,2)*sinth*vz)/
+				    ((Power(cosph,2) + Power(sinph,2))*(Power(costh,2) + Power(sinth,2))));
+			    vph = -((sinph*vx - cosph*vy)/(Power(cosph,2) + Power(sinph,2)));
 
-			  //vth /= r;
-			  //vph /= r*sinth;
-			  vr/=sqrt(geom.gg[1][1]);
-			  vth/=sqrt(geom.gg[2][2]);
-			  vph/=sqrt(geom.gg[3][3]);
+			    //vth /= r;
+			    //vph /= r*sinth;
+			    vr/=sqrt(geom.gg[1][1]);
+			    vth/=sqrt(geom.gg[2][2]);
+			    vph/=sqrt(geom.gg[3][3]);
 
-			  ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
-			  //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-			  //trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
-			  //conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
+			    ucon[1]=vr; ucon[2]=vth; ucon[3]=vph;
+			    //conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+			    //trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+			    //conv_vels(ucon,ucon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 
 			    pp[FX]=ucon[1];
 			    pp[FY]=ucon[2];
 			    pp[FZ]=ucon[3];
-			  //add average rotation
-			  pp[FZ]+=axis2_primplus[NV+1][gix];
+			    //add average rotation
+			    pp[FZ]+=axis2_primplus[NV+1][gix];
 			  }
- #endif
+#endif
 
 #ifdef EVOLVEINTENSITIES
 			  for(iv=0;iv<NUMANGLES;iv++)
@@ -5679,21 +5711,21 @@ correct_polaraxis_3d()
 
 			  PLOOP(iv)
 			  {
-			    set_u(p,iv,ix,iy,iz,pp[iv]);  
-			    set_u(u,iv,ix,iy,iz,uu[iv]);
+			    if(iv<B1 || iv>B3)
+			      {
+				set_u(p,iv,ix,iy,iz,pp[iv]);  
+				set_u(u,iv,ix,iy,iz,uu[iv]);
+			      }
 			  }
 			}
 		    }
 
 		}
-	      //	      printf("%d > %e %e %e %e\n",gix,get_u(p,EE,ix,0,0),get_u(p,EE,ix,1,0),get_u(p,EE,ix,2,0),get_u(p,EE,ix,3,0));
-	      //	      printf("%d > %e %e %e %e\n",gix,get_u(p,EE,ix,0,1),get_u(p,EE,ix,1,1),get_u(p,EE,ix,2,1),get_u(p,EE,ix,3,1));
+	     
 	    }
 	}
 
-      //      getch();
-
-	     }
+    }
 
 
   return 0; 
