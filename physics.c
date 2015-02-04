@@ -446,10 +446,15 @@ int f_metric_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 //***************************************
 int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 {
-  int i;
+  int i,j;
 
   struct geometry *geom
     = (struct geometry *) ggg;
+
+  ldouble gdet=geom->gdet,gdetu=gdet;
+#if (GDETIN==0) //no metric determinant inside derivatives
+  gdetu=1.;
+#endif
 
   int ix,iy,iz,iv;
   ix=geom->ix;
@@ -459,6 +464,35 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   PLOOP(iv) ss[iv]=0.;
 
   /***************************************************/
+
+  //artificial heating of gas at constant rate per unit mass
+
+#ifdef HEATINGRATEPERMASS
+  //gas velocity
+  ldouble ucon[4];
+  ucon[1]=pp[VX];
+  ucon[2]=pp[VY];
+  ucon[3]=pp[VZ];
+  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+  //gas density
+  ldouble rho=pp[RHO];
+  //four-vector of heating to be applied to gas, H^\mu
+  ldouble Hmu[4]={0.,0.,0.,0.};
+  for(i=0;i<4;i++)
+    Hmu[i]=HEATINGRATEPERMASS*rho*ucon[i];
+  //H_\mu
+  indices_21(Hmu,Hmu,geom->gg);
+  //source terms
+  ss[UU]+=gdetu*Hmu[0];
+  ss[VX]+=gdetu*Hmu[1];
+  ss[VY]+=gdetu*Hmu[2];
+  ss[VZ]+=gdetu*Hmu[3];
+#endif
+
+
+  /***************************************************/
+
+
 
   return 0;
 }
@@ -704,7 +738,7 @@ update_entropy(int ix,int iy,int iz,int u2pflag)
   ldouble gg[4][5],GG[4][5];
   pick_G(ix,iy,iz,GG);
   pick_g(ix,iy,iz,gg);
-  ldouble gdet=gg[3][4],gdetu=gdet;;
+  ldouble gdet=gg[3][4],gdetu=gdet;
 #if (GDETIN==0) //no metric determinant inside derivatives
   gdetu=1.;
 #endif

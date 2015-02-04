@@ -7,8 +7,12 @@
 #define BHDISK_PROBLEMTYPE
 #define DOFIXUPS 1
 #define UNPERTURBED
+
 //#define SKIPRADSOURCE
-#define SKIPHDEVOLUTION
+//#define SKIPHDEVOLUTION
+
+
+#define HEATINGRATEPERMASS 2.e-5
 
 /************************************/
 //radiation
@@ -20,6 +24,7 @@
 /************************************/
 //viscosity choices
 /************************************/
+#ifdef RADIATION
 #define RADVISCOSITY SHEARVISCOSITY
 //#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
@@ -27,6 +32,7 @@
 #define RADVISCMAXVELDAMP
 #define ALPHARADVISC .5
 #define MAXRADVISCVEL .5
+#endif
 
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
@@ -77,10 +83,10 @@
 #define DTH (0.04)
 #define MINY (DTH)
 #define MAXY (M_PI-DTH)
-#define MINZ -1.
-#define MAXZ 1.
-#define TNX 50//150 // Total number of cells in X 
-#define TNY 100//300
+#define MINZ -M_PI
+#define MAXZ M_PI
+#define TNX 100//150 // Total number of cells in X 
+#define TNY 200//300
 #define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2
