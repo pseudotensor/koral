@@ -64,7 +64,7 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   //checking on hd floors  
   int floorret=0;
 
-  if(is_cell_active(ix,iy,iz))
+  if(is_cell_active(ix,iy,iz) && !is_cell_corrected_polaraxis(ix,iy,iz))
     floorret=check_floors_mhd(pp,VELPRIM,&geom);
 
   if(floorret<0.)
@@ -77,7 +77,7 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
     
   #ifdef RADIATION
   floorret=0;
-  if(is_cell_active(ix,iy,iz))
+  if(is_cell_active(ix,iy,iz) &&  !is_cell_corrected_polaraxis(ix,iy,iz)))
     floorret=check_floors_rad(pp,VELPRIMRAD,&geom);
   if(floorret<0.)
     {
@@ -91,7 +91,7 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
   //************************************
   //update conserved to follow corrections on primitives
 
-  
+if(!is_cell_corrected_polaraxis(ix,iy,iz))
   p2u(pp,uu,&geom);
 
   /*
