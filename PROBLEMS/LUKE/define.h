@@ -15,14 +15,14 @@
 #define TNY 50
 #define TNZ 50
 
-#define NTX 10
-#define NTY 1
-#define NTZ 1
+#define NTX 2
+#define NTY 2
+#define NTZ 2
 
 #define TIMESTEPPING RK2HEUN
 
 //#define MPI4CORNERS
-//#define MAGNFIELD
+#define MAGNFIELD
 #define VECPOTGIVEN
 
 #define INT_ORDER 1

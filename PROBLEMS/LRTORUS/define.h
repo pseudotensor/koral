@@ -2,7 +2,7 @@
 //general
 /************************************/
 #define BHDISK_PROBLEMTYPE
-//#define PERTURBVEL (-.5)
+#define PERTURBVEL (-.5)
 
 /************************************/
 //restart
@@ -98,7 +98,7 @@
 #define MKSMP0 1.2
 #define METRICAXISYMMETRIC
 #define PERTMAGN 1.e-2
-#define RMIN 1.55
+#define RMIN 5.//1.55
 #define RMAX 50.
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
@@ -123,9 +123,9 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 160 //8*34
-#define TNY 120 //10*24
-#define TNZ 1//8 //16*2
+#define TNX 120 //8*34
+#define TNY 100 //10*24
+#define TNZ 16 //16*2
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -153,7 +153,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 25.
+#define DTOUT1 .5
 #define DTOUT2 1000.
 
 /************************************/

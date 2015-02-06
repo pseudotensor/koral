@@ -864,10 +864,14 @@ fprint_restartfile_bin(ldouble t, char* folder)
 int
 fread_restartfile(int nout1, char* folder,ldouble *t)
 {
+
+
   int ret;
   char bufor[250];
   sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
 
+
+  
   #ifdef MPI
 
   ret=fread_restartfile_mpi(nout1,folder,t);
@@ -998,8 +1002,10 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   /***********/
   //header file
   fdump=fopen(fnamehead,"r");
-  if(fdump==NULL) return 1; //request start from scratch
-
+  if(fdump==NULL) 
+    {
+      return 1; //request start from scratch
+    }
   //reading parameters, mostly time
   int intpar[6];
   ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);

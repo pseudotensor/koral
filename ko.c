@@ -648,6 +648,8 @@ solve_the_problem(ldouble tstart, char* folder)
 	    addi_u_3(1.,ut0,1./2.,ut2,1./2.,ut3,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
 
 	  }
+
+	  //	  getch();
 	  t+=dt;
 	  /************************** end of RK2 **********************************/
 	}
