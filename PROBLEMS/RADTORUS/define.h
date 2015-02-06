@@ -10,9 +10,9 @@
 
 //#define SKIPRADSOURCE
 //#define SKIPHDEVOLUTION
+//#define SKIPHDBUTENERGY
 
-
-#define HEATINGRATEPERMASS 2.e-5
+#define HEATINGRATEPERMASS 1.e-4
 
 /************************************/
 //radiation
@@ -85,8 +85,8 @@
 #define MAXY (M_PI-DTH)
 #define MINZ -M_PI
 #define MAXZ M_PI
-#define TNX 100//150 // Total number of cells in X 
-#define TNY 200//300
+#define TNX 50//150 // Total number of cells in X 
+#define TNY 100//300
 #define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2
@@ -131,7 +131,7 @@
 #define MASS 10.
 #define TORUSENTR 1.2e3//5.e2 - higher density, 1.2e3 - order lower density 
 //#define TEMPTORUS 5.e6 //overwrites the temperature
-#define RHOAMB 1.e-26
+#define RHOAMB 1.e-24
 #define UUAMB 1.e-7*RHOAMB //temp ~ uu/rho
 #define TEMPAMB 5.e6 //overwrites the temperature
 #define ERADATMMIN 1.e-30

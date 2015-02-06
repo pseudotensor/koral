@@ -1401,6 +1401,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 #ifdef SKIPHDEVOLUTION
     if(iv>=NVMHD)
 #endif
+#ifdef SKIPHDBUTENERGY
+	    if(iv>=NVMHD || iv==UU)
+#endif
       {
 	set_u(p,iv,ix,iy,iz,pp[iv]);
 	set_u(u,iv,ix,iy,iz,uu[iv]);

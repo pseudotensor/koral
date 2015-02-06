@@ -1153,6 +1153,10 @@ op_explicit(ldouble t, ldouble dtin)
 	  #ifdef SKIPHDEVOLUTION
 	  if(iv>=NVMHD)
           #endif
+#ifdef SKIPHDBUTENERGY
+	    if(iv>=NVMHD || iv==UU)
+#endif
+
 	    set_u(u,iv,ix,iy,iz,val);	 
 
 	}
