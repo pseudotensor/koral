@@ -867,10 +867,7 @@ fread_restartfile(int nout1, char* folder,ldouble *t)
 
 
   int ret;
-  char bufor[250];
-  sprintf(bufor,"%s/res%04d.dat",folder,nfout1);
-
-
+   
   
   #ifdef MPI
 
@@ -891,6 +888,7 @@ fread_restartfile(int nout1, char* folder,ldouble *t)
 int 
 fread_restartfile_bin(int nout1, char *folder, ldouble *t)
 {
+  //  printf("what?\n");
   int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
   char fname[40],fnamehead[40];
   if(nout1>=0)
@@ -922,7 +920,8 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   //reading parameters, mostly time
   int intpar[6];
   ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
-  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
+  if(PROCID==0)
+    printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
 	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
   nfout1=intpar[0]+1; //global file no.
   nfout2=intpar[1]; //global file no. for avg
@@ -985,7 +984,8 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 {
   #ifdef MPI
   int ret, ix,iy,iz,iv,i,ic,gix,giy,giz,tix,tiy,tiz;
-  char fname[40],fnamehead[40];
+  char fname[400],fnamehead[400];
+
   if(nout1>=0)
     {
       sprintf(fname,"%s/res%04d.dat",folder,nout1);
@@ -997,10 +997,12 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
       sprintf(fnamehead,"%s/reslast.head",folder);
     }
 
+
   FILE *fdump;
 
   /***********/
   //header file
+ 
   fdump=fopen(fnamehead,"r");
   if(fdump==NULL) 
     {
@@ -1009,12 +1011,15 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   //reading parameters, mostly time
   int intpar[6];
   ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
+  if(PROCID==0)
   printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
 	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
   nfout1=intpar[0]+1; //global file no.
   nfout2=intpar[1]; //global file no. for avg
   fclose(fdump);
+    
 
+  
 
   //maybe not needed
   MPI_Barrier(MPI_COMM_WORLD);
@@ -1035,10 +1040,11 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 
   /***** first read all the indices ******/
 
-  
+
   //first read the indices
   #ifdef RESTARTGENERALINDICES
-  int indices[TNX*TNY*TNZ*3];
+  //int indices[TNX*TNY*TNZ*3];
+  int *indices=(int *)malloc(TNX*TNY*TNZ*3*sizeof(int));
   int len=TNX*TNY*TNZ;
   #else
   int indices[NX*NY*NZ*3];
@@ -1074,7 +1080,8 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   //new location in the second block
   #ifdef RESTARTGENERALINDICES
   pos=TNX*TNY*TNZ*(3*sizeof(int));
-  ldouble pout[TNX*TNY*TNZ*NV];
+  //  ldouble pout[TNX*TNY*TNZ*NV];
+  ldouble *pout=(ldouble *)malloc(TNX*TNY*TNZ*NV*sizeof(ldouble));
   #else
   pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
   ldouble pout[NX*NY*NZ*NV];
