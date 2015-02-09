@@ -93,7 +93,7 @@
 //90 VETSHADOW - vet shadow test
 //91 TDENRICO - tidal disruption with Enrico's input
 
-#define PROBLEM 58
+#define PROBLEM 89
 
 
 #if(PROBLEM==91)
@@ -137,6 +137,7 @@
 #define PR_OUT2GIF_1D "PROBLEMS/RADTORUS/out2gif_1d.c"
 #define PR_DUMP "PROBLEMS/RADTORUS/dump.c"
 #define PR_TOOLS "PROBLEMS/RADTORUS/tools.c"
+#define PR_FINGER "PROBLEMS/RADTORUS/finger.c"
 
 #endif
 

@@ -340,7 +340,7 @@ is_cell_corrected_polaraxis(int ix, int iy, int iz);
 int
 calc_subzones(ldouble t, ldouble dt,int* ix1,int* iy1,int* iz1,int* ix2,int* iy2,int* iz2);
 int calc_u2p();
-int do_finger();
+int do_correct();
 int correct_polaraxis();
 int smooth_polaraxis();
 int correct_polaraxis_3d();

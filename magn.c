@@ -160,6 +160,25 @@ int flz_z(int i)
 /***********************************************************************************************/
 /***********************************************************************************************/
 /* flux constrained transport */
+
+// B^i = \dF^{it}
+// E_i = - [ijk] v^j B^k  , such that (\detg B^i),t = - (\detg(B^i v^j - B^j v^i)),j = - (\detg [ijk] E_k),j = ([ijk] emf[k]),j
+      
+// -> E_1 = v^3 B^2 - v^2 B^3
+// -> E_2 = v^1 B^3 - v^3 B^1
+// -> E_3 = v^2 B^1 - v^1 B^2
+
+// emf[i] = - \detg E_i
+
+// And notice that Fj[Bi] = \dF^{ij} = B^i v^j - B^j v^i , where j=dir
+
+// so:
+// emf_1 = B^3 v^2 - B^2 v^3 = F2[B3] or -F3[B2]
+// emf_2 = B^1 v^3 - B^3 v^1 = F3[B1] or -F1[B3]
+// emf_3 = B^2 v^1 - B^1 v^2 = F1[B2] or -F2[B1]
+
+// Notice only 6 independent ways.  The diagonal terms vanish (e.g. Fi[Bi]=0).
+
 int
 flux_ct()
 {
@@ -255,6 +274,8 @@ flux_ct()
   //reset certain emfs at the boundaries to ensure stationarity
   adjust_fluxcttoth_emfs();
 
+  #pragma omp barrier
+
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_4;ii++) // 0...NX
     {
@@ -306,10 +327,42 @@ flux_ct()
 }
 
 
-// resets emf's (E_3) at the boundaries in x1-x2 plane to zero
+// resets emf's near the boundaries where corresponding velocities are zero
 int adjust_fluxcttoth_emfs()
 {
-  //don't know what to do here
+  #ifdef CORRECT_POLARAXIS
+  int ix,iz;
+  #ifdef OMP
+  if(PROCID==0)
+  #endif
+    {
+      #ifdef MPI
+      if(TJ==0) //upper axis
+      #endif
+	{
+	  //over all corners at the polar edge
+	  for(ix=0;ix<=NX;ix++)
+	    for(iz=0;iz<=NZ;iz++)
+	      {
+		set_emf(1,ix,0,iz,0.);
+		set_emf(3,ix,0,iz,0.);
+	      }
+	}
+      #ifdef MPI
+      if(TJ==NTY-1) //lower axis
+      #endif
+	{
+	  //over all corners at the polar edge
+	  for(ix=0;ix<=NX;ix++)
+	    for(iz=0;iz<=NZ;iz++)
+	      {
+		set_emf(1,ix,NY,iz,0.);
+		set_emf(3,ix,NY,iz,0.);
+	      }
+	}
+    }
+  #endif
+
   return 0;
 }
 

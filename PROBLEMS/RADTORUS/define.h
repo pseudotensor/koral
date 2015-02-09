@@ -10,6 +10,7 @@
 
 //#define SKIPRADSOURCE
 //#define SKIPHDEVOLUTION
+#define FIXEDALLBUTTEMP
 //#define SKIPHDBUTENERGY
 
 #define HEATINGRATEPERMASS 1.e-4
@@ -86,7 +87,7 @@
 #define MINZ -M_PI
 #define MAXZ M_PI
 #define TNX 50//150 // Total number of cells in X 
-#define TNY 100//300
+#define TNY 150//300
 #define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2
@@ -107,6 +108,7 @@
 #define RADOUTPUT 1
 #define SIMOUTPUT 2
 #define SCAOUTPUT 1
+#define AVGOUTPUT 1
 #if (TNZ==1)
 #define SILO2D_XZPLANE
 #endif
@@ -114,7 +116,7 @@
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 9000 //stop after this number of outputs
 #define DTOUT1 1. //res
-#define DTOUT2 1.e20 //avg
+#define DTOUT2 10. //avg
 
 /************************************/
 //reconstruction / stepping

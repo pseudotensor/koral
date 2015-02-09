@@ -608,7 +608,7 @@ calc_wavespeeds()
 /* corrects them if needed, updates *u *************/
 /***************************************************/
 int
-do_finger()
+do_correct()
 {
   int ix,iy,iz,ii;
   

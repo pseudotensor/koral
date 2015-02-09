@@ -1,7 +1,7 @@
 
 //imposes initial condition where cloud is not
 
-#ifdef TRACER
+#ifdef FIXEDALLBUTTEMP
 
 int ix,iy,iz,ii,iv;
 /**************************/
@@ -9,36 +9,21 @@ int ix,iy,iz,ii,iv;
 #pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
 for(ii=0;ii<Nloop_0;ii++) //domain only
   {
-    ldouble trace,f;
-    ldouble pp[NV],ppinit[NV],uu[NV];
     struct geometry geom;
     ix=loop_0[ii][0];
     iy=loop_0[ii][1];
     iz=loop_0[ii][2]; 
  
-    trace=get_u(p,TRA,ix,iy,iz);
+    fill_geometry(ix,iy,iz,&geom);
 
-    if(trace<MINTRACE)
-      {
-	fill_geometry(ix,iy,iz,&geom);
-	f = trace / MINTRACE;
-	for(iv=0;iv<NV;iv++)
-	  {
-	    ppinit[iv]=get_u(pinit,iv,ix,iy,iz);	
-	    pp[iv]=get_u(p,iv,ix,iy,iz);
+    ldouble temp = calc_PEQ_Tfromurho(get_u(p,UU,ix,iy,iz),get_u(p,RHO,ix,iy,iz));
+	
+    //resetting all gas quantities but for temperature
+    for(iv=0;iv<NVMHD;iv++)
+      set_u(p,iv,ix,iy,iz,get_u(pinit,iv,ix,iy,iz));
+    
+    set_u(p,UU,ix,iy,iz,calc_PEQ_ufromTrho(temp,get_u(p,RHO,ix,iy,iz)));
 
-	    pp[iv]=ppinit[iv]*(1.-f) + pp[iv]*f;
-	  }
-
-	//hd floors
-	check_floors_hd(pp,VELPRIM,&geom);
-	p2u(pp,uu,&geom);
-	for(iv=0;iv<NV;iv++)
-	  {
-	    if(iv==TRA) continue; //do not overwrite the tracer field
-	    set_u(u,iv,ix,iy,iz,uu[iv]);
-	    set_u(p,iv,ix,iy,iz,pp[iv]);
-	  }
-     }
+    p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
   }
 #endif

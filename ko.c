@@ -439,7 +439,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    dtcell=dt;
 	    calc_u2p();
 	    #pragma omp barrier
-	    do_finger();
+	    do_correct();
 	    #pragma omp barrier
 
 	    /******* 1st implicit **********/
@@ -459,7 +459,7 @@ solve_the_problem(ldouble tstart, char* folder)
       
 	    calc_u2p();
 #pragma omp barrier
-	    do_finger();
+	    do_correct();
 #pragma omp barrier
 
 	    count_entropy(&nentr[1],&nentr2[1]); 
@@ -488,7 +488,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    copyi_u(1.,u,uforget);
 	    calc_u2p();
 	    #pragma omp barrier
-	    do_finger();
+	    do_correct();
 	    #pragma omp barrier
 
 	    count_entropy(&nentr[2],&nentr2[2]); 
@@ -506,7 +506,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    copyi_u(1.,u,ut2);
 	    calc_u2p();
             #pragma omp barrier
-	    do_finger();
+	    do_correct();
 	    #pragma omp barrier
 
 	    count_entropy(&nentr[3],&nentr2[3]);
@@ -559,7 +559,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    {
 	    //1st
 	    copyi_u(1.,u,ut0);
-	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_finger();
+	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_correct();
 	    op_explicit (t,0.5*dt); 
 
 	    calc_u2p();
@@ -612,13 +612,13 @@ solve_the_problem(ldouble tstart, char* folder)
 	    calc_u2p();
 #pragma omp barrier
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); 
-	    do_finger();
+	    do_correct();
 #pragma omp barrier
 	    op_explicit (t,1.*dt); 
 #ifdef RADIATION
 	    calc_u2p();
 	    #pragma omp barrier
-	    do_finger();
+	    do_correct();
 #endif
 #pragma omp barrier
 	    count_entropy(&nentr[1],&nentr2[1]); 
@@ -629,7 +629,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    copyi_u(1.,u,ut1);
 	    calc_u2p();
 	    #pragma omp barrier
-	    do_finger();
+	    do_correct();
 #pragma omp barrier
 	    count_entropy(&nentr[2],&nentr2[2]); 
 	    //#pragma omp barrier
@@ -637,7 +637,7 @@ solve_the_problem(ldouble tstart, char* folder)
 #ifdef RADIATION
 	    calc_u2p();
 	    #pragma omp barrier
-	    do_finger();
+	    do_correct();
 #endif
 #pragma omp barrier
 	    count_entropy(&nentr[3],&nentr2[3]); 
@@ -667,7 +667,7 @@ solve_the_problem(ldouble tstart, char* folder)
 #endif
 
       //**********************************************************************
-      //************************* finger  ************************************
+      //********************** user def. finger  ************************************
       //**********************************************************************
 
       #pragma omp parallel
@@ -889,7 +889,7 @@ print_scalings()
   printf("\n ***************************************\n\n");
   printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.16e\nmdot: %.16e\nsigma: %.16e\nlen: %.16e\ntime: %.16e\nenden:"
 	 "%.16e\nflux: %.16e\nT(1,1): %.16e\nkbt: %.16e\nkb/me: %.16e\nkappa: %.16e\n\n"
-	 "rhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\nmdotEdd: %.16e\n\nlumEdd: %.16e\n",
+	 "rhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\n->mdotEdd: %.16e\n->lumEdd: %.16e\n",
 	 MASS,BHSPIN,
 	 rhoGU2CGS(1.),
 	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.),

@@ -63,7 +63,7 @@
 /************************************/
 //#define CORRECT_POLARAXIS_3D
 #define CORRECT_POLARAXIS
-#define SMOOTH_POLARAXIS
+//#define SMOOTH_POLARAXIS
 //#define POLARAXISAVGIN3D
 #define U2P_EQS U2P_EQS_NOBLE
 #define U2P_SOLVER U2P_SOLVER_W
