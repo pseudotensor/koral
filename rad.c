@@ -1252,7 +1252,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   PLOOP(iv) 
     { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
     params[1]=RADIMPLICIT_ENERGYEQ;
-    params[2]=RADIMPLICIT_LAB;
+    //    params[2]=RADIMPLICIT_LAB;
     params[0]=RAD;
 
     ret=solve_implicit_lab_4dprim_fixvel(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
@@ -1276,6 +1276,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   int startwith;
   if(Ehat<enratiotreshold*pp0[UU]) startwith=RAD; else startwith=MHD;
+
 #ifdef NCOMPTONIZATION //only RAD primitives work
   //  startwith=RAD;
 #endif
@@ -1595,6 +1596,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   utcon[2]=pp[3];
   utcon[3]=pp[4];
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+
+
  
   //gas properties
   ldouble rho=pp[RHO];

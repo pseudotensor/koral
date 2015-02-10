@@ -10,7 +10,7 @@
 
 //#define SKIPRADSOURCE
 //#define SKIPHDEVOLUTION
-//#define FIXEDALLBUTTEMP
+#define FIXEDALLBUTTEMP
 //#define SKIPHDBUTENERGY
 
 //#define HEATINGRATEPERMASS 1.e-4
@@ -124,7 +124,7 @@
 /************************************/
 #define INT_ORDER 2
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .5
+#define TSTEPLIM .001
 #define FLUXLIMITER 0
 #define MINMOD_THETA 2.
 

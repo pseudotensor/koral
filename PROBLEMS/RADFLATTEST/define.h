@@ -10,7 +10,7 @@
 //radiation
 /************************************/
 #define RADIATION
-#define MASS 1.e10
+#define MASS 1.e11
 //#define SKIPRADSOURCE
 //#define TWOBEAMS
 #define RHOAMB 0.01
@@ -45,6 +45,7 @@
 
 #define ALLOWRADCEILINGINIMPLICIT
 #define BASICRADIMPLICIT
+//#define RADIMPLICITTHRESHOLD 1.e-40
 //#define NCOMPTONIZATION 
 //#define RADOUTPUTVELS
 #define RADOUTPUTINFF
@@ -69,7 +70,7 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define TNX 256
+#define TNX 128
 #define TNY 1
 #define TNZ 1
 #define NTX 1 //for MPI and OMP
@@ -79,7 +80,7 @@
 #define SPECIFIC_BC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC
-#define VELRAD 2.
+#define VELRAD .1
 
 
 /************************************/
@@ -87,7 +88,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .5
+#define TSTEPLIM .001
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
