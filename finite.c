@@ -548,6 +548,10 @@ calc_u2p()
 
   //fixup here hd after inversions
   cell_fixup_hd();
+  #ifdef RADIATION
+  cell_fixup_rad();
+  #endif
+
 
 //**********************************************************************
   //**********************************************************************
@@ -1275,7 +1279,7 @@ op_implicit(ldouble t, ldouble dtin)
     } //source terms
 
   //fixup here after source term 
-  //cell_fixup_rad();
+  cell_fixup_rad();
 
 #endif //IMPLICIT_LAB_RAD_SOURCE
 #endif //SKIPRADSOURCE
@@ -4712,7 +4716,7 @@ cell_fixup_rad()
 
   int ix,iy,iz,iv;
   int in,ii,iii;
-  int verbose=0;
+  int verbose=1;
 
   copy_u(1.,u,u_bak_fixup);
   copy_u(1.,p,p_bak_fixup);

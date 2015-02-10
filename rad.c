@@ -2541,7 +2541,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
   
   ldouble del4[NRADVAR],delapl[NV];
   int iv;
-  int verbose=0;
+  int verbose=1;
 
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
@@ -2551,9 +2551,12 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
       //numerical implicit in 4D did not work
       if(verbose) 
 	{
-	  printf("===\nimp_lab didn't work at %d %d %d (%f %f %f)\n",ix,iy,iz,get_x(ix,0),get_x(iy,1),get_x(iz,1));
-	  solve_implicit_lab(ix,iy,iz,dt,del4,2);
-	  exit(0);
+	  printf("imp_lab didn't work at %d %d %d\n",ix+TOI,iy+TOJ,iz+TOK);
+	  if(verbose>1)
+	    {
+	      solve_implicit_lab(ix,iy,iz,dt,del4,2);
+	      exit(0);
+	    }
 	  //getchar();
 	}
       //use the explicit-implicit backup method
@@ -3836,14 +3839,16 @@ test_solve_implicit_lab()
   struct geometry geom;
   fill_geometry(0,0,0,&geom);
 
-  pp0[0]=1.;
-  pp0[1]=1.;
+  pp0[0]=0.01;
+  pp0[1]=calc_PEQ_ufromTrho(1.e7,pp0[0]);
   pp0[2]=0.;
   pp0[3]=0.;
   pp0[4]=0.;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
   pp0[EE]=0.1;
   pp0[FX]=0.1;
+  pp0[EE]=calc_LTE_EfromT(1.e8);
+  pp0[FX]=0.;
   pp0[FY]=0.;
   pp0[FZ]=0.;
   #ifdef NCOMPTONIZATION
@@ -3857,6 +3862,7 @@ test_solve_implicit_lab()
   PLOOP(iv) pp[iv]=pp0[iv];
 
   print_primitives(pp0);
+  printf("gas temp: %e\nrad temp: %e\n",calc_PEQ_Tfromurho(pp0[1],pp0[0]),calc_LTE_TfromE(pp0[EE]));
 
   ldouble del4[NRADVAR];
   int verbose=0;
@@ -3900,13 +3906,15 @@ test_solve_implicit_lab()
   PLOOP(iv) pp[iv]=pp0[iv];
   if(1)
     { 
-    
-      params[0]=RAD;
+  
+      params[0]=MHD;
       params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LAB;
       params[3]=0; 
+      verbose=1;
       solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,del4,verbose,params,pp);
       print_primitives(pp);
+      printf("gas temp: %e\nrad temp: %e\n",calc_PEQ_Tfromurho(pp[1],pp[0]),calc_LTE_TfromE(pp[EE]));
     }
 
 

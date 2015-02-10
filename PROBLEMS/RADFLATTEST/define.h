@@ -88,16 +88,17 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .001
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
 
-#define DOFIXUPS 0
+#define DOFIXUPS 1
+#define DORADFIXUPS 1
 #define U2PCONV 1.e-12
 #define RADIMPCONV 1.e-10
 #define RADIMPEPS 1.e-8
-#define RADIMPMAXITER 15
+#define RADIMPMAXITER 50
 #define GAMMAMAXRAD 5.
 
 /************************************/

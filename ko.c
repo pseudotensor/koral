@@ -92,7 +92,7 @@ main(int argc, char **argv)
 
   //test_inversion(); exit(1);
 
-  //test_solve_implicit_lab();
+  //test_solve_implicit_lab(); exit(1);
   //test_Giff();  exit(-1);
 
   //print scalings GU->CGS and quit
