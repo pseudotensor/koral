@@ -32,7 +32,9 @@ if(BCtype==XBCHI)
 
     //fixed hydro part
    pp[RHO]=RHOAMB; 
-   pp[UU]=UUAMB; 
+   //pp[UU]=UUAMB; 
+   pp[UU]=calc_PEQ_ufromTrho(TEMPAMB,RHOAMB);
+ 
    pp[VZ]=0.;
    pp[VY]=0.;
    pp[VX]=0.;

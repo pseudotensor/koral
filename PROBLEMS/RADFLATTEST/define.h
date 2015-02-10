@@ -10,10 +10,13 @@
 //radiation
 /************************************/
 #define RADIATION
-#define SKIPRADSOURCE
-#define TWOBEAMS
+//#define SKIPRADSOURCE
+//#define TWOBEAMS
+#define RHOAMB 0.001
+#define LEFTRHO 0.001
+#define UUAMB (RHOAMB*1.e-5)
 
-#define myVET
+//#define myVET
 
 #ifdef myVET
 

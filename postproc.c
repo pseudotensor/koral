@@ -48,7 +48,7 @@
 //conserved flux rho ur transformed to BLCOORDS (37)
 //conserved flux rho ur in MYCOORDS (38)
 //conserved flux rho ur+Trt in MYCOORDS (39)
-//conserved flux for Rrt int MYCOORDS(40)
+//conserved flux for Rrt int MYCOORDS (40)
 //surface density of energy = int (Ttt+rhout+Rtt) dz (41)
 //rho-weighted radial velocity in the jet (42)
 //magnetic flux in the jet (43)

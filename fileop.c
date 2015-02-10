@@ -7,7 +7,7 @@
 /*  adds up current quantities to the pavg array */
 /*********************************************/
 int
-save_avg(ldouble dt)
+save_avg(ldouble dtin)
 {
   int ix,iy,iz,iv,ii;
 
@@ -29,6 +29,15 @@ save_avg(ldouble dt)
 	      ldouble avg[NV+NAVGVARS];
 	      p2avg(ix,iy,iz,avg);
 
+	      //timestep
+	      dt=dtin;
+              #ifdef SELFTIMESTEP
+	      dt=get_u_scalar(cell_dt,ix,iy,iz); //individual time step
+	      //for some reason this is not working, replace with:
+	      dt=1.;
+	      set_u_scalar(avgselftime,ix,iy,iz,get_u_scalar(avgselftime,ix,iy,iz)+dt);
+              #endif
+
 	      for(iv=0;iv<NV+NAVGVARS;iv++)
 		{
 		  set_uavg(pavg,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz)+avg[iv]*dt);
@@ -38,6 +47,7 @@ save_avg(ldouble dt)
     }
 
   avgtime+=dt;
+
   
   return 0;
 }

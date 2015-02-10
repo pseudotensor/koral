@@ -1,2 +1,2 @@
 //absorption opacities
-kappa=0.;
+kappa=1.;

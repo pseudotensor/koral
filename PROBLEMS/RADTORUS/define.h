@@ -10,11 +10,12 @@
 
 //#define SKIPRADSOURCE
 //#define SKIPHDEVOLUTION
-#define FIXEDALLBUTTEMP
+//#define FIXEDALLBUTTEMP
 //#define SKIPHDBUTENERGY
 
-#define HEATINGRATEPERMASS 1.e-4
-
+//#define HEATINGRATEPERMASS 1.e-4
+//#define HEATINGRATEPERMASSSQ (1.e-4/1.e-13)
+//#define HEATINGLIMITINGRHO 1.e-14
 /************************************/
 //radiation
 /************************************/
@@ -125,7 +126,7 @@
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
-#define MINMOD_THETA 1.
+#define MINMOD_THETA 2.
 
 /************************************/
 //problem params
@@ -133,9 +134,9 @@
 #define MASS 10.
 #define TORUSENTR 1.2e3//5.e2 - higher density, 1.2e3 - order lower density 
 //#define TEMPTORUS 5.e6 //overwrites the temperature
-#define RHOAMB 1.e-24
-#define UUAMB 1.e-7*RHOAMB //temp ~ uu/rho
-#define TEMPAMB 5.e6 //overwrites the temperature
+#define RHOAMB 1.e-26
+#define UUAMB 1.e-4*RHOAMB //temp ~ uu/rho, but see belo
+#define TEMPAMB 5.e6 //overwrites the ambient temperature
 #define ERADATMMIN 1.e-30
 #define RADIMPLICITTHRESHOLD 1.e10
 

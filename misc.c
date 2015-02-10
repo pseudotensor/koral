@@ -128,10 +128,13 @@ initialize_arrays()
   //primitives at cell centers for other uses 
   pproblem1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
-      //arrays for temporary use (e.g., vector potential, mimic_dynamo)
-      ptemp1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      pvecpot=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  //arrays for temporary use (e.g., vector potential, mimic_dynamo)
+  ptemp1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+  pvecpot=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
 
+  #ifdef SELFTIMESTEP
+  avgselftime=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));  
+  #endif
 
   /********* extra arrays, used only for time evolution ***********/
 

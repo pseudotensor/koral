@@ -191,6 +191,14 @@ main(int argc, char **argv)
   //zeros the avg array
   copy_u_core(0.,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));	  
   avgtime=0.;
+  #ifdef SELFTIMESTEP
+  int iz,iy,ix;
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      for(ix=0;ix<NX;ix++)
+	set_u_scalar(avgselftime,ix,iy,iz,0.);
+  #endif
+   
 
   //prints initial profiles to out0000.dat
   if(ifinit==1)
@@ -244,8 +252,8 @@ solve_the_problem(ldouble tstart, char* folder)
   ldouble totalmass=0.;
   ldouble dtout = DTOUT1;
   ldouble dtoutavg = DTOUT2;
-  int lasttout_floor;
-  int lasttoutavg_floor;
+  ldouble lasttout_floor;
+  ldouble lasttoutavg_floor;
   int i,j,ii;
   int loopsallociter;
   int spitoutput,lastzone;
@@ -741,7 +749,18 @@ solve_the_problem(ldouble tstart, char* folder)
 	    printf("%d > avg file no #%6d dumped\n",PROCID,nfout2);
 	  
 	  //avg goes first so that what is later can use it
+	  #ifndef SELFTIMESTEP
 	  copy_u_core(1./avgtime,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
+	  #else
+	  for(iz=0;iz<NZ;iz++)
+	    for(iy=0;iy<NY;iy++)
+	      for(ix=0;ix<NX;ix++)
+		{
+		  for(iv=0;iv<(NV+NAVGVARS);iv++)
+		    set_uavg(pavg,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz) / get_u_scalar(avgselftime,ix,iy,iz));
+		  set_u_scalar(avgselftime,ix,iy,iz,0.);
+		}              
+	  #endif
 	  fprint_avgfile(t,folder,"avg");
 	  //zeros avg
 	  copy_u_core(0.,pavg,pavg,SX*SY*SZ*(NV+NAVGVARS));
@@ -887,9 +906,9 @@ int
 print_scalings()
 {
   printf("\n ***************************************\n\n");
-  printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.16e\nmdot: %.16e\nsigma: %.16e\nlen: %.16e\ntime: %.16e\nenden:"
-	 "%.16e\nflux: %.16e\nT(1,1): %.16e\nkbt: %.16e\nkb/me: %.16e\nkappa: %.16e\n\n"
-	 "rhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\n->mdotEdd: %.16e\n->lumEdd: %.16e\n",
+  printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.6e\nmdot: %.6e\nsigma: %.6e\nlen: %.6e\ntime: %.6e\nenden:"
+	 "%.6e\nflux: %.6e\nT(1,1): %.6e\nkbt: %.6e\nkb/me: %.6e\nsigma_rad: %.6e\nkappa: %.6e\n\n"
+	 "rhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\n->mdotEdd: %.6e\n->lumEdd: %.6e\n",
 	 MASS,BHSPIN,
 	 rhoGU2CGS(1.),
 	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.),
@@ -901,6 +920,7 @@ print_scalings()
 	 calc_PEQ_Tfromurho(1.,1.),
 	 K_BOLTZ/MU_GAS/M_PROTON,
 	 K_BOLTZ/M_ELECTR,
+	 SIGMA_RAD,
 	 kappaCGS2GU(1.),
 	 rhorizonBL,
 	 rISCOBL,

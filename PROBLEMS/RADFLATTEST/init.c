@@ -8,11 +8,11 @@ ldouble pp[NV],uu[NV];
 /************************/
 
 if(geom.xx<0.3)
-  pp[0]=.001;
+  pp[0]=LEFTRHO;
 else
-  pp[0]=.001;
+  pp[0]=RHOAMB;
 
-pp[1]=.1;
+pp[1]=UUAMB;
 pp[2]=0.;
 pp[3]=0.;
 pp[4]=0.;

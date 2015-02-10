@@ -44,8 +44,8 @@ if(ix>=NX) //outflow or 2nd beam
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        } 
 
-     pp[0]=.001;
-     pp[1]=.1;
+     pp[0]=RHOAMB;
+     pp[1]=UUAMB;
      pp[2]=0.;
      pp[3]=0.;
      pp[4]=0.;
@@ -89,9 +89,9 @@ if(ix>=NX) //outflow or 2nd beam
 	 pp[iv]=get_u(p,iv,0,iiy,iiz);
        } 
 
-     pp[0]=.001;
-     pp[1]=.1;
-     pp[2]=0.;
+     pp[0]=LEFTRHO;
+     pp[1]=UUAMB;
+     if(pp[VX]<0.) pp[VX]=0.;
      pp[3]=0.;
      pp[4]=0.;
      pp[5]=calc_Sfromu(pp[0],pp[1]);

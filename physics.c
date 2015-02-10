@@ -467,7 +467,7 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
 
   //artificial heating of gas at constant rate per unit mass
 
-#ifdef HEATINGRATEPERMASS
+#if defined(HEATINGRATEPERMASS) || defined(HEATINGRATEPERMASSSQ)
   //gas velocity
   ldouble ucon[4];
   ucon[1]=pp[VX];
@@ -478,8 +478,18 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   ldouble rho=pp[RHO];
   //four-vector of heating to be applied to gas, H^\mu
   ldouble Hmu[4]={0.,0.,0.,0.};
+  #ifdef HEATINGRATEPERMASS
+  ldouble Hthat = HEATINGRATEPERMASS*rho;
+  #endif
+  #ifdef HEATINGRATEPERMASSSQ
+  ldouble Hthat = HEATINGRATEPERMASSSQ*rho*rho;
+  #endif
+  #ifdef HEATINGLIMITINGRHO
+  if(rho<HEATINGLIMITINGRHO)
+    Hthat = 0.;
+  #endif
   for(i=0;i<4;i++)
-    Hmu[i]=HEATINGRATEPERMASS*rho*ucon[i];
+    Hmu[i]=Hthat*ucon[i];
   //H_\mu
   indices_21(Hmu,Hmu,geom->gg);
   //source terms

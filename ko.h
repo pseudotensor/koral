@@ -118,6 +118,9 @@ ldouble start_time, end_time, mid1_time, mid2_time, maxmp_time, max_u2ptime,  mi
 int max_u2ptime_loc,min_u2ptime_loc;
 
 ldouble avgtime,dt;
+#ifdef SELFTIMESTEP
+ldouble *avgselftime;
+#endif
 int nstep;
 int global_int_slot[NGLOBALINTSLOT];
 ldouble max_ws[3],max_dt,ttm1,ttm2,max_ws_ph;
