@@ -6,14 +6,15 @@
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
 #define DOFIXUPS 1
+#define DORADFIXUPS 1
 #define UNPERTURBED
 
 //#define SKIPRADSOURCE
 //#define SKIPHDEVOLUTION
-#define FIXEDALLBUTTEMP
+//#define FIXEDALLBUTTEMP
 //#define SKIPHDBUTENERGY
 
-//#define HEATINGRATEPERMASS 1.e-4
+#define HEATINGRATEPERMASS 1.e-4
 //#define HEATINGRATEPERMASSSQ (1.e-4/1.e-13)
 //#define HEATINGLIMITINGRHO 1.e-14
 /************************************/
@@ -37,12 +38,12 @@
 #endif
 
 #define ALLOWRADCEILINGINIMPLICIT
-#define BASICRADIMPLICIT
+//#define BASICRADIMPLICIT
 
 #define U2PCONV 1.e-10
 #define RADIMPCONV 1.e-10
-#define RADIMPEPS 1.e-6
-#define RADIMPMAXITER 15
+#define RADIMPEPS 1.e-8
+#define RADIMPMAXITER 50
 
 //#define myVET
 
@@ -88,7 +89,7 @@
 #define MINZ -M_PI
 #define MAXZ M_PI
 #define TNX 50//150 // Total number of cells in X 
-#define TNY 150//300
+#define TNY 100//300
 #define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2
@@ -113,10 +114,11 @@
 #if (TNZ==1)
 #define SILO2D_XZPLANE
 #endif
+
 #define ALLSTEPSOUTPUT 0 //whether to output every step
-#define NSTEPSTOP 1.e10 //stop after this number of steps
+
 #define NOUTSTOP 9000 //stop after this number of outputs
-#define DTOUT1 1. //res
+#define DTOUT1 5. //res
 #define DTOUT2 10. //avg
 
 /************************************/
@@ -124,9 +126,11 @@
 /************************************/
 #define INT_ORDER 2
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .001
+#define TSTEPLIM .6
 #define FLUXLIMITER 0
-#define MINMOD_THETA 2.
+#define MINMOD_THETA 1.5
+#define NSTEPSTOP 1e10
+
 
 /************************************/
 //problem params
@@ -134,11 +138,11 @@
 #define MASS 10.
 #define TORUSENTR 1.2e3//5.e2 - higher density, 1.2e3 - order lower density 
 //#define TEMPTORUS 5.e6 //overwrites the temperature
-#define RHOAMB 1.e-26
-#define UUAMB 1.e-4*RHOAMB //temp ~ uu/rho, but see belo
+#define RHOAMB 1.e-24
+#define UUAMB 1.e-2*RHOAMB //temp ~ uu/rho, but see belo
 #define TEMPAMB 5.e6 //overwrites the ambient temperature
 #define ERADATMMIN 1.e-30
-#define RADIMPLICITTHRESHOLD 1.e10
+#define RADIMPLICITTHRESHOLD 1.e-20 //start with MHD
 
 /************************************/
 //rhd floors

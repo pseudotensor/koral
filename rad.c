@@ -2551,7 +2551,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
       //numerical implicit in 4D did not work
       if(verbose) 
 	{
-	  printf("imp_lab didn't work at %d %d %d\n",ix+TOI,iy+TOJ,iz+TOK);
+	  printf("%4d > %4d %4d %4d > RADIMPFAIL > unchanged / fixup \n",PROCID,ix+TOI,iy+TOJ,iz+TOK);
 	  if(verbose>1)
 	    {
 	      solve_implicit_lab(ix,iy,iz,dt,del4,2);
