@@ -52,7 +52,9 @@ if(ix>=NX) //outflow or 2nd beam
      pp[5]=calc_Sfromu(pp[0],pp[1]);
 
 #ifdef RADIATION
-     pp[6]=.1;
+     //pp[6]=.1;
+     pp[6]=calc_LTE_EfromT(calc_PEQ_Tfromurho(pp[UU],pp[RHO]));
+
      pp[7]=-VELRAD;
      pp[8]=0.;
      pp[9]=0.;
@@ -97,7 +99,9 @@ if(ix>=NX) //outflow or 2nd beam
      pp[5]=calc_Sfromu(pp[0],pp[1]);
 
 #ifdef RADIATION
-     pp[6]=.1;
+     //pp[6]=.1;
+     pp[6]=calc_LTE_EfromT(1.e8);//calc_PEQ_Tfromurho(pp[UU],pp[RHO]));
+
      pp[7]=VELRAD;
      pp[8]=0.;
      pp[9]=0.;

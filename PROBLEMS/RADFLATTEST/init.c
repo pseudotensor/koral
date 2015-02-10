@@ -18,7 +18,7 @@ pp[3]=0.;
 pp[4]=0.;
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 #ifdef RADIATION
-pp[6]=1.e-5;
+pp[6]=calc_LTE_EfromT(calc_PEQ_Tfromurho(pp[UU],pp[RHO]));
 pp[7]=0.;
 pp[8]=0.;
 pp[9]=0.;

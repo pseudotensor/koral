@@ -10,11 +10,12 @@
 //radiation
 /************************************/
 #define RADIATION
+#define MASS 1.e10
 //#define SKIPRADSOURCE
 //#define TWOBEAMS
-#define RHOAMB 0.001
-#define LEFTRHO 0.001
-#define UUAMB (RHOAMB*1.e-5)
+#define RHOAMB 0.01
+#define LEFTRHO 0.01
+#define UUAMB (RHOAMB*1.e-6)
 
 //#define myVET
 
@@ -68,8 +69,8 @@
 #define MINZ 0.
 #define MAXZ 1.
 
-#define TNX 40
-#define TNY 5
+#define TNX 256
+#define TNY 1
 #define TNZ 1
 #define NTX 1 //for MPI and OMP
 #define NTY 1
@@ -86,7 +87,7 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
-#define TSTEPLIM .3
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0      
