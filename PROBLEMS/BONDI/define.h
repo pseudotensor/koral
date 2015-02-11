@@ -4,19 +4,13 @@
 #define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
-//#define MODYFIKUJKRZYSIE 1
-//#define FLUXMETHOD HLL_FLUX
-//#define TEST124
-//#define GDETIN 1
-//#define WAVESPEEDSATFACES
-
 
 /************************************/
 //define MSTEPS
 /************************************/
 //#define MSTEP
-#define MSTEP_LIMITBC
-#define NUMMSTEPLEVELS 20
+//#define MSTEP_LIMITBC
+//#define NUMMSTEPLEVELS 20
 
 /************************************/
 //radiation
@@ -24,17 +18,14 @@
 #define RADIATION
 //#define EXPLICIT_LAB_RAD_SOURCE
 
-//#define OVERWRITERADWAVESPEEDSWITHHD
-//#define RESETNPH
-//#define SKIPRADSOURCE
-//#define PUTNFFLOOR
-
 #define RADIMPLICITTHRESHOLD 1.e-2
-#define RADIMPCONV 1.e-12
+#define RADIMPCONV 1.e-10
 #define RADIMPEPS 1.e-8
 #define U2PCONV 1.e-12
+
 #define ALLOWRADCEILINGINIMPLICIT
-#define BASICRADIMPLICIT
+//#define BASICRADIMPLICIT
+
 #ifdef RADIATION
 #define NCOMPTONIZATION
 //#define DAMPCOMPTONIZATIONATBH
@@ -42,7 +33,7 @@
 
 //#define SKIPFANCYOPACITIES
 //#define OPACSIMPLE
-//#define OPACSKIPBE
+#define OPACSKIPBE
 //#define OPACSMOOTH
 //#define RADIMPSTARTLOWTEMP
 //#define EXTRAHEATINGCOOLING
@@ -99,10 +90,10 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 512
+#define TNX 256
 #define TNY 1
 #define TNZ 1
-#define NTX 4//for MPI and OMP
+#define NTX 16//for MPI and OMP
 #define NTY 1
 #define NTZ 1
 
@@ -116,25 +107,32 @@
 //#define SHORTERTIMESTEP
 
 //#define SUBZONES
-#define SUBZONES_NSTEPSTEP 10
+//#define SUBZONES_NSTEPSTEP 10
 //#define OUTPUTAFTERSUBZONES
-#define NSUBZONES (4.)
-#define SUBZONESOVERLAP 0
+//#define NSUBZONES (4.)
+//#define SUBZONESOVERLAP 0
 
 #define SPECIFIC_BC
+
+#define LOWMDOT
+
+#ifdef HIGHMDOT
 #define FIX_TEMPERATURE
-//#define FIX_PRESSURERHO
-//#define FIX_VELBONDI
 #define FIX_VELOUTBONDI
 #define FULLBONDI
-//#define INFLOW
+#endif
+
+#ifdef LOWMDOT
+#define FIX_TEMPERATURE
+#define FIX_VELOUTBONDI
+#endif
 
 
 /************************************/
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2HEUN
+#define TIMESTEPPING RK2IMEX
 #define U2P_SOLVER U2P_SOLVER_W
 #define U2P_EQS U2P_EQS_NOBLE
 #define TSTEPLIM 0.3//(get_tsteplimiter())
@@ -143,10 +141,10 @@
 #define SHUFFLELOOPS 0      
 
 #define DOFIXUPS 1
-
-
-#define RADIMPMAXITER 15
+#define DORADFIXUPS 1
+#define RADIMPMAXITER 50
 #define GAMMAMAXRAD 3.
+
 /************************************/
 //output
 /************************************/
@@ -170,23 +168,20 @@
 #define DTOUT1 1.e2
 #endif
 
-#define DTOUT2 (DTOUT1*100000.) //avg
+#define DTOUT2 (DTOUT1*10.) //avg
 #define TMAX 1.e100 //time to stop
 
 /************************************/
 //test specific
 /***********************************/
 #define GAMMA (5./3.)
-#define MDOT 1.e4
-#define TAMB 3.e3
+#define MDOT 1.e-4
 
-/*
-#ifndef FULLBONDI
-#define TAMB (3.267e12/RBONDI)
+#ifdef FULLBONDI
+#define TAMB 1.e4
 #else
 #define TAMB (3.267e12/RBONDI)
 #endif
-*/
 
 //#define UURHORATIOMIN (calc_PEQ_ufromTrho(TAMB,1.))
 

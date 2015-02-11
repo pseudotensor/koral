@@ -1790,7 +1790,9 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",endenGU2CGS(ehat),fluxGU2CGS(Fx),fluxGU2CGS(Fy),fluxGU2CGS(Fz)); //(14) - (17)
 	       
 	       ldouble conv=kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC; //because (cE-4piB) in non-geom
-	       fprintf(fout1,"%.5e %.5e ",Giff[0]*conv,Gicff[0]*conv);
+	       fprintf(fout1,"%.5e %.5e ",Giff[0]*conv,Gicff[0]*conv); //(18)-(19)
+
+	       fprintf(fout1,"%.5e ",calc_LTE_TfromE(ehat)); //(20)
 #endif
 
 	      fprintf(fout1,"\n");

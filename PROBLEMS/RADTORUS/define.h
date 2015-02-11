@@ -11,10 +11,10 @@
 
 //#define SKIPRADSOURCE
 //#define SKIPHDEVOLUTION
-//#define FIXEDALLBUTTEMP
+#define FIXEDALLBUTTEMP
 //#define SKIPHDBUTENERGY
 
-#define HEATINGRATEPERMASS 1.e-4
+//#define HEATINGRATEPERMASS 1.e-4
 //#define HEATINGRATEPERMASSSQ (1.e-4/1.e-13)
 //#define HEATINGLIMITINGRHO 1.e-14
 /************************************/
@@ -22,7 +22,6 @@
 /************************************/
 #define RADIATION
 #define OMSCALE 1.
-
 
 /************************************/
 //viscosity choices
