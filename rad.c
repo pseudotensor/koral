@@ -1417,34 +1417,38 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   int whereeq=params[2];
   if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ && whereeq==RADIMPLICIT_LAB)
     {
+#pragma omp critical
       global_int_slot[GLOBALINTSLOT_NIMPENERRAD]+=1;
     }
   if(whichprim==RAD && whicheq==RADIMPLICIT_ENERGYEQ && whereeq==RADIMPLICIT_FF)
     {
+#pragma omp critical
       global_int_slot[GLOBALINTSLOT_NIMPENERRADFF]+=1;
     }
   if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ && whereeq==RADIMPLICIT_LAB)
     {
-      global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+=1; 
+ #pragma omp critical
+     global_int_slot[GLOBALINTSLOT_NIMPENERMHD]+=1; 
     }
   if(whichprim==MHD && whicheq==RADIMPLICIT_ENERGYEQ && whereeq==RADIMPLICIT_FF)
     {
-      global_int_slot[GLOBALINTSLOT_NIMPENERMHDFF]+=1; 
+ #pragma omp critical
+     global_int_slot[GLOBALINTSLOT_NIMPENERMHDFF]+=1; 
     }
   if(whichprim==RAD && whicheq==RADIMPLICIT_ENTROPYEQ)
     {
-      //#pragma omp critical
+#pragma omp critical
       global_int_slot[GLOBALINTSLOT_NIMPENTRRAD]+=1;
     }
   if(whichprim==MHD && whicheq==RADIMPLICIT_ENTROPYEQ)
     {
-      //#pragma omp critical
+#pragma omp critical
       global_int_slot[GLOBALINTSLOT_NIMPENTRMHD]+=1;
     }
   if(whicheq==RADIMPLICIT_LTEEQ)
     {
-      //#pragma omp critical
-      global_int_slot[GLOBALINTSLOT_NIMPLTE]+=1;
+ #pragma omp critical
+     global_int_slot[GLOBALINTSLOT_NIMPLTE]+=1;
     }
 
   return 0;  

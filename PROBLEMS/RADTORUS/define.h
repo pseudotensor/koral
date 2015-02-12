@@ -2,7 +2,7 @@
 //restart
 /************************************/
 #define RESTART 
-#define RESTARTNUM -1
+#define RESTARTNUM 7
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
 #define DOFIXUPS 1
@@ -14,7 +14,7 @@
 #define FIXEDALLBUTTEMP
 //#define SKIPHDBUTENERGY
 
-//#define HEATINGRATEPERMASS 1.e-4
+#define HEATINGRATEPERMASS 1.e-4
 //#define HEATINGRATEPERMASSSQ (1.e-4/1.e-13)
 //#define HEATINGLIMITINGRHO 1.e-14
 /************************************/
@@ -27,7 +27,7 @@
 //viscosity choices
 /************************************/
 #ifdef RADIATION
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 //#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
@@ -39,8 +39,8 @@
 #define ALLOWRADCEILINGINIMPLICIT
 //#define BASICRADIMPLICIT
 
-#define U2PCONV 1.e-10
-#define RADIMPCONV 1.e-10
+#define U2PCONV 1.e-12
+#define RADIMPCONV 1.e-12
 #define RADIMPEPS 1.e-8
 #define RADIMPMAXITER 50
 
@@ -123,7 +123,7 @@
 /************************************/
 //reconstruction / stepping
 /************************************/
-#define INT_ORDER 2
+#define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .6
 #define FLUXLIMITER 0

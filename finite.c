@@ -297,7 +297,6 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
 {
   ldouble aaaxhd,aaaxrad,aaayhd,aaayrad,aaazhd,aaazrad;
 
-	      
   set_u_scalar(ahdxl,ix,iy,iz,aaa[0]);
   set_u_scalar(ahdxr,ix,iy,iz,aaa[1]);
   set_u_scalar(ahdyl,ix,iy,iz,aaa[2]);
@@ -310,7 +309,7 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   set_u_scalar(aradyr,ix,iy,iz,aaa[9]);
   set_u_scalar(aradzl,ix,iy,iz,aaa[10]);
   set_u_scalar(aradzr,ix,iy,iz,aaa[11]);
-
+  
   aaaxhd=my_max(fabs(aaa[0]),fabs(aaa[1]));
   aaayhd=my_max(fabs(aaa[2]),fabs(aaa[3]));
   aaazhd=my_max(fabs(aaa[4]),fabs(aaa[5]));
@@ -318,14 +317,14 @@ save_wavespeeds(int ix,int iy,int iz, ldouble *aaa,ldouble* max_lws)
   aaaxrad=my_max(fabs(aaa[6]),fabs(aaa[7]));
   aaayrad=my_max(fabs(aaa[8]),fabs(aaa[9]));
   aaazrad=my_max(fabs(aaa[10]),fabs(aaa[11]));
-
+  
   set_u_scalar(ahdx,ix,iy,iz,aaaxhd);
   set_u_scalar(ahdy,ix,iy,iz,aaayhd);
   set_u_scalar(ahdz,ix,iy,iz,aaazhd);
   set_u_scalar(aradx,ix,iy,iz,aaaxrad);
   set_u_scalar(arady,ix,iy,iz,aaayrad);
   set_u_scalar(aradz,ix,iy,iz,aaazrad);
-
+  
 
 #ifdef RADIATION
   if(my_max(aaaxhd,aaaxrad)>max_lws[0]) max_lws[0]=my_max(aaaxhd,aaaxrad);
@@ -649,6 +648,7 @@ do_correct()
 int
 op_explicit(ldouble t, ldouble dtin) 
 {
+  
   int ix,iy,iz,iv,ii;
   ldouble dt;
   
@@ -690,6 +690,8 @@ op_explicit(ldouble t, ldouble dtin)
 
   //calculates wavespeeds
   calc_wavespeeds();
+
+
 
   //**********************************************************************
   //**********************************************************************
@@ -1025,6 +1027,9 @@ op_explicit(ldouble t, ldouble dtin)
   }
 	    
   
+  //test111
+  //return 0;  
+
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
@@ -1160,8 +1165,8 @@ op_explicit(ldouble t, ldouble dtin)
 #ifdef SKIPHDBUTENERGY
 	    if(iv>=NVMHD || iv==UU)
 #endif
-
-	    set_u(u,iv,ix,iy,iz,val);	 
+	      
+	      set_u(u,iv,ix,iy,iz,val);	 
 
 	}
 
@@ -1241,6 +1246,7 @@ op_explicit(ldouble t, ldouble dtin)
 int
 op_implicit(ldouble t, ldouble dtin) 
 {
+
   int ii;
   ldouble dt;
 
@@ -2813,7 +2819,6 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
 int set_bc(ldouble t,int ifinit)
 {
   int ix,iy,iz,ii,iv;
-
 
   //first fill the GC with no corners
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static,4)

@@ -6,14 +6,15 @@
 int ix,iy,iz,ii,iv;
 /**************************/
 
-#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
+#pragma omp parallel private(ix,iy,iz,iv,ii) 
 for(ii=0;ii<Nloop_0;ii++) //domain only
   {
-    struct geometry geom;
+
     ix=loop_0[ii][0];
     iy=loop_0[ii][1];
     iz=loop_0[ii][2]; 
- 
+
+    struct geometry geom;
     fill_geometry(ix,iy,iz,&geom);
 
     ldouble temp = calc_PEQ_Tfromurho(get_u(p,UU,ix,iy,iz),get_u(p,RHO,ix,iy,iz));
@@ -26,4 +27,5 @@ for(ii=0;ii<Nloop_0;ii++) //domain only
 
     p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
   }
+
 #endif
