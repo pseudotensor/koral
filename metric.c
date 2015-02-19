@@ -3738,6 +3738,7 @@ calc_metric()
   if(PROCID==0) {printf("Precalculating metrics... "); fflush(stdout);}
 #endif
   
+  /*
   #pragma omp parallel private(ix,iy,iz,ii) 
   {
     for(ii=0;ii<Nloop_5;ii++) //domain and ghost cells
@@ -3745,6 +3746,15 @@ calc_metric()
 	ix=loop_5[ii][0];
 	iy=loop_5[ii][1];
 	iz=loop_5[ii][2]; 
+  */
+  
+  //it is not loop_5 because NGCZ != NGCZMET
+  //some problems with the following loop on rclogin
+#pragma omp parallel for private(ix,iy,iz,ii) 
+    for(ix=-NGCX;ix<NX+NGCX;ix++)
+      for(iy=-NGCY;iy<NY+NGCY;iy++)
+        for(iz=-NGCZMET;iz<NZ+NGCZMET;iz++)
+          {
 
 
 #ifdef METRICAXISYMMETRIC
@@ -3917,7 +3927,7 @@ calc_metric()
 	    set_gb(Gbz,3,4,ix,iy,iz+1,calc_gttpert(xx),2);
 
 	  }
-      }
+	  }
 
     //precalculating characteristic radii and parameters
     //works for all metrics but makes sense only for BH problems
@@ -3926,9 +3936,6 @@ calc_metric()
     rmboundBL = r_mbound_BL(BHSPIN);
     rphotonBL = r_photon_BL(BHSPIN);
     etaNT = 1.-sqrt(1.-2./3./r_ISCO_BL(BHSPIN));
-
-
-  }
 
 #ifndef METRICTIMEDEPENDENT
     if(PROCID==0) printf("done!\n");

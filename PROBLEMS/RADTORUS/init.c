@@ -98,7 +98,11 @@ if(epsilon>0. && geomBL.xx>rin) //OS: interior of the torus
     Fx=Fy=Fz=0.;
 
     //corrected gas pressure / internal energy density
+    if(T4<TEMPAMB)
+      T4=TEMPAMB;
+
     pp[UU]=calc_PEQ_ufromTrho(T4,rho);
+
 
     #ifdef TEMPTORUS
     pp[UU]=calc_PEQ_ufromTrho(TEMPTORUS,rho);

@@ -108,9 +108,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
       tautot=tauabs=0.;
 
       // #ifdef BHDISK_PROBLEMTYPE
-      if(NZ==1) //phi-symmetry
+      for(iz=0;iz<NZ;iz++)
 	{
-	  iz=0;
 	  for(iy=0;iy<NY;iy++)
 	    {
 	      //metric
@@ -161,17 +160,23 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 	      ldouble dxph[3];
 	      ldouble xx1[4],xx2[4];
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
-	      dx[2]=2.*M_PI;
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[2]=fabs(xx2[3]-xx1[3]);
+	      if(NZ==1) dx[2]=2.*M_PI;
+
 	      dxph[0]=dx[0]*sqrt(geomBL.gg[1][1]);
 	      dxph[1]=dx[1]*sqrt(geomBL.gg[2][2]);
 	      dxph[2]=dx[2]*sqrt(geomBL.gg[3][3]);
@@ -1459,7 +1464,13 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	  dxBL[1]=fabs(xx2[2]-xx1[2]);
-	  dxBL[2]=2.*M_PI;
+	  xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
+	  xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
+	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	  dxBL[2]=fabs(xx2[3]-xx1[3]);
+
+	  if(NZ==1) dxBL[2]=2.*M_PI;
 	  dxph[0]=dxBL[0]*sqrt(geomBL.gg[1][1]);
 	  dxph[1]=dxBL[1]*sqrt(geomBL.gg[2][2]);
 	  dxph[2]=dxBL[2]*sqrt(geomBL.gg[3][3]);
@@ -1934,19 +1945,23 @@ calc_mdot(ldouble radius,int type)
 	      ucon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 	      rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);	      	      
 	      gdet=geomBL.gdet;
-	      ldouble dxph[3];
 	      ldouble xx1[4],xx2[4];
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
-	      dx[2]=2.*M_PI;
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[2]=fabs(xx2[3]-xx1[3]);
+	      if(NZ==1) dx[2]=2.*M_PI;
 	    }
 	  else
 	    {
@@ -1972,7 +1987,6 @@ calc_mdot(ldouble radius,int type)
 	      rhouconr=rho*ucon[1];
 	      gdet=geom.gdet;	
 	      dx[1]=dx[1];	     
-	      dx[2]=2.*M_PI;
 	      /*
 	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
 	      ldouble dxph[3];
@@ -2073,17 +2087,21 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 	      ldouble Br = bcon[1]*ucon[0] - bcon[0]*ucon[1];
 	      
 	      ldouble xx1[4],xx2[4];
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
-	      dx[2]=2.*M_PI;
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[2]=fabs(xx2[3]-xx1[3]);
 
 	      if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
 		Psi+=geomBL.gdet*fabs(Br)*dx[1]*dx[2];
@@ -2113,7 +2131,6 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 	      ldouble Br=pp[B1];
 
 	      dx[1]=dx[1];
-	      dx[2]=2.*M_PI;
 
 	  
 	      if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
@@ -2173,17 +2190,23 @@ int calc_anarelradialprofiles(ldouble profiles[][NX])
 	      
 	      ldouble dxph[3],dx[3];
 	      ldouble xx1[4],xx2[4];
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+
+	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
-	      dx[2]=2.*M_PI;
+	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
+	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
+	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      dx[2]=fabs(xx2[3]-xx1[3]);
+
 	      dxph[0]=dx[0]*sqrt(geomBL.gg[1][1]);
 	      dxph[1]=dx[1]*sqrt(geomBL.gg[2][2]);
 	      dxph[2]=dx[2]*sqrt(geomBL.gg[3][3]);

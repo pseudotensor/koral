@@ -106,9 +106,9 @@
 #endif
 
 //total resolution
-#define TNX 240//240
-#define TNY 192//160
-#define TNZ 64
+#define TNX 240
+#define TNY 160
+#define TNZ 96
 //number of tiles
 #define NTX 2
 #define NTY 2
