@@ -571,6 +571,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    op_explicit (t,0.5*dt); 
 
 	    calc_u2p();
+	    
             #pragma omp barrier
 	    count_entropy(&nentr[1],&nentr2[1]);
 	    op_implicit (t,0.5*dt); 
@@ -674,11 +675,6 @@ solve_the_problem(ldouble tstart, char* folder)
       update_intensities(t, dt);
 #endif
 
-      //**********************************************************************
-      //********************** user def. finger  ************************************
-      //**********************************************************************
-
-      my_finger(t);
 
       //**********************************************************************
       //************************* outputs ************************************

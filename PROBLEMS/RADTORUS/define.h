@@ -2,7 +2,7 @@
 //restart
 /************************************/
 #define RESTART 
-#define RESTARTNUM 7
+#define RESTARTNUM -1
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
 #define DOFIXUPS 1

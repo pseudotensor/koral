@@ -17,7 +17,7 @@ save_avg(ldouble dtin)
   //iy=loop_0[ii][1];
   //iz=loop_0[ii][2]; 
 
-#pragma omp parallel private(ix,iy,iz,iv) 
+#pragma omp parallel for private(ix,iy,iz,iv) 
   for(iz=0;iz<NZ;iz++)
     {
       for(iy=0;iy<NY;iy++)

@@ -808,7 +808,7 @@ ldouble calc_divB(int ix,int iy,int iz);
 void calc_bcon_prim(double *pp, double *bcon, void* ggg);
 void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg);
 int flux_ct();
-ldouble calc_Qtheta(int ix, int iy, int iz);
+int calc_Qthetaphi(int ix, int iy, int iz,ldouble*,ldouble*);
 ldouble get_tsteplimiter();
 
 //silo.c

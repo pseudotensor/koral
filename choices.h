@@ -268,7 +268,7 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES 45
+#define NRADPROFILES (47-1)
 #endif
 
 #ifndef NTHPROFILES

@@ -579,8 +579,8 @@ calc_divB(int ix,int iy,int iz)
   return divB;  
 }
 
-ldouble
-calc_Qtheta(int ix, int iy, int iz)
+int
+calc_Qthetaphi(int ix, int iy, int iz,ldouble *Qtheta,ldouble *Qphi)
 {
   if(!doingavg)
     {
@@ -596,9 +596,11 @@ calc_Qtheta(int ix, int iy, int iz)
       ucon[3]=get_u(p,VZ,ix,iy,iz);
       conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
       ldouble Omega = ucon[3]/ucon[0];
-      ldouble dx=get_xb(iy+1,1)-get_xb(iy,1);
-
-      return 2.*M_PI/fabs(Omega)/dx*fabs(bcon[2])/sqrt(rho);
+      ldouble dxth=get_xb(iy+1,1)-get_xb(iy,1);
+      ldouble dxph=get_xb(iz+1,2)-get_xb(iz,2);
+ 
+      *Qtheta = 2.*M_PI/fabs(Omega)/dxth*fabs(bcon[2])/sqrt(rho);
+      *Qphi = 2.*M_PI/fabs(Omega)/dxph*fabs(bcon[3])/sqrt(rho);
     }
   else //doingavg, in BL
     {
@@ -606,18 +608,26 @@ calc_Qtheta(int ix, int iy, int iz)
       fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 
       ldouble bcon2 = get_uavg(pavg,AVGBCON(2),ix,iy,iz);
+      ldouble bcon3 = get_uavg(pavg,AVGBCON(3),ix,iy,iz);
       ldouble Omega = get_uavg(pavg,AVGUCON(3),ix,iy,iz)/get_uavg(pavg,AVGUCON(0),ix,iy,iz);
       ldouble rho = get_uavg(pavg,RHO,ix,iy,iz);
-      ldouble dx;
+      ldouble dxth,dxph;
       ldouble xx1[4],xx2[4];
-      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-      xx2[0]=0.;xx2[1]=get_xb(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
+      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
       coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
       coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
-      dx=fabs(xx2[2]-xx1[2]);
+      dxth=fabs(xx2[2]-xx1[2]);
+      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
+      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz,2);
+      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+      dxph=fabs(xx2[3]-xx1[3]);
 
-      return 2.*M_PI/fabs(Omega)/dx*fabs(bcon2)/sqrt(rho);
+      *Qtheta = 2.*M_PI/fabs(Omega)/dxth*fabs(bcon2)/sqrt(rho);
+      *Qphi= 2.*M_PI/fabs(Omega)/dxph*fabs(bcon3)/sqrt(rho);
     }
+  return 0;
 }
 
 //calculates sqrt(g_rr g_phph) b^r b^phi and b^2

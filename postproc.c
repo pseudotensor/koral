@@ -36,7 +36,7 @@
 //opt thin mhd energy flux (25)
 //opt. thin rad energy flux (26)
 //opt. thin mass flux (27)
-//rho-weighted q-theta (28)
+//rho-weighted qtheta (28)
 //rho-weighted temperature (29)
 //rho-weighted magn.field angle <sqrt(grr gphph)b^r b^ph> / <bsq> (30)
 //scale-height (31)
@@ -53,7 +53,9 @@
 //rho-weighted radial velocity in the jet (42)
 //magnetic flux in the jet (43)
 //kinetic flux in the jet (44)
-//radial velocity close to the axis (45)                                                                                                                                                                         //Bernoulli close to the axis (46)                                                                                                                                                                                                                                    
+//radial velocity close to the axis (45)                                                                                                                                                                         /
+//Bernoulli close to the axis (46)  
+//rho-weighted qphi (47)                                                                                                                                                                                                                                  
 
 
 /*********************************************/
@@ -73,7 +75,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
       ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
       ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,ucon[4],utcon[4],ucon3[4];
-      ldouble rhoucont,enden,rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4],Qtheta;
+      ldouble rhoucont,enden,rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4];
       ldouble Trtmagn,Trtkin;
       ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
       ldouble tautot,tautotloc,tauabs,tauabsloc;
@@ -426,8 +428,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //angular velocity
 	      ldouble Omega=utcon[3]/utcon[0];
 
-	      //MRI resolution parameter
-	      ldouble qtheta=calc_Qtheta(ix,iy,iz);//2.*M_PI/Omega/dx[1]*fabs(bcon[2])/sqrt(rho);
+	      //MRI resolution parameters
+	      ldouble qtheta,qphi;
+	      calc_Qthetaphi(ix,iy,iz,&qtheta,&qphi);
 
 	      //to calculate magn. field angle
 	      //bsq and brbphi taken from avg if neeeded
@@ -461,6 +464,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //rho-weighted q-theta (28)
 	      profiles[26][ix]+=rho*qtheta*dxph[1];
+	       
+	      //rho-weighted q-phi (47)
+	      profiles[45][ix]+=rho*qphi*dxph[1];
 	       
 	      //rho-weighted temperature (29)
 	      profiles[27][ix]+=rho*temp*dxph[1];
@@ -597,61 +603,60 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      else
 		profiles[3][ix]+=rho*ucov[3]*dxph[1];
 	    }
+	}
 
 
 	 
-	  //normalizing by sigma
-	  profiles[22][ix]/=profiles[21][ix];
-	  profiles[26][ix]/=profiles[0][ix];
-	  profiles[27][ix]/=profiles[0][ix];
-	  //profiles[29][ix]/=profiles[0][ix];
-	  profiles[30][ix]/=profiles[0][ix];
-	  profiles[31][ix]/=profiles[0][ix];
-	  profiles[32][ix]/=profiles[0][ix];
-	  //profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
-	  profiles[29][ix]=scaleth_otg[ix]; //scale height
-	  profiles[40][ix]/=jetsigma;
+      //normalizing by sigma
+      profiles[22][ix]/=profiles[21][ix];
+      profiles[26][ix]/=profiles[0][ix];
+      profiles[45][ix]/=profiles[0][ix];
+      profiles[27][ix]/=profiles[0][ix];
+      //profiles[29][ix]/=profiles[0][ix];
+      profiles[30][ix]/=profiles[0][ix];
+      profiles[31][ix]/=profiles[0][ix];
+      profiles[32][ix]/=profiles[0][ix];
+      //profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
+      profiles[29][ix]=scaleth_otg[ix]; //scale height
+      profiles[40][ix]/=jetsigma;
 	  
-	  Bangle1/=profiles[0][ix];
-	  Bangle2/=profiles[0][ix];
+      Bangle1/=profiles[0][ix];
+      Bangle2/=profiles[0][ix];
 
-	  //rho-weighted magn.field angle -<sqrt(grr gphph)b^r b^ph> / <bsq> (30)
-	  profiles[28][ix]=-Bangle1/Bangle2;
+      //rho-weighted magn.field angle -<sqrt(grr gphph)b^r b^ph> / <bsq> (30)
+      profiles[28][ix]=-Bangle1/Bangle2;
 	     
-	  //normalizing by <(rho+u+bsq/2)u^r>
-	  //profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];
-	  profiles[3][ix]/=profiles[0][ix];
+      //normalizing by <(rho+u+bsq/2)u^r>
+      //profiles[3][ix]/=avgsums[AVGWUCON(1)][ix];
+      profiles[3][ix]/=profiles[0][ix];
  
-	  //Keplerian u_phi (6)
-	  ldouble r=xxBL[1];
-	  profiles[4][ix]=((r*r-2.*BHSPIN*sqrt(r)+BHSPIN*BHSPIN)/(sqrt(r*(r*r-3.*r+2.*BHSPIN*sqrt(r)))));  
+      //Keplerian u_phi (6)
+      ldouble r=xxBL[1];
+      profiles[4][ix]=((r*r-2.*BHSPIN*sqrt(r)+BHSPIN*BHSPIN)/(sqrt(r*(r*r-3.*r+2.*BHSPIN*sqrt(r)))));  
 
-	  //net accretion rate at given radius (9)
-	  profiles[7][ix]=fabs(calc_mdot(xxBL[1],0));
-	  //inflow accretion rate at given radius (10)
-	  profiles[8][ix]=fabs(calc_mdot(xxBL[1],1));
-	  //outflow accretion rate at given radius (11)
-	  profiles[9][ix]=fabs(calc_mdot(xxBL[1],2));
+      //net accretion rate at given radius (9)
+      profiles[7][ix]=fabs(calc_mdot(xxBL[1],0));
+      //inflow accretion rate at given radius (10)
+      profiles[8][ix]=fabs(calc_mdot(xxBL[1],1));
+      //outflow accretion rate at given radius (11)
+      profiles[9][ix]=fabs(calc_mdot(xxBL[1],2));
 
-	  //to get velocities
-	  profiles[2][ix]=profiles[1][ix]/Sigmagdet;
-	  profiles[22][ix]=profiles[8][ix]/Sigmagdet;
-	  profiles[34][ix]=profiles[9][ix]/Sigmagdet;
+      //to get velocities
+      profiles[2][ix]=profiles[1][ix]/Sigmagdet;
+      profiles[22][ix]=profiles[8][ix]/Sigmagdet;
+      profiles[34][ix]=profiles[9][ix]/Sigmagdet;
 
 
-	  //luminosity at given radius (12)
-	  ldouble radlum,totallum;
-	  calc_lum(xxBL[1],0,&radlum,&totallum);
-	  profiles[10][ix]=radlum;
-	  //luminosity at given radius (22)
-	  calc_lum(xxBL[1],1,&radlum,&totallum);
-	  profiles[20][ix]=radlum;
-	  //location of the photosphere (13)
-	  profiles[11][ix]=calc_photloc(ix);
+      //luminosity at given radius (12)
+      ldouble radlum,totallum;
+      calc_lum(xxBL[1],0,&radlum,&totallum);
+      profiles[10][ix]=radlum;
+      //luminosity at given radius (22)
+      calc_lum(xxBL[1],1,&radlum,&totallum);
+      profiles[20][ix]=radlum;
+      //location of the photosphere (13)
+      profiles[11][ix]=calc_photloc(ix);
 
-	}
-
-     //#endif
     }
 
   return 0;
@@ -1754,7 +1759,7 @@ calc_resmri(ldouble radius)
 
   int ix,iy,iz,iv;
   ldouble xx[4],xxBL[4],dx[3];
-  ldouble qtheta=0.,sigma=0.,rho;
+  ldouble qtheta=0.,qphi=0.,sigma=0.,rho;
  
   //search for appropriate radial index
   for(ix=0;ix<NX;ix++)
@@ -1764,22 +1769,21 @@ calc_resmri(ldouble radius)
       if(xxBL[1]>radius) break;
     }
 
-  if(NZ==1)
-    {
-      iz=0;
-      for(iy=0;iy<NY;iy++)
-	{
-	  dx[1]=get_size_x(iy,1);
-	  rho=get_u(p,RHO,ix,iy,iz);
+  for(iz=0;iz<NZ;iz++)
+    for(iy=0;iy<NY;iy++)
+      {
+	dx[1]=get_size_x(iy,1);
+	rho=get_u(p,RHO,ix,iy,iz);
 
-	  sigma+=rho*dx[1];
-	  qtheta+=rho*calc_Qtheta(ix,iy,iz)*dx[1];
-	}
+	sigma+=rho*dx[1];
+	ldouble q1,q2;
+	calc_Qthetaphi(ix,iy,iz,&q1,&q2);
+	qtheta+=rho*q1*dx[1];
+	qphi+=rho*q2*dx[1];
+      }
 
-      return qtheta/sigma;
-    }
-  else
-    return -1.;
+  return qtheta/sigma;
+  
 
 #endif
     return -1.;
