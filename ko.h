@@ -546,6 +546,7 @@ ldouble calc_kappa(ldouble*,void*,ldouble*,ldouble*,ldouble*,ldouble*);
 ldouble calc_kappaes(ldouble*,void*);
 ldouble calc_ufromS(ldouble S,ldouble rho);
 ldouble calc_Sfromu(ldouble S,ldouble u);
+ldouble calc_sfromu(ldouble S,ldouble u);
 int
 avg2point(ldouble *um2,ldouble *um1,ldouble *u0,ldouble *up1,ldouble *up2,ldouble*,ldouble*,ldouble dxm2,ldouble dxm1,ldouble dx0,ldouble dxp1,ldouble dxp2,int);
 
@@ -792,7 +793,6 @@ int calc_rad_wavespeeds(ldouble *pp,void*,ldouble tautot[3],ldouble *aval,int ve
 int calc_rad_wavespeeds_pure(ldouble *pp,ldouble gg[][5],ldouble GG[][5],ldouble *aval);
 int solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose);
 ldouble calc_nsource(ldouble *pp, void* ggg);
-int calc_heatcool(ldouble *pp, void* ggg,int labframe,ldouble *Gi);
 
 //magn.c
 int mimic_dynamo(ldouble);

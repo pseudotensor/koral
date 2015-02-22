@@ -466,7 +466,6 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   /***************************************************/
 
   //artificial heating of gas at constant rate per unit mass
-
 #if defined(HEATINGRATEPERMASS) || defined(HEATINGRATEPERMASSSQ)
   //gas velocity
   ldouble ucon[4];
@@ -497,6 +496,54 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   ss[VX]+=gdetu*Hmu[1];
   ss[VY]+=gdetu*Hmu[2];
   ss[VZ]+=gdetu*Hmu[3];
+#endif
+
+
+  /***************************************************/
+
+ /***************************************************/
+
+  //artificial heating of gas towards prescribed entropy to make disk thin
+#if defined(COOLINGTOWARDSENTROPY)
+  //gas velocity
+  ldouble ucon[4];
+  ucon[1]=pp[VX];
+  ucon[2]=pp[VY];
+  ucon[3]=pp[VZ];
+  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+  //local Keplerian orbital time
+  ldouble xx[4];
+  get_xx_arb(geom->ix,geom->iy,geom->iz,xx,BLCOORDS);
+  ldouble r=xx[1];
+  ldouble Omk=1./(BHSPIN+sqrt(r*r*r));
+  ldouble Pk = 2.*M_PI/Omk;
+
+  //current entropy
+  ldouble Sloc = log(GAMMAM1*pp[UU]/pow(pp[RHO],GAMMA)); //log(p/rho^Gamma)
+  //target entropy
+  ldouble Star = TARGETLOGENTROPY;
+
+  //vertical limit for artificial cooling
+  ldouble theta = xx[2];
+  ldouble thnocool = THETANOCOOL;
+  ldouble stheta = exp(-(theta - M_PI/2.)*(theta - M_PI/2.)/2./thnocool/thnocool);
+
+  //comoving cooling rate
+  ldouble dudtau=0;
+  if(Sloc>Star) dudtau=-pp[UU]*(Sloc-Star)*stheta/Pk;
+
+  //four-vector of cooling to be applied to gas, C^\mu
+  ldouble Cmu[4]={0.,0.,0.,0.};
+  for(i=0;i<4;i++)
+    Cmu[i]=dudtau*ucon[i];
+
+  //C_\mu
+  indices_21(Cmu,Cmu,geom->gg);
+  //source terms
+  ss[UU]+=gdetu*Cmu[0];
+  ss[VX]+=gdetu*Cmu[1];
+  ss[VY]+=gdetu*Cmu[2];
+  ss[VZ]+=gdetu*Cmu[3];
 #endif
 
 
@@ -731,10 +778,16 @@ calc_ufromS(ldouble S,ldouble rho)
 }
 
 ldouble
-calc_Sfromu(ldouble rho,ldouble u)
+calc_sfromu(ldouble rho,ldouble u)
 {
   ldouble indexn=1.0/GAMMAM1;
-  return rho*log(pow(GAMMAM1*u,indexn)/pow(rho,indexn+1.0));
+  return log(pow(GAMMAM1*u,indexn)/pow(rho,indexn+1.0));
+}
+
+ldouble
+calc_Sfromu(ldouble rho,ldouble u)
+{
+  return rho*calc_sfromu(rho,u);
 }
 
 
