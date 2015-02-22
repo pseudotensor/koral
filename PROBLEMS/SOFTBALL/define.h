@@ -10,9 +10,11 @@
 //#define SKIPHDEVOLUTION
 
 //tests
+/*
 #define COOLINGTOWARDSENTROPY
 #define TARGETLOGENTROPY 8.
 #define THETANOCOOL 0.01
+*/
 
 /************************************/
 //radiation
