@@ -517,6 +517,7 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   ldouble r=xx[1];
   ldouble Omk=1./(BHSPIN+sqrt(r*r*r));
   ldouble Pk = 2.*M_PI/Omk;
+  ldouble taucool = Pk;
 
   //current entropy
   ldouble Sloc = log(GAMMAM1*pp[UU]/pow(pp[RHO],GAMMA)); //log(p/rho^Gamma)
@@ -529,8 +530,16 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   ldouble stheta = exp(-(theta - M_PI/2.)*(theta - M_PI/2.)/2./thnocool/thnocool);
 
   //comoving cooling rate
-  ldouble dudtau=0;
-  if(Sloc>Star) dudtau=-pp[UU]*(Sloc-Star)*stheta/Pk;
+  ldouble dudtau;
+  if(Sloc>Star) dudtau=-pp[UU]*(Sloc-Star)*stheta/taucool;
+
+  //sanity checks
+  if(dudtau>0.) dudtau=0.; //no heating
+  //if(global_dt>taucool) dudtau=0.; //not to overshoot - following Penna
+  if(fabs(dudtau) > 0.5*pp[UU]) dudtau=-0.5*pp[UU]; //not to overshoot - mine
+  dudtau *= step_function(r - 0.5*(rISCOBL + rhorizonBL),.1*rhorizonBL); //to avoid BH
+  if(r<rhorizonBL) dudtau=0.;
+
 
   //four-vector of cooling to be applied to gas, C^\mu
   ldouble Cmu[4]={0.,0.,0.,0.};

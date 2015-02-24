@@ -456,7 +456,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[39][ix]+=enden*dxph[1];
 
 	      //numerator of scale height (31) (column)
-	      //profiles[29][ix]+=rho*dxph[1]*pow(tan(fabs(M_PI/2.-xxBL[2])),2.);
+	      #ifndef CALCHRONTHEGO
+	      profiles[29][ix]+=rho*dxph[1]*pow(tan(fabs(M_PI/2.-xxBL[2])),2.);
+	      #endif
 
 	      //surface density in the inflow (23)
 	      if(utcon[1]<0.)
@@ -612,12 +614,17 @@ int calc_radialprofiles(ldouble profiles[][NX])
       profiles[26][ix]/=profiles[0][ix];
       profiles[45][ix]/=profiles[0][ix];
       profiles[27][ix]/=profiles[0][ix];
-      //profiles[29][ix]/=profiles[0][ix];
+      #ifndef CALCHRONTHEGO
+      profiles[29][ix]/=profiles[0][ix];
+      profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
+      #else
+      profiles[29][ix]=scaleth_otg[ix]; //scale height
+      #endif
+      
       profiles[30][ix]/=profiles[0][ix];
       profiles[31][ix]/=profiles[0][ix];
       profiles[32][ix]/=profiles[0][ix];
-      //profiles[29][ix]=sqrt(profiles[29][ix]); //scale height
-      profiles[29][ix]=scaleth_otg[ix]; //scale height
+
       profiles[40][ix]/=jetsigma;
 	  
       Bangle1/=profiles[0][ix];
@@ -1976,6 +1983,8 @@ calc_mdot(ldouble radius,int type)
 	      dx[0]=get_size_x(ix,0);
 	      dx[1]=get_size_x(iy,1);
 	      dx[2]=get_size_x(iz,2);
+	      if(NZ==1)
+		dx[2]=2.*M_PI;
 	      pick_g(ix,iy,iz,gg);
 	      pick_G(ix,iy,iz,GG);
 
@@ -2106,6 +2115,8 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
 	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
 	      dx[2]=fabs(xx2[3]-xx1[3]);
+	      if(NZ==1)
+		dx[2]=2.*M_PI;
 
 	      if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
 		Psi+=geomBL.gdet*fabs(Br)*dx[1]*dx[2];
@@ -2123,6 +2134,9 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 	      dx[1]=get_size_x(iy,1);
 	      dx[2]=get_size_x(iz,2);
 
+	      if(NZ==1)
+		dx[2]=2.*M_PI;
+
 	      get_xx(ix,iy,iz,xx);
 	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
 
@@ -2134,9 +2148,6 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 
 	      ldouble Br=pp[B1];
 
-	      dx[1]=dx[1];
-
-	  
 	      if(type==0 || (type==1 && ucon[1]<0.) || (type==2 && ucon[1]>0.))
 		Psi+=geom.gdet*fabs(Br)*dx[1]*dx[2];
 	  

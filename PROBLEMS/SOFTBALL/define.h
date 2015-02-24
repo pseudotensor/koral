@@ -10,11 +10,10 @@
 //#define SKIPHDEVOLUTION
 
 //tests
-/*
 #define COOLINGTOWARDSENTROPY
-#define TARGETLOGENTROPY 8.
-#define THETANOCOOL 0.01
-*/
+#define TARGETLOGENTROPY 1.5
+#define THETANOCOOL 0.2
+
 
 /************************************/
 //radiation
@@ -47,8 +46,8 @@
 #define MAXY (M_PI/2.+DTH)
 #define MINZ 0.
 #define MAXZ (2.*M_PI) 
-#define TNX 100 // Total number of cells in X 
-#define TNY 100
+#define TNX 80 // Total number of cells in X 
+#define TNY 80
 #define TNZ 1
 #define NTX 2 //number of tiles in X 
 #define NTY 2
@@ -68,7 +67,7 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 #define NSTEPSTOP 1.e10 //stop after this number of steps
 #define NOUTSTOP 9000 //stop after this number of outputs
-#define DTOUT1 1. //res
+#define DTOUT1 10. //res
 #define DTOUT2 1.e20 //avg
 
 /************************************/
@@ -107,6 +106,11 @@
 /************************************/
 #define GAMMA (5./3.)
 //when constructing rad-pressure supported torus we want to have pressure like for a gamma=4/3 gas, because radiation pressure has effective gamma = 4/3 
+#ifdef RADIATION
 #define EFFGAMMA (4./3.) //opt.thick
+#else
+#define EFFGAMMA (5./3.) //opt.thick
+#endif
+
 #define FRACMICHEL 0.06
 #define PERTMAGN 0.01

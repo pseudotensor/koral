@@ -8,6 +8,12 @@ ldouble ZZsun=1.;
 ldouble kappaffcgs=6.4e22*rho/Tcgs/Tcgs/Tcgs/sqrt(Tcgs);
 //ldouble kappabfcgs=4.8e-24/1.67262158e-24/1.67262158e-24*rho/Tcgs/Tcgs/Tcgs/sqrt(Tcgs)*ZZsun;
 
-return kappaCGS2GU(1.e-1)*rho;
+kappa=1.e-1;
+
+//does not work with FIXALLBUTEMP
+//kappa*=step_function(log(rho)-(-14.),1.);
+
+
+return kappaCGS2GU(kappa)*rho;
 //return kappaCGS2GU(kappaffcgs)*rho;
 
