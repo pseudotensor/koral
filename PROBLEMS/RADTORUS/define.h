@@ -11,15 +11,16 @@
 
 //#define SKIPRADSOURCE
 //#define SKIPHDEVOLUTION
-#define FIXEDALLBUTTEMP
+//#define FIXEDALLBUTTEMP
 //#define SKIPHDBUTENERGY
-#define HEATINGRATEPERMASS 1.e-4
+//#define HEATINGRATEPERMASS 1.e-4
 //#define HEATINGRATEPERMASSSQ (1.e-4/1.e-13)
 //#define HEATINGLIMITINGRHO 1.e-14
 /************************************/
 //radiation
 /************************************/
 #define RADIATION
+//#define COMPTONIZATION
 #define OMSCALE 1.
 
 /************************************/
@@ -73,12 +74,17 @@
 #ifdef myMKER1COORDS
 #define MYCOORDS MKER1COORDS
 #define RADCLOSURECOORDS BLCOORDS
-#endif
-
-#ifdef myMKER1COORDS
 #define MKS1R0 0.
 #define MINX (log(RMIN-MKS1R0))
 #define MAXX (log(RMAX-MKS1R0))
+#endif
+
+
+#ifdef myBLCOORDS
+#define MYCOORDS BLCOORDS
+#define RADCLOSURECOORDS BLCOORDS
+#define MINX RMIN
+#define MAXX RMAX
 #endif
 
 #define DTH (0.04)
@@ -116,8 +122,8 @@
 #define ALLSTEPSOUTPUT 0 //whether to output every step
 
 #define NOUTSTOP 9000 //stop after this number of outputs
-#define DTOUT1 5. //res
-#define DTOUT2 10. //avg
+#define DTOUT1 1. //res
+#define DTOUT2 5. //avg
 
 /************************************/
 //reconstruction / stepping

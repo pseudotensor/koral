@@ -3365,7 +3365,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
 	     #endif
 	   }
 
-	 if(isnan(du[i][idim])) {
+	 if(isnan(du[i][idim]) && !doingavg) {
 	   printf("nan in shear_lab : %d %d %d %d\n",ix,iy,iz,idim);
 	   print_4vector(ucovm1);
 	   print_4vector(ucov);

@@ -438,7 +438,7 @@
 #endif
 
 #ifndef RADIMPMAXITER
-#define RADIMPMAXITER 20
+#define RADIMPMAXITER 50
 #endif
 
 #define NUMEPSILON DBL_EPSILON

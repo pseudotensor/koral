@@ -125,6 +125,7 @@ main(int argc, char **argv)
 	      for(ix=0;ix<NX;ix++)
 		for(iv=0;iv<NV;iv++)
 		  set_uavg(pavg,iv,ix,iy,iz,get_u(p,iv,ix,iy,iz));
+	  //printf("1 %e %e\n",get_u(p,EE,2*NX/3,NY/2,0),get_uavg(pavg,EE,2*NX/3,NY/2,0));
 	}
 
       global_time=t;
@@ -145,13 +146,16 @@ main(int argc, char **argv)
 	}
 
       add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
+
 	
       ttot+=dt;
     }
+  printf("ttot: %f\n",ttot);
 
   //average primitives and averaged quantities
   copy_u_core(1./ttot,pavgtot,pavg,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
- 
+
+
   //avarage of average files
 #ifdef AVGAVGOUTPUT
   avgtime=1./ttot;
@@ -171,6 +175,8 @@ main(int argc, char **argv)
 	  fill_geometry(ix,iy,iz,&geom);
 	  p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
 	}
+
+
 
   //calculates scaleheight etc.
   calc_avgs_throughout();

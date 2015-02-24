@@ -361,13 +361,16 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   */
 
   //four fource
-  ldouble Gi[4],Gic[4];
+  ldouble Gi[4],Gic[4],Giff[4],Gicff[4];
   calc_Gi(pp,&geomout,Gi,1); 
-  boost2_lab2ff(Gi,Gi,pp,geomout.gg,geomout.GG);
+  boost2_lab2ff(Gi,Giff,pp,geomout.gg,geomout.GG);
+
+  if(ix==NX/2 && iy==NY/2) printf("%e %e\n",Giff[0],Giff[1]);
+
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
   ldouble kappaes=calc_kappaes(pp,&geomout);
   calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,ucon);
-  boost2_lab2ff(Gic,Gic,pp,geomout.gg,geomout.GG);
+  boost2_lab2ff(Gic,Gicff,pp,geomout.gg,geomout.GG);
 #endif 
 
   for(iv=0;iv<4;iv++)
@@ -386,9 +389,9 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
     avg[AVGEHATUCOV(iv)]=Ehat*ucov[iv];
 
   for(iv=0;iv<4;iv++)
-    avg[AVGGHAT(iv)]=Gi[iv];
+    avg[AVGGHAT(iv)]=Giff[iv];
   for(iv=0;iv<4;iv++)
-    avg[AVGGHATCOMPT(iv)]=Gic[iv];
+    avg[AVGGHATCOMPT(iv)]=Gicff[iv];
 
 #endif
 

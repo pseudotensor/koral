@@ -93,7 +93,7 @@
 //90 VETSHADOW - vet shadow test
 //91 TDENRICO - tidal disruption with Enrico's input
 
-#define PROBLEM 79
+#define PROBLEM 89
 
 
 #if(PROBLEM==91)

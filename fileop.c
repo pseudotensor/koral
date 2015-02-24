@@ -1748,7 +1748,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       ldouble ugas[4],Fx,Fy,Fz;
 	       ldouble Gi[4],Giff[4]={0.,0.,0.,0.};
 	       ldouble Gic[4],Gicff[4]={0.,0.,0.,0.};
-	       if(doingavg==0)
+	       if(doingavg==0) 
 		{
 		  calc_ff_Rtt(pp,&Rtt,ugas,&geomBL);
 		  ehat=-Rtt;  
@@ -1758,14 +1758,18 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 		  //four fource
 		  calc_Gi(pp,&geomBL,Gi,1); 
 		  boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
-                  #ifdef COMPTONIZATION
+#if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
 		  ldouble kappaes=calc_kappaes(pp,&geomBL);
 		  calc_Compt_Gi(pp,&geomBL,Gic,ehat,temp,kappaes,vel);
 		  boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
                   #endif 
-		  
-		  //test
-		  //calc_Gi(pp,&geomBL,Gi,0); 
+		  /*
+		  if(ix==2*NX/3 && iy==NY/2) 
+		    {
+		      printf("%e %e\n",pp[UU]/pp[RHO],pp[EE]);
+		      printf("gi: %e %e\n",Giff[0],Giff[1]);
+		    }
+		  */
 		}
 	      else
 		{
@@ -1776,10 +1780,11 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 		      Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz); 
 		  for(j=0;j<4;j++)
 		    Giff[j]=get_uavg(pavg,AVGGHAT(j),ix,iy,iz);
-                  #ifdef COMPTONIZATION
+#if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
 		  for(j=0;j<4;j++)
 		    Gicff[j]=get_uavg(pavg,AVGGHATCOMPT(j),ix,iy,iz);
-		  #endif		  
+		  #endif	
+
 		}
 	       
 	       //flux
