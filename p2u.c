@@ -365,8 +365,6 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   calc_Gi(pp,&geomout,Gi,1); 
   boost2_lab2ff(Gi,Giff,pp,geomout.gg,geomout.GG);
 
-  if(ix==NX/2 && iy==NY/2) printf("%e %e\n",Giff[0],Giff[1]);
-
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
   ldouble kappaes=calc_kappaes(pp,&geomout);
   calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,ucon);

@@ -836,8 +836,6 @@ mimic_dynamo(ldouble dtin)
       iy=loop_6[ii][1];
       iz=loop_6[ii][2]; 
 
-      if(!is_cell_active(ix,iy,iz)) continue;
-
       calc_primitives(ix,iy,iz,0,0);
 
       struct geometry geom;
@@ -953,7 +951,7 @@ mimic_dynamo(ldouble dtin)
       ldouble effalpha=ALPHADYNAMO;
 
       //dynamo proportional to vertical gravity ~ z
-      #ifdef ALPHAFLPSSIGN
+      #ifdef ALPHAFLIPSSIGN
       effalpha = - (M_PI/2. - xxBL[2])/(HRDTHETA/2.) * ALPHADYNAMO;  //2 to get average alpha = alphadynamo
       #endif
 
@@ -1055,7 +1053,12 @@ mimic_dynamo(ldouble dtin)
 
   //once the whole array is filled with cell centered A^phi we can 
   //calculate the extra magnetic field returned through pvecpot[1..3]
-  calc_BfromA(ptemp1,0);  
+#ifdef OMP
+  if(PROCID==0)
+    {
+#endif
+      calc_BfromA(ptemp1,0);  
+    }
    
   //and superimpose it on the original one
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
@@ -1075,10 +1078,6 @@ mimic_dynamo(ldouble dtin)
       B[1]=get_u(pvecpot,1,ix,iy,iz);
       B[2]=get_u(pvecpot,2,ix,iy,iz);
       B[3]=get_u(pvecpot,3,ix,iy,iz);
-
-#ifdef PRESERVEBSQ
-      //abandoned at 3/18/14
-#endif
 
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);

@@ -512,7 +512,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      if(isjet==1)
 		profiles[41][ix]+=(-Trtmagn)*dx[1]*dx[2]*geomBL.gdet;
 
-	      //kinetic mhd energy flux in jet (43)  
+	      //kinetic mhd energy flux in jet (44)  
 	      if(isjet==1)
 		profiles[42][ix]+=(-Trtkin)*dx[1]*dx[2]*geomBL.gdet;
 

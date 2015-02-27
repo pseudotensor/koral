@@ -534,6 +534,7 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   if(Sloc>Star) dudtau=-pp[UU]*(Sloc-Star)*stheta/taucool;
 
   //sanity checks
+  if(fabs(theta-M_PI/2.)>(0.9*M_PI/2.)) stheta=0.; //nothing at the axis                                                                                        
   if(dudtau>0.) dudtau=0.; //no heating
   //if(global_dt>taucool) dudtau=0.; //not to overshoot - following Penna
   if(fabs(dudtau) > 0.5*pp[UU]) dudtau=-0.5*pp[UU]; //not to overshoot - mine

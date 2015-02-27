@@ -1237,6 +1237,7 @@ op_explicit(ldouble t, ldouble dtin)
 
   //mimics dynamo
   mimic_dynamo(dt); 
+
   
   //must be the last one as it does not update the magn. field outside the inner domain
 
@@ -2208,9 +2209,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(TK>0) zlim1=0; 
     if(TK<NTZ-1) zlim2=0;
     #endif
-
-    if(TNY>1) ylim=1 ; else ylim=0;
-    if(TNZ>1) zlim=1 ; else zlim=0;
 
     for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
       {

@@ -2,71 +2,73 @@
 //general
 /************************************/
 #define BHDISK_PROBLEMTYPE
-#define PERTURBVEL (-.5)
 
 /************************************/
 //restart
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 44
-//#define ENFORCEENTROPY
+#define RESTARTNUM 350
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
-//#define COMPTONIZATION
+#define RADIATION
+#define COMPTONIZATION
+
+
+
+#define U2PCONV 1.e-12
+#define RADIMPCONV 1.e-12
+#define RADIMPEPS 1.e-6
+#define RADIMPMAXITER 50
+
 
 /************************************/
 //magnetic choices
 /************************************/
-//#define MIMICDYNAMO
-//#define CALCHRONTHEGO
-//#define THETAANGLE 0.25
-//#define ALPHAFLIPSSIGN                                                        
-//#define ALPHADYNAMO 0.314
-//#define DAMPBETA
-//#define BETASATURATED 0.1
-//#define ALPHABETA 6.28
+#define MIMICDYNAMO
+#define CALCHRONTHEGO
+#define THETAANGLE 0.25
+#define ALPHAFLIPSSIGN                                                        
 
+#define ALPHADYNAMO 0.314
+#define DAMPBETA
+#define BETASATURATED 0.1
+#define ALPHABETA 6.28
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
+#define MAXBETA .01 //target pmag/pgas int the midplane
 
 /************************************/
 //reconstruction / Courant
 /************************************/
-#define INT_ORDER 2
-#define TIMESTEPPING RK2HEUN
+#define INT_ORDER 1
+#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
+#define DORADFIXUPS 1
 
 /************************************/
 //viscosity choices
 /************************************/
-#ifdef RADIATION
-//#define RADVISCOSITY SHEARVISCOSITY
-//#define ACCELRADVISCOSITY
-//#define RADVISCMFPSPH
-//#define RADVISCNUDAMP
-//#define RADVISCMAXVELDAMP
-//#define ALPHARADVISC 0.1
-//#define MAXRADVISCVEL .1
-#endif
+#define RADVISCOSITY SHEARVISCOSITY
+#define ACCELRADVISCOSITY
+#define RADVISCMFPSPH
+#define RADVISCNUDAMP
+#define RADVISCMAXVELDAMP
+#define ALPHARADVISC 0.1
+#define MAXRADVISCVEL 0.1
 
 /************************************/
 //rmhd floors
 /************************************/
-//#define CORRECT_POLARAXIS_3D
 #define CORRECT_POLARAXIS
-//#define SMOOTH_POLARAXIS
 //#define POLARAXISAVGIN3D
-#define U2P_EQS U2P_EQS_NOBLE
-#define U2P_SOLVER U2P_SOLVER_W
 #define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
@@ -75,7 +77,7 @@
 #define EEUURATIOMIN 1.e-20
 #define EEUURATIOMAX 1.e20
 #define B2UURATIOMIN 0.
-#define B2UURATIOMAX 10000.
+#define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
 #define B2RHORATIOMAX 50.
 #define GAMMAMAXRAD 50.
@@ -85,26 +87,23 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.7
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS3COORDS
+#define myMKS2COORDS
 #define MKSR0 0.
 #define MKSH0 0.6
 #define MKSMY1 0.001
-#define MKSMY2 0.025
-#define MKSMP0 1.2
+#define MKSMY2 0.2
+#define MKSMP0 1.5
 #define METRICAXISYMMETRIC
-#define PERTMAGN 1.e-2
-#define RMIN 5.//1.55
-#define RMAX 50.
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(RMIN-MKSR0))
-#define MAXX (log(RMAX-MKSR0))
+#define MINX (log(1.85-MKSR0))
+#define MAXX (log(1000.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
 #endif
@@ -112,8 +111,8 @@
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
-#define MINX (log(RMIN-MKSR0))
-#define MAXX (log(RMAX-MKSR0))
+#define MINX (log(1.85-MKSR0))
+#define MAXX (log(100.-MKSR0))
 #define MINY 0.
 #define MAXY 1.
 #endif
@@ -123,9 +122,9 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 120 //8*34
-#define TNY 100 //10*24
-#define TNZ 16 //16*2
+#define TNX 252 //28*9
+#define TNY 234 //26*9
+#define TNZ 1 //2*8
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -153,7 +152,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 .5
+#define DTOUT1 1.e-2
 #define DTOUT2 1000.
 
 /************************************/
@@ -161,74 +160,7 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 81
-
-
-#if(NTORUS==81) //
-#define LT_KAPPA 5.e2
-#define LT_XI 0.705
-#define LT_R1 40.
-#define LT_R2 1000.
-#ifdef RADIATION
-#define LT_GAMMA 4./3.
-#else
-#define LT_GAMMA 5./3.
-#endif
-#define LT_RIN 10.
-#define BETANORMEQPLANE
-//#define BETANORMFACTOR 1.e-04
-#undef MAXBETA
-#define MAXBETA (.1) 
-#endif
-
-#if(NTORUS==79 || NTORUS==80) //
-#define LT_KAPPA 5.e2
-#define LT_XI 0.705
-#define LT_R1 40.
-#define LT_R2 1000.
-#ifdef RADIATION
-#define LT_GAMMA 4./3.
-#else
-#define LT_GAMMA 5./3.
-#endif
-#define LT_RIN 10.
-#define BETANORMEQPLANE
-//#define BETANORMFACTOR 1.e-4
-#undef MAXBETA
-#define MAXBETA (.01) 
-#endif
-
-#if(NTORUS==78) //
-#define LT_KAPPA 5.e2
-#define LT_XI 0.96
-#define LT_R1 14.
-#define LT_R2 400.
-#ifdef RADIATION
-#define LT_GAMMA 4./3.
-#else
-#define LT_GAMMA 5./3.
-#endif
-#define LT_RIN 10.
-#define BETANORMEQPLANE
-#undef MAXBETA
-#define MAXBETA (.1) 
-#endif
-
-#if(NTORUS==77) //flat sigma, single poloidal loop
-#define LT_KAPPA 5.e2
-#define LT_XI 0.975
-#define LT_R1 30.
-#define LT_R2 200.
-#ifdef RADIATION
-#define LT_GAMMA 4./3.
-#else
-#define LT_GAMMA 5./3.
-#endif
-#define LT_RIN 22.
-#define BETANORMFULL
-#undef MAXBETA
-#define MAXBETA (.05) 
-#endif
+#define NTORUS 7
 
 #if(NTORUS==7) //flat sigma
 #define LT_KAPPA 5.e2
@@ -236,15 +168,11 @@
 #define LT_XI 0.975
 #define LT_R1 30.
 #define LT_R2 200.
-#ifdef RADIATION
 #define LT_GAMMA 4./3.
-#else
-#define LT_GAMMA 5./3.
-#endif
 #define LT_RIN 22.
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (1./10.)
+#define MAXBETA (1./10.) //eq.plane
 #endif
 
 #if(NTORUS==6) //for not-so-hyper
@@ -319,6 +247,6 @@
 #define LT_RIN 10.
 #endif
 
-#define RHOATMMIN  1.e-20
+#define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

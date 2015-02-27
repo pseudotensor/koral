@@ -153,7 +153,7 @@ main(int argc, char **argv)
 #ifdef MAGNFIELD
 #ifdef VECPOTGIVEN
       if(PROCID==0) {printf("Calculating magn. field... ");fflush(stdout);}
-      //#pragma omp parallel
+      #pragma omp parallel
       calc_BfromA(p,1);
       //exchange magn. field calculated in domain
       mpi_exchangedata();
@@ -437,6 +437,12 @@ solve_the_problem(ldouble tstart, char* folder)
       //**********************************************************************
       //**********************************************************************
 
+      if(TIMESTEPPING==-100) //skip evolution completely
+	{
+	  save_timesteps(); 
+	  t+=dt;
+	}
+      else
       if(TIMESTEPPING==RK2IMEX)
 	{
 	  ldouble gamma=1.-1./sqrt(2.),dtcell;

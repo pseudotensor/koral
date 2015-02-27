@@ -1,9 +1,10 @@
 //scales magnetic pressure so MAXBETA = pmag/(pgas+prad)
 int ix,iy,iz;
+
 #ifdef MAGNFIELD
 if(PROCID==0) {printf("Renormalizing magnetic field... ");fflush(stdout);}
 ldouble maxbeta=0.;
-//#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
 for(iz=0;iz<NZ;iz++)
   {
     for(iy=0;iy<NY;iy++)
@@ -41,23 +42,23 @@ for(iz=0;iz<NZ;iz++)
 		
 #endif
 
-#ifdef BETANORMEQPLANE //normalizing wrt to near the equatorial plane
-		if(fabs(geomBL.yy-M_PI/2.)<M_PI/10. && geomBL.xx<300.)
-		  {
-#pragma omp critical
-		    if(pmag/ptot>maxbeta) 
-		      maxbeta=pmag/ptot;
-		  }
-#else		//normalizing wrt everywhere by default
+#ifdef BETANORMFULL
+		//normalizing wrt everywhere
 #pragma omp critical
 		if(pmag/ptot>maxbeta) 
 		  {
 		    maxbeta=pmag/ptot;
 		    //printf("%d %d > %e %e %e\n",ix,iy,pmag,ptot,maxbeta);
 		  }
-#endif
 		    
-
+#else //normalizing wrt to the equatorial plane
+		if(geom.iy==NY/2)
+		  {
+#pragma omp critical
+		    if(pmag/ptot>maxbeta) 
+		      maxbeta=pmag/ptot;
+		  }
+#endif
 	  }
       }
   }
@@ -79,8 +80,7 @@ ldouble fac=sqrt(MAXBETA/maxbeta);
 #ifdef BETANORMFACTOR
 fac=BETANORMFACTOR;
 #endif
-
-printf("rescaling magn.fields by %e (%e)\n",fac,maxbeta);
+//printf("rescaling magn.fields by %e (%e)\n",fac,maxbeta);
 
 #pragma omp parallel for private(ix,iy,iz) schedule (dynamic)
 for(iz=0;iz<NZ;iz++)
