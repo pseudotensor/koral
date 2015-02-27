@@ -367,6 +367,7 @@ int adjust_fluxcttoth_emfs()
 }
 
 //calculates magnetic field from vector potential given in pinput[B1..B3]
+//serial!
 int
 calc_BfromA(ldouble* pinput, int ifoverwrite)
 {
@@ -386,6 +387,8 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
       for(iz=0;iz<=NZ;iz++)
 	{
     
+	  if(NZ==1 && iz>0) continue;
+	  if(NY==1 && iy>0) continue;
 
       //calculating A_i on corners by averaging neighbouring cell centers
       ldouble A[3];
@@ -486,8 +489,8 @@ calc_BfromA_core()
       iz=loop_0[ii][2]; 
   */
 
-  for(ix=0;ix<NX;ix++)
-    for(iy=0;iy<NY;iy++)
+  for(ix=-1;ix<=NX;ix++)
+    for(iy=-1;iy<=NY;iy++)
       for(iz=0;iz<NZ;iz++)
 	{
 
@@ -829,14 +832,14 @@ mimic_dynamo(ldouble dtin)
   ugasin=ugasout=0.;
 
 
-  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   for(ii=0;ii<Nloop_6;ii++) //inner domain plus 1-cell layer including corners
     {      
       ix=loop_6[ii][0];
       iy=loop_6[ii][1];
       iz=loop_6[ii][2]; 
-
-      calc_primitives(ix,iy,iz,0,0);
+  
+      // cannot be here! mpi exchanges primitives, not conserved, so we are ready to go!
+      //      calc_primitives(ix,iy,iz,0,0); 
 
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
@@ -1051,12 +1054,13 @@ mimic_dynamo(ldouble dtin)
 
     }
 
+  
   //once the whole array is filled with cell centered A^phi we can 
   //calculate the extra magnetic field returned through pvecpot[1..3]
 #ifdef OMP
   if(PROCID==0)
-    {
 #endif
+    {
       calc_BfromA(ptemp1,0);  
     }
    
@@ -1078,6 +1082,8 @@ mimic_dynamo(ldouble dtin)
       B[1]=get_u(pvecpot,1,ix,iy,iz);
       B[2]=get_u(pvecpot,2,ix,iy,iz);
       B[3]=get_u(pvecpot,3,ix,iy,iz);
+
+      
 
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
@@ -1109,7 +1115,7 @@ mimic_dynamo(ldouble dtin)
       set_u(u,B1,ix,iy,iz,uutemp[B1]);
       set_u(u,B2,ix,iy,iz,uutemp[B2]);
       set_u(u,B3,ix,iy,iz,uutemp[B3]);
-
+      
      
       if(verbose)// && ix+TOI==verix && iy+TOJ==veriy)
 	{

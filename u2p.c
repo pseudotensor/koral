@@ -36,6 +36,14 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
+  /*
+  if(type==77)
+    {
+      if(PROCID==5 && ix==NX && iy==NY-2) printf("1 %d > %e\n",PROCID,pp[UU]);
+  if(PROCID==6 && ix==0 && iy==NY-2) printf("1 %d > %e\n",PROCID,pp[UU]);
+    }
+  */
+
   //aux
   if(setflags)
     {
@@ -50,8 +58,17 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
       u2p_solver_Bonly(uu,pp,&geom); //invert only the magnetic field, the rest will be overwritten
     }
   else
-    u2p(uu,pp,&geom,corrected,fixups,type); //regular inversion
+    //    u2p(uu,pp,&geom,corrected,fixups,type); //regular inversion
+    u2p(uu,pp,&geom,corrected,fixups,0); //regular inversion
   
+    /*
+    if(type==77)
+      {
+ if(PROCID==5 && ix==NX && iy==NY-2) printf("2 %d > %e\n",PROCID,pp[UU]);
+ if(PROCID==6 && ix==0 && iy==NY-2) printf("2 %d > %e\n",PROCID,pp[UU]);
+      }
+    */
+
   if(corrected[0]==1 && setflags) //hd correction - entropy solver
     set_cflag(ENTROPYFLAG,ix,iy,iz,1); 
   if(corrected[2]==1 && setflags) //borrowing energy from radiation didn't work

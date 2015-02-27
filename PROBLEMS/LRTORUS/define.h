@@ -6,14 +6,14 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM 350
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define COMPTONIZATION
 
 
@@ -45,7 +45,7 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
+#define TIMESTEPPING RK2HEUN//IMEX //test IMEX with radiation etc!!!
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
@@ -102,7 +102,7 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.85-MKSR0))
+#define MINX (log(5.-MKSR0))
 #define MAXX (log(1000.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
@@ -122,12 +122,12 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 252 //28*9
-#define TNY 234 //26*9
+#define TNX 160 //28*9
+#define TNY 100 //26*9
 #define TNZ 1 //2*8
 //number of tiles
-#define NTX 2
-#define NTY 2
+#define NTX 4
+#define NTY 4
 #define NTZ 1
 
 #define SPECIFIC_BC
@@ -152,7 +152,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.e-2
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/
