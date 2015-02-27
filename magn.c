@@ -838,9 +838,6 @@ mimic_dynamo(ldouble dtin)
       iy=loop_6[ii][1];
       iz=loop_6[ii][2]; 
   
-      // cannot be here! mpi exchanges primitives, not conserved, so we are ready to go!
-      //      calc_primitives(ix,iy,iz,0,0); 
-
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
 
@@ -976,56 +973,7 @@ mimic_dynamo(ldouble dtin)
 
 //damping azimuthal component of magnetic field if beta exceeds DAMPBETA
 #ifdef DAMPBETA      
-      //local four-velocity
-      /*     
-      ucon[0]=0;
-      ucon[1]=get_u(p,VX,ix,iy,iz);
-      ucon[2]=get_u(p,VY,ix,iy,iz);
-      ucon[3]=get_u(p,VZ,ix,iy,iz);
-      conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geom.gg,geom.GG);
-      
-      ldouble bphi,dbphi,Bcon[4];
-      
-      bphi = bcon[3];
-
-      //double range for damping
-      zH/=2.;
-      faczH = my_max(0.,pow(1. - zH*zH,zHpow));
-
-      dbphi = - ALPHABETA 
-	* facvel
-	* facradius
-	* faczH
-	* dt / Pk 
-	* my_max(0.,beta - BETASATURATED) / BETASATURATED 
-	* bphi;
-
-      if((dbphi+bphi)*bphi<0.) dbphi=-bphi; //not to overshoot zero
-
      
-      bphi+=dbphi;
-      bcon[3]=bphi;
-
-      Bcon[1]=get_u(p,B1,ix,iy,iz);
-      Bcon[2]=get_u(p,B2,ix,iy,iz);
-      Bcon[3]=get_u(p,B3,ix,iy,iz);
-
-      Bcon[3]=(bcon[3]*ucon[0]-(Bcon[1]*ucov[1]+Bcon[2]*ucov[2])*ucon[3])/
-	(1.+ucon[3]*ucov[3]);
-
-      ldouble Bphinew=Bcon[3];
-      const ldouble maxBphichange=1.e-1;
-      ldouble facdamp=1.;
-      ldouble Bphichange=fabs((Bphinew-Bphi)/Bphi);
-
-      if (Bphichange>maxBphichange)
-        facdamp=maxBphichange/Bphichange;
-
-      Bcon[3]=Bphi + (Bphinew-Bphi)*facdamp;
-
-      set_u(p,B3,ix,iy,iz,Bcon[3]);
-*/
-      
       
       ldouble dBphi = - ALPHABETA 
 	* facradius
