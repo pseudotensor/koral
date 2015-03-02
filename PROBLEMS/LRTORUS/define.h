@@ -13,7 +13,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define COMPTONIZATION
 
 
@@ -145,6 +145,10 @@
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
+#define BOXOUTPUT 1
+#define BOXR1 40.
+#define BOXR2 50.
+#define BOXITH (TNY/4) //distance from eq.plane in cells
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
 #define RADOUTPUT 1
@@ -152,7 +156,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/

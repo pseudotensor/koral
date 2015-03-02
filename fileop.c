@@ -77,6 +77,12 @@ fprint_openfiles(char* folder)
 
   sprintf(bufor,"%s/failures.dat",folder);
   fout_fail=fopen(bufor,"a");
+
+  //ultimately to handle MPI as well
+#if(BOXOUTPUT==1)
+  sprintf(bufor,"%s/boxscalars.dat",folder);
+  fout_boxscalars=fopen(bufor,"a");
+#endif
 #endif
 
   return 0;
@@ -92,6 +98,9 @@ fprint_closefiles()
 #ifndef MPI
   fclose(fout_scalars);
   fclose(fout_fail);  
+#if(BOXOUTPUT==1)
+  fclose(fout_boxscalars);
+#endif
 #endif
   return 0;
 }
@@ -159,6 +168,35 @@ fprint_scalars(ldouble t, ldouble *scalars, int nscalars)
 
   return 0;
 }
+
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints scalars to boxscalars.dat */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int
+fprint_boxscalars(ldouble t)
+{
+  ldouble boxscalars[NBOXSCALARS];
+
+
+  calc_boxscalars(boxscalars,t);
+  #ifndef MPI
+  int iv;
+  //printing boxscalars
+  fprintf(fout_boxscalars,"%e ",t);
+  for(iv=0;iv<NBOXSCALARS;iv++)
+    fprintf(fout_boxscalars,"%e ",boxscalars[iv]);
+  fprintf(fout_boxscalars,"\n");
+  fflush(fout_boxscalars);
+  #endif
+
+  return 0;
+}
+
 
 /*********************************************/
 /*********************************************/
@@ -253,6 +291,7 @@ fprint_thprofiles(ldouble t, int nfile, char* folder, char* prefix)
   return 0;
 }
  
+
 
 /*********************************************/
 /*********************************************/

@@ -275,6 +275,10 @@
 #define NTHPROFILES 6
 #endif
 
+#ifndef NBOXSCALARS
+#define NBOXSCALARS 4
+#endif
+
 #ifndef NANARELRADPROFILES
 #define NANARELRADPROFILES 4
 #endif

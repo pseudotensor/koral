@@ -4546,7 +4546,7 @@ radclosure_VET(ldouble *pp0, void *ggg, ldouble Rij[][4])
 	printf("%e ",intensities[l]);
       printf("\n");
       for(l=0;l<NUMANGLES;l++)
-	printf("%e ",Ibeam[geom->ix+i-1+NGCX][geom->iy+j-1+NGCY][geom->iz+k-1+NGCZ][l]);
+	printf("%e ",Ibeam[geom->ix+NGCX][geom->iy+NGCY][geom->iz+NGCZ][l]);
       printf("\n");
 	      
 	  
@@ -5045,7 +5045,7 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
   rettemp=u2p_solver(uuexp,ppexp,geom,U2P_HOT,0); 
 
   if(rettemp<0)
-    printf("hd u2p in fix vel failed %d %d\n",corr[0],corr[1]);
+    printf("hd u2p in fix vel failed \n");
 
   /* end of explicit */
 

@@ -1141,6 +1141,141 @@ int calc_scalars(ldouble *scalars,ldouble t)
 }
 
 
+/*********************************************/
+/* calculates box-related scalars  */
+/*********************************************/
+int calc_boxscalars(ldouble *boxscalars,ldouble t)
+{
+  //adjust NBOXSCALARS in problem.h
+  
+  int ix,iy,iz,ii,iv;
+  int bix1,bix2,biy1,biy2,giy;
+  ldouble xx[4],xxBL[4];
+
+  //zero scalars by default
+  for(ii=0;ii<NBOXSCALARS;ii++)
+    boxscalars[ii]=0.;
+
+  //search for appropriate indices
+  
+
+  //limits of this tile
+  int rmin,rmax;
+  get_xx(0,0,0,xx);
+  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  rmin=xxBL[1];
+  get_xx(NX-1,0,0,xx);
+  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  rmax=xxBL[1];
+
+  //global index of the theta limits
+  int giy1,giy2;
+  mpi_local2globalidx(0,0,0,&ix,&giy1,&iz);
+  mpi_local2globalidx(0,NY-1,0,&ix,&giy2,&iz);
+
+  //if tile completely outside the box
+  int ifoutsidebox=0;
+
+  if((rmax<BOXR2) || (rmin>BOXR2))
+    ifoutsidebox=1;
+
+  if((giy2 < (TNY/2-BOXITH)) || (giy1 > (TNY/2+BOXITH)))
+    ifoutsidebox=1;
+
+  if(ifoutsidebox) return 0;
+
+  //radial limits first 
+  bix1=bix2=-1;
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>BOXR1 & bix1<0) bix1=ix;
+      if(xxBL[1]>BOXR2 & bix2<0) bix2=ix;
+    }
+  if(bix1<0) bix1=NX-1;
+  if(bix2<0) bix2=NX-1;
+
+  //then polar angle
+
+  biy1=biy2=-1;
+  for(iy=0;iy<NY;iy++)
+    {
+      mpi_local2globalidx(0,iy,0,&ix,&giy,&iz);
+      
+      if(giy>(TNY/2-BOXITH) && biy1<0) biy1=iy;
+      if(giy>(TNY/2+BOXITH) && biy2<0) biy2=iy;
+    }
+  if(biy1<0) biy1=NY-1;
+  if(biy2<0) biy2=NY-1;
+  
+  printf("PROCID: %d > bix: %d - %d > biy: %d - %d\n",PROCID,bix1,bix2,biy1,biy2);
+
+  //first integrals / averages within the box
+  ldouble mass=0.;
+  ldouble rho,uint,Tgas,Trad,ehat,pgas,prad,ptot,pp[NV];
+
+  for(ix=bix1;ix<=bix2;ix++)
+    for(iy=biy1;iy<=biy2;iy++)
+      for(iz=0;iz<NZ;iz++)
+      {
+	struct geometry geom;
+	fill_geometry(ix,iy,iz,&geom);
+	
+	struct geometry geomBL;
+	fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	
+	//coordinates
+	get_xx(ix,iy,iz,xx);	      
+	coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	ldouble dxph[3],dx[3];
+	ldouble xx1[4],xx2[4];
+	xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
+	xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
+	coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	dx[0]=fabs(xx2[1]-xx1[1]);
+	xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
+	xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
+	coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	dx[1]=fabs(xx2[2]-xx1[2]);
+	xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
+	xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
+	coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
+	coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	dx[2]=fabs(xx2[3]-xx1[3]);
+	if(NZ==1) dx[2]=2.*M_PI;
+
+	//primitives at the cell - either averaged or original, in BL or MYCOORDS
+	for(iv=0;iv<NV;iv++)
+	  pp[iv]=get_u(p,iv,ix,iy,iz);
+
+	//to BL, res-files and primitives in avg in MYCOORDS
+	trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+
+	//from now on - working in BL coords
+
+	//PLACE - get avg quantities if required
+
+	//precalculating stuff
+	
+
+	//integrals
+	rho=pp[RHO];
+	mass+=rho*dx[0]*dx[1]*dx[2]*geomBL.gdet;
+
+	//PLACE - rho-averages
+	
+      }
+  
+  boxscalars[0]=mass; // (1) - total mass inside the box
+
+
+  return 0;
+}
+
+
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************

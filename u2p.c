@@ -1162,8 +1162,6 @@ find_Wplim(ldouble *Wp,ldouble *cons)
   if(verbose) printf ("%-5s %10s %10s\n",
           "iter", "root", "err(est)");
 
-   if(verbose) printf ("%5d %10.7e %10.7e\n",
-              iter, x, x - x0);
   do
     {
       iter++;
@@ -1497,7 +1495,7 @@ u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 	  //if(Etype!=U2P_HOT) 
 	  //(*f_u2p)(Wpnew,cons,&f0tmp,&dfdWtmp,&errtmp);
 
-	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e %e %e %e\n",idump,iter,Wpnew,f0tmp,dfdWtmp,errtmp,v2,gamma2,wmrho0);
+	  if(verbose>1) printf("sub (%d) :%d %e %e %e %e %e %e\n",idump,iter,Wpnew,f0tmp,dfdWtmp,v2,gamma2,wmrho0);
 
 	  //if((gamma2<0. || Wpnew<0. || wmrho0<0. || !isfinite(f0tmp) || !isfinite(dfdWtmp)) && (idump<itmaxdamp))
 	  if((gamma2<0. || Wpnew<0. || wmrho0<=0.) && (idump<itmaxdamp))

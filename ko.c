@@ -764,6 +764,11 @@ solve_the_problem(ldouble tstart, char* folder)
 	  fprint_restartfile(t,folder);
 
 	  //dumps dumps
+
+#if(BOXOUTPUT==1)
+	  fprint_boxscalars(t);
+#endif
+
 	  #ifndef MPI //comment if you want .silo etc files per core for OUTPUTPERCORE
 #if(SCAOUTPUT==1)
 	  fprint_scalars(t,scalars,NSCALARS);
@@ -773,6 +778,9 @@ solve_the_problem(ldouble tstart, char* folder)
 #endif
 #if(OUTOUTPUT==1)
 	  fprint_outfile(t,nfout1,0,folder,"out");
+#endif
+#if(THOUTPUT==1)
+	  fprint_thprofiles(t,nfout1,folder,"th");
 #endif
 #if(SILOOUTPUT==1)
 #ifndef NOSILO

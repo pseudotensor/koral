@@ -2125,7 +2125,7 @@ coco_KS2MKS1(ldouble *xKS, ldouble *xMKS1)
   ldouble KSx1=xKS[1];
   ldouble KSx2=xKS[2];
   ldouble KSx3=xKS[3];
-  ldouble R0;
+  ldouble R0=0.;
 
 #if(MYCOORDS==MKS1COORDS)
   R0=MKSR0;
@@ -2159,8 +2159,7 @@ coco_KS2MKS2(ldouble *xKS, ldouble *xMKS1)
   ldouble KSx1=xKS[1];
   ldouble KSx2=xKS[2];
   ldouble KSx3=xKS[3];
-  ldouble R0,H0;
-  R0=H0=0.;
+  ldouble R0=0.,H0=0.;
 
 #if(MYCOORDS==MKS1COORDS)
   R0=MKSR0;
@@ -2248,7 +2247,7 @@ coco_KS2TKS3(ldouble *xKS, ldouble *xMKS)
   ldouble KSx3=xKS[3];
   ldouble x0,x1,x2,x3;
   ldouble R0,H0,MY1,MY2,MP0,T0;
-  R0=H0=MY1=MY2=T0=0.;
+  R0=H0=MY1=MY2=MP0=T0=0.;
 
   
 #if(MYCOORDS==TKS3COORDS)
@@ -2296,6 +2295,7 @@ coco_MINK2TFLAT(ldouble *xKS, ldouble *xMKS)
 
 
   ldouble T0,x0,x1,x2,x3;
+  T0=0.;
 #if(MYCOORDS==TFLATCOORDS)
   T0=TFLATT0;
 #endif
@@ -2333,7 +2333,7 @@ coco_MKS12KS(ldouble *xMKS1, ldouble *xKS)
   ldouble x1=xMKS1[1];
   ldouble x2=xMKS1[2];
   ldouble x3=xMKS1[3];
-  ldouble R0;
+  ldouble R0=0.;
 #if(MYCOORDS==MKS1COORDS)
   R0=MKSR0;
 #endif
@@ -2451,7 +2451,7 @@ coco_TKS32KS(ldouble *xMKS, ldouble *xKS)
   ldouble x3=xMKS[3];
   ldouble R0,H0,MY1,MY2,MP0,T0;
   ldouble KSx0,KSx1,KSx2,KSx3;
-  R0=H0=MY1=MY2=T0=0.;
+  R0=H0=MY1=MY2=MP0=T0=0.;
 
 #if(MYCOORDS==TKS3COORDS)
   T0=TKST0;
@@ -2498,7 +2498,7 @@ coco_TFLAT2MINK(ldouble *xMKS, ldouble *xKS)
   ldouble x3=xMKS[3];
 
 
-  ldouble T0,KSx0,KSx1,KSx2,KSx3;
+  ldouble T0=0.,KSx0,KSx1,KSx2,KSx3;
 #if(MYCOORDS==TFLATCOORDS)
   T0=TFLATT0;
 #endif
@@ -3153,7 +3153,7 @@ dxdx_KS2TKS3(ldouble *xx, ldouble dxdx[][4])
   ldouble KSx3=xx[3];
 
   ldouble R0,H0,MY1,MY2,MP0,T0;
-  R0=H0=MY1=MY2=T0=0.;
+  R0=H0=MY1=MY2=MP0=T0=0.;
 
 #if(MYCOORDS==TKS3COORDS)			
   T0=TKST0;
@@ -3204,7 +3204,7 @@ dxdx_MINK2TFLAT(ldouble *xx, ldouble dxdx[][4])
   ldouble KSx2=xx[2];
   ldouble KSx3=xx[3];
 
-  ldouble T0;
+  ldouble T0=0.;
 #if(MYCOORDS==TFLATCOORDS)
   T0=TFLATT0;
 #endif
@@ -3391,7 +3391,7 @@ dxdx_TKS32KS(ldouble *xx, ldouble dxdx[][4])
   ldouble x3=xx[3];
 
   ldouble R0,H0,MY1,MY2,MP0,T0;
-  R0=H0=MY1=MY2=T0=0.;
+  R0=H0=MY1=MY2=MP0=T0=0.;
 
 #if(MYCOORDS==TKS3COORDS)
   T0=TKST0;
@@ -3442,7 +3442,7 @@ dxdx_TFLAT2MINK(ldouble *xx, ldouble dxdx[][4])
   ldouble x2=xx[2];
   ldouble x3=xx[3];
   
-  ldouble T0;
+  ldouble T0=0.;
 #if(MYCOORDS==TFLATCOORDS)
   T0=TFLATT0;
 #endif
