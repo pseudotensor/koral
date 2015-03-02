@@ -1836,8 +1836,7 @@ calc_Rij_visc_total()
 {
 #ifdef RADIATION
 #if (RADVISCOSITY==SHEARVISCOSITY)
-#pragma omp parallel
-  {
+
   int ii,ix,iy,iz,i,j;
   struct geometry geomcent;
   int derdir[3]={0,0,0};
@@ -1862,7 +1861,7 @@ calc_Rij_visc_total()
 	    Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]=Rvisc[i][j];	      
 	  }
     }
-  }
+  
    #endif
 #endif
    return 0;

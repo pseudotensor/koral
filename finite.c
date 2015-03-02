@@ -409,42 +409,38 @@ save_timesteps()
 #endif
 
 
-#pragma omp parallel 
-  {
-    int ii;
-    ldouble dtminloc=BIG;
-    for(ii=0;ii<Nloop_0;ii++) 
-      { 
-	int ix,iy,iz;
-	ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
+  int ii;
+  ldouble dtminloc=BIG;
+  for(ii=0;ii<Nloop_0;ii++) 
+    { 
+      int ix,iy,iz;
+      ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 
-	set_u_scalar(cell_dt,ix,iy,iz,1./get_u_scalar(cell_tstepden,ix,iy,iz));
+      set_u_scalar(cell_dt,ix,iy,iz,1./get_u_scalar(cell_tstepden,ix,iy,iz));
 	
-	#ifdef SHORTERTIMESTEP
-	ldouble dtm1,dtp1,dt;
-	if(ix>0)
-	  dtm1=1./get_u_scalar(cell_tstepden,ix-1,iy,iz);
-	else
-	  dtm1=BIG;
+#ifdef SHORTERTIMESTEP
+      ldouble dtm1,dtp1,dt;
+      if(ix>0)
+	dtm1=1./get_u_scalar(cell_tstepden,ix-1,iy,iz);
+      else
+	dtm1=BIG;
 
-	if(ix<NX)
-	  dtp1=1./get_u_scalar(cell_tstepden,ix+1,iy,iz);
-	else
-	  dtp1=BIG;
+      if(ix<NX)
+	dtp1=1./get_u_scalar(cell_tstepden,ix+1,iy,iz);
+      else
+	dtp1=BIG;
 
-	dt=1./get_u_scalar(cell_tstepden,ix,iy,iz);
+      dt=1./get_u_scalar(cell_tstepden,ix,iy,iz);
 
-	set_u_scalar(cell_dt,ix,iy,iz,my_min(my_min(dtm1,dtp1),dt));
-        #endif
+      set_u_scalar(cell_dt,ix,iy,iz,my_min(my_min(dtm1,dtp1),dt));
+#endif
 
-	//find the shortest
+      //find the shortest
 	
-	if(get_u_scalar(cell_dt,ix,iy,iz)<dtminloc)
-	  dtminloc=get_u_scalar(cell_dt,ix,iy,iz);
+      if(get_u_scalar(cell_dt,ix,iy,iz)<dtminloc)
+	dtminloc=get_u_scalar(cell_dt,ix,iy,iz);
 
-      }
-  }
-  
+    }
 
 #ifdef SELFTIMESTEP_POWRADIUS
   //find the smallest (dt / RMIN**pow)
@@ -465,8 +461,6 @@ save_timesteps()
 	    }
 	}
 
-#pragma omp parallel shared(dtmin)
-  {
     int ii;
     struct geometry geomBL;
     for(ii=0;ii<Nloop_0;ii++) 
@@ -485,9 +479,6 @@ save_timesteps()
 	//printf("%d %d>%e %e %e\n",PROCID,ix,get_u_scalar(cell_dt,ix,iy,iz),dtmin,frad);
       }
     
-  }
-
-
   //find the longest
   ldouble dtmax=-1.;
   for(ix=0;ix<NX;ix++)
@@ -1867,35 +1858,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 #endif
 
-#pragma omp parallel private(ix,iy,iz,i,ii,jj,ix1,ix2,iy1,iy2,iz1,iz2)
-  {
-#ifdef OMP
-    //under openMP - loops reflect the tiles
-    ix1=TOI;
-    ix2=TOI+TNX/NTX;
-    iy1=TOJ;
-    iy2=TOJ+TNY/NTY;
-    iz1=TOK;
-    iz2=TOK+TNZ/NTZ;
-
-    //printf("%d %d %d %d %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,iz1,iz2);
-
-#if defined(SUBZONES) || defined(MSTEP)
-    //split the subzone between szix1 and szix2 into tiles - 1d only
-    ldouble istart=(ldouble)szix1;
-    ldouble iend=(ldouble)szix2;
-    ldouble ilen=(iend-istart)/(ldouble)NTX;
-    int tsi=floor(ilen);
-    if(tsi<ilen) tsi++;
-    ix1 = szix1 + TI*tsi;
-    ix2 = ix1 + tsi;
-
-    if(TI==NTX-1) ix2=szix2;  
-
-
-#endif
-#endif
-
     //printf("%d %d %d | %d %d | %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,SX,SY,SZMET); if(PROCID==0) getch();
 
     global_ix1=ix1;
@@ -1952,17 +1914,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(TNY>1) ylim1=ylim2=lim; else ylim1=ylim2=0;
     if(TNZ>1) zlim1=zlim2=lim; else zlim1=zlim2=0;
 
-    #ifdef OMP
-        
-    if(TI>0) xlim1=0; //not left-most
-    if(TI<NTX-1) xlim2=0; //not right-most
-    if(TJ>0) ylim1=0; 
-    if(TJ<NTY-1) ylim2=0;
-    if(TK>0) zlim1=0; 
-    if(TK<NTZ-1) zlim2=0;   
-    
-    #endif
-
     Nloop_1=0;
     //loop_1=(int **)malloc(sizeof(int*));
     //loop_1[0]=(int *)malloc(3*sizeof(int));
@@ -2002,14 +1953,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(TNY>1) ylim1=ylim2=NG; else ylim1=ylim2=0;
     if(TNZ>1) zlim1=zlim2=NG; else zlim1=zlim2=0;
 
-    #ifdef OMP
-    if(TI>0) xlim1=0; //not left-most
-    if(TI<NTX-1) xlim2=0; //not right-most
-    if(TJ>0) ylim1=0; 
-    if(TJ<NTY-1) ylim2=0;
-    if(TK>0) zlim1=0; 
-    if(TK<NTZ-1) zlim2=0;
-    #endif
 
     Nloop_2=0;
     //loop_2=(int **)malloc(sizeof(int*));
@@ -2120,15 +2063,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //if(TNY>1) ylim2=iy2; else ylim2=iy1;
     //if(TNZ>1) zlim2=iz2; else zlim2=iz1;
 
-
-    #ifdef OMP
-        
-    if(TI<NTX-1) xlim2=ix2-1; //not right-most
-    if(TJ<NTY-1) ylim2=iy2-1;
-    if(TK<NTZ-1) zlim2=iz2-1;   
-    
-    #endif
-
     for(ix=ix1;ix<=xlim2;ix++)
       {
 	for(iy=iy1;iy<=ylim2;iy++)
@@ -2164,14 +2098,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(TNY>1) ylim1=ylim2=NGCY; else ylim1=ylim2=0;
     if(TNZ>1) zlim1=zlim2=NGCZ; else zlim1=zlim2=0;
 
-    #ifdef OMP
-    if(TI>0) xlim1=0; //not left-most
-    if(TI<NTX-1) xlim2=0; //not right-most
-    if(TJ>0) ylim1=0; 
-    if(TJ<NTY-1) ylim2=0;
-    if(TK>0) zlim1=0; 
-    if(TK<NTZ-1) zlim2=0;
-    #endif
 
     for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
       {
@@ -2208,15 +2134,6 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(TNY>1) ylim1=ylim2=1; else ylim1=ylim2=0;
     if(TNZ>1) zlim1=zlim2=1; else zlim1=zlim2=0;
 
-    #ifdef OMP
-    if(TI>0) xlim1=0; //not left-most
-    if(TI<NTX-1) xlim2=0; //not right-most
-    if(TJ>0) ylim1=0; 
-    if(TJ<NTY-1) ylim2=0;
-    if(TK>0) zlim1=0; 
-    if(TK<NTZ-1) zlim2=0;
-    #endif
-
     for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
       {
 	for(iy=-ylim1+iy1;iy<iy2+ylim2;iy++)
@@ -2239,10 +2156,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 #if (SHUFFLELOOPS)
     shuffle_loop(loop_6,Nloop_6);
 #endif
-  }     
 
-
-  return zone;
+return zone;
 }
 
 //**********************************************************************
@@ -2882,11 +2797,6 @@ int set_bc(ldouble t,int ifinit)
 
   //treating the corners of tiles
 #ifdef MPI4CORNERS
-
-#ifdef OMP
-  if(PROCID==0) //what is below should be serial
-#endif
-    {
 
   /*****************************************************************/
   /* now calculate conserved in corners from exchanged primitives */
@@ -4539,8 +4449,6 @@ int set_bc(ldouble t,int ifinit)
        }
 
    }
-}
-
   
 #endif
 
@@ -5046,106 +4954,97 @@ solve_implicit_metric(int ix,int iy,int iz,ldouble dt,ldouble *ubase)
 int
 smooth_polaraxis()
 {
-#ifdef OMP
-  if(PROCID==0)
-#endif
+  int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
+
+  int ix,iy,iz,iv,ic,iysrc,ixsrc;
+  ldouble pp[NV],uu[NV];
+  struct geometry geom;
+
+  //spherical like coords
+  if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MKS3COORDS || MYCOORDS==TKS3COORDS || MYCOORDS==MSPH1COORDS)
     {
-      int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
-
-      int ix,iy,iz,iv,ic,iysrc,ixsrc;
-      ldouble pp[NV],uu[NV];
-      struct geometry geom;
-
-      //spherical like coords
-      if (MYCOORDS==SCHWCOORDS || MYCOORDS==KSCOORDS || MYCOORDS==KERRCOORDS || MYCOORDS==SPHCOORDS || MYCOORDS==MKS1COORDS || MYCOORDS==MKS2COORDS || MYCOORDS==MKS3COORDS || MYCOORDS==TKS3COORDS || MYCOORDS==MSPH1COORDS)
+      for(ix=0;ix<NX;ix++)
 	{
-	  for(ix=0;ix<NX;ix++)
-	    {
-	      //upper axis
+	  //upper axis
 #ifdef MPI
-	      if(TJ==0)
+	  if(TJ==0)
 #endif
+	    {
+	      for(ic=0;ic<nc;ic++)
 		{
-		  for(ic=0;ic<nc;ic++)
+		  iy=ic;
+		  PLOOP(iv)
+		    pp[iv]=0.;
+		  for(iz=0;iz<NZ;iz++)
 		    {
-		      iy=ic;
 		      PLOOP(iv)
-			pp[iv]=0.;
-		      for(iz=0;iz<NZ;iz++)
-			{
-			  PLOOP(iv)
-			    pp[iv]+=get_u(p,iv,ix,iy,iz);
-			}
+			pp[iv]+=get_u(p,iv,ix,iy,iz);
+		    }
+		  PLOOP(iv)
+		    pp[iv]/=NZ;
+		  for(iz=0;iz<NZ;iz++)
+		    {
+		      fill_geometry(ix,iy,iz,&geom);
+		      //recover magnetic field from this cell
+		      pp[B1]=get_u(p,B1,ix,iy,iz);
+		      pp[B2]=get_u(p,B2,ix,iy,iz);
+		      pp[B3]=get_u(p,B3,ix,iy,iz);
+		      p2u(pp,uu,&geom);
 		      PLOOP(iv)
-			pp[iv]/=NZ;
-		      for(iz=0;iz<NZ;iz++)
-			{
-			  fill_geometry(ix,iy,iz,&geom);
-			  //recover magnetic field from this cell
-			  pp[B1]=get_u(p,B1,ix,iy,iz);
-			  pp[B2]=get_u(p,B2,ix,iy,iz);
-			  pp[B3]=get_u(p,B3,ix,iy,iz);
-			  p2u(pp,uu,&geom);
-			  PLOOP(iv)
-			  {
-			    if(iv<B1 || iv>B3) { //skip magnetic field
-			      set_u(p,iv,ix,iy,iz,pp[iv]);  
-			      set_u(u,iv,ix,iy,iz,uu[iv]); }
-			  }
-			}
+		      {
+			if(iv<B1 || iv>B3) { //skip magnetic field
+			  set_u(p,iv,ix,iy,iz,pp[iv]);  
+			  set_u(u,iv,ix,iy,iz,uu[iv]); }
+		      }
 		    }
 		}
-	      //lower axis
+	    }
+	  //lower axis
 #ifndef HALFTHETA
 #ifdef MPI
-	      if(TJ==NTY-1)
+	  if(TJ==NTY-1)
 #endif
+	    {
+	      for(ic=0;ic<nc;ic++)
 		{
-		  for(ic=0;ic<nc;ic++)
+		  iy=NY-1-ic;
+		  PLOOP(iv)
+		    pp[iv]=0.;
+		  for(iz=0;iz<NZ;iz++)
 		    {
-		      iy=NY-1-ic;
 		      PLOOP(iv)
-			pp[iv]=0.;
-		      for(iz=0;iz<NZ;iz++)
-			{
-			  PLOOP(iv)
-			    pp[iv]+=get_u(p,iv,ix,iy,iz);
-			}
+			pp[iv]+=get_u(p,iv,ix,iy,iz);
+		    }
+		  PLOOP(iv)
+		    pp[iv]/=NZ;
+		  for(iz=0;iz<NZ;iz++)
+		    {
+		      fill_geometry(ix,iy,iz,&geom);
+		      //recover magnetic field from this cell
+		      pp[B1]=get_u(p,B1,ix,iy,iz);
+		      pp[B2]=get_u(p,B2,ix,iy,iz);
+		      pp[B3]=get_u(p,B3,ix,iy,iz);
+		      p2u(pp,uu,&geom);
 		      PLOOP(iv)
-			pp[iv]/=NZ;
-		      for(iz=0;iz<NZ;iz++)
-			{
-			  fill_geometry(ix,iy,iz,&geom);
-			  //recover magnetic field from this cell
-			  pp[B1]=get_u(p,B1,ix,iy,iz);
-			  pp[B2]=get_u(p,B2,ix,iy,iz);
-			  pp[B3]=get_u(p,B3,ix,iy,iz);
-			  p2u(pp,uu,&geom);
-			  PLOOP(iv)
-			  {
-			    if(iv<B1 || iv>B3) { //skip magnetic field
-			      set_u(p,iv,ix,iy,iz,pp[iv]);  
-			      set_u(u,iv,ix,iy,iz,uu[iv]); }
-			  }
-			}
+		      {
+			if(iv<B1 || iv>B3) { //skip magnetic field
+			  set_u(p,iv,ix,iy,iz,pp[iv]);  
+			  set_u(u,iv,ix,iy,iz,uu[iv]); }
+		      }
 		    }
 		}
-#endif
 	    }
+#endif
 	}
     }
 
-  return 0;
+return 0;
 }
 
 //treats the most polar cells is a special way, correcting them, not evolving them
 int
 correct_polaraxis()
 {
-#ifdef OMP
-  if(PROCID==0)
-#endif
-    {
       int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
       int ix,iy,iz,iv,ic,iysrc,ixsrc;
@@ -5384,7 +5283,7 @@ correct_polaraxis()
 	}
       
 
-    }
+    
   return 0; 
 }
 
@@ -5393,10 +5292,6 @@ correct_polaraxis()
 int
 correct_polaraxis_3d()
 {
-#ifdef OMP
-  if(PROCID==0)
-#endif
-    {
       int nc=NCCORRECTPOLAR; //correct velocity in nc most polar cells;
 
       int ix,iy,iz,iv,ic,iysrc,ixsrc,gix;
@@ -5698,8 +5593,6 @@ correct_polaraxis_3d()
 	     
 	    }
 	}
-
-    }
 
 
   return 0; 

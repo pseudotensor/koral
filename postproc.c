@@ -150,8 +150,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      ldouble gdetuBL=geomBL.gdet;
 
-	      //	      if(PROCID==0) {printf("%d %d %d > %e %e %e\n",ix,iy,iz,geom.gg[1][1],geom.gdet,geomBL.gdet);getch();}
-	      //exit(1);
 
 #if (GDETIN==0) //gdet out of derivatives
 	      gdetuBL=1.;

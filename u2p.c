@@ -95,12 +95,6 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
 if(!is_cell_corrected_polaraxis(ix,iy,iz))
   p2u(pp,uu,&geom);
 
-  /*
-  if(ix==5 && PROCID==0) print_primitives(pp);
-  if(ix==5 && PROCID==0) print_conserved(uu);
-  if(ix==5 && PROCID==0) printf("gdet: %e\n",geom.gdet);
-  */
-
   for(iv=0;iv<NV;iv++)
     {
       set_u(u,iv,ix,iy,iz,uu[iv]);
@@ -1693,29 +1687,24 @@ int count_entropy(int *n, int *n2)
 {
   int nentr=0,nentrloc=0,ii,ix,iy,iz;
   int nentr2=0,nentrloc2=0;
-#ifdef OMP //for openMP only one thread is supposed to do that, the routine may be called from outside parallel region
-  if(PROCID==0)
-#endif
 
-    {
-      //counting the number of entropy inversions
+  //counting the number of entropy inversions
 
-      for(ix=0;ix<NX;ix++)
-	for(iy=0;iy<NY;iy++)
-	  for(iz=0;iz<NZ;iz++)
-	    {
-	      nentrloc+=get_cflag(ENTROPYFLAG,ix,iy,iz); 
-	      nentrloc2+=get_cflag(ENTROPYFLAG2,ix,iy,iz); 
-	    }
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	{
+	  nentrloc+=get_cflag(ENTROPYFLAG,ix,iy,iz); 
+	  nentrloc2+=get_cflag(ENTROPYFLAG2,ix,iy,iz); 
+	}
 #ifdef MPI
-      MPI_Allreduce(&nentrloc, &nentr, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
-      MPI_Allreduce(&nentrloc2, &nentr2, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
+  MPI_Allreduce(&nentrloc, &nentr, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
+  MPI_Allreduce(&nentrloc2, &nentr2, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);  
 #else
-      nentr=nentrloc;
-      nentr2=nentrloc2;
+  nentr=nentrloc;
+  nentr2=nentrloc2;
 #endif
-
-    }
+    
   *n = nentr;
   *n2 = nentr2;
   return 0;

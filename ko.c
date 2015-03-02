@@ -74,7 +74,6 @@ main(int argc, char **argv)
 #ifdef RADIATION
   //prepare angular grid for radiative solver
 #if(RADCLOSURE==VETCLOSURE)
-#pragma omp parallel
   zero_init();						
   //ZEROtest_oldmain();
 #endif
@@ -116,7 +115,6 @@ main(int argc, char **argv)
   //todo: read intensities from file!
 #if (RADCLOSURE==VETCLOSURE)
 #ifdef RADSTARTWITHM1INTENSITIES
-#pragma omp parallel  
   calc_M1intensities();
 #endif
 #endif
@@ -126,7 +124,6 @@ main(int argc, char **argv)
       //exchange initial state
       mpi_exchangedata();  
       calc_avgs_throughout();
-      #pragma omp parallel
       set_bc(tstart,1);
     }
 #endif
@@ -143,7 +140,6 @@ main(int argc, char **argv)
       if(PROCID==0) {printf("Sending initial data... ");fflush(stdout);}
       mpi_exchangedata();
       calc_avgs_throughout();
-#pragma omp parallel
       set_bc(tstart,1);
 
       #ifdef MPI
@@ -153,12 +149,10 @@ main(int argc, char **argv)
 #ifdef MAGNFIELD
 #ifdef VECPOTGIVEN
       if(PROCID==0) {printf("Calculating magn. field... ");fflush(stdout);}
-      #pragma omp parallel
       calc_BfromA(p,1);
       //exchange magn. field calculated in domain
       mpi_exchangedata();
       calc_avgs_throughout();
-#pragma omp parallel  
       set_bc(tstart,1);
        #ifdef MPI
       MPI_Barrier(MPI_COMM_WORLD);
@@ -167,11 +161,9 @@ main(int argc, char **argv)
 #endif
 #endif
 #ifdef RADSTARTWITHM1INTENSITIES
-#pragma omp parallel  
       calc_M1intensities();
       mpi_exchangedata();
       calc_avgs_throughout();
-#pragma omp parallel  
       set_bc(tstart,1);
 #endif
 
@@ -287,19 +279,16 @@ solve_the_problem(ldouble tstart, char* folder)
   tstepdenmax/=TSTEPLIM;
   tstepdenmin=tstepdenmax;
 
-#pragma omp parallel private(ii)
-  {
-    for(ii=0;ii<Nloop_0;ii++) //domain 
-      {
-	int ix,iy,iz;
-	ix=loop_0[ii][0];
-	iy=loop_0[ii][1];
-	iz=loop_0[ii][2]; 
+  for(ii=0;ii<Nloop_0;ii++) //domain 
+    {
+      int ix,iy,iz;
+      ix=loop_0[ii][0];
+      iy=loop_0[ii][1];
+      iz=loop_0[ii][2]; 
 
-	set_u_scalar(cell_tstepden,ix,iy,iz,tstepdenmax);
-	set_u_scalar(cell_dt,ix,iy,iz,1./tstepdenmax);
-      }
-  }
+      set_u_scalar(cell_tstepden,ix,iy,iz,tstepdenmax);
+      set_u_scalar(cell_dt,ix,iy,iz,1./tstepdenmax);
+    }
 
   //chooses the smalles timestep etc.
   mpi_synchtiming(&t);
@@ -319,12 +308,10 @@ solve_the_problem(ldouble tstart, char* folder)
   loopsallociter=0;
   currentzonetime=t;
 
-  #pragma omp parallel
-  {
-    set_bc(t,0);
-    int ii,jj;
-    for(ii=0;ii<Nloop_02;ii++) //domain + gc
-      {
+  set_bc(t,0);
+  int ii,jj;
+  for(ii=0;ii<Nloop_02;ii++) //domain + gc
+    {
       ix=loop_02[ii][0];
       iy=loop_02[ii][1];
       iz=loop_02[ii][2]; 
@@ -333,10 +320,9 @@ solve_the_problem(ldouble tstart, char* folder)
 	set_u(u_bak_subzone,jj,ix,iy,iz,get_u(u,jj,ix,iy,iz));
 	set_u(p_bak_subzone,jj,ix,iy,iz,get_u(p,jj,ix,iy,iz));
       }
-      }
-  }
+    }
   
-  #endif
+#endif
  
   while (t < t1 && nfout1<=NOUTSTOP && nstep<NSTEPSTOP)
     {   
@@ -380,7 +366,6 @@ solve_the_problem(ldouble tstart, char* folder)
 	  if(lastzone!=currentzone) //zone switched
 	    {
 	      //recomputes the timestep though wavespeeds
-	      #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
 	      for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
 		{
 		  ix=loop_1[ii][0]; iy=loop_1[ii][1]; iz=loop_1[ii][2]; ldouble aaa[12],max_lws[3];
@@ -443,18 +428,16 @@ solve_the_problem(ldouble tstart, char* folder)
 	  t+=dt;
 	}
       else
-      if(TIMESTEPPING==RK2IMEX)
-	{
-	  ldouble gamma=1.-1./sqrt(2.),dtcell;
-	  save_timesteps(); 
-
-#pragma omp parallel private(ii,iv,ix,iy,iz,dtcell)
+	if(TIMESTEPPING==RK2IMEX)
 	  {
+	    ldouble gamma=1.-1./sqrt(2.),dtcell;
+	    save_timesteps(); 
+
 	    dtcell=dt;
 	    calc_u2p();
-	    #pragma omp barrier
+#pragma omp barrier
 	    do_correct();
-	    #pragma omp barrier
+#pragma omp barrier
 
 	    /******* 1st implicit **********/
 	    copyi_u(1.,u,ut0);
@@ -482,28 +465,28 @@ solve_the_problem(ldouble tstart, char* folder)
 	    
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	    dtcell=get_u_scalar(cell_dt,ix,iy,iz);
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
-	    PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(dtcell))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell))*get_u(ut1,iv,ix,iy,iz)); 
-	  }
+	      PLOOP(iv) set_u(dut1,iv,ix,iy,iz,(1./(dtcell))*get_u(u,iv,ix,iy,iz)+(-1./(dtcell))*get_u(ut1,iv,ix,iy,iz)); 
+	    }
 	    //addi_u(1./dt,u,-1./dt,ut1,dut1); //F(U(1)) in *dut1;
 
 
 	    /******* 1st together **********/
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
-	    dtcell=get_u_scalar(cell_dt,ix,iy,iz);
+	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
 #endif
-	    PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dtcell)*get_u(dut1,iv,ix,iy,iz)+(dtcell*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
-	  }
+	      PLOOP(iv) set_u(u,iv,ix,iy,iz,get_u(ut0,iv,ix,iy,iz)+(dtcell)*get_u(dut1,iv,ix,iy,iz)+(dtcell*(1.-2.*gamma))*get_u(drt1,iv,ix,iy,iz)); 
+	    }
 	    //addi_u_3(1.,ut0,dt,dut1,dt*(1.-2.*gamma),drt1,u); //(U(n) + dt F(U(1)) + dt (1-2gamma) R(U(1))) in *u
 	    
 	    /******* 2nd implicit **********/
 	    copyi_u(1.,u,uforget);
 	    calc_u2p();
-	    #pragma omp barrier
+#pragma omp barrier
 	    do_correct();
-	    #pragma omp barrier
+#pragma omp barrier
 
 	    count_entropy(&nentr[2],&nentr2[2]); 
 	    op_implicit (t,gamma*dt); //U(2) in *u
@@ -519,9 +502,9 @@ solve_the_problem(ldouble tstart, char* folder)
 	    /******* 2nd explicit **********/
 	    copyi_u(1.,u,ut2);
 	    calc_u2p();
-            #pragma omp barrier
+#pragma omp barrier
 	    do_correct();
-	    #pragma omp barrier
+#pragma omp barrier
 
 	    count_entropy(&nentr[3],&nentr2[3]);
 	    op_explicit (t,dt); //U(2) in *ut2; 
@@ -560,17 +543,16 @@ solve_the_problem(ldouble tstart, char* folder)
 	    update_intensities(t, dt);
 #endif
 	    //printf("nstep: %d\n",nstep);
-	  }
-	  t+=dt;	 
+	
+	    t+=dt;	 
 
-	}
-      else if(TIMESTEPPING==RK2)
-	{ 
-	  /******************************* RK2 **********************************/
+	  }
+	else if(TIMESTEPPING==RK2)
+	  { 
+	    /******************************* RK2 **********************************/
 
 	    save_timesteps();
-#pragma omp parallel private(ii,iv,ix,iy,iz)
-	    {
+
 	    //1st
 	    copyi_u(1.,u,ut0);
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); do_correct();
@@ -578,7 +560,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    calc_u2p();
 	    
-            #pragma omp barrier
+#pragma omp barrier
 	    count_entropy(&nentr[1],&nentr2[1]);
 	    op_implicit (t,0.5*dt); 
 
@@ -592,12 +574,12 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    //2nd
 	    //calc_u2p();
-            #pragma omp barrier
+#pragma omp barrier
 	    count_entropy(&nentr[2],&nentr2[2]); 
 	    op_explicit (t,dt); 
 
 	    calc_u2p();
-            #pragma omp barrier
+#pragma omp barrier
 	    count_entropy(&nentr[3],&nentr2[3]); 
 	    op_implicit (t,dt); 
 
@@ -605,22 +587,20 @@ solve_the_problem(ldouble tstart, char* folder)
 	    addi_u(1.,u,-1.,ut1,ut2); //k2 in ut2
 	    addi_u(1.,ut0,1.,ut2,u);
 
-	    #ifdef EVOLVEINTENSITIES
+#ifdef EVOLVEINTENSITIES
 	    update_intensities(t, dt);
 	    addi_intensities(1.,Ibeam,-1.,Ibeam1,Ibeambak);
 	    addi_intensities(1.,Ibeam0,1.,Ibeambak,Ibeam);
-            #endif
-	  }
-	  t+=dt;
+#endif
 	  
-	  /************************** end of RK2 **********************************/
-	}
-      else if(TIMESTEPPING==RK2HEUN)
-	{ 
-	  /******************************* RK2 Heun **********************************/
-	  save_timesteps();
-#pragma omp parallel private(ii,iv,ix,iy,iz)
-	  {
+	    t+=dt;
+	  
+	    /************************** end of RK2 **********************************/
+	  }
+	else if(TIMESTEPPING==RK2HEUN)
+	  { 
+	    /******************************* RK2 Heun **********************************/
+	    save_timesteps();
 
 	    //1st	 
 	    copyi_u(1.,u,ut0);
@@ -632,7 +612,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    op_explicit (t,1.*dt); 
 #ifdef RADIATION
 	    calc_u2p();
-	    #pragma omp barrier
+#pragma omp barrier
 	    do_correct();
 #endif
 #pragma omp barrier
@@ -643,7 +623,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //2nd
 	    copyi_u(1.,u,ut1);
 	    calc_u2p();
-	    #pragma omp barrier
+#pragma omp barrier
 	    do_correct();
 #pragma omp barrier
 	    count_entropy(&nentr[2],&nentr2[2]); 
@@ -651,7 +631,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    op_explicit (t,dt); 
 #ifdef RADIATION
 	    calc_u2p();
-	    #pragma omp barrier
+#pragma omp barrier
 	    do_correct();
 #endif
 #pragma omp barrier
@@ -662,13 +642,11 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //together     
 	    addi_u_3(1.,ut0,1./2.,ut2,1./2.,ut3,u); //u += dt/2 (R(U(1)) + R(U(2))) in *u
 
+	    //	  getch();
+	    t+=dt;
+	    /************************** end of RK2 **********************************/
 	  }
-
-	  //	  getch();
-	  t+=dt;
-	  /************************** end of RK2 **********************************/
-	}
-      else 
+	else 
 	my_err("wrong time stepping specified\n");
       
  
@@ -780,7 +758,6 @@ solve_the_problem(ldouble tstart, char* folder)
 	    printf("%d > snap file no #%6d dumped\n",PROCID,nfout1);
 	  
 	  //projects primitives onto ghost cells
-	  #pragma omp parallel
 	  set_bc(t,0);
 
 	  //restart files

@@ -1883,30 +1883,19 @@ omp_myinit()
 {
 #ifdef OMP
 
-  #ifdef MPI
+#ifdef MPI
   printf("MPI does not work with OMP.\n"); exit(-1);
-  #endif
+#endif
 
-  omp_set_dynamic(0);
-  omp_set_num_threads(NTX*NTY*NTZ);
+  //omp_set_dynamic(0);
+  //omp_set_num_threads(NTX*NTY*NTZ);
 
-  #pragma omp parallel
-  {
-    NPROCS=omp_get_num_threads();
-    PROCID=omp_get_thread_num();
-    if(NPROCS!=NTX*NTY*NTZ)
-      {
-	if(PROCID==0) 
-	  {
-	    printf("Wrong number of threads. Problem set up for: %d x %d x %d = %d threads (openMP).\n",NTX,NTY,NTZ,NTX*NTY*NTZ);
-	    exit(-1);
-	  }
-      } 
-    mpi_procid2tile(PROCID,&TI,&TJ,&TK);
-    mpi_tileorigin(TI,TJ,TK,&TOI,&TOJ,&TOK);
-    if(PROCID==0) printf("tid: %d/%d; tot.res: %dx%dx%d; tile.res:  %dx%dx%d\n"
-			 "tile: %d,%d,%d; tile orig.: %d,%d,%d\n",PROCID,NPROCS,TNX,TNY,TNZ,NX,NY,NZ,TI,TJ,TK,TOI,TOJ,TOK);
-  }
+  NPROCS=omp_get_num_threads();
+  PROCID=0;
+  TI=TJ=TK=0;
+  TOI=TOJ=TOK=0;
+  PROCID=0;  
+
 #else
   NPROCS=1;
   TI=TJ=TK=0;

@@ -207,9 +207,9 @@ int loop_5[SX*SY*SZ][3];
 int loop_6[SX*SY*SZ][3];
 int Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6;
 
-#ifdef OMP
-#pragma omp threadprivate(loop_0,loop_02,loop_1,loop_2,loop_3,loop_4,loop_5,loop_6,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6,TI,TJ,TK,TOI,TOJ,TOK,PROCID,global_ix1,global_ix2,global_iy1,global_iy2,global_iz1,global_iz2)
-#endif
+//#ifdef OMP
+//#pragma omp threadprivate(loop_0,loop_02,loop_1,loop_2,loop_3,loop_4,loop_5,loop_6,Nloop_0,Nloop_1,Nloop_2,Nloop_02,Nloop_3,Nloop_4,Nloop_5,Nloop_6,TI,TJ,TK,TOI,TOJ,TOK,PROCID,global_ix1,global_ix2,global_iy1,global_iy2,global_iz1,global_iz2)
+//#endif
 
 //arrays for on the go averaging throughout the domain
 ldouble sigma_otg[TNX];

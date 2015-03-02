@@ -330,38 +330,34 @@ flux_ct()
 // resets emf's near the boundaries where corresponding velocities are zero
 int adjust_fluxcttoth_emfs()
 {
-  #ifdef CORRECT_POLARAXIS
+#ifdef CORRECT_POLARAXIS
   int ix,iz;
-  #ifdef OMP
-  if(PROCID==0)
-  #endif
+#ifdef MPI
+  if(TJ==0) //upper axis
+#endif
     {
-      #ifdef MPI
-      if(TJ==0) //upper axis
-      #endif
-	{
-	  //over all corners at the polar edge
-	  for(ix=0;ix<=NX;ix++)
-	    for(iz=0;iz<=NZ;iz++)
-	      {
-		set_emf(1,ix,0,iz,0.);
-		set_emf(3,ix,0,iz,0.);
-	      }
-	}
-      #ifdef MPI
-      if(TJ==NTY-1) //lower axis
-      #endif
-	{
-	  //over all corners at the polar edge
-	  for(ix=0;ix<=NX;ix++)
-	    for(iz=0;iz<=NZ;iz++)
-	      {
-		set_emf(1,ix,NY,iz,0.);
-		set_emf(3,ix,NY,iz,0.);
-	      }
-	}
+      //over all corners at the polar edge
+      for(ix=0;ix<=NX;ix++)
+	for(iz=0;iz<=NZ;iz++)
+	  {
+	    set_emf(1,ix,0,iz,0.);
+	    set_emf(3,ix,0,iz,0.);
+	  }
     }
-  #endif
+#ifdef MPI
+  if(TJ==NTY-1) //lower axis
+#endif
+    {
+      //over all corners at the polar edge
+      for(ix=0;ix<=NX;ix++)
+	for(iz=0;iz<=NZ;iz++)
+	  {
+	    set_emf(1,ix,NY,iz,0.);
+	    set_emf(3,ix,NY,iz,0.);
+	  }
+    }
+
+#endif
 
   return 0;
 }
@@ -1008,12 +1004,7 @@ mimic_dynamo(ldouble dtin)
   
   //once the whole array is filled with cell centered A^phi we can 
   //calculate the extra magnetic field returned through pvecpot[1..3]
-#ifdef OMP
-  if(PROCID==0)
-#endif
-    {
       calc_BfromA(ptemp1,0);  
-    }
    
   //and superimpose it on the original one
   //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
