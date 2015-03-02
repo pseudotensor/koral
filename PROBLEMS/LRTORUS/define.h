@@ -6,9 +6,9 @@
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 350
+#define RESTARTNUM 0
 
 /************************************/
 //radiation choices
@@ -126,8 +126,8 @@
 #define TNY 100 //26*9
 #define TNZ 1 //2*8
 //number of tiles
-#define NTX 4
-#define NTY 4
+#define NTX 1
+#define NTY 1
 #define NTZ 1
 
 #define SPECIFIC_BC
@@ -152,7 +152,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/

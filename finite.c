@@ -1230,15 +1230,22 @@ op_explicit(ldouble t, ldouble dtin)
   my_err("Mimic dynamo not yet friends with multipstep.\n");
   #endif
 
+  //recalculates primitives
+  calc_u2p();
+
   //correlates ghost cells
   mpi_exchangedata();
   calc_avgs_throughout();
   set_bc(t,0);
 
+  //  if(PROCID==1) printf("(0) %d > %e\n",ix,get_u(p,B1,0,NY-1,0));
+
+
   //mimics dynamo
   mimic_dynamo(dt); 
 
-  
+  //  if(PROCID==1) printf("(00) %d > %e\n",ix,get_u(p,B1,0,NY-1,0));
+
   //must be the last one as it does not update the magn. field outside the inner domain
 
 #endif

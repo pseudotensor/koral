@@ -968,6 +968,9 @@ mimic_dynamo(ldouble dtin)
 	* facmagnetization 
 	* facangle;
 
+      //if(PROCID==1 && ix==0 && iy==NY-1) printf("(1) %d > %e %e\n",ix,get_u(p,B1,ix,iy,iz),bsq);
+
+
       //saving vector potential to ptemp1
       set_u(ptemp1,B3,ix,iy,iz,Aphi); 
 
@@ -1031,7 +1034,7 @@ mimic_dynamo(ldouble dtin)
       B[2]=get_u(pvecpot,2,ix,iy,iz);
       B[3]=get_u(pvecpot,3,ix,iy,iz);
 
-      
+      //if(PROCID==1 && ix==0 && iy==NY-1) printf("(2) %d > %e %e\n",ix,get_u(p,B1,ix,iy,iz),B[1]);
 
       set_u(p,B1,ix,iy,iz,get_u(p,B1,ix,iy,iz)+B[1]);
       set_u(p,B2,ix,iy,iz,get_u(p,B2,ix,iy,iz)+B[2]);
@@ -1102,7 +1105,8 @@ mimic_dynamo(ldouble dtin)
   //done consistently only inside the inner domain
   //need for set_bc / exchange information afterwards or executed as the last operator
   //done
-     
+  //if(PROCID==1) printf("(3) %d > %e\n",0,get_u(p,B1,0,NY-1,0));
+
 
 #endif
 #endif
