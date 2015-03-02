@@ -126,8 +126,8 @@
 #define TNY 100 //26*9
 #define TNZ 1 //2*8
 //number of tiles
-#define NTX 1
-#define NTY 1
+#define NTX 2
+#define NTY 2
 #define NTZ 1
 
 #define SPECIFIC_BC

@@ -3738,16 +3738,6 @@ calc_metric()
   if(PROCID==0) {printf("Precalculating metrics... "); fflush(stdout);}
 #endif
   
-  /*
-  #pragma omp parallel private(ix,iy,iz,ii) 
-  {
-    for(ii=0;ii<Nloop_5;ii++) //domain and ghost cells
-      {
-	ix=loop_5[ii][0];
-	iy=loop_5[ii][1];
-	iz=loop_5[ii][2]; 
-  */
-  
   //it is not loop_5 because NGCZ != NGCZMET
   //some problems with the following loop on rclogin
 #pragma omp parallel for private(ix,iy,iz,ii) 

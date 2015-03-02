@@ -202,7 +202,7 @@ flux_ct()
   else coefemf[3]=0.5; 
   
   int ix,iy,iz,iv,ii;
-  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (dynamic)
   //calculating EMF at corners
   for(ii=0;ii<Nloop_4;ii++) 
     {
@@ -269,14 +269,10 @@ flux_ct()
 #endif
     }
   
-  #pragma omp barrier
-
   //reset certain emfs at the boundaries to ensure stationarity
   adjust_fluxcttoth_emfs();
 
-  #pragma omp barrier
-
-  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+  #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (dynamic)
   for(ii=0;ii<Nloop_4;ii++) // 0...NX
     {
       ix=loop_4[ii][0];
@@ -371,17 +367,18 @@ calc_BfromA(ldouble* pinput, int ifoverwrite)
 
   int ix,iy,iz,iv,ii;
   
-  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
   
-  /*for(ii=0;ii<Nloop_4;ii++) //all corners of the inner domain
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (dynamic)
+  for(ii=0;ii<Nloop_4;ii++) //all corners of the inner domain
     {      
       ix=loop_4[ii][0];
       iy=loop_4[ii][1];
-      iz=loop_4[ii][2];*/
+      iz=loop_4[ii][2];
+      /*
   for(ix=0;ix<=NX;ix++)
     for(iy=0;iy<=NY;iy++)
-      for(iz=0;iz<=NZ;iz++)
-	{
+    for(iz=0;iz<=NZ;iz++)
+    {*/
     
 	  if(NZ==1 && iz>0) continue;
 	  if(NY==1 && iy>0) continue;
@@ -476,20 +473,19 @@ calc_BfromA_core()
     if(PROCID==0) printf("calc_BfromA_core(): warning: assumes d/dz A_i = 0. \n");
 
 
-  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
-  /*
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain + one layer
     {
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
-  */
-
+  
+  /*
   for(ix=-1;ix<=NX;ix++)
     for(iy=-1;iy<=NY;iy++)
       for(iz=0;iz<NZ;iz++)
 	{
-
+  */
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
 
@@ -1007,7 +1003,7 @@ mimic_dynamo(ldouble dtin)
       calc_BfromA(ptemp1,0);  
    
   //and superimpose it on the original one
-  //#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (static)
+#pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain only!
     {
       ix=loop_0[ii][0];

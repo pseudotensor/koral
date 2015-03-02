@@ -605,17 +605,17 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //1st	 
 	    copyi_u(1.,u,ut0);
 	    calc_u2p();
-#pragma omp barrier
+	    //#pragma omp barrier
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); 
 	    do_correct();
-#pragma omp barrier
+	    //#pragma omp barrier
 	    op_explicit (t,1.*dt); 
 #ifdef RADIATION
 	    calc_u2p();
-#pragma omp barrier
+	    //#pragma omp barrier
 	    do_correct();
 #endif
-#pragma omp barrier
+	    //#pragma omp barrier
 	    count_entropy(&nentr[1],&nentr2[1]); 
 	    op_implicit (t,1.*dt); 
 	    addi_u(1.,u,-1.,ut0,ut2); 
@@ -623,18 +623,18 @@ solve_the_problem(ldouble tstart, char* folder)
 	    //2nd
 	    copyi_u(1.,u,ut1);
 	    calc_u2p();
-#pragma omp barrier
+	    //#pragma omp barrier
 	    do_correct();
-#pragma omp barrier
+	    //#pragma omp barrier
 	    count_entropy(&nentr[2],&nentr2[2]); 
 	    //#pragma omp barrier
 	    op_explicit (t,dt); 
 #ifdef RADIATION
 	    calc_u2p();
-#pragma omp barrier
+	    //#pragma omp barrier
 	    do_correct();
 #endif
-#pragma omp barrier
+	    //#pragma omp barrier
 	    count_entropy(&nentr[3],&nentr2[3]); 
 	    op_implicit (t,dt); 
 	    addi_u(1.,u,-1.,ut1,ut3); 
@@ -793,7 +793,7 @@ solve_the_problem(ldouble tstart, char* folder)
       //performance to screen only every second
       if(end_time-fprintf_time>1. && PROCID==0) 
 	{
-	  znps = TNX*TNY*TNZ*(nstep-fprintf_nstep);
+	  //znps = TNX*TNY*TNZ*(nstep-fprintf_nstep);
 	  
 	  printf("(%d) step #%6d t=%10.3e dt=%.3e (tot.time: %.2e (%.2e|%3d > %.2e|%3d) mp: %7.6f) znps: %.0f "
 		 ,PROCID,nstep,t,dt,end_time-start_time,2.*max_u2ptime,max_u2ptime_loc,2.*min_u2ptime,min_u2ptime_loc,2*maxmp_time,znps);
