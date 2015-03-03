@@ -591,6 +591,7 @@ calc_Qthetaphi(int ix, int iy, int iz,ldouble *Qtheta,ldouble *Qphi)
       ucon[3]=get_u(p,VZ,ix,iy,iz);
       conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
       ldouble Omega = ucon[3]/ucon[0];
+      if(Omega==0.) Omega=BIG;
       ldouble dxth=get_xb(iy+1,1)-get_xb(iy,1);
       ldouble dxph=get_xb(iz+1,2)-get_xb(iz,2);
  

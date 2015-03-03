@@ -81,6 +81,10 @@ main(int argc, char **argv)
       //opens the scalar file
       sprintf(bufor,"%s/avgscalars.dat",folder);
       fout_scalars=fopen(bufor,"w");
+#if(BOXOUTPUT==1)
+      sprintf(bufor,"analysis/avgboxscalars.dat");
+      fout_boxscalars=fopen(bufor,"w");
+#endif
     }
 
 
@@ -143,6 +147,11 @@ main(int argc, char **argv)
 	  calc_scalars(scalars,t);
 
 	  fprint_scalars(t,scalars,NSCALARS);
+
+	  
+#if(BOXOUTPUT==1)
+	  fprint_boxscalars(t);
+#endif
 	}
 
       add_u_core(1.,pavgtot,dt,pavg,pavgtot,(SX)*(SY)*(SZ)*(NV+NAVGVARS));
@@ -225,6 +234,11 @@ main(int argc, char **argv)
   fprint_simplefile(t,no2,"analysis",prefix);
 #endif
   
+#if(BOXOUTPUT==1)
+  fclose(fout_boxscalars);
+#endif
+
+  fclose(fout_scalars);
   return 0;
 }
 

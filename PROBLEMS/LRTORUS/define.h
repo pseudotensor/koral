@@ -13,7 +13,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define COMPTONIZATION
 
 

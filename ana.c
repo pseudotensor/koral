@@ -75,9 +75,15 @@ main(int argc, char **argv)
 
   //getch();
 
-  //opens the scalar file
+  //opens the scalars file
   sprintf(bufer,"analysis/scalars.dat");
   fout_scalars=fopen(bufer,"w");
+
+  #if(BOXOUTPUT==1)
+  sprintf(bufer,"analysis/boxscalars.dat");
+  fout_boxscalars=fopen(bufer,"w");
+  #endif
+
 
   int ifile,itot=0,readret;
   ldouble t,ttot; ldouble scalars[NSCALARS];
@@ -104,6 +110,7 @@ main(int argc, char **argv)
      
       //calculate scalars
       calc_scalars(scalars,t);
+     
 
       //dumps dumps to analysis analysis
       
@@ -115,7 +122,9 @@ main(int argc, char **argv)
 	sprintf(suffix,"%sphiavg",suffix);
  
 
-
+#if(BOXOUTPUT==1)
+      fprint_boxscalars(t);
+#endif
 #if(SCAOUTPUT==1)
       fprint_scalars(t,scalars,NSCALARS);
 #endif
@@ -147,6 +156,9 @@ main(int argc, char **argv)
 
     }
 
+#if(BOXOUTPUT==1)
+  fclose(fout_boxscalars);
+#endif
 
   fclose(fout_scalars);
   

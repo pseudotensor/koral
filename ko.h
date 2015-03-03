@@ -295,7 +295,9 @@ calc_local_lum(int ix,int iy,int iz,ldouble *radlum, ldouble *totallum);
 
 ldouble calc_photloc(int ix);
 
-//misc§<.c
+//misc.c
+int 
+get_cell_sizeBL(int ix,int iy,int iz,ldouble *dx);
 int
 get_state(ldouble *pp,void* ggg,void* sss);
 int print_primitives(ldouble *u);
