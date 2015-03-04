@@ -1238,7 +1238,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		pp[iv]=get_u(p,iv,ix,iy,iz);
 
 	      //to BL, res-files and primitives in avg in MYCOORDS
-	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
 
 	      //from now on - working in BL coords
         
@@ -1364,7 +1364,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 
 		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
 
 		//from now on - working in BL coords
         
@@ -1442,7 +1442,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 
 		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
 
 		//from now on - working in BL coords
         
@@ -1520,7 +1520,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 
 		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
 
 		//from now on - working in BL coords
         
@@ -1597,7 +1597,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 
 		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
 
 		//from now on - working in BL coords
         
@@ -1683,7 +1683,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
     boxscalars[iv]=bscsum[iv];
 #endif
 
-  //if(PROCID==0) printf("sum %d > %e\n",PROCID,boxscalars[0]);
+  //if(PROCID==0) printf("sum %d > %e\n",PROCID,boxscalars[8]);
 
   
   //normalizing the rho-averages by the total mass

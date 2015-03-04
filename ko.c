@@ -244,8 +244,10 @@ solve_the_problem(ldouble tstart, char* folder)
   ldouble totalmass=0.;
   ldouble dtout = DTOUT1;
   ldouble dtoutavg = DTOUT2;
+  ldouble dtoutbox = DTOUT3;
   ldouble lasttout_floor;
   ldouble lasttoutavg_floor;
+  ldouble lasttoutbox_floor;
   int i,j,ii;
   int loopsallociter;
   int spitoutput,lastzone;
@@ -266,6 +268,7 @@ solve_the_problem(ldouble tstart, char* folder)
 
   lasttout_floor=floor(t/dtout); 
   lasttoutavg_floor=floor(t/dtoutavg);
+  lasttoutbox_floor=floor(t/dtoutbox);
  
   dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=10000.;
@@ -751,6 +754,17 @@ solve_the_problem(ldouble tstart, char* folder)
 	}
 #endif
 
+     //boxscalars.dat file
+#if(BOXOUTPUT==1) 
+      if(lasttoutbox_floor!=floor(t/dtoutbox))
+	{
+#if(BOXOUTPUT==1)
+	  fprint_boxscalars(t);
+#endif
+	  lasttoutbox_floor=floor(t/dtoutbox);	 
+	}
+#endif
+
       //snapshots
       if(lasttout_floor!=floor(t/dtout) || ALLSTEPSOUTPUT || t>.9999999*t1 || spitoutput==1)
 	{
@@ -764,11 +778,6 @@ solve_the_problem(ldouble tstart, char* folder)
 	  fprint_restartfile(t,folder);
 
 	  //dumps dumps
-
-#if(BOXOUTPUT==1)
-	  fprint_boxscalars(t);
-#endif
-
 	  #ifndef MPI //comment if you want .silo etc files per core for OUTPUTPERCORE
 #if(SCAOUTPUT==1)
 	  fprint_scalars(t,scalars,NSCALARS);

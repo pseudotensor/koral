@@ -413,6 +413,10 @@
 #define DTOUT2 DTOUT1
 #endif
 
+#ifndef DTOUT3
+#define DTOUT3 DTOUT1
+#endif
+
 #ifndef B2RHOFLOORFRAME
 #define B2RHOFLOORFRAME ZAMOFRAME
 #endif
