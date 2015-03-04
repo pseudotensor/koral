@@ -1644,7 +1644,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       
   ldouble fac;
   
-
+  
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
   ldouble Gic[4];
 
@@ -1667,7 +1667,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   for(i=0;i<4;i++)
     Gi[i]+=fac*Gic[i];
 #endif 
-
+  
   return 0;
 }
 

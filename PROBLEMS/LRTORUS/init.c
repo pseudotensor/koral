@@ -91,7 +91,7 @@ if(rho<0.) //outside donut
 #endif
 
 #ifdef NCOMPTONIZATION
-  pp[NF0]=calc_NFfromE(pp[EE0]);
+    pp[NF0]=calc_NFfromE(pp[EE0]);
 #endif
 
     //transforming primitives from BL to MYCOORDS

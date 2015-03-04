@@ -362,13 +362,32 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 
   //four fource
   ldouble Gi[4],Gic[4],Giff[4],Gicff[4];
-  calc_Gi(pp,&geomout,Gi,1); 
-  boost2_lab2ff(Gi,Giff,pp,geomout.gg,geomout.GG);
+  //calc_Gi(pp,&geomout,Gi,1); 
+  //boost2_lab2ff(Gi,Giff,pp,geomout.gg,geomout.GG);
+  calc_Gi(pp,&geomout,Giff,0); 
 
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
+  //uwaga! boost sprawia, ze znaki fluid frame Compt i abs part rozne! spojrzec dlaczego!
+
+  //test - directly in ff
+  ucon[1]=ucon[2]=ucon[3]=ucov[1]=ucov[2]=ucov[3]=0.;
+  ucon[0]=1.;
+  ucov[0]=-1.;
   ldouble kappaes=calc_kappaes(pp,&geomout);
-  calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,ucon);
-  boost2_lab2ff(Gic,Gicff,pp,geomout.gg,geomout.GG);
+  calc_Compt_Gi(pp,&geomout,Gicff,Ehat,Tgas,kappaes,ucon);
+  
+  //in lab frame + boost:
+  //   calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,ucon);
+  //boost2_lab2ff(Gic,Gicff,pp,geomout.gg,geomout.GG);
+
+  /*
+  if(ix==NX/3 && iy==NY/2)
+    {    
+      printf("%d %d (%f %f) - %e %e %e\n",ix,iy,geomout.xx,geomout.yy,Giff[0],Gicff[0],Giff[0]-Gicff[0]);
+    }
+  */
+
+
 #endif 
 
   for(iv=0;iv<4;iv++)

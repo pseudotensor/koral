@@ -8,21 +8,23 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 0
+#define RESTARTNUM 200
 
 /************************************/
 //radiation choices
 /************************************/
 #define RADIATION
+#define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
 
+//#define U2P_EQS U2P_EQS_JONS
+//#define U2P_SOLVER U2P_SOLVER_WP
 
 
-#define U2PCONV 1.e-12
-#define RADIMPCONV 1.e-12
+#define U2PCONV 1.e-10
+#define RADIMPCONV 1.e-10
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 50
-
 
 /************************************/
 //magnetic choices
@@ -45,13 +47,13 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2HEUN//IMEX //test IMEX with radiation etc!!!
+#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 1
-#define DORADFIXUPS 1
+#define DOFIXUPS 0
+#define DORADFIXUPS 0
 
 /************************************/
 //viscosity choices
@@ -102,7 +104,7 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(5.-MKSR0))
+#define MINX (log(1.85-MKSR0))
 #define MAXX (log(1000.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
@@ -122,12 +124,12 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 160 //28*9
-#define TNY 100 //26*9
+#define TNX 252 //28*9
+#define TNY 234 //26*9
 #define TNZ 1 //2*8
 //number of tiles
-#define NTX 4
-#define NTY 4
+#define NTX 4//14//28
+#define NTY 9//13//26
 #define NTZ 1
 
 #define SPECIFIC_BC
@@ -138,17 +140,18 @@
 /************************************/
 //output
 /************************************/
-//#define OUTPUTPERCORE
+
+#define DTOUT3 .1
+#define BOXOUTPUT 1
+#define BOXR1 10.
+#define BOXR2 15.
+#define BOXITH 30 //distance from eq.plane in cells                                                                                                             
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define BOXOUTPUT 1
-#define BOXR1 40.
-#define BOXR2 50.
-#define BOXITH (TNY/4) //distance from eq.plane in cells
 #define SILOOUTPUT 1
 #define OUTOUTPUT 0
 #define RADOUTPUT 1
@@ -156,8 +159,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 2.
-#define DTOUT3 .5
+#define DTOUT1 50.
 #define DTOUT2 1000.
 
 /************************************/
