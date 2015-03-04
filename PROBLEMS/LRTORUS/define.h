@@ -126,8 +126,8 @@
 #define TNY 100 //26*9
 #define TNZ 1 //2*8
 //number of tiles
-#define NTX 2
-#define NTY 2
+#define NTX 4
+#define NTY 4
 #define NTZ 1
 
 #define SPECIFIC_BC
@@ -156,7 +156,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 .5
 #define DTOUT2 1000.
 
 /************************************/

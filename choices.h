@@ -276,7 +276,7 @@
 #endif
 
 #ifndef NBOXSCALARS
-#define NBOXSCALARS 17
+#define NBOXSCALARS 18
 #endif
 
 #ifndef NANARELRADPROFILES

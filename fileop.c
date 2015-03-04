@@ -71,18 +71,20 @@ fprint_openfiles(char* folder)
   nfout2=0;
 #endif
 
+#if(BOXOUTPUT==1) //this one MPI-safe
+  if(PROCID==0)
+    {
+      sprintf(bufor,"%s/boxscalars.dat",folder);
+      fout_boxscalars=fopen(bufor,"a");
+    }
+#endif
+
 #ifndef MPI
   sprintf(bufor,"%s/scalars.dat",folder);
   fout_scalars=fopen(bufor,"a");
 
   sprintf(bufor,"%s/failures.dat",folder);
   fout_fail=fopen(bufor,"a");
-
-  //ultimately to handle MPI as well
-#if(BOXOUTPUT==1)
-  sprintf(bufor,"%s/boxscalars.dat",folder);
-  fout_boxscalars=fopen(bufor,"a");
-#endif
 #endif
 
   return 0;
@@ -95,13 +97,16 @@ fprint_openfiles(char* folder)
 int 
 fprint_closefiles()
 {
+#if(BOXOUTPUT==1)
+  if(PROCID==0)
+    fclose(fout_boxscalars);
+#endif
+
 #ifndef MPI
   fclose(fout_scalars);
   fclose(fout_fail);  
-#if(BOXOUTPUT==1)
-  fclose(fout_boxscalars);
 #endif
-#endif
+
   return 0;
 }
 
@@ -181,18 +186,19 @@ int
 fprint_boxscalars(ldouble t)
 {
   ldouble boxscalars[NBOXSCALARS];
-
+  int iv;
 
   calc_boxscalars(boxscalars,t);
-  #ifndef MPI
-  int iv;
-  //printing boxscalars
-  fprintf(fout_boxscalars,"%e ",t);
-  for(iv=0;iv<NBOXSCALARS;iv++)
-    fprintf(fout_boxscalars,"%e ",boxscalars[iv]);
-  fprintf(fout_boxscalars,"\n");
-  fflush(fout_boxscalars);
-  #endif
+  if(PROCID==0)
+    {
+      //printing boxscalars
+      fprintf(fout_boxscalars,"%e ",t);
+      for(iv=0;iv<NBOXSCALARS;iv++)
+	fprintf(fout_boxscalars,"%e ",boxscalars[iv]);
+      fprintf(fout_boxscalars,"\n");
+      fflush(fout_boxscalars);
+    }
+  
 
   return 0;
 }
