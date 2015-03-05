@@ -234,11 +234,14 @@ main(int argc, char **argv)
   fprint_simplefile(t,no2,"analysis",prefix);
 #endif
   
+  if(procotg)
+    {
 #if(BOXOUTPUT==1)
   fclose(fout_boxscalars);
 #endif
 
   fclose(fout_scalars);
+    }
   return 0;
 }
 

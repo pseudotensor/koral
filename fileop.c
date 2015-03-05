@@ -1801,12 +1801,14 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 		  indices_2221(Rij,Rij,geomBL.gg);
 
 		  //four fource
-		  calc_Gi(pp,&geomBL,Gi,1); 
-		  boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
+		  calc_Gi(pp,&geomBL,Giff,0); 
+		  //boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
 		  ldouble kappaes=calc_kappaes(pp,&geomBL);
-		  calc_Compt_Gi(pp,&geomBL,Gic,ehat,temp,kappaes,vel);
-		  boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
+		  //test - directly in ff
+		  vel[1]=vel[2]=vel[3]=0.; vel[0]=1.;
+		  calc_Compt_Gi(pp,&geomBL,Gicff,ehat,temp,kappaes,vel);
+		  //boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
                   #endif 
 		  /*
 		  if(ix==2*NX/3 && iy==NY/2) 

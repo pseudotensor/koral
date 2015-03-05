@@ -270,6 +270,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   //#ifdef BHDISK_PROBLEMTYPE
   //avg already in OUTCOORDS
   avg[AVGBSQ]=bsq;
+  avg[AVGTGAS]=Tgas;
   for(iv=0;iv<4;iv++)
     avg[AVGUCON(iv)]=ucon[iv];
   for(iv=0;iv<4;iv++)
@@ -370,9 +371,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   //uwaga! boost sprawia, ze znaki fluid frame Compt i abs part rozne! spojrzec dlaczego!
 
   //test - directly in ff
-  ucon[1]=ucon[2]=ucon[3]=ucov[1]=ucov[2]=ucov[3]=0.;
-  ucon[0]=1.;
-  ucov[0]=-1.;
+  ucon[1]=ucon[2]=ucon[3]=0.;  ucon[0]=1.;
   ldouble kappaes=calc_kappaes(pp,&geomout);
   calc_Compt_Gi(pp,&geomout,Gicff,Ehat,Tgas,kappaes,ucon);
   
@@ -390,12 +389,22 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 
 #endif 
 
+  //radiation temperature
+  ldouble Thatrad;
+  #ifdef NCOMPTONIZATION //number of photons conserved
+  Thatrad = calc_ncompt_Thatrad(pp,ggg,Ehat);
+  #else //thermal comptonization
+  Thatrad = calc_LTE_TfromE(Ehat);
+  #endif
+
   for(iv=0;iv<4;iv++)
     avg[AVGURFCON(iv)]=ucon[iv];
   for(iv=0;iv<4;iv++)
     avg[AVGURFCOV(iv)]=ucov[iv];
    
   avg[AVGEHAT]=Ehat;
+  avg[AVGTRAD]=Thatrad;
+
   for(iv=0;iv<4;iv++)
     for(iv2=0;iv2<4;iv2++)
       avg[AVGRIJ(iv,iv2)]=Rij[iv][iv2];
