@@ -85,6 +85,10 @@ main(int argc, char **argv)
       sprintf(bufor,"analysis/avgboxscalars.dat");
       fout_boxscalars=fopen(bufor,"w");
 #endif
+#if(VAROUTPUT==1)
+      sprintf(bufor,"analysis/avgvarscalars.dat");
+      fout_varscalars=fopen(bufor,"w");
+#endif
     }
 
 
@@ -151,6 +155,10 @@ main(int argc, char **argv)
 	  
 #if(BOXOUTPUT==1)
 	  fprint_boxscalars(t);
+#endif
+
+#if(VAROUTPUT==1)
+	  fprint_varscalars(t);
 #endif
 	}
 
@@ -238,6 +246,10 @@ main(int argc, char **argv)
     {
 #if(BOXOUTPUT==1)
   fclose(fout_boxscalars);
+#endif
+
+#if(VAROUTPUT==1)
+  fclose(fout_varscalars);
 #endif
 
   fclose(fout_scalars);

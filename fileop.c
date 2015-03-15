@@ -11,12 +11,6 @@ save_avg(ldouble dtin)
 {
   int ix,iy,iz,iv,ii;
 
-  //commented out to work with SUBZONES too
-  //  for(ii=0;ii<Nloop_0;ii++) //domain 
-  //ix=loop_0[ii][0];
-  //iy=loop_0[ii][1];
-  //iz=loop_0[ii][2]; 
-
 #pragma omp parallel for private(ix,iy,iz,iv) 
   for(iz=0;iz<NZ;iz++)
     {
@@ -29,8 +23,24 @@ save_avg(ldouble dtin)
 	      ldouble avg[NV+NAVGVARS];
 	      p2avg(ix,iy,iz,avg);
 
+	      int gix,giy,giz;
+              mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+
+	      /*
+	      if(giy==TNY/2 && gix==40)	printf("                                                         %d %d > %e %e %e\n",gix,giy
+					       ,avg[AVGGHAT(0)]*kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC,
+					       get_uavg(pavg,AVGGHAT(0),ix,iy,iz)/avgtime*kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC,
+					       avg[AVGTGAS]-avg[AVGTRAD]);
+
+	      if(giy==TNY/2 && gix==85)
+		printf("%d %d > %e %e %e\n",gix,giy
+		       ,avg[AVGGHAT(0)]*kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC,
+		        get_uavg(pavg,AVGGHAT(0),ix,iy,iz)/avgtime*kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC,
+		       avg[AVGTGAS]-avg[AVGTRAD]);
+	      */
+
 	      //timestep
-	      dt=dtin;
+	      ldouble dt=dtin;
               #ifdef SELFTIMESTEP
 	      dt=get_u_scalar(cell_dt,ix,iy,iz); //individual time step
 	      //for some reason this is not working, replace with:
@@ -42,11 +52,13 @@ save_avg(ldouble dtin)
 		{
 		  set_uavg(pavg,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iy,iz)+avg[iv]*dt);
 		}
+
+	      
 	    }
 	}
     }
 
-  avgtime+=dt;
+  avgtime+=dtin;
 
   
   return 0;
@@ -79,6 +91,14 @@ fprint_openfiles(char* folder)
     }
 #endif
 
+#if(VAROUTPUT==1) //this one (to be) MPI-safe
+  if(PROCID==0)
+    {
+      sprintf(bufor,"%s/varscalars.dat",folder);
+      fout_varscalars=fopen(bufor,"a");
+    }
+#endif
+
 #ifndef MPI
   sprintf(bufor,"%s/scalars.dat",folder);
   fout_scalars=fopen(bufor,"a");
@@ -100,6 +120,11 @@ fprint_closefiles()
 #if(BOXOUTPUT==1)
   if(PROCID==0)
     fclose(fout_boxscalars);
+#endif
+
+#if(VAROUTPUT==1)
+  if(PROCID==0)
+    fclose(fout_varscalars);
 #endif
 
 #ifndef MPI
@@ -202,6 +227,36 @@ fprint_boxscalars(ldouble t)
 
   return 0;
 }
+
+
+/*********************************************/
+/*********************************************/
+/*********************************************/
+/* prints variability to varscalars.dat */
+/*********************************************/
+/*********************************************/
+/*********************************************/
+int
+fprint_varscalars(ldouble t)
+{
+  ldouble varscalars[NVARSCALARS];
+  int iv;
+
+  calc_varscalars(varscalars,t);
+  if(PROCID==0)
+    {
+      //printing varscalars
+      fprintf(fout_varscalars,"%e ",t);
+      for(iv=0;iv<NVARSCALARS;iv++)
+	fprintf(fout_varscalars,"%e ",varscalars[iv]);
+      fprintf(fout_varscalars,"\n");
+      fflush(fout_varscalars);
+    }
+  
+
+  return 0;
+}
+
 
 
 /*********************************************/
@@ -1379,7 +1434,13 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
       ret=fread(&giy,sizeof(int),1,fdump);
       ret=fread(&giz,sizeof(int),1,fdump);
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+      if(ix<0 || ix>=NX) {ix=0; printf("bad idx in avg: %d %d | %d %d %d\n",ic,NX*NY*NZ,ix,iy,iz);}
+     
+      if(iy<0 || iy>=NY) iy=0;
+      if(iz<0 || iz>=NZ) iz=0;
+
       ret=fread(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
+
     }
 
   fclose(fdump);

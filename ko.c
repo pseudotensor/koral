@@ -245,9 +245,11 @@ solve_the_problem(ldouble tstart, char* folder)
   ldouble dtout = DTOUT1;
   ldouble dtoutavg = DTOUT2;
   ldouble dtoutbox = DTOUT3;
+  ldouble dtoutvar = DTOUT4;
   ldouble lasttout_floor;
   ldouble lasttoutavg_floor;
   ldouble lasttoutbox_floor;
+  ldouble lasttoutvar_floor;
   int i,j,ii;
   int loopsallociter;
   int spitoutput,lastzone;
@@ -269,6 +271,7 @@ solve_the_problem(ldouble tstart, char* folder)
   lasttout_floor=floor(t/dtout); 
   lasttoutavg_floor=floor(t/dtoutavg);
   lasttoutbox_floor=floor(t/dtoutbox);
+  lasttoutvar_floor=floor(t/dtoutvar);
  
   dt=-1.;
   max_ws[0]=max_ws[1]=max_ws[2]=10000.;
@@ -437,15 +440,12 @@ solve_the_problem(ldouble tstart, char* folder)
 	    save_timesteps(); 
 
 	    dtcell=dt;
-	    calc_u2p();
-#pragma omp barrier
-	    do_correct();
-#pragma omp barrier
 
 	    /******* 1st implicit **********/
 	    copyi_u(1.,u,ut0);
 	    count_entropy(&nentr[0],&nentr2[0]); copy_entropycount(); 
 	    op_implicit (t,dt*gamma); //U(n) in *ut0;  U(1) in *u	  
+	    
 	    for(ii=0;ii<Nloop_0;ii++) { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
 	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
@@ -465,7 +465,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    count_entropy(&nentr[1],&nentr2[1]); 
 
 	    op_explicit (t,dt); //U(1) in *ut1; 
-	    
+
 	    for(ii=0;ii<Nloop_0;ii++)  { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
 	      dtcell=get_u_scalar(cell_dt,ix,iy,iz);
@@ -493,6 +493,12 @@ solve_the_problem(ldouble tstart, char* folder)
 
 	    count_entropy(&nentr[2],&nentr2[2]); 
 	    op_implicit (t,gamma*dt); //U(2) in *u
+
+	    	    #if(AVGOUTPUT==1) 
+	    //save to avg arrays	    
+	    save_avg(dt);
+	    #endif
+
 
 	    for(ii=0;ii<Nloop_0;ii++) { ix=loop_0[ii][0];      iy=loop_0[ii][1];      iz=loop_0[ii][2];
 #ifdef SELFTIMESTEP
@@ -546,6 +552,11 @@ solve_the_problem(ldouble tstart, char* folder)
 	    update_intensities(t, dt);
 #endif
 	    //printf("nstep: %d\n",nstep);
+
+	    calc_u2p();
+#pragma omp barrier
+	    do_correct();
+#pragma omp barrier
 	
 	    t+=dt;	 
 
@@ -584,7 +595,13 @@ solve_the_problem(ldouble tstart, char* folder)
 	    calc_u2p();
 #pragma omp barrier
 	    count_entropy(&nentr[3],&nentr2[3]); 
-	    op_implicit (t,dt); 
+	    op_implicit (t,dt);
+
+	    #if(AVGOUTPUT==1) 
+	    //save to avg arrays	    
+	    save_avg(dt);
+	    #endif
+ 
 
 	    //together
 	    addi_u(1.,u,-1.,ut1,ut2); //k2 in ut2
@@ -639,7 +656,13 @@ solve_the_problem(ldouble tstart, char* folder)
 #endif
 	    //#pragma omp barrier
 	    count_entropy(&nentr[3],&nentr2[3]); 
-	    op_implicit (t,dt); 
+	    op_implicit (t,dt);
+
+	    #if(AVGOUTPUT==1) 
+	    //save to avg arrays	    
+	    save_avg(dt);
+	    #endif
+ 
 	    addi_u(1.,u,-1.,ut1,ut3); 
 
 	    //together     
@@ -721,9 +744,8 @@ solve_the_problem(ldouble tstart, char* folder)
 
       //avg files
 #if(AVGOUTPUT==1) 
-     //save to avg arrays
-      save_avg(dt);
-
+      //save to avg arrays	    
+      //save_avg(dt);
       //dump avg file?
       if(lasttoutavg_floor!=floor(t/dtoutavg))
 	{
@@ -758,10 +780,17 @@ solve_the_problem(ldouble tstart, char* folder)
 #if(BOXOUTPUT==1) 
       if(lasttoutbox_floor!=floor(t/dtoutbox))
 	{
-#if(BOXOUTPUT==1)
 	  fprint_boxscalars(t);
-#endif
 	  lasttoutbox_floor=floor(t/dtoutbox);	 
+	}
+#endif
+
+ //varscalars.dat file
+#if(VAROUTPUT==1) 
+      if(lasttoutvar_floor!=floor(t/dtoutvar))
+	{
+	  fprint_varscalars(t);
+	  lasttoutvar_floor=floor(t/dtoutvar);	 
 	}
 #endif
 

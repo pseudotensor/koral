@@ -84,6 +84,11 @@ main(int argc, char **argv)
   fout_boxscalars=fopen(bufer,"w");
   #endif
 
+ #if(VAROUTPUT==1)
+  sprintf(bufer,"analysis/varscalars.dat");
+  fout_varscalars=fopen(bufer,"w");
+  #endif
+
 
   int ifile,itot=0,readret;
   ldouble t,ttot; ldouble scalars[NSCALARS];
@@ -125,6 +130,11 @@ main(int argc, char **argv)
 #if(BOXOUTPUT==1)
       fprint_boxscalars(t);
 #endif
+
+#if(VAROUTPUT==1)
+      fprint_varscalars(t);
+#endif
+
 #if(SCAOUTPUT==1)
       fprint_scalars(t,scalars,NSCALARS);
 #endif
@@ -158,6 +168,10 @@ main(int argc, char **argv)
 
 #if(BOXOUTPUT==1)
   fclose(fout_boxscalars);
+#endif
+
+#if(BOXOUTPUT==1)
+  fclose(fout_varscalars);
 #endif
 
   fclose(fout_scalars);

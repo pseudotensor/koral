@@ -88,7 +88,7 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 10.
+#define MASS 1000.
 #define BHSPIN 0.0
 
 /************************************/
@@ -124,12 +124,12 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 252 //28*9
-#define TNY 234 //26*9
-#define TNZ 1 //2*8
+#define TNX 60//252 //28*9
+#define TNY 60//234 //26*9
+#define TNZ 10 //2*8
 //number of tiles
-#define NTX 4//14//28
-#define NTY 9//13//26
+#define NTX 2//14//28
+#define NTY 2//13//26
 #define NTZ 1
 
 #define SPECIFIC_BC
@@ -160,7 +160,7 @@
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 50.
-#define DTOUT2 1000.
+#define DTOUT2 1.e-1
 
 /************************************/
 //common physics / torus / atmosphere
@@ -170,7 +170,7 @@
 #define NTORUS 7
 
 #if(NTORUS==7) //flat sigma
-#define LT_KAPPA 5.e2
+#define LT_KAPPA 110.
 #define EXPECTEDHR 0.3
 #define LT_XI 0.975
 #define LT_R1 30.

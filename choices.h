@@ -256,15 +256,11 @@
 #endif
 
 #ifndef NAVGVARS
-//#ifdef BHDISK_PROBLEMTYPE
 #ifdef RADIATION
-#define NAVGVARS (152+3*NV) //added to existing NV 
+#define NAVGVARS (153+3*NV) //added to existing NV; previously: 151
 #else
-#define NAVGVARS (111+3*NV)
+#define NAVGVARS (112+3*NV) //previously: 110
 #endif
-//#else
-//#define NAVGVARS (0)
-//#endif
 #endif
 
 #ifndef NRADPROFILES
@@ -277,6 +273,10 @@
 
 #ifndef NBOXSCALARS
 #define NBOXSCALARS 18
+#endif
+
+#ifndef NVARSCALARS
+#define NVARSCALARS 10
 #endif
 
 #ifndef NANARELRADPROFILES
@@ -415,6 +415,10 @@
 
 #ifndef DTOUT3
 #define DTOUT3 DTOUT1
+#endif
+
+#ifndef DTOUT4
+#define DTOUT4 DTOUT1
 #endif
 
 #ifndef B2RHOFLOORFRAME

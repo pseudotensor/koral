@@ -228,7 +228,7 @@ int doingpostproc;
 ldouble Kr_tmp[4][4][4],g_tmp[4][4];
 ldouble inputarg[10];
 int **gcidx;
-FILE *fout1,*fout_scalars,*fout_radprofiles,*fout_fail,*fout_boxscalars;
+FILE *fout1,*fout_scalars,*fout_radprofiles,*fout_fail,*fout_boxscalars,*fout_varscalars;
 int nfout1,nfout2;
 
 //precalculated metric parameters
@@ -279,6 +279,7 @@ ldouble calc_meantemp(ldouble);
 ldouble calc_scaleheight(ldouble);
 int calc_scalars(ldouble*,ldouble);
 int calc_boxscalars(ldouble*,ldouble);
+int calc_varscalars(ldouble*,ldouble);
 int calc_Bflux(ldouble radius,int type,ldouble*,ldouble*);
 ldouble calc_mdotEdd();
 ldouble calc_lumEdd();
@@ -470,6 +471,7 @@ int fprint_simplebondi(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_simplesph(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_scalars(ldouble t, ldouble *scalars, int nscalars);
 int fprint_boxscalars(ldouble t);
+int fprint_varscalars(ldouble t);
 int fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_thprofiles(ldouble t, int nfile, char* folder, char* prefix);
 int fprint_anarelradprofiles(ldouble t, int nfile, char* folder, char* prefix, ldouble[NANARELRADPROFILES][NX]);
