@@ -275,8 +275,16 @@
 #define NBOXSCALARS 18
 #endif
 
+#ifndef NVARCUTS
+#define NVARCUTS 19
+#endif
+
+#ifndef NVARVARSPERCUT
+#define NVARVARSPERCUT 2
+#endif
+
 #ifndef NVARSCALARS
-#define NVARSCALARS 10
+#define NVARSCALARS (NVARCUTS*NVARVARSPERCUT)
 #endif
 
 #ifndef NANARELRADPROFILES

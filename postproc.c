@@ -1703,551 +1703,127 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 int calc_varscalars(ldouble *varscalars,ldouble t)
 {
 #if(VAROUTPUT==1)
+
+  #ifdef MPI
+  if(PROCID==0) my_warning("VAROUTPUT does not work with mpi yet. Use only for postprocesing with ana.c.\n");
+#endif
+
   //adjust NVARSCALARS in problem.h
   
   int ix,iy,iz,ii,iv;
-  int bix1,bix2,biy1,biy2,giy;
+
+  //search for appropriate radial index
   ldouble xx[4],xxBL[4];
+  ldouble radius=1.e3;
+  #ifdef VARRADIUS
+  radius=VARRADIUS;
+  #endif
+  for(ix=0;ix<NX;ix++)
+    {
+      get_xx(ix,0,0,xx);
+      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      if(xxBL[1]>radius) break;
+    }
 
   //zero scalars by default
   for(ii=0;ii<NVARSCALARS;ii++)
     varscalars[ii]=0.;
 
-  //search for appropriate indices
+  ldouble pp[NV];
+ 
+  //ix fixed by VARRADIUS
+  iz=0; //no veritcal averaging - slice through iz=0, use ./phisli first.
   
-
-  //limits of this tile
-  int rmin,rmax;
-  get_xx(0,0,0,xx);
-  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-  rmin=xxBL[1];
-  get_xx(NX-1,0,0,xx);
-  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-  rmax=xxBL[1];
-
-  //global index of the theta limits
-  int giy1,giy2;
-  mpi_local2globalidx(0,0,0,&ix,&giy1,&iz);
-  mpi_local2globalidx(0,NY-1,0,&ix,&giy2,&iz);
-
-  //if tile completely outside the var
-  int ifoutsidevar=0;
-
-  if((rmax<VARR2) || (rmin>VARR2))
-    ifoutsidevar=1;
-
-  if((giy2 < (TNY/2-VARITH)) || (giy1 > (TNY/2+VARITH-1)))
-    ifoutsidevar=1;
-
-  if(!ifoutsidevar)  //do the integrals only if given tile covers some part the var
+  //divide 0-2*MPI uniformly into NVARCUTS and find appropriate polar indices
+  int iys[NVARCUTS],i;
+  ldouble th;
+  for(i=0;i<NVARCUTS;i++)
     {
-      //radial limits first 
-      bix1=bix2=-1;
-      for(ix=0;ix<NX;ix++)
+      iy=NCCORRECTPOLAR-1;
+      th=M_PI*(ldouble)i/(ldouble)(NVARCUTS-1);
+      do
 	{
-	  get_xx(ix,0,0,xx);
+	  iy++;
+	  get_xx(ix,iy,iz,xx);
 	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-	  if(xxBL[1]>VARR1 & bix1<0) bix1=ix;
-	  if(xxBL[1]>VARR2 & bix2<0) bix2=ix;
+	  //printf(">> %d %f\n",iy,xxBL[2]);
 	}
-      if(bix1<0) bix1=NX;
-      if(bix2<0) bix2=NX;
+      while(xxBL[2]<th && iy<=NY-1-NCCORRECTPOLAR);
+      iys[i]=iy;
 
-      //then polar angle
+      //printf("> %d %f %f\n",iy,th,xxBL[2]);
+    }
 
-      biy1=biy2=-1;
-      for(iy=0;iy<NY;iy++)
-	{
-	  mpi_local2globalidx(0,iy,0,&ix,&giy,&iz);
-      
-	  if(giy>(TNY/2-VARITH) && biy1<0) biy1=iy;
-	  if(giy>(TNY/2+VARITH-1) && biy2<0) biy2=iy;
-	}
-      if(biy1<0) biy1=NY;
-      if(biy2<0) biy2=NY;
-  
-      //printf("PROCID: %d > bix: %d - %d > biy: %d - %d -> giy: %d - %d\n",PROCID,bix1,bix2,biy1,biy2,biy1+TOJ,biy2+TOJ);
+  int idx=0;
+  ldouble diy;
+  for(i=0;i<NVARCUTS;i++)
+    {
+      iy=iys[i];
+      //printf("%d\n",iy);
 
-      //first integrals / averages within the var
-      ldouble mass,pgasint,pradint,ptotint,Gtint,Gctint;
-      mass=pgasint=pradint=ptotint=Gtint=Gctint=0.;
-      ldouble tempav,qthetaav,alphaav;
-      tempav=qthetaav=alphaav=0.;
-      ldouble pp[NV];
-
-      for(ix=bix1;ix<bix2;ix++)
-	for(iy=biy1;iy<biy2;iy++)
-	  for(iz=0;iz<NZ;iz++)
-	    {
-	      struct geometry geom;
-	      fill_geometry(ix,iy,iz,&geom);
+      struct geometry geom;
+      fill_geometry(ix,iy,iz,&geom);
 	
-	      struct geometry geomBL;
-	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+      struct geometry geomBL;
+      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 	
-	      //coordinate
-	      ldouble dx[3];
-	      get_cell_sizeBL(ix,iy,iz,dx);
+      //primitives at the cell - either averaged or original, in BL or MYCOORDS
+      for(iv=0;iv<NV;iv++)
+	pp[iv]=get_u(p,iv,ix,iy,iz);
+		
+      //to BL, res-files and primitives in avg in MYCOORDS
+      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
 
-	      //primitives at the cell - either averaged or original, in BL or MYCOORDS
-	      for(iv=0;iv<NV;iv++)
-		pp[iv]=get_u(p,iv,ix,iy,iz);
-
-	      //to BL, res-files and primitives in avg in MYCOORDS
-	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
-
-	      //from now on - working in BL coords
+      //from now on - working in BL coords
         
-	      //primitives and derivatives
-	      /****************************/
-	      /****************************/
-	      /****************************/
-	      ldouble rho=pp[RHO];
-	      ldouble uint=pp[UU];
-	      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
-	      ldouble bsq=0.;
-	      ldouble ucon[4],ucov[4],bcon[4],bcov[4],vel[4];
-	      ucon[1]=pp[VX];
-	      ucon[2]=pp[VY];
-	      ucon[3]=pp[VZ];
+      //primitives and derivatives
+      /****************************/
+      /****************************/
+      /****************************/
+      ldouble rho=pp[RHO];
+      ldouble uint=pp[UU];
+      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
+      ldouble bsq=0.;
+      ldouble ucon[4],ucov[4],bcon[4],bcov[4],vel[4];
+      ucon[1]=pp[VX];
+      ucon[2]=pp[VY];
+      ucon[3]=pp[VZ];
 		  
 #ifdef MAGNFIELD
-	      calc_bcon_prim(pp,bcon,&geomBL);
-	      indices_21(bcon,bcov,geomBL.gg); 
-	      bsq = dot(bcon,bcov); 
+      calc_bcon_prim(pp,bcon,&geomBL);
+      indices_21(bcon,bcov,geomBL.gg); 
+      bsq = dot(bcon,bcov); 
 #endif
 
-	      conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-	      ldouble rhouconr=rho*ucon[1];
+      conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+      ldouble rhouconr=rho*ucon[1];
 
-	      ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
-	      calc_Tij(pp,&geomBL,Tij22);
-	      indices_2221(Tij22,Tij,geomBL.gg);
-	      ldouble Trt = Tij[1][0],Rrt=0.;
-s	      ldouble Trtmagn = bsq*ucon[1]*ucov[0] - bcon[1]*bcov[0];
-	      ldouble Trtkin =  rho*ucon[1]*ucov[0];
-	      ldouble enden = Tij[0][0] + rho*ucon[0];
-	      ldouble Ehat=0.;
-	      ldouble Gi[4],Giff[4]={0.,0.,0.,0.};
-	      ldouble Gic[4],Gicff[4]={0.,0.,0.,0.};
-	      
+      ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
+      calc_Tij(pp,&geomBL,Tij22);
+      indices_2221(Tij22,Tij,geomBL.gg);
+      ldouble Trt = Tij[1][0],Rrt=0.;
+      ldouble Trtmagn = bsq*ucon[1]*ucov[0] - bcon[1]*bcov[0];
+      ldouble Trtkin =  rho*ucon[1]*ucov[0];
 
 #ifdef RADIATION
-	      calc_Rij(pp,&geomBL,Rij);
-	      indices_2221(Rij,Rij,geomBL.gg);
-	      Rrt = Rij[1][0];
-
-	      ldouble Rtt,uconr[4];
-	      calc_ff_Rtt(pp,&Rtt,uconr,&geomBL);
-	      Ehat=-Rtt; 	
-	      enden+=Rij[0][0];
-
-	      //four fource
-	      calc_Gi(pp,&geomBL,Gi,1); 
-	      boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
-#if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
-	      ldouble kappaes=calc_kappaes(pp,&geomBL);
-	      calc_Compt_Gi(pp,&geomBL,Gic,Ehat,temp,kappaes,ucon);
-	      boost2_lab2ff(Gic,Gicff,pp,geomBL.gg,geomBL.GG);
-#endif 
+      calc_Rij(pp,&geomBL,Rij);
+      indices_2221(Rij,Rij,geomBL.gg);
+      Rrt = Rij[1][0];
 #endif
 
-	      ldouble pregas = GAMMAM1*uint;
-	      ldouble premag = bsq/2.;
-	      ldouble prerad = 0.;
-#ifdef RADIATION
-	      prerad = Ehat/3.;
-#endif
-	      ldouble pretot = pregas + premag + prerad;
-
-	      //alpha 
-	      boost22_lab2ff(Tij22,Tij22,pp,geomBL.gg,geomBL.GG);
-	      ldouble alpha=sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij22[1][3]/pretot;
-	      //angular velocity
-	      ldouble Omega=ucon[3]/ucon[0];
-	      //MRI resolution parameters
-	      ldouble qtheta,qphi;
-	      calc_Qthetaphi(ix,iy,iz,&qtheta,&qphi);
-
-	      //PLACE - overwrite with avg quantities if required
-	      if(doingavg)
-		{
-
-		}
-
-	      //integrals
-	      mass+=rho*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	      pgasint+=pregas*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	      pradint+=prerad*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	      ptotint+=pretot*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	      Gtint+=(Giff[0])*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	      Gctint+=(Gicff[0])*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	
-	      //rho-averages
-	      tempav+=temp*rho*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	      qthetaav+=qtheta*rho*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	      alphaav+=alpha*rho*dx[0]*dx[1]*dx[2]*geomBL.gdet;
-	    }
-
- 
-      //now integrals of fluxes over the walls [left radial, right radial, top+bottom]
-      ldouble Rrttot[3]={0.,0.,0.};
-      ldouble Trttot[3]={0.,0.,0.};
-      ldouble Trtkintot[3]={0.,0.,0.};
-      ldouble Trtmagntot[3]={0.,0.,0.};
-      ldouble rhouconrtot[3]={0.,0.,0.};
-
-      //left radial wall
-      if(VARR1>rmin && VARR1<=rmax) //within this tile
+      //PLACE - overwrite with avg quantities if required
+      if(doingavg)
 	{
-	  ix=bix1;
-	  for(iy=biy1;iy<=biy2;iy++)
-	    for(iz=0;iz<NZ;iz++)
-	      {
-		struct geometry geom;
-		fill_geometry(ix,iy,iz,&geom);
-	
-		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-	
-		//coordinates
-		ldouble dx[3];
-		get_cell_sizeBL(ix,iy,iz,dx);
-	    
-
-		//primitives at the cell - either averaged or original, in BL or MYCOORDS
-		for(iv=0;iv<NV;iv++)
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
-
-		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
-
-		//from now on - working in BL coords
-        
-		//primitives and derivatives
-		/****************************/
-		/****************************/
-		/****************************/
-		ldouble rho=pp[RHO];
-		ldouble uint=pp[UU];
-		ldouble temp=calc_PEQ_Tfromurho(uint,rho);
-		ldouble bsq=0.;
-		ldouble ucon[4],ucov[4],bcon[4],bcov[4],vel[4];
-		ucon[1]=pp[VX];
-		ucon[2]=pp[VY];
-		ucon[3]=pp[VZ];
-		  
-#ifdef MAGNFIELD
-		calc_bcon_prim(pp,bcon,&geomBL);
-		indices_21(bcon,bcov,geomBL.gg); 
-		bsq = dot(bcon,bcov); 
-#endif
-
-		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-		ldouble rhouconr=rho*ucon[1];
-
-		ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
-		calc_Tij(pp,&geomBL,Tij22);
-		indices_2221(Tij22,Tij,geomBL.gg);
-		ldouble Trt = Tij[1][0],Rrt=0.;
-		ldouble Trtmagn = bsq*ucon[1]*ucov[0] - bcon[1]*bcov[0];
-		ldouble Trtkin =  rho*ucon[1]*ucov[0];
-
-#ifdef RADIATION
-		calc_Rij(pp,&geomBL,Rij);
-		indices_2221(Rij,Rij,geomBL.gg);
-		Rrt = Rij[1][0];
-#endif
-
-		//PLACE - overwrite with avg quantities if required
-		if(doingavg)
-		  {
-
-		  }
-
-		//integrals
-		rhouconrtot[0]+=rhouconr*dx[1]*dx[2]*geomBL.gdet;
-		Trttot[0]+=Trt*dx[1]*dx[2]*geomBL.gdet;
-		Trtkintot[0]+=Trtkin*dx[1]*dx[2]*geomBL.gdet;
-		Trtmagntot[0]+=Trtmagn*dx[1]*dx[2]*geomBL.gdet;
-		Rrttot[0]+=Rrt*dx[1]*dx[2]*geomBL.gdet;
-	      }
-
+	  
 	}
 
+       ldouble fluxconv=fluxGU2CGS(1.); 
+       varscalars[idx+0]=-fluxconv*(Trt+Rrt+rhouconr); // (2nd + 2*i column) - total energy, i - # of slice
+       varscalars[idx+1]=-fluxconv*Rrt; // (3rd + 2*i column) - radiative flux
 
-      //right radial wall (with minus sign)
-      if(VARR2>rmin && VARR2<=rmax) //within this tile
-	{
-	  ix=bix2;
-	  for(iy=biy1;iy<=biy2;iy++)
-	    for(iz=0;iz<NZ;iz++)
-	      {
-		struct geometry geom;
-		fill_geometry(ix,iy,iz,&geom);
-	
-		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-	
-		//coordinates
-		ldouble dx[3];
-		get_cell_sizeBL(ix,iy,iz,dx);
-	    
-		//primitives at the cell - either averaged or original, in BL or MYCOORDS
-		for(iv=0;iv<NV;iv++)
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
+       idx+=NVARVARSPERCUT;
+    }
 
-		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
-
-		//from now on - working in BL coords
-        
-		//primitives and derivatives
-		/****************************/
-		/****************************/
-		/****************************/
-		ldouble rho=pp[RHO];
-		ldouble uint=pp[UU];
-		ldouble temp=calc_PEQ_Tfromurho(uint,rho);
-		ldouble bsq=0.;
-		ldouble ucon[4],ucov[4],bcon[4],bcov[4],vel[4];
-		ucon[1]=pp[VX];
-		ucon[2]=pp[VY];
-		ucon[3]=pp[VZ];
-		  
-#ifdef MAGNFIELD
-		calc_bcon_prim(pp,bcon,&geomBL);
-		indices_21(bcon,bcov,geomBL.gg); 
-		bsq = dot(bcon,bcov); 
-#endif
-
-		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-		ldouble rhouconr=rho*ucon[1];
-
-		ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
-		calc_Tij(pp,&geomBL,Tij22);
-		indices_2221(Tij22,Tij,geomBL.gg);
-		ldouble Trt = Tij[1][0],Rrt=0.;
-		ldouble Trtmagn = bsq*ucon[1]*ucov[0] - bcon[1]*bcov[0];
-		ldouble Trtkin =  rho*ucon[1]*ucov[0];
-
-#ifdef RADIATION
-		calc_Rij(pp,&geomBL,Rij);
-		indices_2221(Rij,Rij,geomBL.gg);
-		Rrt = Rij[1][0];
-#endif
-
-		//PLACE - overwrite with avg quantities if required
-		if(doingavg)
-		  {
-
-		  }
-
-		//integrals
-		rhouconrtot[1]-=rhouconr*dx[1]*dx[2]*geomBL.gdet;
-		Trttot[1]-=Trt*dx[1]*dx[2]*geomBL.gdet;
-		Trtkintot[1]-=Trtkin*dx[1]*dx[2]*geomBL.gdet;
-		Trtmagntot[1]-=Trtmagn*dx[1]*dx[2]*geomBL.gdet;
-		Rrttot[1]-=Rrt*dx[1]*dx[2]*geomBL.gdet;
-	      }
-
-	}
-
-
-      //top face (with minus sign)
-      if((TNY/2-VARITH)>=giy1 && (TNY/2-VARITH)<=giy2)
-	{
-	  iy=biy1;
-	  for(ix=bix1;ix<=bix2;ix++)
-	    for(iz=0;iz<NZ;iz++)
-	      {
-		struct geometry geom;
-		fill_geometry(ix,iy,iz,&geom);
-	
-		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-	
-		//coordinates
-		ldouble dx[3];
-		get_cell_sizeBL(ix,iy,iz,dx);
-	    
-		//primitives at the cell - either averaged or original, in BL or MYCOORDS
-		for(iv=0;iv<NV;iv++)
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
-
-		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
-
-		//from now on - working in BL coords
-        
-		//primitives and derivatives
-		/****************************/
-		/****************************/
-		/****************************/
-		ldouble rho=pp[RHO];
-		ldouble uint=pp[UU];
-		ldouble temp=calc_PEQ_Tfromurho(uint,rho);
-		ldouble bsq=0.;
-		ldouble ucon[4],ucov[4],bcon[4],bcov[4],vel[4];
-		ucon[1]=pp[VX];
-		ucon[2]=pp[VY];
-		ucon[3]=pp[VZ];
-		  
-#ifdef MAGNFIELD
-		calc_bcon_prim(pp,bcon,&geomBL);
-		indices_21(bcon,bcov,geomBL.gg); 
-		bsq = dot(bcon,bcov); 
-#endif
-
-		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-		ldouble rhouconth=rho*ucon[2];
-
-		ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
-		calc_Tij(pp,&geomBL,Tij22);
-		indices_2221(Tij22,Tij,geomBL.gg);
-		ldouble Ttht = Tij[2][0],Rtht=0.;
-		ldouble Tthtmagn = bsq*ucon[2]*ucov[0] - bcon[2]*bcov[0];
-		ldouble Tthtkin =  rho*ucon[2]*ucov[0];
-
-#ifdef RADIATION
-		calc_Rij(pp,&geomBL,Rij);
-		indices_2221(Rij,Rij,geomBL.gg);
-		Rtht = Rij[2][0];
-#endif
-
-		//PLACE - overwrite with avg quantities if required
-		if(doingavg)
-		  {
-
-		  }
-
-		//integrals (watch the sign!)
-		rhouconrtot[2]-=rhouconth*dx[2]*dx[0]*geomBL.gdet;
-		Trttot[2]-=Ttht*dx[2]*dx[0]*geomBL.gdet;
-		Trtkintot[2]-=Tthtkin*dx[2]*dx[0]*geomBL.gdet;
-		Trtmagntot[2]-=Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
-		Rrttot[2]-=Rtht*dx[2]*dx[0]*geomBL.gdet;
-	      }
-
-	}
-
-      //bottom face
-      if((TNY/2+VARITH)>=giy1 && (TNY/2+VARITH)<=giy2)
-	{
-	  iy=biy2;
-	  for(ix=bix1;ix<=bix2;ix++)
-	    for(iz=0;iz<NZ;iz++)
-	      {
-		struct geometry geom;
-		fill_geometry(ix,iy,iz,&geom);
-	
-		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
-	
-		//coordinates
-		ldouble dx[3];
-		get_cell_sizeBL(ix,iy,iz,dx);
-	    
-		//primitives at the cell - either averaged or original, in BL or MYCOORDS
-		for(iv=0;iv<NV;iv++)
-		  pp[iv]=get_u(p,iv,ix,iy,iz);
-
-		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
-
-		//from now on - working in BL coords
-        
-		//primitives and derivatives
-		/****************************/
-		/****************************/
-		/****************************/
-		ldouble rho=pp[RHO];
-		ldouble uint=pp[UU];
-		ldouble temp=calc_PEQ_Tfromurho(uint,rho);
-		ldouble bsq=0.;
-		ldouble ucon[4],ucov[4],bcon[4],bcov[4],vel[4];
-		ucon[1]=pp[VX];
-		ucon[2]=pp[VY];
-		ucon[3]=pp[VZ];
-		  
-#ifdef MAGNFIELD
-		calc_bcon_prim(pp,bcon,&geomBL);
-		indices_21(bcon,bcov,geomBL.gg); 
-		bsq = dot(bcon,bcov); 
-#endif
-
-		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-		ldouble rhouconth=rho*ucon[2];
-
-		ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
-		calc_Tij(pp,&geomBL,Tij22);
-		indices_2221(Tij22,Tij,geomBL.gg);
-		ldouble Ttht = Tij[2][0],Rtht=0.;
-		ldouble Tthtmagn = bsq*ucon[2]*ucov[0] - bcon[2]*bcov[0];
-		ldouble Tthtkin =  rho*ucon[2]*ucov[0];
-
-#ifdef RADIATION
-		calc_Rij(pp,&geomBL,Rij);
-		indices_2221(Rij,Rij,geomBL.gg);
-		Rtht = Rij[2][0];
-#endif
-
-		//PLACE - overwrite with avg quantities if required
-		if(doingavg)
-		  {
-
-		  }
-
-		//integrals (watch the sign!)
-		rhouconrtot[2]+=rhouconth*dx[2]*dx[0]*geomBL.gdet;
-		Trttot[2]+=Ttht*dx[2]*dx[0]*geomBL.gdet;
-		Trtkintot[2]+=Tthtkin*dx[2]*dx[0]*geomBL.gdet;
-		Trtmagntot[2]+=Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
-		Rrttot[2]+=Rtht*dx[2]*dx[0]*geomBL.gdet;
-	      }
-	}
-
-      //saving local integrals 
-      varscalars[0]=mass; // (2nd column) - total mass inside the var
-      varscalars[1]=ptotint; // (3) - total integrated pressure | beta = pmag/ptot = (($3-$4-$5)/$3)
-      varscalars[2]=pgasint; // (4) - gas integrated pressure
-      varscalars[3]=pradint; // (5) - rad integrated pressure 
-      varscalars[4]=Gtint; // (6) - integrated total heating (\hat G_abs^t + \hat G_compt^t)
-      varscalars[5]=Gctint; // (7) - integrated Compton heating (\hat G_compt^t)
-      varscalars[6]=tempav; // (8) - averaged temperature
-      varscalars[7]=qthetaav; // (9) - averaged Qtheta
-      varscalars[8]=alphaav; // (10) - averaged alpha
-
-      int nia=8; //number of varscalars slots filled so far
-      varscalars[nia+1]=rhouconrtot[0]; // (11th column = nia + 3) - mass flux through inner face
-      varscalars[nia+2]=rhouconrtot[1]; // (12) - (-)mass flux through right face
-      varscalars[nia+3]=rhouconrtot[2]; // (13) - mass flux outflowing through top and bottom together
-      varscalars[nia+4]=Trttot[0]; // (14) - Trt flux 
-      varscalars[nia+5]=Trttot[1]; // (15) - -Trt flux
-      varscalars[nia+6]=Trttot[2]; // (16) - Ttht flux
-      varscalars[nia+7]=Rrttot[0]; // (17) - Rrt flux
-      varscalars[nia+8]=Rrttot[1]; // (18) - -Rrt flux
-      varscalars[nia+9]=Rrttot[2]; // (19) - Rtht flux
-    } //if(!ifoutsidevar)
-
-
-  //aggregating over all tiles to the master who will then print out
-#ifdef MPI
-  ldouble bscsum[NVARSCALARS];
-  MPI_Reduce(varscalars, bscsum, NVARSCALARS, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  for(iv=0;iv<NVARSCALARS;iv++)
-    varscalars[iv]=bscsum[iv];
-#endif
-
-  //if(PROCID==0) printf("sum %d > %e\n",PROCID,varscalars[8]);
-
-  
-  //normalizing the rho-averages by the total mass
-  varscalars[6]/=varscalars[0];
-  varscalars[7]/=varscalars[0];
-  varscalars[8]/=varscalars[0];
-
- 
 #endif //VAROUTPUT==1
   return 0;
 }

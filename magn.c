@@ -897,7 +897,7 @@ mimic_dynamo(ldouble dtin)
       ldouble facradius = step_function(xxBL[1]-1.*rISCOBL,.1*rISCOBL);
 
       #ifdef MAXRADIUS4DYNAMO
-      if(xxBL[1]>2.*MAXRADIUSDYNAMO) continue;
+      if(xxBL[1]>2.*MAXRADIUS4DYNAMO) continue;
       facradius *= step_function(MAXRADIUS4DYNAMO-xxBL[1],.1*MAXRADIUS4DYNAMO);
       #endif
 

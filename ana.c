@@ -38,10 +38,13 @@ main(int argc, char **argv)
     }
 
   char folder[100],bufer[100];
-  if(!ifphiavg)
+  if(ifphiavg==0)
     sprintf(folder,"%s","dumps");
-  else
+  else if(ifphiavg==1)
     sprintf(folder,"%s","dumps_phiavg");
+  else if(ifphiavg==2)
+    sprintf(folder,"%s","dumps_phisli");
+
 
   int i;
   
@@ -79,15 +82,21 @@ main(int argc, char **argv)
   sprintf(bufer,"analysis/scalars.dat");
   fout_scalars=fopen(bufer,"w");
 
-  #if(BOXOUTPUT==1)
+  if(ifphiavg<2)
+    {
+#if(BOXOUTPUT==1)
   sprintf(bufer,"analysis/boxscalars.dat");
   fout_boxscalars=fopen(bufer,"w");
   #endif
+    }
 
+  if(ifphiavg==2)
+    {
  #if(VAROUTPUT==1)
   sprintf(bufer,"analysis/varscalars.dat");
   fout_varscalars=fopen(bufer,"w");
   #endif
+    }
 
 
   int ifile,itot=0,readret;
@@ -123,17 +132,30 @@ main(int argc, char **argv)
       char suffix[10];
       sprintf(suffix,"");
 
-      if(ifphiavg)
+      if(ifphiavg==1)
 	sprintf(suffix,"%sphiavg",suffix);
+      if(ifphiavg==2)
+	sprintf(suffix,"%sphisli",suffix);
  
+      if(ifphiavg==2) //phisliced - only these below make sense for phi-slices
+	{
+#if(VAROUTPUT==1)
+      fprint_varscalars(t);
+#endif
+#if(SILOOUTPUT==1)
+#ifndef NOSILO
+      sprintf(prefix,"sil%s",suffix);  
+      fprint_silofile(t,nfout1,"analysis",prefix);
+#endif
+#endif
+	}
+      else
+	{ //regular
 
 #if(BOXOUTPUT==1)
       fprint_boxscalars(t);
 #endif
 
-#if(VAROUTPUT==1)
-      fprint_varscalars(t);
-#endif
 
 #if(SCAOUTPUT==1)
       fprint_scalars(t,scalars,NSCALARS);
@@ -162,6 +184,7 @@ main(int argc, char **argv)
       sprintf(prefix,"sim%s",suffix);  
       fprint_simplefile(t,nfout1,"analysis",prefix);
 #endif
+	}
   
 
     }

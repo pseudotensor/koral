@@ -179,6 +179,14 @@ initialize_arrays()
       //LNRF basis vectors
       emulo=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
 
+      #ifdef RADIATION
+      #if (RADVISCOSITY==SHEARVISCOSITY)
+      Rijviscprev=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
+      Rijviscglobal=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
+      radvisclasttime=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+      #endif
+      #endif
+
       //ortonormal tetrad one-forms
       tmuup=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
       //ortonormal tetrad vectors
@@ -267,6 +275,8 @@ initialize_arrays()
       //timesteps required by each cell
       cell_tstepden=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
       cell_dt=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+
+      
     }
   
   return 0;

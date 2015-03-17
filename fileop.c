@@ -998,9 +998,8 @@ fread_restartfile(int nout1, char* folder,ldouble *t)
 int 
 fread_restartfile_bin(int nout1, char *folder, ldouble *t)
 {
-  //  printf("what?\n");
   int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
-  char fname[40],fnamehead[40];
+  char fname[400],fnamehead[400];
   if(nout1>=0)
     {
       sprintf(fname,"%s/res%04d.dat",folder,nout1);

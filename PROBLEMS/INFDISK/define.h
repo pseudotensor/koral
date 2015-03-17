@@ -84,7 +84,7 @@
 /************************************/
 #define myMKS2COORDS
 #define ROUT 50.
-#define RMIN 1.8
+#define RMIN 10.8
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MKSR0 0.
@@ -174,6 +174,7 @@
 #define DISKRCIR 25.
 #define DISKTEMP 1.e8
 #define VERTBTIME 10.
+#define BDIPOLAR
 
 #define MAXRADIUS4DYNAMO DISKRCIR
 

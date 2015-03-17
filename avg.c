@@ -71,10 +71,12 @@ main(int argc, char **argv)
   char folderin[100],bufor[100];
   sprintf(folder,"analysis");
 
-  if(!ifphiavg)
+  if(ifphiavg==0)
     sprintf(folderin,"%s","dumps");
-  else
+  else if(ifphiavg==1)
     sprintf(folderin,"%s","dumps_phiavg");
+  else if(ifphiavg==2)
+    my_err("using phisli(ced) data with ./avg makes no sense.\n");
 
   if(procotg)
     {

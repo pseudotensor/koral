@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 200
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -124,9 +124,9 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 60//252 //28*9
-#define TNY 60//234 //26*9
-#define TNZ 10 //2*8
+#define TNX 160//252 //28*9
+#define TNY 120//234 //26*9
+#define TNZ 100 //2*8
 //number of tiles
 #define NTX 2//14//28
 #define NTY 2//13//26
@@ -143,6 +143,8 @@
 
 #define DTOUT3 .1
 #define BOXOUTPUT 1
+#define VAROUTPUT 1
+#define DTOUT4 .1
 #define BOXR1 10.
 #define BOXR2 15.
 #define BOXITH 30 //distance from eq.plane in cells                                                                                                             
