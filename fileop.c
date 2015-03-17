@@ -831,8 +831,10 @@ fprint_restartfile_mpi(ldouble t, char* folder)
 
   /***** first write all the indices ******/
 
-  int indices[NX*NY*NZ*3];
-
+  //  int indices[NX*NY*NZ*3];
+  int *indices;
+  indices = (int *)malloc(NX*NY*NZ*3*sizeof(int));
+  
   int ix,iy,iz,iv;
   int gix,giy,giz;
 
@@ -1044,7 +1046,11 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;
   char c;
-  int indices[NX*NY*NZ][3];
+  //int indices[NX*NY*NZ][3];
+  int **indices;
+  indices = (int **)malloc(NX*NY*NZ*sizeof(int*));
+  for(i=0;i<NX*NY*NZ;i++)
+    indices[i]=(int *)malloc(3*sizeof(int));
 
   //first indices
   for(ic=0;ic<NX*NY*NZ;ic++)
@@ -1156,7 +1162,9 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   int *indices=(int *)malloc(TNX*TNY*TNZ*3*sizeof(int));
   int len=TNX*TNY*TNZ;
   #else
-  int indices[NX*NY*NZ*3];
+  //int indices[NX*NY*NZ*3];
+  int *indices;
+  indices = (int *)malloc(NX*NY*NZ*3*sizeof(int));
   int len=NX*NY*NZ;
   #endif
 

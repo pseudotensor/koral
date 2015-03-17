@@ -194,7 +194,7 @@ main
 	      for(iv=0;iv<nv;iv++)
 		prims[i][j][iv]=0.;
 
-	    int **indices;
+	  int **indices;
 	  indices = (int **)malloc(nx*ny*nz*sizeof(int*));
 	  for(i=0;i<nx*ny*nz;i++)
 	    indices[i]=(int *)malloc(3*sizeof(int));
