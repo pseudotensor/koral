@@ -892,6 +892,7 @@ fprint_restartfile_mpi(ldouble t, char* folder)
       iv=system(bufor);
     }
 
+  free (indices);
 #endif
   return 0;
 }
@@ -1086,6 +1087,10 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
 	}
     }
 
+  for(i=0;i<NX*NY*NZ;i++)
+    free(indices[i]);
+  free(indices);
+  
   fclose(fdump);
 
   return 0;
@@ -1232,6 +1237,7 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 
   MPI_File_close( &cFile );
   MPI_Barrier(MPI_COMM_WORLD);
+  free(indices);
 #endif
   return 0;
 }
@@ -1263,8 +1269,90 @@ fprint_avgfile(ldouble t, char* folder,char* prefix)
 /*********************************************/
 /*********************************************/
 
+
 int //parallel output to a single file
 fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
+{
+  #ifdef MPI
+  char bufor[250];
+  //header
+  if(PROCID==0)
+    {
+      sprintf(bufor,"%s/%s%04d.head",folder,prefix,nfout2);
+      fout1=fopen(bufor,"w"); 
+      sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
+      fprintf(fout1,"%s",bufor);
+      fclose(fout1);
+    }
+
+  //body
+  sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfout2);
+
+  MPI_File cFile;
+  MPI_Status status;
+  MPI_Request req;
+
+ 
+  int rc = MPI_File_open( MPI_COMM_WORLD, bufor, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &cFile );
+  if (rc) {
+    printf( "Unable to open/create file %s\n", bufor );fflush(stdout); exit(-1);
+    }
+
+  /***** first write all the indices ******/
+
+  int *indices;
+  indices = (int *)malloc(NX*NY*NZ*3*sizeof(int));
+  
+  int ix,iy,iz,iv;
+  int gix,giy,giz;
+
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	{
+	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  indices[ix*NY*NZ*3+iy*NZ*3+iz*3+0]=gix;
+	  indices[ix*NY*NZ*3+iy*NZ*3+iz*3+1]=giy;
+	  indices[ix*NY*NZ*3+iy*NZ*3+iz*3+2]=giz;
+	}
+
+  //set the initial location at each process for indices
+  MPI_Offset pos;
+  pos=PROCID*NX*NY*NZ*(3*sizeof(int));  
+  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
+
+  //write all indices
+  MPI_File_write( cFile, indices, NX*NY*NZ*3, MPI_INT, &status );
+  
+  /***** then primitives in the same order ******/
+
+  //now let's try manually
+  pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*((NV+NAVGVARS)*sizeof(ldouble)); 
+  MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
+
+
+  //ldouble pout[NX*NY*NZ*(NV+NAVGVARS)];
+  ldouble *pout=(ldouble *) malloc(NX*NY*NZ*(NV+NAVGVARS)*sizeof(ldouble));
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	for(iv=0;iv<(NV+NAVGVARS);iv++)
+	  pout[ix*NY*NZ*(NV+NAVGVARS)+iy*NZ*(NV+NAVGVARS)+iz*(NV+NAVGVARS)+iv]=get_uavg(pavg,iv,ix,iy,iz);
+
+  MPI_File_write( cFile, pout, NX*NY*NZ*(NV+NAVGVARS), MPI_LDOUBLE, &status );
+
+  free(pout);
+  free(indices);
+
+  MPI_File_close( &cFile );
+
+#endif
+  return 0;
+}
+
+
+int //parallel output to a single file
+fprint_avgfile_mpi_old(ldouble t, char* folder, char* prefix)
 {
   #ifdef MPI
   char bufor[250];
@@ -1320,8 +1408,57 @@ fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
 /*********************************************/
 /*********************************************/
 
+
 int //serial binary output
 fprint_avgfile_bin(ldouble t, char* folder,char *prefix)
+{
+  char bufor[250];
+  
+  //header
+  if(PROCID==0)
+    {
+      sprintf(bufor,"%s/%s%04d.head",folder,prefix,nfout2);
+      fout1=fopen(bufor,"w"); 
+      sprintf(bufor,"## %5d %10.6e %10.6e %10.6e\n",nfout2,t-avgtime,t,avgtime);
+      fprintf(fout1,"%s",bufor);
+      fclose(fout1);
+    }
+
+  //body
+  sprintf(bufor,"%s/%s%04d.dat",folder,prefix,nfout2);
+  fout1=fopen(bufor,"wb"); 
+
+  int ix,iy,iz,iv;
+  int gix,giy,giz;
+  ldouble pp[NV];
+  //indices first
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	{
+	  mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
+	  fwrite(&gix,sizeof(int),1,fout1);
+	  fwrite(&giy,sizeof(int),1,fout1);
+	  fwrite(&giz,sizeof(int),1,fout1);
+	}
+
+  //then, in the same order, primitives
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	{
+	  fwrite(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fout1);
+	}
+
+  fclose(fout1);
+
+
+  return 0;
+}
+
+
+int //serial binary output
+fprint_avgfile_bin_old(ldouble t, char* folder,char *prefix)
 {
   char bufor[250];
   
@@ -1430,25 +1567,49 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
   //body file
 
   fdump=fopen(fname,"rb");
- 
+
   struct geometry geom;
   ldouble xxvec[4],xxvecout[4];
   ldouble uu[NV],pp[NV],ftemp;
   char c;
+  //int indices[NX*NY*NZ][3];
+  int **indices;
+  indices = (int **)malloc(NX*NY*NZ*sizeof(int*));
+  for(i=0;i<NX*NY*NZ;i++)
+    indices[i]=(int *)malloc(3*sizeof(int));
+
+  //first indices
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
       ret=fread(&gix,sizeof(int),1,fdump);
       ret=fread(&giy,sizeof(int),1,fdump);
       ret=fread(&giz,sizeof(int),1,fdump);
+
       mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+
       if(ix<0 || ix>=NX) {ix=0; printf("bad idx in avg: %d %d | %d %d %d\n",ic,NX*NY*NZ,ix,iy,iz);}
-     
       if(iy<0 || iy>=NY) iy=0;
       if(iz<0 || iz>=NZ) iz=0;
 
-      ret=fread(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
-
+      indices[ic][0]=ix;
+      indices[ic][1]=iy;
+      indices[ic][2]=iz;
     }
+
+  //then averages
+   for(ic=0;ic<NX*NY*NZ;ic++)
+    {
+      ix=indices[ic][0];
+      iy=indices[ic][1];
+      iz=indices[ic][2];
+
+      ret=fread(&get_uavg(pavg,0,ix,iy,iz),sizeof(ldouble),NV+NAVGVARS,fdump);
+    }
+
+  for(i=0;i<NX*NY*NZ;i++)
+    free(indices[i]);
+  free(indices);
+
 
   fclose(fdump);
 
@@ -1461,7 +1622,11 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
 int 
 fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
 {
-   #ifdef MPI
+#ifdef MPI
+  my_err("fread_avgfile should not be used with MPI\n");
+  exit(1);
+
+  /*
   int ret, ix,iy,iz,iv,i,ic,gix,giy,giz;
   char fname[40],fnamehead[40];
 
@@ -1470,7 +1635,6 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
 
   FILE *fdump;
 
-  /***********/
   //header file
   fdump=fopen(fnamehead,"r");
 
@@ -1484,7 +1648,6 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
   *dt=ldpar[2];
   fclose(fdump);
 
-  /***********/
   //body file
   struct geometry geom;
   ldouble xxvec[4],xxvecout[4];
@@ -1524,6 +1687,7 @@ fread_avgfile_mpi(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
 	}
 
   MPI_File_close( &cFile );
+  */
 #endif
 
   return 0;

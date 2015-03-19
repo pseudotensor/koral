@@ -1732,6 +1732,10 @@ int calc_varscalars(ldouble *varscalars,ldouble t)
   if((rmax<VARRADIUS) || (rmin>VARRADIUS))
     ifoutsidebox=1;
 
+  #ifdef MPI
+  if(TK!=0) ifoutsidebox=1; //only slice through giz=0
+#endif
+
   if(!ifoutsidebox)  //do the calculations only if VARRADIUS inside given tile
     {
 

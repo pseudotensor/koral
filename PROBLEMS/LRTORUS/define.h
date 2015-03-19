@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 500
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -164,8 +164,8 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
-#define DTOUT2 1000.
+#define DTOUT1 .5
+#define DTOUT2 .5
 
 /************************************/
 //common physics / torus / atmosphere

@@ -59,8 +59,10 @@ main
   double ***prims,*pp;
   pp=(double*)malloc(nv*sizeof(double));
   prims=(double***)malloc(nx*sizeof(double**));
+  int **ngood=(int**)malloc(nx*sizeof(int*));
   for(i=0;i<nx;i++)
     {
+      ngood[i]=(int*)malloc(ny*sizeof(int));
       prims[i]=(double**)malloc(ny*sizeof(double*));
       for(j=0;j<ny;j++)
 	prims[i][j]=(double*)malloc(nv*sizeof(double));
@@ -87,7 +89,7 @@ main
       //reading damp file parameters
       int intpar[6];
 
-      if(ifavg) //avg follows old writing sequence
+      if(ifavg) //avg follows old writing sequence - to correct!!!
 	{
 	  sprintf(bufor,"cp %s %s\n",fnamehead,fnameheadout);
 	  system(bufor);
@@ -107,8 +109,11 @@ main
 	  
 	  for(j=0;j<ny;j++)
 	    for(i=0;i<nx;i++)
-	      for(iv=0;iv<nv;iv++)
-		prims[i][j][iv]=0.;
+	      {
+		ngood[i][j]=0;
+		for(iv=0;iv<nv;iv++)
+		  prims[i][j][iv]=0.;
+	      }
 
 	  for(k=0;k<nz;k++)
 	    {
@@ -127,8 +132,11 @@ main
 		      if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
 			printf("blont: %d %d %d vs %d %d %d | %d %d %d\n",i,j,k,gix,giy,giz,nx,ny,nz);
 		      else
-			for(iv=0;iv<nv;iv++)
-			  prims[gix][giy][iv]+=pp[iv];
+			{
+			  for(iv=0;iv<nv;iv++)
+			    prims[gix][giy][iv]+=pp[iv];
+			  ngood[gix][giy]++;
+			}
 		    }
 		}
 	    }
@@ -136,7 +144,7 @@ main
 	  for(j=0;j<ny;j++)
 	    for(i=0;i<nx;i++)
 	      for(iv=0;iv<nv;iv++)
-		prims[i][j][iv]/=(double)nz;
+		prims[i][j][iv]/=(double)ngood[i][j];
 
 	  //print to a file
 	  k=0;
@@ -191,8 +199,11 @@ main
  
 	  for(j=0;j<ny;j++)
 	    for(i=0;i<nx;i++)
-	      for(iv=0;iv<nv;iv++)
-		prims[i][j][iv]=0.;
+	      {
+		ngood[i][j]=0;
+		for(iv=0;iv<nv;iv++)
+		  prims[i][j][iv]=0.;
+	      }
 
 	  int **indices;
 	  indices = (int **)malloc(nx*ny*nz*sizeof(int*));
@@ -224,17 +235,19 @@ main
 	      giz=indices[ic][2];
 	  
 	      if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
-		printf("blont: %d %d %d vs %d %d %d | %d %d %d\n",i,j,k,gix,giy,giz,nx,ny,nz);
+		printf("blont: %d %d %d | %d %d %d\n",gix,giy,giz,nx,ny,nz);
 	      else
-		for(iv=0;iv<nv;iv++)
-		  prims[gix][giy][iv]+=pp[iv];
-
+		{
+		  ngood[gix][giy]++;
+		  for(iv=0;iv<nv;iv++)
+		    prims[gix][giy][iv]+=pp[iv];
+		}
 	    }
 
 	  for(j=0;j<ny;j++)
 	    for(i=0;i<nx;i++)
 	      for(iv=0;iv<nv;iv++)
-		prims[i][j][iv]/=(double)nz;
+		prims[i][j][iv]/=(double)ngood[i][j];
 
 	  //print to a file
       
@@ -255,6 +268,9 @@ main
 		fwrite(&prims[ix][iy][0],sizeof(ldouble),nv,fout);
 	      }
 
+	  for(i=0;i<nx*ny*nz;i++)
+	    free(indices[i]);
+	  free(indices);
 
 	  fclose(fdump);
 	  fclose(fout);
