@@ -1177,7 +1177,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
   //if tile completely outside the box
   int ifoutsidebox=0;
 
-  if((rmax<BOXR2) || (rmin>BOXR2))
+  if((rmax<BOXR1) || (rmin>BOXR2))
     ifoutsidebox=1;
 
   if((giy2 < (TNY/2-BOXITH)) || (giy1 > (TNY/2+BOXITH-1)))
@@ -1704,125 +1704,163 @@ int calc_varscalars(ldouble *varscalars,ldouble t)
 {
 #if(VAROUTPUT==1)
 
-  #ifdef MPI
-  if(PROCID==0) my_warning("VAROUTPUT does not work with mpi yet. Use only for postprocesing with ana.c.\n");
-#endif
 
   //adjust NVARSCALARS in problem.h
-  
   int ix,iy,iz,ii,iv;
-
-  //search for appropriate radial index
-  ldouble xx[4],xxBL[4];
-  ldouble radius=1.e3;
-  #ifdef VARRADIUS
-  radius=VARRADIUS;
-  #endif
-  for(ix=0;ix<NX;ix++)
-    {
-      get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-      if(xxBL[1]>radius) break;
-    }
-
+  ldouble pp[NV]; ldouble xx[4],xxBL[4],xx1[4],xxBL1[4];
+  ldouble varscalarsloc[NVARSCALARS];
   //zero scalars by default
   for(ii=0;ii<NVARSCALARS;ii++)
-    varscalars[ii]=0.;
+    varscalars[ii]=varscalarsloc[ii]=0.;
 
-  ldouble pp[NV];
- 
-  //ix fixed by VARRADIUS
-  iz=0; //no veritcal averaging - slice through iz=0, use ./phisli first.
+
+
   
-  //divide 0-2*MPI uniformly into NVARCUTS and find appropriate polar indices
-  int iys[NVARCUTS],i;
-  ldouble th;
-  for(i=0;i<NVARCUTS;i++)
+
+ //limits of this tile
+  int rmin,rmax;
+  get_xx(0,0,0,xx);
+  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  rmin=xxBL[1];
+  get_xx(NX-1,0,0,xx);
+  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  rmax=xxBL[1];
+
+  //if tile completely outside the box
+  int ifoutsidebox=0;
+
+  if((rmax<VARRADIUS) || (rmin>VARRADIUS))
+    ifoutsidebox=1;
+
+  if(!ifoutsidebox)  //do the calculations only if VARRADIUS inside given tile
     {
-      iy=NCCORRECTPOLAR-1;
-      th=M_PI*(ldouble)i/(ldouble)(NVARCUTS-1);
-      do
+
+      //search for appropriate radial index
+     
+      ldouble radius=VARRADIUS;
+
+      for(ix=0;ix<NX;ix++)
 	{
-	  iy++;
-	  get_xx(ix,iy,iz,xx);
+	  get_xx(ix,0,0,xx);
 	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
-	  //printf(">> %d %f\n",iy,xxBL[2]);
+	  if(xxBL[1]>radius) break;
 	}
-      while(xxBL[2]<th && iy<=NY-1-NCCORRECTPOLAR);
-      iys[i]=iy;
 
-      //printf("> %d %f %f\n",iy,th,xxBL[2]);
-    }
+ 
+      //ix fixed by VARRADIUS
+      iz=0; //no azimuthal averaging - slice through iz=0, use ./phisli first, or run on the go
+  
+      //divide 0-2*MPI uniformly into NVARCUTS and find appropriate polar indices
+      int iys[NVARCUTS],i;
+      ldouble th;
+      for(i=0;i<NVARCUTS;i++)
+	{
+	  iy=0;
+	  th=M_PI*(ldouble)i/(ldouble)(NVARCUTS-1);
+	  do
+	    {
+	      iy++;
+	      get_xx(ix,iy,iz,xx);
+	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	      get_xx(ix,iy-1,iz,xx1);
+	      coco_N(xx1,xxBL1,MYCOORDS,BLCOORDS);
+	    }
+	  while(!(th<=xxBL[2] && th>xxBL1[2]) && iy<=NY-1);
 
-  int idx=0;
-  ldouble diy;
-  for(i=0;i<NVARCUTS;i++)
-    {
-      iy=iys[i];
-      //printf("%d\n",iy);
+	  if(iy>=NY) iy=-1; //no cut within this tile
 
-      struct geometry geom;
-      fill_geometry(ix,iy,iz,&geom);
+	  #ifdef MPI
+	  if(TJ==0 && iy==-1 && i==0) iy=0;
+	  if(TJ==NTY-1 && iy==-1 && i==NVARCUTS-1) iy=NY-1;
+	  #else
+	  if(iy==-1 && i==0) iy=0;
+	  if(iy==-1 && i==NVARCUTS-1) iy=NY-1;
+	  #endif
+
+	  iys[i]=iy;
+
+	  //if(PROCID==0) printf("%d > %d > %d %f %f\n",PROCID,i,iy,th,xxBL[2]);
+	}
+
+      int idx=0;
+      ldouble diy;	  
+      for(i=0;i<NVARCUTS;i++,idx+=NVARVARSPERCUT)
+	{
+	  iy=iys[i];
+	  if(iy<0) continue;
+	  //printf("%d\n",iy);
+
+	  struct geometry geom;
+	  fill_geometry(ix,iy,iz,&geom);
 	
-      struct geometry geomBL;
-      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	  struct geometry geomBL;
+	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
 	
-      //primitives at the cell - either averaged or original, in BL or MYCOORDS
-      for(iv=0;iv<NV;iv++)
-	pp[iv]=get_u(p,iv,ix,iy,iz);
+	  //primitives at the cell - either averaged or original, in BL or MYCOORDS
+	  for(iv=0;iv<NV;iv++)
+	    pp[iv]=get_u(p,iv,ix,iy,iz);
 		
-      //to BL, res-files and primitives in avg in MYCOORDS
-      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+	  //to BL, res-files and primitives in avg in MYCOORDS
+	  trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
 
-      //from now on - working in BL coords
+	  //from now on - working in BL coords
         
-      //primitives and derivatives
-      /****************************/
-      /****************************/
-      /****************************/
-      ldouble rho=pp[RHO];
-      ldouble uint=pp[UU];
-      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
-      ldouble bsq=0.;
-      ldouble ucon[4],ucov[4],bcon[4],bcov[4],vel[4];
-      ucon[1]=pp[VX];
-      ucon[2]=pp[VY];
-      ucon[3]=pp[VZ];
+	  //primitives and derivatives
+	  /****************************/
+	  /****************************/
+	  /****************************/
+	  ldouble rho=pp[RHO];
+	  ldouble uint=pp[UU];
+	  ldouble temp=calc_PEQ_Tfromurho(uint,rho);
+	  ldouble bsq=0.;
+	  ldouble ucon[4],ucov[4],bcon[4],bcov[4],vel[4];
+	  ucon[1]=pp[VX];
+	  ucon[2]=pp[VY];
+	  ucon[3]=pp[VZ];
 		  
 #ifdef MAGNFIELD
-      calc_bcon_prim(pp,bcon,&geomBL);
-      indices_21(bcon,bcov,geomBL.gg); 
-      bsq = dot(bcon,bcov); 
+	  calc_bcon_prim(pp,bcon,&geomBL);
+	  indices_21(bcon,bcov,geomBL.gg); 
+	  bsq = dot(bcon,bcov); 
 #endif
 
-      conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-      ldouble rhouconr=rho*ucon[1];
+	  conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+	  ldouble rhouconr=rho*ucon[1];
 
-      ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
-      calc_Tij(pp,&geomBL,Tij22);
-      indices_2221(Tij22,Tij,geomBL.gg);
-      ldouble Trt = Tij[1][0],Rrt=0.;
-      ldouble Trtmagn = bsq*ucon[1]*ucov[0] - bcon[1]*bcov[0];
-      ldouble Trtkin =  rho*ucon[1]*ucov[0];
+	  ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
+	  calc_Tij(pp,&geomBL,Tij22);
+	  indices_2221(Tij22,Tij,geomBL.gg);
+	  ldouble Trt = Tij[1][0],Rrt=0.;
+	  ldouble Trtmagn = bsq*ucon[1]*ucov[0] - bcon[1]*bcov[0];
+	  ldouble Trtkin =  rho*ucon[1]*ucov[0];
 
 #ifdef RADIATION
-      calc_Rij(pp,&geomBL,Rij);
-      indices_2221(Rij,Rij,geomBL.gg);
-      Rrt = Rij[1][0];
+	  calc_Rij(pp,&geomBL,Rij);
+	  indices_2221(Rij,Rij,geomBL.gg);
+	  Rrt = Rij[1][0];
 #endif
 
-      //PLACE - overwrite with avg quantities if required
-      if(doingavg)
-	{
+	  //PLACE - overwrite with avg quantities if required
+	  if(doingavg)
+	    {
 	  
+	    }
+
+	  ldouble fluxconv=fluxGU2CGS(1.); 
+	  varscalarsloc[idx+0]=-fluxconv*(Trt+Rrt+rhouconr); // (2nd + 2*i column) - total energy, i - # of slice
+	  varscalarsloc[idx+1]=-fluxconv*Rrt; // (3rd + 2*i column) - radiative flux
+
+
 	}
-
-       ldouble fluxconv=fluxGU2CGS(1.); 
-       varscalars[idx+0]=-fluxconv*(Trt+Rrt+rhouconr); // (2nd + 2*i column) - total energy, i - # of slice
-       varscalars[idx+1]=-fluxconv*Rrt; // (3rd + 2*i column) - radiative flux
-
-       idx+=NVARVARSPERCUT;
     }
+
+  //aggregating over all tiles to the master who will then print out
+#ifdef MPI
+  MPI_Reduce(varscalarsloc, varscalars, NVARSCALARS, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+#else
+  for(iv=0;iv<NBOXSCALARS;iv++)
+    varscalars[iv]=varscalarsloc[iv];
+#endif
 
 #endif //VAROUTPUT==1
   return 0;

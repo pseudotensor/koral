@@ -275,8 +275,15 @@
 #define NBOXSCALARS 18
 #endif
 
+
+
+#ifndef VARRADIUS
+#define VARRADIUS 100.
+#endif
+
+
 #ifndef NVARCUTS
-#define NVARCUTS 19
+#define NVARCUTS 20
 #endif
 
 #ifndef NVARVARSPERCUT

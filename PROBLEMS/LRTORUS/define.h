@@ -8,7 +8,7 @@
 /************************************/
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 500
 
 /************************************/
 //radiation choices
@@ -29,7 +29,7 @@
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
+//#define MIMICDYNAMO
 #define CALCHRONTHEGO
 #define THETAANGLE 0.25
 #define ALPHAFLIPSSIGN                                                        
@@ -47,13 +47,13 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
+#define TIMESTEPPING RK2IMEX
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 0
-#define DORADFIXUPS 0
+#define DOFIXUPS 1
+#define DORADFIXUPS 1
 
 /************************************/
 //viscosity choices
@@ -104,7 +104,7 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.85-MKSR0))
+#define MINX (log(5.85-MKSR0))
 #define MAXX (log(1000.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
@@ -124,11 +124,11 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 160//252 //28*9
-#define TNY 120//234 //26*9
-#define TNZ 100 //2*8
+#define TNX 252//252 //28*9
+#define TNY 234//234 //26*9
+#define TNZ 1 //2*8
 //number of tiles
-#define NTX 2//14//28
+#define NTX 4//14//28
 #define NTY 2//13//26
 #define NTZ 1
 
@@ -145,9 +145,12 @@
 #define BOXOUTPUT 1
 #define VAROUTPUT 1
 #define DTOUT4 .1
+#define NVARCUTS 20
 #define BOXR1 10.
 #define BOXR2 15.
-#define BOXITH 30 //distance from eq.plane in cells                                                                                                             
+#define BOXITH 30 //distance from eq.plane in cells   
+
+                                                                                                          
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
@@ -162,7 +165,7 @@
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
 #define DTOUT1 50.
-#define DTOUT2 1.e-1
+#define DTOUT2 1000.
 
 /************************************/
 //common physics / torus / atmosphere
