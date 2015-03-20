@@ -49,8 +49,14 @@ if(rho<0.) //outside donut
     
     indices_12(ucov,ucon,geomBL.GG);
 
+#ifdef PERTURBVEL
+    ucon[1]=PERTURBVEL;
+    #endif
+
     conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG);
    
+   
+
     pp[0]=my_max(rho,ppback[0]); 
     pp[1]=my_max(uint,ppback[1]);
     pp[2]=ucon[1]; 
@@ -88,10 +94,6 @@ if(rho<0.) //outside donut
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
     prad_ff2lab(pp,pp,&geomBL);
 
-#endif
-
-#ifdef NCOMPTONIZATION
-    pp[NF0]=calc_NFfromE(pp[EE0]);
 #endif
 
     //transforming primitives from BL to MYCOORDS
@@ -267,8 +269,73 @@ if(rho<0.) //outside donut
     //    if(iy==NY/2) printf("%d %f %f > %e %e %e %e\n",iy,r,th,uchop,u_av_mid,u_av, u_av_chop);
     Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
 
+#elif (NTORUS==77 || NTORUS==78)
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-15,2.)-1.e-3,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
+
+    //if(iy==TNY/2) printf("%d %d > %e\n",ix,iy,pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-15,2.));
+
+#elif (NTORUS==79) //a'la adaf paper - center too close
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.01,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
+
+#elif (NTORUS==80) //a'la adaf paper but ~ RHO
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/1.e-5,2.)-0.1,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
+
+
+#elif (NTORUS==81) //a'la adaf paper but ~ UU
+    /*
+    Acov[3]=my_max((pp[UU]*geomBL.xx*geomBL.xx-1.e-10*10.*10.)/7e-10-0.1,0.)*
+      pow(sin(fabs(geomBL.yy)),3.);
+
+    ldouble STARTFIELD=LT_RIN*1.2;
+    ldouble lambda = 750.;
+    ldouble fr = (pow(geomBL.xx,0.6)/0.6  + 0.5/0.4*pow(geomBL.xx,-0.4)) / lambda;
+    ldouble fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
+    Acov[3] *= sin(fr - fr_start) ;
+    */
+
+  //LIMOFIELD from a=0 MAD harm init.c
+    ldouble lambda = 25.;
+    ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
+    ldouble rchop = 800.; //outer boundary of field loops
+    ldouble u_av = pp[UU];
+    ldouble u_av_chop, u_av_mid;
+    //midplane at r
+    init_dsandvels_limotorus(r, M_PI/2., BHSPIN, &rho, &u_av_mid, &ell);
+    //midplane at rchop
+    init_dsandvels_limotorus(rchop, M_PI/2., BHSPIN, &rho, &u_av_chop, &ell);
+    
+    //vetor potential follows contours of UU
+    ldouble uchop = u_av - u_av_chop; //vpot->zero on contour of radius r=rchop
+    ldouble uchopmid = u_av_mid - u_av_chop; //vpot->zero away from midplane
+
+    ldouble rin=LT_RIN;
+    ldouble STARTFIELD = 2.5*rin;
+    ldouble q, fr, fr_start, vpot=0.;
+    if (r > STARTFIELD && r < rchop) {
+      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 8); // * pow(tanh(r/rsmooth),2);
+    } else q = 0;
+
+    if(q > 0.) {
+      fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
+      fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
+      vpot += q * sin(fr - fr_start) ;
+    }
+
+    Acov[3]=vpot;
+
 #else //standard single poloidal loop
-    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
+
+    
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.0001,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
+				     //*step_function(-(geomBL.xx-350.),10.);
 #endif
 
     pp[B1]=Acov[1];
@@ -278,8 +345,15 @@ if(rho<0.) //outside donut
 
    }
 
+#ifdef PERTMAGN //perturb to break axisymmetry
+//pp[UU]*=1.+((double)rand()/(double)RAND_MAX-0.5)*2.*PERTMAGN;
+pp[UU]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL.zz)/(MAXZ-MINZ));
+#endif
+
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
+
+
 //to conserved
 p2u(pp,uu,&geom);
 

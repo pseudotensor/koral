@@ -340,11 +340,35 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
    
 #ifdef RADIATION
   ldouble Rtt,Ehat,ugas[4];
-  calc_ff_Rtt(pp,&Rtt,ugas,&geomout);
+  //calc_ff_Rtt(pp,&Rtt,ugas,&geomout); //this very slow - why?
+
+  /*
+  ldouble Rijp[4][4];
+  calc_Rij_M1(pp,&geomout,Rijp);
+ 
+  indices_2221(Rijp,Rijp,geomout.gg);
+  Rtt=0.;
+  int i1,i2;
+  for(i1=0;i1<4;i1++)
+    for(i2=0;i2<4;i2++)
+      Rtt+=-Rijp[i1][i2]*ucon[i2]*ucov[i1];
+  
   Ehat=-Rtt;       
+  */
+
   ldouble Rij[4][4];
   calc_Rij(pp,&geomout,Rij);
   indices_2221(Rij,Rij,geomout.gg);
+
+  //Ehat calculation from Rij, gas velocity still in ucon, ucov
+  Rtt=0.;
+  int i1,i2;
+  for(i1=0;i1<4;i1++)
+    for(i2=0;i2<4;i2++)
+    Rtt+=-Rij[i1][i2]*ucon[i2]*ucov[i1];
+
+  Ehat=-Rtt;       
+
   vcon[1]=pp[FX];
   vcon[2]=pp[FY];
   vcon[3]=pp[FZ];
@@ -367,6 +391,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   //boost2_lab2ff(Gi,Giff,pp,geomout.gg,geomout.GG);
   calc_Gi(pp,&geomout,Giff,0); 
 
+  
 #if defined(COMPTONIZATION) || defined(NCOMPTONIZATION)
   //uwaga! boost sprawia, ze znaki fluid frame Compt i abs part rozne! spojrzec dlaczego!
 
@@ -379,12 +404,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   //   calc_Compt_Gi(pp,&geomout,Gic,Ehat,Tgas,kappaes,ucon);
   //boost2_lab2ff(Gic,Gicff,pp,geomout.gg,geomout.GG);
 
-  /*
-  if(ix==NX/3 && iy==NY/2)
-    {    
-      printf("%d %d (%f %f) - %e %e %e\n",ix,iy,geomout.xx,geomout.yy,Giff[0],Gicff[0],Giff[0]-Gicff[0]);
-    }
-  */
+  
 
 
 #endif 
@@ -396,7 +416,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   #else //thermal comptonization
   Thatrad = calc_LTE_TfromE(Ehat);
   #endif
-
+  
   for(iv=0;iv<4;iv++)
     avg[AVGURFCON(iv)]=ucon[iv];
   for(iv=0;iv<4;iv++)

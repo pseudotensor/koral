@@ -12,11 +12,11 @@ save_avg(ldouble dtin)
   int ix,iy,iz,iv,ii;
 
 #pragma omp parallel for private(ix,iy,iz,iv) 
-  for(iz=0;iz<NZ;iz++)
+  for(ix=0;ix<NX;ix++) 
     {
       for(iy=0;iy<NY;iy++)
 	{
-	  for(ix=0;ix<NX;ix++) 
+	  for(iz=0;iz<NZ;iz++)
 	    {
      
       
