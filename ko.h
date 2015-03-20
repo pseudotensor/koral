@@ -429,11 +429,13 @@ int set_ub(ldouble* uarr,int iv,int ix,int iy,int iz,ldouble value,int idim);
 //metric specific
 int set_g(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value);
 int set_T(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value);
+int set_Tfull(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value);
 int set_Tb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim);
 int set_gb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim);
 int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
 #define get_g(uarr,i,j,ix,iy,iz) uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX)*gSIZE]
 #define get_T(uarr,i,j,ix,iy,iz) uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16]
+#define get_Tfull(uarr,i,j,ix,iy,iz) uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16]
 #define get_Tb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX+1)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*16] : (idim==1 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*16] : (idim==2 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16] : 0.)))
 #define get_gb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX+1)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*gSIZE] : (idim==1 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*gSIZE] : (idim==2 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX)*gSIZE] : 0.)))
 #define get_gKr(i,j,k,ix,iy,iz) gKr[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*64]

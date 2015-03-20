@@ -1859,7 +1859,7 @@ calc_Rij_visc_total()
 	for(j=0;j<4;j++)
 	  {
 	    //Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]=Rvisc[i][j];	      
-	    set_T(Rijviscglobal,i,j,ix,iy,iz,Rvisc[i][j]);
+	    set_Tfull(Rijviscglobal,i,j,ix,iy,iz,Rvisc[i][j]);
 	  }
     }
   
@@ -1956,7 +1956,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
 	    Rvisc[i][j]= -2. * nu * Erad * shear[i][j];
 
 	    //Rijviscprev[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]=Rvisc[i][j];	      
-	    set_T(Rijviscprev,i,j,ix,iy,iz,Rvisc[i][j]);
+	    set_Tfull(Rijviscprev,i,j,ix,iy,iz,Rvisc[i][j]);
 	  }
 
       //radvisclasttime[ix+NGCX][iy+NGCY][iz+NGCZ]=global_time;      
@@ -1968,7 +1968,7 @@ calc_Rij_visc(ldouble *pp, void* ggg, ldouble Rvisc[][4], int *derdir)
 	for(j=0;j<4;j++)
 	  {
 	    //Rvisc[i][j]=Rijviscprev[ix+NGCX][iy+NGCY][iz+NGCZ][i][j];	      
-	    Rvisc[i][j]=get_T(Rijviscprev,i,j,ix,iy,iz);
+	    Rvisc[i][j]=get_Tfull(Rijviscprev,i,j,ix,iy,iz);
 	  }
     }
   /*
@@ -2981,7 +2981,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[
 	  {
 	    //Rijvisc[i][j]=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
 	    //Rijvisc[i][j]=.5*(Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]+Rijviscglobal[iix+NGCX][iiy+NGCY][iiz+NGCZ][i][j]);
-	    Rijvisc[i][j]=.5*(get_T(Rijviscglobal,i,j,ix,iy,iz)+get_T(Rijviscglobal,i,j,ix,iy,iz));
+	    Rijvisc[i][j]=.5*(get_Tfull(Rijviscglobal,i,j,ix,iy,iz)+get_T(Rijviscglobal,i,j,ix,iy,iz));
 	  }
 
     }
@@ -2997,7 +2997,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[
 	for(j=0;j<4;j++)
 	  {
 	    //Rijvisc[i][j]=Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j];
-	    Rijvisc[i][j]=get_T(Rijviscglobal,i,j,ix,iy,iz);
+	    Rijvisc[i][j]=get_Tfull(Rijviscglobal,i,j,ix,iy,iz);
 	  }     
     }  
 

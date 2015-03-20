@@ -2310,11 +2310,21 @@ int set_g(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value)
 }
 
 //deals with arrays [NX+NG x NY+NG x NZ+NG x 16] - 4x4 tensors
+//metric specific 
 int set_T(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value)
 {
   if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_T - index ouf of range");
   
   uarr[i*4+j + (ix+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16] = value;
+  return 0;
+}
+
+//deals with arrays [NX+NG x NY+NG x NZ+NG x 16] - 4x4 tensors
+int set_Tfull(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value)
+{
+  if(ix<-NG || ix>NX-1+NG || iy<-NG || iy>NY-1+NG || iz<-NG || iz>NZ-1+NG) my_err("blont w set_T - index ouf of range");
+  
+  uarr[i*4+j + (ix+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16] = value;
   return 0;
 }
 
