@@ -21,7 +21,7 @@
 /************************************/
 #define RADIATION
 #define BALANCEENTROPYWITHRADIATION
-#define COMPTONIZATION
+#define NCOMPTONIZATION
 
 /************************************/
 //magnetic choices
@@ -87,7 +87,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.7
+#define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
@@ -158,7 +158,7 @@
 #define BOXOUTPUT 1
 #define BOXR1 15.
 #define BOXR2 20.
-#define BOXITH 20 //distance from eq.plane in cells                                                                                                            \
+#define BOXITH 20 
 #define VAROUTPUT 1
 #define VARRADIUS 100.
 #define NVARCUTS 20
@@ -171,7 +171,7 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 77
+#define NTORUS 7
 
 #if(NTORUS==81) //
 #define LT_KAPPA 5.e2

@@ -412,7 +412,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
   //radiation temperature
   ldouble Thatrad;
   #ifdef NCOMPTONIZATION //number of photons conserved
-  Thatrad = calc_ncompt_Thatrad(pp,ggg,Ehat);
+  Thatrad = calc_ncompt_Thatrad(pp,&geomout,Ehat);
   #else //thermal comptonization
   Thatrad = calc_LTE_TfromE(Ehat);
   #endif
