@@ -9,8 +9,7 @@ main(int argc, char **argv)
 {  
   #ifdef MPI
   mpi_myinit(argc,argv);
-  #endif
-  #ifdef OMP
+  #else
   omp_myinit();  
   #endif
   mstep_init();
