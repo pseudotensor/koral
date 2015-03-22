@@ -1243,7 +1243,7 @@ op_implicit(ldouble t, ldouble dtin)
 {
 
   int ii;
-  ldouble dt;
+
 
   //to count the average number of iteration in the implicit solver
   for(ii=0;ii<NGLOBALINTSLOT;ii++)
@@ -1262,6 +1262,7 @@ op_implicit(ldouble t, ldouble dtin)
   for(ii=0;ii<Nloop_0;ii++) //domain 
     {
       int ix,iy,iz;
+      ldouble dt;
       ix=loop_0[ii][0];
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
@@ -2751,11 +2752,9 @@ int set_bc(ldouble t,int ifinit)
   int ii;
   int ix,iy,iz,iv;
   //first fill the GC with no corners
-  //something wrong with this loop below?
-  #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv) schedule (dynamic)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only, no corners
     {
-
 
       ix=loop_2[ii][0];
       iy=loop_2[ii][1];
@@ -4476,7 +4475,7 @@ cell_fixup_hd()
   copyi_u(1.,p,p_bak_fixup);
 
   //gets the neiboring the primitives
-#pragma omp parallel for private(ix,iy,iz,iv,ii,iii,in) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv,iii,in) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -4602,7 +4601,7 @@ cell_fixup_rad()
   copyi_u(1.,p,p_bak_fixup);
 
   //gets the neighboring the primitives
-#pragma omp parallel for private(ix,iy,iz,iv,ii,iii,in) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv,iii,in) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
