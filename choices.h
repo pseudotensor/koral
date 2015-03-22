@@ -490,66 +490,6 @@
 
 #define GMC2CM (MASSCM) //gravitational radius in cm
 
-/*********************/
-/*********************/
-/*********************/
-/*********************/
-/***** mpi-spec ******/
-/*********************/
-/*********************/
-/*********************/
-/*********************/
-
-#if !defined(MPI) && !defined(OMP)
-#undef NTX
-#undef NTY
-#undef NTZ
-#define NTX 1 //number of tiles in X
-#define NTY 1
-#define NTZ 1
-#endif
-
-#ifndef NTX
-#define NTX 1 //number of tiles in X
-#endif
-
-#ifndef NTY
-#define NTY 1
-#endif
-
-#ifndef NTZ
-#define NTZ 1
-#endif
-
-
-
-#ifdef MPI
-#ifndef NX
-#define NX (TNX/NTX)
-#endif 
-
-#ifndef NY
-#define NY (TNY/NTY)
-#endif
- 
-#ifndef NZ
-#define NZ (TNZ/NTZ)
-#endif 
-
-#else //OMP or single core
-
-#ifndef NX
-#define NX (TNX)
-#endif 
-
-#ifndef NY
-#define NY (TNY)
-#endif
- 
-#ifndef NZ
-#define NZ (TNZ)
-#endif 
-#endif
 
 
 #ifndef RADCLOSURE

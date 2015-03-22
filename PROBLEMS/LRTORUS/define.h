@@ -51,7 +51,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 //#define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP

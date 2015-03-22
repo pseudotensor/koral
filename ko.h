@@ -141,6 +141,68 @@ int TOI,TOJ,TOK; //indices of the tile origin
 int PROCID;
 int NPROCS;
 
+
+/*********************/
+/*********************/
+/*********************/
+/*********************/
+/***** mpi-spec ******/
+/*********************/
+/*********************/
+/*********************/
+/*********************/
+
+#if !defined(MPI) && !defined(OMP)
+#undef NTX
+#undef NTY
+#undef NTZ
+#define NTX 1 //number of tiles in X
+#define NTY 1
+#define NTZ 1
+#endif
+
+#ifndef NTX
+#define NTX 1 //number of tiles in X
+#endif
+
+#ifndef NTY
+#define NTY 1
+#endif
+
+#ifndef NTZ
+#define NTZ 1
+#endif
+
+
+
+#ifdef MPI
+#ifndef NX
+#define NX (TNX/NTX)
+#endif 
+
+#ifndef NY
+#define NY (TNY/NTY)
+#endif
+ 
+#ifndef NZ
+#define NZ (TNZ/NTZ)
+#endif 
+
+#else //OMP or single core
+
+#ifndef NX
+#define NX (TNX)
+#endif 
+
+#ifndef NY
+#define NY (TNY)
+#endif
+ 
+#ifndef NZ
+#define NZ (TNZ)
+#endif 
+#endif
+
 //size of 3d arrays
 #define SX (NX+2*NG)
 #define NGCX NG
@@ -744,9 +806,12 @@ int coco_3vector(ldouble A1[3],ldouble A2[3],int CO1,int CO2,void* ggg);
 
 //rad.c
 //rad-viscosity specific
+#ifdef RADIATION
+#if (RADVISCOSITY==SHEARVISCOSITY)
 ldouble *Rijviscprev,*radvisclasttime,*Rijviscglobal;
-
-//#if (RADVISCOSITY==SHEARVISCOSITY)
+#endif
+#endif
+//
 //ldouble Rijviscprev[SX][SY][SZ][4][4],radvisclasttime[SX][SY][SZ];
 //ldouble Rijviscglobal[SX][SY][SZ][4][4];
 //#endif
