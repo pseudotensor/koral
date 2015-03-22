@@ -164,9 +164,21 @@ int NPROCS;
 #define iZ(iz) (0)
 #endif
 
+//for METRICAXISYMMETRIC store only single phi slice
 #define SZMET SZ
 #define NGCZMET NGCZ
 #define iZMET(iz) iZ(iz)
+
+//to limit memory footprint for non-VET
+#if (RADCLOSURE==VETCLOSURE)
+#define SXVET SX
+#define SYVET SY
+#define SZVET SZ
+#else
+#define SXVET 1
+#define SYVET 1
+#define SZVET 1
+#endif
 
 #ifdef METRICAXISYMMETRIC
 #undef SZMET

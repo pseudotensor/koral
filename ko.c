@@ -16,15 +16,9 @@ main(int argc, char **argv)
 
   ldouble tstart;
   int i; char folder[100],bufer[100];
-  sprintf(folder,"%s","dumps");
-  #ifdef MPI
-  #ifdef OUTPUTPERCORE
-  sprintf(folder,"%s/%d",folder,PROCID);
-  sprintf(bufer,"mkdir %s",folder);
-  i=system(bufer);
-  #endif
-  #endif
 
+  //dumping to
+  sprintf(folder,"%s","dumps");
   //this is not avg.c
   doingavg=0;
   //neither ana.c anarel.c ...
