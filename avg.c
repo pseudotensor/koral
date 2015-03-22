@@ -146,7 +146,6 @@ main(int argc, char **argv)
 	  calc_avgs_throughout();
 	  
 	  //sets bc
-	  #pragma omp parallel
 	  set_bc(t,0);
 	  
 	  //calculate scalars
@@ -201,7 +200,6 @@ main(int argc, char **argv)
   calc_avgs_throughout();
 
   //projects on ghost cells
-  #pragma omp parallel
   set_bc(t,0);
 
   char prefix[40];

@@ -653,17 +653,6 @@ op_explicit(ldouble t, ldouble dtin)
   //global wavespeeds
   max_ws[0]=max_ws[1]=max_ws[2]=-1.;
  
-  
-  //**********************************************************************
-  //**********************************************************************
-  //**********************************************************************
-
-  //determines treatment or not of ghost cells
-  int xlim,ylim,zlim;
-  if(NX>1) xlim=1; else xlim=0;  
-  if(NY>1) ylim=1; else ylim=0;
-  if(NZ>1) zlim=1; else zlim=0;
-  
 
   //**********************************************************************
   //* MPI ****************************************************************
@@ -702,7 +691,7 @@ op_explicit(ldouble t, ldouble dtin)
 
 #ifndef SKIPEVOLUTION
   //interpolation and flux-calculation
-  #pragma omp parallel for private(iy,iz,iv,ix)  schedule (dynamic) 
+#pragma omp parallel for private(ix,iy,iz,iv)  schedule (dynamic) 
   for(ii=0;ii<Nloop_1;ii++) //domain plus some ghost cells
     {
       ix=loop_1[ii][0];
@@ -1856,9 +1845,9 @@ alloc_loops(int init,ldouble t,ldouble dt)
     szix1=0;
     szix2=imaxx;
 
-#endif
+#endif //MSTEP
 
-    //printf("%d %d %d | %d %d | %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,SX,SY,SZMET); if(PROCID==0) getch();
+    printf("%d > %d %d | %d %d | %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,SX,SY,SZMET); //if(PROCID==0) getch();
 
     global_ix1=ix1;
     global_iy1=iy1;

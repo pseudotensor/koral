@@ -51,11 +51,7 @@ main(int argc, char **argv)
   set_grid(&min_dx,&min_dy,&min_dz,&max_dt);
   //print_grid(min_dx,min_dy,min_dz);
 
-
   alloc_loops(1,0.,0.);
-
-  //free(loop_0);
-  //free(loop_0);
 
 #if(GRIDOUTPUT==1)
   fprint_gridfile(folder);

@@ -119,7 +119,6 @@ main(int argc, char **argv)
       calc_avgs_throughout();
       
       //sets bc
-      #pragma omp parallel
       set_bc(t,0);
      
       //calculate scalars

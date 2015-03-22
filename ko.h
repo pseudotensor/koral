@@ -203,6 +203,22 @@ int NPROCS;
 #endif 
 #endif
 
+
+#ifndef NG
+#if (INT_ORDER==0)
+#define NG 2 //number of ghost cells
+#endif
+#if (INT_ORDER==1)
+#define NG 2 
+#endif
+#if (INT_ORDER==2)
+#define NG 3
+#endif
+#if (INT_ORDER==4)
+#define NG 4
+#endif
+#endif
+
 //size of 3d arrays
 #define SX (NX+2*NG)
 #define NGCX NG
