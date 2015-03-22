@@ -98,11 +98,6 @@ if(rho<0.) //outside donut
 
     //transforming primitives from BL to MYCOORDS
     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-
-#ifdef NCOMPTONIZATION
-    pp[NF0]=calc_NFfromE(pp[EE0]);
-#endif
-
     
 #ifdef MAGNFIELD 
     //MYCOORDS vector potential to calculate B's
@@ -275,11 +270,11 @@ if(rho<0.) //outside donut
     Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
 
 #elif (NTORUS==77 || NTORUS==78)
-  
-    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-15,2.)-1.e-3,0.)*
-      pow(sin(fabs(geomBL.yy)),4.);
 
-    //if(iy==TNY/2) printf("%d %d > %e\n",ix,iy,pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-15,2.));
+
+  
+    Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*sqrt(geomBL.xx)/1.e-5,2.)-0.0001,0.)*
+      pow(sin(fabs(geomBL.yy)),4.);
 
 #elif (NTORUS==79) //a'la adaf paper - center too close
   

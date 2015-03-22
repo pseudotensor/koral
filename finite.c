@@ -1919,6 +1919,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
     loop_1=(int **)malloc(SX*SY*SZ*sizeof(int*));
     for(i=0;i<SX*SY*SZ;i++) loop_1[i]=(int *)malloc(3*sizeof(int));
 
+
     for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
       {
 	for(iy=-ylim1+iy1;iy<iy2+ylim2;iy++)
@@ -2758,12 +2759,15 @@ int set_bc_core(int ix,int iy,int iz,double t,ldouble *uval,ldouble *pval,int if
 //boundary conditions - sets conserved in the ghost cells
 int set_bc(ldouble t,int ifinit)
 {
-  int ix,iy,iz,ii,iv;
-
+  int ii;
+  int ix,iy,iz,iv;
   //first fill the GC with no corners
+  //something wrong with this loop below?
   #pragma omp parallel for private(ix,iy,iz,iv,ii) schedule (dynamic)
   for(ii=0;ii<Nloop_2;ii++) //ghost cells only, no corners
     {
+
+
       ix=loop_2[ii][0];
       iy=loop_2[ii][1];
       iz=loop_2[ii][2];
@@ -4483,7 +4487,7 @@ cell_fixup_hd()
   copyi_u(1.,p,p_bak_fixup);
 
   //gets the neiboring the primitives
-  #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv,ii,iii,in) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];
@@ -4609,7 +4613,7 @@ cell_fixup_rad()
   copyi_u(1.,p,p_bak_fixup);
 
   //gets the neighboring the primitives
-  #pragma omp parallel for private(ix,iy,iz,iv,ii,in) schedule (dynamic)
+#pragma omp parallel for private(ix,iy,iz,iv,ii,iii,in) schedule (dynamic)
   for(ii=0;ii<Nloop_0;ii++) //domain only
     {
       ix=loop_0[ii][0];

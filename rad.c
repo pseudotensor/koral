@@ -2981,7 +2981,7 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[
 	  {
 	    //Rijvisc[i][j]=.5*(Rvisc1[i][j]+Rvisc2[i][j]);
 	    //Rijvisc[i][j]=.5*(Rijviscglobal[ix+NGCX][iy+NGCY][iz+NGCZ][i][j]+Rijviscglobal[iix+NGCX][iiy+NGCY][iiz+NGCZ][i][j]);
-	    Rijvisc[i][j]=.5*(get_Tfull(Rijviscglobal,i,j,ix,iy,iz)+get_T(Rijviscglobal,i,j,ix,iy,iz));
+	    Rijvisc[i][j]=.5*(get_Tfull(Rijviscglobal,i,j,ix,iy,iz)+get_Tfull(Rijviscglobal,i,j,iix,iiy,iiz));
 	  }
 
     }
@@ -4789,18 +4789,22 @@ update_intensities(ldouble t,ldouble dt)
 void
 reset_radviscaccel()
 {
+#ifdef RADIATION
 #if (RADVISCOSITY==SHEARVISCOSITY)
 
-  int ix,iy,iz;
-  for(ix=0;ix<SX;ix++)
-    for(iy=0;iy<SY;iy++)
-      for(iz=0;iz<SZ;iz++)
-	{
-	  //radvisclasttime[ix][iy][iz]=-1.;
-	  set_u_scalar(radvisclasttime,ix,iy,iz,-1);
-	}
+  int ix,iy,iz,ii;
+
+  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells 
+    {
+      ix=loop_02[ii][0];
+      iy=loop_02[ii][1];
+      iz=loop_02[ii][2]; 
+      //radvisclasttime[ix][iy][iz]=-1.;
+      set_u_scalar(radvisclasttime,ix,iy,iz,-1);
+    }
 
   #endif
+#endif
 }
 
 

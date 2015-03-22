@@ -1,6 +1,3 @@
-//for postprocessing old avgs
-//#define NAVGVARS (151+3*NV) //added to existing NV; previously: 151
-
 /************************************/
 //general
 /************************************/
@@ -19,15 +16,15 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
 #define BALANCEENTROPYWITHRADIATION
-#define NCOMPTONIZATION
+#define RADIATION
+#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
 //#define MIMICDYNAMO
-//#define CALCHRONTHEG
+//#define CALCHRONTHEGO
 //#define THETAANGLE 0.25
 //#define ALPHAFLIPSSIGN                                                        
 //#define ALPHADYNAMO 0.314
@@ -49,6 +46,7 @@
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
 #define DOFIXUPS 1
+#define DORADFIXUPS 1
 
 /************************************/
 //viscosity choices
@@ -87,7 +85,7 @@
 //blackhole
 /************************************/
 #define MASS 10.
-#define BHSPIN 0.0
+#define BHSPIN 0.
 
 /************************************/
 //coordinates / resolution
@@ -102,7 +100,7 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.55-MKSR0))
+#define MINX (log(1.85-MKSR0))
 #define MAXX (log(1000.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
@@ -121,14 +119,15 @@
 #define MINZ (-PHIWEDGE/2.)
 #define MAXZ (PHIWEDGE/2.)
 
-//total resolution
-#define TNX 160//272 //16*17
-#define TNY 120//192 //16*12
-#define TNZ 1//128 //16*8
-//number of tiles
-#define NTX 17
-#define NTY 12
-#define NTZ 8
+//total resolution                                                                                                                               
+#define TNX 120//264 //12*22                                                                                                                          
+#define TNY 80//192 //12*16                                                                                                                          
+#define TNZ 4//132 //12*11                                                                                                                          
+
+//number of tiles                                                                                                                                
+#define NTX 12//22
+#define NTY 4//16
+#define NTZ 1//11
 
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
@@ -145,15 +144,6 @@
 #define RADOUTPUTINZAMO
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
-#define SILOOUTPUT 1
-#define OUTOUTPUT 0
-#define RADOUTPUT 1
-#define SCAOUTPUT 1
-#define AVGOUTPUT 1
-#define SILO2D_XZPLANE
-#define CBAUTOSCALE
-#define DTOUT1 50.
-#define DTOUT2 1000.
 
 #define BOXOUTPUT 1
 #define BOXR1 15.
@@ -162,9 +152,19 @@
 #define VAROUTPUT 1
 #define VARRADIUS 100.
 #define NVARCUTS 20
+
 #define DTOUT3 1.
 #define DTOUT4 1.
 
+#define SILOOUTPUT 1
+#define OUTOUTPUT 0
+#define RADOUTPUT 1
+#define SCAOUTPUT 1
+#define AVGOUTPUT 1
+#define SILO2D_XZPLANE
+#define CBAUTOSCALE
+#define DTOUT1 10.
+#define DTOUT2 1000.
 
 /************************************/
 //common physics / torus / atmosphere
@@ -174,7 +174,7 @@
 #define NTORUS 7
 
 #if(NTORUS==81) //
-#define LT_KAPPA 5.e2
+#define LT_KAPPA 2.e2
 #define LT_XI 0.705
 #define LT_R1 40.
 #define LT_R2 1000.
@@ -241,7 +241,7 @@
 #endif
 
 #if(NTORUS==7) //flat sigma
-#define LT_KAPPA 5.e2
+#define LT_KAPPA 2.e2
 #define EXPECTEDHR 0.3
 #define LT_XI 0.975
 #define LT_R1 30.
@@ -329,6 +329,6 @@
 #define LT_RIN 10.
 #endif
 
-#define RHOATMMIN  1.e-22
+#define RHOATMMIN  1.e-20
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/1.e5)
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

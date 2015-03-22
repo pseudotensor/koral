@@ -116,7 +116,7 @@ if(!is_cell_corrected_polaraxis(ix,iy,iz))
       if(fixups[1]>0)
 	{
 	  set_cflag(RADFIXUPFLAG,ix,iy,iz,-1); 
-	  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;      
+	  global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]++;      
 	}
       else
 	set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
@@ -387,40 +387,47 @@ corrected[2]=0;
   //by borrowing from the radiation field
 
  if(ret==-1) //entropy u2p was used
-    {            
-      ldouble uunew[NV],ppnew[NV];
-      PLOOP(iv) uunew[iv]=uu[iv];
-      p2u_mhd(pp,uunew,geom); 
-      ldouble dugas = uunew[UU]-uu[UU]; //this much energy was introduced
-      uunew[EE0]-=dugas; //balancing with radiation      
-      u2p_rad(uunew,ppnew,geom,&radcor);
- 
-      if(radcor==0) //there was enough energy to borrow from
-	{
-	  PLOOP(iv) uu[iv]=uunew[iv];
-	  //printf("entropy correction did work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
-	}
-      else
-	{
-	  corrected[2]=1; //entropy correction didn't work
-	  //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
-	}
-    }
+   {            
+     ldouble uunew[NV],ppnew[NV];
+     PLOOP(iv) {uunew[iv]=uu[iv]; ppnew[iv]=pp[iv];}
+     p2u_mhd(pp,uunew,geom); 
+     ldouble dugas = uunew[UU]-uu[UU]; //this much energy was introduced
+     if(fabs(dugas)<0.1*fabs(uunew[EE0]))//correction relatively small
+       {
+	 uunew[EE0]-=dugas; //balancing with radiation      
+	 u2p_rad(uunew,ppnew,geom,&radcor);
+       }
+     else
+       radcor=1;
+   
+	
+     if(radcor==0) //there was enough energy to borrow from and uunew inverts with hot
+       {
+	 PLOOP(iv) 
+	   uu[iv]=uunew[iv];
+	 //printf("entropy correction did work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+       }
+     else
+       {
+	 corrected[2]=1; //entropy correction didn't work
+	 //printf("entropy correction didn't work at %d %d\n",geom->ix+TOI,geom->iy+TOJ);
+       }
+   }
   
-  #endif
+#endif
 
-  u2p_rad(uu,pp,geom,&radcor);
+ u2p_rad(uu,pp,geom,&radcor);
 
-  #ifdef BALANCERADCORRWITHGAS
-  if(radcor!=0) //some type of radiative correction applied
-    {
-      ldouble uunew[NV],ppnew[NV];
-      PLOOP(iv) 
-      {uunew[iv]=uu[iv];ppnew[iv]=pp[iv];}
-      p2u(pp,uunew,geom);
-      ldouble durad = uunew[EE0]-uu[EE0];
-      uunew[UU]-=durad;
-      u2pret=u2p_solver(uunew,ppnew,geom,U2P_HOT,0); 
+#ifdef BALANCERADCORRWITHGAS
+ if(radcor!=0) //some type of radiative correction applied
+   {
+     ldouble uunew[NV],ppnew[NV];
+     PLOOP(iv) 
+     {uunew[iv]=uu[iv];ppnew[iv]=pp[iv];}
+     p2u(pp,uunew,geom);
+     ldouble durad = uunew[EE0]-uu[EE0];
+     uunew[UU]-=durad;
+     u2pret=u2p_solver(uunew,ppnew,geom,U2P_HOT,0); 
       
       if(u2pret==0) //there was enough energy to borrow from
 	{
