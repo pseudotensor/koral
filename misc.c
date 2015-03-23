@@ -99,48 +99,48 @@ initialize_arrays()
   /********* basic arrays, used for postprocessing ***********/
 
   //grid 
-  x=(ldouble*)malloc((NX+NY+NZ+6*NG)*sizeof(ldouble));
-  xb=(ldouble*)malloc((NX+1+NY+1+NZ+1+6*NG)*sizeof(ldouble));
+  if((x=(ldouble*)malloc((NX+NY+NZ+6*NG)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+  if((xb=(ldouble*)malloc((NX+1+NY+1+NZ+1+6*NG)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
   //primitives at cell centers
-  p=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+   if((p=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
   //quantities to average in time
-  pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble));
+   if((pavg=(ldouble*)malloc((SX)*(SY)*(SZ)*(NV+NAVGVARS)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
   
   //conserved averages
-  u=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+   if((u=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
   //flags at cell centers
-  cellflag=(int*)malloc((SX)*(SY)*(SZ)*NFLAGS*sizeof(int));
+   if((cellflag=(int*)malloc((SX)*(SY)*(SZ)*NFLAGS*sizeof(int)))==NULL) my_err("malloc err.\n");
  
 
   //metric at cell centers
-  g=(ldouble*)malloc((SX)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
+   if((g=(ldouble*)malloc((SX)*(SY)*(SZMET)*gSIZE*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
   //metric at cell centers
-  G=(ldouble*)malloc((SX)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
+   if((G=(ldouble*)malloc((SX)*(SY)*(SZMET)*gSIZE*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
   //Kristofels at cell centers
-  gKr=(ldouble*)malloc((SX)*(SY)*(SZMET)*64*sizeof(ldouble));
+   if((gKr=(ldouble*)malloc((SX)*(SY)*(SZMET)*64*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
   //primitives at cell centers at initial state - used for fixed boundary conditions
-  pinit=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+   if((pinit=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
  
   //primitives at cell centers for other uses 
-  pproblem1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+   if((pproblem1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
   //arrays for temporary use (e.g., vector potential, mimic_dynamo)
-  ptemp1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-  pvecpot=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+   if((ptemp1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+   if((pvecpot=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
   #ifdef SELFTIMESTEP
-  avgselftime=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));  
+   if((avgselftime=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");  
   #endif
 
 #ifdef RADIATION
 #if (RADVISCOSITY==SHEARVISCOSITY)
-  Rijviscprev=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
-  Rijviscglobal=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble));
-  radvisclasttime=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+   if((Rijviscprev=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+   if((Rijviscglobal=(ldouble*)malloc((SX)*(SY)*(SZ)*16*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+   if((radvisclasttime=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 #endif
 #endif
 
@@ -149,134 +149,134 @@ initialize_arrays()
   if(doingpostproc==0)
     {
       //primitives at cell centers for other uses 
-      pproblem2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+       if((pproblem2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
      
       //primitives at cell centers in previous time steps
-      ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      //ptm2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+       if((ptm1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+      //ptm2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       //buffer for sending/receiving messages
 #ifdef MPI
-      msgbufs=(ldouble**)malloc(MPIMSGBUFSIZE*sizeof(ldouble*));
+       if((msgbufs=(ldouble**)malloc(MPIMSGBUFSIZE*sizeof(ldouble*)))==NULL) my_err("malloc err.\n");
       for(i=0;i<MPIMSGBUFSIZE;i++)
-	msgbufs[i]=(ldouble*)malloc(my_max3(NX*NY*NV*NG,NY*NZ*NV*NG,NZ*NX*NV*NG)*sizeof(ldouble));
+	 if((msgbufs[i]=(ldouble*)malloc(my_max3(NX*NY*NV*NG,NY*NZ*NV*NG,NZ*NX*NV*NG)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 #endif
 
 #ifdef MAGNFIELD
       //electromotive force at corners
-      emf=(ldouble*)malloc((NX+1)*(NY+1)*(NZ+1)*3*sizeof(ldouble));
+       if((emf=(ldouble*)malloc((NX+1)*(NY+1)*(NZ+1)*3*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 #endif
 
       //metric at cell x-faces
-      gbx=(ldouble*)malloc((SX+1)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
+       if((gbx=(ldouble*)malloc((SX+1)*(SY)*(SZMET)*gSIZE*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //metric at cell y-faces
-      gby=(ldouble*)malloc((SX)*(SY+1)*(SZMET)*gSIZE*sizeof(ldouble));
+       if((gby=(ldouble*)malloc((SX)*(SY+1)*(SZMET)*gSIZE*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //metric at cell z-faces
-      gbz=(ldouble*)malloc((SX)*(SY)*(SZMET+1)*gSIZE*sizeof(ldouble));
+       if((gbz=(ldouble*)malloc((SX)*(SY)*(SZMET+1)*gSIZE*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //metric at cell x-faces
-      Gbx=(ldouble*)malloc((SX+1)*(SY)*(SZMET)*gSIZE*sizeof(ldouble));
+       if((Gbx=(ldouble*)malloc((SX+1)*(SY)*(SZMET)*gSIZE*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //metric at cell y-faces
-      Gby=(ldouble*)malloc((SX)*(SY+1)*(SZMET)*gSIZE*sizeof(ldouble));
+       if((Gby=(ldouble*)malloc((SX)*(SY+1)*(SZMET)*gSIZE*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //metric at cell z-faces
-      Gbz=(ldouble*)malloc((SX)*(SY)*(SZMET+1)*gSIZE*sizeof(ldouble));
+       if((Gbz=(ldouble*)malloc((SX)*(SY)*(SZMET+1)*gSIZE*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       
       //LNRF basis one-forms
-      emuup=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
+       if((emuup=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //LNRF basis vectors
-      emulo=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
+       if((emulo=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
      
 
       //ortonormal tetrad one-forms
-      tmuup=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
+      if(( tmuup=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //ortonormal tetrad vectors
-      tmulo=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble));
+       if((tmulo=(ldouble*)malloc((SX)*(SY)*(SZMET)*16*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       //left-interpolated primitives at cell x-faces
-      pbLx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble));
+       if((pbLx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //right-interpolated primitives at cell x-faces
-      pbRx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble));
+       if((pbRx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //left-interpolated primitives at cell y-faces
-      pbLy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
+       if((pbLy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //right-interpolated primitives at cell y-faces
-      pbRy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
+       if((pbRy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //left-interpolated primitives at cell z-faces
-      pbLz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
+       if((pbLz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //right-interpolated primitives at cell z-faces
-      pbRz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
+       if((pbRz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
 
       //corrected flux at x faces
-      flbx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble));
+       if((flbx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //corrected flux at x faces
-      flby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
+       if((flby=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //corrected flux at x faces
-      flbz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
+       if((flbz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       //flux based on left-interpolated conserved at cell x-faces
-      flLx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble));
+       if((flLx=(ldouble*)malloc((SX+1)*(SY )*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //flux based on right-interpolated conserved at cell x-faces
-      flRx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble));
+       if((flRx=(ldouble*)malloc((SX+1)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //flux based on left-interpolated conserved at cell y-faces
-      flLy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
+       if((flLy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //flux based on right-interpolated conserved at cell y-faces
-      flRy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble));
+       if((flRy=(ldouble*)malloc((SX)*(SY+1)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //flux based on left-interpolated conserved at cell z-faces
-      flLz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
+       if((flLz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
       //flux based on right-interpolated conserved at cell z-faces
-      flRz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble));
+       if((flRz=(ldouble*)malloc((SX)*(SY)*(SZ+1)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
 
 
 
       //auxiliary primitive arrays
-      ut0=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      ut1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      ut2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      ut3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      dut0=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      dut1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      dut2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      dut3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      drt0=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      drt1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      drt2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      drt3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      uforget=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      u_bak_fixup=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      p_bak_fixup=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      u_bak_subzone=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
-      p_bak_subzone=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble));
+       if((ut0=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ut1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ut2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ut3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((dut0=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((dut1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((dut2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((dut3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((drt0=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((drt1=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((drt2=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((drt3=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((uforget=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((u_bak_fixup=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((p_bak_fixup=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((u_bak_subzone=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((p_bak_subzone=(ldouble*)malloc((SX)*(SY)*(SZ)*NV*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       //wavespeeds hd and rad - max(al,ar)
-      ahdx=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      ahdy=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      ahdz=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      aradx=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      arady=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      aradz=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+       if((ahdx=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ahdy=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ahdz=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((aradx=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((arady=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((aradz=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       //wavespeeds hd and rad - leftgoing
-      ahdxl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      ahdyl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      ahdzl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      aradxl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      aradyl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      aradzl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+       if((ahdxl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ahdyl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ahdzl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((aradxl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((aradyl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((aradzl=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       //wavespeeds hd and rad - lrightgoing
-      ahdxr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      ahdyr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      ahdzr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      aradxr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      aradyr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      aradzr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+       if((ahdxr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ahdyr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((ahdzr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((aradxr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+      if(( aradyr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+      if(( aradzr=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       //timesteps required by each cell
-      cell_tstepden=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
-      cell_dt=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble));
+       if((cell_tstepden=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
+       if((cell_dt=(ldouble*)malloc((SX)*(SY)*(SZ)*sizeof(ldouble)))==NULL) my_err("malloc err.\n");
 
       
     }

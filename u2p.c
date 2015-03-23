@@ -392,7 +392,7 @@ corrected[2]=0;
      PLOOP(iv) {uunew[iv]=uu[iv]; ppnew[iv]=pp[iv];}
      p2u_mhd(pp,uunew,geom); 
      ldouble dugas = uunew[UU]-uu[UU]; //this much energy was introduced
-     if(fabs(dugas)<0.1*fabs(uunew[EE0]))//correction relatively small
+     if(fabs(dugas)<0.1*fabs(uunew[EE0]))//correction relatively small - is this general enough?
        {
 	 uunew[EE0]-=dugas; //balancing with radiation      
 	 u2p_rad(uunew,ppnew,geom,&radcor);

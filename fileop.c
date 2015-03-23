@@ -833,7 +833,7 @@ fprint_restartfile_mpi(ldouble t, char* folder)
 
   //  int indices[NX*NY*NZ*3];
   int *indices;
-  indices = (int *)malloc(NX*NY*NZ*3*sizeof(int));
+  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
   
   int ix,iy,iz,iv;
   int gix,giy,giz;
@@ -863,7 +863,11 @@ fprint_restartfile_mpi(ldouble t, char* folder)
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
 
 
-  ldouble pout[NX*NY*NZ*NV];
+  //ldouble pout[NX*NY*NZ*NV];
+  ldouble *pout;
+  if((pout = (ldouble *)malloc(NX*NY*NZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop\n");
+  
+  
   for(ix=0;ix<NX;ix++)
     for(iy=0;iy<NY;iy++)
       for(iz=0;iz<NZ;iz++)
@@ -893,6 +897,7 @@ fprint_restartfile_mpi(ldouble t, char* folder)
     }
 
   free (indices);
+  free (pout);
 #endif
   return 0;
 }
@@ -1049,9 +1054,9 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   char c;
   //int indices[NX*NY*NZ][3];
   int **indices;
-  indices = (int **)malloc(NX*NY*NZ*sizeof(int*));
+  if((indices = (int **)malloc(NX*NY*NZ*sizeof(int*)))==NULL) my_err("malloc err. - fileop\n");
   for(i=0;i<NX*NY*NZ;i++)
-    indices[i]=(int *)malloc(3*sizeof(int));
+    if((indices[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
 
   //first indices
   for(ic=0;ic<NX*NY*NZ;ic++)
@@ -1164,12 +1169,13 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   //first read the indices
   #ifdef RESTARTGENERALINDICES
   //int indices[TNX*TNY*TNZ*3];
-  int *indices=(int *)malloc(TNX*TNY*TNZ*3*sizeof(int));
+  int *indices;
+  if((indices=(int *)malloc(TNX*TNY*TNZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
   int len=TNX*TNY*TNZ;
   #else
   //int indices[NX*NY*NZ*3];
   int *indices;
-  indices = (int *)malloc(NX*NY*NZ*3*sizeof(int));
+  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
   int len=NX*NY*NZ;
   #endif
 
@@ -1203,10 +1209,13 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   #ifdef RESTARTGENERALINDICES
   pos=TNX*TNY*TNZ*(3*sizeof(int));
   //  ldouble pout[TNX*TNY*TNZ*NV];
-  ldouble *pout=(ldouble *)malloc(TNX*TNY*TNZ*NV*sizeof(ldouble));
+  ldouble *pout;
+  if((pout=(ldouble *)malloc(TNX*TNY*TNZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop\n");
   #else
   pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
-  ldouble pout[NX*NY*NZ*NV];
+  //ldouble pout[NX*NY*NZ*NV];
+  ldouble *pout;
+  if((pout=(ldouble *)malloc(NX*NY*NZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop\n");
   #endif
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
@@ -1238,6 +1247,7 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   MPI_File_close( &cFile );
   MPI_Barrier(MPI_COMM_WORLD);
   free(indices);
+  free(pout);
 #endif
   return 0;
 }
@@ -1301,7 +1311,7 @@ fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
   /***** first write all the indices ******/
 
   int *indices;
-  indices = (int *)malloc(NX*NY*NZ*3*sizeof(int));
+  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
   
   int ix,iy,iz,iv;
   int gix,giy,giz;
@@ -1332,7 +1342,8 @@ fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
 
 
   //ldouble pout[NX*NY*NZ*(NV+NAVGVARS)];
-  ldouble *pout=(ldouble *) malloc(NX*NY*NZ*(NV+NAVGVARS)*sizeof(ldouble));
+  ldouble *pout;
+  if((pout=(ldouble *) malloc(NX*NY*NZ*(NV+NAVGVARS)*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop\n");
   for(ix=0;ix<NX;ix++)
     for(iy=0;iy<NY;iy++)
       for(iz=0;iz<NZ;iz++)
@@ -1574,9 +1585,9 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
   char c;
   //int indices[NX*NY*NZ][3];
   int **indices;
-  indices = (int **)malloc(NX*NY*NZ*sizeof(int*));
+  if((indices = (int **)malloc(NX*NY*NZ*sizeof(int*)))==NULL) my_err("malloc err. - fileop\n");
   for(i=0;i<NX*NY*NZ;i++)
-    indices[i]=(int *)malloc(3*sizeof(int));
+    if((indices[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
 
   //first indices
   for(ic=0;ic<NX*NY*NZ;ic++)

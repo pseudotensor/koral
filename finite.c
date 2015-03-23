@@ -1848,7 +1848,7 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 #endif //MSTEP
 
-    printf("%d > %d %d | %d %d | %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,SX,SY,SZMET); //if(PROCID==0) getch();
+    printf("%d > %d %d | %d %d | %d %d %d %d\n",PROCID,ix1,ix2,iy1,iy2,SX,SY,SZ,SZMET); //if(PROCID==0) getch();
 
     global_ix1=ix1;
     global_iy1=iy1;
@@ -1861,8 +1861,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //inside domain only
     Nloop_0=0;
 
-    loop_0=(int **)malloc(SX*SY*SZ*sizeof(int*));
-    for(i=0;i<SX*SY*SZ;i++) loop_0[i]=(int *)malloc(3*sizeof(int));
+    if((loop_0=(int **)malloc(SX*SY*SZ*sizeof(int*)))==NULL) my_err("malloc err. - loops\n");
+    for(i=0;i<SX*SY*SZ;i++) if((loop_0[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - loops\n");
 
     for(ix=ix1;ix<ix2;ix++)
       {
@@ -1906,8 +1906,9 @@ alloc_loops(int init,ldouble t,ldouble dt)
     if(TNZ>1) zlim1=zlim2=lim; else zlim1=zlim2=0;
 
     Nloop_1=0;
-    loop_1=(int **)malloc(SX*SY*SZ*sizeof(int*));
-    for(i=0;i<SX*SY*SZ;i++) loop_1[i]=(int *)malloc(3*sizeof(int));
+    if((loop_1=(int **)malloc(SX*SY*SZ*sizeof(int*)))==NULL) my_err("malloc err. - loops\n");
+
+    for(i=0;i<SX*SY*SZ;i++) if((loop_1[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - loops\n");
 
 
     for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
@@ -1947,8 +1948,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
 
 
     Nloop_2=0;
-    loop_2=(int **)malloc(SX*SY*SZ*sizeof(int*));
-    for(i=0;i<SX*SY*SZ;i++) loop_2[i]=(int *)malloc(3*sizeof(int));
+    if((loop_2=(int **)malloc(SX*SY*SZ*sizeof(int*)))==NULL) my_err("malloc err. - loops\n");
+    for(i=0;i<SX*SY*SZ;i++) if((loop_2[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - loops\n");
 
 
     for(ix=-xlim1+ix1;ix<ix2+xlim2;ix++)
@@ -1984,8 +1985,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //**********************************************************************
     //domain and all ghost cells (no corners)
     Nloop_02=Nloop_0+Nloop_2;
-    loop_02=(int **)malloc(SX*SY*SZ*sizeof(int*));
-    for(i=0;i<SX*SY*SZ;i++) loop_02[i]=(int *)malloc(3*sizeof(int));
+    if((loop_02=(int **)malloc(SX*SY*SZ*sizeof(int*)))==NULL) my_err("malloc err. - loops\n");
+    for(i=0;i<SX*SY*SZ;i++) if((loop_02[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - loops\n");
 
     for(ix=0;ix<Nloop_0;ix++)
       {
@@ -2046,8 +2047,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //all corners of the domain - like in staggered grid
   
     Nloop_4=0;
-    loop_4=(int **)malloc((SX+1)*(SY+1)*(SZ+1)*sizeof(int*));
-    for(i=0;i<(SX+1)*(SY+1)*(SZ+1);i++) loop_4[i]=(int *)malloc(3*sizeof(int));
+    if((loop_4=(int **)malloc((SX+1)*(SY+1)*(SZ+1)*sizeof(int*)))==NULL) my_err("malloc err. - loops\n");
+    for(i=0;i<(SX+1)*(SY+1)*(SZ+1);i++) if((loop_4[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - loops\n");
 
 
     xlim2=ix2;
@@ -2085,8 +2086,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
   
     Nloop_5=0;
 
-    loop_5=(int **)malloc(SX*SY*SZ*sizeof(int*));
-    for(i=0;i<SX*SY*SZ;i++) loop_5[i]=(int *)malloc(3*sizeof(int));
+    if((loop_5=(int **)malloc(SX*SY*SZ*sizeof(int*)))==NULL) my_err("malloc err. - loops\n");
+    for(i=0;i<SX*SY*SZ;i++) if((loop_5[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - loops\n");
   
     if(TNX>1) xlim1=xlim2=NGCX; else xlim1=xlim2=0;  
     if(TNY>1) ylim1=ylim2=NGCY; else ylim1=ylim2=0;
@@ -2121,8 +2122,8 @@ alloc_loops(int init,ldouble t,ldouble dt)
     //inner domain plus 1-cell layer including corners
   
     Nloop_6=0;
-    loop_6=(int **)malloc(SX*SY*SZ*sizeof(int*));
-    for(i=0;i<SX*SY*SZ;i++) loop_6[i]=(int *)malloc(3*sizeof(int));
+    if((loop_6=(int **)malloc(SX*SY*SZ*sizeof(int*)))==NULL) my_err("malloc err. - loops\n");
+    for(i=0;i<SX*SY*SZ;i++) if((loop_6[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - loops\n");
   
     if(TNX>1) xlim1=xlim2=1; else xlim1=xlim2=0;  
     if(TNY>1) ylim1=ylim2=1; else ylim1=ylim2=0;
