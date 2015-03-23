@@ -833,7 +833,7 @@ fprint_restartfile_mpi(ldouble t, char* folder)
 
   //  int indices[NX*NY*NZ*3];
   int *indices;
-  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
+  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop 0\n");
   
   int ix,iy,iz,iv;
   int gix,giy,giz;
@@ -865,7 +865,7 @@ fprint_restartfile_mpi(ldouble t, char* folder)
 
   //ldouble pout[NX*NY*NZ*NV];
   ldouble *pout;
-  if((pout = (ldouble *)malloc(NX*NY*NZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop\n");
+  if((pout = (ldouble *)malloc(NX*NY*NZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop 1\n");
   
   
   for(ix=0;ix<NX;ix++)
@@ -1054,9 +1054,9 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
   char c;
   //int indices[NX*NY*NZ][3];
   int **indices;
-  if((indices = (int **)malloc(NX*NY*NZ*sizeof(int*)))==NULL) my_err("malloc err. - fileop\n");
+  if((indices = (int **)malloc(NX*NY*NZ*sizeof(int*)))==NULL) my_err("malloc err. - fileop 2\n");
   for(i=0;i<NX*NY*NZ;i++)
-    if((indices[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
+    if((indices[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - fileop 3\n");
 
   //first indices
   for(ic=0;ic<NX*NY*NZ;ic++)
@@ -1170,12 +1170,12 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   #ifdef RESTARTGENERALINDICES
   //int indices[TNX*TNY*TNZ*3];
   int *indices;
-  if((indices=(int *)malloc(TNX*TNY*TNZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
+  if((indices=(int *)malloc(TNX*TNY*TNZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop 4\n");
   int len=TNX*TNY*TNZ;
   #else
   //int indices[NX*NY*NZ*3];
   int *indices;
-  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
+  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop 5\n");
   int len=NX*NY*NZ;
   #endif
 
@@ -1210,12 +1210,12 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   pos=TNX*TNY*TNZ*(3*sizeof(int));
   //  ldouble pout[TNX*TNY*TNZ*NV];
   ldouble *pout;
-  if((pout=(ldouble *)malloc(TNX*TNY*TNZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop\n");
+  if((pout=(ldouble *)malloc(TNX*TNY*TNZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop 6\n");
   #else
   pos=TNX*TNY*TNZ*(3*sizeof(int)) + PROCID*NX*NY*NZ*(NV*sizeof(ldouble)); 
   //ldouble pout[NX*NY*NZ*NV];
   ldouble *pout;
-  if((pout=(ldouble *)malloc(NX*NY*NZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop\n");
+  if((pout=(ldouble *)malloc(NX*NY*NZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop 7\n");
   #endif
   MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
   
@@ -1311,7 +1311,7 @@ fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
   /***** first write all the indices ******/
 
   int *indices;
-  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
+  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop 8\n");
   
   int ix,iy,iz,iv;
   int gix,giy,giz;
@@ -1343,7 +1343,7 @@ fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
 
   //ldouble pout[NX*NY*NZ*(NV+NAVGVARS)];
   ldouble *pout;
-  if((pout=(ldouble *) malloc(NX*NY*NZ*(NV+NAVGVARS)*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop\n");
+  if((pout=(ldouble *) malloc(NX*NY*NZ*(NV+NAVGVARS)*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop 9\n");
   for(ix=0;ix<NX;ix++)
     for(iy=0;iy<NY;iy++)
       for(iz=0;iz<NZ;iz++)
@@ -1585,9 +1585,9 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
   char c;
   //int indices[NX*NY*NZ][3];
   int **indices;
-  if((indices = (int **)malloc(NX*NY*NZ*sizeof(int*)))==NULL) my_err("malloc err. - fileop\n");
+  if((indices = (int **)malloc(NX*NY*NZ*sizeof(int*)))==NULL) my_err("malloc err. - fileop 10\n");
   for(i=0;i<NX*NY*NZ;i++)
-    if((indices[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - fileop\n");
+    if((indices[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - fileop 11\n");
 
   //first indices
   for(ic=0;ic<NX*NY*NZ;ic++)
