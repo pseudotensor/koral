@@ -155,7 +155,7 @@ static int get_m1closure_gammarel2(int verbose,void *ggg, ldouble *Avcon, ldoubl
    (gn11*Power(Rdtt,2) + 2.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 2.*gn13*Rdtt*Rdty + 2.*gn23*Rdtx*Rdty + gn33*Power(Rdty,2) + 
     2.*(gn14*Rdtt + gn24*Rdtx + gn34*Rdty)*Rdtz + gn44*Power(Rdtz,2));
 
-  if(verbose)     printf("gamma2a: %e\n",gamma2a);
+  if(verbose>1)     printf("gamma2a: %e\n",gamma2a);
 
   if( gamma2a<GAMMASMALLLIMIT || !isfinite(gamma2a) ){
     gamma2b=(0.25*(-2.*Power(gn11,2)*Power(Rdtt,2) - 1.*gn11*(4.*gn12*Rdtt*Rdtx + gn22*Power(Rdtx,2) + 
@@ -312,7 +312,7 @@ static int get_m1closure_urfconrel(int verbose,
     // get good relative velocity
     ldouble gammarel=sqrt(gammarel2);
  
-    for(ii=1;ii<4;ii++)
+    for(ii=0;ii<4;ii++)
       {	  
 	urfconrel[ii] = alpha * (Avcon[ii] + 1./3.*Erf*GG[0][ii]*(4.0*gammarel2-1.0) )/(4./3.*Erf*gammarel);
       }
@@ -391,7 +391,7 @@ static int get_m1closure_urfconrel(int verbose,
 	printf("end: %e %e %e %e\n",Erf,*Erfreturn,Erfslow,Erffast);
       }
 
-  if(!isfinite(Erf) || !isfinite(gammarel2) || !isfinite(urfconrel[0])|| !isfinite(urfconrel[1])|| !isfinite(urfconrel[2])|| !isfinite(urfconrel[3]) )
+  if(!isfinite(Erf) || !isfinite(gammarel2) || !isfinite(urfconrel[1])|| !isfinite(urfconrel[2])|| !isfinite(urfconrel[3]))
     {
       if(verbose)      
 	{
@@ -402,6 +402,8 @@ static int get_m1closure_urfconrel(int verbose,
 	  
 	  printf("JONNAN: ijk=%d %d %d :  %g %g : %g %g %g %g : %d %d %d %d : %g %g %g %g\n",gix,giy,giz,Erf,gammarel2,urfconrel[0],urfconrel[1],urfconrel[2],urfconrel[3],failure1,failure2,failure3,failure,Avcon[0],Avcon[1],Avcon[2],Avcon[3]);
 	}
+    
+
       return -1;
   }
 
@@ -434,59 +436,46 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
   gdetu=1.;
 #endif
 
-  int irf,verbose=0,iv;
+  int verbose=0;
   
-  //multi-rad-fluids
-  //for(irf=0;irf<NRF;irf++)
+  //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
+  *corrected=0;
+
+  ldouble Rij[4][4];
+  ldouble urfcon[4],urfcov[4],Erf;
+  //conserved - R^t_mu
+  ldouble Avcov[4]={uu[EE]/gdetu,uu[FX]/gdetu,uu[FY]/gdetu,uu[FZ]/gdetu};
+  ldouble Avcon[4];
+  //indices up - R^tmu
+  indices_12(Avcov,Avcon,GG);
+
+  ldouble gammarel2,delta,numerator,divisor;
+
+  // get \gamma^2 for relative 4-velocity
+  if(get_m1closure_gammarel2(verbose,ggg,Avcon,Avcov,&gammarel2,&delta,&numerator,&divisor)<0)
     {
-      //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
-      *corrected=0;
-
-      ldouble Rij[4][4];
-      ldouble urfcon[4],urfcov[4],Erf;
-      //conserved - R^t_mu
-      ldouble Avcov[4]={uu[EE]/gdetu,uu[FX]/gdetu,uu[FY]/gdetu,uu[FZ]/gdetu};
-      ldouble Avcon[4];
-      //indices up - R^tmu
-      indices_12(Avcov,Avcon,GG);
-
-      ldouble gammarel2,delta,numerator,divisor;
-
-      // get \gamma^2 for relative 4-velocity
-      if(get_m1closure_gammarel2(verbose,ggg,Avcon,Avcov,&gammarel2,&delta,&numerator,&divisor)<0)
-	{
-	  //printf("get_m1closure_gammarel2 failed at %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK);
-	 
-	  return -1;
-	}
-
-      // get E in radiation frame
-      get_m1closure_Erf(ggg,Avcon,gammarel2,&Erf);
-
-      // get relative 4-velocity
-      if(get_m1closure_urfconrel(verbose,ggg,pp,Avcon,Avcov,gammarel2,delta,numerator,divisor,&Erf,urfcon,corrected)<0)
-	{
-	  //printf("get_m1closure_urfconrel failed at %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK);
-	  return -1;
-	}
-
-      //test
-      /*
-      if(*corrected)
-	{
-	  printf("rad u2p corrected at %d %d \n",geom->ix,geom->iy);
-	  //getch();
-	}
-      */
-
-      conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
-
-      //new primitives
-      pp[EE]=Erf;
-      pp[FX]=urfcon[1];
-      pp[FY]=urfcon[2];
-      pp[FZ]=urfcon[3];
+      //printf("get_m1closure_gammarel2 failed at %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK);
+      return -1;
     }
+
+  // get E in radiation frame
+  get_m1closure_Erf(ggg,Avcon,gammarel2,&Erf);
+
+  // get relative 4-velocity
+  if(get_m1closure_urfconrel(verbose,ggg,pp,Avcon,Avcov,gammarel2,delta,numerator,divisor,&Erf,urfcon,corrected)<0)
+    {
+      //printf("get_m1closure_urfconrel failed at %d %d %d\n",geom->ix+TOI,geom->iy+TOJ,geom->iz+TOK);
+      return -1;
+    }
+
+  conv_vels(urfcon,urfcon,VELR,VELPRIMRAD,gg,GG);
+
+  //new primitives
+  pp[EE]=Erf;
+  pp[FX]=urfcon[1];
+  pp[FY]=urfcon[2];
+  pp[FZ]=urfcon[3];
+
 
   return 0;
 }
