@@ -1874,7 +1874,6 @@ int
 omp_myinit()
 {
 #ifdef OMP
-  printf("MPI does not work with OMP.\n"); exit(-1);
 #ifdef MPI
   printf("MPI does not work with OMP.\n"); exit(-1);
 #endif

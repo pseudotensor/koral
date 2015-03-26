@@ -1166,6 +1166,141 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   /***** first read all the indices ******/
 
 
+  //first read the indices pretending to be a single process
+  int *indices;
+  if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop 5\n");
+  int len=NX*NY*NZ;
+
+  ldouble *pout;
+  if((pout=(ldouble *)malloc(NX*NY*NZ*NV*sizeof(ldouble)))==NULL) my_err("malloc err. - fileop 7\n");
+
+  //set the initial location
+  int procid=PROCID;
+  MPI_Offset pos;
+
+#ifdef RESTARTGENERALINDICES
+  for(procid=0;procid<NTX*NTY*NTZ;procid++)
+#endif
+    {
+      pos=procid*NX*NY*NZ*(3*sizeof(int));  
+
+      MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
+  
+      //read them
+      MPI_File_read( cFile, indices, 3*len, MPI_INT, &status );
+
+      //convert to local
+      for(ic=0;ic<len;ic++)
+	{
+	  gix=indices[ic*3+0];
+	  giy=indices[ic*3+1];
+	  giz=indices[ic*3+2];
+	  mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+	  indices[ic*3+0]=ix;
+	  indices[ic*3+1]=iy;
+	  indices[ic*3+2]=iz;
+	}
+
+      /***** then primitives in the same order ******/
+
+      pos=TNX*TNY*TNZ*(3*sizeof(int)) + procid*NX*NY*NZ*(NV*sizeof(ldouble)); 
+      MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
+      MPI_File_read( cFile, pout, len*NV, MPI_LDOUBLE, &status );
+ 
+      //rewriting to p
+      int ppos;
+      for(ic=0;ic<len;ic++)
+	{
+	  ix=indices[ic*3+0];
+	  iy=indices[ic*3+1];
+	  iz=indices[ic*3+2];
+
+	  ppos=ic*NV;
+
+	  if(if_indomain(ix,iy,iz))
+	    {
+	      fill_geometry(ix,iy,iz,&geom);
+
+	      PLOOP(iv)
+		set_u(p,iv,ix,iy,iz,pout[ppos+iv]);
+
+	      p2u(&get_u(p,0,ix,iy,iz),&get_u(u,0,ix,iy,iz),&geom);
+	    }
+	}
+    }
+
+
+  MPI_File_close( &cFile );
+  MPI_Barrier(MPI_COMM_WORLD);
+  free(indices);
+  free(pout);
+#endif
+  return 0;
+}
+							    
+
+int 
+fread_restartfile_mpi_org(int nout1, char *folder, ldouble *t)
+{
+  #ifdef MPI
+  int ret, ix,iy,iz,iv,i,ic,gix,giy,giz,tix,tiy,tiz;
+  char fname[400],fnamehead[400];
+
+  if(nout1>=0)
+    {
+      sprintf(fname,"%s/res%04d.dat",folder,nout1);
+      sprintf(fnamehead,"%s/res%04d.head",folder,nout1);
+    }
+  else
+    {
+      sprintf(fname,"%s/reslast.dat",folder);
+      sprintf(fnamehead,"%s/reslast.head",folder);
+    }
+
+
+  FILE *fdump;
+
+  /***********/
+  //header file
+ 
+  fdump=fopen(fnamehead,"r");
+  if(fdump==NULL) 
+    {
+      return 1; //request start from scratch
+    }
+  //reading parameters, mostly time
+  int intpar[6];
+  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],t,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
+  if(PROCID==0)
+  printf("restart file (%s) read no. %d at time: %f of PROBLEM: %d with NXYZ: %d %d %d\n",
+	 fname,intpar[0],*t,intpar[2],intpar[3],intpar[4],intpar[5]); 
+  nfout1=intpar[0]+1; //global file no.
+  nfout2=intpar[1]; //global file no. for avg
+  fclose(fdump);
+    
+
+  
+
+  //maybe not needed
+  MPI_Barrier(MPI_COMM_WORLD);
+
+  /***********/
+  //body file
+  struct geometry geom;
+  ldouble uu[NV],pp[NV],ftemp;
+
+  MPI_File cFile;
+  MPI_Status status;
+  MPI_Request req;
+
+  int rc = MPI_File_open( MPI_COMM_WORLD, fname, MPI_MODE_RDONLY, MPI_INFO_NULL, &cFile );
+  if (rc) {
+    printf( "Unable to open/create file %s\n", fname );fflush(stdout); exit(-1);
+    }
+
+  /***** first read all the indices ******/
+
+
   //first read the indices
   #ifdef RESTARTGENERALINDICES
   //int indices[TNX*TNY*TNZ*3];

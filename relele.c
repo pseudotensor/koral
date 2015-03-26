@@ -662,7 +662,7 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
-//picks a tensor from cell face arr at ix,iy,iz
+//picks metric like tensor from cell face arr at ix,iy,iz
 int
 pick_Tb(ldouble* arr,int ix,int iy,int iz,int idim,ldouble T[][4])
 {
@@ -676,7 +676,7 @@ pick_Tb(ldouble* arr,int ix,int iy,int iz,int idim,ldouble T[][4])
   //**********************************************************************
   //**********************************************************************
   //**********************************************************************
-//picks a tensor from arr at ix,iy,iz
+//picks metric like tensor from arr at ix,iy,iz
 int
 pick_T(ldouble* arr,int ix,int iy,int iz,ldouble T[][4])
 {

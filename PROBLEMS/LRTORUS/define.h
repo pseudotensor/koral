@@ -121,8 +121,8 @@
 
 //total resolution                                                                                                                               
 #define TNX 120//264 //12*22                                                                                                                          
-#define TNY 80//192 //12*16                                                                                                                          
-#define TNZ 4//132 //12*11                                                                                                                          
+#define TNY 180//192 //12*16                                                                                                                          
+#define TNZ 140//132 //12*11                                                                                                                          
 
 //number of tiles                                                                                                                                
 #define NTX 12//22

@@ -11,8 +11,8 @@
 #define MINZ -1.
 #define MAXZ 1.
 
-#define TNX 50
-#define TNY 50
+#define TNX 60
+#define TNY 60
 #define TNZ 50
 
 #define NTX 2
