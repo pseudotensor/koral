@@ -92,9 +92,24 @@
 //89 RADTORUS - radiating fixed torus
 //90 VETSHADOW - vet shadow test
 //91 TDEMILIO - tidal disruption with Emilio's input
+//92 ADVDIFF - diffusion in scattering moving blob
 
-#define PROBLEM 58
+#define PROBLEM 92
 
+
+#if(PROBLEM==92)
+
+#define PR_DEFINE "PROBLEMS/ADVDIFF/define.h"
+#define PR_BC "PROBLEMS/ADVDIFF/bc.c"
+#define PR_INIT "PROBLEMS/ADVDIFF/init.c"
+#define PR_KAPPA "PROBLEMS/ADVDIFF/kappa.c"
+#define PR_KAPPAES "PROBLEMS/ADVDIFF/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/ADVDIFF/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/ADVDIFF/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/ADVDIFF/dump.c"
+#define PR_TOOLS "PROBLEMS/ADVDIFF/tools.c"
+
+#endif
 
 #if(PROBLEM==91)
 
