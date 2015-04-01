@@ -61,7 +61,6 @@ if(rho<0.) //outside donut
     pp[B1]=pp[B2]=pp[B3]=0.; 
 #endif
 
-
 #ifdef RADIATION
     //distributing pressure
     ldouble P,aaa,bbb;
@@ -79,19 +78,12 @@ if(rho<0.) //outside donut
     pp[UU]=my_max(uint,ppback[1]);
     pp[EE0]=my_max(E,ppback[EE0]);
 
-
-
     pp[FX0]=Fx;
     pp[FY0]=Fy;
     pp[FZ0]=Fz;
 
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
     prad_ff2lab(pp,pp,&geomBL);
-
-#endif
-
-#ifdef NCOMPTONIZATION
-    pp[NF0]=calc_NFfromE(pp[EE0]);
 #endif
 
     //transforming primitives from BL to MYCOORDS
@@ -199,40 +191,6 @@ if(rho<0.) //outside donut
 
     
 
-#elif (NTORUS==7)
-
-   //LIMOFIELD from a=0 SANE harm init.c with flipping polarity in theta
-    ldouble lambda = 2.5;
-    ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
-    ldouble rchop = 350.; //outer boundary of field loops
-    ldouble u_av = uintorg;
-    ldouble u_av_chop, u_av_mid;
-    //midplane at r
-    init_dsandvels_limotorus(r, M_PI/2., BHSPIN, &rho, &u_av_mid, &ell);
-    //midplane at rchop
-    init_dsandvels_limotorus(rchop, M_PI/2., BHSPIN, &rho, &u_av_chop, &ell);
-    
-    //vetor potential follows contours of UU
-    ldouble uchop = u_av - u_av_chop; //vpot->zero on contour of radius r=rchop
-    ldouble uchopmid = u_av_mid - u_av_chop; //vpot->zero away from midplane
-
-    ldouble rin=LT_RIN;
-    ldouble STARTFIELD = 1.25*rin;
-    ldouble q, fr, fr_start, vpot=0.;
-    if (r > STARTFIELD && r < rchop) {
-      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 3); // * pow(tanh(r/rsmooth),2);
-    } else q = 0;
-
-    
-    if(q > 0.) {
-      fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
-      fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
-      vpot += q * sin(fr - fr_start) ;
-    }
-     
-    //    if(iy==NY/2) printf("%d %f %f > %e %e %e %e\n",iy,r,th,uchop,u_av_mid,u_av, u_av_chop);
-    Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
-
 #elif (NTORUS==6)
 
    //LIMOFIELD from a=0 SANE harm init.c with flipping polarity in theta
@@ -251,7 +209,7 @@ if(rho<0.) //outside donut
     ldouble uchopmid = u_av_mid - u_av_chop; //vpot->zero away from midplane
 
     ldouble rin=LT_RIN;
-    ldouble STARTFIELD = 1.25*rin;
+    ldouble STARTFIELD = 2.*rin;
     ldouble q, fr, fr_start, vpot=0.;
     if (r > STARTFIELD && r < rchop) {
       q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 3); // * pow(tanh(r/rsmooth),2);

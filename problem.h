@@ -93,8 +93,25 @@
 //90 VETSHADOW - vet shadow test
 //91 TDEMILIO - tidal disruption with Emilio's input
 //92 ADVDIFF - diffusion in scattering moving blob
+//93 KATOTORUS - radiative torus initiated like in Kato+2004
 
-#define PROBLEM 92
+#define PROBLEM 93
+
+
+#if(PROBLEM==93)
+
+#define PR_DEFINE "PROBLEMS/KATOTORUS/define.h"
+#define PR_BC "PROBLEMS/KATOTORUS/bc.c"
+#define PR_INIT "PROBLEMS/KATOTORUS/init.c"
+#define PR_POSTINIT "PROBLEMS/KATOTORUS/postinit.c"
+#define PR_KAPPA "PROBLEMS/KATOTORUS/kappa.c"
+#define PR_KAPPAES "PROBLEMS/KATOTORUS/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/KATOTORUS/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/KATOTORUS/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/KATOTORUS/dump.c"
+#define PR_TOOLS "PROBLEMS/KATOTORUS/tools.c"
+
+#endif
 
 
 #if(PROBLEM==92)

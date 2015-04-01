@@ -447,11 +447,30 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //alpha (34) (column)
 	      profiles[32][ix]+=alpha*rho*dxph[1];
 
+	       //rho-weighted beta (32)
+	      ldouble prermhd = GAMMAM1*uint;
+	      #ifdef RADIATION
+	      prermhd+=Ehat/3.;
+	      #endif
+	      ldouble ibeta=bsq/2./(prermhd+bsq/2.);
+	      profiles[30][ix]+=rho*ibeta*dxph[1];
+
+	      //rho-weighted prad/pgas (33)
+	      #ifdef RADIATION
+	      profiles[31][ix]+=rho*prerad/pregas*dxph[1];
+	      #else
+	      profiles[31][ix]+=0.;
+	      #endif
+
 	      //surface density (2) (column)
 	      profiles[0][ix]+=rho*dxph[1];
+	      //temporarily total pressure:
+	      //profiles[0][ix]+=(prermhd+bsq/2.)*dxph[1];
 
 	      //surface energy density (41)
 	      profiles[39][ix]+=enden*dxph[1];
+	      //temporarily magnetic pressure:
+	      //profiles[39][ix]+=(bsq/2.)*dxph[1];
 
 	      //numerator of scale height (31) (column)
 	      #ifndef CALCHRONTHEGO
@@ -471,20 +490,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rho-weighted temperature (29)
 	      profiles[27][ix]+=rho*temp*dxph[1];
 	      
-	      //rho-weighted beta (32)
-	      ldouble prermhd = GAMMAM1*uint;
-	      #ifdef RADIATION
-	      prermhd+=Ehat/3.;
-	      #endif
-	      ldouble ibeta=bsq/2./(prermhd+bsq/2.);
-	      profiles[30][ix]+=rho*ibeta*dxph[1];
-
-	      //rho-weighted prad/pgas (33)
-	      #ifdef RADIATION
-	      profiles[31][ix]+=rho*prerad/pregas*dxph[1];
-	      #else
-	      profiles[31][ix]+=0.;
-	      #endif
+	     
               
     
 	      //rest mass flux (3)

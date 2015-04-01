@@ -13,31 +13,21 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
-#define BALANCEENTROPYWITHRADIATION
-#define COMPTONIZATION
-
-//#define U2P_EQS U2P_EQS_JONS
-//#define U2P_SOLVER U2P_SOLVER_WP
-
-
-#define U2PCONV 1.e-10
-#define RADIMPCONV 1.e-10
-#define RADIMPEPS 1.e-6
-#define RADIMPMAXITER 50
+//#define RADIATION
+//#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MIMICDYNAMO
-#define CALCHRONTHEGO
-#define THETAANGLE 0.25
-#define ALPHAFLIPSSIGN                                                        
+//#define MIMICDYNAMO
+//#define CALCHRONTHEGO
+//#define THETAANGLE 0.25
+//#define ALPHAFLIPSSIGN                                                        
+//#define ALPHADYNAMO 0.314
+//#define DAMPBETA
+//#define BETASATURATED 0.1
+//#define ALPHABETA 6.28
 
-#define ALPHADYNAMO 0.314
-#define DAMPBETA
-#define BETASATURATED 0.1
-#define ALPHABETA 6.28
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
@@ -47,30 +37,29 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
-#define TSTEPLIM .5
+#define TIMESTEPPING RK2IMEX
+#define TSTEPLIM .4
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 0
-#define DORADFIXUPS 0
+#define DOFIXUPS 1
 
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
-#define ACCELRADVISCOSITY
-#define RADVISCMFPSPH
-#define RADVISCNUDAMP
-#define RADVISCMAXVELDAMP
-#define ALPHARADVISC 0.1
-#define MAXRADVISCVEL 0.1
+//#define RADVISCOSITY SHEARVISCOSITY
+//#define ACCELRADVISCOSITY
+//#define RADVISCMFPSPH
+//#define RADVISCNUDAMP
+//#define RADVISCMAXVELDAMP
+//#define ALPHARADVISC 0.1
+//#define MAXRADVISCVEL .1
 
 /************************************/
 //rmhd floors
 /************************************/
-#define CORRECT_POLARAXIS
-//#define POLARAXISAVGIN3D
+#define CORRECT_POLARAXIS_3D
+#define POLARAXISAVGIN3D
 #define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
@@ -88,18 +77,18 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 6.62
-#define BHSPIN 0.0
+#define MASS 10.
+#define BHSPIN 0.7
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS2COORDS
+#define myMKS3COORDS
 #define MKSR0 0.
-#define MKSH0 0.6
+#define MKSH0 0.4
 #define MKSMY1 0.001
-#define MKSMY2 0.2
-#define MKSMP0 1.5
+#define MKSMY2 0.025
+#define MKSMP0 1.2
 #define METRICAXISYMMETRIC
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
@@ -113,8 +102,8 @@
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
-#define MINX (log(1.85-MKSR0))
-#define MAXX (log(100.-MKSR0))
+#define MINX (log(1.55-MKSR0))
+#define MAXX (log(1000.-MKSR0))
 #define MINY 0.
 #define MAXY 1.
 #endif
@@ -124,13 +113,13 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 140//252 //28*9
-#define TNY 100//234 //26*9
-#define TNZ 1 //2*8
+#define TNX 272 //8*34
+#define TNY 192 //8*24
+#define TNZ 1//32 //16*2
 //number of tiles
-#define NTX 28
-#define NTY 26
-#define NTZ 1
+#define NTX 16//34//16
+#define NTY 16//24//16
+#define NTZ 1//2//1
 
 #define SPECIFIC_BC
 #define PERIODIC_ZBC
@@ -140,12 +129,7 @@
 /************************************/
 //output
 /************************************/
-
-#define DTOUT3 1.
-#define BOXOUTPUT 1
-#define BOXR1 10.
-#define BOXR2 15.
-#define BOXITH 30 //distance from eq.plane in cells                                                                                                             
+//#define OUTPUTPERCORE
 #define OUTCOORDS KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
@@ -159,7 +143,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 100.
 #define DTOUT2 1000.
 
 /************************************/
@@ -167,7 +151,23 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 7
+#define NTORUS 77
+
+#if(NTORUS==77) //flat sigma, single poloidal loop
+#define LT_KAPPA 5.e2
+#define LT_XI 0.975
+#define LT_R1 30.
+#define LT_R2 200.
+#ifdef RADIATION
+#define LT_GAMMA 4./3.
+#else
+#define LT_GAMMA 5./3.
+#endif
+#define LT_RIN 22.
+#define BETANORMFULL
+#undef MAXBETA
+#define MAXBETA (.5) 
+#endif
 
 #if(NTORUS==7) //flat sigma
 #define LT_KAPPA 5.e2
@@ -175,11 +175,15 @@
 #define LT_XI 0.975
 #define LT_R1 30.
 #define LT_R2 200.
+#ifdef RADIATION
 #define LT_GAMMA 4./3.
+#else
+#define LT_GAMMA 5./3.
+#endif
 #define LT_RIN 22.
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (1./10.) //eq.plane
+#define MAXBETA (1./10.)
 #endif
 
 #if(NTORUS==6) //for not-so-hyper
@@ -254,6 +258,6 @@
 #define LT_RIN 10.
 #endif
 
-#define RHOATMMIN  1.e-24
+#define RHOATMMIN  1.e-10
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)

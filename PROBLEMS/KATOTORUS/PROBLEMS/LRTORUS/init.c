@@ -1,7 +1,7 @@
 int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell);
 
 ldouble rho,mx,my,mz,m,E,uint,pgas,Fx,Fy,Fz,pLTE,ell;  
-ldouble uu[NV], pp[NV],ppback[NV],T,uintorg;
+ldouble uu[NV], pp[NV],ppback[NV],T;
 ldouble Vphi,Vr;
 ldouble D,W,eps,uT,uphi,uPhi;
 
@@ -16,7 +16,6 @@ ldouble r=geomBL.xx;
 ldouble th=geomBL.yy;
 
 init_dsandvels_limotorus(r, th, BHSPIN, &rho, &uint, &ell);
-uintorg=uint;
 
 if(rho<0.) //outside donut
   {
@@ -61,7 +60,6 @@ if(rho<0.) //outside donut
     pp[B1]=pp[B2]=pp[B3]=0.; 
 #endif
 
-
 #ifdef RADIATION
     //distributing pressure
     ldouble P,aaa,bbb;
@@ -79,19 +77,12 @@ if(rho<0.) //outside donut
     pp[UU]=my_max(uint,ppback[1]);
     pp[EE0]=my_max(E,ppback[EE0]);
 
-
-
     pp[FX0]=Fx;
     pp[FY0]=Fy;
     pp[FZ0]=Fz;
 
     //transforming from BL lab radiative primitives to code non-ortonormal primitives
     prad_ff2lab(pp,pp,&geomBL);
-
-#endif
-
-#ifdef NCOMPTONIZATION
-    pp[NF0]=calc_NFfromE(pp[EE0]);
 #endif
 
     //transforming primitives from BL to MYCOORDS
@@ -166,11 +157,11 @@ if(rho<0.) //outside donut
 
 #elif (NTORUS==5)
 
-   //LIMOFIELD from a=0 SANE harm init.c for mimic_dynamo
+   //LIMOFIELD from a=0 SANE harm init.c
     ldouble lambda = 2.5;
     ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
     ldouble rchop = 550.; //outer boundary of field loops
-    ldouble u_av = pp[UU];
+    ldouble u_av = uintorg;
     ldouble u_av_chop, u_av_mid;
     //midplane at r
     init_dsandvels_limotorus(r, M_PI/2., BHSPIN, &rho, &u_av_mid, &ell);
@@ -195,78 +186,29 @@ if(rho<0.) //outside donut
       vpot += q * sin(fr - fr_start) ;
     }
         
-    Acov[2]=vpot*sin((M_PI/2.-geomBL.yy));;
-
-    
-
-#elif (NTORUS==7)
-
-   //LIMOFIELD from a=0 SANE harm init.c with flipping polarity in theta
-    ldouble lambda = 2.5;
-    ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
-    ldouble rchop = 350.; //outer boundary of field loops
-    ldouble u_av = uintorg;
-    ldouble u_av_chop, u_av_mid;
-    //midplane at r
-    init_dsandvels_limotorus(r, M_PI/2., BHSPIN, &rho, &u_av_mid, &ell);
-    //midplane at rchop
-    init_dsandvels_limotorus(rchop, M_PI/2., BHSPIN, &rho, &u_av_chop, &ell);
-    
-    //vetor potential follows contours of UU
-    ldouble uchop = u_av - u_av_chop; //vpot->zero on contour of radius r=rchop
-    ldouble uchopmid = u_av_mid - u_av_chop; //vpot->zero away from midplane
-
-    ldouble rin=LT_RIN;
-    ldouble STARTFIELD = 1.25*rin;
-    ldouble q, fr, fr_start, vpot=0.;
-    if (r > STARTFIELD && r < rchop) {
-      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 3); // * pow(tanh(r/rsmooth),2);
-    } else q = 0;
-
-    
-    if(q > 0.) {
-      fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
-      fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
-      vpot += q * sin(fr - fr_start) ;
-    }
-     
-    //    if(iy==NY/2) printf("%d %f %f > %e %e %e %e\n",iy,r,th,uchop,u_av_mid,u_av, u_av_chop);
     Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
 
-#elif (NTORUS==6)
-
-   //LIMOFIELD from a=0 SANE harm init.c with flipping polarity in theta
-    ldouble lambda = 2.5;
-    ldouble anorm=1.; //BOBMARK: not used, letting HARM normalize the field
-    ldouble rchop = 350.; //outer boundary of field loops
-    ldouble u_av = uintorg;
-    ldouble u_av_chop, u_av_mid;
-    //midplane at r
-    init_dsandvels_limotorus(r, M_PI/2., BHSPIN, &rho, &u_av_mid, &ell);
-    //midplane at rchop
-    init_dsandvels_limotorus(rchop, M_PI/2., BHSPIN, &rho, &u_av_chop, &ell);
-    
-    //vetor potential follows contours of UU
-    ldouble uchop = u_av - u_av_chop; //vpot->zero on contour of radius r=rchop
-    ldouble uchopmid = u_av_mid - u_av_chop; //vpot->zero away from midplane
-
+    /*
     ldouble rin=LT_RIN;
-    ldouble STARTFIELD = 1.25*rin;
-    ldouble q, fr, fr_start, vpot=0.;
-    if (r > STARTFIELD && r < rchop) {
-      q = anorm * (uchop - 0.2*uchopmid) / (0.8*uchopmid) * pow(sin(th), 3); // * pow(tanh(r/rsmooth),2);
-    } else q = 0;
+    ldouble rchop = 1.e15;
+    ldouble STARTFIELD = 15.;
+    ldouble rrho=pp[RHO]/1.;
+    ldouble rxx=geomBL.xx/25.;
+    ldouble lambda=8.;
+    //if (r > STARTFIELD && r < rchop && pp[RHO]>1.e-3) 
+      //      Acov[2]=my_max(rrho*rrho*rxx*rxx*rxx*rxx-.1,0.)*pow(sin(M_PI/2.-geomBL.yy),1.);
+      //Acov[2]=my_max(rrho*rrho*rrho*rxx*rxx*rxx*rxx*rxx*rxx*rxx*rxx-1.*rxx*rxx,0.)*(M_PI/2.-geomBL.yy);
+      //Acov[2]=my_max(sqrt(rho)*rxx*rxx*rxx*rxx-100.,0.)*(M_PI/2.-geomBL.yy);
+      //Acov[2]=my_max(sqrt(rho)*rxx*rxx*rxx*rxx-100.,0.);//*(M_PI/2.-geomBL.yy);
+    Acov[2]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx,2.)-1.e0,0.)*sin((M_PI/2.-geomBL.yy));
+    //    Acov[2]*=pow(geomBL.xx,5./2.);
+    Acov[2]*=pow(geomBL.xx,5./2.);
 
-    
-    if(q > 0.) {
-      fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
-      fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
-      vpot += q * sin(fr - fr_start) ;
-    }
-     
-    //    if(iy==NY/2) printf("%d %f %f > %e %e %e %e\n",iy,r,th,uchop,u_av_mid,u_av, u_av_chop);
-    Acov[3]=vpot*sin((M_PI/2.-geomBL.yy));;
-
+    ldouble fr = (pow(r,0.6)/0.6  + 0.5/0.4*pow(r,-0.4)) / lambda;
+    ldouble fr_start = (pow(STARTFIELD,0.6)/0.6  + 0.5/0.4*pow(STARTFIELD,-0.4)) / lambda;
+    //Acov[2] *= sin(fr - fr_start) ;
+    //Acov[2] *= sin(fr - fr_start) ;
+    */
 #else //standard single poloidal loop
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
 #endif

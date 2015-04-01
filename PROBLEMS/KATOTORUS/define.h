@@ -95,6 +95,8 @@
 //coordinates / resolution
 /************************************/
 #define myMKS2COORDS
+#define RMIN 4.
+#define RMAX 100.
 #define MKSR0 0.
 #define MKSH0 0.6
 #define MKSMY1 0.001
@@ -104,8 +106,8 @@
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
-#define MINX (log(1.85-MKSR0))
-#define MAXX (log(1000.-MKSR0))
+#define MINX (log(RMIN-MKSR0))
+#define MAXX (log(100.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
 #endif
@@ -124,8 +126,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 140//252 //28*9
-#define TNY 100//234 //26*9
+#define TNX 252 //28*9
+#define TNY 234 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 28
@@ -159,7 +161,7 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/
@@ -167,92 +169,17 @@
 /************************************/
 #define GAMMA (5./3.)
 
-#define NTORUS 7
+#define NTORUS 1
 
-#if(NTORUS==7) //flat sigma
-#define LT_KAPPA 5.e2
-#define EXPECTEDHR 0.3
-#define LT_XI 0.975
-#define LT_R1 30.
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 22.
-#define BETANORMFULL
+#if(NTORUS==1) //Jiang+14
+#define KT_A 0.4
+#define KT_R0 (25.*2.)
+#define KT_RHO0 (10.*rhoCGS2GU(1.e-2))
+#define KT_T0 (100.*1.e7)
 #undef MAXBETA
-#define MAXBETA (1./10.) //eq.plane
+#define MAXBETA (3.294/10.) //eq.plane
 #endif
 
-#if(NTORUS==6) //for not-so-hyper
-#define LT_KAPPA 1.5e3
-#define EXPECTEDHR 0.4
-#define LT_XI 0.95
-#define LT_R1 16.
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-//#define LT_RIN 10.25
-#define LT_RIN 10.6
-#undef MAXBETA
-#define MAXBETA (1./25.) //eq.plane
-#endif
-
-#if(NTORUS==5) //single toroidal loop
-
-#define EXPECTEDHR 0.4
-#define LT_KAPPA 1.e-2
-#define LT_XI 0.708
-#define LT_R1 42.
-#define LT_R2 1000.
-#define LT_GAMMA 5./3.
-#define LT_RIN 10.
-#undef MAXBETA
-#define MAXBETA (1./30.) //target pmag/pgas inside torus
-#define BETANORMFULL
-//#define BETANORMFACTOR 2.e-10
-#endif
-
-#if(NTORUS==4) //a=0 SANE, no rad, denser loops
-#define EXPECTEDHR 0.4
-#define LT_KAPPA 1.e-2
-#define LT_XI 0.708
-#define LT_R1 42.
-#define LT_R2 1000.
-#define LT_GAMMA 5./3.
-#define LT_RIN 10.
-#undef MAXBETA
-#define MAXBETA (1./30.) //target pmag/pgas inside torus
-#define BETANORMFULL
-#endif
-
-#if(NTORUS==3) //a=0 SANE, no rad!
-#define EXPECTEDHR 0.4
-#define LT_KAPPA 1.e-2
-#define LT_XI 0.708
-#define LT_R1 42.
-#define LT_R2 1000.
-#define LT_GAMMA 5./3.
-#define LT_RIN 10.
-#undef MAXBETA
-#define MAXBETA (1./30.) //target pmag/pgas inside torus
-#define BETANORMFULL
-#endif
-
-#if(NTORUS==1) //original (2nd koral paper)
-#define LT_KAPPA 1.5e3
-#define LT_XI 0.9
-#define LT_R1 31.75
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 15.
-#endif
-
-#if(NTORUS==2) //for Yucong?
-#define LT_KAPPA 2.e3
-#define LT_XI 0.95
-#define LT_R1 16.
-#define LT_R2 200.
-#define LT_GAMMA 4./3.
-#define LT_RIN 10.
-#endif
 
 #define RHOATMMIN  1.e-24
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
