@@ -47,12 +47,12 @@
 //reconstruction / Courant
 /************************************/
 #define INT_ORDER 1
-#define TIMESTEPPING RK2IMEX //test IMEX with radiation etc!!!
+#define TIMESTEPPING RK2IMEX 
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 #define DORADFIXUPS 0
 
 /************************************/
@@ -97,8 +97,8 @@
 #define myMKS2COORDS
 #define RMIN 4.
 #define RMAX 100.
-#define MKSR0 0.
-#define MKSH0 0.6
+#define MKSR0 -300.
+#define MKSH0 0.8
 #define MKSMY1 0.001
 #define MKSMY2 0.2
 #define MKSMP0 1.5
@@ -126,8 +126,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 252 //28*9
-#define TNY 234 //26*9
+#define TNX 400 //28*9
+#define TNY 400 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 28
@@ -159,9 +159,11 @@
 #define RADOUTPUT 1
 #define SCAOUTPUT 1
 #define AVGOUTPUT 1
+#if(TNZ==1)
 #define SILO2D_XZPLANE
+#endif
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 50.
 #define DTOUT2 1000.
 
 /************************************/
