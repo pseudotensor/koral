@@ -60,6 +60,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *forcebal2 = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Omega = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *muBe = (ldouble*)malloc(nx*ny*nz*sizeof(double));
+  ldouble *Be = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Qtheta = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *Qphi = (ldouble*)malloc(nx*ny*nz*sizeof(double));
   ldouble *divB = (ldouble*)malloc(nx*ny*nz*sizeof(double));
@@ -282,7 +283,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      ldouble dpdr; //d/dr (gdet * p)
 	      ldouble gracen; //gdet T^k_l Gamma^l_kr
 	      ldouble w;//entalphy
-	      ldouble rhouconr;
+	      ldouble rhouconr,rhoucont;
 	      
 	      entropyinv[nodalindex]=get_cflag(ENTROPYFLAG3,ix,iy,iz);
 
@@ -299,6 +300,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  indices_21(vel,vcov,geomout.gg);
 
 		  rhouconr=rho[nodalindex]*vcon[1];
+		  rhoucont=rho[nodalindex]*vcon[0];
  
 		  Omega[nodalindex]=vel[3]/vel[0];
 
@@ -310,18 +312,14 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[3]=Tij[3][0];
 
 
-		  //Bernoulli number
-		  //muBe[nodalindex]=-(rho[nodalindex]+ GAMMA*uint[nodalindex])/rho[nodalindex]*vcov[0]-1.;
-
+		  //Bernoulli flux / number
 		  muBe[nodalindex]=-(Tij[1][0] + rhouconr)/rhouconr;
-
+		  Be[nodalindex]=-(Tij[0][0] + rhoucont)/rhoucont;
+ 
 		  #ifdef MAGNFIELD
-		  //muBe[nodalindex]+=-bsq[nodalindex]/rho[nodalindex]*vcov[0];
-
+		  
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
 		  Qphi[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[2]*fabs(bcon[3])/sqrt(rho[nodalindex]);
-		  //if(iy==NY/2+10 || iy==NY/2-10)printf("%d %d > %e %e %e %e > %e\n",ix,iy,Omega[nodalindex],dx[1],bcon[2],rho[nodalindex],Qtheta[nodalindex]);
-
 
 		  //to calculate magn. field angle
 		  ldouble brbphi,bsq,bfake[4];
@@ -353,6 +351,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  rho[nodalindex]=get_uavg(pavg,RHO,ix,iy,iz);
 		  uint[nodalindex]=get_uavg(pavg,UU,ix,iy,iz);
 		  rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+		  rhoucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz);
 		 
 		  vel[0]=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 		  vel[1]=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
@@ -382,11 +381,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  Tit[2]=Tij[2][0];
 		  Tit[3]=Tij[3][0];
 
-		  //Bernoulli number
-		  //muBe[nodalindex]=-(rho[nodalindex]+GAMMA*uint[nodalindex])/rho[nodalindex]*vcov[0]-1.;
+		  //Bernoulli flux / number
 		  muBe[nodalindex]=-(Tij[1][0] + rhouconr)/rhouconr;
+		  Be[nodalindex]=-(Tij[0][0] + rhoucont)/rhoucont;
 		  #ifdef MAGNFIELD
-		  //muBe[nodalindex]+=-bsq[nodalindex]/rho[nodalindex]*vcov[0];
 
 		  Qtheta[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[1]*fabs(bcon[2])/sqrt(rho[nodalindex]);
 		  Qphi[nodalindex]=2.*M_PI/Omega[nodalindex]/dx[2]*fabs(bcon[3])/sqrt(rho[nodalindex]);
@@ -616,6 +614,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 
 	      //Bernoulli number
 	      muBe[nodalindex]+=-Rij[1][0]/rhouconr;
+	      Be[nodalindex]+=-Rij[0][0]/rhoucont;
 
 	      indices_2122(Rij,Rij22,geomout.GG);
 
@@ -830,6 +829,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		DB_DOUBLE, DB_NODECENT, optList);
 
   DBPutQuadvar1(file, "muBe","mesh1", muBe,
+  		dimensions, ndim, NULL, 0, 
+		DB_DOUBLE, DB_NODECENT, optList);
+
+ DBPutQuadvar1(file, "Be","mesh1", Be,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 

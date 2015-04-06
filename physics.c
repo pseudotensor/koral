@@ -463,6 +463,37 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
  
   PLOOP(iv) ss[iv]=0.;
 
+/***************************************************/
+
+  //gravitational atraction applied directly following the Paczynski-Witta potential
+#if defined(PWPOTENTIAL)
+  //gas velocity
+  ldouble ucon[4];
+  ucon[1]=pp[VX];
+  ucon[2]=pp[VY];
+  ucon[3]=pp[VZ];
+  conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
+  //gas density
+  ldouble rho=pp[RHO];
+  //coordinates
+  ldouble xxvecSPH[4],r;
+  coco_N(geom->xxvec,xxvecSPH,MYCOORDS,BLCOORDS);
+  r=xxvecSPH[1];
+  //radial gradient of phi
+  ldouble dphi=1./(r-2.)/(r-2.);
+
+  //source terms
+
+  //radial acceleration
+  ss[VX]+=-gdetu*rho*dphi;
+  //what increases the total energy as well
+  ss[UU]+=-gdetu*rho*ucon[1]*dphi;
+#endif
+
+
+  /***************************************************/
+
+
   /***************************************************/
 
   //artificial heating of gas at constant rate per unit mass

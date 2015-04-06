@@ -13,7 +13,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
 
@@ -58,7 +58,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
@@ -94,8 +94,9 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS2COORDS
-#define RMIN 4.
+//#define myMKS2COORDS
+#define mySPHCOORDS
+#define RMIN 10.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -103,6 +104,24 @@
 #define MKSMY2 0.2
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
+
+#ifdef myMSPH1COORDS //modified Kerr-Shild
+#define PWPOTENTIAL
+#define MYCOORDS MSPH1COORDS
+#define MINX (log(RMIN-MKSR0))
+#define MAXX (log(100.-MKSR0))
+#define MINY (0.45)
+#define MAXY (M_PI-MINY)
+#endif
+
+#ifdef mySPHCOORDS //modified Kerr-Shild
+#define PWPOTENTIAL
+#define MYCOORDS SPHCOORDS
+#define MINX RMIN
+#define MAXX 100.
+#define MINY (0.45)
+#define MAXY (M_PI-MINY)
+#endif
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
@@ -126,8 +145,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 400 //28*9
-#define TNY 400 //26*9
+#define TNX 80 //28*9
+#define TNY 60 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 28
@@ -163,13 +182,18 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 5.
 #define DTOUT2 1000.
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
 #define GAMMA (5./3.)
+
+#ifndef RADIATION
+#undef GAMMA
+#define GAMMA (4./3.)
+#endif
 
 #define NTORUS 1
 
