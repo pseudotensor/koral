@@ -13,7 +13,7 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 #define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
 
@@ -58,7 +58,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
@@ -96,7 +96,7 @@
 /************************************/
 //#define myMKS2COORDS
 #define mySPHCOORDS
-#define RMIN 10.
+#define RMIN 4.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -119,7 +119,7 @@
 #define MYCOORDS SPHCOORDS
 #define MINX RMIN
 #define MAXX 100.
-#define MINY (0.45)
+#define MINY (0.05)
 #define MAXY (M_PI-MINY)
 #endif
 
@@ -133,6 +133,7 @@
 
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
+
 #define MYCOORDS MKS3COORDS
 #define MINX (log(1.85-MKSR0))
 #define MAXX (log(100.-MKSR0))
@@ -145,9 +146,9 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 80 //28*9
-#define TNY 60 //26*9
-#define TNZ 1 //2*8
+#define TNX 64//300 //28*9
+#define TNY 64//300 //26*9
+#define TNZ 64//1 //2*8
 //number of tiles
 #define NTX 28
 #define NTY 26

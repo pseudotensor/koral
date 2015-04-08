@@ -15,7 +15,7 @@
 /************************************/
 #define RADIATION
 #define BALANCEENTROPYWITHRADIATION
-#define COMPTONIZATION
+#define NCOMPTONIZATION
 
 //#define U2P_EQS U2P_EQS_JONS
 //#define U2P_SOLVER U2P_SOLVER_WP
@@ -124,9 +124,9 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 140//252 //28*9
-#define TNY 100//234 //26*9
-#define TNZ 1 //2*8
+#define TNX 64//140//252 //28*9
+#define TNY 64//100//234 //26*9
+#define TNZ 64//1 //2*8
 //number of tiles
 #define NTX 28
 #define NTY 26

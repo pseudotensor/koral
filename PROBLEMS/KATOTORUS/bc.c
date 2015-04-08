@@ -78,9 +78,46 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
      iiz=iz;
 
       for(iv=0;iv<NV;iv++)
-       {
-	 pp[iv]=get_u(p,iv,0,iiy,iiz);
-       }
+	{
+	  pp[iv]=get_u(p,iv,0,iiy,iiz);
+	}
+
+      if(RMIN>rhorizonBL) //do not allow for inflow
+	{
+	  //checking for the gas inflow
+	  ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
+	  conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
+	  trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
+	  if(ucon[1]>0.) //inflow, resseting to atmosphere
+	    {
+	      //atmosphere in rho,uint and velocities and zero magn. field
+	      //set_hdatmosphere(pp,xxvec,gg,GG,4);
+	      ucon[1]=0.;
+	      trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
+	      conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+	      pp[VX]=ucon[1];
+	      pp[VY]=ucon[2];
+	      pp[VZ]=ucon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	    }
+
+#ifdef RADIATION
+	  ldouble urfcon[4]={0.,pp[FX0],pp[FY0],pp[FZ0]};    
+	  conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom.gg,geom.GG);
+	  trans2_coco(geom.xxvec,urfcon,urfcon,MYCOORDS,BLCOORDS);
+	  if(urfcon[1]>0.) //inflow, resseting to atmosphere
+	    {
+	      //atmosphere in radiation
+	      //set_radatmosphere(pp,xxvec,gg,GG,0);
+	      urfcon[1]=0.;
+	      trans2_coco(geomBL.xxvec,urfcon,urfcon,BLCOORDS,MYCOORDS);
+	      conv_vels(urfcon,urfcon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
+	      pp[FX0]=urfcon[1];
+	      pp[FY0]=urfcon[2];
+	      pp[FZ0]=urfcon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	    }
+#endif
+
+	}
 
      p2u(pp,uu,&geom);
      return 0;

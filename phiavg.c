@@ -88,7 +88,8 @@ main
 
       //reading damp file parameters
       int intpar[6];
-
+      
+      /*
       if(ifavg) //avg follows old writing sequence - to correct!!!
 	{
 	  sprintf(bufor,"cp %s %s\n",fnamehead,fnameheadout);
@@ -98,7 +99,6 @@ main
 	  nz=TNZ;
 	  problem=PROBLEM;
 
-	  /***********/
 	  fout=fopen(fnameout,"w");
 	  //body file
 	  fdump=fopen(fname,"rb");
@@ -161,6 +161,26 @@ main
 	  fclose(fdump);
 	  fclose(fout);
 	}
+
+  */
+   
+      if(ifavg) //avg follows old writing sequence - to correct!!!
+	{
+	  sprintf(bufor,"cp %s %s\n",fnamehead,fnameheadout);
+	  system(bufor);
+	  nx=TNX;
+	  ny=TNY;
+	  nz=TNZ;
+	  problem=PROBLEM;
+
+	  fout=fopen(fnameout,"w");
+	  //body file
+	  fdump=fopen(fname,"rb");
+ 
+	  printf("avg file (%s) read no. %d\n",
+		 fname,itot);
+	}
+
       else
 	{
 	  ret=fscanf(fdump,"## %d %d %lf %d %d %d %d\n",&intpar[0],&intpar[1],&time,&intpar[2],&intpar[3],&intpar[4],&intpar[5]);
@@ -178,8 +198,6 @@ main
        
 	  /***********/
 	  fout=fopen(fnameout,"w");
-
-     
       
 	  if(nx!=TNX || ny!=TNY || problem!=PROBLEM)
 	    {
@@ -193,88 +211,88 @@ main
 
 	  printf("time: %e resolution: %d x %d x %d NV: %d\n",time,nx,ny,nz,nv);
 
-
 	  //body file
 	  fdump=fopen(fname,"rb");
- 
-	  for(j=0;j<ny;j++)
-	    for(i=0;i<nx;i++)
-	      {
-		ngood[i][j]=0;
-		for(iv=0;iv<nv;iv++)
-		  prims[i][j][iv]=0.;
-	      }
-
-	  int **indices;
-	  indices = (int **)malloc(nx*ny*nz*sizeof(int*));
-	  for(i=0;i<nx*ny*nz;i++)
-	    indices[i]=(int *)malloc(3*sizeof(int));
-
-	  //first indices
-	  for(ic=0;ic<nx*ny*nz;ic++)
-	    {
-	      ret=fread(&ix,sizeof(int),1,fdump);
-	      ret=fread(&iy,sizeof(int),1,fdump);
-	      ret=fread(&iz,sizeof(int),1,fdump);
-
-	      //phiavg only serial
-	      //mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
-
-	      indices[ic][0]=ix;
-	      indices[ic][1]=iy;
-	      indices[ic][2]=iz;
-	    }
-
-	  //then primitives
-	  for(ic=0;ic<nx*ny*nz;ic++)
-	    {
-	      ret=fread(pp,sizeof(double),nv,fdump);
-
-	      gix=indices[ic][0];
-	      giy=indices[ic][1];
-	      giz=indices[ic][2];
-	  
-	      if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
-		printf("blont: %d %d %d | %d %d %d\n",gix,giy,giz,nx,ny,nz);
-	      else
-		{
-		  ngood[gix][giy]++;
-		  for(iv=0;iv<nv;iv++)
-		    prims[gix][giy][iv]+=pp[iv];
-		}
-	    }
-
-	  for(j=0;j<ny;j++)
-	    for(i=0;i<nx;i++)
-	      for(iv=0;iv<nv;iv++)
-		prims[i][j][iv]/=(double)ngood[i][j];
-
-	  //print to a file
-      
-	  //indices first
-	  iz=0;
-	  for(ix=0;ix<nx;ix++)
-	    for(iy=0;iy<ny;iy++)
-	      {
-		fwrite(&ix,sizeof(int),1,fout);
-		fwrite(&iy,sizeof(int),1,fout);
-		fwrite(&iz,sizeof(int),1,fout);
-	      }
-
-	  //then, in the same order, primitives
-	  for(ix=0;ix<nx;ix++)
-	    for(iy=0;iy<ny;iy++)
-	      {
-		fwrite(&prims[ix][iy][0],sizeof(ldouble),nv,fout);
-	      }
-
-	  for(i=0;i<nx*ny*nz;i++)
-	    free(indices[i]);
-	  free(indices);
-
-	  fclose(fdump);
-	  fclose(fout);
 	}
+ 
+      for(j=0;j<ny;j++)
+	for(i=0;i<nx;i++)
+	  {
+	    ngood[i][j]=0;
+	    for(iv=0;iv<nv;iv++)
+	      prims[i][j][iv]=0.;
+	  }
+
+      int **indices;
+      indices = (int **)malloc(nx*ny*nz*sizeof(int*));
+      for(i=0;i<nx*ny*nz;i++)
+	indices[i]=(int *)malloc(3*sizeof(int));
+
+      //first indices
+      for(ic=0;ic<nx*ny*nz;ic++)
+	{
+	  ret=fread(&ix,sizeof(int),1,fdump);
+	  ret=fread(&iy,sizeof(int),1,fdump);
+	  ret=fread(&iz,sizeof(int),1,fdump);
+
+	  //phiavg only serial
+	  //mpi_global2localidx(gix,giy,giz,&ix,&iy,&iz);
+
+	  indices[ic][0]=ix;
+	  indices[ic][1]=iy;
+	  indices[ic][2]=iz;
+	}
+
+      //then primitives
+      for(ic=0;ic<nx*ny*nz;ic++)
+	{
+	  ret=fread(pp,sizeof(double),nv,fdump);
+
+	  gix=indices[ic][0];
+	  giy=indices[ic][1];
+	  giz=indices[ic][2];
+	  
+	  if(gix<0 || gix>=nx ||giy<0 || giy>=ny)
+	    printf("blont: %d %d %d | %d %d %d\n",gix,giy,giz,nx,ny,nz);
+	  else
+	    {
+	      ngood[gix][giy]++;
+	      for(iv=0;iv<nv;iv++)
+		prims[gix][giy][iv]+=pp[iv];
+	    }
+	}
+
+      for(j=0;j<ny;j++)
+	for(i=0;i<nx;i++)
+	  for(iv=0;iv<nv;iv++)
+	    prims[i][j][iv]/=(double)ngood[i][j];
+
+      //print to a file
+      
+      //indices first
+      iz=0;
+      for(ix=0;ix<nx;ix++)
+	for(iy=0;iy<ny;iy++)
+	  {
+	    fwrite(&ix,sizeof(int),1,fout);
+	    fwrite(&iy,sizeof(int),1,fout);
+	    fwrite(&iz,sizeof(int),1,fout);
+	  }
+
+      //then, in the same order, primitives
+      for(ix=0;ix<nx;ix++)
+	for(iy=0;iy<ny;iy++)
+	  {
+	    fwrite(&prims[ix][iy][0],sizeof(ldouble),nv,fout);
+	  }
+
+      for(i=0;i<nx*ny*nz;i++)
+	free(indices[i]);
+      free(indices);
+
+      fclose(fdump);
+      fclose(fout);
     }
+
   return 0;
 }

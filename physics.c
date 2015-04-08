@@ -487,7 +487,7 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   //radial acceleration
   ss[VX]+=-gdetu*rho*dphi;
   //what increases the total energy as well
-  ss[UU]+=-gdetu*rho*ucon[1]*dphi;
+  ss[UU]+=gdetu*rho*ucon[1]*dphi;
 #endif
 
 
