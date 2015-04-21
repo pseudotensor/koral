@@ -1155,7 +1155,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 #if(BOXOUTPUT==1)
   //adjust NBOXSCALARS in problem.h
   
-  int ix,iy,iz,ii,iv;
+  int ix,iy,iz,ii,iv,i,j;
   int bix1,bix2,biy1,biy2,giy;
   ldouble xx[4],xxBL[4];
 
@@ -1322,7 +1322,38 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 	      //PLACE - overwrite with avg quantities if required
 	      if(doingavg)
 		{
-
+		  rho=get_uavg(pavg,RHO,ix,iy,iz);
+		  uint=get_uavg(pavg,UU,ix,iy,iz);
+		  bsq=get_uavg(pavg,AVGBSQ,ix,iy,iz);
+		  temp=get_uavg(pavg,AVGTGAS,ix,iy,iz);
+		  for(i=0;i<4;i++)
+		    {
+		      for(j=0;j<4;j++)
+			{
+			  Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(i,j),ix,iy,iz)
+			    + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(i,j),ix,iy,iz)
+			    + get_uavg(pavg,AVGBSQUCONUCOV(i,j),ix,iy,iz)
+			    - get_uavg(pavg,AVGBCONBCOV(i,j),ix,iy,iz); 
+			  #ifdef RADIATION
+			  Rij[i][j]=get_uavg(pavg,AVGRIJ(i,j),ix,iy,iz); 
+			  #endif
+			}
+		      Giff[i]=get_uavg(pavg,AVGGHAT(i),ix,iy,iz);
+		      Gicff[i]=get_uavg(pavg,AVGGHATCOMPT(i),ix,iy,iz);
+		    }
+		  pregas = GAMMAM1*uint;
+		  premag = bsq/2.;
+		  pretot = pregas + premag;
+		  prerad = Ehat = 0.;
+#ifdef RADIATION
+		  Ehat=get_uavg(pavg,AVGEHAT,ix,iy,iz);
+		  prerad = Ehat/3.;
+		  pretot+=prerad;
+#endif
+		  //alpha not averaged properly - use snapshots rather
+		  boost22_lab2ff(Tij22,Tij22,pp,geomBL.gg,geomBL.GG);
+		  alpha=sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij22[1][3]/pretot;
+		  //neither Qtheta - stays the same
 		}
 
 	      //integrals
@@ -1346,6 +1377,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
       ldouble Trtkintot[3]={0.,0.,0.};
       ldouble Trtmagntot[3]={0.,0.,0.};
       ldouble rhouconrtot[3]={0.,0.,0.};
+      ldouble Ehatuconrtot[3]={0.,0.,0.};
 
       //left radial wall
       if(BOXR1>rmin && BOXR1<=rmax) //within this tile
@@ -1396,6 +1428,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 		ldouble rhouconr=rho*ucon[1];
 
+
 		ldouble Tij[4][4],Tij22[4][4],Rij[4][4];
 		calc_Tij(pp,&geomBL,Tij22);
 		indices_2221(Tij22,Tij,geomBL.gg);
@@ -1403,16 +1436,32 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		ldouble Trtmagn = bsq*ucon[1]*ucov[0] - bcon[1]*bcov[0];
 		ldouble Trtkin =  rho*ucon[1]*ucov[0];
 
+		ldouble Ehat=0.;
 #ifdef RADIATION
 		calc_Rij(pp,&geomBL,Rij);
 		indices_2221(Rij,Rij,geomBL.gg);
 		Rrt = Rij[1][0];
+		ldouble Rtt,uconr[4];
+		calc_ff_Rtt(pp,&Rtt,uconr,&geomBL);
+		Ehat=-Rtt;
 #endif
+		ldouble Ehatuconr = Ehat*ucon[1];
 
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
-
+		    Trt=Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+			      + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
+			      + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+			      - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+		    Trtmagn= get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		      - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+		    Trtkin = get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz);
+		    rhouconr = get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+		    #ifdef RADIATION
+		    Rrt=get_uavg(pavg,AVGRIJ(1,0),ix,iy,iz); 
+		    Ehatuconr = get_uavg(pavg,AVGEHATUCON(1),ix,iy,iz);
+		    #endif
 		  }
 
 		//integrals
@@ -1421,6 +1470,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		Trtkintot[0]+=Trtkin*dx[1]*dx[2]*geomBL.gdet;
 		Trtmagntot[0]+=Trtmagn*dx[1]*dx[2]*geomBL.gdet;
 		Rrttot[0]+=Rrt*dx[1]*dx[2]*geomBL.gdet;
+		Ehatuconrtot[0]+=Ehatuconr*dx[1]*dx[2]*geomBL.gdet;
 	      }
 
 	}
@@ -1481,16 +1531,32 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		ldouble Trtmagn = bsq*ucon[1]*ucov[0] - bcon[1]*bcov[0];
 		ldouble Trtkin =  rho*ucon[1]*ucov[0];
 
+		ldouble Ehat=0.;
 #ifdef RADIATION
 		calc_Rij(pp,&geomBL,Rij);
 		indices_2221(Rij,Rij,geomBL.gg);
 		Rrt = Rij[1][0];
+		ldouble Rtt,uconr[4];
+		calc_ff_Rtt(pp,&Rtt,uconr,&geomBL);
+		Ehat=-Rtt;
 #endif
+		ldouble Ehatuconr = Ehat*ucon[1];
 
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
-
+		    Trt=Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+		      + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
+		      + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		      - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+		    Trtmagn= get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
+		      - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
+		    Trtkin = get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz);
+		    rhouconr = get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
+#ifdef RADIATION
+		    Rrt=get_uavg(pavg,AVGRIJ(1,0),ix,iy,iz); 
+		    Ehatuconr = get_uavg(pavg,AVGEHATUCON(1),ix,iy,iz);
+#endif
 		  }
 
 		//integrals
@@ -1499,6 +1565,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		Trtkintot[1]-=Trtkin*dx[1]*dx[2]*geomBL.gdet;
 		Trtmagntot[1]-=Trtmagn*dx[1]*dx[2]*geomBL.gdet;
 		Rrttot[1]-=Rrt*dx[1]*dx[2]*geomBL.gdet;
+		Ehatuconrtot[1]-=Ehatuconr*dx[1]*dx[2]*geomBL.gdet;
 	      }
 
 	}
@@ -1559,16 +1626,32 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		ldouble Tthtmagn = bsq*ucon[2]*ucov[0] - bcon[2]*bcov[0];
 		ldouble Tthtkin =  rho*ucon[2]*ucov[0];
 
+		ldouble Ehat=0.;
 #ifdef RADIATION
 		calc_Rij(pp,&geomBL,Rij);
 		indices_2221(Rij,Rij,geomBL.gg);
 		Rtht = Rij[2][0];
-#endif
+		ldouble Rtt,uconr[4];
+		calc_ff_Rtt(pp,&Rtt,uconr,&geomBL);
+		Ehat=-Rtt;
+#endif	
+		ldouble Ehatuconth = Ehat*ucon[2];
 
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
-
+		    Ttht=Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz)
+		      + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(2,0),ix,iy,iz)
+		      + get_uavg(pavg,AVGBSQUCONUCOV(2,0),ix,iy,iz)
+		      - get_uavg(pavg,AVGBCONBCOV(2,0),ix,iy,iz); 
+		    Tthtmagn= get_uavg(pavg,AVGBSQUCONUCOV(2,0),ix,iy,iz)
+		      - get_uavg(pavg,AVGBCONBCOV(2,0),ix,iy,iz); 
+		    Tthtkin = get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz);
+		    rhouconth = get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz);
+#ifdef RADIATION
+		    Rtht=get_uavg(pavg,AVGRIJ(2,0),ix,iy,iz); 
+		    Ehatuconth = get_uavg(pavg,AVGEHATUCON(2),ix,iy,iz);
+#endif
 		  }
 
 		//integrals (watch the sign!)
@@ -1577,6 +1660,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		Trtkintot[2]-=Tthtkin*dx[2]*dx[0]*geomBL.gdet;
 		Trtmagntot[2]-=Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
 		Rrttot[2]-=Rtht*dx[2]*dx[0]*geomBL.gdet;
+		Ehatuconrtot[2]-=Ehatuconth*dx[2]*dx[0]*geomBL.gdet;
 	      }
 
 	}
@@ -1636,16 +1720,32 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		ldouble Tthtmagn = bsq*ucon[2]*ucov[0] - bcon[2]*bcov[0];
 		ldouble Tthtkin =  rho*ucon[2]*ucov[0];
 
+		ldouble Ehat=0.;
 #ifdef RADIATION
 		calc_Rij(pp,&geomBL,Rij);
 		indices_2221(Rij,Rij,geomBL.gg);
 		Rtht = Rij[2][0];
-#endif
+		ldouble Rtt,uconr[4];
+		calc_ff_Rtt(pp,&Rtt,uconr,&geomBL);
+		Ehat=-Rtt;
+#endif	
+		ldouble Ehatuconth = Ehat*ucon[2];
 
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
-
+		    Ttht=Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz)
+		      + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(2,0),ix,iy,iz)
+		      + get_uavg(pavg,AVGBSQUCONUCOV(2,0),ix,iy,iz)
+		      - get_uavg(pavg,AVGBCONBCOV(2,0),ix,iy,iz); 
+		    Tthtmagn= get_uavg(pavg,AVGBSQUCONUCOV(2,0),ix,iy,iz)
+		      - get_uavg(pavg,AVGBCONBCOV(2,0),ix,iy,iz); 
+		    Tthtkin = get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz);
+		    rhouconth = get_uavg(pavg,AVGRHOUCON(2),ix,iy,iz);
+#ifdef RADIATION
+		    Rtht=get_uavg(pavg,AVGRIJ(2,0),ix,iy,iz); 
+		    Ehatuconth = get_uavg(pavg,AVGEHATUCON(2),ix,iy,iz);
+#endif
 		  }
 
 		//integrals (watch the sign!)
@@ -1654,6 +1754,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		Trtkintot[2]+=Tthtkin*dx[2]*dx[0]*geomBL.gdet;
 		Trtmagntot[2]+=Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
 		Rrttot[2]+=Rtht*dx[2]*dx[0]*geomBL.gdet;
+		Ehatuconrtot[2]+=Ehatuconth*dx[1]*dx[2]*geomBL.gdet;
 	      }
 	}
 
@@ -1678,6 +1779,9 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
       boxscalars[nia+7]=Rrttot[0]; // (17) - Rrt flux
       boxscalars[nia+8]=Rrttot[1]; // (18) - -Rrt flux
       boxscalars[nia+9]=Rrttot[2]; // (19) - Rtht flux
+      boxscalars[nia+10]=Ehatuconrtot[0]; // (17) - Ehatuconr flux
+      boxscalars[nia+11]=Ehatuconrtot[1]; // (18) - -Ehatuconr flux
+      boxscalars[nia+12]=Ehatuconrtot[2]; // (19) - Ehatuconth flux
     } //if(!ifoutsidebox)
 
 
