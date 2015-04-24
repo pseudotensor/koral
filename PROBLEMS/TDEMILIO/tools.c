@@ -1,5 +1,5 @@
 
-int diskatboundary(ldouble *pp, void *ggg, void *gggBL)
+int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
 {
   struct geometry *geom
      = (struct geometry *) ggg;

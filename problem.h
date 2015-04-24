@@ -95,7 +95,7 @@
 //92 ADVDIFF - diffusion in scattering moving blob
 //93 KATOTORUS - radiative torus initiated like in Kato+2004
 
-#define PROBLEM 93
+#define PROBLEM 91
 
 
 #if(PROBLEM==93)
@@ -130,6 +130,7 @@
 
 #if(PROBLEM==91)
 
+#define PR_PREPINIT "PROBLEMS/TDEMILIO/prepinit.c"
 #define PR_DEFINE "PROBLEMS/TDEMILIO/define.h"
 #define PR_BC "PROBLEMS/TDEMILIO/bc.c"
 #define PR_INIT "PROBLEMS/TDEMILIO/init.c"

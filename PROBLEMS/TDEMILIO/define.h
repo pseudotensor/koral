@@ -1,4 +1,20 @@
 //************************************/
+//problem-specific arrays
+/************************************/
+double ***SPHdata0,***SPHdata1,***SPHcoords;
+double SPHtime0,SPHtime1;
+int ***SPHprojection;
+int SPHitime;
+
+//************************************/
+//SPH input parameters
+/************************************/
+#define SPHTNY 160
+#define SPHTNZ 96
+#define SPHNT 33
+#define SPHITSTART 13
+
+//************************************/
 //general
 /************************************/
 #define BHDISK_PROBLEMTYPE
@@ -6,7 +22,7 @@
 /************************************/
 //restart
 /************************************/
-#define RESTART
+//#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -76,7 +92,7 @@
 /************************************/
 //blackhole
 /************************************/
-#define MASS 10.
+#define MASS 1.e5
 #define BHSPIN 0.0
 
 /************************************/
@@ -84,7 +100,7 @@
 /************************************/
 #define myMKS2COORDS
 #define ROUT 100.
-#define RMIN 1.8
+#define RMIN 10.
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MKSR0 0.
@@ -106,9 +122,9 @@
 #endif
 
 //total resolution
-#define TNX 240
-#define TNY 160
-#define TNZ 96
+#define TNX 40
+#define TNY 60//160
+#define TNZ 40//96
 //number of tiles
 #define NTX 2
 #define NTY 2

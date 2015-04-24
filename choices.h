@@ -258,7 +258,7 @@
 #endif
 
 #ifndef NBOXSCALARS
-#define NBOXSCALARS 21
+#define NBOXSCALARS 24
 #endif
 
 

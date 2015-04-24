@@ -78,15 +78,16 @@ main(int argc, char **argv)
   else if(ifphiavg==2)
     my_err("using phisli(ced) data with ./avg makes no sense.\n");
 
+#if(BOXOUTPUT==1)
+      sprintf(bufor,"analysis/avgboxscalars.dat");
+      fout_boxscalars=fopen(bufor,"w");
+#endif
+
   if(procotg)
     {
       //opens the scalar file
       sprintf(bufor,"%s/avgscalars.dat",folder);
       fout_scalars=fopen(bufor,"w");
-#if(BOXOUTPUT==1)
-      sprintf(bufor,"analysis/avgboxscalars.dat");
-      fout_boxscalars=fopen(bufor,"w");
-#endif
 #if(VAROUTPUT==1)
       sprintf(bufor,"analysis/avgvarscalars.dat");
       fout_varscalars=fopen(bufor,"w");
@@ -215,6 +216,11 @@ main(int argc, char **argv)
 
   
   //dumps dumps to analysis analysis
+
+#if(BOXOUTPUT==1)
+  fprint_boxscalars(t);
+#endif
+
 #if(RADOUTPUT==1)
   sprintf(prefix,"radavg%s%04d-",suffix,no1);
   fprint_radprofiles(t,no2,"analysis",prefix);
@@ -242,11 +248,13 @@ main(int argc, char **argv)
   fprint_simplefile(t,no2,"analysis",prefix);
 #endif
   
-  if(procotg)
-    {
+
 #if(BOXOUTPUT==1)
   fclose(fout_boxscalars);
 #endif
+
+  if(procotg)
+    {
 
 #if(VAROUTPUT==1)
   fclose(fout_varscalars);

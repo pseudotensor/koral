@@ -1,4 +1,4 @@
-int diskatboundary(ldouble *pp, void *ggg, void *gggBL);
+int SPHboundary(ldouble *pp, void *ggg, void *gggBL);
 
 /**********************/
 
@@ -26,7 +26,7 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 //outer edge, outflows with velocity check
 if(BCtype==XBCHI)
   {
-    if(diskatboundary(pp, &geom, &geomBL)<0)
+    if(SPHboundary(pp, &geom, &geomBL)<0)
       {
 	iix=NX-1;
 	iiy=iy;

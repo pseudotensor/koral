@@ -85,17 +85,17 @@ main(int argc, char **argv)
   if(ifphiavg<2)
     {
 #if(BOXOUTPUT==1)
-  sprintf(bufer,"analysis/boxscalars.dat");
-  fout_boxscalars=fopen(bufer,"w");
-  #endif
+      sprintf(bufer,"analysis/boxscalars.dat");
+      fout_boxscalars=fopen(bufer,"w");
+#endif
     }
 
   if(ifphiavg==2)
     {
- #if(VAROUTPUT==1)
-  sprintf(bufer,"analysis/varscalars.dat");
-  fout_varscalars=fopen(bufer,"w");
-  #endif
+#if(VAROUTPUT==1)
+      sprintf(bufer,"analysis/varscalars.dat");
+      fout_varscalars=fopen(bufer,"w");
+#endif
     }
 
 

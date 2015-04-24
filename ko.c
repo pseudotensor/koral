@@ -15,7 +15,7 @@ main(int argc, char **argv)
   mstep_init();
 
   ldouble tstart;
-  int i; char folder[100],bufer[100];
+  int i,j,k; char folder[100],bufer[100];
 
   //dumping to
   sprintf(folder,"%s","dumps");

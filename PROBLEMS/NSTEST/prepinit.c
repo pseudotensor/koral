@@ -2,9 +2,10 @@
 
 #ifdef MAGNFIELD
 
-#pragma omp parallel
+
 {
-  int ii;
+  int ii
+#pragma omp parallel for
  for(ii=0;ii<Nloop_02;ii++) //domain and ghost cells
 	{
 	  int ix, iy, iz;

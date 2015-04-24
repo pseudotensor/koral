@@ -1378,6 +1378,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
       ldouble Trtmagntot[3]={0.,0.,0.};
       ldouble rhouconrtot[3]={0.,0.,0.};
       ldouble Ehatuconrtot[3]={0.,0.,0.};
+      ldouble areas[3]={0.,0.,0.};
 
       //left radial wall
       if(BOXR1>rmin && BOXR1<=rmax) //within this tile
@@ -1447,10 +1448,11 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 #endif
 		ldouble Ehatuconr = Ehat*ucon[1];
 
+		if(iy==TNY/2) printf("1> %d %d | %e\n",ix,iy,Rrt);
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
-		    Trt=Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+		    Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
 			      + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
 			      + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
 			      - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
@@ -1463,6 +1465,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		    Ehatuconr = get_uavg(pavg,AVGEHATUCON(1),ix,iy,iz);
 		    #endif
 		  }
+			if(iy==TNY/2) printf("2> %d %d | %e\n",ix,iy,Rrt);
 
 		//integrals
 		rhouconrtot[0]+=rhouconr*dx[1]*dx[2]*geomBL.gdet;
@@ -1471,6 +1474,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		Trtmagntot[0]+=Trtmagn*dx[1]*dx[2]*geomBL.gdet;
 		Rrttot[0]+=Rrt*dx[1]*dx[2]*geomBL.gdet;
 		Ehatuconrtot[0]+=Ehatuconr*dx[1]*dx[2]*geomBL.gdet;
+		areas[0]+=dx[1]*dx[2]*geomBL.gdet;
 	      }
 
 	}
@@ -1545,7 +1549,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
-		    Trt=Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
+		    Trt=get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz)
 		      + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(1,0),ix,iy,iz)
 		      + get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
 		      - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
@@ -1566,6 +1570,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		Trtmagntot[1]-=Trtmagn*dx[1]*dx[2]*geomBL.gdet;
 		Rrttot[1]-=Rrt*dx[1]*dx[2]*geomBL.gdet;
 		Ehatuconrtot[1]-=Ehatuconr*dx[1]*dx[2]*geomBL.gdet;
+		areas[1]+=dx[1]*dx[2]*geomBL.gdet;
 	      }
 
 	}
@@ -1640,7 +1645,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
-		    Ttht=Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz)
+		    Ttht=get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz)
 		      + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(2,0),ix,iy,iz)
 		      + get_uavg(pavg,AVGBSQUCONUCOV(2,0),ix,iy,iz)
 		      - get_uavg(pavg,AVGBCONBCOV(2,0),ix,iy,iz); 
@@ -1655,12 +1660,14 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  }
 
 		//integrals (watch the sign!)
-		rhouconrtot[2]-=rhouconth*dx[2]*dx[0]*geomBL.gdet;
-		Trttot[2]-=Ttht*dx[2]*dx[0]*geomBL.gdet;
-		Trtkintot[2]-=Tthtkin*dx[2]*dx[0]*geomBL.gdet;
-		Trtmagntot[2]-=Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
-		Rrttot[2]-=Rtht*dx[2]*dx[0]*geomBL.gdet;
-		Ehatuconrtot[2]-=Ehatuconth*dx[2]*dx[0]*geomBL.gdet;
+		rhouconrtot[2]+=rhouconth*dx[2]*dx[0]*geomBL.gdet;
+		Trttot[2]+=Ttht*dx[2]*dx[0]*geomBL.gdet;
+		Trtkintot[2]+=Tthtkin*dx[2]*dx[0]*geomBL.gdet;
+		Trtmagntot[2]+=Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
+		Rrttot[2]+=Rtht*dx[2]*dx[0]*geomBL.gdet;
+		Ehatuconrtot[2]+=Ehatuconth*dx[2]*dx[0]*geomBL.gdet;
+
+		areas[2]+=dx[1]*dx[2]*geomBL.gdet;
 	      }
 
 	}
@@ -1734,7 +1741,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
-		    Ttht=Tij[i][j]=get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz)
+		    Ttht=get_uavg(pavg,AVGRHOUCONUCOV(2,0),ix,iy,iz)
 		      + GAMMA*get_uavg(pavg,AVGUUUCONUCOV(2,0),ix,iy,iz)
 		      + get_uavg(pavg,AVGBSQUCONUCOV(2,0),ix,iy,iz)
 		      - get_uavg(pavg,AVGBCONBCOV(2,0),ix,iy,iz); 
@@ -1746,15 +1753,19 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		    Rtht=get_uavg(pavg,AVGRIJ(2,0),ix,iy,iz); 
 		    Ehatuconth = get_uavg(pavg,AVGEHATUCON(2),ix,iy,iz);
 #endif
+		    
+
 		  }
 
 		//integrals (watch the sign!)
-		rhouconrtot[2]+=rhouconth*dx[2]*dx[0]*geomBL.gdet;
-		Trttot[2]+=Ttht*dx[2]*dx[0]*geomBL.gdet;
-		Trtkintot[2]+=Tthtkin*dx[2]*dx[0]*geomBL.gdet;
-		Trtmagntot[2]+=Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
-		Rrttot[2]+=Rtht*dx[2]*dx[0]*geomBL.gdet;
-		Ehatuconrtot[2]+=Ehatuconth*dx[1]*dx[2]*geomBL.gdet;
+		rhouconrtot[2]+=-rhouconth*dx[2]*dx[0]*geomBL.gdet;
+		Trttot[2]+=-Ttht*dx[2]*dx[0]*geomBL.gdet;
+		Trtkintot[2]+=-Tthtkin*dx[2]*dx[0]*geomBL.gdet;
+		Trtmagntot[2]+=-Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
+		Rrttot[2]+=-Rtht*dx[2]*dx[0]*geomBL.gdet;
+		Ehatuconrtot[2]+=-Ehatuconth*dx[1]*dx[2]*geomBL.gdet;
+
+		areas[2]+=dx[1]*dx[2]*geomBL.gdet;
 	      }
 	}
 
@@ -1770,18 +1781,26 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
       boxscalars[8]=alphaav; // (10) - averaged alpha
 
       int nia=8; //number of boxscalars slots filled so far
-      boxscalars[nia+1]=rhouconrtot[0]; // (11th column = nia + 3) - mass flux through inner face
-      boxscalars[nia+2]=rhouconrtot[1]; // (12) - (-)mass flux through right face
-      boxscalars[nia+3]=rhouconrtot[2]; // (13) - mass flux outflowing through top and bottom together
-      boxscalars[nia+4]=Trttot[0]; // (14) - Trt flux 
-      boxscalars[nia+5]=Trttot[1]; // (15) - -Trt flux
-      boxscalars[nia+6]=Trttot[2]; // (16) - Ttht flux
-      boxscalars[nia+7]=Rrttot[0]; // (17) - Rrt flux
-      boxscalars[nia+8]=Rrttot[1]; // (18) - -Rrt flux
-      boxscalars[nia+9]=Rrttot[2]; // (19) - Rtht flux
-      boxscalars[nia+10]=Ehatuconrtot[0]; // (17) - Ehatuconr flux
-      boxscalars[nia+11]=Ehatuconrtot[1]; // (18) - -Ehatuconr flux
-      boxscalars[nia+12]=Ehatuconrtot[2]; // (19) - Ehatuconth flux
+
+      boxscalars[nia+1]=areas[0];
+      boxscalars[nia+2]=areas[1];
+      boxscalars[nia+3]=areas[2];
+
+      nia=11;
+
+      boxscalars[nia+1]=rhouconrtot[0]; // (14th column = nia + 3) - mass flux through inner face
+      boxscalars[nia+2]=rhouconrtot[1]; // (15) - (-)mass flux through right face
+      boxscalars[nia+3]=rhouconrtot[2]; // (16) - mass flux outflowing through top and bottom together
+      boxscalars[nia+4]=Trttot[0]; // (17) - Trt flux 
+      boxscalars[nia+5]=Trttot[1]; // (18) - -Trt flux
+      boxscalars[nia+6]=Trttot[2]; // (19) - Ttht flux
+      boxscalars[nia+7]=Rrttot[0]; // (20) - Rrt flux
+      boxscalars[nia+8]=Rrttot[1]; // (21) - -Rrt flux
+      boxscalars[nia+9]=Rrttot[2]; // (22) - Rtht flux
+      boxscalars[nia+10]=Ehatuconrtot[0]; // (23) - Ehatuconr flux
+      boxscalars[nia+11]=Ehatuconrtot[1]; // (24) - -Ehatuconr flux
+      boxscalars[nia+12]=Ehatuconrtot[2]; // (25) - Ehatuconth flux
+
     } //if(!ifoutsidebox)
 
 
