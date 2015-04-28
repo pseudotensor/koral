@@ -131,6 +131,7 @@
 #if(PROBLEM==91)
 
 #define PR_PREPINIT "PROBLEMS/TDEMILIO/prepinit.c"
+#define PR_FINGER "PROBLEMS/TDEMILIO/finger.c"
 #define PR_DEFINE "PROBLEMS/TDEMILIO/define.h"
 #define PR_BC "PROBLEMS/TDEMILIO/bc.c"
 #define PR_INIT "PROBLEMS/TDEMILIO/init.c"

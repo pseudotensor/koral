@@ -2,7 +2,7 @@
 //problem-specific arrays
 /************************************/
 double ***SPHdata0,***SPHdata1,***SPHcoords;
-double SPHtime0,SPHtime1;
+double SPHtime0,SPHtime1,SPHtshift;
 int ***SPHprojection;
 int SPHitime;
 
@@ -98,7 +98,7 @@ int SPHitime;
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS2COORDS
+#define myMKS3COORDS
 #define ROUT 100.
 #define RMIN 10.
 
@@ -117,8 +117,22 @@ int SPHitime;
 #define MYCOORDS MKS2COORDS
 #define MINX (log(RMIN-MKSR0))
 #define MAXX (log(ROUT-MKSR0))
-#define MINY (0.0025)
-#define MAXY (1.-0.0025)
+#define MINY (0.01)
+#define MAXY (1.-MINY)
+#endif
+
+
+#ifdef myMKS3COORDS //modified Kerr-Shild further from axis
+#define MKSMY1 0.001
+#define MKSMY2 0.4
+#define MKSH0 0.6
+#define MKSMP0 1.5
+#define METRICNUMERIC
+#define MYCOORDS MKS3COORDS
+#define MINX (log(RMIN-MKSR0))
+#define MAXX (log(100.-MKSR0))
+#define MINY 0.
+#define MAXY 1.
 #endif
 
 //total resolution
@@ -171,7 +185,7 @@ int SPHitime;
 #define SILO2D_XZPLANE
 #define PRINTXGC_RIGHT
 
-#define DTOUT1 1.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/

@@ -10,6 +10,8 @@
 
 //GM/C2 for Msun in cm
 #define MSUNCM 147700.
+#define GMC2 (MSUNCM*MASS)
+#define GMC3 (GMC2/CCC0)
 
 //conversions
 #define tempCGS2GU(x)    (x)

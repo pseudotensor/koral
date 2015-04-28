@@ -9,9 +9,6 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
  
   ldouble th=geomBL->xxvec[2];
   ldouble r=geomBL->xxvec[1];
-  ldouble theq=fabs(M_PI/2.-th);
-  ldouble theq2=M_PI/2.-th;
-  ldouble thmax=DISKHR*M_PI/2.;
 
   //ambient
   set_hdatmosphere(pp,geom->xxvec,geom->gg,geom->GG,0);
@@ -19,35 +16,52 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   set_radatmosphere(pp,geom->xxvec,geom->gg,geom->GG,0);
 #endif
 
-  if(theq>thmax)
+  int ix,iy,iz;
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+
+  double rhoamb,rho0,rho1,vr0,vr1,vth0,vth1,vph0,vph1,temp0,temp1;
+  double rho,temp,vr,vth,vph;
+  double ucon[4];
+
+  rhoamb=pp[RHO];
+  rho0=rhoCGS2GU(SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][0]);
+  rho1=rhoCGS2GU(SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][0]);
+
+  //verify if we have non-zero SPH input with density exceeding the ambient density
+  if(rho0<rhoamb && rho1<rhoamb)
     return -1; //outside disk;
    
-  ldouble rho,uint,uphi,Om,Omk,ucon[4],temp,pre0,uint0,temp0,ell;
+  temp0=tempCGS2GU(SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][1]);
+  temp1=tempCGS2GU(SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][1]);
 
-  rho=DISKRHO*pow(1.-pow(theq/thmax,2.),3.);
+  vr0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][2]/CCC0;
+  vr1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][2]/CCC0;
 
-  Omk=1./sqrt(r*r*r);
+  ldouble rcgs=geomBL->xx * GMC2;
 
-  // pre0 = DISKSIGMA * Omk * Omk * DISKH * DISKH / 2. / DISKH ;  //P=2Hp, P/S = Om^2 H^2 
-  //uint0 = pre0 / GAMMAM1;
-  //temp0 = calc_PEQ_Tfromurho(uint0, DISKRHO);
+  vth0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][3];
+  vth1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][3];
 
-  temp=DISKTEMP;
-  uint=calc_PEQ_ufromTrho(temp,rho);
+  vph0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][4];
+  vph1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][4];
 
-  //ang.momentum corresponding to DISKRCIR
-  ell=sqrt(DISKRCIR);
-  Om=ell/r/r;
-  
+  //interpolation
+  rho = rho1 - (rho1 - rho0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
+  temp = temp1 - (temp1 - temp0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
+  vr = vr1 - (vr1 - vr0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
+  vth = vth1 - (vth1 - vth0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
+  vph = vph1 - (vph1 - vph0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
 
-  ucon[1]=DISKVR;
-  ucon[2]=0.;
-  ucon[3]=Om;
+  ucon[1]=vr;
+  ucon[2]=vth;
+  ucon[3]=vph;
     
   conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL->gg,geomBL->GG);
  
-  pp[0]=my_max(rho,pp[0]);
-  pp[1]=my_max(uint,pp[1]);
+  pp[0]=rho;
+  pp[1]=calc_PEQ_ufromTrho(temp,rho);
   pp[2]=ucon[1]; 
   pp[3]=ucon[2];
   pp[4]=ucon[3];
@@ -127,10 +141,12 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   */
 #endif
 
-
+  /*
 #ifdef PERTMAGN //perturb to break axisymmetry
 pp[UU]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL->zz)/(MAXZ-MINZ));
 #endif
-  
+  */
+
   return 0;
 }
+
