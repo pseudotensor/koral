@@ -12,7 +12,11 @@ int SPHitime;
 #define SPHTNY 160
 #define SPHTNZ 96
 #define SPHNT 33
-#define SPHITSTART 13
+#define SPHITSTART 0
+#define SPHRADIUS 100.
+#define SCALEVR
+
+#define FULLPHI
 
 //************************************/
 //general
@@ -22,7 +26,7 @@ int SPHitime;
 /************************************/
 //restart
 /************************************/
-//#define RESTART
+#define RESTART
 #define RESTARTNUM -1
 
 /************************************/
@@ -37,15 +41,6 @@ int SPHitime;
 //if we want a magnetic field, uncomment MAGNFIELD
 //#define MAGNFIELD
 #define GDETIN 1
-
-#define MIMICDYNAMO
-#define CALCHRONTHEGO
-#define THETAANGLE 0.25
-#define ALPHAFLIPSSIGN                                                        
-#define ALPHADYNAMO 0.314
-#define DAMPBETA
-#define BETASATURATED 0.1
-#define ALPHABETA 6.28
 
 /************************************/
 //reconstruction / Courant
@@ -75,7 +70,7 @@ int SPHitime;
 //rmhd floors
 /************************************/
 #define CORRECT_POLARAXIS
-#define NCCORRECTPOLAR 10
+#define NCCORRECTPOLAR 1
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
@@ -92,15 +87,16 @@ int SPHitime;
 /************************************/
 //blackhole
 /************************************/
-#define MASS 1.e5
+#define MASS 1.e5//1.e1
 #define BHSPIN 0.0
 
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS3COORDS
+#define myMKS2COORDS
+#define METRICAXISYMMETRIC
 #define ROUT 100.
-#define RMIN 10.
+#define RMIN 1.85
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MKSR0 0.
@@ -112,8 +108,8 @@ int SPHitime;
 #endif
 
 #ifdef myMKS2COORDS //modified Kerr-Shild with more cells towards the eq.plane
-#define MKSR0 0.
-#define MKSH0 0.6 //makes cells smaller towards equatorial plane
+#define MKSR0 -10.
+#define MKSH0 0.85 //makes cells smaller towards equatorial plane
 #define MYCOORDS MKS2COORDS
 #define MINX (log(RMIN-MKSR0))
 #define MAXX (log(ROUT-MKSR0))
@@ -125,7 +121,8 @@ int SPHitime;
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define MKSMY1 0.001
 #define MKSMY2 0.4
-#define MKSH0 0.6
+#define MKSH0 0.85
+#define MKSR0 0.
 #define MKSMP0 1.5
 #define METRICNUMERIC
 #define MYCOORDS MKS3COORDS
@@ -136,13 +133,13 @@ int SPHitime;
 #endif
 
 //total resolution
-#define TNX 40
-#define TNY 60//160
-#define TNZ 40//96
+#define TNX 128
+#define TNY 64
+#define TNZ 64
 //number of tiles
 #define NTX 2
 #define NTY 2
-#define NTZ 1
+#define NTZ 2
 
 //#define HALFTHETA //symmetry wrt eq. plane?
 #ifdef HALFTHETA
@@ -177,13 +174,14 @@ int SPHitime;
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 
+
+#define PRINTXGC_RIGHT
+#define PRINTZONEMORE
 #define SCAOUTPUT 1
 #define SILOOUTPUT 1
 #define RADOUTPUT 1
 #define AVGOUTPUT 1
 #define COORDOUTPUT 2
-#define SILO2D_XZPLANE
-#define PRINTXGC_RIGHT
 
 #define DTOUT1 10.
 #define DTOUT2 1000.
@@ -193,26 +191,9 @@ int SPHitime;
 /************************************/
 #define GAMMA (5./3.)
 
-
-//parameters for inflow
-#define DISKVR (-sqrt(2./ROUT))
-#define DISKHR 0.1
-#define DISKHCGS (DISKHR*ROUT*MASS*1477.) 
-#define MDOTEDD 10.
-#define MDOT (MDOTEDD*2.23e18)
-//TODO:correct!!!
-#define DISKSIGMA surfdensCGS2GU(MDOT/((-3.e10)*DISKVR*2.*DISKHCGS))
-#define DISKRCIR 25.
-#define DISKTEMP 1.e8
+//parameters for the magnetic field
 #define VERTBTIME 10.
-
-#define MAXRADIUS4DYNAMO DISKRCIR
-
-#define DISKH (DISKHR*ROUT)
-#define DISKRHO (DISKSIGMA/2./DISKH)
-
 #define MAGNOMEGA 0.//(2.*M_PI/1000.)//0.
-//#define MAGNOMEGA 0.*(1.5e-2*pow(200./50.,-1.5)) //omega should follow the free fall time?
 #define MAGBETA 0.1
 
 //atmosphere

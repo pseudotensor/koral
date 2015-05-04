@@ -39,13 +39,19 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   vr0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][2]/CCC0;
   vr1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][2]/CCC0;
 
+  #ifdef SCALEVR
+  vr0*=sqrt(SPHRADIUS/geomBL->xx);
+  vr1*=sqrt(SPHRADIUS/geomBL->xx);
+  #endif
+
   ldouble rcgs=geomBL->xx * GMC2;
 
-  vth0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][3];
-  vth1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][3];
+  //angular velocities given in rad/s
+  vth0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][3]*GMC3;
+  vth1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][3]*GMC3;
 
-  vph0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][4];
-  vph1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][4];
+  vph0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][4]*GMC3;
+  vph1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][4]*GMC3;
 
   //interpolation
   rho = rho1 - (rho1 - rho0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
@@ -58,7 +64,9 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   ucon[2]=vth;
   ucon[3]=vph;
     
-  conv_vels_ut(ucon,ucon,VEL4,VELPRIM,geomBL->gg,geomBL->GG);
+  conv_vels(ucon,ucon,VEL3,VELPRIM,geomBL->gg,geomBL->GG);
+
+  //if(geom->iy==TNY/2) printf("%d %e %e %e %e\n",geom->iz,rho0,rho1,vr,ucon[1]);
  
   pp[0]=rho;
   pp[1]=calc_PEQ_ufromTrho(temp,rho);

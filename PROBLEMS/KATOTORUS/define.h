@@ -95,8 +95,8 @@
 //coordinates / resolution
 /************************************/
 //#define myMKS2COORDS
-#define mySPHCOORDS
-#define RMIN 4.
+#define myCYLCOORDS
+#define RMIN 15.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -121,6 +121,15 @@
 #define MAXX 100.
 #define MINY (0.05)
 #define MAXY (M_PI-MINY)
+#endif
+
+#ifdef myCYLCOORDS //modified Kerr-Shild
+#define PWPOTENTIAL
+#define MYCOORDS CYLCOORDS
+#define MINX RMIN
+#define MAXX 100.
+#define MINY (-50.)
+#define MAXY (50.)
 #endif
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
@@ -148,10 +157,10 @@
 //total resolution
 #define TNX 64//300 //28*9
 #define TNY 64//300 //26*9
-#define TNZ 64//1 //2*8
+#define TNZ 1//64//1 //2*8
 //number of tiles
-#define NTX 28
-#define NTY 26
+#define NTX 1//28
+#define NTY 1//26
 #define NTZ 1
 
 #define SPECIFIC_BC

@@ -920,8 +920,8 @@ print_scalings()
 {
   printf("\n ***************************************\n\n");
   printf("BH mass: %.6f\nspin: %.6f\n\nscalings  (GU->CGS):\nrho: %.6e\nmdot: %.6e\nsigma: %.6e\nlen: %.6e\ntime: %.6e\nenden:"
-	 "%.6e\nflux: %.6e\nT(1,1): %.6e\nkbt: %.6e\nkb/me: %.6e\nsigma_rad: %.6e\nkappa: %.6e\n\n"
-	 "rhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\n->mdotEdd: %.6e\n->lumEdd: %.6e\n",
+	 "%.6e\nflux: %.6e\nT(1,1): %.6e\nkbt: %.6e\nkb/me: %.6e\nsigma_rad: %.6e\nkappa: %.6e\nGt: %.6e\n\n"
+	 "rhorizonBL: %.6f\nrISCOBL: %.6f\netaNT: %.6f\n\n->mdotEdd: %.6e\n->lumEdd: %.6e\n\nGMc2: %.6e\nGMc3: %.6e\n",
 	 MASS,BHSPIN,
 	 rhoGU2CGS(1.),
 	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.),
@@ -935,11 +935,14 @@ print_scalings()
 	 K_BOLTZ/M_ELECTR,
 	 SIGMA_RAD,
 	 kappaCGS2GU(1.),
+	 kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC,
 	 rhorizonBL,
 	 rISCOBL,
 	 etaNT,
 	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)/calc_mdotEdd(),
-	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*CCC0*CCC0/calc_lumEdd()
+	 rhoGU2CGS(1.)*velGU2CGS(1.)*lenGU2CGS(1.)*lenGU2CGS(1.)*CCC0*CCC0/calc_lumEdd(),
+	 GMC2,
+	 GMC3
 	 );
     printf("\n ***************************************\n\n");
   return 0;

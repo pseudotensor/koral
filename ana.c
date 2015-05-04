@@ -70,11 +70,11 @@ main(int argc, char **argv)
 
 
   //precalculating problem related numbers
-  /*
+  int j;
     #ifdef PR_PREPINIT
     #include PR_PREPINIT
     #endif
-  */
+  
 
   //getch();
 

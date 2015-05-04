@@ -222,12 +222,12 @@ int NPROCS;
 #endif
 
 //size of 3d arrays
-#define SX (NX+2*NG)
-#define NGCX NG
+#define SX ((NX)+2*(NG))
+#define NGCX (NG)
 #define iX(ix) (ix)
 #if(NY>1)
-#define NGCY NG
-#define SY (NY+2*NG)
+#define NGCY (NG)
+#define SY ((NY)+2*(NG))
 #define iY(iy) (iy)
 #else
 #define NGCY 0
@@ -235,8 +235,8 @@ int NPROCS;
 #define iY(iy) (0)
 #endif
 #if(NZ>1)
-#define NGCZ NG
-#define SZ (NZ+2*NG)
+#define NGCZ (NG)
+#define SZ ((NZ)+2*(NG))
 #define iZ(iz) (iz)
 #else
 #define NGCZ 0
@@ -245,15 +245,15 @@ int NPROCS;
 #endif
 
 //for METRICAXISYMMETRIC store only single phi slice
-#define SZMET SZ
-#define NGCZMET NGCZ
+#define SZMET (SZ)
+#define NGCZMET (NGCZ)
 #define iZMET(iz) iZ(iz)
 
 //to limit memory footprint for non-VET
 #if (RADCLOSURE==VETCLOSURE)
-#define SXVET SX
-#define SYVET SY
-#define SZVET SZ
+#define SXVET (SX)
+#define SYVET (SY)
+#define SZVET (SZ)
 #else
 #define SXVET 1
 #define SYVET 1
@@ -492,30 +492,30 @@ int set_x(int,int,ldouble);
 int set_xb(int,int,ldouble);
 //end of coordinates
 
-#define get_emf(iv,ix,iy,iz) (emf[iv-1 + (ix)*3 + (iy)*(NX+1)*3 + (iz)*(NY+1)*(NX+1)*3])
-#define set_emf(iv,ix,iy,iz,val) emf[iv-1 + (ix)*3 + (iy)*(NX+1)*3 + (iz)*(NY+1)*(NX+1)*3]=val
+#define get_emf(iv,ix,iy,iz) (emf[iv-1 + (ix)*3 + (iy)*((NX)+1)*3 + (iz)*((NY)+1)*((NX)+1)*3])
+#define set_emf(iv,ix,iy,iz,val) emf[iv-1 + (ix)*3 + (iy)*((NX)+1)*3 + (iz)*((NY)+1)*((NX)+1)*3]=val
 //end of emf
 
 //ldouble get_u(ldouble*,int,int,int,int);
-#define get_cflag(iflag,ix,iy,iz) (cellflag[iflag + (iX(ix)+NGCX)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS])
-#define set_cflag(iflag,ix,iy,iz,val) cellflag[iflag + (iX(ix)+NGCX)*NFLAGS + (iY(iy)+NGCY)*(SX)*NFLAGS + (iZ(iz)+NGCZ)*(SY)*(SX)*NFLAGS]=val
+#define get_cflag(iflag,ix,iy,iz) (cellflag[iflag + (iX(ix)+(NGCX))*NFLAGS + (iY(iy)+(NGCY))*(SX)*NFLAGS + (iZ(iz)+(NGCZ))*(SY)*(SX)*NFLAGS])
+#define set_cflag(iflag,ix,iy,iz,val) cellflag[iflag + (iX(ix)+(NGCX))*NFLAGS + (iY(iy)+(NGCY))*(SX)*NFLAGS + (iZ(iz)+(NGCZ))*(SY)*(SX)*NFLAGS]=val
 //what is below works like u[SZ][SY][SX][NV] but NGCX accounts for negative indices
-#define get_u(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV])
-#define get_uavg(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+NGCX)*(NV+NAVGVARS) + (iY(iy)+NGCY)*(SX)*(NV+NAVGVARS) + (iZ(iz)+NGCZ)*(SY)*(SX)*(NV+NAVGVARS)])
+#define get_u(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX)*NV + (iZ(iz)+(NGCZ))*(SY)*(SX)*NV])
+#define get_uavg(uarr,iv,ix,iy,iz) (uarr[iv + (iX(ix)+(NGCX))*(NV+(NAVGVARS)) + (iY(iy)+(NGCY))*(SX)*(NV+(NAVGVARS)) + (iZ(iz)+(NGCZ))*(SY)*(SX)*(NV+(NAVGVARS))])
 //int set_u(ldouble*,int,int,int,int,ldouble);
-#define set_u(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV]=val
-#define set_uavg(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*(NV+NAVGVARS) + (iY(iy)+NGCY)*(SX)*(NV+NAVGVARS) + (iZ(iz)+NGCZ)*(SY)*(SX)*(NV+NAVGVARS)]=val
-#define get_u_scalar(uarr,ix,iy,iz) (uarr[(iX(ix)+NGCX) + (iY(iy)+NGCY)*(SX) + (iZ(iz)+NGCZ)*(SY)*(SX)])
+#define set_u(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX)*NV + (iZ(iz)+(NGCZ))*(SY)*(SX)*NV]=val
+#define set_uavg(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+(NGCX))*(NV+(NAVGVARS)) + (iY(iy)+(NGCY))*(SX)*(NV+(NAVGVARS)) + (iZ(iz)+(NGCZ))*(SY)*(SX)*(NV+(NAVGVARS))]=val
+#define get_u_scalar(uarr,ix,iy,iz) (uarr[(iX(ix)+(NGCX)) + (iY(iy)+(NGCY))*(SX) + (iZ(iz)+(NGCZ))*(SY)*(SX)])
 //ldouble get_u_scalar(ldouble*,int,int,int);
 //int set_u_scalar(ldouble*,int,int,int,ldouble);
-#define set_u_scalar(uarr,ix,iy,iz,val) uarr[iX(ix)+NGCX + (iY(iy)+NGCY)*(SX) + (iZ(iz)+NGCZ)*(SY)*(SX)] = val
+#define set_u_scalar(uarr,ix,iy,iz,val) uarr[iX(ix)+(NGCX) + (iY(iy)+(NGCY))*(SX) + (iZ(iz)+(NGCZ))*(SY)*(SX)] = val
 int set_ub(ldouble* uarr,int iv,int ix,int iy,int iz,ldouble value,int idim);
-//#define set_ub(uarr,iv,ix,iy,iz,idim,val) (idim==0 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX+1)*NV + (iZ(iz)+NGCZ)*(SY)*(SX+1)*NV]=val : (idim==1 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY+1)*(SX)*NV]=val : (idim==2 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV]=val : 0.)))
-#define set_ubx(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX+1)*NV + (iZ(iz)+NGCZ)*(SY)*(SX+1)*NV]=val
-#define set_uby(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY+1)*(SX)*NV]=val
-#define set_ubz(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV]=val
+//#define set_ub(uarr,iv,ix,iy,iz,idim,val) (idim==0 ? uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX+1)*NV + (iZ(iz)+(NGCZ))*(SY)*(SX+1)*NV]=val : (idim==1 ? uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX)*NV + (iZ(iz)+(NGCZ))*(SY+1)*(SX)*NV]=val : (idim==2 ? uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX)*NV + (iZ(iz)+(NGCZ))*(SY)*(SX)*NV]=val : 0.)))
+#define set_ubx(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX+1)*NV + (iZ(iz)+(NGCZ))*(SY)*(SX+1)*NV]=val
+#define set_uby(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX)*NV + (iZ(iz)+(NGCZ))*(SY+1)*(SX)*NV]=val
+#define set_ubz(uarr,iv,ix,iy,iz,val) uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX)*NV + (iZ(iz)+(NGCZ))*(SY)*(SX)*NV]=val
 //ldouble get_ub(ldouble* uarr,int iv,int ix,int iy,int iz,int idim);
-#define get_ub(uarr,iv,ix,iy,iz,idim) (idim==0 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX+1)*NV + (iZ(iz)+NGCZ)*(SY)*(SX+1)*NV] : (idim==1 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY+1)*(SX)*NV] : (idim==2 ? uarr[iv + (iX(ix)+NGCX)*NV + (iY(iy)+NGCY)*(SX)*NV + (iZ(iz)+NGCZ)*(SY)*(SX)*NV] : 0.)))
+#define get_ub(uarr,iv,ix,iy,iz,idim) (idim==0 ? uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX+1)*NV + (iZ(iz)+(NGCZ))*(SY)*(SX+1)*NV] : (idim==1 ? uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX)*NV + (iZ(iz)+(NGCZ))*(SY+1)*(SX)*NV] : (idim==2 ? uarr[iv + (iX(ix)+(NGCX))*NV + (iY(iy)+(NGCY))*(SX)*NV + (iZ(iz)+(NGCZ))*(SY)*(SX)*NV] : 0.)))
 
 
 //metric specific
@@ -525,14 +525,14 @@ int set_Tfull(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value);
 int set_Tb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim);
 int set_gb(ldouble* uarr,int i,int j,int ix,int iy,int iz,ldouble value,int idim);
 int set_Krb(int i,int j,int k,int ix,int iy,int iz,ldouble value,int idim);
-#define get_g(uarr,i,j,ix,iy,iz) uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX)*gSIZE]
-#define get_T(uarr,i,j,ix,iy,iz) uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16]
-#define get_Tfull(uarr,i,j,ix,iy,iz) uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZ(iz)+NGCZ)*(SY)*(SX)*16]
-#define get_Tb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX+1)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*16] : (idim==1 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*16] : (idim==2 ? uarr[i*4+j + (iX(ix)+NGCX)*16 + (iY(iy)+NGCY)*(SX)*16 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*16] : 0.)))
-#define get_gb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX+1)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*gSIZE] : (idim==1 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY+1)*(SX)*gSIZE] : (idim==2 ? uarr[i*5+j + (iX(ix)+NGCX)*gSIZE + (iY(iy)+NGCY)*(SX)*gSIZE + (iZMET(iz)+NGCZMET)*(SY)*(SX)*gSIZE] : 0.)))
-#define get_gKr(i,j,k,ix,iy,iz) gKr[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*64]
-#define get_gKrb(i,j,k,ix,iy,iz,idim) (idim==0 ? gKrbx[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX+1)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*64] : (idim==1 ? gKrby[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY+1)*(SX+1)*64] : (idim==2 ? gKrbz[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX+1)*64] : 0.)))
-#define set_gKr(i,j,k,ix,iy,iz,val) gKr[i*4*4+j*4+k + (iX(ix)+NGCX)*64 + (iY(iy)+NGCY)*(SX)*64 + (iZMET(iz)+NGCZMET)*(SY)*(SX)*64]=val
+#define get_g(uarr,i,j,ix,iy,iz) uarr[i*5+j + (iX(ix)+(NGCX))*gSIZE + (iY(iy)+(NGCY))*(SX)*gSIZE + (iZMET(iz)+(NGCZMET))*(SY)*(SX)*gSIZE]
+#define get_T(uarr,i,j,ix,iy,iz) uarr[i*4+j + (iX(ix)+(NGCX))*16 + (iY(iy)+(NGCY))*(SX)*16 + (iZMET(iz)+(NGCZMET))*(SY)*(SX)*16]
+#define get_Tfull(uarr,i,j,ix,iy,iz) uarr[i*4+j + (iX(ix)+(NGCX))*16 + (iY(iy)+(NGCY))*(SX)*16 + (iZ(iz)+(NGCZ))*(SY)*(SX)*16]
+#define get_Tb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*4+j + (iX(ix)+(NGCX))*16 + (iY(iy)+(NGCY))*(SX+1)*16 + (iZMET(iz)+(NGCZMET))*(SY)*(SX+1)*16] : (idim==1 ? uarr[i*4+j + (iX(ix)+(NGCX))*16 + (iY(iy)+(NGCY))*(SX)*16 + (iZMET(iz)+(NGCZMET))*(SY+1)*(SX)*16] : (idim==2 ? uarr[i*4+j + (iX(ix)+(NGCX))*16 + (iY(iy)+(NGCY))*(SX)*16 + (iZMET(iz)+(NGCZMET))*(SY)*(SX)*16] : 0.)))
+#define get_gb(uarr,i,j,ix,iy,iz,idim) (idim==0 ? uarr[i*5+j + (iX(ix)+(NGCX))*gSIZE + (iY(iy)+(NGCY))*(SX+1)*gSIZE + (iZMET(iz)+(NGCZMET))*(SY)*(SX+1)*gSIZE] : (idim==1 ? uarr[i*5+j + (iX(ix)+(NGCX))*gSIZE + (iY(iy)+(NGCY))*(SX)*gSIZE + (iZMET(iz)+(NGCZMET))*(SY+1)*(SX)*gSIZE] : (idim==2 ? uarr[i*5+j + (iX(ix)+(NGCX))*gSIZE + (iY(iy)+(NGCY))*(SX)*gSIZE + (iZMET(iz)+(NGCZMET))*(SY)*(SX)*gSIZE] : 0.)))
+#define get_gKr(i,j,k,ix,iy,iz) gKr[i*4*4+j*4+k + (iX(ix)+(NGCX))*64 + (iY(iy)+(NGCY))*(SX)*64 + (iZMET(iz)+(NGCZMET))*(SY)*(SX)*64]
+#define get_gKrb(i,j,k,ix,iy,iz,idim) (idim==0 ? gKrbx[i*4*4+j*4+k + (iX(ix)+(NGCX))*64 + (iY(iy)+(NGCY))*(SX+1)*64 + (iZMET(iz)+(NGCZMET))*(SY)*(SX+1)*64] : (idim==1 ? gKrby[i*4*4+j*4+k + (iX(ix)+(NGCX))*64 + (iY(iy)+(NGCY))*(SX)*64 + (iZMET(iz)+(NGCZMET))*(SY+1)*(SX+1)*64] : (idim==2 ? gKrbz[i*4*4+j*4+k + (iX(ix)+(NGCX))*64 + (iY(iy)+(NGCY))*(SX)*64 + (iZMET(iz)+(NGCZMET))*(SY)*(SX+1)*64] : 0.)))
+#define set_gKr(i,j,k,ix,iy,iz,val) gKr[i*4*4+j*4+k + (iX(ix)+(NGCX))*64 + (iY(iy)+(NGCY))*(SX)*64 + (iZMET(iz)+(NGCZMET))*(SY)*(SX)*64]=val
 
 //other wrappers
 #define delta(i,j) (i==j ? 1 : 0)
@@ -660,7 +660,8 @@ int my_finger(ldouble);
 int analytical_solution(ldouble t,int ix,int iy,int iz,ldouble *uu,ldouble *pp,ldouble *vv);
 
 //metric.c
-
+int if_coords_sphericallike(int coords);
+int if_coords_cylindricallike(int coords);
 int fill_geometry(int ix,int iy,int iz,void *geom);
 int fill_geometry_face(int ix,int iy,int iz,int,void *geom);
 int fill_geometry_face_arb(int ix,int iy,int iz,int,void *geom,int);
@@ -685,6 +686,8 @@ int dxdx_MSPH12SPH(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_SPH2MSPH1(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_MKER12KER(ldouble *xx, ldouble dxdx[][4]);
 int dxdx_KER2MKER1(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_CYL2SPH(ldouble *xx, ldouble dxdx[][4]);
+int dxdx_SPH2CYL(ldouble *xx, ldouble dxdx[][4]);
 
 int calc_g(ldouble*,ldouble[][5]);
 int calc_G(ldouble*,ldouble[][5]);

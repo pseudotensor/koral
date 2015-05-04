@@ -35,7 +35,7 @@ if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
     //checking for the gas inflow
     ldouble ucon[4]={0.,pp[VX],pp[VY],pp[VZ]};    
     conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
-    trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
+    if(MYCOORDS!=CYLCOORDS) trans2_coco(geom.xxvec,ucon,ucon,MYCOORDS,BLCOORDS);
     if(ucon[1]<0.) //inflow, resseting to atmosphere
       {
 	//atmosphere in rho,uint and velocities and zero magn. field

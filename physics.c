@@ -476,18 +476,41 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   //gas density
   ldouble rho=pp[RHO];
   //coordinates
-  ldouble xxvecSPH[4],r;
-  coco_N(geom->xxvec,xxvecSPH,MYCOORDS,BLCOORDS);
-  r=xxvecSPH[1];
-  //radial gradient of phi
-  ldouble dphi=1./(r-2.)/(r-2.);
+  if(MYCOORDS!=SPHCOORDS && MYCOORDS!=CYLCOORDS) 
+    my_err("PWPOTENIAL implemented only for SPHCOORDS and CYLCOORDS\n");
 
-  //source terms
+  if(if_coords_sphericallike(MYCOORDS))
+    {
+      ldouble xxvecSPH[4],r;
+      coco_N(geom->xxvec,xxvecSPH,MYCOORDS,BLCOORDS);
+      r=xxvecSPH[1];
+      //radial gradient of phi
+      ldouble dphi=1./(r-2.)/(r-2.);
+      //radial acceleration
+      ss[VX]+=-gdetu*rho*dphi;
+      //what increases the total energy as well
+      ss[UU]+=gdetu*rho*ucon[1]*dphi;
+    }
 
-  //radial acceleration
-  ss[VX]+=-gdetu*rho*dphi;
-  //what increases the total energy as well
-  ss[UU]+=gdetu*rho*ucon[1]*dphi;
+  if(if_coords_cylindricallike(MYCOORDS))
+    {
+      ldouble xxvecCYL[4],R,z,r;
+      coco_N(geom->xxvec,xxvecCYL,MYCOORDS,CYLCOORDS);
+      R=xxvecCYL[1];
+      z=xxvecCYL[2];
+      r=sqrt(R*R+z*z);
+      //gradients of phi
+      ldouble dphidR,dphidz;
+      dphidR=R/(r*(-2.+r)*(-2.+r));
+      dphidz=z/(r*(-2.+r)*(-2.+r));
+      
+      ss[VX]+=-gdetu*rho*dphidR;
+      ss[VY]+=-gdetu*rho*dphidz;
+      //what increases the total energy as well
+      ss[UU]+=gdetu*rho*(ucon[1]*dphidR+ucon[2]*dphidz);
+    }
+
+
 #endif
 
 

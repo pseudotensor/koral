@@ -118,7 +118,6 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   ldouble *uradz = (ldouble*)malloc(nx*ny*nz*sizeof(double));
 #endif
 
-
   for(iz=0;iz<nz;iz++)
     {
       

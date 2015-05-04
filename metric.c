@@ -2596,6 +2596,72 @@ coco_CYL2MCYL1(ldouble *xCYL, ldouble *xMCYL1)
 //**********************************************************************
 //**********************************************************************
 //converts coordinates
+//for CYL -> SPH
+int
+coco_CYL2SPH(ldouble *xCYL, ldouble *xSPH)
+{
+  ldouble t=xCYL[0];
+  ldouble R=xCYL[1];
+  ldouble z=xCYL[2];
+  ldouble phi=xCYL[3];
+  ldouble r,th;
+
+  r=sqrt(R*R+z*z);
+  th=atan2(R,z);
+
+  xSPH[0]
+    = t;
+  ;
+  xSPH[1]
+    = r;
+  ;
+  xSPH[2]
+    = th;
+  ;
+  xSPH[3]
+    = phi;
+  ;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
+//for SPH -> CYL
+int
+coco_SPH2CYL(ldouble *xCYL, ldouble *xSPH)
+{
+  ldouble t=xSPH[0];
+  ldouble r=xSPH[1];
+  ldouble th=xSPH[2];
+  ldouble phi=xSPH[3];
+  ldouble R,z;
+
+  R=r*sin(th);
+  z=r*cos(th);
+
+  xCYL[0]
+    = t;
+  ;
+  xCYL[1]
+    = R;
+  ;
+  xCYL[2]
+    = z;
+  ;
+  xCYL[3]
+    = phi;
+  ;
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//converts coordinates
 //for MSPH1 -> SPH
 int
 coco_MSPH12SPH(ldouble *xMSPH1, ldouble *xSPH)
@@ -2997,6 +3063,25 @@ else if (CO1==MINKCOORDS && CO2==TKS3COORDS)
       coco_KS2BL(x2,x2);
       coco_SPH2MINK(x2,x2);
     }
+   else if (CO1==CYLCOORDS && CO2==MINKCOORDS)
+    {
+      coco_CYL2SPH(x1,x2);
+      coco_SPH2MINK(x2,x2);
+    }
+   else if (CO1==CYLCOORDS && (CO2==SPHCOORDS || CO2==BLCOORDS))
+    {
+      coco_CYL2SPH(x1,x2);
+    }
+   else if ((CO1==SPHCOORDS || CO1==BLCOORDS) && CO2==CYLCOORDS)
+    {
+      coco_SPH2CYL(x1,x2);
+    }
+   else if (CO1==MINKCOORDS && CO2==CYLCOORDS)
+     {
+       coco_MINK2SPH(x1,x2);
+       coco_SPH2CYL(x2,x2);
+     }
+
   else
     {
       printf("coco: %d -> %d\n",CO1,CO2);
@@ -4275,4 +4360,35 @@ calc_gttpert_arb(double *xx, int COORDS)
   gttpert+=ftemp2;
 
   return gttpert;
+}
+
+//if coordinates spherical like
+int
+if_coords_sphericallike(int coords)
+{
+  if(coords==SPHCOORDS ||
+     coords==KSCOORDS ||
+     coords==BLCOORDS ||
+     coords==MKS1COORDS ||
+     coords==MKS2COORDS ||
+     coords==MKS3COORDS ||
+     coords==TKS3COORDS ||
+     coords==MSPH1COORDS ||
+     coords==MKER1COORDS)
+    return 1;
+
+  else
+    return 0;
+}
+
+//if coordinates cylindrical like
+int
+if_coords_cylindricallike(int coords)
+{
+  if(coords==CYLCOORDS ||
+     coords==MCYL1COORDS)
+    return 1;
+
+  else
+    return 0;
 }
