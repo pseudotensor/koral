@@ -96,6 +96,7 @@
 /************************************/
 //#define myMKS2COORDS
 #define myCYLCOORDS
+//#define mySPHCOORDS
 #define RMIN 15.
 #define RMAX 100.
 #define MKSR0 -300.
@@ -155,12 +156,12 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 64//300 //28*9
-#define TNY 64//300 //26*9
+#define TNX 300 //28*9
+#define TNY 300 //26*9
 #define TNZ 1//64//1 //2*8
 //number of tiles
-#define NTX 1//28
-#define NTY 1//26
+#define NTX 4//28
+#define NTY 4//26
 #define NTZ 1
 
 #define SPECIFIC_BC
@@ -212,8 +213,10 @@
 #define KT_R0 (25.*2.)
 #define KT_RHO0 (10.*rhoCGS2GU(1.e-2))
 #define KT_T0 (100.*1.e7)
+#define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (3.294/10.) //eq.plane
+#define MAXBETA (0.1*0.05/0.12) 
+//#define MAXBETA (3.294/10.) //eq.plane
 #endif
 
 

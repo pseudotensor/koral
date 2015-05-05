@@ -453,6 +453,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      prermhd+=Ehat/3.;
 	      #endif
 	      ldouble ibeta=bsq/2./(prermhd+bsq/2.);
+	      //ldouble ibeta=bsq/2./(GAMMAM1*uint);
 	      profiles[30][ix]+=rho*ibeta*dxph[1];
 
 	      //rho-weighted prad/pgas (33)
@@ -463,14 +464,14 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      #endif
 
 	      //surface density (2) (column)
-	      profiles[0][ix]+=rho*dxph[1];
-	      //temporarily total pressure:
-	      //profiles[0][ix]+=(prermhd+bsq/2.)*dxph[1];
+	      //profiles[0][ix]+=rho*dxph[1];
+	      //temporarily gas pressure:
+	      profiles[0][ix]+=(GAMMAM1*uint)*dxph[1];
 
 	      //surface energy density (41)
-	      profiles[39][ix]+=enden*dxph[1];
+	      //profiles[39][ix]+=enden*dxph[1];
 	      //temporarily magnetic pressure:
-	      //profiles[39][ix]+=(bsq/2.)*dxph[1];
+	      profiles[39][ix]+=(bsq/2.)*dxph[1];
 
 	      //numerator of scale height (31) (column)
 	      #ifndef CALCHRONTHEGO
