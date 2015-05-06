@@ -289,7 +289,7 @@ fprint_radprofiles(ldouble t, int nfile, char* folder, char* prefix)
 	{
 	  ldouble xx[4],xxout[4];
 	  get_xx(ix,0,0,xx);
-	  coco_N(xx,xxout,MYCOORDS,BLCOORDS); 
+	  coco_N(xx,xxout,MYCOORDS,OUTCOORDS); 
 	  if(xxout[1]<rhorizonBL) continue;
 	  fprintf(fout_radprofiles,"%e ",xxout[1]);
 	  for(iv=0;iv<NRADPROFILES;iv++)

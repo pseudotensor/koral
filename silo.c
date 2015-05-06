@@ -152,18 +152,18 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 	      ldouble dxph[3],dx[3];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[2]=fabs(xx2[3]-xx1[3]);
 
 	      dxph[0]=dx[0]*sqrt(geomout.gg[1][1]);
@@ -188,12 +188,12 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 #endif
 
 	      get_xx(iix-1,iiy,iiz,xx1);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      gdet1=calc_gdet_arb(xx1,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      gdet1=calc_gdet_arb(xx1,OUTCOORDS);
 
 	      get_xx(iix+1,iiy,iiz,xx2);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
-	      gdet2=calc_gdet_arb(xx2,BLCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
+	      gdet2=calc_gdet_arb(xx2,OUTCOORDS);
 
 
 	      imz=iz;

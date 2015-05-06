@@ -69,9 +69,6 @@
 /************************************/
 //rmhd floors
 /************************************/
-#define CORRECT_POLARAXIS
-//#define POLARAXISAVGIN3D
-#define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
@@ -97,7 +94,7 @@
 //#define myMKS2COORDS
 #define myCYLCOORDS
 //#define mySPHCOORDS
-#define RMIN 15.
+#define RMIN 4.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -127,10 +124,11 @@
 #ifdef myCYLCOORDS //modified Kerr-Shild
 #define PWPOTENTIAL
 #define MYCOORDS CYLCOORDS
+#define OUTCOORDS CYLCOORDS
 #define MINX RMIN
 #define MAXX 100.
-#define MINY (-50.)
-#define MAXY (50.)
+#define MINY (-60.)
+#define MAXY (60.)
 #endif
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
@@ -151,13 +149,20 @@
 #define MAXY 1.
 #endif
 
+#ifndef myCYLCOORDS
+#define CORRECT_POLARAXIS
+#endif
+//#define POLARAXISAVGIN3D
+#define NCCORRECTPOLAR 2
+
+
 #define PHIWEDGE (M_PI/2.)
 #define MINZ (-PHIWEDGE/2.)
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 300 //28*9
-#define TNY 300 //26*9
+#define TNX 64 //28*9
+#define TNY 64 //26*9
 #define TNZ 1//64//1 //2*8
 //number of tiles
 #define NTX 4//28
@@ -178,7 +183,9 @@
 #define BOXR1 10.
 #define BOXR2 15.
 #define BOXITH 30 //distance from eq.plane in cells                                                                                                             
+#ifndef OUTCOORDS
 #define OUTCOORDS KERRCOORDS                                                                    
+#endif
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
@@ -215,8 +222,8 @@
 #define KT_T0 (100.*1.e7)
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (0.1*0.05/0.12) 
-//#define MAXBETA (3.294/10.) //eq.plane
+#define MAXBETA (.34*0.05/0.015)//(0.1*0.05/0.12) 
+//#define MAXBETA (3.294/10.) //eq.plane to mtach pmag/ptot = 0.02
 #endif
 
 

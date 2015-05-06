@@ -45,7 +45,7 @@
 //alpha (34)
 //rad. viscosity energy flux (35)
 //rho-weighted minus radial velocity in the outflow (36)
-//conserved flux rho ur transformed to BLCOORDS (37)
+//conserved flux rho ur transformed to OUTCOORDS (37)
 //conserved flux rho ur in MYCOORDS (38)
 //conserved flux rho ur+Trt in MYCOORDS (39)
 //conserved flux for Rrt int MYCOORDS (40)
@@ -97,7 +97,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
       //outside horizon?
       struct geometry geomBLtemp;
-      fill_geometry_arb(ix,0,0,&geomBLtemp,BLCOORDS);
+      fill_geometry_arb(ix,0,0,&geomBLtemp,OUTCOORDS);
       if(geomBLtemp.xx<=1.1*rhorizonBL) continue; //to avoid working inside horizon
       
       Bangle1=Bangle2=0.;
@@ -128,13 +128,13 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      fill_geometry_arb(ix+1,iy,iz,&geomp1,MYCOORDS);
 
 	      struct geometry geomBL;
-	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	      fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 
 	      struct geometry geomBLm1;
-	      fill_geometry_arb(ix-1,iy,iz,&geomBLm1,BLCOORDS);
+	      fill_geometry_arb(ix-1,iy,iz,&geomBLm1,OUTCOORDS);
 
 	      struct geometry geomBLp1;
-	      fill_geometry_arb(ix+1,iy,iz,&geomBLp1,BLCOORDS);
+	      fill_geometry_arb(ix+1,iy,iz,&geomBLp1,OUTCOORDS);
 
 	      struct geometry geoml;
 	      fill_geometry_face(ix,iy,iz,0,&geoml);
@@ -143,10 +143,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      fill_geometry_face(ix+1,iy,iz,0,&geomr);	
 	      
 	      struct geometry geomBLl;
-	      fill_geometry_face_arb(ix,iy,iz,0,&geomBLl,BLCOORDS);
+	      fill_geometry_face_arb(ix,iy,iz,0,&geomBLl,OUTCOORDS);
 
 	      struct geometry geomBLr;
-	      fill_geometry_face_arb(ix+1,iy,iz,0,&geomBLr,BLCOORDS);	      
+	      fill_geometry_face_arb(ix+1,iy,iz,0,&geomBLr,OUTCOORDS);	      
 
 	      ldouble gdetuBL=geomBL.gdet;
 
@@ -157,23 +157,23 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //coordinates
 	      get_xx(ix,iy,iz,xx);	      
-	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	      ldouble dxph[3];
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[2]=fabs(xx2[3]-xx1[3]);
 	      if(NZ==1) dx[2]=2.*M_PI;
 
@@ -222,15 +222,15 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      avg2point(fd_pm2,fd_pm2,fd_pm1,fd_p0,fd_pp1,fd_plm1,fd_prm1,dxm2,dxm2,dxm1,dx0,dxp1,0);   
 		  
 	      //to BL, res-files and primitives in avg in MYCOORDS
-	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	      trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,xx,&geom,&geomBL);
 
 	      //transforming interpolated primitives to BL
-	      trans_pall_coco(fd_pm1,fd_pm1,MYCOORDS,BLCOORDS,xx,&geomm1,&geomBLm1);
-	      trans_pall_coco(fd_pp1,fd_pp1,MYCOORDS,BLCOORDS,xx,&geomp1,&geomBLp1);
-	      trans_pall_coco(fd_pl,fd_pl,MYCOORDS,BLCOORDS,xx,&geoml,&geomBLl);
-	      trans_pall_coco(fd_pr,fd_pr,MYCOORDS,BLCOORDS,xx,&geomr,&geomBLr);
-	      trans_pall_coco(fd_plp1,fd_plp1,MYCOORDS,BLCOORDS,xx,&geoml,&geomBLl);
-	      trans_pall_coco(fd_prm1,fd_prm1,MYCOORDS,BLCOORDS,xx,&geomr,&geomBLr);
+	      trans_pall_coco(fd_pm1,fd_pm1,MYCOORDS,OUTCOORDS,xx,&geomm1,&geomBLm1);
+	      trans_pall_coco(fd_pp1,fd_pp1,MYCOORDS,OUTCOORDS,xx,&geomp1,&geomBLp1);
+	      trans_pall_coco(fd_pl,fd_pl,MYCOORDS,OUTCOORDS,xx,&geoml,&geomBLl);
+	      trans_pall_coco(fd_pr,fd_pr,MYCOORDS,OUTCOORDS,xx,&geomr,&geomBLr);
+	      trans_pall_coco(fd_plp1,fd_plp1,MYCOORDS,OUTCOORDS,xx,&geoml,&geomBLl);
+	      trans_pall_coco(fd_prm1,fd_prm1,MYCOORDS,OUTCOORDS,xx,&geomr,&geomBLr);
 
 	      if(doingavg)
 		{
@@ -465,8 +465,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 	      //surface density (2) (column)
 	      //profiles[0][ix]+=rho*dxph[1];
-	      //temporarily gas pressure:
-	      profiles[0][ix]+=(GAMMAM1*uint)*dxph[1];
+	      //temporarily total pressure gas+radiation:
+	      profiles[0][ix]+=(prermhd)*dxph[1];
 
 	      //surface energy density (41)
 	      //profiles[39][ix]+=enden*dxph[1];
@@ -498,7 +498,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      profiles[1][ix]+=-rhouconr*dx[1]*dx[2]*geomBL.gdet;
 
 
-	      //conserved flux (rhour) transformed to BLCOORDS (may be imprecise) (37)
+	      //conserved flux (rhour) transformed to OUTCOORDS (may be imprecise) (37)
 	      profiles[35][ix]+=-rhouconrcons*dx[1]*dx[2];
 
 	      //conserved flux (gdet rhour) in MYCOORDS (38)
@@ -699,7 +699,7 @@ int calc_thetaprofiles(ldouble profiles[][NY])
   for(ix=0;ix<NX;ix++)
     {
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
       if(xxBL[1]>radius) break;
     }
 
@@ -714,7 +714,7 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 	{
 	  iz=0;
 	  struct geometry geomBL;
-	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	  fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	  struct geometry geom;
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 	      
@@ -723,7 +723,7 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 
 	  //to BL, res-files and primitives in avg in MYCOORDS
-	  trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	  trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,xx,&geom,&geomBL);
 
 	  if(doingavg)
 	    {
@@ -840,15 +840,15 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 	  for(iix=NX-1;iix>=0;iix--)
 	    {
 	      struct geometry geomBL2;
-	      fill_geometry_arb(iix,iy,iz,&geomBL2,BLCOORDS);
+	      fill_geometry_arb(iix,iy,iz,&geomBL2,OUTCOORDS);
 	      ldouble grr=geomBL2.gg[1][1];
 	      //coordinates
 	      ldouble dxph[3],dx[0];
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
 	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      dxph[0]=dx[0]*sqrt(geomBL2.gg[1][1]);
 	      ldouble rho2=get_u(p,RHO,iix,iy,iz);
@@ -920,7 +920,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   ldouble xx[4],xxBL[4];
   get_xx(NX-1,0,0,xx);
-  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 
   //luminosities 
   ldouble rlum=15.;
@@ -994,7 +994,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
   for(ix=0;ix<NX;ix++)
     {
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
       if(xxBL[1]>radius) break;
     }
 
@@ -1048,7 +1048,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
       for(j=0;j<NY;j++)
 	{
 	  struct geometry geomBL;
-	  fill_geometry_arb(i,j,0,&geomBL,BLCOORDS);
+	  fill_geometry_arb(i,j,0,&geomBL,OUTCOORDS);
 	  ldouble dV=get_size_x(i,0)*get_size_x(j,1)*2.*M_PI*geomBL.gdet;
 	  L2+=get_u(p,RHO,i,j,0)*get_u(p,RHO,i,j,0)*dV;
 	}
@@ -1170,10 +1170,10 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
   //limits of this tile
   int rmin,rmax;
   get_xx(0,0,0,xx);
-  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
   rmin=xxBL[1];
   get_xx(NX-1,0,0,xx);
-  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
   rmax=xxBL[1];
 
   //global index of the theta limits
@@ -1197,7 +1197,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
       for(ix=0;ix<NX;ix++)
 	{
 	  get_xx(ix,0,0,xx);
-	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	  if(xxBL[1]>BOXR1 & bix1<0) bix1=ix;
 	  if(xxBL[1]>BOXR2 & bix2<0) bix2=ix;
 	}
@@ -1234,7 +1234,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 	      fill_geometry(ix,iy,iz,&geom);
 	
 	      struct geometry geomBL;
-	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	      fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	
 	      //coordinate
 	      ldouble dx[3];
@@ -1245,7 +1245,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		pp[iv]=get_u(p,iv,ix,iy,iz);
 
 	      //to BL, res-files and primitives in avg in MYCOORDS
-	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+	      trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,geom.xxvec,&geom,&geomBL);
 
 	      //from now on - working in BL coords
         
@@ -1392,7 +1392,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		fill_geometry(ix,iy,iz,&geom);
 	
 		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+		fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	
 		//coordinates
 		ldouble dx[3];
@@ -1404,7 +1404,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 
 		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+		trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,geom.xxvec,&geom,&geomBL);
 
 		//from now on - working in BL coords
         
@@ -1449,7 +1449,6 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 #endif
 		ldouble Ehatuconr = Ehat*ucon[1];
 
-		if(iy==TNY/2) printf("1> %d %d | %e\n",ix,iy,Rrt);
 		//PLACE - overwrite with avg quantities if required
 		if(doingavg)
 		  {
@@ -1466,7 +1465,6 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		    Ehatuconr = get_uavg(pavg,AVGEHATUCON(1),ix,iy,iz);
 		    #endif
 		  }
-			if(iy==TNY/2) printf("2> %d %d | %e\n",ix,iy,Rrt);
 
 		//integrals
 		rhouconrtot[0]+=rhouconr*dx[1]*dx[2]*geomBL.gdet;
@@ -1492,7 +1490,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		fill_geometry(ix,iy,iz,&geom);
 	
 		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+		fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	
 		//coordinates
 		ldouble dx[3];
@@ -1503,7 +1501,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 
 		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+		trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,geom.xxvec,&geom,&geomBL);
 
 		//from now on - working in BL coords
         
@@ -1588,7 +1586,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		fill_geometry(ix,iy,iz,&geom);
 	
 		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+		fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	
 		//coordinates
 		ldouble dx[3];
@@ -1599,7 +1597,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 
 		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+		trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,geom.xxvec,&geom,&geomBL);
 
 		//from now on - working in BL coords
         
@@ -1684,7 +1682,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		fill_geometry(ix,iy,iz,&geom);
 	
 		struct geometry geomBL;
-		fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+		fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	
 		//coordinates
 		ldouble dx[3];
@@ -1695,7 +1693,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 
 		//to BL, res-files and primitives in avg in MYCOORDS
-		trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+		trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,geom.xxvec,&geom,&geomBL);
 
 		//from now on - working in BL coords
         
@@ -1850,10 +1848,10 @@ int calc_varscalars(ldouble *varscalars,ldouble t)
  //limits of this tile
   int rmin,rmax;
   get_xx(0,0,0,xx);
-  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
   rmin=xxBL[1];
   get_xx(NX-1,0,0,xx);
-  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
   rmax=xxBL[1];
 
   //if tile completely outside the box
@@ -1876,7 +1874,7 @@ int calc_varscalars(ldouble *varscalars,ldouble t)
       for(ix=0;ix<NX;ix++)
 	{
 	  get_xx(ix,0,0,xx);
-	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	  if(xxBL[1]>radius) break;
 	}
 
@@ -1895,9 +1893,9 @@ int calc_varscalars(ldouble *varscalars,ldouble t)
 	    {
 	      iy++;
 	      get_xx(ix,iy,iz,xx);
-	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	      get_xx(ix,iy-1,iz,xx1);
-	      coco_N(xx1,xxBL1,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xxBL1,MYCOORDS,OUTCOORDS);
 	    }
 	  while(!(th<=xxBL[2] && th>xxBL1[2]) && iy<=NY-1);
 
@@ -1928,14 +1926,14 @@ int calc_varscalars(ldouble *varscalars,ldouble t)
 	  fill_geometry(ix,iy,iz,&geom);
 	
 	  struct geometry geomBL;
-	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	  fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	
 	  //primitives at the cell - either averaged or original, in BL or MYCOORDS
 	  for(iv=0;iv<NV;iv++)
 	    pp[iv]=get_u(p,iv,ix,iy,iz);
 		
 	  //to BL, res-files and primitives in avg in MYCOORDS
-	  trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+	  trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,geom.xxvec,&geom,&geomBL);
 
 	  //from now on - working in BL coords
         
@@ -2087,7 +2085,7 @@ calc_local_lum(int ix,int iy,int iz,ldouble *radlum, ldouble *totallum)
       PLOOP(iv)
 	pp[iv]=get_uavg(pavg,iv,ix,iy,iz);
 
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 
       ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
       ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
@@ -2112,7 +2110,7 @@ calc_local_lum(int ix,int iy,int iz,ldouble *radlum, ldouble *totallum)
     }
   else
     {
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	  
       ucongas[1]=pp[2];
       ucongas[2]=pp[3];
@@ -2167,14 +2165,14 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
   for(ix=0;ix<NX-1;ix++)
     {
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
       if(xxBL[1]>radius) break;
     }
   if(ix==NX) 
     {
       ix=NX-2;
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
     }
       
   
@@ -2199,7 +2197,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	  PLOOP(iv)
 	    pp[iv]=get_uavg(pavg,iv,ix,iy,iz);
 
-	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 
 	  ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 	  ldouble uconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);		  
@@ -2244,7 +2242,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	}
       else
 	{
-	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	  
 	  ucongas[1]=pp[2];
 	  ucongas[2]=pp[3];
@@ -2326,18 +2324,18 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	  ldouble xx1[4],xx2[4];
 	  xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
 	  xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
-	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	  coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	  coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	  dxBL[0]=fabs(xx2[1]-xx1[1]);
 	  xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
 	  xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
-	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	  coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	  coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	  dxBL[1]=fabs(xx2[2]-xx1[2]);
 	  xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
 	  xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
-	  coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	  coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	  coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	  coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	  dxBL[2]=fabs(xx2[3]-xx1[3]);
 
 	  if(NZ==1) dxBL[2]=2.*M_PI;
@@ -2350,7 +2348,7 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	      PLOOP(iv)
 		pp[iv]=get_uavg(pavg,iv,ix,iy,iz);
 
-	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	      calc_tautot(pp,&geomBL,dxph,tautot);
 
 	      ldouble ucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
@@ -2416,10 +2414,10 @@ calc_lum(ldouble radius,int type,ldouble *radlum, ldouble *totallum)
 	    {
 	      
 	      //to BL
-	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+	      trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,geom.xxvec,&geom,&geomBL);
 	      //hydro part may be insonsistent
 
-	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	      calc_tautot(pp,&geomBL,dxph,tautot);
 
 	      ucongas[1]=pp[2];
@@ -2630,7 +2628,7 @@ calc_resmri(ldouble radius)
   for(ix=0;ix<NX;ix++)
     {
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
       if(xxBL[1]>radius) break;
     }
 
@@ -2674,7 +2672,7 @@ calc_meantemp(ldouble radius)
   for(ix=0;ix<NX;ix++)
     {
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
       if(xxBL[1]>radius) break;
     }
 
@@ -2717,7 +2715,7 @@ calc_scaleheight(ldouble radius)
   for(ix=0;ix<NX;ix++)
     {
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
       if(xxBL[1]>radius) break;
     }
 
@@ -2731,7 +2729,7 @@ calc_scaleheight(ldouble radius)
 ldouble
 calc_photloc(int ix)
 {
-  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS && MYCOORDS != MKS3COORDS)
+  if(MYCOORDS != OUTCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS && MYCOORDS != MKS3COORDS)
     return -1.; //no BH
 
   ldouble tau=0.,pp[NV],xx[4],xxBL[4],dx[3];
@@ -2760,7 +2758,7 @@ calc_photloc(int ix)
 	  dx[1]=dx[1]*sqrt(geom.gg[2][2]);
 	  dx[2]=2.*M_PI*sqrt(geom.gg[3][3]);
 
-	  coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	  coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	  calc_tautot(pp,&geom,dx,tautot);
 	  tau+=tautot[1];
 	  if(tau>1.) break;
@@ -2789,7 +2787,7 @@ calc_mdot(ldouble radius,int type)
   for(ix=0;ix<NX;ix++)
     {
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
       if(xxBL[1]>radius) break;
     }
 
@@ -2804,7 +2802,7 @@ calc_mdot(ldouble radius,int type)
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 	  
 	  struct geometry geomBL;
-	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	  fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 
 	  if(doingavg)
 	    {
@@ -2817,18 +2815,18 @@ calc_mdot(ldouble radius,int type)
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[2]=fabs(xx2[3]-xx1[3]);
 	      if(NZ==1) dx[2]=2.*M_PI;
 	    }
@@ -2846,7 +2844,7 @@ calc_mdot(ldouble radius,int type)
 	      pick_g(ix,iy,iz,gg);
 	      pick_G(ix,iy,iz,GG);
 
-	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 	      
 
 	      rho=pp[0];
@@ -2859,20 +2857,20 @@ calc_mdot(ldouble radius,int type)
 	      gdet=geom.gdet;	
 	      dx[1]=dx[1];	     
 	      /*
-	      trans_pmhd_coco(pp,pp,MYCOORDS,BLCOORDS,xx,&geom,&geomBL);
+	      trans_pmhd_coco(pp,pp,MYCOORDS,OUTCOORDS,xx,&geom,&geomBL);
 	      ldouble dxph[3];
 	      conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 	      rhouconr=rho*ucon[1];
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
 	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
 	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
 	      dx[2]=2.*M_PI;
 	      gdet=geomBL.gdet;
@@ -2907,7 +2905,7 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 {
   *Bflux=*Bfluxquad=0.;
   
-  if(MYCOORDS != BLCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS && MYCOORDS != MKS3COORDS)
+  if(MYCOORDS != OUTCOORDS && MYCOORDS != KSCOORDS && MYCOORDS != MKS1COORDS && MYCOORDS != MKS2COORDS && MYCOORDS != MKS3COORDS)
     {
       return -1.; //no BH
     }
@@ -2921,7 +2919,7 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
   for(ix=0;ix<NX;ix++)
     {
       get_xx(ix,0,0,xx);
-      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
       if(xxBL[1]>radius) break;
     }
 
@@ -2937,7 +2935,7 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 	  fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 	  
 	  struct geometry geomBL;
-	  fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	  fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	  
 
 	  if(doingavg)
@@ -2960,18 +2958,18 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 	      ldouble xx1[4],xx2[4];
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[2]=fabs(xx2[3]-xx1[3]);
 	      if(NZ==1)
 		dx[2]=2.*M_PI;
@@ -2996,13 +2994,13 @@ calc_Bflux(ldouble radius,int type,ldouble *Bflux, ldouble* Bfluxquad)
 		dx[2]=2.*M_PI;
 
 	      get_xx(ix,iy,iz,xx);
-	      coco_N(xx,xxBL,MYCOORDS,BLCOORDS);
+	      coco_N(xx,xxBL,MYCOORDS,OUTCOORDS);
 
 	      struct geometry geom;
 	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
 	      struct geometry geomBL;
-	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	      fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 
 	      ldouble Br=pp[B1];
 
@@ -3059,25 +3057,25 @@ int calc_anarelradialprofiles(ldouble profiles[][NX])
 	      fill_geometry_arb(ix,iy,iz,&geom,MYCOORDS);
 
 	      struct geometry geomBL;
-	      fill_geometry_arb(ix,iy,iz,&geomBL,BLCOORDS);
+	      fill_geometry_arb(ix,iy,iz,&geomBL,OUTCOORDS);
 	      
 	      ldouble dxph[3],dx[3];
 	      ldouble xx1[4],xx2[4];
 
 	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_xb(ix+1,0);xx2[2]=get_x(iy,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[0]=fabs(xx2[1]-xx1[1]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_x(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_xb(iy+1,1);xx2[3]=get_x(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[1]=fabs(xx2[2]-xx1[2]);
 	      xx1[0]=0.;xx1[1]=get_x(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_xb(iz,2);
 	      xx2[0]=0.;xx2[1]=get_x(ix,0);xx2[2]=get_x(iy,1);xx2[3]=get_xb(iz+1,2);
-	      coco_N(xx1,xx1,MYCOORDS,BLCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,BLCOORDS);
+	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
 	      dx[2]=fabs(xx2[3]-xx1[3]);
 
 	      dxph[0]=dx[0]*sqrt(geomBL.gg[1][1]);
@@ -3111,7 +3109,7 @@ int calc_anarelradialprofiles(ldouble profiles[][NX])
 	      for(iv=0;iv<NV;iv++)
 		  pp[iv]=get_u(p,iv,ix,iy,iz);
 	      //to BL     
-	      trans_pall_coco(pp,pp,MYCOORDS,BLCOORDS,geom.xxvec,&geom,&geomBL);
+	      trans_pall_coco(pp,pp,MYCOORDS,OUTCOORDS,geom.xxvec,&geom,&geomBL);
 	      rho=pp[0];
 	      uint=pp[1];
 	      ucon[1]=pp[2];
