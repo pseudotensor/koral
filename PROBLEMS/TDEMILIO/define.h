@@ -39,7 +39,7 @@ int SPHitime;
 //magnetic choices
 /************************************/
 //if we want a magnetic field, uncomment MAGNFIELD
-//#define MAGNFIELD
+#define MAGNFIELD
 #define GDETIN 1
 
 /************************************/
@@ -96,7 +96,7 @@ int SPHitime;
 #define myMKS2COORDS
 #define METRICAXISYMMETRIC
 #define ROUT 100.
-#define RMIN 1.85
+#define RMIN 1.6
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MKSR0 0.
@@ -108,7 +108,7 @@ int SPHitime;
 #endif
 
 #ifdef myMKS2COORDS //modified Kerr-Shild with more cells towards the eq.plane
-#define MKSR0 -10.
+#define MKSR0 0.
 #define MKSH0 0.85 //makes cells smaller towards equatorial plane
 #define MYCOORDS MKS2COORDS
 #define MINX (log(RMIN-MKSR0))
@@ -133,9 +133,9 @@ int SPHitime;
 #endif
 
 //total resolution
-#define TNX 128
-#define TNY 64
-#define TNZ 64
+#define TNX 64
+#define TNY 32
+#define TNZ 32
 //number of tiles
 #define NTX 2
 #define NTY 2
@@ -192,7 +192,7 @@ int SPHitime;
 #define GAMMA (5./3.)
 
 //parameters for the magnetic field
-#define VERTBTIME 10.
+#define VERTBTIME 1000.
 #define MAGNOMEGA 0.//(2.*M_PI/1000.)//0.
 #define MAGBETA 0.1
 

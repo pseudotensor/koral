@@ -464,14 +464,14 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      #endif
 
 	      //surface density (2) (column)
-	      //profiles[0][ix]+=rho*dxph[1];
+	      profiles[0][ix]+=rho*dxph[1];
 	      //temporarily total pressure gas+radiation:
-	      profiles[0][ix]+=(prermhd)*dxph[1];
+	      //profiles[0][ix]+=(prermhd)*dxph[1];
 
 	      //surface energy density (41)
-	      //profiles[39][ix]+=enden*dxph[1];
+	      profiles[39][ix]+=enden*dxph[1];
 	      //temporarily magnetic pressure:
-	      profiles[39][ix]+=(bsq/2.)*dxph[1];
+	      //profiles[39][ix]+=(bsq/2.)*dxph[1];
 
 	      //numerator of scale height (31) (column)
 	      #ifndef CALCHRONTHEGO

@@ -1,6 +1,8 @@
 
 int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
 {
+
+
   struct geometry *geom
      = (struct geometry *) ggg;
    
@@ -21,23 +23,29 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   iy=geom->iy;
   iz=geom->iz;
 
+  int iys,izs;  //shifted to fit the projection array
+  iys=iy+NG;
+  izs=iz+NG;
+
+  //printf("%d %d %d > %d %d\n",ix,iy,iz,PROCID,TI);
+
   double rhoamb,rho0,rho1,vr0,vr1,vth0,vth1,vph0,vph1,temp0,temp1;
   double rho,temp,vr,vth,vph;
   double ucon[4];
 
   rhoamb=pp[RHO];
-  rho0=rhoCGS2GU(SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][0]);
-  rho1=rhoCGS2GU(SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][0]);
+  rho0=rhoCGS2GU(SPHdata0[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][0]);
+  rho1=rhoCGS2GU(SPHdata1[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][0]);
 
   //verify if we have non-zero SPH input with density exceeding the ambient density
   if(rho0<rhoamb && rho1<rhoamb)
     return -1; //outside disk;
    
-  temp0=tempCGS2GU(SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][1]);
-  temp1=tempCGS2GU(SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][1]);
+  temp0=tempCGS2GU(SPHdata0[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][1]);
+  temp1=tempCGS2GU(SPHdata1[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][1]);
 
-  vr0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][2]/CCC0;
-  vr1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][2]/CCC0;
+  vr0=SPHdata0[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][2]/CCC0;
+  vr1=SPHdata1[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][2]/CCC0;
 
   #ifdef SCALEVR
   vr0*=sqrt(SPHRADIUS/geomBL->xx);
@@ -47,11 +55,11 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   ldouble rcgs=geomBL->xx * GMC2;
 
   //angular velocities given in rad/s
-  vth0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][3]*GMC3;
-  vth1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][3]*GMC3;
+  vth0=SPHdata0[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][3]*GMC3;
+  vth1=SPHdata1[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][3]*GMC3;
 
-  vph0=SPHdata0[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][4]*GMC3;
-  vph1=SPHdata1[SPHprojection[iy][iz][0]][SPHprojection[iy][iz][1]][4]*GMC3;
+  vph0=SPHdata0[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][4]*GMC3;
+  vph1=SPHdata1[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][4]*GMC3;
 
   //interpolation
   rho = rho1 - (rho1 - rho0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
@@ -60,16 +68,22 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   vth = vth1 - (vth1 - vth0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
   vph = vph1 - (vph1 - vph0) * (SPHtime1 - global_time) / (SPHtime1 - SPHtime0); 
 
+  //verify again
+  if(rho<rhoamb)
+    return -1; //outside disk;
+   
+  
   ucon[1]=vr;
   ucon[2]=vth;
   ucon[3]=vph;
     
   conv_vels(ucon,ucon,VEL3,VELPRIM,geomBL->gg,geomBL->GG);
 
-  //if(geom->iy==TNY/2) printf("%d %e %e %e %e\n",geom->iz,rho0,rho1,vr,ucon[1]);
+  //if(geom->iy==TNY/2 && geom->ix==TNX) printf("%d > %e %e %e %e %e\n",geom->iz,rho,temp,vr,vth,vph);
  
   pp[0]=rho;
   pp[1]=calc_PEQ_ufromTrho(temp,rho);
+  ldouble uint=pp[1];
   pp[2]=ucon[1]; 
   pp[3]=ucon[2];
   pp[4]=ucon[3];
@@ -126,34 +140,22 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
 #else
   Prad=0.;
 #endif
-  /*old B2
-  pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[2][2])*cos(MAGNOMEGA*global_time);
-  */
   
-  //pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[2][2])*sin(theq2/thmax*M_PI)*cos(MAGNOMEGA*global_time);
-
   //radial
-  pp[B1]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[1][1])*sin(theq2/thmax*M_PI*2.)*cos(MAGNOMEGA*global_time);
-  if(global_time < VERTBTIME)
-    pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA/2.)/sqrt(geom->gg[2][2])*sin(theq2/thmax*M_PI)*cos(MAGNOMEGA*global_time);
+  //pp[B1]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[1][1])*sin(theq2/thmax*M_PI*2.)*cos(MAGNOMEGA*global_time);
+  //if(global_time < VERTBTIME)
+  //pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA/2.)/sqrt(geom->gg[2][2])*sin(theq2/thmax*M_PI)*cos(MAGNOMEGA*global_time);
  
-  /*
-  //MYCOORDS vector potential to calculate B's
-  ldouble Acov[4];
-  Acov[0]=Acov[1]=Acov[2]=0.;
-  Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
-
-  pp[B1]=0.;
-  pp[B2]=0.;
-  pp[B3]=Acov[3];
-  */
+  pp[B1]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[1][1])*cos(MAGNOMEGA*global_time);
+  if(global_time < VERTBTIME)
+    pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom->gg[2][2])*cos(MAGNOMEGA*global_time);
 #endif
 
-  /*
+  
 #ifdef PERTMAGN //perturb to break axisymmetry
 pp[UU]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL->zz)/(MAXZ-MINZ));
 #endif
-  */
+  
 
   return 0;
 }
