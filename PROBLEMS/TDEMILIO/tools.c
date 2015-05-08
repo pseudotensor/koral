@@ -2,7 +2,6 @@
 int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
 {
 
-
   struct geometry *geom
      = (struct geometry *) ggg;
    
@@ -24,6 +23,13 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   iz=geom->iz;
 
   int iys,izs;  //shifted to fit the projection array
+
+  //temporary, to avoid problems in corners
+  //  if(iy<0) iy=0;
+  //if(iy>=NY) iy=NY-1;
+  //if(iz<0) iz=0;
+  //if(iz>=NZ) iz=NZ-1;
+
   iys=iy+NG;
   izs=iz+NG;
 
@@ -155,7 +161,11 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
 #ifdef PERTMAGN //perturb to break axisymmetry
 pp[UU]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL->zz)/(MAXZ-MINZ));
 #endif
-  
+ 
+//if(TI==NTX-1 && TJ==NTY/2 && TK==0 && iy==NY-1) printf("%d > %d > %e %e\n",TK,iz,pp[RHO],pp[B1]);
+// if(TI==NTX-1 && TJ==NTY/2 && TK==NTZ-1 && iy==NY-1) printf("%d > %d > %e %e\n",TK,iz,pp[RHO],pp[B1]);
+
+ pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
   return 0;
 }

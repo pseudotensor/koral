@@ -26,7 +26,15 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 //outer edge, outflows with velocity check
 if(BCtype==XBCHI)
   {
-    if(SPHboundary(pp, &geom, &geomBL)<0)
+    int override=0;
+#ifdef MPI
+    if(TI<NTX-1) //the SPH boundary only at the outer edge - should not happen
+      {      override=1;
+	printf("what? %d\n",TI);
+      }
+#endif
+
+   if(override || SPHboundary(pp, &geom, &geomBL)<0)
       {
 	iix=NX-1;
 	iiy=iy;

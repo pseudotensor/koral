@@ -4146,8 +4146,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4159,8 +4159,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4172,8 +4172,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4185,8 +4185,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4198,8 +4198,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4211,8 +4211,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4224,8 +4224,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4237,8 +4237,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,XBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4251,8 +4251,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4264,8 +4264,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4277,8 +4277,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4290,8 +4290,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4303,8 +4303,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4316,8 +4316,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4329,8 +4329,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4342,8 +4342,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4357,8 +4357,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4370,8 +4370,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4383,8 +4383,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4396,8 +4396,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4409,8 +4409,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,YBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4422,8 +4422,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4435,8 +4435,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCLO);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4448,8 +4448,8 @@ int set_bc(ldouble t,int ifinit)
 	       {
 		 set_bc_core(i,j,k,t,uval,pval,ifinit,ZBCHI);
 		 PLOOP(iv)     	 {
-		   set_u(u,iv,i,j,iz,uval[iv]);
-		   set_u(p,iv,i,j,iz,pval[iv]);	      
+		   set_u(u,iv,i,j,k,uval[iv]);
+		   set_u(p,iv,i,j,k,pval[iv]);	      
 		 }
 	       }
        }
@@ -4571,9 +4571,9 @@ cell_fixup_hd()
 	  else
 	    {
 #ifndef MPI
-	      fprintf(fout_fail,"%4d > %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup\n",PROCID,ix,iy,iz);
+	      fprintf(fout_fail,"%4d > %4d %4d %4d | %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup\n",PROCID,ix+TOI,iy+TOJ,iz+TOK,ix,iy,iz);
 #endif
-	      printf("%4d > %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup \n",PROCID,ix,iy,iz);
+	      printf("%4d > %4d %4d %4d | %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup \n",PROCID,ix+TOI,iy+TOJ,iz+TOK,ix,iy,iz);
 	    }
 	}
     }
@@ -4745,9 +4745,9 @@ cell_fixup_rad()
 	  else
 	    {
 #ifndef MPI
-	      fprintf(fout_fail,"%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup\n",PROCID,ix,iy,iz);
+	      fprintf(fout_fail,"%4d > %4d %4d %4d | %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup\n",PROCID,ix+TOI,iy+TOJ,iz+TOK,ix,iy,iz);
 #endif
-	      printf("%4d > %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup \n",PROCID,ix,iy,iz);
+	      printf("%4d > %4d %4d %4d | %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup \n",PROCID,ix+TOI,iy+TOJ,iz+TOK,ix,iy,iz);
 	    }
 		  
 	}

@@ -39,7 +39,8 @@ int SPHitime;
 //magnetic choices
 /************************************/
 //if we want a magnetic field, uncomment MAGNFIELD
-#define MAGNFIELD
+//#define MAGNFIELD
+#define MPI4CORNERS
 #define GDETIN 1
 
 /************************************/
@@ -133,13 +134,13 @@ int SPHitime;
 #endif
 
 //total resolution
-#define TNX 64
-#define TNY 32
-#define TNZ 32
+#define TNX 128
+#define TNY 64
+#define TNZ 64
 //number of tiles
 #define NTX 2
-#define NTY 2
-#define NTZ 2
+#define NTY 8
+#define NTZ 8
 
 //#define HALFTHETA //symmetry wrt eq. plane?
 #ifdef HALFTHETA
