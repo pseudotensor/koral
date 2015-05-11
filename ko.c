@@ -23,6 +23,8 @@ main(int argc, char **argv)
   doingavg=0;
   //neither ana.c anarel.c ...
   doingpostproc=0;
+  
+  global_time=0.;
 
   //gsl errors off
   gsl_set_error_handler_off();
@@ -92,20 +94,23 @@ main(int argc, char **argv)
   //end of tests
   //**************
 
-  
-  //precalculating problem related numbers
-#ifdef PR_PREPINIT
-#include PR_PREPINIT
-#endif
+ 
 
   int ifinit=1;
 #ifdef RESTART
   ifinit=fread_restartfile(RESTARTNUM,folder,&tstart);
+  if(!ifinit) global_time=tstart;
   //todo: read intensities from file!
 #if (RADCLOSURE==VETCLOSURE)
 #ifdef RADSTARTWITHM1INTENSITIES
   calc_M1intensities();
 #endif
+#endif
+
+ 
+  //precalculating problem related numbers
+#ifdef PR_PREPINIT
+#include PR_PREPINIT
 #endif
 
   if(!ifinit)

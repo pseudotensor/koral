@@ -933,6 +933,9 @@ int calc_scalars(ldouble *scalars,ldouble t)
 #if(PROBLEM==7) //RADTORUS
   rlum=13.;
 #endif
+#if(PROBLEM==91) //TDEMILIO
+  rlum=0.99*ROUT;
+#endif
   ldouble radlum,totallum;
   calc_lum(rlum,1,&radlum,&totallum);
 
@@ -1002,7 +1005,19 @@ int calc_scalars(ldouble *scalars,ldouble t)
   calc_local_lum(ix,NCCORRECTPOLAR+1,0,&radlum,&totlum);
   scalars[11]=totlum;
 
- 
+  /* accretion rates through the outer edged for TDEMILIO */
+  
+#if(PROBLEM==91)
+  rmdot = 0.95*ROUT;
+  
+  //inflow (12)
+  mdot=calc_mdot(rmdot,1);
+  scalars[10]=-mdot*mdotscale/calc_mdotEdd();
+  //outflow (13)
+  mdot=calc_mdot(rmdot,2);
+  scalars[11]=-mdot*mdotscale/calc_mdotEdd();
+  
+#endif
 
   /*********************************************/
   //Tgas Trad Egas Erad for testing Comptonization
@@ -2793,9 +2808,8 @@ calc_mdot(ldouble radius,int type)
 
   mdot=0.;
 
-  if(NZ==1) //phi-symmetry
+  for(iz=0;iz<NZ;iz++)
     {
-      iz=0;
       for(iy=0;iy<NY;iy++)
 	{
 	  struct geometry geom;
@@ -2855,25 +2869,25 @@ calc_mdot(ldouble radius,int type)
 	      conv_vels(ucon,ucon,VELPRIM,VEL4,geom.gg,geom.GG);
 	      rhouconr=rho*ucon[1];
 	      gdet=geom.gdet;	
-	      dx[1]=dx[1];	     
+	      
 	      /*
-	      trans_pmhd_coco(pp,pp,MYCOORDS,OUTCOORDS,xx,&geom,&geomBL);
-	      ldouble dxph[3];
-	      conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
-	      rhouconr=rho*ucon[1];
-	      ldouble xx1[4],xx2[4];
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
-	      dx[0]=fabs(xx2[1]-xx1[1]);
-	      xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
-	      xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
-	      coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
-	      coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
-	      dx[1]=fabs(xx2[2]-xx1[2]);
-	      dx[2]=2.*M_PI;
-	      gdet=geomBL.gdet;
+		trans_pmhd_coco(pp,pp,MYCOORDS,OUTCOORDS,xx,&geom,&geomBL);
+		ldouble dxph[3];
+		conv_vels(ucon,ucon,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
+		rhouconr=rho*ucon[1];
+		ldouble xx1[4],xx2[4];
+		xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+		xx2[0]=0.;xx2[1]=get_xb(ix+1,1);xx2[2]=get_xb(iy,1);xx2[3]=get_xb(iz,2);
+		coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+		coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
+		dx[0]=fabs(xx2[1]-xx1[1]);
+		xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_xb(iy,1);xx1[3]=get_xb(iz,2);
+		xx2[0]=0.;xx2[1]=get_xb(ix,1);xx2[2]=get_xb(iy+1,1);xx2[3]=get_xb(iz,2);
+		coco_N(xx1,xx1,MYCOORDS,OUTCOORDS);
+		coco_N(xx2,xx2,MYCOORDS,OUTCOORDS);
+		dx[1]=fabs(xx2[2]-xx1[2]);
+		dx[2]=2.*M_PI;
+		gdet=geomBL.gdet;
 	      */
 	      
 	    }
@@ -2888,8 +2902,6 @@ calc_mdot(ldouble radius,int type)
 	    mdot+=gdet*rhouconr*dx[1]*dx[2];	     
 	}
     }
-  else
-    return -1;
 
   return mdot;
 }

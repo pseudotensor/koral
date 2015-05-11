@@ -2,7 +2,7 @@
 //problem-specific arrays
 /************************************/
 double ***SPHdata0,***SPHdata1,***SPHcoords;
-double SPHtime0,SPHtime1,SPHtshift;
+double SPHtime0,SPHtime1,SPHtshift,SPHtime00;
 int ***SPHprojection;
 int SPHitime;
 
@@ -12,7 +12,7 @@ int SPHitime;
 #define SPHTNY 160
 #define SPHTNZ 96
 #define SPHNT 33
-#define SPHITSTART 0
+#define SPHTSTART 17145. //in GM/c3, 0 to start from the first SPH output
 #define SPHRADIUS 100.
 #define SCALEVR
 
@@ -134,9 +134,9 @@ int SPHitime;
 #endif
 
 //total resolution
-#define TNX 128
-#define TNY 64
-#define TNZ 64
+#define TNX 64//128//64
+#define TNY 32//64//32
+#define TNZ 32//64//32
 //number of tiles
 #define NTX 2
 #define NTY 8
@@ -184,7 +184,7 @@ int SPHitime;
 #define AVGOUTPUT 1
 #define COORDOUTPUT 2
 
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/
