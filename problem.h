@@ -95,7 +95,7 @@
 //92 ADVDIFF - diffusion in scattering moving blob
 //93 KATOTORUS - radiative torus initiated like in Kato+2004
 
-#define PROBLEM 91
+#define PROBLEM 93
 
 
 #if(PROBLEM==93)

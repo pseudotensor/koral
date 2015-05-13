@@ -1628,15 +1628,13 @@ trans2_coco(ldouble *xx,ldouble *u1,ldouble *u2,int CO1, int CO2)
     }
   else if ((CO1==BLCOORDS || CO1==SPHCOORDS) && CO2==CYLCOORDS)
     {
-      //nothing!
-      //works for the radial component only
-      //TODO
+      dxdx_SPH2CYL(xx,dxdx);
+      multiply2(u1,u2,dxdx);
     }
   else if ((CO2==BLCOORDS || CO2==SPHCOORDS) && CO1==CYLCOORDS)
     {
-      //nothing!
-      //works for the radial component only
-      //TODO
+      dxdx_CYL2SPH(xx,dxdx);
+      multiply2(u1,u2,dxdx);
     }
 
   else

@@ -78,6 +78,24 @@ main(int argc, char **argv)
   //**************
   //tests
   //**************
+
+  /*
+  ldouble vec[4]={0.,1.,1./10.,1./10.};
+  ldouble xx[4]={0.,10.,3*M_PI/4.,0.}; 
+  printf("> %f %f %f\n",xx[1],xx[2],xx[3]);
+  print_4vector(vec);
+  trans2_coco(xx,vec,vec,SPHCOORDS,CYLCOORDS);
+  print_4vector(vec);
+  coco_N(xx,xx,SPHCOORDS,CYLCOORDS);
+  printf("> %f %f %f\n",xx[1],xx[2],xx[3]);
+  trans2_coco(xx,vec,vec,CYLCOORDS,SPHCOORDS);
+  print_4vector(vec);
+  coco_N(xx,xx,CYLCOORDS,SPHCOORDS);
+  printf("> %f %f %f\n",xx[1],xx[2],xx[3]);
+ 
+  exit(1);
+  */
+
   //test_metric(); exit(1);
 
   //test_inversion(); exit(1);

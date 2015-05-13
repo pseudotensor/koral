@@ -12,8 +12,8 @@ int SPHitime;
 #define SPHTNY 160
 #define SPHTNZ 96
 #define SPHNT 33
-#define SPHTSTART 17145. //in GM/c3, 0 to start from the first SPH output
-#define SPHRADIUS 100.
+#define SPHTSTART 0. //in GM/c3, 0 to start from the first SPH output
+#define SPHRADIUS 300.
 #define SCALEVR
 
 #define FULLPHI
@@ -27,6 +27,7 @@ int SPHitime;
 //restart
 /************************************/
 #define RESTART
+#define RESTARTGENERALINDICES
 #define RESTARTNUM -1
 
 /************************************/
@@ -96,7 +97,7 @@ int SPHitime;
 /************************************/
 #define myMKS2COORDS
 #define METRICAXISYMMETRIC
-#define ROUT 100.
+#define ROUT 300.
 #define RMIN 1.6
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
@@ -139,8 +140,8 @@ int SPHitime;
 #define TNZ 32//64//32
 //number of tiles
 #define NTX 2
-#define NTY 8
-#define NTZ 8
+#define NTY 4
+#define NTZ 4
 
 //#define HALFTHETA //symmetry wrt eq. plane?
 #ifdef HALFTHETA
@@ -184,7 +185,7 @@ int SPHitime;
 #define AVGOUTPUT 1
 #define COORDOUTPUT 2
 
-#define DTOUT1 1.
+#define DTOUT1 .1
 #define DTOUT2 1000.
 
 /************************************/
@@ -198,7 +199,7 @@ int SPHitime;
 #define MAGBETA 0.1
 
 //atmosphere
-#define RHOATMMIN  1.e-20
+#define RHOATMMIN  1.e-26
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
 

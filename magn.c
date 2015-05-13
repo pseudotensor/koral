@@ -961,7 +961,7 @@ mimic_dynamo(ldouble dtin)
 	* facmagnetization 
 	* facangle;
 
-      //if(PROCID==1 && ix==0 && iy==NY-1) printf("(1) %d > %e %e\n",ix,get_u(p,B1,ix,iy,iz),bsq);
+      //if(ix==NX/2 && iy>NY/3 && iy<2*NY/3) printf("%d %d > %e %e %e %e %e\n",ix,iy,Aphi,effalpha,xxBL[2],HRDTHETA,ALPHADYNAMO);
 
 
       //saving vector potential to ptemp1

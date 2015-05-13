@@ -48,6 +48,7 @@ for(ix=-NGCX;ix<NX+NGCX;ix++)
     gix=ix+TOI;
     if(gix>0 && gix<TNX)
       scaleth_otg[gix]=sqrt(scaleth_otg[gix]/sigma_otg[gix]);
+
   }
 #endif
 /***************************/

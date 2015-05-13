@@ -1084,6 +1084,8 @@ fread_restartfile_bin(int nout1, char *folder, ldouble *t)
       fill_geometry(ix,iy,iz,&geom);
       p2u(pp,uu,&geom);
 
+ 
+
       //saving primitives
       for(iv=0;iv<NV;iv++)    
 	{

@@ -2901,7 +2901,7 @@ coco_N(ldouble *x1, ldouble *x2,int CO1, int CO2)
       x2[0]=x1[0];
       x2[3]=ph;
       x2[1]=sqrt(R*R+z*z);
-      x2[2]=asin(R/x2[1]);
+      x2[2]=atan2(z,R)+M_PI/2.;//asin(R/x2[1]);
     }
   
   else if(((CO1==SCHWCOORDS || CO1==KERRCOORDS) && CO2==SPHCOORDS) ||
@@ -3613,6 +3613,62 @@ dxdx_MCYL12CYL(ldouble *xx, ldouble dxdx[][4])
 
   return 0;
 }
+
+
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for CYL -> SPH
+int
+dxdx_CYL2SPH(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble CYLx0=xx[0];
+  ldouble CYLx1=xx[1];
+  ldouble CYLx2=xx[2];
+  ldouble CYLx3=xx[3];
+  ldouble r=sqrt(CYLx1*CYLx1+CYLx2*CYLx2);
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[1][1]=CYLx1/r;
+  dxdx[1][2]=CYLx2/r;
+  dxdx[2][1]=CYLx2/r/r;
+  dxdx[2][2]=-CYLx1*CYLx2/(CYLx2*r*r);
+
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates transformation matrices dxmu/dxnu
+//for SPH -> CYL
+int
+dxdx_SPH2CYL(ldouble *xx, ldouble dxdx[][4])
+{
+  ldouble x0=xx[0];
+  ldouble x1=xx[1];
+  ldouble x2=xx[2];
+  ldouble x3=xx[3];
+
+  int i,j;
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      dxdx[i][j]=delta(i,j);
+  
+  dxdx[1][1]=sin(x2);
+  dxdx[1][2]=x1*cos(x2);
+  dxdx[2][1]=cos(x2);
+  dxdx[2][2]=-x1*sin(x2);
+
+  return 0;
+}
+
 
 //**********************************************************************
 //**********************************************************************

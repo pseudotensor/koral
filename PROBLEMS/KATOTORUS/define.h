@@ -13,7 +13,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
 
@@ -58,7 +58,9 @@
 /************************************/
 //viscosity choices
 /************************************/
+#ifdef RADIATION
 #define RADVISCOSITY SHEARVISCOSITY
+#endif
 #define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
@@ -94,10 +96,10 @@
 //#define myMKS2COORDS
 #define myCYLCOORDS
 //#define mySPHCOORDS
-#define RMIN 4.
+#define RMIN 20.
 #define RMAX 100.
-#define MKSR0 -300.
-#define MKSH0 0.8
+#define MKSR0 0.
+#define MKSH0 0.6
 #define MKSMY1 0.001
 #define MKSMY2 0.2
 #define MKSMP0 1.5
@@ -117,18 +119,18 @@
 #define MYCOORDS SPHCOORDS
 #define MINX RMIN
 #define MAXX 100.
-#define MINY (0.05)
+#define MINY (M_PI/4.)
 #define MAXY (M_PI-MINY)
 #endif
 
 #ifdef myCYLCOORDS //modified Kerr-Shild
 #define PWPOTENTIAL
 #define MYCOORDS CYLCOORDS
-#define OUTCOORDS CYLCOORDS
+#define OUTCOORDS SPHCOORDS
 #define MINX RMIN
 #define MAXX 100.
-#define MINY (-60.)
-#define MAXY (60.)
+#define MINY (-30.)
+#define MAXY (30.)
 #endif
 
 #ifdef myMKS2COORDS //modified Kerr-Shild
@@ -161,12 +163,12 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 64 //28*9
-#define TNY 64 //26*9
+#define TNX 128//64 //28*9
+#define TNY 128//64 //26*9
 #define TNZ 1//64//1 //2*8
 //number of tiles
-#define NTX 4//28
-#define NTY 4//26
+#define NTX 28//28
+#define NTY 26//26
 #define NTZ 1
 
 #define SPECIFIC_BC
@@ -200,7 +202,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 5.
+#define DTOUT1 50.
 #define DTOUT2 1000.
 
 /************************************/
@@ -222,7 +224,7 @@
 #define KT_T0 (100.*1.e7)
 #define BETANORMFULL
 #undef MAXBETA
-#define MAXBETA (.34*0.05/0.015)//(0.1*0.05/0.12) 
+#define MAXBETA (.3*0.05/0.015)//(0.1*0.05/0.12) 
 //#define MAXBETA (3.294/10.) //eq.plane to mtach pmag/ptot = 0.02
 #endif
 

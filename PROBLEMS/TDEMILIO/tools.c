@@ -1,7 +1,6 @@
 
 int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
 {
-
   struct geometry *geom
      = (struct geometry *) ggg;
    
@@ -42,6 +41,9 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   rhoamb=pp[RHO];
   rho0=rhoCGS2GU(SPHdata0[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][0]);
   rho1=rhoCGS2GU(SPHdata1[SPHprojection[iys][izs][0]][SPHprojection[iys][izs][1]][0]);
+
+  //  if(geom->iy==TNY/2) printf("%d > %e %e \n",geom->iz,rho0,rho1);
+ 
 
   //verify if we have non-zero SPH input with density exceeding the ambient density
   if(rho0<rhoamb && rho1<rhoamb)
@@ -85,8 +87,7 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
     
   conv_vels(ucon,ucon,VEL3,VELPRIM,geomBL->gg,geomBL->GG);
 
-  //if(geom->iy==TNY/2 && geom->ix==TNX) printf("%d > %e %e %e %e %e\n",geom->iz,rho,temp,vr,vth,vph);
- 
+  
   pp[0]=rho;
   pp[1]=calc_PEQ_ufromTrho(temp,rho);
   ldouble uint=pp[1];
