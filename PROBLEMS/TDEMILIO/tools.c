@@ -125,8 +125,8 @@ int SPHboundary(ldouble *pp, void *ggg, void *gggBL)
   pp[FY0]=Fy;
   pp[FZ0]=Fz;
 
-  //temp
-  // if(geom->iy==NY/2) printf("%f %e\n",E/3. / (2./3.*uint),T4);
+  //temperature
+  //if(geom->iy==TNY/2) printf("%d %d > %e %e %e %e %e\n",geom->iy,geom->iz,E, Eatm, E/3. / (2./3.*uint),temp,T4);
  
   //transforming from BL lab radiative primitives to code non-ortonormal primitives
   prad_ff2lab(pp,pp,geomBL);

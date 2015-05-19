@@ -25,6 +25,8 @@ if(rho<0.) //outside donut
 #ifdef RADIATION
     set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
 #endif
+
+
   }
  else //inside donut
    {
@@ -57,6 +59,13 @@ if(rho<0.) //outside donut
     pp[3]=ucon[2];
     pp[4]=ucon[3];
 
+
+
+
+
+	print_primitives(pp);
+
+	
 #ifdef MAGNFIELD//setting them zero not to break the following coordinate transformation
     pp[B1]=pp[B2]=pp[B3]=0.; 
 #endif
@@ -96,7 +105,7 @@ if(rho<0.) //outside donut
 
     //transforming primitives from BL to MYCOORDS
     trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-    
+
 #ifdef MAGNFIELD 
     //MYCOORDS vector potential to calculate B's
     ldouble Acov[4];
@@ -275,15 +284,19 @@ if(rho<0.) //outside donut
     pp[B2]=Acov[2];
     pp[B3]=Acov[3];
 #endif
-
+	
    }
-
+	
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1]);
 //to conserved
 p2u(pp,uu,&geom);
 
-
+if(pp[0]>1.)
+  {
+print_primitives(pp); 
+ getch();
+  }
 
 /***********************************************/
 

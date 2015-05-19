@@ -292,10 +292,6 @@ int init_dsandvels_limotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
    *ell=l;
    *uuout = kappa * pow(rho, LT_GAMMA) / (LT_GAMMA - 1.);
 
-   //my_err("wfsg");
-   //printf("%e %e %e\n",rho,kappa,*uuout);
-   //exit(0);   getch();
-
    return(0);
 
 }

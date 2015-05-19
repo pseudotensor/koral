@@ -8,6 +8,13 @@ void calc_bcon_4vel(double *pr, double *ucon, double *ucov, double *bcon)
 {
   int j ;
 
+#ifdef NONRELMHD
+  bcon[0]=0.;
+  for(j=1;j<4;j++)
+    bcon[j] = pr[B1-1+j];
+  return;
+#endif
+
   bcon[0] = pr[B1]*ucov[1] + pr[B2]*ucov[2] + pr[B3]*ucov[3] ;
   for(j=1;j<4;j++)
     {
@@ -44,6 +51,15 @@ void calc_bcon_prim(double *pp, double *bcon, void* ggg)
 void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg) 
 {
   int j;
+
+
+#ifdef NONRELMHD
+  Bcon[0]=0.;
+  for(j=1;j<4;j++)
+    Bcon[j] = bcon[j];
+  return;
+#endif
+
   struct geometry *geom
     = (struct geometry *) ggg;
 

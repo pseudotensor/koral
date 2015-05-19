@@ -392,7 +392,7 @@ ldouble calc_photloc(int ix);
 
 //misc.c
 int 
-get_cell_sizeBL(int ix,int iy,int iz,ldouble *dx);
+get_cell_size_arb(int ix,int iy,int iz,ldouble *dx,int);
 int
 get_state(ldouble *pp,void* ggg,void* sss);
 int print_primitives(ldouble *u);
@@ -725,6 +725,7 @@ int set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int
 int conv_velsinprims(ldouble *pp,int which1, int which2,ldouble gg[][5],ldouble GG[][5]);
 #define dot(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2]+A[3]*B[3])
 #define dot3(A,B) (A[0]*B[0]+A[1]*B[1]+A[2]*B[2])
+#define dot3nr(A,B) (A[3]*B[3]+A[1]*B[1]+A[2]*B[2])
 #define kron(i,j) (i == j ? 1. : 0.)
 ldouble pick_gdet(int ix,int iy,int iz);
 int pick_g(int ix,int iy,int iz,ldouble gg[][5]);
@@ -751,6 +752,7 @@ int conv_vels_core(ldouble *u1,ldouble *u2,ldouble *u2cov,int which1,int which2,
 
 //u2p.c
 int test_inversion();
+int test_inversion_nonrel();
 int count_entropy(int *,int*);
 int copy_entropycount();
 int calc_primitives_local(int ix,int iy,int iz,ldouble *pp);
@@ -763,6 +765,7 @@ int u2p_cold(ldouble*,ldouble*,void*);
 int u2p_slow(ldouble*,ldouble*,void*);
 int u2p_hotmax(ldouble*,ldouble*,void*);
 int u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
+int u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
 int u2p_solver_Wp(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
 int u2p_solver_W(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose);
 int u2p_solver_Bonly(ldouble *uu, ldouble *pp, void *ggg);
@@ -778,6 +781,7 @@ ldouble calc_utp1(ldouble *vcon, ldouble *ucon, void *ggg);
 int p2avg(int,int,int,ldouble*);
 int calc_conserved(int ix,int iy,int iz);
 int p2u(ldouble *p, ldouble *u,void*);
+int p2u_mhd_nonrel(ldouble *p, ldouble *u,void*);
 int pff2u(ldouble *p, ldouble *u,ldouble[][5],ldouble[][4],ldouble[][4]);
 int p2u_rad(ldouble *p,ldouble *u,void*);
 int p2u_mhd(ldouble *p,ldouble *u,void*);

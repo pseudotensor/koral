@@ -11,7 +11,7 @@ int SPHitime;
 /************************************/
 #define SPHTNY 160
 #define SPHTNZ 96
-#define SPHNT 33
+#define SPHNT 22
 #define SPHTSTART 0. //in GM/c3, 0 to start from the first SPH output
 #define SPHRADIUS 300.
 #define SCALEVR
@@ -34,7 +34,7 @@ int SPHitime;
 //radiation choices
 /************************************/
 //#define RADIATION
-//#define COMPTONIZATION
+#define COMPTONIZATION
 
 /************************************/
 //magnetic choices
@@ -53,7 +53,7 @@ int SPHitime;
 #else
 #define TIMESTEPPING RK2HEUN
 #endif
-#define TSTEPLIM .6
+#define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define DOFIXUPS 1
@@ -185,7 +185,7 @@ int SPHitime;
 #define AVGOUTPUT 1
 #define COORDOUTPUT 2
 
-#define DTOUT1 .1
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/
@@ -201,5 +201,5 @@ int SPHitime;
 //atmosphere
 #define RHOATMMIN  1.e-26
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10/100000.)
 

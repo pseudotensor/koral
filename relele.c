@@ -6,6 +6,11 @@
 int //calculates only ucon, assumes ut unknown where applicable
 conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
+  #ifdef NONRELMHD
+  u1[0]=1.;
+  u2[1]=u1[1];u2[2]=u1[2];u2[3]=u1[3];u2[0]=u1[0]; return 0;
+  #endif
+
   ldouble ucov[4];
   ldouble alpgam;
   if(which1==VELR)
@@ -28,6 +33,11 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 int //calculates only ucon, assumes ut known where applicable
 conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
+  #ifdef NONRELMHD
+  u1[0]=1.;
+  u2[1]=u1[1];u2[2]=u1[2];u2[3]=u1[3];u2[0]=u1[0]; return 0;
+  #endif
+
   ldouble ucov[4];
 
   ldouble alpgam;
@@ -51,6 +61,12 @@ conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
 int //calculates both ucon and ucov, assumes ut unknown where applicable
 conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
+  #ifdef NONRELMHD
+  u1[0]=1.;
+  u2con[1]=u1[1];u2con[2]=u1[2];u2con[3]=u1[3];u2con[0]=u1[0]; 
+  indices_21(u2con,u2cov,gg);return 0;
+  #endif
+
   ldouble ucov[4];
 
   ldouble alpgam;
@@ -355,6 +371,10 @@ conv_vels_core(ldouble *u1,ldouble *u2conout,ldouble *u2covout,int which1,int wh
 int
 conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
+  #ifdef NONRELMHD
+  printf("conv_velscov() not ready for NONRELMHD\n");exit(1);
+  #endif
+
   int i,j;
   ldouble ut[4];
   int verbose=0;

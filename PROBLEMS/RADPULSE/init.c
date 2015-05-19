@@ -12,6 +12,7 @@
   {
 */
 
+
 ldouble rho,mx,my,mz,m,E,uint,E0,Fx,Fy,Fz,pLTE;  
 ldouble xx,yy,zz;
 ldouble uu[NV];
@@ -61,7 +62,7 @@ pp[9]=Fz;
 
 prad_ff2lab(pp,pp,&geom);
 //print_Nvector(pp,NV);
-p2u(pp,uu,gg,GG);	 
+p2u(pp,uu,&geom);	 
 //print_Nvector(uu,NV);getchar();
 
 

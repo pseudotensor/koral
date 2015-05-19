@@ -1205,6 +1205,10 @@ find_Wplim(ldouble *Wp,ldouble *cons)
 int
 u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 {
+  #ifdef NONRELMHD
+  return u2p_solver_nonrel(uu,pp,ggg,Etype,verbose);
+  #endif
+
   int (*solver)(ldouble*,ldouble*,void*,int,int);
 #if (U2P_SOLVER==U2P_SOLVER_WP)
   solver = & u2p_solver_Wp;
@@ -1216,6 +1220,85 @@ u2p_solver(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   return (*solver)(uu,pp,ggg,Etype,verbose);
 }
  
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//non-relativistic, analytical, solver
+
+int
+u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
+{
+  /****************************/
+  //prepare geometry
+  struct geometry *geom
+    = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;  GG=geom->GG;
+  gdet=geom->gdet;gdetu=gdet;
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+  /****************************/
+
+  /****************************/
+  //density
+  ldouble rho=uu[RHO]/gdetu;
+  //velocities u_i
+  ldouble ucov[4],ucon[4],vcov[4];
+  ucov[1]=uu[VX]/gdetu;
+  ucov[2]=uu[VY]/gdetu;
+  ucov[3]=uu[VZ]/gdetu;
+
+  indices_12(ucov,ucon,GG);
+
+  ldouble v2=dot3nr(ucon,ucov);
+
+  pp[VX]=ucon[1];
+  pp[VY]=ucon[2];
+  pp[VZ]=ucon[3];
+
+  ldouble bcon[4],bcov[4],bsq=0.;
+
+#ifdef MAGNFIELD
+ 
+  bcon[0]=0.;
+  bcon[1]=uu[B1]/gdetu;
+  bcon[2]=uu[B2]/gdetu;
+  bcon[3]=uu[B3]/gdetu;
+
+  pp[B1]=bcon[1];
+  pp[B2]=bcon[2];
+  pp[B3]=bcon[3];
+
+  indices_21(bcon,bcov,gg); 
+  bsq = dot(bcon,bcov);
+#endif
+
+  //  printf("%e %e %e\n",uu[UU]/gdetu,-bsq/2. ,- rho*v2/2.);
+  
+  ldouble uint;
+  if(Etype==U2P_HOT)
+    {
+      uint = uu[UU]/gdetu-bsq/2. - rho*v2/2.;
+      pp[UU]=uint;
+     
+    }
+  else if(Etype==U2P_ENTROPY)
+    {
+      ldouble S=uu[ENTR]/gdetu;
+      uint= calc_ufromS(S,rho);
+    }
+
+  //entropy 
+  pp[ENTR]=calc_Sfromu(rho,uint);
+
+
+  return 0;
+}
+
+
 //**********************************************************************
 //**********************************************************************
 //**********************************************************************
@@ -1769,6 +1852,57 @@ test_inversion()
   return 0;
 
 }
+
+
+//tests
+int
+test_inversion_nonrel()
+{
+  ldouble pp[NV],pp2[NV],uu[NV],ucon[4]={0.,0.,0.,0.};
+  struct geometry geom,geomBL;
+  int iv;
+
+  fill_geometry(NX-2,NY/2,0,&geom);
+
+  print_metric(geom.gg);
+
+  ucon[1]=0.001;
+  ucon[2]=0.001;
+  ucon[3]=0.00001;
+  conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
+
+  pp[RHO]=1.;
+  pp[UU]=1.e-5;
+  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
+  pp[VX]=ucon[1];
+  pp[VY]=ucon[2];
+  pp[VZ]=ucon[3];
+
+#ifdef MAGNFIELD
+  pp[B1]=pp[B2]=pp[B3]=0.;
+  pp[B1]=1.e-5;
+#endif
+
+#ifdef RADIATION
+  pp[EE]=pp[UU];
+
+  pp[FX]=pp[FY]=pp[FZ]=0.;
+#endif
+
+
+  print_primitives(pp);
+  p2u(pp,uu,&geom);
+
+  print_conserved(uu);
+  printf("gdet = %e\n",geom.gdet);
+
+  u2p_solver(uu,pp,&geom,U2P_HOT,0); 
+  print_primitives(pp);
+
+  return 0;
+
+}
+
 
 
 //**********************************************************************

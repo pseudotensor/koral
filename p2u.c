@@ -55,6 +55,12 @@ p2u(ldouble *p, ldouble *u, void *ggg)
 int
 p2u_mhd(ldouble *p, ldouble *u, void *ggg)
 {
+
+#ifdef NONRELMHD
+  p2u_mhd_nonrel(p,u,ggg);
+  return 0;
+#endif
+
   struct geometry *geom
    = (struct geometry *) ggg;
 
@@ -148,6 +154,91 @@ p2u_mhd(ldouble *p, ldouble *u, void *ggg)
 
   return 0.;
 }
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//primitive to conserved converter - non-relativistic!
+int
+p2u_mhd_nonrel(ldouble *p, ldouble *u, void *ggg)
+{
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5],gdet,gdetu;
+  gg=geom->gg;
+  gdet=geom->gdet;
+  GG=geom->GG;
+  gdetu=gdet;
+
+#if (GDETIN==0) //gdet out of derivatives
+  gdetu=1.;
+#endif
+
+  ldouble rho=p[0];
+  ldouble uu=p[1];
+  ldouble vcon[4],vcov[4],ucon[4],ucov[4];
+  ldouble bcon[4]={0.,0.,0.,0.},bcov[4]={0.,0.,0.,0.},bsq=0.;
+  vcon[1]=p[2];
+  vcon[2]=p[3];
+  vcon[3]=p[4];
+  vcon[0]=0.;
+  ldouble S=p[5];
+
+  conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+
+  ldouble v2=dot3nr(ucon,ucov);
+
+#ifdef MAGNFIELD
+  calc_bcon_4vel(p,ucon,ucov,bcon);
+  indices_21(bcon,bcov,gg); 
+  bsq = dot(bcon,bcov);
+#endif
+
+
+  //************************************
+  //************************************
+  //************************************
+  //hydro part
+  //************************************
+  //************************************
+  //************************************
+ 
+  ldouble Tttt=uu + bsq/2. + rho*v2/2.;
+  ldouble Ttr =rho*ucov[1];
+  ldouble Ttth =rho*ucov[2];
+  ldouble Ttph =rho*ucov[3];
+
+  u[0]=gdetu*rho;
+  u[1]=gdetu*Tttt;
+  u[2]=gdetu*Ttr;
+  u[3]=gdetu*Ttth;
+  u[4]=gdetu*Ttph;
+  u[5]=gdetu*S;
+
+
+#ifdef TRACER
+  ldouble tracerut=p[TRA]*ut;
+  u[TRA]= gdetu*tracerut;
+#endif
+
+  //************************************
+  //************************************
+  //************************************
+  //magnetic part
+  //************************************
+  //************************************
+  //************************************
+ 
+#ifdef MAGNFIELD
+  u[B1]=gdetu*p[B1];
+  u[B2]=gdetu*p[B2];
+  u[B3]=gdetu*p[B3];
+#endif
+
+  return 0.;
+}
+
 
 /********************************************************/
 /**** converts radiative primitives xs************************/

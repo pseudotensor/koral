@@ -52,10 +52,12 @@
 //surface density of energy = int (Ttt+rhout+Rtt) dz (41)
 //rho-weighted radial velocity in the jet (42)
 //magnetic flux in the jet (43)
-//kinetic flux in the jet (44)
+//kinetic + binding flux in the jet (44)
 //radial velocity close to the axis (45)                                        
 //Bernoulli close to the axis (46)  
-//rho-weighted qphi (47)                                                                                                                                                                                                                                  
+//rho-weighted qphi (47)                                                                                                                                                                                                     //magnetic flux everywhere (48)
+//kinetic + binding flux everywhere (49)
+                       
 
 
 /*********************************************/
@@ -517,10 +519,15 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      if(isjet==1)
 		profiles[41][ix]+=(-Trtmagn)*dx[1]*dx[2]*geomBL.gdet;
 
-	      //kinetic mhd energy flux in jet (44)  
+	      //kinetic + binding mhd energy flux in jet (44)  
 	      if(isjet==1)
 		profiles[42][ix]+=(-Trtkin)*dx[1]*dx[2]*geomBL.gdet;
 
+	        //magnetic mhd energy flux (48)
+	      profiles[46][ix]+=(-Trtmagn)*dx[1]*dx[2]*geomBL.gdet;
+
+	      //kinetic + binding mhd energy flux (49)
+	      profiles[47][ix]+=(-Trtkin)*dx[1]*dx[2]*geomBL.gdet;
 
 
 	      
@@ -1253,7 +1260,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 	
 	      //coordinate
 	      ldouble dx[3];
-	      get_cell_sizeBL(ix,iy,iz,dx);
+	      get_cell_size_arb(ix,iy,iz,dx,OUTCOORDS);
 
 	      //primitives at the cell - either averaged or original, in BL or MYCOORDS
 	      for(iv=0;iv<NV;iv++)
@@ -1411,7 +1418,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 	
 		//coordinates
 		ldouble dx[3];
-		get_cell_sizeBL(ix,iy,iz,dx);
+		get_cell_size_arb(ix,iy,iz,dx,OUTCOORDS);
 	    
 
 		//primitives at the cell - either averaged or original, in BL or MYCOORDS
@@ -1509,7 +1516,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 	
 		//coordinates
 		ldouble dx[3];
-		get_cell_sizeBL(ix,iy,iz,dx);
+		get_cell_size_arb(ix,iy,iz,dx,OUTCOORDS);
 	    
 		//primitives at the cell - either averaged or original, in BL or MYCOORDS
 		for(iv=0;iv<NV;iv++)
@@ -1605,7 +1612,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 	
 		//coordinates
 		ldouble dx[3];
-		get_cell_sizeBL(ix,iy,iz,dx);
+		get_cell_size_arb(ix,iy,iz,dx,OUTCOORDS);
 	    
 		//primitives at the cell - either averaged or original, in BL or MYCOORDS
 		for(iv=0;iv<NV;iv++)
@@ -1681,7 +1688,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		Rrttot[2]+=Rtht*dx[2]*dx[0]*geomBL.gdet;
 		Ehatuconrtot[2]+=Ehatuconth*dx[2]*dx[0]*geomBL.gdet;
 
-		areas[2]+=dx[1]*dx[2]*geomBL.gdet;
+		areas[2]+=dx[2]*dx[0]*geomBL.gdet;
 	      }
 
 	}
@@ -1701,7 +1708,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 	
 		//coordinates
 		ldouble dx[3];
-		get_cell_sizeBL(ix,iy,iz,dx);
+		get_cell_size_arb(ix,iy,iz,dx,OUTCOORDS);
 	    
 		//primitives at the cell - either averaged or original, in BL or MYCOORDS
 		for(iv=0;iv<NV;iv++)
@@ -1777,9 +1784,9 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 		Trtkintot[2]+=-Tthtkin*dx[2]*dx[0]*geomBL.gdet;
 		Trtmagntot[2]+=-Tthtmagn*dx[2]*dx[0]*geomBL.gdet;
 		Rrttot[2]+=-Rtht*dx[2]*dx[0]*geomBL.gdet;
-		Ehatuconrtot[2]+=-Ehatuconth*dx[1]*dx[2]*geomBL.gdet;
+		Ehatuconrtot[2]+=-Ehatuconth*dx[2]*dx[0]*geomBL.gdet;
 
-		areas[2]+=dx[1]*dx[2]*geomBL.gdet;
+		areas[2]+=dx[2]*dx[0]*geomBL.gdet;
 	      }
 	}
 

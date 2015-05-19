@@ -8,18 +8,20 @@
 
 #define RK3STEPPING
 #define INT_ORDER 1
-#define NX 101
-#define NY 1
-#define NZ 1
+#define TNX 101
+#define TNY 1
+#define TNZ 1
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
 #define SPECIFIC_BC
-#define COPY_XBC
-#define COPY_YBC
-#define COPY_ZBC
+#define PERIODIC_XBC
+#define PERIODIC_YBC
+#define PERIODIC_ZBC
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.
 #define DTOUT1 100.
+#define OUTOUTPUT 1 //to out file
+
 #define ALLSTEPSOUTPUT 0
 #define NOUTSTOP 100
 #define GAMMA (ldouble)(5./3.)
@@ -54,3 +56,4 @@
 //#define RADOUTPUTINZAMO
 #define UFLOOR 1.e-40
 #define RHOFLOOR 1.e-40
+#define RADIMPLICITTHRESHOLD 1.e-40

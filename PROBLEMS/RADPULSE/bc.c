@@ -43,7 +43,8 @@ if(iz>NZ-1) iiz=NZ-1;
       pp[iv]=get_u(p,iv,iix,iiy,iiz);      
     }
 pp[7]=0.;
-p2u(pp,uu,gg,GG);
+
+//p2u(pp,uu,gg,GG);
 
 if(iy<0) {print_Nvector(pp,NV);print_Nvector(uu,NV);getchar();}
 

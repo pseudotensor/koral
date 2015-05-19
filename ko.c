@@ -98,7 +98,7 @@ main(int argc, char **argv)
 
   //test_metric(); exit(1);
 
-  //test_inversion(); exit(1);
+  test_inversion_nonrel(); exit(1);
 
   //test_solve_implicit_lab(); exit(1);
   //test_Giff();  exit(-1);

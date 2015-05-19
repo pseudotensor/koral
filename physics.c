@@ -475,6 +475,15 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
   //gas density
   ldouble rho=pp[RHO];
+  //state
+  struct struct_of_state state;
+  get_state(pp,geom,&state);
+  //enthalphy
+  ldouble w=rho+GAMMA*state.uint+state.bsq;
+  //override
+  w=rho;
+
+
   //coordinates
   if(MYCOORDS!=SPHCOORDS && MYCOORDS!=CYLCOORDS) 
     my_err("PWPOTENIAL implemented only for SPHCOORDS and CYLCOORDS\n");
@@ -487,9 +496,9 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
       //radial gradient of phi
       ldouble dphi=1./(r-2.)/(r-2.);
       //radial acceleration
-      ss[VX]+=-gdetu*rho*dphi;
+      ss[VX]+=-gdetu*w*dphi;
       //what increases the total energy as well
-      ss[UU]+=gdetu*rho*ucon[1]*dphi;
+      ss[UU]+=gdetu*w*ucon[1]*dphi;
     }
 
   if(if_coords_cylindricallike(MYCOORDS))
@@ -504,10 +513,10 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
       dphidR=R/(r*(-2.+r)*(-2.+r));
       dphidz=z/(r*(-2.+r)*(-2.+r));
       
-      ss[VX]+=-gdetu*rho*dphidR;
-      ss[VY]+=-gdetu*rho*dphidz;
+      ss[VX]+=-gdetu*w*dphidR;
+      ss[VY]+=-gdetu*w*dphidz;
       //what increases the total energy as well
-      ss[UU]+=gdetu*rho*(ucon[1]*dphidR+ucon[2]*dphidz);
+      ss[UU]+=gdetu*w*(ucon[1]*dphidR+ucon[2]*dphidz);
     }
 
 

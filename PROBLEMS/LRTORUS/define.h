@@ -13,9 +13,9 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define BALANCEENTROPYWITHRADIATION
-#define NCOMPTONIZATION
+//#define NCOMPTONIZATION
 
 //#define U2P_EQS U2P_EQS_JONS
 //#define U2P_SOLVER U2P_SOLVER_WP
@@ -38,7 +38,7 @@
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-#define MAGNFIELD
+//#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -58,7 +58,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
@@ -94,7 +94,7 @@
 /************************************/
 //coordinates / resolution
 /************************************/
-#define myMKS2COORDS
+#define mySPHCOORDS
 #define MKSR0 0.
 #define MKSH0 0.6
 #define MKSMY1 0.001
@@ -102,10 +102,19 @@
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
 
+#ifdef mySPHCOORDS //modified Kerr-Shild
+#define MYCOORDS SPHCOORDS
+#define MINX 15.
+#define MAXX 200.
+#define MINY (0.1)
+#define MAXY (M_PI-MINY)
+#define PWPOTENTIAL
+#endif
+
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
 #define MINX (log(1.85-MKSR0))
-#define MAXX (log(1000.-MKSR0))
+#define MAXX (log(200.-MKSR0))
 #define MINY (0.001)
 #define MAXY (1.-0.001)
 #endif
@@ -126,7 +135,7 @@
 //total resolution
 #define TNX 64//140//252 //28*9
 #define TNY 64//100//234 //26*9
-#define TNZ 64//1 //2*8
+#define TNZ 1 //2*8
 //number of tiles
 #define NTX 28
 #define NTY 26
@@ -159,13 +168,13 @@
 #define AVGOUTPUT 1
 #define SILO2D_XZPLANE
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/
 //common physics / torus / atmosphere
 /************************************/
-#define GAMMA (5./3.)
+#define GAMMA (4./3.)
 
 #define NTORUS 7
 
