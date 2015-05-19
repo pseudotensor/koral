@@ -478,11 +478,6 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
   //state
   struct struct_of_state state;
   get_state(pp,geom,&state);
-  //enthalphy
-  ldouble w=rho+GAMMA*state.uint+state.bsq;
-  //override
-  w=rho;
-
 
   //coordinates
   if(MYCOORDS!=SPHCOORDS && MYCOORDS!=CYLCOORDS) 
@@ -496,9 +491,9 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
       //radial gradient of phi
       ldouble dphi=1./(r-2.)/(r-2.);
       //radial acceleration
-      ss[VX]+=-gdetu*w*dphi;
+      ss[VX]+=-gdetu*rho*dphi;
       //what increases the total energy as well
-      ss[UU]+=gdetu*w*ucon[1]*dphi;
+      ss[UU]+=gdetu*rho*ucon[1]*dphi;
     }
 
   if(if_coords_cylindricallike(MYCOORDS))
@@ -513,10 +508,10 @@ int f_general_source_term_arb(ldouble *pp,void *ggg,ldouble *ss)
       dphidR=R/(r*(-2.+r)*(-2.+r));
       dphidz=z/(r*(-2.+r)*(-2.+r));
       
-      ss[VX]+=-gdetu*w*dphidR;
-      ss[VY]+=-gdetu*w*dphidz;
+      ss[VX]+=-gdetu*rho*dphidR;
+      ss[VY]+=-gdetu*rho*dphidz;
       //what increases the total energy as well
-      ss[UU]+=gdetu*w*(ucon[1]*dphidR+ucon[2]*dphidz);
+      ss[UU]+=gdetu*rho*(ucon[1]*dphidR+ucon[2]*dphidz);
     }
 
 
@@ -742,6 +737,11 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
   //ff[1]= gdetu*(T[idim+1][0]+rho*ucon[idim+1]);
   //to avoid slow cancellation:
   ff[1]= gdetu*(etap*ucon[idim+1]*ucov[0] + rho*ucon[idim+1]*utp1);
+
+#ifdef NONRELMHD
+  ff[1]= gdetu*T[idim+1][0];
+#endif
+
 #ifdef MAGNFIELD
   ff[1]+= - gdetu*bcon[idim+1]*bcov[0];
 #endif
@@ -825,15 +825,25 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   bcon[0]=bcon[1]=bcon[2]=bcon[3]=0.;
   bsq=0.;
 #endif
-  
+
   ldouble p=(GAMMA-1.)*uu; 
   ldouble w=rho+uu+p;
   ldouble eta=w+bsq;
   ldouble ptot=p+0.5*bsq;
+
+#ifndef NONRELMHD
   
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
       T[i][j]=eta*ucon[i]*ucon[j] + ptot*GG[i][j] - bcon[i]*bcon[j];
+
+#else //NONRELMHD
+
+  for(i=0;i<4;i++)
+    for(j=0;j<4;j++)
+      T[i][j]=(rho + delta(0,i)*delta(0,j)*(uu+p+bsq))*ucon[i]*ucon[j] + ptot*GG[i][j] - bcon[i]*bcon[j];
+
+#endif
 
   return 0;
 }

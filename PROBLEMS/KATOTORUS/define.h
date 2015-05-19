@@ -15,7 +15,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 #define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
 
@@ -40,7 +40,7 @@
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-#define MAGNFIELD
+//#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -60,7 +60,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-#define RADVISCOSITY SHEARVISCOSITY
+//#define RADVISCOSITY SHEARVISCOSITY
 #define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
@@ -98,7 +98,7 @@
 /************************************/
 //#define myMKS2COORDS
 #define mySPHCOORDS
-#define RMIN 4.
+#define RMIN 15.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -147,8 +147,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 64 //28*9
-#define TNY 64 //26*9
+#define TNX 128 //28*9
+#define TNY 192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 25
@@ -169,7 +169,7 @@
 #define BOXR1 10.
 #define BOXR2 15.
 #define BOXITH 30 //distance from eq.plane in cells                                                                                                             
-#define OUTCOORDS KERRCOORDS                                                                    
+#define OUTCOORDS MYCOORDS//KERRCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
 #define RADOUTPUTINZAMO
@@ -184,7 +184,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 50.
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/

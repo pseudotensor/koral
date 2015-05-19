@@ -36,6 +36,7 @@ calc_primitives(int ix,int iy,int iz,int type,int setflags)
       pp[iv]=get_u(p,iv,ix,iy,iz);
     }
 
+
   //aux
   if(setflags)
     {
@@ -235,6 +236,9 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
 #ifdef ENFORCEENTROPY
       u2pret=-1; //skip hot
 #else
+
+    
+
       u2pret=u2p_solver(uu,pp,ggg,method,0); 
   
       //check if u2p_hot went mad by making entropy decrease
@@ -1242,14 +1246,19 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 #endif
   /****************************/
 
+
+
   /****************************/
   //density
   ldouble rho=uu[RHO]/gdetu;
+  pp[RHO]=rho;
+
   //velocities u_i
   ldouble ucov[4],ucon[4],vcov[4];
-  ucov[1]=uu[VX]/gdetu;
-  ucov[2]=uu[VY]/gdetu;
-  ucov[3]=uu[VZ]/gdetu;
+  ucov[0]=-1.;
+  ucov[1]=uu[VX]/rho/gdetu;
+  ucov[2]=uu[VY]/rho/gdetu;
+  ucov[3]=uu[VZ]/rho/gdetu;
 
   indices_12(ucov,ucon,GG);
 
@@ -1276,7 +1285,6 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   bsq = dot(bcon,bcov);
 #endif
 
-  //  printf("%e %e %e\n",uu[UU]/gdetu,-bsq/2. ,- rho*v2/2.);
   
   ldouble uint;
   if(Etype==U2P_HOT)
@@ -1289,11 +1297,13 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
     {
       ldouble S=uu[ENTR]/gdetu;
       uint= calc_ufromS(S,rho);
+      pp[UU]=uint;
     }
 
   //entropy 
   pp[ENTR]=calc_Sfromu(rho,uint);
 
+  
 
   return 0;
 }

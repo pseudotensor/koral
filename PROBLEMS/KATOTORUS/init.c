@@ -61,7 +61,7 @@ if(rho<0.) //outside donut
     pp[B1]=pp[B2]=pp[B3]=0.; 
 #endif
 
-    //if(iy==TNY/2.) {printf("ix: %d %e %e\n",ix,rho,uint); print_primitives(pp);getch();}
+    
 
 
 #ifdef RADIATION
