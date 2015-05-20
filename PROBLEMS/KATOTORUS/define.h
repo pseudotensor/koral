@@ -15,7 +15,7 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 #define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
@@ -41,7 +41,7 @@
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-#define MAGNFIELD
+//#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -61,7 +61,9 @@
 /************************************/
 //viscosity choices
 /************************************/
+#ifdef RADIATION
 #define RADVISCOSITY SHEARVISCOSITY
+#endif
 #define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
@@ -148,8 +150,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 128 //28*9
-#define TNY 192 //26*9
+#define TNX 128//350//128 //28*9
+#define TNY 128//350//192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 25
@@ -185,7 +187,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 100.
 #define DTOUT2 1000.
 
 /************************************/

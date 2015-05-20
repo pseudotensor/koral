@@ -9,7 +9,7 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 #ifdef NONRELMHD //only four-velocity used;
   u2[1]=u1[1];u2[2]=u1[2];u2[3]=u1[3];
   u2[0]=1.;
-  //fill_utinucon(u2,gg,GG); //calculates the proper u^t for four-velocity
+  fill_utinucon(u2,gg,GG); //calculates the proper u^t for four-velocity
   return 0;
 #endif
 
@@ -38,7 +38,7 @@ conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
 #ifdef NONRELMHD //only four-velocity used;
   u2[1]=u1[1];u2[2]=u1[2];u2[3]=u1[3];
   u2[0]=1.;
-  //fill_utinucon(u2,gg,GG); //calculates the proper u^t for four-velocity
+  fill_utinucon(u2,gg,GG); //calculates the proper u^t for four-velocity
   return 0;
 #endif
 
@@ -68,7 +68,7 @@ conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,l
  #ifdef NONRELMHD //only four-velocity used;
   u2con[1]=u1[1];u2con[2]=u1[2];u2con[3]=u1[3];
   u2con[0]=1.;
-  //fill_utinucon(u2con,gg,GG); //calculates the proper u^t for four-velocity
+  fill_utinucon(u2con,gg,GG); //calculates the proper u^t for four-velocity
   indices_21(u2con,u2cov,gg);
   u2cov[0]=-1.;
   return 0;

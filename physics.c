@@ -88,6 +88,12 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   utcon[0]=0.;
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
  
+  //fill the proper u^t if unknown
+  #ifdef NONRELMHD
+  fill_utinucon(ucon,gg,GG);
+  fill_utinucov(ucov,gg,GG);
+  #endif
+
   //**********************************************************************
   //***** hydro: speed of sound ******************************************
   //**********************************************************************
@@ -839,6 +845,9 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
       T[i][j]=eta*ucon[i]*ucon[j] + ptot*GG[i][j] - bcon[i]*bcon[j];
 
 #else //NONRELMHD
+
+  ucon[0]=1.;
+  ucov[0]=-1.;
 
   ldouble v2=dot3nr(ucon,ucov);
 
