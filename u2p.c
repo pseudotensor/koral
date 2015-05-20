@@ -1259,6 +1259,7 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ucov[1]=uu[VX]/rho/gdetu;
   ucov[2]=uu[VY]/rho/gdetu;
   ucov[3]=uu[VZ]/rho/gdetu;
+  fill_utinucov(ucov,gg,GG);
 
   indices_12(ucov,ucon,GG);
 
@@ -1289,9 +1290,9 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ldouble uint;
   if(Etype==U2P_HOT)
     {
-      uint = uu[UU]/gdetu-bsq/2. - rho*v2/2.;
+      uint = -uu[UU]/gdetu-bsq/2. - rho*v2/2.;
+      if(uint<1.e-10*rho) return -1;
       pp[UU]=uint;
-     
     }
   else if(Etype==U2P_ENTROPY)
     {
@@ -1302,8 +1303,6 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   //entropy 
   pp[ENTR]=calc_Sfromu(rho,uint);
-
-  
 
   return 0;
 }
@@ -1881,7 +1880,7 @@ test_inversion_nonrel()
   ucon[3]=0.00001;
   conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
-  pp[RHO]=1.;
+  pp[RHO]=100.;
   pp[UU]=1.e-5;
   pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
   pp[VX]=ucon[1];

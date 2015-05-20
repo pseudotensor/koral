@@ -5,7 +5,7 @@ int init_dsandvels_katotorus(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *u
   
   if(r<15.) {*rhoout=-1.;return 0;}
 
-  R=r*sin(th); //cylindrical radius
+  R=r*sin(th); //cylindrical radius 
 
   L0=sqrt(KT_R0*KT_R0*KT_R0)/(KT_R0-2.);
   L=L0*pow(R/KT_R0,KT_A);

@@ -5499,7 +5499,7 @@ correct_polaraxis_3d()
 			  pp[UU]=axis2_primplus[UU][gix];
 			  pp[ENTR]=calc_Sfromu(pp[RHO],pp[UU]);
 
-			  //if(geomBL.xx > 1.*rhorizonBL ) 	
+			  //if(geomBL.xx > 1.*rhorizonBL ) 	 
 			  {  
 			    //gas velocities
 			    vx=axis2_primplus[VX][gix];

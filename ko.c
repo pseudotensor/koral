@@ -14,6 +14,9 @@ main(int argc, char **argv)
   #endif
   mstep_init();
 
+  //check if definitions agree with each other
+  am_i_sane();
+
   ldouble tstart;
   int i,j,k; char folder[100],bufer[100];
 
@@ -969,4 +972,42 @@ print_scalings()
 	 );
     printf("\n ***************************************\n\n");
   return 0;
+}
+
+//verifies that we have no conficts
+void
+am_i_sane()
+{
+#ifdef NONRELMHD
+  if(MYCOORDS!=SPHCOORDS && MYCOORDS!=CYLCOORDS)
+    {
+      printf("NONRELMHD implemented only for SPHCOORDS or CYLCOORDS so far.\n");
+      exit(-1);
+    }
+
+#ifdef NCOMPTONIZATION
+  printf("NONRELMHD not implemented for NCOMPTONIZATION.\n");
+  exit(-1);
+#endif
+
+  if(RADCLOSURE==VETCLOSURE) 
+    {
+      printf("NONRELMHD not implemented for VETCLOSURE.\n");
+      exit(-1);
+    }
+
+#endif
+
+
+
+
+#ifdef PWPOTENTIAL
+  if(MYCOORDS!=SPHCOORDS && MYCOORDS!=CYLCOORDS)
+    {
+      printf("PWPOTENTIAL implemented only for SPHCOORDS or CYLCOORDS so far.\n");
+      exit(-1);
+    }
+#endif
+
+  return;
 }

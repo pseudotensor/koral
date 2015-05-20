@@ -55,7 +55,8 @@
 //kinetic + binding flux in the jet (44)
 //radial velocity close to the axis (45)                                        
 //Bernoulli close to the axis (46)  
-//rho-weighted qphi (47)                                                                                                                                                                                                     //magnetic flux everywhere (48)
+//rho-weighted qphi (47)          
+//magnetic flux everywhere (48)
 //kinetic + binding flux everywhere (49)
                        
 

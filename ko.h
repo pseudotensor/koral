@@ -363,7 +363,8 @@ struct struct_of_state
   ldouble Rij[4][4],Gi[4],Gic[4],Giff[4],Gicff[4],radentr,Trad;
 };
 
-//main.c
+//ko.c
+void am_i_sane(); 
 int solve_the_problem(ldouble,char*);
 int print_scalings(void);
  
@@ -744,6 +745,8 @@ ldouble r_ISCO_BL(ldouble ac);
 ldouble r_mbound_BL(ldouble a);
 ldouble r_photon_BL(ldouble a);
 int update_entropy(int ix,int iy,int iz,int u2pflag);
+int fill_utinucon(ldouble *u1,double gg[][5],ldouble GG[][5]);
+int fill_utinucov(ldouble *u1,double gg[][5],ldouble GG[][5]);
 int conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 int conv_velscov(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);
 int conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5]);

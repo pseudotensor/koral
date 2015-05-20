@@ -57,7 +57,7 @@ trans_pmhd_coco(ldouble *ppin, ldouble *ppout, int CO1,int CO2, ldouble *xxvec, 
       ucon[2]=pp1[3];
       ucon[3]=pp1[4];
 
-      conv_vels(ucon,ucon,VELPRIM,VEL4,geom1->gg,geom1->GG);
+      conv_vels(ucon,ucon,VELPRIM,VEL4,geom1->gg,geom1->GG); 
       //converting to CO2
       trans2_coco(xxvec,ucon,ucon,CO1,CO2);
       //to VELPRIM

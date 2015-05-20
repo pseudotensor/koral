@@ -15,7 +15,7 @@ fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 ldouble r=geomBL.xx;
 ldouble th=geomBL.yy;
 
-init_dsandvels_katotorus(r, th, BHSPIN, &rho, &uint, &ell);
+init_dsandvels_katotorus(r, th, BHSPIN, &rho, &uint, &ell); 
 uintorg=uint;
 
 if(rho<0.) //outside donut

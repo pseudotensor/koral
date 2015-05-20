@@ -438,7 +438,7 @@ u2p_rad_urf(ldouble *uu, ldouble *pp,void* ggg, int *corrected)
 
   int verbose=0;
   
-  //whether primitives corrected for caps, floors etc. - if so, conserved will be updated
+  //whether primitives corrected for caps, floors etc. - if so, conserved will be updated 
   *corrected=0;
 
   ldouble Rij[4][4];
@@ -502,6 +502,10 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   urfcon[2]=pp[FY];
   urfcon[3]=pp[FZ];
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
+#ifdef NONRELMHD
+  fill_utinucon(urfcon,geom->gg,geom->GG);
+  #endif
+ 
   pp[NF]=uu[NF]/urfcon[0]/gdetu;
   #endif
 
@@ -758,6 +762,10 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   for(iv=1;iv<4;iv++)
     ucond[iv]=pp[1+iv];
   conv_vels(ucond,ucond,VELPRIM,VEL4,gg,GG);
+#ifdef NONRELMHD
+  fill_utinucon(uconc,geom->gg,geom->GG);
+  #endif
+ 
   indices_21(ucond,ucovd,gg);
   calc_bcon_4vel(pp,ucond,ucovd,bcond);
   indices_21(bcond,bcovd,gg); 

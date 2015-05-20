@@ -1,15 +1,17 @@
 //KORAL - relele.c
 //some relativistic routines
 
-#include "ko.h"
+#include "ko.h" 
 
 int //calculates only ucon, assumes ut unknown where applicable
 conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
-  #ifdef NONRELMHD
-  u1[0]=1.;
-  u2[1]=u1[1];u2[2]=u1[2];u2[3]=u1[3];u2[0]=u1[0]; return 0;
-  #endif
+#ifdef NONRELMHD //only four-velocity used;
+  u2[1]=u1[1];u2[2]=u1[2];u2[3]=u1[3];
+  u2[0]=1.;
+  //fill_utinucon(u2,gg,GG); //calculates the proper u^t for four-velocity
+  return 0;
+#endif
 
   ldouble ucov[4];
   ldouble alpgam;
@@ -33,10 +35,12 @@ conv_vels(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble 
 int //calculates only ucon, assumes ut known where applicable
 conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
-  #ifdef NONRELMHD
-  u1[0]=1.;
-  u2[1]=u1[1];u2[2]=u1[2];u2[3]=u1[3];u2[0]=u1[0]; return 0;
-  #endif
+#ifdef NONRELMHD //only four-velocity used;
+  u2[1]=u1[1];u2[2]=u1[2];u2[3]=u1[3];
+  u2[0]=1.;
+  //fill_utinucon(u2,gg,GG); //calculates the proper u^t for four-velocity
+  return 0;
+#endif
 
   ldouble ucov[4];
 
@@ -61,10 +65,13 @@ conv_vels_ut(ldouble *u1,ldouble *u2,int which1,int which2,ldouble gg[][5],ldoub
 int //calculates both ucon and ucov, assumes ut unknown where applicable
 conv_vels_both(ldouble *u1,ldouble *u2con,ldouble *u2cov,int which1,int which2,ldouble gg[][5],ldouble GG[][5])
 {
-  #ifdef NONRELMHD
-  u1[0]=1.;
-  u2con[1]=u1[1];u2con[2]=u1[2];u2con[3]=u1[3];u2con[0]=u1[0]; 
-  indices_21(u2con,u2cov,gg);return 0;
+ #ifdef NONRELMHD //only four-velocity used;
+  u2con[1]=u1[1];u2con[2]=u1[2];u2con[3]=u1[3];
+  u2con[0]=1.;
+  //fill_utinucon(u2con,gg,GG); //calculates the proper u^t for four-velocity
+  indices_21(u2con,u2cov,gg);
+  u2cov[0]=-1.;
+  return 0;
   #endif
 
   ldouble ucov[4];
@@ -360,6 +367,67 @@ conv_vels_core(ldouble *u1,ldouble *u2conout,ldouble *u2covout,int which1,int wh
       print_4vector(u2con);      
       printf("conv_vels done %d %d\n",which1,which2);
     }
+  
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates u^t from spatial components of four-velocity u^mu
+int
+fill_utinucon(ldouble *u1,double gg[][5],ldouble GG[][5])
+{
+  //assumes u^t unknown
+  ldouble a,b,c;
+  int i,j;
+  a=gg[0][0];
+  b=0.;
+  c=1.;
+  for(i=1;i<4;i++)
+    {
+      b+=2.*u1[i]*gg[0][i];
+      for(j=1;j<4;j++)
+	{
+	  c+=u1[i]*u1[j]*gg[i][j];
+	}
+    }
+  ldouble delta=b*b-4.*a*c;
+  if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4\n");
+  u1[0]=(-b-sqrt(delta))/2./a;
+  //TODO: more strict criterion
+  if(u1[0]<0.) u1[0]=(-b+sqrt(delta))/2./a;
+  
+  return 0;
+}
+
+//**********************************************************************
+//**********************************************************************
+//**********************************************************************
+//calculates u_t from spatial components of four-velocity u_mu
+int
+fill_utinucov(ldouble *u1,double gg[][5],ldouble GG[][5])
+{
+  //TODO : this may be incorrect - verify!
+  //assumes u_t unknown
+  ldouble a,b,c;
+  int i,j;
+  a=GG[0][0];
+  b=0.;
+  c=1.;
+  for(i=1;i<4;i++)
+    {
+      b+=2.*u1[i]*GG[0][i];
+      for(j=1;j<4;j++)
+	{
+	  c+=u1[i]*u1[j]*GG[i][j];
+	}
+    }
+  ldouble delta=b*b-4.*a*c;
+  if(delta<0.) my_err("delta.lt.0 in VEL4->VEL4 in fill_utinucov\n");
+  u1[0]=(-b-sqrt(delta))/2./a;
+  //TODO: more strict criterion
+  if(u1[0]>0.) u1[0]=(-b+sqrt(delta))/2./a;
   
   return 0;
 }

@@ -204,13 +204,13 @@ p2u_mhd_nonrel(ldouble *p, ldouble *u, void *ggg)
   //************************************
   //************************************
  
-  ldouble Tttt=uu + bsq/2. + rho*v2/2.;
+  ldouble Ttt=-(uu + bsq/2. + rho*v2/2.);
   ldouble Ttr =rho*ucov[1];
   ldouble Ttth =rho*ucov[2];
   ldouble Ttph =rho*ucov[3];
 
   u[0]=gdetu*rho;
-  u[1]=gdetu*Tttt;
+  u[1]=gdetu*Ttt;
   u[2]=gdetu*Ttr;
   u[3]=gdetu*Ttth;
   u[4]=gdetu*Ttph;
@@ -276,6 +276,10 @@ int p2u_rad(ldouble *pp,ldouble *uu,void *ggg)
 
       //converting to lab four-velocity
       conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
+#ifdef NONRELMHD
+      fill_utinucon(urf,geom->gg,geom->GG);
+#endif
+ 
   
       ldouble Rtopp[4];
       Rtopp[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^t_t

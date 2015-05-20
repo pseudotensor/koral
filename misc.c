@@ -1386,7 +1386,7 @@ get_state(ldouble *pp,void* ggg,void* sss)
 int 
 get_cell_size_arb(int ix,int iy,int iz,ldouble *dx,int COORDS)
 {
-  ldouble xx1[4],xx2[4],xx[4],xxBL[4];
+  ldouble xx1[4],xx2[4],xx[4],xxBL[4]; 
   get_xx(ix,iy,iz,xx);	      
   coco_N(xx,xxBL,MYCOORDS,COORDS);
   xx1[0]=0.;xx1[1]=get_xb(ix,0);xx1[2]=get_x(iy,1);xx1[3]=get_x(iz,2);
@@ -1408,3 +1408,4 @@ get_cell_size_arb(int ix,int iy,int iz,ldouble *dx,int COORDS)
 
   return 0;
 }
+

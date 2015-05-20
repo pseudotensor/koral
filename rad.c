@@ -1601,7 +1601,11 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   utcon[3]=pp[4];
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
 
-
+  //fill the proper u^t if unknown
+  #ifdef NONRELMHD
+  fill_utinucon(ucon,gg,GG);
+  fill_utinucov(ucov,gg,GG);
+  #endif
  
   //gas properties
   ldouble rho=pp[RHO];
@@ -1748,6 +1752,12 @@ calc_Rij_M1(ldouble *pp, void* ggg, ldouble Rij[][4])
   urfcon[3]=pp[FZ0];
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+  //fill the proper u^t if unknown
+  #ifdef NONRELMHD
+  fill_utinucon(urfcon,gg,GG);
+  #endif
+ 
+
   //lab frame stress energy tensor:
   for(i=0;i<4;i++)
     for(j=0;j<4;j++)
@@ -2110,13 +2120,14 @@ calc_Rij_Minerbo_ff(ldouble *pp, ldouble Rij[][4])
 int
 set_radatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atmtype)
 {
-#ifdef RADIATION  
+#ifdef RADIATION   
   if(atmtype==0) //fixed Erf, urf of normal observer
     {
       pp[EE0]=ERADATMMIN; 
       ldouble ucon[4];
       calc_normalobs_relvel(GG,ucon);
       conv_vels(ucon,ucon,VELR,VELPRIMRAD,gg,GG);
+ 
       pp[FX0]=ucon[1]; 
       pp[FY0]=ucon[2];
       pp[FZ0]=ucon[3];
@@ -2263,6 +2274,11 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   urfcon[2]=pp[FY0];
   urfcon[3]=pp[FZ0];
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
+  
+  //fill the proper u^t if unknown
+  #ifdef NONRELMHD
+  fill_utinucon(urfcon,gg,GG);
+  #endif
 
   //square of radiative wavespeed in radiative rest frame
   ldouble rv2rad = 1./3.;
@@ -2623,6 +2639,12 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   utcon[2]=pp[VY];
   utcon[3]=pp[VZ];
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
+  //fill the proper u^t if unknown
+  #ifdef NONRELMHD
+  fill_utinucon(ucon,geom->gg,geom->GG);
+  fill_utinucov(ucov,geom->gg,geom->GG);
+  #endif
+ 
   //conv_velscov(utcon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
   //indices_21(ucon,ucov,geom->gg);
   ldouble Rij[4][4],Rtt;
@@ -3216,7 +3238,12 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
     }
   utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
   conv_vels_both(utcon,ucon,ucov,whichvel,VEL4,gg,GG);  
-   
+  //fill the proper u^t if unknown
+  #ifdef NONRELMHD
+  fill_utinucon(ucon,gg,GG);
+  fill_utinucov(ucov,gg,GG);
+  #endif
+ 
   //derivatives
   for(idim=1;idim<4;idim++)
     {
@@ -3297,6 +3324,14 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
 
      conv_vels_both(utconm1,uconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
      conv_vels_both(utconp1,uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
+     //fill the proper u^t if unknown
+#ifdef NONRELMHD
+     fill_utinucon(uconm1,gg,GG);
+     fill_utinucov(ucovm1,gg,GG);
+     fill_utinucon(uconp1,gg,GG);
+     fill_utinucov(ucovp1,gg,GG);
+#endif
+ 
 
      ldouble dl,dr,dc;
      ldouble dl2,dr2,dc2;

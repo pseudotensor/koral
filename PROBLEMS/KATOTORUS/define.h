@@ -7,7 +7,7 @@
 
 /************************************/
 //restart
-/************************************/
+/************************************/ 
 #define RESTART
 #define RESTARTGENERALINDICES
 #define RESTARTNUM -1
@@ -15,7 +15,8 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
+//#define SKIPRADSOURCE
 #define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
 
@@ -40,7 +41,7 @@
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-//#define MAGNFIELD
+#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -60,7 +61,7 @@
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#define RADVISCOSITY SHEARVISCOSITY
 #define ACCELRADVISCOSITY
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
@@ -184,7 +185,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/

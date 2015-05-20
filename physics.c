@@ -738,10 +738,6 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
   //to avoid slow cancellation:
   ff[1]= gdetu*(etap*ucon[idim+1]*ucov[0] + rho*ucon[idim+1]*utp1);
 
-#ifdef NONRELMHD
-  ff[1]= gdetu*T[idim+1][0];
-#endif
-
 #ifdef MAGNFIELD
   ff[1]+= - gdetu*bcon[idim+1]*bcov[0];
 #endif
@@ -750,6 +746,11 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
   ff[3]= gdetu*(T[idim+1][2]); 
   ff[4]= gdetu*(T[idim+1][3]);
   ff[5]= gdetu*S*ucon[idim+1];
+
+
+#ifdef NONRELMHD
+  ff[1]= gdetu*T[idim+1][0]; 
+#endif
 
 #ifdef TRACER
   ff[TRA]= gdetu*tracer*ucon[idim+1]; 
@@ -821,7 +822,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   calc_bcon_4vel(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
   bsq = dot(bcon,bcov);
-#else
+#else 
   bcon[0]=bcon[1]=bcon[2]=bcon[3]=0.;
   bsq=0.;
 #endif
@@ -839,9 +840,16 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
 #else //NONRELMHD
 
-  for(i=0;i<4;i++)
-    for(j=0;j<4;j++)
-      T[i][j]=(rho + delta(0,i)*delta(0,j)*(uu+p+bsq))*ucon[i]*ucon[j] + ptot*GG[i][j] - bcon[i]*bcon[j];
+  ldouble v2=dot3nr(ucon,ucov);
+
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      T[i][j]=(rho)*ucon[i]*ucon[j] + ptot*GG[i][j] - bcon[i]*bcon[j];
+
+  T[0][0]=uu + bsq/2. + rho*v2/2.;
+
+   for(i=1;i<4;i++)
+     T[0][i]=T[i][0]=(T[0][0] + ptot) *ucon[i]*ucon[0] + ptot*GG[i][0] - bcon[i]*bcon[0];
 
 #endif
 
