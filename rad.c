@@ -1315,45 +1315,43 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	params[2]=RADIMPLICIT_FF;
 	ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
       }      
-    #endif
+#endif
   }
   
-  //TESTNR
+//*********** 2.5th ************
   
-  //*********** 2.5th ************
-  /*
-    if(ret!=0) {
+if(ret!=0) {
+  PLOOP(iv) 
+  {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+  params[1]=RADIMPLICIT_ENERGYEQ;
+  params[2]=RADIMPLICIT_LAB;
+  if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+#ifndef BASICRADIMPLICIT
+  if(ret!=0)
+    {
       PLOOP(iv) 
-      {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-      params[1]=RADIMPLICIT_ENERGYEQ;
-      params[2]=RADIMPLICIT_LAB;
-      if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
+      { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+      params[2]=RADIMPLICIT_FF;
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-      #ifndef BASICRADIMPLICIT
-      if(ret!=0)
-	{
-	  PLOOP(iv) 
-	  { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-	  params[2]=RADIMPLICIT_FF;
-	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-	}  
-      #endif
-      }*/
-  //#endif
+    }  
+#endif
+ }
+//#endif
 
-  #ifndef BASICRADIMPLICIT
-  //*********** 3th ************
-  if(ret!=0) {
-    PLOOP(iv) 
-    {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
-    params[1]=RADIMPLICIT_ENTROPYEQ;
-    params[2]=RADIMPLICIT_LAB;
-    params[0]=startwith;
-    ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
-  }
+#ifndef BASICRADIMPLICIT
+//*********** 3th ************
+if(ret!=0) {
+  PLOOP(iv) 
+  {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[2]=RADIMPLICIT_LAB;
+  params[0]=startwith;
+  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
+ }
 
-  //*********** 4th ************
-  //#ifndef NCOMPTONIZATION
+//*********** 4th ************
+//#ifndef NCOMPTONIZATION
   if(ret!=0) {
     PLOOP(iv) 
     {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }

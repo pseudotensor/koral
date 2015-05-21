@@ -19,12 +19,12 @@
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
-#define BASICRADIMPLICIT
+//#define BASICRADIMPLICIT
 //#define RADIMPLICITTHRESHOLD 1.e-40	
-//#define BALANCEENTROPYWITHRADIATION
-//#define COMPTONIZATION
+#define BALANCEENTROPYWITHRADIATION
+#define COMPTONIZATION
 
 //#define U2P_EQS U2P_EQS_JONS
 //#define U2P_SOLVER U2P_SOLVER_WP
@@ -38,6 +38,8 @@
 /************************************/
 //magnetic choices
 /************************************/
+#define MAGNFIELD
+
 #define MIMICDYNAMO
 #define CALCHRONTHEGO
 #define THETAANGLE 0.25
@@ -47,7 +49,7 @@
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-#define MAGNFIELD
+
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -107,7 +109,7 @@
 /************************************/
 //#define myMKS2COORDS
 #define mySPHCOORDS
-#define RMIN 15.
+#define RMIN 4.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -156,8 +158,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 128//350//128 //28*9
-#define TNY 192//350//192 //26*9
+#define TNX 128//350//64//128 //28*9
+#define TNY 192//350////192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 25
@@ -193,7 +195,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/
@@ -209,6 +211,7 @@
 #define NTORUS 1
 
 #if(NTORUS==1) //Jiang+14
+#define VELRINIT -0.3
 #define KT_A 0.4
 #define KT_R0 (25.*2.)
 #define KT_RHO0 (10.*rhoCGS2GU(1.e-2))

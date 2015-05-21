@@ -122,6 +122,28 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   ldouble vtot2; //total characteristic velocity
   vtot2=cs2 + va2 - cs2*va2;
 
+#ifdef NONRELMHD //non-rel version
+  
+  ldouble vx,vy,vz,cs,csx,csy,csz;
+  vx=pp[VX];
+  vy=pp[VY];
+  vz=pp[VZ];
+  cs=sqrt(vtot2);
+  csx=cs/sqrt(gg[1][1]);
+  csy=cs/sqrt(gg[2][2]);
+  csz=cs/sqrt(gg[3][3]);
+  
+  axhdr=vx+csx;
+  axhdl=vx-csx;
+
+  ayhdr=vy+csy;
+  ayhdl=vy-csy;
+  
+  azhdr=vz+csz;
+  azhdl=vz-csz;
+
+#else //fully relativistic
+
   //**********************************************************************
   //algorithm from HARM to transform the fluid frame wavespeed into lab frame
   //**********************************************************************
@@ -142,6 +164,8 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
   if(ret<0) {printf("error wsz at %d | %d | %d\n",geom->ix,geom->iy,geom->iz);}
   azhdl=aret[0];
   azhdr=aret[1];
+
+#endif
  
 #ifdef RADIATION
   //**********************************************************************
@@ -748,7 +772,7 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
   ff[5]= gdetu*S*ucon[idim+1];
 
 #ifdef NONRELMHD
-  ff[1]= gdetu*T[idim+1][0]; 
+  ff[1]= gdetu*T[idim+1][0];
 #endif
 
 #ifdef TRACER

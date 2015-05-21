@@ -205,12 +205,13 @@ p2u_mhd_nonrel(ldouble *p, ldouble *u, void *ggg)
   //************************************
  
   ldouble Ttt=-(uu + bsq/2. + rho*v2/2.);
+  ldouble Tttt=Ttt;
   ldouble Ttr =rho*ucov[1];
   ldouble Ttth =rho*ucov[2];
   ldouble Ttph =rho*ucov[3];
 
   u[0]=gdetu*rho;
-  u[1]=gdetu*Ttt;
+  u[1]=gdetu*Tttt;
   u[2]=gdetu*Ttr;
   u[3]=gdetu*Ttth;
   u[4]=gdetu*Ttph;

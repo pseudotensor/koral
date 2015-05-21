@@ -42,7 +42,7 @@ if(rho<0.) //outside donut
     ult = ulph / ell;
 
     ucov[0]=ult;
-    ucov[1]=0.;
+    ucov[1]=VELRINIT; //to perturb the torus radially
     ucov[2]=0.;
     ucov[3]=ulph;
     
