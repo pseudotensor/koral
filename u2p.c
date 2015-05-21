@@ -1259,9 +1259,11 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   ucov[1]=uu[VX]/rho/gdetu;
   ucov[2]=uu[VY]/rho/gdetu;
   ucov[3]=uu[VZ]/rho/gdetu;
-  fill_utinucov(ucov,gg,GG);
+  //fill_utinucov(ucov,gg,GG); //actually unneccesary because raising indices does not mix up components
 
   indices_12(ucov,ucon,GG);
+
+  ucon[0]=1.;
 
   ldouble v2=dot3nr(ucon,ucov);
 
@@ -1269,21 +1271,35 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   pp[VY]=ucon[2];
   pp[VZ]=ucon[3];
 
-  ldouble bcon[4],bcov[4],bsq=0.;
+  ldouble bsq=0.;
 
 #ifdef MAGNFIELD
  
-  bcon[0]=0.;
-  bcon[1]=uu[B1]/gdetu;
-  bcon[2]=uu[B2]/gdetu;
-  bcon[3]=uu[B3]/gdetu;
+  ldouble bcon[4],bcov[4],Bcon[4];
 
-  pp[B1]=bcon[1];
-  pp[B2]=bcon[2];
-  pp[B3]=bcon[3];
+  Bcon[0]=0.;
+  Bcon[1]=uu[B1]/gdetu;
+  Bcon[2]=uu[B2]/gdetu;
+  Bcon[3]=uu[B3]/gdetu;
+
+  pp[B1]=Bcon[1];
+  pp[B2]=Bcon[2];
+  pp[B3]=Bcon[3];
+
+  calc_bcon_4vel(pp,ucon,ucov,bcon);
 
   indices_21(bcon,bcov,gg); 
+
   bsq = dot(bcon,bcov);
+
+  /*
+  print_4vector(ucon);
+  print_4vector(ucov);
+  print_4vector(bcon);
+  print_4vector(bcov);
+  printf("%e\n",bsq);
+  */
+
 #endif
 
   
@@ -1875,9 +1891,9 @@ test_inversion_nonrel()
 
   print_metric(geom.gg);
 
-  ucon[1]=0.001;
+  ucon[1]=0.1;
   ucon[2]=0.001;
-  ucon[3]=0.00001;
+  ucon[3]=0.001;
   conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 
   pp[RHO]=100.;
@@ -1889,7 +1905,9 @@ test_inversion_nonrel()
 
 #ifdef MAGNFIELD
   pp[B1]=pp[B2]=pp[B3]=0.;
-  pp[B1]=1.e-5;
+  pp[B1]=1.e-1;
+  pp[B2]=1.e-4;
+  pp[B3]=1.e-3;
 #endif
 
 #ifdef RADIATION

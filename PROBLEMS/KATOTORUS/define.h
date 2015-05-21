@@ -94,7 +94,7 @@
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 50.
+#define B2RHORATIOMAX 5.
 #define GAMMAMAXRAD 50.
 #define GAMMAMAXHD 50.
 
@@ -109,6 +109,7 @@
 /************************************/
 //#define myMKS2COORDS
 #define mySPHCOORDS
+//#define myCYLCOORDS
 #define RMIN 4.
 #define RMAX 100.
 #define MKSR0 -300.
@@ -117,6 +118,15 @@
 #define MKSMY2 0.2
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
+
+#ifdef myCYLCOORDS //modified Kerr-Shild
+#define PWPOTENTIAL
+#define MYCOORDS CYLCOORDS
+#define MINX RMIN
+#define MAXX 100.
+#define MINY (-60.)
+#define MAXY (60.)
+#endif
 
 #ifdef myMSPH1COORDS //modified Kerr-Shild
 #define PWPOTENTIAL

@@ -187,6 +187,11 @@ p2u_mhd_nonrel(ldouble *p, ldouble *u, void *ggg)
 
   conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
 
+#ifdef NONRELMHD
+  ucon[0]=1.;
+  ucov[0]=-1.;
+#endif
+
   ldouble v2=dot3nr(ucon,ucov);
 
 #ifdef MAGNFIELD

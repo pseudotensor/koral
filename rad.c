@@ -2638,7 +2638,7 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   utcon[2]=pp[VY];
   utcon[3]=pp[VZ];
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
-   #ifdef NONRELMHD
+   #ifdef SKIP_NONRELMHD
   ucon[0]=1.;
   ucov[0]=-1.;
   #endif

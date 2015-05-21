@@ -6,8 +6,9 @@
 /* calculate magnetic field four-vector knowing gas four-velocity ucov */
 void calc_bcon_4vel(double *pr, double *ucon, double *ucov, double *bcon) 
 {
-  int j ;
+  int j;
   
+  /*
 #ifdef NONRELMHD
   bcon[0] = pr[B1]*ucov[1] + pr[B2]*ucov[2] + pr[B3]*ucov[3] ;
   for(j=1;j<4;j++)
@@ -16,7 +17,7 @@ void calc_bcon_4vel(double *pr, double *ucon, double *ucov, double *bcon)
     }
   return;
 #endif
-  
+  */
 
   bcon[0] = pr[B1]*ucov[1] + pr[B2]*ucov[2] + pr[B3]*ucov[3] ;
   for(j=1;j<4;j++)
@@ -68,10 +69,11 @@ void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg)
   conv_vels(ucon,ucon,VELPRIM,VEL4,geom->gg,geom->GG);
   indices_21(ucon,ucov,geom->gg);
 
+  /*
  #ifdef NONRELMHD
   ucon[0]=1.;
 #endif
-
+  */
   
 
   Bcon[0]=0.;
@@ -84,6 +86,7 @@ void calc_Bcon_prim(double *pp, double *bcon,double *Bcon, void* ggg)
   
   return;
 }
+
 
 /***********************************************************************************************/
 /***********************************************************************************************/

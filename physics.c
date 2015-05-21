@@ -726,6 +726,11 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
   //converting to 4-velocity
   conv_vels_both(vcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
 
+#ifdef NONRELMHD
+  ucon[0]=1.;
+  ucov[0]=-1.;
+#endif
+
 #ifdef MAGNFIELD
   calc_bcon_4vel(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
@@ -841,6 +846,12 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
   utcon[0]=0.;
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
 
+  #ifdef NONRELMHD
+  ucon[0]=1.;
+  ucov[0]=-1.;
+#endif
+
+
 #ifdef MAGNFIELD
   calc_bcon_4vel(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
@@ -863,9 +874,7 @@ calc_Tij(ldouble *pp, void* ggg, ldouble T[][4])
 
 #else //NONRELMHD
 
-  ucon[0]=1.;
-  ucov[0]=-1.;
-
+  
   ldouble v2=dot3nr(ucon,ucov);
 
   for(i=1;i<4;i++)
