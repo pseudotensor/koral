@@ -9,6 +9,10 @@
 /*********************/
 /*********************/
 
+#ifndef NONRELMHDENTROPYCUT
+#define NONRELMHDENTROPYCUT 1.e-7
+#endif
+
 #ifndef VELPRIM
 #define VELPRIM VELR
 #endif

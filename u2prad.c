@@ -502,9 +502,6 @@ u2p_rad(ldouble *uu, ldouble *pp, void *ggg, int *corrected)
   urfcon[2]=pp[FY];
   urfcon[3]=pp[FZ];
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,geom->gg,geom->GG);
-#ifdef NONRELMHD
-  fill_utinucon(urfcon,geom->gg,geom->GG);
-  #endif
  
   pp[NF]=uu[NF]/urfcon[0]/gdetu;
   #endif
@@ -692,7 +689,7 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   //skip floors for some time
   //return 0;
 
-  int verbose=0;
+  int verbose=1;
   int ret=0;
 
   struct geometry *geom
@@ -762,9 +759,6 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   for(iv=1;iv<4;iv++)
     ucond[iv]=pp[1+iv];
   conv_vels(ucond,ucond,VELPRIM,VEL4,gg,GG);
-#ifdef NONRELMHD
-  fill_utinucon(uconc,geom->gg,geom->GG);
-  #endif
  
   indices_21(ucond,ucovd,gg);
   calc_bcon_4vel(pp,ucond,ucovd,bcond);

@@ -87,12 +87,6 @@ calc_wavespeeds_lr_pure(ldouble *pp,void *ggg,ldouble *aaa)
     utcon[iv]=pp[1+iv];
   utcon[0]=0.;
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
- 
-  //fill the proper u^t if unknown
-  #ifdef NONRELMHD
-  fill_utinucon(ucon,gg,GG);
-  fill_utinucov(ucov,gg,GG);
-  #endif
 
   //**********************************************************************
   //***** hydro: speed of sound ******************************************
@@ -752,7 +746,6 @@ int f_flux_prime( ldouble *pp, int idim, int ix, int iy, int iz,ldouble *ff,int 
   ff[3]= gdetu*(T[idim+1][2]); 
   ff[4]= gdetu*(T[idim+1][3]);
   ff[5]= gdetu*S*ucon[idim+1];
-
 
 #ifdef NONRELMHD
   ff[1]= gdetu*T[idim+1][0]; 

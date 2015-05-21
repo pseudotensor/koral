@@ -276,10 +276,6 @@ int p2u_rad(ldouble *pp,ldouble *uu,void *ggg)
 
       //converting to lab four-velocity
       conv_vels(urf,urf,VELPRIMRAD,VEL4,gg,GG);
-#ifdef NONRELMHD
-      fill_utinucon(urf,geom->gg,geom->GG);
-#endif
- 
   
       ldouble Rtopp[4];
       Rtopp[0]=4./3.*Erf*urf[0]*urf[0] + 1./3.*Erf*GG[0][0]; //R^t_t

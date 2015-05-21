@@ -1,4 +1,8 @@
 #define NONRELMHD
+#define NONRELMHDENTROPYCUT 1.e-8
+#define RADIMPLICITTHRESHOLD 1.e-40
+//#define VELPRIM VEL4
+//#define VELPRIMRAD VEL4
 
 /************************************/
 //general
@@ -15,10 +19,12 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
-#define BALANCEENTROPYWITHRADIATION
-#define COMPTONIZATION
+#define BASICRADIMPLICIT
+//#define RADIMPLICITTHRESHOLD 1.e-40	
+//#define BALANCEENTROPYWITHRADIATION
+//#define COMPTONIZATION
 
 //#define U2P_EQS U2P_EQS_JONS
 //#define U2P_SOLVER U2P_SOLVER_WP
@@ -41,7 +47,7 @@
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-//#define MAGNFIELD
+#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -151,7 +157,7 @@
 
 //total resolution
 #define TNX 128//350//128 //28*9
-#define TNY 128//350//192 //26*9
+#define TNY 192//350//192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 25
@@ -187,7 +193,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 100.
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/

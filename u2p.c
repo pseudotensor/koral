@@ -1291,7 +1291,7 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   if(Etype==U2P_HOT)
     {
       uint = -uu[UU]/gdetu-bsq/2. - rho*v2/2.;
-      if(uint<1.e-10*rho) return -1;
+      if(uint<NONRELMHDENTROPYCUT*rho) return -1;
       pp[UU]=uint;
     }
   else if(Etype==U2P_ENTROPY)

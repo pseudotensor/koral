@@ -120,6 +120,11 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
   utcon[0]=0.;
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
 
+  #ifdef NONRELMHD
+  ucon[0]=1.;
+  ucov[0]=-1.;
+  #endif
+
   //correcting rho for MHD prims
   if(whichprim==MHD)
     {
@@ -851,6 +856,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      //correct rho to follow new velocity (only for MHD primitives)
 	      ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
 	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+
+#ifdef NONRELMHD
+	      ucon[0]=1.;
+#endif
+
 	      pp[RHO]=(uu0[RHO])/gdetu/ucon[0];
 	    }
 
@@ -880,8 +890,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      if(rettemp<0) u2pret=-2; //to return error if even entropy inversion failed
 	      else u2pret=0;	      
 
-	      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
-	      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+	      //ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
+	      //conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
 
 	    }
 	  if(whichprim==MHD)
@@ -964,7 +974,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	  
 	  ldouble CONVREL=EPS;
 	  ldouble CONVRELERR=1.-EPS;
-
+	  //TODO: shaky?
 
 	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
 	    {
@@ -997,6 +1007,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
     {
       ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+
+#ifdef NONRELMHD
+      ucon[0]=1.;
+#endif
+
       pp[RHO]=(uu0[RHO])/gdetu/ucon[0];
     }
   //updating entropy
@@ -1028,8 +1043,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       else 
 	u2pret=0;
 	      
-      ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
-      conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
+      //ucon[1]=pp[2]; ucon[2]=pp[3]; ucon[3]=pp[4]; ucon[0]=0.;
+      //conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);
     }
   if(whichprim==MHD)
     {
@@ -1303,9 +1318,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     #endif
   }
   
-  // #ifndef NCOMPTONIZATION
+  //TESTNR
+  
   //*********** 2.5th ************
-  if(ret!=0) {
+  /*
+    if(ret!=0) {
       PLOOP(iv) 
       {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
       params[1]=RADIMPLICIT_ENERGYEQ;
@@ -1321,7 +1338,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	  ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 	}  
       #endif
-  }
+      }*/
   //#endif
 
   #ifndef BASICRADIMPLICIT
@@ -1600,12 +1617,6 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   utcon[2]=pp[3];
   utcon[3]=pp[4];
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
-
-  //fill the proper u^t if unknown
-  #ifdef NONRELMHD
-  fill_utinucon(ucon,gg,GG);
-  fill_utinucov(ucov,gg,GG);
-  #endif
  
   //gas properties
   ldouble rho=pp[RHO];
@@ -1752,11 +1763,6 @@ calc_Rij_M1(ldouble *pp, void* ggg, ldouble Rij[][4])
   urfcon[3]=pp[FZ0];
   //converting to lab four-velocity
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
-  //fill the proper u^t if unknown
-  #ifdef NONRELMHD
-  fill_utinucon(urfcon,gg,GG);
-  #endif
- 
 
   //lab frame stress energy tensor:
   for(i=0;i<4;i++)
@@ -2274,11 +2280,6 @@ calc_rad_wavespeeds(ldouble *pp,void *ggg,ldouble tautot[3],ldouble *aval,int ve
   urfcon[2]=pp[FY0];
   urfcon[3]=pp[FZ0];
   conv_vels(urfcon,urfcon,VELPRIMRAD,VEL4,gg,GG);
-  
-  //fill the proper u^t if unknown
-  #ifdef NONRELMHD
-  fill_utinucon(urfcon,gg,GG);
-  #endif
 
   //square of radiative wavespeed in radiative rest frame
   ldouble rv2rad = 1./3.;
@@ -2639,12 +2640,10 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   utcon[2]=pp[VY];
   utcon[3]=pp[VZ];
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
-  //fill the proper u^t if unknown
-  #ifdef NONRELMHD
-  fill_utinucon(ucon,geom->gg,geom->GG);
-  fill_utinucov(ucov,geom->gg,geom->GG);
+   #ifdef NONRELMHD
+  ucon[0]=1.;
+  ucov[0]=-1.;
   #endif
- 
   //conv_velscov(utcon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
   //indices_21(ucon,ucov,geom->gg);
   ldouble Rij[4][4],Rtt;
@@ -3238,12 +3237,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
     }
   utcon[1]=pp[istart];  utcon[2]=pp[istart+1];  utcon[3]=pp[istart+2];
   conv_vels_both(utcon,ucon,ucov,whichvel,VEL4,gg,GG);  
-  //fill the proper u^t if unknown
-  #ifdef NONRELMHD
-  fill_utinucon(ucon,gg,GG);
-  fill_utinucov(ucov,gg,GG);
-  #endif
- 
+
   //derivatives
   for(idim=1;idim<4;idim++)
     {
@@ -3324,15 +3318,7 @@ calc_shear_lab(ldouble *pp0, void* ggg,ldouble S[][4],int hdorrad,int *derdir)
 
      conv_vels_both(utconm1,uconm1,ucovm1,whichvel,VEL4,ggm1,GGm1);
      conv_vels_both(utconp1,uconp1,ucovp1,whichvel,VEL4,ggp1,GGp1);
-     //fill the proper u^t if unknown
-#ifdef NONRELMHD
-     fill_utinucon(uconm1,gg,GG);
-     fill_utinucov(ucovm1,gg,GG);
-     fill_utinucon(uconp1,gg,GG);
-     fill_utinucov(ucovp1,gg,GG);
-#endif
  
-
      ldouble dl,dr,dc;
      ldouble dl2,dr2,dc2;
      for(i=0;i<4;i++)
@@ -5556,6 +5542,11 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
     {
       ucon[1]=pp[2];ucon[2]=pp[3];ucon[3]=pp[4]; ucon[0]=0.;
       conv_vels(ucon,ucon,VELPRIM,VEL4,gg,GG);  
+
+  #ifdef NONRELMHD
+  ucon[0]=1.;
+  #endif
+
       pp[RHO]=(uu0[RHO])/gdetu/ucon[0];
     }
   //updating entropy
