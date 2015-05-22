@@ -1,8 +1,9 @@
 #define NONRELMHD
-#define NONRELMHDENTROPYCUT 1.e-8
-#define RADIMPLICITTHRESHOLD 1.e-40
+#define RADIMPLICITTHRESHOLD 1.e0
+#define MAXRADIMPDAMPING 1.e-2
 //#define VELPRIM VEL4
-//#define VELPRIMRAD VEL4
+
+#define NONRELMHDENTROPYCUT 1.e-10 // Tcut = 3e12*this number
 
 /************************************/
 //general
@@ -14,32 +15,33 @@
 /************************************/ 
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 18
 
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
 //#define SKIPRADSOURCE
-//#define BASICRADIMPLICIT
-//#define RADIMPLICITTHRESHOLD 1.e-40	
-#define BALANCEENTROPYWITHRADIATION
+//#define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
+//#define RADIMPSTARTWITHEXP
+//#define ALLOWFORENTRINF4DPRIM
+//#define ALLOWRADCEILINGINIMPLICIT
+//#define RADIMPLICITFIXVEL
+#define BASICRADIMPLICIT
 
 //#define U2P_EQS U2P_EQS_JONS
 //#define U2P_SOLVER U2P_SOLVER_WP
 
 
-#define U2PCONV 1.e-10
+#define U2PCONV 1.e-12
 #define RADIMPCONV 1.e-10
-#define RADIMPEPS 1.e-6
+#define RADIMPEPS 1.e-8
 #define RADIMPMAXITER 50
 
 /************************************/
 //magnetic choices
 /************************************/
-#define MAGNFIELD
-
 #define MIMICDYNAMO
 #define CALCHRONTHEGO
 #define THETAANGLE 0.25
@@ -49,7 +51,7 @@
 #define DAMPBETA
 #define BETASATURATED 0.1
 #define ALPHABETA 6.28
-
+#define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
 #define MAXBETA .01 //target pmag/pgas int the midplane
@@ -94,9 +96,9 @@
 #define B2UURATIOMIN 0.
 #define B2UURATIOMAX 100000.
 #define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 5.
+#define B2RHORATIOMAX 50.
 #define GAMMAMAXRAD 50.
-#define GAMMAMAXHD 50.
+#define GAMMAMAXHD 2.
 
 /************************************/
 //blackhole
@@ -109,7 +111,6 @@
 /************************************/
 //#define myMKS2COORDS
 #define mySPHCOORDS
-//#define myCYLCOORDS
 #define RMIN 4.
 #define RMAX 100.
 #define MKSR0 -300.
@@ -118,15 +119,6 @@
 #define MKSMY2 0.2
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
-
-#ifdef myCYLCOORDS //modified Kerr-Shild
-#define PWPOTENTIAL
-#define MYCOORDS CYLCOORDS
-#define MINX RMIN
-#define MAXX 100.
-#define MINY (-60.)
-#define MAXY (60.)
-#endif
 
 #ifdef myMSPH1COORDS //modified Kerr-Shild
 #define PWPOTENTIAL
@@ -168,8 +160,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 128//350//64//128 //28*9
-#define TNY 192//350////192 //26*9
+#define TNX 350//128 //28*9
+#define TNY 350//192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 25
@@ -205,7 +197,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 100.
 #define DTOUT2 1000.
 
 /************************************/
@@ -221,7 +213,6 @@
 #define NTORUS 1
 
 #if(NTORUS==1) //Jiang+14
-#define VELRINIT -0.3
 #define KT_A 0.4
 #define KT_R0 (25.*2.)
 #define KT_RHO0 (10.*rhoCGS2GU(1.e-2))

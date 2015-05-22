@@ -1307,13 +1307,21 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   if(Etype==U2P_HOT)
     {
       uint = -uu[UU]/gdetu-bsq/2. - rho*v2/2.;
-      if(uint<NONRELMHDENTROPYCUT*rho) return -1;
+      if(uint<NONRELMHDENTROPYCUT*rho) 
+	{
+	  //printf("%d %d > %e %e %e %e %e\n",geom->ix,geom->iy,uint,uu[UU]/gdetu,bsq/2.,rho*v2/2.,rho); 
+	  //if(geom->ix>50) getch();
+	  return -1;
+	  
+	}
       pp[UU]=uint;
     }
   else if(Etype==U2P_ENTROPY)
     {
       ldouble S=uu[ENTR]/gdetu;
       uint= calc_ufromS(S,rho);
+      //printf("entr: %d %d > %e %e %e %e %e\n",geom->ix,geom->iy,uint,uu[UU]/gdetu,bsq/2.,rho*v2/2.,rho); 
+	  
       pp[UU]=uint;
     }
 

@@ -124,6 +124,31 @@ main(int argc, char **argv)
 	{
 	  //reading avg file
 	  readret=fread_avgfile(ifile,folderin,pavg,&dt,&t);
+
+	  //test for errors in the avg file
+	  int flag[NX][NY][NZ];
+	  for(iz=0;iz<NZ;iz++)
+	    for(iy=0;iy<NY;iy++)
+	      for(ix=0;ix<NX;ix++)
+		{
+		  flag[ix][iy][iz]=0;
+		  for(iv=0;iv<NV+NAVGVARS;iv++)
+		    {
+		      ldouble val=get_uavg(pavg,iv,ix,iy,iz);
+		      if(!isfinite(val))
+			flag[ix][iy][iz]=-1;
+		    }
+		}
+
+	  for(ix=0;ix<NX;ix++) 
+	    for(iz=0;iz<NZ;iz++)
+	      for(iy=0;iy<NY;iy++)
+		if(flag[ix][iy][iz]<0) //error
+		  {
+		    printf("correcting %d %d %d\n",ix,iy,iz);
+		  }
+	      
+	
 	}
       else
 	{

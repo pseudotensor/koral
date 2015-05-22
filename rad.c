@@ -153,8 +153,11 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
 
       int rettemp=0;
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-      //if(rettemp<0)
-      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+
+      #ifdef ALLOWFORENTRINF4DPRIM
+      if(rettemp<0)
+	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0);
+      #endif
 
       if(rettemp<0) 
 	  u2pret=-2; //to return error
@@ -936,7 +939,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      xiapp/=2.; 
 	    }
 
-	  if(xiapp<1.e-2) 
+	  if(xiapp<MAXRADIMPDAMPING) 
 	    {
 	      if(verbose) printf("damped unsuccesfully in implicit_4dprim\n");
 	      failed=1;
@@ -1186,7 +1189,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   int iv;ldouble pp[NV],uu[NV];
   for(iv=0;iv<NV;iv++)
     {
-      uu[iv]=get_u(u,iv,ix,iy,iz); //conserved after advection and geometry
+      uu[iv]=get_u(u,iv,ix,iy,iz); //conserved after advection and geometry and source terms
       pp[iv]=get_u(p,iv,ix,iy,iz); //some reasonable estimate of primitives 
    }
   
@@ -1223,6 +1226,44 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 
   //otherwise assumes *u and *p consistent!
 
+  #ifdef RADIMPSTARTWITHEXP
+  solve_explicit_lab_core(uu,pp,&geom,dt,deltas,verbose);
+  ldouble delapl[NV],uuexp[NV],ppexp[NV];
+  for(iv=0;iv<NV;iv++)
+    {
+      delapl[iv]=0.;
+      uuexp[iv]=uu[iv];
+      ppexp[iv]=pp[iv];
+    }
+      
+  delapl[1]=-deltas[0];
+  delapl[ENTR]=-deltas[0];
+  delapl[2]=-deltas[1];
+  delapl[3]=-deltas[2];
+  delapl[4]=-deltas[3];
+  delapl[EE0]=deltas[0];
+  delapl[FX0]=deltas[1];
+  delapl[FY0]=deltas[2];
+  delapl[FZ0]=deltas[3];
+
+  for(iv=0;iv<NV;iv++)
+    uuexp[iv]+=delapl[iv];
+
+  u2p(uuexp,ppexp,&geom,corr,fixup,0);
+
+  /*
+  if(corr[0]!=0 || corr[1]!=0)
+    printf(":impexp NOT succeeded at %d %d\n",geom.ix,geom.iy);
+  */
+  
+  if(corr[0]==0 && corr[1]==0)//success
+    {
+      for(iv=0;iv<NV;iv++)
+	pp[iv]=ppexp[iv];
+    }
+
+
+  #endif
  
   //initial guess in pp[]
 
@@ -1288,6 +1329,11 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 #endif
 
 
+  //***********************************************//
+  //***********************************************//
+  //***********************************************//
+
+
 
   int startwith;
   if(Ehat<enratiotreshold*pp0[UU]) startwith=RAD; else startwith=MHD;
@@ -1310,6 +1356,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     #ifndef BASICRADIMPLICIT
     if(ret!=0)
       { 
+
+	//TESTNR below!
+	
 	PLOOP(iv) 
 	{ pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
 	params[2]=RADIMPLICIT_FF;
@@ -2557,7 +2606,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
   
   ldouble del4[NRADVAR],delapl[NV];
   int iv;
-  int verbose=1;
+  int verbose=1; //set to 2 to print out the whole failed iterations
 
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
@@ -2637,13 +2686,9 @@ calc_ff_Rtt(ldouble *pp,ldouble *Rttret, ldouble* ucon,void* ggg)
   utcon[1]=pp[VX];
   utcon[2]=pp[VY];
   utcon[3]=pp[VZ];
+
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
-   #ifdef SKIP_NONRELMHD
-  ucon[0]=1.;
-  ucov[0]=-1.;
-  #endif
-  //conv_velscov(utcon,ucov,VELPRIM,VEL4,geom->gg,geom->GG);
-  //indices_21(ucon,ucov,geom->gg);
+  
   ldouble Rij[4][4],Rtt;
   calc_Rij_M1(pp,ggg,Rij);
  

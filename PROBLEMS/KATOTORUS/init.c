@@ -42,7 +42,7 @@ if(rho<0.) //outside donut
     ult = ulph / ell;
 
     ucov[0]=ult;
-    ucov[1]=VELRINIT; //to perturb the torus radially
+    ucov[1]=0.;
     ucov[2]=0.;
     ucov[3]=ulph;
     
@@ -105,8 +105,7 @@ if(rho<0.) //outside donut
     Acov[0]=Acov[1]=Acov[2]=0.;
 
     //standard single poloidal loop
-    //Acov[3]=my_max(pp[RHO]-1.e-2*KT_RHO0,0.);
-    Acov[3]=my_max(pp[RHO]-1.e-1*KT_RHO0,0.);
+    Acov[3]=my_max(pp[RHO]-1.e-2*KT_RHO0,0.);
 
     pp[B1]=Acov[1];
     pp[B2]=Acov[2];
