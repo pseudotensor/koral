@@ -138,6 +138,8 @@ main(int argc, char **argv)
 		      if(!isfinite(val))
 			flag[ix][iy][iz]=-1;
 		    }
+		  if(get_uavg(pavg,RHO,ix,iy,iz)<SMALL || get_uavg(pavg,RHO,ix,iy,iz)>BIG)
+		    flag[ix][iy][iz]=-1;
 		}
 
 	  for(ix=0;ix<NX;ix++) 
@@ -145,7 +147,41 @@ main(int argc, char **argv)
 	      for(iy=0;iy<NY;iy++)
 		if(flag[ix][iy][iz]<0) //error
 		  {
-		    printf("correcting %d %d %d\n",ix,iy,iz);
+		    
+		    if(TNZ==1) //corecting in 2d in theta
+		      {
+			int iiy=iy;
+			if(iy>TNY/2) //lower half
+			  {
+			    do
+			      iiy--;
+			    while(flag[ix][iiy][iz]<0 && iiy>=0);
+			  }
+			else
+			  {
+			    do
+			      iiy++;
+			    while(flag[ix][iiy][iz]<0 && iiy<TNY);
+			  }
+
+			if(iiy>=0 && iy<TNY)
+			  {
+			    //printf("correcting2 %d %d with %d\n",ix,iy,iiy);
+			     for(iv=0;iv<NV+NAVGVARS;iv++)
+			       {
+				 set_uavg(pavg,iv,ix,iy,iz,get_uavg(pavg,iv,ix,iiy,iz));
+			       }
+			  }
+			else
+			  {
+			    printf("was not able to find good neighbor for %d %d\n",ix,iy);
+			  }
+		      }
+		    else //in 3d - in phi
+		      {
+			printf("correcting in 3d not implemented yet.\n"); 
+		      }
+
 		  }
 	      
 	
