@@ -1,7 +1,9 @@
+#define NONRELMHD
+
 #define MYCOORDS MINKCOORDS
 
-#define NY 1
-#define NZ 1
+#define TNY 1
+#define TNZ 1
 
 #define TSTEPLIM .6
 #define FULLDISSIPATION
@@ -34,9 +36,9 @@
 #define RADIMPCONV 1.e-12
 #define U2PCONV 1.e-14
 
-#define NX 128
+#define TNX 256
 
-#define NUMERO 104
+#define NUMERO 1002
 
 #if (NUMERO==1) //sonic wave
 #define KAPPA 0.

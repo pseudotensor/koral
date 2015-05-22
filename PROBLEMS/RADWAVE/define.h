@@ -1,13 +1,7 @@
-#define U2P_NUMTEMP
-#define U2PPREC 1.e-6
-#define U2PRADPREC 1.e-7
-#define RADFORCEPREC 1.e-5
-#define VERBOSE0 0
-
 #define MYCOORDS MINKCOORDS
 
-#define NY 1
-#define NZ 1
+#define TNY 1
+#define TNZ 1
 #define TSTEPLIM .5
 #define INITTSTEPLIM (TSTEPLIM/10.)
 
@@ -31,7 +25,7 @@
 //#define EDDINGTON_APR
 #define KAPPAES 0.
 #define KAPPA 0.
-#define NX 100
+#define TNX 100
 
 //efine RADIATION
 

@@ -1356,9 +1356,6 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     #ifndef BASICRADIMPLICIT
     if(ret!=0)
       { 
-
-	//TESTNR below!
-	
 	PLOOP(iv) 
 	{ pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
 	params[2]=RADIMPLICIT_FF;

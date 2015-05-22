@@ -484,7 +484,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 {
   //return 0;
 
-  int verbose=0;
+  int verbose=1;
   int ret=0;
   int iv;
 

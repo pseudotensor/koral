@@ -979,9 +979,9 @@ void
 am_i_sane()
 {
 #ifdef NONRELMHD
-  if(MYCOORDS!=SPHCOORDS && MYCOORDS!=CYLCOORDS)
+  if(MYCOORDS!=SPHCOORDS && MYCOORDS!=CYLCOORDS && MYCOORDS!=MINKCOORDS)
     {
-      printf("NONRELMHD implemented only for SPHCOORDS or CYLCOORDS so far.\n");
+      printf("NONRELMHD implemented only for flat coords so far.\n");
       exit(-1);
     }
 

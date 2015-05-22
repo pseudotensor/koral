@@ -1,6 +1,6 @@
 #define NONRELMHD
 #define RADIMPLICITTHRESHOLD 1.e0
-#define MAXRADIMPDAMPING 1.e-2
+#define MAXRADIMPDAMPING 1.e-10
 //#define VELPRIM VEL4
 
 #define NONRELMHDENTROPYCUT 1.e-10 // Tcut = 3e12*this number
@@ -15,7 +15,7 @@
 /************************************/ 
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 18
+#define RESTARTNUM 20
 
 /************************************/
 //radiation choices
@@ -24,7 +24,7 @@
 //#define SKIPRADSOURCE
 //#define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
-//#define RADIMPSTARTWITHEXP
+#define RADIMPSTARTWITHEXP
 //#define ALLOWFORENTRINF4DPRIM
 //#define ALLOWRADCEILINGINIMPLICIT
 //#define RADIMPLICITFIXVEL
@@ -160,8 +160,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 350//128 //28*9
-#define TNY 350//192 //26*9
+#define TNX 128//350//128 //28*9
+#define TNY 128//350//192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 25

@@ -1,8 +1,10 @@
+#define NONRELMHD
+
 /************************************/
 //restart
 /************************************/
 #define RESTART
-#define RESTARTNUM 14
+#define RESTARTNUM -1
 
 /************************************/
 //radiation
@@ -56,9 +58,9 @@
 #define MAXY 1.
 #define MINZ -1.
 #define MAXZ 1.
-#define NX 64
-#define NY 64
-#define NZ 1
+#define TNX 64
+#define TNY 64
+#define TNZ 1
 #define PERIODIC_XBC
 #define PERIODIC_YBC
 #define PERIODIC_ZBC
@@ -67,12 +69,12 @@
 //output
 /************************************/
 #define ALLSTEPSOUTPUT 0
-#define NSTEPSTOP 100
+#define NSTEPSTOP 1.e50
 #define NOUTSTOP 50
 #define SILOOUTPUT 1
 #define AVGOUTPUT 1
 #define OUTOUTPUT 0
-#define DTOUT1 1000.
+#define DTOUT1 100.
 #define DTOUT2 3000.
 
 /************************************/
