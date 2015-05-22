@@ -472,7 +472,7 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
       ldouble bcon[4],bcov[4],bsq;
       calc_bcon_prim(pp0,bcon,geom);
       indices_21(bcon,bcov,geom->gg); 
-      bsq = dot(bcon,bcov);
+      bsq = dotB(bcon,bcov);
       printf("bsq: %e\n\n",bsq);
 
       qsq=0.;

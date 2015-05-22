@@ -679,7 +679,7 @@ calc_angle_brbphibsq(int ix, int iy, int iz, ldouble *brbphi, ldouble *bsq, ldou
       //b_mu
       indices_21(bcon,bcov,geomBL.gg); 
 
-      *bsq = dot(bcon,bcov);
+      *bsq = dotB(bcon,bcov);
       *brbphi = sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*bcon[1]*bcon[3];
     }
 
@@ -711,7 +711,7 @@ calc_angle_bpbphibsq(int ix, int iy, int iz, ldouble *bpbphi, ldouble *bsq, ldou
   //b_mu
   indices_21(bcon,bcov,geomBL.gg); 
 
-  *bsq = dot(bcon,bcov);
+  *bsq = dotB(bcon,bcov);
 
   ldouble br = sqrt(geomBL.gg[1][1])*bcon[1];
   ldouble bth = sqrt(geomBL.gg[2][2])*bcon[2];
@@ -863,7 +863,7 @@ mimic_dynamo(ldouble dtin)
 
 	  calc_bcon_prim(&get_u(p,0,ix,iy,iz), bcon, &geom);
 	  indices_21(bcon,bcov,geom.gg); 
-	  bsqin = dot(bcon,bcov);
+	  bsqin = dotB(bcon,bcov);
 
 	  //ugasin=get_u(p,UU,ix,iy,iz);
 
@@ -1058,7 +1058,7 @@ mimic_dynamo(ldouble dtin)
 
 	  calc_bcon_prim(&get_u(p,0,ix,iy,iz), bcon, &geom);
 	  indices_21(bcon,bcov,geom.gg); 
-	  bsqout = dot(bcon,bcov);
+	  bsqout = dotB(bcon,bcov);
 
 	  //printf("bsqout: %e\n",bsqout);
 

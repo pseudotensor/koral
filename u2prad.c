@@ -763,7 +763,7 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   indices_21(ucond,ucovd,gg);
   calc_bcon_4vel(pp,ucond,ucovd,bcond);
   indices_21(bcond,bcovd,gg); 
-  magpre = dot(bcond,bcovd)/2.;
+  magpre = dotB(bcond,bcovd)/2.;
 
   //Ehat/uint ratios 
   

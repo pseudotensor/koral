@@ -252,7 +252,7 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
 		  getch();
 		  */
 		  indices_21(bcon,bcov,geomout.gg); 
-		  bsq[nodalindex] = dot(bcon,bcov);
+		  bsq[nodalindex] = dotB(bcon,bcov);
 		}
 	      else
 		{

@@ -90,7 +90,7 @@ p2u_mhd(ldouble *p, ldouble *u, void *ggg)
 #ifdef MAGNFIELD
   calc_bcon_4vel(p,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
-  bsq = dot(bcon,bcov);
+  bsq = dotB(bcon,bcov);
 #endif
 
 
@@ -197,7 +197,7 @@ p2u_mhd_nonrel(ldouble *p, ldouble *u, void *ggg)
 #ifdef MAGNFIELD
   calc_bcon_4vel(p,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
-  bsq = dot(bcon,bcov);
+  bsq = dotB(bcon,bcov);
 #endif
 
 
@@ -356,7 +356,7 @@ p2avg(int ix,int iy,int iz,ldouble *avg)
 #ifdef MAGNFIELD
   calc_bcon_4vel(pp,ucon,ucov,bcon);
   indices_21(bcon,bcov,gg); 
-  bsq = dot(bcon,bcov);
+  bsq = dotB(bcon,bcov);
 #endif
   
   //hydro stress-energy

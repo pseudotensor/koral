@@ -15,7 +15,7 @@
 /************************************/ 
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM 20
+#define RESTARTNUM -1
 
 /************************************/
 //radiation choices
@@ -24,11 +24,11 @@
 //#define SKIPRADSOURCE
 //#define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
-#define RADIMPSTARTWITHEXP
+//#define RADIMPSTARTWITHEXP
 //#define ALLOWFORENTRINF4DPRIM
 //#define ALLOWRADCEILINGINIMPLICIT
 //#define RADIMPLICITFIXVEL
-#define BASICRADIMPLICIT
+//#define BASICRADIMPLICIT
 
 //#define U2P_EQS U2P_EQS_JONS
 //#define U2P_SOLVER U2P_SOLVER_WP
@@ -111,7 +111,7 @@
 /************************************/
 //#define myMKS2COORDS
 #define mySPHCOORDS
-#define RMIN 4.
+#define RMIN 15.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -197,7 +197,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 100.
+#define DTOUT1 10.
 #define DTOUT2 1000.
 
 /************************************/

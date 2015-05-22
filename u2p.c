@@ -484,7 +484,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
 {
   //return 0;
 
-  int verbose=1;
+  int verbose=0;
   int ret=0;
   int iv;
 
@@ -579,7 +579,7 @@ check_floors_mhd(ldouble *pp, int whichvel,void *ggg)
   indices_21(ucond,ucovd,gg);
   calc_bcon_4vel(pp,ucond,ucovd,bcond);
   indices_21(bcond,bcovd,gg); 
-  magpre = dot(bcond,bcovd)/2.;
+  magpre = dotB(bcond,bcovd)/2.;
   calc_normalobs_4vel(GG,etacon);
   conv_vels_ut(etacon,etarel,VEL4,VELPRIM,gg,GG);
 
@@ -1290,7 +1290,7 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
 
   indices_21(bcon,bcov,gg); 
 
-  bsq = dot(bcon,bcov);
+  bsq = dotB(bcon,bcov);
 
   /*
   print_4vector(ucon);

@@ -302,7 +302,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 #ifdef MAGNFIELD
 		  calc_bcon_prim(pp,bcon,&geomBL);
 		  indices_21(bcon,bcov,geomBL.gg); 
-		  bsq = dot(bcon,bcov); 
+		  bsq = dotB(bcon,bcov); 
 #endif
 
 		  conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -786,7 +786,7 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 #ifdef MAGNFIELD
 	      calc_bcon_prim(pp,bcon,&geomBL);
 	      indices_21(bcon,bcov,geomBL.gg); 
-	      bsq = dot(bcon,bcov); 
+	      bsq = dotB(bcon,bcov); 
 #endif
 
 	      conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -1288,7 +1288,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 #ifdef MAGNFIELD
 	      calc_bcon_prim(pp,bcon,&geomBL);
 	      indices_21(bcon,bcov,geomBL.gg); 
-	      bsq = dot(bcon,bcov); 
+	      bsq = dotB(bcon,bcov); 
 #endif
 
 	      conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -1447,7 +1447,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 #ifdef MAGNFIELD
 		calc_bcon_prim(pp,bcon,&geomBL);
 		indices_21(bcon,bcov,geomBL.gg); 
-		bsq = dot(bcon,bcov); 
+		bsq = dotB(bcon,bcov); 
 #endif
 
 		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -1544,7 +1544,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 #ifdef MAGNFIELD
 		calc_bcon_prim(pp,bcon,&geomBL);
 		indices_21(bcon,bcov,geomBL.gg); 
-		bsq = dot(bcon,bcov); 
+		bsq = dotB(bcon,bcov); 
 #endif
 
 		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -1640,7 +1640,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 #ifdef MAGNFIELD
 		calc_bcon_prim(pp,bcon,&geomBL);
 		indices_21(bcon,bcov,geomBL.gg); 
-		bsq = dot(bcon,bcov); 
+		bsq = dotB(bcon,bcov); 
 #endif
 
 		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -1736,7 +1736,7 @@ int calc_boxscalars(ldouble *boxscalars,ldouble t)
 #ifdef MAGNFIELD
 		calc_bcon_prim(pp,bcon,&geomBL);
 		indices_21(bcon,bcov,geomBL.gg); 
-		bsq = dot(bcon,bcov); 
+		bsq = dotB(bcon,bcov); 
 #endif
 
 		conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -1976,7 +1976,7 @@ int calc_varscalars(ldouble *varscalars,ldouble t)
 #ifdef MAGNFIELD
 	  calc_bcon_prim(pp,bcon,&geomBL);
 	  indices_21(bcon,bcov,geomBL.gg); 
-	  bsq = dot(bcon,bcov); 
+	  bsq = dotB(bcon,bcov); 
 #endif
 
 	  conv_vels_both(ucon,ucon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
@@ -3140,7 +3140,7 @@ int calc_anarelradialprofiles(ldouble profiles[][NX])
               #ifdef MAGNFIELD
 	      calc_bcon_prim(pp,bcon,&geomBL);
 	      indices_21(bcon,bcov,geomBL.gg); 
-	      bsq = dot(bcon,bcov); 
+	      bsq = dotB(bcon,bcov); 
               #endif
 
               #ifdef RADIATION
