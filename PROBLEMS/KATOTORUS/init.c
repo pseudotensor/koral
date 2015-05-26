@@ -105,8 +105,7 @@ if(rho<0.) //outside donut
     Acov[0]=Acov[1]=Acov[2]=0.;
 
     //standard single poloidal loop
-    //TESTNR, should be 1.e-2 
-    Acov[3]=my_max(pp[RHO]-1.e-1*KT_RHO0,0.);
+    Acov[3]=my_max(pp[RHO]-1.e-2*KT_RHO0,0.);
 
     pp[B1]=Acov[1];
     pp[B2]=Acov[2];

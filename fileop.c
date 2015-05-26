@@ -1726,6 +1726,12 @@ fread_avgfile_bin(int nout1, char *folder,ldouble *pavg, ldouble *dt,ldouble *t)
   for(i=0;i<NX*NY*NZ;i++)
     if((indices[i]=(int *)malloc(3*sizeof(int)))==NULL) my_err("malloc err. - fileop 11\n");
 
+  //to mark unfilled slots
+  for(ix=0;ix<NX;ix++)
+    for(iy=0;iy<NY;iy++)
+      for(iz=0;iz<NZ;iz++)
+	set_uavg(pavg,RHO,ix,iy,iz,-1.);
+
   //first indices
   for(ic=0;ic<NX*NY*NZ;ic++)
     {
@@ -2224,7 +2230,8 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 	       ldouble conv=kappaGU2CGS(1.)*rhoGU2CGS(1.)*endenGU2CGS(1.)*CCC; //because (cE-4piB) in non-geom
 	       fprintf(fout1,"%.5e %.5e ",Giff[0]*conv,Gicff[0]*conv); //(18)-(19)
 
-	       fprintf(fout1,"%.5e ",calc_LTE_TfromE(ehat)); //(20)
+               fprintf(fout1,"%.5e %.5e",calc_LTE_TfromE(ehat), get_uavg(pavg,AVGTRAD,ix,iy,iz)); //(20), (21)                                                  
+	       //	       fprintf(fout1,"%.5e ",calc_LTE_TfromE(ehat)); //(20)
 #endif
 
 	      fprintf(fout1,"\n");

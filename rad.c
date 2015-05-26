@@ -1654,6 +1654,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   ldouble Rij[4][4];
   calc_Rij_M1(pp,ggg,Rij);
 
+  
   //the four-velocity of fluid in lab frame
   ldouble ucon[4],utcon[4],ucov[4],vpr[3];
 
@@ -1661,6 +1662,8 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   utcon[2]=pp[3];
   utcon[3]=pp[4];
   conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+
+
  
   //gas properties
   ldouble rho=pp[RHO];
@@ -1673,6 +1676,31 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   if(kappagasAbs==-1) //no distincion
     {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
   ldouble kappaes=calc_kappaes(pp,geom);
+
+
+#ifdef NONRELMHD
+  ldouble Er,Fr[3],Pr[3][3],vgas[3];
+  Er=Rij[0][0];
+  Fr[0]=Rij[1][0];
+  Fr[1]=Rij[2][0];
+  Fr[2]=Rij[3][0];
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      Pr[i-1][j-1]=Rij[i][j];
+  vgas[0]=utcon[1];
+  vgas[1]=utcon[2];
+  vgas[2]=utcon[3];
+
+  //ff:      Gi[0]=-kappagasAbs*4.*Pi*B + kapparadAbs*Ehatrad;
+  Gi[0]=-kappa*(4.*Pi*B - Er) - (kappa + kappaes) * 
+    (
+     vgas[0]*(Fr[0]-(vgas[0]*Er + vgas[0]*Pr[0][0] + vgas[1]*Pr[0][1] + vgas[2]*Pr[0][2])) +
+     vgas[1]*(Fr[1]-(vgas[1]*Er + vgas[0]*Pr[1][0] + vgas[1]*Pr[1][1] + vgas[2]*Pr[1][2])) +
+     vgas[2]*(Fr[2]-(vgas[2]*Er + vgas[0]*Pr[2][0] + vgas[1]*Pr[2][1] + vgas[2]*Pr[2][2]))
+     )
+
+  return 0;
+  #endif
 
   //contravariant four-force in the lab frame
 
@@ -4096,6 +4124,7 @@ test_solve_implicit_lab_file()
   //test
   //pp0[UU]*=1000000000.;
 
+  /*
   ldouble Gi[4];
   ldouble temp;
   for(temp=1.e0;temp<1.e10;temp*=1.2)
@@ -4105,11 +4134,12 @@ test_solve_implicit_lab_file()
       printf("%e %e\n",temp,Gi[0]);
     }
   exit(1);
+  */
 
    
   params[0]=MHD;
   params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_LAB;
+  params[2]=RADIMPLICIT_FF;
   params[3]=0; 
   solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 

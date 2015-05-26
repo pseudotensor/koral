@@ -58,7 +58,7 @@
 //rho-weighted qphi (47)          
 //magnetic flux everywhere (48)
 //kinetic + binding flux everywhere (49)
-                       
+//radial profiles of rho-weighted radiation temperature (50)
 
 
 /*********************************************/
@@ -77,7 +77,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
       int iy,iz,iv,i,j;
       ldouble x0[3],x0l[3],x0r[3],xm1[3],xp1[3];
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
-      ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,ucon[4],utcon[4],ucon3[4];
+      ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,temprad,ucon[4],utcon[4],ucon3[4];
       ldouble rhoucont,enden,rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4];
       ldouble Trtmagn,Trtkin;
       ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
@@ -239,6 +239,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		{
 		  rho=get_uavg(pavg,RHO,ix,iy,iz);
 		  uint=get_uavg(pavg,UU,ix,iy,iz);
+		  //temperature
+		  temp=get_uavg(pavg,AVGTGAS,ix,iy,iz);
 		  bsq=get_uavg(pavg,AVGBSQ,ix,iy,iz);
 		  bcon[0]=get_uavg(pavg,AVGBCON(0),ix,iy,iz);
 		  bcon[1]=get_uavg(pavg,AVGBCON(1),ix,iy,iz);
@@ -281,6 +283,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  enden += Rij[0][0];
 		  Rrt = Rij[1][0];
 		  Ehat = get_uavg(pavg,AVGEHAT,ix,iy,iz);
+		  temprad=get_uavg(pavg,AVGTRAD,ix,iy,iz);
+		 
 
 		  int derdir[3]={0,0,0};
 		  calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
@@ -298,6 +302,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  utcon[1]=pp[2];
 		  utcon[2]=pp[3];
 		  utcon[3]=pp[4];
+		  //temperature
+		  temp=calc_PEQ_Tfromurho(uint,rho);
+
+	      
 		  
 #ifdef MAGNFIELD
 		  calc_bcon_prim(pp,bcon,&geomBL);
@@ -423,9 +431,6 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      boost22_lab2ff(Tij22,Tij22,pp,geomBL.gg,geomBL.GG);
 	      ldouble alpha=sqrt(geomBL.gg[1][1]*geomBL.gg[3][3])*Tij22[1][3]/ptot;
 
-	      //temperature
-	      ldouble temp=calc_PEQ_Tfromurho(uint,rho);
-
 	      //angular velocity
 	      ldouble Omega=utcon[3]/utcon[0];
 
@@ -494,7 +499,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rho-weighted temperature (29)
 	      profiles[27][ix]+=rho*temp*dxph[1];
 	      
-	     
+	     //rho-weighted rad temperature (50)
+	      profiles[48][ix]+=rho*temprad*dxph[1];
+	      
+	      
               
     
 	      //rest mass flux (3)
@@ -627,6 +635,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
       profiles[26][ix]/=profiles[0][ix];
       profiles[45][ix]/=profiles[0][ix];
       profiles[27][ix]/=profiles[0][ix];
+      profiles[48][ix]/=profiles[0][ix];
       #ifndef CALCHRONTHEGO
       profiles[29][ix]/=profiles[0][ix];
       profiles[29][ix]=sqrt(profiles[29][ix]); //scale height

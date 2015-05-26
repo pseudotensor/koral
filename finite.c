@@ -4549,10 +4549,17 @@ cell_fixup_hd()
 	    {
 	      for(iv=0;iv<NV;iv++)
 		{
-		  pp[iv]=0;
-		  for(iii=0;iii<in;iii++)
-		    pp[iv]+=ppn[iii][iv];
-		  pp[iv]/=(ldouble)in;  
+		  if(iv==RHO || iv==UU || iv==ENTR || iv>B3)  //skip correctin magnetic field and velocities not to disrupt div B
+		    {
+		      pp[iv]=0.;
+		      for(iii=0;iii<in;iii++)
+			pp[iv]+=ppn[iii][iv];
+		      pp[iv]/=(ldouble)in;  
+		    }
+		  else //leave magnetic field as was
+		    {
+		      pp[iv]=get_u(p,iv,ix,iy,iz); 
+		    }
 		}
 	      p2u(pp,uu,&geom);
 

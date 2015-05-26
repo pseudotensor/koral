@@ -172,9 +172,9 @@ if(BCtype==YBCLO) //upper spin axis
 	    //atmosphere in rho,uint and velocities and zero magn. field
 	    //set_hdatmosphere(pp,xxvec,gg,GG,4);
 	    ucon[2]=0.;
-	    	#ifdef MAGNFIELD
-	pp[B1]=pp[B3]=0.;
-	#endif
+#ifdef MAGNFIELD
+	    pp[B1]=pp[B3]=0.;
+#endif
 	    if(MYCOORDS!=CYLCOORDS) trans2_coco(geomBL.xxvec,ucon,ucon,BLCOORDS,MYCOORDS);
 	    conv_vels(ucon,ucon,VEL4,VELPRIM,geom.gg,geom.GG);
 	    pp[VX]=ucon[1];
@@ -252,6 +252,9 @@ if(BCtype==YBCHI) //lower spin axis
 	    pp[VX]=ucon[1];
 	    pp[VY]=ucon[2];
 	    pp[VZ]=ucon[3];//atmosphere in rho,uint and velocities and zero magn. field
+	    #ifdef MAGNFIELD
+	    pp[B1]=pp[B3]=0.;
+#endif
 	  }
 
 #ifdef RADIATION
@@ -263,9 +266,7 @@ if(BCtype==YBCHI) //lower spin axis
 	    //atmosphere in radiation
 	    //set_radatmosphere(pp,xxvec,gg,GG,0);
 	    urfcon[2]=0.;
-	     	#ifdef MAGNFIELD
-	pp[B1]=pp[B3]=0.;
-	#endif
+
 	    if(MYCOORDS!=CYLCOORDS) trans2_coco(geomBL.xxvec,urfcon,urfcon,BLCOORDS,MYCOORDS);
 	    conv_vels(urfcon,urfcon,VEL4,VELPRIMRAD,geom.gg,geom.GG);
 	    pp[FX0]=urfcon[1];

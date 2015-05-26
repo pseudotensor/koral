@@ -1,8 +1,6 @@
 #define NONRELMHD
 #define RADIMPLICITTHRESHOLD 1.e0
-#define MAXRADIMPDAMPING 1.e-10
-//#define VELPRIM VEL4
-
+#define MAXRADIMPDAMPING 1.e-6
 #define NONRELMHDENTROPYCUT 1.e-10 // Tcut = 3e12*this number
 
 /************************************/
@@ -22,13 +20,13 @@
 /************************************/
 #define RADIATION
 //#define SKIPRADSOURCE
-//#define BALANCEENTROPYWITHRADIATION
+#define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
-//#define RADIMPSTARTWITHEXP
-//#define ALLOWFORENTRINF4DPRIM
-//#define ALLOWRADCEILINGINIMPLICIT
+#define ALLOWRADCEILINGINIMPLICIT
 //#define RADIMPLICITFIXVEL
 //#define BASICRADIMPLICIT
+//#define RADIMPSTARTWITHEXP
+//#define ALLOWFORENTRINF4DPRIM
 
 //#define U2P_EQS U2P_EQS_JONS
 //#define U2P_SOLVER U2P_SOLVER_WP
@@ -61,12 +59,12 @@
 /************************************/
 #define INT_ORDER 1
 #define TIMESTEPPING RK2IMEX 
-#define TSTEPLIM .5
+#define TSTEPLIM 0.5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 1
-#define DORADFIXUPS 1
+#define DOFIXUPS 0
+#define DORADFIXUPS 0
 
 /************************************/
 //viscosity choices
@@ -82,25 +80,6 @@
 #define MAXRADVISCVEL 0.1
 
 /************************************/
-//rmhd floors
-/************************************/
-#define CORRECT_POLARAXIS
-//#define POLARAXISAVGIN3D
-#define NCCORRECTPOLAR 2
-#define UURHORATIOMIN 1.e-10
-#define UURHORATIOMAX 1.e2
-#define EERHORATIOMIN 1.e-20
-#define EERHORATIOMAX 1.e20
-#define EEUURATIOMIN 1.e-20
-#define EEUURATIOMAX 1.e20
-#define B2UURATIOMIN 0.
-#define B2UURATIOMAX 100000.
-#define B2RHORATIOMIN 0.
-#define B2RHORATIOMAX 50.
-#define GAMMAMAXRAD 50.
-#define GAMMAMAXHD 2.
-
-/************************************/
 //blackhole
 /************************************/
 #define MASS 6.62
@@ -110,8 +89,9 @@
 //coordinates / resolution
 /************************************/
 //#define myMKS2COORDS
-#define mySPHCOORDS
-#define RMIN 15.
+//#define mySPHCOORDS
+#define myCYLCOORDS
+#define RMIN 4.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -138,6 +118,15 @@
 #define MAXY (M_PI-MINY)
 #endif
 
+#ifdef myCYLCOORDS //modified Kerr-Shild
+#define PWPOTENTIAL
+#define MYCOORDS CYLCOORDS
+#define MINX RMIN
+#define MAXX 100.
+#define MINY (-60.)
+#define MAXY 60.
+#endif
+
 #ifdef myMKS2COORDS //modified Kerr-Shild
 #define MYCOORDS MKS2COORDS
 #define MINX (log(RMIN-MKSR0))
@@ -160,12 +149,12 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 128//350//128 //28*9
-#define TNY 128//350//192 //26*9
+#define TNX 350//128 //28*9
+#define TNY 350//192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
-#define NTX 25
-#define NTY 25
+#define NTX 4
+#define NTY 4
 #define NTZ 1
 
 #define SPECIFIC_BC
@@ -197,7 +186,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 10.
+#define DTOUT1 1.
 #define DTOUT2 1000.
 
 /************************************/
@@ -221,7 +210,29 @@
 #define MAXBETA (3.294/10.) //eq.plane
 #endif
 
-
-#define RHOATMMIN  1.e-24
+#define RHOFLOOR 1.e-50
+#define RHOATMMIN  1.e-20
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10)
+
+
+/************************************/
+//rmhd floors
+/************************************/
+#ifndef myCYLCOORDS
+#define CORRECT_POLARAXIS
+#endif
+//#define POLARAXISAVGIN3D
+#define NCCORRECTPOLAR 2
+#define UURHORATIOMIN 1.e-10
+#define UURHORATIOMAX 1.e2
+#define EERHORATIOMIN 1.e-20
+#define EERHORATIOMAX 1.e20
+#define EEUURATIOMIN 1.e-20
+#define EEUURATIOMAX 1.e20
+#define B2UURATIOMIN 0.
+#define B2UURATIOMAX 100000.
+#define B2RHORATIOMIN 0.
+#define B2RHORATIOMAX 50.
+#define GAMMAMAXRAD 50.
+#define GAMMAMAXHD 2.

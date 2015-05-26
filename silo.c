@@ -916,7 +916,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[1]=vy;
   vels[2]=vz;
 #ifdef SILO2D_XZPLANE
+#if (MYCOORDS!=CYLCOORDS)
   vels[1]=vz;
+#endif
   DBPutQuadvar1(file, "velocity_z","mesh1", vy,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
@@ -935,7 +937,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[1]=Edoty;
   vels[2]=Edotz;
 #ifdef SILO2D_XZPLANE
+#if (MYCOORDS!=CYLCOORDS)
+
   vels[1]=Edotz;
+#endif
   DBPutQuadvar1(file, "en_flux_z","mesh1", Edoty,
   		dimensions, ndim, NULL, 0, 
 	      DB_DOUBLE, DB_NODECENT, optList);
@@ -954,8 +959,11 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[1]=By;
   vels[2]=Bz;
 #ifdef SILO2D_XZPLANE
+#if (MYCOORDS!=CYLCOORDS)
+ 
   vels[1]=Bz;
-  DBPutQuadvar1(file, "magn_field_z","mesh1", By,
+ #endif
+ DBPutQuadvar1(file, "magn_field_z","mesh1", By,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
 #endif
@@ -972,7 +980,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[1]=Bydyn;
   vels[2]=Bzdyn;
   #ifdef SILO2D_XZPLANE
+#if (MYCOORDS!=CYLCOORDS)
+ 
   vels[1]=Bzdyn;
+#endif
   DBPutQuadvar1(file, "magn_field_dyn_z","mesh1", Bydyn,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
@@ -994,7 +1005,9 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[1]=Fy;
   vels[2]=Fz;
 #ifdef SILO2D_XZPLANE
+#if (MYCOORDS!=CYLCOORDS)
   vels[1]=Fz;
+#endif
   DBPutQuadvar1(file, "erad_z","mesh1", Fy,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);
@@ -1011,7 +1024,10 @@ int fprint_silofile(ldouble time, int num, char* folder, char* prefix)
   vels[1]=urady;
   vels[2]=uradz;
 #ifdef SILO2D_XZPLANE
+#if (MYCOORDS!=CYLCOORDS)
+ 
   vels[1]=uradz;
+#endif
   DBPutQuadvar1(file, "rad_vel_z","mesh1", uradz,
   		dimensions, ndim, NULL, 0, 
 		DB_DOUBLE, DB_NODECENT, optList);

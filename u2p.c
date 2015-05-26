@@ -212,6 +212,7 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
   //************************************
   //hot hydro - conserving energy
   ret=0;
+  u2pret=-1;
   
   //test
   ldouble ppold[NV];
@@ -223,12 +224,15 @@ u2p(ldouble *uu0, ldouble *pp,void *ggg,int corrected[3],int fixups[2],int type)
     {
        int gix,giy,giz;
        mpi_local2globalidx(geom->ix,geom->iy,geom->iz,&gix,&giy,&giz);
-       printf("%4d > %4d %4d %4d > NEGUU  > neg uu[0] - requesting fixup\n",PROCID,gix,giy,giz);
-      pp[0]=RHOFLOOR; //used when not fixin up
-      ret=-2; //to request fixup
-      u2pret=0; //to skip solvers
+       if(verbose) printf("%4d > %4d %4d %4d > NEGUU  > neg uu[0] - requesting fixup\n",PROCID,gix,giy,giz);
+       pp[0]=RHOFLOOR; //used when not fixin up
+       uu[0]=RHOFLOOR*gdetu;
+       ret=-2; //to request fixup
+       u2pret=-1; //not to skip solvers
+       global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]++;  //but count as fixup
     }
-  else
+  
+  if(u2pret!=0)
     {
       int method=U2P_HOT;
 
@@ -1307,9 +1311,10 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   if(Etype==U2P_HOT)
     {
       uint = -uu[UU]/gdetu-bsq/2. - rho*v2/2.;
-      if(uint<NONRELMHDENTROPYCUT*rho) 
+      //TESTNR
+      if(uint<NONRELMHDENTROPYCUT*rho || !isfinite(uint)) 
 	{
-	  //printf("%d %d > %e %e %e %e %e\n",geom->ix,geom->iy,uint,uu[UU]/gdetu,bsq/2.,rho*v2/2.,rho); 
+	  if(!isfinite(uint)) printf("%d %d > %e %e %e %e %e\n",geom->ix+TOI,geom->iy+TOI,uint,uu[UU]/gdetu,bsq/2.,rho*v2/2.,rho); 
 	  //if(geom->ix>50) getch();
 	  return -1;
 	  

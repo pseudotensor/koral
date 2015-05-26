@@ -103,7 +103,8 @@ main(int argc, char **argv)
 
   //test_inversion_nonrel(); exit(1);
 
-  //test_solve_implicit_lab(); exit(1);
+  //test_solve_implicit_lab_file(); exit(1);
+  
   //test_Giff();  exit(-1);
 
   //print scalings GU->CGS and quit
@@ -278,11 +279,7 @@ solve_the_problem(ldouble tstart, char* folder)
    
  
   i1=i2=0.;
-  global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]=0; //counting number of critical failures
-  global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]=0; //and fixups requests
-  global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]=0; //and fixups requests
-
-
+  
   lasttout_floor=floor(t/dtout); 
   lasttoutavg_floor=floor(t/dtoutavg);
   lasttoutbox_floor=floor(t/dtoutbox);
@@ -347,24 +344,17 @@ solve_the_problem(ldouble tstart, char* folder)
  
   while (t < t1 && nfout1<=NOUTSTOP && nstep<NSTEPSTOP)
     {   
-      #ifdef METRICTIMEDEPENDENT
+      global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]=0; //counting number of critical failures
+      global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]=0; //and fixups requests
+      global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]=0; //and fixups requests
+
+#ifdef METRICTIMEDEPENDENT
       calc_metric();
       #endif
  
       spitoutput=0;
       global_time=t;
       nstep++;
-
-      //verify if broken
-      if(global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]>1.e3 ||
-	 global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]>1.e3 ||
-	 global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]>1.e3)
-	{
-	  /*
-	  printf("exceeded # of failures (%d %d %d) - exiting.\n",
-		 global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES],global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS],global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]);
-		 exit(-1);*/
-	}
 
       
       //chooses the smalles timestep etc.
@@ -705,9 +695,30 @@ solve_the_problem(ldouble tstart, char* folder)
       //************************* outputs ************************************
       //**********************************************************************
    
- 
+      //counting failures and average parameters of the implicit solver
+      int nfailures[3],nfailuresloc[3]={global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES],
+					    global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS],
+					    global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]};
       
+      #ifdef MPI
+      MPI_Allreduce(nfailuresloc, nfailures, 3, MPI_INT, MPI_SUM,
+		    MPI_COMM_WORLD);  
+     
+      #else
+      for(i=0;i<3;i++) nfailures[i]=nfailuresloc[i];
+      #endif
       
+      //verify if broken
+      int maxfailures=TNX*TNY*TNZ/10;
+      if(nfailures[0]>maxfailures ||
+	 nfailures[1]>maxfailures ||
+	 nfailures[2]>maxfailures)
+	{
+	  printf("exceeded # of failures (%d %d %d) - exiting.\n",
+		 nfailures[0],nfailures[1],nfailures[2]);
+		 exit(-1);
+	}
+
 
 
       #ifdef RADIATION
@@ -856,8 +867,9 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  //znps = TNX*TNY*TNZ*(nstep-fprintf_nstep);
 	  
-	  printf("(%d) step #%6d t=%10.3e dt=%.3e (tot.time: %.2e (%.2e|%3d > %.2e|%3d) mp: %7.6f) znps: %.0f "
-		 ,PROCID,nstep,t,dt,end_time-start_time,2.*max_u2ptime,max_u2ptime_loc,2.*min_u2ptime,min_u2ptime_loc,2*maxmp_time,znps);
+	  printf("st #%6d t=%10.2e dt=%.2e (time: %.2e (%.2e|%3d > %.2e|%3d) mp: %7.6f) znps: %.0f fail: %1d %1d %1d "
+		 ,nstep,t,dt,end_time-start_time,2.*max_u2ptime,max_u2ptime_loc,2.*min_u2ptime,min_u2ptime_loc,2*maxmp_time,znps,
+		 nfailures[0],nfailures[1],nfailures[2]);
 
 #ifdef BALANCEENTROPYWITHRADIATION
 	  printf("#: %d|%d %d|%d %d|%d %d|%d ",nentr[0],nentr2[0],nentr[1],nentr2[1],nentr[2],nentr2[2],nentr[3],nentr2[3]);
