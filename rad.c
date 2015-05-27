@@ -1678,7 +1678,7 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   ldouble kappaes=calc_kappaes(pp,geom);
 
 
-#ifdef NONRELMHD
+#ifdef NONRELMHD //like in Jiang+14
   ldouble Er,Fr[3],Pr[3][3],vgas[3];
   Er=Rij[0][0];
   Fr[0]=Rij[1][0];
@@ -1692,12 +1692,18 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   vgas[2]=utcon[3];
 
   //ff:      Gi[0]=-kappagasAbs*4.*Pi*B + kapparadAbs*Ehatrad;
-  Gi[0]=-kappa*(4.*Pi*B - Er) - (kappa + kappaes) * 
+  Gi[0]=-kappa*(4.*Pi*B - Er) - (kappa - kappaes) * 
     (
      vgas[0]*(Fr[0]-(vgas[0]*Er + vgas[0]*Pr[0][0] + vgas[1]*Pr[0][1] + vgas[2]*Pr[0][2])) +
      vgas[1]*(Fr[1]-(vgas[1]*Er + vgas[0]*Pr[1][0] + vgas[1]*Pr[1][1] + vgas[2]*Pr[1][2])) +
      vgas[2]*(Fr[2]-(vgas[2]*Er + vgas[0]*Pr[2][0] + vgas[1]*Pr[2][1] + vgas[2]*Pr[2][2]))
-     )
+     );
+
+  for(i=0;i<3;i++)
+    {
+      Gi[i+1]=
+	(kappa + kappaes)*(Fr[i]-(vgas[i]*Er + vgas[0]*Pr[i][0] + vgas[1]*Pr[i][1] + vgas[2]*Pr[i][2])) + vgas[i]*kappa*(4.*Pi*B - Er);
+    }
 
   return 0;
   #endif
@@ -3988,14 +3994,14 @@ test_Giff()
 
   pp0[0]=1.;
   pp0[1]=1.e-1;
-  pp0[2]=0.1;
-  pp0[3]=0.2;
-  pp0[4]=0.5;
+  pp0[2]=.01;
+  pp0[3]=.01;
+  pp0[4]=.001;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
   pp0[EE]=0.1;
-  pp0[FX]=0.1;
-  pp0[FY]=0.6;
-  pp0[FZ]=0.1;
+  pp0[FX]=0.3;
+  pp0[FY]=0.5;
+  pp0[FZ]=0.01;
   #ifdef NCOMPTONIZATION
   pp0[NF0]=calc_NFfromE(pp0[EE0]);
   #endif
@@ -4003,12 +4009,12 @@ test_Giff()
   //radiative four-force
   ldouble Gi[4],Giff[4],Giff2[4];
   calc_Gi(pp0,&geom,Gi,1); 
-  calc_Gi(pp0,&geom,Giff,0); 
-  boost2_lab2ff(Gi,Giff2,pp0,geom.gg,geom.GG);
+  //calc_Gi(pp0,&geom,Giff,0); 
+  //boost2_lab2ff(Gi,Giff2,pp0,geom.gg,geom.GG);
 
   print_4vector(Gi);
-  print_4vector(Giff);
-  print_4vector(Giff2);
+  //  print_4vector(Giff);
+  //print_4vector(Giff2);
   
   
 
