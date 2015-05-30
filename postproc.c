@@ -59,6 +59,7 @@
 //magnetic flux everywhere (48)
 //kinetic + binding flux everywhere (49)
 //radial profiles of rho-weighted radiation temperature (50)
+//<u_phi> in the outflow (51)
 
 
 /*********************************************/
@@ -603,11 +604,15 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		profiles[19][ix]+=(-rhouconr)*dx[1]*dx[2]*geomBL.gdet;
 
 	      //rho-weighted minus radial velocity (4)
-	      //profiles[2][ix]+=-rhouconr*dxph[1];
+	      profiles[2][ix]+=-rhouconr*dxph[1];
 
 	      //rho-weighted minus radial velocity in the inflow (24)
-	      //if(utcon[1]<0.)
-	      //profiles[22][ix]+=-rhouconr*dxph[1];
+	      if(utcon[1]<0.)
+		profiles[22][ix]+=-rhouconr*dxph[1];
+
+	      //rho-weighted minus radial velocity in the outflow (36)
+	      if(utcon[1]>0.)
+		profiles[34][ix]+=rhouconr*dxph[1];
 
 	      //abs optical depth (7)
 	      profiles[5][ix]=tauabs;	
@@ -621,18 +626,40 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //<(rho+u+bsq/2)u^r><u_phi> (5)
 	      //profiles[3][ix]+=get_uavg(pavg,AVGWUCON(1),ix,iy,iz)*get_uavg(pavg,AVGUCOV(3),ix,iy,iz)*dxph[1];
 
-	      if(doingavg)
-		profiles[3][ix]+=get_uavg(pavg,AVGRHOUCOV(3),ix,iy,iz)*dxph[1];
-	      else
-		profiles[3][ix]+=rho*ucov[3]*dxph[1];
+	        //u_phi in the inflow (5)
+	      if(utcon[1]<0.)
+		{
+
+		  if(doingavg)
+		    profiles[3][ix]+=get_uavg(pavg,AVGRHOUCOV(3),ix,iy,iz)*dxph[1];
+		  else
+		    profiles[3][ix]+=rho*ucov[3]*dxph[1];
+		}
+
+	      //int the outflow (51)
+	      if(utcon[1]>0.)
+		{
+		  if(doingavg)
+		    profiles[49][ix]+=get_uavg(pavg,AVGRHOUCOV(3),ix,iy,iz)*dxph[1];
+		  else
+		    profiles[49][ix]+=rho*ucov[3]*dxph[1];
+		}
 	    }
 	}
 
 
 	 
       //normalizing by sigma
-      profiles[22][ix]/=profiles[21][ix];
-      profiles[26][ix]/=profiles[0][ix];
+      ldouble sigmaout=profiles[0][ix]-profiles[21][ix];
+      ldouble sigmain=profiles[21][ix];
+      profiles[2][ix]/=profiles[0][ix]; //total
+      
+      profiles[3][ix]/=sigmain; //inflow only
+      profiles[49][ix]/=sigmaout; //normalized by surface density in the outlfow
+      profiles[22][ix]/=profiles[21][ix]; //sigma in
+      profiles[34][ix]/=sigmaout;
+     profiles[26][ix]/=profiles[0][ix];
+      profiles[49][ix]/=(profiles[0][ix]-profiles[21][ix]); //normalized by surface density in the outlfow
       profiles[45][ix]/=profiles[0][ix];
       profiles[27][ix]/=profiles[0][ix];
       profiles[48][ix]/=profiles[0][ix];
@@ -671,9 +698,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
       profiles[9][ix]=fabs(calc_mdot(xxBL[1],2));
 
       //to get velocities
-      profiles[2][ix]=profiles[1][ix]/Sigmagdet;
-      profiles[22][ix]=profiles[8][ix]/Sigmagdet;
-      profiles[34][ix]=profiles[9][ix]/Sigmagdet;
+      //profiles[2][ix]=profiles[1][ix]/Sigmagdet;
+      //profiles[22][ix]=profiles[8][ix]/Sigmagdet;
+      //profiles[34][ix]=profiles[9][ix]/Sigmagdet;
 
 
       //luminosity at given radius (12)

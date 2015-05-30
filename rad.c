@@ -154,6 +154,9 @@ int f_implicit_lab_4dprim(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble dt,voi
       int rettemp=0;
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
 
+      //TESTFIXVEL
+      //printf("%e vs %e -> %e\n",pp[VX],0.,pp[UU]);
+
       #ifdef ALLOWFORENTRINF4DPRIM
       if(rettemp<0)
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0);
@@ -3909,14 +3912,14 @@ test_solve_implicit_lab()
   fill_geometry(0,0,0,&geom);
 
   pp0[0]=1.e-19;
-  pp0[1]=calc_PEQ_ufromTrho(1.e6,pp0[0]);
-  pp0[2]=0.01;
+  pp0[1]=calc_PEQ_ufromTrho(1.e9,pp0[0]);
+  pp0[2]=0.15;
   pp0[3]=0.;
   pp0[4]=0.;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
   pp0[B1]=pp0[B2]=pp0[B3]=0.;
-  pp0[EE]=1.e-20;
-  pp0[FX]=0.13;
+  pp0[EE]=1.e-19;
+  pp0[FX]=0.5;
   pp0[FY]=0.;
   pp0[FZ]=0.;
   #ifdef NCOMPTONIZATION
@@ -3972,16 +3975,16 @@ test_solve_implicit_lab()
   verbose=1;
   //full implicit
   PLOOP(iv) pp[iv]=pp0[iv];
-  if(0)
+  if(1)
     { 
   
-      params[0]=RAD;
+      params[0]=MHD;
       params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LAB;
       params[3]=0; 
       solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,del4,verbose,params,pp);
       print_primitives(pp);
-      printf("gas temp: %e\nrad temp: %e\n",calc_PEQ_Tfromurho(pp[1],pp[0]),calc_LTE_TfromE(pp[EE]));
+      //printf("gas temp: %e\nrad temp: %e\n",calc_PEQ_Tfromurho(pp[1],pp[0]),calc_LTE_TfromE(pp[EE]));
     }
 
   getch();
@@ -3993,7 +3996,7 @@ test_solve_implicit_lab()
     
       params[0]=RAD;
       params[1]=RADIMPLICIT_ENERGYEQ;
-      params[2]=RADIMPLICIT_LAB;
+      params[2]=RADIMPLICIT_FF;
       params[3]=0; 
       solve_implicit_lab_4dprim_fixvel(uu0,pp0,&geom,dt,del4,verbose,params,pp);
       print_primitives(pp);
@@ -4982,6 +4985,53 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
 	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
 #endif
 
+      
+      //TESTFIXVEL
+      //printf("%e vs %e -> %e\n",pp[VX],ppin[VX],pp[UU]);
+   
+#ifdef NONRELMHD // the velocity is fixed and should be used to recover the temperature properly ,if not comment this out
+      /****************************/
+      //density
+      ldouble rho=uu[RHO]/gdetu;
+      pp[RHO]=rho;
+      //use the estimated velocity when calculating the kinetic energy
+      ldouble ucov[4],ucon[4],vcov[4];
+      ucon[0]=1.;
+      ucon[1]=ppin[VX];
+      ucon[2]=ppin[VY];       
+      ucon[3]=ppin[VZ];
+      indices_21(ucon,ucov,gg);
+      ldouble v2=dot3nr(ucon,ucov);
+      ldouble bsq=0.;
+#ifdef MAGNFIELD
+      ldouble bcon[4],bcov[4],Bcon[4];
+      Bcon[0]=0.;
+      Bcon[1]=uu[B1]/gdetu;
+      Bcon[2]=uu[B2]/gdetu;
+      Bcon[3]=uu[B3]/gdetu;
+      pp[B1]=Bcon[1];
+      pp[B2]=Bcon[2];
+      pp[B3]=Bcon[3];
+      calc_bcon_4vel(pp,ucon,ucov,bcon);
+      indices_21(bcon,bcov,gg); 
+      bsq = dotB(bcon,bcov);
+#endif
+      ldouble uint;
+      rettemp=0;
+      //U2P_HOT
+      uint = -uu[UU]/gdetu-bsq/2. - rho*v2/2.;
+      
+      if(uint<0. && pp[UU]<0.) //if both inversions failed
+	u2pret=-2;
+      else if(uint>0.) //if only this one, leave pp[UU] as is
+	pp[UU]=uint;
+   
+#ifdef ALLOWFORENTRINF4DPRIM
+      if(uint<0 || !isfinite(uint))
+	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+#endif
+#endif
+
       if(rettemp<0) 
 	u2pret=-2; //to return error
 
@@ -5249,11 +5299,17 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 #endif //NONRELMHD
 
   //use the velocities from previous t-step 
+  //TESTFIXREL
   /*
   ppexp[VX]=pp[VX];
   ppexp[VY]=pp[VY];
   ppexp[VZ]=pp[VZ];
   */
+
+  //overwrite with correct
+  //TESTFIXREL
+  //ppexp[VX]=4.275227747972851e-01;
+  
 
   /* end of estimation of the gas velocity */
 
