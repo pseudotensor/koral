@@ -974,10 +974,11 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    //print_4vector(&pp[sh]);
 	    //print_4vector(f3);
 	  }
+
+	  //regular solver
 	  
 	  ldouble CONVREL=EPS;
-	  ldouble CONVRELERR=1.-EPS;
-	  //TODO: shaky?
+	  ldouble CONVRELERR=RADIMPCONVRELERR;//1.-EPS;
 
 	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
 	    {
@@ -1308,7 +1309,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   PLOOP(iv) 
     { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
     params[1]=RADIMPLICIT_ENERGYEQ;
-    //    params[2]=RADIMPLICIT_LAB;
+    params[2]=RADIMPLICIT_LAB;
     params[0]=RAD;
 
     ret=solve_implicit_lab_4dprim_fixvel(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
@@ -1324,10 +1325,12 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     #endif
 
     if(ret<0)
-      printf("fixvel failed at %d\n",ix);
+      {
+	global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]++;
+      }
 
 #endif
-
+      
 
   //***********************************************//
   //***********************************************//
@@ -1349,6 +1352,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
     { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
     params[1]=RADIMPLICIT_ENERGYEQ;
     params[2]=RADIMPLICIT_LAB;
+    #ifdef RADIMPLICIT_STARTWITHFF
+    params[2]=RADIMPLICIT_FF;
+    #endif
     params[0]=startwith;
 
     ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp); 
@@ -1359,6 +1365,9 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
 	PLOOP(iv) 
 	{ pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
 	params[2]=RADIMPLICIT_FF;
+#ifdef RADIMPLICIT_STARTWITHFF
+	params[2]=RADIMPLICIT_LAB;
+    #endif
 	ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
       }      
 #endif
@@ -1371,6 +1380,9 @@ if(ret!=0) {
   {	pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
   params[1]=RADIMPLICIT_ENERGYEQ;
   params[2]=RADIMPLICIT_LAB;
+#ifdef RADIMPLICIT_STARTWITHFF
+    params[2]=RADIMPLICIT_FF;
+    #endif
   if(params[0]==RAD) params[0]=MHD; else params[0]=RAD;
   ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 #ifndef BASICRADIMPLICIT
@@ -1379,6 +1391,9 @@ if(ret!=0) {
       PLOOP(iv) 
       { pp0[iv]=pp00[iv]; uu0[iv]=uu00[iv]; }
       params[2]=RADIMPLICIT_FF;
+#ifdef RADIMPLICIT_STARTWITHFF
+    params[2]=RADIMPLICIT_LAB;
+    #endif
       ret=solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
     }  
 #endif
@@ -3887,17 +3902,18 @@ test_solve_implicit_lab()
   struct geometry geom;
   fill_geometry(0,0,0,&geom);
 
-  pp0[0]=0.01;
+  pp0[0]=1.e-20;
   pp0[1]=calc_PEQ_ufromTrho(1.e7,pp0[0]);
-  pp0[2]=0.;
+  pp0[2]=0.1;
   pp0[3]=0.;
   pp0[4]=0.;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
-  pp0[EE]=0.1;
-  pp0[FX]=0.1;
+  pp0[B1]=pp0[B2]=pp0[B3]=0.;
+  pp0[EE]=1.e-20;
+  pp0[FX]=0.0;
   pp0[EE]=calc_LTE_EfromT(1.e8);
-  pp0[FX]=0.;
-  pp0[FY]=0.;
+  pp0[FX]=0.3;
+  pp0[FY]=0.1;
   pp0[FZ]=0.;
   #ifdef NCOMPTONIZATION
   pp0[NF0]=calc_NFfromE(pp0[EE0]);
@@ -3949,26 +3965,26 @@ test_solve_implicit_lab()
       print_primitives(pp);
     }
 
-
+  verbose=1;
   //full implicit
   PLOOP(iv) pp[iv]=pp0[iv];
   if(1)
     { 
   
-      params[0]=MHD;
+      params[0]=RAD;
       params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LAB;
       params[3]=0; 
-      verbose=1;
       solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,del4,verbose,params,pp);
       print_primitives(pp);
       printf("gas temp: %e\nrad temp: %e\n",calc_PEQ_Tfromurho(pp[1],pp[0]),calc_LTE_TfromE(pp[EE]));
     }
 
+  getch();
 
   //implicit with fixed gas-vel
   PLOOP(iv) pp[iv]=pp0[iv];
-  if(0)
+  if(1)
     { 
     
       params[0]=RAD;
@@ -4955,7 +4971,8 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
       uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
 
       int rettemp=0;
-      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
+      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0);
+ 
       //if(rettemp<0)
       //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
 
@@ -5154,8 +5171,75 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
   int rettemp;
   rettemp=u2p_solver(uuexp,ppexp,geom,U2P_HOT,0); 
 
+  //in NONRELMHD even if energy inversion fails (negative uint), the velocities have been updated, so one may proceed
+  /*
   if(rettemp<0)
-    printf("hd u2p in fix vel failed \n");
+    {
+      printf("hd u2p in fix vel failed \n");
+      print_conserved(uuexp);
+      getch();
+    }
+  */
+
+  ldouble utcon[4],ucov[4],vpr[3],ucon[4];
+
+  #ifdef NONRELMHD
+  //the four-velocity of fluid in lab frame
+
+
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+  //velocity estimation as in Jiang+2014a
+  //radiative stress tensor in the lab frame
+  ldouble Rij[4][4];
+  calc_Rij_M1(pp,ggg,Rij);
+  //gas properties
+  ldouble rho=pp[RHO];
+  ldouble u=pp[1];
+  ldouble p= (GAMMA-1.)*(ldouble)u;
+  ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
+  ldouble kappagasRos,kappagasAbs,kapparadRos,kapparadAbs;
+  ldouble kappa=calc_kappa(pp,geom,&kappagasRos,&kappagasAbs,&kapparadRos,&kapparadAbs);
+  if(kappagasAbs==-1) //no distincion
+    {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
+  ldouble kappaes=calc_kappaes(pp,geom);
+  ldouble Er,Fr[3],Pr[3][3],vgas[3];
+  Er=Rij[0][0];
+  Fr[0]=Rij[1][0];
+  Fr[1]=Rij[2][0];
+  Fr[2]=Rij[3][0];
+  for(i=1;i<4;i++)
+    for(j=1;j<4;j++)
+      Pr[i-1][j-1]=Rij[i][j];
+  vgas[0]=utcon[1];
+  vgas[1]=utcon[2];
+  vgas[2]=utcon[3];
+
+  ldouble vest[3];
+
+  for(i=0;i<3;i++)
+    {
+      vest[i] = (rho*vgas[i] + 0.5*dt*(kappa+kappaes)*(rho*vgas[i] + Fr[i]))/
+	(rho + 0.5*dt*(kappa+kappaes)*(rho + Er + Pr[i][i]));
+    }
+
+ //TESTFIXVEL
+  /*
+  printf("vel org: %e %e %e\n",pp[VX],pp[VY],pp[VZ]);
+  printf("vel exp: %e %e %e\n",ppexp[VX],ppexp[VY],ppexp[VZ]);
+  printf("vel YF: %e %e %e\n",vest[0],vest[1],vest[2]); getch();
+  */
+  //use YF's estimator:
+  ppexp[VX]=vest[0];
+  ppexp[VY]=vest[1];
+  ppexp[VZ]=vest[2];
+
+#endif //NONRELMHD
+
+ 
 
   /* end of explicit */
 
@@ -5195,7 +5279,7 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
     sh=EE0; //solving in rad primitives
 
   ldouble frdt = 1.0;
-  ldouble ucon[4];
+
 	  
   int iter=0;
   int failed=0;
@@ -5534,9 +5618,9 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 	      xiapp/=2.; 
 	    }
 
-	  if(xiapp<1.e-2) 
+	  if(xiapp<MAXRADIMPDAMPING) 
 	    {
-	      if(verbose) printf("damped unsuccesfully in implicit_4dprim_fixvel\n");
+	      if(verbose) printf("damped unsuccesfully in implicit_4dprim_fixvel %e %e\n",uu[0],uu[1]);
 	      failed=1;
 	      break;
 	    }
@@ -5571,8 +5655,10 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 	    //print_4vector(f3);
 	  }
 	  
+	  //FIXVEL
+
 	  ldouble CONVREL=EPS;
-	  ldouble CONVRELERR=1.-EPS;
+	  ldouble CONVRELERR=RADIMPCONVRELERR;//1.-EPS;
 
 	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
 	    {

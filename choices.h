@@ -446,6 +446,10 @@
 #define U2PCONV 1.e-10
 #endif
 
+#ifndef RADIMPCONVRELERR
+#define RADIMPCONVRELERR (1.-EPS)
+#endif
+
 #ifndef MAXRADIMPDAMPING
 #define MAXRADIMPDAMPING 1.e-5
 #endif
