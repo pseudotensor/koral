@@ -887,8 +887,10 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	      int rettemp=0;
 	      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-	      //if(rettemp<0)
-	      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+	      #ifdef ALLOWFORENTRINF4DPRIM
+      	      if(rettemp<0)
+	       rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+	      #endif
 
 	      if(rettemp<0) u2pret=-2; //to return error if even entropy inversion failed
 	      else u2pret=0;	      
@@ -1039,8 +1041,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
       int rettemp=0;
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-      //if(rettemp<0)
-      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+
+#ifdef ALLOWFORENTRINF4DPRIM
+      
+      if(rettemp<0)
+      rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+#endif
       
       if(rettemp<0) //to return error if neither entropy or energy inversion succeeded
 	u2pret=-2; 
@@ -3902,18 +3908,16 @@ test_solve_implicit_lab()
   struct geometry geom;
   fill_geometry(0,0,0,&geom);
 
-  pp0[0]=1.e-20;
-  pp0[1]=calc_PEQ_ufromTrho(1.e7,pp0[0]);
-  pp0[2]=0.1;
+  pp0[0]=1.e-19;
+  pp0[1]=calc_PEQ_ufromTrho(1.e6,pp0[0]);
+  pp0[2]=0.01;
   pp0[3]=0.;
   pp0[4]=0.;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
   pp0[B1]=pp0[B2]=pp0[B3]=0.;
   pp0[EE]=1.e-20;
-  pp0[FX]=0.0;
-  pp0[EE]=calc_LTE_EfromT(1.e8);
-  pp0[FX]=0.3;
-  pp0[FY]=0.1;
+  pp0[FX]=0.13;
+  pp0[FY]=0.;
   pp0[FZ]=0.;
   #ifdef NCOMPTONIZATION
   pp0[NF0]=calc_NFfromE(pp0[EE0]);
@@ -3968,7 +3972,7 @@ test_solve_implicit_lab()
   verbose=1;
   //full implicit
   PLOOP(iv) pp[iv]=pp0[iv];
-  if(1)
+  if(0)
     { 
   
       params[0]=RAD;
@@ -4944,6 +4948,7 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
 
   int whichprim=params[0];
 
+  //FIXREL works only on radiative primitives
   whichprim=RAD;
 
   int whicheq=params[1];
@@ -4965,23 +4970,24 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
   if(whichprim==RAD)
     {
       uu[RHO]=uu0[RHO];
-      uu[1] = uu0[1] - (uu[EE0]-uu0[EE0]);
-      uu[2] = uu0[2] - (uu[FX0]-uu0[FX0]);
-      uu[3] = uu0[3] - (uu[FY0]-uu0[FY0]);
-      uu[4] = uu0[4] - (uu[FZ0]-uu0[FZ0]);  
+      uu[UU] = uu0[UU] - (uu[EE0]-uu0[EE0]);
+      uu[VX] = uu0[VX] - (uu[FX0]-uu0[FX0]);
+      uu[VY] = uu0[VY] - (uu[FY0]-uu0[FY0]);
+      uu[VZ] = uu0[VZ] - (uu[FZ0]-uu0[FZ0]);  
 
       int rettemp=0;
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0);
- 
-      //if(rettemp<0)
-      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+#ifdef ALLOWFORENTRINF4DPRIM
+      if(rettemp<0)
+	rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+#endif
 
       if(rettemp<0) 
-	  u2pret=-2; //to return error
+	u2pret=-2; //to return error
 
       else u2pret=0;
 
-      //imposes explicit velocity given in ppin!
+      //imposes explicit gas velocity given in ppin!
       pp[VX]=ppin[VX];
       pp[VY]=ppin[VY];
       pp[VZ]=ppin[VZ];      
@@ -5232,16 +5238,24 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
   printf("vel exp: %e %e %e\n",ppexp[VX],ppexp[VY],ppexp[VZ]);
   printf("vel YF: %e %e %e\n",vest[0],vest[1],vest[2]); getch();
   */
-  //use YF's estimator:
+
+  //use YF's estimator instead of the explicit solution
   ppexp[VX]=vest[0];
   ppexp[VY]=vest[1];
   ppexp[VZ]=vest[2];
 
+  //but what if this is too large to provide positive internal energy?
+
 #endif //NONRELMHD
 
- 
+  //use the velocities from previous t-step 
+  /*
+  ppexp[VX]=pp[VX];
+  ppexp[VY]=pp[VY];
+  ppexp[VZ]=pp[VZ];
+  */
 
-  /* end of explicit */
+  /* end of estimation of the gas velocity */
 
   
   
@@ -5566,8 +5580,10 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 	      rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0);
 	      //WHY?
 	      //rettemp=0.;
-	      //if(rettemp<0)
-	      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+#ifdef ALLOWFORENTRINF4DPRIM
+      if(rettemp<0)
+      rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+#endif
 
 	      if(rettemp<0) u2pret=-2; //to return error if even entropy inversion failed
 	      else u2pret=0;	      
@@ -5732,8 +5748,11 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 
       int rettemp=0;
       rettemp=u2p_solver(uu,pp,geom,U2P_HOT,0); 
-      //if(rettemp<0)
-      //rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+      #ifdef ALLOWFORENTRINF4DPRIM
+      
+      if(rettemp<0)
+      rettemp=u2p_solver(uu,pp,geom,U2P_ENTROPY,0); 
+      #endif
       
       if(rettemp<0) //to return error if neither entropy or energy inversion succeeded
 	u2pret=-2; 

@@ -1311,15 +1311,15 @@ u2p_solver_nonrel(ldouble *uu, ldouble *pp, void *ggg,int Etype,int verbose)
   if(Etype==U2P_HOT)
     {
       uint = -uu[UU]/gdetu-bsq/2. - rho*v2/2.;
-      //TESTNR
+
       if(uint<NONRELMHDENTROPYCUT*rho || !isfinite(uint)) 
 	{
 	  //if(!isfinite(uint)) printf("%d %d > %e %e %e %e %e\n",geom->ix+TOI,geom->iy+TOI,uint,uu[UU]/gdetu,bsq/2.,rho*v2/2.,rho); 
 	  //printf("%e %e\n",uint,rho);
 	  //if(geom->ix>50) getch();
 	  return -1;
-	  
 	}
+
       pp[UU]=uint;
     }
   else if(Etype==U2P_ENTROPY)
