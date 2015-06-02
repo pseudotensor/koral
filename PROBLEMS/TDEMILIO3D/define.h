@@ -1,23 +1,24 @@
-//************************************/
-//problem-specific arrays
-/************************************/
-double ***SPHdata0,***SPHdata1,***SPHcoords;
-double SPHtime0,SPHtime1,SPHtshift,SPHtime00;
-int ***SPHprojection;
-int SPHitime;
 
 //************************************/
 //SPH input parameters
 /************************************/
-#define SPH3D
 #define SPHTNX 256
-
 #define SPHTNY 160
 #define SPHTNZ 96
-#define SPHNT 22
-#define SPHTSTART 0. //in GM/c3, 0 to start from the first SPH output
-#define SPHRADIUS 300.
-#define SCALEVR
+#define SPHRMIN 1.8
+#define SPHRMAX 450.
+#define SPHRHOCUT 1.e-40
+
+//************************************/
+//problem-specific arrays
+/************************************/
+double SPHcoordsX[SPHTNX];
+double SPHcoordsY[SPHTNY];
+double SPHcoordsZ[SPHTNZ];
+int SPHprojX[SPHTNX];
+int SPHprojY[SPHTNY];
+int SPHprojZ[SPHTNZ];
+
 
 #define FULLPHI
 
@@ -100,8 +101,8 @@ int SPHitime;
 /************************************/
 #define myMKS2COORDS
 #define METRICAXISYMMETRIC
-#define ROUT 300.
-#define RMIN 1.6
+#define ROUT 500.
+#define RMIN 100.
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MKSR0 0.
@@ -138,9 +139,9 @@ int SPHitime;
 #endif
 
 //total resolution
-#define TNX 64//128//64
+#define TNX 256//128//64
 #define TNY 32//64//32
-#define TNZ 32//64//32
+#define TNZ 96//64//32
 //number of tiles
 #define NTX 2
 #define NTY 4

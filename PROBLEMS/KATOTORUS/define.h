@@ -35,7 +35,7 @@
 
 #define U2PCONV 1.e-12
 #define RADIMPCONV 1.e-10
-#define RADIMPEPS 1.e-6
+#define RADIMPEPS 1.e-5
 #define RADIMPMAXITER 50
 
 /************************************/
@@ -90,8 +90,8 @@
 //coordinates / resolution
 /************************************/
 //#define myMKS2COORDS
-//#define mySPHCOORDS
-#define myCYLCOORDS
+#define mySPHCOORDS
+//#define myCYLCOORDS
 #define RMIN 4.
 #define RMAX 100.
 #define MKSR0 -300.
@@ -150,8 +150,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 350//128 //28*9
-#define TNY 350//192 //26*9
+#define TNX 300//128 //28*9
+#define TNY 500//192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 4
@@ -208,7 +208,7 @@
 #define KT_RHO0 (10.*rhoCGS2GU(1.e-2))
 #define KT_T0 (100.*1.e7)
 #undef MAXBETA
-#define MAXBETA (3.294/10.) //eq.plane
+#define MAXBETA (1.25*3.294/10.) //eq.plane
 #endif
 
 #define RHOFLOOR 1.e-50

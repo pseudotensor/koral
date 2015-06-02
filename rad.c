@@ -3055,18 +3055,17 @@ int f_flux_prime_rad_total(ldouble *pp, void *ggg,ldouble Rij[][4],ldouble Rij0[
 
   
 #if (RADVISCOSITY==SHEARVISCOSITY)
+  ix=geom->ix;
+  iy=geom->iy;
+  iz=geom->iz;
+  struct geometry geomcent;
+      
+  iix=ix;iiy=iy;iiz=iz;
+
   //when face and shear viscosity put the face primitives at both cell centers and average the viscous stress tensor
   if(geom->ifacedim>-1)
     //face fluxes
     {      
-       
-      ix=geom->ix;
-      iy=geom->iy;
-      iz=geom->iz;
-      struct geometry geomcent;
-      
-      iix=ix;iiy=iy;iiz=iz;
-
       //left (because ix as a face index corresponds to face between ix-1 and ix cells)
       if(geom->ifacedim==0)
 	iix=ix-1;
@@ -3912,14 +3911,14 @@ test_solve_implicit_lab()
   fill_geometry(0,0,0,&geom);
 
   pp0[0]=1.e-19;
-  pp0[1]=calc_PEQ_ufromTrho(1.e9,pp0[0]);
-  pp0[2]=0.15;
+  pp0[1]=1.e-23;//calc_PEQ_ufromTrho(1.e9,pp0[0]);
+  pp0[2]=0.1;
   pp0[3]=0.;
   pp0[4]=0.;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
   pp0[B1]=pp0[B2]=pp0[B3]=0.;
-  pp0[EE]=1.e-19;
-  pp0[FX]=0.5;
+  pp0[EE]=1.e-23;
+  pp0[FX]=0.1;
   pp0[FY]=0.;
   pp0[FZ]=0.;
   #ifdef NCOMPTONIZATION
@@ -3975,10 +3974,10 @@ test_solve_implicit_lab()
   verbose=1;
   //full implicit
   PLOOP(iv) pp[iv]=pp0[iv];
-  if(1)
+  if(0)
     { 
   
-      params[0]=MHD;
+      params[0]=RAD;
       params[1]=RADIMPLICIT_ENERGYEQ;
       params[2]=RADIMPLICIT_LAB;
       params[3]=0; 
@@ -3996,7 +3995,7 @@ test_solve_implicit_lab()
     
       params[0]=RAD;
       params[1]=RADIMPLICIT_ENERGYEQ;
-      params[2]=RADIMPLICIT_FF;
+      params[2]=RADIMPLICIT_LAB;
       params[3]=0; 
       solve_implicit_lab_4dprim_fixvel(uu0,pp0,&geom,dt,del4,verbose,params,pp);
       print_primitives(pp);
@@ -4951,8 +4950,7 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
 
   int whichprim=params[0];
 
-  //FIXREL works only on radiative primitives
-  whichprim=RAD;
+  //FIXREL works only on radiative primitives!
 
   int whicheq=params[1];
   int whichframe=params[2];
@@ -5042,6 +5040,24 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
       pp[VY]=ppin[VY];
       pp[VZ]=ppin[VZ];      
     }
+   if(whichprim==MHD)
+    {
+      uu[EE0] = uu0[EE0] - (uu[1]-uu0[1]);
+      uu[FX0] = uu0[FX0] - (uu[2]-uu0[2]);
+      uu[FY0] = uu0[FY0] - (uu[3]-uu0[3]);
+      uu[FZ0] = uu0[FZ0] - (uu[4]-uu0[4]);
+
+      u2pret=u2p_rad(uu,pp,geom,corr);
+
+      #ifdef NCOMPTONIZATION //urf unknown before p2u
+      pp[NF0]=ppin[NF0];
+      #endif
+
+      //imposes explicit gas velocity given in ppin!
+      pp[VX]=ppin[VX];
+      pp[VY]=ppin[VY];
+      pp[VZ]=ppin[VZ];     
+    }   
  
   if(corr[0]!=0 || corr[1]!=0) 
     ret=1;
@@ -5056,6 +5072,17 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
   calc_Gi(pp,ggg,Gi,1); 
   indices_21(Gi,Gi,gg);
   
+   //errors in momenta - always in lab frame
+  if(whichprim==MHD) //mhd-primitives
+    {
+      f[1] = uu[2] - uu0[2] - dt * gdetu * Gi[1];
+      f[2] = uu[3] - uu0[3] - dt * gdetu * Gi[2];
+      f[3] = uu[4] - uu0[4] - dt * gdetu * Gi[3];
+
+      if(fabs(f[1])>SMALL) err[1]=fabs(f[1])/(fabs(uu[2])+fabs(uu0[2])+fabs(dt*gdetu*Gi[1])); else err[1]=0.;
+      if(fabs(f[2])>SMALL) err[2]=fabs(f[2])/(fabs(uu[3])+fabs(uu0[3])+fabs(dt*gdetu*Gi[2])); else err[2]=0.;
+      if(fabs(f[3])>SMALL) err[3]=fabs(f[3])/(fabs(uu[4])+fabs(uu0[4])+fabs(dt*gdetu*Gi[3])); else err[3]=0.;
+    }
   //errors in momenta - always in lab frame
   if(whichprim==RAD) //rad-primitives
     {
@@ -5090,7 +5117,21 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
 	    my_err("not implemented 23\n");
 	}
       else
-	my_err("not implemented 24\n");      
+	 if(whichprim==MHD) //hydro-primitives
+	{
+	  if(whicheq==RADIMPLICIT_ENERGYEQ)
+	    {
+	      f[0] = uu[UU] - uu0[UU] - dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[UU]) + fabs(uu0[UU]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	    }
+	  else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+	    {	  
+	      f[0] = uu[ENTR] - uu0[ENTR] - dt * gdetu * Gi[0];
+	      if(fabs(f[0])>SMALL) err[0] = fabs(f[0])/(fabs(uu[ENTR]) + fabs(uu0[ENTR]) + fabs(dt * gdetu * Gi[0])); else err[0]=0.;
+	    }      
+	  else
+	    my_err("not implemented 24\n");
+	}  
     }
 
   /***** FF FRAME ENERGY/ENTROPY EQS *****/
@@ -5125,10 +5166,24 @@ int f_implicit_lab_4dprim_fixvel(ldouble *ppin,ldouble *uu0,ldouble *pp0,ldouble
 	      f[0]=pp[ENTR] - pp0[ENTR] - dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
 	      err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
 	    }
-	  else
-	    my_err("not implemented 22\n");	 
-	    
-	}      
+	  if(whichprim==MHD) //mhd-
+	    {
+	      if(whicheq==RADIMPLICIT_ENERGYEQ)
+		{
+		  f[0]=pp[UU] - pp0[UU] - dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+		  err[0]=fabs(f[0])/(fabs(pp[UU]) + fabs(pp0[UU]) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+		}
+	      else if(whicheq==RADIMPLICIT_ENTROPYEQ)
+		{
+		  pp0[ENTR]= calc_Sfromu(pp0[RHO],pp0[UU]);
+		  pp[ENTR]= calc_Sfromu(pp[RHO],pp[UU]);
+		  f[0]=pp[ENTR] - pp0[ENTR] - dtau * Gi[0];//kappaabs*(Ehat-4.*Pi*B)*dtau;
+		  err[0]=fabs(f[0])/(fabs(pp[ENTR]) + fabs(pp0[ENTR]) + fabs(dtau * Gi[0]));//fabs(kappaabs*(Ehat-4.*Pi*B)*dtau));
+		}
+	      else
+		my_err("not implemented 22\n");	  
+	    }	 
+	}
     }
 
   if(!isfinite(f[0]) || !isfinite(f[1]) || !isfinite(f[2]) || !isfinite(f[3]))
@@ -5308,7 +5363,7 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 
   //overwrite with correct
   //TESTFIXREL
-  //ppexp[VX]=4.275227747972851e-01;
+  //ppexp[VX]=1.561283660377975e-01;//4.275227747972851e-01;
   
 
   /* end of estimation of the gas velocity */
@@ -5319,8 +5374,12 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
   /******************************************/
   /******************************************/
   //choice of primitives to evolve
-  int whichprim=RAD;
-  
+  //TEST22
+  int whichprim=params[0];//RAD;
+
+  if(whichprim!=RAD)
+    printf("FIXVEL solver works only on RAD primiitves!\n");
+
   int whicheq=params[1];
   int do_mom_over =params[3];
   

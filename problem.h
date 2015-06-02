@@ -94,8 +94,24 @@
 //91 TDEMILIO - tidal disruption with Emilio's input
 //92 ADVDIFF - diffusion in scattering moving blob
 //93 KATOTORUS - radiative torus initiated like in Kato+2004
+//94 TDEMILIO3D - tidal disruption with Emilio's input
 
-#define PROBLEM 93
+#define PROBLEM 94
+
+
+#if(PROBLEM==94)
+#define PR_PREPINIT "PROBLEMS/TDEMILIO3D/prepinit.c"
+#define PR_FINGER "PROBLEMS/TDEMILIO3D/finger.c"
+#define PR_DEFINE "PROBLEMS/TDEMILIO3D/define.h"
+#define PR_BC "PROBLEMS/TDEMILIO3D/bc.c"
+#define PR_INIT "PROBLEMS/TDEMILIO3D/init.c"
+#define PR_KAPPA "PROBLEMS/TDEMILIO3D/kappa.c"
+#define PR_KAPPAES "PROBLEMS/TDEMILIO3D/kappaes.c"
+#define PR_OUT2GIF_2D "PROBLEMS/TDEMILIO3D/out2gif_2d.c"
+#define PR_OUT2GIF_1D "PROBLEMS/TDEMILIO3D/out2gif_1d.c"
+#define PR_DUMP "PROBLEMS/TDEMILIO3D/dump.c"
+#define PR_TOOLS "PROBLEMS/TDEMILIO3D/tools.c"
+#endif
 
 
 #if(PROBLEM==93)
