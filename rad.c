@@ -1658,13 +1658,12 @@ solve_explicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
   return ret;
 }
 
-
 //**********************************************************************
 //****** takes radiative stress tensor and gas primitives **************
-//****** and calculates contravariant four-force ***********************
+//****** and calculates contravariant four-force as in Jiang+14 **********
 //**********************************************************************
 int
-calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
+calc_Gi_nonrel(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
 {
   int i,j,k;
   struct geometry *geom
@@ -1702,7 +1701,6 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   ldouble kappaes=calc_kappaes(pp,geom);
 
 
-#ifdef NONRELMHD //like in Jiang+14
   ldouble Er,Fr[3],Pr[3][3],vgas[3];
   Er=Rij[0][0];
   Fr[0]=Rij[1][0];
@@ -1711,6 +1709,10 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
   for(i=1;i<4;i++)
     for(j=1;j<4;j++)
       Pr[i-1][j-1]=Rij[i][j];
+
+
+  //printf("nr %e %e %e\n",kappa,Er, B);
+
   vgas[0]=utcon[1];
   vgas[1]=utcon[2];
   vgas[2]=utcon[3];
@@ -1723,14 +1725,78 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
      vgas[2]*(Fr[2]-(vgas[2]*Er + vgas[0]*Pr[2][0] + vgas[1]*Pr[2][1] + vgas[2]*Pr[2][2]))
      );
 
+
   for(i=0;i<3;i++)
     {
       Gi[i+1]=
 	(kappa + kappaes)*(Fr[i]-(vgas[i]*Er + vgas[0]*Pr[i][0] + vgas[1]*Pr[i][1] + vgas[2]*Pr[i][2])) + vgas[i]*kappa*(4.*Pi*B - Er);
     }
 
+   if(labframe==0)
+     {
+       //this is approximate and inconsistent with Jiang - to be used as a backup only!
+       //R^ab u_a u_b = Erad in fluid frame
+       ldouble Ruu=0.;
+       for(i=0;i<4;i++)
+	 for(j=0;j<4;j++)
+	   Ruu+=Rij[i][j]*ucov[i]*ucov[j];
+       ldouble Ehatrad = Ruu;
+       boost2_lab2ff(Gi,Gi,pp,gg,GG);
+       //rewrite the time component directly
+       Gi[0]=-kappagasAbs*4.*Pi*B + kapparadAbs*Ehatrad;
+    }
+  
+  return 0;
+}
+
+//**********************************************************************
+//****** takes radiative stress tensor and gas primitives **************
+//****** and calculates contravariant four-force ***********************
+//**********************************************************************
+int
+calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
+{
+  #ifdef NONRELMHD
+  calc_Gi_nonrel(pp,ggg,Gi,labframe);
   return 0;
   #endif
+
+  int i,j,k;
+  struct geometry *geom
+   = (struct geometry *) ggg;
+
+  ldouble (*gg)[5],(*GG)[5];
+  gg=geom->gg;
+  GG=geom->GG;
+
+  //radiative stress tensor in the lab frame
+  ldouble Rij[4][4];
+  calc_Rij_M1(pp,ggg,Rij);
+
+  
+  //the four-velocity of fluid in lab frame
+  ldouble ucon[4],utcon[4],ucov[4],vpr[3];
+
+  utcon[1]=pp[2];
+  utcon[2]=pp[3];
+  utcon[3]=pp[4];
+  conv_vels_both(utcon,ucon,ucov,VELPRIM,VEL4,gg,GG);
+
+
+ 
+  //gas properties
+  ldouble rho=pp[RHO];
+  ldouble u=pp[1];
+  ldouble p= (GAMMA-1.)*(ldouble)u;
+  ldouble Tgas=p*MU_GAS*M_PROTON/K_BOLTZ/rho;
+  ldouble B = SIGMA_RAD*pow(Tgas,4.)/Pi;
+  ldouble kappagasRos,kappagasAbs,kapparadRos,kapparadAbs;
+  ldouble kappa=calc_kappa(pp,geom,&kappagasRos,&kappagasAbs,&kapparadRos,&kapparadAbs);
+  if(kappagasAbs==-1) //no distincion
+    {kappagasRos=kappagasAbs=kapparadRos=kapparadAbs=kappa;}
+  ldouble kappaes=calc_kappaes(pp,geom);
+
+
 
   //contravariant four-force in the lab frame
 
@@ -1741,6 +1807,9 @@ calc_Gi(ldouble *pp, void *ggg, ldouble Gi[4],int labframe)
       Ruu+=Rij[i][j]*ucov[i]*ucov[j];
   ldouble Ehatrad = Ruu;
   
+
+  //  printf("r %e %e %e %e\n",kappagasAbs,kapparadAbs,Ehatrad, B);
+
   ldouble Ru;
   for(i=0;i<4;i++)
     {
@@ -3913,13 +3982,13 @@ test_solve_implicit_lab()
   pp0[0]=1.e-19;
   pp0[1]=1.e-23;//calc_PEQ_ufromTrho(1.e9,pp0[0]);
   pp0[2]=0.1;
-  pp0[3]=0.;
+  pp0[3]=0.1;
   pp0[4]=0.;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
   pp0[B1]=pp0[B2]=pp0[B3]=0.;
   pp0[EE]=1.e-23;
-  pp0[FX]=0.1;
-  pp0[FY]=0.;
+  pp0[FX]=0.12;
+  pp0[FY]=0.05;
   pp0[FZ]=0.;
   #ifdef NCOMPTONIZATION
   pp0[NF0]=calc_NFfromE(pp0[EE0]);
@@ -3974,23 +4043,23 @@ test_solve_implicit_lab()
   verbose=1;
   //full implicit
   PLOOP(iv) pp[iv]=pp0[iv];
-  if(0)
+  if(1)
     { 
   
-      params[0]=RAD;
+      params[0]=MHD;
       params[1]=RADIMPLICIT_ENERGYEQ;
-      params[2]=RADIMPLICIT_LAB;
+      params[2]=RADIMPLICIT_FF;
       params[3]=0; 
       solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,del4,verbose,params,pp);
       print_primitives(pp);
       //printf("gas temp: %e\nrad temp: %e\n",calc_PEQ_Tfromurho(pp[1],pp[0]),calc_LTE_TfromE(pp[EE]));
     }
 
-  getch();
+
 
   //implicit with fixed gas-vel
   PLOOP(iv) pp[iv]=pp0[iv];
-  if(1)
+  if(0)
     { 
     
       params[0]=RAD;
@@ -4007,40 +4076,42 @@ test_solve_implicit_lab()
 
 
 int
-test_Giff()
+test_Gi()
 {
   int i1,i2,iv;
   ldouble uu0[NV],pp0[NV],pp[NV],uu[NV],dt;
   struct geometry geom;
   fill_geometry(0,0,0,&geom);
+  printf("radius: %f\n",geom.xx);
 
   pp0[0]=1.;
-  pp0[1]=1.e-1;
-  pp0[2]=.01;
-  pp0[3]=.01;
-  pp0[4]=.001;
+  pp0[1]=0.1;
+  pp0[VX]=.01;
+  pp0[VY]=.0;
+  pp0[VZ]=0.0;
   pp0[5]=calc_Sfromu(pp0[0],pp0[1]);
-  pp0[EE]=0.1;
-  pp0[FX]=0.3;
-  pp0[FY]=0.5;
-  pp0[FZ]=0.01;
+  pp0[EE]=1.0*calc_LTE_Efromurho(pp0[UU],pp0[RHO]);
+  pp0[FX]=0.01;
+  pp0[FY]=0.;
+  pp0[FZ]=0.0;
   #ifdef NCOMPTONIZATION
   pp0[NF0]=calc_NFfromE(pp0[EE0]);
   #endif
 
-  //radiative four-force
-  ldouble Gi[4],Giff[4],Giff2[4];
-  calc_Gi(pp0,&geom,Gi,1); 
-  //calc_Gi(pp0,&geom,Giff,0); 
-  //boost2_lab2ff(Gi,Giff2,pp0,geom.gg,geom.GG);
-
-  print_4vector(Gi);
-  //  print_4vector(Giff);
-  //print_4vector(Giff2);
-  
-  
-
   print_primitives(pp0);
+
+  ldouble Rij[4][4];
+  calc_Rij_M1(pp0,&geom,Rij);
+  print_4vector(&Rij[0][0]);
+
+  //relativistic radiative four-force (turn off NONRELMHD)
+  ldouble Gi[4],Giff[4],Giff2[4];
+  calc_Gi(pp0,&geom,Gi,0); 
+  print_4vector(Gi);
+
+  //non-rel rad-force
+  calc_Gi_nonrel(pp0,&geom,Gi,0 ); 
+  print_4vector(Gi);
 
   return 0;
 }

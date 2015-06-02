@@ -131,14 +131,27 @@ if(PROCID==10)
 	  
 	    if(if_indomain(i,j,kk))
 	      {
+		int sx,sy,sz;
+		ldouble rho=datain[0];
+		for(sx=-SPHSMEARX;sx<=SPHSMEARX;sx++)
+		  for(sy=-SPHSMEARY;sy<=SPHSMEARY;sy++)
+		    for(sz=-SPHSMEARZ;sz<=SPHSMEARZ;sz++)
+		      {
+			int iix,iiy,iiz;
+			iix=i+sx;
+			iiy=j+sy;
+			iiz=kk+sz;
+			if(if_indomain(iix,iiy,iiz))
+			  {
+			    set_u(pproblem1,0,i+sx,j+sy,kk+sz,rho+get_u(pproblem1,0,i+sx,j+sy,kk+sz));
+			    int ivv;
+			    for(ivv=1;ivv<5;ivv++)
+			      set_u(pproblem1,ivv,i+sx,j+sy,kk+sz,rho*datain[ivv]+get_u(pproblem1,ivv,i+sx,j+sy,kk+sz));
+			    count[i+sx][j+sy][kk+sz]++;
+			  }
+		      }
 
-		set_u(pproblem1,0,i,j,kk,datain[0]+get_u(pproblem1,0,i,j,kk));
-		set_u(pproblem1,1,i,j,kk,datain[1]+get_u(pproblem1,1,i,j,kk));
-		set_u(pproblem1,2,i,j,kk,datain[2]+get_u(pproblem1,2,i,j,kk));
-		set_u(pproblem1,3,i,j,kk,datain[3]+get_u(pproblem1,3,i,j,kk));
-		set_u(pproblem1,4,i,j,kk,datain[4]+get_u(pproblem1,4,i,j,kk));
-
-		count[i][j][kk]++;
+		//		printf("%d %d %d\n",ix,iy,iz);
 	      }
 	  }
 
@@ -148,8 +161,10 @@ if(PROCID==10)
 	  {
 	    if(count[i][j][kk]>0)
 	      {
-		for(ix=0;ix<5;ix++)
-		set_u(pproblem1,ix,i,j,kk,get_u(pproblem1,ix,i,j,kk)/count[i][j][kk]);
+		ldouble rhotot=get_u(pproblem1,0,i,j,kk);
+		set_u(pproblem1,0,i,j,kk,get_u(pproblem1,0,i,j,kk)/count[i][j][kk]);
+		for(ix=1;ix<5;ix++)
+		  set_u(pproblem1,ix,i,j,kk,get_u(pproblem1,ix,i,j,kk)/rhotot);
 	      }
 
 	    if(count[i][j][kk]<0 ||  get_u(pproblem1,RHO,i,j,kk)<SPHRHOCUT)

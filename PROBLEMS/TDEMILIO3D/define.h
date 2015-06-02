@@ -8,6 +8,9 @@
 #define SPHRMIN 1.8
 #define SPHRMAX 450.
 #define SPHRHOCUT 1.e-40
+#define SPHSMEARX 2
+#define SPHSMEARY 1
+#define SPHSMEARZ 1
 
 //************************************/
 //problem-specific arrays
@@ -203,7 +206,7 @@ int SPHprojZ[SPHTNZ];
 #define MAGBETA 0.1
 
 //atmosphere
-#define RHOATMMIN  1.e-26
+#define RHOATMMIN  1.e-20
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
 #define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10/100000.)
 

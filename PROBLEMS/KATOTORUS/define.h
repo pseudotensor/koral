@@ -21,9 +21,9 @@
 #define RADIATION
 //#define SKIPRADSOURCE
 #define BALANCEENTROPYWITHRADIATION
-#define COMPTONIZATION
+//#define COMPTONIZATION
 #define ALLOWRADCEILINGINIMPLICIT
-#define RADIMPLICITFIXVEL
+//#define RADIMPLICITFIXVEL
 #define RADIMPCONVRELERR 1.e-4
 //#define BASICRADIMPLICIT
 //#define RADIMPSTARTWITHEXP
@@ -90,8 +90,9 @@
 //coordinates / resolution
 /************************************/
 //#define myMKS2COORDS
-#define mySPHCOORDS
-//#define myCYLCOORDS
+//#define mySPHCOORDS
+//#define myKSCOORDS
+#define myCYLCOORDS
 #define RMIN 4.
 #define RMAX 100.
 #define MKSR0 -300.
@@ -118,6 +119,16 @@
 #define MINY (0.05)
 #define MAXY (M_PI-MINY)
 #endif
+
+#ifdef myKSCOORDS //modified Kerr-Shild
+//#define PWPOTENTIAL
+#define MYCOORDS KSCOORDS
+#define MINX RMIN
+#define MAXX 100.
+#define MINY (0.05)
+#define MAXY (M_PI-MINY)
+#endif
+
 
 #ifdef myCYLCOORDS //modified Kerr-Shild
 #define PWPOTENTIAL
@@ -151,7 +162,7 @@
 
 //total resolution
 #define TNX 300//128 //28*9
-#define TNY 500//192 //26*9
+#define TNY 600//192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 4
@@ -205,7 +216,7 @@
 #if(NTORUS==1) //Jiang+14
 #define KT_A 0.4
 #define KT_R0 (25.*2.)
-#define KT_RHO0 (10.*rhoCGS2GU(1.e-2))
+#define KT_RHO0 (3.*rhoCGS2GU(1.e-2))
 #define KT_T0 (100.*1.e7)
 #undef MAXBETA
 #define MAXBETA (1.25*3.294/10.) //eq.plane
