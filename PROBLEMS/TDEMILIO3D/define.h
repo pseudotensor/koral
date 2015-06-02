@@ -1,26 +1,17 @@
+int find_globalindex(double r, double th, double ph, int gi[3]);
 
 //************************************/
 //SPH input parameters
 /************************************/
-#define SPHTNX 256
-#define SPHTNY 160
-#define SPHTNZ 96
-#define SPHRMIN 1.8
-#define SPHRMAX 450.
+//#define SPHRMIN 1.8
+//#define SPHRMAX 450.
 #define SPHRHOCUT 1.e-40
-#define SPHSMEARX 2
+
+#define SPHSMEARX 1
 #define SPHSMEARY 1
 #define SPHSMEARZ 1
 
-//************************************/
-//problem-specific arrays
-/************************************/
-double SPHcoordsX[SPHTNX];
-double SPHcoordsY[SPHTNY];
-double SPHcoordsZ[SPHTNZ];
-int SPHprojX[SPHTNX];
-int SPHprojY[SPHTNY];
-int SPHprojZ[SPHTNZ];
+
 
 
 #define FULLPHI
@@ -104,8 +95,8 @@ int SPHprojZ[SPHTNZ];
 /************************************/
 #define myMKS2COORDS
 #define METRICAXISYMMETRIC
-#define ROUT 500.
-#define RMIN 100.
+#define ROUT 1000.
+#define RMIN 1.6
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MKSR0 0.
@@ -142,9 +133,9 @@ int SPHprojZ[SPHTNZ];
 #endif
 
 //total resolution
-#define TNX 256//128//64
-#define TNY 32//64//32
-#define TNZ 96//64//32
+#define TNX 192//128//64
+#define TNY 64//64//32
+#define TNZ 64//64//32
 //number of tiles
 #define NTX 2
 #define NTY 4

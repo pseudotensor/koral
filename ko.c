@@ -18,7 +18,7 @@ main(int argc, char **argv)
   am_i_sane();
 
   ldouble tstart;
-  int i,j,k; char folder[100],bufer[100];
+  int i,j; char folder[100],bufer[100];
 
   //dumping to
   sprintf(folder,"%s","dumps");

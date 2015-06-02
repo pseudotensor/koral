@@ -28,10 +28,9 @@ if(get_u(pproblem1,0,ix,iy,iz)>pp[RHO]) //sph input if density higher than photo
     temp=tempCGS2GU(get_u(pproblem1,1,ix,iy,iz));
     uint=calc_PEQ_ufromTrho(temp,rho);
     vr=tempCGS2GU(get_u(pproblem1,2,ix,iy,iz))/CCC0;
-
     vth=tempCGS2GU(get_u(pproblem1,3,ix,iy,iz))*GMC3;
     vph=tempCGS2GU(get_u(pproblem1,4,ix,iy,iz))*GMC3;
-    if(iy==TNY/2) printf("%d %d > %e %e %e\n",ix,iz,vr,vth,vph);  
+    //if(iy==TNY/2) printf("%d %d > %e %e %e\n",ix,iz,vr,vth,vph);  
     ucon[1]=vr;
     ucon[2]=vth;
     ucon[3]=vph;
