@@ -1,4 +1,4 @@
-#define NONRELMHD
+//#define NONRELMHD
 #define RADIMPLICITTHRESHOLD 1.e0
 #define MAXRADIMPDAMPING 1.e-6
 #define NONRELMHDENTROPYCUT 1.e-10 // Tcut = 3e12*this number
@@ -13,12 +13,12 @@
 /************************************/ 
 #define RESTART
 #define RESTARTGENERALINDICES
-#define RESTARTNUM -1
+#define RESTARTNUM 70
 
 /************************************/
 //radiation choices
 /************************************/
-#define RADIATION
+//#define RADIATION
 //#define SKIPRADSOURCE
 #define BALANCEENTROPYWITHRADIATION
 //#define COMPTONIZATION
@@ -64,7 +64,7 @@
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define SHUFFLELOOPS 0
-#define DOFIXUPS 0
+#define DOFIXUPS 1
 #define DORADFIXUPS 0
 
 /************************************/
@@ -91,9 +91,9 @@
 /************************************/
 //#define myMKS2COORDS
 //#define mySPHCOORDS
-//#define myKSCOORDS
-#define myCYLCOORDS
-#define RMIN 4.
+#define myKSCOORDS
+//#define myCYLCOORDS
+#define RMIN 15.
 #define RMAX 100.
 #define MKSR0 -300.
 #define MKSH0 0.8
@@ -161,8 +161,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 300//128 //28*9
-#define TNY 600//192 //26*9
+#define TNX 64//128 //28*9
+#define TNY 64//192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 4
@@ -198,7 +198,7 @@
 #define SILO2D_XZPLANE
 #endif
 #define CBAUTOSCALE
-#define DTOUT1 1.
+#define DTOUT1 20.
 #define DTOUT2 1000.
 
 /************************************/

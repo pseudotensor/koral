@@ -928,9 +928,12 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	    }    
 
 	    
-	  
+	  //minimal energy density that you can go down to in one step
+	  ldouble edenmin=ppp[sh]/RADIMPLICITMAXENCHANGEDOWN;
+	  //maximal energy density that you can go up to in one step
+	  ldouble edenmax=ppp[sh]*RADIMPLICIMAXENCHANGEUP;
 	  //check if energy density positive and the inversion worked using U2P_HOT
-	  if(xxx[0]>0. && u2pret>=-1) break;
+	  if(xxx[0]>edenmin && xxx[0]<edenmax && u2pret>=-1) break;
 
 	  
 	  //if not decrease the applied fraction
@@ -939,9 +942,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 	      xiapp*=ppp[sh]/(ppp[sh]+fabs(xxx[0]));
 	      xiapp*=1.e-1;//sqrt(EPS); //not to land too close to zero, but sometimes prevents from finding proper solution
 	    }
-	  else //u2p error only
+	  else //u2p error only or too large change
 	    {
-	      xiapp/=2.; 
+	      xiapp/=RADIMPLICITDAMPINGFACTOR; 
 	    }
 
 	  if(xiapp<MAXRADIMPDAMPING) 

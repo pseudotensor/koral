@@ -869,19 +869,23 @@ solve_the_problem(ldouble tstart, char* folder)
 	{
 	  //znps = TNX*TNY*TNZ*(nstep-fprintf_nstep);
 	  
-	  printf("st #%6d t=%10.2e dt=%.2e (time: %.2e (%.2e|%3d > %.2e|%3d) mp: %7.6f) znps: %.0f fail: %1d %1d %1d "
-		 ,nstep,t,dt,end_time-start_time,2.*max_u2ptime,max_u2ptime_loc,2.*min_u2ptime,min_u2ptime_loc,2*maxmp_time,znps,
+	  /*printf("st #%6d t=%10.2e dt=%.2e (time: %.2e (%.2e|%3d > %.2e|%3d) mp: %7.6f) znps: %.0f fail: %1d %1d %1d "
+	    ,nstep,t,dt,end_time-start_time,2.*max_u2ptime,max_u2ptime_loc,2.*min_u2ptime,min_u2ptime_loc,2*maxmp_time,znps,
+	    nfailures[0],nfailures[1],nfailures[2]);*/
+
+	  printf("st #%6d t=%10.2e dt=%.2e mpi=%3.1f\%% znps=%.0f fail# %1d %1d %1d "
+		 ,nstep,t,dt,2.*maxmp_time/(end_time-start_time),znps,
 		 nfailures[0],nfailures[1],nfailures[2]);
 
 #ifdef BALANCEENTROPYWITHRADIATION
-	  printf("#: %d|%d %d|%d %d|%d %d|%d ",nentr[0],nentr2[0],nentr[1],nentr2[1],nentr[2],nentr2[2],nentr[3],nentr2[3]);
+	  printf("ent# %d|%d %d|%d %d|%d %d|%d ",nentr[0],nentr2[0],nentr[1],nentr2[1],nentr[2],nentr2[2],nentr[3],nentr2[3]);
 #else
-	  printf("#: %d %d %d %d ",nentr[0],nentr[1],nentr[2],nentr[3]);
+	  printf("ent# %d %d %d %d ",nentr[0],nentr[1],nentr[2],nentr[3]);
 #endif
 
 #ifdef RADIATION
 #ifndef SKIPRADSOURCE
-	  printf("#:%d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f ",
+	  printf("imp# %d %d %d %d %d %d %d | %.1f %.1f %.1f %.1f %.1f ",
 		 impnums[0],impnums[1],impnums[2],impnums[3],impnums[4],impnums[5],impnums[6],
 		 avimpit[0],avimpit[1],avimpit[2],avimpit[3],avimpit[4]);
 #endif

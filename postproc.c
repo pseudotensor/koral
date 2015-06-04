@@ -60,6 +60,7 @@
 //kinetic + binding flux everywhere (49)
 //radial profiles of rho-weighted radiation temperature (50)
 //<u_phi> in the outflow (51)
+//integrated heating/cooling rate fluid frame G^t (52)
 
 
 /*********************************************/
@@ -92,6 +93,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
       ldouble fd_pl[NV],fd_pr[NV],fd_plm1[NV],fd_prm1[NV],fd_plp1[NV],fd_prp1[NV];
       ldouble fd_ul[NV],fd_ur[NV],fd_ulm1[NV],fd_urm1[NV],fd_ulp1[NV],fd_urp1[NV];
       ldouble du[NV],dul[NV],dur[NV],aaa[12],ahd,arad;
+      ldouble Gi[4],Giff[4];
       int injet;
 
       //vertically integrated/averaged profiles
@@ -291,6 +293,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
       
 		  Rviscrt = Rviscij[1][0];
+
+		  for(iv=0;iv<4;iv++)
+		    Giff[iv]=get_uavg(pavg,AVGGHAT(iv),ix,iy,iz);
 #endif
 		  
 		  //no need of transforming interpolated primitives to BL, already there
@@ -341,6 +346,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
       
 		  Rviscrt = Rviscij[1][0];
+
+		  //lab-frame four fource
+		  calc_Gi(pp,&geomBL,Gi,1); 
+		  boost2_lab2ff(Gi,Giff,pp,geomBL.gg,geomBL.GG);
 #endif
 
 
@@ -539,7 +548,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //kinetic + binding mhd energy flux (49)
 	      profiles[47][ix]+=(-Trtkin)*dx[1]*dx[2]*geomBL.gdet;
 
-
+	      //integrated cooling rate (52)
+	      profiles[50][ix]+=Giff[0]*dx[1]*dx[2]*geomBL.gdet;
 	      
 	      //opt thin mhd energy flux (25)
 	      if(tautot<1.)

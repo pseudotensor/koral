@@ -123,6 +123,11 @@ if(!is_cell_corrected_polaraxis(ix,iy,iz))
 	set_cflag(RADFIXUPFLAG,ix,iy,iz,0); 
     }
   
+  //TESTFIXUP
+  //if(PROCID==6)
+  //{
+  //set_cflag(HDFIXUPFLAG,0,NY-1,0,1); 
+  //    }
 
   return 0;
 }

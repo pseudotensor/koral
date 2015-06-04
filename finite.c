@@ -4468,6 +4468,7 @@ cell_fixup_hd()
   if(DOFIXUPS==0)
     return 0;
 
+
   int ix,iy,iz,iv;
   int in,ii,iii;
   int verbose=2;
@@ -4483,7 +4484,7 @@ cell_fixup_hd()
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      if(get_cflag(HDFIXUPFLAG,ix,iy,iz)==1 && is_cell_active(ix,iy,iz))
+      if(get_cflag(HDFIXUPFLAG,ix,iy,iz)!=0 && is_cell_active(ix,iy,iz))
 	{
 	  //set_cflag(HDFIXUPFLAG,ix,iy,iz,0); //try only once
 
