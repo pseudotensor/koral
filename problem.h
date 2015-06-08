@@ -96,7 +96,7 @@
 //93 KATOTORUS - radiative torus initiated like in Kato+2004
 //94 TDEMILIO3D - tidal disruption with Emilio's input
 
-#define PROBLEM 93
+#define PROBLEM 94
 
 
 #if(PROBLEM==94)

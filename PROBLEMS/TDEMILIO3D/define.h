@@ -3,13 +3,14 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 //************************************/
 //SPH input parameters
 /************************************/
-//#define SPHRMIN 1.8
-//#define SPHRMAX 450.
+
 #define SPHRHOCUT 1.e-40
 
-#define SPHSMEARX 1
-#define SPHSMEARY 1
-#define SPHSMEARZ 1
+#define SPHSMEARX 0
+#define SPHSMEARY 0
+#define SPHSMEARZ 0
+
+#define SPHMASSNORM 1.9891e32 //mass of the star in cgs
 
 
 

@@ -75,9 +75,53 @@ for(i=0;i<NX;i++)
 	  }
 
 	if(count[i][j][k]<0 ||  get_u(pproblem1,RHO,i,j,k)<SPHRHOCUT)
-	  set_u(pproblem1,RHO,i,j,k,-1.); //negative density if no sph data at this cell
+	  set_u(pproblem1,RHO,i,j,k,-SMALL); //negative density if no sph data at this cell
       }
 
+//calculating total mass everywhere to normalize to SPHMASSNORM
+
+ldouble massloc, mass,masscgs,massscale;
+ldouble xx[4],dx[3],rho,gdet;
+  
+massloc=0.;
+for(iz=0;iz<NZ;iz++)
+  {
+    for(iy=0;iy<NY;iy++)
+      {
+	for(ix=0;ix<NX;ix++)
+	  {
+	    get_xx(ix,iy,iz,xx);
+	    dx[0]=get_size_x(ix,0);
+	    dx[1]=get_size_x(iy,1);
+	    dx[2]=get_size_x(iz,2);
+	    gdet=calc_gdet(xx);
+	    rho=rhoCGS2GU(get_u(pproblem1,RHO,ix,iy,iz));
+	    if(rho>0.)
+	      massloc+=rho*dx[0]*dx[1]*dx[2]*gdet;
+	  }
+      }
+  }
+
+#ifdef MPI
+MPI_Allreduce(&massloc, &mass, 1, MPI_DOUBLE, MPI_SUM,
+		    MPI_COMM_WORLD);  
+#else
+mass=massloc;
+#endif
+
+//printf("%d > %e %e\n",PROCID,massloc,mass);
+
+
+masscgs= massGU2CGS(mass);
+massscale = SPHMASSNORM/masscgs;
+
+for(i=0;i<NX;i++)
+  for(j=0;j<NY;j++)
+    for(k=0;k<NZ;k++)
+      {
+	if( get_u(pproblem1,RHO,i,j,k)>0.)
+	  set_u(pproblem1,RHO,i,j,k,get_u(pproblem1,RHO,i,j,k)*massscale);
+      }
     
     //printing at the equatorial plane
 /*

@@ -5883,7 +5883,6 @@ solve_implicit_lab_4dprim_fixvel(ldouble *uu00,ldouble *pp00,void *ggg,ldouble d
 
   if(iter>MAXITER || failed==1)
     {
-      getch();
       if(verbose)
 	{
 	  printf("iter (%d) or failed in solve_implicit_lab_4dprim_fixvel() for frdt=%f (%e)\n",iter,dt,errbest);	  
