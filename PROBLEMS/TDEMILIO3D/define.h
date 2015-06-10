@@ -5,9 +5,13 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 /************************************/
 
 #define SPHRHOCUT 1.e-40
+#define SPHRHOCUTBFIELD 1.e-12
+#define SPHPRECUTBFIELD 1.e-21
+#define SPHTHBCUT 0.002 //max theta from eq. plane for initial B field
+#define SPHBFIELDRHO
 
 #define SPHSMEARX 0
-#define SPHSMEARY 0
+#define SPHSMEARY 1
 #define SPHSMEARZ 0
 
 #define SPHMASSNORM 1.9891e32 //mass of the star in cgs
@@ -39,7 +43,9 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 //magnetic choices
 /************************************/
 //if we want a magnetic field, uncomment MAGNFIELD
-//#define MAGNFIELD
+#define MAGNFIELD
+#define MAXBETA 0.1
+#define VECPOTGIVEN
 #define MPI4CORNERS
 #define GDETIN 1
 
@@ -55,7 +61,7 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
-#define DOFIXUPS 1
+#define DOFIXUPS 0
 
 /************************************/
 //viscosity choices
@@ -97,7 +103,7 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #define myMKS2COORDS
 #define METRICAXISYMMETRIC
 #define ROUT 1000.
-#define RMIN 1.6
+#define RMIN 1.7
 
 #ifdef myMKS1COORDS //modified Kerr-Shild
 #define MKSR0 0.
@@ -110,7 +116,7 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 
 #ifdef myMKS2COORDS //modified Kerr-Shild with more cells towards the eq.plane
 #define MKSR0 0.
-#define MKSH0 0.85 //makes cells smaller towards equatorial plane
+#define MKSH0 0.9 //makes cells smaller towards equatorial plane
 #define MYCOORDS MKS2COORDS
 #define MINX (log(RMIN-MKSR0))
 #define MAXX (log(ROUT-MKSR0))
@@ -134,9 +140,9 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #endif
 
 //total resolution
-#define TNX 192//128//64
-#define TNY 64//64//32
-#define TNZ 64//64//32
+#define TNX 224//128//64
+#define TNY 128//64//32
+#define TNZ 96//64//32
 //number of tiles
 #define NTX 2
 #define NTY 4
@@ -180,7 +186,7 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #define PRINTZONEMORE
 #define SCAOUTPUT 1
 #define SILOOUTPUT 1
-#define RADOUTPUT 1
+#define RADOUTPUT 0
 #define AVGOUTPUT 1
 #define COORDOUTPUT 2
 

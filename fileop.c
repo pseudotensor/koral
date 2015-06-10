@@ -685,7 +685,9 @@ fprint_outfile(ldouble t, int nfile, int codeprim, char* folder, char *prefix)
 									  /******************/
 									  /* extra lines to calculate v1...v4 from PROBLEMS/XXX/dump.c */
 
+#ifdef PR_DUMP
 #include PR_DUMP
+#endif
 									  /******************/
 
 

@@ -161,8 +161,8 @@
 #define MAXZ (PHIWEDGE/2.)
 
 //total resolution
-#define TNX 64//128 //28*9
-#define TNY 64//192 //26*9
+#define TNX 192 //28*9
+#define TNY 192 //26*9
 #define TNZ 1 //2*8
 //number of tiles
 #define NTX 4

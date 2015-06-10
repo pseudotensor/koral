@@ -496,12 +496,6 @@ calc_BfromA_core()
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
   
-  /*
-  for(ix=-1;ix<=NX;ix++)
-    for(iy=-1;iy<=NY;iy++)
-      for(iz=0;iz<NZ;iz++)
-	{
-  */
       struct geometry geom;
       fill_geometry(ix,iy,iz,&geom);
 
@@ -510,25 +504,70 @@ calc_BfromA_core()
       dA[1][1]=dA[2][2]=dA[3][3]=0.;
 
      
-      /* flux-ct-compatible, axisymmetric! */
+      if(TNZ==1) /* flux-ct-compatible, axisymmetric! */
+	{
+	  
+	  dA[1][2] = -(get_u(pvecpot,B1,ix,iy,iz) - get_u(pvecpot,B1,ix,iy+1,iz)
+		       + get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
+	  dA[1][1] = -(get_u(pvecpot,B1,ix,iy,iz) + get_u(pvecpot,B1,ix,iy+1,iz)
+		       - get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+	  dA[1][3] = 0.;
 
-      dA[1][2] = -(get_u(pvecpot,B1,ix,iy,iz) - get_u(pvecpot,B1,ix,iy+1,iz)
-		   + get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
-      dA[1][1] = -(get_u(pvecpot,B1,ix,iy,iz) + get_u(pvecpot,B1,ix,iy+1,iz)
-		   - get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
-      dA[1][3] = 0.;
+	  dA[2][2] = -(get_u(pvecpot,B2,ix,iy,iz) - get_u(pvecpot,B2,ix,iy+1,iz)
+		       + get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
+	  dA[2][1] = -(get_u(pvecpot,B2,ix,iy,iz) + get_u(pvecpot,B2,ix,iy+1,iz)
+		       - get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+	  dA[2][3] = 0.;
 
-      dA[2][2] = -(get_u(pvecpot,B2,ix,iy,iz) - get_u(pvecpot,B2,ix,iy+1,iz)
-		   + get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
-      dA[2][1] = -(get_u(pvecpot,B2,ix,iy,iz) + get_u(pvecpot,B2,ix,iy+1,iz)
-		   - get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
-      dA[2][3] = 0.;
+	  dA[3][2] = -(get_u(pvecpot,B3,ix,iy,iz) - get_u(pvecpot,B3,ix,iy+1,iz)
+		       + get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
+	  dA[3][1] = -(get_u(pvecpot,B3,ix,iy,iz) + get_u(pvecpot,B3,ix,iy+1,iz)
+		       - get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
+	  dA[3][3] = 0.;
 
-      dA[3][2] = -(get_u(pvecpot,B3,ix,iy,iz) - get_u(pvecpot,B3,ix,iy+1,iz)
-		   + get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(iy,1)) ;
-      dA[3][1] = -(get_u(pvecpot,B3,ix,iy,iz) + get_u(pvecpot,B3,ix,iy+1,iz)
-		   - get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(2.*get_size_x(ix,0)) ;
-      dA[3][3] = 0.;
+	}
+      else //generalized to three dimensions
+	{
+
+	  dA[1][1] = (get_u(pvecpot,B1,ix+1,iy,iz) - get_u(pvecpot,B1,ix,iy,iz) +
+		      get_u(pvecpot,B1,ix+1,iy+1,iz) - get_u(pvecpot,B1,ix,iy+1,iz) +
+		      get_u(pvecpot,B1,ix+1,iy,iz+1) - get_u(pvecpot,B1,ix,iy,iz+1) +
+		      get_u(pvecpot,B1,ix+1,iy+1,iz+1) - get_u(pvecpot,B1,ix,iy+1,iz+1) )/(4.*get_size_x(ix,0)) ;
+	  dA[1][2] = (get_u(pvecpot,B1,ix,iy+1,iz) - get_u(pvecpot,B1,ix,iy,iz) +
+		      get_u(pvecpot,B1,ix+1,iy+1,iz) - get_u(pvecpot,B1,ix+1,iy,iz) +
+		      get_u(pvecpot,B1,ix,iy+1,iz+1) - get_u(pvecpot,B1,ix,iy,iz+1) +
+		      get_u(pvecpot,B1,ix+1,iy+1,iz+1) - get_u(pvecpot,B1,ix+1,iy,iz+1))/(4.*get_size_x(iy,1)) ;
+	  dA[1][3] = (get_u(pvecpot,B1,ix,iy,iz+1) - get_u(pvecpot,B1,ix,iy,iz) +
+		      get_u(pvecpot,B1,ix+1,iy,iz+1) - get_u(pvecpot,B1,ix+1,iy,iz) +
+		      get_u(pvecpot,B1,ix,iy+1,iz+1) - get_u(pvecpot,B1,ix,iy+1,iz) +
+		      get_u(pvecpot,B1,ix+1,iy+1,iz+1) - get_u(pvecpot,B1,ix+1,iy+1,iz))/(4.*get_size_x(iz,2)) ;
+
+	  dA[2][1] = (get_u(pvecpot,B2,ix+1,iy,iz) - get_u(pvecpot,B2,ix,iy,iz) +
+		      get_u(pvecpot,B2,ix+1,iy+1,iz) - get_u(pvecpot,B2,ix,iy+1,iz) +
+		      get_u(pvecpot,B2,ix+1,iy,iz+1) - get_u(pvecpot,B2,ix,iy,iz+1) +
+		      get_u(pvecpot,B2,ix+1,iy+1,iz+1) - get_u(pvecpot,B2,ix,iy+1,iz+1) )/(4.*get_size_x(ix,0)) ;
+	  dA[2][2] = (get_u(pvecpot,B2,ix,iy+1,iz) - get_u(pvecpot,B2,ix,iy,iz) +
+		      get_u(pvecpot,B2,ix+1,iy+1,iz) - get_u(pvecpot,B2,ix+1,iy,iz) +
+		      get_u(pvecpot,B2,ix,iy+1,iz+1) - get_u(pvecpot,B2,ix,iy,iz+1) +
+		      get_u(pvecpot,B2,ix+1,iy+1,iz+1) - get_u(pvecpot,B2,ix+1,iy,iz+1))/(4.*get_size_x(iy,1)) ;
+	  dA[2][3] = (get_u(pvecpot,B2,ix,iy,iz+1) - get_u(pvecpot,B2,ix,iy,iz) +
+		      get_u(pvecpot,B2,ix+1,iy,iz+1) - get_u(pvecpot,B2,ix+1,iy,iz) +
+		      get_u(pvecpot,B2,ix,iy+1,iz+1) - get_u(pvecpot,B2,ix,iy+1,iz) +
+		      get_u(pvecpot,B2,ix+1,iy+1,iz+1) - get_u(pvecpot,B2,ix+1,iy+1,iz))/(4.*get_size_x(iz,2)) ;
+
+	   dA[3][1] = (get_u(pvecpot,B3,ix+1,iy,iz) - get_u(pvecpot,B3,ix,iy,iz) +
+		      get_u(pvecpot,B3,ix+1,iy+1,iz) - get_u(pvecpot,B3,ix,iy+1,iz) +
+		      get_u(pvecpot,B3,ix+1,iy,iz+1) - get_u(pvecpot,B3,ix,iy,iz+1) +
+		      get_u(pvecpot,B3,ix+1,iy+1,iz+1) - get_u(pvecpot,B3,ix,iy+1,iz+1) )/(4.*get_size_x(ix,0)) ;
+	  dA[3][2] = (get_u(pvecpot,B3,ix,iy+1,iz) - get_u(pvecpot,B3,ix,iy,iz) +
+		      get_u(pvecpot,B3,ix+1,iy+1,iz) - get_u(pvecpot,B3,ix+1,iy,iz) +
+		      get_u(pvecpot,B3,ix,iy+1,iz+1) - get_u(pvecpot,B3,ix,iy,iz+1) +
+		      get_u(pvecpot,B3,ix+1,iy+1,iz+1) - get_u(pvecpot,B3,ix+1,iy,iz+1))/(4.*get_size_x(iy,1)) ;
+	  dA[3][3] = (get_u(pvecpot,B3,ix,iy,iz+1) - get_u(pvecpot,B3,ix,iy,iz) +
+		      get_u(pvecpot,B3,ix+1,iy,iz+1) - get_u(pvecpot,B3,ix+1,iy,iz) +
+		      get_u(pvecpot,B3,ix,iy+1,iz+1) - get_u(pvecpot,B3,ix,iy+1,iz) +
+		      get_u(pvecpot,B3,ix+1,iy+1,iz+1) - get_u(pvecpot,B3,ix+1,iy+1,iz))/(4.*get_size_x(iz,2)) ;
+	}
 
 
       B[1]=(dA[2][3] - dA[3][2])/geom.gdet;

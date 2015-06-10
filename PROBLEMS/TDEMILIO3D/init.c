@@ -88,22 +88,42 @@ if(get_u(pproblem1,0,ix,iy,iz)>pp[RHO]) //sph input if density higher than photo
     
 #ifdef MAGNFIELD 
   //artificially impose poloidal magnetic field
-  ldouble Pgas,Prad;
+  ldouble Pgas,Prad,Ptot;
   Pgas=GAMMAM1*uint;
 #ifdef RADIATION
   Prad=E/3.;
 #else
   Prad=0.;
 #endif
+
+  Ptot=Pgas+Prad;
   
-  //radial
-  //pp[B1]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom.gg[1][1])*sin(theq2/thmax*M_PI*2.)*cos(MAGNOMEGA*global_time);
-  //if(global_time < VERTBTIME)
-  //pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA/2.)/sqrt(geom.gg[2][2])*sin(theq2/thmax*M_PI)*cos(MAGNOMEGA*global_time);
+  //MYCOORDS vector potential to calculate B's - interpreted as on corners
+  ldouble Acov[4];
+  Acov[0]=Acov[1]=Acov[2]=0.;
+
+  ldouble dth=fabs(th-M_PI/2.);
+  ldouble thdamp = exp(-dth*dth/SPHTHBCUT/SPHTHBCUT);
  
-  pp[B1]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom.gg[1][1])*cos(MAGNOMEGA*global_time);
-  if(global_time < VERTBTIME)
-    pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom.gg[2][2])*cos(MAGNOMEGA*global_time);
+#ifdef SPHBFIELDRHO
+      //standard single poloidal loop along rho
+  Acov[3]=my_max(pp[RHO]*pp[RHO]-SPHRHOCUTBFIELD*SPHRHOCUTBFIELD,0.)*thdamp;
+#endif
+
+#ifdef SPHBFIELDPRE
+      //standard single poloidal loop along rho
+      Acov[3]=my_max(Ptot-SPHPRECUTBFIELD,0.)*thdamp;
+#endif
+    
+
+    pp[B1]=Acov[1];
+    pp[B2]=Acov[2];
+    pp[B3]=Acov[3];
+
+    /* old, direct:
+       if(global_time < VERTBTIME)
+       pp[B2]=sqrt(2.*(Pgas+Prad)*MAGBETA)/sqrt(geom.gg[2][2])*cos(MAGNOMEGA*global_time);
+    */
 #endif
 
   

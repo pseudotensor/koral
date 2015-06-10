@@ -4,7 +4,7 @@ int k;
 
     //reading in the SPH file
     char fname[100];
-    sprintf(fname,"reddwarf3D");
+    sprintf(fname,"reddwarf3D_hr");
     fhandle_problem1=fopen(fname,"rb");
     if(fhandle_problem1==NULL) {printf("no SPH2KORAL file %s!\n",fname); exit(1);}
 

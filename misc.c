@@ -16,7 +16,9 @@ convert_out2gif_2d(char *fname,char *fname2,int niter,ldouble t)
 
 
   //PROBLEMS/XXX/out2gid_2d.c
+#ifdef PR_OUT2GIF_2D
   #include PR_OUT2GIF_2D
+#endif
 
   fprintf(fgnu,"\n");
   fclose(fgnu);   
@@ -37,8 +39,10 @@ convert_out2gif_1d(char *fname,char *fname2,int niter,ldouble t)
   char bufor[50];
 
   //PROBLEMS/XXX/out2gid_1d.c
-  #include PR_OUT2GIF_1D
+#ifdef PR_OUT2GIF_1D
 
+  #include PR_OUT2GIF_1D
+#endif
   fprintf(fgnu,"\n");
   fclose(fgnu);   
   
