@@ -924,6 +924,9 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 #else
 		  u2pret=-2; //not to allow hitting radiation ceiling in rad when doing iterations
 #endif
+		  //TESTRAD
+		  //override:
+		  u2pret=-1;
 		}
 	    }    
 
@@ -985,8 +988,15 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
 
 	  //regular solver
 	  
-	  ldouble CONVREL=EPS;
+	  ldouble CONVREL=RADIMPCONVREL;
 	  ldouble CONVRELERR=RADIMPCONVRELERR;//1.-EPS;
+
+	  if(params[1]==RADIMPLICIT_ENTROPYEQ)
+	    {
+	      CONVREL=RADIMPCONVRELENTR;
+	      CONVRELERR=RADIMPCONVRELENTRERR;
+	    }
+  
 
 	  if(f3[0]<CONVREL && f3[1]<CONVREL && f3[2]<CONVREL && f3[3]<CONVREL && errbase<CONVRELERR)
 	    {
@@ -2733,7 +2743,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
   
   ldouble del4[NRADVAR],delapl[NV];
   int iv;
-  int verbose=1; //set to 2 to print out the whole failed iterations
+  int verbose=2; //set to 2 to print out the whole failed iterations
 
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 

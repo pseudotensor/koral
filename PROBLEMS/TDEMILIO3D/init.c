@@ -22,9 +22,14 @@ set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
 
 if(get_u(pproblem1,0,ix,iy,iz)>pp[RHO]) //sph input if density higher than photosphere
   {
-    ldouble rho,uint,vr,vth,vph,temp,ucon[4];
+    ldouble rho,uint,vr,vth,vph,temp,ucon[4],uintatm;
+    uintatm=pp[UU];
 
     rho=rhoCGS2GU(get_u(pproblem1,0,ix,iy,iz));
+
+    //TESTRAD
+    //rho/=1.e1;
+
     temp=tempCGS2GU(get_u(pproblem1,1,ix,iy,iz));
     uint=calc_PEQ_ufromTrho(temp,rho);
     vr=tempCGS2GU(get_u(pproblem1,2,ix,iy,iz))/CCC0;
@@ -66,8 +71,8 @@ if(get_u(pproblem1,0,ix,iy,iz)>pp[RHO]) //sph input if density higher than photo
   Fx=Fy=Fz=0.;
   uint=calc_PEQ_ufromTrho(T4,rho);
 
-  pp[UU]=uint;//my_max(uint,uintatm);
-  pp[EE0]=E;//my_max(E,Eatm);
+  pp[UU]=my_max(uint,uintatm);
+  pp[EE0]=my_max(E,Eatm);
 
   pp[FX0]=Fx;
   pp[FY0]=Fy;
@@ -77,7 +82,7 @@ if(get_u(pproblem1,0,ix,iy,iz)>pp[RHO]) //sph input if density higher than photo
   //if(geom.iy==TNY/2) printf("%d %d > %e %e %e %e %e\n",geom.iy,geom.iz,E, Eatm, E/3. / (2./3.*uint),temp,T4);
  
   //transforming from BL lab radiative primitives to code non-ortonormal primitives
-  prad_ff2lab(pp,pp,geomBL);
+  prad_ff2lab(pp,pp,&geomBL);
     
 #endif
 

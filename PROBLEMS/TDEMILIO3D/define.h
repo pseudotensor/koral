@@ -36,14 +36,35 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
+#define RADIATION
+#define RADIMPLICITTHRESHOLD 1.e0
+#define MAXRADIMPDAMPING 1.e-6
+//#define SKIPRADSOURCE
+#define BALANCEENTROPYWITHRADIATION
 #define COMPTONIZATION
+#define ALLOWRADCEILINGINIMPLICIT
+//#define RADIMPLICITFIXVEL
+#define RADIMPCONVRELERR 1.e-10
+//#define BASICRADIMPLICIT
+//#define RADIMPSTARTWITHEXP
+//#define ALLOWFORENTRINF4DPRIM
+
+//#define U2P_EQS U2P_EQS_JONS
+//#define U2P_SOLVER U2P_SOLVER_WP
+
+
+#define U2PCONV 1.e-12
+#define RADIMPCONV 1.e-6
+#define RADIMPCONVREL 1.e-10
+#define RADIMPEPS 1.e-7
+#define RADIMPMAXITER 50
+
 
 /************************************/
 //magnetic choices
 /************************************/
 //if we want a magnetic field, uncomment MAGNFIELD
-#define MAGNFIELD
+//#define MAGNFIELD
 #define MAXBETA 0.1
 #define VECPOTGIVEN
 #define MPI4CORNERS
@@ -62,11 +83,14 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
 #define DOFIXUPS 0
+#define DORADFIXUPS 0
 
 /************************************/
 //viscosity choices
 /************************************/
-//#define RADVISCOSITY SHEARVISCOSITY
+#ifdef RADIATION
+#define RADVISCOSITY SHEARVISCOSITY
+#endif
 #define RADVISCMFPSPH
 #define RADVISCNUDAMP
 #define ALPHARADVISC .1
@@ -78,7 +102,7 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 /************************************/
 #define CORRECT_POLARAXIS
 #define NCCORRECTPOLAR 1
-#define UURHORATIOMIN 1.e-10
+#define UURHORATIOMIN 1.e-9 // 1K: u/rho = 7.259162e+12
 #define UURHORATIOMAX 1.e2
 #define EERHORATIOMIN 1.e-20
 #define EERHORATIOMAX 1.e20
@@ -140,9 +164,9 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #endif
 
 //total resolution
-#define TNX 224//128//64
-#define TNY 128//64//32
-#define TNZ 96//64//32
+#define TNX 128// 224//128//64
+#define TNY 64//128//64//32
+#define TNZ 32//96//64//32
 //number of tiles
 #define NTX 2
 #define NTY 4
@@ -190,7 +214,7 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #define AVGOUTPUT 1
 #define COORDOUTPUT 2
 
-#define DTOUT1 1.
+#define DTOUT1 .01
 #define DTOUT2 1000.
 
 /************************************/
@@ -206,5 +230,5 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 //atmosphere
 #define RHOATMMIN  1.e-20
 #define UINTATMMIN  (calc_PEQ_ufromTrho(1.e10,RHOATMMIN))
-#define ERADATMMIN  (calc_LTE_EfromT(3.e6)/10/100000.)
+#define ERADATMMIN  1.e-35//(calc_LTE_EfromT(3.e6)/10/100000.)
 
