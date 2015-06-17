@@ -2059,7 +2059,7 @@ int calc_varscalars(ldouble *varscalars,ldouble t)
 #ifdef MPI
   MPI_Reduce(varscalarsloc, varscalars, NVARSCALARS, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 #else
-  for(iv=0;iv<NBOXSCALARS;iv++)
+  for(iv=0;iv<NVARSCALARS;iv++)
     varscalars[iv]=varscalarsloc[iv];
 #endif
 

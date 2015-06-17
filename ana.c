@@ -44,6 +44,8 @@ main(int argc, char **argv)
     sprintf(folder,"%s","dumps_phiavg");
   else if(ifphiavg==2)
     sprintf(folder,"%s","dumps_phisli");
+  else if(ifphiavg==3)
+    sprintf(folder,"%s","dumps_thsli");
 
 
   int i;
@@ -135,7 +137,19 @@ main(int argc, char **argv)
 	sprintf(suffix,"%sphiavg",suffix);
       if(ifphiavg==2)
 	sprintf(suffix,"%sphisli",suffix);
+      if(ifphiavg==3)
+	sprintf(suffix,"%sthsli",suffix);
  
+      if(ifphiavg==3) //th-sliced - only these below make sense for phi-slices
+	{
+#if(SILOOUTPUT==1)
+#ifndef NOSILO
+      sprintf(prefix,"sil%s",suffix);  
+      fprint_silofile(t,nfout1,"analysis",prefix);
+#endif
+#endif
+	}
+      else
       if(ifphiavg==2) //phisliced - only these below make sense for phi-slices
 	{
 #if(VAROUTPUT==1)

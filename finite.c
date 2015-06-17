@@ -1044,7 +1044,7 @@ op_explicit(ldouble t, ldouble dtin)
   my_err("Magnetic fields do not work with multistep yet. On todo list\n");
 #endif
 
-  #pragma omp barrier
+  #pragma omp barrie
   //TODO: flux_ct still screws up the boundaries under OMP
   flux_ct(); //constrained transport to preserve div.B=0
 
@@ -1267,7 +1267,8 @@ op_implicit(ldouble t, ldouble dtin)
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      if(is_cell_active(ix,iy,iz)==0) 
+      if(is_cell_active(ix,iy,iz)==0 ||  is_cell_corrected_polaraxis(ix,iy,iz)==1)
+        //if(is_cell_active(ix,iy,iz)==0) 
 	continue;
 
       //timestep
