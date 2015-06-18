@@ -4250,8 +4250,8 @@ test_solve_implicit_lab_file()
 
    
   params[0]=MHD;
-  params[1]=RADIMPLICIT_ENERGYEQ;
-  params[2]=RADIMPLICIT_FF;
+  params[1]=RADIMPLICIT_ENTROPYEQ;
+  params[2]=RADIMPLICIT_LAB;
   params[3]=0; 
   solve_implicit_lab_4dprim(uu0,pp0,&geom,dt,deltas,verbose,params,pp);
 

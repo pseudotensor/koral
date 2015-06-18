@@ -44,7 +44,16 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #define COMPTONIZATION
 #define ALLOWRADCEILINGINIMPLICIT
 //#define RADIMPLICITFIXVEL
+                                                                                                                                                
+#define RADIMPCONV 1.e-8
+#define RADIMPEPS 1.e-6
+#define RADIMPMAXITER 50
+#define RADIMPCONVREL 1.e-6
+#define RADIMPCONVRELERR 1.e-1
+#define RADIMPCONVRELENTR 1.e-4
+#define RADIMPCONVRELENTRERR .999
 #define RADIMPCONVRELERR 1.e-10
+
 //#define BASICRADIMPLICIT
 //#define RADIMPSTARTWITHEXP
 //#define ALLOWFORENTRINF4DPRIM
@@ -54,9 +63,6 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 
 
 #define U2PCONV 1.e-12
-#define RADIMPCONV 1.e-6
-#define RADIMPCONVREL 1.e-10
-#define RADIMPEPS 1.e-7
 #define RADIMPMAXITER 50
 
 
