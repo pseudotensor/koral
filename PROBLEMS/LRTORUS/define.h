@@ -14,17 +14,20 @@
 //radiation choices
 /************************************/
 //#define RADIATION
+#define RADIMPLICITTHRESHOLD 1.e0
+#define MAXRADIMPDAMPING 1.e-6
 #define BALANCEENTROPYWITHRADIATION
-//#define NCOMPTONIZATION
-
-//#define U2P_EQS U2P_EQS_JONS
-//#define U2P_SOLVER U2P_SOLVER_WP
-
-
-#define U2PCONV 1.e-10
-#define RADIMPCONV 1.e-10
+#define COMPTONIZATION
+#define ALLOWRADCEILINGINIMPLICIT
+#define RADIMPCONV 1.e-8
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 50
+#define RADIMPCONVREL 1.e-6
+#define RADIMPCONVRELERR 1.e-1
+#define RADIMPCONVRELENTR 1.e-4
+#define RADIMPCONVRELENTRERR .999
+
+#define U2PCONV 1.e-10
 
 /************************************/
 //magnetic choices

@@ -65,6 +65,24 @@ calc_tautot(ldouble *pp, void *ggg, ldouble *dx, ldouble *tautot)
 }
 
 //**********************************************************************
+//******* calculates eff opacity over dx[] ***************************
+//**********************************************************************
+int
+calc_taueff(ldouble *pp, void *ggg, ldouble *dx, ldouble *tauabs)
+{
+  ldouble k1,k2,k3,k4;
+  ldouble kappa=calc_kappa(pp,ggg,&k1,&k2,&k3,&k4);
+  ldouble chi=calc_chi(pp,ggg);
+
+  
+  tauabs[0]=sqrt(kappa*chi)*dx[0];
+  tauabs[1]=sqrt(kappa*chi)*dx[1];
+  tauabs[2]=sqrt(kappa*chi)*dx[2];
+
+  return 0;
+}
+
+//**********************************************************************
 //******* calculates abs opacity over dx[] ***************************
 //**********************************************************************
 int
@@ -2728,7 +2746,7 @@ int explicit_rad_source_term(int ix,int iy, int iz,ldouble dt)
 
   apply_rad_source_del4(ix,iy,iz,del4);
 
-  set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
+  set_cflag(RADIMPFIXUPFLAG,ix,iy,iz,0); 
 
   return 0;
 }
@@ -2743,13 +2761,13 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
   
   ldouble del4[NRADVAR],delapl[NV];
   int iv;
-  int verbose=2; //set to 2 to print out the whole failed iterations
+  int verbose=1; //set to 2 to print out the whole failed iterations
 
   set_cflag(RADSOURCETYPEFLAG,ix,iy,iz,RADSOURCETYPEIMPLICITLAB); 
 
   if(solve_implicit_lab(ix,iy,iz,dt,del4,0)<0)
     {
-      set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,-1);
+      set_cflag(RADIMPFIXUPFLAG,ix,iy,iz,-1);
       //numerical implicit in 4D did not work
       if(verbose) 
 	{
@@ -2766,7 +2784,7 @@ int implicit_lab_rad_source_term(int ix,int iy, int iz,ldouble dt)
   else
     {
       //success in lab frame
-      set_cflag(RADSOURCEWORKEDFLAG,ix,iy,iz,0); 
+      set_cflag(RADIMPFIXUPFLAG,ix,iy,iz,0); 
       //apply_rad_source_del4(ix,iy,iz,del4);
     }
 

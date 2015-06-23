@@ -29,6 +29,18 @@
 #define DOFIXUPS 1
 #endif
 
+#ifndef DOU2PRADFIXUPS
+#define DOU2PRADFIXUPS 1
+#endif
+
+#ifndef DOU2PMHDFIXUPS
+#define DOU2PMHDFIXUPS 1
+#endif
+
+#ifndef DORADIMPFIXUPS
+#define DORADIMPFIXUPS 1
+#endif
+
 #ifndef ALLOWENTROPYU2P
 #define ALLOWENTROPYU2P 1
 #endif

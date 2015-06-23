@@ -106,7 +106,7 @@
 
 //boolean
 #define ENTROPYFLAG 0
-#define RADSOURCEWORKEDFLAG 1
+#define RADIMPFIXUPFLAG 1
 #define HDFIXUPFLAG 2
 #define RADFIXUPFLAG 3
 #define ENTROPYFLAG2 4
@@ -226,3 +226,7 @@
 #define MPI_MSG_XHIYHIZLO 307
 #define MPI_MSG_XHIYHIZHI 308
 
+//fixup types
+#define FIXUP_U2PRAD 100
+#define FIXUP_U2PMHD 101
+#define FIXUP_RADIMP 102

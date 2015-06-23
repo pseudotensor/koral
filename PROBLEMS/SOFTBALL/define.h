@@ -5,24 +5,40 @@
 #define RESTARTNUM -1
 #define RESTARTGENERALINDICES
 #define BHDISK_PROBLEMTYPE
-#define DOFIXUPS 0
-#define UNPERTURBED
+
+#define DOFIXUPS 1
+#define DOU2PRADFIXUPS 0
+#define DOU2PMHDFIXUPS 1
+#define DORADIMPFIXUPS 1
+
+//#define UNPERTURBED
 //#define SKIPHDEVOLUTION
 
 //tests
-#define COOLINGTOWARDSENTROPY
-#define TARGETLOGENTROPY 1.5
-#define THETANOCOOL 0.2
+//#define COOLINGTOWARDSENTROPY
+//#define TARGETLOGENTROPY 1.5
+//#define THETANOCOOL 0.2
 
+//this controls the heating rate per unit mass per time
+//this more or less should equal the luminosity of the rad-supported torus divided by the total mass
+//#define HEATINGRATEPERMASS 1.
 
 /************************************/
 //radiation
 /************************************/
 //#define RADIATION
+#define RADIMPLICITTHRESHOLD 1.e0
+#define MAXRADIMPDAMPING 1.e-6
+#define BALANCEENTROPYWITHRADIATION
+#define COMPTONIZATION
 #define ALLOWRADCEILINGINIMPLICIT
-#define BASICRADIMPLICIT
-
-//#define BALANCEENTROPYWITHRADIATION
+#define RADIMPCONV 1.e-8
+#define RADIMPEPS 1.e-6
+#define RADIMPMAXITER 50
+#define RADIMPCONVREL 1.e-6
+#define RADIMPCONVRELERR 1.e-1
+#define RADIMPCONVRELENTR 1.e-4
+#define RADIMPCONVRELENTRERR .999
 
 /************************************/
 //magnetic fields
@@ -109,7 +125,7 @@
 #ifdef RADIATION
 #define EFFGAMMA (4./3.) //opt.thick
 #else
-#define EFFGAMMA (5./3.) //opt.thick
+#define EFFGAMMA (5./3.) //opt.thin
 #endif
 
 #define FRACMICHEL 0.06

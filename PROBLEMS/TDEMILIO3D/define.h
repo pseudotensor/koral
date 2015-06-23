@@ -52,7 +52,6 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #define RADIMPCONVRELERR 1.e-1
 #define RADIMPCONVRELENTR 1.e-4
 #define RADIMPCONVRELENTRERR .999
-#define RADIMPCONVRELERR 1.e-10
 
 //#define BASICRADIMPLICIT
 //#define RADIMPSTARTWITHEXP
@@ -88,8 +87,11 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 #define TSTEPLIM .5
 #define FLUXLIMITER 0
 #define MINMOD_THETA 1.5
-#define DOFIXUPS 0
-#define DORADFIXUPS 0
+#define DOFIXUPS 1
+#define DOU2PRADFIXUPS 0
+#define DOU2PMHDFIXUPS 1
+#define DORADIMPFIXUPS 1
+
 
 /************************************/
 //viscosity choices

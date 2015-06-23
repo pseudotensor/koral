@@ -885,10 +885,10 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 
 	  //optical depths
 	  int iix;
-	  ldouble tau1,tau2,Rphot;
+	  ldouble tau1,tau2,taueff1,taueff2,Rphot,Rphoteff;
 	  ldouble k1,k2,k3,k4;
-	  tau1=tau2=0.;
-	  Rphot=-1.;
+	  tau1=tau2=taueff1=taueff2=0.;
+	  Rphot=Rphoteff=-1.;
 
 
 	  for(iix=NX-1;iix>=0;iix--)
@@ -924,17 +924,25 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 		  ucov[0]=-1.; ucov[1]=0.;
 		}
 
-	      tau1+=-(kabsloc+kscaloc)*(ucov[0]+ucov[1])*sqrt(grr)*dxph[0];
-	      tau2=-(kabsloc+kscaloc)*(ucov[0]+ucov[1])*geomBL2.xx*sqrt(grr);
-	      if(Rphot<0. && my_max(tau1,tau2)>2./3.)
-		Rphot=geomBL2.xx;
+	      if(geomBL2.xx>rhorizonBL)
+		{
+		  tau1+=-(kabsloc+kscaloc)*(ucov[0]+ucov[1])*sqrt(grr)*dxph[0];
+		  tau2=-(kabsloc+kscaloc)*(ucov[0]+ucov[1])*geomBL2.xx*sqrt(grr);
+		  taueff1+=-sqrt(kabsloc*(kabsloc+kscaloc))*(ucov[0]+ucov[1])*sqrt(grr)*dxph[0];
+		  taueff2=-sqrt(kabsloc*(kabsloc+kscaloc))*(ucov[0]+ucov[1])*geomBL2.xx*sqrt(grr);
+		  if(Rphot<0. && my_max(tau1,tau2)>2./3.)
+		    Rphot=geomBL2.xx;
+		  if(Rphoteff<0. && my_max(taueff1,taueff2)>2./3.)
+		    Rphoteff=geomBL2.xx;
+		}
+	      
 	    }
 
 	  //location of photosphere (6)
 	  profiles[4][iy]=Rphot;
 
-	  //optical depth along radius between boundaries (7)
-	  profiles[5][iv]=tau1;
+	  //location of the effective photosphere (7)
+	  profiles[5][iy]=Rphoteff;
 
 
 	}

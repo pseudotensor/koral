@@ -65,7 +65,8 @@ main
       for(j=0;j<nz;j++)
 	prims[i][j]=(double*)malloc(nv*sizeof(double));
     }
-
+ int **indices;
+	 
   for(ifile=no1;ifile<=no2;ifile+=nostep)
     {
       itot++;
@@ -190,10 +191,12 @@ main
 	      for(iv=0;iv<nv;iv++)
 		prims[i][j][iv]=0.;
 
-	  int **indices;
+	  if(itot==1)
+	    {
 	  indices = (int **)malloc(nx*ny*nz*sizeof(int*));
 	  for(i=0;i<nx*ny*nz;i++)
 	    indices[i]=(int *)malloc(3*sizeof(int));
+	    }
 
 	  //first indices
 	  for(ic=0;ic<nx*ny*nz;ic++)
@@ -255,13 +258,14 @@ main
 		fwrite(&prims[ix][iz][0],sizeof(ldouble),nv,fout);
 	      }
 
-	  for(i=0;i<NX*NY*NZ;i++)
-	    free(indices[i]);
-	  free(indices);
 
 	  fclose(fdump);
 	  fclose(fout);
 	}
     }
+
+	  for(i=0;i<NX*NY*NZ;i++)
+	    free(indices[i]);
+	  free(indices);
   return 0;
 }

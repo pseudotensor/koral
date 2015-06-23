@@ -18,25 +18,25 @@
 /************************************/
 //radiation choices
 /************************************/
-//#define RADIATION
-//#define SKIPRADSOURCE
+#define RADIATION
+#define RADIMPLICITTHRESHOLD 1.e0
+#define MAXRADIMPDAMPING 1.e-6
 #define BALANCEENTROPYWITHRADIATION
-//#define COMPTONIZATION
+#define COMPTONIZATION
 #define ALLOWRADCEILINGINIMPLICIT
-//#define RADIMPLICITFIXVEL
-#define RADIMPCONVRELERR 1.e-4
-//#define BASICRADIMPLICIT
-//#define RADIMPSTARTWITHEXP
-//#define ALLOWFORENTRINF4DPRIM
+#define RADIMPCONV 1.e-8
+#define RADIMPEPS 1.e-6
+#define RADIMPMAXITER 50
+#define RADIMPCONVREL 1.e-6
+#define RADIMPCONVRELERR 1.e-1
+#define RADIMPCONVRELENTR 1.e-4
+#define RADIMPCONVRELENTRERR .999
 
 //#define U2P_EQS U2P_EQS_JONS
 //#define U2P_SOLVER U2P_SOLVER_WP
 
 
 #define U2PCONV 1.e-12
-#define RADIMPCONV 1.e-10
-#define RADIMPEPS 1.e-5
-#define RADIMPMAXITER 50
 
 /************************************/
 //magnetic choices

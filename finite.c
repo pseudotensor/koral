@@ -537,9 +537,9 @@ calc_u2p()
   //**********************************************************************
 
   //fixup here hd after inversions
-  cell_fixup_hd();
+  cell_fixup(FIXUP_U2PMHD);
   #ifdef RADIATION
-  cell_fixup_rad();
+  cell_fixup(FIXUP_U2PRAD);
   #endif
 
 
@@ -1044,7 +1044,7 @@ op_explicit(ldouble t, ldouble dtin)
   my_err("Magnetic fields do not work with multistep yet. On todo list\n");
 #endif
 
-  #pragma omp barrie
+  #pragma omp barrier
   //TODO: flux_ct still screws up the boundaries under OMP
   flux_ct(); //constrained transport to preserve div.B=0
 
@@ -1282,7 +1282,7 @@ op_implicit(ldouble t, ldouble dtin)
     } //source terms
 
   //fixup here after source term 
-  cell_fixup_rad();
+  cell_fixup(FIXUP_RADIMP);
 
 #endif //IMPLICIT_LAB_RAD_SOURCE
 #endif //SKIPRADSOURCE
@@ -4462,17 +4462,26 @@ int set_bc(ldouble t,int ifinit)
   return 0;
 }
 
+
 //fixing after failed MHD main inversion
 int
-cell_fixup_hd()
+cell_fixup(int type)
 {
   if(DOFIXUPS==0)
     return 0;
 
+  if(DOU2PMHDFIXUPS==0 && type==FIXUP_U2PMHD)
+    return 0;
+
+  if(DOU2PRADFIXUPS==0 && type==FIXUP_U2PRAD)
+    return 0;
+
+  if(DORADIMPFIXUPS==0 && type==FIXUP_RADIMP)
+    return 0;
 
   int ix,iy,iz,iv;
   int in,ii,iii;
-  int verbose=2;
+  int verbose=1;
 
   copyi_u(1.,u,u_bak_fixup);
   copyi_u(1.,p,p_bak_fixup);
@@ -4485,59 +4494,74 @@ cell_fixup_hd()
       iy=loop_0[ii][1];
       iz=loop_0[ii][2]; 
 
-      if(get_cflag(HDFIXUPFLAG,ix,iy,iz)!=0 && is_cell_active(ix,iy,iz))
+      if(((get_cflag(HDFIXUPFLAG,ix,iy,iz)!=0 && type==FIXUP_U2PMHD) ||
+	  (get_cflag(RADFIXUPFLAG,ix,iy,iz)!=0 && type==FIXUP_U2PRAD) ||
+	  (get_cflag(RADIMPFIXUPFLAG,ix,iy,iz)!=0 && type==FIXUP_RADIMP)) && is_cell_active(ix,iy,iz))
 	{
-	  //set_cflag(HDFIXUPFLAG,ix,iy,iz,0); //try only once
+	  if(type==FIXUP_U2PMHD) set_cflag(HDFIXUPFLAG,ix,iy,iz,0); //try only once
+	  if(type==FIXUP_U2PRAD) set_cflag(RADFIXUPFLAG,ix,iy,iz,0); //try only once
+	  if(type==FIXUP_RADIMP) set_cflag(RADIMPFIXUPFLAG,ix,iy,iz,0); //try only once
 
-	  //total fixups  
+	  //looking around for good neighbors
 	  struct geometry geom;
 	  fill_geometry(ix,iy,iz,&geom);
 
 	  ldouble ppn[6][NV],pp[NV],uu[NV];
 
-	  //int gix,giy,giz;
-	  //mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
-
 	  //should care about global but at the stage where it is called knowns not about the boundaries
+	  //so fixups idividually in tiles but later exchanged 
 
 	  in=0; //number of successfull neighbors
 		  
-	  if(ix-1>=0 &&  get_cflag(HDFIXUPFLAG,ix-1,iy,iz)==0)
+	  if(ix-1>=0 &&  
+	     ((get_cflag(HDFIXUPFLAG,ix-1,iy,iz)==0 && type==FIXUP_U2PMHD) ||
+	      (get_cflag(RADFIXUPFLAG,ix-1,iy,iz)==0 && type==FIXUP_U2PRAD) ||
+	      (get_cflag(RADIMPFIXUPFLAG,ix-1,iy,iz)==0 && type==FIXUP_RADIMP)))	      
 	    {
 	      in++;
 	      for(iv=0;iv<NV;iv++)
 		ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
 	    }
 
-	  if(ix+1<NX && get_cflag(HDFIXUPFLAG,ix+1,iy,iz)==0)
+	  if(ix+1<NX &&  ((get_cflag(HDFIXUPFLAG,ix+1,iy,iz)==0 && type==FIXUP_U2PMHD) ||
+	      (get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0 && type==FIXUP_U2PRAD) ||
+	      (get_cflag(RADIMPFIXUPFLAG,ix+1,iy,iz)==0 && type==FIXUP_RADIMP)))
 	    {
 	      in++;
 	      for(iv=0;iv<NV;iv++)
 		ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
 	    }
 
-	  if(iy-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy-1,iz)==0)
+	  if(iy-1>=0 && ((get_cflag(HDFIXUPFLAG,ix,iy-1,iz)==0 && type==FIXUP_U2PMHD) ||
+	      (get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0 && type==FIXUP_U2PRAD) ||
+	      (get_cflag(RADIMPFIXUPFLAG,ix,iy-1,iz)==0 && type==FIXUP_RADIMP)))
 	    {
 	      in++;
 	      for(iv=0;iv<NV;iv++)
 		ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
 	    }
 
-	  if(iy+1<NY && get_cflag(HDFIXUPFLAG,ix,iy+1,iz)==0)
+	  if(iy+1<NY &&  ((get_cflag(HDFIXUPFLAG,ix,iy+1,iz)==0 && type==FIXUP_U2PMHD) ||
+	      (get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0 && type==FIXUP_U2PRAD) ||
+	      (get_cflag(RADIMPFIXUPFLAG,ix,iy+1,iz)==0 && type==FIXUP_RADIMP)))
 	    {
 	      in++;
 	      for(iv=0;iv<NV;iv++)
 		ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
 	    }
 
-	  if(iz-1>=0 && get_cflag(HDFIXUPFLAG,ix,iy,iz-1)==0)
+	  if(iz-1>=0 &&  ((get_cflag(HDFIXUPFLAG,ix,iy,iz-1)==0 && type==FIXUP_U2PMHD) ||
+	      (get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0 && type==FIXUP_U2PRAD) ||
+	      (get_cflag(RADIMPFIXUPFLAG,ix,iy,iz-1)==0 && type==FIXUP_RADIMP)))
 	    {
 	      in++;
 	      for(iv=0;iv<NV;iv++)
 		ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
 	    }
 
-	  if(iz+1<NZ && get_cflag(HDFIXUPFLAG,ix,iy,iz+1)==0)
+	  if(iz+1<NZ  && ((get_cflag(HDFIXUPFLAG,ix,iy,iz+1)==0 && type==FIXUP_U2PMHD) ||
+	      (get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0 && type==FIXUP_U2PRAD) ||
+	      (get_cflag(RADIMPFIXUPFLAG,ix,iy,iz+1)==0 && type==FIXUP_RADIMP)))
 	    {
 	      in++;
 	      for(iv=0;iv<NV;iv++)
@@ -4546,19 +4570,30 @@ cell_fixup_hd()
 
 	  if((NZ==1 && NY==1 && in>=1) ||
 	     (NZ==1 && in>=2) ||
-	     (NY==1 && in>=1) ||
-	     in>3) //sufficient number of neighbors
+	     (NY==1 && in>=2) ||
+	     in>=3) //sufficient number of neighbors
 	    {
 	      for(iv=0;iv<NV;iv++)
 		{
-		  if(iv==RHO || iv==UU || iv==ENTR || iv>B3)  //skip correctin magnetic field and velocities not to disrupt div B
+		  int fixthis=0;
+
+		  if(type==FIXUP_U2PMHD &&  iv<B1) //skip correctin magnetic field not to disrupt div B
+		    fixthis=1;
+
+		  if(type==FIXUP_U2PRAD &&  (iv>=EE && iv<=FZ)) //fix only radiative quantites
+		    fixthis=1;
+
+		  if(type==FIXUP_RADIMP &&  (iv<B1 || (iv>=EE && iv<=FZ))) //fix both mhd and rad but not magn field
+		    fixthis=1;
+
+		  if(fixthis==1)
 		    {
 		      pp[iv]=0.;
 		      for(iii=0;iii<in;iii++)
 			pp[iv]+=ppn[iii][iv];
 		      pp[iv]/=(ldouble)in;  
 		    }
-		  else //leave magnetic field as was
+		  else //leave as was
 		    {
 		      pp[iv]=get_u(p,iv,ix,iy,iz); 
 		    }
@@ -4567,7 +4602,9 @@ cell_fixup_hd()
 
 	      if(verbose>1) 
 		{
-		  printf("%4d > %4d %4d %4d > MHDFIX > fixing up mhd with %d neighbors\n",PROCID,ix,iy,iz,in);
+		  if(type==FIXUP_U2PMHD)		  printf("%4d > %4d %4d %4d > U2PMHD > fixing up with %d neighbors\n",PROCID,ix+TOI,iy+TOJ,iz+TOK,in);
+		  if(type==FIXUP_U2PRAD)		  printf("%4d > %4d %4d %4d > U2PRAD > fixing up with %d neighbors\n",PROCID,ix+TOI,iy+TOJ,iz+TOK,in);
+		  if(type==FIXUP_RADIMP)		  printf("%4d > %4d %4d %4d > RADIMP > fixing up with %d neighbors\n",PROCID,ix+TOI,iy+TOJ,iz+TOK,in);
 		}
 	      
 	      //save to updated arrays memory
@@ -4579,10 +4616,9 @@ cell_fixup_hd()
 	    }
 	  else
 	    {
-#ifndef MPI
-	      fprintf(fout_fail,"%4d > %4d %4d %4d | %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup\n",PROCID,ix+TOI,iy+TOJ,iz+TOK,ix,iy,iz);
-#endif
-	      printf("%4d > %4d %4d %4d | %4d %4d %4d > MHDFIXFAIL > didn't manage to hd fixup \n",PROCID,ix+TOI,iy+TOJ,iz+TOK,ix,iy,iz);
+	      if(type==FIXUP_U2PMHD)		  printf("%4d > %4d %4d %4d > U2PMHD > didn't manage to hd fixup\n",PROCID,ix+TOI,iy+TOJ,iz+TOK);
+	      if(type==FIXUP_U2PRAD)		  printf("%4d > %4d %4d %4d > U2PRAD > didn't manage to hd fixup\n",PROCID,ix+TOI,iy+TOJ,iz+TOK);
+	      if(type==FIXUP_RADIMP)		  printf("%4d > %4d %4d %4d > RADIMP > didn't manage to hd fixup\n",PROCID,ix+TOI,iy+TOJ,iz+TOK);
 	    }
 	}
     }
@@ -4595,179 +4631,6 @@ cell_fixup_hd()
 }
 
 
-
-//fixing after radiative implicit solver
-int
-cell_fixup_rad()
-{
-  if(DORADFIXUPS==0)
-    return 0;
-
-  int ix,iy,iz,iv;
-  int in,ii,iii;
-  int verbose=1;
-
-  copyi_u(1.,u,u_bak_fixup);
-  copyi_u(1.,p,p_bak_fixup);
-
-  //gets the neighboring the primitives
-#pragma omp parallel for private(ix,iy,iz,iv,iii,in) schedule (dynamic)
-  for(ii=0;ii<Nloop_0;ii++) //domain only
-    {
-      ix=loop_0[ii][0];
-      iy=loop_0[ii][1];
-      iz=loop_0[ii][2]; 
-
-      if(get_cflag(RADFIXUPFLAG,ix,iy,iz)<0)
-	{
-
-	  set_cflag(RADFIXUPFLAG,iz,iy,iz,0); //only once
-
-	  ldouble ppn[26][NV],pp[NV],uu[NV];
-
-	  //total fixups  
-	  struct geometry geom;
-	  fill_geometry(ix,iy,iz,&geom); 
-		  
-	  //int gix,giy,giz;
-	  //mpi_local2globalidx(ix,iy,iz,&gix,&giy,&giz);
-	  //as above
-
-	  in=0; //number of successfull neighbors
-		  
-	  if(ix-1>=0 &&  get_cflag(RADFIXUPFLAG,ix-1,iy,iz)==0)
-	    {
-	      in++;
-	      for(iv=0;iv<NV;iv++)
-		ppn[in-1][iv]=get_u(p,iv,ix-1,iy,iz);
-	    }
-		  
-	  if(ix+1<NX && get_cflag(RADFIXUPFLAG,ix+1,iy,iz)==0)
-	    {
-	      in++;
-	      for(iv=0;iv<NV;iv++)
-		ppn[in-1][iv]=get_u(p,iv,ix+1,iy,iz);
-	    }
-
-	  if(iy-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy-1,iz)==0)
-	    {
-	      in++;
-	      for(iv=0;iv<NV;iv++)
-		ppn[in-1][iv]=get_u(p,iv,ix,iy-1,iz);
-	    }
-
-	  if(iy+1<NY && get_cflag(RADFIXUPFLAG,ix,iy+1,iz)==0)
-	    {
-	      in++;
-	      for(iv=0;iv<NV;iv++)
-		ppn[in-1][iv]=get_u(p,iv,ix,iy+1,iz);
-	    }
-
-	  if(iz-1>=0 && get_cflag(RADFIXUPFLAG,ix,iy,iz-1)==0)
-	    {
-	      in++;
-	      for(iv=0;iv<NV;iv++)
-		ppn[in-1][iv]=get_u(p,iv,ix,iy,iz-1);
-	    }
-
-	  if(iz+1<NZ && get_cflag(RADFIXUPFLAG,ix,iy,iz+1)==0)
-	    {
-	      in++;
-	      for(iv=0;iv<NV;iv++)
-		ppn[in-1][iv]=get_u(p,iv,ix,iy,iz+1);
-	    }
-
-	  //try corners as well
-	  //unnecessary + typos
-	  //TODO: so far only for NZ==1
-	  /*
-	    if(NZ==1 && NY>1)
-	    {
-	    if(gix-1>=0 && giy-1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy-1,iz)==0)
-	    {
-	    in++;
-	    for(iv=0;iv<NV;iv++)
-	    ppn[in-1][iv]=get_u(p,iv,ix-1,iy-1,iz);
-	    idx[in-1][0]=ix-1;
-	    idx[in-1][1]=iy-1;
-	    idx[in-1][2]=iz;
-	    }
-
-	    if(gix+1>=0 && giy-1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy-1,iz)==0)
-	    {
-	    in++;
-	    for(iv=0;iv<NV;iv++)
-	    ppn[in-1][iv]=get_u(p,iv,ix+1,iy-1,iz);
-	    idx[in-1][0]=ix+1;
-	    idx[in-1][1]=iy-1;
-	    idx[in-1][2]=iz;
-	    }
-
-	    if(gix+1>=0 && giy+1>=0 && get_cflag(RADFIXUPFLAG,ix+1,iy+1,iz)==0)
-	    {
-	    in++;
-	    for(iv=0;iv<NV;iv++)
-	    ppn[in-1][iv]=get_u(p,iv,ix+1,iy+1,iz);
-	    idx[in-1][0]=ix+1;
-	    idx[in-1][1]=iy+1;
-	    idx[in-1][2]=iz;
-	    }
-
-	    if(gix-1>=0 && giy+1>=0 && get_cflag(RADFIXUPFLAG,ix-1,iy+1,iz)==0)
-	    {
-	    in++;
-	    for(iv=0;iv<NV;iv++)
-	    ppn[in-1][iv]=get_u(p,iv,ix-1,iy+1,iz);
-	    idx[in-1][0]=ix-1;
-	    idx[in-1][1]=iy+1;
-	    idx[in-1][2]=iz;
-	    }			 
-	    }
-	  */
-		  
-	  if((NZ==1 && NY==1 && in>=1) ||
-	     (NZ==1 && in>=1) ||
-	     (NY==1 && in>=1) ||
-	     in>3) //sufficient number of neighbors
-	    {
-	      for(iv=0;iv<NV;iv++)
-		{
-		  pp[iv]=0;
-		  for(iii=0;iii<in;iii++)
-		    pp[iv]+=ppn[iii][iv];
-		  pp[iv]/=(ldouble)in;  
-		}
-	      p2u(pp,uu,&geom);
-		      
-	      if(verbose>1) 
-		printf("%4d > %4d %4d %4d > RADFIX > fixing up rad with %d neighbors\n",PROCID,ix,iy,iz,in);
-
-	      //save to updated arrays memory
-	      //all the primitives!
-	      for(iv=0;iv<NV;iv++)
-		{
-		  //if(iv!=UU && iv!=EE0) continue; //why?
-		  set_u(u_bak_fixup,iv,ix,iy,iz,uu[iv]);
-		  set_u(p_bak_fixup,iv,ix,iy,iz,pp[iv]);
-		}
-	    }
-	  else
-	    {
-#ifndef MPI
-	      fprintf(fout_fail,"%4d > %4d %4d %4d | %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup\n",PROCID,ix+TOI,iy+TOJ,iz+TOK,ix,iy,iz);
-#endif
-	      printf("%4d > %4d %4d %4d | %4d %4d %4d > RADFIXFAIL > didn't manage to rad fixup \n",PROCID,ix+TOI,iy+TOJ,iz+TOK,ix,iy,iz);
-	    }
-		  
-	}
-    }
-
-  //restoring to memory
-  copyi_u(1.,u_bak_fixup,u);
-  copyi_u(1.,p_bak_fixup,p);
-
-  return 0;
-}
 
 //**********************************************************************
 //**********************************************************************

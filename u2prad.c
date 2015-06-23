@@ -689,7 +689,7 @@ check_floors_rad(ldouble *pp, int whichvel,void *ggg)
   //skip floors for some time
   //return 0;
 
-  int verbose=1;
+  int verbose=0;
   int ret=0;
 
   struct geometry *geom

@@ -140,13 +140,18 @@ main(int argc, char **argv)
       if(ifphiavg==3)
 	sprintf(suffix,"%sthsli",suffix);
  
-      if(ifphiavg==3) //th-sliced - only these below make sense for phi-slices
+      if(ifphiavg==3) //th-sliced - only these below make sense for th-slices
 	{
 #if(SILOOUTPUT==1)
 #ifndef NOSILO
       sprintf(prefix,"sil%s",suffix);  
       fprint_silofile(t,nfout1,"analysis",prefix);
 #endif
+#endif
+
+#if(SIMOUTPUT!=0)	  
+      sprintf(prefix,"sim%s",suffix);  
+      fprint_simplefile(t,nfout1,"analysis",prefix);
 #endif
 	}
       else
@@ -160,6 +165,11 @@ main(int argc, char **argv)
       sprintf(prefix,"sil%s",suffix);  
       fprint_silofile(t,nfout1,"analysis",prefix);
 #endif
+#endif
+
+#if(SIMOUTPUT!=0)	  
+      sprintf(prefix,"sim%s",suffix);  
+      fprint_simplefile(t,nfout1,"analysis",prefix);
 #endif
 	}
       else

@@ -292,11 +292,7 @@ pp[5]=calc_Sfromu(pp[0],pp[1]);
 //to conserved
 p2u(pp,uu,&geom);
 
-if(pp[0]>1.)
-  {
-print_primitives(pp); 
- getch();
-  }
+
 
 /***********************************************/
 

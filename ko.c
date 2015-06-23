@@ -103,7 +103,7 @@ main(int argc, char **argv)
 
   //test_inversion_nonrel(); exit(1);
 
-  test_solve_implicit_lab_file(); exit(1);
+  //test_solve_implicit_lab_file(); exit(1);
   
   //test_solve_implicit_lab(); exit(1);
 
