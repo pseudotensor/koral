@@ -46,6 +46,7 @@ int find_globalindex(double r, double th, double ph, int gi[3]);
 //#define RADIMPLICITFIXVEL
                                                                                                                                                 
 #define RADIMPCONV 1.e-8
+#define RADIMPENTRCONV 1.e-5
 #define RADIMPEPS 1.e-6
 #define RADIMPMAXITER 50
 #define RADIMPCONVREL 1.e-6

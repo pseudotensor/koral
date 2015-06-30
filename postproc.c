@@ -49,7 +49,7 @@
 //conserved flux rho ur in MYCOORDS (38)
 //conserved flux rho ur+Trt in MYCOORDS (39)
 //conserved flux for Rrt int MYCOORDS (40)
-//surface density of energy = int (Ttt+rhout+Rtt) dz (41)
+//surface density of energy for Be<0. = int (Ehat + uint) (41)
 //rho-weighted radial velocity in the jet (42)
 //magnetic flux in the jet (43)
 //kinetic + binding flux in the jet (44)
@@ -61,6 +61,9 @@
 //radial profiles of rho-weighted radiation temperature (50)
 //<u_phi> in the outflow (51)
 //integrated heating/cooling rate fluid frame G^t (52)
+//energy-averaged radial transport velocity (53)
+//energy-averaged vertical transport velocity (54)
+
 
 
 /*********************************************/
@@ -81,7 +84,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
       ldouble dx0, dxm2, dxm1, dxp1, dxp2;  
       ldouble xx[4],xxBL[4],dx[3],dxph[3],dxcgs[3],mdot,rho,rhouconrcons,uint,temp,temprad,ucon[4],utcon[4],ucon3[4];
       ldouble rhoucont,enden,rhouconr,Tij[4][4],Tij22[4][4],Rij[4][4],Rviscij[4][4],Trt,Fluxx[NV],Rrt,Rviscrt,bsq,bcon[4],bcov[4];
-      ldouble Trtmagn,Trtkin;
+      ldouble Trtmagn,Trtkin,endensimple,endenuconr,endenuconth;
       ldouble ucov[4],pp[NV],gg[4][5],GG[4][5],ggBL[4][5],GGBL[4][5],Ehat;
       ldouble tautot,tautotloc,tauabs,tauabsloc;
       ldouble avgsums[NV+NAVGVARS][NX];
@@ -257,6 +260,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
 		  rhoucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz);
 
+		  endenuconr = get_uavg(pavg,AVGUUUCON(1),ix,iy,iz) * sqrt(geomBL.gg[1][1]);
+		  endenuconth = get_uavg(pavg,AVGUUUCON(2),ix,iy,iz) * sqrt(geomBL.gg[2][2]);
+
 		  rhouconrcons=get_uavg(pavg,AVGRHOURDIFF,ix,iy,iz);
 		  
 		  for(i=0;i<4;i++)
@@ -272,11 +278,12 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 		  Trt=Tij[1][0];
 		  enden = Tij[0][0]+rhoucont;
+		  endensimple = uint;
 
 		  Trtmagn = get_uavg(pavg,AVGBSQUCONUCOV(1,0),ix,iy,iz)
 		    - get_uavg(pavg,AVGBCONBCOV(1,0),ix,iy,iz); 
 
-		  Trtkin = get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz);
+		  Trtkin = utcon[0]-1.;
 
 #ifdef RADIATION  
 		  for(i=0;i<4;i++)
@@ -288,6 +295,11 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  Ehat = get_uavg(pavg,AVGEHAT,ix,iy,iz);
 		  temprad=get_uavg(pavg,AVGTRAD,ix,iy,iz);
 		 
+		  endensimple+=Ehat;
+
+		  endenuconr += get_uavg(pavg,AVGEHATUCON(1),ix,iy,iz) * sqrt(geomBL.gg[1][1]);
+		  endenuconth += get_uavg(pavg,AVGEHATUCON(2),ix,iy,iz) * sqrt(geomBL.gg[2][2]);
+		  
 
 		  int derdir[3]={0,0,0};
 		  calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
@@ -312,7 +324,7 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  temp=calc_PEQ_Tfromurho(uint,rho);
 
 	      
-		  
+ 
 #ifdef MAGNFIELD
 		  calc_bcon_prim(pp,bcon,&geomBL);
 		  indices_21(bcon,bcov,geomBL.gg); 
@@ -321,6 +333,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 
 		  conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 		  rhouconr=rhouconrcons=rho*utcon[1];
+		  endenuconr = uint*utcon[1]* sqrt(geomBL.gg[1][1]);
+		  endenuconth = uint*utcon[2]* sqrt(geomBL.gg[2][2]);
 
 		  calc_Tij(pp,&geomBL,Tij22);
 		  indices_2221(Tij22,Tij,geomBL.gg);
@@ -328,8 +342,9 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  Trt = Tij[1][0];
 
 		  Trtmagn = bsq*utcon[1]*ucov[0] - bcon[1]*bcov[0];
-		  Trtkin =  rho*utcon[1]*ucov[0];
+		  Trtkin = utcon[0]-1.;
 		  enden = Tij[0][0] + rho*utcon[0];
+		  endensimple = uint;
 
 #ifdef RADIATION
 		  calc_Rij(pp,&geomBL,Rij);
@@ -341,7 +356,10 @@ int calc_radialprofiles(ldouble profiles[][NX])
 		  calc_ff_Rtt(&get_u(p,0,ix,iy,iz),&Rtt,uconr,&geomBL);
 		  Ehat=-Rtt; 	
 		  enden+=Rij[0][0];
-
+		  endensimple+=Ehat;
+		  endenuconr+=Ehat*ucon[1]*sqrt(geomBL.gg[1][1]);
+		  endenuconth+=Ehat*ucon[2]*sqrt(geomBL.gg[2][2]);
+ 
 		  int derdir[3]={0,0,0}; 
 		  calc_Rij_visc(pp,&geomBL,Rviscij,derdir);
       
@@ -487,7 +505,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //profiles[0][ix]+=(prermhd)*dxph[1];
 
 	      //surface energy density (41)
-	      profiles[39][ix]+=enden*dxph[1];
+	      if(muBe<0.)
+		profiles[39][ix]+=endensimple*dxph[1];
 	      //temporarily magnetic pressure:
 	      //profiles[39][ix]+=(bsq/2.)*dxph[1];
 
@@ -616,6 +635,14 @@ int calc_radialprofiles(ldouble profiles[][NX])
 	      //rho-weighted minus radial velocity (4)
 	      profiles[2][ix]+=-rhouconr*dxph[1];
 
+	      //energy-averaged radial transport velocity (53)
+	      if(muBe>0.0)
+		profiles[51][ix]+=endenuconr*dxph[1];
+
+	      //energy-averaged vertical transport velocity (54)
+	      if(muBe>0.0)
+		profiles[52][ix]+=my_sign(geomBL.xxvec[2]-M_PI/2.)*endenuconth*dxph[1];
+
 	      //rho-weighted minus radial velocity in the inflow (24)
 	      if(utcon[1]<0.)
 		profiles[22][ix]+=-rhouconr*dxph[1];
@@ -663,7 +690,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
       ldouble sigmaout=profiles[0][ix]-profiles[21][ix];
       ldouble sigmain=profiles[21][ix];
       profiles[2][ix]/=profiles[0][ix]; //total
-      
+      profiles[51][ix]/=profiles[39][ix];
+      profiles[52][ix]/=profiles[39][ix];
       profiles[3][ix]/=sigmain; //inflow only
       profiles[49][ix]/=sigmaout; //normalized by surface density in the outlfow
       profiles[22][ix]/=profiles[21][ix]; //sigma in
@@ -737,8 +765,8 @@ int calc_radialprofiles(ldouble profiles[][NX])
 int calc_thetaprofiles(ldouble profiles[][NY])
 {
   //adjust NTHPROFILES in problem.h
-  ldouble rho,uint,bsq,bcon[4],bcov[4],utcon[4],ucov[4],rhouconr,rhoucont;
-  ldouble Tij[4][4],Tij22[4][4],Rij[4][4],Trt,Rrt,Ehat,Rviscij[4][4],Rviscrt;
+  ldouble rho,uint,bsq,bcon[4],bcov[4],utcon[4],ucov[4],rhouconr,rhoucont,rhouconrucovt;
+  ldouble Tij[4][4],Tij22[4][4],Rij[4][4],Trt,Trtkin,Rrt,Ehat,Rviscij[4][4],Rviscrt;
   ldouble pp[NV];
 
   //choose radius where to extract from
@@ -794,7 +822,8 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 	      utcon[3]=get_uavg(pavg,AVGRHOUCON(3),ix,iy,iz)/get_uavg(pavg,RHO,ix,iy,iz);
 	      rhouconr=get_uavg(pavg,AVGRHOUCON(1),ix,iy,iz);
 	      rhoucont=get_uavg(pavg,AVGRHOUCON(0),ix,iy,iz);
-		  
+	      rhouconrucovt = get_uavg(pavg,AVGRHOUCONUCOV(1,0),ix,iy,iz);
+
 	      for(i=0;i<4;i++)
 		for(j=0;j<4;j++)
 
@@ -837,12 +866,14 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 
 	      conv_vels_both(utcon,utcon,ucov,VELPRIM,VEL4,geomBL.gg,geomBL.GG);
 	      rhouconr=rho*utcon[1];
+	      
 
 	      calc_Tij(pp,&geomBL,Tij22);
 	      indices_2221(Tij22,Tij,geomBL.gg);
 
 	      Trt = Tij[1][0];
-
+	      rhouconrucovt =  rho*utcon[1]*ucov[0];
+		 
 #ifdef RADIATION
 	      calc_Rij(pp,&geomBL,Rij);
 	      indices_2221(Rij,Rij,geomBL.gg);
@@ -871,11 +902,17 @@ int calc_thetaprofiles(ldouble profiles[][NY])
 	  
 	  ldouble fluxconv=fluxGU2CGS(1.); 
 
-	  //total energy luminosity in cgs for converged region (2)
+	  //total energy flux in cgs  (2)
 	  profiles[0][iy]=-fluxconv*(Rrt+rhouconr+Trt);
 	      
-	  //radiative luminosity in cgs for converged region (3)
+	  //radiative flux in cgs (3)
 	  profiles[1][iy]=-fluxconv*(Rrt);
+
+	   //kinetic flux in cgs (8)
+	  //ldouble binding = sqrt(-1./geomBL.GG[0][0]);
+	  //Trtkin=rhouconrucovt - rhouconr*binding;
+	  Trtkin = rhouconr*(utcon[0]-1.);
+	  profiles[6][iy]=fluxconv*(Trtkin);
 
 	  //gas velocity (4)
 	  profiles[2][iy]=utcon[1];
@@ -995,7 +1032,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
 #if(PROBLEM==7) //RADTORUS
   rlum=13.;
 #endif
-#if(PROBLEM==91) //TDEMILIO
+#if(PROBLEM==91 || PROBLEM==94)  //TDEMILIO
   rlum=0.99*ROUT;
 #endif
   ldouble radlum,totallum;
@@ -1011,7 +1048,7 @@ int calc_scalars(ldouble *scalars,ldouble t)
     }
 
   //total energy at infinity (rho ur + Trt + Rrt) (12)
-  calc_lum(rlum,1,&radlum,&totallum);
+  //calc_lum(rlum,1,&radlum,&totallum);
   scalars[10]=totallum;
   
 
@@ -1069,8 +1106,8 @@ int calc_scalars(ldouble *scalars,ldouble t)
 
   /* accretion rates through the outer edged for TDEMILIO */
   
-#if(PROBLEM==91)
-  rmdot = 0.95*ROUT;
+#if(PROBLEM==91 || PROBLEM==94)
+  rmdot = 300.;
   
   //inflow (12)
   mdot=calc_mdot(rmdot,1);

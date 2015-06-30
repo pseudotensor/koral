@@ -2160,6 +2160,12 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 
 	       ldouble rho=rhoGU2CGS(pp[RHO]);
 	       ldouble temp=calc_PEQ_Tfromurho(pp[UU],pp[RHO]);
+
+	       if(doingavg)
+		 {
+		   temp=get_uavg(pavg,AVGTGAS,ix,iy,iz);
+		 }
+
 	       ldouble vel[4]={0,pp[VX],pp[VY],pp[VZ]};	
 	       conv_vels(vel,vel,VELPRIM,VEL4,geomBL.gg,geomBL.GG);						  
 	       ldouble r=geomBL.xx;
@@ -2170,7 +2176,7 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
 
 	       fprintf(fout1,"%.5e %.5e %.5e ",r,th,ph);
 
-	       fprintf(fout1,"%.5e %.5e ",rho,temp);
+	       fprintf(fout1,"%.5e %.5e ",rho,temp); //(7-8)
 
 	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",vel[0],vel[1],vel[2],vel[3]);
 
@@ -2235,6 +2241,41 @@ int fprint_simplesph(ldouble t, int nfile, char* folder,char* prefix)
                fprintf(fout1,"%.5e %.5e",calc_LTE_TfromE(ehat), get_uavg(pavg,AVGTRAD,ix,iy,iz)); //(20), (21)                                                  
 	       //	       fprintf(fout1,"%.5e ",calc_LTE_TfromE(ehat)); //(20)
 #endif
+
+	       #ifdef MAGNFIELD
+
+	       ldouble bsq,bcon[4],bcov[4];
+
+	       if(doingavg==0) 
+		{
+		  calc_bcon_prim(pp,bcon,&geomBL);
+		  indices_21(bcon,bcov,geomBL.gg); 
+		  bsq = dotB(bcon,bcov); 
+		}
+	      else
+		{
+		  bsq=get_uavg(pavg,AVGBSQ,ix,iy,iz);
+		  bcon[0]=get_uavg(pavg,AVGBCON(0),ix,iy,iz);
+		  bcon[1]=get_uavg(pavg,AVGBCON(1),ix,iy,iz);
+		  bcon[2]=get_uavg(pavg,AVGBCON(2),ix,iy,iz);
+		  bcon[3]=get_uavg(pavg,AVGBCON(3),ix,iy,iz);
+		}	       
+
+	       bsq=endenGU2CGS(bsq);
+	       
+	       int i;
+	       ldouble scaling=endenGU2CGS(1.);
+	       for(i=0;i<4;i++)
+		 {
+		   if(i==0) bcon[i]*=scaling;
+		   else
+		     bcon[i]*=sqrt(scaling);
+		 }
+
+	       fprintf(fout1,"%.5e %.5e %.5e %.5e ",bsq,bcon[1],bcon[2],bcon[3]); //(14) - (17)
+    
+
+	       #endif
 
 	      fprintf(fout1,"\n");
 

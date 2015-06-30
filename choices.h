@@ -266,11 +266,11 @@
 #endif
 
 #ifndef NRADPROFILES
-#define NRADPROFILES (52-1)
+#define NRADPROFILES (54-1)
 #endif
 
 #ifndef NTHPROFILES
-#define NTHPROFILES 6
+#define NTHPROFILES 7
 #endif
 
 #ifndef NBOXSCALARS
@@ -494,6 +494,10 @@
 #define RADIMPCONV 1.e-10
 #endif
 
+#ifndef RADIMPENTRCONV
+#define RADIMPENTRCONV 1.e-5
+#endif
+
 #ifndef RADIMPEPS
 #define RADIMPEPS 1.e-6
 #endif
@@ -618,3 +622,4 @@
 #define U2P_SOLVER U2P_SOLVER_W
 #endif
 
+#define RESTARTGENERALINDICES

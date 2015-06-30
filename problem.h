@@ -95,8 +95,21 @@
 //92 ADVDIFF - diffusion in scattering moving blob
 //93 KATOTORUS - radiative torus initiated like in Kato+2004
 //94 TDEMILIO3D - tidal disruption with Emilio's input
+//95 XINYI - two half-planes colliding in cartesian
 
-#define PROBLEM 67
+#define PROBLEM 95
+
+#if(PROBLEM==95)
+#define PR_DEFINE "PROBLEMS/XINYI/define.h" //most-important, definitions, choices
+#define PR_PREPINIT "PROBLEMS/XINYI/prepinit.c" //auxiliary, if you need to precalculate something
+#define PR_INIT "PROBLEMS/XINYI/init.c" //initial state
+#define PR_POSTINIT "PROBLEMS/XINYI/postinit.c" //auxilary, if you need to e.g. normalize something (magn.field?)
+#define PR_BC "PROBLEMS/XINYI/bc.c" //boundary conditions (if not periodic)
+#define PR_KAPPA "PROBLEMS/XINYI/kappa.c" //absorption opacity
+#define PR_KAPPAES "PROBLEMS/XINYI/kappaes.c" //scattering opacity
+#define PR_TOOLS "PROBLEMS/XINYI/tools.c" //auxiliary
+//#define PR_FINGER "PROBLEMS/TDEMILIO/finger.c" //if you want to modify on the go
+#endif
 
 
 #if(PROBLEM==94)

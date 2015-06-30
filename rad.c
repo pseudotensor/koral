@@ -570,6 +570,8 @@ solve_implicit_lab_4dprim(ldouble *uu00,ldouble *pp00,void *ggg,ldouble dt,ldoub
   //4dprim
   ldouble EPS = RADIMPEPS;
   ldouble CONV = RADIMPCONV;  
+  if(params[1]==RADIMPLICIT_ENTROPYEQ)
+     CONV = RADIMPENTRCONV;  
   ldouble MAXITER = RADIMPMAXITER;
   int corr[2],fixup[2];
 
@@ -1364,10 +1366,7 @@ solve_implicit_lab(int ix,int iy,int iz,ldouble dt,ldouble* deltas,int verbose)
       }      
     #endif
 
-    if(ret<0)
-      {
-	global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]++;
-      }
+  
 
 #endif
       
@@ -1469,7 +1468,7 @@ if(ret!=0) {
   if(ret!=0)
     {
       set_cflag(RADFIXUPFLAG,ix,iy,iz,-1);
-      global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]++;      
+      global_int_slot[GLOBALINTSLOT_NTOTALRADIMPFIXUPS]++;      
 
       //report failure, stop and rerun with verbose, or accept what happened
       return -1;

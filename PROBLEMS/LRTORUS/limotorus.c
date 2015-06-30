@@ -5,7 +5,7 @@
 
 #define FTYPE double
 
-#define LT_BHSPIN 0.9
+#define LT_BHSPIN 0.0
 #define LT_KAPPA 2.e3
 #define LT_XI 0.975
 #define LT_R1 30.

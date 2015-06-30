@@ -4577,13 +4577,13 @@ cell_fixup(int type)
 		{
 		  int fixthis=0;
 
-		  if(type==FIXUP_U2PMHD &&  iv<B1) //skip correctin magnetic field not to disrupt div B
+		  if(type==FIXUP_U2PMHD &&  iv!=RHO && iv<B1) //skip correctin magnetic field not to disrupt div B
 		    fixthis=1;
 
-		  if(type==FIXUP_U2PRAD &&  (iv>=EE && iv<=FZ)) //fix only radiative quantites
+		  if(type==FIXUP_U2PRAD &&  iv!=RHO && iv>=EE && iv<=FZ) //fix only radiative quantites
 		    fixthis=1;
 
-		  if(type==FIXUP_RADIMP &&  (iv<B1 || (iv>=EE && iv<=FZ))) //fix both mhd and rad but not magn field
+		  if(type==FIXUP_RADIMP &&  iv!=RHO && (iv<B1 || (iv>=EE && iv<=FZ))) //fix both mhd and rad but not magn field
 		    fixthis=1;
 
 		  if(fixthis==1)

@@ -346,7 +346,7 @@ solve_the_problem(ldouble tstart, char* folder)
  
   while (t < t1 && nfout1<=NOUTSTOP && nstep<NSTEPSTOP)
     {   
-      global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES]=0; //counting number of critical failures
+      global_int_slot[GLOBALINTSLOT_NTOTALRADIMPFIXUPS]=0; //counting number of critical failures
       global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS]=0; //and fixups requests
       global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]=0; //and fixups requests
 
@@ -697,7 +697,7 @@ solve_the_problem(ldouble tstart, char* folder)
       //************************* outputs ************************************
       //**********************************************************************
    
-      //counting failures and average parameters of the implicit solver
+      //counting faiures and average parameters of the implicit solver
       int nfailures[3],nfailuresloc[3]={global_int_slot[GLOBALINTSLOT_NTOTALCRITFAILURES],
 					    global_int_slot[GLOBALINTSLOT_NTOTALMHDFIXUPS],
 					    global_int_slot[GLOBALINTSLOT_NTOTALRADFIXUPS]};
@@ -873,7 +873,7 @@ solve_the_problem(ldouble tstart, char* folder)
 	    ,nstep,t,dt,end_time-start_time,2.*max_u2ptime,max_u2ptime_loc,2.*min_u2ptime,min_u2ptime_loc,2*maxmp_time,znps,
 	    nfailures[0],nfailures[1],nfailures[2]);*/
 
-	  printf("st #%6d t=%10.2e dt=%.2e mpi=%3.1f\%% znps=%.0f fail# %1d %1d %1d "
+	  printf("st #%6d t=%10.3e dt=%.2e mpi=%3.1f\%% znps=%.0f fail# %1d %1d %1d "
 		 ,nstep,t,dt,2.*maxmp_time/(end_time-start_time),znps,
 		 nfailures[0],nfailures[1],nfailures[2]);
 
